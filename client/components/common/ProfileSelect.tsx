@@ -478,7 +478,9 @@ function MultiValueLabel({ children, ...props }: MultiValueGenericProps<ProfileS
   const data = props.data;
   return (
     <components.MultiValueLabel {...(props as any)}>
-      <OverflownText as="span">{data.name ?? ""}</OverflownText>
+      <OverflownText key={data.id}>
+        <ProfileSelectOption data={data} hideProfileType={true} />
+      </OverflownText>
     </components.MultiValueLabel>
   );
 }

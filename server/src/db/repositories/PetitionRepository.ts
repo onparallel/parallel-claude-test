@@ -2223,6 +2223,7 @@ export class PetitionRepository extends BaseRepository {
       // insert an empty FIELD_GROUP reply for every required FIELD_GROUP field
       await this.createEmptyFieldGroupReply(
         fields.filter((f) => f.type === "FIELD_GROUP" && !f.optional).map((f) => f.id),
+        {},
         user,
         t,
       );
@@ -3305,6 +3306,7 @@ export class PetitionRepository extends BaseRepository {
         // insert an empty FIELD_GROUP reply for every required FIELD_GROUP field
         await this.createEmptyFieldGroupReply(
           clonedFields.filter((f) => f.type === "FIELD_GROUP" && !f.optional).map((f) => f.id),
+          {},
           owner,
           t,
         );
@@ -8328,7 +8330,12 @@ export class PetitionRepository extends BaseRepository {
       [deletedBy, fieldId],
     );
   }
-  async createEmptyFieldGroupReply(fieldIds: number[], user: User, t?: Knex.Transaction) {
+  async createEmptyFieldGroupReply(
+    fieldIds: number[],
+    data: Pick<CreatePetitionFieldReply, "associated_profile_id">,
+    user: User,
+    t?: Knex.Transaction,
+  ) {
     if (fieldIds.length === 0) {
       return [];
     }
@@ -8336,6 +8343,7 @@ export class PetitionRepository extends BaseRepository {
     return await this.insert(
       "petition_field_reply",
       fieldIds.map((fieldId) => ({
+        ...data,
         petition_field_id: fieldId,
         user_id: user.id,
         type: "FIELD_GROUP",

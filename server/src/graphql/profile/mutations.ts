@@ -1751,49 +1751,38 @@ export const associateProfileToPetition = mutationField("associateProfileToPetit
     profileId: nonNull(globalIdArg("Profile")),
   },
   resolve: async (_, { petitionId, profileId }, ctx) => {
-    try {
-      const [petitionProfile] = await ctx.profiles.associateProfilesToPetition(
-        [
-          {
-            profile_id: profileId,
-            petition_id: petitionId,
-          },
-        ],
-        `User:${ctx.user!.id}`,
+    const [association] = await ctx.profiles.associateProfilesToPetition(
+      [{ profile_id: profileId, petition_id: petitionId }],
+      `User:${ctx.user!.id}`,
+    );
+
+    if (!association) {
+      throw new ApolloError(
+        "Profile already associated to petition",
+        "PROFILE_ALREADY_ASSOCIATED_TO_PETITION",
       );
-
-      await ctx.petitions.createEvent({
-        type: "PROFILE_ASSOCIATED",
-        petition_id: petitionId,
-        data: {
-          user_id: ctx.user!.id,
-          profile_id: profileId,
-        },
-      });
-      await ctx.profiles.createEvent({
-        type: "PETITION_ASSOCIATED",
-        org_id: ctx.user!.org_id,
-        profile_id: profileId,
-        data: {
-          user_id: ctx.user!.id,
-          petition_id: petitionId,
-        },
-      });
-
-      return petitionProfile;
-    } catch (e) {
-      if (
-        e instanceof DatabaseError &&
-        e.constraint === "petition_profile__petition_id__profile_id"
-      ) {
-        throw new ApolloError(
-          "Profile already associated to petition",
-          "PROFILE_ALREADY_ASSOCIATED_TO_PETITION",
-        );
-      }
-
-      throw e;
     }
+
+    await ctx.petitions.createEvent({
+      type: "PROFILE_ASSOCIATED",
+      petition_id: association.petition_id,
+      data: {
+        user_id: ctx.user!.id,
+        profile_id: association.profile_id,
+      },
+    });
+
+    await ctx.profiles.createEvent({
+      type: "PETITION_ASSOCIATED",
+      org_id: ctx.user!.org_id,
+      profile_id: association.profile_id,
+      data: {
+        user_id: ctx.user!.id,
+        petition_id: association.petition_id,
+      },
+    });
+
+    return association;
   },
 });
 
@@ -1821,37 +1810,32 @@ export const disassociateProfilesFromPetitions = mutationField(
       uniqueValues("petitionIds"),
     ),
     resolve: async (_, { profileIds, petitionIds }, ctx) => {
-      await ctx.profiles.disassociateProfileFromPetition(
+      const disassociated = await ctx.profiles.disassociateProfileFromPetition(
         petitionIds,
         profileIds,
-        `User:${ctx.user!.id}`,
       );
 
       await ctx.petitions.createEvent(
-        profileIds.flatMap((profileId) =>
-          petitionIds.map((petitionId) => ({
-            type: "PROFILE_DISASSOCIATED",
-            petition_id: petitionId,
-            data: {
-              user_id: ctx.user!.id,
-              profile_id: profileId,
-            },
-          })),
-        ),
+        disassociated.map((d) => ({
+          type: "PROFILE_DISASSOCIATED",
+          petition_id: d.petition_id,
+          data: {
+            user_id: ctx.user!.id,
+            profile_id: d.profile_id,
+          },
+        })),
       );
 
       await ctx.profiles.createEvent(
-        profileIds.flatMap((profileId) =>
-          petitionIds.map((petitionId) => ({
-            type: "PETITION_DISASSOCIATED",
-            org_id: ctx.user!.org_id,
-            profile_id: profileId,
-            data: {
-              user_id: ctx.user!.id,
-              petition_id: petitionId,
-            },
-          })),
-        ),
+        disassociated.map((d) => ({
+          type: "PETITION_DISASSOCIATED",
+          org_id: ctx.user!.org_id,
+          profile_id: d.profile_id,
+          data: {
+            user_id: ctx.user!.id,
+            petition_id: d.petition_id,
+          },
+        })),
       );
 
       return RESULT.SUCCESS;

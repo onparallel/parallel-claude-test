@@ -491,25 +491,26 @@ export function relationshipBelongsToProfile<
 export function profileHasSameProfileTypeAsField<
   TypeName extends string,
   FieldName extends string,
-  TProfileIdArg extends Arg<TypeName, FieldName, number>,
+  TProfileIdsArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
   TPetitionFieldIdArg extends Arg<TypeName, FieldName, number>,
 >(
-  profileIdArg: TProfileIdArg,
+  profileIdsArg: TProfileIdsArg,
   petitionFieldIdArg: TPetitionFieldIdArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileId = getArg(args, profileIdArg);
+    const profileIds = unMaybeArray(getArg(args, profileIdsArg));
     const petitionFieldId = getArg(args, petitionFieldIdArg);
 
-    const [profile, petitionField] = await Promise.all([
-      ctx.profiles.loadProfile(profileId),
+    const [profiles, petitionField] = await Promise.all([
+      ctx.profiles.loadProfile(profileIds),
       ctx.petitions.loadField(petitionFieldId),
     ]);
 
-    return (
-      isNonNullish(profile) &&
-      isNonNullish(petitionField) &&
-      profile.profile_type_id === petitionField.profile_type_id
+    return profiles.every(
+      (profile) =>
+        isNonNullish(profile) &&
+        isNonNullish(petitionField) &&
+        profile.profile_type_id === petitionField.profile_type_id,
     );
   };
 }

@@ -932,6 +932,9 @@ export type Mutation = {
   createExportExcelTask: Task;
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
   createExportRepliesTask: Task;
+  /** Creates replies on a FIELD_GROUP field with the provided profiles */
+  createFieldGroupRepliesFromProfiles: PetitionField;
+  /** @deprecated use createFieldGroupRepliesFromProfiles */
   createFieldGroupReplyFromProfile: PetitionFieldReply;
   /** Creates a task for exporting files from a petition using an integration */
   createFileExportTask: Task;
@@ -1100,6 +1103,8 @@ export type Mutation = {
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
   /** Pins a profile type to the user's navigation manu */
   pinProfileType: ProfileType;
+  /** Prefills petition field groups with information from provided profiles */
+  prefillPetitionFromProfiles: Petition;
   profileExternalSourceDetails: ProfileExternalSourceSearchSingleResult;
   profileExternalSourceSearch: ProfileExternalSourceSearchResults;
   /** Generates a download link for a profile field file */
@@ -1575,6 +1580,14 @@ export type MutationcreateExportExcelTaskArgs = {
 export type MutationcreateExportRepliesTaskArgs = {
   pattern?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateFieldGroupRepliesFromProfilesArgs = {
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+  petitionFieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  profileIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationcreateFieldGroupReplyFromProfileArgs = {
@@ -2067,6 +2080,13 @@ export type MutationpetitionFieldAttachmentUploadCompleteArgs = {
 
 export type MutationpinProfileTypeArgs = {
   profileTypeId: Scalars["GID"]["input"];
+};
+
+export type MutationprefillPetitionFromProfilesArgs = {
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
+  prefill: Array<CreatePetitionFromProfilePrefillInput>;
 };
 
 export type MutationprofileExternalSourceDetailsArgs = {

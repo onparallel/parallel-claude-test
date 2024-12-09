@@ -26,6 +26,7 @@ import { RecipientViewPetitionFieldShortText } from "@parallel/components/recipi
 import { RecipientViewPetitionFieldTaxDocuments } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldTaxDocuments";
 import { RecipientViewPetitionFieldText } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldText";
 import {
+  CreatePetitionFromProfilePrefillInput,
   PreviewPetitionFieldGroup_PetitionBaseFragment,
   PreviewPetitionFieldGroup_PetitionFieldDataFragment,
   PreviewPetitionFieldGroup_PetitionFieldFragment,
@@ -40,6 +41,10 @@ import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { useIntl } from "react-intl";
 import { isNonNullish, isNullish, zip } from "remeda";
+import {
+  useCreateFieldGroupRepliesFromProfiles,
+  usePrefillPetitionFromProfiles,
+} from "../clientMutations";
 import { usePreviewConfirmImportFromProfileDialog } from "../dialogs/PreviewConfirmImportFromProfileDialog";
 import { usePreviewImportFromProfileDialog } from "../dialogs/PreviewImportFromProfileDialog";
 import { PreviewPetitionFieldKyc } from "./PreviewPetitionFieldKyc";
@@ -87,19 +92,6 @@ export interface PreviewPetitionFieldGroupProps
   fieldLogic: FieldLogicResult;
   onError: (error: any) => void;
   onDownloadAttachment: (fieldId: string) => (attachmentId: string) => Promise<void>;
-  onCreateFieldGroupReplyFromProfile: ({
-    petitionId,
-    petitionFieldId,
-    parentReplyId,
-    profileId,
-    force,
-  }: {
-    petitionId: string;
-    petitionFieldId: string;
-    parentReplyId: string;
-    profileId: string;
-    force?: boolean;
-  }) => Promise<void>;
 }
 
 export function PreviewPetitionFieldGroup({
@@ -117,7 +109,6 @@ export function PreviewPetitionFieldGroup({
   onCreateFileReply,
   onStartAsyncFieldCompletion,
   onRetryAsyncFieldCompletion,
-  onCreateFieldGroupReplyFromProfile,
   onRefreshField,
   onError,
   fieldLogic,
@@ -139,56 +130,106 @@ export function PreviewPetitionFieldGroup({
 
   const showPreviewImportFromProfileDialog = usePreviewImportFromProfileDialog();
   const showConfirmImportFromProfileDialog = usePreviewConfirmImportFromProfileDialog();
-  const handleImportFromProfile = async (parentReplyId: string) => {
+  const createFieldGroupRepliesFromProfiles = useCreateFieldGroupRepliesFromProfiles();
+  const prefillPetitionFromProfiles = usePrefillPetitionFromProfiles();
+
+  const handleImportFromProfile = async (groupId?: string) => {
     if (isNullish(field.profileType)) {
       return;
     }
-    let profileId = "";
+
     try {
-      profileId = await showPreviewImportFromProfileDialog({ profileTypeId: field.profileType.id });
-      await onCreateFieldGroupReplyFromProfile({
-        petitionId: petition.id,
-        petitionFieldId: field.id,
-        parentReplyId,
-        profileId,
-      });
-    } catch (e) {
-      if (isApolloError(e, "NOTHING_TO_IMPORT_ERROR")) {
+      const group = field.replies.find((r) => r.id === groupId) ?? field.replies[0];
+      // If is called from one reply of the group we check if children have some replies
+      const childrenHaveReplies = groupId
+        ? group.children!.some((c) => c.replies.length > 0)
+        : false;
+      const response:
+        | { profileIds: string[] }
+        | { prefill: CreatePetitionFromProfilePrefillInput[] } =
+        await showPreviewImportFromProfileDialog({
+          profileTypeId: field.profileType.id,
+          showMultipleSelect: !childrenHaveReplies && field.multiple,
+          petitionId: petition.id,
+          fieldId: field.id,
+        });
+
+      if ("profileIds" in response) {
         try {
-          await showConfirmImportFromProfileDialog();
-          await onCreateFieldGroupReplyFromProfile({
+          await createFieldGroupRepliesFromProfiles({
             petitionId: petition.id,
             petitionFieldId: field.id,
-            parentReplyId,
-            profileId,
-            force: true,
+            parentReplyId: groupId,
+            profileIds: response.profileIds,
+            isCacheOnly,
           });
         } catch (e) {
-          if (!isDialogError(e)) {
-            showErrorToast();
+          if (isApolloError(e, "NOTHING_TO_IMPORT_ERROR")) {
+            try {
+              const profileIds = e.graphQLErrors?.[0].extensions?.profileIds as string[];
+              await showConfirmImportFromProfileDialog({
+                profileIds,
+              });
+              await createFieldGroupRepliesFromProfiles({
+                petitionId: petition.id,
+                petitionFieldId: field.id,
+                parentReplyId: groupId,
+                profileIds: response.profileIds,
+                isCacheOnly,
+                force: true,
+              });
+            } catch (e) {
+              if (!isDialogError(e)) {
+                showErrorToast(e);
+              }
+              return;
+            }
+          } else if (!isDialogError(e)) {
+            showErrorToast(e);
           }
           return;
         }
-      } else if (!isDialogError(e)) {
-        showErrorToast();
+      } else {
+        try {
+          await prefillPetitionFromProfiles({
+            petitionId: petition.id,
+            parentReplyId: groupId,
+            prefill: response.prefill,
+            isCacheOnly,
+          });
+        } catch (e) {
+          if (isApolloError(e, "NOTHING_TO_IMPORT_ERROR")) {
+            try {
+              const profileIds = e.graphQLErrors?.[0].extensions?.profileIds as string[];
+              await showConfirmImportFromProfileDialog({ profileIds });
+              await prefillPetitionFromProfiles({
+                petitionId: petition.id,
+                parentReplyId: groupId,
+                prefill: response.prefill,
+                isCacheOnly,
+                force: true,
+              });
+            } catch (e) {
+              if (!isDialogError(e)) {
+                showErrorToast(e);
+              }
+              return;
+            }
+          } else if (!isDialogError(e)) {
+            showErrorToast(e);
+          }
+          return;
+        }
       }
-      return;
-    }
-    onRefreshField();
-    showToast({
-      title: intl.formatMessage({
-        id: "component.preview-petition-field-group.profile-successfully-imported",
-        defaultMessage: "Profile successfully imported",
-      }),
-      status: "success",
-    });
-  };
-
-  const handleAddReplyAndFillWithProfile = async () => {
-    const parentReplyId = await onCreateReply({});
-    if (parentReplyId) {
-      await handleImportFromProfile(parentReplyId);
-    }
+      onRefreshField();
+      showToast({
+        title: intl.formatMessage({
+          id: "component.preview-petition-field-group.profile-successfully-imported",
+          defaultMessage: "Profile successfully imported",
+        }),
+        status: "success",
+      });
+    } catch {}
   };
 
   return (
@@ -208,7 +249,7 @@ export function PreviewPetitionFieldGroup({
           (petition.__typename === "Petition"
             ? petition.status === "CLOSED"
             : false) ? undefined : (
-            <Button onClick={handleAddReplyAndFillWithProfile} leftIcon={<ImportIcon />}>
+            <Button onClick={() => handleImportFromProfile()} leftIcon={<ImportIcon />}>
               <Text>
                 {intl.formatMessage({
                   id: "component.recipient-view-petition-field-group.add-from-profile-button",
@@ -502,6 +543,7 @@ PreviewPetitionFieldGroup.fragments = {
     fragment PreviewPetitionFieldGroup_PetitionField on PetitionField {
       ...RecipientViewPetitionFieldCard_PetitionField
       ...PreviewPetitionFieldGroup_PetitionFieldData
+      multiple
       profileType {
         id
       }
@@ -534,6 +576,7 @@ PreviewPetitionFieldGroup.fragments = {
           }
         }
       }
+      ...useCreateFieldGroupRepliesFromProfiles_PetitionField
     }
     fragment PreviewPetitionFieldGroup_PetitionFieldData on PetitionField {
       ...RecipientViewPetitionFieldLayout_PetitionField
@@ -541,5 +584,6 @@ PreviewPetitionFieldGroup.fragments = {
     ${RecipientViewPetitionFieldCard.fragments.PetitionField}
     ${RecipientViewPetitionFieldLayout.fragments.PetitionField}
     ${RecipientViewPetitionFieldLayout.fragments.PetitionFieldReply}
+    ${useCreateFieldGroupRepliesFromProfiles.fragments.PetitionField}
   `,
 };

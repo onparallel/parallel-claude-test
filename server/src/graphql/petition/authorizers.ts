@@ -1227,25 +1227,25 @@ export function userHasAccessToUpdatePetitionFieldGroupRelationshipsInput<
 export function userHasAccessToCreatePetitionFromProfilePrefillInput<
   TypeName extends string,
   FieldName extends string,
-  TProfileIdArg extends Arg<TypeName, FieldName, number>,
-  TTemplateIdArg extends Arg<TypeName, FieldName, number>,
-  TTemplateFieldIdArg extends Arg<TypeName, FieldName, number | null | undefined>,
+  TPetitionIdArg extends Arg<TypeName, FieldName, number>,
   TInputArg extends Arg<
     TypeName,
     FieldName,
     NexusGenInputs["CreatePetitionFromProfilePrefillInput"][]
   >,
+  TProfileIdArg extends Arg<TypeName, FieldName, number>,
+  TFieldIdArg extends Arg<TypeName, FieldName, number | null | undefined>,
 >(
-  profileIdArg: TProfileIdArg,
-  templateIdArg: TTemplateIdArg,
-  templateFieldIdArg: TTemplateFieldIdArg,
+  petitionIdArg: TPetitionIdArg,
   inputArg: TInputArg,
+  profileIdArg?: TProfileIdArg,
+  fieldIdArg?: TFieldIdArg,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileId = getArg(args, profileIdArg);
-    const templateId = getArg(args, templateIdArg);
-    const templateFieldId = getArg(args, templateFieldIdArg);
+    const mainProfileId = profileIdArg ? getArg(args, profileIdArg) : undefined;
+    const mainFieldId = fieldIdArg ? getArg(args, fieldIdArg) : undefined;
 
+    const petitionId = getArg(args, petitionIdArg);
     const input = unMaybeArray(getArg(args, inputArg));
 
     if (input.length === 0) {
@@ -1253,15 +1253,17 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
       return true;
     }
 
-    if (!templateFieldId) {
-      throw new ForbiddenError("templateFieldId arg is required when providing prefill data");
-    }
+    if (isNonNullish(mainProfileId)) {
+      if (!mainFieldId) {
+        throw new ForbiddenError("templateFieldId arg is required when providing profileId");
+      }
 
-    const inputEntry = input.find((i) => i.petitionFieldId === templateFieldId);
-    if (isNullish(inputEntry) || !inputEntry.profileIds.some((id) => id === profileId)) {
-      throw new ForbiddenError(
-        "provided petitionFieldId must be in the prefill input and include the main profileId",
-      );
+      const inputEntry = input.find((i) => i.petitionFieldId === mainFieldId);
+      if (isNullish(inputEntry) || !inputEntry.profileIds.some((id) => id === mainProfileId)) {
+        throw new ForbiddenError(
+          "provided petitionFieldId must be in the prefill input and include the main profileId",
+        );
+      }
     }
 
     const inputFieldIds = input.map((i) => i.petitionFieldId);
@@ -1276,17 +1278,13 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
       throw new ForbiddenError("Invalid fields");
     }
 
-    if (inputFields.some((f) => f.petition_id !== templateId)) {
-      throw new ForbiddenError("fields must belong to the template");
+    if (inputFields.some((f) => f.petition_id !== petitionId)) {
+      throw new ForbiddenError("fields must belong to the petition");
     }
 
     if (inputFields.some((f) => f.type !== "FIELD_GROUP" || f.profile_type_id === null)) {
       throw new ForbiddenError("fields must have type FIELD_GROUP and have a linked profile type");
     }
-
-    const templateFieldGroups = (await ctx.petitions.loadFieldsForPetition(templateId)).filter(
-      (f) => isNonNullish(f) && f.type === "FIELD_GROUP" && isNonNullish(f.profile_type_id),
-    );
 
     const inputProfileIds = input.flatMap((i) => i.profileIds);
     const inputProfiles =
@@ -1299,78 +1297,86 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
       throw new ForbiddenError("profiles must be OPEN or CLOSED");
     }
 
-    const profileRelationships = await ctx.profiles.loadProfileRelationshipsByProfileId(profileId);
+    let fieldsWithCompatibleProfiles: { fieldId: number; profileIds: number[] }[] | null = null;
+    if (isNonNullish(mainProfileId) && isNonNullish(mainFieldId)) {
+      const profileRelationships =
+        await ctx.profiles.loadProfileRelationshipsByProfileId(mainProfileId);
 
-    const templateRelationships = (
-      await ctx.petitions.loadPetitionFieldGroupRelationshipsByPetitionId(templateId)
-    ).filter(
-      (r) =>
-        r.left_side_petition_field_id === templateFieldId ||
-        r.right_side_petition_field_id === templateFieldId,
-    );
+      const templateRelationships = (
+        await ctx.petitions.loadPetitionFieldGroupRelationshipsByPetitionId(petitionId)
+      ).filter(
+        (r) =>
+          r.left_side_petition_field_id === mainFieldId ||
+          r.right_side_petition_field_id === mainFieldId,
+      );
 
-    const relationshipTypes =
-      templateRelationships.length > 0
-        ? await ctx.profiles.loadProfileRelationshipType(
-            unique(templateRelationships.map((r) => r.profile_relationship_type_id)),
-          )
-        : [];
+      const relationshipTypes =
+        templateRelationships.length > 0
+          ? await ctx.profiles.loadProfileRelationshipType(
+              unique(templateRelationships.map((r) => r.profile_relationship_type_id)),
+            )
+          : [];
 
-    // iterate all FIELD_GROUPs of the template,
-    //and for each get every possible valid profile given their relationships and profile types configuration
-    const fieldsWithCompatibleProfiles =
-      profileRelationships.length === 0
-        ? [{ fieldId: templateFieldId, profileIds: [profileId] }]
-        : templateFieldGroups.map((f) => {
-            const profileIds = unique([
-              ...(templateFieldId === f.id ? [profileId] : []),
-              ...profileRelationships
-                .filter((pr) => {
-                  return templateRelationships
-                    .filter(
-                      // relationships of the same type
-                      (tr) => tr.profile_relationship_type_id === pr.profile_relationship_type_id,
-                    )
-                    .some((tr) => {
-                      let [leftId, rightId] = [
-                        tr.left_side_petition_field_id,
-                        tr.right_side_petition_field_id,
-                      ];
+      const petitionFieldGroups = (await ctx.petitions.loadFieldsForPetition(petitionId)).filter(
+        (f) => isNonNullish(f) && f.type === "FIELD_GROUP" && isNonNullish(f.profile_type_id),
+      );
 
-                      const relationshipType = relationshipTypes.find(
-                        (rt) => rt?.id === tr.profile_relationship_type_id,
-                      );
+      // iterate all FIELD_GROUPs of the template,
+      //and for each get every possible valid profile given their relationships and profile types configuration
+      fieldsWithCompatibleProfiles =
+        profileRelationships.length === 0
+          ? [{ fieldId: mainFieldId, profileIds: [mainProfileId] }]
+          : petitionFieldGroups.map((f) => {
+              const profileIds = unique([
+                ...(mainFieldId === f.id ? [mainProfileId] : []),
+                ...profileRelationships
+                  .filter((pr) => {
+                    return templateRelationships
+                      .filter(
+                        // relationships of the same type
+                        (tr) => tr.profile_relationship_type_id === pr.profile_relationship_type_id,
+                      )
+                      .some((tr) => {
+                        let [leftId, rightId] = [
+                          tr.left_side_petition_field_id,
+                          tr.right_side_petition_field_id,
+                        ];
 
-                      assert(
-                        isNonNullish(relationshipType),
-                        "relationshipType expected to be defined",
-                      );
-                      if (relationshipType.is_reciprocal) {
-                        return (
-                          (leftId === templateFieldId && rightId === f.id) ||
-                          (leftId === f.id && rightId === templateFieldId)
+                        const relationshipType = relationshipTypes.find(
+                          (rt) => rt?.id === tr.profile_relationship_type_id,
                         );
-                      }
 
-                      if (pr.right_side_profile_id === profileId) {
-                        [leftId, rightId] = [rightId, leftId];
-                      }
-                      if (tr.direction === "RIGHT_LEFT") {
-                        [leftId, rightId] = [rightId, leftId];
-                      }
+                        assert(
+                          isNonNullish(relationshipType),
+                          "relationshipType expected to be defined",
+                        );
+                        if (relationshipType.is_reciprocal) {
+                          return (
+                            (leftId === mainFieldId && rightId === f.id) ||
+                            (leftId === f.id && rightId === mainFieldId)
+                          );
+                        }
 
-                      return leftId === templateFieldId && rightId === f.id;
-                    });
-                })
-                .map((r) =>
-                  r.left_side_profile_id === profileId
-                    ? r.right_side_profile_id
-                    : r.left_side_profile_id,
-                ),
-            ]);
+                        if (pr.right_side_profile_id === mainProfileId) {
+                          [leftId, rightId] = [rightId, leftId];
+                        }
+                        if (tr.direction === "RIGHT_LEFT") {
+                          [leftId, rightId] = [rightId, leftId];
+                        }
 
-            return { fieldId: f.id, profileIds };
-          });
+                        return leftId === mainFieldId && rightId === f.id;
+                      });
+                  })
+                  .map((r) =>
+                    r.left_side_profile_id === mainProfileId
+                      ? r.right_side_profile_id
+                      : r.left_side_profile_id,
+                  ),
+              ]);
+
+              return { fieldId: f.id, profileIds };
+            });
+    }
 
     for (const entry of input) {
       if (entry.profileIds.length === 0) {
@@ -1390,13 +1396,15 @@ export function userHasAccessToCreatePetitionFromProfilePrefillInput<
         throw new ForbiddenError("field does not allow multiple profiles");
       }
 
-      const compatibleProfileIds = fieldsWithCompatibleProfiles.find(
-        (f) => f.fieldId === field.id,
-      )?.profileIds;
-      assert(compatibleProfileIds, "compatibleProfileIds expected to be defined");
+      if (isNonNullish(fieldsWithCompatibleProfiles)) {
+        const compatibleProfileIds = fieldsWithCompatibleProfiles.find(
+          (f) => f.fieldId === field.id,
+        )?.profileIds;
+        assert(compatibleProfileIds, "compatibleProfileIds expected to be defined");
 
-      if (!profiles.every((p) => compatibleProfileIds.includes(p.id))) {
-        throw new ForbiddenError("profiles in prefill must be compatible with the field");
+        if (!profiles.every((p) => compatibleProfileIds.includes(p.id))) {
+          throw new ForbiddenError("profiles in prefill must be compatible with the field");
+        }
       }
     }
 

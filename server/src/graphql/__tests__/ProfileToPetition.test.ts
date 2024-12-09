@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 import { Knex } from "knex";
-import { indexBy } from "remeda";
+import { indexBy, range } from "remeda";
 import {
   Organization,
   Petition,
@@ -5971,12 +5971,15 @@ describe("GraphQL/Profiles to Petitions", () => {
     });
   });
 
-  describe("createFieldGroupReplyFromProfile", () => {
+  describe("createFieldGroupRepliesFromProfiles", () => {
     let petition: Petition;
     let fieldGroup: PetitionField;
     let groupChildren: PetitionField[];
 
-    let profile: Profile;
+    let mikeRoss: Profile;
+    let harveySpecter: Profile;
+    let emptyProfile: Profile;
+
     let profileType: ProfileType;
     let propertiesIdx: Record<ProfileTypeFieldType, ProfileTypeField>;
 
@@ -6018,54 +6021,59 @@ describe("GraphQL/Profiles to Petitions", () => {
 
       propertiesIdx = indexBy(properties, (p) => p.type);
 
-      [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      [mikeRoss, harveySpecter, emptyProfile] = await mocks.createRandomProfiles(
+        organization.id,
+        profileType.id,
+        3,
+      );
 
+      // INSERT VALUES FOR MIKE ROSS
       await mocks.knex.from("profile_field_value").insert([
         {
           type: "TEXT",
-          profile_id: profile.id,
+          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["TEXT"].id,
-          content: { value: "Mike" },
+          content: { value: "Mike Ross" },
           created_by_user_id: user.id,
         },
         {
           type: "SHORT_TEXT",
-          profile_id: profile.id,
+          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["SHORT_TEXT"].id,
-          content: { value: "Ross" },
+          content: { value: "Lawyer" },
           created_by_user_id: user.id,
         },
         {
           type: "DATE",
-          profile_id: profile.id,
+          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["DATE"].id,
           content: { value: "2020-10-09" },
           created_by_user_id: user.id,
         },
         {
           type: "PHONE",
-          profile_id: profile.id,
+          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["PHONE"].id,
           content: { value: "+34611676433" },
           created_by_user_id: user.id,
         },
         {
           type: "NUMBER",
-          profile_id: profile.id,
+          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["NUMBER"].id,
           content: { value: 1234 },
           created_by_user_id: user.id,
         },
         {
           type: "SELECT",
-          profile_id: profile.id,
+          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["SELECT"].id,
           content: { value: "LOW" },
           created_by_user_id: user.id,
         },
         {
           type: "BACKGROUND_CHECK",
-          profile_id: profile.id,
+          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["BACKGROUND_CHECK"].id,
           content: {
             query: {
@@ -6095,27 +6103,121 @@ describe("GraphQL/Profiles to Petitions", () => {
         },
         {
           type: "CHECKBOX",
-          profile_id: profile.id,
+          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["CHECKBOX"].id,
           content: { value: ["A", "C"] },
           created_by_user_id: user.id,
         },
       ]);
-
-      const [file] = await mocks.createRandomFileUpload(1, () => ({
+      const [mikeRossDocument] = await mocks.createRandomFileUpload(1, () => ({
         filename: "id_document__mike_ross",
         size: "1024",
         content_type: "application/pdf",
       }));
-
       await mocks.knex.from("profile_field_file").insert({
-        profile_id: profile.id,
+        profile_id: mikeRoss.id,
         profile_type_field_id: propertiesIdx["FILE"].id,
         type: "FILE",
-        file_upload_id: file.id,
+        file_upload_id: mikeRossDocument.id,
         created_by_user_id: user.id,
       });
 
+      // INSERT VALUES FOR HARVEY SPECTER
+      await mocks.knex.from("profile_field_value").insert([
+        {
+          type: "TEXT",
+          profile_id: harveySpecter.id,
+          profile_type_field_id: propertiesIdx["TEXT"].id,
+          content: { value: "Harvey Specter" },
+          created_by_user_id: user.id,
+        },
+        {
+          type: "SHORT_TEXT",
+          profile_id: harveySpecter.id,
+          profile_type_field_id: propertiesIdx["SHORT_TEXT"].id,
+          content: { value: "CEO" },
+          created_by_user_id: user.id,
+        },
+        {
+          type: "DATE",
+          profile_id: harveySpecter.id,
+          profile_type_field_id: propertiesIdx["DATE"].id,
+          content: { value: "2023-10-09" },
+          created_by_user_id: user.id,
+        },
+        {
+          type: "PHONE",
+          profile_id: harveySpecter.id,
+          profile_type_field_id: propertiesIdx["PHONE"].id,
+          content: { value: "+541165259666" },
+          created_by_user_id: user.id,
+        },
+        {
+          type: "NUMBER",
+          profile_id: harveySpecter.id,
+          profile_type_field_id: propertiesIdx["NUMBER"].id,
+          content: { value: 0.123456789 },
+          created_by_user_id: user.id,
+        },
+        {
+          type: "SELECT",
+          profile_id: harveySpecter.id,
+          profile_type_field_id: propertiesIdx["SELECT"].id,
+          content: { value: "MEDIUM" },
+          created_by_user_id: user.id,
+        },
+        {
+          type: "BACKGROUND_CHECK",
+          profile_id: harveySpecter.id,
+          profile_type_field_id: propertiesIdx["BACKGROUND_CHECK"].id,
+          content: {
+            query: {
+              name: "Harvey Specter",
+              date: "2023-10-09",
+              type: "PERSON",
+            },
+            search: {
+              totalCount: 1,
+              items: [
+                {
+                  id: "Q7748",
+                  type: "Person",
+                  name: "Harvey SPECTER",
+                  properties: {},
+                },
+              ],
+              createdAt: expect.any(String),
+            },
+            entity: {
+              id: "Q7748",
+              type: "Person",
+              name: "Harvey SPECTER",
+              properties: {},
+            },
+          },
+        },
+        {
+          type: "CHECKBOX",
+          profile_id: harveySpecter.id,
+          profile_type_field_id: propertiesIdx["CHECKBOX"].id,
+          content: { value: ["B"] },
+          created_by_user_id: user.id,
+        },
+      ]);
+      const [harveySpecterDocument] = await mocks.createRandomFileUpload(1, () => ({
+        filename: "id_document__harvey_specter",
+        size: "1024",
+        content_type: "application/pdf",
+      }));
+      await mocks.knex.from("profile_field_file").insert({
+        profile_id: harveySpecter.id,
+        profile_type_field_id: propertiesIdx["FILE"].id,
+        type: "FILE",
+        file_upload_id: harveySpecterDocument.id,
+        created_by_user_id: user.id,
+      });
+
+      // CREATE PETITION WITH LINKED FIELDS
       [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
       [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
         type: "FIELD_GROUP",
@@ -6185,63 +6287,56 @@ describe("GraphQL/Profiles to Petitions", () => {
       await mocks.knex.from("petition_field_reply").delete();
       await mocks.knex.from("petition_profile").delete();
       await mocks.knex.from("petition_event").delete();
+      await mocks.knex.from("profile_event").delete();
     });
 
     it("creates a new field group reply with the contents of the profile", async () => {
-      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
-        user_id: user.id,
-      }));
-
-      const [unlinkedReply] = await mocks.createRandomTextReply(
-        groupChildren.at(-1)!.id,
-        undefined,
-        1,
-        () => ({
-          parent_petition_field_reply_id: groupReply.id,
-          user_id: user.id,
-          type: "SHORT_TEXT",
-          content: { value: "This reply is not linked to a profile field" },
-        }),
-      );
-
       const { errors, data } = await testClient.execute(
         gql`
-          mutation (
-            $petitionId: GID!
-            $petitionFieldId: GID!
-            $parentReplyId: GID!
-            $profileId: GID!
-          ) {
-            createFieldGroupReplyFromProfile(
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $profileIds: [GID!]!) {
+            createFieldGroupRepliesFromProfiles(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
-              parentReplyId: $parentReplyId
-              profileId: $profileId
+              profileIds: $profileIds
             ) {
               id
-              associatedProfile {
-                id
-              }
-              field {
-                petition {
-                  ... on Petition {
-                    profiles {
-                      id
+              petition {
+                ... on Petition {
+                  events(limit: 100, offset: 0) {
+                    totalCount
+                    items {
+                      type
+                    }
+                  }
+                  profiles {
+                    id
+                    events(limit: 100, offset: 0) {
+                      totalCount
+                      items {
+                        type
+                      }
                     }
                   }
                 }
               }
-              children {
-                field {
+              type
+              replies {
+                id
+                associatedProfile {
                   id
-                  type
-                  profileTypeField {
-                    id
-                  }
                 }
-                replies {
-                  id
-                  content
+                children {
+                  field {
+                    id
+                    type
+                    profileTypeField {
+                      id
+                    }
+                  }
+                  replies {
+                    id
+                    content
+                  }
                 }
               }
             }
@@ -6250,158 +6345,173 @@ describe("GraphQL/Profiles to Petitions", () => {
         {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
-          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
-          profileId: toGlobalId("Profile", profile.id),
+          profileIds: [toGlobalId("Profile", mikeRoss.id)],
         },
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createFieldGroupReplyFromProfile).toEqual({
-        id: toGlobalId("PetitionFieldReply", groupReply.id),
-        associatedProfile: {
-          id: toGlobalId("Profile", profile.id),
-        },
-        field: {
-          petition: {
-            profiles: [{ id: toGlobalId("Profile", profile.id) }],
+      expect(data?.createFieldGroupRepliesFromProfiles).toEqual({
+        id: toGlobalId("PetitionField", fieldGroup.id),
+        petition: {
+          events: {
+            totalCount: 10,
+            items: [
+              { type: "PROFILE_ASSOCIATED" },
+              ...range(0, 9).map(() => ({ type: "REPLY_CREATED" })),
+            ],
           },
-        },
-        children: [
-          {
-            field: {
-              id: expect.any(String),
-              type: "TEXT",
-              profileTypeField: { id: toGlobalId("ProfileTypeField", propertiesIdx["TEXT"].id) },
-            },
-            replies: [{ id: expect.any(String), content: { value: "Mike" } }],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "SHORT_TEXT",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["SHORT_TEXT"].id),
+          profiles: [
+            {
+              id: toGlobalId("Profile", mikeRoss.id),
+              events: {
+                totalCount: 1,
+                items: [{ type: "PETITION_ASSOCIATED" }],
               },
             },
-            replies: [{ id: expect.any(String), content: { value: "Ross" } }],
-          },
+          ],
+        },
+        type: "FIELD_GROUP",
+        replies: [
           {
-            field: {
-              id: expect.any(String),
-              type: "FILE_UPLOAD",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["FILE"].id),
-              },
+            id: expect.any(String),
+            associatedProfile: {
+              id: toGlobalId("Profile", mikeRoss.id),
             },
-            replies: [
+            children: [
               {
-                id: expect.any(String),
-                content: {
+                field: {
                   id: expect.any(String),
-                  filename: "id_document__mike_ross",
-                  size: "1024",
-                  contentType: "application/pdf",
-                  extension: "pdf",
-                  uploadComplete: true,
-                },
-              },
-            ],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "DATE",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["DATE"].id),
-              },
-            },
-            replies: [{ id: expect.any(String), content: { value: "2020-10-09" } }],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "PHONE",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["PHONE"].id),
-              },
-            },
-            replies: [{ id: expect.any(String), content: { value: "+34611676433" } }],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "NUMBER",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["NUMBER"].id),
-              },
-            },
-            replies: [{ id: expect.any(String), content: { value: 1234 } }],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "SELECT",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["SELECT"].id),
-              },
-            },
-            replies: [{ id: expect.any(String), content: { value: "LOW" } }],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "BACKGROUND_CHECK",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["BACKGROUND_CHECK"].id),
-              },
-            },
-            replies: [
-              {
-                id: expect.any(String),
-                content: {
-                  query: {
-                    name: "Mike Ross",
-                    date: "2020-10-09",
-                    type: "PERSON",
-                  },
-                  search: {
-                    totalCount: 1,
-                  },
-                  entity: {
-                    id: "Q7747",
-                    type: "Person",
-                    name: "Mike ROSS",
-                    properties: {},
+                  type: "TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["TEXT"].id),
                   },
                 },
+                replies: [{ id: expect.any(String), content: { value: "Mike Ross" } }],
               },
-            ],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "CHECKBOX",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["CHECKBOX"].id),
-              },
-            },
-            replies: [
               {
-                id: expect.any(String),
-                content: { value: ["A", "C"] },
+                field: {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SHORT_TEXT"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "Lawyer" } }],
               },
-            ],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "SHORT_TEXT",
-              profileTypeField: null,
-            },
-            replies: [
               {
-                id: toGlobalId("PetitionFieldReply", unlinkedReply.id),
-                content: { value: "This reply is not linked to a profile field" },
+                field: {
+                  id: expect.any(String),
+                  type: "FILE_UPLOAD",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["FILE"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {
+                      id: expect.any(String),
+                      filename: "id_document__mike_ross",
+                      size: "1024",
+                      contentType: "application/pdf",
+                      extension: "pdf",
+                      uploadComplete: true,
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "DATE",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["DATE"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "2020-10-09" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "PHONE",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["PHONE"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "+34611676433" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "NUMBER",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["NUMBER"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: 1234 } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SELECT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SELECT"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "LOW" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "BACKGROUND_CHECK",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["BACKGROUND_CHECK"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {
+                      query: {
+                        name: "Mike Ross",
+                        date: "2020-10-09",
+                        type: "PERSON",
+                      },
+                      search: {
+                        totalCount: 1,
+                      },
+                      entity: {
+                        id: "Q7747",
+                        type: "Person",
+                        name: "Mike ROSS",
+                        properties: {},
+                      },
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "CHECKBOX",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["CHECKBOX"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: ["A", "C"] },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  profileTypeField: null,
+                },
+                replies: [],
               },
             ],
           },
@@ -6409,19 +6519,740 @@ describe("GraphQL/Profiles to Petitions", () => {
       });
     });
 
-    it("updates field group reply if it already exists and replaces associated_profile_id, disassociating old profile from petition", async () => {
-      const [newProfile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
-      await mocks.knex.from("profile_field_value").insert({
-        type: "TEXT",
-        profile_id: newProfile.id,
-        profile_type_field_id: propertiesIdx["TEXT"].id,
-        content: { value: "Harvey" },
-        created_by_user_id: user.id,
-      });
+    it("creates replies for two profiles at once", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $profileIds: [GID!]!) {
+            createFieldGroupRepliesFromProfiles(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              profileIds: $profileIds
+            ) {
+              id
+              type
+              replies {
+                id
+                associatedProfile {
+                  id
+                }
+                children {
+                  field {
+                    id
+                    type
+                    profileTypeField {
+                      id
+                    }
+                  }
+                  replies {
+                    id
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          profileIds: [toGlobalId("Profile", mikeRoss.id), toGlobalId("Profile", harveySpecter.id)],
+        },
+      );
 
+      expect(errors).toBeUndefined();
+      expect(data?.createFieldGroupRepliesFromProfiles).toEqual({
+        id: toGlobalId("PetitionField", fieldGroup.id),
+        type: "FIELD_GROUP",
+        replies: [
+          {
+            id: expect.any(String),
+            associatedProfile: {
+              id: toGlobalId("Profile", mikeRoss.id),
+            },
+            children: [
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["TEXT"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "Mike Ross" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SHORT_TEXT"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "Lawyer" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "FILE_UPLOAD",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["FILE"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {
+                      id: expect.any(String),
+                      filename: "id_document__mike_ross",
+                      size: "1024",
+                      contentType: "application/pdf",
+                      extension: "pdf",
+                      uploadComplete: true,
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "DATE",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["DATE"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "2020-10-09" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "PHONE",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["PHONE"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "+34611676433" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "NUMBER",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["NUMBER"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: 1234 } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SELECT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SELECT"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "LOW" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "BACKGROUND_CHECK",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["BACKGROUND_CHECK"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {
+                      query: {
+                        name: "Mike Ross",
+                        date: "2020-10-09",
+                        type: "PERSON",
+                      },
+                      search: {
+                        totalCount: 1,
+                      },
+                      entity: {
+                        id: "Q7747",
+                        type: "Person",
+                        name: "Mike ROSS",
+                        properties: {},
+                      },
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "CHECKBOX",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["CHECKBOX"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: ["A", "C"] },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  profileTypeField: null,
+                },
+                replies: [],
+              },
+            ],
+          },
+          {
+            id: expect.any(String),
+            associatedProfile: {
+              id: toGlobalId("Profile", harveySpecter.id),
+            },
+            children: [
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["TEXT"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "Harvey Specter" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SHORT_TEXT"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "CEO" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "FILE_UPLOAD",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["FILE"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {
+                      id: expect.any(String),
+                      filename: "id_document__harvey_specter",
+                      size: "1024",
+                      contentType: "application/pdf",
+                      extension: "pdf",
+                      uploadComplete: true,
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "DATE",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["DATE"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "2023-10-09" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "PHONE",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["PHONE"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "+541165259666" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "NUMBER",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["NUMBER"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: 0.123456789 } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SELECT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SELECT"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "MEDIUM" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "BACKGROUND_CHECK",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["BACKGROUND_CHECK"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {
+                      query: {
+                        name: "Harvey Specter",
+                        date: "2023-10-09",
+                        type: "PERSON",
+                      },
+                      search: {
+                        totalCount: 1,
+                      },
+                      entity: {
+                        id: "Q7748",
+                        type: "Person",
+                        name: "Harvey SPECTER",
+                        properties: {},
+                      },
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "CHECKBOX",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["CHECKBOX"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: ["B"] },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  profileTypeField: null,
+                },
+                replies: [],
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("sends error if one of the profiles is empty and force=false", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $profileIds: [GID!]!) {
+            createFieldGroupRepliesFromProfiles(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              profileIds: $profileIds
+            ) {
+              id
+              type
+              replies {
+                id
+                associatedProfile {
+                  id
+                }
+                children {
+                  field {
+                    id
+                    type
+                    profileTypeField {
+                      id
+                    }
+                  }
+                  replies {
+                    id
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          profileIds: [toGlobalId("Profile", mikeRoss.id), toGlobalId("Profile", emptyProfile.id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("NOTHING_TO_IMPORT_ERROR", {
+        profileIds: [toGlobalId("Profile", emptyProfile.id)],
+      });
+      expect(data).toBeNull();
+    });
+
+    it("creates replies for an empty profile if force=true", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $profileIds: [GID!]!) {
+            createFieldGroupRepliesFromProfiles(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              profileIds: $profileIds
+              force: true
+            ) {
+              id
+              type
+              replies {
+                id
+                associatedProfile {
+                  id
+                }
+                children {
+                  field {
+                    id
+                    type
+                    profileTypeField {
+                      id
+                    }
+                  }
+                  replies {
+                    id
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          profileIds: [toGlobalId("Profile", mikeRoss.id), toGlobalId("Profile", emptyProfile.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createFieldGroupRepliesFromProfiles).toEqual({
+        id: toGlobalId("PetitionField", fieldGroup.id),
+        type: "FIELD_GROUP",
+        replies: [
+          {
+            id: expect.any(String),
+            associatedProfile: {
+              id: toGlobalId("Profile", mikeRoss.id),
+            },
+            children: [
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["TEXT"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "Mike Ross" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SHORT_TEXT"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "Lawyer" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "FILE_UPLOAD",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["FILE"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {
+                      id: expect.any(String),
+                      filename: "id_document__mike_ross",
+                      size: "1024",
+                      contentType: "application/pdf",
+                      extension: "pdf",
+                      uploadComplete: true,
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "DATE",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["DATE"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "2020-10-09" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "PHONE",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["PHONE"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "+34611676433" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "NUMBER",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["NUMBER"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: 1234 } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SELECT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SELECT"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "LOW" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "BACKGROUND_CHECK",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["BACKGROUND_CHECK"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {
+                      query: {
+                        name: "Mike Ross",
+                        date: "2020-10-09",
+                        type: "PERSON",
+                      },
+                      search: {
+                        totalCount: 1,
+                      },
+                      entity: {
+                        id: "Q7747",
+                        type: "Person",
+                        name: "Mike ROSS",
+                        properties: {},
+                      },
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "CHECKBOX",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["CHECKBOX"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: ["A", "C"] },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  profileTypeField: null,
+                },
+                replies: [],
+              },
+            ],
+          },
+          {
+            id: expect.any(String),
+            associatedProfile: {
+              id: toGlobalId("Profile", emptyProfile.id),
+            },
+            children: [
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["TEXT"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SHORT_TEXT"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "FILE_UPLOAD",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["FILE"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "DATE",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["DATE"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "PHONE",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["PHONE"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "NUMBER",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["NUMBER"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SELECT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SELECT"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "BACKGROUND_CHECK",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["BACKGROUND_CHECK"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "CHECKBOX",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["CHECKBOX"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  profileTypeField: null,
+                },
+                replies: [],
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("sends error if profile types do not match the type of the field group", async () => {
+      const [wrongProfileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+      const [wrongProfile] = await mocks.createRandomProfiles(
+        organization.id,
+        wrongProfileType.id,
+        1,
+      );
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $profileIds: [GID!]!) {
+            createFieldGroupRepliesFromProfiles(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              profileIds: $profileIds
+            ) {
+              id
+              type
+              replies {
+                id
+                associatedProfile {
+                  id
+                }
+                children {
+                  field {
+                    id
+                    type
+                    profileTypeField {
+                      id
+                    }
+                  }
+                  replies {
+                    id
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          profileIds: [toGlobalId("Profile", mikeRoss.id), toGlobalId("Profile", wrongProfile.id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("updates field group reply if it already exists and replaces associated_profile_id, disassociating old profile from petition", async () => {
       const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
         user_id: user.id,
-        associated_profile_id: profile.id,
+        associated_profile_id: mikeRoss.id,
       }));
 
       const [unlinkedReply] = await mocks.createRandomTextReply(
@@ -6438,7 +7269,7 @@ describe("GraphQL/Profiles to Petitions", () => {
 
       await mocks.knex.from("petition_field_reply").insert([
         {
-          content: { value: "Mike" },
+          content: { value: "Mike Ross" },
           parent_petition_field_reply_id: groupReply.id,
           petition_field_id: groupChildren.find(
             (f) => f.profile_type_field_id === propertiesIdx["TEXT"].id,
@@ -6448,7 +7279,7 @@ describe("GraphQL/Profiles to Petitions", () => {
           user_id: user.id,
         },
         {
-          content: { value: "Ross" },
+          content: { value: "Lawyer" },
           parent_petition_field_reply_id: groupReply.id,
           petition_field_id: groupChildren.find(
             (f) => f.profile_type_field_id === propertiesIdx["SHORT_TEXT"].id,
@@ -6461,7 +7292,7 @@ describe("GraphQL/Profiles to Petitions", () => {
 
       await mocks.knex.from("petition_profile").insert({
         petition_id: petition.id,
-        profile_id: profile.id,
+        profile_id: mikeRoss.id,
       });
 
       const { errors, data } = await testClient.execute(
@@ -6470,45 +7301,52 @@ describe("GraphQL/Profiles to Petitions", () => {
             $petitionId: GID!
             $petitionFieldId: GID!
             $parentReplyId: GID!
-            $profileId: GID!
+            $profileIds: [GID!]!
           ) {
-            createFieldGroupReplyFromProfile(
+            createFieldGroupRepliesFromProfiles(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               parentReplyId: $parentReplyId
-              profileId: $profileId
+              profileIds: $profileIds
             ) {
               id
-              associatedProfile {
-                id
-              }
-              field {
-                petition {
-                  ... on Petition {
-                    profiles {
-                      id
-                    }
+              petition {
+                ... on Petition {
+                  profiles {
+                    id
                     events(limit: 100, offset: 0) {
                       totalCount
                       items {
                         type
-                        data
                       }
+                    }
+                  }
+                  events(limit: 100, offset: 0) {
+                    totalCount
+                    items {
+                      type
+                      data
                     }
                   }
                 }
               }
-              children {
-                field {
+              replies {
+                id
+                associatedProfile {
                   id
-                  type
-                  profileTypeField {
-                    id
-                  }
                 }
-                replies {
-                  id
-                  content
+                children {
+                  field {
+                    id
+                    type
+                    profileTypeField {
+                      id
+                    }
+                  }
+                  replies {
+                    id
+                    content
+                  }
                 }
               }
             }
@@ -6518,154 +7356,199 @@ describe("GraphQL/Profiles to Petitions", () => {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
           parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
-          profileId: toGlobalId("Profile", newProfile.id),
+          profileIds: [toGlobalId("Profile", harveySpecter.id)],
         },
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createFieldGroupReplyFromProfile).toEqual({
-        id: toGlobalId("PetitionFieldReply", groupReply.id),
-        associatedProfile: {
-          id: toGlobalId("Profile", newProfile.id),
-        },
-        field: {
-          petition: {
-            profiles: [{ id: toGlobalId("Profile", newProfile.id) }],
-            events: {
-              totalCount: 3,
-              items: [
-                {
-                  type: "REPLY_CREATED",
-                  data: {
-                    petitionAccessId: null,
-                    userId: toGlobalId("User", user.id),
-                    petitionFieldId: toGlobalId(
-                      "PetitionField",
-                      groupChildren.find(
-                        (f) => f.profile_type_field_id === propertiesIdx["TEXT"].id,
-                      )!.id,
-                    ),
-                    petitionFieldReplyId: expect.any(String),
-                  },
-                },
-                {
-                  type: "PROFILE_ASSOCIATED",
-                  data: {
-                    profileId: toGlobalId("Profile", newProfile.id),
-                    userId: toGlobalId("User", user.id),
-                  },
-                },
-                {
-                  type: "PROFILE_DISASSOCIATED",
-                  data: {
-                    profileId: toGlobalId("Profile", profile.id),
-                    userId: toGlobalId("User", user.id),
-                    petitionAccessId: null,
-                  },
-                },
-              ],
-            },
-          },
-        },
-        children: [
-          {
-            field: {
-              id: expect.any(String),
-              type: "TEXT",
-              profileTypeField: { id: toGlobalId("ProfileTypeField", propertiesIdx["TEXT"].id) },
-            },
-            replies: [{ id: expect.any(String), content: { value: "Harvey" } }],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "SHORT_TEXT",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["SHORT_TEXT"].id),
+      expect(data?.createFieldGroupRepliesFromProfiles).toEqual({
+        id: toGlobalId("PetitionField", fieldGroup.id),
+        petition: {
+          profiles: [
+            {
+              id: toGlobalId("Profile", harveySpecter.id),
+              events: {
+                totalCount: 1,
+                items: [{ type: "PETITION_ASSOCIATED" }],
               },
             },
-            replies: [],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "FILE_UPLOAD",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["FILE"].id),
-              },
-            },
-            replies: [],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "DATE",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["DATE"].id),
-              },
-            },
-            replies: [],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "PHONE",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["PHONE"].id),
-              },
-            },
-            replies: [],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "NUMBER",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["NUMBER"].id),
-              },
-            },
-            replies: [],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "SELECT",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["SELECT"].id),
-              },
-            },
-            replies: [],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "BACKGROUND_CHECK",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["BACKGROUND_CHECK"].id),
-              },
-            },
-            replies: [],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "CHECKBOX",
-              profileTypeField: {
-                id: toGlobalId("ProfileTypeField", propertiesIdx["CHECKBOX"].id),
-              },
-            },
-            replies: [],
-          },
-          {
-            field: {
-              id: expect.any(String),
-              type: "SHORT_TEXT",
-              profileTypeField: null,
-            },
-            replies: [
+          ],
+          events: {
+            totalCount: 11,
+            items: [
               {
-                id: toGlobalId("PetitionFieldReply", unlinkedReply.id),
-                content: { value: "This reply is not linked to a profile field" },
+                type: "PROFILE_ASSOCIATED",
+                data: {
+                  userId: toGlobalId("User", user.id),
+                  profileId: toGlobalId("Profile", harveySpecter.id),
+                },
+              },
+              ...range(0, 9).map(() => ({
+                type: "REPLY_CREATED",
+                data: {
+                  userId: toGlobalId("User", user.id),
+                  petitionAccessId: null,
+                  petitionFieldId: expect.any(String),
+                  petitionFieldReplyId: expect.any(String),
+                },
+              })),
+              {
+                type: "PROFILE_DISASSOCIATED",
+                data: {
+                  petitionAccessId: null,
+                  userId: toGlobalId("User", user.id),
+                  profileId: toGlobalId("Profile", mikeRoss.id),
+                },
+              },
+            ],
+          },
+        },
+        replies: [
+          {
+            id: expect.any(String),
+            associatedProfile: {
+              id: toGlobalId("Profile", harveySpecter.id),
+            },
+            children: [
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["TEXT"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "Harvey Specter" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SHORT_TEXT"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "CEO" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "FILE_UPLOAD",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["FILE"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {
+                      id: expect.any(String),
+                      filename: "id_document__harvey_specter",
+                      size: "1024",
+                      contentType: "application/pdf",
+                      extension: "pdf",
+                      uploadComplete: true,
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "DATE",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["DATE"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "2023-10-09" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "PHONE",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["PHONE"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "+541165259666" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "NUMBER",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["NUMBER"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: 0.123456789 } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SELECT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SELECT"].id),
+                  },
+                },
+                replies: [{ id: expect.any(String), content: { value: "MEDIUM" } }],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "BACKGROUND_CHECK",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["BACKGROUND_CHECK"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {
+                      query: {
+                        name: "Harvey Specter",
+                        date: "2023-10-09",
+                        type: "PERSON",
+                      },
+                      search: {
+                        totalCount: 1,
+                      },
+                      entity: {
+                        id: "Q7748",
+                        type: "Person",
+                        name: "Harvey SPECTER",
+                        properties: {},
+                      },
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "CHECKBOX",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["CHECKBOX"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: ["B"] },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  profileTypeField: null,
+                },
+                replies: [
+                  {
+                    id: toGlobalId("PetitionFieldReply", unlinkedReply.id),
+                    content: { value: "This reply is not linked to a profile field" },
+                  },
+                ],
               },
             ],
           },
@@ -6674,28 +7557,19 @@ describe("GraphQL/Profiles to Petitions", () => {
     });
 
     it("does not disassociate old profile if it is still being referenced on another reply", async () => {
-      const [newProfile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
-      await mocks.knex.from("profile_field_value").insert({
-        type: "TEXT",
-        profile_id: newProfile.id,
-        profile_type_field_id: propertiesIdx["TEXT"].id,
-        content: { value: "Harvey" },
-        created_by_user_id: user.id,
-      });
-
       const [, groupReply2] = await mocks.createFieldGroupReply(
         fieldGroup.id,
         undefined,
         2,
         () => ({
           user_id: user.id,
-          associated_profile_id: profile.id,
+          associated_profile_id: mikeRoss.id,
         }),
       );
 
       await mocks.knex.from("petition_profile").insert({
         petition_id: petition.id,
-        profile_id: profile.id,
+        profile_id: mikeRoss.id,
       });
 
       const { errors, data } = await testClient.execute(
@@ -6703,31 +7577,25 @@ describe("GraphQL/Profiles to Petitions", () => {
           mutation (
             $petitionId: GID!
             $petitionFieldId: GID!
-            $parentReplyId: GID!
-            $profileId: GID!
+            $parentReplyId: GID
+            $profileIds: [GID!]!
           ) {
-            createFieldGroupReplyFromProfile(
+            createFieldGroupRepliesFromProfiles(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               parentReplyId: $parentReplyId
-              profileId: $profileId
+              profileIds: $profileIds
             ) {
-              id
-              associatedProfile {
-                id
-              }
-              field {
-                petition {
-                  ... on Petition {
-                    profiles {
-                      id
-                    }
-                    events(limit: 100, offset: 0) {
-                      totalCount
-                      items {
-                        type
-                        data
-                      }
+              petition {
+                ... on Petition {
+                  profiles {
+                    id
+                  }
+                  events(limit: 100, offset: 0) {
+                    totalCount
+                    items {
+                      type
+                      data
                     }
                   }
                 }
@@ -6739,43 +7607,37 @@ describe("GraphQL/Profiles to Petitions", () => {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
           parentReplyId: toGlobalId("PetitionFieldReply", groupReply2.id),
-          profileId: toGlobalId("Profile", newProfile.id),
+          profileIds: [toGlobalId("Profile", harveySpecter.id)],
         },
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createFieldGroupReplyFromProfile).toEqual({
-        id: toGlobalId("PetitionFieldReply", groupReply2.id),
-        associatedProfile: {
-          id: toGlobalId("Profile", newProfile.id),
-        },
-        field: {
-          petition: {
-            profiles: [
-              { id: toGlobalId("Profile", profile.id) },
-              { id: toGlobalId("Profile", newProfile.id) },
+      expect(data?.createFieldGroupRepliesFromProfiles).toEqual({
+        petition: {
+          profiles: [
+            { id: toGlobalId("Profile", mikeRoss.id) },
+            { id: toGlobalId("Profile", harveySpecter.id) },
+          ],
+          events: {
+            totalCount: 10,
+            items: [
+              {
+                type: "PROFILE_ASSOCIATED",
+                data: {
+                  profileId: toGlobalId("Profile", harveySpecter.id),
+                  userId: toGlobalId("User", user.id),
+                },
+              },
+              ...range(0, 9).map(() => ({
+                type: "REPLY_CREATED",
+                data: {
+                  petitionAccessId: null,
+                  userId: toGlobalId("User", user.id),
+                  petitionFieldId: expect.any(String),
+                  petitionFieldReplyId: expect.any(String),
+                },
+              })),
             ],
-            events: {
-              totalCount: 2,
-              items: [
-                {
-                  type: "REPLY_CREATED",
-                  data: {
-                    petitionAccessId: null,
-                    userId: toGlobalId("User", user.id),
-                    petitionFieldId: expect.any(String),
-                    petitionFieldReplyId: expect.any(String),
-                  },
-                },
-                {
-                  type: "PROFILE_ASSOCIATED",
-                  data: {
-                    profileId: toGlobalId("Profile", newProfile.id),
-                    userId: toGlobalId("User", user.id),
-                  },
-                },
-              ],
-            },
           },
         },
       });
@@ -6793,7 +7655,7 @@ describe("GraphQL/Profiles to Petitions", () => {
         type: "TEXT",
         profile_id: newProfile.id,
         profile_type_field_id: propertiesIdx["TEXT"].id,
-        content: { value: "Harvey" },
+        content: { value: "HOMER SIMPSON" },
         created_by_user_id: user.id,
       });
 
@@ -6806,35 +7668,16 @@ describe("GraphQL/Profiles to Petitions", () => {
           mutation (
             $petitionId: GID!
             $petitionFieldId: GID!
-            $parentReplyId: GID!
-            $profileId: GID!
+            $parentReplyId: GID
+            $profileIds: [GID!]!
           ) {
-            createFieldGroupReplyFromProfile(
+            createFieldGroupRepliesFromProfiles(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               parentReplyId: $parentReplyId
-              profileId: $profileId
+              profileIds: $profileIds
             ) {
               id
-              associatedProfile {
-                id
-              }
-              field {
-                petition {
-                  ... on Petition {
-                    profiles {
-                      id
-                    }
-                    events(limit: 100, offset: 0) {
-                      totalCount
-                      items {
-                        type
-                        data
-                      }
-                    }
-                  }
-                }
-              }
             }
           }
         `,
@@ -6842,11 +7685,13 @@ describe("GraphQL/Profiles to Petitions", () => {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
           parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
-          profileId: toGlobalId("Profile", newProfile.id),
+          profileIds: [toGlobalId("Profile", newProfile.id)],
         },
       );
 
-      expect(errors).toContainGraphQLError("NOTHING_TO_IMPORT_ERROR");
+      expect(errors).toContainGraphQLError("NOTHING_TO_IMPORT_ERROR", {
+        profileIds: [toGlobalId("Profile", newProfile.id)],
+      });
       expect(data).toBeNull();
 
       await mocks.knex
@@ -6880,32 +7725,26 @@ describe("GraphQL/Profiles to Petitions", () => {
           mutation (
             $petitionId: GID!
             $petitionFieldId: GID!
-            $parentReplyId: GID!
-            $profileId: GID!
+            $parentReplyId: GID
+            $profileIds: [GID!]!
           ) {
-            createFieldGroupReplyFromProfile(
+            createFieldGroupRepliesFromProfiles(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               parentReplyId: $parentReplyId
-              profileId: $profileId
+              profileIds: $profileIds
               force: true
             ) {
-              id
-              associatedProfile {
-                id
-              }
-              field {
-                petition {
-                  ... on Petition {
-                    profiles {
-                      id
-                    }
-                    events(limit: 100, offset: 0) {
-                      totalCount
-                      items {
-                        type
-                        data
-                      }
+              petition {
+                ... on Petition {
+                  profiles {
+                    id
+                  }
+                  events(limit: 100, offset: 0) {
+                    totalCount
+                    items {
+                      type
+                      data
                     }
                   }
                 }
@@ -6917,31 +7756,25 @@ describe("GraphQL/Profiles to Petitions", () => {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
           parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
-          profileId: toGlobalId("Profile", newProfile.id),
+          profileIds: [toGlobalId("Profile", newProfile.id)],
         },
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createFieldGroupReplyFromProfile).toEqual({
-        id: toGlobalId("PetitionFieldReply", groupReply.id),
-        associatedProfile: {
-          id: toGlobalId("Profile", newProfile.id),
-        },
-        field: {
-          petition: {
-            profiles: [{ id: toGlobalId("Profile", newProfile.id) }],
-            events: {
-              totalCount: 1,
-              items: [
-                {
-                  type: "PROFILE_ASSOCIATED",
-                  data: {
-                    profileId: toGlobalId("Profile", newProfile.id),
-                    userId: toGlobalId("User", user.id),
-                  },
+      expect(data?.createFieldGroupRepliesFromProfiles).toEqual({
+        petition: {
+          profiles: [{ id: toGlobalId("Profile", newProfile.id) }],
+          events: {
+            totalCount: 1,
+            items: [
+              {
+                type: "PROFILE_ASSOCIATED",
+                data: {
+                  profileId: toGlobalId("Profile", newProfile.id),
+                  userId: toGlobalId("User", user.id),
                 },
-              ],
-            },
+              },
+            ],
           },
         },
       });
@@ -6965,25 +7798,19 @@ describe("GraphQL/Profiles to Petitions", () => {
           mutation (
             $petitionId: GID!
             $petitionFieldId: GID!
-            $parentReplyId: GID!
-            $profileId: GID!
+            $parentReplyId: GID
+            $profileIds: [GID!]!
           ) {
-            createFieldGroupReplyFromProfile(
+            createFieldGroupRepliesFromProfiles(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               parentReplyId: $parentReplyId
-              profileId: $profileId
+              profileIds: $profileIds
             ) {
-              id
-              associatedProfile {
-                id
-              }
-              field {
-                petition {
-                  ... on Petition {
-                    profiles {
-                      id
-                    }
+              petition {
+                ... on Petition {
+                  profiles {
+                    id
                   }
                 }
               }
@@ -6994,20 +7821,14 @@ describe("GraphQL/Profiles to Petitions", () => {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
           parentReplyId: toGlobalId("PetitionFieldReply", groupReply1.id),
-          profileId: toGlobalId("Profile", profile.id),
+          profileIds: [toGlobalId("Profile", mikeRoss.id)],
         },
       );
 
       expect(errors1).toBeUndefined();
-      expect(data1?.createFieldGroupReplyFromProfile).toEqual({
-        id: toGlobalId("PetitionFieldReply", groupReply1.id),
-        associatedProfile: {
-          id: toGlobalId("Profile", profile.id),
-        },
-        field: {
-          petition: {
-            profiles: [{ id: toGlobalId("Profile", profile.id) }],
-          },
+      expect(data1?.createFieldGroupRepliesFromProfiles).toEqual({
+        petition: {
+          profiles: [{ id: toGlobalId("Profile", mikeRoss.id) }],
         },
       });
 
@@ -7016,25 +7837,19 @@ describe("GraphQL/Profiles to Petitions", () => {
           mutation (
             $petitionId: GID!
             $petitionFieldId: GID!
-            $parentReplyId: GID!
-            $profileId: GID!
+            $parentReplyId: GID
+            $profileIds: [GID!]!
           ) {
-            createFieldGroupReplyFromProfile(
+            createFieldGroupRepliesFromProfiles(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               parentReplyId: $parentReplyId
-              profileId: $profileId
+              profileIds: $profileIds
             ) {
-              id
-              associatedProfile {
-                id
-              }
-              field {
-                petition {
-                  ... on Petition {
-                    profiles {
-                      id
-                    }
+              petition {
+                ... on Petition {
+                  profiles {
+                    id
                   }
                 }
               }
@@ -7045,20 +7860,14 @@ describe("GraphQL/Profiles to Petitions", () => {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
           parentReplyId: toGlobalId("PetitionFieldReply", groupReply2.id),
-          profileId: toGlobalId("Profile", profile.id),
+          profileIds: [toGlobalId("Profile", mikeRoss.id)],
         },
       );
 
       expect(errors2).toBeUndefined();
-      expect(data2?.createFieldGroupReplyFromProfile).toEqual({
-        id: toGlobalId("PetitionFieldReply", groupReply2.id),
-        associatedProfile: {
-          id: toGlobalId("Profile", profile.id),
-        },
-        field: {
-          petition: {
-            profiles: [{ id: toGlobalId("Profile", profile.id) }],
-          },
+      expect(data2?.createFieldGroupRepliesFromProfiles).toEqual({
+        petition: {
+          profiles: [{ id: toGlobalId("Profile", mikeRoss.id) }],
         },
       });
     });

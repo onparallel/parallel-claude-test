@@ -1000,6 +1000,9 @@ export interface Mutation {
   createExportExcelTask: Task;
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
   createExportRepliesTask: Task;
+  /** Creates replies on a FIELD_GROUP field with the provided profiles */
+  createFieldGroupRepliesFromProfiles: PetitionField;
+  /** @deprecated use createFieldGroupRepliesFromProfiles */
   createFieldGroupReplyFromProfile: PetitionFieldReply;
   /** Creates a task for exporting files from a petition using an integration */
   createFileExportTask: Task;
@@ -1168,6 +1171,8 @@ export interface Mutation {
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
   /** Pins a profile type to the user's navigation manu */
   pinProfileType: ProfileType;
+  /** Prefills petition field groups with information from provided profiles */
+  prefillPetitionFromProfiles: Petition;
   profileExternalSourceDetails: ProfileExternalSourceSearchSingleResult;
   profileExternalSourceSearch: ProfileExternalSourceSearchResults;
   /** Generates a download link for a profile field file */
@@ -1643,6 +1648,14 @@ export interface MutationcreateExportExcelTaskArgs {
 export interface MutationcreateExportRepliesTaskArgs {
   pattern?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
+}
+
+export interface MutationcreateFieldGroupRepliesFromProfilesArgs {
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+  petitionFieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  profileIds: Array<Scalars["GID"]["input"]>;
 }
 
 export interface MutationcreateFieldGroupReplyFromProfileArgs {
@@ -2137,6 +2150,13 @@ export interface MutationpetitionFieldAttachmentUploadCompleteArgs {
 
 export interface MutationpinProfileTypeArgs {
   profileTypeId: Scalars["GID"]["input"];
+}
+
+export interface MutationprefillPetitionFromProfilesArgs {
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
+  prefill: Array<CreatePetitionFromProfilePrefillInput>;
 }
 
 export interface MutationprofileExternalSourceDetailsArgs {
@@ -22132,51 +22152,7 @@ export type PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyF
   content: { [key: string]: any };
 };
 
-export type PreviewPetitionFieldMutations_createFieldGroupReplyFromProfileMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"]["input"];
-    petitionFieldId: Scalars["GID"]["input"];
-    parentReplyId: Scalars["GID"]["input"];
-    profileId: Scalars["GID"]["input"];
-    force?: InputMaybe<Scalars["Boolean"]["input"]>;
-  }>;
-
-export type PreviewPetitionFieldMutations_createFieldGroupReplyFromProfileMutation = {
-  createFieldGroupReplyFromProfile: { __typename?: "PetitionFieldReply"; id: string };
-};
-
-export type PreviewPetitionFieldMutations_profileQueryVariables = Exact<{
-  profileId: Scalars["GID"]["input"];
-}>;
-
-export type PreviewPetitionFieldMutations_profileQuery = {
-  profile: {
-    __typename?: "Profile";
-    id: string;
-    properties: Array<{
-      __typename?: "ProfileFieldProperty";
-      field: { __typename?: "ProfileTypeField"; id: string };
-      files?: Array<{
-        __typename?: "ProfileFieldFile";
-        id: string;
-        file?: {
-          __typename?: "FileUpload";
-          size: number;
-          isComplete: boolean;
-          filename: string;
-          contentType: string;
-        } | null;
-      }> | null;
-      value?: {
-        __typename?: "ProfileFieldValue";
-        id: string;
-        content?: { [key: string]: any } | null;
-      } | null;
-    }>;
-  };
-};
-
-export type useCreateFieldGroupReplyFromProfile_PetitionFieldFragment = {
+export type useCreateFieldGroupRepliesFromProfiles_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   children?: Array<{
@@ -22185,6 +22161,162 @@ export type useCreateFieldGroupReplyFromProfile_PetitionFieldFragment = {
     type: PetitionFieldType;
     profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
   }> | null;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    children?: Array<{
+      __typename?: "PetitionFieldGroupChildReply";
+      field: { __typename?: "PetitionField"; id: string };
+      replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+    }> | null;
+  }>;
+  previewReplies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    children?: Array<{
+      __typename?: "PetitionFieldGroupChildReply";
+      replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+    }> | null;
+  }>;
+};
+
+export type PreviewPetitionFieldMutations_prefillPetitionFromProfilesMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+  prefill: Array<CreatePetitionFromProfilePrefillInput> | CreatePetitionFromProfilePrefillInput;
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+}>;
+
+export type PreviewPetitionFieldMutations_prefillPetitionFromProfilesMutation = {
+  prefillPetitionFromProfiles: {
+    __typename?: "Petition";
+    id: string;
+    fields: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      children?: Array<{
+        __typename?: "PetitionField";
+        id: string;
+        type: PetitionFieldType;
+        profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+      }> | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        children?: Array<{
+          __typename?: "PetitionFieldGroupChildReply";
+          field: { __typename?: "PetitionField"; id: string };
+          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+        }> | null;
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        children?: Array<{
+          __typename?: "PetitionFieldGroupChildReply";
+          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+        }> | null;
+      }>;
+    }>;
+  };
+};
+
+export type PreviewPetitionFieldMutations_createFieldGroupRepliesFromProfilesMutationVariables =
+  Exact<{
+    petitionId: Scalars["GID"]["input"];
+    petitionFieldId: Scalars["GID"]["input"];
+    parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+    profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+    force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  }>;
+
+export type PreviewPetitionFieldMutations_createFieldGroupRepliesFromProfilesMutation = {
+  createFieldGroupRepliesFromProfiles: {
+    __typename?: "PetitionField";
+    id: string;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+    }> | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: { __typename?: "PetitionField"; id: string };
+        replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+      }> | null;
+    }>;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+      }> | null;
+    }>;
+  };
+};
+
+export type PreviewPetitionFieldMutations_ProfileFragment = {
+  __typename?: "Profile";
+  id: string;
+  properties: Array<{
+    __typename?: "ProfileFieldProperty";
+    field: { __typename?: "ProfileTypeField"; id: string };
+    files?: Array<{
+      __typename?: "ProfileFieldFile";
+      id: string;
+      file?: {
+        __typename?: "FileUpload";
+        size: number;
+        isComplete: boolean;
+        filename: string;
+        contentType: string;
+      } | null;
+    }> | null;
+    value?: {
+      __typename?: "ProfileFieldValue";
+      id: string;
+      content?: { [key: string]: any } | null;
+    } | null;
+  }>;
+};
+
+export type PreviewPetitionFieldMutations_profilesQueryVariables = Exact<{
+  filter?: InputMaybe<ProfileFilter>;
+}>;
+
+export type PreviewPetitionFieldMutations_profilesQuery = {
+  profiles: {
+    __typename?: "ProfilePagination";
+    items: Array<{
+      __typename?: "Profile";
+      id: string;
+      properties: Array<{
+        __typename?: "ProfileFieldProperty";
+        field: { __typename?: "ProfileTypeField"; id: string };
+        files?: Array<{
+          __typename?: "ProfileFieldFile";
+          id: string;
+          file?: {
+            __typename?: "FileUpload";
+            size: number;
+            isComplete: boolean;
+            filename: string;
+            contentType: string;
+          } | null;
+        }> | null;
+        value?: {
+          __typename?: "ProfileFieldValue";
+          id: string;
+          content?: { [key: string]: any } | null;
+        } | null;
+      }>;
+    }>;
+  };
 };
 
 export type GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDataMutationVariables =
@@ -22214,6 +22346,265 @@ export type GeneratePrefilledPublicLinkDialog_PetitionTemplateFragment = {
     previewReplies: Array<{ __typename?: "PetitionFieldReply"; content: { [key: string]: any } }>;
     children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
   }>;
+};
+
+export type usePreviewConfirmImportFromProfileDialog_profilesQueryVariables = Exact<{
+  filter?: InputMaybe<ProfileFilter>;
+}>;
+
+export type usePreviewConfirmImportFromProfileDialog_profilesQuery = {
+  profiles: {
+    __typename?: "ProfilePagination";
+    items: Array<{
+      __typename?: "Profile";
+      id: string;
+      localizableName: { [locale in UserLocale]?: string };
+      status: ProfileStatus;
+    }>;
+  };
+};
+
+export type usePreviewImportFromProfileDialog_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  name?: string | null;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    multiple: boolean;
+    isLinkedToProfileType: boolean;
+    options: { [key: string]: any };
+    title?: string | null;
+    profileType?: { __typename?: "ProfileType"; id: string } | null;
+    children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
+  }>;
+  fieldRelationships: Array<{
+    __typename?: "PetitionFieldGroupRelationship";
+    id: string;
+    leftSidePetitionField: {
+      __typename?: "PetitionField";
+      id: string;
+      profileType?: { __typename?: "ProfileType"; id: string } | null;
+    };
+    rightSidePetitionField: {
+      __typename?: "PetitionField";
+      id: string;
+      profileType?: { __typename?: "ProfileType"; id: string } | null;
+    };
+    relationshipTypeWithDirection: {
+      __typename?: "ProfileRelationshipTypeWithDirection";
+      direction: ProfileRelationshipDirection;
+      profileRelationshipType: {
+        __typename?: "ProfileRelationshipType";
+        id: string;
+        isReciprocal: boolean;
+      };
+    };
+  }>;
+};
+
+export type usePreviewImportFromProfileDialog_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  name?: string | null;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    multiple: boolean;
+    isLinkedToProfileType: boolean;
+    options: { [key: string]: any };
+    title?: string | null;
+    profileType?: { __typename?: "ProfileType"; id: string } | null;
+    children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
+  }>;
+  fieldRelationships: Array<{
+    __typename?: "PetitionFieldGroupRelationship";
+    id: string;
+    leftSidePetitionField: {
+      __typename?: "PetitionField";
+      id: string;
+      profileType?: { __typename?: "ProfileType"; id: string } | null;
+    };
+    rightSidePetitionField: {
+      __typename?: "PetitionField";
+      id: string;
+      profileType?: { __typename?: "ProfileType"; id: string } | null;
+    };
+    relationshipTypeWithDirection: {
+      __typename?: "ProfileRelationshipTypeWithDirection";
+      direction: ProfileRelationshipDirection;
+      profileRelationshipType: {
+        __typename?: "ProfileRelationshipType";
+        id: string;
+        isReciprocal: boolean;
+      };
+    };
+  }>;
+};
+
+export type usePreviewImportFromProfileDialog_PetitionBaseFragment =
+  | usePreviewImportFromProfileDialog_PetitionBase_Petition_Fragment
+  | usePreviewImportFromProfileDialog_PetitionBase_PetitionTemplate_Fragment;
+
+export type usePreviewImportFromProfileDialog_ProfileFragment = {
+  __typename?: "Profile";
+  id: string;
+  status: ProfileStatus;
+  localizableName: { [locale in UserLocale]?: string };
+  profileType: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+  };
+  relationships: Array<{
+    __typename?: "ProfileRelationship";
+    id: string;
+    leftSideProfile: {
+      __typename?: "Profile";
+      id: string;
+      status: ProfileStatus;
+      localizableName: { [locale in UserLocale]?: string };
+      profileType: { __typename?: "ProfileType"; id: string };
+    };
+    rightSideProfile: {
+      __typename?: "Profile";
+      id: string;
+      status: ProfileStatus;
+      localizableName: { [locale in UserLocale]?: string };
+      profileType: { __typename?: "ProfileType"; id: string };
+    };
+    relationshipType: { __typename?: "ProfileRelationshipType"; id: string; isReciprocal: boolean };
+  }>;
+};
+
+export type usePreviewImportFromProfileDialog_petitionQueryVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type usePreviewImportFromProfileDialog_petitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        name?: string | null;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          multiple: boolean;
+          isLinkedToProfileType: boolean;
+          options: { [key: string]: any };
+          title?: string | null;
+          profileType?: { __typename?: "ProfileType"; id: string } | null;
+          children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
+        }>;
+        fieldRelationships: Array<{
+          __typename?: "PetitionFieldGroupRelationship";
+          id: string;
+          leftSidePetitionField: {
+            __typename?: "PetitionField";
+            id: string;
+            profileType?: { __typename?: "ProfileType"; id: string } | null;
+          };
+          rightSidePetitionField: {
+            __typename?: "PetitionField";
+            id: string;
+            profileType?: { __typename?: "ProfileType"; id: string } | null;
+          };
+          relationshipTypeWithDirection: {
+            __typename?: "ProfileRelationshipTypeWithDirection";
+            direction: ProfileRelationshipDirection;
+            profileRelationshipType: {
+              __typename?: "ProfileRelationshipType";
+              id: string;
+              isReciprocal: boolean;
+            };
+          };
+        }>;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        name?: string | null;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          multiple: boolean;
+          isLinkedToProfileType: boolean;
+          options: { [key: string]: any };
+          title?: string | null;
+          profileType?: { __typename?: "ProfileType"; id: string } | null;
+          children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
+        }>;
+        fieldRelationships: Array<{
+          __typename?: "PetitionFieldGroupRelationship";
+          id: string;
+          leftSidePetitionField: {
+            __typename?: "PetitionField";
+            id: string;
+            profileType?: { __typename?: "ProfileType"; id: string } | null;
+          };
+          rightSidePetitionField: {
+            __typename?: "PetitionField";
+            id: string;
+            profileType?: { __typename?: "ProfileType"; id: string } | null;
+          };
+          relationshipTypeWithDirection: {
+            __typename?: "ProfileRelationshipTypeWithDirection";
+            direction: ProfileRelationshipDirection;
+            profileRelationshipType: {
+              __typename?: "ProfileRelationshipType";
+              id: string;
+              isReciprocal: boolean;
+            };
+          };
+        }>;
+      }
+    | null;
+};
+
+export type usePreviewImportFromProfileDialog_profileQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+}>;
+
+export type usePreviewImportFromProfileDialog_profileQuery = {
+  profile: {
+    __typename?: "Profile";
+    id: string;
+    status: ProfileStatus;
+    localizableName: { [locale in UserLocale]?: string };
+    profileType: {
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+    };
+    relationships: Array<{
+      __typename?: "ProfileRelationship";
+      id: string;
+      leftSideProfile: {
+        __typename?: "Profile";
+        id: string;
+        status: ProfileStatus;
+        localizableName: { [locale in UserLocale]?: string };
+        profileType: { __typename?: "ProfileType"; id: string };
+      };
+      rightSideProfile: {
+        __typename?: "Profile";
+        id: string;
+        status: ProfileStatus;
+        localizableName: { [locale in UserLocale]?: string };
+        profileType: { __typename?: "ProfileType"; id: string };
+      };
+      relationshipType: {
+        __typename?: "ProfileRelationshipType";
+        id: string;
+        isReciprocal: boolean;
+      };
+    }>;
+  };
 };
 
 export type PreviewPetitionFieldGroup_UserFragment = {
@@ -22525,13 +22916,13 @@ export type PreviewPetitionFieldGroup_PetitionBaseFragment =
 
 export type PreviewPetitionFieldGroup_PetitionFieldFragment = {
   __typename?: "PetitionField";
+  multiple: boolean;
   id: string;
   type: PetitionFieldType;
   title?: string | null;
   description?: string | null;
   options: { [key: string]: any };
   optional: boolean;
-  multiple: boolean;
   isInternal: boolean;
   commentCount: number;
   unreadCommentCount: number;
@@ -22550,6 +22941,7 @@ export type PreviewPetitionFieldGroup_PetitionFieldFragment = {
     commentCount: number;
     unreadCommentCount: number;
     hasCommentsEnabled: boolean;
+    profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -27642,6 +28034,7 @@ export type ProfileKeyProcesses_ProfileFragment = {
   __typename?: "Profile";
   id: string;
   localizableName: { [locale in UserLocale]?: string };
+  status: ProfileStatus;
   profileType: {
     __typename?: "ProfileType";
     id: string;
@@ -27699,12 +28092,14 @@ export type ProfileKeyProcesses_ProfileFragment = {
     leftSideProfile: {
       __typename?: "Profile";
       id: string;
+      status: ProfileStatus;
       localizableName: { [locale in UserLocale]?: string };
       profileType: { __typename?: "ProfileType"; id: string };
     };
     rightSideProfile: {
       __typename?: "Profile";
       id: string;
+      status: ProfileStatus;
       localizableName: { [locale in UserLocale]?: string };
       profileType: { __typename?: "ProfileType"; id: string };
     };
@@ -27724,6 +28119,7 @@ export type ProfileKeyProcesses_associateProfileToPetitionMutation = {
       __typename?: "Profile";
       id: string;
       localizableName: { [locale in UserLocale]?: string };
+      status: ProfileStatus;
       profileType: {
         __typename?: "ProfileType";
         id: string;
@@ -27781,12 +28177,14 @@ export type ProfileKeyProcesses_associateProfileToPetitionMutation = {
         leftSideProfile: {
           __typename?: "Profile";
           id: string;
+          status: ProfileStatus;
           localizableName: { [locale in UserLocale]?: string };
           profileType: { __typename?: "ProfileType"; id: string };
         };
         rightSideProfile: {
           __typename?: "Profile";
           id: string;
+          status: ProfileStatus;
           localizableName: { [locale in UserLocale]?: string };
           profileType: { __typename?: "ProfileType"; id: string };
         };
@@ -27827,12 +28225,14 @@ export type ProfilePetitionsTable_ProfileFragment = {
     leftSideProfile: {
       __typename?: "Profile";
       id: string;
+      status: ProfileStatus;
       localizableName: { [locale in UserLocale]?: string };
       profileType: { __typename?: "ProfileType"; id: string };
     };
     rightSideProfile: {
       __typename?: "Profile";
       id: string;
+      status: ProfileStatus;
       localizableName: { [locale in UserLocale]?: string };
       profileType: { __typename?: "ProfileType"; id: string };
     };
@@ -27929,12 +28329,14 @@ export type ProfilePetitionsTable_associateProfileToPetitionMutation = {
         leftSideProfile: {
           __typename?: "Profile";
           id: string;
+          status: ProfileStatus;
           localizableName: { [locale in UserLocale]?: string };
           profileType: { __typename?: "ProfileType"; id: string };
         };
         rightSideProfile: {
           __typename?: "Profile";
           id: string;
+          status: ProfileStatus;
           localizableName: { [locale in UserLocale]?: string };
           profileType: { __typename?: "ProfileType"; id: string };
         };
@@ -28049,12 +28451,14 @@ export type ProfilePetitionsTable_petitionsQuery = {
       leftSideProfile: {
         __typename?: "Profile";
         id: string;
+        status: ProfileStatus;
         localizableName: { [locale in UserLocale]?: string };
         profileType: { __typename?: "ProfileType"; id: string };
       };
       rightSideProfile: {
         __typename?: "Profile";
         id: string;
+        status: ProfileStatus;
         localizableName: { [locale in UserLocale]?: string };
         profileType: { __typename?: "ProfileType"; id: string };
       };
@@ -28065,6 +28469,149 @@ export type ProfilePetitionsTable_petitionsQuery = {
       };
     }>;
   };
+};
+
+export type ProfileRelationshipsAssociationTable_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  name?: string | null;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    multiple: boolean;
+    isLinkedToProfileType: boolean;
+    options: { [key: string]: any };
+    title?: string | null;
+    profileType?: { __typename?: "ProfileType"; id: string } | null;
+    children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
+  }>;
+  fieldRelationships: Array<{
+    __typename?: "PetitionFieldGroupRelationship";
+    id: string;
+    leftSidePetitionField: {
+      __typename?: "PetitionField";
+      id: string;
+      profileType?: { __typename?: "ProfileType"; id: string } | null;
+    };
+    rightSidePetitionField: {
+      __typename?: "PetitionField";
+      id: string;
+      profileType?: { __typename?: "ProfileType"; id: string } | null;
+    };
+    relationshipTypeWithDirection: {
+      __typename?: "ProfileRelationshipTypeWithDirection";
+      direction: ProfileRelationshipDirection;
+      profileRelationshipType: {
+        __typename?: "ProfileRelationshipType";
+        id: string;
+        isReciprocal: boolean;
+      };
+    };
+  }>;
+};
+
+export type ProfileRelationshipsAssociationTable_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  name?: string | null;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    multiple: boolean;
+    isLinkedToProfileType: boolean;
+    options: { [key: string]: any };
+    title?: string | null;
+    profileType?: { __typename?: "ProfileType"; id: string } | null;
+    children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
+  }>;
+  fieldRelationships: Array<{
+    __typename?: "PetitionFieldGroupRelationship";
+    id: string;
+    leftSidePetitionField: {
+      __typename?: "PetitionField";
+      id: string;
+      profileType?: { __typename?: "ProfileType"; id: string } | null;
+    };
+    rightSidePetitionField: {
+      __typename?: "PetitionField";
+      id: string;
+      profileType?: { __typename?: "ProfileType"; id: string } | null;
+    };
+    relationshipTypeWithDirection: {
+      __typename?: "ProfileRelationshipTypeWithDirection";
+      direction: ProfileRelationshipDirection;
+      profileRelationshipType: {
+        __typename?: "ProfileRelationshipType";
+        id: string;
+        isReciprocal: boolean;
+      };
+    };
+  }>;
+};
+
+export type ProfileRelationshipsAssociationTable_PetitionBaseFragment =
+  | ProfileRelationshipsAssociationTable_PetitionBase_Petition_Fragment
+  | ProfileRelationshipsAssociationTable_PetitionBase_PetitionTemplate_Fragment;
+
+export type ProfileRelationshipsAssociationTable_ProfileInnerFragment = {
+  __typename?: "Profile";
+  id: string;
+  status: ProfileStatus;
+  localizableName: { [locale in UserLocale]?: string };
+  profileType: { __typename?: "ProfileType"; id: string };
+};
+
+export type ProfileRelationshipsAssociationTable_ProfileFragment = {
+  __typename?: "Profile";
+  id: string;
+  status: ProfileStatus;
+  localizableName: { [locale in UserLocale]?: string };
+  profileType: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+  };
+  relationships: Array<{
+    __typename?: "ProfileRelationship";
+    id: string;
+    leftSideProfile: {
+      __typename?: "Profile";
+      id: string;
+      status: ProfileStatus;
+      localizableName: { [locale in UserLocale]?: string };
+      profileType: { __typename?: "ProfileType"; id: string };
+    };
+    rightSideProfile: {
+      __typename?: "Profile";
+      id: string;
+      status: ProfileStatus;
+      localizableName: { [locale in UserLocale]?: string };
+      profileType: { __typename?: "ProfileType"; id: string };
+    };
+    relationshipType: { __typename?: "ProfileRelationshipType"; id: string; isReciprocal: boolean };
+  }>;
+};
+
+export type ProfileRelationshipsAssociationTable_ProfileRelationshipFragment = {
+  __typename?: "ProfileRelationship";
+  id: string;
+  leftSideProfile: {
+    __typename?: "Profile";
+    id: string;
+    status: ProfileStatus;
+    localizableName: { [locale in UserLocale]?: string };
+    profileType: { __typename?: "ProfileType"; id: string };
+  };
+  rightSideProfile: {
+    __typename?: "Profile";
+    id: string;
+    status: ProfileStatus;
+    localizableName: { [locale in UserLocale]?: string };
+    profileType: { __typename?: "ProfileType"; id: string };
+  };
+  relationshipType: { __typename?: "ProfileRelationshipType"; id: string; isReciprocal: boolean };
 };
 
 export type ProfileRelationshipsTable_RelatedProfileFragment = {
@@ -28387,17 +28934,11 @@ export type useAssociateNewPetitionToProfileDialog_PetitionBase_Petition_Fragmen
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
-    title?: string | null;
-    alias?: string | null;
+    multiple: boolean;
     isLinkedToProfileType: boolean;
     options: { [key: string]: any };
-    multiple: boolean;
-    profileType?: {
-      __typename?: "ProfileType";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      isStandard: boolean;
-    } | null;
+    title?: string | null;
+    profileType?: { __typename?: "ProfileType"; id: string } | null;
     children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
   }>;
   fieldRelationships: Array<{
@@ -28433,17 +28974,11 @@ export type useAssociateNewPetitionToProfileDialog_PetitionBase_PetitionTemplate
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
-    title?: string | null;
-    alias?: string | null;
+    multiple: boolean;
     isLinkedToProfileType: boolean;
     options: { [key: string]: any };
-    multiple: boolean;
-    profileType?: {
-      __typename?: "ProfileType";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      isStandard: boolean;
-    } | null;
+    title?: string | null;
+    profileType?: { __typename?: "ProfileType"; id: string } | null;
     children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
   }>;
   fieldRelationships: Array<{
@@ -28500,6 +29035,7 @@ export type useAssociateNewPetitionToProfileDialog_ProfileFragment = {
   __typename?: "Profile";
   id: string;
   localizableName: { [locale in UserLocale]?: string };
+  status: ProfileStatus;
   profileType: {
     __typename?: "ProfileType";
     id: string;
@@ -28511,35 +29047,19 @@ export type useAssociateNewPetitionToProfileDialog_ProfileFragment = {
     leftSideProfile: {
       __typename?: "Profile";
       id: string;
+      status: ProfileStatus;
       localizableName: { [locale in UserLocale]?: string };
       profileType: { __typename?: "ProfileType"; id: string };
     };
     rightSideProfile: {
       __typename?: "Profile";
       id: string;
+      status: ProfileStatus;
       localizableName: { [locale in UserLocale]?: string };
       profileType: { __typename?: "ProfileType"; id: string };
     };
     relationshipType: { __typename?: "ProfileRelationshipType"; id: string; isReciprocal: boolean };
   }>;
-};
-
-export type useAssociateNewPetitionToProfileDialog_ProfileRelationshipFragment = {
-  __typename?: "ProfileRelationship";
-  id: string;
-  leftSideProfile: {
-    __typename?: "Profile";
-    id: string;
-    localizableName: { [locale in UserLocale]?: string };
-    profileType: { __typename?: "ProfileType"; id: string };
-  };
-  rightSideProfile: {
-    __typename?: "Profile";
-    id: string;
-    localizableName: { [locale in UserLocale]?: string };
-    profileType: { __typename?: "ProfileType"; id: string };
-  };
-  relationshipType: { __typename?: "ProfileRelationshipType"; id: string; isReciprocal: boolean };
 };
 
 export type useAssociateNewPetitionToProfileDialog_petitionQueryVariables = Exact<{
@@ -28556,17 +29076,11 @@ export type useAssociateNewPetitionToProfileDialog_petitionQuery = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
-          title?: string | null;
-          alias?: string | null;
+          multiple: boolean;
           isLinkedToProfileType: boolean;
           options: { [key: string]: any };
-          multiple: boolean;
-          profileType?: {
-            __typename?: "ProfileType";
-            id: string;
-            name: { [locale in UserLocale]?: string };
-            isStandard: boolean;
-          } | null;
+          title?: string | null;
+          profileType?: { __typename?: "ProfileType"; id: string } | null;
           children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
         }>;
         fieldRelationships: Array<{
@@ -28601,17 +29115,11 @@ export type useAssociateNewPetitionToProfileDialog_petitionQuery = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
-          title?: string | null;
-          alias?: string | null;
+          multiple: boolean;
           isLinkedToProfileType: boolean;
           options: { [key: string]: any };
-          multiple: boolean;
-          profileType?: {
-            __typename?: "ProfileType";
-            id: string;
-            name: { [locale in UserLocale]?: string };
-            isStandard: boolean;
-          } | null;
+          title?: string | null;
+          profileType?: { __typename?: "ProfileType"; id: string } | null;
           children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
         }>;
         fieldRelationships: Array<{
@@ -28639,21 +29147,6 @@ export type useAssociateNewPetitionToProfileDialog_petitionQuery = {
         }>;
       }
     | null;
-};
-
-export type useAssociateNewPetitionToProfileDialog_profileRelationshipTypesQueryVariables = Exact<{
-  [key: string]: never;
-}>;
-
-export type useAssociateNewPetitionToProfileDialog_profileRelationshipTypesQuery = {
-  profileRelationshipTypes: Array<{
-    __typename?: "ProfileRelationshipType";
-    id: string;
-    alias?: string | null;
-    allowedLeftRightProfileTypeIds: Array<string>;
-    allowedRightLeftProfileTypeIds: Array<string>;
-    isReciprocal: boolean;
-  }>;
 };
 
 export type useAssociateNewPetitionToProfileDialog_createPetitionFromProfileMutationVariables =
@@ -52216,12 +52709,14 @@ export type ProfileDetail_profileQuery = {
       leftSideProfile: {
         __typename?: "Profile";
         id: string;
+        status: ProfileStatus;
         localizableName: { [locale in UserLocale]?: string };
         profileType: { __typename?: "ProfileType"; id: string };
       };
       rightSideProfile: {
         __typename?: "Profile";
         id: string;
+        status: ProfileStatus;
         localizableName: { [locale in UserLocale]?: string };
         profileType: { __typename?: "ProfileType"; id: string };
       };
@@ -60945,6 +61440,128 @@ export const PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragment,
   unknown
 >;
+export const PreviewPetitionFieldMutations_ProfileFragmentDoc = gql`
+  fragment PreviewPetitionFieldMutations_Profile on Profile {
+    id
+    properties {
+      field {
+        id
+      }
+      files {
+        id
+        file {
+          size
+          isComplete
+          filename
+          contentType
+        }
+      }
+      value {
+        id
+        content
+      }
+    }
+  }
+` as unknown as DocumentNode<PreviewPetitionFieldMutations_ProfileFragment, unknown>;
+export const ProfileRelationshipsAssociationTable_PetitionBaseFragmentDoc = gql`
+  fragment ProfileRelationshipsAssociationTable_PetitionBase on PetitionBase {
+    id
+    name
+    fields {
+      id
+      type
+      multiple
+      isLinkedToProfileType
+      options
+      profileType {
+        id
+      }
+      ...PetitionFieldReference_PetitionField
+    }
+    fieldRelationships {
+      id
+      leftSidePetitionField {
+        id
+        profileType {
+          id
+        }
+      }
+      rightSidePetitionField {
+        id
+        profileType {
+          id
+        }
+      }
+      relationshipTypeWithDirection {
+        direction
+        profileRelationshipType {
+          id
+          isReciprocal
+        }
+      }
+    }
+    ...useFieldsWithIndices_PetitionBase
+  }
+  ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${useFieldsWithIndices_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<ProfileRelationshipsAssociationTable_PetitionBaseFragment, unknown>;
+export const usePreviewImportFromProfileDialog_PetitionBaseFragmentDoc = gql`
+  fragment usePreviewImportFromProfileDialog_PetitionBase on PetitionBase {
+    id
+    ...ProfileRelationshipsAssociationTable_PetitionBase
+  }
+  ${ProfileRelationshipsAssociationTable_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<usePreviewImportFromProfileDialog_PetitionBaseFragment, unknown>;
+export const ProfileRelationshipsAssociationTable_ProfileInnerFragmentDoc = gql`
+  fragment ProfileRelationshipsAssociationTable_ProfileInner on Profile {
+    id
+    status
+    localizableName
+    profileType {
+      id
+    }
+  }
+` as unknown as DocumentNode<ProfileRelationshipsAssociationTable_ProfileInnerFragment, unknown>;
+export const ProfileRelationshipsAssociationTable_ProfileRelationshipFragmentDoc = gql`
+  fragment ProfileRelationshipsAssociationTable_ProfileRelationship on ProfileRelationship {
+    id
+    leftSideProfile {
+      ...ProfileRelationshipsAssociationTable_ProfileInner
+    }
+    rightSideProfile {
+      ...ProfileRelationshipsAssociationTable_ProfileInner
+    }
+    relationshipType {
+      id
+      isReciprocal
+    }
+  }
+  ${ProfileRelationshipsAssociationTable_ProfileInnerFragmentDoc}
+` as unknown as DocumentNode<
+  ProfileRelationshipsAssociationTable_ProfileRelationshipFragment,
+  unknown
+>;
+export const ProfileRelationshipsAssociationTable_ProfileFragmentDoc = gql`
+  fragment ProfileRelationshipsAssociationTable_Profile on Profile {
+    ...ProfileRelationshipsAssociationTable_ProfileInner
+    profileType {
+      id
+      name
+    }
+    relationships {
+      ...ProfileRelationshipsAssociationTable_ProfileRelationship
+    }
+  }
+  ${ProfileRelationshipsAssociationTable_ProfileInnerFragmentDoc}
+  ${ProfileRelationshipsAssociationTable_ProfileRelationshipFragmentDoc}
+` as unknown as DocumentNode<ProfileRelationshipsAssociationTable_ProfileFragment, unknown>;
+export const usePreviewImportFromProfileDialog_ProfileFragmentDoc = gql`
+  fragment usePreviewImportFromProfileDialog_Profile on Profile {
+    id
+    ...ProfileRelationshipsAssociationTable_Profile
+  }
+  ${ProfileRelationshipsAssociationTable_ProfileFragmentDoc}
+` as unknown as DocumentNode<usePreviewImportFromProfileDialog_ProfileFragment, unknown>;
 export const PetitionRepliesSummary_UserFragmentDoc = gql`
   fragment PetitionRepliesSummary_User on User {
     id
@@ -61228,25 +61845,6 @@ export const useAssociateNewPetitionToProfileDialog_ProfileInnerFragmentDoc = gq
     }
   }
 ` as unknown as DocumentNode<useAssociateNewPetitionToProfileDialog_ProfileInnerFragment, unknown>;
-export const useAssociateNewPetitionToProfileDialog_ProfileRelationshipFragmentDoc = gql`
-  fragment useAssociateNewPetitionToProfileDialog_ProfileRelationship on ProfileRelationship {
-    id
-    leftSideProfile {
-      ...useAssociateNewPetitionToProfileDialog_ProfileInner
-    }
-    rightSideProfile {
-      ...useAssociateNewPetitionToProfileDialog_ProfileInner
-    }
-    relationshipType {
-      id
-      isReciprocal
-    }
-  }
-  ${useAssociateNewPetitionToProfileDialog_ProfileInnerFragmentDoc}
-` as unknown as DocumentNode<
-  useAssociateNewPetitionToProfileDialog_ProfileRelationshipFragment,
-  unknown
->;
 export const useAssociateNewPetitionToProfileDialog_ProfileFragmentDoc = gql`
   fragment useAssociateNewPetitionToProfileDialog_Profile on Profile {
     ...useAssociateNewPetitionToProfileDialog_ProfileInner
@@ -61254,12 +61852,10 @@ export const useAssociateNewPetitionToProfileDialog_ProfileFragmentDoc = gql`
       id
       name
     }
-    relationships {
-      ...useAssociateNewPetitionToProfileDialog_ProfileRelationship
-    }
+    ...ProfileRelationshipsAssociationTable_Profile
   }
   ${useAssociateNewPetitionToProfileDialog_ProfileInnerFragmentDoc}
-  ${useAssociateNewPetitionToProfileDialog_ProfileRelationshipFragmentDoc}
+  ${ProfileRelationshipsAssociationTable_ProfileFragmentDoc}
 ` as unknown as DocumentNode<useAssociateNewPetitionToProfileDialog_ProfileFragment, unknown>;
 export const ProfileKeyProcesses_ProfileFragmentDoc = gql`
   fragment ProfileKeyProcesses_Profile on Profile {
@@ -61468,44 +62064,15 @@ export const useAssociateNewPetitionToProfileDialog_PetitionBaseFragmentDoc = gq
     fields {
       id
       type
-      title
-      alias
-      isLinkedToProfileType
       options
-      multiple
-      profileType {
-        id
-        name
-        isStandard
-      }
       ...PetitionFieldReference_PetitionField
     }
-    fieldRelationships {
-      id
-      leftSidePetitionField {
-        id
-        profileType {
-          id
-        }
-      }
-      rightSidePetitionField {
-        id
-        profileType {
-          id
-        }
-      }
-      relationshipTypeWithDirection {
-        direction
-        profileRelationshipType {
-          id
-          isReciprocal
-        }
-      }
-    }
     ...useFieldsWithIndices_PetitionBase
+    ...ProfileRelationshipsAssociationTable_PetitionBase
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${useFieldsWithIndices_PetitionBaseFragmentDoc}
+  ${ProfileRelationshipsAssociationTable_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<useAssociateNewPetitionToProfileDialog_PetitionBaseFragment, unknown>;
 export const useCreateProfileDialog_ProfileFragmentDoc = gql`
   fragment useCreateProfileDialog_Profile on Profile {
@@ -65478,10 +66045,42 @@ export const PreviewPetitionFieldGroup_PetitionFieldDataFragmentDoc = gql`
   }
   ${RecipientViewPetitionFieldLayout_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionFieldGroup_PetitionFieldDataFragment, unknown>;
+export const useCreateFieldGroupRepliesFromProfiles_PetitionFieldFragmentDoc = gql`
+  fragment useCreateFieldGroupRepliesFromProfiles_PetitionField on PetitionField {
+    id
+    children {
+      id
+      type
+      profileTypeField {
+        id
+      }
+    }
+    replies {
+      id
+      children {
+        field {
+          id
+        }
+        replies {
+          id
+        }
+      }
+    }
+    previewReplies @client {
+      id
+      children {
+        replies {
+          id
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<useCreateFieldGroupRepliesFromProfiles_PetitionFieldFragment, unknown>;
 export const PreviewPetitionFieldGroup_PetitionFieldFragmentDoc = gql`
   fragment PreviewPetitionFieldGroup_PetitionField on PetitionField {
     ...RecipientViewPetitionFieldCard_PetitionField
     ...PreviewPetitionFieldGroup_PetitionFieldData
+    multiple
     profileType {
       id
     }
@@ -65514,24 +66113,14 @@ export const PreviewPetitionFieldGroup_PetitionFieldFragmentDoc = gql`
         }
       }
     }
+    ...useCreateFieldGroupRepliesFromProfiles_PetitionField
   }
   ${RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc}
   ${PreviewPetitionFieldGroup_PetitionFieldDataFragmentDoc}
   ${RecipientViewPetitionFieldLayout_PetitionFieldFragmentDoc}
   ${RecipientViewPetitionFieldLayout_PetitionFieldReplyFragmentDoc}
+  ${useCreateFieldGroupRepliesFromProfiles_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionFieldGroup_PetitionFieldFragment, unknown>;
-export const useCreateFieldGroupReplyFromProfile_PetitionFieldFragmentDoc = gql`
-  fragment useCreateFieldGroupReplyFromProfile_PetitionField on PetitionField {
-    id
-    children {
-      id
-      type
-      profileTypeField {
-        id
-      }
-    }
-  }
-` as unknown as DocumentNode<useCreateFieldGroupReplyFromProfile_PetitionFieldFragment, unknown>;
 export const PreviewPetitionField_PetitionFieldFragmentDoc = gql`
   fragment PreviewPetitionField_PetitionField on PetitionField {
     ...RecipientViewPetitionFieldLayout_PetitionField
@@ -65547,14 +66136,12 @@ export const PreviewPetitionField_PetitionFieldFragmentDoc = gql`
       id
     }
     ...completedFieldReplies_PetitionField
-    ...useCreateFieldGroupReplyFromProfile_PetitionField
   }
   ${RecipientViewPetitionFieldLayout_PetitionFieldFragmentDoc}
   ${RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc}
   ${PreviewPetitionFieldGroup_PetitionFieldFragmentDoc}
   ${RecipientViewPetitionFieldLayout_PetitionFieldReplyFragmentDoc}
   ${completedFieldReplies_PetitionFieldFragmentDoc}
-  ${useCreateFieldGroupReplyFromProfile_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionField_PetitionFieldFragment, unknown>;
 export const HiddenFieldDialog_PetitionFieldFragmentDoc = gql`
   fragment HiddenFieldDialog_PetitionField on PetitionField {
@@ -70567,55 +71154,65 @@ export const PreviewPetitionFieldMutations_startAsyncFieldCompletionDocument = g
   PreviewPetitionFieldMutations_startAsyncFieldCompletionMutation,
   PreviewPetitionFieldMutations_startAsyncFieldCompletionMutationVariables
 >;
-export const PreviewPetitionFieldMutations_createFieldGroupReplyFromProfileDocument = gql`
-  mutation PreviewPetitionFieldMutations_createFieldGroupReplyFromProfile(
+export const PreviewPetitionFieldMutations_prefillPetitionFromProfilesDocument = gql`
+  mutation PreviewPetitionFieldMutations_prefillPetitionFromProfiles(
     $petitionId: GID!
-    $petitionFieldId: GID!
-    $parentReplyId: GID!
-    $profileId: GID!
+    $parentReplyId: GID
+    $prefill: [CreatePetitionFromProfilePrefillInput!]!
     $force: Boolean
   ) {
-    createFieldGroupReplyFromProfile(
+    prefillPetitionFromProfiles(
       petitionId: $petitionId
-      petitionFieldId: $petitionFieldId
       parentReplyId: $parentReplyId
-      profileId: $profileId
+      prefill: $prefill
       force: $force
     ) {
       id
-    }
-  }
-` as unknown as DocumentNode<
-  PreviewPetitionFieldMutations_createFieldGroupReplyFromProfileMutation,
-  PreviewPetitionFieldMutations_createFieldGroupReplyFromProfileMutationVariables
->;
-export const PreviewPetitionFieldMutations_profileDocument = gql`
-  query PreviewPetitionFieldMutations_profile($profileId: GID!) {
-    profile(profileId: $profileId) {
-      id
-      properties {
-        field {
-          id
-        }
-        files {
-          id
-          file {
-            size
-            isComplete
-            filename
-            contentType
-          }
-        }
-        value {
-          id
-          content
-        }
+      fields {
+        ...useCreateFieldGroupRepliesFromProfiles_PetitionField
       }
     }
   }
+  ${useCreateFieldGroupRepliesFromProfiles_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<
-  PreviewPetitionFieldMutations_profileQuery,
-  PreviewPetitionFieldMutations_profileQueryVariables
+  PreviewPetitionFieldMutations_prefillPetitionFromProfilesMutation,
+  PreviewPetitionFieldMutations_prefillPetitionFromProfilesMutationVariables
+>;
+export const PreviewPetitionFieldMutations_createFieldGroupRepliesFromProfilesDocument = gql`
+  mutation PreviewPetitionFieldMutations_createFieldGroupRepliesFromProfiles(
+    $petitionId: GID!
+    $petitionFieldId: GID!
+    $parentReplyId: GID
+    $profileIds: [GID!]!
+    $force: Boolean
+  ) {
+    createFieldGroupRepliesFromProfiles(
+      petitionId: $petitionId
+      petitionFieldId: $petitionFieldId
+      parentReplyId: $parentReplyId
+      profileIds: $profileIds
+      force: $force
+    ) {
+      ...useCreateFieldGroupRepliesFromProfiles_PetitionField
+    }
+  }
+  ${useCreateFieldGroupRepliesFromProfiles_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_createFieldGroupRepliesFromProfilesMutation,
+  PreviewPetitionFieldMutations_createFieldGroupRepliesFromProfilesMutationVariables
+>;
+export const PreviewPetitionFieldMutations_profilesDocument = gql`
+  query PreviewPetitionFieldMutations_profiles($filter: ProfileFilter) {
+    profiles(offset: 0, limit: 100, filter: $filter) {
+      items {
+        ...PreviewPetitionFieldMutations_Profile
+      }
+    }
+  }
+  ${PreviewPetitionFieldMutations_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_profilesQuery,
+  PreviewPetitionFieldMutations_profilesQueryVariables
 >;
 export const GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDataDocument = gql`
   mutation GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillData(
@@ -70632,6 +71229,42 @@ export const GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDa
 ` as unknown as DocumentNode<
   GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDataMutation,
   GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDataMutationVariables
+>;
+export const usePreviewConfirmImportFromProfileDialog_profilesDocument = gql`
+  query usePreviewConfirmImportFromProfileDialog_profiles($filter: ProfileFilter) {
+    profiles(offset: 0, limit: 100, filter: $filter) {
+      items {
+        id
+        ...ProfileReference_Profile
+      }
+    }
+  }
+  ${ProfileReference_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  usePreviewConfirmImportFromProfileDialog_profilesQuery,
+  usePreviewConfirmImportFromProfileDialog_profilesQueryVariables
+>;
+export const usePreviewImportFromProfileDialog_petitionDocument = gql`
+  query usePreviewImportFromProfileDialog_petition($petitionId: GID!) {
+    petition(id: $petitionId) {
+      ...usePreviewImportFromProfileDialog_PetitionBase
+    }
+  }
+  ${usePreviewImportFromProfileDialog_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  usePreviewImportFromProfileDialog_petitionQuery,
+  usePreviewImportFromProfileDialog_petitionQueryVariables
+>;
+export const usePreviewImportFromProfileDialog_profileDocument = gql`
+  query usePreviewImportFromProfileDialog_profile($profileId: GID!) {
+    profile(profileId: $profileId) {
+      ...usePreviewImportFromProfileDialog_Profile
+    }
+  }
+  ${usePreviewImportFromProfileDialog_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  usePreviewImportFromProfileDialog_profileQuery,
+  usePreviewImportFromProfileDialog_profileQueryVariables
 >;
 export const PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument = gql`
   mutation PetitionRepliesField_petitionFieldAttachmentDownloadLink(
@@ -71073,20 +71706,6 @@ export const useAssociateNewPetitionToProfileDialog_petitionDocument = gql`
 ` as unknown as DocumentNode<
   useAssociateNewPetitionToProfileDialog_petitionQuery,
   useAssociateNewPetitionToProfileDialog_petitionQueryVariables
->;
-export const useAssociateNewPetitionToProfileDialog_profileRelationshipTypesDocument = gql`
-  query useAssociateNewPetitionToProfileDialog_profileRelationshipTypes {
-    profileRelationshipTypes {
-      id
-      alias
-      allowedLeftRightProfileTypeIds
-      allowedRightLeftProfileTypeIds
-      isReciprocal
-    }
-  }
-` as unknown as DocumentNode<
-  useAssociateNewPetitionToProfileDialog_profileRelationshipTypesQuery,
-  useAssociateNewPetitionToProfileDialog_profileRelationshipTypesQueryVariables
 >;
 export const useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument = gql`
   mutation useAssociateNewPetitionToProfileDialog_createPetitionFromProfile(

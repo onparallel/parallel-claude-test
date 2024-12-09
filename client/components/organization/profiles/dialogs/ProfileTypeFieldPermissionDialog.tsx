@@ -34,7 +34,7 @@ import { UserSelect, UserSelectInstance } from "@parallel/components/common/User
 import {
   ProfileTypeField,
   ProfileTypeFieldPermissionType,
-  UpdateProfileTypeFieldPermissionInput,
+  UpdateProfileTypeFieldPermissionsInput,
   useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragment,
   useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermissionFragment,
   useProfileTypeFieldPermissionDialog_UserFragment,
@@ -77,7 +77,7 @@ interface ProfileTypeFieldPermissionDialogData {
 
 interface ProfileTypeFieldPermissionDialogResult {
   defaultPermission: ProfileTypeFieldPermissionType;
-  permissions: UpdateProfileTypeFieldPermissionInput[];
+  permissions: UpdateProfileTypeFieldPermissionsInput[];
 }
 
 export function useProfileTypeFieldPermissionDialog() {

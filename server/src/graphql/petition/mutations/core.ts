@@ -84,6 +84,10 @@ import {
   not,
   or,
 } from "../../helpers/authorize";
+import {
+  buildFieldGroupRepliesFromPrefillInput,
+  createPetitionFieldRepliesFromPrefillData,
+} from "../../helpers/buildFieldGroupRepliesFromPrefill";
 import { buildProfileUpdatedEventsData } from "../../helpers/buildProfileUpdatedEventsData";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { importFromExcel } from "../../helpers/importDataFromExcel";
@@ -98,6 +102,7 @@ import { maxLength } from "../../helpers/validators/maxLength";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 import { notEmptyString } from "../../helpers/validators/notEmptyString";
+import { uniqueValues } from "../../helpers/validators/uniqueValues";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { validateFieldLogicInput } from "../../helpers/validators/validFieldLogic";
 import { validFolderId } from "../../helpers/validators/validFolderId";
@@ -164,6 +169,7 @@ import {
   profileTypeFieldCanBeLinkedToFieldGroup,
   repliesBelongsToField,
   repliesBelongsToPetition,
+  replyIsForFieldOfType,
   replyStatusCanBeUpdated,
   templateDoesNotHavePublicPetitionLink,
   userHasAccessToCreatePetitionFromProfilePrefillInput,
@@ -1499,7 +1505,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
             // if updating FIELD_GROUP to required, create an empty field group reply only if there are no replies
             const replies = await ctx.petitions.loadRepliesForField(field.id);
             if (replies.length === 0) {
-              await ctx.petitions.createEmptyFieldGroupReply([field.id], ctx.user!);
+              await ctx.petitions.createEmptyFieldGroupReply([field.id], {}, ctx.user!);
               ctx.petitions.loadRepliesForField.dataloader.clear(field.id);
             }
           }
@@ -3659,39 +3665,32 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         }
       }
 
-      try {
-        await ctx.profiles.associateProfilesToPetition(
-          [{ petition_id: args.petitionId, profile_id: profile!.id }],
-          `User:${ctx.user!.id}`,
-        );
+      const associations = await ctx.profiles.associateProfilesToPetition(
+        [{ petition_id: args.petitionId, profile_id: profile!.id }],
+        `User:${ctx.user!.id}`,
+      );
 
-        await ctx.petitions.createEvent({
+      await ctx.petitions.createEvent(
+        associations.map((a) => ({
           type: "PROFILE_ASSOCIATED",
-          petition_id: args.petitionId,
+          petition_id: a.petition_id,
           data: {
             user_id: ctx.user!.id,
-            profile_id: profile!.id,
+            profile_id: a.profile_id,
           },
-        });
-        await ctx.profiles.createEvent({
+        })),
+      );
+      await ctx.profiles.createEvent(
+        associations.map((a) => ({
           type: "PETITION_ASSOCIATED",
           org_id: ctx.user!.org_id,
-          profile_id: profile!.id,
+          profile_id: a.profile_id,
           data: {
             user_id: ctx.user!.id,
-            petition_id: args.petitionId,
+            petition_id: a.petition_id,
           },
-        });
-      } catch (error) {
-        if (
-          error instanceof DatabaseError &&
-          error.constraint === "petition_profile__petition_id__profile_id"
-        ) {
-          // profile is already associated to petition, safe to ignore error
-        } else {
-          throw error;
-        }
-      }
+        })),
+      );
 
       // these are the possible field relationships with petitionFieldId in any of the sides.
       // we need to look for replies with set associated_profile_id that belong to the field on the other side of the relationship
@@ -3887,10 +3886,10 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
       ),
     ),
     userHasAccessToCreatePetitionFromProfilePrefillInput(
-      "profileId",
       "templateId",
-      "petitionFieldId",
       "prefill",
+      "profileId",
+      "petitionFieldId",
     ),
   ),
   args: {
@@ -3985,92 +3984,127 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
       return petition;
     }
 
-    const fieldGroups = (await ctx.petitions.loadFieldsForPetition(petition.id)).filter(
+    // as this prefill array comes from template fields, we need to map the template field Ids to the new petition field Ids
+    const petitionFieldGroups = (await ctx.petitions.loadFieldsForPetition(petition.id)).filter(
       (f) => f!.type === "FIELD_GROUP" && isNonNullish(f.profile_type_id),
     );
-    const children = await ctx.petitions.loadPetitionFieldChildren(fieldGroups.map((f) => f.id));
-    const groupsWithChildren = zip(fieldGroups, children);
+    const prefill = args.prefill.map((input) => ({
+      ...input,
+      petitionFieldId: petitionFieldGroups.find(
+        (pf) => pf.from_petition_field_id === input.petitionFieldId,
+      )!.id,
+    }));
+    const data = await buildFieldGroupRepliesFromPrefillInput(petition.id, prefill, ctx);
 
-    const replies: CreatePetitionFieldReply[] = [];
-    for (const input of args.prefill.filter((p) => p.profileIds.length > 0)) {
-      const [parent, children] = groupsWithChildren.find(
-        ([parent]) => parent!.from_petition_field_id === input.petitionFieldId,
-      )!;
-      // prioritize filling empty groups first
-      const emptyGroupReplies = await ctx.petitions.loadEmptyFieldGroupReplies(parent.id);
-
-      for (const profileId of input.profileIds) {
-        let groupReply = emptyGroupReplies.shift();
-        if (isNullish(groupReply)) {
-          [groupReply] = await ctx.petitions.createEmptyFieldGroupReply([parent.id], ctx.user!);
-        }
-
-        await ctx.petitions.updatePetitionFieldReply(
-          groupReply.id,
-          { associated_profile_id: profileId },
-          `User:${ctx.user!.id}`,
-        );
-
-        const profileFieldValues = await ctx.profiles.loadProfileFieldValuesByProfileId(profileId);
-        const profileFieldFiles = await ctx.profiles.loadProfileFieldFilesByProfileId(profileId);
-
-        const linkedChildren = children.filter((c) => isNonNullish(c.profile_type_field_id));
-
-        const userPermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
-          linkedChildren.map((child) => ({
-            profileTypeFieldId: child.profile_type_field_id!,
-            userId: ctx.user!.id,
-          })),
-        );
-
-        for (const [child] of zip(linkedChildren, userPermissions).filter(([, permission]) =>
-          // do not prefill petition fields if the user does not have at least READ permission on the profile property
-          isAtLeast(permission, "READ"),
-        )) {
-          const profileValue = profileFieldValues.find(
-            (v) => v.profile_type_field_id === child.profile_type_field_id,
-          );
-          const profileFiles = profileFieldFiles.filter(
-            (f) => f.profile_type_field_id === child.profile_type_field_id,
-          );
-
-          const fileUploadIds = profileFiles.map((f) => f.file_upload_id).filter(isNonNullish);
-          const clonedFileUploads =
-            fileUploadIds.length > 0 ? await ctx.files.cloneFileUpload(fileUploadIds) : [];
-
-          if (isNonNullish(profileValue)) {
-            replies.push({
-              petition_field_id: child.id,
-              parent_petition_field_reply_id: groupReply.id,
-              content: profileValue.content,
-              type: child.type,
-              user_id: ctx.user!.id,
-            });
-          } else if (clonedFileUploads.length > 0) {
-            replies.push(
-              ...clonedFileUploads.map((file) => ({
-                petition_field_id: child.id,
-                parent_petition_field_reply_id: groupReply.id,
-                content: { file_upload_id: file.id },
-                type: child.type,
-                user_id: ctx.user!.id,
-              })),
-            );
-          }
-        }
-      }
-    }
-
-    if (replies.length > 0) {
+    if (data.length > 0) {
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(petition.id, `User:${ctx.user!.id}`);
-      await ctx.petitions.createPetitionFieldReply(petition.id, replies, `User:${ctx.user!.id}`);
+      await createPetitionFieldRepliesFromPrefillData(petition.id, data, ctx);
     }
 
     return petition;
   },
 });
 
+export const prefillPetitionFromProfiles = mutationField("prefillPetitionFromProfiles", {
+  type: "Petition",
+  description: "Prefills petition field groups with information from provided profiles",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToPetitions("petitionId"),
+    petitionsAreOfTypePetition("petitionId"),
+    petitionIsNotAnonymized("petitionId"),
+    userHasAccessToCreatePetitionFromProfilePrefillInput("petitionId", "prefill"),
+    ifArgDefined(
+      "parentReplyId",
+      and(
+        repliesBelongsToPetition("petitionId", "parentReplyId" as never),
+        replyIsForFieldOfType("parentReplyId" as never, "FIELD_GROUP"),
+      ),
+    ),
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    prefill: nonNull(list(nonNull("CreatePetitionFromProfilePrefillInput"))),
+    parentReplyId: nullable(
+      globalIdArg("PetitionFieldReply", {
+        description:
+          "Reply ID to insert the first profile into. If not provided, new parent replies will be created for each profile",
+      }),
+    ),
+    force: booleanArg({
+      description:
+        "Pass force=true to associate the profile to an empty field reply even if there is nothing to import from the profile",
+    }),
+  },
+  validateArgs: notEmptyArray("prefill"),
+  resolve: async (_, args, ctx) => {
+    const data = await buildFieldGroupRepliesFromPrefillInput(
+      args.petitionId,
+      args.prefill.map((p, index) => ({
+        ...p,
+        parentReplyId: index === 0 ? (args.parentReplyId ?? null) : null,
+      })),
+      ctx,
+    );
+
+    const emptyProfileIds = data
+      .filter((d) => d.childReplies.length === 0)
+      .map((d) => d.associatedProfileId);
+
+    if (emptyProfileIds.length > 0 && !args.force) {
+      throw new ApolloError(
+        "Some of the provided profiles are empty. Pass force=true to associate the profiles to empty field replies",
+        "NOTHING_TO_IMPORT_ERROR",
+        { profileIds: emptyProfileIds.map((id) => toGlobalId("Profile", id)) },
+      );
+    }
+
+    if (data.length > 0) {
+      await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
+
+      // insert data in DB only after the two error checks have passed (NOTHING_TO_IMPORT_ERROR and PETITION_SEND_LIMIT_REACHED).
+      // this will ensure nothing will be modified in DB if an error is thrown
+      await createPetitionFieldRepliesFromPrefillData(args.petitionId, data, ctx);
+    }
+
+    const profileIds = unique(args.prefill.flatMap((p) => p.profileIds));
+
+    const associations = await ctx.profiles.associateProfilesToPetition(
+      profileIds.map((profileId) => ({
+        profile_id: profileId,
+        petition_id: args.petitionId,
+      })),
+      `User:${ctx.user!.id}`,
+    );
+    await ctx.petitions.createEvent(
+      associations.map((a) => ({
+        type: "PROFILE_ASSOCIATED",
+        petition_id: a.petition_id,
+        data: {
+          user_id: ctx.user!.id,
+          profile_id: a.profile_id,
+        },
+      })),
+    );
+    await ctx.profiles.createEvent(
+      associations.map((a) => ({
+        type: "PETITION_ASSOCIATED",
+        org_id: ctx.user!.org_id,
+        profile_id: a.profile_id,
+        data: {
+          user_id: ctx.user!.id,
+          petition_id: a.petition_id,
+        },
+      })),
+    );
+
+    return (await ctx.petitions.loadPetition(args.petitionId))!;
+  },
+});
+
+/** @deprecated */
 export const createFieldGroupReplyFromProfile = mutationField("createFieldGroupReplyFromProfile", {
+  deprecation: "use createFieldGroupRepliesFromProfiles",
   type: "PetitionFieldReply",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
@@ -4190,40 +4224,33 @@ export const createFieldGroupReplyFromProfile = mutationField("createFieldGroupR
       }
     }
 
-    try {
-      await ctx.profiles.associateProfilesToPetition(
-        [{ profile_id: args.profileId, petition_id: args.petitionId }],
-        `User:${ctx.user!.id}`,
-      );
+    const associations = await ctx.profiles.associateProfilesToPetition(
+      [{ profile_id: args.profileId, petition_id: args.petitionId }],
+      `User:${ctx.user!.id}`,
+    );
 
-      await ctx.petitions.createEvent({
+    await ctx.petitions.createEvent(
+      associations.map((a) => ({
         type: "PROFILE_ASSOCIATED",
-        petition_id: args.petitionId,
+        petition_id: a.petition_id,
         data: {
           user_id: ctx.user!.id,
-          profile_id: args.profileId,
+          profile_id: a.profile_id,
         },
-      });
+      })),
+    );
 
-      await ctx.profiles.createEvent({
+    await ctx.profiles.createEvent(
+      associations.map((a) => ({
         type: "PETITION_ASSOCIATED",
         org_id: ctx.user!.org_id,
-        profile_id: args.profileId,
+        profile_id: a.profile_id,
         data: {
           user_id: ctx.user!.id,
-          petition_id: args.petitionId,
+          petition_id: a.petition_id,
         },
-      });
-    } catch (error) {
-      if (
-        error instanceof DatabaseError &&
-        error.constraint === "petition_profile__petition_id__profile_id"
-      ) {
-        // profile is already associated to petition, safe to ignore error
-      } else {
-        throw error;
-      }
-    }
+      })),
+    );
 
     if (profileLinkedChildren.length > 0) {
       await ctx.petitions.deletePetitionFieldReplies(
@@ -4244,6 +4271,115 @@ export const createFieldGroupReplyFromProfile = mutationField("createFieldGroupR
     return updatedReply;
   },
 });
+
+export const createFieldGroupRepliesFromProfiles = mutationField(
+  "createFieldGroupRepliesFromProfiles",
+  {
+    description: "Creates replies on a FIELD_GROUP field with the provided profiles",
+    type: "PetitionField",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PROFILES"),
+      petitionIsNotAnonymized("petitionId"),
+      petitionsAreOfTypePetition("petitionId"),
+      userHasAccessToPetitions("petitionId"),
+      fieldsBelongsToPetition("petitionId", "petitionFieldId"),
+      fieldHasType("petitionFieldId", ["FIELD_GROUP"]),
+      fieldIsLinkedToProfileType("petitionFieldId"),
+      ifArgDefined(
+        "parentReplyId",
+        repliesBelongsToField("petitionFieldId", "parentReplyId" as never),
+      ),
+      userHasAccessToProfile("profileIds"),
+      profileHasStatus("profileIds", ["OPEN", "CLOSED"]),
+      profileIsNotAnonymized("profileIds"),
+      profileHasSameProfileTypeAsField("profileIds", "petitionFieldId"),
+    ),
+    args: {
+      petitionId: nonNull(globalIdArg("Petition")),
+      petitionFieldId: nonNull(
+        globalIdArg("PetitionField", { description: "ID of the FIELD_GROUP" }),
+      ),
+      parentReplyId: nullable(
+        globalIdArg("PetitionFieldReply", {
+          description:
+            "Reply ID to insert the first profile into. If not provided, new parent replies will be created for each profile",
+        }),
+      ),
+      profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
+      force: booleanArg({
+        description:
+          "Pass force=true to associate the profile to an empty field reply even if there is nothing to import from the profile",
+      }),
+    },
+    validateArgs: validateAnd(notEmptyArray("profileIds"), uniqueValues("profileIds")),
+    resolve: async (_, args, ctx) => {
+      const data = await buildFieldGroupRepliesFromPrefillInput(
+        args.petitionId,
+        [
+          {
+            petitionFieldId: args.petitionFieldId,
+            parentReplyId: args.parentReplyId ?? null,
+            profileIds: args.profileIds,
+          },
+        ],
+        ctx,
+      );
+
+      const emptyProfileIds = data
+        .filter((d) => d.childReplies.length === 0)
+        .map((d) => d.associatedProfileId);
+
+      if (emptyProfileIds.length > 0 && !args.force) {
+        throw new ApolloError(
+          "Some of the provided profiles are empty. Pass force=true to associate the profiles to empty field replies",
+          "NOTHING_TO_IMPORT_ERROR",
+          { profileIds: emptyProfileIds.map((id) => toGlobalId("Profile", id)) },
+        );
+      }
+
+      if (data.length > 0) {
+        await ctx.orgCredits.ensurePetitionHasConsumedCredit(
+          args.petitionId,
+          `User:${ctx.user!.id}`,
+        );
+        // insert data in DB only after the two error checks have passed (NOTHING_TO_IMPORT_ERROR and PETITION_SEND_LIMIT_REACHED).
+        // this will ensure nothing will be modified in DB if an error is thrown
+        await createPetitionFieldRepliesFromPrefillData(args.petitionId, data, ctx);
+      }
+
+      const associations = await ctx.profiles.associateProfilesToPetition(
+        args.profileIds.map((profileId) => ({
+          profile_id: profileId,
+          petition_id: args.petitionId,
+        })),
+        `User:${ctx.user!.id}`,
+      );
+      await ctx.petitions.createEvent(
+        associations.map((a) => ({
+          type: "PROFILE_ASSOCIATED",
+          petition_id: a.petition_id,
+          data: {
+            user_id: ctx.user!.id,
+            profile_id: a.profile_id,
+          },
+        })),
+      );
+      await ctx.profiles.createEvent(
+        associations.map((a) => ({
+          type: "PETITION_ASSOCIATED",
+          org_id: ctx.user!.org_id,
+          profile_id: a.profile_id,
+          data: {
+            user_id: ctx.user!.id,
+            petition_id: a.petition_id,
+          },
+        })),
+      );
+
+      return (await ctx.petitions.loadField(args.petitionFieldId))!;
+    },
+  },
+);
 
 export const enableAutomaticNumberingOnPetitionFields = mutationField(
   "enableAutomaticNumberingOnPetitionFields",

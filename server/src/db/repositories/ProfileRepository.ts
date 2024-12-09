@@ -47,6 +47,7 @@ import {
   CreateProfileTypeProcess,
   Organization,
   Petition,
+  PetitionProfile,
   Profile,
   ProfileEvent,
   ProfileEventType,
@@ -1800,22 +1801,32 @@ export class ProfileRepository extends BaseRepository {
     },
   );
 
-  async associateProfilesToPetition(data: CreatePetitionProfile[], createdBy: string) {
+  async associateProfilesToPetition(
+    data: CreatePetitionProfile[],
+    createdBy: string,
+    t?: Knex.Transaction,
+  ) {
     if (data.length === 0) {
       return [];
     }
 
-    return await this.from("petition_profile").insert(
-      data.map((d) => ({ ...d, created_at: this.now(), created_by: createdBy })),
-      "*",
+    return await this.raw<PetitionProfile>(
+      /* sql */ `
+        ?
+        on conflict (petition_id, profile_id)
+        do nothing -- association is already there, ignore row
+        returning *;
+      `,
+      [
+        this.from("petition_profile").insert(
+          data.map((d) => ({ ...d, created_at: this.now(), created_by: createdBy })),
+        ),
+      ],
+      t,
     );
   }
 
-  async disassociateProfileFromPetition(
-    petitionIds: number[],
-    profileIds: number[],
-    updatedBy: string,
-  ) {
+  async disassociateProfileFromPetition(petitionIds: number[], profileIds: number[]) {
     if (profileIds.length === 0) {
       throw new Error("expected profileIds to be non-empty");
     }
@@ -1823,10 +1834,11 @@ export class ProfileRepository extends BaseRepository {
       throw new Error("expected petitionIds to be non-empty");
     }
 
-    await this.from("petition_profile")
+    return await this.from("petition_profile")
       .whereIn("petition_id", petitionIds)
       .whereIn("profile_id", profileIds)
-      .delete();
+      .delete()
+      .returning("*");
   }
 
   async countProfilesAssociatedToPetitions(profileIds: number[], petitionIds: number[]) {

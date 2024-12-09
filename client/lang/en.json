@@ -7531,8 +7531,8 @@
   },
   {
     "term": "component.preview-confirm-import-from-profile-dialog.body",
-    "definition": "The selected profile has no information available to import into the group.",
-    "context": "The selected profile has no information available to import into the group."
+    "definition": "The following selected profiles do not have information available for importing into the group:",
+    "context": "The following selected profiles do not have information available for importing into the group:"
   },
   {
     "term": "component.preview-confirm-import-from-profile-dialog.body-2",
@@ -7558,6 +7558,11 @@
     "term": "component.preview-import-from-profile-dialog.body",
     "definition": "All replies to linked fields will be overwritten.",
     "context": "All replies to linked fields will be overwritten."
+  },
+  {
+    "term": "component.preview-import-from-profile-dialog.body-select-relationships",
+    "definition": "Select the relationships you would like to import in the related fields:",
+    "context": "Select the relationships you would like to import in the related fields:"
   },
   {
     "term": "component.preview-import-from-profile-dialog.header",

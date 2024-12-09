@@ -38,7 +38,6 @@ import { RecipientViewPetitionFieldShortText } from "../recipient-view/fields/Re
 import { RecipientViewPetitionFieldTaxDocuments } from "../recipient-view/fields/RecipientViewPetitionFieldTaxDocuments";
 import { RecipientViewPetitionFieldText } from "../recipient-view/fields/RecipientViewPetitionFieldText";
 import {
-  useCreateFieldGroupReplyFromProfile,
   useCreateFileUploadReply,
   useCreatePetitionFieldReply,
   useDeletePetitionReply,
@@ -243,33 +242,6 @@ export function PreviewPetitionField({
     return pick(data!.retryAsyncFieldCompletion, ["type", "url"]);
   };
 
-  const createFieldGroupReplyFromProfile = useCreateFieldGroupReplyFromProfile();
-  const handleCreateFieldGroupReplyFromProfile = useCallback(
-    async ({
-      petitionId,
-      petitionFieldId,
-      parentReplyId,
-      profileId,
-      force,
-    }: {
-      petitionId: string;
-      petitionFieldId: string;
-      parentReplyId: string;
-      profileId: string;
-      force?: boolean;
-    }) => {
-      await createFieldGroupReplyFromProfile({
-        petitionId,
-        petitionFieldId,
-        parentReplyId,
-        profileId,
-        force,
-        isCacheOnly,
-      });
-    },
-    [createFieldGroupReplyFromProfile],
-  );
-
   const { refetch } = useQuery(PreviewPetitionField_queryDocument, {
     skip: true,
   });
@@ -310,7 +282,6 @@ export function PreviewPetitionField({
         onRefreshField={handleRefreshAsyncField}
         onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
         onRetryAsyncFieldCompletion={handleRetryAsyncFieldCompletion}
-        onCreateFieldGroupReplyFromProfile={handleCreateFieldGroupReplyFromProfile}
         isCacheOnly={isCacheOnly}
         petition={petition}
         showErrors={showErrors}
@@ -425,14 +396,12 @@ PreviewPetitionField.fragments = {
         id
       }
       ...completedFieldReplies_PetitionField
-      ...useCreateFieldGroupReplyFromProfile_PetitionField
     }
     ${RecipientViewPetitionFieldCard.fragments.PetitionField}
     ${RecipientViewPetitionFieldLayout.fragments.PetitionField}
     ${RecipientViewPetitionFieldLayout.fragments.PetitionFieldReply}
     ${PreviewPetitionFieldGroup.fragments.PetitionField}
     ${completedFieldReplies.fragments.PetitionField}
-    ${useCreateFieldGroupReplyFromProfile.fragments.PetitionField}
   `,
   PetitionFieldReply: gql`
     fragment PreviewPetitionField_PetitionFieldReply on PetitionFieldReply {

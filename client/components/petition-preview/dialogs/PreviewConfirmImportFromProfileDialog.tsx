@@ -1,10 +1,24 @@
-import { Button, Stack, Text } from "@chakra-ui/react";
+import { gql, useQuery } from "@apollo/client";
+import { Button, ListItem, Stack, Text, UnorderedList } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { ProfileReference } from "@parallel/components/common/ProfileReference";
+import { usePreviewConfirmImportFromProfileDialog_profilesDocument } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
-export function PreviewConfirmImportFromProfileDialog({ ...props }: DialogProps<{}>) {
+export function PreviewConfirmImportFromProfileDialog({
+  profileIds,
+  ...props
+}: DialogProps<{ profileIds: string[] }, void>) {
+  const { data } = useQuery(usePreviewConfirmImportFromProfileDialog_profilesDocument, {
+    variables: {
+      filter: {
+        profileId: profileIds,
+      },
+    },
+  });
+
   return (
     <ConfirmDialog
       header={
@@ -19,20 +33,27 @@ export function PreviewConfirmImportFromProfileDialog({ ...props }: DialogProps<
         </Stack>
       }
       body={
-        <>
+        <Stack>
           <Text>
             <FormattedMessage
               id="component.preview-confirm-import-from-profile-dialog.body"
-              defaultMessage="The selected profile has no information available to import into the group."
+              defaultMessage="The following selected profiles do not have information available for importing into the group:"
             />
           </Text>
+          <UnorderedList paddingStart={2} paddingBottom={2}>
+            {data?.profiles.items.map((profile) => (
+              <ListItem key={profile.id}>
+                <ProfileReference profile={profile} />
+              </ListItem>
+            ))}
+          </UnorderedList>
           <Text>
             <FormattedMessage
               id="component.preview-confirm-import-from-profile-dialog.body-2"
               defaultMessage="If you continue, the profile will be associated with the parallel, but existing responses in fields linked to the profile type will be deleted."
             />
           </Text>
-        </>
+        </Stack>
       }
       confirm={
         <Button onClick={() => props.onResolve()} colorScheme="primary" variant="solid">
@@ -47,3 +68,17 @@ export function PreviewConfirmImportFromProfileDialog({ ...props }: DialogProps<
 export function usePreviewConfirmImportFromProfileDialog() {
   return useDialog(PreviewConfirmImportFromProfileDialog);
 }
+
+const _queries = [
+  gql`
+    query usePreviewConfirmImportFromProfileDialog_profiles($filter: ProfileFilter) {
+      profiles(offset: 0, limit: 100, filter: $filter) {
+        items {
+          id
+          ...ProfileReference_Profile
+        }
+      }
+    }
+    ${ProfileReference.fragments.Profile}
+  `,
+];

@@ -1294,7 +1294,7 @@ type Mutation {
     parentReplyId: GID
     petitionId: GID!
     profileId: ID!
-  ): PetitionFieldReply! @deprecated(reason: "use BACKGROUND_CHECK field")
+  ): PetitionFieldReply!
 
   """
   Creates a task for downloading a PDF file with the profile of an entity in DowJones
@@ -1347,6 +1347,28 @@ type Mutation {
   Creates a task for exporting a ZIP file with petition replies and sends it to the queue
   """
   createExportRepliesTask(pattern: String, petitionId: GID!): Task!
+
+  """
+  Creates replies on a FIELD_GROUP field with the provided profiles
+  """
+  createFieldGroupRepliesFromProfiles(
+    """
+    Pass force=true to associate the profile to an empty field reply even if there is nothing to import from the profile
+    """
+    force: Boolean
+
+    """
+    Reply ID to insert the first profile into. If not provided, new parent replies will be created for each profile
+    """
+    parentReplyId: GID
+
+    """
+    ID of the FIELD_GROUP
+    """
+    petitionFieldId: GID!
+    petitionId: GID!
+    profileIds: [GID!]!
+  ): PetitionField!
   createFieldGroupReplyFromProfile(
     """
     Pass force=true to associate the profile to an empty field reply even if there is nothing to import from the profile
@@ -1356,7 +1378,7 @@ type Mutation {
     petitionFieldId: GID!
     petitionId: GID!
     profileId: GID!
-  ): PetitionFieldReply!
+  ): PetitionFieldReply! @deprecated(reason: "use createFieldGroupRepliesFromProfiles")
 
   """
   Creates a task for exporting files from a petition using an integration
@@ -1879,18 +1901,6 @@ type Mutation {
   """
   Disassociates a petition from a profile
   """
-  disassociatePetitionFromProfile(petitionIds: [GID!]!, profileId: GID!): Success!
-    @deprecated(reason: "use disassociateProfilesFromPetitions")
-
-  """
-  Disassociates a profile from a petition
-  """
-  disassociateProfileFromPetition(petitionId: GID!, profileIds: [GID!]!): Success!
-    @deprecated(reason: "use disassociateProfilesFromPetitions")
-
-  """
-  Disassociates a petition from a profile
-  """
   disassociateProfilesFromPetitions(petitionIds: [GID!]!, profileIds: [GID!]!): Success!
 
   """
@@ -2078,6 +2088,23 @@ type Mutation {
   Pins a profile type to the user's navigation manu
   """
   pinProfileType(profileTypeId: GID!): ProfileType!
+
+  """
+  Prefills petition field groups with information from provided profiles
+  """
+  prefillPetitionFromProfiles(
+    """
+    Pass force=true to associate the profile to an empty field reply even if there is nothing to import from the profile
+    """
+    force: Boolean
+
+    """
+    Reply ID to insert the first profile into. If not provided, new parent replies will be created for each profile
+    """
+    parentReplyId: GID
+    petitionId: GID!
+    prefill: [CreatePetitionFromProfilePrefillInput!]!
+  ): Petition!
   profileExternalSourceDetails(
     externalId: ID!
     integrationId: GID!
@@ -2969,16 +2996,6 @@ type Mutation {
     profileTypeFieldId: GID!
     profileTypeId: GID!
   ): ProfileTypeField!
-
-  """
-  Updates the default permission for a profile type field for a set of users and/or user groups.
-  """
-  updateProfileTypeFieldPermission(
-    data: [UpdateProfileTypeFieldPermissionInput!]!
-    defaultPermission: ProfileTypeFieldPermissionType
-    profileTypeFieldId: GID!
-    profileTypeId: GID!
-  ): ProfileTypeField! @deprecated(reason: "use updateProfileTypeFieldPermissions")
 
   """
   Updates the default permission for a list of profile type fields and a set of users and/or user groups.
@@ -5621,17 +5638,6 @@ type Profile implements Timestamps {
   localizableName: LocalizableUserText!
   name: String!
   permanentDeletionAt: DateTime
-  petitions(
-    """
-    Number of elements to take from the list.
-    """
-    limit: Int
-
-    """
-    Number of elements to skip from the list.
-    """
-    offset: Int
-  ): PetitionPagination! @deprecated(reason: "use associatedPetitions instead")
   profileType: ProfileType!
   properties(filter: [ProfileFieldPropertyFilter!]): [ProfileFieldProperty!]!
   relationships(filter: [ProfileRelationshipFilter!]): [ProfileRelationship!]!
@@ -8147,12 +8153,6 @@ input UpdateProfileTypeFieldInput {
   name: LocalizableUserText
   options: JSONObject
   substitutions: [UpdateProfileTypeFieldSelectOptionsSubstitution!]
-}
-
-input UpdateProfileTypeFieldPermissionInput {
-  permission: ProfileTypeFieldPermissionType!
-  userGroupId: GID
-  userId: GID
 }
 
 input UpdateProfileTypeFieldPermissionsInput {
