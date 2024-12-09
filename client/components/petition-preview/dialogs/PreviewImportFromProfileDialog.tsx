@@ -108,6 +108,8 @@ function PreviewImportFromProfileDialogSelectProfiles({
                     },
                     { profileIds },
                   );
+                } else {
+                  props.onResolve({ profileIds });
                 }
               }
             }

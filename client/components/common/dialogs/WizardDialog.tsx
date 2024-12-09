@@ -1,6 +1,6 @@
 import { ModalProps } from "@chakra-ui/react";
 import { ComponentType, useCallback, useMemo, useState } from "react";
-import { BaseDialogPropsProvider, DialogCallbacks, DialogProps, useDialog } from "./DialogProvider";
+import { BaseDialogPropsProvider, DialogCallbacks, useDialog } from "./DialogProvider";
 
 export function useWizardDialog<TSteps extends Record<string, object>>(steps: {
   [K in keyof TSteps]: ComponentType<TSteps[K]>;
