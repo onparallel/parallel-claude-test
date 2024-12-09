@@ -64,6 +64,7 @@ const config = {
   },
   redirects() {
     return [
+      { source: "/signup", destination: "/login", permanent: false },
       { source: "/invite", destination: "/signup", permanent: true },
       { source: "/app/settings/tokens", destination: "/app/settings/developers", permanent: true },
       {
