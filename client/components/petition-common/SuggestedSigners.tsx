@@ -8,6 +8,7 @@ import {
   SuggestedSigners_UserFragment,
   Tone,
 } from "@parallel/graphql/__types";
+import { FullPetitionSignerFragment } from "@parallel/utils/apollo/fragments";
 import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { ArrayUnionToUnion } from "@parallel/utils/types";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
@@ -21,14 +22,17 @@ type PetitionSelection =
 
 type PetitionFieldSelection = ArrayUnionToUnion<PetitionSelection["fields"]>;
 
-type SuggestionType = SuggestedSigners_PetitionSignerFragment & { isMe?: boolean };
+type SuggestionType = Pick<
+  SuggestedSigners_PetitionSignerFragment,
+  "firstName" | "lastName" | "email"
+> & { isMe?: boolean };
 
 interface SuggestedSignersProps {
   petition: PetitionSelection;
   user?: SuggestedSigners_UserFragment;
   contact?: SuggestedSigners_PublicContactFragment;
-  onAddSigner: (s: SuggestedSigners_PetitionSignerFragment) => void;
-  currentSigners: SuggestedSigners_PetitionSignerFragment[];
+  onAddSigner: (s: SuggestionType) => void;
+  currentSigners: SuggestionType[];
   isDisabled?: boolean;
   tone?: Tone;
 }
@@ -255,7 +259,7 @@ export function SuggestedSigners({
 }
 interface SuggestedSignersRowProps {
   suggestions: SuggestionType[];
-  onAddSigner: (s: SuggestedSigners_PetitionSignerFragment) => void;
+  onAddSigner: (s: SuggestionType) => void;
   title: string;
   isDisabled?: boolean;
   tone?: Tone;
@@ -326,10 +330,9 @@ SuggestedSigners.fragments = {
   get PetitionSigner() {
     return gql`
       fragment SuggestedSigners_PetitionSigner on PetitionSigner {
-        firstName
-        lastName
-        email
+        ...Fragments_FullPetitionSigner
       }
+      ${FullPetitionSignerFragment}
     `;
   },
   get PublicContact() {

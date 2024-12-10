@@ -638,6 +638,7 @@ ProfileFieldBackgroundCheckSettings.fragments = {
       fragment ProfileFieldBackgroundCheckSettings_ProfileType on ProfileType {
         id
         fields {
+          id
           ...ProfileFieldBackgroundCheckSettings_ProfileTypeField
         }
       }

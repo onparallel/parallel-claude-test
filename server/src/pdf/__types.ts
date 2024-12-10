@@ -380,6 +380,12 @@ export type CreateContactInput = {
   lastName?: InputMaybe<Scalars["String"]["input"]>;
 };
 
+export type CreatePetitionFieldInput = {
+  isInternal?: InputMaybe<Scalars["Boolean"]["input"]>;
+  multiple?: InputMaybe<Scalars["Boolean"]["input"]>;
+  options?: InputMaybe<Scalars["JSONObject"]["input"]>;
+};
+
 export type CreatePetitionFieldReplyInput = {
   content?: InputMaybe<Scalars["JSON"]["input"]>;
   id: Scalars["GID"]["input"];
@@ -1671,9 +1677,11 @@ export type MutationcreatePetitionEventSubscriptionArgs = {
 };
 
 export type MutationcreatePetitionFieldArgs = {
+  data?: InputMaybe<CreatePetitionFieldInput>;
   parentFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   petitionId: Scalars["GID"]["input"];
   position?: InputMaybe<Scalars["Int"]["input"]>;
+  profileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
   type: PetitionFieldType;
 };
 

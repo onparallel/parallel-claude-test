@@ -615,6 +615,7 @@ useArchiveFieldGroupReplyIntoProfileDialog.fragments = {
           ...getProfileNamePreview_PetitionField
         }
         replies {
+          id
           ...useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInner
           ...useResolveProfilePropertiesConflictsDialog_PetitionFieldReply
           ...useConfigureExpirationsDateDialog_PetitionFieldReply
@@ -629,6 +630,7 @@ useArchiveFieldGroupReplyIntoProfileDialog.fragments = {
     fragment useArchiveFieldGroupReplyIntoProfileDialog_Petition on Petition {
       id
       fields {
+        id
         ...useArchiveFieldGroupReplyIntoProfileDialog_PetitionField
       }
       ...useFieldLogic_PetitionBase

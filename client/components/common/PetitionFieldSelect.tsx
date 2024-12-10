@@ -150,8 +150,10 @@ PetitionFieldSelect.fragments = {
   PetitionBase: gql`
     fragment PetitionFieldSelect_PetitionBase on PetitionBase {
       fields {
+        id
         ...PetitionFieldSelect_PetitionFieldInner
         children {
+          id
           ...PetitionFieldSelect_PetitionFieldInner
         }
       }

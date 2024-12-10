@@ -485,8 +485,10 @@ PetitionFieldMathEditor.fragments = {
   PetitionBase: gql`
     fragment PetitionFieldMathEditor_PetitionBase on PetitionBase {
       fields {
+        id
         ...PetitionFieldMathEditor_PetitionField
         children {
+          id
           ...PetitionFieldMathEditor_PetitionField
         }
       }

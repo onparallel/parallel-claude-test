@@ -486,8 +486,10 @@ export const PetitionComposeFieldList = Object.assign(
           fragment PetitionComposeFieldList_PetitionBase on PetitionBase {
             id
             fields {
+              id
               ...PetitionComposeFieldList_PetitionField
               children {
+                id
                 parent {
                   id
                 }

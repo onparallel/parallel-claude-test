@@ -196,8 +196,10 @@ PetitionFieldVisibilityEditor.fragments = {
     return gql`
       fragment PetitionFieldVisibilityEditor_PetitionBase on PetitionBase {
         fields {
+          id
           ...PetitionFieldVisibilityEditor_PetitionField
           children {
+            id
             ...PetitionFieldVisibilityEditor_PetitionField
           }
         }

@@ -16,6 +16,7 @@ import {
   RecipientViewSignatureSentAlert_PublicPetitionFragment,
   Tone,
 } from "@parallel/graphql/__types";
+import { FullPetitionSignerFragment } from "@parallel/utils/apollo/fragments";
 import { withError } from "@parallel/utils/promises/withError";
 import { FormattedMessage } from "react-intl";
 import { isNullish } from "remeda";
@@ -148,8 +149,8 @@ RecipientViewSignatureSentAlert.fragments = {
         status
         signerStatus {
           signer {
-            fullName
-            email
+            ...Fragments_FullPetitionSigner
+            ...ContactListPopover_PetitionSigner
           }
           status
         }
@@ -158,15 +159,17 @@ RecipientViewSignatureSentAlert.fragments = {
         review
         signingMode
         signers {
-          fullName
-          email
+          ...Fragments_FullPetitionSigner
+          ...ContactListPopover_PetitionSigner
         }
         additionalSigners {
-          fullName
-          email
+          ...Fragments_FullPetitionSigner
+          ...ContactListPopover_PetitionSigner
         }
       }
     }
+    ${ContactListPopover.fragments.PetitionSigner}
+    ${FullPetitionSignerFragment}
   `,
 };
 

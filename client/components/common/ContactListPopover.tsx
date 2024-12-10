@@ -15,6 +15,7 @@ import {
   ContactListPopover_PetitionSignerFragment,
   ContactListPopover_PublicContactFragment,
 } from "@parallel/graphql/__types";
+import { FullPetitionSignerFragment } from "@parallel/utils/apollo/fragments";
 import { ReactNode } from "react";
 
 type ContactSelection =
@@ -96,8 +97,8 @@ ContactListPopover.fragments = {
   `,
   PetitionSigner: gql`
     fragment ContactListPopover_PetitionSigner on PetitionSigner {
-      email
-      fullName
+      ...Fragments_FullPetitionSigner
     }
+    ${FullPetitionSignerFragment}
   `,
 };

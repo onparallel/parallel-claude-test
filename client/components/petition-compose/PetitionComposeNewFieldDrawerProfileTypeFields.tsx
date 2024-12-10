@@ -299,6 +299,7 @@ PetitionComposeNewFieldDrawerProfileTypeFields.fragments = {
         id
         name
         fields {
+          id
           ...PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeField
         }
       }
@@ -338,6 +339,7 @@ PetitionComposeNewFieldDrawerProfileTypeFields.fragments = {
       fragment PetitionComposeNewFieldDrawerProfileTypeFields_PetitionBase on PetitionBase {
         id
         fields {
+          id
           ...PetitionComposeNewFieldDrawerProfileTypeFields_PetitionField
         }
       }

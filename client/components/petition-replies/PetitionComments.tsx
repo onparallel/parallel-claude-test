@@ -235,6 +235,7 @@ PetitionComments.fragments = {
         unreadCommentCount
         hasCommentsEnabled
         lastComment {
+          id
           ...PetitionComments_PetitionFieldComment
         }
       }
@@ -246,12 +247,14 @@ PetitionComments.fragments = {
       fragment PetitionComments_PetitionBase on PetitionBase {
         id
         fields {
+          id
           ...PetitionComments_PetitionField
         }
         ... on Petition {
           generalCommentCount
           unreadGeneralCommentCount
           lastGeneralComment {
+            id
             ...PetitionComments_PetitionFieldComment
           }
         }

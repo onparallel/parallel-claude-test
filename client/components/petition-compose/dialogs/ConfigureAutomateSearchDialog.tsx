@@ -229,8 +229,10 @@ ConfigureAutomateSearchDialog.fragments = {
   PetitionBase: gql`
     fragment ConfigureAutomateSearchDialog_PetitionBase on PetitionBase {
       fields {
+        id
         ...ConfigureAutomateSearchDialog_InnerPetitionField
         children {
+          id
           ...ConfigureAutomateSearchDialog_InnerPetitionField
         }
       }

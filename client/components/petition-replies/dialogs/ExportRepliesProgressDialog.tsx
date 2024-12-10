@@ -321,6 +321,7 @@ ExportRepliesProgressDialog.fragments = {
         id
         ...useFilenamePlaceholdersRename_PetitionField
         replies {
+          id
           ...useFilenamePlaceholdersRename_PetitionFieldReply
           ...useCuatrecasasExport_PetitionFieldReply
         }
@@ -328,6 +329,7 @@ ExportRepliesProgressDialog.fragments = {
           id
           ...useFilenamePlaceholdersRename_PetitionField
           replies {
+            id
             ...useFilenamePlaceholdersRename_PetitionFieldReply
             ...useCuatrecasasExport_PetitionFieldReply
           }

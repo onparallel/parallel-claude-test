@@ -453,14 +453,17 @@ const _queries = [
         petition {
           id
           fields {
+            id
             ...RecipientViewComments_PublicPetitionField
           }
           generalComments {
+            id
             ...RecipientViewComments_PublicPetitionFieldComment
           }
           generalCommentCount
           unreadGeneralCommentCount
           lastGeneralComment {
+            id
             ...RecipientViewComments_PublicPetitionFieldComment
           }
         }

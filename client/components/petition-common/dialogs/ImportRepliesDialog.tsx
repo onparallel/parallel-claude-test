@@ -465,6 +465,7 @@ const _queries = [
         id
         ...MapFieldsTable_PetitionBase
         fields {
+          id
           ...mapReplyContents_PetitionField
           ...ImportRepliesDialog_PetitionField
         }

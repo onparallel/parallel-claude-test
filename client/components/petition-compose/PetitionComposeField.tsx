@@ -1411,6 +1411,7 @@ const fragments = {
       fragment PetitionComposeField_PetitionBase on PetitionBase {
         id
         fields {
+          id
           isReadOnly
         }
         ...PetitionFieldVisibilityEditor_PetitionBase

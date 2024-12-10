@@ -2,11 +2,12 @@ import { gql } from "@apollo/client";
 import { Center, ListItem, ListItemProps, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon, EditIcon } from "@parallel/chakra/icons";
 import { SelectedSignerRow_PetitionSignerFragment } from "@parallel/graphql/__types";
+import { FullPetitionSignerFragment } from "@parallel/utils/apollo/fragments";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
 interface SelectedSignerRowProps extends ListItemProps {
-  signer: SelectedSignerRow_PetitionSignerFragment;
+  signer: Pick<SelectedSignerRow_PetitionSignerFragment, "email" | "firstName" | "lastName">;
   isMe?: boolean;
   isEditable?: boolean;
   onRemoveClick?: () => void;
@@ -75,9 +76,8 @@ export function SelectedSignerRow({
 SelectedSignerRow.fragments = {
   PetitionSigner: gql`
     fragment SelectedSignerRow_PetitionSigner on PetitionSigner {
-      firstName
-      lastName
-      email
+      ...Fragments_FullPetitionSigner
     }
+    ${FullPetitionSignerFragment}
   `,
 };

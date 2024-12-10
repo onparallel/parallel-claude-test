@@ -39,6 +39,7 @@ import {
   SignatureConfigInputSigner,
   SignatureConfigSigningMode,
 } from "@parallel/graphql/__types";
+import { FullPetitionSignerFragment } from "@parallel/utils/apollo/fragments";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { withError } from "@parallel/utils/promises/withError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
@@ -49,9 +50,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Controller,
   FormProvider,
-  UseFormHandleSubmit,
   useForm,
   useFormContext,
+  UseFormHandleSubmit,
 } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
@@ -768,11 +769,7 @@ SignatureConfigDialog.fragments = {
           ...SignatureConfigDialog_SignatureOrgIntegration
         }
         signers {
-          contactId
-          firstName
-          lastName
-          email
-          isPreset
+          ...Fragments_FullPetitionSigner
         }
         title
         review
@@ -783,6 +780,7 @@ SignatureConfigDialog.fragments = {
         useCustomDocument
       }
       ${this.SignatureOrgIntegration}
+      ${FullPetitionSignerFragment}
     `;
   },
   get PetitionBase() {

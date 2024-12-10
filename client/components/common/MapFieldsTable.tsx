@@ -237,6 +237,7 @@ export const MapFieldsTable = Object.assign(
           fragment MapFieldsTable_PetitionBase on PetitionBase {
             id
             fields {
+              id
               ...MapFieldsTable_PetitionField
             }
             ...PetitionFieldSelect_PetitionBase

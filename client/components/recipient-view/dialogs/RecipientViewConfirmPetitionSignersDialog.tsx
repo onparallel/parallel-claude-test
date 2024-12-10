@@ -27,6 +27,7 @@ import {
   Tone,
   useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccessFragment,
 } from "@parallel/graphql/__types";
+import { FullPetitionSignerFragment } from "@parallel/utils/apollo/fragments";
 import { fullName } from "@parallel/utils/fullName";
 import { Maybe } from "@parallel/utils/types";
 import { useState } from "react";
@@ -371,13 +372,10 @@ useRecipientViewConfirmPetitionSignersDialog.fragments = {
   get PetitionSigner() {
     return gql`
       fragment useRecipientViewConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
-        firstName
-        lastName
-        fullName
-        email
-        isPreset
+        ...Fragments_FullPetitionSigner
         ...SelectedSignerRow_PetitionSigner
       }
+      ${FullPetitionSignerFragment}
       ${SelectedSignerRow.fragments.PetitionSigner}
     `;
   },

@@ -410,6 +410,7 @@ export const AppLayoutNavBar = Object.assign(
               }
             }
             pinnedProfileTypes {
+              id
               ...AppLayoutNavBar_ProfileType
             }
           }
@@ -431,6 +432,7 @@ export const AppLayoutNavBar = Object.assign(
             profileTypes(limit: 100, offset: 0, filter: { includeArchived: true }) {
               totalCount
               items {
+                id
                 ...AppLayoutNavBar_ProfileType
               }
             }

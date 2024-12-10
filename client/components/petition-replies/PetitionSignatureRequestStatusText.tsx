@@ -84,6 +84,7 @@ export function PetitionSignatureRequestStatusText({
 PetitionSignatureRequestStatusText.fragments = {
   PetitionSignatureRequest: gql`
     fragment PetitionSignatureRequestStatusText_PetitionSignatureRequest on PetitionSignatureRequest {
+      id
       status
       cancelReason
     }

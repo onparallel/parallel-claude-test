@@ -330,8 +330,10 @@ ExportRepliesDialog.fragments = {
     fragment ExportRepliesDialog_Petition on Petition {
       ...useFilenamePlaceholdersRename_PetitionBase
       fields {
+        id
         ...ExportRepliesDialog_PetitionField
         children {
+          id
           ...ExportRepliesDialog_PetitionField
         }
       }

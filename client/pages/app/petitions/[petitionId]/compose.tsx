@@ -1569,6 +1569,7 @@ const _fragments = {
           ...useUpdateIsReadNotification_User
           ...useSendPetitionHandler_User
           organization {
+            id
             isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
             petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
               limit
@@ -1675,6 +1676,7 @@ const _mutations = [
         ...PetitionCompose_PetitionField
         ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField
         petition {
+          id
           ...PetitionLayout_PetitionBase
           ...PetitionComposeNewFieldDrawer_PetitionBase
           fields {
@@ -1699,6 +1701,7 @@ const _mutations = [
         ...PetitionCompose_PetitionField
         ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField
         petition {
+          id
           ...PetitionLayout_PetitionBase
           ...PetitionComposeNewFieldDrawer_PetitionBase
           fields {

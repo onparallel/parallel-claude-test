@@ -560,8 +560,10 @@ PreviewPetitionFieldBackgroundCheck.fragments = {
     fragment PreviewPetitionFieldBackgroundCheck_PetitionBase on PetitionBase {
       id
       fields {
+        id
         ...PreviewPetitionFieldBackgroundCheck_PetitionField
         children {
+          id
           ...PreviewPetitionFieldBackgroundCheck_PetitionField
         }
       }

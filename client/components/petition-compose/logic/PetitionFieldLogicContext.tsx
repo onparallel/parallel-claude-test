@@ -71,11 +71,13 @@ PetitionFieldLogicContext.fragments = {
       fragment PetitionFieldLogicContext_PetitionBase on PetitionBase {
         id
         fields {
+          id
           ...PetitionFieldLogicContext_PetitionField
           parent {
             id
           }
           children {
+            id
             ...PetitionFieldLogicContext_PetitionField
             parent {
               id

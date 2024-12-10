@@ -457,6 +457,7 @@ ProfileTypeSettings.fragments = {
         id
         name
         fields {
+          id
           ...ProfileTypeSettings_ProfileTypeField
         }
         isStandard

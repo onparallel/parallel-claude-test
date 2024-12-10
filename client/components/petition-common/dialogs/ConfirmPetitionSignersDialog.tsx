@@ -41,6 +41,7 @@ import {
   ConfirmPetitionSignersDialog_petitionDocument,
   SignatureConfigInputSigner,
 } from "@parallel/graphql/__types";
+import { FullPetitionSignerFragment } from "@parallel/utils/apollo/fragments";
 import { FORMATS } from "@parallel/utils/dates";
 import { downloadLocalFile } from "@parallel/utils/downloadLocalFile";
 import { fullName } from "@parallel/utils/fullName";
@@ -74,7 +75,7 @@ export interface ConfirmPetitionSignersDialogResult {
 
 export type SignerSelectSelection = Omit<
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
-  "__typename" | "isPreset"
+  "__typename" | "isPreset" | "fullName"
 > & { isPreset?: boolean | null };
 
 const MAX_SIGNERS_ALLOWED = 40;
@@ -647,13 +648,10 @@ ConfirmPetitionSignersDialog.fragments = {
   get PetitionSigner() {
     return gql`
       fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
-        contactId
-        email
-        firstName
-        lastName
-        isPreset
+        ...Fragments_FullPetitionSigner
         ...SelectedSignerRow_PetitionSigner
       }
+      ${FullPetitionSignerFragment}
       ${SelectedSignerRow.fragments.PetitionSigner}
     `;
   },

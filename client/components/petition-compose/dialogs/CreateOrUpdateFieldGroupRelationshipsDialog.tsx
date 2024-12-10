@@ -342,6 +342,7 @@ useCreateOrUpdateFieldGroupRelationshipsDialog.fragments = {
           }
         }
         fields {
+          id
           ...useCreateOrUpdateFieldGroupRelationshipsDialog_PetitionField
         }
         ...PetitionFieldSelect_PetitionBase

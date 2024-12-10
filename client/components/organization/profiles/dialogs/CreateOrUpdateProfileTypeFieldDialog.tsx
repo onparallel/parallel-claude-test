@@ -782,6 +782,7 @@ useCreateOrUpdateProfileTypeFieldDialog.fragments = {
       fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileType on ProfileType {
         id
         fields {
+          id
           ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
         }
         ...ProfileFieldBackgroundCheckSettings_ProfileType

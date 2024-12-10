@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { Text, TextProps } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { SignerReference_PetitionSignerFragment } from "@parallel/graphql/__types";
+import { FullPetitionSignerFragment } from "@parallel/utils/apollo/fragments";
 import { Maybe } from "@parallel/utils/types";
 import { DeletedContact } from "./DeletedContact";
 
@@ -28,8 +29,8 @@ export function SignerReference({
 SignerReference.fragments = {
   PetitionSigner: gql`
     fragment SignerReference_PetitionSigner on PetitionSigner {
-      email
-      fullName
+      ...Fragments_FullPetitionSigner
     }
+    ${FullPetitionSignerFragment}
   `,
 };

@@ -562,6 +562,7 @@ CreateOrUpdateProfileEventSubscriptionDialog.fragments = {
         id
         name
         fields {
+          id
           ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeField
         }
       }

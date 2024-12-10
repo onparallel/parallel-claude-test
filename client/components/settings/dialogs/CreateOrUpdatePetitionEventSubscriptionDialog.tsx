@@ -703,6 +703,7 @@ CreateOrUpdatePetitionEventSubscriptionDialog.fragments = {
       fragment CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFields on PetitionBase {
         id
         fields {
+          id
           ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionField
         }
         ...PetitionFieldSelect_PetitionBase

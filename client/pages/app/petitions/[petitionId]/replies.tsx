@@ -948,6 +948,7 @@ PetitionReplies.fragments = {
         }
         isAnonymized
         profiles {
+          id
           ...ProfileDrawer_Profile
         }
         variables {
@@ -993,9 +994,9 @@ PetitionReplies.fragments = {
   get PetitionField() {
     return gql`
       fragment PetitionReplies_PetitionField on PetitionField {
+        id
         isReadOnly
         requireApproval
-
         ...PetitionRepliesField_PetitionField
         ...PetitionRepliesContents_PetitionField
         ...PetitionRepliesFieldComments_PetitionField
@@ -1146,6 +1147,7 @@ PetitionReplies.queries = [
       me {
         id
         organization {
+          id
           name
           isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
           petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {

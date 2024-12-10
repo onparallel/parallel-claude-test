@@ -36,13 +36,7 @@ export function TemplateIconSignature({ signatureConfig, ...props }: TemplateIco
 TemplateIconSignature.fragments = {
   SignatureConfig: gql`
     fragment TemplateIconSignature_SignatureConfig on SignatureConfig {
-      signers {
-        contactId
-        fullName
-        email
-      }
       review
-      allowAdditionalSigners
     }
   `,
 };
