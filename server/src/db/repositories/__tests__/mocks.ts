@@ -1375,15 +1375,6 @@ export class Mocks {
       "*",
     );
   }
-
-  async nowUTC() {
-    const {
-      rows: [{ now }],
-    } = await this.knex.raw<{ rows: { now: Date }[] }>(
-      /* sql */ `select now() at time zone 'UTC' as now`,
-    );
-    return now;
-  }
 }
 
 function randomPetitionStatus() {

@@ -3,7 +3,7 @@ import "reflect-metadata";
 import { GenericContainer, Wait } from "testcontainers";
 
 export default async function () {
-  await new GenericContainer("postgres:12.8")
+  await new GenericContainer("postgres:16.6")
     .withExposedPorts({ container: 5432, host: 5433 })
     .withWaitStrategy(Wait.forLogMessage("database system is ready to accept connections"))
     .withEnvironment({
