@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import { Center, Stack, useBreakpointValue } from "@chakra-ui/react";
-import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
 import { DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragment } from "@parallel/graphql/__types";
 import { isNonNullish } from "remeda";
 import { DashboardChartLegend } from "../charts/DashboardChartLegend";
@@ -41,7 +40,7 @@ export function DashboardProfilesPieChartModule({
       }
       rows={rows}
     >
-      {isNonNullish(module.profilesPieChartSettings) ? (
+      {isNonNullish(module.profilesPieChartResult) ? (
         <Stack
           direction={{ base: "column", md: "row" }}
           alignItems="stretch"
@@ -58,9 +57,7 @@ export function DashboardProfilesPieChartModule({
               )}
             </Center>
           </Center>
-          <ScrollShadows flex={1} direction="vertical" overflowY="auto">
-            <DashboardChartLegend data={data} />
-          </ScrollShadows>
+          <DashboardChartLegend data={data} />
         </Stack>
       ) : (
         <DashboardModuleSpinner />

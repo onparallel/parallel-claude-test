@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { Center, Stack, useBreakpointValue } from "@chakra-ui/react";
 
-import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
 import { DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment } from "@parallel/graphql/__types";
 import { isNonNullish } from "remeda";
 import { DashboardChartLegend } from "../charts/DashboardChartLegend";
@@ -59,9 +58,8 @@ export function DashboardPetitionsPieChartModule({
               )}
             </Center>
           </Center>
-          <ScrollShadows flex={1} direction="vertical" overflowY="auto">
-            <DashboardChartLegend data={data} />
-          </ScrollShadows>
+
+          <DashboardChartLegend data={data} />
         </Stack>
       ) : (
         <DashboardModuleSpinner />
