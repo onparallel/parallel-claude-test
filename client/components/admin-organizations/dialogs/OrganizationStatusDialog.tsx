@@ -32,7 +32,13 @@ function OrganizationStatusDialog({
     required: true,
   });
 
-  const organizationStatus = ["ACTIVE", "CHURNED", "DEMO", "DEV"] as OrganizationStatus[];
+  const organizationStatus = [
+    "ACTIVE",
+    "CHURNED",
+    "DEMO",
+    "DEV",
+    "INACTIVE",
+  ] as OrganizationStatus[];
 
   return (
     <ConfirmDialog

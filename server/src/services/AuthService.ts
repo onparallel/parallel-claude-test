@@ -750,7 +750,10 @@ export class Auth implements IAuth {
     return null;
   }
 
-  /** session users must have status ACTIVE to be valid */
+  /**
+   * session users must have status ACTIVE to be valid
+   * and their organization must have a status different from INACTIVE or CHURNED
+   */
   private async validateSession(req: IncomingMessage) {
     const token = this.getSessionToken(req);
     if (!token) {
@@ -763,9 +766,20 @@ export class Auth implements IAuth {
       if (user.status !== "ACTIVE" || (isNonNullish(realUser) && realUser.status !== "ACTIVE")) {
         return null;
       }
-    } else {
-      return null;
+
+      const org = await this.orgs.loadOrg(user.org_id);
+      const realOrg = isNonNullish(realUser) ? await this.orgs.loadOrg(realUser.org_id) : null;
+      if (
+        isNullish(org) ||
+        org.status === "INACTIVE" ||
+        org.status === "CHURNED" ||
+        realOrg?.status === "INACTIVE" ||
+        realOrg?.status === "CHURNED"
+      ) {
+        return null;
+      }
     }
+
     return result;
   }
 
@@ -849,7 +863,10 @@ export class Auth implements IAuth {
     { cacheKeyFn: (payload) => payload.token },
   );
 
-  /** users from auth token must have status ACTIVE to be valid */
+  /**
+   * users from auth token must have status ACTIVE to be valid
+   * and their organization must have a status different from INACTIVE or CHURNED
+   */
   private async validateUserAuthToken(req: IncomingMessage): Promise<[User] | null> {
     const token = this.getBearerToken(req);
     if (!token) {
@@ -859,10 +876,18 @@ export class Auth implements IAuth {
     if (isNullish(user) || user.status !== "ACTIVE") {
       return null;
     }
+    const org = await this.orgs.loadOrg(user.org_id);
+    if (isNullish(org) || org.status === "INACTIVE" || org.status === "CHURNED") {
+      return null;
+    }
+
     return [user];
   }
 
-  /** users from temp auth token can have ACTIVE or ON_HOLD status to be valid */
+  /**
+   * users from temp auth token can have ACTIVE or ON_HOLD status to be valid
+   * and their organization must have a status different from INACTIVE or CHURNED
+   */
   private async validateTempAuthToken(req: IncomingMessage): Promise<[User] | null> {
     const token = this.getBearerToken(req);
     if (!token || !token.includes(".")) {
@@ -874,6 +899,11 @@ export class Auth implements IAuth {
       if (isNullish(user) || !["ACTIVE", "ON_HOLD"].includes(user.status)) {
         return null;
       }
+      const org = await this.orgs.loadOrg(user.org_id);
+      if (isNullish(org) || org.status === "INACTIVE" || org.status === "CHURNED") {
+        return null;
+      }
+
       return [user];
     } catch {
       return null;

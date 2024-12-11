@@ -14,6 +14,7 @@ export interface AdminOrganizationMembersListTableHeaderProps {
   usersCount: number;
   usersLimit: number;
   hasSsoProvider: boolean;
+  canInviteUsers: boolean;
 }
 
 export function AdminOrganizationMembersListTableHeader({
@@ -25,6 +26,7 @@ export function AdminOrganizationMembersListTableHeader({
   usersCount,
   usersLimit,
   hasSsoProvider,
+  canInviteUsers,
 }: AdminOrganizationMembersListTableHeaderProps) {
   const intl = useIntl();
 
@@ -66,7 +68,7 @@ export function AdminOrganizationMembersListTableHeader({
             defaultMessage="Change limit"
           />
         </Button>
-        <Button colorScheme="primary" onClick={onInviteClick}>
+        <Button colorScheme="primary" isDisabled={!canInviteUsers} onClick={onInviteClick}>
           <FormattedMessage id="generic.invite-user" defaultMessage="Invite user" />
         </Button>
       </HStack>

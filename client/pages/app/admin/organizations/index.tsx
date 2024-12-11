@@ -34,7 +34,7 @@ const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
   items: values([10, 25, 50]).orDefault(10),
   search: string(),
-  status: values<OrganizationStatus>(["DEV", "DEMO", "ACTIVE", "CHURNED"]),
+  status: values<OrganizationStatus>(["DEV", "DEMO", "ACTIVE", "CHURNED", "INACTIVE"]),
   sort: sorting(SORTING).orDefault({
     field: "createdAt",
     direction: "ASC",
@@ -220,6 +220,7 @@ function useOrganizationColumns() {
                   DEMO: "yellow",
                   ACTIVE: "green",
                   CHURNED: "red",
+                  INACTIVE: "red",
                 } as Record<OrganizationStatus, string>
               )[row.status]
             }

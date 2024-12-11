@@ -3479,6 +3479,11 @@ enum OrganizationStatus {
   DEV
 
   """
+  Inactive client. Users will not be able to login
+  """
+  INACTIVE
+
+  """
   Root client
   """
   ROOT

@@ -240,7 +240,8 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
               isDisabled:
                 selectedRows.length !== 1 ||
                 selectedRows[0].id === me.id ||
-                selectedRows[0].status === "INACTIVE",
+                selectedRows[0].status === "INACTIVE" ||
+                organization.status === "INACTIVE",
               leftIcon: <LogInIcon />,
               children: <FormattedMessage id="page.users.login-as" defaultMessage="Login as..." />,
             },
@@ -250,6 +251,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
               search={search}
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
+              canInviteUsers={organization.status !== "INACTIVE"}
               onInviteClick={handleInviteUser}
               hasSsoProvider={organization.hasSsoProvider}
               onChangeLimit={handleChangeUserLimit}

@@ -138,6 +138,14 @@ export const inviteUserToOrganization = mutationField("inviteUserToOrganization"
       ctx.organizations.loadOrg(orgId),
       ctx.users.loadUserData(ctx.user!.user_data_id),
     ]);
+
+    if (organization?.status === "INACTIVE") {
+      throw new ApolloError(
+        "Can't invite users to an inactive organization",
+        "ORGANIZATION_INACTIVE_ERROR",
+      );
+    }
+
     const email = args.email.trim().toLowerCase();
     const firstName = args.firstName.trim();
     const lastName = args.lastName.trim();

@@ -160,7 +160,7 @@ export type ListViewType = "ALL" | "CUSTOM";
 
 export const ListViewTypeValues = ["ALL", "CUSTOM"] as ListViewType[];
 
-export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED" | "ROOT";
+export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED" | "ROOT" | "INACTIVE";
 
 export const OrganizationStatusValues = [
   "DEV",
@@ -168,6 +168,7 @@ export const OrganizationStatusValues = [
   "ACTIVE",
   "CHURNED",
   "ROOT",
+  "INACTIVE",
 ] as OrganizationStatus[];
 
 export type OrganizationThemeType = "PDF_DOCUMENT" | "BRAND";

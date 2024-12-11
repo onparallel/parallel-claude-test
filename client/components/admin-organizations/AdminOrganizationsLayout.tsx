@@ -111,6 +111,7 @@ export function AdminOrganizationsLayout({
                   DEMO: "yellow",
                   ACTIVE: "green",
                   CHURNED: "red",
+                  INACTIVE: "red",
                 } as Record<OrganizationStatus, string>
               )[organization.status]
             }

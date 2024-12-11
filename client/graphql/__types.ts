@@ -3185,6 +3185,8 @@ export type OrganizationStatus =
   | "DEMO"
   /** Used for development or testing purposes */
   | "DEV"
+  /** Inactive client. Users will not be able to login */
+  | "INACTIVE"
   /** Root client */
   | "ROOT";
 

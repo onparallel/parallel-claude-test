@@ -28,6 +28,7 @@ export const OrganizationStatus = enumType({
     { name: "ACTIVE", description: "Used for regular clients" },
     { name: "CHURNED", description: "Used on churned clients" },
     { name: "ROOT", description: "Root client" },
+    { name: "INACTIVE", description: "Inactive client. Users will not be able to login" },
   ],
   description: "The status of the organization.",
 });
