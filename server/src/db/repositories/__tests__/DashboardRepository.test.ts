@@ -1118,7 +1118,7 @@ describe("DashboardRepository", () => {
       expect(
         await dashboards.getParallelsPieChartValues(organization.id, {
           graphicType: "PIE",
-          filters: [
+          items: [
             { label: "En proceso", color: "#FF0000", filter: { status: ["DRAFT", "PENDING"] } },
             { label: "Completados", color: "#00FF00", filter: { status: ["COMPLETED"] } },
             { label: "Cerrados", color: "#0000FF", filter: { status: ["CLOSED"] } },
@@ -1134,7 +1134,7 @@ describe("DashboardRepository", () => {
       expect(
         await dashboards.getParallelsPieChartValues(organization.id, {
           graphicType: "PIE",
-          filters: [
+          items: [
             { label: "Borradores", color: "#FF0000", filter: { status: ["DRAFT"] } },
             { label: "En proceso", color: "#FF0000", filter: { status: ["DRAFT", "PENDING"] } },
             { label: "Completados", color: "#00FF00", filter: { status: ["COMPLETED"] } },
@@ -1307,7 +1307,7 @@ describe("DashboardRepository", () => {
           type: "COUNT",
           graphicType: "PIE",
           profileTypeId: profileType.id,
-          filters: [
+          items: [
             { label: "Abiertos", color: "#FF0000", filter: { status: ["OPEN"] } },
             { label: "Cerrados", color: "#00FF00", filter: { status: ["CLOSED"] } },
             { label: "Eliminados", color: "#0000FF", filter: { status: ["DELETION_SCHEDULED"] } },
@@ -1327,7 +1327,7 @@ describe("DashboardRepository", () => {
           aggregate: "SUM",
           profileTypeFieldId: numberField.id,
           profileTypeId: profileType.id,
-          filters: [
+          items: [
             {
               color: "#FF0000",
               label: "HIGH RISK",
@@ -1378,7 +1378,7 @@ describe("DashboardRepository", () => {
           type: "COUNT",
           graphicType: "PIE",
           profileTypeId: profileType.id,
-          filters: [
+          items: [
             { label: "Abiertos", color: "#FF0000", filter: { status: ["OPEN"] } },
             { label: "Cerrados", color: "#00FF00", filter: { status: ["OPEN", "CLOSED"] } },
             { label: "Eliminados", color: "#0000FF", filter: { status: ["DELETION_SCHEDULED"] } },
@@ -1399,7 +1399,7 @@ describe("DashboardRepository", () => {
             aggregate,
             profileTypeFieldId: numberField.id,
             profileTypeId: profileType.id,
-            filters: [
+            items: [
               {
                 color: "#FF0000",
                 label: "HIGH RISK",

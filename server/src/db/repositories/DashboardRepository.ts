@@ -42,7 +42,7 @@ export type ModuleSettings<TType extends DashboardModuleType> = {
   };
   PARALLELS_PIE_CHART: {
     graphicType: "DOUGHNUT" | "PIE";
-    filters: { label: string; color: string; filter: ParallelsFilter }[];
+    items: { label: string; color: string; filter: ParallelsFilter }[];
   };
   PROFILES_NUMBER: {
     profileTypeId: number;
@@ -56,7 +56,7 @@ export type ModuleSettings<TType extends DashboardModuleType> = {
   PROFILES_PIE_CHART: {
     graphicType: "DOUGHNUT" | "PIE";
     profileTypeId: number;
-    filters: { label: string; color: string; filter: ProfilesFilter }[];
+    items: { label: string; color: string; filter: ProfilesFilter }[];
   } & ModuleResultType;
 }[TType];
 
@@ -640,11 +640,11 @@ export class DashboardRepository extends BaseRepository {
     const data: { count: number; filter: number }[] = await this.knex
       .queryBuilder()
       .modify((q) => {
-        settings.filters.forEach(({ filter }, i) => {
+        settings.items.forEach(({ filter }, i) => {
           q.with(`p${i}`, this.parallelsCountQuery(orgId, filter));
         });
         q.with("p_union", (q) => {
-          settings.filters.forEach((_, i) => {
+          settings.items.forEach((_, i) => {
             q.union((u) => u.from(`p${i}`).select("*"));
           });
         });
@@ -652,7 +652,7 @@ export class DashboardRepository extends BaseRepository {
       .select(this.count(), this.knex.raw(`-1 as filter`))
       .from("p_union")
       .modify((q) => {
-        settings.filters.forEach((_, i) => {
+        settings.items.forEach((_, i) => {
           q.union((u) => u.from(`p${i}`).select(this.count(), this.knex.raw(`${i}`)));
         });
       });
@@ -782,14 +782,14 @@ export class DashboardRepository extends BaseRepository {
     const data: { filter: number; count: number; aggr?: number }[] = await this.knex
       .queryBuilder()
       .modify((q) => {
-        settings.filters.forEach(({ filter }, i) => {
+        settings.items.forEach(({ filter }, i) => {
           q.with(
             `p${i}`,
             this.profilesCountQuery(orgId, settings.profileTypeId, filter, fieldsById, settings),
           );
         });
         q.with("p_union", (q) => {
-          settings.filters.forEach((_, i) => {
+          settings.items.forEach((_, i) => {
             q.union((u) => u.select("id").from(`p${i}`));
           });
         });
@@ -797,7 +797,7 @@ export class DashboardRepository extends BaseRepository {
       .select(this.knex.raw(`-1 as filter`), this.count(), this.knex.raw("0 as aggr"))
       .from("p_union")
       .modify((q) => {
-        settings.filters.forEach((_, i) => {
+        settings.items.forEach((_, i) => {
           q.union((u) =>
             u
               .select(

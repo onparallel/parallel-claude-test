@@ -83,7 +83,7 @@ export async function seed(knex: Knex): Promise<any> {
         title: "Estado de los parallels",
         settings: JSON.stringify({
           graphicType: "DOUGHNUT",
-          filters: [
+          items: [
             {
               label: "Borradores",
               color: "#ECC94B",
@@ -127,7 +127,7 @@ export async function seed(knex: Knex): Promise<any> {
           graphicType: "PIE",
           type: "COUNT",
           profileTypeId: individual.id,
-          filters: [
+          items: [
             { label: "Abiertos", color: "#ECC94B", filter: { status: ["OPEN"] } },
             { label: "Cerrados", color: "#D69E2E", filter: { status: ["CLOSED"] } },
             {
