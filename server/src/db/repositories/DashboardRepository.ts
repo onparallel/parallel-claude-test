@@ -35,32 +35,32 @@ export type ModuleSettings<TType extends DashboardModuleType> = {
     label: string;
     template_id: number;
   };
-  PARALLELS_NUMBER: { filters: ParallelsCountFilter };
+  PARALLELS_NUMBER: { filters: ParallelsFilter };
   PARALLELS_RATIO: {
     graphicType: "RATIO" | "PERCENTAGE";
-    filters: [ParallelsCountFilter, ParallelsCountFilter];
+    filters: [ParallelsFilter, ParallelsFilter];
   };
   PARALLELS_PIE_CHART: {
     graphicType: "DOUGHNUT" | "PIE";
-    filters: { label: string; color: string; filter: ParallelsCountFilter }[];
+    filters: { label: string; color: string; filter: ParallelsFilter }[];
   };
   PROFILES_NUMBER: {
     profileTypeId: number;
-    filters: ProfilesCountFilter;
+    filters: ProfilesFilter;
   } & ModuleResultType;
   PROFILES_RATIO: {
     graphicType: "RATIO" | "PERCENTAGE";
     profileTypeId: number;
-    filters: [ProfilesCountFilter, ProfilesCountFilter];
+    filters: [ProfilesFilter, ProfilesFilter];
   } & ModuleResultType;
   PROFILES_PIE_CHART: {
     graphicType: "DOUGHNUT" | "PIE";
     profileTypeId: number;
-    filters: { label: string; color: string; filter: ProfilesCountFilter }[];
+    filters: { label: string; color: string; filter: ProfilesFilter }[];
   } & ModuleResultType;
 }[TType];
 
-export interface ParallelsCountFilter {
+export interface ParallelsFilter {
   path?: string | null;
   status?: PetitionStatus[] | null;
   locale?: ContactLocale | null;
@@ -90,7 +90,7 @@ export interface ParallelsCountFilter {
   fromTemplateId?: number[] | null;
 }
 
-export interface ProfilesCountFilter {
+export interface ProfilesFilter {
   status?: ProfileStatus[] | null;
   values?: ProfileFieldValuesFilter | null;
 }
@@ -182,7 +182,7 @@ export class DashboardRepository extends BaseRepository {
     return module;
   }
 
-  private parallelsCountQuery(orgId: number, filters: ParallelsCountFilter) {
+  private parallelsCountQuery(orgId: number, filters: ParallelsFilter) {
     return (
       this.from({ p: "petition" })
         .where("p.org_id", orgId)
@@ -333,7 +333,7 @@ export class DashboardRepository extends BaseRepository {
   private profilesCountQuery(
     orgId: number,
     profileTypeId: number,
-    filters: ProfilesCountFilter,
+    filters: ProfilesFilter,
     profileTypeFieldsById: Record<number, ProfileTypeField>,
     resultType: ModuleResultType,
   ) {

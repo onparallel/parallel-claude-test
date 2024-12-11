@@ -18,7 +18,7 @@ import {
   UserGroup,
 } from "../../__types";
 import { KNEX } from "../../knex";
-import { DashboardRepository, ModuleSettings, ParallelsCountFilter } from "../DashboardRepository";
+import { DashboardRepository, ModuleSettings, ParallelsFilter } from "../DashboardRepository";
 import { Mocks } from "./mocks";
 
 describe("DashboardRepository", () => {
@@ -57,7 +57,7 @@ describe("DashboardRepository", () => {
     let tags: Tag[];
     let userGroups: UserGroup[];
 
-    async function count(filters: ParallelsCountFilter) {
+    async function count(filters: ParallelsFilter) {
       return await dashboards.getParallelsNumberValue(organization.id, { filters });
     }
 
