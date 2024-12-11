@@ -434,14 +434,14 @@ export type Dashboard = {
   name: Scalars["String"]["output"];
 };
 
-export type DashboardCreateParallelButtonModule = DashboardModule & {
+export type DashboardCreatePetitionButtonModule = DashboardModule & {
   id: Scalars["GID"]["output"];
-  settings: DashboardCreateParallelButtonModuleSettings;
+  settings: DashboardCreatePetitionButtonModuleSettings;
   size: DashboardModuleSize;
   title: Maybe<Scalars["String"]["output"]>;
 };
 
-export type DashboardCreateParallelButtonModuleSettings = {
+export type DashboardCreatePetitionButtonModuleSettings = {
   label: Scalars["String"]["output"];
   template: Maybe<PetitionBaseMini>;
 };
@@ -455,45 +455,45 @@ export type DashboardModule = {
 export type DashboardModuleSize = "LARGE" | "MEDIUM" | "SMALL";
 
 export type DashboardNumberModuleResult = {
-  value: Scalars["Int"]["output"];
+  value: Scalars["Float"]["output"];
 };
 
-export type DashboardParallelsNumberModule = DashboardModule & {
+export type DashboardPetitionsNumberModule = DashboardModule & {
   id: Scalars["GID"]["output"];
   result: Maybe<DashboardNumberModuleResult>;
   size: DashboardModuleSize;
   title: Maybe<Scalars["String"]["output"]>;
 };
 
-export type DashboardParallelsPieChartModule = DashboardModule & {
+export type DashboardPetitionsPieChartModule = DashboardModule & {
   id: Scalars["GID"]["output"];
   result: Maybe<DashboardPieChartModuleResult>;
-  settings: DashboardParallelsPieChartModuleSettings;
+  settings: DashboardPetitionsPieChartModuleSettings;
   size: DashboardModuleSize;
   title: Maybe<Scalars["String"]["output"]>;
 };
 
-export type DashboardParallelsPieChartModuleSettings = {
+export type DashboardPetitionsPieChartModuleSettings = {
   colors: Array<Scalars["String"]["output"]>;
   graphicType: DashboardPieChartModuleSettingsType;
   labels: Array<Scalars["String"]["output"]>;
 };
 
-export type DashboardParallelsRatioModule = DashboardModule & {
+export type DashboardPetitionsRatioModule = DashboardModule & {
   id: Scalars["GID"]["output"];
   result: Maybe<DashboardRatioModuleResult>;
-  settings: DashboardParallelsRatioModuleSettings;
+  settings: DashboardPetitionsRatioModuleSettings;
   size: DashboardModuleSize;
   title: Maybe<Scalars["String"]["output"]>;
 };
 
-export type DashboardParallelsRatioModuleSettings = {
+export type DashboardPetitionsRatioModuleSettings = {
   graphicType: DashboardRatioModuleSettingsType;
 };
 
 export type DashboardPieChartModuleResult = {
   isIncongruent: Scalars["Boolean"]["output"];
-  value: Array<Scalars["Int"]["output"]>;
+  value: Array<Scalars["Float"]["output"]>;
 };
 
 export type DashboardPieChartModuleSettingsType = "DOUGHNUT" | "PIE";
@@ -533,7 +533,7 @@ export type DashboardProfilesRatioModuleSettings = {
 
 export type DashboardRatioModuleResult = {
   isIncongruent: Scalars["Boolean"]["output"];
-  value: Array<Scalars["Int"]["output"]>;
+  value: Array<Scalars["Float"]["output"]>;
 };
 
 export type DashboardRatioModuleSettingsType = "PERCENTAGE" | "RATIO";

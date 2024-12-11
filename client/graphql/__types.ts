@@ -467,16 +467,16 @@ export interface Dashboard {
   name: Scalars["String"]["output"];
 }
 
-export interface DashboardCreateParallelButtonModule extends DashboardModule {
-  __typename?: "DashboardCreateParallelButtonModule";
+export interface DashboardCreatePetitionButtonModule extends DashboardModule {
+  __typename?: "DashboardCreatePetitionButtonModule";
   id: Scalars["GID"]["output"];
-  settings: DashboardCreateParallelButtonModuleSettings;
+  settings: DashboardCreatePetitionButtonModuleSettings;
   size: DashboardModuleSize;
   title?: Maybe<Scalars["String"]["output"]>;
 }
 
-export interface DashboardCreateParallelButtonModuleSettings {
-  __typename?: "DashboardCreateParallelButtonModuleSettings";
+export interface DashboardCreatePetitionButtonModuleSettings {
+  __typename?: "DashboardCreatePetitionButtonModuleSettings";
   label: Scalars["String"]["output"];
   template?: Maybe<PetitionBaseMini>;
 }
@@ -491,51 +491,51 @@ export type DashboardModuleSize = "LARGE" | "MEDIUM" | "SMALL";
 
 export interface DashboardNumberModuleResult {
   __typename?: "DashboardNumberModuleResult";
-  value: Scalars["Int"]["output"];
+  value: Scalars["Float"]["output"];
 }
 
-export interface DashboardParallelsNumberModule extends DashboardModule {
-  __typename?: "DashboardParallelsNumberModule";
+export interface DashboardPetitionsNumberModule extends DashboardModule {
+  __typename?: "DashboardPetitionsNumberModule";
   id: Scalars["GID"]["output"];
   result?: Maybe<DashboardNumberModuleResult>;
   size: DashboardModuleSize;
   title?: Maybe<Scalars["String"]["output"]>;
 }
 
-export interface DashboardParallelsPieChartModule extends DashboardModule {
-  __typename?: "DashboardParallelsPieChartModule";
+export interface DashboardPetitionsPieChartModule extends DashboardModule {
+  __typename?: "DashboardPetitionsPieChartModule";
   id: Scalars["GID"]["output"];
   result?: Maybe<DashboardPieChartModuleResult>;
-  settings: DashboardParallelsPieChartModuleSettings;
+  settings: DashboardPetitionsPieChartModuleSettings;
   size: DashboardModuleSize;
   title?: Maybe<Scalars["String"]["output"]>;
 }
 
-export interface DashboardParallelsPieChartModuleSettings {
-  __typename?: "DashboardParallelsPieChartModuleSettings";
+export interface DashboardPetitionsPieChartModuleSettings {
+  __typename?: "DashboardPetitionsPieChartModuleSettings";
   colors: Array<Scalars["String"]["output"]>;
   graphicType: DashboardPieChartModuleSettingsType;
   labels: Array<Scalars["String"]["output"]>;
 }
 
-export interface DashboardParallelsRatioModule extends DashboardModule {
-  __typename?: "DashboardParallelsRatioModule";
+export interface DashboardPetitionsRatioModule extends DashboardModule {
+  __typename?: "DashboardPetitionsRatioModule";
   id: Scalars["GID"]["output"];
   result?: Maybe<DashboardRatioModuleResult>;
-  settings: DashboardParallelsRatioModuleSettings;
+  settings: DashboardPetitionsRatioModuleSettings;
   size: DashboardModuleSize;
   title?: Maybe<Scalars["String"]["output"]>;
 }
 
-export interface DashboardParallelsRatioModuleSettings {
-  __typename?: "DashboardParallelsRatioModuleSettings";
+export interface DashboardPetitionsRatioModuleSettings {
+  __typename?: "DashboardPetitionsRatioModuleSettings";
   graphicType: DashboardRatioModuleSettingsType;
 }
 
 export interface DashboardPieChartModuleResult {
   __typename?: "DashboardPieChartModuleResult";
   isIncongruent: Scalars["Boolean"]["output"];
-  value: Array<Scalars["Int"]["output"]>;
+  value: Array<Scalars["Float"]["output"]>;
 }
 
 export type DashboardPieChartModuleSettingsType = "DOUGHNUT" | "PIE";
@@ -581,7 +581,7 @@ export interface DashboardProfilesRatioModuleSettings {
 export interface DashboardRatioModuleResult {
   __typename?: "DashboardRatioModuleResult";
   isIncongruent: Scalars["Boolean"]["output"];
-  value: Array<Scalars["Int"]["output"]>;
+  value: Array<Scalars["Float"]["output"]>;
 }
 
 export type DashboardRatioModuleSettingsType = "PERCENTAGE" | "RATIO";
@@ -8698,13 +8698,13 @@ export type ImportContactsDialog_bulkCreateContactsMutation = {
   };
 };
 
-export type DashboardModule_DashboardModule_DashboardCreateParallelButtonModule_Fragment = {
-  __typename?: "DashboardCreateParallelButtonModule";
+export type DashboardModule_DashboardModule_DashboardCreatePetitionButtonModule_Fragment = {
+  __typename?: "DashboardCreatePetitionButtonModule";
   id: string;
   title?: string | null;
   size: DashboardModuleSize;
-  parallelButtonSettings: {
-    __typename?: "DashboardCreateParallelButtonModuleSettings";
+  petitionButtonSettings: {
+    __typename?: "DashboardCreatePetitionButtonModuleSettings";
     label: string;
     template?: {
       __typename?: "PetitionBaseMini";
@@ -8717,44 +8717,44 @@ export type DashboardModule_DashboardModule_DashboardCreateParallelButtonModule_
   };
 };
 
-export type DashboardModule_DashboardModule_DashboardParallelsNumberModule_Fragment = {
-  __typename?: "DashboardParallelsNumberModule";
+export type DashboardModule_DashboardModule_DashboardPetitionsNumberModule_Fragment = {
+  __typename?: "DashboardPetitionsNumberModule";
   id: string;
   title?: string | null;
   size: DashboardModuleSize;
-  parallelsNumberResult?: { __typename?: "DashboardNumberModuleResult"; value: number } | null;
+  petitionsNumberResult?: { __typename?: "DashboardNumberModuleResult"; value: number } | null;
 };
 
-export type DashboardModule_DashboardModule_DashboardParallelsPieChartModule_Fragment = {
-  __typename?: "DashboardParallelsPieChartModule";
+export type DashboardModule_DashboardModule_DashboardPetitionsPieChartModule_Fragment = {
+  __typename?: "DashboardPetitionsPieChartModule";
   id: string;
   title?: string | null;
   size: DashboardModuleSize;
-  parallelsPieChartResult?: {
+  petitionsPieChartResult?: {
     __typename?: "DashboardPieChartModuleResult";
     value: Array<number>;
     isIncongruent: boolean;
   } | null;
-  parallelsPieChartSettings: {
-    __typename?: "DashboardParallelsPieChartModuleSettings";
+  petitionsPieChartSettings: {
+    __typename?: "DashboardPetitionsPieChartModuleSettings";
     graphicType: DashboardPieChartModuleSettingsType;
     labels: Array<string>;
     colors: Array<string>;
   };
 };
 
-export type DashboardModule_DashboardModule_DashboardParallelsRatioModule_Fragment = {
-  __typename?: "DashboardParallelsRatioModule";
+export type DashboardModule_DashboardModule_DashboardPetitionsRatioModule_Fragment = {
+  __typename?: "DashboardPetitionsRatioModule";
   id: string;
   title?: string | null;
   size: DashboardModuleSize;
-  parallelsRatioResult?: {
+  petitionsRatioResult?: {
     __typename?: "DashboardRatioModuleResult";
     value: Array<number>;
     isIncongruent: boolean;
   } | null;
-  parallelsRatioSettings: {
-    __typename?: "DashboardParallelsRatioModuleSettings";
+  petitionsRatioSettings: {
+    __typename?: "DashboardPetitionsRatioModuleSettings";
     graphicType: DashboardRatioModuleSettingsType;
   };
 };
@@ -8802,10 +8802,10 @@ export type DashboardModule_DashboardModule_DashboardProfilesRatioModule_Fragmen
 };
 
 export type DashboardModule_DashboardModuleFragment =
-  | DashboardModule_DashboardModule_DashboardCreateParallelButtonModule_Fragment
-  | DashboardModule_DashboardModule_DashboardParallelsNumberModule_Fragment
-  | DashboardModule_DashboardModule_DashboardParallelsPieChartModule_Fragment
-  | DashboardModule_DashboardModule_DashboardParallelsRatioModule_Fragment
+  | DashboardModule_DashboardModule_DashboardCreatePetitionButtonModule_Fragment
+  | DashboardModule_DashboardModule_DashboardPetitionsNumberModule_Fragment
+  | DashboardModule_DashboardModule_DashboardPetitionsPieChartModule_Fragment
+  | DashboardModule_DashboardModule_DashboardPetitionsRatioModule_Fragment
   | DashboardModule_DashboardModule_DashboardProfilesNumberModule_Fragment
   | DashboardModule_DashboardModule_DashboardProfilesPieChartModule_Fragment
   | DashboardModule_DashboardModule_DashboardProfilesRatioModule_Fragment;
@@ -8819,12 +8819,12 @@ export type DashboardTabs_DashboardFragment = {
   name: string;
 };
 
-export type DashboardCreateParallelButtonModule_DashboardCreateParallelButtonModuleFragment = {
-  __typename?: "DashboardCreateParallelButtonModule";
+export type DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragment = {
+  __typename?: "DashboardCreatePetitionButtonModule";
   title?: string | null;
   size: DashboardModuleSize;
-  parallelButtonSettings: {
-    __typename?: "DashboardCreateParallelButtonModuleSettings";
+  petitionButtonSettings: {
+    __typename?: "DashboardCreatePetitionButtonModuleSettings";
     label: string;
     template?: {
       __typename?: "PetitionBaseMini";
@@ -8837,42 +8837,42 @@ export type DashboardCreateParallelButtonModule_DashboardCreateParallelButtonMod
   };
 };
 
-export type DashboardParallelsNumberModule_DashboardParallelsNumberModuleFragment = {
-  __typename?: "DashboardParallelsNumberModule";
+export type DashboardPetitionsNumberModule_DashboardPetitionsNumberModuleFragment = {
+  __typename?: "DashboardPetitionsNumberModule";
   title?: string | null;
   size: DashboardModuleSize;
-  parallelsNumberResult?: { __typename?: "DashboardNumberModuleResult"; value: number } | null;
+  petitionsNumberResult?: { __typename?: "DashboardNumberModuleResult"; value: number } | null;
 };
 
-export type DashboardParallelsPieChartModule_DashboardParallelsPieChartModuleFragment = {
-  __typename?: "DashboardParallelsPieChartModule";
+export type DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment = {
+  __typename?: "DashboardPetitionsPieChartModule";
   id: string;
   title?: string | null;
   size: DashboardModuleSize;
-  parallelsPieChartResult?: {
+  petitionsPieChartResult?: {
     __typename?: "DashboardPieChartModuleResult";
     value: Array<number>;
     isIncongruent: boolean;
   } | null;
-  parallelsPieChartSettings: {
-    __typename?: "DashboardParallelsPieChartModuleSettings";
+  petitionsPieChartSettings: {
+    __typename?: "DashboardPetitionsPieChartModuleSettings";
     graphicType: DashboardPieChartModuleSettingsType;
     labels: Array<string>;
     colors: Array<string>;
   };
 };
 
-export type DashboardParallelsRatioModule_DashboardParallelsRatioModuleFragment = {
-  __typename?: "DashboardParallelsRatioModule";
+export type DashboardPetitionsRatioModule_DashboardPetitionsRatioModuleFragment = {
+  __typename?: "DashboardPetitionsRatioModule";
   title?: string | null;
   size: DashboardModuleSize;
-  parallelsRatioResult?: {
+  petitionsRatioResult?: {
     __typename?: "DashboardRatioModuleResult";
     value: Array<number>;
     isIncongruent: boolean;
   } | null;
-  parallelsRatioSettings: {
-    __typename?: "DashboardParallelsRatioModuleSettings";
+  petitionsRatioSettings: {
+    __typename?: "DashboardPetitionsRatioModuleSettings";
     graphicType: DashboardRatioModuleSettingsType;
   };
 };
@@ -8917,26 +8917,26 @@ export type DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragment = 
   };
 };
 
-export type DashboardModuleCard_DashboardModule_DashboardCreateParallelButtonModule_Fragment = {
-  __typename?: "DashboardCreateParallelButtonModule";
+export type DashboardModuleCard_DashboardModule_DashboardCreatePetitionButtonModule_Fragment = {
+  __typename?: "DashboardCreatePetitionButtonModule";
   title?: string | null;
   size: DashboardModuleSize;
 };
 
-export type DashboardModuleCard_DashboardModule_DashboardParallelsNumberModule_Fragment = {
-  __typename?: "DashboardParallelsNumberModule";
+export type DashboardModuleCard_DashboardModule_DashboardPetitionsNumberModule_Fragment = {
+  __typename?: "DashboardPetitionsNumberModule";
   title?: string | null;
   size: DashboardModuleSize;
 };
 
-export type DashboardModuleCard_DashboardModule_DashboardParallelsPieChartModule_Fragment = {
-  __typename?: "DashboardParallelsPieChartModule";
+export type DashboardModuleCard_DashboardModule_DashboardPetitionsPieChartModule_Fragment = {
+  __typename?: "DashboardPetitionsPieChartModule";
   title?: string | null;
   size: DashboardModuleSize;
 };
 
-export type DashboardModuleCard_DashboardModule_DashboardParallelsRatioModule_Fragment = {
-  __typename?: "DashboardParallelsRatioModule";
+export type DashboardModuleCard_DashboardModule_DashboardPetitionsRatioModule_Fragment = {
+  __typename?: "DashboardPetitionsRatioModule";
   title?: string | null;
   size: DashboardModuleSize;
 };
@@ -8960,35 +8960,35 @@ export type DashboardModuleCard_DashboardModule_DashboardProfilesRatioModule_Fra
 };
 
 export type DashboardModuleCard_DashboardModuleFragment =
-  | DashboardModuleCard_DashboardModule_DashboardCreateParallelButtonModule_Fragment
-  | DashboardModuleCard_DashboardModule_DashboardParallelsNumberModule_Fragment
-  | DashboardModuleCard_DashboardModule_DashboardParallelsPieChartModule_Fragment
-  | DashboardModuleCard_DashboardModule_DashboardParallelsRatioModule_Fragment
+  | DashboardModuleCard_DashboardModule_DashboardCreatePetitionButtonModule_Fragment
+  | DashboardModuleCard_DashboardModule_DashboardPetitionsNumberModule_Fragment
+  | DashboardModuleCard_DashboardModule_DashboardPetitionsPieChartModule_Fragment
+  | DashboardModuleCard_DashboardModule_DashboardPetitionsRatioModule_Fragment
   | DashboardModuleCard_DashboardModule_DashboardProfilesNumberModule_Fragment
   | DashboardModuleCard_DashboardModule_DashboardProfilesPieChartModule_Fragment
   | DashboardModuleCard_DashboardModule_DashboardProfilesRatioModule_Fragment;
 
-export type DashboardSimpleModuleCard_DashboardModule_DashboardCreateParallelButtonModule_Fragment =
+export type DashboardSimpleModuleCard_DashboardModule_DashboardCreatePetitionButtonModule_Fragment =
   {
-    __typename?: "DashboardCreateParallelButtonModule";
+    __typename?: "DashboardCreatePetitionButtonModule";
     title?: string | null;
     size: DashboardModuleSize;
   };
 
-export type DashboardSimpleModuleCard_DashboardModule_DashboardParallelsNumberModule_Fragment = {
-  __typename?: "DashboardParallelsNumberModule";
+export type DashboardSimpleModuleCard_DashboardModule_DashboardPetitionsNumberModule_Fragment = {
+  __typename?: "DashboardPetitionsNumberModule";
   title?: string | null;
   size: DashboardModuleSize;
 };
 
-export type DashboardSimpleModuleCard_DashboardModule_DashboardParallelsPieChartModule_Fragment = {
-  __typename?: "DashboardParallelsPieChartModule";
+export type DashboardSimpleModuleCard_DashboardModule_DashboardPetitionsPieChartModule_Fragment = {
+  __typename?: "DashboardPetitionsPieChartModule";
   title?: string | null;
   size: DashboardModuleSize;
 };
 
-export type DashboardSimpleModuleCard_DashboardModule_DashboardParallelsRatioModule_Fragment = {
-  __typename?: "DashboardParallelsRatioModule";
+export type DashboardSimpleModuleCard_DashboardModule_DashboardPetitionsRatioModule_Fragment = {
+  __typename?: "DashboardPetitionsRatioModule";
   title?: string | null;
   size: DashboardModuleSize;
 };
@@ -9012,10 +9012,10 @@ export type DashboardSimpleModuleCard_DashboardModule_DashboardProfilesRatioModu
 };
 
 export type DashboardSimpleModuleCard_DashboardModuleFragment =
-  | DashboardSimpleModuleCard_DashboardModule_DashboardCreateParallelButtonModule_Fragment
-  | DashboardSimpleModuleCard_DashboardModule_DashboardParallelsNumberModule_Fragment
-  | DashboardSimpleModuleCard_DashboardModule_DashboardParallelsPieChartModule_Fragment
-  | DashboardSimpleModuleCard_DashboardModule_DashboardParallelsRatioModule_Fragment
+  | DashboardSimpleModuleCard_DashboardModule_DashboardCreatePetitionButtonModule_Fragment
+  | DashboardSimpleModuleCard_DashboardModule_DashboardPetitionsNumberModule_Fragment
+  | DashboardSimpleModuleCard_DashboardModule_DashboardPetitionsPieChartModule_Fragment
+  | DashboardSimpleModuleCard_DashboardModule_DashboardPetitionsRatioModule_Fragment
   | DashboardSimpleModuleCard_DashboardModule_DashboardProfilesNumberModule_Fragment
   | DashboardSimpleModuleCard_DashboardModule_DashboardProfilesPieChartModule_Fragment
   | DashboardSimpleModuleCard_DashboardModule_DashboardProfilesRatioModule_Fragment;
@@ -35322,12 +35322,12 @@ export type Home_dashboardQuery = {
     name: string;
     modules: Array<
       | {
-          __typename?: "DashboardCreateParallelButtonModule";
+          __typename?: "DashboardCreatePetitionButtonModule";
           id: string;
           title?: string | null;
           size: DashboardModuleSize;
-          parallelButtonSettings: {
-            __typename?: "DashboardCreateParallelButtonModuleSettings";
+          petitionButtonSettings: {
+            __typename?: "DashboardCreatePetitionButtonModuleSettings";
             label: string;
             template?: {
               __typename?: "PetitionBaseMini";
@@ -35340,44 +35340,44 @@ export type Home_dashboardQuery = {
           };
         }
       | {
-          __typename?: "DashboardParallelsNumberModule";
+          __typename?: "DashboardPetitionsNumberModule";
           id: string;
           title?: string | null;
           size: DashboardModuleSize;
-          parallelsNumberResult?: {
+          petitionsNumberResult?: {
             __typename?: "DashboardNumberModuleResult";
             value: number;
           } | null;
         }
       | {
-          __typename?: "DashboardParallelsPieChartModule";
+          __typename?: "DashboardPetitionsPieChartModule";
           id: string;
           title?: string | null;
           size: DashboardModuleSize;
-          parallelsPieChartResult?: {
+          petitionsPieChartResult?: {
             __typename?: "DashboardPieChartModuleResult";
             value: Array<number>;
             isIncongruent: boolean;
           } | null;
-          parallelsPieChartSettings: {
-            __typename?: "DashboardParallelsPieChartModuleSettings";
+          petitionsPieChartSettings: {
+            __typename?: "DashboardPetitionsPieChartModuleSettings";
             graphicType: DashboardPieChartModuleSettingsType;
             labels: Array<string>;
             colors: Array<string>;
           };
         }
       | {
-          __typename?: "DashboardParallelsRatioModule";
+          __typename?: "DashboardPetitionsRatioModule";
           id: string;
           title?: string | null;
           size: DashboardModuleSize;
-          parallelsRatioResult?: {
+          petitionsRatioResult?: {
             __typename?: "DashboardRatioModuleResult";
             value: Array<number>;
             isIncongruent: boolean;
           } | null;
-          parallelsRatioSettings: {
-            __typename?: "DashboardParallelsRatioModuleSettings";
+          petitionsRatioSettings: {
+            __typename?: "DashboardPetitionsRatioModuleSettings";
             graphicType: DashboardRatioModuleSettingsType;
           };
         }
@@ -60812,16 +60812,16 @@ export const DashboardSimpleModuleCard_DashboardModuleFragmentDoc = gql`
   }
   ${DashboardModuleCard_DashboardModuleFragmentDoc}
 ` as unknown as DocumentNode<DashboardSimpleModuleCard_DashboardModuleFragment, unknown>;
-export const DashboardParallelsNumberModule_DashboardParallelsNumberModuleFragmentDoc = gql`
-  fragment DashboardParallelsNumberModule_DashboardParallelsNumberModule on DashboardParallelsNumberModule {
+export const DashboardPetitionsNumberModule_DashboardPetitionsNumberModuleFragmentDoc = gql`
+  fragment DashboardPetitionsNumberModule_DashboardPetitionsNumberModule on DashboardPetitionsNumberModule {
     ...DashboardSimpleModuleCard_DashboardModule
-    parallelsNumberResult: result {
+    petitionsNumberResult: result {
       value
     }
   }
   ${DashboardSimpleModuleCard_DashboardModuleFragmentDoc}
 ` as unknown as DocumentNode<
-  DashboardParallelsNumberModule_DashboardParallelsNumberModuleFragment,
+  DashboardPetitionsNumberModule_DashboardPetitionsNumberModuleFragment,
   unknown
 >;
 export const DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragmentDoc = gql`
@@ -60836,20 +60836,20 @@ export const DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragment
   DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragment,
   unknown
 >;
-export const DashboardParallelsRatioModule_DashboardParallelsRatioModuleFragmentDoc = gql`
-  fragment DashboardParallelsRatioModule_DashboardParallelsRatioModule on DashboardParallelsRatioModule {
+export const DashboardPetitionsRatioModule_DashboardPetitionsRatioModuleFragmentDoc = gql`
+  fragment DashboardPetitionsRatioModule_DashboardPetitionsRatioModule on DashboardPetitionsRatioModule {
     ...DashboardSimpleModuleCard_DashboardModule
-    parallelsRatioResult: result {
+    petitionsRatioResult: result {
       value
       isIncongruent
     }
-    parallelsRatioSettings: settings {
+    petitionsRatioSettings: settings {
       graphicType
     }
   }
   ${DashboardSimpleModuleCard_DashboardModuleFragmentDoc}
 ` as unknown as DocumentNode<
-  DashboardParallelsRatioModule_DashboardParallelsRatioModuleFragment,
+  DashboardPetitionsRatioModule_DashboardPetitionsRatioModuleFragment,
   unknown
 >;
 export const DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragmentDoc = gql`
@@ -60868,23 +60868,23 @@ export const DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragmentDo
   DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragment,
   unknown
 >;
-export const DashboardParallelsPieChartModule_DashboardParallelsPieChartModuleFragmentDoc = gql`
-  fragment DashboardParallelsPieChartModule_DashboardParallelsPieChartModule on DashboardParallelsPieChartModule {
+export const DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragmentDoc = gql`
+  fragment DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModule on DashboardPetitionsPieChartModule {
     id
     title
     size
-    parallelsPieChartResult: result {
+    petitionsPieChartResult: result {
       value
       isIncongruent
     }
-    parallelsPieChartSettings: settings {
+    petitionsPieChartSettings: settings {
       graphicType
       labels
       colors
     }
   }
 ` as unknown as DocumentNode<
-  DashboardParallelsPieChartModule_DashboardParallelsPieChartModuleFragment,
+  DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment,
   unknown
 >;
 export const DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragmentDoc = gql`
@@ -60906,11 +60906,11 @@ export const DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFrag
   DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragment,
   unknown
 >;
-export const DashboardCreateParallelButtonModule_DashboardCreateParallelButtonModuleFragmentDoc =
+export const DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragmentDoc =
   gql`
-    fragment DashboardCreateParallelButtonModule_DashboardCreateParallelButtonModule on DashboardCreateParallelButtonModule {
+    fragment DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModule on DashboardCreatePetitionButtonModule {
       ...DashboardSimpleModuleCard_DashboardModule
-      parallelButtonSettings: settings {
+      petitionButtonSettings: settings {
         label
         template {
           id
@@ -60922,41 +60922,41 @@ export const DashboardCreateParallelButtonModule_DashboardCreateParallelButtonMo
     }
     ${DashboardSimpleModuleCard_DashboardModuleFragmentDoc}
   ` as unknown as DocumentNode<
-    DashboardCreateParallelButtonModule_DashboardCreateParallelButtonModuleFragment,
+    DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragment,
     unknown
   >;
 export const DashboardModule_DashboardModuleFragmentDoc = gql`
   fragment DashboardModule_DashboardModule on DashboardModule {
     id
-    ... on DashboardParallelsNumberModule {
-      ...DashboardParallelsNumberModule_DashboardParallelsNumberModule
+    ... on DashboardPetitionsNumberModule {
+      ...DashboardPetitionsNumberModule_DashboardPetitionsNumberModule
     }
     ... on DashboardProfilesNumberModule {
       ...DashboardProfilesNumberModule_DashboardProfilesNumberModule
     }
-    ... on DashboardParallelsRatioModule {
-      ...DashboardParallelsRatioModule_DashboardParallelsRatioModule
+    ... on DashboardPetitionsRatioModule {
+      ...DashboardPetitionsRatioModule_DashboardPetitionsRatioModule
     }
     ... on DashboardProfilesRatioModule {
       ...DashboardProfilesRatioModule_DashboardProfilesRatioModule
     }
-    ... on DashboardParallelsPieChartModule {
-      ...DashboardParallelsPieChartModule_DashboardParallelsPieChartModule
+    ... on DashboardPetitionsPieChartModule {
+      ...DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModule
     }
     ... on DashboardProfilesPieChartModule {
       ...DashboardProfilesPieChartModule_DashboardProfilesPieChartModule
     }
-    ... on DashboardCreateParallelButtonModule {
-      ...DashboardCreateParallelButtonModule_DashboardCreateParallelButtonModule
+    ... on DashboardCreatePetitionButtonModule {
+      ...DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModule
     }
   }
-  ${DashboardParallelsNumberModule_DashboardParallelsNumberModuleFragmentDoc}
+  ${DashboardPetitionsNumberModule_DashboardPetitionsNumberModuleFragmentDoc}
   ${DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragmentDoc}
-  ${DashboardParallelsRatioModule_DashboardParallelsRatioModuleFragmentDoc}
+  ${DashboardPetitionsRatioModule_DashboardPetitionsRatioModuleFragmentDoc}
   ${DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragmentDoc}
-  ${DashboardParallelsPieChartModule_DashboardParallelsPieChartModuleFragmentDoc}
+  ${DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragmentDoc}
   ${DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragmentDoc}
-  ${DashboardCreateParallelButtonModule_DashboardCreateParallelButtonModuleFragmentDoc}
+  ${DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragmentDoc}
 ` as unknown as DocumentNode<DashboardModule_DashboardModuleFragment, unknown>;
 export const UserSettingsLayout_QueryFragmentDoc = gql`
   fragment UserSettingsLayout_Query on Query {

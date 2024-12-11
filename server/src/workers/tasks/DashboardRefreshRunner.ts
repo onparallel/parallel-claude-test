@@ -18,8 +18,8 @@ export class DashboardRefreshRunner extends TaskRunner<"DASHBOARD_REFRESH"> {
       for (const module of modules) {
         let result: any;
         switch (module.type) {
-          case "PARALLELS_NUMBER":
-            result = await this.ctx.dashboards.getParallelsNumberValue(
+          case "PETITIONS_NUMBER":
+            result = await this.ctx.dashboards.getPetitionsNumberValue(
               dashboard.org_id,
               module.settings,
             );
@@ -30,8 +30,8 @@ export class DashboardRefreshRunner extends TaskRunner<"DASHBOARD_REFRESH"> {
               module.settings,
             );
             break;
-          case "PARALLELS_RATIO":
-            result = await this.ctx.dashboards.getParallelsRatioValues(
+          case "PETITIONS_RATIO":
+            result = await this.ctx.dashboards.getPetitionsRatioValues(
               dashboard.org_id,
               module.settings,
             );
@@ -42,8 +42,8 @@ export class DashboardRefreshRunner extends TaskRunner<"DASHBOARD_REFRESH"> {
               module.settings,
             );
             break;
-          case "PARALLELS_PIE_CHART":
-            result = await this.ctx.dashboards.getParallelsPieChartValues(
+          case "PETITIONS_PIE_CHART":
+            result = await this.ctx.dashboards.getPetitionsPieChartValues(
               dashboard.org_id,
               module.settings,
             );

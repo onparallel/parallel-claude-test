@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Center, Stack, useBreakpointValue } from "@chakra-ui/react";
 
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
-import { DashboardParallelsPieChartModule_DashboardParallelsPieChartModuleFragment } from "@parallel/graphql/__types";
+import { DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment } from "@parallel/graphql/__types";
 import { isNonNullish } from "remeda";
 import { DashboardChartLegend } from "../charts/DashboardChartLegend";
 import { DashboardDoughnutChart } from "../charts/DashboardDoughnutChart";
@@ -11,19 +11,19 @@ import { DashboardModuleAlertIncongruent } from "../shared/DashboardModuleAlertI
 import { DashboardModuleCard } from "../shared/DashboardModuleCard";
 import { DashboardModuleSpinner } from "../shared/DashboardModuleSpinner";
 
-export function DashboardParallelsPieChartModule({
+export function DashboardPetitionsPieChartModule({
   module,
 }: {
-  module: DashboardParallelsPieChartModule_DashboardParallelsPieChartModuleFragment;
+  module: DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment;
 }) {
   const data = {
     datasets: [
       {
-        data: module.parallelsPieChartResult?.value ?? [],
-        backgroundColor: module.parallelsPieChartSettings?.colors ?? [],
+        data: module.petitionsPieChartResult?.value ?? [],
+        backgroundColor: module.petitionsPieChartSettings?.colors ?? [],
       },
     ],
-    labels: module.parallelsPieChartSettings?.labels ?? [],
+    labels: module.petitionsPieChartSettings?.labels ?? [],
   };
 
   const rows = useBreakpointValue({ base: 4, md: 2, lg: module.size === "LARGE" ? 3 : 2 });
@@ -36,13 +36,13 @@ export function DashboardParallelsPieChartModule({
     <DashboardModuleCard
       module={module}
       headerAddon={
-        module.parallelsPieChartResult?.isIncongruent ? (
+        module.petitionsPieChartResult?.isIncongruent ? (
           <DashboardModuleAlertIncongruent />
         ) : undefined
       }
       rows={rows}
     >
-      {isNonNullish(module.parallelsPieChartResult) ? (
+      {isNonNullish(module.petitionsPieChartResult) ? (
         <Stack
           direction={{ base: "column", md: "row" }}
           alignItems="stretch"
@@ -52,7 +52,7 @@ export function DashboardParallelsPieChartModule({
         >
           <Center>
             <Center position="relative" boxSize={`${chartSize}px`}>
-              {module.parallelsPieChartSettings?.graphicType === "DOUGHNUT" ? (
+              {module.petitionsPieChartSettings?.graphicType === "DOUGHNUT" ? (
                 <DashboardDoughnutChart data={data} />
               ) : (
                 <DashboardPieChart data={data} />
@@ -70,18 +70,18 @@ export function DashboardParallelsPieChartModule({
   );
 }
 
-DashboardParallelsPieChartModule.fragments = {
-  get DashboardParallelsPieChartModule() {
+DashboardPetitionsPieChartModule.fragments = {
+  get DashboardPetitionsPieChartModule() {
     return gql`
-      fragment DashboardParallelsPieChartModule_DashboardParallelsPieChartModule on DashboardParallelsPieChartModule {
+      fragment DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModule on DashboardPetitionsPieChartModule {
         id
         title
         size
-        parallelsPieChartResult: result {
+        petitionsPieChartResult: result {
           value
           isIncongruent
         }
-        parallelsPieChartSettings: settings {
+        petitionsPieChartSettings: settings {
           graphicType
           labels
           colors

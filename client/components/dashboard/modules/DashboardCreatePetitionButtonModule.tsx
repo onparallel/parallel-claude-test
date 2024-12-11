@@ -1,17 +1,17 @@
 import { gql } from "@apollo/client";
 import { Button } from "@chakra-ui/react";
-import { DashboardCreateParallelButtonModule_DashboardCreateParallelButtonModuleFragment } from "@parallel/graphql/__types";
+import { DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragment } from "@parallel/graphql/__types";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { isNullish } from "remeda";
 import { DashboardSimpleModuleCard } from "../shared/DashboardSimpleModuleCard";
 
-export function DashboardCreateParallelButtonModule({
+export function DashboardCreatePetitionButtonModule({
   module,
 }: {
-  module: DashboardCreateParallelButtonModule_DashboardCreateParallelButtonModuleFragment;
+  module: DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragment;
 }) {
-  const template = module.parallelButtonSettings.template;
+  const template = module.petitionButtonSettings.template;
   const createPetition = useCreatePetition();
   const goToPetition = useGoToPetition();
 
@@ -28,18 +28,18 @@ export function DashboardCreateParallelButtonModule({
         isDisabled={isNullish(template?.myEffectivePermission)}
         onClick={handleCreatePetition}
       >
-        {module.parallelButtonSettings.label}
+        {module.petitionButtonSettings.label}
       </Button>
     </DashboardSimpleModuleCard>
   );
 }
 
-DashboardCreateParallelButtonModule.fragments = {
-  get DashboardCreateParallelButtonModule() {
+DashboardCreatePetitionButtonModule.fragments = {
+  get DashboardCreatePetitionButtonModule() {
     return gql`
-      fragment DashboardCreateParallelButtonModule_DashboardCreateParallelButtonModule on DashboardCreateParallelButtonModule {
+      fragment DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModule on DashboardCreatePetitionButtonModule {
         ...DashboardSimpleModuleCard_DashboardModule
-        parallelButtonSettings: settings {
+        petitionButtonSettings: settings {
           label
           template {
             id

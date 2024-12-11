@@ -59,7 +59,7 @@ export async function seed(knex: Knex): Promise<any> {
         }),
       },
       {
-        type: "PARALLELS_NUMBER",
+        type: "PETITIONS_NUMBER",
         size: "SMALL",
         title: "Total parallels pendientes",
         settings: JSON.stringify({
@@ -69,7 +69,7 @@ export async function seed(knex: Knex): Promise<any> {
         }),
       },
       {
-        type: "CREATE_PARALLEL_BUTTON",
+        type: "CREATE_PETITION_BUTTON",
         size: "SMALL",
         title: "Know your customer...",
         settings: JSON.stringify({
@@ -78,7 +78,7 @@ export async function seed(knex: Knex): Promise<any> {
         }),
       },
       {
-        type: "PARALLELS_PIE_CHART",
+        type: "PETITIONS_PIE_CHART",
         size: "MEDIUM",
         title: "Estado de los parallels",
         settings: JSON.stringify({
@@ -108,7 +108,7 @@ export async function seed(knex: Knex): Promise<any> {
         }),
       },
       {
-        type: "PARALLELS_RATIO",
+        type: "PETITIONS_RATIO",
         size: "MEDIUM",
         title: "% pendientes",
         settings: JSON.stringify({

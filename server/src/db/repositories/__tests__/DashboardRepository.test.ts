@@ -18,7 +18,7 @@ import {
   UserGroup,
 } from "../../__types";
 import { KNEX } from "../../knex";
-import { DashboardRepository, ModuleSettings, ParallelsFilter } from "../DashboardRepository";
+import { DashboardRepository, ModuleSettings, PetitionsFilter } from "../DashboardRepository";
 import { Mocks } from "./mocks";
 
 describe("DashboardRepository", () => {
@@ -51,14 +51,14 @@ describe("DashboardRepository", () => {
     await knex.destroy();
   });
 
-  describe("getParallelsNumberValue", () => {
+  describe("getPetitionsNumberValue", () => {
     let templates: Petition[];
 
     let tags: Tag[];
     let userGroups: UserGroup[];
 
-    async function count(filters: ParallelsFilter) {
-      return await dashboards.getParallelsNumberValue(organization.id, { filters });
+    async function count(filters: PetitionsFilter) {
+      return await dashboards.getPetitionsNumberValue(organization.id, { filters });
     }
 
     beforeAll(async () => {
@@ -119,23 +119,23 @@ describe("DashboardRepository", () => {
       await mocks.knex.from("petition").update({ deleted_at: new Date() });
     });
 
-    it("counts parallels in a specific path", async () => {
+    it("counts petitions in a specific path", async () => {
       expect(await count({ path: "/KYC/" })).toEqual({ value: 4 });
     });
 
-    it("counts parallels with DRAFT or PENDING status", async () => {
+    it("counts petitions with DRAFT or PENDING status", async () => {
       expect(await count({ status: ["DRAFT", "PENDING"] })).toEqual({ value: 4 });
     });
 
-    it("counts parallels with a specific locale", async () => {
+    it("counts petitions with a specific locale", async () => {
       expect(await count({ locale: "it" })).toEqual({ value: 1 });
     });
 
-    it("counts parallels with a completed signature", async () => {
+    it("counts petitions with a completed signature", async () => {
       expect(await count({ signature: ["COMPLETED"] })).toEqual({ value: 4 });
     });
 
-    it("counts parallels with specific tags", async () => {
+    it("counts petitions with specific tags", async () => {
       expect(
         await count({
           tags: {
@@ -161,7 +161,7 @@ describe("DashboardRepository", () => {
       ).toEqual({ value: 6 });
     });
 
-    it("counts parallels with no tags", async () => {
+    it("counts petitions with no tags", async () => {
       expect(
         await count({
           tags: {
@@ -172,7 +172,7 @@ describe("DashboardRepository", () => {
       ).toEqual({ value: 5 });
     });
 
-    it("counts parallels shared with me", async () => {
+    it("counts petitions shared with me", async () => {
       expect(
         await count({
           sharedWith: {
@@ -194,7 +194,7 @@ describe("DashboardRepository", () => {
       ).toEqual({ value: 5 });
     });
 
-    it("counts parallels not shared with me", async () => {
+    it("counts petitions not shared with me", async () => {
       expect(
         await count({
           sharedWith: {
@@ -211,7 +211,7 @@ describe("DashboardRepository", () => {
       ).toEqual({ value: 2 });
     });
 
-    it("counts parallels shared with me through a specific user group", async () => {
+    it("counts petitions shared with me through a specific user group", async () => {
       expect(
         await count({
           sharedWith: {
@@ -233,7 +233,7 @@ describe("DashboardRepository", () => {
       ).toEqual({ value: 1 });
     });
 
-    it("counts parallels that i own", async () => {
+    it("counts petitions that i own", async () => {
       expect(
         await count({
           sharedWith: {
@@ -250,11 +250,11 @@ describe("DashboardRepository", () => {
       ).toEqual({ value: 8 });
     });
 
-    it("counts parallels from a specific template", async () => {
+    it("counts petitions from a specific template", async () => {
       expect(await count({ fromTemplateId: [templates[0].id] })).toEqual({ value: 8 });
     });
 
-    it("counts parallels with multiple filters", async () => {
+    it("counts petitions with multiple filters", async () => {
       expect(
         await count({
           status: ["COMPLETED"],
@@ -992,7 +992,7 @@ describe("DashboardRepository", () => {
     });
   });
 
-  describe("getParallelsRatioValues", () => {
+  describe("getPetitionsRatioValues", () => {
     beforeAll(async () => {
       await mocks.createRandomPetitions(organization.id, users[0].id, 10, (i) => ({
         status: [
@@ -1014,9 +1014,9 @@ describe("DashboardRepository", () => {
       await mocks.knex.from("petition").update({ deleted_at: new Date() });
     });
 
-    it("calculates the ratio of DRAFT or PENDING parallels", async () => {
+    it("calculates the ratio of DRAFT or PENDING petitions", async () => {
       expect(
-        await dashboards.getParallelsRatioValues(organization.id, {
+        await dashboards.getPetitionsRatioValues(organization.id, {
           graphicType: "RATIO",
           filters: [
             { status: ["DRAFT", "PENDING"] },
@@ -1031,7 +1031,7 @@ describe("DashboardRepository", () => {
 
     it("detects incongruent filters", async () => {
       expect(
-        await dashboards.getParallelsRatioValues(organization.id, {
+        await dashboards.getPetitionsRatioValues(organization.id, {
           graphicType: "RATIO",
           filters: [{ status: ["DRAFT", "PENDING"] }, { status: ["DRAFT", "COMPLETED", "CLOSED"] }],
         }),
@@ -1098,7 +1098,7 @@ describe("DashboardRepository", () => {
     });
   });
 
-  describe("getParallelsPieChartValues", () => {
+  describe("getPetitionsPieChartValues", () => {
     beforeAll(async () => {
       await mocks.createRandomPetitions(organization.id, users[0].id, 20, (i) => ({
         status: [
@@ -1114,9 +1114,9 @@ describe("DashboardRepository", () => {
       await mocks.knex.from("petition").update({ deleted_at: new Date() });
     });
 
-    it("calculates the amount of parallels in each status", async () => {
+    it("calculates the amount of petitions in each status", async () => {
       expect(
-        await dashboards.getParallelsPieChartValues(organization.id, {
+        await dashboards.getPetitionsPieChartValues(organization.id, {
           graphicType: "PIE",
           items: [
             { label: "En proceso", color: "#FF0000", filter: { status: ["DRAFT", "PENDING"] } },
@@ -1132,7 +1132,7 @@ describe("DashboardRepository", () => {
 
     it("detects incongruent filters", async () => {
       expect(
-        await dashboards.getParallelsPieChartValues(organization.id, {
+        await dashboards.getPetitionsPieChartValues(organization.id, {
           graphicType: "PIE",
           items: [
             { label: "Borradores", color: "#FF0000", filter: { status: ["DRAFT"] } },

@@ -30,22 +30,22 @@ export type DashboardModuleSize = "SMALL" | "MEDIUM" | "LARGE";
 export const DashboardModuleSizeValues = ["SMALL", "MEDIUM", "LARGE"] as DashboardModuleSize[];
 
 export type DashboardModuleType =
-  | "PARALLELS_NUMBER"
   | "PROFILES_NUMBER"
-  | "PARALLELS_RATIO"
   | "PROFILES_RATIO"
-  | "PARALLELS_PIE_CHART"
   | "PROFILES_PIE_CHART"
-  | "CREATE_PARALLEL_BUTTON";
+  | "PETITIONS_NUMBER"
+  | "PETITIONS_RATIO"
+  | "PETITIONS_PIE_CHART"
+  | "CREATE_PETITION_BUTTON";
 
 export const DashboardModuleTypeValues = [
-  "PARALLELS_NUMBER",
   "PROFILES_NUMBER",
-  "PARALLELS_RATIO",
   "PROFILES_RATIO",
-  "PARALLELS_PIE_CHART",
   "PROFILES_PIE_CHART",
-  "CREATE_PARALLEL_BUTTON",
+  "PETITIONS_NUMBER",
+  "PETITIONS_RATIO",
+  "PETITIONS_PIE_CHART",
+  "CREATE_PETITION_BUTTON",
 ] as DashboardModuleType[];
 
 export type DocumentProcessingType = "PAYSLIP";

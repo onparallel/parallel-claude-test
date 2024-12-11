@@ -31,20 +31,20 @@ export const DashboardModule = interfaceType({
   },
   resolveType: (o) => {
     switch (o.type) {
-      case "PARALLELS_NUMBER":
-        return "DashboardParallelsNumberModule";
+      case "PETITIONS_NUMBER":
+        return "DashboardPetitionsNumberModule";
       case "PROFILES_NUMBER":
         return "DashboardProfilesNumberModule";
-      case "PARALLELS_RATIO":
-        return "DashboardParallelsRatioModule";
+      case "PETITIONS_RATIO":
+        return "DashboardPetitionsRatioModule";
       case "PROFILES_RATIO":
         return "DashboardProfilesRatioModule";
-      case "PARALLELS_PIE_CHART":
-        return "DashboardParallelsPieChartModule";
+      case "PETITIONS_PIE_CHART":
+        return "DashboardPetitionsPieChartModule";
       case "PROFILES_PIE_CHART":
         return "DashboardProfilesPieChartModule";
-      case "CREATE_PARALLEL_BUTTON":
-        return "DashboardCreateParallelButtonModule";
+      case "CREATE_PETITION_BUTTON":
+        return "DashboardCreatePetitionButtonModule";
       default:
         throw new Error(`Unknown type: ${o.type}`);
     }
@@ -54,12 +54,12 @@ export const DashboardModule = interfaceType({
 export const DashboardNumberModuleResult = objectType({
   name: "DashboardNumberModuleResult",
   definition(t) {
-    t.nonNull.int("value");
+    t.nonNull.float("value");
   },
 });
 
-export const DashboardParallelsNumberModule = objectType({
-  name: "DashboardParallelsNumberModule",
+export const DashboardPetitionsNumberModule = objectType({
+  name: "DashboardPetitionsNumberModule",
   definition(t) {
     t.implements("DashboardModule");
     t.nullable.field("result", { type: "DashboardNumberModuleResult" });
@@ -77,7 +77,7 @@ export const DashboardProfilesNumberModule = objectType({
 export const DashboardRatioModuleResult = objectType({
   name: "DashboardRatioModuleResult",
   definition(t) {
-    t.nonNull.list.nonNull.int("value");
+    t.nonNull.list.nonNull.float("value");
     t.nonNull.boolean("isIncongruent");
   },
 });
@@ -87,13 +87,13 @@ export const DashboardRatioModuleSettingsType = enumType({
   members: ["PERCENTAGE", "RATIO"],
 });
 
-export const DashboardParallelsRatioModule = objectType({
-  name: "DashboardParallelsRatioModule",
+export const DashboardPetitionsRatioModule = objectType({
+  name: "DashboardPetitionsRatioModule",
   definition(t) {
     t.implements("DashboardModule");
     t.nonNull.field("settings", {
       type: objectType({
-        name: "DashboardParallelsRatioModuleSettings",
+        name: "DashboardPetitionsRatioModuleSettings",
         definition(t) {
           t.nonNull.field("graphicType", { type: "DashboardRatioModuleSettingsType" });
         },
@@ -127,18 +127,18 @@ export const DashboardPieChartModuleSettingsType = enumType({
 export const DashboardPieChartModuleResult = objectType({
   name: "DashboardPieChartModuleResult",
   definition(t) {
-    t.nonNull.list.nonNull.int("value");
+    t.nonNull.list.nonNull.float("value");
     t.nonNull.boolean("isIncongruent");
   },
 });
 
-export const DashboardParallelsPieChartModule = objectType({
-  name: "DashboardParallelsPieChartModule",
+export const DashboardPetitionsPieChartModule = objectType({
+  name: "DashboardPetitionsPieChartModule",
   definition(t) {
     t.implements("DashboardModule");
     t.nonNull.field("settings", {
       type: objectType({
-        name: "DashboardParallelsPieChartModuleSettings",
+        name: "DashboardPetitionsPieChartModuleSettings",
         definition(t) {
           t.nonNull.field("graphicType", { type: "DashboardPieChartModuleSettingsType" });
           t.nonNull.list.nonNull.string("labels", {
@@ -176,7 +176,7 @@ export const DashboardProfilesPieChartModule = objectType({
         },
         sourceType: /* ts */ `{
           graphicType: "DOUGHNUT" | "PIE";
-          filters: { label: string; color: string }[];
+          items: { label: string; color: string }[];
         }`,
       }),
     });
@@ -184,13 +184,13 @@ export const DashboardProfilesPieChartModule = objectType({
   },
 });
 
-export const DashboardCreateParallelButtonModule = objectType({
-  name: "DashboardCreateParallelButtonModule",
+export const DashboardCreatePetitionButtonModule = objectType({
+  name: "DashboardCreatePetitionButtonModule",
   definition(t) {
     t.implements("DashboardModule");
     t.nonNull.field("settings", {
       type: objectType({
-        name: "DashboardCreateParallelButtonModuleSettings",
+        name: "DashboardCreatePetitionButtonModuleSettings",
         definition(t) {
           t.nonNull.string("label");
           t.nullable.field("template", {

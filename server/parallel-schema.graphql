@@ -481,14 +481,14 @@ type Dashboard {
   name: String!
 }
 
-type DashboardCreateParallelButtonModule implements DashboardModule {
+type DashboardCreatePetitionButtonModule implements DashboardModule {
   id: GID!
-  settings: DashboardCreateParallelButtonModuleSettings!
+  settings: DashboardCreatePetitionButtonModuleSettings!
   size: DashboardModuleSize!
   title: String
 }
 
-type DashboardCreateParallelButtonModuleSettings {
+type DashboardCreatePetitionButtonModuleSettings {
   label: String!
   template: PetitionBaseMini
 }
@@ -506,45 +506,45 @@ enum DashboardModuleSize {
 }
 
 type DashboardNumberModuleResult {
-  value: Int!
+  value: Float!
 }
 
-type DashboardParallelsNumberModule implements DashboardModule {
+type DashboardPetitionsNumberModule implements DashboardModule {
   id: GID!
   result: DashboardNumberModuleResult
   size: DashboardModuleSize!
   title: String
 }
 
-type DashboardParallelsPieChartModule implements DashboardModule {
+type DashboardPetitionsPieChartModule implements DashboardModule {
   id: GID!
   result: DashboardPieChartModuleResult
-  settings: DashboardParallelsPieChartModuleSettings!
+  settings: DashboardPetitionsPieChartModuleSettings!
   size: DashboardModuleSize!
   title: String
 }
 
-type DashboardParallelsPieChartModuleSettings {
+type DashboardPetitionsPieChartModuleSettings {
   colors: [String!]!
   graphicType: DashboardPieChartModuleSettingsType!
   labels: [String!]!
 }
 
-type DashboardParallelsRatioModule implements DashboardModule {
+type DashboardPetitionsRatioModule implements DashboardModule {
   id: GID!
   result: DashboardRatioModuleResult
-  settings: DashboardParallelsRatioModuleSettings!
+  settings: DashboardPetitionsRatioModuleSettings!
   size: DashboardModuleSize!
   title: String
 }
 
-type DashboardParallelsRatioModuleSettings {
+type DashboardPetitionsRatioModuleSettings {
   graphicType: DashboardRatioModuleSettingsType!
 }
 
 type DashboardPieChartModuleResult {
   isIncongruent: Boolean!
-  value: [Int!]!
+  value: [Float!]!
 }
 
 enum DashboardPieChartModuleSettingsType {
@@ -587,7 +587,7 @@ type DashboardProfilesRatioModuleSettings {
 
 type DashboardRatioModuleResult {
   isIncongruent: Boolean!
-  value: [Int!]!
+  value: [Float!]!
 }
 
 enum DashboardRatioModuleSettingsType {

@@ -31,18 +31,18 @@ type ModuleResultType =
     };
 
 export type ModuleSettings<TType extends DashboardModuleType> = {
-  CREATE_PARALLEL_BUTTON: {
+  CREATE_PETITION_BUTTON: {
     label: string;
     template_id: number;
   };
-  PARALLELS_NUMBER: { filters: ParallelsFilter };
-  PARALLELS_RATIO: {
+  PETITIONS_NUMBER: { filters: PetitionsFilter };
+  PETITIONS_RATIO: {
     graphicType: "RATIO" | "PERCENTAGE";
-    filters: [ParallelsFilter, ParallelsFilter];
+    filters: [PetitionsFilter, PetitionsFilter];
   };
-  PARALLELS_PIE_CHART: {
+  PETITIONS_PIE_CHART: {
     graphicType: "DOUGHNUT" | "PIE";
-    items: { label: string; color: string; filter: ParallelsFilter }[];
+    items: { label: string; color: string; filter: PetitionsFilter }[];
   };
   PROFILES_NUMBER: {
     profileTypeId: number;
@@ -60,7 +60,7 @@ export type ModuleSettings<TType extends DashboardModuleType> = {
   } & ModuleResultType;
 }[TType];
 
-export interface ParallelsFilter {
+export interface PetitionsFilter {
   path?: string | null;
   status?: PetitionStatus[] | null;
   locale?: ContactLocale | null;
@@ -132,7 +132,7 @@ export class DashboardRepository extends BaseRepository {
           or exists (
             select 1 from dashboard_module 
             where dashboard_id = ? 
-            and type != 'CREATE_PARALLEL_BUTTON'
+            and type != 'CREATE_PETITION_BUTTON'
             and deleted_at is null 
             and result is null
           )
@@ -182,7 +182,7 @@ export class DashboardRepository extends BaseRepository {
     return module;
   }
 
-  private parallelsCountQuery(orgId: number, filters: ParallelsFilter) {
+  private petitionsCountQuery(orgId: number, filters: PetitionsFilter) {
     return (
       this.from({ p: "petition" })
         .where("p.org_id", orgId)
@@ -593,21 +593,21 @@ export class DashboardRepository extends BaseRepository {
       });
   }
 
-  async getParallelsNumberValue(orgId: number, settings: ModuleSettings<"PARALLELS_NUMBER">) {
+  async getPetitionsNumberValue(orgId: number, settings: ModuleSettings<"PETITIONS_NUMBER">) {
     const [{ value }] = await this.knex
-      .with("ps", this.parallelsCountQuery(orgId, settings.filters))
+      .with("ps", this.petitionsCountQuery(orgId, settings.filters))
       .from("ps")
       .select<[{ value: number }]>(this.count("value"));
 
     return { value };
   }
 
-  async getParallelsRatioValues(orgId: number, settings: ModuleSettings<"PARALLELS_RATIO">) {
+  async getPetitionsRatioValues(orgId: number, settings: ModuleSettings<"PETITIONS_RATIO">) {
     assert(settings.filters.length === 2, "Expected 2 filters");
 
     const data: { count: number; filter: 0 | 1 | -1 }[] = await this.knex
-      .with("p0", this.parallelsCountQuery(orgId, settings.filters[0]))
-      .with("p1", this.parallelsCountQuery(orgId, settings.filters[1]))
+      .with("p0", this.petitionsCountQuery(orgId, settings.filters[0]))
+      .with("p1", this.petitionsCountQuery(orgId, settings.filters[1]))
       .with("p_int", (q) =>
         q
           .select("*")
@@ -636,12 +636,12 @@ export class DashboardRepository extends BaseRepository {
     };
   }
 
-  async getParallelsPieChartValues(orgId: number, settings: ModuleSettings<"PARALLELS_PIE_CHART">) {
+  async getPetitionsPieChartValues(orgId: number, settings: ModuleSettings<"PETITIONS_PIE_CHART">) {
     const data: { count: number; filter: number }[] = await this.knex
       .queryBuilder()
       .modify((q) => {
         settings.items.forEach(({ filter }, i) => {
-          q.with(`p${i}`, this.parallelsCountQuery(orgId, filter));
+          q.with(`p${i}`, this.petitionsCountQuery(orgId, filter));
         });
         q.with("p_union", (q) => {
           settings.items.forEach((_, i) => {
