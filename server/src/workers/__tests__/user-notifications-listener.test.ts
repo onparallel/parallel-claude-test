@@ -500,7 +500,7 @@ describe("Worker - User Notifications Listener", () => {
       .where({ petition_id: petition.id })
       .select("read_at", "processed_at", "data", "petition_id", "type", "user_id");
 
-    expect(notifications).toEqual(
+    expect(notifications).toIncludeSameMembers(
       users.map((user) => ({
         read_at: null,
         processed_at: null,

@@ -270,6 +270,17 @@ export const User = objectType({
         });
       },
     });
+    t.nonNull.list.nonNull.field("dashboards", {
+      type: "Dashboard",
+      resolve: async (o, _, ctx) => {
+        const hasFF = await ctx.featureFlags.userHasFeatureFlag(o.id, "DASHBOARDS");
+        if (!hasFF) {
+          return [];
+        }
+
+        return await ctx.dashboards.loadDashboardsByOrgId(o.org_id);
+      },
+    });
   },
 });
 

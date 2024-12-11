@@ -2,6 +2,7 @@ import { ContainerModule } from "inversify";
 import { Knex } from "knex";
 import { createKnex, KNEX } from "./knex";
 import { ContactRepository } from "./repositories/ContactRepository";
+import { DashboardRepository } from "./repositories/DashboardRepository";
 import { EmailLogRepository } from "./repositories/EmailLogRepository";
 import { EventRepository } from "./repositories/EventRepository";
 import { FeatureFlagRepository } from "./repositories/FeatureFlagRepository";
@@ -49,4 +50,5 @@ export const dbModule = new ContainerModule((bind) => {
   bind<ViewRepository>(ViewRepository).toSelf();
   bind<ProfileRepository>(ProfileRepository).toSelf();
   bind<EventRepository>(EventRepository).toSelf();
+  bind<DashboardRepository>(DashboardRepository).toSelf();
 });

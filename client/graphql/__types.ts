@@ -457,6 +457,135 @@ export interface CreatedAt {
   createdAt: Scalars["DateTime"]["output"];
 }
 
+export interface Dashboard {
+  __typename?: "Dashboard";
+  id: Scalars["GID"]["output"];
+  isDefault: Scalars["Boolean"]["output"];
+  isRefreshing: Scalars["Boolean"]["output"];
+  lastRefreshAt?: Maybe<Scalars["DateTime"]["output"]>;
+  modules: Array<DashboardModule>;
+  name: Scalars["String"]["output"];
+}
+
+export interface DashboardCreateParallelButtonModule extends DashboardModule {
+  __typename?: "DashboardCreateParallelButtonModule";
+  id: Scalars["GID"]["output"];
+  settings: DashboardCreateParallelButtonModuleSettings;
+  size: DashboardModuleSize;
+  title?: Maybe<Scalars["String"]["output"]>;
+}
+
+export interface DashboardCreateParallelButtonModuleSettings {
+  __typename?: "DashboardCreateParallelButtonModuleSettings";
+  label: Scalars["String"]["output"];
+  template?: Maybe<PetitionBaseMini>;
+}
+
+export interface DashboardModule {
+  id: Scalars["GID"]["output"];
+  size: DashboardModuleSize;
+  title?: Maybe<Scalars["String"]["output"]>;
+}
+
+export type DashboardModuleSize = "LARGE" | "MEDIUM" | "SMALL";
+
+export interface DashboardNumberModuleResult {
+  __typename?: "DashboardNumberModuleResult";
+  value: Scalars["Int"]["output"];
+}
+
+export interface DashboardParallelsNumberModule extends DashboardModule {
+  __typename?: "DashboardParallelsNumberModule";
+  id: Scalars["GID"]["output"];
+  result?: Maybe<DashboardNumberModuleResult>;
+  size: DashboardModuleSize;
+  title?: Maybe<Scalars["String"]["output"]>;
+}
+
+export interface DashboardParallelsPieChartModule extends DashboardModule {
+  __typename?: "DashboardParallelsPieChartModule";
+  id: Scalars["GID"]["output"];
+  result?: Maybe<DashboardPieChartModuleResult>;
+  settings: DashboardParallelsPieChartModuleSettings;
+  size: DashboardModuleSize;
+  title?: Maybe<Scalars["String"]["output"]>;
+}
+
+export interface DashboardParallelsPieChartModuleSettings {
+  __typename?: "DashboardParallelsPieChartModuleSettings";
+  colors: Array<Scalars["String"]["output"]>;
+  graphicType: DashboardPieChartModuleSettingsType;
+  labels: Array<Scalars["String"]["output"]>;
+}
+
+export interface DashboardParallelsRatioModule extends DashboardModule {
+  __typename?: "DashboardParallelsRatioModule";
+  id: Scalars["GID"]["output"];
+  result?: Maybe<DashboardRatioModuleResult>;
+  settings: DashboardParallelsRatioModuleSettings;
+  size: DashboardModuleSize;
+  title?: Maybe<Scalars["String"]["output"]>;
+}
+
+export interface DashboardParallelsRatioModuleSettings {
+  __typename?: "DashboardParallelsRatioModuleSettings";
+  graphicType: DashboardRatioModuleSettingsType;
+}
+
+export interface DashboardPieChartModuleResult {
+  __typename?: "DashboardPieChartModuleResult";
+  isIncongruent: Scalars["Boolean"]["output"];
+  value: Array<Scalars["Int"]["output"]>;
+}
+
+export type DashboardPieChartModuleSettingsType = "DOUGHNUT" | "PIE";
+
+export interface DashboardProfilesNumberModule extends DashboardModule {
+  __typename?: "DashboardProfilesNumberModule";
+  id: Scalars["GID"]["output"];
+  result?: Maybe<DashboardNumberModuleResult>;
+  size: DashboardModuleSize;
+  title?: Maybe<Scalars["String"]["output"]>;
+}
+
+export interface DashboardProfilesPieChartModule extends DashboardModule {
+  __typename?: "DashboardProfilesPieChartModule";
+  id: Scalars["GID"]["output"];
+  result?: Maybe<DashboardPieChartModuleResult>;
+  settings: DashboardProfilesPieChartModuleSettings;
+  size: DashboardModuleSize;
+  title?: Maybe<Scalars["String"]["output"]>;
+}
+
+export interface DashboardProfilesPieChartModuleSettings {
+  __typename?: "DashboardProfilesPieChartModuleSettings";
+  colors: Array<Scalars["String"]["output"]>;
+  graphicType: DashboardPieChartModuleSettingsType;
+  labels: Array<Scalars["String"]["output"]>;
+}
+
+export interface DashboardProfilesRatioModule extends DashboardModule {
+  __typename?: "DashboardProfilesRatioModule";
+  id: Scalars["GID"]["output"];
+  result?: Maybe<DashboardRatioModuleResult>;
+  settings: DashboardProfilesRatioModuleSettings;
+  size: DashboardModuleSize;
+  title?: Maybe<Scalars["String"]["output"]>;
+}
+
+export interface DashboardProfilesRatioModuleSettings {
+  __typename?: "DashboardProfilesRatioModuleSettings";
+  graphicType: DashboardRatioModuleSettingsType;
+}
+
+export interface DashboardRatioModuleResult {
+  __typename?: "DashboardRatioModuleResult";
+  isIncongruent: Scalars["Boolean"]["output"];
+  value: Array<Scalars["Int"]["output"]>;
+}
+
+export type DashboardRatioModuleSettingsType = "PERCENTAGE" | "RATIO";
+
 export type DocumentProcessingType = "PAYSLIP";
 
 export interface DowJonesKycEntityDate {
@@ -616,6 +745,7 @@ export type FeatureFlag =
   | "CREATE_PROFILE_TYPE"
   | "CUSTOM_HOST_UI"
   | "CUSTOM_PROPERTIES"
+  | "DASHBOARDS"
   | "DOCUSIGN_SANDBOX_PROVIDER"
   | "DOW_JONES_KYC"
   | "ES_TAX_DOCUMENTS_FIELD"
@@ -5487,6 +5617,7 @@ export interface Query {
   contacts: ContactPagination;
   /** Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts */
   contactsByEmail: Array<Maybe<Contact>>;
+  dashboard: Dashboard;
   dowJonesKycEntityProfile: DowJonesKycEntityProfileResult;
   dowJonesKycEntitySearch: DowJonesKycEntitySearchResultPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
@@ -5593,6 +5724,10 @@ export interface QuerycontactsArgs {
 
 export interface QuerycontactsByEmailArgs {
   emails: Array<Scalars["String"]["input"]>;
+}
+
+export interface QuerydashboardArgs {
+  id: Scalars["GID"]["input"];
 }
 
 export interface QuerydowJonesKycEntityProfileArgs {
@@ -6249,6 +6384,7 @@ export type TaskName =
   | "BANKFLIP_SESSION_COMPLETED"
   | "BULK_PETITION_SEND"
   | "CLOSE_PETITIONS"
+  | "DASHBOARD_REFRESH"
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
@@ -6455,6 +6591,7 @@ export interface User extends Timestamps {
   canCreateUsers: Scalars["Boolean"]["output"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
+  dashboards: Array<Dashboard>;
   /** Users that the user can send on behalf of */
   delegateOf: Array<User>;
   /** Users that the user allows to send on their behalf */
@@ -6684,6 +6821,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -8227,12 +8365,6 @@ export type PetitionViewTabs_PetitionListViewFragment = {
   };
 };
 
-export type PetitionViewTabs_UserFragment = {
-  __typename?: "User";
-  id: string;
-  petitionListViews: Array<{ __typename?: "PetitionListView"; id: string }>;
-};
-
 export type PetitionViewTabs_reorderPetitionListViewsMutationVariables = Exact<{
   ids: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
 }>;
@@ -8564,6 +8696,328 @@ export type ImportContactsDialog_bulkCreateContactsMutation = {
   };
 };
 
+export type DashboardModule_DashboardModule_DashboardCreateParallelButtonModule_Fragment = {
+  __typename?: "DashboardCreateParallelButtonModule";
+  id: string;
+  title?: string | null;
+  size: DashboardModuleSize;
+  parallelButtonSettings: {
+    __typename?: "DashboardCreateParallelButtonModuleSettings";
+    label: string;
+    template?: {
+      __typename?: "PetitionBaseMini";
+      id: string;
+      myEffectivePermission?: {
+        __typename?: "EffectivePetitionUserPermission";
+        permissionType: PetitionPermissionType;
+      } | null;
+    } | null;
+  };
+};
+
+export type DashboardModule_DashboardModule_DashboardParallelsNumberModule_Fragment = {
+  __typename?: "DashboardParallelsNumberModule";
+  id: string;
+  title?: string | null;
+  size: DashboardModuleSize;
+  parallelsNumberResult?: { __typename?: "DashboardNumberModuleResult"; value: number } | null;
+};
+
+export type DashboardModule_DashboardModule_DashboardParallelsPieChartModule_Fragment = {
+  __typename?: "DashboardParallelsPieChartModule";
+  id: string;
+  title?: string | null;
+  size: DashboardModuleSize;
+  parallelsPieChartResult?: {
+    __typename?: "DashboardPieChartModuleResult";
+    value: Array<number>;
+    isIncongruent: boolean;
+  } | null;
+  parallelsPieChartSettings: {
+    __typename?: "DashboardParallelsPieChartModuleSettings";
+    graphicType: DashboardPieChartModuleSettingsType;
+    labels: Array<string>;
+    colors: Array<string>;
+  };
+};
+
+export type DashboardModule_DashboardModule_DashboardParallelsRatioModule_Fragment = {
+  __typename?: "DashboardParallelsRatioModule";
+  id: string;
+  title?: string | null;
+  size: DashboardModuleSize;
+  parallelsRatioResult?: {
+    __typename?: "DashboardRatioModuleResult";
+    value: Array<number>;
+    isIncongruent: boolean;
+  } | null;
+  parallelsRatioSettings: {
+    __typename?: "DashboardParallelsRatioModuleSettings";
+    graphicType: DashboardRatioModuleSettingsType;
+  };
+};
+
+export type DashboardModule_DashboardModule_DashboardProfilesNumberModule_Fragment = {
+  __typename?: "DashboardProfilesNumberModule";
+  id: string;
+  title?: string | null;
+  size: DashboardModuleSize;
+  profilesNumberResult?: { __typename?: "DashboardNumberModuleResult"; value: number } | null;
+};
+
+export type DashboardModule_DashboardModule_DashboardProfilesPieChartModule_Fragment = {
+  __typename?: "DashboardProfilesPieChartModule";
+  id: string;
+  size: DashboardModuleSize;
+  title?: string | null;
+  profilesPieChartResult?: {
+    __typename?: "DashboardPieChartModuleResult";
+    value: Array<number>;
+    isIncongruent: boolean;
+  } | null;
+  profilesPieChartSettings: {
+    __typename?: "DashboardProfilesPieChartModuleSettings";
+    graphicType: DashboardPieChartModuleSettingsType;
+    labels: Array<string>;
+    colors: Array<string>;
+  };
+};
+
+export type DashboardModule_DashboardModule_DashboardProfilesRatioModule_Fragment = {
+  __typename?: "DashboardProfilesRatioModule";
+  id: string;
+  title?: string | null;
+  size: DashboardModuleSize;
+  profilesRatioResult?: {
+    __typename?: "DashboardRatioModuleResult";
+    value: Array<number>;
+    isIncongruent: boolean;
+  } | null;
+  profilesRatioSettings: {
+    __typename?: "DashboardProfilesRatioModuleSettings";
+    graphicType: DashboardRatioModuleSettingsType;
+  };
+};
+
+export type DashboardModule_DashboardModuleFragment =
+  | DashboardModule_DashboardModule_DashboardCreateParallelButtonModule_Fragment
+  | DashboardModule_DashboardModule_DashboardParallelsNumberModule_Fragment
+  | DashboardModule_DashboardModule_DashboardParallelsPieChartModule_Fragment
+  | DashboardModule_DashboardModule_DashboardParallelsRatioModule_Fragment
+  | DashboardModule_DashboardModule_DashboardProfilesNumberModule_Fragment
+  | DashboardModule_DashboardModule_DashboardProfilesPieChartModule_Fragment
+  | DashboardModule_DashboardModule_DashboardProfilesRatioModule_Fragment;
+
+export type DashboardTabs_DashboardFragment = {
+  __typename?: "Dashboard";
+  id: string;
+  isDefault: boolean;
+  isRefreshing: boolean;
+  lastRefreshAt?: string | null;
+  name: string;
+};
+
+export type DashboardCreateParallelButtonModule_DashboardCreateParallelButtonModuleFragment = {
+  __typename?: "DashboardCreateParallelButtonModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+  parallelButtonSettings: {
+    __typename?: "DashboardCreateParallelButtonModuleSettings";
+    label: string;
+    template?: {
+      __typename?: "PetitionBaseMini";
+      id: string;
+      myEffectivePermission?: {
+        __typename?: "EffectivePetitionUserPermission";
+        permissionType: PetitionPermissionType;
+      } | null;
+    } | null;
+  };
+};
+
+export type DashboardParallelsNumberModule_DashboardParallelsNumberModuleFragment = {
+  __typename?: "DashboardParallelsNumberModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+  parallelsNumberResult?: { __typename?: "DashboardNumberModuleResult"; value: number } | null;
+};
+
+export type DashboardParallelsPieChartModule_DashboardParallelsPieChartModuleFragment = {
+  __typename?: "DashboardParallelsPieChartModule";
+  id: string;
+  title?: string | null;
+  size: DashboardModuleSize;
+  parallelsPieChartResult?: {
+    __typename?: "DashboardPieChartModuleResult";
+    value: Array<number>;
+    isIncongruent: boolean;
+  } | null;
+  parallelsPieChartSettings: {
+    __typename?: "DashboardParallelsPieChartModuleSettings";
+    graphicType: DashboardPieChartModuleSettingsType;
+    labels: Array<string>;
+    colors: Array<string>;
+  };
+};
+
+export type DashboardParallelsRatioModule_DashboardParallelsRatioModuleFragment = {
+  __typename?: "DashboardParallelsRatioModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+  parallelsRatioResult?: {
+    __typename?: "DashboardRatioModuleResult";
+    value: Array<number>;
+    isIncongruent: boolean;
+  } | null;
+  parallelsRatioSettings: {
+    __typename?: "DashboardParallelsRatioModuleSettings";
+    graphicType: DashboardRatioModuleSettingsType;
+  };
+};
+
+export type DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragment = {
+  __typename?: "DashboardProfilesNumberModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+  profilesNumberResult?: { __typename?: "DashboardNumberModuleResult"; value: number } | null;
+};
+
+export type DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragment = {
+  __typename?: "DashboardProfilesPieChartModule";
+  id: string;
+  size: DashboardModuleSize;
+  title?: string | null;
+  profilesPieChartResult?: {
+    __typename?: "DashboardPieChartModuleResult";
+    value: Array<number>;
+    isIncongruent: boolean;
+  } | null;
+  profilesPieChartSettings: {
+    __typename?: "DashboardProfilesPieChartModuleSettings";
+    graphicType: DashboardPieChartModuleSettingsType;
+    labels: Array<string>;
+    colors: Array<string>;
+  };
+};
+
+export type DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragment = {
+  __typename?: "DashboardProfilesRatioModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+  profilesRatioResult?: {
+    __typename?: "DashboardRatioModuleResult";
+    value: Array<number>;
+    isIncongruent: boolean;
+  } | null;
+  profilesRatioSettings: {
+    __typename?: "DashboardProfilesRatioModuleSettings";
+    graphicType: DashboardRatioModuleSettingsType;
+  };
+};
+
+export type DashboardModuleCard_DashboardModule_DashboardCreateParallelButtonModule_Fragment = {
+  __typename?: "DashboardCreateParallelButtonModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+};
+
+export type DashboardModuleCard_DashboardModule_DashboardParallelsNumberModule_Fragment = {
+  __typename?: "DashboardParallelsNumberModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+};
+
+export type DashboardModuleCard_DashboardModule_DashboardParallelsPieChartModule_Fragment = {
+  __typename?: "DashboardParallelsPieChartModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+};
+
+export type DashboardModuleCard_DashboardModule_DashboardParallelsRatioModule_Fragment = {
+  __typename?: "DashboardParallelsRatioModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+};
+
+export type DashboardModuleCard_DashboardModule_DashboardProfilesNumberModule_Fragment = {
+  __typename?: "DashboardProfilesNumberModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+};
+
+export type DashboardModuleCard_DashboardModule_DashboardProfilesPieChartModule_Fragment = {
+  __typename?: "DashboardProfilesPieChartModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+};
+
+export type DashboardModuleCard_DashboardModule_DashboardProfilesRatioModule_Fragment = {
+  __typename?: "DashboardProfilesRatioModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+};
+
+export type DashboardModuleCard_DashboardModuleFragment =
+  | DashboardModuleCard_DashboardModule_DashboardCreateParallelButtonModule_Fragment
+  | DashboardModuleCard_DashboardModule_DashboardParallelsNumberModule_Fragment
+  | DashboardModuleCard_DashboardModule_DashboardParallelsPieChartModule_Fragment
+  | DashboardModuleCard_DashboardModule_DashboardParallelsRatioModule_Fragment
+  | DashboardModuleCard_DashboardModule_DashboardProfilesNumberModule_Fragment
+  | DashboardModuleCard_DashboardModule_DashboardProfilesPieChartModule_Fragment
+  | DashboardModuleCard_DashboardModule_DashboardProfilesRatioModule_Fragment;
+
+export type DashboardSimpleModuleCard_DashboardModule_DashboardCreateParallelButtonModule_Fragment =
+  {
+    __typename?: "DashboardCreateParallelButtonModule";
+    title?: string | null;
+    size: DashboardModuleSize;
+  };
+
+export type DashboardSimpleModuleCard_DashboardModule_DashboardParallelsNumberModule_Fragment = {
+  __typename?: "DashboardParallelsNumberModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+};
+
+export type DashboardSimpleModuleCard_DashboardModule_DashboardParallelsPieChartModule_Fragment = {
+  __typename?: "DashboardParallelsPieChartModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+};
+
+export type DashboardSimpleModuleCard_DashboardModule_DashboardParallelsRatioModule_Fragment = {
+  __typename?: "DashboardParallelsRatioModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+};
+
+export type DashboardSimpleModuleCard_DashboardModule_DashboardProfilesNumberModule_Fragment = {
+  __typename?: "DashboardProfilesNumberModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+};
+
+export type DashboardSimpleModuleCard_DashboardModule_DashboardProfilesPieChartModule_Fragment = {
+  __typename?: "DashboardProfilesPieChartModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+};
+
+export type DashboardSimpleModuleCard_DashboardModule_DashboardProfilesRatioModule_Fragment = {
+  __typename?: "DashboardProfilesRatioModule";
+  title?: string | null;
+  size: DashboardModuleSize;
+};
+
+export type DashboardSimpleModuleCard_DashboardModuleFragment =
+  | DashboardSimpleModuleCard_DashboardModule_DashboardCreateParallelButtonModule_Fragment
+  | DashboardSimpleModuleCard_DashboardModule_DashboardParallelsNumberModule_Fragment
+  | DashboardSimpleModuleCard_DashboardModule_DashboardParallelsPieChartModule_Fragment
+  | DashboardSimpleModuleCard_DashboardModule_DashboardParallelsRatioModule_Fragment
+  | DashboardSimpleModuleCard_DashboardModule_DashboardProfilesNumberModule_Fragment
+  | DashboardSimpleModuleCard_DashboardModule_DashboardProfilesPieChartModule_Fragment
+  | DashboardSimpleModuleCard_DashboardModule_DashboardProfilesRatioModule_Fragment;
+
 export type AdminSettingsLayout_QueryFragment = {
   me: {
     __typename?: "User";
@@ -8580,6 +9034,7 @@ export type AdminSettingsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -8646,6 +9101,7 @@ export type AppLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -8709,6 +9165,7 @@ export type AppLayoutNavBar_ProfileTypeFragment = {
 export type AppLayoutNavBar_UserFragment = {
   __typename?: "User";
   id: string;
+  hasDashboardsAccess: boolean;
   hasProfilesAccess: boolean;
   hasShowContactsButton: boolean;
   organization: {
@@ -8751,6 +9208,7 @@ export type AppLayoutNavBar_QueryFragment = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -8807,6 +9265,7 @@ export type DevelopersLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -8902,6 +9361,7 @@ export type OrganizationSettingsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -9148,6 +9608,7 @@ export type PetitionLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -9214,6 +9675,7 @@ export type ProfileLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -9497,6 +9959,7 @@ export type ReportsSidebarLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -9563,6 +10026,7 @@ export type SidebarLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -9631,6 +10095,7 @@ export type UserGroupLayout_QueryFragment = {
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -9759,6 +10224,7 @@ export type UserSettingsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -10950,6 +11416,7 @@ export type OrganizationProfilesLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -32743,6 +33210,7 @@ export type Admin_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -32828,6 +33296,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -32987,6 +33456,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -33273,6 +33743,7 @@ export type AdminOrganizationsMembers_queryQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -33473,6 +33944,7 @@ export type AdminOrganizations_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -33568,6 +34040,7 @@ export type AdminSupportMethods_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -33681,6 +34154,7 @@ export type Alerts_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -34499,6 +34973,7 @@ export type Contact_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -34691,6 +35166,7 @@ export type Contacts_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -34741,6 +35217,214 @@ export type Contacts_userQuery = {
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
+export type Home_UserFragment = {
+  __typename?: "User";
+  id: string;
+  dashboards: Array<{
+    __typename?: "Dashboard";
+    id: string;
+    isDefault: boolean;
+    isRefreshing: boolean;
+    lastRefreshAt?: string | null;
+    name: string;
+  }>;
+};
+
+export type Home_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type Home_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    permissions: Array<string>;
+    isOrgOwner: boolean;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
+    hasProfilesAccess: boolean;
+    hasShowContactsButton: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      hasIdVerification: boolean;
+      iconUrl?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+    dashboards: Array<{
+      __typename?: "Dashboard";
+      id: string;
+      isDefault: boolean;
+      isRefreshing: boolean;
+      lastRefreshAt?: string | null;
+      name: string;
+    }>;
+    pinnedProfileTypes: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      canCreate: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      canCreate: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
+  };
+  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
+};
+
+export type Home_dashboardQueryVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type Home_dashboardQuery = {
+  dashboard: {
+    __typename?: "Dashboard";
+    id: string;
+    isRefreshing: boolean;
+    lastRefreshAt?: string | null;
+    name: string;
+    modules: Array<
+      | {
+          __typename?: "DashboardCreateParallelButtonModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+          parallelButtonSettings: {
+            __typename?: "DashboardCreateParallelButtonModuleSettings";
+            label: string;
+            template?: {
+              __typename?: "PetitionBaseMini";
+              id: string;
+              myEffectivePermission?: {
+                __typename?: "EffectivePetitionUserPermission";
+                permissionType: PetitionPermissionType;
+              } | null;
+            } | null;
+          };
+        }
+      | {
+          __typename?: "DashboardParallelsNumberModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+          parallelsNumberResult?: {
+            __typename?: "DashboardNumberModuleResult";
+            value: number;
+          } | null;
+        }
+      | {
+          __typename?: "DashboardParallelsPieChartModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+          parallelsPieChartResult?: {
+            __typename?: "DashboardPieChartModuleResult";
+            value: Array<number>;
+            isIncongruent: boolean;
+          } | null;
+          parallelsPieChartSettings: {
+            __typename?: "DashboardParallelsPieChartModuleSettings";
+            graphicType: DashboardPieChartModuleSettingsType;
+            labels: Array<string>;
+            colors: Array<string>;
+          };
+        }
+      | {
+          __typename?: "DashboardParallelsRatioModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+          parallelsRatioResult?: {
+            __typename?: "DashboardRatioModuleResult";
+            value: Array<number>;
+            isIncongruent: boolean;
+          } | null;
+          parallelsRatioSettings: {
+            __typename?: "DashboardParallelsRatioModuleSettings";
+            graphicType: DashboardRatioModuleSettingsType;
+          };
+        }
+      | {
+          __typename?: "DashboardProfilesNumberModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+          profilesNumberResult?: {
+            __typename?: "DashboardNumberModuleResult";
+            value: number;
+          } | null;
+        }
+      | {
+          __typename?: "DashboardProfilesPieChartModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+          profilesPieChartResult?: {
+            __typename?: "DashboardPieChartModuleResult";
+            value: Array<number>;
+            isIncongruent: boolean;
+          } | null;
+          profilesPieChartSettings: {
+            __typename?: "DashboardProfilesPieChartModuleSettings";
+            graphicType: DashboardPieChartModuleSettingsType;
+            labels: Array<string>;
+            colors: Array<string>;
+          };
+        }
+      | {
+          __typename?: "DashboardProfilesRatioModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+          profilesRatioResult?: {
+            __typename?: "DashboardRatioModuleResult";
+            value: Array<number>;
+            isIncongruent: boolean;
+          } | null;
+          profilesRatioSettings: {
+            __typename?: "DashboardProfilesRatioModuleSettings";
+            graphicType: DashboardRatioModuleSettingsType;
+          };
+        }
+    >;
+  };
+};
+
 export type ChooseOrg_OrganizationFragment = {
   __typename?: "Organization";
   name: string;
@@ -34764,9 +35448,10 @@ export type ChooseOrg_organizationsQuery = {
   };
 };
 
-export type ChooseOrg_petitionsQueryVariables = Exact<{ [key: string]: never }>;
+export type ChooseOrg_QueryQueryVariables = Exact<{ [key: string]: never }>;
 
-export type ChooseOrg_petitionsQuery = {
+export type ChooseOrg_QueryQuery = {
+  me: { __typename?: "User"; id: string; hasDashboards: boolean };
   petitions: { __typename?: "PetitionBaseOrFolderPagination"; totalCount: number };
 };
 
@@ -34797,6 +35482,7 @@ export type OrganizationBranding_userQuery = {
     hasRemovedParallelBranding: boolean;
     hasPdfExportV2: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     hasRecipientLangCA: boolean;
     hasRecipientLangIT: boolean;
@@ -34901,6 +35587,7 @@ export type OrganizationCompliance_userQuery = {
     hasAutoAnonymize: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -34985,6 +35672,7 @@ export type OrganizationGeneral_userQuery = {
     hasCustomHost: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -35178,6 +35866,7 @@ export type OrganizationGroup_userQuery = {
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -35283,6 +35972,7 @@ export type PermissionsGroup_userQuery = {
     hasLoginAsAccess: boolean;
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -35511,6 +36201,7 @@ export type OrganizationGroups_userQuery = {
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -35578,6 +36269,7 @@ export type OrganizationSettings_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -35649,6 +36341,7 @@ export type OrganizationIntegrations_userQuery = {
     hasDowJonesFeature: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -35796,6 +36489,7 @@ export type IntegrationsSignature_userQuery = {
     hasBackgroundCheck: boolean;
     hasDocusignSandbox: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -36040,6 +36734,7 @@ export type OrganizationProfileType_userQuery = {
     hasKeyProcessesFeature: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -36513,6 +37208,7 @@ export type OrganizationProfileTypes_userQuery = {
     hasCreateProfileType: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -36664,6 +37360,7 @@ export type OrganizationUsage_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -36868,6 +37565,7 @@ export type OrganizationUsers_userQuery = {
     hasGhostLogin: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -38207,6 +38905,7 @@ export type PetitionActivity_QueryFragment = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -39906,6 +40605,7 @@ export type PetitionActivity_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -40948,6 +41648,7 @@ export type PetitionCompose_QueryFragment = {
     hasAutoAnonymize: boolean;
     hasEsTaxDocumentsField: boolean;
     hasDowJonesField: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     hasRecipientLangCA: boolean;
     hasRecipientLangIT: boolean;
@@ -43153,6 +43854,7 @@ export type PetitionCompose_userQuery = {
     hasAutoAnonymize: boolean;
     hasEsTaxDocumentsField: boolean;
     hasDowJonesField: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     hasRecipientLangCA: boolean;
     hasRecipientLangIT: boolean;
@@ -44091,6 +44793,7 @@ export type PetitionMessages_QueryFragment = {
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -44160,6 +44863,7 @@ export type PetitionMessages_userQuery = {
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -45724,6 +46428,7 @@ export type PetitionPreview_QueryFragment = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -48167,6 +48872,7 @@ export type PetitionPreview_userQuery = {
     hasPublicLinkPrefill: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -50888,6 +51594,7 @@ export type PetitionReplies_userQuery = {
     hasBackgroundCheck: boolean;
     hasExportCuatrecasas: boolean;
     hasSummaryAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     hasPetitionSignature: boolean;
     organization: {
@@ -52017,6 +52724,7 @@ export type Petitions_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -52572,6 +53280,7 @@ export type NewPetition_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     hasRecipientLangCA: boolean;
@@ -52766,6 +53475,7 @@ export type ProfileDetail_userQuery = {
     hasKeyProcessesFeature: boolean;
     hasBackgroundCheck: boolean;
     hasProfilesAccess: boolean;
+    hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -53033,6 +53743,7 @@ export type Profiles_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     profileListViews: Array<{
@@ -53268,6 +53979,7 @@ export type Reports_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -53342,6 +54054,7 @@ export type Overview_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -53416,6 +54129,7 @@ export type ReportsReplies_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -53490,6 +54204,7 @@ export type ReportsTemplates_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -53559,6 +54274,7 @@ export type Account_QueryFragment = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasOnBehalfOf: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -53668,6 +54384,7 @@ export type Account_userQuery = {
     initials?: string | null;
     hasBackgroundCheck: boolean;
     hasOnBehalfOf: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -54009,6 +54726,7 @@ export type Subscriptions_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -54109,6 +54827,7 @@ export type Tokens_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -54177,6 +54896,7 @@ export type Settings_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -54253,6 +54973,7 @@ export type Security_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -59687,6 +60408,7 @@ export const AppLayoutNavBar_ProfileTypeFragmentDoc = gql`
 export const AppLayoutNavBar_UserFragmentDoc = gql`
   fragment AppLayoutNavBar_User on User {
     id
+    hasDashboardsAccess: hasFeatureFlag(featureFlag: DASHBOARDS)
     hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
     hasShowContactsButton: hasFeatureFlag(featureFlag: SHOW_CONTACTS_BUTTON)
     organization {
@@ -60076,14 +60798,164 @@ export const TaskProgressDialog_TaskFragmentDoc = gql`
     output
   }
 ` as unknown as DocumentNode<TaskProgressDialog_TaskFragment, unknown>;
-export const PetitionViewTabs_UserFragmentDoc = gql`
-  fragment PetitionViewTabs_User on User {
-    id
-    petitionListViews {
-      id
+export const DashboardModuleCard_DashboardModuleFragmentDoc = gql`
+  fragment DashboardModuleCard_DashboardModule on DashboardModule {
+    title
+    size
+  }
+` as unknown as DocumentNode<DashboardModuleCard_DashboardModuleFragment, unknown>;
+export const DashboardSimpleModuleCard_DashboardModuleFragmentDoc = gql`
+  fragment DashboardSimpleModuleCard_DashboardModule on DashboardModule {
+    ...DashboardModuleCard_DashboardModule
+  }
+  ${DashboardModuleCard_DashboardModuleFragmentDoc}
+` as unknown as DocumentNode<DashboardSimpleModuleCard_DashboardModuleFragment, unknown>;
+export const DashboardParallelsNumberModule_DashboardParallelsNumberModuleFragmentDoc = gql`
+  fragment DashboardParallelsNumberModule_DashboardParallelsNumberModule on DashboardParallelsNumberModule {
+    ...DashboardSimpleModuleCard_DashboardModule
+    parallelsNumberResult: result {
+      value
     }
   }
-` as unknown as DocumentNode<PetitionViewTabs_UserFragment, unknown>;
+  ${DashboardSimpleModuleCard_DashboardModuleFragmentDoc}
+` as unknown as DocumentNode<
+  DashboardParallelsNumberModule_DashboardParallelsNumberModuleFragment,
+  unknown
+>;
+export const DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragmentDoc = gql`
+  fragment DashboardProfilesNumberModule_DashboardProfilesNumberModule on DashboardProfilesNumberModule {
+    ...DashboardSimpleModuleCard_DashboardModule
+    profilesNumberResult: result {
+      value
+    }
+  }
+  ${DashboardSimpleModuleCard_DashboardModuleFragmentDoc}
+` as unknown as DocumentNode<
+  DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragment,
+  unknown
+>;
+export const DashboardParallelsRatioModule_DashboardParallelsRatioModuleFragmentDoc = gql`
+  fragment DashboardParallelsRatioModule_DashboardParallelsRatioModule on DashboardParallelsRatioModule {
+    ...DashboardSimpleModuleCard_DashboardModule
+    parallelsRatioResult: result {
+      value
+      isIncongruent
+    }
+    parallelsRatioSettings: settings {
+      graphicType
+    }
+  }
+  ${DashboardSimpleModuleCard_DashboardModuleFragmentDoc}
+` as unknown as DocumentNode<
+  DashboardParallelsRatioModule_DashboardParallelsRatioModuleFragment,
+  unknown
+>;
+export const DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragmentDoc = gql`
+  fragment DashboardProfilesRatioModule_DashboardProfilesRatioModule on DashboardProfilesRatioModule {
+    ...DashboardSimpleModuleCard_DashboardModule
+    profilesRatioResult: result {
+      value
+      isIncongruent
+    }
+    profilesRatioSettings: settings {
+      graphicType
+    }
+  }
+  ${DashboardSimpleModuleCard_DashboardModuleFragmentDoc}
+` as unknown as DocumentNode<
+  DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragment,
+  unknown
+>;
+export const DashboardParallelsPieChartModule_DashboardParallelsPieChartModuleFragmentDoc = gql`
+  fragment DashboardParallelsPieChartModule_DashboardParallelsPieChartModule on DashboardParallelsPieChartModule {
+    id
+    title
+    size
+    parallelsPieChartResult: result {
+      value
+      isIncongruent
+    }
+    parallelsPieChartSettings: settings {
+      graphicType
+      labels
+      colors
+    }
+  }
+` as unknown as DocumentNode<
+  DashboardParallelsPieChartModule_DashboardParallelsPieChartModuleFragment,
+  unknown
+>;
+export const DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragmentDoc = gql`
+  fragment DashboardProfilesPieChartModule_DashboardProfilesPieChartModule on DashboardProfilesPieChartModule {
+    id
+    size
+    title
+    profilesPieChartResult: result {
+      value
+      isIncongruent
+    }
+    profilesPieChartSettings: settings {
+      graphicType
+      labels
+      colors
+    }
+  }
+` as unknown as DocumentNode<
+  DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragment,
+  unknown
+>;
+export const DashboardCreateParallelButtonModule_DashboardCreateParallelButtonModuleFragmentDoc =
+  gql`
+    fragment DashboardCreateParallelButtonModule_DashboardCreateParallelButtonModule on DashboardCreateParallelButtonModule {
+      ...DashboardSimpleModuleCard_DashboardModule
+      parallelButtonSettings: settings {
+        label
+        template {
+          id
+          myEffectivePermission {
+            permissionType
+          }
+        }
+      }
+    }
+    ${DashboardSimpleModuleCard_DashboardModuleFragmentDoc}
+  ` as unknown as DocumentNode<
+    DashboardCreateParallelButtonModule_DashboardCreateParallelButtonModuleFragment,
+    unknown
+  >;
+export const DashboardModule_DashboardModuleFragmentDoc = gql`
+  fragment DashboardModule_DashboardModule on DashboardModule {
+    id
+    ... on DashboardParallelsNumberModule {
+      ...DashboardParallelsNumberModule_DashboardParallelsNumberModule
+    }
+    ... on DashboardProfilesNumberModule {
+      ...DashboardProfilesNumberModule_DashboardProfilesNumberModule
+    }
+    ... on DashboardParallelsRatioModule {
+      ...DashboardParallelsRatioModule_DashboardParallelsRatioModule
+    }
+    ... on DashboardProfilesRatioModule {
+      ...DashboardProfilesRatioModule_DashboardProfilesRatioModule
+    }
+    ... on DashboardParallelsPieChartModule {
+      ...DashboardParallelsPieChartModule_DashboardParallelsPieChartModule
+    }
+    ... on DashboardProfilesPieChartModule {
+      ...DashboardProfilesPieChartModule_DashboardProfilesPieChartModule
+    }
+    ... on DashboardCreateParallelButtonModule {
+      ...DashboardCreateParallelButtonModule_DashboardCreateParallelButtonModule
+    }
+  }
+  ${DashboardParallelsNumberModule_DashboardParallelsNumberModuleFragmentDoc}
+  ${DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragmentDoc}
+  ${DashboardParallelsRatioModule_DashboardParallelsRatioModuleFragmentDoc}
+  ${DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragmentDoc}
+  ${DashboardParallelsPieChartModule_DashboardParallelsPieChartModuleFragmentDoc}
+  ${DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragmentDoc}
+  ${DashboardCreateParallelButtonModule_DashboardCreateParallelButtonModuleFragmentDoc}
+` as unknown as DocumentNode<DashboardModule_DashboardModuleFragment, unknown>;
 export const UserSettingsLayout_QueryFragmentDoc = gql`
   fragment UserSettingsLayout_Query on Query {
     ...SidebarLayout_Query
@@ -63182,6 +64054,26 @@ export const Contacts_ContactsListFragmentDoc = gql`
   }
   ${useDeleteContacts_ContactFragmentDoc}
 ` as unknown as DocumentNode<Contacts_ContactsListFragment, unknown>;
+export const DashboardTabs_DashboardFragmentDoc = gql`
+  fragment DashboardTabs_Dashboard on Dashboard {
+    id
+    isDefault
+    isRefreshing
+    lastRefreshAt
+    name
+  }
+` as unknown as DocumentNode<DashboardTabs_DashboardFragment, unknown>;
+export const Home_UserFragmentDoc = gql`
+  fragment Home_User on User {
+    id
+    dashboards {
+      id
+      isDefault
+      ...DashboardTabs_Dashboard
+    }
+  }
+  ${DashboardTabs_DashboardFragmentDoc}
+` as unknown as DocumentNode<Home_UserFragment, unknown>;
 export const ChooseOrg_OrganizationFragmentDoc = gql`
   fragment ChooseOrg_Organization on Organization {
     name
@@ -73391,6 +74283,33 @@ export const Contacts_userDocument = gql`
   }
   ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Contacts_userQuery, Contacts_userQueryVariables>;
+export const Home_userDocument = gql`
+  query Home_user {
+    ...AppLayout_Query
+    me {
+      ...Home_User
+    }
+  }
+  ${AppLayout_QueryFragmentDoc}
+  ${Home_UserFragmentDoc}
+` as unknown as DocumentNode<Home_userQuery, Home_userQueryVariables>;
+export const Home_dashboardDocument = gql`
+  query Home_dashboard($id: GID!) {
+    dashboard(id: $id) {
+      id
+      isRefreshing
+      lastRefreshAt
+      name
+      modules {
+        id
+        title
+        size
+        ...DashboardModule_DashboardModule
+      }
+    }
+  }
+  ${DashboardModule_DashboardModuleFragmentDoc}
+` as unknown as DocumentNode<Home_dashboardQuery, Home_dashboardQueryVariables>;
 export const ChooseOrg_organizationsDocument = gql`
   query ChooseOrg_organizations {
     realMe {
@@ -73403,13 +74322,17 @@ export const ChooseOrg_organizationsDocument = gql`
   }
   ${ChooseOrg_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<ChooseOrg_organizationsQuery, ChooseOrg_organizationsQueryVariables>;
-export const ChooseOrg_petitionsDocument = gql`
-  query ChooseOrg_petitions {
+export const ChooseOrg_QueryDocument = gql`
+  query ChooseOrg_Query {
+    me {
+      id
+      hasDashboards: hasFeatureFlag(featureFlag: DASHBOARDS)
+    }
     petitions {
       totalCount
     }
   }
-` as unknown as DocumentNode<ChooseOrg_petitionsQuery, ChooseOrg_petitionsQueryVariables>;
+` as unknown as DocumentNode<ChooseOrg_QueryQuery, ChooseOrg_QueryQueryVariables>;
 export const ChooseOrg_changeOrganizationDocument = gql`
   mutation ChooseOrg_changeOrganization($orgId: GID) {
     changeOrganization(orgId: $orgId)

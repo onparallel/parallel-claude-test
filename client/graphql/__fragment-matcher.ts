@@ -19,6 +19,15 @@ const result: PossibleTypesResultData = {
       "PetitionReminder",
       "UserAuthenticationToken",
     ],
+    DashboardModule: [
+      "DashboardCreateParallelButtonModule",
+      "DashboardParallelsNumberModule",
+      "DashboardParallelsPieChartModule",
+      "DashboardParallelsRatioModule",
+      "DashboardProfilesNumberModule",
+      "DashboardProfilesPieChartModule",
+      "DashboardProfilesRatioModule",
+    ],
     DowJonesKycEntityProfileResult: [
       "DowJonesKycEntityProfileResultEntity",
       "DowJonesKycEntityProfileResultPerson",

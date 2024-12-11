@@ -11,7 +11,7 @@ import {
   ChooseOrg_changeOrganizationDocument,
   ChooseOrg_OrganizationFragment,
   ChooseOrg_organizationsDocument,
-  ChooseOrg_petitionsDocument,
+  ChooseOrg_QueryDocument,
 } from "@parallel/graphql/__types";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
@@ -35,8 +35,14 @@ function ChooseOrg({ organizations }: ChooseOrgProps) {
         variables: { orgId },
       });
       await apollo.clearStore();
-      const { data } = await apollo.query({ query: ChooseOrg_petitionsDocument });
-      Router.push(data.petitions.totalCount ? "/app/petitions" : "/app/petitions/new");
+      const { data } = await apollo.query({ query: ChooseOrg_QueryDocument });
+      Router.push(
+        data.me.hasDashboards
+          ? "/app/home"
+          : data.petitions.totalCount
+            ? "/app/petitions"
+            : "/app/petitions/new",
+      );
     },
     [],
   );
@@ -170,7 +176,11 @@ const _queries = [
     ${_fragments.Organization}
   `,
   gql`
-    query ChooseOrg_petitions {
+    query ChooseOrg_Query {
+      me {
+        id
+        hasDashboards: hasFeatureFlag(featureFlag: DASHBOARDS)
+      }
       petitions {
         totalCount
       }
@@ -188,13 +198,25 @@ const _mutations = [
 
 ChooseOrg.getInitialProps = async ({ fetchQuery, query }: WithApolloDataContext) => {
   if (isNonNullish(query.continue)) {
-    const { data } = await fetchQuery(ChooseOrg_petitionsDocument);
-    throw new RedirectError(data.petitions.totalCount ? "/app/petitions" : "/app/petitions/new");
+    const { data } = await fetchQuery(ChooseOrg_QueryDocument);
+    throw new RedirectError(
+      data.me.hasDashboards
+        ? "/app/home"
+        : data.petitions.totalCount
+          ? "/app/petitions"
+          : "/app/petitions/new",
+    );
   } else {
     const { data } = await fetchQuery(ChooseOrg_organizationsDocument);
     if (data.realMe.organizations.length === 1) {
-      const { data } = await fetchQuery(ChooseOrg_petitionsDocument);
-      throw new RedirectError(data.petitions.totalCount ? "/app/petitions" : "/app/petitions/new");
+      const { data } = await fetchQuery(ChooseOrg_QueryDocument);
+      throw new RedirectError(
+        data.me.hasDashboards
+          ? "/app/home"
+          : data.petitions.totalCount
+            ? "/app/petitions"
+            : "/app/petitions/new",
+      );
     } else {
       return {
         organizations: data.realMe.organizations,

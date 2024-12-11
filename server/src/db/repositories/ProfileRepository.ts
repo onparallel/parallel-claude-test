@@ -717,6 +717,10 @@ export class ProfileRepository extends BaseRepository {
                   } else {
                     const condition = filter;
                     const profileTypeField = profileTypeFieldsById[condition.profileTypeFieldId];
+                    assert(
+                      profileTypeField,
+                      `Profile type field ${condition.profileTypeFieldId} not found`,
+                    );
                     if (isNullish(joins[condition.profileTypeFieldId])) {
                       const alias = (joins[condition.profileTypeFieldId] = `pfv${index++}`);
                       const table =

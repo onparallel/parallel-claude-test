@@ -4,6 +4,7 @@ import { CONFIG, Config } from "./config";
 import { Contact, Organization, PetitionAccess, User } from "./db/__types";
 import { readOnly } from "./db/knex";
 import { ContactRepository } from "./db/repositories/ContactRepository";
+import { DashboardRepository } from "./db/repositories/DashboardRepository";
 import { EmailLogRepository } from "./db/repositories/EmailLogRepository";
 import { EventRepository } from "./db/repositories/EventRepository";
 import { FeatureFlagRepository } from "./db/repositories/FeatureFlagRepository";
@@ -150,6 +151,7 @@ export class ApiContext {
     public readonly licenseCodes: LicenseCodeRepository,
     public readonly views: ViewRepository,
     public readonly profiles: ProfileRepository,
+    public readonly dashboards: DashboardRepository,
   ) {}
 }
 
@@ -205,6 +207,7 @@ export class WorkerContext {
     public readonly tasks: TaskRepository,
     public readonly profiles: ProfileRepository,
     public readonly events: EventRepository,
+    public readonly dashboards: DashboardRepository,
 
     @readOnly public readonly readonlyContacts: ContactRepository,
     @readOnly public readonly readonlyPetitions: PetitionRepository,

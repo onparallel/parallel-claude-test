@@ -8,6 +8,7 @@ import { BackgroundCheckProfilePdfRunner } from "./tasks/BackgroundCheckProfileP
 import { BankflipSessionCompletedRunner } from "./tasks/BankflipSessionCompletedRunner";
 import { BulkPetitionSendRunner } from "./tasks/BulkPetitionSendRunner";
 import { ClosePetitionsRunner } from "./tasks/ClosePetitionsRunner";
+import { DashboardRefreshRunner } from "./tasks/DashboardRefreshRunner";
 import { DowJonesProfileDownloadRunner } from "./tasks/DowJonesProfileDownloadRunner";
 import { ExportExcelRunner } from "./tasks/ExportExcelRunner";
 import { ExportRepliesRunner } from "./tasks/ExportRepliesRunner";
@@ -42,6 +43,7 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   FILE_EXPORT: FileExportRunner,
   CLOSE_PETITIONS: ClosePetitionsRunner,
   PROFILES_EXCEL_IMPORT: ProfilesExcelImportRunner,
+  DASHBOARD_REFRESH: DashboardRefreshRunner,
 };
 
 export interface TaskWorkerPayload {

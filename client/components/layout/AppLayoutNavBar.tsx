@@ -33,6 +33,7 @@ import {
   ChevronLeftIcon,
   HamburgerMenuIcon,
   HelpOutlineIcon,
+  HomeIcon,
   MoreVerticalIcon,
   NewsIcon,
   PaperPlaneIcon,
@@ -397,6 +398,7 @@ export const AppLayoutNavBar = Object.assign(
         return gql`
           fragment AppLayoutNavBar_User on User {
             id
+            hasDashboardsAccess: hasFeatureFlag(featureFlag: DASHBOARDS)
             hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
             hasShowContactsButton: hasFeatureFlag(featureFlag: SHOW_CONTACTS_BUTTON)
             organization {
@@ -488,6 +490,20 @@ function SectionsAndProfilesList({
 
   const items = useMemo(
     () => [
+      ...(me.hasDashboardsAccess
+        ? [
+            {
+              section: "home",
+              href: "/app/home",
+              icon: <HomeIcon boxSize={5} />,
+              isActive: pathname.startsWith("/app/home"),
+              text: intl.formatMessage({
+                id: "component.app-layout-nav-bar.home-link",
+                defaultMessage: "Home",
+              }),
+            },
+          ]
+        : []),
       {
         section: "petitions",
         href: "/app/petitions",

@@ -295,6 +295,11 @@
     "context": "Create new"
   },
   {
+    "term": "component.app-layout-nav-bar.home-link",
+    "definition": "Home",
+    "context": "Home"
+  },
+  {
     "term": "component.app-layout-nav-bar.individuals-button",
     "definition": "Individuals",
     "context": "Individuals"
@@ -2533,6 +2538,21 @@
     "term": "component.custom-list-details.options-included",
     "definition": "Options included:",
     "context": "Options included:"
+  },
+  {
+    "term": "component.dashboard-chart-legend.total",
+    "definition": "Total {count}",
+    "context": "Total {count}"
+  },
+  {
+    "term": "component.dashboard-module-card.inconsistent-filters-popover",
+    "definition": "The selected filters produce inconsistent results. Please review them.",
+    "context": "The selected filters produce inconsistent results. Please review them."
+  },
+  {
+    "term": "component.dashboard-module-card.untitled-module",
+    "definition": "Untitled module",
+    "context": "Untitled module"
   },
   {
     "term": "component.date-range-picker-button.clear-range",
@@ -14718,6 +14738,21 @@
     "term": "page.groups.title",
     "definition": "Teams",
     "context": "Teams"
+  },
+  {
+    "term": "page.home.last-refreshed",
+    "definition": "Updated {timeAgo}",
+    "context": "Updated {timeAgo}"
+  },
+  {
+    "term": "page.home.refreshing-data",
+    "definition": "Refreshing data...",
+    "context": "Refreshing data..."
+  },
+  {
+    "term": "page.home.title",
+    "definition": "Home",
+    "context": "Home"
   },
   {
     "term": "page.login.deactivated-user-toast-body",

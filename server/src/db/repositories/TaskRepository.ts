@@ -98,6 +98,9 @@ export type TaskInput<TName extends TaskName> = {
     profile_type_id: number;
     temporary_file_id: number;
   };
+  DASHBOARD_REFRESH: {
+    dashboard_id: number;
+  };
 }[TName];
 
 export interface AddPetitionPermissionsInput {
@@ -246,6 +249,10 @@ export type TaskOutput<TName extends TaskName> = {
   PROFILES_EXCEL_IMPORT: {
     success: boolean;
     count: number;
+    error?: any;
+  };
+  DASHBOARD_REFRESH: {
+    success: boolean;
     error?: any;
   };
 }[TName];

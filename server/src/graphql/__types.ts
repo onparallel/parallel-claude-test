@@ -493,6 +493,9 @@ export interface NexusGenEnums {
     | "INVALID_NEW_PASSWORD"
     | "LIMIT_EXCEEDED"
     | "SUCCESS";
+  DashboardModuleSize: db.DashboardModuleSize;
+  DashboardPieChartModuleSettingsType: "DOUGHNUT" | "PIE";
+  DashboardRatioModuleSettingsType: "PERCENTAGE" | "RATIO";
   DocumentProcessingType: db.DocumentProcessingType;
   DowJonesKycEntityType: "Entity" | "Person";
   FeatureFlag: db.FeatureFlagName;
@@ -836,6 +839,87 @@ export interface NexusGenObjects {
     totalCount: number; // Int!
   };
   ContactlessAccessUsedEvent: petitionEvents.ContactlessAccessUsedEvent;
+  Dashboard: db.Dashboard;
+  DashboardCreateParallelButtonModule: {
+    // root type
+    id: NexusGenScalars["GID"]; // GID!
+    settings: NexusGenRootTypes["DashboardCreateParallelButtonModuleSettings"]; // DashboardCreateParallelButtonModuleSettings!
+    title?: string | null; // String
+  };
+  DashboardCreateParallelButtonModuleSettings: {
+    label: string;
+    template_id: number;
+  };
+  DashboardNumberModuleResult: {
+    // root type
+    value: number; // Int!
+  };
+  DashboardParallelsNumberModule: {
+    // root type
+    id: NexusGenScalars["GID"]; // GID!
+    result?: NexusGenRootTypes["DashboardNumberModuleResult"] | null; // DashboardNumberModuleResult
+    title?: string | null; // String
+  };
+  DashboardParallelsPieChartModule: {
+    // root type
+    id: NexusGenScalars["GID"]; // GID!
+    result?: NexusGenRootTypes["DashboardPieChartModuleResult"] | null; // DashboardPieChartModuleResult
+    settings: NexusGenRootTypes["DashboardParallelsPieChartModuleSettings"]; // DashboardParallelsPieChartModuleSettings!
+    title?: string | null; // String
+  };
+  DashboardParallelsPieChartModuleSettings: {
+    graphicType: "DOUGHNUT" | "PIE";
+    filters: { label: string; color: string }[];
+  };
+  DashboardParallelsRatioModule: {
+    // root type
+    id: NexusGenScalars["GID"]; // GID!
+    result?: NexusGenRootTypes["DashboardRatioModuleResult"] | null; // DashboardRatioModuleResult
+    settings: NexusGenRootTypes["DashboardParallelsRatioModuleSettings"]; // DashboardParallelsRatioModuleSettings!
+    title?: string | null; // String
+  };
+  DashboardParallelsRatioModuleSettings: {
+    // root type
+    graphicType: NexusGenEnums["DashboardRatioModuleSettingsType"]; // DashboardRatioModuleSettingsType!
+  };
+  DashboardPieChartModuleResult: {
+    // root type
+    isIncongruent: boolean; // Boolean!
+    value: number[]; // [Int!]!
+  };
+  DashboardProfilesNumberModule: {
+    // root type
+    id: NexusGenScalars["GID"]; // GID!
+    result?: NexusGenRootTypes["DashboardNumberModuleResult"] | null; // DashboardNumberModuleResult
+    title?: string | null; // String
+  };
+  DashboardProfilesPieChartModule: {
+    // root type
+    id: NexusGenScalars["GID"]; // GID!
+    result?: NexusGenRootTypes["DashboardPieChartModuleResult"] | null; // DashboardPieChartModuleResult
+    settings: NexusGenRootTypes["DashboardProfilesPieChartModuleSettings"]; // DashboardProfilesPieChartModuleSettings!
+    title?: string | null; // String
+  };
+  DashboardProfilesPieChartModuleSettings: {
+    graphicType: "DOUGHNUT" | "PIE";
+    filters: { label: string; color: string }[];
+  };
+  DashboardProfilesRatioModule: {
+    // root type
+    id: NexusGenScalars["GID"]; // GID!
+    result?: NexusGenRootTypes["DashboardRatioModuleResult"] | null; // DashboardRatioModuleResult
+    settings: NexusGenRootTypes["DashboardProfilesRatioModuleSettings"]; // DashboardProfilesRatioModuleSettings!
+    title?: string | null; // String
+  };
+  DashboardProfilesRatioModuleSettings: {
+    // root type
+    graphicType: NexusGenEnums["DashboardRatioModuleSettingsType"]; // DashboardRatioModuleSettingsType!
+  };
+  DashboardRatioModuleResult: {
+    // root type
+    isIncongruent: boolean; // Boolean!
+    value: number[]; // [Int!]!
+  };
   DowJonesKycEntityDate: {
     // root type
     day?: number | null; // Int
@@ -1476,6 +1560,7 @@ export interface NexusGenInterfaces {
   CreatedAt: {
     created_at: Date;
   };
+  DashboardModule: db.DashboardModule;
   DowJonesKycEntityProfileResult:
     | NexusGenRootTypes["DowJonesKycEntityProfileResultEntity"]
     | NexusGenRootTypes["DowJonesKycEntityProfileResultPerson"];
@@ -1796,6 +1881,107 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+  };
+  Dashboard: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    isDefault: boolean; // Boolean!
+    isRefreshing: boolean; // Boolean!
+    lastRefreshAt: NexusGenScalars["DateTime"] | null; // DateTime
+    modules: NexusGenRootTypes["DashboardModule"][]; // [DashboardModule!]!
+    name: string; // String!
+  };
+  DashboardCreateParallelButtonModule: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    settings: NexusGenRootTypes["DashboardCreateParallelButtonModuleSettings"]; // DashboardCreateParallelButtonModuleSettings!
+    size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
+    title: string | null; // String
+  };
+  DashboardCreateParallelButtonModuleSettings: {
+    // field return type
+    label: string; // String!
+    template: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
+  };
+  DashboardNumberModuleResult: {
+    // field return type
+    value: number; // Int!
+  };
+  DashboardParallelsNumberModule: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    result: NexusGenRootTypes["DashboardNumberModuleResult"] | null; // DashboardNumberModuleResult
+    size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
+    title: string | null; // String
+  };
+  DashboardParallelsPieChartModule: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    result: NexusGenRootTypes["DashboardPieChartModuleResult"] | null; // DashboardPieChartModuleResult
+    settings: NexusGenRootTypes["DashboardParallelsPieChartModuleSettings"]; // DashboardParallelsPieChartModuleSettings!
+    size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
+    title: string | null; // String
+  };
+  DashboardParallelsPieChartModuleSettings: {
+    // field return type
+    colors: string[]; // [String!]!
+    graphicType: NexusGenEnums["DashboardPieChartModuleSettingsType"]; // DashboardPieChartModuleSettingsType!
+    labels: string[]; // [String!]!
+  };
+  DashboardParallelsRatioModule: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    result: NexusGenRootTypes["DashboardRatioModuleResult"] | null; // DashboardRatioModuleResult
+    settings: NexusGenRootTypes["DashboardParallelsRatioModuleSettings"]; // DashboardParallelsRatioModuleSettings!
+    size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
+    title: string | null; // String
+  };
+  DashboardParallelsRatioModuleSettings: {
+    // field return type
+    graphicType: NexusGenEnums["DashboardRatioModuleSettingsType"]; // DashboardRatioModuleSettingsType!
+  };
+  DashboardPieChartModuleResult: {
+    // field return type
+    isIncongruent: boolean; // Boolean!
+    value: number[]; // [Int!]!
+  };
+  DashboardProfilesNumberModule: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    result: NexusGenRootTypes["DashboardNumberModuleResult"] | null; // DashboardNumberModuleResult
+    size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
+    title: string | null; // String
+  };
+  DashboardProfilesPieChartModule: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    result: NexusGenRootTypes["DashboardPieChartModuleResult"] | null; // DashboardPieChartModuleResult
+    settings: NexusGenRootTypes["DashboardProfilesPieChartModuleSettings"]; // DashboardProfilesPieChartModuleSettings!
+    size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
+    title: string | null; // String
+  };
+  DashboardProfilesPieChartModuleSettings: {
+    // field return type
+    colors: string[]; // [String!]!
+    graphicType: NexusGenEnums["DashboardPieChartModuleSettingsType"]; // DashboardPieChartModuleSettingsType!
+    labels: string[]; // [String!]!
+  };
+  DashboardProfilesRatioModule: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    result: NexusGenRootTypes["DashboardRatioModuleResult"] | null; // DashboardRatioModuleResult
+    settings: NexusGenRootTypes["DashboardProfilesRatioModuleSettings"]; // DashboardProfilesRatioModuleSettings!
+    size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
+    title: string | null; // String
+  };
+  DashboardProfilesRatioModuleSettings: {
+    // field return type
+    graphicType: NexusGenEnums["DashboardRatioModuleSettingsType"]; // DashboardRatioModuleSettingsType!
+  };
+  DashboardRatioModuleResult: {
+    // field return type
+    isIncongruent: boolean; // Boolean!
+    value: number[]; // [Int!]!
   };
   DowJonesKycEntityDate: {
     // field return type
@@ -3639,6 +3825,7 @@ export interface NexusGenFieldTypes {
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
     contactsByEmail: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
+    dashboard: NexusGenRootTypes["Dashboard"]; // Dashboard!
     dowJonesKycEntityProfile: NexusGenRootTypes["DowJonesKycEntityProfileResult"]; // DowJonesKycEntityProfileResult!
     dowJonesKycEntitySearch: NexusGenRootTypes["DowJonesKycEntitySearchResultPagination"]; // DowJonesKycEntitySearchResultPagination!
     emailIsAvailable: boolean; // Boolean!
@@ -3980,6 +4167,7 @@ export interface NexusGenFieldTypes {
     avatarUrl: string | null; // String
     canCreateUsers: boolean; // Boolean!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    dashboards: NexusGenRootTypes["Dashboard"][]; // [Dashboard!]!
     delegateOf: NexusGenRootTypes["User"][]; // [User!]!
     delegates: NexusGenRootTypes["User"][]; // [User!]!
     email: string; // String!
@@ -4118,6 +4306,12 @@ export interface NexusGenFieldTypes {
   CreatedAt: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  DashboardModule: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
+    title: string | null; // String
   };
   DowJonesKycEntityProfileResult: {
     // field return type
@@ -4536,6 +4730,107 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     petition: "Petition";
     type: "PetitionEventType";
+  };
+  Dashboard: {
+    // field return type name
+    id: "GID";
+    isDefault: "Boolean";
+    isRefreshing: "Boolean";
+    lastRefreshAt: "DateTime";
+    modules: "DashboardModule";
+    name: "String";
+  };
+  DashboardCreateParallelButtonModule: {
+    // field return type name
+    id: "GID";
+    settings: "DashboardCreateParallelButtonModuleSettings";
+    size: "DashboardModuleSize";
+    title: "String";
+  };
+  DashboardCreateParallelButtonModuleSettings: {
+    // field return type name
+    label: "String";
+    template: "PetitionBaseMini";
+  };
+  DashboardNumberModuleResult: {
+    // field return type name
+    value: "Int";
+  };
+  DashboardParallelsNumberModule: {
+    // field return type name
+    id: "GID";
+    result: "DashboardNumberModuleResult";
+    size: "DashboardModuleSize";
+    title: "String";
+  };
+  DashboardParallelsPieChartModule: {
+    // field return type name
+    id: "GID";
+    result: "DashboardPieChartModuleResult";
+    settings: "DashboardParallelsPieChartModuleSettings";
+    size: "DashboardModuleSize";
+    title: "String";
+  };
+  DashboardParallelsPieChartModuleSettings: {
+    // field return type name
+    colors: "String";
+    graphicType: "DashboardPieChartModuleSettingsType";
+    labels: "String";
+  };
+  DashboardParallelsRatioModule: {
+    // field return type name
+    id: "GID";
+    result: "DashboardRatioModuleResult";
+    settings: "DashboardParallelsRatioModuleSettings";
+    size: "DashboardModuleSize";
+    title: "String";
+  };
+  DashboardParallelsRatioModuleSettings: {
+    // field return type name
+    graphicType: "DashboardRatioModuleSettingsType";
+  };
+  DashboardPieChartModuleResult: {
+    // field return type name
+    isIncongruent: "Boolean";
+    value: "Int";
+  };
+  DashboardProfilesNumberModule: {
+    // field return type name
+    id: "GID";
+    result: "DashboardNumberModuleResult";
+    size: "DashboardModuleSize";
+    title: "String";
+  };
+  DashboardProfilesPieChartModule: {
+    // field return type name
+    id: "GID";
+    result: "DashboardPieChartModuleResult";
+    settings: "DashboardProfilesPieChartModuleSettings";
+    size: "DashboardModuleSize";
+    title: "String";
+  };
+  DashboardProfilesPieChartModuleSettings: {
+    // field return type name
+    colors: "String";
+    graphicType: "DashboardPieChartModuleSettingsType";
+    labels: "String";
+  };
+  DashboardProfilesRatioModule: {
+    // field return type name
+    id: "GID";
+    result: "DashboardRatioModuleResult";
+    settings: "DashboardProfilesRatioModuleSettings";
+    size: "DashboardModuleSize";
+    title: "String";
+  };
+  DashboardProfilesRatioModuleSettings: {
+    // field return type name
+    graphicType: "DashboardRatioModuleSettingsType";
+  };
+  DashboardRatioModuleResult: {
+    // field return type name
+    isIncongruent: "Boolean";
+    value: "Int";
   };
   DowJonesKycEntityDate: {
     // field return type name
@@ -6379,6 +6674,7 @@ export interface NexusGenFieldTypeNames {
     contact: "Contact";
     contacts: "ContactPagination";
     contactsByEmail: "Contact";
+    dashboard: "Dashboard";
     dowJonesKycEntityProfile: "DowJonesKycEntityProfileResult";
     dowJonesKycEntitySearch: "DowJonesKycEntitySearchResultPagination";
     emailIsAvailable: "Boolean";
@@ -6720,6 +7016,7 @@ export interface NexusGenFieldTypeNames {
     avatarUrl: "String";
     canCreateUsers: "Boolean";
     createdAt: "DateTime";
+    dashboards: "Dashboard";
     delegateOf: "User";
     delegates: "User";
     email: "String";
@@ -6858,6 +7155,12 @@ export interface NexusGenFieldTypeNames {
   CreatedAt: {
     // field return type name
     createdAt: "DateTime";
+  };
+  DashboardModule: {
+    // field return type name
+    id: "GID";
+    size: "DashboardModuleSize";
+    title: "String";
   };
   DowJonesKycEntityProfileResult: {
     // field return type name
@@ -8678,6 +8981,10 @@ export interface NexusGenArgTypes {
       // args
       emails: string[]; // [String!]!
     };
+    dashboard: {
+      // args
+      id: NexusGenScalars["GID"]; // GID!
+    };
     dowJonesKycEntityProfile: {
       // args
       profileId: string; // ID!
@@ -8967,6 +9274,14 @@ export interface NexusGenAbstractTypeMembers {
     | "PetitionMessage"
     | "PetitionReminder"
     | "UserAuthenticationToken";
+  DashboardModule:
+    | "DashboardCreateParallelButtonModule"
+    | "DashboardParallelsNumberModule"
+    | "DashboardParallelsPieChartModule"
+    | "DashboardParallelsRatioModule"
+    | "DashboardProfilesNumberModule"
+    | "DashboardProfilesPieChartModule"
+    | "DashboardProfilesRatioModule";
   DowJonesKycEntityProfileResult:
     | "DowJonesKycEntityProfileResultEntity"
     | "DowJonesKycEntityProfileResultPerson";
@@ -9091,6 +9406,13 @@ export interface NexusGenTypeInterfaces {
   CommentPublishedEvent: "PetitionEvent";
   Contact: "Timestamps";
   ContactlessAccessUsedEvent: "PetitionEvent";
+  DashboardCreateParallelButtonModule: "DashboardModule";
+  DashboardParallelsNumberModule: "DashboardModule";
+  DashboardParallelsPieChartModule: "DashboardModule";
+  DashboardParallelsRatioModule: "DashboardModule";
+  DashboardProfilesNumberModule: "DashboardModule";
+  DashboardProfilesPieChartModule: "DashboardModule";
+  DashboardProfilesRatioModule: "DashboardModule";
   DowJonesKycEntityProfileResultEntity: "DowJonesKycEntityProfileResult";
   DowJonesKycEntityProfileResultPerson: "DowJonesKycEntityProfileResult";
   DowJonesKycEntitySearchResultEntity: "DowJonesKycEntitySearchResult";
@@ -9205,6 +9527,7 @@ export type NexusGenAbstractsUsingStrategyResolveType =
   | "BackgroundCheckEntityDetails"
   | "BackgroundCheckEntitySearchSchema"
   | "CreatedAt"
+  | "DashboardModule"
   | "DowJonesKycEntityProfileResult"
   | "DowJonesKycEntitySearchResult"
   | "EventSubscription"

@@ -425,6 +425,119 @@ export type CreatedAt = {
   createdAt: Scalars["DateTime"]["output"];
 };
 
+export type Dashboard = {
+  id: Scalars["GID"]["output"];
+  isDefault: Scalars["Boolean"]["output"];
+  isRefreshing: Scalars["Boolean"]["output"];
+  lastRefreshAt: Maybe<Scalars["DateTime"]["output"]>;
+  modules: Array<DashboardModule>;
+  name: Scalars["String"]["output"];
+};
+
+export type DashboardCreateParallelButtonModule = DashboardModule & {
+  id: Scalars["GID"]["output"];
+  settings: DashboardCreateParallelButtonModuleSettings;
+  size: DashboardModuleSize;
+  title: Maybe<Scalars["String"]["output"]>;
+};
+
+export type DashboardCreateParallelButtonModuleSettings = {
+  label: Scalars["String"]["output"];
+  template: Maybe<PetitionBaseMini>;
+};
+
+export type DashboardModule = {
+  id: Scalars["GID"]["output"];
+  size: DashboardModuleSize;
+  title: Maybe<Scalars["String"]["output"]>;
+};
+
+export type DashboardModuleSize = "LARGE" | "MEDIUM" | "SMALL";
+
+export type DashboardNumberModuleResult = {
+  value: Scalars["Int"]["output"];
+};
+
+export type DashboardParallelsNumberModule = DashboardModule & {
+  id: Scalars["GID"]["output"];
+  result: Maybe<DashboardNumberModuleResult>;
+  size: DashboardModuleSize;
+  title: Maybe<Scalars["String"]["output"]>;
+};
+
+export type DashboardParallelsPieChartModule = DashboardModule & {
+  id: Scalars["GID"]["output"];
+  result: Maybe<DashboardPieChartModuleResult>;
+  settings: DashboardParallelsPieChartModuleSettings;
+  size: DashboardModuleSize;
+  title: Maybe<Scalars["String"]["output"]>;
+};
+
+export type DashboardParallelsPieChartModuleSettings = {
+  colors: Array<Scalars["String"]["output"]>;
+  graphicType: DashboardPieChartModuleSettingsType;
+  labels: Array<Scalars["String"]["output"]>;
+};
+
+export type DashboardParallelsRatioModule = DashboardModule & {
+  id: Scalars["GID"]["output"];
+  result: Maybe<DashboardRatioModuleResult>;
+  settings: DashboardParallelsRatioModuleSettings;
+  size: DashboardModuleSize;
+  title: Maybe<Scalars["String"]["output"]>;
+};
+
+export type DashboardParallelsRatioModuleSettings = {
+  graphicType: DashboardRatioModuleSettingsType;
+};
+
+export type DashboardPieChartModuleResult = {
+  isIncongruent: Scalars["Boolean"]["output"];
+  value: Array<Scalars["Int"]["output"]>;
+};
+
+export type DashboardPieChartModuleSettingsType = "DOUGHNUT" | "PIE";
+
+export type DashboardProfilesNumberModule = DashboardModule & {
+  id: Scalars["GID"]["output"];
+  result: Maybe<DashboardNumberModuleResult>;
+  size: DashboardModuleSize;
+  title: Maybe<Scalars["String"]["output"]>;
+};
+
+export type DashboardProfilesPieChartModule = DashboardModule & {
+  id: Scalars["GID"]["output"];
+  result: Maybe<DashboardPieChartModuleResult>;
+  settings: DashboardProfilesPieChartModuleSettings;
+  size: DashboardModuleSize;
+  title: Maybe<Scalars["String"]["output"]>;
+};
+
+export type DashboardProfilesPieChartModuleSettings = {
+  colors: Array<Scalars["String"]["output"]>;
+  graphicType: DashboardPieChartModuleSettingsType;
+  labels: Array<Scalars["String"]["output"]>;
+};
+
+export type DashboardProfilesRatioModule = DashboardModule & {
+  id: Scalars["GID"]["output"];
+  result: Maybe<DashboardRatioModuleResult>;
+  settings: DashboardProfilesRatioModuleSettings;
+  size: DashboardModuleSize;
+  title: Maybe<Scalars["String"]["output"]>;
+};
+
+export type DashboardProfilesRatioModuleSettings = {
+  graphicType: DashboardRatioModuleSettingsType;
+};
+
+export type DashboardRatioModuleResult = {
+  isIncongruent: Scalars["Boolean"]["output"];
+  value: Array<Scalars["Int"]["output"]>;
+};
+
+export type DashboardRatioModuleSettingsType = "PERCENTAGE" | "RATIO";
+
 export type DocumentProcessingType = "PAYSLIP";
 
 export type DowJonesKycEntityDate = {
@@ -573,6 +686,7 @@ export type FeatureFlag =
   | "CREATE_PROFILE_TYPE"
   | "CUSTOM_HOST_UI"
   | "CUSTOM_PROPERTIES"
+  | "DASHBOARDS"
   | "DOCUSIGN_SANDBOX_PROVIDER"
   | "DOW_JONES_KYC"
   | "ES_TAX_DOCUMENTS_FIELD"
@@ -5287,6 +5401,7 @@ export type Query = {
   contacts: ContactPagination;
   /** Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts */
   contactsByEmail: Array<Maybe<Contact>>;
+  dashboard: Dashboard;
   dowJonesKycEntityProfile: DowJonesKycEntityProfileResult;
   dowJonesKycEntitySearch: DowJonesKycEntitySearchResultPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
@@ -5393,6 +5508,10 @@ export type QuerycontactsArgs = {
 
 export type QuerycontactsByEmailArgs = {
   emails: Array<Scalars["String"]["input"]>;
+};
+
+export type QuerydashboardArgs = {
+  id: Scalars["GID"]["input"];
 };
 
 export type QuerydowJonesKycEntityProfileArgs = {
@@ -6022,6 +6141,7 @@ export type TaskName =
   | "BANKFLIP_SESSION_COMPLETED"
   | "BULK_PETITION_SEND"
   | "CLOSE_PETITIONS"
+  | "DASHBOARD_REFRESH"
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
@@ -6225,6 +6345,7 @@ export type User = Timestamps & {
   canCreateUsers: Scalars["Boolean"]["output"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
+  dashboards: Array<Dashboard>;
   /** Users that the user can send on behalf of */
   delegateOf: Array<User>;
   /** Users that the user allows to send on their behalf */

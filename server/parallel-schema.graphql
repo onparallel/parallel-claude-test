@@ -472,6 +472,129 @@ interface CreatedAt {
   createdAt: DateTime!
 }
 
+type Dashboard {
+  id: GID!
+  isDefault: Boolean!
+  isRefreshing: Boolean!
+  lastRefreshAt: DateTime
+  modules: [DashboardModule!]!
+  name: String!
+}
+
+type DashboardCreateParallelButtonModule implements DashboardModule {
+  id: GID!
+  settings: DashboardCreateParallelButtonModuleSettings!
+  size: DashboardModuleSize!
+  title: String
+}
+
+type DashboardCreateParallelButtonModuleSettings {
+  label: String!
+  template: PetitionBaseMini
+}
+
+interface DashboardModule {
+  id: GID!
+  size: DashboardModuleSize!
+  title: String
+}
+
+enum DashboardModuleSize {
+  LARGE
+  MEDIUM
+  SMALL
+}
+
+type DashboardNumberModuleResult {
+  value: Int!
+}
+
+type DashboardParallelsNumberModule implements DashboardModule {
+  id: GID!
+  result: DashboardNumberModuleResult
+  size: DashboardModuleSize!
+  title: String
+}
+
+type DashboardParallelsPieChartModule implements DashboardModule {
+  id: GID!
+  result: DashboardPieChartModuleResult
+  settings: DashboardParallelsPieChartModuleSettings!
+  size: DashboardModuleSize!
+  title: String
+}
+
+type DashboardParallelsPieChartModuleSettings {
+  colors: [String!]!
+  graphicType: DashboardPieChartModuleSettingsType!
+  labels: [String!]!
+}
+
+type DashboardParallelsRatioModule implements DashboardModule {
+  id: GID!
+  result: DashboardRatioModuleResult
+  settings: DashboardParallelsRatioModuleSettings!
+  size: DashboardModuleSize!
+  title: String
+}
+
+type DashboardParallelsRatioModuleSettings {
+  graphicType: DashboardRatioModuleSettingsType!
+}
+
+type DashboardPieChartModuleResult {
+  isIncongruent: Boolean!
+  value: [Int!]!
+}
+
+enum DashboardPieChartModuleSettingsType {
+  DOUGHNUT
+  PIE
+}
+
+type DashboardProfilesNumberModule implements DashboardModule {
+  id: GID!
+  result: DashboardNumberModuleResult
+  size: DashboardModuleSize!
+  title: String
+}
+
+type DashboardProfilesPieChartModule implements DashboardModule {
+  id: GID!
+  result: DashboardPieChartModuleResult
+  settings: DashboardProfilesPieChartModuleSettings!
+  size: DashboardModuleSize!
+  title: String
+}
+
+type DashboardProfilesPieChartModuleSettings {
+  colors: [String!]!
+  graphicType: DashboardPieChartModuleSettingsType!
+  labels: [String!]!
+}
+
+type DashboardProfilesRatioModule implements DashboardModule {
+  id: GID!
+  result: DashboardRatioModuleResult
+  settings: DashboardProfilesRatioModuleSettings!
+  size: DashboardModuleSize!
+  title: String
+}
+
+type DashboardProfilesRatioModuleSettings {
+  graphicType: DashboardRatioModuleSettingsType!
+}
+
+type DashboardRatioModuleResult {
+  isIncongruent: Boolean!
+  value: [Int!]!
+}
+
+enum DashboardRatioModuleSettingsType {
+  PERCENTAGE
+  RATIO
+}
+
 """
 A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
@@ -649,6 +772,7 @@ enum FeatureFlag {
   CREATE_PROFILE_TYPE
   CUSTOM_HOST_UI
   CUSTOM_PROPERTIES
+  DASHBOARDS
   DOCUSIGN_SANDBOX_PROVIDER
   DOW_JONES_KYC
   ES_TAX_DOCUMENTS_FIELD
@@ -7005,6 +7129,7 @@ type Query {
   Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts
   """
   contactsByEmail(emails: [String!]!): [Contact]!
+  dashboard(id: GID!): Dashboard!
   dowJonesKycEntityProfile(profileId: ID!): DowJonesKycEntityProfileResult!
   dowJonesKycEntitySearch(
     dateOfBirth: DateTime
@@ -7929,6 +8054,7 @@ enum TaskName {
   BANKFLIP_SESSION_COMPLETED
   BULK_PETITION_SEND
   CLOSE_PETITIONS
+  DASHBOARD_REFRESH
   DOW_JONES_PROFILE_DOWNLOAD
   EXPORT_EXCEL
   EXPORT_REPLIES
@@ -8205,6 +8331,7 @@ type User implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
+  dashboards: [Dashboard!]!
 
   """
   Users that the user can send on behalf of

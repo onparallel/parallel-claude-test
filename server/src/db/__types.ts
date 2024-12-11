@@ -25,6 +25,29 @@ export type ContactLocale = "en" | "es" | "ca" | "it" | "pt";
 
 export const ContactLocaleValues = ["en", "es", "ca", "it", "pt"] as ContactLocale[];
 
+export type DashboardModuleSize = "SMALL" | "MEDIUM" | "LARGE";
+
+export const DashboardModuleSizeValues = ["SMALL", "MEDIUM", "LARGE"] as DashboardModuleSize[];
+
+export type DashboardModuleType =
+  | "PARALLELS_NUMBER"
+  | "PROFILES_NUMBER"
+  | "PARALLELS_RATIO"
+  | "PROFILES_RATIO"
+  | "PARALLELS_PIE_CHART"
+  | "PROFILES_PIE_CHART"
+  | "CREATE_PARALLEL_BUTTON";
+
+export const DashboardModuleTypeValues = [
+  "PARALLELS_NUMBER",
+  "PROFILES_NUMBER",
+  "PARALLELS_RATIO",
+  "PROFILES_RATIO",
+  "PARALLELS_PIE_CHART",
+  "PROFILES_PIE_CHART",
+  "CREATE_PARALLEL_BUTTON",
+] as DashboardModuleType[];
+
 export type DocumentProcessingType = "PAYSLIP";
 
 export const DocumentProcessingTypeValues = ["PAYSLIP"] as DocumentProcessingType[];
@@ -66,7 +89,8 @@ export type FeatureFlagName =
   | "CREATE_PROFILE_TYPE"
   | "PDF_EXPORT_V2"
   | "SHOW_CONTACTS_BUTTON"
-  | "KEY_PROCESSES";
+  | "KEY_PROCESSES"
+  | "DASHBOARDS";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -102,6 +126,7 @@ export const FeatureFlagNameValues = [
   "PDF_EXPORT_V2",
   "SHOW_CONTACTS_BUTTON",
   "KEY_PROCESSES",
+  "DASHBOARDS",
 ] as FeatureFlagName[];
 
 export type IntegrationType =
@@ -520,7 +545,8 @@ export type TaskName =
   | "ID_VERIFICATION_SESSION_COMPLETED"
   | "FILE_EXPORT"
   | "CLOSE_PETITIONS"
-  | "PROFILES_EXCEL_IMPORT";
+  | "PROFILES_EXCEL_IMPORT"
+  | "DASHBOARD_REFRESH";
 
 export const TaskNameValues = [
   "PRINT_PDF",
@@ -541,6 +567,7 @@ export const TaskNameValues = [
   "FILE_EXPORT",
   "CLOSE_PETITIONS",
   "PROFILES_EXCEL_IMPORT",
+  "DASHBOARD_REFRESH",
 ] as TaskName[];
 
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";
@@ -637,6 +664,8 @@ export interface TableTypes {
   contact: Contact;
   contact_authentication: ContactAuthentication;
   contact_authentication_request: ContactAuthenticationRequest;
+  dashboard: Dashboard;
+  dashboard_module: DashboardModule;
   document_processing_log: DocumentProcessingLog;
   email_attachment: EmailAttachment;
   email_event: EmailEvent;
@@ -711,6 +740,8 @@ export interface TableCreateTypes {
   contact: CreateContact;
   contact_authentication: CreateContactAuthentication;
   contact_authentication_request: CreateContactAuthenticationRequest;
+  dashboard: CreateDashboard;
+  dashboard_module: CreateDashboardModule;
   document_processing_log: CreateDocumentProcessingLog;
   email_attachment: CreateEmailAttachment;
   email_event: CreateEmailEvent;
@@ -785,6 +816,8 @@ export interface TablePrimaryKeys {
   contact: "id";
   contact_authentication: "id";
   contact_authentication_request: "id";
+  dashboard: "id";
+  dashboard_module: "id";
   document_processing_log: "id";
   email_attachment: "id";
   email_event: "id";
@@ -955,6 +988,64 @@ export type CreateContactAuthenticationRequest = PartialProps<
   | "contact_first_name"
   | "contact_last_name"
   | "contact_email"
+>;
+
+export interface Dashboard {
+  id: number; // int4
+  org_id: number; // int4
+  name: string; // varchar
+  position: number; // int4
+  is_default: boolean; // bool
+  is_refreshing: boolean; // bool
+  last_refresh_at: Maybe<Date>; // timestamptz
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateDashboard = PartialProps<
+  Omit<Dashboard, "id">,
+  | "is_default"
+  | "is_refreshing"
+  | "last_refresh_at"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+>;
+
+export interface DashboardModule {
+  id: number; // int4
+  dashboard_id: number; // int4
+  title: Maybe<string>; // varchar
+  type: DashboardModuleType; // dashboard_module_type
+  position: number; // int4
+  size: DashboardModuleSize; // dashboard_module_size
+  settings: any; // jsonb
+  result: Maybe<any>; // jsonb
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateDashboardModule = PartialProps<
+  Omit<DashboardModule, "id">,
+  | "title"
+  | "result"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
 >;
 
 export interface DocumentProcessingLog {

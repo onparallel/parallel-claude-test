@@ -212,17 +212,6 @@ export const PetitionViewTabs = Object.assign(
           ${ViewTabs.fragments.ListView}
         `;
       },
-      get User() {
-        return gql`
-          fragment PetitionViewTabs_User on User {
-            id
-            petitionListViews {
-              id
-            }
-          }
-          ${this.PetitionListView}
-        `;
-      },
     },
   },
 );

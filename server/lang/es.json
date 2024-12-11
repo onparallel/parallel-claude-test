@@ -160,11 +160,6 @@
     "context": "Why we use Parallel?"
   },
   {
-    "term": "default-list-views.all",
-    "definition": "Todo",
-    "context": "All"
-  },
-  {
     "term": "default-petition-list-views.closed",
     "definition": "Cerrados",
     "context": "Closed"
