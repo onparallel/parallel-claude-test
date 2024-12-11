@@ -62,8 +62,6 @@ function Home() {
   const dashboard = data?.dashboard;
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     if (!isPageVisible) {
       stopPolling();
     } else {
