@@ -869,7 +869,7 @@ export interface NexusGenObjects {
   };
   DashboardParallelsPieChartModuleSettings: {
     graphicType: "DOUGHNUT" | "PIE";
-    filters: { label: string; color: string }[];
+    items: { label: string; color: string }[];
   };
   DashboardParallelsRatioModule: {
     // root type

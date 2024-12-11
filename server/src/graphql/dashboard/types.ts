@@ -142,15 +142,15 @@ export const DashboardParallelsPieChartModule = objectType({
         definition(t) {
           t.nonNull.field("graphicType", { type: "DashboardPieChartModuleSettingsType" });
           t.nonNull.list.nonNull.string("labels", {
-            resolve: (o) => o.filters.map((f: any) => f.label),
+            resolve: (o) => o.items.map((f: any) => f.label),
           });
           t.nonNull.list.nonNull.string("colors", {
-            resolve: (o) => o.filters.map((f: any) => f.color),
+            resolve: (o) => o.items.map((f: any) => f.color),
           });
         },
         sourceType: /* ts */ `{
           graphicType: "DOUGHNUT" | "PIE";
-          filters: { label: string; color: string }[];
+          items: { label: string; color: string }[];
         }`,
       }),
     });
@@ -168,10 +168,10 @@ export const DashboardProfilesPieChartModule = objectType({
         definition(t) {
           t.nonNull.field("graphicType", { type: "DashboardPieChartModuleSettingsType" });
           t.nonNull.list.nonNull.string("labels", {
-            resolve: (o) => o.filters.map((f: any) => f.label),
+            resolve: (o) => o.items.map((f: any) => f.label),
           });
           t.nonNull.list.nonNull.string("colors", {
-            resolve: (o) => o.filters.map((f: any) => f.color),
+            resolve: (o) => o.items.map((f: any) => f.color),
           });
         },
         sourceType: /* ts */ `{
