@@ -30,7 +30,7 @@ import { useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 
-const POLL_INTERVAL_REFRESHING = 500;
+const POLL_INTERVAL_REFRESHING = 1_500;
 const POLL_INTERVAL = 30_000;
 
 const QUERY_STATE = {
