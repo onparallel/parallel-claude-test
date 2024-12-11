@@ -11,7 +11,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { LockClosedIcon } from "@parallel/chakra/icons";
-import { Link, NormalLink } from "@parallel/components/common/Link";
+import { Link } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { postJSON } from "@parallel/utils/rest";
@@ -186,19 +186,6 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
                 />
               </Button>
             ) : null}
-            <Text>
-              <FormattedMessage
-                id="public.login.register-for-free"
-                defaultMessage="Don't have an account? <a>Register for free</a>"
-                values={{
-                  a: (chunks: any) => (
-                    <NormalLink role="a" href="signup">
-                      {chunks}
-                    </NormalLink>
-                  ),
-                }}
-              />
-            </Text>
           </Stack>
         )}
       </Flex>

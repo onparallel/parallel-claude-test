@@ -17095,11 +17095,6 @@
     "context": "Update your password"
   },
   {
-    "term": "public.login.register-for-free",
-    "definition": "Don't have an account? <a>Register for free</a>",
-    "context": "Don't have an account? <a>Register for free</a>"
-  },
-  {
     "term": "public.login.signup",
     "definition": "Sign Up",
     "context": "Sign Up"
