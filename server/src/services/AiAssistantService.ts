@@ -2,7 +2,6 @@ import Ajv from "ajv";
 import { inject, injectable } from "inversify";
 import { AzureOpenAI } from "openai";
 import { ChatCompletionMessageParam } from "openai/resources";
-import { outdent } from "outdent";
 import { isNonNullish } from "remeda";
 import { Config, CONFIG } from "../config";
 import { JsonSchemaFor } from "../util/jsonSchema";
@@ -42,27 +41,14 @@ export class AiAssistantService implements IAiAssistantService {
     schema: JsonSchemaFor<T>,
   ): Promise<T | null> {
     try {
-      messages = [
-        ...messages,
-        {
-          role: "system",
-          content: outdent`
-            Your reply must adhere to the following JSON Schema
-            ${JSON.stringify(schema)}
-          `,
-        },
-      ];
       this.logger.info("Requesting JSON completion", { deploymentName, messages });
       const response = await this.client.chat.completions.create({
         model: deploymentName,
         messages,
         n: 1,
-        // response_format: {
-        //   type: "json_schema",
-        //   json_schema: { name: schema.title ?? "", schema },
-        // },
         response_format: {
-          type: "json_object",
+          type: "json_schema",
+          json_schema: { name: schema.title ?? "", schema },
         },
       });
       this.logger.info("Received JSON completion", { response });
