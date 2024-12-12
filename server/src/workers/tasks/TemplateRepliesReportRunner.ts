@@ -102,27 +102,49 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
 
     if (petitions.length > 0) {
       const ids = petitions.map((p) => p.id);
-      const [
-        petitionsAccesses,
-        petitionsMessages,
-        composedPetitions,
-        petitionsOwner,
-        petitionsTags,
-        petitionsEvents,
-        latestSignatures,
-      ] = await Promise.all([
-        this.ctx.readonlyPetitions.loadAccessesForPetition(ids),
-        this.ctx.readonlyPetitions.loadMessagesByPetitionId(ids),
-        pMapChunk(
-          ids,
-          (ids) => this.ctx.readonlyPetitions.getComposedPetitionFieldsAndVariables(ids),
-          { chunkSize: 200, concurrency: 3 },
-        ),
-        this.ctx.readonlyPetitions.loadPetitionOwner(ids),
-        this.ctx.readonlyTags.loadTagsByPetitionId(ids),
-        this.ctx.readonlyPetitions.loadPetitionEventsByPetitionId(ids),
-        this.ctx.readonlyPetitions.loadLatestPetitionSignatureByPetitionId(ids),
-      ]);
+
+      const petitionsAccesses = await pMapChunk(
+        ids,
+        async (ids) => await this.ctx.readonlyPetitions.loadAccessesForPetition(ids),
+        { chunkSize: 200, concurrency: 1 },
+      );
+
+      const petitionsMessages = await pMapChunk(
+        ids,
+        async (ids) => await this.ctx.readonlyPetitions.loadMessagesByPetitionId(ids),
+        { chunkSize: 200, concurrency: 1 },
+      );
+
+      const composedPetitions = await pMapChunk(
+        ids,
+        async (ids) => await this.ctx.readonlyPetitions.getComposedPetitionFieldsAndVariables(ids),
+        { chunkSize: 200, concurrency: 1 },
+      );
+
+      const petitionsOwner = await pMapChunk(
+        ids,
+        async (ids) => await this.ctx.readonlyPetitions.loadPetitionOwner(ids),
+        { chunkSize: 200, concurrency: 1 },
+      );
+
+      const petitionsTags = await pMapChunk(
+        ids,
+        async (ids) => await this.ctx.readonlyTags.loadTagsByPetitionId(ids),
+        { chunkSize: 200, concurrency: 1 },
+      );
+
+      const petitionsEvents = await pMapChunk(
+        ids,
+        async (ids) => await this.ctx.readonlyPetitions.loadPetitionEventsByPetitionId(ids),
+        { chunkSize: 200, concurrency: 1 },
+      );
+
+      const latestSignatures = await pMapChunk(
+        ids,
+        async (ids) =>
+          await this.ctx.readonlyPetitions.loadLatestPetitionSignatureByPetitionId(ids),
+        { chunkSize: 200, concurrency: 1 },
+      );
 
       const petitionsAccessesContacts = await Promise.all(
         petitionsAccesses.map((accesses) =>
