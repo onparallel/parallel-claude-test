@@ -19,7 +19,21 @@ export const DashboardNumberValue = chakraForwardRef<"span", DashboardNumberValu
         as={MotionNumber}
         locales={intl.locale}
         value={value}
-        format={{ style: isPercentage ? "percent" : "decimal", maximumFractionDigits: 2 }}
+        {...(value > 10_000 && !isPercentage
+          ? { title: intl.formatNumber(value, { maximumFractionDigits: 2 }) }
+          : {})}
+        format={
+          isPercentage
+            ? { style: "percent", maximumFractionDigits: 2 }
+            : value >= 10_000
+              ? { notation: "compact", compactDisplay: "short", maximumSignificantDigits: 3 }
+              : {
+                  maximumFractionDigits: 2,
+                  minimumSignificantDigits: 4,
+                  maximumSignificantDigits: 4,
+                  trailingZeroDisplay: "stripIfInteger",
+                }
+        }
         {...props}
       />
     ) : (
