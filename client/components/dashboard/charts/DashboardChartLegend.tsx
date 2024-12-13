@@ -2,8 +2,7 @@ import { Grid, GridItem, Square, Stack, Text } from "@chakra-ui/react";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
 import { Fragment } from "react";
-import { FormattedMessage } from "react-intl";
-import { DashboardNumberValue } from "../shared/DashboardNumberValue";
+import { FormattedMessage, FormattedNumber } from "react-intl";
 
 export interface DashboardChartLegendChartData {
   datasets: {
@@ -58,14 +57,16 @@ export function DashboardChartLegend({ data }: { data: DashboardChartLegendChart
                 <GridItem minWidth={0}>
                   <OverflownText>{label}</OverflownText>
                 </GridItem>
-                <GridItem textAlign="end">
-                  <DashboardNumberValue value={value} fontSize="xl" fontWeight={600} />
+                <GridItem textAlign="end" fontSize="xl" fontWeight={600}>
+                  <FormattedNumber value={value} />
                 </GridItem>
                 {total === 0 ? null : (
-                  <GridItem textAlign="end">
-                    <Text as="span" fontSize="sm" fontWeight={400}>
-                      <DashboardNumberValue value={value / total} isPercentage />
-                    </Text>
+                  <GridItem textAlign="end" fontSize="sm" fontWeight={400}>
+                    <FormattedNumber
+                      value={value / total}
+                      style="percent"
+                      maximumSignificantDigits={3}
+                    />
                   </GridItem>
                 )}
               </Fragment>

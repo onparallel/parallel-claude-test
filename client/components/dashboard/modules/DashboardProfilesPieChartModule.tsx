@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Center, Stack, useBreakpointValue } from "@chakra-ui/react";
+import { Box, Center, Stack, useBreakpointValue } from "@chakra-ui/react";
 import { DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragment } from "@parallel/graphql/__types";
 import { isNonNullish } from "remeda";
 import { DashboardChartLegend } from "../charts/DashboardChartLegend";
@@ -19,6 +19,9 @@ export function DashboardProfilesPieChartModule({
       {
         data: module.profilesPieChartResult?.value ?? [],
         backgroundColor: module.profilesPieChartSettings?.colors ?? [],
+        borderColor: "white",
+        hoverBackgroundColor: module.profilesPieChartSettings?.colors ?? [],
+        hoverBorderColor: "white",
       },
     ],
     labels: module.profilesPieChartSettings?.labels ?? [],
@@ -49,13 +52,13 @@ export function DashboardProfilesPieChartModule({
           minHeight={0}
         >
           <Center>
-            <Center position="relative" boxSize={`${chartSize}px`}>
+            <Box position="relative" boxSize={`${chartSize}px`}>
               {module.profilesPieChartSettings?.graphicType === "DOUGHNUT" ? (
                 <DashboardDoughnutChart data={data} />
               ) : (
                 <DashboardPieChart data={data} />
               )}
-            </Center>
+            </Box>
           </Center>
           <DashboardChartLegend data={data} />
         </Stack>
