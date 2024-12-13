@@ -137,6 +137,11 @@ export interface NexusGenInputs {
     firstName: string; // String!
     lastName?: string | null; // String
   };
+  CreatePetitionButtonDashboardModuleSettingsInput: {
+    // input type
+    buttonLabel: string; // String!
+    templateId: NexusGenScalars["GID"]; // GID!
+  };
   CreatePetitionFieldInput: {
     // input type
     isInternal?: boolean | null; // Boolean
@@ -266,6 +271,26 @@ export interface NexusGenInputs {
     operator: NexusGenEnums["PetitionTagFilterLineOperator"]; // PetitionTagFilterLineOperator!
     value: NexusGenScalars["GID"][]; // [GID!]!
   };
+  PetitionsNumberDashboardModuleSettingsInput: {
+    // input type
+    filters: NexusGenInputs["PetitionFilter"]; // PetitionFilter!
+  };
+  PetitionsPieChartDashboardModuleSettingsInput: {
+    // input type
+    graphicType: NexusGenEnums["DashboardPieChartModuleSettingsType"]; // DashboardPieChartModuleSettingsType!
+    items: NexusGenInputs["PetitionsPieChartDashboardModuleSettingsItemInput"][]; // [PetitionsPieChartDashboardModuleSettingsItemInput!]!
+  };
+  PetitionsPieChartDashboardModuleSettingsItemInput: {
+    // input type
+    color: string; // String!
+    filter: NexusGenInputs["PetitionFilter"]; // PetitionFilter!
+    label: string; // String!
+  };
+  PetitionsRatioDashboardModuleSettingsInput: {
+    // input type
+    filters: NexusGenInputs["PetitionFilter"][]; // [PetitionFilter!]!
+    graphicType: NexusGenEnums["DashboardRatioModuleSettingsType"]; // DashboardRatioModuleSettingsType!
+  };
   ProfileAssociatedPetitionFilter: {
     // input type
     fromTemplateId?: NexusGenScalars["GID"][] | null; // [GID!]
@@ -323,6 +348,38 @@ export interface NexusGenInputs {
     includeArchived?: boolean | null; // Boolean
     onlyArchived?: boolean | null; // Boolean
     profileTypeId?: NexusGenScalars["GID"][] | null; // [GID!]
+  };
+  ProfilesNumberDashboardModuleSettingsInput: {
+    // input type
+    aggregate?: NexusGenEnums["ProfilesModuleResultAggregateType"] | null; // ProfilesModuleResultAggregateType
+    filter: NexusGenInputs["ProfileFilter"]; // ProfileFilter!
+    profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
+    profileTypeId: NexusGenScalars["GID"]; // GID!
+    type: NexusGenEnums["ProfilesModuleResultType"]; // ProfilesModuleResultType!
+  };
+  ProfilesPieChartDashboardModuleSettingsInput: {
+    // input type
+    aggregate?: NexusGenEnums["ProfilesModuleResultAggregateType"] | null; // ProfilesModuleResultAggregateType
+    graphicType: NexusGenEnums["DashboardPieChartModuleSettingsType"]; // DashboardPieChartModuleSettingsType!
+    items: NexusGenInputs["ProfilesPieChartDashboardModuleSettingsItemInput"][]; // [ProfilesPieChartDashboardModuleSettingsItemInput!]!
+    profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
+    profileTypeId: NexusGenScalars["GID"]; // GID!
+    type: NexusGenEnums["ProfilesModuleResultType"]; // ProfilesModuleResultType!
+  };
+  ProfilesPieChartDashboardModuleSettingsItemInput: {
+    // input type
+    color: string; // String!
+    filter: NexusGenInputs["ProfileFilter"]; // ProfileFilter!
+    label: string; // String!
+  };
+  ProfilesRatioDashboardModuleSettingsInput: {
+    // input type
+    aggregate?: NexusGenEnums["ProfilesModuleResultAggregateType"] | null; // ProfilesModuleResultAggregateType
+    filters: NexusGenInputs["ProfileFilter"][]; // [ProfileFilter!]!
+    graphicType: NexusGenEnums["DashboardRatioModuleSettingsType"]; // DashboardRatioModuleSettingsType!
+    profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
+    profileTypeId: NexusGenScalars["GID"]; // GID!
+    type: NexusGenEnums["ProfilesModuleResultType"]; // ProfilesModuleResultType!
   };
   PublicPetitionSignerDataInput: {
     // input type
@@ -627,6 +684,8 @@ export interface NexusGenEnums {
     | "STORE"
     | "VERIFIED_PERSON";
   ProfileTypeStandardType: db.ProfileTypeStandardType;
+  ProfilesModuleResultAggregateType: "AVG" | "MAX" | "MIN" | "SUM";
+  ProfilesModuleResultType: "AGGREGATE" | "COUNT";
   PublicSignatureStatus: "COMPLETED" | "STARTED";
   QueryContacts_OrderBy:
     | "createdAt_ASC"
@@ -2226,6 +2285,7 @@ export interface NexusGenFieldTypes {
     // field return type
     activateUser: NexusGenRootTypes["User"][]; // [User!]!
     addUsersToUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
+    adminCreateDashboard: NexusGenRootTypes["Dashboard"]; // Dashboard!
     anonymizePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     approveOrRejectPetitionFieldReplies: NexusGenRootTypes["Petition"]; // Petition!
     archiveFieldGroupReplyIntoProfile: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
@@ -2258,6 +2318,7 @@ export interface NexusGenFieldTypes {
     createCompaniesHouseProfileExternalSourceIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createContactlessPetitionAccess: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
+    createCreatePetitionButtonDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
     createCustomSignatureDocumentUploadLink: NexusGenScalars["JSONObject"]; // JSONObject!
     createDowJonesKycIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     createDowJonesKycReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
@@ -2286,6 +2347,9 @@ export interface NexusGenFieldTypes {
     createPetitionListView: NexusGenRootTypes["PetitionListView"]; // PetitionListView!
     createPetitionSummaryTask: NexusGenRootTypes["Task"]; // Task!
     createPetitionVariable: NexusGenRootTypes["Petition"]; // Petition!
+    createPetitionsNumberDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
+    createPetitionsPieChartDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
+    createPetitionsRatioDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
     createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     createProfile: NexusGenRootTypes["Profile"]; // Profile!
     createProfileEventSubscription: NexusGenRootTypes["ProfileEventSubscription"]; // ProfileEventSubscription!
@@ -2297,6 +2361,9 @@ export interface NexusGenFieldTypes {
     createProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     createProfileTypeProcess: NexusGenRootTypes["ProfileTypeProcess"]; // ProfileTypeProcess!
     createProfilesExcelImportTask: NexusGenRootTypes["Task"]; // Task!
+    createProfilesNumberDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
+    createProfilesPieChartDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
+    createProfilesRatioDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     createPublicPetitionLinkPrefillData: string; // String!
     createRemovePetitionPermissionMaybeTask: NexusGenRootTypes["MaybeTask"]; // MaybeTask!
@@ -2311,6 +2378,7 @@ export interface NexusGenFieldTypes {
     deactivateUser: NexusGenRootTypes["User"][]; // [User!]!
     deleteAzureOpenAiIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     deleteContacts: NexusGenEnums["Result"]; // Result!
+    deleteDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
     deleteDowJonesKycIntegration: NexusGenRootTypes["Organization"]; // Organization!
     deleteEventSubscriptionSignatureKeys: NexusGenEnums["Result"]; // Result!
     deleteEventSubscriptions: NexusGenEnums["Result"]; // Result!
@@ -2428,6 +2496,7 @@ export interface NexusGenFieldTypes {
     updateBackgroundCheckEntity: NexusGenEnums["Success"]; // Success!
     updateCompaniesHouseCustomProperties: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
+    updateDashboardModulePositions: NexusGenRootTypes["Dashboard"]; // Dashboard!
     updateEinformaCustomProperties: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateFeatureFlags: NexusGenRootTypes["Organization"]; // Organization!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -5075,6 +5144,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     activateUser: "User";
     addUsersToUserGroup: "UserGroup";
+    adminCreateDashboard: "Dashboard";
     anonymizePetition: "SupportMethodResponse";
     approveOrRejectPetitionFieldReplies: "Petition";
     archiveFieldGroupReplyIntoProfile: "PetitionFieldReply";
@@ -5107,6 +5177,7 @@ export interface NexusGenFieldTypeNames {
     createCompaniesHouseProfileExternalSourceIntegration: "SupportMethodResponse";
     createContact: "Contact";
     createContactlessPetitionAccess: "PetitionAccess";
+    createCreatePetitionButtonDashboardModule: "Dashboard";
     createCustomSignatureDocumentUploadLink: "JSONObject";
     createDowJonesKycIntegration: "OrgIntegration";
     createDowJonesKycReply: "PetitionFieldReply";
@@ -5135,6 +5206,9 @@ export interface NexusGenFieldTypeNames {
     createPetitionListView: "PetitionListView";
     createPetitionSummaryTask: "Task";
     createPetitionVariable: "Petition";
+    createPetitionsNumberDashboardModule: "Dashboard";
+    createPetitionsPieChartDashboardModule: "Dashboard";
+    createPetitionsRatioDashboardModule: "Dashboard";
     createPrintPdfTask: "Task";
     createProfile: "Profile";
     createProfileEventSubscription: "ProfileEventSubscription";
@@ -5146,6 +5220,9 @@ export interface NexusGenFieldTypeNames {
     createProfileTypeField: "ProfileTypeField";
     createProfileTypeProcess: "ProfileTypeProcess";
     createProfilesExcelImportTask: "Task";
+    createProfilesNumberDashboardModule: "Dashboard";
+    createProfilesPieChartDashboardModule: "Dashboard";
+    createProfilesRatioDashboardModule: "Dashboard";
     createPublicPetitionLink: "PublicPetitionLink";
     createPublicPetitionLinkPrefillData: "String";
     createRemovePetitionPermissionMaybeTask: "MaybeTask";
@@ -5160,6 +5237,7 @@ export interface NexusGenFieldTypeNames {
     deactivateUser: "User";
     deleteAzureOpenAiIntegration: "SupportMethodResponse";
     deleteContacts: "Result";
+    deleteDashboardModule: "Dashboard";
     deleteDowJonesKycIntegration: "Organization";
     deleteEventSubscriptionSignatureKeys: "Result";
     deleteEventSubscriptions: "Result";
@@ -5277,6 +5355,7 @@ export interface NexusGenFieldTypeNames {
     updateBackgroundCheckEntity: "Success";
     updateCompaniesHouseCustomProperties: "SupportMethodResponse";
     updateContact: "Contact";
+    updateDashboardModulePositions: "Dashboard";
     updateEinformaCustomProperties: "SupportMethodResponse";
     updateFeatureFlags: "Organization";
     updateFieldPositions: "PetitionBase";
@@ -7351,6 +7430,11 @@ export interface NexusGenArgTypes {
       userGroupId: NexusGenScalars["GID"]; // GID!
       userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
+    adminCreateDashboard: {
+      // args
+      name: string; // String!
+      orgId: NexusGenScalars["GID"]; // GID!
+    };
     anonymizePetition: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
@@ -7532,6 +7616,13 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
     };
+    createCreatePetitionButtonDashboardModule: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      settings: NexusGenInputs["CreatePetitionButtonDashboardModuleSettingsInput"]; // CreatePetitionButtonDashboardModuleSettingsInput!
+      size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
+      title?: string | null; // String
+    };
     createCustomSignatureDocumentUploadLink: {
       // args
       file: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
@@ -7711,6 +7802,27 @@ export interface NexusGenArgTypes {
       data: NexusGenInputs["CreatePetitionVariableInput"]; // CreatePetitionVariableInput!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
+    createPetitionsNumberDashboardModule: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      settings: NexusGenInputs["PetitionsNumberDashboardModuleSettingsInput"]; // PetitionsNumberDashboardModuleSettingsInput!
+      size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
+      title?: string | null; // String
+    };
+    createPetitionsPieChartDashboardModule: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      settings: NexusGenInputs["PetitionsPieChartDashboardModuleSettingsInput"]; // PetitionsPieChartDashboardModuleSettingsInput!
+      size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
+      title?: string | null; // String
+    };
+    createPetitionsRatioDashboardModule: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      settings: NexusGenInputs["PetitionsRatioDashboardModuleSettingsInput"]; // PetitionsRatioDashboardModuleSettingsInput!
+      size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
+      title?: string | null; // String
+    };
     createPrintPdfTask: {
       // args
       includeNdLinks?: boolean | null; // Boolean
@@ -7777,6 +7889,27 @@ export interface NexusGenArgTypes {
       // args
       file: NexusGenScalars["Upload"]; // Upload!
       profileTypeId: NexusGenScalars["GID"]; // GID!
+    };
+    createProfilesNumberDashboardModule: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      settings: NexusGenInputs["ProfilesNumberDashboardModuleSettingsInput"]; // ProfilesNumberDashboardModuleSettingsInput!
+      size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
+      title?: string | null; // String
+    };
+    createProfilesPieChartDashboardModule: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      settings: NexusGenInputs["ProfilesPieChartDashboardModuleSettingsInput"]; // ProfilesPieChartDashboardModuleSettingsInput!
+      size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
+      title?: string | null; // String
+    };
+    createProfilesRatioDashboardModule: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      settings: NexusGenInputs["ProfilesRatioDashboardModuleSettingsInput"]; // ProfilesRatioDashboardModuleSettingsInput!
+      size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
+      title?: string | null; // String
     };
     createPublicPetitionLink: {
       // args
@@ -7859,6 +7992,11 @@ export interface NexusGenArgTypes {
       // args
       force?: boolean | null; // Boolean
       ids: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    deleteDashboardModule: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      moduleId: NexusGenScalars["GID"]; // GID!
     };
     deleteEventSubscriptionSignatureKeys: {
       // args
@@ -8495,6 +8633,11 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["UpdateContactInput"]; // UpdateContactInput!
       id: NexusGenScalars["GID"]; // GID!
+    };
+    updateDashboardModulePositions: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      moduleIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     updateEinformaCustomProperties: {
       // args

@@ -163,7 +163,7 @@ interface PetitionTagFilter {
   operator: "AND" | "OR";
 }
 
-interface PetitionFilter {
+export interface PetitionFilter {
   path?: string | null;
   status?: PetitionStatus[] | null;
   locale?: ContactLocale | null;

@@ -412,6 +412,11 @@ export interface CreateContactInput {
   lastName?: InputMaybe<Scalars["String"]["input"]>;
 }
 
+export interface CreatePetitionButtonDashboardModuleSettingsInput {
+  buttonLabel: Scalars["String"]["input"];
+  templateId: Scalars["GID"]["input"];
+}
+
 export interface CreatePetitionFieldInput {
   isInternal?: InputMaybe<Scalars["Boolean"]["input"]>;
   multiple?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -1041,6 +1046,8 @@ export interface Mutation {
   activateUser: Array<User>;
   /** Add users to a user group */
   addUsersToUserGroup: UserGroup;
+  /** Creates a new dashboard in the organization */
+  adminCreateDashboard: Dashboard;
   /** Anonymizes a petition */
   anonymizePetition: SupportMethodResponse;
   /** Updates the status of a PENDING petition field replies to APPROVED or REJECTED */
@@ -1107,6 +1114,7 @@ export interface Mutation {
   createContact: Contact;
   /** Creates a contactless petition access */
   createContactlessPetitionAccess: PetitionAccess;
+  createCreatePetitionButtonDashboardModule: Dashboard;
   createCustomSignatureDocumentUploadLink: Scalars["JSONObject"]["output"];
   /** Creates a new Dow Jones KYC integration on the user's organization */
   createDowJonesKycIntegration: OrgIntegration;
@@ -1168,6 +1176,9 @@ export interface Mutation {
   createPetitionSummaryTask: Task;
   /** Creates a new variable on the petition. */
   createPetitionVariable: Petition;
+  createPetitionsNumberDashboardModule: Dashboard;
+  createPetitionsPieChartDashboardModule: Dashboard;
+  createPetitionsRatioDashboardModule: Dashboard;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
   createPrintPdfTask: Task;
   createProfile: Profile;
@@ -1186,6 +1197,9 @@ export interface Mutation {
   createProfileTypeProcess: ProfileTypeProcess;
   /** Creates a task for importing profiles from an excel file */
   createProfilesExcelImportTask: Task;
+  createProfilesNumberDashboardModule: Dashboard;
+  createProfilesPieChartDashboardModule: Dashboard;
+  createProfilesRatioDashboardModule: Dashboard;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
   /** Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition. */
@@ -1220,6 +1234,7 @@ export interface Mutation {
   deleteAzureOpenAiIntegration: SupportMethodResponse;
   /** Delete contacts. */
   deleteContacts: Result;
+  deleteDashboardModule: Dashboard;
   /** Removes the DOW JONES integration of the user's organization */
   deleteDowJonesKycIntegration: Organization;
   /** Deletes a subscription signature key */
@@ -1436,6 +1451,7 @@ export interface Mutation {
   updateCompaniesHouseCustomProperties: SupportMethodResponse;
   /** Updates a contact. */
   updateContact: Contact;
+  updateDashboardModulePositions: Dashboard;
   updateEinformaCustomProperties: SupportMethodResponse;
   /** Activate or deactivate a list of organization feature flag */
   updateFeatureFlags: Organization;
@@ -1548,6 +1564,11 @@ export interface MutationactivateUserArgs {
 export interface MutationaddUsersToUserGroupArgs {
   userGroupId: Scalars["GID"]["input"];
   userIds: Array<Scalars["GID"]["input"]>;
+}
+
+export interface MutationadminCreateDashboardArgs {
+  name: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
 }
 
 export interface MutationanonymizePetitionArgs {
@@ -1731,6 +1752,13 @@ export interface MutationcreateContactlessPetitionAccessArgs {
   remindersConfig?: InputMaybe<RemindersConfigInput>;
 }
 
+export interface MutationcreateCreatePetitionButtonDashboardModuleArgs {
+  dashboardId: Scalars["GID"]["input"];
+  settings: CreatePetitionButtonDashboardModuleSettingsInput;
+  size: DashboardModuleSize;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+}
+
 export interface MutationcreateCustomSignatureDocumentUploadLinkArgs {
   file: FileUploadInput;
   petitionId: Scalars["GID"]["input"];
@@ -1910,6 +1938,27 @@ export interface MutationcreatePetitionVariableArgs {
   petitionId: Scalars["GID"]["input"];
 }
 
+export interface MutationcreatePetitionsNumberDashboardModuleArgs {
+  dashboardId: Scalars["GID"]["input"];
+  settings: PetitionsNumberDashboardModuleSettingsInput;
+  size: DashboardModuleSize;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+}
+
+export interface MutationcreatePetitionsPieChartDashboardModuleArgs {
+  dashboardId: Scalars["GID"]["input"];
+  settings: PetitionsPieChartDashboardModuleSettingsInput;
+  size: DashboardModuleSize;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+}
+
+export interface MutationcreatePetitionsRatioDashboardModuleArgs {
+  dashboardId: Scalars["GID"]["input"];
+  settings: PetitionsRatioDashboardModuleSettingsInput;
+  size: DashboardModuleSize;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+}
+
 export interface MutationcreatePrintPdfTaskArgs {
   includeNdLinks?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionId: Scalars["GID"]["input"];
@@ -1975,6 +2024,27 @@ export interface MutationcreateProfileTypeProcessArgs {
 export interface MutationcreateProfilesExcelImportTaskArgs {
   file: Scalars["Upload"]["input"];
   profileTypeId: Scalars["GID"]["input"];
+}
+
+export interface MutationcreateProfilesNumberDashboardModuleArgs {
+  dashboardId: Scalars["GID"]["input"];
+  settings: ProfilesNumberDashboardModuleSettingsInput;
+  size: DashboardModuleSize;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+}
+
+export interface MutationcreateProfilesPieChartDashboardModuleArgs {
+  dashboardId: Scalars["GID"]["input"];
+  settings: ProfilesPieChartDashboardModuleSettingsInput;
+  size: DashboardModuleSize;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+}
+
+export interface MutationcreateProfilesRatioDashboardModuleArgs {
+  dashboardId: Scalars["GID"]["input"];
+  settings: ProfilesRatioDashboardModuleSettingsInput;
+  size: DashboardModuleSize;
+  title?: InputMaybe<Scalars["String"]["input"]>;
 }
 
 export interface MutationcreatePublicPetitionLinkArgs {
@@ -2057,6 +2127,11 @@ export interface MutationdeleteAzureOpenAiIntegrationArgs {
 export interface MutationdeleteContactsArgs {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   ids: Array<Scalars["GID"]["input"]>;
+}
+
+export interface MutationdeleteDashboardModuleArgs {
+  dashboardId: Scalars["GID"]["input"];
+  moduleId: Scalars["GID"]["input"];
 }
 
 export interface MutationdeleteEventSubscriptionSignatureKeysArgs {
@@ -2693,6 +2768,11 @@ export interface MutationupdateCompaniesHouseCustomPropertiesArgs {
 export interface MutationupdateContactArgs {
   data: UpdateContactInput;
   id: Scalars["GID"]["input"];
+}
+
+export interface MutationupdateDashboardModulePositionsArgs {
+  dashboardId: Scalars["GID"]["input"];
+  moduleIds: Array<Scalars["GID"]["input"]>;
 }
 
 export interface MutationupdateEinformaCustomPropertiesArgs {
@@ -4589,6 +4669,26 @@ export interface PetitionVariableResult {
   value?: Maybe<Scalars["Float"]["output"]>;
 }
 
+export interface PetitionsNumberDashboardModuleSettingsInput {
+  filters: PetitionFilter;
+}
+
+export interface PetitionsPieChartDashboardModuleSettingsInput {
+  graphicType: DashboardPieChartModuleSettingsType;
+  items: Array<PetitionsPieChartDashboardModuleSettingsItemInput>;
+}
+
+export interface PetitionsPieChartDashboardModuleSettingsItemInput {
+  color: Scalars["String"]["input"];
+  filter: PetitionFilter;
+  label: Scalars["String"]["input"];
+}
+
+export interface PetitionsRatioDashboardModuleSettingsInput {
+  filters: Array<PetitionFilter>;
+  graphicType: DashboardRatioModuleSettingsType;
+}
+
 export interface Profile extends Timestamps {
   __typename?: "Profile";
   associatedPetitions: PetitionPagination;
@@ -5247,6 +5347,48 @@ export interface ProfileUpdatedEvent extends ProfileEvent {
   profile?: Maybe<Profile>;
   type: ProfileEventType;
   user?: Maybe<User>;
+}
+
+export type ProfilesModuleResultAggregateType = "AVG" | "MAX" | "MIN" | "SUM";
+
+export type ProfilesModuleResultType = "AGGREGATE" | "COUNT";
+
+export interface ProfilesNumberDashboardModuleSettingsInput {
+  /** Aggregate function. Only for type AGGREGATE */
+  aggregate?: InputMaybe<ProfilesModuleResultAggregateType>;
+  filter: ProfileFilter;
+  /** Field to aggregate on. Only for type AGGREGATE */
+  profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+  type: ProfilesModuleResultType;
+}
+
+export interface ProfilesPieChartDashboardModuleSettingsInput {
+  /** Aggregate function. Only for type AGGREGATE */
+  aggregate?: InputMaybe<ProfilesModuleResultAggregateType>;
+  graphicType: DashboardPieChartModuleSettingsType;
+  items: Array<ProfilesPieChartDashboardModuleSettingsItemInput>;
+  /** Field to aggregate on. Only for type AGGREGATE */
+  profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+  type: ProfilesModuleResultType;
+}
+
+export interface ProfilesPieChartDashboardModuleSettingsItemInput {
+  color: Scalars["String"]["input"];
+  filter: ProfileFilter;
+  label: Scalars["String"]["input"];
+}
+
+export interface ProfilesRatioDashboardModuleSettingsInput {
+  /** Aggregate function. Only for type AGGREGATE */
+  aggregate?: InputMaybe<ProfilesModuleResultAggregateType>;
+  filters: Array<ProfileFilter>;
+  graphicType: DashboardRatioModuleSettingsType;
+  /** Field to aggregate on. Only for type AGGREGATE */
+  profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+  type: ProfilesModuleResultType;
 }
 
 export interface PublicAccessVerification {
@@ -8817,6 +8959,851 @@ export type DashboardTabs_DashboardFragment = {
   isRefreshing: boolean;
   lastRefreshAt?: string | null;
   name: string;
+};
+
+export type DashboardEditDialog_DashboardFragment = {
+  __typename?: "Dashboard";
+  id: string;
+  isRefreshing: boolean;
+  lastRefreshAt?: string | null;
+  name: string;
+  modules: Array<
+    | {
+        __typename?: "DashboardCreatePetitionButtonModule";
+        id: string;
+        title?: string | null;
+        size: DashboardModuleSize;
+        petitionButtonSettings: {
+          __typename?: "DashboardCreatePetitionButtonModuleSettings";
+          label: string;
+          template?: {
+            __typename?: "PetitionBaseMini";
+            id: string;
+            myEffectivePermission?: {
+              __typename?: "EffectivePetitionUserPermission";
+              permissionType: PetitionPermissionType;
+            } | null;
+          } | null;
+        };
+      }
+    | {
+        __typename?: "DashboardPetitionsNumberModule";
+        id: string;
+        title?: string | null;
+        size: DashboardModuleSize;
+        petitionsNumberResult?: {
+          __typename?: "DashboardNumberModuleResult";
+          value: number;
+        } | null;
+      }
+    | {
+        __typename?: "DashboardPetitionsPieChartModule";
+        id: string;
+        title?: string | null;
+        size: DashboardModuleSize;
+        petitionsPieChartResult?: {
+          __typename?: "DashboardPieChartModuleResult";
+          value: Array<number>;
+          isIncongruent: boolean;
+        } | null;
+        petitionsPieChartSettings: {
+          __typename?: "DashboardPetitionsPieChartModuleSettings";
+          graphicType: DashboardPieChartModuleSettingsType;
+          labels: Array<string>;
+          colors: Array<string>;
+        };
+      }
+    | {
+        __typename?: "DashboardPetitionsRatioModule";
+        id: string;
+        title?: string | null;
+        size: DashboardModuleSize;
+        petitionsRatioResult?: {
+          __typename?: "DashboardRatioModuleResult";
+          value: Array<number>;
+          isIncongruent: boolean;
+        } | null;
+        petitionsRatioSettings: {
+          __typename?: "DashboardPetitionsRatioModuleSettings";
+          graphicType: DashboardRatioModuleSettingsType;
+        };
+      }
+    | {
+        __typename?: "DashboardProfilesNumberModule";
+        id: string;
+        title?: string | null;
+        size: DashboardModuleSize;
+        profilesNumberResult?: { __typename?: "DashboardNumberModuleResult"; value: number } | null;
+      }
+    | {
+        __typename?: "DashboardProfilesPieChartModule";
+        id: string;
+        title?: string | null;
+        size: DashboardModuleSize;
+        profilesPieChartResult?: {
+          __typename?: "DashboardPieChartModuleResult";
+          value: Array<number>;
+          isIncongruent: boolean;
+        } | null;
+        profilesPieChartSettings: {
+          __typename?: "DashboardProfilesPieChartModuleSettings";
+          graphicType: DashboardPieChartModuleSettingsType;
+          labels: Array<string>;
+          colors: Array<string>;
+        };
+      }
+    | {
+        __typename?: "DashboardProfilesRatioModule";
+        id: string;
+        title?: string | null;
+        size: DashboardModuleSize;
+        profilesRatioResult?: {
+          __typename?: "DashboardRatioModuleResult";
+          value: Array<number>;
+          isIncongruent: boolean;
+        } | null;
+        profilesRatioSettings: {
+          __typename?: "DashboardProfilesRatioModuleSettings";
+          graphicType: DashboardRatioModuleSettingsType;
+        };
+      }
+  >;
+};
+
+export type DashboardEditDialog_dashboardQueryVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type DashboardEditDialog_dashboardQuery = {
+  dashboard: {
+    __typename?: "Dashboard";
+    id: string;
+    isRefreshing: boolean;
+    lastRefreshAt?: string | null;
+    name: string;
+    modules: Array<
+      | {
+          __typename?: "DashboardCreatePetitionButtonModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+          petitionButtonSettings: {
+            __typename?: "DashboardCreatePetitionButtonModuleSettings";
+            label: string;
+            template?: {
+              __typename?: "PetitionBaseMini";
+              id: string;
+              myEffectivePermission?: {
+                __typename?: "EffectivePetitionUserPermission";
+                permissionType: PetitionPermissionType;
+              } | null;
+            } | null;
+          };
+        }
+      | {
+          __typename?: "DashboardPetitionsNumberModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+          petitionsNumberResult?: {
+            __typename?: "DashboardNumberModuleResult";
+            value: number;
+          } | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsPieChartModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+          petitionsPieChartResult?: {
+            __typename?: "DashboardPieChartModuleResult";
+            value: Array<number>;
+            isIncongruent: boolean;
+          } | null;
+          petitionsPieChartSettings: {
+            __typename?: "DashboardPetitionsPieChartModuleSettings";
+            graphicType: DashboardPieChartModuleSettingsType;
+            labels: Array<string>;
+            colors: Array<string>;
+          };
+        }
+      | {
+          __typename?: "DashboardPetitionsRatioModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+          petitionsRatioResult?: {
+            __typename?: "DashboardRatioModuleResult";
+            value: Array<number>;
+            isIncongruent: boolean;
+          } | null;
+          petitionsRatioSettings: {
+            __typename?: "DashboardPetitionsRatioModuleSettings";
+            graphicType: DashboardRatioModuleSettingsType;
+          };
+        }
+      | {
+          __typename?: "DashboardProfilesNumberModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+          profilesNumberResult?: {
+            __typename?: "DashboardNumberModuleResult";
+            value: number;
+          } | null;
+        }
+      | {
+          __typename?: "DashboardProfilesPieChartModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+          profilesPieChartResult?: {
+            __typename?: "DashboardPieChartModuleResult";
+            value: Array<number>;
+            isIncongruent: boolean;
+          } | null;
+          profilesPieChartSettings: {
+            __typename?: "DashboardProfilesPieChartModuleSettings";
+            graphicType: DashboardPieChartModuleSettingsType;
+            labels: Array<string>;
+            colors: Array<string>;
+          };
+        }
+      | {
+          __typename?: "DashboardProfilesRatioModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+          profilesRatioResult?: {
+            __typename?: "DashboardRatioModuleResult";
+            value: Array<number>;
+            isIncongruent: boolean;
+          } | null;
+          profilesRatioSettings: {
+            __typename?: "DashboardProfilesRatioModuleSettings";
+            graphicType: DashboardRatioModuleSettingsType;
+          };
+        }
+    >;
+  };
+};
+
+export type DashboardEditDialog_petitionListViewsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type DashboardEditDialog_petitionListViewsQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    petitionListViews: Array<{
+      __typename?: "PetitionListView";
+      id: string;
+      name: string;
+      data: {
+        __typename?: "PetitionListViewData";
+        status?: Array<PetitionStatus> | null;
+        signature?: Array<PetitionSignatureStatusFilter> | null;
+        fromTemplateId?: Array<string> | null;
+        path: string;
+        sharedWith?: {
+          __typename?: "PetitionListViewDataSharedWith";
+          operator: FilterSharedWithLogicalOperator;
+          filters: Array<{
+            __typename?: "PetitionListViewDataSharedWithFilters";
+            value: string;
+            operator: FilterSharedWithOperator;
+          }>;
+        } | null;
+        tags?: {
+          __typename?: "PetitionListViewDataTags";
+          operator: PetitionTagFilterLogicalOperator;
+          filters: Array<{
+            __typename?: "PetitionListViewDataTagsFilters";
+            value: Array<string>;
+            operator: PetitionTagFilterLineOperator;
+          }>;
+        } | null;
+      };
+    }>;
+  };
+};
+
+export type DashboardEditDialog_profileListViewsQueryVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type DashboardEditDialog_profileListViewsQuery = {
+  me: {
+    __typename?: "User";
+    profileListViews: Array<{
+      __typename?: "ProfileListView";
+      id: string;
+      name: string;
+      data: {
+        __typename?: "ProfileListViewData";
+        search?: string | null;
+        status?: ProfileStatus | null;
+        values?: { [key: string]: any } | null;
+      };
+    }>;
+  };
+};
+
+export type DashboardEditDialog_profileTypeQueryVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type DashboardEditDialog_profileTypeQuery = {
+  profileType: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    fields: Array<{
+      __typename?: "ProfileTypeField";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      type: ProfileTypeFieldType;
+    }>;
+  };
+};
+
+export type DashboardEditDialog_adminCreateDashboardMutationVariables = Exact<{
+  orgId: Scalars["GID"]["input"];
+  name: Scalars["String"]["input"];
+}>;
+
+export type DashboardEditDialog_adminCreateDashboardMutation = {
+  adminCreateDashboard: {
+    __typename?: "Dashboard";
+    id: string;
+    name: string;
+    modules: Array<
+      | { __typename?: "DashboardCreatePetitionButtonModule"; id: string }
+      | { __typename?: "DashboardPetitionsNumberModule"; id: string }
+      | { __typename?: "DashboardPetitionsPieChartModule"; id: string }
+      | { __typename?: "DashboardPetitionsRatioModule"; id: string }
+      | { __typename?: "DashboardProfilesNumberModule"; id: string }
+      | { __typename?: "DashboardProfilesPieChartModule"; id: string }
+      | { __typename?: "DashboardProfilesRatioModule"; id: string }
+    >;
+  };
+};
+
+export type DashboardEditDialog_createCreatePetitionButtonDashboardModuleMutationVariables = Exact<{
+  dashboardId: Scalars["GID"]["input"];
+  size: DashboardModuleSize;
+  settings: CreatePetitionButtonDashboardModuleSettingsInput;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type DashboardEditDialog_createCreatePetitionButtonDashboardModuleMutation = {
+  createCreatePetitionButtonDashboardModule: {
+    __typename?: "Dashboard";
+    id: string;
+    modules: Array<
+      | {
+          __typename?: "DashboardCreatePetitionButtonModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+        }
+      | {
+          __typename?: "DashboardPetitionsNumberModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+        }
+      | {
+          __typename?: "DashboardPetitionsPieChartModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+        }
+      | {
+          __typename?: "DashboardPetitionsRatioModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+        }
+      | {
+          __typename?: "DashboardProfilesNumberModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+        }
+      | {
+          __typename?: "DashboardProfilesPieChartModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+        }
+      | {
+          __typename?: "DashboardProfilesRatioModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+        }
+    >;
+  };
+};
+
+export type DashboardEditDialog_createPetitionsNumberDashboardModuleMutationVariables = Exact<{
+  dashboardId: Scalars["GID"]["input"];
+  size: DashboardModuleSize;
+  settings: PetitionsNumberDashboardModuleSettingsInput;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type DashboardEditDialog_createPetitionsNumberDashboardModuleMutation = {
+  createPetitionsNumberDashboardModule: {
+    __typename?: "Dashboard";
+    id: string;
+    modules: Array<
+      | {
+          __typename?: "DashboardCreatePetitionButtonModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+        }
+      | {
+          __typename?: "DashboardPetitionsNumberModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+        }
+      | {
+          __typename?: "DashboardPetitionsPieChartModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+        }
+      | {
+          __typename?: "DashboardPetitionsRatioModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+        }
+      | {
+          __typename?: "DashboardProfilesNumberModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+        }
+      | {
+          __typename?: "DashboardProfilesPieChartModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+        }
+      | {
+          __typename?: "DashboardProfilesRatioModule";
+          id: string;
+          title?: string | null;
+          size: DashboardModuleSize;
+        }
+    >;
+  };
+};
+
+export type DashboardEditDialog_createPetitionsRatioDashboardModuleMutationVariables = Exact<{
+  dashboardId: Scalars["GID"]["input"];
+  size: DashboardModuleSize;
+  settings: PetitionsRatioDashboardModuleSettingsInput;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type DashboardEditDialog_createPetitionsRatioDashboardModuleMutation = {
+  createPetitionsRatioDashboardModule: {
+    __typename?: "Dashboard";
+    id: string;
+    modules: Array<
+      | {
+          __typename?: "DashboardCreatePetitionButtonModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsNumberModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsPieChartModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsRatioModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesNumberModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesPieChartModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesRatioModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+    >;
+  };
+};
+
+export type DashboardEditDialog_createPetitionsPieChartDashboardModuleMutationVariables = Exact<{
+  dashboardId: Scalars["GID"]["input"];
+  size: DashboardModuleSize;
+  settings: PetitionsPieChartDashboardModuleSettingsInput;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type DashboardEditDialog_createPetitionsPieChartDashboardModuleMutation = {
+  createPetitionsPieChartDashboardModule: {
+    __typename?: "Dashboard";
+    id: string;
+    modules: Array<
+      | {
+          __typename?: "DashboardCreatePetitionButtonModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsNumberModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsPieChartModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsRatioModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesNumberModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesPieChartModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesRatioModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+    >;
+  };
+};
+
+export type DashboardEditDialog_createProfilesNumberDashboardModuleMutationVariables = Exact<{
+  dashboardId: Scalars["GID"]["input"];
+  size: DashboardModuleSize;
+  settings: ProfilesNumberDashboardModuleSettingsInput;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type DashboardEditDialog_createProfilesNumberDashboardModuleMutation = {
+  createProfilesNumberDashboardModule: {
+    __typename?: "Dashboard";
+    id: string;
+    modules: Array<
+      | {
+          __typename?: "DashboardCreatePetitionButtonModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsNumberModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsPieChartModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsRatioModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesNumberModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesPieChartModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesRatioModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+    >;
+  };
+};
+
+export type DashboardEditDialog_createProfilesPieChartDashboardModuleMutationVariables = Exact<{
+  dashboardId: Scalars["GID"]["input"];
+  size: DashboardModuleSize;
+  settings: ProfilesPieChartDashboardModuleSettingsInput;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type DashboardEditDialog_createProfilesPieChartDashboardModuleMutation = {
+  createProfilesPieChartDashboardModule: {
+    __typename?: "Dashboard";
+    id: string;
+    modules: Array<
+      | {
+          __typename?: "DashboardCreatePetitionButtonModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsNumberModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsPieChartModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsRatioModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesNumberModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesPieChartModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesRatioModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+    >;
+  };
+};
+
+export type DashboardEditDialog_createProfilesRatioDashboardModuleMutationVariables = Exact<{
+  dashboardId: Scalars["GID"]["input"];
+  size: DashboardModuleSize;
+  settings: ProfilesRatioDashboardModuleSettingsInput;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type DashboardEditDialog_createProfilesRatioDashboardModuleMutation = {
+  createProfilesRatioDashboardModule: {
+    __typename?: "Dashboard";
+    id: string;
+    modules: Array<
+      | {
+          __typename?: "DashboardCreatePetitionButtonModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsNumberModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsPieChartModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsRatioModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesNumberModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesPieChartModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesRatioModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+    >;
+  };
+};
+
+export type DashboardEditDialog_deleteDashboardModuleMutationVariables = Exact<{
+  dashboardId: Scalars["GID"]["input"];
+  moduleId: Scalars["GID"]["input"];
+}>;
+
+export type DashboardEditDialog_deleteDashboardModuleMutation = {
+  deleteDashboardModule: {
+    __typename?: "Dashboard";
+    id: string;
+    modules: Array<
+      | {
+          __typename?: "DashboardCreatePetitionButtonModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsNumberModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsPieChartModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsRatioModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesNumberModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesPieChartModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesRatioModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+    >;
+  };
+};
+
+export type DashboardEditDialog_updateDashboardModulePositionsMutationVariables = Exact<{
+  dashboardId: Scalars["GID"]["input"];
+  moduleIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type DashboardEditDialog_updateDashboardModulePositionsMutation = {
+  updateDashboardModulePositions: {
+    __typename?: "Dashboard";
+    id: string;
+    modules: Array<
+      | {
+          __typename?: "DashboardCreatePetitionButtonModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsNumberModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsPieChartModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardPetitionsRatioModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesNumberModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesPieChartModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+      | {
+          __typename?: "DashboardProfilesRatioModule";
+          id: string;
+          size: DashboardModuleSize;
+          title?: string | null;
+        }
+    >;
+  };
 };
 
 export type DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragment = {
@@ -35288,6 +36275,7 @@ export type Home_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -60958,6 +61946,21 @@ export const DashboardModule_DashboardModuleFragmentDoc = gql`
   ${DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragmentDoc}
   ${DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragmentDoc}
 ` as unknown as DocumentNode<DashboardModule_DashboardModuleFragment, unknown>;
+export const DashboardEditDialog_DashboardFragmentDoc = gql`
+  fragment DashboardEditDialog_Dashboard on Dashboard {
+    id
+    isRefreshing
+    lastRefreshAt
+    name
+    modules {
+      id
+      title
+      size
+      ...DashboardModule_DashboardModule
+    }
+  }
+  ${DashboardModule_DashboardModuleFragmentDoc}
+` as unknown as DocumentNode<DashboardEditDialog_DashboardFragment, unknown>;
 export const UserSettingsLayout_QueryFragmentDoc = gql`
   fragment UserSettingsLayout_Query on Query {
     ...SidebarLayout_Query
@@ -70783,6 +71786,308 @@ export const ImportContactsDialog_bulkCreateContactsDocument = gql`
   ImportContactsDialog_bulkCreateContactsMutation,
   ImportContactsDialog_bulkCreateContactsMutationVariables
 >;
+export const DashboardEditDialog_dashboardDocument = gql`
+  query DashboardEditDialog_dashboard($id: GID!) {
+    dashboard(id: $id) {
+      id
+      ...DashboardEditDialog_Dashboard
+    }
+  }
+  ${DashboardEditDialog_DashboardFragmentDoc}
+` as unknown as DocumentNode<
+  DashboardEditDialog_dashboardQuery,
+  DashboardEditDialog_dashboardQueryVariables
+>;
+export const DashboardEditDialog_petitionListViewsDocument = gql`
+  query DashboardEditDialog_petitionListViews {
+    me {
+      id
+      petitionListViews {
+        id
+        name
+        data {
+          status
+          sharedWith {
+            operator
+            filters {
+              value
+              operator
+            }
+          }
+          tags: tagsFilters {
+            operator
+            filters {
+              value
+              operator
+            }
+          }
+          signature
+          fromTemplateId
+          path
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DashboardEditDialog_petitionListViewsQuery,
+  DashboardEditDialog_petitionListViewsQueryVariables
+>;
+export const DashboardEditDialog_profileListViewsDocument = gql`
+  query DashboardEditDialog_profileListViews($profileTypeId: GID!) {
+    me {
+      profileListViews(profileTypeId: $profileTypeId) {
+        id
+        name
+        data {
+          search
+          status
+          values
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DashboardEditDialog_profileListViewsQuery,
+  DashboardEditDialog_profileListViewsQueryVariables
+>;
+export const DashboardEditDialog_profileTypeDocument = gql`
+  query DashboardEditDialog_profileType($profileTypeId: GID!) {
+    profileType(profileTypeId: $profileTypeId) {
+      id
+      name
+      fields {
+        id
+        ...ProfileTypeFieldSelect_ProfileTypeField
+      }
+    }
+  }
+  ${ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<
+  DashboardEditDialog_profileTypeQuery,
+  DashboardEditDialog_profileTypeQueryVariables
+>;
+export const DashboardEditDialog_adminCreateDashboardDocument = gql`
+  mutation DashboardEditDialog_adminCreateDashboard($orgId: GID!, $name: String!) {
+    adminCreateDashboard(orgId: $orgId, name: $name) {
+      id
+      name
+      modules {
+        id
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DashboardEditDialog_adminCreateDashboardMutation,
+  DashboardEditDialog_adminCreateDashboardMutationVariables
+>;
+export const DashboardEditDialog_createCreatePetitionButtonDashboardModuleDocument = gql`
+  mutation DashboardEditDialog_createCreatePetitionButtonDashboardModule(
+    $dashboardId: GID!
+    $size: DashboardModuleSize!
+    $settings: CreatePetitionButtonDashboardModuleSettingsInput!
+    $title: String
+  ) {
+    createCreatePetitionButtonDashboardModule(
+      dashboardId: $dashboardId
+      size: $size
+      settings: $settings
+      title: $title
+    ) {
+      id
+      modules {
+        id
+        title
+        size
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DashboardEditDialog_createCreatePetitionButtonDashboardModuleMutation,
+  DashboardEditDialog_createCreatePetitionButtonDashboardModuleMutationVariables
+>;
+export const DashboardEditDialog_createPetitionsNumberDashboardModuleDocument = gql`
+  mutation DashboardEditDialog_createPetitionsNumberDashboardModule(
+    $dashboardId: GID!
+    $size: DashboardModuleSize!
+    $settings: PetitionsNumberDashboardModuleSettingsInput!
+    $title: String
+  ) {
+    createPetitionsNumberDashboardModule(
+      dashboardId: $dashboardId
+      size: $size
+      settings: $settings
+      title: $title
+    ) {
+      id
+      modules {
+        id
+        title
+        size
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DashboardEditDialog_createPetitionsNumberDashboardModuleMutation,
+  DashboardEditDialog_createPetitionsNumberDashboardModuleMutationVariables
+>;
+export const DashboardEditDialog_createPetitionsRatioDashboardModuleDocument = gql`
+  mutation DashboardEditDialog_createPetitionsRatioDashboardModule(
+    $dashboardId: GID!
+    $size: DashboardModuleSize!
+    $settings: PetitionsRatioDashboardModuleSettingsInput!
+    $title: String
+  ) {
+    createPetitionsRatioDashboardModule(
+      dashboardId: $dashboardId
+      size: $size
+      settings: $settings
+      title: $title
+    ) {
+      id
+      modules {
+        id
+        size
+        title
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DashboardEditDialog_createPetitionsRatioDashboardModuleMutation,
+  DashboardEditDialog_createPetitionsRatioDashboardModuleMutationVariables
+>;
+export const DashboardEditDialog_createPetitionsPieChartDashboardModuleDocument = gql`
+  mutation DashboardEditDialog_createPetitionsPieChartDashboardModule(
+    $dashboardId: GID!
+    $size: DashboardModuleSize!
+    $settings: PetitionsPieChartDashboardModuleSettingsInput!
+    $title: String
+  ) {
+    createPetitionsPieChartDashboardModule(
+      dashboardId: $dashboardId
+      size: $size
+      settings: $settings
+      title: $title
+    ) {
+      id
+      modules {
+        id
+        size
+        title
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DashboardEditDialog_createPetitionsPieChartDashboardModuleMutation,
+  DashboardEditDialog_createPetitionsPieChartDashboardModuleMutationVariables
+>;
+export const DashboardEditDialog_createProfilesNumberDashboardModuleDocument = gql`
+  mutation DashboardEditDialog_createProfilesNumberDashboardModule(
+    $dashboardId: GID!
+    $size: DashboardModuleSize!
+    $settings: ProfilesNumberDashboardModuleSettingsInput!
+    $title: String
+  ) {
+    createProfilesNumberDashboardModule(
+      dashboardId: $dashboardId
+      size: $size
+      settings: $settings
+      title: $title
+    ) {
+      id
+      modules {
+        id
+        size
+        title
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DashboardEditDialog_createProfilesNumberDashboardModuleMutation,
+  DashboardEditDialog_createProfilesNumberDashboardModuleMutationVariables
+>;
+export const DashboardEditDialog_createProfilesPieChartDashboardModuleDocument = gql`
+  mutation DashboardEditDialog_createProfilesPieChartDashboardModule(
+    $dashboardId: GID!
+    $size: DashboardModuleSize!
+    $settings: ProfilesPieChartDashboardModuleSettingsInput!
+    $title: String
+  ) {
+    createProfilesPieChartDashboardModule(
+      dashboardId: $dashboardId
+      size: $size
+      settings: $settings
+      title: $title
+    ) {
+      id
+      modules {
+        id
+        size
+        title
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DashboardEditDialog_createProfilesPieChartDashboardModuleMutation,
+  DashboardEditDialog_createProfilesPieChartDashboardModuleMutationVariables
+>;
+export const DashboardEditDialog_createProfilesRatioDashboardModuleDocument = gql`
+  mutation DashboardEditDialog_createProfilesRatioDashboardModule(
+    $dashboardId: GID!
+    $size: DashboardModuleSize!
+    $settings: ProfilesRatioDashboardModuleSettingsInput!
+    $title: String
+  ) {
+    createProfilesRatioDashboardModule(
+      dashboardId: $dashboardId
+      size: $size
+      settings: $settings
+      title: $title
+    ) {
+      id
+      modules {
+        id
+        size
+        title
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DashboardEditDialog_createProfilesRatioDashboardModuleMutation,
+  DashboardEditDialog_createProfilesRatioDashboardModuleMutationVariables
+>;
+export const DashboardEditDialog_deleteDashboardModuleDocument = gql`
+  mutation DashboardEditDialog_deleteDashboardModule($dashboardId: GID!, $moduleId: GID!) {
+    deleteDashboardModule(dashboardId: $dashboardId, moduleId: $moduleId) {
+      id
+      modules {
+        id
+        size
+        title
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DashboardEditDialog_deleteDashboardModuleMutation,
+  DashboardEditDialog_deleteDashboardModuleMutationVariables
+>;
+export const DashboardEditDialog_updateDashboardModulePositionsDocument = gql`
+  mutation DashboardEditDialog_updateDashboardModulePositions(
+    $dashboardId: GID!
+    $moduleIds: [GID!]!
+  ) {
+    updateDashboardModulePositions(dashboardId: $dashboardId, moduleIds: $moduleIds) {
+      id
+      modules {
+        id
+        size
+        title
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DashboardEditDialog_updateDashboardModulePositionsMutation,
+  DashboardEditDialog_updateDashboardModulePositionsMutationVariables
+>;
 export const PetitionHeader_reopenPetitionDocument = gql`
   mutation PetitionHeader_reopenPetition($petitionId: GID!) {
     reopenPetition(petitionId: $petitionId) {
@@ -74290,6 +75595,13 @@ export const Home_userDocument = gql`
     ...AppLayout_Query
     me {
       ...Home_User
+      organization {
+        id
+      }
+    }
+    realMe {
+      id
+      isSuperAdmin
     }
   }
   ${AppLayout_QueryFragmentDoc}

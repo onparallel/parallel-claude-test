@@ -82,7 +82,7 @@ import {
 import { SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 
-interface ProfileFilter {
+export interface ProfileFilter {
   profileId?: number[] | null;
   profileTypeId?: number[] | null;
   status?: ProfileStatus[] | null;

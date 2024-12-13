@@ -69,5 +69,6 @@ export * from "./profile/mutations";
 export * from "./profile/queries";
 export * from "./profile/types";
 
+export * from "./dashboard/mutations";
 export * from "./dashboard/queries";
 export * from "./dashboard/types";

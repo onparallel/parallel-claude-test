@@ -418,6 +418,11 @@ input CreateContactInput {
   lastName: String
 }
 
+input CreatePetitionButtonDashboardModuleSettingsInput {
+  buttonLabel: String!
+  templateId: GID!
+}
+
 input CreatePetitionFieldInput {
   isInternal: Boolean
   multiple: Boolean
@@ -1125,6 +1130,11 @@ type Mutation {
   addUsersToUserGroup(userGroupId: GID!, userIds: [GID!]!): UserGroup!
 
   """
+  Creates a new dashboard in the organization
+  """
+  adminCreateDashboard(name: String!, orgId: GID!): Dashboard!
+
+  """
   Anonymizes a petition
   """
   anonymizePetition(petitionId: GID!): SupportMethodResponse!
@@ -1399,6 +1409,12 @@ type Mutation {
     petitionId: GID!
     remindersConfig: RemindersConfigInput
   ): PetitionAccess!
+  createCreatePetitionButtonDashboardModule(
+    dashboardId: GID!
+    settings: CreatePetitionButtonDashboardModuleSettingsInput!
+    size: DashboardModuleSize!
+    title: String
+  ): Dashboard!
   createCustomSignatureDocumentUploadLink(file: FileUploadInput!, petitionId: GID!): JSONObject!
 
   """
@@ -1716,6 +1732,24 @@ type Mutation {
   Creates a new variable on the petition.
   """
   createPetitionVariable(data: CreatePetitionVariableInput!, petitionId: GID!): Petition!
+  createPetitionsNumberDashboardModule(
+    dashboardId: GID!
+    settings: PetitionsNumberDashboardModuleSettingsInput!
+    size: DashboardModuleSize!
+    title: String
+  ): Dashboard!
+  createPetitionsPieChartDashboardModule(
+    dashboardId: GID!
+    settings: PetitionsPieChartDashboardModuleSettingsInput!
+    size: DashboardModuleSize!
+    title: String
+  ): Dashboard!
+  createPetitionsRatioDashboardModule(
+    dashboardId: GID!
+    settings: PetitionsRatioDashboardModuleSettingsInput!
+    size: DashboardModuleSize!
+    title: String
+  ): Dashboard!
 
   """
   Creates a task for printing a PDF of the petition and sends it to the queue
@@ -1791,6 +1825,24 @@ type Mutation {
   Creates a task for importing profiles from an excel file
   """
   createProfilesExcelImportTask(file: Upload!, profileTypeId: GID!): Task!
+  createProfilesNumberDashboardModule(
+    dashboardId: GID!
+    settings: ProfilesNumberDashboardModuleSettingsInput!
+    size: DashboardModuleSize!
+    title: String
+  ): Dashboard!
+  createProfilesPieChartDashboardModule(
+    dashboardId: GID!
+    settings: ProfilesPieChartDashboardModuleSettingsInput!
+    size: DashboardModuleSize!
+    title: String
+  ): Dashboard!
+  createProfilesRatioDashboardModule(
+    dashboardId: GID!
+    settings: ProfilesRatioDashboardModuleSettingsInput!
+    size: DashboardModuleSize!
+    title: String
+  ): Dashboard!
 
   """
   Creates a public link from a user's template
@@ -1906,6 +1958,7 @@ type Mutation {
     force: Boolean
     ids: [GID!]!
   ): Result!
+  deleteDashboardModule(dashboardId: GID!, moduleId: GID!): Dashboard!
 
   """
   Removes the DOW JONES integration of the user's organization
@@ -2770,6 +2823,7 @@ type Mutation {
   Updates a contact.
   """
   updateContact(data: UpdateContactInput!, id: GID!): Contact!
+  updateDashboardModulePositions(dashboardId: GID!, moduleIds: [GID!]!): Dashboard!
   updateEinformaCustomProperties(
     """
     {[profileTypeId: number]: {[profileTypeFieldId: number]: string }} @form:type=textarea
@@ -5729,6 +5783,26 @@ type PetitionVariableResult {
   value: Float
 }
 
+input PetitionsNumberDashboardModuleSettingsInput {
+  filters: PetitionFilter!
+}
+
+input PetitionsPieChartDashboardModuleSettingsInput {
+  graphicType: DashboardPieChartModuleSettingsType!
+  items: [PetitionsPieChartDashboardModuleSettingsItemInput!]!
+}
+
+input PetitionsPieChartDashboardModuleSettingsItemInput {
+  color: String!
+  filter: PetitionFilter!
+  label: String!
+}
+
+input PetitionsRatioDashboardModuleSettingsInput {
+  filters: [PetitionFilter!]!
+  graphicType: DashboardRatioModuleSettingsType!
+}
+
 type Profile implements Timestamps {
   associatedPetitions(
     filters: ProfileAssociatedPetitionFilter
@@ -6460,6 +6534,71 @@ type ProfileUpdatedEvent implements ProfileEvent {
   profile: Profile
   type: ProfileEventType!
   user: User
+}
+
+enum ProfilesModuleResultAggregateType {
+  AVG
+  MAX
+  MIN
+  SUM
+}
+
+enum ProfilesModuleResultType {
+  AGGREGATE
+  COUNT
+}
+
+input ProfilesNumberDashboardModuleSettingsInput {
+  """
+  Aggregate function. Only for type AGGREGATE
+  """
+  aggregate: ProfilesModuleResultAggregateType
+  filter: ProfileFilter!
+
+  """
+  Field to aggregate on. Only for type AGGREGATE
+  """
+  profileTypeFieldId: GID
+  profileTypeId: GID!
+  type: ProfilesModuleResultType!
+}
+
+input ProfilesPieChartDashboardModuleSettingsInput {
+  """
+  Aggregate function. Only for type AGGREGATE
+  """
+  aggregate: ProfilesModuleResultAggregateType
+  graphicType: DashboardPieChartModuleSettingsType!
+  items: [ProfilesPieChartDashboardModuleSettingsItemInput!]!
+
+  """
+  Field to aggregate on. Only for type AGGREGATE
+  """
+  profileTypeFieldId: GID
+  profileTypeId: GID!
+  type: ProfilesModuleResultType!
+}
+
+input ProfilesPieChartDashboardModuleSettingsItemInput {
+  color: String!
+  filter: ProfileFilter!
+  label: String!
+}
+
+input ProfilesRatioDashboardModuleSettingsInput {
+  """
+  Aggregate function. Only for type AGGREGATE
+  """
+  aggregate: ProfilesModuleResultAggregateType
+  filters: [ProfileFilter!]!
+  graphicType: DashboardRatioModuleSettingsType!
+
+  """
+  Field to aggregate on. Only for type AGGREGATE
+  """
+  profileTypeFieldId: GID
+  profileTypeId: GID!
+  type: ProfilesModuleResultType!
 }
 
 type PublicAccessVerification {

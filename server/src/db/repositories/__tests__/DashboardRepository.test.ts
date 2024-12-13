@@ -3,6 +3,7 @@ import { Container } from "inversify";
 import { Knex } from "knex";
 import { range } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
+import { toGlobalId } from "../../../util/globalId";
 import { deleteAllData } from "../../../util/knexUtils";
 import {
   ContactLocale,
@@ -18,7 +19,8 @@ import {
   UserGroup,
 } from "../../__types";
 import { KNEX } from "../../knex";
-import { DashboardRepository, ModuleSettings, PetitionsFilter } from "../DashboardRepository";
+import { DashboardRepository, ModuleSettings } from "../DashboardRepository";
+import { PetitionFilter } from "../PetitionRepository";
 import { Mocks } from "./mocks";
 
 describe("DashboardRepository", () => {
@@ -57,7 +59,7 @@ describe("DashboardRepository", () => {
     let tags: Tag[];
     let userGroups: UserGroup[];
 
-    async function count(filters: PetitionsFilter) {
+    async function count(filters: PetitionFilter) {
       return await dashboards.getPetitionsNumberValue(organization.id, { filters });
     }
 
@@ -141,8 +143,8 @@ describe("DashboardRepository", () => {
           tags: {
             operator: "AND",
             filters: [
-              { operator: "CONTAINS", ids: [tags[0].id, tags[2].id] },
-              { operator: "DOES_NOT_CONTAIN", ids: [tags[1].id] },
+              { operator: "CONTAINS", value: [tags[0].id, tags[2].id] },
+              { operator: "DOES_NOT_CONTAIN", value: [tags[1].id] },
             ],
           },
         }),
@@ -153,8 +155,8 @@ describe("DashboardRepository", () => {
           tags: {
             operator: "OR",
             filters: [
-              { operator: "CONTAINS", ids: [tags[2].id] },
-              { operator: "IS_EMPTY", ids: [] },
+              { operator: "CONTAINS", value: [tags[2].id] },
+              { operator: "IS_EMPTY", value: [] },
             ],
           },
         }),
@@ -166,7 +168,7 @@ describe("DashboardRepository", () => {
         await count({
           tags: {
             operator: "AND",
-            filters: [{ operator: "IS_EMPTY", ids: [] }],
+            filters: [{ operator: "IS_EMPTY", value: [] }],
           },
         }),
       ).toEqual({ value: 5 });
@@ -180,13 +182,11 @@ describe("DashboardRepository", () => {
             filters: [
               {
                 operator: "SHARED_WITH",
-                type: "User",
-                id: users[0].id,
+                value: toGlobalId("User", users[0].id),
               },
               {
                 operator: "NOT_IS_OWNER",
-                type: "User",
-                id: users[0].id,
+                value: toGlobalId("User", users[0].id),
               },
             ],
           },
@@ -202,8 +202,7 @@ describe("DashboardRepository", () => {
             filters: [
               {
                 operator: "NOT_SHARED_WITH",
-                type: "User",
-                id: users[0].id,
+                value: toGlobalId("User", users[0].id),
               },
             ],
           },
@@ -219,13 +218,11 @@ describe("DashboardRepository", () => {
             filters: [
               {
                 operator: "SHARED_WITH",
-                type: "UserGroup",
-                id: userGroups[0].id,
+                value: toGlobalId("UserGroup", userGroups[0].id),
               },
               {
                 operator: "NOT_IS_OWNER",
-                type: "User",
-                id: users[0].id,
+                value: toGlobalId("User", users[0].id),
               },
             ],
           },
@@ -241,8 +238,7 @@ describe("DashboardRepository", () => {
             filters: [
               {
                 operator: "IS_OWNER",
-                type: "User",
-                id: users[0].id,
+                value: toGlobalId("User", users[0].id),
               },
             ],
           },
@@ -263,7 +259,7 @@ describe("DashboardRepository", () => {
           fromTemplateId: [templates[0].id],
           tags: {
             operator: "AND",
-            filters: [{ operator: "IS_EMPTY", ids: [] }],
+            filters: [{ operator: "IS_EMPTY", value: [] }],
           },
         }),
       ).toEqual({ value: 1 });

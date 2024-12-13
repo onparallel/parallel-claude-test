@@ -380,6 +380,11 @@ export type CreateContactInput = {
   lastName?: InputMaybe<Scalars["String"]["input"]>;
 };
 
+export type CreatePetitionButtonDashboardModuleSettingsInput = {
+  buttonLabel: Scalars["String"]["input"];
+  templateId: Scalars["GID"]["input"];
+};
+
 export type CreatePetitionFieldInput = {
   isInternal?: InputMaybe<Scalars["Boolean"]["input"]>;
   multiple?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -1029,6 +1034,7 @@ export type Mutation = {
   createContact: Contact;
   /** Creates a contactless petition access */
   createContactlessPetitionAccess: PetitionAccess;
+  createCreatePetitionButtonDashboardModule: Dashboard;
   createCustomSignatureDocumentUploadLink: Scalars["JSONObject"]["output"];
   /** Creates a new Dow Jones KYC integration on the user's organization */
   createDowJonesKycIntegration: OrgIntegration;
@@ -1090,6 +1096,9 @@ export type Mutation = {
   createPetitionSummaryTask: Task;
   /** Creates a new variable on the petition. */
   createPetitionVariable: Petition;
+  createPetitionsNumberDashboardModule: Dashboard;
+  createPetitionsPieChartDashboardModule: Dashboard;
+  createPetitionsRatioDashboardModule: Dashboard;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
   createPrintPdfTask: Task;
   createProfile: Profile;
@@ -1108,6 +1117,9 @@ export type Mutation = {
   createProfileTypeProcess: ProfileTypeProcess;
   /** Creates a task for importing profiles from an excel file */
   createProfilesExcelImportTask: Task;
+  createProfilesNumberDashboardModule: Dashboard;
+  createProfilesPieChartDashboardModule: Dashboard;
+  createProfilesRatioDashboardModule: Dashboard;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
   /** Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition. */
@@ -1653,6 +1665,13 @@ export type MutationcreateContactlessPetitionAccessArgs = {
   remindersConfig?: InputMaybe<RemindersConfigInput>;
 };
 
+export type MutationcreateCreatePetitionButtonDashboardModuleArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  settings: CreatePetitionButtonDashboardModuleSettingsInput;
+  size: DashboardModuleSize;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type MutationcreateCustomSignatureDocumentUploadLinkArgs = {
   file: FileUploadInput;
   petitionId: Scalars["GID"]["input"];
@@ -1832,6 +1851,27 @@ export type MutationcreatePetitionVariableArgs = {
   petitionId: Scalars["GID"]["input"];
 };
 
+export type MutationcreatePetitionsNumberDashboardModuleArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  settings: PetitionsNumberDashboardModuleSettingsInput;
+  size: DashboardModuleSize;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type MutationcreatePetitionsPieChartDashboardModuleArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  settings: PetitionsPieChartDashboardModuleSettingsInput;
+  size: DashboardModuleSize;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type MutationcreatePetitionsRatioDashboardModuleArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  settings: PetitionsRatioDashboardModuleSettingsInput;
+  size: DashboardModuleSize;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type MutationcreatePrintPdfTaskArgs = {
   includeNdLinks?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionId: Scalars["GID"]["input"];
@@ -1897,6 +1937,27 @@ export type MutationcreateProfileTypeProcessArgs = {
 export type MutationcreateProfilesExcelImportTaskArgs = {
   file: Scalars["Upload"]["input"];
   profileTypeId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateProfilesNumberDashboardModuleArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  settings: ProfilesNumberDashboardModuleSettingsInput;
+  size: DashboardModuleSize;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type MutationcreateProfilesPieChartDashboardModuleArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  settings: ProfilesPieChartDashboardModuleSettingsInput;
+  size: DashboardModuleSize;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type MutationcreateProfilesRatioDashboardModuleArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  settings: ProfilesRatioDashboardModuleSettingsInput;
+  size: DashboardModuleSize;
+  title?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationcreatePublicPetitionLinkArgs = {
@@ -4440,6 +4501,26 @@ export type PetitionVariableResult = {
   value: Maybe<Scalars["Float"]["output"]>;
 };
 
+export type PetitionsNumberDashboardModuleSettingsInput = {
+  filters: PetitionFilter;
+};
+
+export type PetitionsPieChartDashboardModuleSettingsInput = {
+  graphicType: DashboardPieChartModuleSettingsType;
+  items: Array<PetitionsPieChartDashboardModuleSettingsItemInput>;
+};
+
+export type PetitionsPieChartDashboardModuleSettingsItemInput = {
+  color: Scalars["String"]["input"];
+  filter: PetitionFilter;
+  label: Scalars["String"]["input"];
+};
+
+export type PetitionsRatioDashboardModuleSettingsInput = {
+  filters: Array<PetitionFilter>;
+  graphicType: DashboardRatioModuleSettingsType;
+};
+
 export type Profile = Timestamps & {
   associatedPetitions: PetitionPagination;
   /** Time when the resource was created. */
@@ -5054,6 +5135,48 @@ export type ProfileUpdatedEvent = ProfileEvent & {
   profile: Maybe<Profile>;
   type: ProfileEventType;
   user: Maybe<User>;
+};
+
+export type ProfilesModuleResultAggregateType = "AVG" | "MAX" | "MIN" | "SUM";
+
+export type ProfilesModuleResultType = "AGGREGATE" | "COUNT";
+
+export type ProfilesNumberDashboardModuleSettingsInput = {
+  /** Aggregate function. Only for type AGGREGATE */
+  aggregate?: InputMaybe<ProfilesModuleResultAggregateType>;
+  filter: ProfileFilter;
+  /** Field to aggregate on. Only for type AGGREGATE */
+  profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+  type: ProfilesModuleResultType;
+};
+
+export type ProfilesPieChartDashboardModuleSettingsInput = {
+  /** Aggregate function. Only for type AGGREGATE */
+  aggregate?: InputMaybe<ProfilesModuleResultAggregateType>;
+  graphicType: DashboardPieChartModuleSettingsType;
+  items: Array<ProfilesPieChartDashboardModuleSettingsItemInput>;
+  /** Field to aggregate on. Only for type AGGREGATE */
+  profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+  type: ProfilesModuleResultType;
+};
+
+export type ProfilesPieChartDashboardModuleSettingsItemInput = {
+  color: Scalars["String"]["input"];
+  filter: ProfileFilter;
+  label: Scalars["String"]["input"];
+};
+
+export type ProfilesRatioDashboardModuleSettingsInput = {
+  /** Aggregate function. Only for type AGGREGATE */
+  aggregate?: InputMaybe<ProfilesModuleResultAggregateType>;
+  filters: Array<ProfileFilter>;
+  graphicType: DashboardRatioModuleSettingsType;
+  /** Field to aggregate on. Only for type AGGREGATE */
+  profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+  type: ProfilesModuleResultType;
 };
 
 export type PublicAccessVerification = {

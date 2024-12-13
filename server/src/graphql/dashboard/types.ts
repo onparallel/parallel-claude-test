@@ -16,16 +16,18 @@ export const Dashboard = objectType({
   },
 });
 
+export const DashboardModuleSize = enumType({
+  name: "DashboardModuleSize",
+  members: DashboardModuleSizeValues,
+});
+
 export const DashboardModule = interfaceType({
   name: "DashboardModule",
   definition(t) {
     t.nonNull.globalId("id");
     t.nullable.string("title");
     t.nonNull.field("size", {
-      type: enumType({
-        name: "DashboardModuleSize",
-        members: DashboardModuleSizeValues,
-      }),
+      type: "DashboardModuleSize",
       resolve: (o) => o.size,
     });
   },
@@ -205,4 +207,14 @@ export const DashboardCreatePetitionButtonModule = objectType({
       }),
     });
   },
+});
+
+export const ProfilesModuleResultType = enumType({
+  name: "ProfilesModuleResultType",
+  members: ["COUNT", "AGGREGATE"],
+});
+
+export const ProfilesModuleResultAggregateType = enumType({
+  name: "ProfilesModuleResultAggregateType",
+  members: ["SUM", "AVG", "MAX", "MIN"],
 });

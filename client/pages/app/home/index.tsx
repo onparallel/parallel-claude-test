@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Grid, Heading, HStack, Spinner, Stack, Text } from "@chakra-ui/react";
+import { Grid, Heading, HStack, IconButton, Spinner, Stack, Text } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
-import { HomeIcon } from "@parallel/chakra/icons";
+import { EditIcon, HomeIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import {
@@ -12,6 +12,7 @@ import {
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { DashboardModule } from "@parallel/components/dashboard/DashboardModule";
 import { DashboardTabs } from "@parallel/components/dashboard/DashboardTabs";
+import { useDashboardEditDialog } from "@parallel/components/dashboard/dialogs/DashboardEditDialog";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { Home_dashboardDocument, Home_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
@@ -45,7 +46,7 @@ function Home() {
   const [state, setQueryState] = useQueryState(QUERY_STATE);
 
   const { data: queryObject } = useAssertQuery(Home_userDocument);
-  const { me } = queryObject;
+  const { me, realMe } = queryObject;
 
   const selectedDasboardId = state.dashboard || me.dashboards[0]?.id;
 
@@ -77,6 +78,16 @@ function Home() {
       stopPolling();
     };
   }, [dashboard?.isRefreshing, startPolling, stopPolling, refetch, isPageVisible]);
+
+  const showDashboardEditDialog = useDashboardEditDialog();
+  const handleEditDashboard = async () => {
+    try {
+      await showDashboardEditDialog({
+        orgId: me.organization.id,
+        dashboardId: selectedDasboardId,
+      });
+    } catch {}
+  };
 
   return (
     <AppLayout
@@ -123,6 +134,9 @@ function Home() {
                     }}
                   />
                 </Text>
+                {realMe?.isSuperAdmin ? (
+                  <IconButton aria-label="" icon={<EditIcon />} onClick={handleEditDashboard} />
+                ) : null}
               </HStack>
             ) : null}
           </HStack>
@@ -173,6 +187,13 @@ const _queries = [
       ...AppLayout_Query
       me {
         ...Home_User
+        organization {
+          id
+        }
+      }
+      realMe {
+        id
+        isSuperAdmin
       }
     }
     ${AppLayout.fragments.Query}

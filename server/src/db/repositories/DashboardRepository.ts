@@ -1,24 +1,27 @@
 import { inject } from "inversify";
 import { Knex } from "knex";
-import { indexBy, isNonNullish, isNullish, sumBy } from "remeda";
+import { indexBy, isNonNullish, isNullish, sumBy, unique } from "remeda";
 import { assert } from "ts-essentials";
+import { fromGlobalId } from "../../util/globalId";
 import { never } from "../../util/never";
 import {
   ProfileFieldValuesFilter,
   ProfileFieldValuesFilterOperator,
 } from "../../util/ProfileFieldValuesFilter";
+import { Replace } from "../../util/types";
 import {
-  ContactLocale,
+  CreateDashboard,
+  CreateDashboardModule,
   Dashboard,
   DashboardModule,
   DashboardModuleType,
-  PetitionStatus,
-  ProfileStatus,
   ProfileTypeField,
   ProfileTypeFieldType,
 } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
+import { PetitionFilter } from "./PetitionRepository";
+import { ProfileFilter } from "./ProfileRepository";
 
 type ModuleResultType =
   | {
@@ -35,65 +38,30 @@ export type ModuleSettings<TType extends DashboardModuleType> = {
     label: string;
     template_id: number;
   };
-  PETITIONS_NUMBER: { filters: PetitionsFilter };
+  PETITIONS_NUMBER: { filters: PetitionFilter };
   PETITIONS_RATIO: {
     graphicType: "RATIO" | "PERCENTAGE";
-    filters: [PetitionsFilter, PetitionsFilter];
+    filters: [PetitionFilter, PetitionFilter];
   };
   PETITIONS_PIE_CHART: {
     graphicType: "DOUGHNUT" | "PIE";
-    items: { label: string; color: string; filter: PetitionsFilter }[];
+    items: { label: string; color: string; filter: PetitionFilter }[];
   };
   PROFILES_NUMBER: {
     profileTypeId: number;
-    filters: ProfilesFilter;
+    filters: ProfileFilter;
   } & ModuleResultType;
   PROFILES_RATIO: {
     graphicType: "RATIO" | "PERCENTAGE";
     profileTypeId: number;
-    filters: [ProfilesFilter, ProfilesFilter];
+    filters: [ProfileFilter, ProfileFilter];
   } & ModuleResultType;
   PROFILES_PIE_CHART: {
     graphicType: "DOUGHNUT" | "PIE";
     profileTypeId: number;
-    items: { label: string; color: string; filter: ProfilesFilter }[];
+    items: { label: string; color: string; filter: ProfileFilter }[];
   } & ModuleResultType;
 }[TType];
-
-export interface PetitionsFilter {
-  path?: string | null;
-  status?: PetitionStatus[] | null;
-  locale?: ContactLocale | null;
-  signature?: (
-    | "NO_SIGNATURE"
-    | "NOT_STARTED"
-    | "PENDING_START"
-    | "PROCESSING"
-    | "COMPLETED"
-    | "CANCELLED"
-  )[];
-  tags?: {
-    operator: "AND" | "OR";
-    filters: {
-      ids: number[];
-      operator: "CONTAINS" | "DOES_NOT_CONTAIN" | "IS_EMPTY";
-    }[];
-  };
-  sharedWith?: {
-    operator: "AND" | "OR";
-    filters: {
-      type: "User" | "UserGroup";
-      id: number;
-      operator: "SHARED_WITH" | "NOT_SHARED_WITH" | "IS_OWNER" | "NOT_IS_OWNER";
-    }[];
-  };
-  fromTemplateId?: number[] | null;
-}
-
-export interface ProfilesFilter {
-  status?: ProfileStatus[] | null;
-  values?: ProfileFieldValuesFilter | null;
-}
 
 export class DashboardRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex) {
@@ -113,6 +81,27 @@ export class DashboardRepository extends BaseRepository {
     "dashboard_id",
     (q) => q.whereNull("deleted_at").orderBy("position", "asc"),
   );
+
+  public readonly loadDashboardModule = this.buildLoadBy("dashboard_module", "id", (q) =>
+    q.whereNull("deleted_at"),
+  );
+
+  async createDashboard(data: Omit<CreateDashboard, "position">, createdBy: string) {
+    const orgDashboards = await this.loadDashboardsByOrgId.raw(data.org_id);
+    const lastDashboard = orgDashboards.at(-1);
+
+    const [dashboard] = await this.from("dashboard").insert(
+      {
+        ...data,
+        position: lastDashboard ? lastDashboard.position + 1 : 0,
+        created_at: this.now(),
+        created_by: createdBy,
+      },
+      "*",
+    );
+
+    return dashboard;
+  }
 
   async getRefreshedDashboard(dashboardId: number, updatedBy: string) {
     const [dashboard] = await this.raw<Dashboard & { requires_refresh: boolean }>(
@@ -182,7 +171,7 @@ export class DashboardRepository extends BaseRepository {
     return module;
   }
 
-  private petitionsCountQuery(orgId: number, filters: PetitionsFilter) {
+  private petitionsCountQuery(orgId: number, filters: PetitionFilter) {
     return (
       this.from({ p: "petition" })
         .where("p.org_id", orgId)
@@ -276,7 +265,7 @@ export class DashboardRepository extends BaseRepository {
                     case "DOES_NOT_CONTAIN":
                       q = filter.operator.startsWith("DOES_NOT_") ? q.not : q;
                       q.havingRaw(/* sql */ `array_agg(distinct pt.tag_id) @> ?`, [
-                        this.sqlArray(filter.ids, "int"),
+                        this.sqlArray(filter.value, "int"),
                       ]);
                       break;
                     case "IS_EMPTY":
@@ -295,7 +284,7 @@ export class DashboardRepository extends BaseRepository {
               /* sql */ `join petition_permission pp2 on pp2.petition_id = p.id and pp2.deleted_at is null`,
             ).modify((q) => {
               for (const filter of sharedWithFilters) {
-                const { id, type } = filter;
+                const { id, type } = fromGlobalId(filter.value);
                 const column = type === "User" ? "user_id" : "user_group_id";
                 q = operator === "AND" ? q.and : q.or;
                 switch (filter.operator) {
@@ -333,7 +322,7 @@ export class DashboardRepository extends BaseRepository {
   private profilesCountQuery(
     orgId: number,
     profileTypeId: number,
-    filters: ProfilesFilter,
+    filters: ProfileFilter,
     profileTypeFieldsById: Record<number, ProfileTypeField>,
     resultType: ModuleResultType,
   ) {
@@ -822,5 +811,101 @@ export class DashboardRepository extends BaseRepository {
       // pie chart is incongruent if the sum of all parts is not equal to the unique total
       isIncongruent: sumBy(data, (d) => d.count) !== totalUnique.count,
     };
+  }
+
+  async createDashboardModule<TType extends DashboardModuleType>(
+    data: Omit<
+      Replace<CreateDashboardModule, { type: TType; settings: ModuleSettings<TType> }>,
+      "position"
+    >,
+    createdBy: string,
+  ) {
+    const modules = await this.loadModulesByDashboardId.raw(data.dashboard_id); // do not cache as same loader may be called in gql response after creating the module
+    const lastModule = modules.at(-1);
+    const position = lastModule ? lastModule.position + 1 : 0;
+
+    await this.from("dashboard_module").insert({
+      ...data,
+      position,
+      created_at: this.now(),
+      created_by: createdBy,
+    });
+  }
+
+  async deleteDashboardModule(dashboardId: number, moduleId: number, deletedBy: string) {
+    const [module] = await this.from("dashboard_module")
+      .where("id", moduleId)
+      .where("dashboard_id", dashboardId)
+      .update(
+        {
+          deleted_at: this.now(),
+          deleted_by: deletedBy,
+        },
+        ["position"],
+      );
+
+    assert(isNonNullish(module), `Module with id ${moduleId} not found`);
+
+    await this.from("dashboard_module")
+      .where("dashboard_id", dashboardId)
+      .where("position", ">", module.position)
+      .update({
+        updated_at: this.now(),
+        updated_by: deletedBy,
+        position: this.knex.raw(`"position" - 1`) as any,
+      });
+  }
+
+  async updateDashboardModulePositions(
+    dashboardId: number,
+    moduleIds: number[],
+    updatedBy: string,
+  ) {
+    await this.withTransaction(async (t) => {
+      await this.transactionLock(`reorderDashboardModules(${dashboardId})`, t);
+      const allModules = await this.from("dashboard_module", t)
+        .where("dashboard_id", dashboardId)
+        .whereNull("deleted_at")
+        .orderBy("position", "asc")
+        .select("*");
+
+      this.validateDashboardModuleReorder(allModules, moduleIds);
+
+      // [id, position]
+      // filter all fields that will not change its position
+      const modulesToUpdate = allModules
+        .map((module, i) =>
+          moduleIds[i] === module.id ? null : [module.id, moduleIds.indexOf(module.id)],
+        )
+        .filter(isNonNullish);
+
+      if (modulesToUpdate.length > 0) {
+        await this.raw(
+          /* sql */ `
+            update dashboard_module as dm set
+              position = t.position,
+              updated_at = NOW(),
+              updated_by = ?
+            from (?) as t (id, position)
+            where t.id = dm.id;
+          `,
+          [updatedBy, this.sqlValues(modulesToUpdate, ["int", "int"])],
+          t,
+        );
+      }
+    });
+  }
+
+  private validateDashboardModuleReorder(allModules: DashboardModule[], moduleIds: number[]) {
+    // check only valid moduleIds and not repeated
+    const _moduleIds = unique(moduleIds);
+    const ids = new Set(allModules.map((m) => m.id));
+    if (
+      _moduleIds.length !== moduleIds.length ||
+      _moduleIds.length !== ids.size ||
+      _moduleIds.some((id) => !ids.has(id))
+    ) {
+      throw new Error("INVALID_MODULE_IDS");
+    }
   }
 }
