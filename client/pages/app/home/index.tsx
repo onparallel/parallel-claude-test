@@ -107,18 +107,18 @@ function Home() {
               </Heading>
             </HStack>
 
-            {dashboard?.lastRefreshAt ? (
-              <HStack>
-                {dashboard?.isRefreshing ? (
-                  <Tooltip
-                    label={intl.formatMessage({
-                      id: "page.home.refreshing-data",
-                      defaultMessage: "Refreshing data...",
-                    })}
-                  >
-                    <Spinner size="xs" thickness="1.5px" />
-                  </Tooltip>
-                ) : null}
+            <HStack>
+              {dashboard?.isRefreshing ? (
+                <Tooltip
+                  label={intl.formatMessage({
+                    id: "page.home.refreshing-data",
+                    defaultMessage: "Refreshing data...",
+                  })}
+                >
+                  <Spinner size="xs" thickness="1.5px" />
+                </Tooltip>
+              ) : null}
+              {dashboard?.lastRefreshAt ? (
                 <Text as="span" fontSize="sm">
                   <FormattedMessage
                     id="page.home.last-refreshed"
@@ -126,7 +126,7 @@ function Home() {
                     values={{
                       timeAgo: (
                         <DateTime
-                          value={dashboard?.lastRefreshAt}
+                          value={dashboard.lastRefreshAt}
                           format={FORMATS.LLL}
                           useRelativeTime="always"
                         />
@@ -134,11 +134,11 @@ function Home() {
                     }}
                   />
                 </Text>
-                {realMe?.isSuperAdmin ? (
-                  <IconButton aria-label="" icon={<EditIcon />} onClick={handleEditDashboard} />
-                ) : null}
-              </HStack>
-            ) : null}
+              ) : null}
+              {realMe?.isSuperAdmin ? (
+                <IconButton aria-label="" icon={<EditIcon />} onClick={handleEditDashboard} />
+              ) : null}
+            </HStack>
           </HStack>
           {me.dashboards.length > 1 ? (
             <DashboardTabs onStateChange={setQueryState} state={state} dashboards={me.dashboards} />

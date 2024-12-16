@@ -51,11 +51,12 @@ import {
   ProfilesPieChartDashboardModuleSettingsInput,
   ProfilesRatioDashboardModuleSettingsInput,
 } from "@parallel/graphql/__types";
+import { unMaybeArray } from "@parallel/utils/types";
 import { untranslated } from "@parallel/utils/untranslated";
 import { Reorder } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { isNonNullish, isNullish, omit } from "remeda";
+import { isNonNullish, isNullish, omit, unique } from "remeda";
 import { DashboardModule } from "../DashboardModule";
 
 export function DashboardEditDialog({
@@ -662,17 +663,18 @@ function AddModule({
         let settings: any;
         const dataSettings = data.settings as any;
         if (type === "PROFILES_NUMBER_DASHBOARD_MODULE") {
+          const filter = omit(
+            profileListViewsData!.me.profileListViews.find(
+              (view) => view.id === dataSettings.filter,
+            )?.data ?? {},
+            ["search", "__typename"],
+          );
           settings = {
             profileTypeId: dataSettings.profileTypeId,
             type: dataSettings.type,
             aggregate: dataSettings.aggregate,
             profileTypeFieldId: dataSettings.profileTypeFieldId,
-            filter: omit(
-              profileListViewsData!.me.profileListViews.find(
-                (view) => view.id === dataSettings.filter,
-              )?.data ?? {},
-              ["search", "__typename"],
-            ),
+            filter: { ...filter, status: unique([...unMaybeArray(filter?.status ?? []), "OPEN"]) },
           } as ProfilesNumberDashboardModuleSettingsInput;
         } else if (type === "PROFILES_RATIO_DASHBOARD_MODULE") {
           settings = {
@@ -681,13 +683,14 @@ function AddModule({
             aggregate: dataSettings.aggregate,
             profileTypeFieldId: dataSettings.profileTypeFieldId,
             graphicType: dataSettings.graphicType,
-            filters: dataSettings.filters.map((id: string) =>
-              omit(
+            filters: dataSettings.filters.map((id: string) => {
+              const filter = omit(
                 profileListViewsData!.me.profileListViews.find((view) => view.id === id)?.data ??
                   {},
                 ["search", "__typename"],
-              ),
-            ),
+              );
+              return { ...filter, status: unique([...unMaybeArray(filter?.status ?? []), "OPEN"]) };
+            }),
           } as ProfilesRatioDashboardModuleSettingsInput;
         } else if (type === "PROFILES_CHART_DASHBOARD_MODULE") {
           settings = {
@@ -696,38 +699,47 @@ function AddModule({
             aggregate: dataSettings.aggregate,
             profileTypeFieldId: dataSettings.profileTypeFieldId,
             graphicType: dataSettings.graphicType,
-            items: dataSettings.items.map((item: any) => ({
-              ...item,
-              filter: omit(
+            items: dataSettings.items.map((item: any) => {
+              const filter = omit(
                 profileListViewsData!.me.profileListViews.find((view) => view.id === item.filter)
                   ?.data ?? {},
                 ["search", "__typename"],
-              ),
-            })),
+              );
+              return {
+                ...item,
+                filter: {
+                  ...filter,
+                  status: unique([...unMaybeArray(filter?.status ?? []), "OPEN"]),
+                },
+              };
+            }),
           } as ProfilesPieChartDashboardModuleSettingsInput;
         } else if (type === "PETITIONS_CHART_DASHBOARD_MODULE") {
           settings = {
             graphicType: dataSettings.graphicType,
             items: dataSettings.items.map((item: any) => {
-              const data = petitionListViewsData!.me.petitionListViews.find(
-                (view) => view.id === item.filter,
-              )?.data ?? { __typename: "" };
+              const filter = omit(
+                petitionListViewsData!.me.petitionListViews.find((view) => view.id === item.filter)
+                  ?.data ?? { status: [], __typename: "" },
+                ["__typename"],
+              );
               return {
                 ...item,
-                filter: omit(data, ["__typename"]),
+                filter,
               };
             }),
           } as PetitionsPieChartDashboardModuleSettingsInput;
         } else if (type === "PETITIONS_RATIO_DASHBOARD_MODULE") {
           settings = {
             graphicType: dataSettings.graphicType,
-            filters: dataSettings.filters.map((id: string) =>
-              omit(
+            filters: dataSettings.filters.map((id: string) => {
+              const filter = omit(
                 petitionListViewsData!.me.petitionListViews.find((view) => view.id === id)
-                  ?.data ?? { __typename: "" },
+                  ?.data ?? { status: [], __typename: "" },
                 ["__typename"],
-              ),
-            ),
+              );
+              return filter;
+            }),
           } as PetitionsRatioDashboardModuleSettingsInput;
         } else if (type === "PETITION_BUTTON_DASHBOARD_MODULE") {
           settings = {
@@ -735,13 +747,14 @@ function AddModule({
             templateId: dataSettings.templateId,
           } as CreatePetitionButtonDashboardModuleSettingsInput;
         } else if (type === "PETITIONS_NUMBER_DASHBOARD_MODULE") {
+          const filter = omit(
+            petitionListViewsData!.me.petitionListViews.find(
+              (view) => view.id === dataSettings.filters,
+            )?.data ?? { status: [], __typename: "" },
+            ["__typename"],
+          );
           settings = {
-            filters: omit(
-              petitionListViewsData!.me.petitionListViews.find(
-                (view) => view.id === dataSettings.filters,
-              )?.data ?? { __typename: "" },
-              ["__typename"],
-            ),
+            filters: filter,
           } as PetitionsNumberDashboardModuleSettingsInput;
         }
 
@@ -862,9 +875,22 @@ function AddModule({
 
             {type === "PROFILES_RATIO_DASHBOARD_MODULE" ? (
               <>
+                <FormControl isRequired>
+                  <FormLabel>{untranslated("Graphic Type")}</FormLabel>
+                  <Select
+                    {...register("settings.graphicType", {
+                      required: true,
+                      shouldUnregister: true,
+                    })}
+                  >
+                    <option value="PERCENTAGE">{untranslated("Percentage")}</option>
+                    <option value="RATIO">{untranslated("Ratio")}</option>
+                  </Select>
+                </FormControl>
+
                 {isNonNullish(settingProfileTypeId) && isNonNullish(profileListViewsData) ? (
                   <FormControl isRequired>
-                    <FormLabel>{untranslated("Filters (min. 2)")}</FormLabel>
+                    <FormLabel>{untranslated("Filters (exactly 2 required)")}</FormLabel>
                     <Stack spacing={3}>
                       {filtersFields.map((_, index) => (
                         <FormControl key={index} isRequired>
@@ -891,6 +917,7 @@ function AddModule({
                         </FormControl>
                       ))}
                       <Button
+                        isDisabled={filtersFields.length >= 2}
                         onClick={() =>
                           appendFilter(profileListViewsData.me.profileListViews[0].id as any)
                         }
@@ -914,7 +941,7 @@ function AddModule({
                     })}
                   >
                     <option value="PIE">{untranslated("Pie")}</option>
-                    <option value="DONUT">{untranslated("Donut")}</option>
+                    <option value="DOUGHNUT">{untranslated("Doughnut")}</option>
                   </Select>
                 </FormControl>
 
@@ -1000,7 +1027,7 @@ function AddModule({
                 {...register("settings.graphicType", { required: true, shouldUnregister: true })}
               >
                 <option value="PIE">{untranslated("Pie")}</option>
-                <option value="DONUT">{untranslated("Donut")}</option>
+                <option value="DOUGHNUT">{untranslated("Doughnut")}</option>
               </Select>
             </FormControl>
 
@@ -1076,7 +1103,7 @@ function AddModule({
             </FormControl>
 
             <FormControl isRequired>
-              <FormLabel>{untranslated("Filters (min. 2)")}</FormLabel>
+              <FormLabel>{untranslated("Filters (exactly 2 required)")}</FormLabel>
               <Stack spacing={3}>
                 {filtersFields.map((_, index) => (
                   <FormControl key={index} isRequired>
@@ -1107,7 +1134,7 @@ function AddModule({
                   </FormControl>
                 ))}
                 <Button
-                  isDisabled={isNullish(petitionListViewsData)}
+                  isDisabled={isNullish(petitionListViewsData) || filtersFields.length >= 2}
                   onClick={() =>
                     appendFilter(petitionListViewsData!.me.petitionListViews[0].id as any)
                   }

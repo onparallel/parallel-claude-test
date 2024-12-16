@@ -3,7 +3,8 @@ import { assert } from "ts-essentials";
 import { PetitionFilter } from "../../db/repositories/PetitionRepository";
 import { ProfileFilter } from "../../db/repositories/ProfileRepository";
 import { ProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
-import { authenticateAnd, ifArgDefined, userIsSuperAdmin } from "../helpers/authorize";
+import { authenticateAnd, ifArgDefined, realUserIsSuperAdmin } from "../helpers/authorize";
+import { ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
@@ -27,7 +28,7 @@ import {
 export const adminCreateDashboard = mutationField("adminCreateDashboard", {
   type: "Dashboard",
   description: "Creates a new dashboard in the organization",
-  authorize: authenticateAnd(userIsSuperAdmin()),
+  authorize: authenticateAnd(realUserIsSuperAdmin()),
   args: {
     orgId: nonNull(globalIdArg("Organization")),
     name: nonNull(stringArg()),
@@ -42,7 +43,7 @@ export const createCreatePetitionButtonDashboardModule = mutationField(
   {
     type: "Dashboard",
     authorize: authenticateAnd(
-      userIsSuperAdmin(),
+      realUserIsSuperAdmin(),
       dashboardExists("dashboardId"),
       templateBelongsToDashboardOrganization("settings.templateId", "dashboardId"),
       petitionsAreOfTypeTemplate("settings.templateId"),
@@ -88,7 +89,7 @@ export const createPetitionsNumberDashboardModule = mutationField(
   "createPetitionsNumberDashboardModule",
   {
     type: "Dashboard",
-    authorize: authenticateAnd(userIsSuperAdmin(), dashboardExists("dashboardId")),
+    authorize: authenticateAnd(realUserIsSuperAdmin(), dashboardExists("dashboardId")),
     args: {
       dashboardId: nonNull(globalIdArg("Dashboard")),
       title: nullable(stringArg()),
@@ -131,7 +132,7 @@ export const createPetitionsRatioDashboardModule = mutationField(
   "createPetitionsRatioDashboardModule",
   {
     type: "Dashboard",
-    authorize: authenticateAnd(userIsSuperAdmin(), dashboardExists("dashboardId")),
+    authorize: authenticateAnd(realUserIsSuperAdmin(), dashboardExists("dashboardId")),
     args: {
       dashboardId: nonNull(globalIdArg("Dashboard")),
       title: nullable(stringArg()),
@@ -176,7 +177,7 @@ export const createPetitionsPieChartDashboardModule = mutationField(
   "createPetitionsPieChartDashboardModule",
   {
     type: "Dashboard",
-    authorize: authenticateAnd(userIsSuperAdmin(), dashboardExists("dashboardId")),
+    authorize: authenticateAnd(realUserIsSuperAdmin(), dashboardExists("dashboardId")),
     args: {
       dashboardId: nonNull(globalIdArg("Dashboard")),
       title: nullable(stringArg()),
@@ -231,7 +232,7 @@ export const createProfilesNumberDashboardModule = mutationField(
   {
     type: "Dashboard",
     authorize: authenticateAnd(
-      userIsSuperAdmin(),
+      realUserIsSuperAdmin(),
       dashboardExists("dashboardId"),
       ifArgDefined(
         "settings.profileTypeFieldId",
@@ -306,7 +307,7 @@ export const createProfilesRatioDashboardModule = mutationField(
   {
     type: "Dashboard",
     authorize: authenticateAnd(
-      userIsSuperAdmin(),
+      realUserIsSuperAdmin(),
       dashboardExists("dashboardId"),
       ifArgDefined(
         "settings.profileTypeFieldId",
@@ -380,7 +381,7 @@ export const createProfilesPieChartDashboardModule = mutationField(
   {
     type: "Dashboard",
     authorize: authenticateAnd(
-      userIsSuperAdmin(),
+      realUserIsSuperAdmin(),
       dashboardExists("dashboardId"),
       ifArgDefined(
         "settings.profileTypeFieldId",
@@ -468,7 +469,7 @@ export const createProfilesPieChartDashboardModule = mutationField(
 export const deleteDashboardModule = mutationField("deleteDashboardModule", {
   type: "Dashboard",
   authorize: authenticateAnd(
-    userIsSuperAdmin(),
+    realUserIsSuperAdmin(),
     dashboardExists("dashboardId"),
     moduleBelongsToDashboard("moduleId", "dashboardId"),
   ),
@@ -488,7 +489,7 @@ export const deleteDashboardModule = mutationField("deleteDashboardModule", {
 export const updateDashboardModulePositions = mutationField("updateDashboardModulePositions", {
   type: "Dashboard",
   authorize: authenticateAnd(
-    userIsSuperAdmin(),
+    realUserIsSuperAdmin(),
     dashboardExists("dashboardId"),
     moduleBelongsToDashboard("moduleIds", "dashboardId"),
   ),
@@ -497,14 +498,21 @@ export const updateDashboardModulePositions = mutationField("updateDashboardModu
     moduleIds: nonNull(list(nonNull(globalIdArg("DashboardModule")))),
   },
   resolve: async (_, { dashboardId, moduleIds }, ctx) => {
-    await ctx.dashboards.updateDashboardModulePositions(
-      dashboardId,
-      moduleIds,
-      `User:${ctx.user!.id}`,
-    );
+    try {
+      await ctx.dashboards.updateDashboardModulePositions(
+        dashboardId,
+        moduleIds,
+        `User:${ctx.user!.id}`,
+      );
 
-    const dashboard = await ctx.dashboards.loadDashboard(dashboardId);
-    assert(dashboard, "Dashboard not found");
-    return dashboard;
+      const dashboard = await ctx.dashboards.loadDashboard(dashboardId);
+      assert(dashboard, "Dashboard not found");
+      return dashboard;
+    } catch (error) {
+      if (error instanceof Error && error.message === "INVALID_MODULE_IDS") {
+        throw new ForbiddenError("Invalid module ids");
+      }
+      throw error;
+    }
   },
 });
