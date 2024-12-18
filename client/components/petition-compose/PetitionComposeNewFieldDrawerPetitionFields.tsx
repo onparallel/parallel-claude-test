@@ -114,78 +114,80 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
       fields?: PetitionFieldType[];
     }[];
 
-    return options.map((c) => {
-      if (isNonNullish(c.fields)) {
-        const fields = isFieldGroupChild
-          ? difference(c.fields, FIELD_GROUP_EXCLUDED_FIELD_TYPES)
-          : c.fields;
-        return {
-          category: c.category,
-          fields: fields
-            .map((type) => ({
-              type,
-              keywords: [c.category, ...getPetitionFieldTypeKeywords(type)],
-              label: getPetitionFieldTypeLabel(intl, type),
-              description: getPetitionFieldTypeDescription(intl, type),
-            }))
-            .filter(({ keywords, label, description }) =>
-              search
-                ? [label, description, ...keywords].some((keyword: string) =>
-                    removeDiacriticsAndLowercase(keyword).includes(
-                      removeDiacriticsAndLowercase(search),
-                    ),
-                  )
-                : true,
-            ),
-        };
-      } else {
-        return {
-          category: c.category,
-          profileTypes: profileTypes
-            .filter((pt) => isNonNullish(pt.standardType))
-            .map((profileType) => ({
-              keywords: [
-                c.category,
-                ...getProfileTypeStandardTypeKeywords(profileType.standardType!),
-              ],
-              label: localizableUserTextRender({
-                intl,
-                value: profileType.name,
-                default: intl.formatMessage({
-                  id: "generic.unnamed-profile-type-field",
-                  defaultMessage: "Unnamed property",
-                }),
-              }),
-              description: intl.formatMessage(
-                {
-                  id: "component.petition-compose-new-field-drawer-pettion-fields.profile-type-description",
-                  defaultMessage: "Add a group to obtain information about {pluralName}.",
-                },
-                {
-                  pluralName: localizableUserTextRender({
-                    intl,
-                    value: profileType.pluralName,
-                    default: intl.formatMessage({
-                      id: "generic.unnamed-profile-type-field",
-                      defaultMessage: "Unnamed property",
-                    }),
-                  }),
-                },
+    return options
+      .map((c) => {
+        if (isNonNullish(c.fields)) {
+          const fields = isFieldGroupChild
+            ? difference(c.fields, FIELD_GROUP_EXCLUDED_FIELD_TYPES)
+            : c.fields;
+          return {
+            category: c.category,
+            fields: fields
+              .map((type) => ({
+                type,
+                keywords: [c.category, ...getPetitionFieldTypeKeywords(type)],
+                label: getPetitionFieldTypeLabel(intl, type),
+                description: getPetitionFieldTypeDescription(intl, type),
+              }))
+              .filter(({ keywords, label, description }) =>
+                search
+                  ? [label, description, ...keywords].some((keyword: string) =>
+                      removeDiacriticsAndLowercase(keyword).includes(
+                        removeDiacriticsAndLowercase(search),
+                      ),
+                    )
+                  : true,
               ),
-              profileType,
-            }))
-            .filter(({ keywords, label, description }) =>
-              search
-                ? [label, description, ...keywords].some((keyword: string) =>
-                    removeDiacriticsAndLowercase(keyword).includes(
-                      removeDiacriticsAndLowercase(search),
-                    ),
-                  )
-                : true,
-            ),
-        };
-      }
-    });
+          };
+        } else if (!isFieldGroupChild) {
+          return {
+            category: c.category,
+            profileTypes: profileTypes
+              .filter((pt) => isNonNullish(pt.standardType))
+              .map((profileType) => ({
+                keywords: [
+                  c.category,
+                  ...getProfileTypeStandardTypeKeywords(profileType.standardType!),
+                ],
+                label: localizableUserTextRender({
+                  intl,
+                  value: profileType.name,
+                  default: intl.formatMessage({
+                    id: "generic.unnamed-profile-type-field",
+                    defaultMessage: "Unnamed property",
+                  }),
+                }),
+                description: intl.formatMessage(
+                  {
+                    id: "component.petition-compose-new-field-drawer-pettion-fields.profile-type-description",
+                    defaultMessage: "Add a group to obtain information about {pluralName}.",
+                  },
+                  {
+                    pluralName: localizableUserTextRender({
+                      intl,
+                      value: profileType.pluralName,
+                      default: intl.formatMessage({
+                        id: "generic.unnamed-profile-type-field",
+                        defaultMessage: "Unnamed property",
+                      }),
+                    }),
+                  },
+                ),
+                profileType,
+              }))
+              .filter(({ keywords, label, description }) =>
+                search
+                  ? [label, description, ...keywords].some((keyword: string) =>
+                      removeDiacriticsAndLowercase(keyword).includes(
+                        removeDiacriticsAndLowercase(search),
+                      ),
+                    )
+                  : true,
+              ),
+          };
+        }
+      })
+      .filter(isNonNullish);
   }, [intl.locale, user.hasEsTaxDocumentsField, user.hasDowJonesField, isFieldGroupChild, search]);
 
   const filteredFieldCategories = fieldCategories.filter(({ fields }) =>
