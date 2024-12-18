@@ -1141,7 +1141,7 @@
   },
   {
     "term": "profiles.default-profile-type-field.individual-background-check",
-    "definition": "Verificación de antecedentes",
+    "definition": "Búsqueda en listados",
     "context": "Background check"
   },
   {

@@ -1722,7 +1722,7 @@ describe("GraphQL/Users", () => {
                 {
                   id: expect.any(String),
                   type: "BACKGROUND_CHECK",
-                  name: { en: "Background check", es: "Verificación de antecedentes" },
+                  name: { en: "Background check", es: "Búsqueda en listados" },
                   alias: "p_background_check",
                   isStandard: true,
                   isExpirable: false,
