@@ -115,12 +115,7 @@ function ThanksFooter() {
           </Center>
         </NormalLink>
       </Stack>
-      <Text align="center" fontSize="12px" marginTop={2}>
-        {untranslated(
-          `Parallel Solutions, S.L. - C/Almogàvers 165, 59.203, 08018 Barcelona, Spain`,
-        )}
-      </Text>
-      <Flex alignItems="center" marginTop={1}>
+      <Flex alignItems="center" marginTop={2}>
         <Link href={`/legal/terms`}>
           <Text align="center" fontSize="12px">
             <FormattedMessage
