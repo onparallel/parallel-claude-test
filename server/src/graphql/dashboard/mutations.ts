@@ -253,13 +253,13 @@ export const createProfilesNumberDashboardModule = mutationField(
           definition(t) {
             t.nonNull.globalId("profileTypeId", { prefixName: "ProfileType" });
             t.nonNull.field("filter", { type: "ProfileFilter" });
-            t.nonNull.field("type", { type: "ProfilesModuleResultType" });
+            t.nonNull.field("type", { type: "ModuleResultType" });
             t.nullable.globalId("profileTypeFieldId", {
               prefixName: "ProfileTypeField",
               description: "Field to aggregate on. Only for type AGGREGATE",
             });
             t.nullable.field("aggregate", {
-              type: "ProfilesModuleResultAggregateType",
+              type: "ModuleResultAggregateType",
               description: "Aggregate function. Only for type AGGREGATE",
             });
           },
@@ -329,13 +329,13 @@ export const createProfilesRatioDashboardModule = mutationField(
             t.nonNull.field("graphicType", { type: "DashboardRatioModuleSettingsType" });
             t.nonNull.globalId("profileTypeId", { prefixName: "ProfileType" });
             t.nonNull.list.nonNull.field("filters", { type: "ProfileFilter" });
-            t.nonNull.field("type", { type: "ProfilesModuleResultType" });
+            t.nonNull.field("type", { type: "ModuleResultType" });
             t.nullable.globalId("profileTypeFieldId", {
               prefixName: "ProfileTypeField",
               description: "Field to aggregate on. Only for type AGGREGATE",
             });
             t.nullable.field("aggregate", {
-              type: "ProfilesModuleResultAggregateType",
+              type: "ModuleResultAggregateType",
               description: "Aggregate function. Only for type AGGREGATE",
             });
           },
@@ -412,14 +412,22 @@ export const createProfilesPieChartDashboardModule = mutationField(
                 },
               }),
             });
-            t.nonNull.field("type", { type: "ProfilesModuleResultType" });
+            t.nonNull.field("type", { type: "ModuleResultType" });
             t.nullable.globalId("profileTypeFieldId", {
               prefixName: "ProfileTypeField",
               description: "Field to aggregate on. Only for type AGGREGATE",
             });
             t.nullable.field("aggregate", {
-              type: "ProfilesModuleResultAggregateType",
+              type: "ModuleResultAggregateType",
               description: "Aggregate function. Only for type AGGREGATE",
+            });
+            t.nullable.globalId("groupByProfileTypeFieldId", {
+              prefixName: "ProfileTypeField",
+              description: "Optional SELECT field to group by its values instead of items array",
+            });
+            t.nullable.field("groupByFilter", {
+              type: "ProfileFilter",
+              description: "Optional filter to apply to all items when grouping by a field",
             });
           },
         }),
@@ -445,6 +453,13 @@ export const createProfilesPieChartDashboardModule = mutationField(
                   profileTypeFieldId: settings.profileTypeFieldId!,
                 }),
             profileTypeId: settings.profileTypeId,
+            groupByProfileTypeFieldId: settings.groupByProfileTypeFieldId ?? undefined,
+            groupByFilter: settings.groupByFilter
+              ? {
+                  status: settings.groupByFilter.status,
+                  values: settings.groupByFilter.values as ProfileFieldValuesFilter,
+                }
+              : undefined,
             graphicType: settings.graphicType,
             items: settings.items.map((item) => ({
               color: item.color,

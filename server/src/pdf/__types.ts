@@ -457,36 +457,43 @@ export type DashboardModule = {
   title: Maybe<Scalars["String"]["output"]>;
 };
 
-export type DashboardModuleSize = "LARGE" | "MEDIUM" | "SMALL";
-
-export type DashboardNumberModuleResult = {
-  value: Scalars["Float"]["output"];
+export type DashboardModuleResultItem = {
+  aggr: Maybe<Scalars["Float"]["output"]>;
+  color: Maybe<Scalars["String"]["output"]>;
+  count: Scalars["Int"]["output"];
+  /** Label of the item, in string or LocalizableUserText format */
+  label: Maybe<Scalars["JSON"]["output"]>;
 };
+
+export type DashboardModuleResultMultiItem = {
+  isIncongruent: Scalars["Boolean"]["output"];
+  items: Array<DashboardModuleResultItem>;
+};
+
+export type DashboardModuleSize = "LARGE" | "MEDIUM" | "SMALL";
 
 export type DashboardPetitionsNumberModule = DashboardModule & {
   id: Scalars["GID"]["output"];
-  result: Maybe<DashboardNumberModuleResult>;
+  result: Maybe<DashboardModuleResultItem>;
   size: DashboardModuleSize;
   title: Maybe<Scalars["String"]["output"]>;
 };
 
 export type DashboardPetitionsPieChartModule = DashboardModule & {
   id: Scalars["GID"]["output"];
-  result: Maybe<DashboardPieChartModuleResult>;
+  result: Maybe<DashboardModuleResultMultiItem>;
   settings: DashboardPetitionsPieChartModuleSettings;
   size: DashboardModuleSize;
   title: Maybe<Scalars["String"]["output"]>;
 };
 
 export type DashboardPetitionsPieChartModuleSettings = {
-  colors: Array<Scalars["String"]["output"]>;
   graphicType: DashboardPieChartModuleSettingsType;
-  labels: Array<Scalars["String"]["output"]>;
 };
 
 export type DashboardPetitionsRatioModule = DashboardModule & {
   id: Scalars["GID"]["output"];
-  result: Maybe<DashboardRatioModuleResult>;
+  result: Maybe<DashboardModuleResultMultiItem>;
   settings: DashboardPetitionsRatioModuleSettings;
   size: DashboardModuleSize;
   title: Maybe<Scalars["String"]["output"]>;
@@ -496,37 +503,36 @@ export type DashboardPetitionsRatioModuleSettings = {
   graphicType: DashboardRatioModuleSettingsType;
 };
 
-export type DashboardPieChartModuleResult = {
-  isIncongruent: Scalars["Boolean"]["output"];
-  value: Array<Scalars["Float"]["output"]>;
-};
-
 export type DashboardPieChartModuleSettingsType = "DOUGHNUT" | "PIE";
 
 export type DashboardProfilesNumberModule = DashboardModule & {
   id: Scalars["GID"]["output"];
-  result: Maybe<DashboardNumberModuleResult>;
+  result: Maybe<DashboardModuleResultItem>;
+  settings: DashboardProfilesNumberModuleSettings;
   size: DashboardModuleSize;
   title: Maybe<Scalars["String"]["output"]>;
 };
 
+export type DashboardProfilesNumberModuleSettings = {
+  type: ModuleResultType;
+};
+
 export type DashboardProfilesPieChartModule = DashboardModule & {
   id: Scalars["GID"]["output"];
-  result: Maybe<DashboardPieChartModuleResult>;
+  result: Maybe<DashboardModuleResultMultiItem>;
   settings: DashboardProfilesPieChartModuleSettings;
   size: DashboardModuleSize;
   title: Maybe<Scalars["String"]["output"]>;
 };
 
 export type DashboardProfilesPieChartModuleSettings = {
-  colors: Array<Scalars["String"]["output"]>;
   graphicType: DashboardPieChartModuleSettingsType;
-  labels: Array<Scalars["String"]["output"]>;
+  type: ModuleResultType;
 };
 
 export type DashboardProfilesRatioModule = DashboardModule & {
   id: Scalars["GID"]["output"];
-  result: Maybe<DashboardRatioModuleResult>;
+  result: Maybe<DashboardModuleResultMultiItem>;
   settings: DashboardProfilesRatioModuleSettings;
   size: DashboardModuleSize;
   title: Maybe<Scalars["String"]["output"]>;
@@ -534,11 +540,7 @@ export type DashboardProfilesRatioModule = DashboardModule & {
 
 export type DashboardProfilesRatioModuleSettings = {
   graphicType: DashboardRatioModuleSettingsType;
-};
-
-export type DashboardRatioModuleResult = {
-  isIncongruent: Scalars["Boolean"]["output"];
-  value: Array<Scalars["Float"]["output"]>;
+  type: ModuleResultType;
 };
 
 export type DashboardRatioModuleSettingsType = "PERCENTAGE" | "RATIO";
@@ -963,11 +965,17 @@ export type MessageSentEvent = PetitionEvent & {
   type: PetitionEventType;
 };
 
+export type ModuleResultAggregateType = "AVG" | "MAX" | "MIN" | "SUM";
+
+export type ModuleResultType = "AGGREGATE" | "COUNT";
+
 export type Mutation = {
   /** set user status to ACTIVE. */
   activateUser: Array<User>;
   /** Add users to a user group */
   addUsersToUserGroup: UserGroup;
+  /** Creates a new dashboard in the organization */
+  adminCreateDashboard: Dashboard;
   /** Anonymizes a petition */
   anonymizePetition: SupportMethodResponse;
   /** Updates the status of a PENDING petition field replies to APPROVED or REJECTED */
@@ -1154,6 +1162,7 @@ export type Mutation = {
   deleteAzureOpenAiIntegration: SupportMethodResponse;
   /** Delete contacts. */
   deleteContacts: Result;
+  deleteDashboardModule: Dashboard;
   /** Removes the DOW JONES integration of the user's organization */
   deleteDowJonesKycIntegration: Organization;
   /** Deletes a subscription signature key */
@@ -1370,6 +1379,7 @@ export type Mutation = {
   updateCompaniesHouseCustomProperties: SupportMethodResponse;
   /** Updates a contact. */
   updateContact: Contact;
+  updateDashboardModulePositions: Dashboard;
   updateEinformaCustomProperties: SupportMethodResponse;
   /** Activate or deactivate a list of organization feature flag */
   updateFeatureFlags: Organization;
@@ -1482,6 +1492,11 @@ export type MutationactivateUserArgs = {
 export type MutationaddUsersToUserGroupArgs = {
   userGroupId: Scalars["GID"]["input"];
   userIds: Array<Scalars["GID"]["input"]>;
+};
+
+export type MutationadminCreateDashboardArgs = {
+  name: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
 };
 
 export type MutationanonymizePetitionArgs = {
@@ -2040,6 +2055,11 @@ export type MutationdeleteAzureOpenAiIntegrationArgs = {
 export type MutationdeleteContactsArgs = {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   ids: Array<Scalars["GID"]["input"]>;
+};
+
+export type MutationdeleteDashboardModuleArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  moduleId: Scalars["GID"]["input"];
 };
 
 export type MutationdeleteEventSubscriptionSignatureKeysArgs = {
@@ -2676,6 +2696,11 @@ export type MutationupdateCompaniesHouseCustomPropertiesArgs = {
 export type MutationupdateContactArgs = {
   data: UpdateContactInput;
   id: Scalars["GID"]["input"];
+};
+
+export type MutationupdateDashboardModulePositionsArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  moduleIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationupdateEinformaCustomPropertiesArgs = {
@@ -5137,29 +5162,29 @@ export type ProfileUpdatedEvent = ProfileEvent & {
   user: Maybe<User>;
 };
 
-export type ProfilesModuleResultAggregateType = "AVG" | "MAX" | "MIN" | "SUM";
-
-export type ProfilesModuleResultType = "AGGREGATE" | "COUNT";
-
 export type ProfilesNumberDashboardModuleSettingsInput = {
   /** Aggregate function. Only for type AGGREGATE */
-  aggregate?: InputMaybe<ProfilesModuleResultAggregateType>;
+  aggregate?: InputMaybe<ModuleResultAggregateType>;
   filter: ProfileFilter;
   /** Field to aggregate on. Only for type AGGREGATE */
   profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
-  type: ProfilesModuleResultType;
+  type: ModuleResultType;
 };
 
 export type ProfilesPieChartDashboardModuleSettingsInput = {
   /** Aggregate function. Only for type AGGREGATE */
-  aggregate?: InputMaybe<ProfilesModuleResultAggregateType>;
+  aggregate?: InputMaybe<ModuleResultAggregateType>;
   graphicType: DashboardPieChartModuleSettingsType;
+  /** Optional filter to apply to all items when grouping by a field */
+  groupByFilter?: InputMaybe<ProfileFilter>;
+  /** Optional SELECT field to group by its values instead of items array */
+  groupByProfileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   items: Array<ProfilesPieChartDashboardModuleSettingsItemInput>;
   /** Field to aggregate on. Only for type AGGREGATE */
   profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
-  type: ProfilesModuleResultType;
+  type: ModuleResultType;
 };
 
 export type ProfilesPieChartDashboardModuleSettingsItemInput = {
@@ -5170,13 +5195,13 @@ export type ProfilesPieChartDashboardModuleSettingsItemInput = {
 
 export type ProfilesRatioDashboardModuleSettingsInput = {
   /** Aggregate function. Only for type AGGREGATE */
-  aggregate?: InputMaybe<ProfilesModuleResultAggregateType>;
+  aggregate?: InputMaybe<ModuleResultAggregateType>;
   filters: Array<ProfileFilter>;
   graphicType: DashboardRatioModuleSettingsType;
   /** Field to aggregate on. Only for type AGGREGATE */
   profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
-  type: ProfilesModuleResultType;
+  type: ModuleResultType;
 };
 
 export type PublicAccessVerification = {

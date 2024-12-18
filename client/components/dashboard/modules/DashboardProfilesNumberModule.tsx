@@ -12,7 +12,13 @@ export function DashboardProfilesNumberModule({
   return (
     <DashboardSimpleModuleCard module={module}>
       {isNonNullish(module.profilesNumberResult) ? (
-        <DashboardNumberValue value={module.profilesNumberResult.value} />
+        <DashboardNumberValue
+          value={
+            module.profilesNumberSettings.type === "COUNT"
+              ? module.profilesNumberResult.count
+              : (module.profilesNumberResult.aggr ?? 0)
+          }
+        />
       ) : null}
     </DashboardSimpleModuleCard>
   );
@@ -23,7 +29,11 @@ DashboardProfilesNumberModule.fragments = {
     fragment DashboardProfilesNumberModule_DashboardProfilesNumberModule on DashboardProfilesNumberModule {
       ...DashboardSimpleModuleCard_DashboardModule
       profilesNumberResult: result {
-        value
+        count
+        aggr
+      }
+      profilesNumberSettings: settings {
+        type
       }
     }
     ${DashboardSimpleModuleCard.fragments.DashboardModule}

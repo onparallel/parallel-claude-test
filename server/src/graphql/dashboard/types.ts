@@ -21,6 +21,26 @@ export const DashboardModuleSize = enumType({
   members: DashboardModuleSizeValues,
 });
 
+export const DashboardRatioModuleSettingsType = enumType({
+  name: "DashboardRatioModuleSettingsType",
+  members: ["PERCENTAGE", "RATIO"],
+});
+
+export const DashboardPieChartModuleSettingsType = enumType({
+  name: "DashboardPieChartModuleSettingsType",
+  members: ["DOUGHNUT", "PIE"],
+});
+
+export const ModuleResultType = enumType({
+  name: "ModuleResultType",
+  members: ["COUNT", "AGGREGATE"],
+});
+
+export const ModuleResultAggregateType = enumType({
+  name: "ModuleResultAggregateType",
+  members: ["SUM", "AVG", "MAX", "MIN"],
+});
+
 export const DashboardModule = interfaceType({
   name: "DashboardModule",
   definition(t) {
@@ -53,10 +73,23 @@ export const DashboardModule = interfaceType({
   },
 });
 
-export const DashboardNumberModuleResult = objectType({
-  name: "DashboardNumberModuleResult",
+export const DashboardModuleResultItem = objectType({
+  name: "DashboardModuleResultItem",
   definition(t) {
-    t.nonNull.float("value");
+    t.nonNull.int("count");
+    t.nullable.float("aggr");
+    t.nullable.json("label", {
+      description: "Label of the item, in string or LocalizableUserText format",
+    });
+    t.nullable.string("color");
+  },
+});
+
+export const DashboardModuleResultMultiItem = objectType({
+  name: "DashboardModuleResultMultiItem",
+  definition(t) {
+    t.nonNull.list.nonNull.field("items", { type: "DashboardModuleResultItem" });
+    t.nonNull.boolean("isIncongruent");
   },
 });
 
@@ -64,7 +97,7 @@ export const DashboardPetitionsNumberModule = objectType({
   name: "DashboardPetitionsNumberModule",
   definition(t) {
     t.implements("DashboardModule");
-    t.nullable.field("result", { type: "DashboardNumberModuleResult" });
+    t.nullable.field("result", { type: "DashboardModuleResultItem" });
   },
 });
 
@@ -72,21 +105,16 @@ export const DashboardProfilesNumberModule = objectType({
   name: "DashboardProfilesNumberModule",
   definition(t) {
     t.implements("DashboardModule");
-    t.nullable.field("result", { type: "DashboardNumberModuleResult" });
+    t.nonNull.field("settings", {
+      type: objectType({
+        name: "DashboardProfilesNumberModuleSettings",
+        definition(t) {
+          t.nonNull.field("type", { type: "ModuleResultType" });
+        },
+      }),
+    });
+    t.nullable.field("result", { type: "DashboardModuleResultItem" });
   },
-});
-
-export const DashboardRatioModuleResult = objectType({
-  name: "DashboardRatioModuleResult",
-  definition(t) {
-    t.nonNull.list.nonNull.float("value");
-    t.nonNull.boolean("isIncongruent");
-  },
-});
-
-export const DashboardRatioModuleSettingsType = enumType({
-  name: "DashboardRatioModuleSettingsType",
-  members: ["PERCENTAGE", "RATIO"],
 });
 
 export const DashboardPetitionsRatioModule = objectType({
@@ -101,7 +129,7 @@ export const DashboardPetitionsRatioModule = objectType({
         },
       }),
     });
-    t.nullable.field("result", { type: "DashboardRatioModuleResult" });
+    t.nullable.field("result", { type: "DashboardModuleResultMultiItem" });
   },
 });
 
@@ -114,23 +142,11 @@ export const DashboardProfilesRatioModule = objectType({
         name: "DashboardProfilesRatioModuleSettings",
         definition(t) {
           t.nonNull.field("graphicType", { type: "DashboardRatioModuleSettingsType" });
+          t.nonNull.field("type", { type: "ModuleResultType" });
         },
       }),
     });
-    t.nullable.field("result", { type: "DashboardRatioModuleResult" });
-  },
-});
-
-export const DashboardPieChartModuleSettingsType = enumType({
-  name: "DashboardPieChartModuleSettingsType",
-  members: ["DOUGHNUT", "PIE"],
-});
-
-export const DashboardPieChartModuleResult = objectType({
-  name: "DashboardPieChartModuleResult",
-  definition(t) {
-    t.nonNull.list.nonNull.float("value");
-    t.nonNull.boolean("isIncongruent");
+    t.nullable.field("result", { type: "DashboardModuleResultMultiItem" });
   },
 });
 
@@ -143,20 +159,10 @@ export const DashboardPetitionsPieChartModule = objectType({
         name: "DashboardPetitionsPieChartModuleSettings",
         definition(t) {
           t.nonNull.field("graphicType", { type: "DashboardPieChartModuleSettingsType" });
-          t.nonNull.list.nonNull.string("labels", {
-            resolve: (o) => o.items.map((f: any) => f.label),
-          });
-          t.nonNull.list.nonNull.string("colors", {
-            resolve: (o) => o.items.map((f: any) => f.color),
-          });
         },
-        sourceType: /* ts */ `{
-          graphicType: "DOUGHNUT" | "PIE";
-          items: { label: string; color: string }[];
-        }`,
       }),
     });
-    t.nullable.field("result", { type: "DashboardPieChartModuleResult" });
+    t.nullable.field("result", { type: "DashboardModuleResultMultiItem" });
   },
 });
 
@@ -169,20 +175,11 @@ export const DashboardProfilesPieChartModule = objectType({
         name: "DashboardProfilesPieChartModuleSettings",
         definition(t) {
           t.nonNull.field("graphicType", { type: "DashboardPieChartModuleSettingsType" });
-          t.nonNull.list.nonNull.string("labels", {
-            resolve: (o) => o.items.map((f: any) => f.label),
-          });
-          t.nonNull.list.nonNull.string("colors", {
-            resolve: (o) => o.items.map((f: any) => f.color),
-          });
+          t.nonNull.field("type", { type: "ModuleResultType" });
         },
-        sourceType: /* ts */ `{
-          graphicType: "DOUGHNUT" | "PIE";
-          items: { label: string; color: string }[];
-        }`,
       }),
     });
-    t.nullable.field("result", { type: "DashboardPieChartModuleResult" });
+    t.nullable.field("result", { type: "DashboardModuleResultMultiItem" });
   },
 });
 
@@ -207,14 +204,4 @@ export const DashboardCreatePetitionButtonModule = objectType({
       }),
     });
   },
-});
-
-export const ProfilesModuleResultType = enumType({
-  name: "ProfilesModuleResultType",
-  members: ["COUNT", "AGGREGATE"],
-});
-
-export const ProfilesModuleResultAggregateType = enumType({
-  name: "ProfilesModuleResultAggregateType",
-  members: ["SUM", "AVG", "MAX", "MIN"],
 });

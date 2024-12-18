@@ -2555,6 +2555,11 @@
     "context": "Untitled module"
   },
   {
+    "term": "component.dashboard-pie-chart-module.not-replied",
+    "definition": "Sin responder",
+    "context": "Not replied"
+  },
+  {
     "term": "component.date-range-picker-button.clear-range",
     "definition": "Vaciar rango de fechas",
     "context": "Clear date range"

@@ -566,6 +566,7 @@ function AddModule({
     handleSubmit,
     register,
     control,
+    setValue,
     formState: { errors },
     watch,
   } = useForm<AddModuleData>({
@@ -615,7 +616,7 @@ function AddModule({
   const [createModule] = useMutation(types.find(([t, _]) => t === type)![1] as any);
 
   // Para los charts
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control,
     name: "settings.items",
   });
@@ -640,6 +641,7 @@ function AddModule({
   });
 
   const settingProfileTypeId = watch("settings.profileTypeId");
+  const settingGroupByProfileTypeFieldId = watch("settings.groupByProfileTypeFieldId");
 
   const { data } = useQuery(DashboardEditDialog_profileTypeDocument, {
     variables: { profileTypeId: settingProfileTypeId },
@@ -693,12 +695,26 @@ function AddModule({
             }),
           } as ProfilesRatioDashboardModuleSettingsInput;
         } else if (type === "PROFILES_CHART_DASHBOARD_MODULE") {
+          const groupByFilter = omit(
+            profileListViewsData!.me.profileListViews.find(
+              (view) => view.id === (dataSettings.groupByFilter ?? null),
+            )?.data ?? {},
+            ["search", "__typename"],
+          );
           settings = {
             profileTypeId: dataSettings.profileTypeId,
             type: dataSettings.type,
             aggregate: dataSettings.aggregate,
             profileTypeFieldId: dataSettings.profileTypeFieldId,
             graphicType: dataSettings.graphicType,
+            groupByFilter:
+              dataSettings.groupByFilter && dataSettings.groupByFilter !== "null"
+                ? {
+                    ...omit(groupByFilter, ["status"]),
+                    status: ["OPEN"],
+                  }
+                : null,
+            groupByProfileTypeFieldId: dataSettings.groupByProfileTypeFieldId,
             items: dataSettings.items.map((item: any) => {
               const filter = omit(
                 profileListViewsData!.me.profileListViews.find((view) => view.id === item.filter)
@@ -946,56 +962,103 @@ function AddModule({
                 </FormControl>
 
                 {isNonNullish(settingProfileTypeId) && isNonNullish(profileListViewsData) ? (
-                  <FormControl isRequired>
-                    <FormLabel>{untranslated("Chart Items")}</FormLabel>
-                    <Stack spacing={3}>
-                      {fields.map((field, index) => (
-                        <Stack key={field.id} spacing={2}>
-                          <Flex justifyContent="space-between" alignItems="center">
-                            <Text fontWeight="bold">{untranslated(`Item ${index + 1}`)}</Text>
-                            <IconButton
-                              icon={<DeleteIcon />}
-                              aria-label=""
-                              size="sm"
-                              colorScheme="red"
-                              onClick={() => remove(index)}
-                            />
-                          </Flex>
-                          <FormControl isRequired>
-                            <FormLabel>{untranslated("Label")}</FormLabel>
-                            <Input {...register(`settings.items.${index}.label`)} />
-                          </FormControl>
+                  <>
+                    <FormControl isRequired={fields.length === 0}>
+                      <FormLabel>{untranslated("Group by profile type field")}</FormLabel>
+                      <Controller
+                        name="settings.groupByProfileTypeFieldId"
+                        control={control}
+                        rules={{
+                          required: fields.length === 0,
+                        }}
+                        render={({ field: { onChange, value } }) => (
+                          <ProfileTypeFieldSelect
+                            value={profileTypeFields.find((f) => f.id === value) as any}
+                            fields={profileTypeFields.filter((f) => f.type === "SELECT")}
+                            onChange={(v) => {
+                              if (v && fields.length) {
+                                replace([]);
+                              }
+                              onChange(v?.id);
+                            }}
+                          />
+                        )}
+                      />
+                    </FormControl>
+                    {settingGroupByProfileTypeFieldId ? (
+                      <FormControl>
+                        <FormLabel>{untranslated("Group by filter")}</FormLabel>
+                        <Select
+                          {...register("settings.groupByFilter", {
+                            shouldUnregister: true,
+                          })}
+                        >
+                          <option key={"null"} value="null">
+                            {untranslated("-- None --")}
+                          </option>
+                          {profileListViewsData.me.profileListViews.map((view) => {
+                            return (
+                              <option key={view.id} value={view.id}>
+                                {view.name}
+                              </option>
+                            );
+                          })}
+                        </Select>
+                      </FormControl>
+                    ) : null}
+                    <FormControl>
+                      <FormLabel>{untranslated("Chart Items")}</FormLabel>
+                      <Stack spacing={3}>
+                        {fields.map((field, index) => (
+                          <Stack key={field.id} spacing={2}>
+                            <Flex justifyContent="space-between" alignItems="center">
+                              <Text fontWeight="bold">{untranslated(`Item ${index + 1}`)}</Text>
+                              <IconButton
+                                icon={<DeleteIcon />}
+                                aria-label=""
+                                size="sm"
+                                colorScheme="red"
+                                onClick={() => remove(index)}
+                              />
+                            </Flex>
+                            <FormControl isRequired>
+                              <FormLabel>{untranslated("Label")}</FormLabel>
+                              <Input {...register(`settings.items.${index}.label`)} />
+                            </FormControl>
 
-                          <FormControl isRequired>
-                            <FormLabel>{untranslated("Color")}</FormLabel>
-                            <Input type="color" {...register(`settings.items.${index}.color`)} />
-                          </FormControl>
+                            <FormControl isRequired>
+                              <FormLabel>{untranslated("Color")}</FormLabel>
+                              <Input type="color" {...register(`settings.items.${index}.color`)} />
+                            </FormControl>
 
-                          <FormControl isRequired>
-                            <FormLabel>{untranslated("Filter")}</FormLabel>
-                            <Select {...register(`settings.items.${index}.filter`)}>
-                              {profileListViewsData.me.profileListViews.map((view) => (
-                                <option key={view.id} value={view.id}>
-                                  {view.name}
-                                </option>
-                              ))}
-                            </Select>
-                          </FormControl>
-                        </Stack>
-                      ))}
-                      <Button
-                        onClick={() =>
-                          append({
-                            label: "",
-                            color: "#000000",
-                            filter: profileListViewsData.me.profileListViews[0].id as any,
-                          })
-                        }
-                      >
-                        {untranslated("Add Item")}
-                      </Button>
-                    </Stack>
-                  </FormControl>
+                            <FormControl isRequired>
+                              <FormLabel>{untranslated("Filter")}</FormLabel>
+                              <Select {...register(`settings.items.${index}.filter`)}>
+                                {profileListViewsData.me.profileListViews.map((view) => (
+                                  <option key={view.id} value={view.id}>
+                                    {view.name}
+                                  </option>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          </Stack>
+                        ))}
+                        <Button
+                          onClick={() => {
+                            setValue("settings.groupByProfileTypeFieldId", null);
+                            setValue("settings.groupByFilter", null);
+                            append({
+                              label: "",
+                              color: "#000000",
+                              filter: profileListViewsData.me.profileListViews[0].id as any,
+                            });
+                          }}
+                        >
+                          {untranslated("Add Item")}
+                        </Button>
+                      </Stack>
+                    </FormControl>
+                  </>
                 ) : null}
               </>
             ) : null}

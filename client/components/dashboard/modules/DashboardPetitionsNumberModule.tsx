@@ -12,7 +12,7 @@ export function DashboardPetitionsNumberModule({
   return (
     <DashboardSimpleModuleCard module={module}>
       {isNonNullish(module.petitionsNumberResult) ? (
-        <DashboardNumberValue value={module.petitionsNumberResult.value} />
+        <DashboardNumberValue value={module.petitionsNumberResult.count} />
       ) : null}
     </DashboardSimpleModuleCard>
   );
@@ -23,7 +23,7 @@ DashboardPetitionsNumberModule.fragments = {
     fragment DashboardPetitionsNumberModule_DashboardPetitionsNumberModule on DashboardPetitionsNumberModule {
       ...DashboardSimpleModuleCard_DashboardModule
       petitionsNumberResult: result {
-        value
+        count
       }
     }
     ${DashboardSimpleModuleCard.fragments.DashboardModule}

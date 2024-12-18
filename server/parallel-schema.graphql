@@ -504,40 +504,50 @@ interface DashboardModule {
   title: String
 }
 
+type DashboardModuleResultItem {
+  aggr: Float
+  color: String
+  count: Int!
+
+  """
+  Label of the item, in string or LocalizableUserText format
+  """
+  label: JSON
+}
+
+type DashboardModuleResultMultiItem {
+  isIncongruent: Boolean!
+  items: [DashboardModuleResultItem!]!
+}
+
 enum DashboardModuleSize {
   LARGE
   MEDIUM
   SMALL
 }
 
-type DashboardNumberModuleResult {
-  value: Float!
-}
-
 type DashboardPetitionsNumberModule implements DashboardModule {
   id: GID!
-  result: DashboardNumberModuleResult
+  result: DashboardModuleResultItem
   size: DashboardModuleSize!
   title: String
 }
 
 type DashboardPetitionsPieChartModule implements DashboardModule {
   id: GID!
-  result: DashboardPieChartModuleResult
+  result: DashboardModuleResultMultiItem
   settings: DashboardPetitionsPieChartModuleSettings!
   size: DashboardModuleSize!
   title: String
 }
 
 type DashboardPetitionsPieChartModuleSettings {
-  colors: [String!]!
   graphicType: DashboardPieChartModuleSettingsType!
-  labels: [String!]!
 }
 
 type DashboardPetitionsRatioModule implements DashboardModule {
   id: GID!
-  result: DashboardRatioModuleResult
+  result: DashboardModuleResultMultiItem
   settings: DashboardPetitionsRatioModuleSettings!
   size: DashboardModuleSize!
   title: String
@@ -547,11 +557,6 @@ type DashboardPetitionsRatioModuleSettings {
   graphicType: DashboardRatioModuleSettingsType!
 }
 
-type DashboardPieChartModuleResult {
-  isIncongruent: Boolean!
-  value: [Float!]!
-}
-
 enum DashboardPieChartModuleSettingsType {
   DOUGHNUT
   PIE
@@ -559,28 +564,32 @@ enum DashboardPieChartModuleSettingsType {
 
 type DashboardProfilesNumberModule implements DashboardModule {
   id: GID!
-  result: DashboardNumberModuleResult
+  result: DashboardModuleResultItem
+  settings: DashboardProfilesNumberModuleSettings!
   size: DashboardModuleSize!
   title: String
 }
 
+type DashboardProfilesNumberModuleSettings {
+  type: ModuleResultType!
+}
+
 type DashboardProfilesPieChartModule implements DashboardModule {
   id: GID!
-  result: DashboardPieChartModuleResult
+  result: DashboardModuleResultMultiItem
   settings: DashboardProfilesPieChartModuleSettings!
   size: DashboardModuleSize!
   title: String
 }
 
 type DashboardProfilesPieChartModuleSettings {
-  colors: [String!]!
   graphicType: DashboardPieChartModuleSettingsType!
-  labels: [String!]!
+  type: ModuleResultType!
 }
 
 type DashboardProfilesRatioModule implements DashboardModule {
   id: GID!
-  result: DashboardRatioModuleResult
+  result: DashboardModuleResultMultiItem
   settings: DashboardProfilesRatioModuleSettings!
   size: DashboardModuleSize!
   title: String
@@ -588,11 +597,7 @@ type DashboardProfilesRatioModule implements DashboardModule {
 
 type DashboardProfilesRatioModuleSettings {
   graphicType: DashboardRatioModuleSettingsType!
-}
-
-type DashboardRatioModuleResult {
-  isIncongruent: Boolean!
-  value: [Float!]!
+  type: ModuleResultType!
 }
 
 enum DashboardRatioModuleSettingsType {
@@ -1116,6 +1121,18 @@ type MessageSentEvent implements PetitionEvent {
   message: PetitionMessage!
   petition: Petition
   type: PetitionEventType!
+}
+
+enum ModuleResultAggregateType {
+  AVG
+  MAX
+  MIN
+  SUM
+}
+
+enum ModuleResultType {
+  AGGREGATE
+  COUNT
 }
 
 type Mutation {
@@ -6536,23 +6553,11 @@ type ProfileUpdatedEvent implements ProfileEvent {
   user: User
 }
 
-enum ProfilesModuleResultAggregateType {
-  AVG
-  MAX
-  MIN
-  SUM
-}
-
-enum ProfilesModuleResultType {
-  AGGREGATE
-  COUNT
-}
-
 input ProfilesNumberDashboardModuleSettingsInput {
   """
   Aggregate function. Only for type AGGREGATE
   """
-  aggregate: ProfilesModuleResultAggregateType
+  aggregate: ModuleResultAggregateType
   filter: ProfileFilter!
 
   """
@@ -6560,15 +6565,25 @@ input ProfilesNumberDashboardModuleSettingsInput {
   """
   profileTypeFieldId: GID
   profileTypeId: GID!
-  type: ProfilesModuleResultType!
+  type: ModuleResultType!
 }
 
 input ProfilesPieChartDashboardModuleSettingsInput {
   """
   Aggregate function. Only for type AGGREGATE
   """
-  aggregate: ProfilesModuleResultAggregateType
+  aggregate: ModuleResultAggregateType
   graphicType: DashboardPieChartModuleSettingsType!
+
+  """
+  Optional filter to apply to all items when grouping by a field
+  """
+  groupByFilter: ProfileFilter
+
+  """
+  Optional SELECT field to group by its values instead of items array
+  """
+  groupByProfileTypeFieldId: GID
   items: [ProfilesPieChartDashboardModuleSettingsItemInput!]!
 
   """
@@ -6576,7 +6591,7 @@ input ProfilesPieChartDashboardModuleSettingsInput {
   """
   profileTypeFieldId: GID
   profileTypeId: GID!
-  type: ProfilesModuleResultType!
+  type: ModuleResultType!
 }
 
 input ProfilesPieChartDashboardModuleSettingsItemInput {
@@ -6589,7 +6604,7 @@ input ProfilesRatioDashboardModuleSettingsInput {
   """
   Aggregate function. Only for type AGGREGATE
   """
-  aggregate: ProfilesModuleResultAggregateType
+  aggregate: ModuleResultAggregateType
   filters: [ProfileFilter!]!
   graphicType: DashboardRatioModuleSettingsType!
 
@@ -6598,7 +6613,7 @@ input ProfilesRatioDashboardModuleSettingsInput {
   """
   profileTypeFieldId: GID
   profileTypeId: GID!
-  type: ProfilesModuleResultType!
+  type: ModuleResultType!
 }
 
 type PublicAccessVerification {

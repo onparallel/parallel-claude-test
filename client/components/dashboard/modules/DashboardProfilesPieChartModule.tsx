@@ -1,6 +1,8 @@
 import { gql } from "@apollo/client";
 import { Box, Center, Stack, useBreakpointValue } from "@chakra-ui/react";
+import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragment } from "@parallel/graphql/__types";
+import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { DashboardChartLegend } from "../charts/DashboardChartLegend";
 import { DashboardDoughnutChart } from "../charts/DashboardDoughnutChart";
@@ -14,17 +16,34 @@ export function DashboardProfilesPieChartModule({
 }: {
   module: DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragment;
 }) {
+  const intl = useIntl();
+  const type = module.profilesPieChartSettings.type;
   const data = {
     datasets: [
       {
-        data: module.profilesPieChartResult?.value ?? [],
-        backgroundColor: module.profilesPieChartSettings?.colors ?? [],
+        data:
+          module.profilesPieChartResult?.items?.map((item) =>
+            type === "COUNT" ? item.count : (item.aggr ?? 0),
+          ) ?? [],
+        backgroundColor:
+          module.profilesPieChartResult?.items?.map((item) => item.color ?? "#E2E8F0") ?? [],
         borderColor: "white",
-        hoverBackgroundColor: module.profilesPieChartSettings?.colors ?? [],
+        hoverBackgroundColor:
+          module.profilesPieChartResult?.items?.map((item) => item.color ?? "#E2E8F0") ?? [],
         hoverBorderColor: "white",
       },
     ],
-    labels: module.profilesPieChartSettings?.labels ?? [],
+    labels:
+      module.profilesPieChartResult?.items?.map(({ label }) =>
+        label === null
+          ? intl.formatMessage({
+              id: "component.dashboard-pie-chart-module.not-replied",
+              defaultMessage: "Not replied",
+            })
+          : typeof label === "string"
+            ? label
+            : localizableUserTextRender({ intl, value: label, default: "" }),
+      ) ?? [],
   };
   const rows = useBreakpointValue({ base: 4, md: 2, lg: module.size === "LARGE" ? 3 : 2 });
   const chartSize = useBreakpointValue({
@@ -77,13 +96,17 @@ DashboardProfilesPieChartModule.fragments = {
         size
         title
         profilesPieChartResult: result {
-          value
+          items {
+            count
+            aggr
+            label
+            color
+          }
           isIncongruent
         }
         profilesPieChartSettings: settings {
           graphicType
-          labels
-          colors
+          type
         }
       }
     `;

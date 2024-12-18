@@ -33,6 +33,8 @@ describe("GraphQL / Dashboards", () => {
   let profileType: ProfileType;
   let shortTextProfileTypeField: ProfileTypeField;
   let numberProfileTypeField: ProfileTypeField;
+  let riskSelectProfileTypeField: ProfileTypeField;
+  let countrySelectProfileTypeField: ProfileTypeField;
 
   let rootOrgProfileType: ProfileType;
   let rootOrgProfileTypeField: ProfileTypeField;
@@ -126,12 +128,27 @@ describe("GraphQL / Dashboards", () => {
       .returning("*");
 
     [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
-    [numberProfileTypeField, shortTextProfileTypeField] = await mocks.createRandomProfileTypeFields(
-      organization.id,
-      profileType.id,
-      2,
-      (i) => ({ type: ["NUMBER", "SHORT_TEXT"][i] as ProfileTypeFieldType }),
-    );
+    [
+      numberProfileTypeField,
+      shortTextProfileTypeField,
+      riskSelectProfileTypeField,
+      countrySelectProfileTypeField,
+    ] = await mocks.createRandomProfileTypeFields(organization.id, profileType.id, 4, (i) => ({
+      type: ["NUMBER", "SHORT_TEXT", "SELECT", "SELECT"][i] as ProfileTypeFieldType,
+      options:
+        i === 2
+          ? {
+              values: [
+                { label: { en: "High", es: "Alto" }, value: "HIGH", color: "#ff0000" },
+                { label: { en: "Medium", es: "Medio" }, value: "MEDIUM", color: "#00ff00" },
+                { label: { en: "Low", es: "Bajo" }, value: "LOW", color: "#0000ff" },
+              ],
+              showOptionsWithColors: true,
+            }
+          : i === 3
+            ? { standardList: "COUNTRIES" }
+            : {},
+    }));
 
     [rootOrgProfileType] = await mocks.createRandomProfileTypes(rootOrg.id, 1);
     [rootOrgProfileTypeField] = await mocks.createRandomProfileTypeFields(
@@ -2243,7 +2260,7 @@ describe("GraphQL / Dashboards", () => {
       });
     });
 
-    it("sends error if passing no filters", async () => {
+    it("sends error if passing no items", async () => {
       const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
         gql`
           mutation (
@@ -2413,6 +2430,218 @@ describe("GraphQL / Dashboards", () => {
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
         argName: "settings.items[0].filter.profileTypeId",
         message: "Cannot be set",
+      });
+      expect(data).toBeNull();
+    });
+
+    it("creates a pie chart based on the values of a SELECT property with custom options", async () => {
+      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: ProfilesPieChartDashboardModuleSettingsInput!
+          ) {
+            createProfilesPieChartDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Profiles pie chart",
+          size: "SMALL",
+          settings: {
+            graphicType: "PIE",
+            type: "COUNT",
+            profileTypeId: toGlobalId("ProfileType", profileType.id),
+            groupByProfileTypeFieldId: toGlobalId(
+              "ProfileTypeField",
+              riskSelectProfileTypeField.id,
+            ),
+            items: [],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createProfilesPieChartDashboardModule).toEqual({
+        id: toGlobalId("Dashboard", dashboards[0].id),
+        modules: [
+          { id: toGlobalId("DashboardModule", modules[0].id) },
+          { id: toGlobalId("DashboardModule", modules[1].id) },
+          { id: expect.any(String) },
+        ],
+      });
+    });
+
+    it("creates a pie chart aggregating values of NUMBER field on OPEN profiles and grouping by a SELECT property with standardList COUNTRIES", async () => {
+      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: ProfilesPieChartDashboardModuleSettingsInput!
+          ) {
+            createProfilesPieChartDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Profiles pie chart",
+          size: "SMALL",
+          settings: {
+            graphicType: "PIE",
+            type: "AGGREGATE",
+            aggregate: "SUM",
+            profileTypeFieldId: toGlobalId("ProfileTypeField", numberProfileTypeField.id),
+            profileTypeId: toGlobalId("ProfileType", profileType.id),
+            groupByProfileTypeFieldId: toGlobalId(
+              "ProfileTypeField",
+              countrySelectProfileTypeField.id,
+            ),
+            groupByFilter: {
+              status: ["OPEN", "CLOSED"],
+            },
+            items: [],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createProfilesPieChartDashboardModule).toEqual({
+        id: toGlobalId("Dashboard", dashboards[0].id),
+        modules: [
+          { id: toGlobalId("DashboardModule", modules[0].id) },
+          { id: toGlobalId("DashboardModule", modules[1].id) },
+          { id: expect.any(String) },
+        ],
+      });
+    });
+
+    it("sends error if trying to group by but property is not SELECT", async () => {
+      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: ProfilesPieChartDashboardModuleSettingsInput!
+          ) {
+            createProfilesPieChartDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Profiles pie chart",
+          size: "SMALL",
+          settings: {
+            graphicType: "PIE",
+            type: "AGGREGATE",
+            aggregate: "SUM",
+            profileTypeFieldId: toGlobalId("ProfileTypeField", numberProfileTypeField.id),
+            profileTypeId: toGlobalId("ProfileType", profileType.id),
+            groupByProfileTypeFieldId: toGlobalId("ProfileTypeField", shortTextProfileTypeField.id),
+            items: [],
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        argName: "settings.groupByProfileTypeFieldId",
+        message: "Must be a SELECT field",
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error if trying to group by and passing settings.items array", async () => {
+      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: ProfilesPieChartDashboardModuleSettingsInput!
+          ) {
+            createProfilesPieChartDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Profiles pie chart",
+          size: "SMALL",
+          settings: {
+            graphicType: "PIE",
+            type: "AGGREGATE",
+            aggregate: "SUM",
+            profileTypeFieldId: toGlobalId("ProfileTypeField", numberProfileTypeField.id),
+            profileTypeId: toGlobalId("ProfileType", profileType.id),
+            groupByProfileTypeFieldId: toGlobalId(
+              "ProfileTypeField",
+              countrySelectProfileTypeField.id,
+            ),
+            groupByFilter: {
+              status: ["OPEN", "CLOSED"],
+            },
+            items: [
+              {
+                label: "Open",
+                color: "#00ff00",
+                filter: {
+                  profileTypeId: toGlobalId("ProfileType", profileType.id),
+                  status: ["OPEN"],
+                },
+              },
+              { label: "Closed", color: "#ff0000", filter: { status: ["CLOSED"] } },
+              { label: "Deleted", color: "#0000ff", filter: { status: ["DELETION_SCHEDULED"] } },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        argName: "settings.items",
+        message: "Must be empty when groupByProfileTypeFieldId is provided",
       });
       expect(data).toBeNull();
     });

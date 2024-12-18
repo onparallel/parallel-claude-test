@@ -122,19 +122,19 @@ describe("DashboardRepository", () => {
     });
 
     it("counts petitions in a specific path", async () => {
-      expect(await count({ path: "/KYC/" })).toEqual({ value: 4 });
+      expect(await count({ path: "/KYC/" })).toEqual({ count: 4 });
     });
 
     it("counts petitions with DRAFT or PENDING status", async () => {
-      expect(await count({ status: ["DRAFT", "PENDING"] })).toEqual({ value: 4 });
+      expect(await count({ status: ["DRAFT", "PENDING"] })).toEqual({ count: 4 });
     });
 
     it("counts petitions with a specific locale", async () => {
-      expect(await count({ locale: "it" })).toEqual({ value: 1 });
+      expect(await count({ locale: "it" })).toEqual({ count: 1 });
     });
 
     it("counts petitions with a completed signature", async () => {
-      expect(await count({ signature: ["COMPLETED"] })).toEqual({ value: 4 });
+      expect(await count({ signature: ["COMPLETED"] })).toEqual({ count: 4 });
     });
 
     it("counts petitions with specific tags", async () => {
@@ -148,7 +148,7 @@ describe("DashboardRepository", () => {
             ],
           },
         }),
-      ).toEqual({ value: 1 });
+      ).toEqual({ count: 1 });
 
       expect(
         await count({
@@ -160,7 +160,7 @@ describe("DashboardRepository", () => {
             ],
           },
         }),
-      ).toEqual({ value: 6 });
+      ).toEqual({ count: 6 });
     });
 
     it("counts petitions with no tags", async () => {
@@ -171,7 +171,7 @@ describe("DashboardRepository", () => {
             filters: [{ operator: "IS_EMPTY", value: [] }],
           },
         }),
-      ).toEqual({ value: 5 });
+      ).toEqual({ count: 5 });
     });
 
     it("counts petitions shared with me", async () => {
@@ -191,7 +191,7 @@ describe("DashboardRepository", () => {
             ],
           },
         }),
-      ).toEqual({ value: 5 });
+      ).toEqual({ count: 5 });
     });
 
     it("counts petitions not shared with me", async () => {
@@ -207,7 +207,7 @@ describe("DashboardRepository", () => {
             ],
           },
         }),
-      ).toEqual({ value: 2 });
+      ).toEqual({ count: 2 });
     });
 
     it("counts petitions shared with me through a specific user group", async () => {
@@ -227,7 +227,7 @@ describe("DashboardRepository", () => {
             ],
           },
         }),
-      ).toEqual({ value: 1 });
+      ).toEqual({ count: 1 });
     });
 
     it("counts petitions that i own", async () => {
@@ -243,11 +243,11 @@ describe("DashboardRepository", () => {
             ],
           },
         }),
-      ).toEqual({ value: 8 });
+      ).toEqual({ count: 8 });
     });
 
     it("counts petitions from a specific template", async () => {
-      expect(await count({ fromTemplateId: [templates[0].id] })).toEqual({ value: 8 });
+      expect(await count({ fromTemplateId: [templates[0].id] })).toEqual({ count: 8 });
     });
 
     it("counts petitions with multiple filters", async () => {
@@ -262,7 +262,7 @@ describe("DashboardRepository", () => {
             filters: [{ operator: "IS_EMPTY", value: [] }],
           },
         }),
-      ).toEqual({ value: 1 });
+      ).toEqual({ count: 1 });
     });
   });
 
@@ -293,9 +293,9 @@ describe("DashboardRepository", () => {
             i === 4
               ? {
                   values: [
-                    { label: "High Risk", value: "HIGH" },
-                    { label: "Medium Risk", value: "MEDIUM" },
-                    { label: "Low Risk", value: "LOW" },
+                    { label: { en: "High Risk" }, value: "HIGH" },
+                    { label: { en: "Medium Risk" }, value: "MEDIUM" },
+                    { label: { en: "Low Risk" }, value: "LOW" },
                   ],
                 }
               : {},
@@ -313,9 +313,9 @@ describe("DashboardRepository", () => {
             i === 2
               ? {
                   values: [
-                    { label: "A", value: "A" },
-                    { label: "B", value: "B" },
-                    { label: "C", value: "C" },
+                    { label: { en: "A" }, value: "A" },
+                    { label: { en: "B" }, value: "B" },
+                    { label: { en: "C" }, value: "C" },
                   ],
                 }
               : i === 3
@@ -651,7 +651,7 @@ describe("DashboardRepository", () => {
           filters: { status: ["OPEN", "CLOSED"] },
           type: "COUNT",
         }),
-      ).toEqual({ value: 3 });
+      ).toEqual({ count: 3, aggr: null });
     });
 
     it("sends error if passing unknown profileTypeFieldId", async () => {
@@ -678,7 +678,7 @@ describe("DashboardRepository", () => {
           },
           type: "COUNT",
         }),
-      ).toEqual({ value: 1 });
+      ).toEqual({ count: 1, aggr: null });
     });
 
     it("counts profiles with HAS_VALUE operator", async () => {
@@ -696,7 +696,7 @@ describe("DashboardRepository", () => {
             },
           },
         }),
-      ).toEqual({ value: 2 });
+      ).toEqual({ count: 2, aggr: null });
     });
 
     it("counts profiles with NOT_HAS_VALUE operator", async () => {
@@ -713,7 +713,7 @@ describe("DashboardRepository", () => {
             },
           },
         }),
-      ).toEqual({ value: 0 });
+      ).toEqual({ count: 0, aggr: null });
     });
 
     it("counts profiles with HAS_BG_CHECK_RESULTS operator", async () => {
@@ -730,7 +730,7 @@ describe("DashboardRepository", () => {
             },
           },
         }),
-      ).toEqual({ value: 3 });
+      ).toEqual({ count: 3, aggr: null });
     });
 
     it("counts profiles with HAS_VALUE & NOT_HAS_BG_CHECK_RESULTS operators", async () => {
@@ -751,7 +751,7 @@ describe("DashboardRepository", () => {
             },
           },
         }),
-      ).toEqual({ value: 1 });
+      ).toEqual({ count: 1, aggr: null });
     });
 
     it("counts profiles with HAS_VALUE & NOT_HAS_BG_CHECK_MATCH operator", async () => {
@@ -769,7 +769,7 @@ describe("DashboardRepository", () => {
             },
           },
         }),
-      ).toEqual({ value: 2 });
+      ).toEqual({ count: 2, aggr: null });
     });
 
     it("counts profiles with HAS_BG_CHECK_TOPICS operator", async () => {
@@ -790,7 +790,7 @@ describe("DashboardRepository", () => {
             },
           },
         }),
-      ).toEqual({ value: 2 });
+      ).toEqual({ count: 2, aggr: null });
     });
 
     it("counts profiles with IS_EXPIRED operator", async () => {
@@ -810,7 +810,7 @@ describe("DashboardRepository", () => {
             },
           },
         }),
-      ).toEqual({ value: 1 });
+      ).toEqual({ count: 1, aggr: null });
     });
 
     it("counts profiles with EXPIRES_IN operator", async () => {
@@ -831,7 +831,7 @@ describe("DashboardRepository", () => {
             },
           },
         }),
-      ).toEqual({ value: 2 });
+      ).toEqual({ count: 2, aggr: null });
     });
 
     it("counts profiles with GREATER_THAN operator", async () => {
@@ -852,7 +852,7 @@ describe("DashboardRepository", () => {
             },
           },
         }),
-      ).toEqual({ value: 1 });
+      ).toEqual({ count: 1, aggr: null });
     });
 
     it("counts profiles with NOT_HAS_EXPIRY operator", async () => {
@@ -872,7 +872,7 @@ describe("DashboardRepository", () => {
             },
           },
         }),
-      ).toEqual({ value: 4 });
+      ).toEqual({ count: 4, aggr: null });
     });
 
     it("counts profiles with CHECKBOX CONTAIN filters", async () => {
@@ -893,7 +893,7 @@ describe("DashboardRepository", () => {
             },
           },
         }),
-      ).toEqual({ value: 2 });
+      ).toEqual({ count: 2, aggr: null });
     });
 
     it("counts profiles with CHECKBOX EQUAL filters", async () => {
@@ -914,7 +914,7 @@ describe("DashboardRepository", () => {
             },
           },
         }),
-      ).toEqual({ value: 1 });
+      ).toEqual({ count: 1, aggr: null });
     });
 
     it("counts OPEN profiles with certain bg check topic and high risk", async () => {
@@ -941,7 +941,7 @@ describe("DashboardRepository", () => {
             },
           },
         }),
-      ).toEqual({ value: 1 });
+      ).toEqual({ count: 1, aggr: null });
     });
 
     it("sends error when aggregating by an unknown field", async () => {
@@ -969,12 +969,12 @@ describe("DashboardRepository", () => {
     });
 
     it("aggregates contract values", async () => {
-      for (const [aggregate, value] of [
-        ["SUM", 1500],
-        ["AVG", 750],
-        ["MIN", 500],
-        ["MAX", 1000],
-      ] as ["SUM" | "AVG" | "MIN" | "MAX", number][]) {
+      for (const [aggregate, aggr, countValue] of [
+        ["SUM", 1500, 2],
+        ["AVG", 750, 2],
+        ["MIN", 500, 2],
+        ["MAX", 1000, 2],
+      ] as ["SUM" | "AVG" | "MIN" | "MAX", number, number][]) {
         expect(
           await count({
             profileTypeId: contract.id,
@@ -983,7 +983,7 @@ describe("DashboardRepository", () => {
             profileTypeFieldId: contractFields[4].id,
             filters: {},
           }),
-        ).toEqual({ value });
+        ).toEqual({ aggr, count: countValue });
       }
     });
   });
@@ -1020,7 +1020,7 @@ describe("DashboardRepository", () => {
           ],
         }),
       ).toEqual({
-        value: [4, 10],
+        items: [{ count: 4 }, { count: 10 }],
         isIncongruent: false,
       });
     });
@@ -1032,7 +1032,7 @@ describe("DashboardRepository", () => {
           filters: [{ status: ["DRAFT", "PENDING"] }, { status: ["DRAFT", "COMPLETED", "CLOSED"] }],
         }),
       ).toEqual({
-        value: [4, 9],
+        items: [{ count: 4 }, { count: 9 }],
         isIncongruent: true,
       });
     });
@@ -1074,7 +1074,10 @@ describe("DashboardRepository", () => {
           filters: [{ status: ["OPEN"] }, { status: ["OPEN", "CLOSED"] }],
         }),
       ).toEqual({
-        value: [6, 8],
+        items: [
+          { count: 6, aggr: null },
+          { count: 8, aggr: null },
+        ],
         isIncongruent: false,
       });
     });
@@ -1088,7 +1091,10 @@ describe("DashboardRepository", () => {
           filters: [{ status: ["OPEN", "CLOSED"] }, { status: ["OPEN"] }],
         }),
       ).toEqual({
-        value: [8, 6],
+        items: [
+          { count: 8, aggr: null },
+          { count: 6, aggr: null },
+        ],
         isIncongruent: true,
       });
     });
@@ -1121,7 +1127,11 @@ describe("DashboardRepository", () => {
           ],
         }),
       ).toEqual({
-        value: [7, 7, 6],
+        items: [
+          { label: "En proceso", color: "#FF0000", count: 7 },
+          { label: "Completados", color: "#00FF00", count: 7 },
+          { label: "Cerrados", color: "#0000FF", count: 6 },
+        ],
         isIncongruent: false,
       });
     });
@@ -1138,7 +1148,12 @@ describe("DashboardRepository", () => {
           ],
         }),
       ).toEqual({
-        value: [2, 7, 7, 6],
+        items: [
+          { label: "Borradores", color: "#FF0000", count: 2 },
+          { label: "En proceso", color: "#FF0000", count: 7 },
+          { label: "Completados", color: "#00FF00", count: 7 },
+          { label: "Cerrados", color: "#0000FF", count: 6 },
+        ],
         isIncongruent: true,
       });
     });
@@ -1146,28 +1161,30 @@ describe("DashboardRepository", () => {
 
   describe("getProfilesPieChartValues", () => {
     let profileType: ProfileType;
-    let selectField: ProfileTypeField;
+    let riskSelectField: ProfileTypeField;
     let numberField: ProfileTypeField;
+    let countrySelectField: ProfileTypeField;
     beforeAll(async () => {
       [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
-      [selectField, numberField] = await mocks.createRandomProfileTypeFields(
-        organization.id,
-        profileType.id,
-        2,
-        (i) => ({
-          type: ["SELECT", "NUMBER"][i] as ProfileTypeFieldType,
+      [riskSelectField, numberField, countrySelectField] =
+        await mocks.createRandomProfileTypeFields(organization.id, profileType.id, 3, (i) => ({
+          type: ["SELECT", "NUMBER", "SELECT"][i] as ProfileTypeFieldType,
           options:
             i === 0
               ? {
                   values: [
-                    { label: "High Risk", value: "HIGH" },
-                    { label: "Medium Risk", value: "MEDIUM" },
-                    { label: "Low Risk", value: "LOW" },
+                    { label: { en: "High Risk" }, color: "#aa0000", value: "HIGH" },
+                    { label: { en: "Medium Risk" }, color: "#bb0000", value: "MEDIUM" },
+                    { label: { en: "Low Risk" }, color: "#cc0000", value: "LOW" },
                   ],
+                  showOptionsWithColors: true,
                 }
-              : {},
-        }),
-      );
+              : i === 1
+                ? {}
+                : i === 2
+                  ? { standardList: "COUNTRIES" }
+                  : {},
+        }));
 
       const profiles = await mocks.createRandomProfiles(
         organization.id,
@@ -1195,7 +1212,7 @@ describe("DashboardRepository", () => {
         {
           created_by_user_id: users[0].id,
           profile_id: profiles[0].id,
-          profile_type_field_id: selectField.id,
+          profile_type_field_id: riskSelectField.id,
           type: "SELECT",
           content: { value: "HIGH" },
         },
@@ -1208,8 +1225,15 @@ describe("DashboardRepository", () => {
         },
         {
           created_by_user_id: users[0].id,
+          profile_id: profiles[0].id,
+          profile_type_field_id: countrySelectField.id,
+          type: "SELECT",
+          content: { value: "AR" },
+        },
+        {
+          created_by_user_id: users[0].id,
           profile_id: profiles[1].id,
-          profile_type_field_id: selectField.id,
+          profile_type_field_id: riskSelectField.id,
           type: "SELECT",
           content: { value: "HIGH" },
         },
@@ -1222,8 +1246,15 @@ describe("DashboardRepository", () => {
         },
         {
           created_by_user_id: users[0].id,
+          profile_id: profiles[1].id,
+          profile_type_field_id: countrySelectField.id,
+          type: "SELECT",
+          content: { value: "FR" },
+        },
+        {
+          created_by_user_id: users[0].id,
           profile_id: profiles[2].id,
-          profile_type_field_id: selectField.id,
+          profile_type_field_id: riskSelectField.id,
           type: "SELECT",
           content: { value: "HIGH" },
         },
@@ -1236,8 +1267,15 @@ describe("DashboardRepository", () => {
         },
         {
           created_by_user_id: users[0].id,
+          profile_id: profiles[2].id,
+          profile_type_field_id: countrySelectField.id,
+          type: "SELECT",
+          content: { value: "AR" },
+        },
+        {
+          created_by_user_id: users[0].id,
           profile_id: profiles[3].id,
-          profile_type_field_id: selectField.id,
+          profile_type_field_id: riskSelectField.id,
           type: "SELECT",
           content: { value: "MEDIUM" },
         },
@@ -1250,8 +1288,15 @@ describe("DashboardRepository", () => {
         },
         {
           created_by_user_id: users[0].id,
+          profile_id: profiles[3].id,
+          profile_type_field_id: countrySelectField.id,
+          type: "SELECT",
+          content: { value: "AR" },
+        },
+        {
+          created_by_user_id: users[0].id,
           profile_id: profiles[4].id,
-          profile_type_field_id: selectField.id,
+          profile_type_field_id: riskSelectField.id,
           type: "SELECT",
           content: { value: "MEDIUM" },
         },
@@ -1264,8 +1309,15 @@ describe("DashboardRepository", () => {
         },
         {
           created_by_user_id: users[0].id,
+          profile_id: profiles[4].id,
+          profile_type_field_id: countrySelectField.id,
+          type: "SELECT",
+          content: { value: "FR" },
+        },
+        {
+          created_by_user_id: users[0].id,
           profile_id: profiles[5].id,
-          profile_type_field_id: selectField.id,
+          profile_type_field_id: riskSelectField.id,
           type: "SELECT",
           content: { value: "MEDIUM" },
         },
@@ -1278,8 +1330,29 @@ describe("DashboardRepository", () => {
         },
         {
           created_by_user_id: users[0].id,
+          profile_id: profiles[5].id,
+          profile_type_field_id: countrySelectField.id,
+          type: "SELECT",
+          content: { value: "FR" },
+        },
+        {
+          created_by_user_id: users[0].id,
+          profile_id: profiles[6].id,
+          profile_type_field_id: countrySelectField.id,
+          type: "SELECT",
+          content: { value: "GB" },
+        },
+        {
+          created_by_user_id: users[0].id,
+          profile_id: profiles[7].id,
+          profile_type_field_id: numberField.id,
+          type: "NUMBER",
+          content: { value: 12345 },
+        },
+        {
+          created_by_user_id: users[0].id,
           profile_id: profiles[8].id,
-          profile_type_field_id: selectField.id,
+          profile_type_field_id: riskSelectField.id,
           type: "SELECT",
           content: { value: "LOW" },
         },
@@ -1289,6 +1362,13 @@ describe("DashboardRepository", () => {
           profile_type_field_id: numberField.id,
           type: "NUMBER",
           content: { value: 8000 },
+        },
+        {
+          created_by_user_id: users[0].id,
+          profile_id: profiles[8].id,
+          profile_type_field_id: countrySelectField.id,
+          type: "SELECT",
+          content: { value: "ES" },
         },
       ]);
     });
@@ -1310,7 +1390,11 @@ describe("DashboardRepository", () => {
           ],
         }),
       ).toEqual({
-        value: [6, 2, 2],
+        items: [
+          { label: "Abiertos", color: "#FF0000", count: 6, aggr: null },
+          { label: "Cerrados", color: "#00FF00", count: 2, aggr: null },
+          { label: "Eliminados", color: "#0000FF", count: 2, aggr: null },
+        ],
         isIncongruent: false,
       });
     });
@@ -1330,7 +1414,7 @@ describe("DashboardRepository", () => {
               filter: {
                 status: ["OPEN", "CLOSED"],
                 values: {
-                  profileTypeFieldId: selectField.id,
+                  profileTypeFieldId: riskSelectField.id,
                   operator: "EQUAL",
                   value: "HIGH",
                 },
@@ -1342,7 +1426,7 @@ describe("DashboardRepository", () => {
               filter: {
                 status: ["OPEN", "CLOSED"],
                 values: {
-                  profileTypeFieldId: selectField.id,
+                  profileTypeFieldId: riskSelectField.id,
                   operator: "EQUAL",
                   value: "MEDIUM",
                 },
@@ -1354,7 +1438,7 @@ describe("DashboardRepository", () => {
               filter: {
                 status: ["OPEN", "CLOSED"],
                 values: {
-                  profileTypeFieldId: selectField.id,
+                  profileTypeFieldId: riskSelectField.id,
                   operator: "EQUAL",
                   value: "LOW",
                 },
@@ -1363,7 +1447,104 @@ describe("DashboardRepository", () => {
           ],
         }),
       ).toEqual({
-        value: [1700, 700, 0],
+        items: [
+          { label: "HIGH RISK", color: "#FF0000", count: 3, aggr: 1700 },
+          { label: "MEDIUM RISK", color: "#FF0000", count: 3, aggr: 700 },
+          { label: "LOW RISK", color: "#FF0000", count: 0, aggr: 0 },
+        ],
+        isIncongruent: false,
+      });
+    });
+
+    it("aggregates numeric values by profile risk, grouping by SELECT property", async () => {
+      expect(
+        await dashboards.getProfilesPieChartValues(organization.id, {
+          type: "AGGREGATE",
+          aggregate: "SUM",
+          items: [],
+          graphicType: "PIE",
+          profileTypeId: profileType.id,
+          profileTypeFieldId: numberField.id,
+          groupByProfileTypeFieldId: riskSelectField.id,
+          groupByFilter: {
+            status: ["OPEN", "CLOSED"],
+          },
+        }),
+      ).toEqual({
+        items: expect.toIncludeSameMembers([
+          { label: { en: "High Risk" }, color: "#aa0000", count: 3, aggr: 1700 },
+          { label: { en: "Medium Risk" }, color: "#bb0000", count: 3, aggr: 700 },
+          { label: null, color: null, count: 1, aggr: 12345 },
+        ]),
+        isIncongruent: false,
+      });
+    });
+
+    it("sends error when grouping by a property of type other than SELECT", async () => {
+      await expect(
+        dashboards.getProfilesPieChartValues(organization.id, {
+          type: "AGGREGATE",
+          aggregate: "SUM",
+          items: [],
+          graphicType: "PIE",
+          profileTypeId: profileType.id,
+          profileTypeFieldId: numberField.id,
+          groupByProfileTypeFieldId: numberField.id,
+          groupByFilter: {
+            status: ["OPEN", "CLOSED"],
+          },
+        }),
+      ).rejects.toThrow();
+    });
+
+    it("counts number of profile of each risk, grouping by SELECT property", async () => {
+      expect(
+        await dashboards.getProfilesPieChartValues(organization.id, {
+          type: "COUNT",
+          items: [],
+          graphicType: "PIE",
+          profileTypeId: profileType.id,
+          groupByProfileTypeFieldId: riskSelectField.id,
+        }),
+      ).toEqual({
+        items: expect.toIncludeSameMembers([
+          { label: { en: "High Risk" }, color: "#aa0000", count: 3, aggr: null },
+          { label: { en: "Medium Risk" }, color: "#bb0000", count: 3, aggr: null },
+          { label: { en: "Low Risk" }, color: "#cc0000", count: 1, aggr: null },
+          { label: null, color: null, count: 3, aggr: null },
+        ]),
+        isIncongruent: false,
+      });
+    });
+
+    it("aggregates numeric values by profile risk, grouping by SELECT property with countries standardList", async () => {
+      expect(
+        await dashboards.getProfilesPieChartValues(organization.id, {
+          type: "AGGREGATE",
+          aggregate: "SUM",
+          items: [],
+          graphicType: "PIE",
+          profileTypeId: profileType.id,
+          profileTypeFieldId: numberField.id,
+          groupByProfileTypeFieldId: countrySelectField.id,
+        }),
+      ).toEqual({
+        items: expect.toIncludeSameMembers([
+          {
+            label: { en: "Argentina", es: "Argentina" },
+            color: expect.any(String),
+            aggr: 1200,
+            count: 3,
+          },
+          {
+            label: { en: "France", es: "Francia" },
+            color: expect.any(String),
+            aggr: 1200,
+            count: 3,
+          },
+          { label: { en: "Spain", es: "España" }, color: expect.any(String), aggr: 8000, count: 1 },
+          { label: null, color: null, aggr: 12345, count: 1 },
+        ]),
         isIncongruent: false,
       });
     });
@@ -1381,7 +1562,11 @@ describe("DashboardRepository", () => {
           ],
         }),
       ).toEqual({
-        value: [6, 8, 2],
+        items: [
+          { label: "Abiertos", color: "#FF0000", count: 6, aggr: null },
+          { label: "Cerrados", color: "#00FF00", count: 8, aggr: null },
+          { label: "Eliminados", color: "#0000FF", count: 2, aggr: null },
+        ],
         isIncongruent: true,
       });
     });
@@ -1402,7 +1587,7 @@ describe("DashboardRepository", () => {
                 filter: {
                   status: ["OPEN", "CLOSED"],
                   values: {
-                    profileTypeFieldId: selectField.id,
+                    profileTypeFieldId: riskSelectField.id,
                     operator: "EQUAL",
                     value: "HIGH",
                   },
@@ -1414,7 +1599,7 @@ describe("DashboardRepository", () => {
                 filter: {
                   status: ["OPEN", "CLOSED"],
                   values: {
-                    profileTypeFieldId: selectField.id,
+                    profileTypeFieldId: riskSelectField.id,
                     operator: "EQUAL",
                     value: "MEDIUM",
                   },
@@ -1426,7 +1611,7 @@ describe("DashboardRepository", () => {
                 filter: {
                   status: ["OPEN", "CLOSED"],
                   values: {
-                    profileTypeFieldId: selectField.id,
+                    profileTypeFieldId: riskSelectField.id,
                     operator: "EQUAL",
                     value: "LOW",
                   },

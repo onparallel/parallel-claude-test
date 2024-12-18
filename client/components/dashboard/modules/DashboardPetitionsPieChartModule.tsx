@@ -1,7 +1,9 @@
 import { gql } from "@apollo/client";
 import { Box, Center, Stack, useBreakpointValue } from "@chakra-ui/react";
 
+import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment } from "@parallel/graphql/__types";
+import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { DashboardChartLegend } from "../charts/DashboardChartLegend";
 import { DashboardDoughnutChart } from "../charts/DashboardDoughnutChart";
@@ -15,17 +17,31 @@ export function DashboardPetitionsPieChartModule({
 }: {
   module: DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment;
 }) {
+  const intl = useIntl();
+
   const data = {
     datasets: [
       {
-        data: module.petitionsPieChartResult?.value ?? [],
-        backgroundColor: module.petitionsPieChartSettings?.colors ?? [],
-        hoverBackgroundColor: module.petitionsPieChartSettings?.colors ?? [],
+        data: module.petitionsPieChartResult?.items?.map((item) => item.count) ?? [],
+        backgroundColor:
+          module.petitionsPieChartResult?.items?.map((item) => item.color ?? "#E2E8F0") ?? [],
         borderColor: "white",
+        hoverBackgroundColor:
+          module.petitionsPieChartResult?.items?.map((item) => item.color ?? "#E2E8F0") ?? [],
         hoverBorderColor: "white",
       },
     ],
-    labels: module.petitionsPieChartSettings?.labels ?? [],
+    labels:
+      module.petitionsPieChartResult?.items?.map(({ label }) =>
+        label === null
+          ? intl.formatMessage({
+              id: "component.dashboard-pie-chart-module.not-replied",
+              defaultMessage: "Not replied",
+            })
+          : typeof label === "string"
+            ? label
+            : localizableUserTextRender({ intl, value: label, default: "" }),
+      ) ?? [],
   };
 
   const rows = useBreakpointValue({ base: 4, md: 2, lg: module.size === "LARGE" ? 3 : 2 });
@@ -78,13 +94,15 @@ DashboardPetitionsPieChartModule.fragments = {
         title
         size
         petitionsPieChartResult: result {
-          value
+          items {
+            count
+            label
+            color
+          }
           isIncongruent
         }
         petitionsPieChartSettings: settings {
           graphicType
-          labels
-          colors
         }
       }
     `;

@@ -309,24 +309,24 @@ export function validateProfilesRatioDashboardModuleSettingsInput<
         `${argName}.filters[${index}]`,
         ctx,
       );
+    }
 
-      try {
-        await validateModuleReturnTypeSetting(settings, ctx);
-      } catch (error) {
-        throw new ArgValidationError(
-          info,
-          `${argName}.type`,
-          error instanceof Error ? error.message : fastSafeStringify(error),
-        );
-      }
+    try {
+      await validateModuleReturnTypeSetting(settings, ctx);
+    } catch (error) {
+      throw new ArgValidationError(
+        info,
+        `${argName}.type`,
+        error instanceof Error ? error.message : fastSafeStringify(error),
+      );
+    }
 
-      if (settings.type === "AGGREGATE" && settings.aggregate !== "SUM") {
-        throw new ArgValidationError(
-          info,
-          `${argName}.aggregate`,
-          "Only SUM is allowed for aggregate when type is AGGREGATE",
-        );
-      }
+    if (settings.type === "AGGREGATE" && settings.aggregate !== "SUM") {
+      throw new ArgValidationError(
+        info,
+        `${argName}.aggregate`,
+        "Only SUM is allowed for aggregate when type is AGGREGATE",
+      );
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
@@ -344,8 +344,45 @@ export function validateProfilesPieChartDashboardModuleSettingsInput<
   return (async (_, args, ctx, info) => {
     const [settings, argName] = getArgWithPath(args, prop);
 
-    if (settings.items.length < 1) {
+    if (isNullish(settings.groupByProfileTypeFieldId) && settings.items.length < 1) {
       throw new ArgValidationError(info, `${argName}.items`, "At least 1 item is required");
+    }
+
+    if (isNonNullish(settings.groupByProfileTypeFieldId)) {
+      if (settings.items.length > 0) {
+        throw new ArgValidationError(
+          info,
+          `${argName}.items`,
+          "Must be empty when groupByProfileTypeFieldId is provided",
+        );
+      }
+
+      const ptf = await ctx.profiles.loadProfileTypeField(settings.groupByProfileTypeFieldId);
+      if (!ptf || ptf.type !== "SELECT") {
+        throw new ArgValidationError(
+          info,
+          `${argName}.groupByProfileTypeFieldId`,
+          "Must be a SELECT field",
+        );
+      }
+    }
+
+    if (isNonNullish(settings.groupByFilter)) {
+      if (isNullish(settings.groupByProfileTypeFieldId)) {
+        throw new ArgValidationError(
+          info,
+          `${argName}.groupByProfileTypeFieldId`,
+          "Must be provided when groupByFilter is provided",
+        );
+      }
+
+      await validateProfileFilter(
+        settings.groupByFilter,
+        settings.profileTypeId,
+        info,
+        `${argName}.groupByFilter`,
+        ctx,
+      );
     }
 
     for (const item of settings.items) {
@@ -365,24 +402,24 @@ export function validateProfilesPieChartDashboardModuleSettingsInput<
         `${argName}.items[${index}].filter`,
         ctx,
       );
+    }
 
-      try {
-        await validateModuleReturnTypeSetting(settings, ctx);
-      } catch (error) {
-        throw new ArgValidationError(
-          info,
-          `${argName}.type`,
-          error instanceof Error ? error.message : fastSafeStringify(error),
-        );
-      }
+    try {
+      await validateModuleReturnTypeSetting(settings, ctx);
+    } catch (error) {
+      throw new ArgValidationError(
+        info,
+        `${argName}.type`,
+        error instanceof Error ? error.message : fastSafeStringify(error),
+      );
+    }
 
-      if (settings.type === "AGGREGATE" && settings.aggregate !== "SUM") {
-        throw new ArgValidationError(
-          info,
-          `${argName}.aggregate`,
-          "Only SUM is allowed for aggregate when type is AGGREGATE",
-        );
-      }
+    if (settings.type === "AGGREGATE" && settings.aggregate !== "SUM") {
+      throw new ArgValidationError(
+        info,
+        `${argName}.aggregate`,
+        "Only SUM is allowed for aggregate when type is AGGREGATE",
+      );
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

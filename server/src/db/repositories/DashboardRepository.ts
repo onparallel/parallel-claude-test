@@ -2,6 +2,7 @@ import { inject } from "inversify";
 import { Knex } from "knex";
 import { indexBy, isNonNullish, isNullish, sumBy, unique } from "remeda";
 import { assert } from "ts-essentials";
+import { hashString } from "../../util/token";
 import { Replace } from "../../util/types";
 import {
   CreateDashboard,
@@ -16,6 +17,7 @@ import {
   PETITION_FILTER_REPOSITORY_HELPER,
   PetitionFilterRepositoryHelper,
 } from "../helpers/PetitionFilterRepositoryHelper";
+import { profileTypeFieldSelectValues } from "../helpers/profileTypeFieldOptions";
 import {
   PROFILE_VALUES_FILTER_REPOSITORY_HELPER,
   ProfileValuesFilterRepositoryHelper,
@@ -39,30 +41,52 @@ export type ModuleSettings<TType extends DashboardModuleType> = {
     label: string;
     template_id: number;
   };
-  PETITIONS_NUMBER: { filters: PetitionFilter };
+
+  PETITIONS_NUMBER: {
+    filters: PetitionFilter;
+  };
+
   PETITIONS_RATIO: {
     graphicType: "RATIO" | "PERCENTAGE";
     filters: [PetitionFilter, PetitionFilter];
   };
+
   PETITIONS_PIE_CHART: {
     graphicType: "DOUGHNUT" | "PIE";
-    items: { label: string; color: string; filter: PetitionFilter }[];
+    items: {
+      label: string;
+      color: string;
+      filter: PetitionFilter;
+    }[];
   };
+
   PROFILES_NUMBER: {
     profileTypeId: number;
     filters: ProfileFilter;
   } & ModuleResultType;
+
   PROFILES_RATIO: {
     graphicType: "RATIO" | "PERCENTAGE";
     profileTypeId: number;
     filters: [ProfileFilter, ProfileFilter];
   } & ModuleResultType;
+
   PROFILES_PIE_CHART: {
     graphicType: "DOUGHNUT" | "PIE";
     profileTypeId: number;
-    items: { label: string; color: string; filter: ProfileFilter }[];
-  } & ModuleResultType;
+    items: {
+      label: string;
+      color: string;
+      filter: ProfileFilter;
+    }[];
+  } & ModuleResultType & {
+      // optionally pass a SELECT profileTypeFieldId to build items array from field values
+      groupByProfileTypeFieldId?: number;
+      groupByFilter?: ProfileFilter; // extra filters to apply to all grouped items
+    };
 }[TType];
+
+const COLORS = ["#E2E8F0", "#F5EFE8", "#FEEBC8", "#FED7D7", "#DDDCF8", "#CEEDFF", "#D5E7DE"];
 
 export class DashboardRepository extends BaseRepository {
   constructor(
@@ -206,12 +230,21 @@ export class DashboardRepository extends BaseRepository {
     profileTypeId: number,
     filters: ProfileFilter,
     profileTypeFieldsById: Record<number, ProfileTypeField>,
-    resultType: ModuleResultType,
+    settings: ModuleResultType & {
+      groupByProfileTypeFieldId?: number;
+      groupByFilter?: ProfileFilter;
+    },
   ) {
     assert(
-      resultType.type !== "AGGREGATE" ||
-        profileTypeFieldsById[resultType.profileTypeFieldId]?.type === "NUMBER",
+      settings.type !== "AGGREGATE" ||
+        profileTypeFieldsById[settings.profileTypeFieldId]?.type === "NUMBER",
       "Aggregation can only be done with NUMBER properties",
+    );
+
+    assert(
+      isNullish(settings.groupByProfileTypeFieldId) ||
+        profileTypeFieldsById[settings.groupByProfileTypeFieldId]?.type === "SELECT",
+      "Group by can only be done with SELECT properties",
     );
 
     const joins: Record<number, string> = {};
@@ -220,25 +253,38 @@ export class DashboardRepository extends BaseRepository {
       .where("profile_type_id", profileTypeId)
       .whereNull("p.deleted_at")
       .mmodify((q) => {
-        if (resultType.type === "AGGREGATE") {
+        q.orderBy("p.id").select(this.knex.raw(/* sql */ `distinct on (p.id) p.id`));
+
+        if (settings.type === "AGGREGATE") {
           this.profileValuesFilter.applyProfileTypeFieldJoin(
             q,
-            resultType.profileTypeFieldId,
+            settings.profileTypeFieldId,
             joins,
             profileTypeFieldsById,
           );
-          const alias = joins[resultType.profileTypeFieldId];
+          const alias = joins[settings.profileTypeFieldId];
           const content = this.knex.raw(`??.content`, [alias]);
-          q.whereRaw(`? is not null`, [content])
-            .orderBy("p.id")
-            .select(
-              this.knex.raw(/* sql */ `distinct on (p.id) p.id, (?->'value')::numeric as aggr`, [
-                content,
-              ]),
-            );
-        } else {
-          q.select(this.knex.raw(/* sql */ `distinct p.id`));
+          q.whereRaw(`? is not null`, [content]).select(
+            this.knex.raw(/* sql */ `(?->'value')::numeric as aggr`, [content]),
+          );
         }
+
+        if (settings.groupByProfileTypeFieldId) {
+          this.profileValuesFilter.applyProfileTypeFieldJoin(
+            q,
+            settings.groupByProfileTypeFieldId,
+            joins,
+            profileTypeFieldsById,
+          );
+          const alias = joins[settings.groupByProfileTypeFieldId];
+          const content = this.knex.raw(`??.content`, [alias]);
+          q.select(
+            this.knex.raw(/* sql */ `(coalesce(?, '{}'::jsonb)->>'value') as group_by_value`, [
+              content,
+            ]),
+          );
+        }
+
         if (isNonNullish(filters?.status) && filters!.status.length > 0) {
           q.whereIn("p.status", filters.status);
         }
@@ -266,12 +312,12 @@ export class DashboardRepository extends BaseRepository {
   }
 
   async getPetitionsNumberValue(orgId: number, settings: ModuleSettings<"PETITIONS_NUMBER">) {
-    const [{ value }] = await this.knex
+    const [{ count }] = await this.knex
       .with("ps", this.petitionsCountQuery(orgId, settings.filters))
       .from("ps")
-      .select<[{ value: number }]>(this.count("value"));
+      .select<[{ count: number }]>(this.count());
 
-    return { value };
+    return { count };
   }
 
   async getPetitionsRatioValues(orgId: number, settings: ModuleSettings<"PETITIONS_RATIO">) {
@@ -302,7 +348,7 @@ export class DashboardRepository extends BaseRepository {
     );
 
     return {
-      value: [value0, value1],
+      items: [{ count: value0 }, { count: value1 }],
       // ratio is incongruent if filter[0] is not fully included in filter[1]
       isIncongruent: intersectionValue !== value0,
     };
@@ -335,7 +381,11 @@ export class DashboardRepository extends BaseRepository {
     assert(totalUnique && totalUnique.filter === -1, "Total unique not found");
 
     return {
-      value: data.map((d) => d.count),
+      items: data.map((d) => ({
+        count: d.count,
+        label: settings.items[d.filter].label,
+        color: settings.items[d.filter].color,
+      })),
       // pie chart is incongruent if the sum of all parts is not equal to the unique total
       isIncongruent: sumBy(data, (d) => d.count) !== totalUnique.count,
     };
@@ -350,7 +400,7 @@ export class DashboardRepository extends BaseRepository {
       (f) => f.id,
     );
 
-    const [{ value }] = await this.knex
+    const [{ count, aggr }] = await this.knex
       .with(
         "p",
         this.profilesCountQuery(
@@ -362,13 +412,14 @@ export class DashboardRepository extends BaseRepository {
         ),
       )
       .from("p")
-      .select<[{ value: number }]>(
+      .select<[{ count: number; aggr: number | null }]>(
+        this.count(),
         settings.type === "AGGREGATE"
-          ? this.knex.raw(`${settings.aggregate}(aggr::numeric) as value`)
-          : this.count("value"),
+          ? this.knex.raw(/* sql */ `coalesce(${settings.aggregate}(aggr::numeric), 0) as aggr`)
+          : this.knex.raw(/* sql */ `null as aggr`),
       );
 
-    return { value };
+    return { count, aggr };
   }
 
   async getProfilesRatioValues(orgId: number, settings: ModuleSettings<"PROFILES_RATIO">) {
@@ -414,8 +465,10 @@ export class DashboardRepository extends BaseRepository {
                 this.knex.raw(`${i}`),
                 this.count(),
                 settings.type === "AGGREGATE"
-                  ? this.knex.raw(`${settings.aggregate}(aggr::numeric) as aggr`)
-                  : this.knex.raw("0 as aggr"),
+                  ? this.knex.raw(
+                      /* sql */ `coalesce(${settings.aggregate}(aggr::numeric), 0) as aggr`,
+                    )
+                  : this.knex.raw(/* sql */ `null as aggr`),
               )
               .from(`p${i}`),
           );
@@ -431,26 +484,19 @@ export class DashboardRepository extends BaseRepository {
     );
 
     return {
-      value: data.map((d) => (settings.type === "COUNT" ? d.count : (d.aggr ?? 0))),
-      // ratio is incongruent if filter[0] is not fully included in filter[1]
+      items: data.map((d) => ({
+        count: d.count,
+        aggr: d.aggr,
+      })),
       isIncongruent: intersection.count !== data[0].count,
     };
   }
 
-  async getProfilesPieChartValues(orgId: number, settings: ModuleSettings<"PROFILES_PIE_CHART">) {
-    assert(
-      settings.type === "COUNT" || settings.aggregate === "SUM",
-      "Expected type COUNT or aggregate SUM on settings",
-    );
-
-    const fieldsById = indexBy(
-      await this.from("profile_type_field")
-        .where("profile_type_id", settings.profileTypeId)
-        .whereNull("deleted_at")
-        .select("*"),
-      (f) => f.id,
-    );
-
+  private async profilesPieChartByCustomValues(
+    orgId: number,
+    settings: ModuleSettings<"PROFILES_PIE_CHART">,
+    fieldsById: Record<string, ProfileTypeField>,
+  ) {
     const data: { filter: number; count: number; aggr?: number }[] = await this.knex
       .queryBuilder()
       .modify((q) => {
@@ -476,8 +522,10 @@ export class DashboardRepository extends BaseRepository {
                 this.knex.raw(`${i}`),
                 this.count(),
                 settings.type === "AGGREGATE"
-                  ? this.knex.raw(`${settings.aggregate}(aggr::numeric) as aggr`)
-                  : this.knex.raw("0 as aggr"),
+                  ? this.knex.raw(
+                      /* sql */ `coalesce(${settings.aggregate}(aggr::numeric), 0) as aggr`,
+                    )
+                  : this.knex.raw(/* sql */ `null as aggr`),
               )
               .from(`p${i}`),
           );
@@ -490,10 +538,89 @@ export class DashboardRepository extends BaseRepository {
     assert(totalUnique && totalUnique.filter === -1, "Total unique not found");
 
     return {
-      value: data.map((d) => (settings.type === "COUNT" ? d.count : (d.aggr ?? 0))),
+      items: data.map((d) => ({
+        count: d.count,
+        aggr: d.aggr,
+        label: settings.items[d.filter].label,
+        color: settings.items[d.filter].color,
+      })),
       // pie chart is incongruent if the sum of all parts is not equal to the unique total
       isIncongruent: sumBy(data, (d) => d.count) !== totalUnique.count,
     };
+  }
+
+  private async profilesPieChartGroupedByFieldValues(
+    orgId: number,
+    settings: ModuleSettings<"PROFILES_PIE_CHART">,
+    fieldsById: Record<string, ProfileTypeField>,
+  ) {
+    assert(settings.groupByProfileTypeFieldId, "groupByProfileTypeFieldId is required");
+
+    const groupByField = fieldsById[settings.groupByProfileTypeFieldId];
+    assert(
+      groupByField && groupByField.type === "SELECT",
+      `Profile type field ${settings.groupByProfileTypeFieldId} not found`,
+    );
+
+    const data: { count: number; aggr?: number; group_by_value: string | null }[] = await this.knex
+      .with(
+        `p_all`,
+        this.profilesCountQuery(
+          orgId,
+          settings.profileTypeId,
+          settings.groupByFilter ?? {},
+          fieldsById,
+          settings,
+        ),
+      )
+      .select(
+        this.count(),
+        settings.type === "AGGREGATE"
+          ? this.knex.raw(/* sql */ `coalesce(${settings.aggregate}(aggr::numeric), 0) as aggr`)
+          : this.knex.raw(/* sql */ `null as aggr`),
+        this.knex.raw("group_by_value"),
+      )
+      .groupBy("p_all.group_by_value")
+      .from("p_all");
+
+    const groupByValues = await profileTypeFieldSelectValues(groupByField.options);
+    const showOptionsWithColors = !!groupByField.options.showOptionsWithColors;
+    return {
+      items: data.map((d) => {
+        const value = groupByValues.find((v) => v.value === d.group_by_value);
+        return {
+          count: d.count,
+          aggr: d.aggr,
+          label: value?.label ?? null,
+          color: value
+            ? ((showOptionsWithColors ? value.color : null) ??
+              COLORS[Math.abs(hashString(value.value)) % COLORS.length])
+            : null,
+        };
+      }),
+      isIncongruent: false, // values grouped by SELECT field will never be incongruent
+    };
+  }
+
+  async getProfilesPieChartValues(orgId: number, settings: ModuleSettings<"PROFILES_PIE_CHART">) {
+    assert(
+      settings.type === "COUNT" || settings.aggregate === "SUM",
+      "Expected type COUNT or aggregate SUM on settings",
+    );
+
+    const fieldsById = indexBy(
+      await this.from("profile_type_field")
+        .where("profile_type_id", settings.profileTypeId)
+        .whereNull("deleted_at")
+        .select("*"),
+      (f) => f.id,
+    );
+
+    if (isNonNullish(settings.groupByProfileTypeFieldId)) {
+      return await this.profilesPieChartGroupedByFieldValues(orgId, settings, fieldsById);
+    } else {
+      return await this.profilesPieChartByCustomValues(orgId, settings, fieldsById);
+    }
   }
 
   async createDashboardModule<TType extends DashboardModuleType>(

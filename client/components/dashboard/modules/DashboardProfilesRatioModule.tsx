@@ -10,6 +10,10 @@ export function DashboardProfilesRatioModule({
 }: {
   module: DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragment;
 }) {
+  const values =
+    module.profilesRatioSettings.type === "COUNT"
+      ? (module.profilesRatioResult?.items.map((i) => i.count) ?? [])
+      : (module.profilesRatioResult?.items.map((i) => i.aggr ?? 0) ?? []);
   return (
     <DashboardSimpleModuleCard
       module={module}
@@ -19,8 +23,8 @@ export function DashboardProfilesRatioModule({
     >
       {isNonNullish(module.profilesRatioResult) ? (
         <DashboardRatio
-          value={module.profilesRatioResult.value[0]}
-          total={module.profilesRatioResult.value[1]}
+          value={values[0]}
+          total={values[1]}
           isPercentage={module.profilesRatioSettings.graphicType === "PERCENTAGE"}
         />
       ) : null}
@@ -33,11 +37,15 @@ DashboardProfilesRatioModule.fragments = {
     fragment DashboardProfilesRatioModule_DashboardProfilesRatioModule on DashboardProfilesRatioModule {
       ...DashboardSimpleModuleCard_DashboardModule
       profilesRatioResult: result {
-        value
+        items {
+          count
+          aggr
+        }
         isIncongruent
       }
       profilesRatioSettings: settings {
         graphicType
+        type
       }
     }
     ${DashboardSimpleModuleCard.fragments.DashboardModule}

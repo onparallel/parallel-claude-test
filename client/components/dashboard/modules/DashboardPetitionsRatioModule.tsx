@@ -19,8 +19,8 @@ export function DashboardPetitionsRatioModule({
     >
       {isNonNullish(module.petitionsRatioResult) ? (
         <DashboardRatio
-          value={module.petitionsRatioResult.value[0]}
-          total={module.petitionsRatioResult.value[1]}
+          value={module.petitionsRatioResult.items[0].count}
+          total={module.petitionsRatioResult.items[1].count}
           isPercentage={module.petitionsRatioSettings.graphicType === "PERCENTAGE"}
         />
       ) : null}
@@ -33,7 +33,9 @@ DashboardPetitionsRatioModule.fragments = {
     fragment DashboardPetitionsRatioModule_DashboardPetitionsRatioModule on DashboardPetitionsRatioModule {
       ...DashboardSimpleModuleCard_DashboardModule
       petitionsRatioResult: result {
-        value
+        items {
+          count
+        }
         isIncongruent
       }
       petitionsRatioSettings: settings {
