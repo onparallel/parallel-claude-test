@@ -3,7 +3,7 @@ import { Duration } from "date-fns";
 import { injectable } from "inversify";
 import { Knex } from "knex";
 import PostgresInterval from "postgres-interval";
-import { groupBy, indexBy, isNonNullish, times } from "remeda";
+import { groupBy, indexBy } from "remeda";
 import { LocalizableUserText } from "../../graphql";
 import { FileExport } from "../../services/FileExportService";
 import { PetitionFieldMath, PetitionFieldVisibility } from "../../util/fieldLogic";
@@ -24,6 +24,7 @@ import {
   PetitionSummaryConfig,
   PetitionVariable,
 } from "../repositories/PetitionRepository";
+import { sqlArray, sqlIn, sqlValues } from "./sql";
 
 export interface TableTypes
   extends Replace<
@@ -339,38 +340,14 @@ export class BaseRepository {
   }
 
   protected sqlIn(array: readonly Knex.RawBinding[], castAs?: string) {
-    const q = isNonNullish(castAs) ? `?::${castAs}` : "?";
-    if (array.length === 0) {
-      throw new Error("array can't be empty");
-    }
-    return this.knex.raw(/* sql */ `(${array.map(() => q).join(", ")})`, [...array]);
+    return sqlIn(this.knex, array, castAs);
   }
 
   protected sqlArray(array: readonly Knex.RawBinding[], castAs?: string) {
-    const q = isNonNullish(castAs) ? `?::${castAs}` : "?";
-    return this.knex.raw(/* sql */ `array[${array.map(() => q).join(", ")}]`, [...array]);
+    return sqlArray(this.knex, array, castAs);
   }
 
   protected sqlValues(tuples: readonly Knex.RawBinding[][], castAs?: string[]) {
-    if (process.env.NODE_ENV !== "production" && isNonNullish(castAs)) {
-      if (!tuples.every((tuple) => tuple.length === castAs.length)) {
-        throw new Error("All tuples must have the same length as the castAs parameter");
-      }
-    }
-    if (tuples.length === 0) {
-      throw new Error("array can't be empty");
-    }
-    const tupleLength = tuples[0].length;
-    if (process.env.NODE_ENV !== "production") {
-      if (tuples.some((t) => t.length !== tupleLength)) {
-        throw new Error("All tuples must have the same length as the castAs parameter");
-      }
-    }
-    const q = isNonNullish(castAs)
-      ? `(${castAs.map((element) => `?::${element}`).join(", ")})`
-      : `(${times(tupleLength, () => "?").join(", ")})`;
-    return this.knex.raw(/* sql */ `values ${tuples.map(() => q).join(", ")}`, [
-      ...tuples.flatMap((t) => t),
-    ]);
+    return sqlValues(this.knex, tuples, castAs);
   }
 }

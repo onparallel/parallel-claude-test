@@ -1,5 +1,13 @@
 import { ContainerModule } from "inversify";
 import { Knex } from "knex";
+import {
+  PETITION_FILTER_REPOSITORY_HELPER,
+  PetitionFilterRepositoryHelper,
+} from "./helpers/PetitionFilterRepositoryHelper";
+import {
+  PROFILE_VALUES_FILTER_REPOSITORY_HELPER,
+  ProfileValuesFilterRepositoryHelper,
+} from "./helpers/ProfileValuesFilterRepositoryHelper";
 import { createKnex, KNEX } from "./knex";
 import { ContactRepository } from "./repositories/ContactRepository";
 import { DashboardRepository } from "./repositories/DashboardRepository";
@@ -51,4 +59,12 @@ export const dbModule = new ContainerModule((bind) => {
   bind<ProfileRepository>(ProfileRepository).toSelf();
   bind<EventRepository>(EventRepository).toSelf();
   bind<DashboardRepository>(DashboardRepository).toSelf();
+
+  // Repository helpers
+  bind<ProfileValuesFilterRepositoryHelper>(PROFILE_VALUES_FILTER_REPOSITORY_HELPER).to(
+    ProfileValuesFilterRepositoryHelper,
+  );
+  bind<PetitionFilterRepositoryHelper>(PETITION_FILTER_REPOSITORY_HELPER).to(
+    PetitionFilterRepositoryHelper,
+  );
 });

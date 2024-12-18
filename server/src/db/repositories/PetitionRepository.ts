@@ -116,6 +116,10 @@ import {
   TableTypes,
 } from "../helpers/BaseRepository";
 import { defaultFieldProperties, validateFieldOptions } from "../helpers/fieldOptions";
+import {
+  PETITION_FILTER_REPOSITORY_HELPER,
+  PetitionFilterRepositoryHelper,
+} from "../helpers/PetitionFilterRepositoryHelper";
 import { SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
@@ -244,6 +248,8 @@ export class PetitionRepository extends BaseRepository {
   private readonly REPLY_EVENTS_DELAY_SECONDS = 60;
   constructor(
     @inject(KNEX) knex: Knex,
+    @inject(PETITION_FILTER_REPOSITORY_HELPER)
+    private petitionFilter: PetitionFilterRepositoryHelper,
     @inject(QUEUES_SERVICE) private queues: QueuesService,
     @inject(LOGGER) private logger: ILogger,
     @inject(FileRepository) private files: FileRepository,
@@ -551,152 +557,14 @@ export class PetitionRepository extends BaseRepository {
         }
       });
     }
-    if (filters?.locale) {
-      builders.push((q) => q.where("recipient_locale", filters.locale));
-    }
-    if (filters?.status && type === "PETITION") {
-      builders.push((q) => q.whereRaw("p.status in ?", [this.sqlIn(filters.status!)]));
-    }
 
-    if (filters?.tags) {
-      const { filters: tagsFilters, operator } = filters.tags;
-
-      builders.push((q) => {
-        q.joinRaw(/* sql */ `left join petition_tag pt on pt.petition_id = p.id`).modify((q) => {
-          for (const filter of tagsFilters) {
-            q = operator === "AND" ? q.and : q.or;
-
-            switch (filter.operator) {
-              case "CONTAINS":
-              case "DOES_NOT_CONTAIN":
-                q = filter.operator.startsWith("DOES_NOT_") ? q.not : q;
-                q.havingRaw(/* sql */ `array_agg(distinct pt.tag_id) @> ?`, [
-                  this.sqlArray(filter.value, "int"),
-                ]);
-                break;
-              case "IS_EMPTY":
-                q.havingRaw(/* sql */ `count(distinct pt.tag_id) = 0`);
-                break;
-            }
-          }
-        });
-      });
-    }
-
-    if (filters?.sharedWith && filters.sharedWith.filters.length > 0) {
-      const { filters: sharedWithFilters, operator } = filters.sharedWith;
-      builders.push((q) => {
-        q.joinRaw(
-          /* sql */ `join petition_permission pp2 on pp2.petition_id = p.id and pp2.deleted_at is null`,
-        ).modify((q) => {
-          for (const filter of sharedWithFilters) {
-            const { id, type } = fromGlobalId(filter.value);
-            if (type !== "User" && type !== "UserGroup") {
-              throw new Error(`Expected User or UserGroup, got ${type}`);
-            }
-            const column = type === "User" ? "user_id" : "user_group_id";
-            q = operator === "AND" ? q.and : q.or;
-            switch (filter.operator) {
-              case "SHARED_WITH":
-              case "NOT_SHARED_WITH":
-                q = filter.operator.startsWith("NOT_") ? q.not : q;
-                q.havingRaw(
-                  /* sql */ `? = any(array_remove(array_agg(distinct pp2.${column}), null))`,
-                  [id],
-                );
-                break;
-              case "IS_OWNER":
-              case "NOT_IS_OWNER":
-                q = filter.operator.startsWith("NOT_") ? q.not : q;
-                q.havingRaw(
-                  /* sql */ `sum(case pp2.type when 'OWNER' then (pp2.user_id = ?)::int else 0 end) > 0`,
-                  [id],
-                );
-                break;
-            }
-          }
-        });
-      });
-    }
-
-    if (filters?.profileIds && filters.profileIds.length > 0) {
-      builders.push((q) => {
-        q.joinRaw(/* sql */ `join petition_profile pp3 on pp3.petition_id = p.id`);
-        q.whereIn("pp3.profile_id", filters.profileIds!);
-      });
-    }
-
-    if (filters?.signature && filters.signature.length > 0) {
-      builders.push((q) =>
-        q.where((q) => {
-          if (filters.signature!.includes("NO_SIGNATURE")) {
-            // no signature configured nor any previous signature request
-            q.or.whereRaw(/* sql */ `
-              p.signature_config is null
-              and p.latest_signature_status is null
-            `);
-          }
-          if (filters.signature!.includes("NOT_STARTED")) {
-            // signature is configured, awaiting to complete the petition
-            q.or.whereRaw(/* sql */ `
-              p.signature_config is not null
-              and p.latest_signature_status is null
-              and p.status in ('DRAFT', 'PENDING')
-            `);
-          }
-          if (filters.signature!.includes("PENDING_START")) {
-            // petition is completed, need to manually start the signature
-            // also show as pending start when user manually cancels the previous request
-            // and signature is still configured
-            q.or.whereRaw(/* sql */ `
-              p.signature_config is not null 
-              and p.status in ('COMPLETED', 'CLOSED')
-              and (
-                p.latest_signature_status is null
-                or p.latest_signature_status = 'COMPLETED'
-                or p.latest_signature_status = 'CANCELLED_BY_USER'
-              )
-            `);
-          }
-          if (filters.signature!.includes("PROCESSING")) {
-            // signature is ongoing
-            q.or.whereRaw(/* sql */ `
-              p.latest_signature_status is not null
-              and p.latest_signature_status not in ('COMPLETED', 'CANCELLED_BY_USER', 'CANCELLED')
-            `);
-          }
-          if (filters.signature!.includes("COMPLETED")) {
-            // signature completed, everyone signed
-            q.or.whereRaw(/* sql */ `
-              p.signature_config is null
-              and p.latest_signature_status is not null
-              and p.latest_signature_status = 'COMPLETED'
-            `);
-          }
-          if (filters.signature!.includes("CANCELLED")) {
-            // cancelled by a reason external to user (request error, signer declined, etc)
-            // or cancelled by user and no signature configured
-            q.or.whereRaw(/* sql */ `
-              p.latest_signature_status is not null
-              and (
-                p.latest_signature_status = 'CANCELLED'
-                or ( 
-                  p.latest_signature_status = 'CANCELLED_BY_USER'
-                  and p.signature_config is null
-                )
-              )
-            `);
-          }
-        }),
+    if (filters) {
+      this.petitionFilter.applyPetitionFilter(
+        builders,
+        omit(filters, ["path"]),
+        { petition: "p", petition_permission: "pp" },
+        type,
       );
-    }
-
-    if (filters?.fromTemplateId && filters.fromTemplateId.length > 0) {
-      builders.push((q) => q.whereIn("p.from_template_id", filters.fromTemplateId!));
-    }
-
-    if (filters?.permissionTypes && filters.permissionTypes.length > 0) {
-      builders.push((q) => q.whereIn("pp.type", filters.permissionTypes!));
     }
 
     if (opts.excludeAnonymized) {
