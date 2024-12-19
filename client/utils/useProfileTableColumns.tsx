@@ -658,8 +658,9 @@ const FreeTextMultiSelect = forwardRef<CreatableSelect, FreeTextMultiSelectProps
           const newValue = inputValue.trim();
           if (newValue.length) {
             event.preventDefault();
+            const updatedValues = unique([...value, newValue]);
+            onChange(updatedValues.slice(0, 100)); // limit to 100
             setInputValue("");
-            onChange(unique([...value, newValue]));
           }
       }
     }
@@ -693,7 +694,8 @@ const FreeTextMultiSelect = forwardRef<CreatableSelect, FreeTextMultiSelectProps
             .map((l) => l.trim())
             .filter((l) => l.length > 0);
           if (values.length > 0) {
-            onChange(unique([...value, ...values]));
+            const newValues = unique([...value, ...values]);
+            onChange(newValues.slice(0, 100)); // limit to 100
           }
           e.preventDefault();
         }
