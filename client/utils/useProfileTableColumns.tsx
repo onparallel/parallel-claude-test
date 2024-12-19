@@ -41,11 +41,14 @@ import {
   useProfileTableColumns_ProfileWithPropertiesFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
+import useMergedRef from "@react-hook/merged-ref";
 import { format, startOfMonth } from "date-fns";
-import { forwardRef, useEffect, useMemo, useState } from "react";
+import { ClipboardEvent, forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { entries, isNonNullish, isNullish, map, omit, pick, pipe, sortBy } from "remeda";
+import { components, InputActionMeta, InputProps } from "react-select";
+import CreatableSelect, { CreatableProps } from "react-select/creatable";
+import { entries, isNonNullish, isNullish, map, omit, pick, pipe, sortBy, unique } from "remeda";
 import { assert, Merge } from "ts-essentials";
 import { BACKGROUND_CHECK_TOPICS } from "./backgroundCheckTopics";
 import { never } from "./never";
@@ -54,6 +57,7 @@ import {
   ProfileFieldValuesFilterCondition,
   ProfileFieldValuesFilterGroup,
 } from "./ProfileFieldValuesFilter";
+import { UseReactSelectProps, useReactSelectProps } from "./react-select/hooks";
 import { UnwrapArray } from "./types";
 import { useProfileFieldValueFilterOperators } from "./useProfileFieldValueFilterOperators";
 import { isValidDateString } from "./validation";
@@ -402,7 +406,11 @@ export function ProfileValueFilterLine({
               } else if (["HAS_VALUE", "IS_EXPIRED", "HAS_EXPIRY"].includes(_operator)) {
                 _value = null;
               } else if (["TEXT", "SHORT_TEXT"].includes(profileTypeField.type)) {
-                _value ??= "";
+                if (_operator === "IS_ONE_OF") {
+                  _value = Array.isArray(value) ? value : [];
+                } else {
+                  _value = typeof value === "string" ? value : "";
+                }
               } else if (profileTypeField.type === "NUMBER") {
                 _value ??= 0;
               } else if (profileTypeField.type === "DATE") {
@@ -449,7 +457,6 @@ export function ProfileValueFilterLine({
         <FormControl gridColumn="2" isInvalid={isNonNullish(error)}>
           <Controller<ProfileValueFilterFormData>
             control={control}
-            shouldUnregister
             name={`${path}.value`}
             rules={{
               required: true,
@@ -457,7 +464,9 @@ export function ProfileValueFilterLine({
                 ...(operator === "EXPIRES_IN"
                   ? { validInterval: (value) => /^P\d+[YMWD]$/.test(value as string) }
                   : ["TEXT", "SHORT_TEXT"].includes(profileTypeField.type)
-                    ? { minLength: (value) => (value as string).trim().length > 0 }
+                    ? ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator)
+                      ? { minLength: (value) => (value as string[]).length > 0 }
+                      : { minLength: (value) => (value as string).trim().length > 0 }
                     : profileTypeField.type === "DATE"
                       ? { validDate: isValidDateString as any }
                       : profileTypeField.type === "PHONE"
@@ -474,13 +483,22 @@ export function ProfileValueFilterLine({
                   {...rest}
                 />
               ) : ["TEXT", "SHORT_TEXT"].includes(profileTypeField.type) ? (
-                <Input
-                  size="sm"
-                  type="text"
-                  value={value as string}
-                  onChange={(e) => onChange(e.target.value)}
-                  {...rest}
-                />
+                ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator) ? (
+                  <FreeTextMultiSelect
+                    size="sm"
+                    value={value as string[]}
+                    onChange={onChange}
+                    {...rest}
+                  />
+                ) : (
+                  <Input
+                    size="sm"
+                    type="text"
+                    value={value as string}
+                    onChange={(e) => onChange(e.target.value)}
+                    {...rest}
+                  />
+                )
               ) : profileTypeField.type === "NUMBER" ? (
                 <NumeralInput size="sm" value={value as number} onChange={onChange} {...rest} />
               ) : profileTypeField.type === "DATE" ? (
@@ -617,6 +635,102 @@ const SimpleDurationInput = chakraForwardRef<"input", ValueProps<string> & Themi
     );
   },
 );
+
+interface FreeTextMultiSelectProps
+  extends ValueProps<string[], false>,
+    UseReactSelectProps<any, true, never>,
+    Omit<CreatableProps<any, true, never>, "value" | "onChange"> {}
+
+const FreeTextMultiSelect = forwardRef<CreatableSelect, FreeTextMultiSelectProps>(
+  function FreeTextMultiSelect({ value, onChange, ...props }, ref) {
+    const innerRef = useRef<CreatableSelect>(null);
+    const _ref = useMergedRef(ref, innerRef);
+    const rsProps = useReactSelectProps({
+      ...props,
+      components: _components as any,
+    });
+    const [inputValue, setInputValue] = useState("");
+
+    function handleKeyDown(event: KeyboardEvent) {
+      switch (event.key) {
+        case "Enter":
+        case "Tab":
+          const newValue = inputValue.trim();
+          if (newValue.length) {
+            event.preventDefault();
+            setInputValue("");
+            onChange(unique([...value, newValue]));
+          }
+      }
+    }
+    function handleInputChange(_value: string, meta: InputActionMeta) {
+      switch (meta.action) {
+        case "input-change":
+          if (_value === "") {
+            setInputValue("");
+          } else {
+            setInputValue(_value);
+          }
+          break;
+        case "set-value":
+          setInputValue("");
+          break;
+        case "input-blur":
+          const newValue = inputValue.trim();
+          if (newValue.length) {
+            setInputValue("");
+            onChange(unique([...value, newValue]));
+          }
+          break;
+      }
+    }
+    function handlePaste(e: ClipboardEvent<HTMLInputElement>) {
+      if (e.clipboardData.types.includes("text/plain")) {
+        const text = e.clipboardData.getData("text/plain") as string;
+        if (text.includes("\n")) {
+          const values = text
+            .split("\n")
+            .map((l) => l.trim())
+            .filter((l) => l.length > 0);
+          if (values.length > 0) {
+            onChange(unique([...value, ...values]));
+          }
+          e.preventDefault();
+        }
+      }
+    }
+
+    return (
+      <CreatableSelect
+        ref={_ref as any}
+        isMulti
+        placeholder={props.placeholder ?? ""}
+        value={value.map((value) => ({ value, label: value }))}
+        onChange={(value) => onChange(value.map(({ value }) => value))}
+        menuIsOpen={false}
+        inputValue={inputValue}
+        onInputChange={handleInputChange}
+        onKeyDown={handleKeyDown as any}
+        {...rsProps}
+        {...{ onPaste: handlePaste }}
+      />
+    );
+  },
+);
+
+const _components = {
+  DropdownIndicator: () => <Spacer width={2} />,
+  Input: function _Input(props: InputProps) {
+    return (
+      <components.Input
+        {...props}
+        {...{
+          onPaste: (props.selectProps as any).onPaste,
+        }}
+      />
+    );
+  },
+};
 
 const BackgroundCheckTopicSelect = forwardRef<
   SimpleSelectInstance<string, boolean>,

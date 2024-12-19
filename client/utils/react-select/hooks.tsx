@@ -188,6 +188,8 @@ export function useReactSelectProps<
           ...omit(styles, ["padding"]),
           paddingInlineStart: padding,
           paddingInlineEnd: 0,
+          maxHeight: "120px",
+          overflow: "auto",
         };
       },
       option: (

@@ -111,7 +111,7 @@ export function useProfileFieldValueFilterOperators(
         },
       );
     }
-    if (field.type === "SELECT") {
+    if (["SHORT_TEXT", "SELECT"].includes(field.type)) {
       operators.push(
         {
           label: intl.formatMessage({
