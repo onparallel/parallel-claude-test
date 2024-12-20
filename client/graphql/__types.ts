@@ -33444,13 +33444,13 @@ export type RecipientViewPetitionField_publicStartAsyncFieldCompletionMutation =
   };
 };
 
-export type PreviewPetitionField_publicretryAsyncFieldCompletionMutationVariables = Exact<{
+export type PreviewPetitionField_publicRetryAsyncFieldCompletionMutationVariables = Exact<{
   keycode: Scalars["ID"]["input"];
   fieldId: Scalars["GID"]["input"];
   parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
 }>;
 
-export type PreviewPetitionField_publicretryAsyncFieldCompletionMutation = {
+export type PreviewPetitionField_publicRetryAsyncFieldCompletionMutation = {
   publicRetryAsyncFieldCompletion: {
     __typename?: "AsyncFieldCompletionResponse";
     type: string;
@@ -75040,8 +75040,8 @@ export const RecipientViewPetitionField_publicStartAsyncFieldCompletionDocument 
   RecipientViewPetitionField_publicStartAsyncFieldCompletionMutation,
   RecipientViewPetitionField_publicStartAsyncFieldCompletionMutationVariables
 >;
-export const PreviewPetitionField_publicretryAsyncFieldCompletionDocument = gql`
-  mutation PreviewPetitionField_publicretryAsyncFieldCompletion(
+export const PreviewPetitionField_publicRetryAsyncFieldCompletionDocument = gql`
+  mutation PreviewPetitionField_publicRetryAsyncFieldCompletion(
     $keycode: ID!
     $fieldId: GID!
     $parentReplyId: GID
@@ -75056,8 +75056,8 @@ export const PreviewPetitionField_publicretryAsyncFieldCompletionDocument = gql`
     }
   }
 ` as unknown as DocumentNode<
-  PreviewPetitionField_publicretryAsyncFieldCompletionMutation,
-  PreviewPetitionField_publicretryAsyncFieldCompletionMutationVariables
+  PreviewPetitionField_publicRetryAsyncFieldCompletionMutation,
+  PreviewPetitionField_publicRetryAsyncFieldCompletionMutationVariables
 >;
 export const RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument = gql`
   mutation RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLink(

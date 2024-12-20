@@ -1,6 +1,6 @@
 import stringify from "fast-safe-stringify";
 import pMap from "p-map";
-import { groupBy, isNonNullish, isNullish, pick, zip } from "remeda";
+import { groupBy, isDeepEqual, isNonNullish, isNullish, pick, zip } from "remeda";
 import { CreatePetitionFieldReply, PetitionFieldReply } from "../../db/__types";
 import {
   ModelRequest,
@@ -156,8 +156,8 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     ) {
       for (const reply of errorReplies) {
         // we need to find the correct document to update as there can be multiple documents with the same request
-        const documents = updatedDocuments.filter(
-          (r) => JSON.stringify(r.content.request) === JSON.stringify(reply.content.request),
+        const documents = updatedDocuments.filter((r) =>
+          isDeepEqual(r.content.request.model, reply.content.request.model),
         );
         // the first document will be the one to update, the rest will be new documents
         const [updateReply, ...newReplies] = documents;
@@ -201,9 +201,10 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     const modelRequestErrorReplies = fieldReplies.filter(
       (r) =>
         (isNullish(r.content.type) || r.content.type === "model-request") &&
-        isNonNullish(r.content.error) &&
-        Array.isArray(r.content.error) &&
-        r.content.error[0]?.reason !== "document_not_found",
+        ((isNonNullish(r.content.error) &&
+          Array.isArray(r.content.error) &&
+          r.content.error[0]?.reason !== "document_not_found") ||
+          isNonNullish(r.content.warning)),
     );
 
     const modelRequestNewDocuments = await pFlatMap(

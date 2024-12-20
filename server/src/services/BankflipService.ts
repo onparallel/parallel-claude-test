@@ -322,17 +322,27 @@ export class BankflipService implements IBankflipService {
       .filter((r) => isNullish(r.content.type) || r.content.type === "model-request")
       .filter(
         (r) =>
-          isNullish(r.content.error) ||
-          (Array.isArray(r.content.error) && r.content.error[0]?.reason === "document_not_found"),
+          (isNullish(r.content.error) ||
+            (Array.isArray(r.content.error) &&
+              r.content.error[0]?.reason === "document_not_found")) &&
+          isNullish(r.content.warning),
       );
 
     // on original configured model requests, get only those that don't have a successful reply with the same request
-    const requests = (field?.options.requests ?? []).filter(
-      (request: any) =>
-        !successfulModelRequestReplies
-          .map((r) => JSON.stringify(r.content.request.model))
-          .includes(JSON.stringify(request.model)),
-    );
+    const requests = (field?.options.requests ?? []).filter((request: any) => {
+      return !successfulModelRequestReplies.find(
+        (r) =>
+          request.model.type === r.content.model.type &&
+          // request configured in petition field may not have the following params,
+          // but the reply content may have them (automatically added by Bankflip response)
+          // e.g. AEAT_IRPF_DATOS_FISCALES model request without a year, last year added in the reply
+          (isNullish(request.model.year) || request.model.year === r.content.model.year) &&
+          (isNullish(request.model.month) || request.model.month === r.content.model.month) &&
+          (isNullish(request.model.quarter) || request.model.quarter === r.content.model.quarter) &&
+          (isNullish(request.model.licensePlate) ||
+            request.model.licensePlate === r.content.model.licensePlate),
+      );
+    });
 
     const successfulIdentityVerificationReply = fieldReplies.find(
       (r) => r.content.type === "identity-verification" && isNullish(r.content.error),
@@ -344,6 +354,10 @@ export class BankflipService implements IBankflipService {
       isNullish(successfulIdentityVerificationReply)
         ? field!.options.identityVerification
         : null;
+
+    if (requests.length === 0 && !identityVerification) {
+      throw new Error("NOTHING_TO_RETRY");
+    }
 
     const orgId = fromGlobalId(metadata.orgId, "Organization").id;
     const customization = await this.buildBankflipCustomization(orgId);

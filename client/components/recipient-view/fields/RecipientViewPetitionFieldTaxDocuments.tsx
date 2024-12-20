@@ -4,6 +4,7 @@ import { useTone } from "@parallel/components/common/ToneProvider";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { centeredPopup, isWindowBlockedError, openNewWindow } from "@parallel/utils/openNewWindow";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useInterval } from "@parallel/utils/useInterval";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { AnimatePresence, motion } from "framer-motion";
@@ -173,6 +174,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
     }
   };
 
+  const showGenericErrorToast = useGenericErrorToast();
   const handleRetryRequest = async () => {
     try {
       setBankflipSessionReady(false);
@@ -180,8 +182,17 @@ export function RecipientViewPetitionFieldTaxDocuments({
       setState("FETCHING");
       popupRef.current = await openNewWindow(
         async () => {
-          const data = await onRetryAsyncFieldCompletion();
-          return data!.url;
+          try {
+            const data = await onRetryAsyncFieldCompletion();
+            return data!.url;
+          } catch (error) {
+            // should not happen, this is here in case the retry button is incorrectly enabled
+            if (isApolloError(error, "NOTHING_TO_RETRY")) {
+              setState("IDLE");
+              showGenericErrorToast(error);
+            }
+            throw error;
+          }
         },
         centeredPopup({ height: 800, width: 700 }),
       );

@@ -438,23 +438,30 @@ export const retryAsyncFieldCompletion = mutationField("retryAsyncFieldCompletio
     const petition = await ctx.petitions.loadPetition(petitionId);
     assert(petition, "Petition not found");
 
-    const session = await ctx.bankflip.createRetrySession(
-      {
-        petitionId: toGlobalId("Petition", petitionId),
-        orgId: toGlobalId("Organization", ctx.user!.org_id),
-        fieldId: toGlobalId("PetitionField", fieldId),
-        userId: toGlobalId("User", ctx.user!.id),
-        parentReplyId: isNonNullish(parentReplyId)
-          ? toGlobalId("PetitionFieldReply", parentReplyId)
-          : null,
-      },
-      petition.recipient_locale,
-    );
+    try {
+      const session = await ctx.bankflip.createRetrySession(
+        {
+          petitionId: toGlobalId("Petition", petitionId),
+          orgId: toGlobalId("Organization", ctx.user!.org_id),
+          fieldId: toGlobalId("PetitionField", fieldId),
+          userId: toGlobalId("User", ctx.user!.id),
+          parentReplyId: isNonNullish(parentReplyId)
+            ? toGlobalId("PetitionFieldReply", parentReplyId)
+            : null,
+        },
+        petition.recipient_locale,
+      );
 
-    return {
-      type: "WINDOW",
-      url: session.widgetLink,
-    };
+      return {
+        type: "WINDOW",
+        url: session.widgetLink,
+      };
+    } catch (error) {
+      if (error instanceof Error && error.message === "NOTHING_TO_RETRY") {
+        throw new ApolloError("There are no models to retry", "NOTHING_TO_RETRY");
+      }
+      throw error;
+    }
   },
 });
 
