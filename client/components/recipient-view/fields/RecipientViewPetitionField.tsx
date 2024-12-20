@@ -1,7 +1,7 @@
 import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import {
-  PreviewPetitionField_publicretryAsyncFieldCompletionDocument,
+  PreviewPetitionField_publicRetryAsyncFieldCompletionDocument,
   RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
   RecipientViewPetitionField_PublicPetitionAccessFragment,
   RecipientViewPetitionField_PublicPetitionFieldFragment,
@@ -234,7 +234,7 @@ export function RecipientViewPetitionField({
   };
 
   const [publicRetryAsyncFieldCompletion] = useMutation(
-    PreviewPetitionField_publicretryAsyncFieldCompletionDocument,
+    PreviewPetitionField_publicRetryAsyncFieldCompletionDocument,
   );
   const handleRetryAsyncFieldCompletion = async (_fieldId?: string, parentReplyId?: string) => {
     const { data } = await publicRetryAsyncFieldCompletion({
@@ -505,7 +505,7 @@ RecipientViewPetitionField.mutations = [
     }
   `,
   gql`
-    mutation PreviewPetitionField_publicretryAsyncFieldCompletion(
+    mutation PreviewPetitionField_publicRetryAsyncFieldCompletion(
       $keycode: ID!
       $fieldId: GID!
       $parentReplyId: GID
