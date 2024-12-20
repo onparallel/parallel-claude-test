@@ -3,7 +3,7 @@
 
 # versions
 nodejs_version="22" # https://nodejs.org/en
-typst_version="0.12.0" # https://github.com/typst/typst/releases
+typst_version="0.11.1" # https://github.com/typst/typst/releases
 nginx_version="1.26.2" # http://nginx.org/en/download.html
 fail2ban_version="1.1.0" # https://github.com/fail2ban/fail2ban/releases
 modsecurity_version="3.0.13" # https://github.com/SpiderLabs/ModSecurity/releases
