@@ -21,7 +21,6 @@ import {
   ifArgDefined,
   or,
   userIsSuperAdmin,
-  verifyCaptcha,
 } from "../helpers/authorize";
 import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -422,7 +421,9 @@ export const signUp = mutationField("signUp", {
     captcha: nonNull(stringArg()),
     licenseCode: stringArg(),
   },
-  authorize: verifyCaptcha("captcha"),
+  // authorize: verifyCaptcha("captcha"),
+  // signup is temporally disabled
+  authorize: () => false,
   validateArgs: validateAnd(
     validPassword("password"),
     validEmail("email"),
