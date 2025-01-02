@@ -2604,6 +2604,7 @@ export const ListOfProfileProperties = ListOf(_ProfileFieldProperty as any);
 const UpdateProfileValue = {
   oneOf: [
     { type: "null" },
+    { type: "number", example: 42, description: "Value of the property" },
     { type: "string", example: "Parallel Solutions", description: "Value of the property" },
     {
       type: "array",
