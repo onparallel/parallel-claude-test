@@ -111,7 +111,6 @@ export class EInformaProfileExternalSourceIntegration
       { key: "ventas", property: { type: "NUMBER", options: {} } },
       { key: "anioVentas", property: { type: "NUMBER", options: {} } },
       { key: "empleados", property: { type: "NUMBER", options: {} } },
-      { key: "fechaConstitucion", property: { type: "DATE", options: {} } },
     ],
   };
 
@@ -563,12 +562,12 @@ export class EInformaProfileExternalSourceIntegration
     switch (key) {
       case "cnae":
         // "cnae" is mapped to a SELECT field of standardList:CNAE
-        return { value: entity["cnae"]!.slice(0, 4) };
+        return { value: entity["cnae"]?.slice(0, 4) };
       case "web":
       case "nombreComercial":
         // "web" and "nombreComercial" are mapped to a SHORT_TEXT field
         // here we need only the first value
-        return { value: entity[key]![0] };
+        return { value: entity[key]?.[0] };
       case "fechaUltimoBalance":
       case "situacion":
       case "capitalSocial":
