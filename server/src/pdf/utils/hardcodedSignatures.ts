@@ -109,7 +109,9 @@ export function getHardcodedSignatures(templateId: string) {
       signatureImageUrl:
         "https://static.onparallel.com/static/images/signatures/manuel-holstein-tiko.png",
     });
-  } else if (["zas25KHxAByKX3yGfeP", "zas25KHxAByKXBXLcU6"].includes(templateId)) {
+  } else if (
+    ["zas25KHxAByKX3yGfeP", "zas25KHxAByKXBXLcU6", "6Y8DSH92uxPaJ4BynS6fS"].includes(templateId)
+  ) {
     signers.push({
       fullName: "Miguel Acosta",
       signatureImageUrl:
