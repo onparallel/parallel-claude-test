@@ -1754,7 +1754,7 @@ describe("GraphQL/Users", () => {
                 },
                 {
                   id: expect.any(String),
-                  type: "TEXT",
+                  type: "SHORT_TEXT",
                   name: { en: "Position", es: "Cargo" },
                   alias: "p_position",
                   isStandard: true,

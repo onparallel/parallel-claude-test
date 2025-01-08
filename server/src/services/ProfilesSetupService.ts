@@ -755,7 +755,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
             alias: "p_poa",
           },
           {
-            type: "TEXT",
+            type: "SHORT_TEXT",
             name: await this.intl.getLocalizableUserText({
               id: "profiles.default-profile-type-field.individual-position",
               defaultMessage: "Position",

@@ -1726,7 +1726,7 @@ describe("ProfileLinkedPetitionFields", () => {
         {
           field: {
             alias: "p_position",
-            type: "TEXT",
+            type: "SHORT_TEXT",
           },
           files: null,
           value: null,
@@ -5073,7 +5073,7 @@ describe("ProfileLinkedPetitionFields", () => {
         {
           field: {
             alias: "p_position",
-            type: "TEXT",
+            type: "SHORT_TEXT",
           },
           files: null,
           value: null,
