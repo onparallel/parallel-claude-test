@@ -473,8 +473,8 @@ export class EInformaProfileExternalSourceIntegration
       async (accessToken, { environment }) => {
         const url =
           environment === "test"
-            ? `/companies/${externalId}/test`
-            : `/companies/${externalId}/report`;
+            ? `/companies/${externalId.toUpperCase()}/test`
+            : `/companies/${externalId.toUpperCase()}/report`;
 
         return await this.apiRequest<EInformaEntityByIdResponse>(accessToken, url, "GET");
       },
