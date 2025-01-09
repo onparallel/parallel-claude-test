@@ -1,5 +1,8 @@
 import { gql, useQuery } from "@apollo/client";
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
   Button,
   FormControl,
   Stack,
@@ -88,6 +91,10 @@ function ResolveProfilePropertiesConflictsDialog({
     }
   }, [profileTypeFieldsWithReplies, data?.profile]);
 
+  const hasFieldsUsedInProfileName = fieldsWithRepliesAndProperty.some(
+    ([, , property]) => property.field.isUsedInProfileName,
+  );
+
   useEffect(() => {
     reset({
       conflicts: pipe(
@@ -131,11 +138,34 @@ function ResolveProfilePropertiesConflictsDialog({
       header={
         <FormattedMessage
           id="component.update-profile-properties-dialog.header"
-          defaultMessage="Update properties"
+          defaultMessage="Manage existing values"
         />
       }
       body={
         <Stack spacing={4} maxHeight="420px">
+          {hasFieldsUsedInProfileName ? (
+            <Alert status="info" borderRadius="md">
+              <AlertIcon />
+              <AlertDescription display="block" flex="1">
+                <FormattedMessage
+                  id="component.update-profile-properties-dialog.alert-properties-used-in-profile-name"
+                  defaultMessage="The name has changed. This might indicate that the data belongs to a different profile. If so, create a new profile for this information."
+                />
+              </AlertDescription>
+              <Button
+                variant="outline"
+                colorScheme="blue"
+                backgroundColor="white"
+                marginX={2}
+                onClick={() => props.onReject("CREATE_NEW_PROFILE")}
+              >
+                <FormattedMessage
+                  id="component.update-profile-properties-dialog.create-new-profile"
+                  defaultMessage="Create new profile"
+                />
+              </Button>
+            </Alert>
+          ) : null}
           <Text>
             <FormattedMessage
               id="component.update-profile-properties-dialog.body"
@@ -289,6 +319,7 @@ useResolveProfilePropertiesConflictsDialog.fragments = {
           type
           name
           options
+          isUsedInProfileName
         }
         files {
           id

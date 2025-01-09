@@ -11545,6 +11545,11 @@
     "context": "Configure expiration date"
   },
   {
+    "term": "component.update-profile-properties-dialog.alert-properties-used-in-profile-name",
+    "definition": "The name has changed. This might indicate that the data belongs to a different profile. If so, create a new profile for this information.",
+    "context": "The name has changed. This might indicate that the data belongs to a different profile. If so, create a new profile for this information."
+  },
+  {
     "term": "component.update-profile-properties-dialog.body",
     "definition": "The following properties of <b>{profileName}</b> profile already contain information.",
     "context": "The following properties of <b>{profileName}</b> profile already contain information."
@@ -11555,9 +11560,14 @@
     "context": "Select the value you want to keep:"
   },
   {
+    "term": "component.update-profile-properties-dialog.create-new-profile",
+    "definition": "Create new profile",
+    "context": "Create new profile"
+  },
+  {
     "term": "component.update-profile-properties-dialog.header",
-    "definition": "Update properties",
-    "context": "Update properties"
+    "definition": "Manage existing values",
+    "context": "Manage existing values"
   },
   {
     "term": "component.update-profile-type-field-dialog.is-expirable-description",

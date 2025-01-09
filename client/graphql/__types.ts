@@ -29148,6 +29148,7 @@ export type useResolveProfilePropertiesConflictsDialog_ProfileFieldPropertyFragm
     type: ProfileTypeFieldType;
     name: { [locale in UserLocale]?: string };
     options: { [key: string]: any };
+    isUsedInProfileName: boolean;
   };
   files?: Array<{
     __typename?: "ProfileFieldFile";
@@ -29178,6 +29179,7 @@ export type useResolveProfilePropertiesConflictsDialog_ProfileFragment = {
       type: ProfileTypeFieldType;
       name: { [locale in UserLocale]?: string };
       options: { [key: string]: any };
+      isUsedInProfileName: boolean;
     };
     files?: Array<{
       __typename?: "ProfileFieldFile";
@@ -29229,6 +29231,7 @@ export type useResolveProfilePropertiesConflictsDialog_profileQuery = {
         type: ProfileTypeFieldType;
         name: { [locale in UserLocale]?: string };
         options: { [key: string]: any };
+        isUsedInProfileName: boolean;
       };
       files?: Array<{
         __typename?: "ProfileFieldFile";
@@ -64049,6 +64052,7 @@ export const useResolveProfilePropertiesConflictsDialog_ProfileFieldPropertyFrag
       type
       name
       options
+      isUsedInProfileName
     }
     files {
       id

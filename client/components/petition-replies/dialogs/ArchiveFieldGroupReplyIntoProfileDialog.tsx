@@ -11,7 +11,12 @@ import {
   ProfileSelectSelection,
 } from "@parallel/components/common/ProfileSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  DialogProps,
+  isDialogError,
+  useDialog,
+} from "@parallel/components/common/dialogs/DialogProvider";
+import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/CreateProfileDialog";
 import {
   ArchiveFieldGroupReplyIntoProfileConflictResolutionInput,
   ArchiveFieldGroupReplyIntoProfileExpirationInput,
@@ -220,7 +225,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
   }, [selectedProfile?.id, isSaved, isEditing, savedProfile.current?.id]);
 
   const showRestrictedProfilePropertiesDialog = useRestrictedProfilePropertiesDialog();
-
+  const showCreateProfileDialog = useCreateProfileDialog();
   async function archiveProfile(profile: ProfileSelectSelection, ignoreFieldsInName?: boolean) {
     let conflictResolutions = (
       ignoreFieldsInName
@@ -332,7 +337,23 @@ function ArchiveFieldGroupReplyIntoProfileRow({
           setIsEditing(false);
           onRefetch();
           savedProfile.current = profile;
-        } catch {}
+        } catch (e) {
+          if (isDialogError(e) && e.reason === "CREATE_NEW_PROFILE") {
+            try {
+              const { profile } = await showCreateProfileDialog({
+                profileTypeId: field.profileType!.id,
+                profileFieldValues: Object.fromEntries(
+                  repliesWithProfileFields.map(([field, replies]) => [
+                    field.profileTypeField!.id,
+                    replies?.[0]?.content?.value,
+                  ]),
+                ),
+              });
+              await archiveProfile(profile as any, true);
+              setSelectedProfile(profile as any);
+            } catch {}
+          }
+        }
       }
     }
   }
