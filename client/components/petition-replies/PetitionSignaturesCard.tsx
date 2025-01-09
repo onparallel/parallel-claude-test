@@ -236,7 +236,9 @@ export const PetitionSignaturesCard = Object.assign(
               petitionId: petition.id,
               signatureConfig: {
                 orgIntegrationId: current.signatureConfig.integration.id,
-                signersInfo: current.signatureConfig.signers.map((s) => omit(s!, ["__typename"])),
+                signersInfo: current.signatureConfig.signers.map((s) =>
+                  omit(s!, ["__typename", "fullName"]),
+                ),
                 ...pick(current.signatureConfig, [
                   "allowAdditionalSigners",
                   "minSigners",
