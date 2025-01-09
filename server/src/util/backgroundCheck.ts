@@ -61,6 +61,7 @@ export function backgroundCheckFieldReplyUrl(
     ...(reply.content.query?.name ? { name: reply.content.query.name } : {}),
     ...(reply.content.query?.date ? { date: reply.content.query.date } : {}),
     ...(reply.content.query?.type ? { type: reply.content.query.type } : {}),
+    ...(reply.content.query?.country ? { country: reply.content.query.country } : {}),
     readonly: "true",
   })}`;
 }
@@ -114,6 +115,12 @@ export function buildAutomatedBackgroundCheckFieldQueries(
 
       const typeValue = backgroundCheck.options.autoSearchConfig?.type || null;
 
+      const countryReply = visibleFields.find(
+        (field) => backgroundCheck.options.autoSearchConfig.country === field.id,
+      )?.replies?.[0];
+
+      const countryValue = countryReply?.content.value || null;
+
       const currentBackgroundCheckReply = backgroundCheck.replies.at(0);
       if (
         currentBackgroundCheckReply?.status === "APPROVED" ||
@@ -134,6 +141,7 @@ export function buildAutomatedBackgroundCheckFieldQueries(
           name: nameValue,
           date: dateValue,
           type: typeValue,
+          country: countryValue,
         },
       };
     })
@@ -205,6 +213,17 @@ export function buildAutomatedBackgroundCheckFieldQueries(
             const dateValue = dateReply?.content.value ?? null;
             const typeValue = backgroundCheck.options.autoSearchConfig?.type ?? null;
 
+            const countryReply = visibleFields
+              .flatMap((f) => [f, ...(f.children ?? [])])
+              .find((f) => f.id === backgroundCheck.options.autoSearchConfig.country)
+              ?.replies.filter(
+                (r) =>
+                  isNullish(r.parent_petition_field_reply_id) ||
+                  r.parent_petition_field_reply_id === groupReply.id,
+              )?.[0];
+
+            const countryValue = countryReply?.content.value ?? null;
+
             const currentBackgroundCheckReply = groupReply.children
               ?.find((c) => c.field.id === backgroundCheck.id)
               ?.replies.at(0);
@@ -213,7 +232,8 @@ export function buildAutomatedBackgroundCheckFieldQueries(
               isNonNullish(currentBackgroundCheckReply?.content.entity) ||
               (currentBackgroundCheckReply?.content.query.name === nameValue &&
                 currentBackgroundCheckReply?.content.query.date === dateValue &&
-                currentBackgroundCheckReply?.content.query.type === typeValue)
+                currentBackgroundCheckReply?.content.query.type === typeValue &&
+                currentBackgroundCheckReply?.content.query.country === countryValue)
             ) {
               // reply is already approved, has an specific entity stored, or query is the same
               return null;
@@ -227,6 +247,7 @@ export function buildAutomatedBackgroundCheckFieldQueries(
                 name: nameValue,
                 date: dateValue,
                 type: typeValue,
+                country: countryValue,
               },
             };
           }),

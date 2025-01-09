@@ -425,6 +425,7 @@ export interface NexusGenInputs {
   };
   UpdatePetitionFieldAutoSearchConfigInput: {
     // input type
+    country?: NexusGenScalars["GID"] | null; // GID
     date?: NexusGenScalars["GID"] | null; // GID
     name: NexusGenScalars["GID"][]; // [GID!]!
     type?: NexusGenEnums["BackgroundCheckEntitySearchType"] | null; // BackgroundCheckEntitySearchType
@@ -9112,6 +9113,7 @@ export interface NexusGenArgTypes {
     };
     backgroundCheckEntitySearch: {
       // args
+      country?: string | null; // String
       date?: NexusGenScalars["Date"] | null; // Date
       name: string; // String!
       token: string; // String!

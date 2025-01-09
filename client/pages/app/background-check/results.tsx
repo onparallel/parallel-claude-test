@@ -24,6 +24,7 @@ import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { integer, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { useLoadOpenSanctionsCountryNames } from "@parallel/utils/useLoadOpenSanctionsCountryNames";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import Head from "next/head";
@@ -58,6 +59,7 @@ function BackgroundCheckFieldSearchResults({
   name,
   date,
   type,
+  country,
 }: UnwrapPromise<ReturnType<typeof BackgroundCheckFieldSearchResults.getInitialProps>>) {
   const router = useRouter();
   const { query } = router;
@@ -69,6 +71,11 @@ function BackgroundCheckFieldSearchResults({
   const isReadOnly = query.readonly === "true";
   const isTemplate = query.template === "true";
 
+  const countryNames = useLoadCountryNames(intl.locale);
+  const countryName =
+    country && isNonNullish(countryNames.countries)
+      ? countryNames.countries[country.toUpperCase()]
+      : country;
   const entityTypeLabel = getEntityTypeLabel(intl, type);
 
   const { data, loading, error } = useQuery(
@@ -79,6 +86,7 @@ function BackgroundCheckFieldSearchResults({
         name,
         date: date ? new Date(date).toISOString().substring(0, 10) : null,
         type,
+        country,
       },
       fetchPolicy: "cache-and-network",
     },
@@ -173,12 +181,13 @@ function BackgroundCheckFieldSearchResults({
           name,
           ...(date ? { date } : {}),
           ...(type ? { type } : {}),
+          ...(country ? { country } : {}),
           ...(isReadOnly ? { readonly: "true" } : {}),
           ...(isTemplate ? { template: "true" } : {}),
         })}`,
       );
     },
-    [token, name, date, type, isReadOnly, isTemplate],
+    [token, name, date, type, country, isReadOnly, isTemplate],
   );
 
   const handleResetClick = () => {
@@ -188,6 +197,7 @@ function BackgroundCheckFieldSearchResults({
         name,
         ...(date ? { date } : {}),
         ...(type ? { type } : {}),
+        ...(country ? { country } : {}),
         ...(isTemplate ? { template: "true" } : {}),
       })}`,
     );
@@ -302,7 +312,7 @@ function BackgroundCheckFieldSearchResults({
                   {": "}
                 </Text>
                 <Text as="span">
-                  {[entityTypeLabel, name, date].filter(isNonNullish).join(" | ")}
+                  {[entityTypeLabel, name, date, countryName].filter(isNonNullish).join(" | ")}
                 </Text>
               </Box>
 
@@ -609,8 +619,15 @@ const _queries = [
       $name: String!
       $date: Date
       $type: BackgroundCheckEntitySearchType
+      $country: String
     ) {
-      backgroundCheckEntitySearch(token: $token, name: $name, date: $date, type: $type) {
+      backgroundCheckEntitySearch(
+        token: $token
+        name: $name
+        date: $date
+        type: $type
+        country: $country
+      ) {
         totalCount
         createdAt
         items {
@@ -627,8 +644,9 @@ BackgroundCheckFieldSearchResults.getInitialProps = async ({ query }: WithApollo
   const name = query.name as string;
   const date = query.date as string | null;
   const type = query.type as BackgroundCheckEntitySearchType | null;
+  const country = query.country as string | null;
 
-  return { token, name, date, type };
+  return { token, name, date, type, country };
 };
 
 export default compose(

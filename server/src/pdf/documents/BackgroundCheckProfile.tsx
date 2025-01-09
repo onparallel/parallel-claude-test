@@ -477,6 +477,12 @@ export default function BackgroundCheckProfile(props: BackgroundCheckProfileProp
                 <Text style={styles.normalText}>{props.query?.date ?? "All"}</Text>
               </View>
               <View style={styles.row}>
+                <Text style={styles.boldText}>Country:</Text>
+                <Text style={styles.normalText}>
+                  {props.query?.country ? COUNTRIES[props.query.country.toLowerCase()] : "Any"}
+                </Text>
+              </View>
+              <View style={styles.row}>
                 <Text style={styles.boldText}>Saved on:</Text>
                 <Text style={styles.normalText}>
                   {intl.formatDate(new Date((props.entity as any)?.createdAt), FORMATS.FULL)}

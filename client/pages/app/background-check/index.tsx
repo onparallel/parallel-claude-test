@@ -19,6 +19,7 @@ import { FieldDateIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { DateInput } from "@parallel/components/common/DateInput";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { SupportLink } from "@parallel/components/common/SupportLink";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
@@ -30,9 +31,11 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
+import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -40,6 +43,7 @@ export interface BackgroundCheckFormData {
   name: string | null;
   date: string | null;
   type: BackgroundCheckEntitySearchType | null;
+  country: string | null;
 }
 
 type BackgroundCheckFieldSearchProps = UnwrapPromise<
@@ -50,6 +54,7 @@ function BackgroundCheckFieldSearch({
   name = "",
   date = "",
   type = null,
+  country = null,
 }: BackgroundCheckFieldSearchProps) {
   const router = useRouter();
   const intl = useIntl();
@@ -71,10 +76,22 @@ function BackgroundCheckFieldSearch({
       name,
       date,
       type,
+      country,
     },
   });
 
   const selectedType = watch("type");
+
+  const countryNames = useLoadCountryNames(intl.locale);
+
+  const countryOptions = useMemo(() => {
+    return countryNames.countries
+      ? Object.entries(countryNames.countries).map(([code, name]) => ({
+          value: code,
+          label: name,
+        }))
+      : [];
+  }, [countryNames]);
 
   return (
     <>
@@ -128,7 +145,7 @@ function BackgroundCheckFieldSearch({
           ) : null}
           <Card
             as="form"
-            onSubmit={handleSubmit(({ name, date, type }) => {
+            onSubmit={handleSubmit(({ name, date, type, country }) => {
               const { token, template } = router.query;
               router.push(
                 `/app/background-check/results?${new URLSearchParams({
@@ -136,6 +153,7 @@ function BackgroundCheckFieldSearch({
                   ...(name ? { name } : {}),
                   ...(date ? { date } : {}),
                   ...(type ? { type } : {}),
+                  ...(country ? { country } : {}),
                   ...(template === "true" ? { template: "true" } : {}),
                 })}`,
               );
@@ -206,6 +224,31 @@ function BackgroundCheckFieldSearch({
                     </Center>
                   </Flex>
                 </FormControl>
+                <FormControl>
+                  <FormLabel fontWeight={400}>
+                    <FormattedMessage
+                      id="page.background-check.country-label"
+                      defaultMessage="Country"
+                    />
+                  </FormLabel>
+                  <Controller
+                    name="country"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <SimpleSelect
+                        isClearable
+                        isSearchable
+                        value={value}
+                        onChange={onChange}
+                        options={countryOptions}
+                        placeholder={intl.formatMessage({
+                          id: "page.background-check.select-country-placeholder",
+                          defaultMessage: "Any country",
+                        })}
+                      />
+                    )}
+                  />
+                </FormControl>
               </Stack>
               <Button colorScheme="primary" type="submit" isDisabled={isDisabled}>
                 <FormattedMessage id="page.background-check.search" defaultMessage="Search" />
@@ -247,12 +290,13 @@ BackgroundCheckFieldSearch.getInitialProps = async ({
   const name = query.name as string | null | undefined;
   const date = query.date as string | null | undefined;
   const type = query.type as BackgroundCheckEntitySearchType | null | undefined;
+  const country = query.country as string | null | undefined;
 
   const {
     data: { metadata },
   } = await fetchQuery(BackgroundCheckFieldSearch_userDocument);
 
-  return { metadata, name, date, type };
+  return { metadata, name, date, type, country };
 };
 
 export default compose(

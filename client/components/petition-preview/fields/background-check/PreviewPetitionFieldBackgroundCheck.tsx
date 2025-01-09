@@ -26,6 +26,7 @@ import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useInterval } from "@parallel/utils/useInterval";
+import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
@@ -173,12 +174,13 @@ export function PreviewPetitionFieldBackgroundCheck({
 
       const isReadOnly = reply.status === "APPROVED" || isDisabled;
 
-      const { name, date, type } = reply.content?.query ?? {};
+      const { name, date, type, country } = reply.content?.query ?? {};
       const urlParams = new URLSearchParams({
         token: tokenBase64,
         ...(name ? { name } : {}),
         ...(date ? { date } : {}),
         ...(type ? { type } : {}),
+        ...(country ? { country } : {}),
         ...(isReadOnly ? { readonly: "true" } : {}),
       });
 
@@ -211,7 +213,7 @@ export function PreviewPetitionFieldBackgroundCheck({
 
     if (field.replies.length) {
       const reply = field.replies[0];
-      const { name, date, type } = reply.content?.query ?? {};
+      const { name, date, type, country } = reply.content?.query ?? {};
 
       if (name) {
         searchParams.set("name", name);
@@ -221,6 +223,9 @@ export function PreviewPetitionFieldBackgroundCheck({
       }
       if (type) {
         searchParams.set("type", type);
+      }
+      if (country) {
+        searchParams.set("country", country);
       }
     } else if (isNonNullish(options.autoSearchConfig)) {
       const fields = parentReplyId
@@ -247,6 +252,10 @@ export function PreviewPetitionFieldBackgroundCheck({
         "";
 
       if (name || date) {
+        const country =
+          fields.find((f) => f.id === options.autoSearchConfig!.country)?.replies[0]?.content
+            .value ?? "";
+
         if (name) {
           searchParams.set("name", name);
         }
@@ -255,6 +264,9 @@ export function PreviewPetitionFieldBackgroundCheck({
         }
         if (options.autoSearchConfig.type) {
           searchParams.set("type", options.autoSearchConfig.type);
+        }
+        if (country) {
+          searchParams.set("country", country);
         }
 
         url += `/results`;
@@ -394,6 +406,7 @@ export function KYCResearchFieldReplyProfile({
 }: KYCResearchFieldReplyProfileProps) {
   const intl = useIntl();
   const entityTypeLabel = getEntityTypeLabel(intl, reply.content?.query?.type);
+  const countryNames = useLoadCountryNames(intl.locale);
 
   return (
     <Stack direction="row" alignItems="center" backgroundColor="white" id={id}>
@@ -433,7 +446,14 @@ export function KYCResearchFieldReplyProfile({
             ) : (
               <Flex flexWrap="wrap" gap={2} alignItems="center">
                 <Text as="span">
-                  {[entityTypeLabel, reply.content?.query?.name, reply.content?.query?.date]
+                  {[
+                    entityTypeLabel,
+                    reply.content?.query?.name,
+                    reply.content?.query?.date,
+                    reply.content?.query?.country && countryNames.countries
+                      ? countryNames.countries[reply.content?.query?.country]
+                      : reply.content?.query?.country,
+                  ]
                     .filter(isNonNullish)
                     .join(" | ")}
                 </Text>

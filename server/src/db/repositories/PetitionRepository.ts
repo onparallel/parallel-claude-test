@@ -1916,7 +1916,9 @@ export class PetitionRepository extends BaseRepository {
                 originalChildrenIds.includes(id),
               ) ||
                 (isNonNullish(f.options.autoSearchConfig.date) &&
-                  originalChildrenIds.includes(f.options.autoSearchConfig.date))),
+                  originalChildrenIds.includes(f.options.autoSearchConfig.date)) ||
+                (isNonNullish(f.options.autoSearchConfig.country) &&
+                  originalChildrenIds.includes(f.options.autoSearchConfig.country))),
           )
           .map((field) => ({
             id: field.id,
@@ -1932,6 +1934,11 @@ export class PetitionRepository extends BaseRepository {
                   ? (clonedFields.find(
                       (f) => f.originalFieldId === field.options.autoSearchConfig.date,
                     )?.cloned.id ?? field.options.autoSearchConfig.date)
+                  : null,
+                country: isNonNullish(field.options.autoSearchConfig.country)
+                  ? (clonedFields.find(
+                      (f) => f.originalFieldId === field.options.autoSearchConfig.country,
+                    )?.cloned.id ?? field.options.autoSearchConfig.country)
                   : null,
               },
             },
@@ -3337,6 +3344,9 @@ export class PetitionRepository extends BaseRepository {
                       ),
                       date: isNonNullish(field.options.autoSearchConfig.date)
                         ? newFieldIds[field.options.autoSearchConfig.date]
+                        : null,
+                      country: isNonNullish(field.options.autoSearchConfig.country)
+                        ? newFieldIds[field.options.autoSearchConfig.country]
                         : null,
                     },
                   }),

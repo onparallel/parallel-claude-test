@@ -30,6 +30,7 @@ import { useBackgroundCheckProfileDownloadTask } from "@parallel/utils/tasks/use
 import { unMaybeArray } from "@parallel/utils/types";
 import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
 import { useInterval } from "@parallel/utils/useInterval";
+import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -100,6 +101,7 @@ export function ProfileFormFieldBackgroundCheck({
   }, [hasReply]);
 
   const hasBackgroundCheck = useHasBackgroundCheck();
+  const countryNames = useLoadCountryNames(intl.locale);
 
   const { entity, query, search } = props.value?.content ?? {};
 
@@ -109,8 +111,14 @@ export function ProfileFormFieldBackgroundCheck({
 
   const entityTypeLabel = getEntityTypeLabel(intl, query?.type);
 
+  const countryName =
+    query?.country && isNonNullish(countryNames.countries)
+      ? countryNames.countries[query?.country.toUpperCase()]
+      : query?.country;
+
   const entityOrSearchName =
-    entity?.name ?? [entityTypeLabel, query?.name, query?.date].filter(isNonNullish).join(" | ");
+    entity?.name ??
+    [entityTypeLabel, query?.name, query?.date, countryName].filter(isNonNullish).join(" | ");
 
   useInterval(
     async (done) => {
@@ -227,13 +235,14 @@ export function ProfileFormFieldBackgroundCheck({
       setState("FETCHING");
       let url = `/${intl.locale}/app/background-check`;
 
-      const { date, name, type } = query ?? {};
+      const { date, name, type, country } = query ?? {};
 
       const searchParams = new URLSearchParams({
         token: tokenBase64,
         ...(name ? { name } : {}),
         ...(date ? { date } : {}),
         ...(type ? { type } : {}),
+        ...(country ? { country } : {}),
       });
 
       url += `?${searchParams.toString()}`;
@@ -246,12 +255,13 @@ export function ProfileFormFieldBackgroundCheck({
     try {
       let url = `/${intl.locale}/app/background-check`;
 
-      const { name, date, type } = query ?? {};
+      const { name, date, type, country } = query ?? {};
       const urlParams = new URLSearchParams({
         token: tokenBase64,
         ...(name ? { name } : {}),
         ...(date ? { date } : {}),
         ...(type ? { type } : {}),
+        ...(country ? { country } : {}),
         ...(isDisabled ? { readonly: "true" } : {}),
       });
 
@@ -339,6 +349,9 @@ export function ProfileFormFieldBackgroundCheck({
                 getEntityTypeLabel(intl, reply.content.query.type),
                 reply.content.query.name,
                 reply.content.query.date,
+                reply.content.query.country && countryNames.countries
+                  ? countryNames.countries[reply.content.query.country]
+                  : reply.content.query.country,
               ]
                 .filter(isNonNullish)
                 .join(" | "),
@@ -361,7 +374,10 @@ export function ProfileFormFieldBackgroundCheck({
             // remove current values
             if (isSearch) {
               return (
-                value !== [query?.type, query?.name, query?.date].filter(isNonNullish).join("-")
+                value !==
+                [query?.type, query?.name, query?.date, query?.country]
+                  .filter(isNonNullish)
+                  .join("-")
               );
             }
             return value !== entity?.id;

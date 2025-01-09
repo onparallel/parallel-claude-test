@@ -319,7 +319,8 @@ export function fieldIsNotBeingUsedInAutoSearchConfig<
               f.type === "BACKGROUND_CHECK" &&
               isNonNullish(f.options.autoSearchConfig) &&
               ((f.options.autoSearchConfig.name as number[]).includes(field.id) ||
-                (f.options.autoSearchConfig.date as number | null) === field.id),
+                (f.options.autoSearchConfig.date as number | null) === field.id ||
+                (f.options.autoSearchConfig.country as number | null) === field.id),
           )
         ) {
           throw new ApolloError(

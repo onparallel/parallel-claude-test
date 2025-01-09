@@ -1155,12 +1155,13 @@ describe("GraphQL/Petition Fields", () => {
       const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
         type: "FIELD_GROUP",
       }));
-      const [name, date, backgroundCheck] = await mocks.createRandomPetitionFields(
+      const [name, date, country, backgroundCheck] = await mocks.createRandomPetitionFields(
         petition.id,
-        3,
+        4,
         (i) => ({
-          type: ["SHORT_TEXT", "DATE", "BACKGROUND_CHECK"][i] as PetitionFieldType,
+          type: ["SHORT_TEXT", "DATE", "SELECT", "BACKGROUND_CHECK"][i] as PetitionFieldType,
           parent_petition_field_id: fieldGroup.id,
+          options: i === 2 ? { standardList: "COUNTRIES" } : {},
         }),
       );
 
@@ -1169,7 +1170,7 @@ describe("GraphQL/Petition Fields", () => {
         .where("id", backgroundCheck.id)
         .update({
           options: JSON.stringify({
-            autoSearchConfig: { name: [name.id], date: date.id, type: null },
+            autoSearchConfig: { name: [name.id], date: date.id, country: country.id, type: null },
           }),
         });
 
@@ -1208,12 +1209,18 @@ describe("GraphQL/Petition Fields", () => {
           },
           {
             id: expect.any(String),
+            type: "SELECT",
+            options: expect.any(Object),
+          },
+          {
+            id: expect.any(String),
             type: "BACKGROUND_CHECK",
             options: {
               autoSearchConfig: {
                 type: null,
                 name: [data.clonePetitionField.children[0].id],
                 date: data.clonePetitionField.children[1].id,
+                country: data.clonePetitionField.children[2].id,
               },
             },
           },

@@ -90,6 +90,7 @@ export interface FieldOptions {
       name: string[];
       date: string | null;
       type: BackgroundCheckEntitySearchType | null;
+      country: string | null;
     } | null;
   };
   FIELD_GROUP: {

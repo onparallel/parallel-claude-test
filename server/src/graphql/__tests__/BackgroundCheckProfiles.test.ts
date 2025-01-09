@@ -126,6 +126,7 @@ describe("Background Check - Profiles", () => {
         name: "Vladimir Putin",
         date: null,
         type: null,
+        country: null,
       });
 
       const pfvs = await mocks.knex
@@ -225,8 +226,18 @@ describe("Background Check - Profiles", () => {
       // second search with different query
       const { errors } = await testClient.execute(
         gql`
-          query ($token: String!, $name: String!, $type: BackgroundCheckEntitySearchType) {
-            backgroundCheckEntitySearch(token: $token, name: $name, type: $type) {
+          query (
+            $token: String!
+            $name: String!
+            $type: BackgroundCheckEntitySearchType
+            $country: String
+          ) {
+            backgroundCheckEntitySearch(
+              token: $token
+              name: $name
+              type: $type
+              country: $country
+            ) {
               totalCount
               items {
                 id
@@ -240,6 +251,7 @@ describe("Background Check - Profiles", () => {
           token: buildToken({ profileId: profile.id, profileTypeFieldId: profileTypeField.id }),
           name: "Vladimir Putin",
           type: "COMPANY",
+          country: "RU",
         },
       );
 
@@ -250,11 +262,13 @@ describe("Background Check - Profiles", () => {
         name: "Vladimir Putin",
         date: null,
         type: null,
+        country: null,
       });
       expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(2, {
         name: "Vladimir Putin",
         date: null,
         type: "COMPANY",
+        country: "RU",
       });
 
       const pfvs = await mocks.knex
@@ -434,6 +448,7 @@ describe("Background Check - Profiles", () => {
         name: "Vladimir Putin",
         date: null,
         type: "PERSON",
+        country: null,
       });
 
       const pfvs = await mocks.knex

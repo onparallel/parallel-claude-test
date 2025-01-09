@@ -198,6 +198,7 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
         properties: {
           name: [query.name],
           ...(query.date ? { birthDate: [query.date] } : {}),
+          ...(query.country ? { nationality: [query.country.toLowerCase()] } : {}),
         },
       };
     }
@@ -207,6 +208,7 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
         properties: {
           name: [query.name],
           ...(query.date ? { incorporationDate: [query.date] } : {}),
+          ...(query.country ? { jurisdiction: [query.country.toLowerCase()] } : {}),
         },
       };
     }

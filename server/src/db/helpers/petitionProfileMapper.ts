@@ -113,6 +113,7 @@ export function contentsAreEqual(
       value.content.query?.name === reply.content.query?.name &&
       value.content.query?.date === reply.content.query?.date &&
       value.content.query?.type === reply.content.query?.type &&
+      value.content.query?.country === reply.content.query?.country &&
       value.content.entity?.id === reply.content.entity?.id
     );
   } else if (value.type === "CHECKBOX") {

@@ -21,6 +21,7 @@ import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { FieldOptions } from "@parallel/utils/petitionFields";
+import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { Fragment, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -67,6 +68,7 @@ export function PetitionRepliesFieldReply({
 
   const browserTabRef = useRef<Window>();
   const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const countryNames = useLoadCountryNames(intl.locale);
 
   const tokenBase64 = btoa(
     JSON.stringify({
@@ -129,7 +131,7 @@ export function PetitionRepliesFieldReply({
 
   const handleAction = async (action: PetitionRepliesFieldAction) => {
     if (action === "VIEW_DETAILS" || action === "VIEW_RESULTS") {
-      const { name, date, type } = reply.content?.query ?? {};
+      const { name, date, type, country } = reply.content?.query ?? {};
 
       let url = `/${intl.locale}/app/background-check/`;
 
@@ -147,6 +149,7 @@ export function PetitionRepliesFieldReply({
         ...(name ? { name } : {}),
         ...(date ? { date } : {}),
         ...(type ? { type } : {}),
+        ...(country ? { country } : {}),
         ...(isReadOnly ? { readonly: "true" } : {}),
       });
       try {
@@ -271,7 +274,14 @@ export function PetitionRepliesFieldReply({
                             })}
                           </VisuallyHidden>
                           <Text as="span">
-                            {[entityTypeLabel, content?.query?.name, content?.query?.date]
+                            {[
+                              entityTypeLabel,
+                              content?.query?.name,
+                              content?.query?.date,
+                              content?.query?.country && countryNames.countries
+                                ? countryNames.countries[content?.query?.country]
+                                : content?.query?.country,
+                            ]
                               .filter(isNonNullish)
                               .join(" | ")}
                           </Text>

@@ -105,6 +105,7 @@ describe("Background Check - Petitions", () => {
             name: "Vladimir Putin",
             date: null,
             type: null,
+            country: null,
           },
           search: {
             totalCount: 2,
@@ -132,6 +133,7 @@ describe("Background Check - Petitions", () => {
         name: "Vladimir Putin",
         date: null,
         type: null,
+        country: null,
       });
     });
 
@@ -149,6 +151,7 @@ describe("Background Check - Petitions", () => {
             name: "Vladimir Putin",
             date: "1990-10-10",
             type: "PERSON",
+            country: "RU",
           },
           search: {
             totalCount: 1,
@@ -173,8 +176,15 @@ describe("Background Check - Petitions", () => {
             $name: String!
             $date: Date
             $type: BackgroundCheckEntitySearchType
+            $country: String
           ) {
-            backgroundCheckEntitySearch(token: $token, name: $name, date: $date, type: $type) {
+            backgroundCheckEntitySearch(
+              token: $token
+              name: $name
+              date: $date
+              type: $type
+              country: $country
+            ) {
               totalCount
             }
           }
@@ -184,6 +194,7 @@ describe("Background Check - Petitions", () => {
           name: "Vladimir Putin",
           date: "1990-10-10",
           type: "PERSON",
+          country: "RU",
         },
       );
 
@@ -255,6 +266,7 @@ describe("Background Check - Petitions", () => {
       expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
         name: "Vladimir Putin",
         date: null,
+        country: null,
         type: "COMPANY",
       });
 

@@ -488,7 +488,7 @@ export const ProfileFieldValue = objectType({
         if (root.type === "BACKGROUND_CHECK") {
           return {
             query: isNonNullish(root.content.query)
-              ? pick(root.content.query, ["name", "date", "type"])
+              ? pick(root.content.query, ["name", "date", "type", "country"])
               : null,
             search: isNonNullish(root.content.search)
               ? pick(root.content.search, ["totalCount", "createdAt"])

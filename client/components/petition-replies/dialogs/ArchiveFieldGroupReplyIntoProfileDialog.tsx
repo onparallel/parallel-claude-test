@@ -351,16 +351,18 @@ function ArchiveFieldGroupReplyIntoProfileRow({
           const fieldContent = replies?.[0]?.content;
           const profileFieldContent = profileField.value?.content;
 
-          const { date = "", name = "", type = "" } = fieldContent?.query ?? {};
+          const { date = "", name = "", type = "", country = "" } = fieldContent?.query ?? {};
           const {
             date: profileDate = "",
             name: profileName = "",
             type: profileType = "",
+            country: profileCountry = "",
           } = profileFieldContent?.query ?? {};
 
           return (
             fieldContent?.entity?.id !== profileFieldContent?.entity?.id ||
-            `${date}-${name}-${type}` !== `${profileDate}-${profileName}-${profileType}`
+            `${date}-${name}-${type}-${country}` !==
+              `${profileDate}-${profileName}-${profileType}-${profileCountry}`
           );
         }
 

@@ -344,7 +344,7 @@ const SCHEMAS = {
       autoSearchConfig: {
         type: ["object", "null"],
         additionalProperties: false,
-        required: ["type", "name", "date"],
+        required: ["type", "name", "date", "country"],
         properties: {
           type: {
             type: ["string", "null"],
@@ -358,6 +358,7 @@ const SCHEMAS = {
             minItems: 1,
           },
           date: { type: ["number", "null"] },
+          country: { type: ["number", "null"] },
         },
       },
     },
@@ -715,6 +716,9 @@ export async function mapFieldOptions(
               ),
               date: isNonNullish(options.autoSearchConfig.date)
                 ? toGlobalId("PetitionField", options.autoSearchConfig.date)
+                : null,
+              country: isNonNullish(options.autoSearchConfig.country)
+                ? toGlobalId("PetitionField", options.autoSearchConfig.country)
                 : null,
             },
           }

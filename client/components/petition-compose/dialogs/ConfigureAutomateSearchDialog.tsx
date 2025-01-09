@@ -12,7 +12,7 @@ import {
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
 
 interface ConfigureAutomateSearchDialogInput {
@@ -25,8 +25,6 @@ export function ConfigureAutomateSearchDialog({
   field,
   ...props
 }: DialogProps<ConfigureAutomateSearchDialogInput, UpdatePetitionFieldAutoSearchConfigInput>) {
-  const intl = useIntl();
-
   const { data, loading } = useQuery(ConfigureAutomateSearchDialog_petitionDocument, {
     variables: { id: petitionId },
   });
@@ -51,16 +49,22 @@ export function ConfigureAutomateSearchDialog({
             .filter(isNonNullish),
           date: allFields.find((field) => autoSearchConfig.date === field.id) ?? null,
           type: autoSearchConfig.type,
+          country: allFields.find((field) => autoSearchConfig.country === field.id) ?? null,
         }
       : {
           name: [],
           date: null,
           type: null,
+          country: null,
         },
   });
 
   const textFields = allFields.filter((field) => field.type === "SHORT_TEXT");
   const dateFields = allFields.filter((field) => field.type === "DATE");
+  const countryFields = allFields.filter(
+    (field) =>
+      field.type === "SELECT" && field.options?.standardList === "COUNTRIES" && !field.multiple,
+  );
   const type = watch("type");
   return (
     <ConfirmDialog
@@ -73,6 +77,7 @@ export function ConfigureAutomateSearchDialog({
               name: data.name.map((field) => field.id),
               date: data.date?.id ?? null,
               type: data.type,
+              country: data.country?.id ?? null,
             });
           }),
         },
@@ -132,10 +137,6 @@ export function ConfigureAutomateSearchDialog({
                     !f.multiple &&
                     (!f.parent || f.parent.id === field.parent?.id)
                   }
-                  placeholder={intl.formatMessage({
-                    id: "component.configure-automate-search-dialog.select-field-placeholder",
-                    defaultMessage: "Select a field",
-                  })}
                 />
               )}
             />
@@ -178,10 +179,6 @@ export function ConfigureAutomateSearchDialog({
                     !f.multiple &&
                     (!f.parent || f.parent.id === field.parent?.id)
                   }
-                  placeholder={intl.formatMessage({
-                    id: "component.configure-automate-search-dialog.select-field-placeholder",
-                    defaultMessage: "Select a field",
-                  })}
                 />
               )}
             />
@@ -190,6 +187,43 @@ export function ConfigureAutomateSearchDialog({
                 <FormattedMessage
                   id="component.configure-automate-search-dialog.date-of-birth-helper-text"
                   defaultMessage="There are no date fields in the form."
+                />
+              </FormHelperText>
+            ) : null}
+          </FormControl>
+          <FormControl isDisabled={!countryFields.length}>
+            <FormLabel fontWeight={400}>
+              <FormattedMessage
+                id="component.configure-automate-search-dialog.country-label"
+                defaultMessage="Country"
+              />
+            </FormLabel>
+            <Controller
+              name="country"
+              control={control}
+              render={({ field: { onChange, value }, fieldState }) => (
+                <PetitionFieldSelect
+                  petition={petition}
+                  isLoading={loading}
+                  isClearable
+                  expandFieldGroups={fieldIsChild}
+                  isInvalid={fieldState.invalid}
+                  value={value}
+                  onChange={onChange}
+                  filterFields={(f) =>
+                    f.type === "SELECT" &&
+                    !f.multiple &&
+                    f.options?.standardList === "COUNTRIES" &&
+                    (!f.parent || f.parent.id === field.parent?.id)
+                  }
+                />
+              )}
+            />
+            {!countryFields.length ? (
+              <FormHelperText>
+                <FormattedMessage
+                  id="component.configure-automate-search-dialog.country-helper-text"
+                  defaultMessage="There are no compatible fields in the form."
                 />
               </FormHelperText>
             ) : null}

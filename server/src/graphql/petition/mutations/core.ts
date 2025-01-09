@@ -1574,6 +1574,9 @@ export const updatePetitionFieldAutoSearchConfig = mutationField(
         const dateField = isNonNullish(args.config!.date)
           ? await ctx.petitions.loadField(args.config!.date)
           : null;
+        const countryField = isNonNullish(args.config!.country)
+          ? await ctx.petitions.loadField(args.config!.country)
+          : null;
         return (
           nameFields.length > 0 &&
           nameFields.every(
@@ -1590,7 +1593,14 @@ export const updatePetitionFieldAutoSearchConfig = mutationField(
               dateField.type === "DATE" &&
               !dateField.multiple &&
               (isNullish(dateField.parent_petition_field_id) ||
-                dateField.parent_petition_field_id === field!.parent_petition_field_id)))
+                dateField.parent_petition_field_id === field!.parent_petition_field_id))) &&
+          (isNullish(countryField) ||
+            (countryField.petition_id === args.petitionId &&
+              countryField.type === "SELECT" &&
+              countryField.options?.standardList === "COUNTRIES" &&
+              !countryField.multiple &&
+              (isNullish(countryField.parent_petition_field_id) ||
+                countryField.parent_petition_field_id === field!.parent_petition_field_id)))
         );
       }),
     ),
@@ -1603,6 +1613,7 @@ export const updatePetitionFieldAutoSearchConfig = mutationField(
           t.nullable.field("type", { type: "BackgroundCheckEntitySearchType" });
           t.nonNull.list.nonNull.globalId("name", { prefixName: "PetitionField" });
           t.nullable.globalId("date", { prefixName: "PetitionField" });
+          t.nullable.globalId("country", { prefixName: "PetitionField" });
         },
       }),
     },
@@ -1612,6 +1623,7 @@ export const updatePetitionFieldAutoSearchConfig = mutationField(
             name: args.config.name,
             date: args.config.date ?? null,
             type: args.config.type ?? null,
+            country: args.config.country ?? null,
           }
         : null;
 

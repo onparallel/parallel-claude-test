@@ -3785,6 +3785,7 @@ describe("GraphQL/Public", () => {
             name: "Simpson",
             date: null,
             type: "PERSON",
+            country: null,
           });
 
           const [dbReply] = await mocks.knex
@@ -3799,6 +3800,7 @@ describe("GraphQL/Public", () => {
                 name: "Simpson",
                 date: null,
                 type: "PERSON",
+                country: null,
               },
               // this reply is mocked
               search: {
@@ -4285,24 +4287,28 @@ describe("GraphQL/Public", () => {
             name: "Simpson",
             date: null,
             type: "PERSON",
+            country: null,
           });
 
           expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(2, {
             name: "Homer Simpson",
             date: "1980-01-01",
             type: "PERSON",
+            country: null,
           });
 
           expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(3, {
             name: "Bart Simpson",
             date: "1985-01-01",
             type: "PERSON",
+            country: null,
           });
 
           expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(4, {
             name: "Lisa Simpson",
             date: "1990-01-01",
             type: "PERSON",
+            country: null,
           });
         });
 
@@ -4389,6 +4395,7 @@ describe("GraphQL/Public", () => {
             name: "Simpson, Homer J",
             date: null,
             type: "PERSON",
+            country: null,
           });
 
           const [dbReply] = await mocks.knex
@@ -4403,6 +4410,7 @@ describe("GraphQL/Public", () => {
                 name: "Simpson, Homer J",
                 date: null,
                 type: "PERSON",
+                country: null,
               },
               search: {
                 totalCount: 1,

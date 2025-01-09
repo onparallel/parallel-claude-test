@@ -241,7 +241,7 @@ function PetitionFieldBackgroundCheck({
   const handleClick = async () => {
     try {
       const { entity, query } = content;
-      const { name, date, type } = query ?? {};
+      const { name, date, type, country } = query ?? {};
       const url = `/${intl.locale}/app/background-check/${isNonNullish(entity) ? entity.id : "results"}?${new URLSearchParams(
         {
           token: btoa(
@@ -254,6 +254,7 @@ function PetitionFieldBackgroundCheck({
           ...(name ? { name } : {}),
           ...(date ? { date } : {}),
           ...(type ? { type } : {}),
+          ...(country ? { country } : {}),
           readonly: "true",
         },
       )}`;

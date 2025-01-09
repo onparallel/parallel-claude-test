@@ -5638,6 +5638,7 @@ export type QuerybackgroundCheckEntityDetailsArgs = {
 };
 
 export type QuerybackgroundCheckEntitySearchArgs = {
+  country?: InputMaybe<Scalars["String"]["input"]>;
   date?: InputMaybe<Scalars["Date"]["input"]>;
   name: Scalars["String"]["input"];
   token: Scalars["String"]["input"];
@@ -6382,6 +6383,7 @@ export type UpdateContactInput = {
 };
 
 export type UpdatePetitionFieldAutoSearchConfigInput = {
+  country?: InputMaybe<Scalars["GID"]["input"]>;
   date?: InputMaybe<Scalars["GID"]["input"]>;
   name: Array<Scalars["GID"]["input"]>;
   type?: InputMaybe<BackgroundCheckEntitySearchType>;

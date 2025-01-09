@@ -5854,6 +5854,7 @@ export interface QuerybackgroundCheckEntityDetailsArgs {
 }
 
 export interface QuerybackgroundCheckEntitySearchArgs {
+  country?: InputMaybe<Scalars["String"]["input"]>;
   date?: InputMaybe<Scalars["Date"]["input"]>;
   name: Scalars["String"]["input"];
   token: Scalars["String"]["input"];
@@ -6627,6 +6628,7 @@ export interface UpdateContactInput {
 }
 
 export interface UpdatePetitionFieldAutoSearchConfigInput {
+  country?: InputMaybe<Scalars["GID"]["input"]>;
   date?: InputMaybe<Scalars["GID"]["input"]>;
   name: Array<Scalars["GID"]["input"]>;
   type?: InputMaybe<BackgroundCheckEntitySearchType>;
@@ -35741,6 +35743,7 @@ export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQueryVa
   name: Scalars["String"]["input"];
   date?: InputMaybe<Scalars["Date"]["input"]>;
   type?: InputMaybe<BackgroundCheckEntitySearchType>;
+  country?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQuery = {
@@ -75645,8 +75648,15 @@ export const BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocume
     $name: String!
     $date: Date
     $type: BackgroundCheckEntitySearchType
+    $country: String
   ) {
-    backgroundCheckEntitySearch(token: $token, name: $name, date: $date, type: $type) {
+    backgroundCheckEntitySearch(
+      token: $token
+      name: $name
+      date: $date
+      type: $type
+      country: $country
+    ) {
       totalCount
       createdAt
       items {

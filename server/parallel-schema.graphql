@@ -7244,6 +7244,11 @@ type Query {
   backgroundCheckEntityDetails(entityId: String!, token: String!): BackgroundCheckEntityDetails!
   backgroundCheckEntitySearch(
     """
+    Country of the entity
+    """
+    country: String
+
+    """
     Date of birth if entity is a Person, or date of registration if entity is a Company
     """
     date: Date
@@ -8361,6 +8366,7 @@ input UpdateContactInput {
 }
 
 input UpdatePetitionFieldAutoSearchConfigInput {
+  country: GID
   date: GID
   name: [GID!]!
   type: BackgroundCheckEntitySearchType

@@ -3,6 +3,7 @@ export const BACKGROUND_CHECK_CLIENT = Symbol.for("BACKGROUND_CHECK_CLIENT");
 export interface EntitySearchRequest {
   name: string;
   date?: string | null;
+  country?: string | null;
   type: "PERSON" | "COMPANY" | null;
 }
 export interface EntitySearchPerson {

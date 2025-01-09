@@ -368,7 +368,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         f.type === "BACKGROUND_CHECK" &&
         options.autoSearchConfig &&
         (options.autoSearchConfig.name.includes(fieldId) ||
-          options.autoSearchConfig.date === fieldId)
+          options.autoSearchConfig.date === fieldId ||
+          options.autoSearchConfig.country === fieldId)
       );
     });
 
