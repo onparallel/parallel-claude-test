@@ -765,7 +765,7 @@ function AddModule({
         } else if (type === "PETITIONS_NUMBER_DASHBOARD_MODULE") {
           const filter = omit(
             petitionListViewsData!.me.petitionListViews.find(
-              (view) => view.id === dataSettings.filters,
+              (view) => view.id === dataSettings.filter,
             )?.data ?? { status: [], __typename: "" },
             ["__typename"],
           );
