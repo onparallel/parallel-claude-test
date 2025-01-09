@@ -548,10 +548,7 @@ function Petitions() {
                 {state.type === "PETITION" ? (
                   <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
                 ) : (
-                  <FormattedMessage
-                    id="page.petitions-list.create-template"
-                    defaultMessage="Create template"
-                  />
+                  <FormattedMessage id="generic.create-template" defaultMessage="Create template" />
                 )}
               </Button>
             </RestrictedFeaturePopover>

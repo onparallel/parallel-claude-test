@@ -309,18 +309,14 @@ function NewPetition() {
             >
               <ResponsiveButtonIcon
                 data-action="create-template"
-                aria-label={intl.formatMessage({
-                  id: "new-petition.create",
-                  defaultMessage: "Create",
-                })}
                 padding={{ base: 0, md: 4 }}
                 colorScheme="primary"
                 alignSelf="flex-end"
                 icon={<AddIcon fontSize={{ base: "16px", md: "12px" }} />}
                 isDisabled={!canCreateTemplate}
                 label={intl.formatMessage({
-                  id: "new-petition.create",
-                  defaultMessage: "Create",
+                  id: "generic.create-template",
+                  defaultMessage: "Create template",
                 })}
                 onClick={handleCreateTemplateClick}
               />

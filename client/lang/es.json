@@ -12325,6 +12325,11 @@
     "context": "Create parallel"
   },
   {
+    "term": "generic.create-template",
+    "definition": "Crear plantilla",
+    "context": "Create template"
+  },
+  {
     "term": "generic.created-at",
     "definition": "Fecha de creación",
     "context": "Created at"
@@ -14055,11 +14060,6 @@
     "context": "Guide me around"
   },
   {
-    "term": "new-petition.create",
-    "definition": "Crear",
-    "context": "Create"
-  },
-  {
     "term": "new-petition.my-templates",
     "definition": "Mis plantillas",
     "context": "My templates"
@@ -15468,11 +15468,6 @@
     "term": "page.petitions-list.create-button",
     "definition": "Nuevo",
     "context": "New"
-  },
-  {
-    "term": "page.petitions-list.create-template",
-    "definition": "Crear plantilla",
-    "context": "Create template"
   },
   {
     "term": "page.petitions-list.new-folder",
