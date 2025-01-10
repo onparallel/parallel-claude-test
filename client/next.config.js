@@ -1,3 +1,14 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+const THIRD_PARTY_SCRIPTS = [
+  "cdnjs.cloudflare.com",
+  "cdn.segment.com",
+  "widget.intercom.io",
+  "js.intercomcdn.com",
+  "www.googletagmanager.com",
+  "snap.licdn.com",
+  "px.ads.linkedin.com",
+];
+
 /** @type {import('next').NextConfig} */
 const config = {
   env: {
@@ -43,6 +54,7 @@ const config = {
     return config;
   },
   async headers() {
+    const statics = `${{ staging: "static-staging", production: "static" }[process.env.NEXT_PUBLIC_ENVIRONMENT]}.onparallel.com`;
     return process.env.NODE_ENV === "production"
       ? [
           {
@@ -51,24 +63,11 @@ const config = {
               {
                 key: "Content-Security-Policy-Report-Only",
                 value: [
-                  [
-                    "default-src",
-                    "self",
-                    `${{ staging: "static-staging", production: "static" }[process.env.NEXT_PUBLIC_ENVIRONMENT]}.onparallel.com`,
-                  ],
+                  ["default-src", "'self'", statics],
                   ["img-src", "*"],
-                  [
-                    "script-src",
-                    "self",
-                    `${{ staging: "static-staging", production: "static" }[process.env.NEXT_PUBLIC_ENVIRONMENT]}.onparallel.com`,
-                    "cdnjs.cloudflare.com",
-                    "cdn.segment.com",
-                    "widget.intercom.io",
-                    "js.intercomcdn.com",
-                    "www.googletagmanager.com",
-                    "snap.licdn.com",
-                    "px.ads.linkedin.com",
-                  ],
+                  ["style-src", "'self'", "'unsafe-inline'", statics],
+                  ["script-src", "'self'", statics, ...THIRD_PARTY_SCRIPTS],
+                  ["connect-src", "*"],
                   [
                     "report-uri",
                     `https://o488034.ingest.us.sentry.io/api/5547679/security/?${new URLSearchParams(
@@ -88,6 +87,11 @@ const config = {
               { key: "X-Content-Type-Options", value: "nosniff" },
               { key: "Referrer-Policy", value: "same-origin" },
               { key: "X-XSS-Protection", value: "1" },
+              {
+                key: "Permissions-Policy",
+                value:
+                  "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
+              },
             ],
           },
         ]
