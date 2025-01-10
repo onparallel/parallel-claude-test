@@ -87,7 +87,6 @@
     "nanoid": "^5.0.9",
     "next": "14.2.21",
     "next-plugin-graphql": "^0.0.2",
-    "next-secure-headers": "^2.2.0",
     "next-transpile-modules": "^10.0.1",
     "node-fetch": "^2.6.12",
     "outdent": "^0.8.0",
