@@ -74,7 +74,7 @@ export function PublicLayout({
         strategy="beforeInteractive"
       />
       <Script
-        src="https://unpkg.com/@segment/consent-manager@5.5.0/standalone/consent-manager.js"
+        src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/js/consent-manager.js`}
         strategy="afterInteractive"
       />
       {(canonicalLocale ? [canonicalLocale] : ["en", "es"]).map((locale) => (

@@ -40,6 +40,7 @@
     "@react-hook/previous": "^1.0.1",
     "@react-hook/resize-observer": "^1.2.6",
     "@sentry/nextjs": "^8.33.1",
+    "@segment/consent-manager": "^5.8.1",
     "@sgratzl/chartjs-chart-boxplot": "^4.4.1",
     "@types/segment-analytics": "^0.0.38",
     "@udecode/plate-autoformat": "^23.7.0",

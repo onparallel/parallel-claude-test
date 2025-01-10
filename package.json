@@ -14,8 +14,9 @@
     "ud": "yarn update-deps",
     "ncux": "ncu -u -x 'chalk,camelcase,escape-string-regexp,p-all,p-map,p-props,file-type,graphql-upload,graphql-request,@types/graphql-upload,graphql-upload-client,flat,@react-hook/resize-observer'",
     "cp-pdf-js-worker-script": "cp node_modules/pdfjs-dist/legacy/build/pdf.worker.min.mjs client/public/static/js/pdf.worker.min.mjs",
+    "cp-consent-manager-js-script": "cp node_modules/@segment/consent-manager/standalone/consent-manager.js client/public/static/js/consent-manager.js",
     "update-ip-db": "if [ -z \"$SKIP_UPDATE_IP_DB\" ]; then node node_modules/ip-location-api/script/updatedb.mjs; fi",
-    "postinstall": "patch-package && yarn cp-pdf-js-worker-script && yarn update-ip-db",
+    "postinstall": "patch-package && yarn cp-pdf-js-worker-script && yarn cp-consent-manager-js-script && yarn update-ip-db",
     "postpull": "yarn && cd server && yarn migrate"
   },
   "devDependencies": {

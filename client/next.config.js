@@ -57,6 +57,34 @@ const config = {
               xssProtection: "sanitize",
               nosniff: "nosniff",
               noopen: "noopen",
+              contentSecurityPolicy: {
+                directives: {
+                  defaultSrc: [
+                    "self",
+                    `${{ staging: "static-staging", production: "static" }[process.env.NEXT_PUBLIC_ENVIRONMENT]}.onparallel.com`,
+                  ],
+                  imgSrc: "*",
+                  scriptSrc: [
+                    "self",
+                    `${{ staging: "static-staging", production: "static" }[process.env.NEXT_PUBLIC_ENVIRONMENT]}.onparallel.com`,
+                    "cdnjs.cloudflare.com",
+                    "cdn.segment.com",
+                    "widget.intercom.io",
+                    "js.intercomcdn.com",
+                    "www.googletagmanager.com",
+                    "snap.licdn.com",
+                    "px.ads.linkedin.com",
+                  ],
+                  reportURI: `https://o488034.ingest.us.sentry.io/api/5547679/security/?${new URLSearchParams(
+                    {
+                      sentry_key: "9b8d902a0e064afeb5e6c1c45086aea1",
+                      sentry_environment: process.env.NEXT_PUBLIC_ENVIRONMENT,
+                      sentry_release: process.env.BUILD_ID,
+                    },
+                  )}`,
+                },
+                reportOnly: true,
+              },
             }),
           },
         ]
