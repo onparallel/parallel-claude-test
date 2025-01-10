@@ -59,7 +59,7 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
       args.petitionId ? this.petitions.loadPetition(args.petitionId) : null,
       args.contactId ? this.contacts.loadContact(args.contactId) : null,
       args.userId ? this.users.loadUserDataByUserId(args.userId) : null,
-      args.petitionId ? this.petitions.loadFieldsForPetition(args.petitionId) : null,
+      args.petitionId ? this.petitions.loadAllFieldsByPetitionId(args.petitionId) : null,
     ]);
 
     const fieldsById = pipe(

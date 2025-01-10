@@ -2,7 +2,8 @@ import { gql } from "@apollo/client";
 import { usePetitionMessagePlaceholderOptions_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
-import { useFieldsWithIndices } from "./fieldIndices";
+import { isNonNullish } from "remeda";
+import { useAllFieldsWithIndices } from "./fieldIndices";
 import { isFileTypeField } from "./isFileTypeField";
 import { PlaceholderOption, createPlaceholderPlugin } from "./slate/PlaceholderPlugin";
 
@@ -12,7 +13,8 @@ export function usePetitionMessagePlaceholderOptions({
   petition: usePetitionMessagePlaceholderOptions_PetitionBaseFragment;
 }): PlaceholderOption[] {
   const intl = useIntl();
-  const fieldsWithIndices = useFieldsWithIndices(petition);
+  const allFieldsWithIndices = useAllFieldsWithIndices(petition);
+
   return useMemo(() => {
     return [
       ...[
@@ -81,14 +83,15 @@ export function usePetitionMessagePlaceholderOptions({
           }),
         },
       })),
-      ...fieldsWithIndices
+      ...allFieldsWithIndices
         .filter(
           ([field]) =>
             field.isInternal &&
             !field.isReadOnly &&
             !isFileTypeField(field.type) &&
             field.type !== "FIELD_GROUP" &&
-            field.type !== "BACKGROUND_CHECK", // don't include BACKGROUND_CHECK, FIELD_GROUP nor any of its children
+            field.type !== "BACKGROUND_CHECK" && // don't include BACKGROUND_CHECK, FIELD_GROUP
+            (isNonNullish(field.parent) ? !field.parent.multiple : true),
         )
         .map(([field, fieldIndex]) => ({
           key: field.id,
@@ -111,14 +114,28 @@ export function usePetitionMessagePlaceholderOptions({
 
 usePetitionMessagePlaceholderOptions.fragments = {
   PetitionBase: gql`
+    fragment usePetitionMessagePlaceholderOptions_PetitionField on PetitionField {
+      id
+      type
+      title
+      isInternal
+      isReadOnly
+      parent {
+        id
+        multiple
+      }
+    }
     fragment usePetitionMessagePlaceholderOptions_PetitionBase on PetitionBase {
       ...createPlaceholderPlugin_PetitionBase
+      ...useAllFieldsWithIndices_PetitionBase
       fields {
-        type
-        isInternal
-        isReadOnly
+        ...usePetitionMessagePlaceholderOptions_PetitionField
+        children {
+          ...usePetitionMessagePlaceholderOptions_PetitionField
+        }
       }
     }
     ${createPlaceholderPlugin.fragments.PetitionBase}
+    ${useAllFieldsWithIndices.fragments.PetitionBase}
   `,
 };
