@@ -2,6 +2,8 @@
 const THIRD_PARTY_SCRIPTS = [
   "cdnjs.cloudflare.com",
   "cdn.segment.com",
+  "canny.io",
+  "js.userflow.com",
   "widget.intercom.io",
   "js.intercomcdn.com",
   "www.googletagmanager.com",
@@ -68,6 +70,8 @@ const config = {
                   ["style-src", "'self'", "'unsafe-inline'", statics],
                   ["script-src", "'self'", statics, ...THIRD_PARTY_SCRIPTS],
                   ["connect-src", "*"],
+                  ["frame-src", "'self'", "changelog-widget.canny.io"],
+                  ["font-src", "'self'", statics, "fonts.intercomcdn.com"],
                   [
                     "report-uri",
                     `https://o488034.ingest.us.sentry.io/api/5547679/security/?${new URLSearchParams(
