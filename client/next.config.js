@@ -68,7 +68,7 @@ const config = {
                   ["default-src", "'self'", statics],
                   ["img-src", "*"],
                   ["style-src", "'self'", "'unsafe-inline'", statics],
-                  ["script-src", "'self'", statics, ...THIRD_PARTY_SCRIPTS],
+                  ["script-src", "'self'", "unsafe-inline", statics, ...THIRD_PARTY_SCRIPTS],
                   ["connect-src", "*"],
                   ["frame-src", "'self'", "changelog-widget.canny.io"],
                   ["font-src", "'self'", statics, "fonts.intercomcdn.com"],
