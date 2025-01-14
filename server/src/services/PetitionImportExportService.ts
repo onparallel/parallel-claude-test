@@ -296,6 +296,8 @@ export class PetitionImportExportService implements IPetitionImportExportService
       default_value: v.defaultValue,
     }));
 
+    const standardListDefinitions = await this.petitions.getAllStandardListDefinitions();
+
     this.validateJsonVariablesAndAliases(variables, fieldAliases);
 
     for (const field of allJsonFields) {
@@ -303,7 +305,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
       await validateFieldLogic(field, allJsonFields, {
         variables,
         customLists: json.customLists,
-        standardListDefinitions: [],
+        standardListDefinitions,
       });
     }
 

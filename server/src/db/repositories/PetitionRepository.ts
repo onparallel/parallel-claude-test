@@ -8770,6 +8770,10 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.orderBy("list_version", "desc"),
   );
 
+  async getAllStandardListDefinitions() {
+    return await this.from("standard_list_definition");
+  }
+
   /**
    * gets definitions for every standard list having in account version overrides defined on the petition
    */
