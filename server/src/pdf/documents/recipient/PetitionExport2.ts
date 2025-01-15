@@ -23,11 +23,11 @@ import {
 } from "../../__types";
 import { documentSignatures } from "../../utils/documentSignatures";
 import { evaluateFieldLogic } from "../../utils/fieldLogic";
-import { LiquidScopeProvider } from "../../utils/liquid/LiquidScopeProvider";
 import {
+  LiquidPetitionScopeProvider,
   buildPetitionFieldsLiquidScope,
-  buildPetitionVariablesLiquidScope,
-} from "../../utils/liquid/liquidScope";
+} from "../../utils/liquid/LiquidPetitionScopeProvider";
+import { buildPetitionVariablesLiquidScope } from "../../utils/liquid/LiquidPetitionVariableProvider";
 import { PdfDocument, PdfDocumentGetPropsContext } from "../../utils/pdf";
 import { block, box, element, heading, image, t, text, tt } from "../../utils/typst";
 
@@ -846,13 +846,13 @@ PetitionExport2.fragments = {
             }
           }
         }
-        ...LiquidScopeProvider_PetitionBase
+        ...LiquidPetitionScopeProvider_PetitionBase
         __typename
       }
       ${this.PetitionField}
       ${this.PetitionFieldReply}
       ${documentSignatures.fragments.SignatureConfig}
-      ${LiquidScopeProvider.fragments.PetitionBase}
+      ${LiquidPetitionScopeProvider.fragments.PetitionBase}
     `;
   },
   get PetitionFieldInner() {

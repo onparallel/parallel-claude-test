@@ -1,5 +1,5 @@
-import type { Duration } from "date-fns";
 import type { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
+import type { Duration } from "date-fns";
 import gql from "graphql-tag";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = T | null;
@@ -58482,7 +58482,7 @@ export type getReplyContents_PetitionFieldFragment = {
   options: { [key: string]: any };
 };
 
-export type LiquidScopeProvider_PetitionBase_Petition_Fragment = {
+export type LiquidPetitionScopeProvider_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
   fields: Array<{
@@ -58577,7 +58577,7 @@ export type LiquidScopeProvider_PetitionBase_Petition_Fragment = {
   }>;
 };
 
-export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
+export type LiquidPetitionScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
   fields: Array<{
@@ -58672,11 +58672,11 @@ export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
   }>;
 };
 
-export type LiquidScopeProvider_PetitionBaseFragment =
-  | LiquidScopeProvider_PetitionBase_Petition_Fragment
-  | LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment;
+export type LiquidPetitionScopeProvider_PetitionBaseFragment =
+  | LiquidPetitionScopeProvider_PetitionBase_Petition_Fragment
+  | LiquidPetitionScopeProvider_PetitionBase_PetitionTemplate_Fragment;
 
-export type LiquidScopeProvider_PetitionFieldFragment = {
+export type LiquidPetitionScopeProvider_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
@@ -58685,7 +58685,7 @@ export type LiquidScopeProvider_PetitionFieldFragment = {
   options: { [key: string]: any };
 };
 
-export type LiquidScopeProvider_PublicPetitionFragment = {
+export type LiquidPetitionScopeProvider_PublicPetitionFragment = {
   __typename?: "PublicPetition";
   id: string;
   fields: Array<{
@@ -58750,7 +58750,7 @@ export type LiquidScopeProvider_PublicPetitionFragment = {
   }>;
 };
 
-export type LiquidScopeProvider_PublicPetitionFieldFragment = {
+export type LiquidPetitionScopeProvider_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
   id: string;
   type: PetitionFieldType;
@@ -68739,25 +68739,25 @@ export const useGetPetitionPages_PetitionBaseFragmentDoc = gql`
   }
   ${useFieldLogic_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<useGetPetitionPages_PetitionBaseFragment, unknown>;
-export const LiquidScopeProvider_PetitionFieldFragmentDoc = gql`
-  fragment LiquidScopeProvider_PetitionField on PetitionField {
+export const LiquidPetitionScopeProvider_PetitionFieldFragmentDoc = gql`
+  fragment LiquidPetitionScopeProvider_PetitionField on PetitionField {
     id
     type
     multiple
     alias
     options
   }
-` as unknown as DocumentNode<LiquidScopeProvider_PetitionFieldFragment, unknown>;
-export const LiquidScopeProvider_PetitionBaseFragmentDoc = gql`
-  fragment LiquidScopeProvider_PetitionBase on PetitionBase {
+` as unknown as DocumentNode<LiquidPetitionScopeProvider_PetitionFieldFragment, unknown>;
+export const LiquidPetitionScopeProvider_PetitionBaseFragmentDoc = gql`
+  fragment LiquidPetitionScopeProvider_PetitionBase on PetitionBase {
     id
     fields {
-      ...LiquidScopeProvider_PetitionField
+      ...LiquidPetitionScopeProvider_PetitionField
       previewReplies @client {
         content
         children {
           field {
-            ...LiquidScopeProvider_PetitionField
+            ...LiquidPetitionScopeProvider_PetitionField
           }
           replies {
             id
@@ -68770,7 +68770,7 @@ export const LiquidScopeProvider_PetitionBaseFragmentDoc = gql`
         content
         children {
           field {
-            ...LiquidScopeProvider_PetitionField
+            ...LiquidPetitionScopeProvider_PetitionField
           }
           replies {
             id
@@ -68782,10 +68782,10 @@ export const LiquidScopeProvider_PetitionBaseFragmentDoc = gql`
     ...useFieldsWithIndices_PetitionBase
     ...useFieldLogic_PetitionBase
   }
-  ${LiquidScopeProvider_PetitionFieldFragmentDoc}
+  ${LiquidPetitionScopeProvider_PetitionFieldFragmentDoc}
   ${useFieldsWithIndices_PetitionBaseFragmentDoc}
   ${useFieldLogic_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<LiquidScopeProvider_PetitionBaseFragment, unknown>;
+` as unknown as DocumentNode<LiquidPetitionScopeProvider_PetitionBaseFragment, unknown>;
 export const PreviewPetitionFieldBackgroundCheck_PetitionFieldFragmentDoc = gql`
   fragment PreviewPetitionFieldBackgroundCheck_PetitionField on PetitionField {
     id
@@ -69033,7 +69033,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
     ...useAllFieldsWithIndices_PetitionBase
     ...useGetPetitionPages_PetitionBase
     ...PetitionLayout_PetitionBase
-    ...LiquidScopeProvider_PetitionBase
+    ...LiquidPetitionScopeProvider_PetitionBase
     ...PreviewPetitionField_PetitionBase
     ...usePetitionCanFinalize_PetitionBase
     ...HiddenFieldDialog_PetitionBase
@@ -69055,7 +69055,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
   ${useAllFieldsWithIndices_PetitionBaseFragmentDoc}
   ${useGetPetitionPages_PetitionBaseFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
-  ${LiquidScopeProvider_PetitionBaseFragmentDoc}
+  ${LiquidPetitionScopeProvider_PetitionBaseFragmentDoc}
   ${PreviewPetitionField_PetitionBaseFragmentDoc}
   ${usePetitionCanFinalize_PetitionBaseFragmentDoc}
   ${HiddenFieldDialog_PetitionBaseFragmentDoc}
@@ -69796,7 +69796,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     ...getPetitionSignatureEnvironment_Petition
     ...useClosePetitionDialog_Petition
     ...useFieldLogic_PetitionBase
-    ...LiquidScopeProvider_PetitionBase
+    ...LiquidPetitionScopeProvider_PetitionBase
     ...PetitionRepliesSummary_Petition
     ...PetitionRepliesFieldComments_PetitionBase
     ...useArchiveFieldGroupReplyIntoProfileDialog_Petition
@@ -69818,7 +69818,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
   ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
   ${useClosePetitionDialog_PetitionFragmentDoc}
   ${useFieldLogic_PetitionBaseFragmentDoc}
-  ${LiquidScopeProvider_PetitionBaseFragmentDoc}
+  ${LiquidPetitionScopeProvider_PetitionBaseFragmentDoc}
   ${PetitionRepliesSummary_PetitionFragmentDoc}
   ${PetitionRepliesFieldComments_PetitionBaseFragmentDoc}
   ${useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragmentDoc}
@@ -70752,15 +70752,15 @@ export const useGetPetitionPages_PublicPetitionFragmentDoc = gql`
   }
   ${useFieldLogic_PublicPetitionFragmentDoc}
 ` as unknown as DocumentNode<useGetPetitionPages_PublicPetitionFragment, unknown>;
-export const LiquidScopeProvider_PublicPetitionFieldFragmentDoc = gql`
-  fragment LiquidScopeProvider_PublicPetitionField on PublicPetitionField {
+export const LiquidPetitionScopeProvider_PublicPetitionFieldFragmentDoc = gql`
+  fragment LiquidPetitionScopeProvider_PublicPetitionField on PublicPetitionField {
     id
     type
     multiple
     alias
     options
   }
-` as unknown as DocumentNode<LiquidScopeProvider_PublicPetitionFieldFragment, unknown>;
+` as unknown as DocumentNode<LiquidPetitionScopeProvider_PublicPetitionFieldFragment, unknown>;
 export const useFieldsWithIndices_PublicPetitionFragmentDoc = gql`
   fragment useFieldsWithIndices_PublicPetition on PublicPetition {
     fields {
@@ -70772,17 +70772,17 @@ export const useFieldsWithIndices_PublicPetitionFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<useFieldsWithIndices_PublicPetitionFragment, unknown>;
-export const LiquidScopeProvider_PublicPetitionFragmentDoc = gql`
-  fragment LiquidScopeProvider_PublicPetition on PublicPetition {
+export const LiquidPetitionScopeProvider_PublicPetitionFragmentDoc = gql`
+  fragment LiquidPetitionScopeProvider_PublicPetition on PublicPetition {
     id
     fields {
-      ...LiquidScopeProvider_PublicPetitionField
+      ...LiquidPetitionScopeProvider_PublicPetitionField
       replies {
         id
         content
         children {
           field {
-            ...LiquidScopeProvider_PublicPetitionField
+            ...LiquidPetitionScopeProvider_PublicPetitionField
           }
           replies {
             id
@@ -70794,10 +70794,10 @@ export const LiquidScopeProvider_PublicPetitionFragmentDoc = gql`
     ...useFieldsWithIndices_PublicPetition
     ...useFieldLogic_PublicPetition
   }
-  ${LiquidScopeProvider_PublicPetitionFieldFragmentDoc}
+  ${LiquidPetitionScopeProvider_PublicPetitionFieldFragmentDoc}
   ${useFieldsWithIndices_PublicPetitionFragmentDoc}
   ${useFieldLogic_PublicPetitionFragmentDoc}
-` as unknown as DocumentNode<LiquidScopeProvider_PublicPetitionFragment, unknown>;
+` as unknown as DocumentNode<LiquidPetitionScopeProvider_PublicPetitionFragment, unknown>;
 export const useCompletingMessageDialog_PublicPetitionFragmentDoc = gql`
   fragment useCompletingMessageDialog_PublicPetition on PublicPetition {
     id
@@ -70917,7 +70917,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     ...RecipientViewContents_PublicPetition
     ...RecipientViewProgressBar_PublicPetition
     ...useGetPetitionPages_PublicPetition
-    ...LiquidScopeProvider_PublicPetition
+    ...LiquidPetitionScopeProvider_PublicPetition
     ...useCompletingMessageDialog_PublicPetition
     ...RecipientViewFooter_PublicPetition
     ...RecipientViewPetitionStatusAlert_PublicPetition
@@ -70931,7 +70931,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
   ${RecipientViewContents_PublicPetitionFragmentDoc}
   ${RecipientViewProgressBar_PublicPetitionFragmentDoc}
   ${useGetPetitionPages_PublicPetitionFragmentDoc}
-  ${LiquidScopeProvider_PublicPetitionFragmentDoc}
+  ${LiquidPetitionScopeProvider_PublicPetitionFragmentDoc}
   ${useCompletingMessageDialog_PublicPetitionFragmentDoc}
   ${RecipientViewFooter_PublicPetitionFragmentDoc}
   ${RecipientViewPetitionStatusAlert_PublicPetitionFragmentDoc}

@@ -1,80 +1,20 @@
-import { gql } from "@apollo/client";
-import { createContext, PropsWithChildren, useMemo } from "react";
-import { useIntl } from "react-intl";
-import { LiquidScopeProvider_PetitionBaseFragment } from "../../__types";
-import { buildPetitionFieldsLiquidScope } from "./liquidScope";
+import { createContext, PropsWithChildren, useContext, useMemo } from "react";
 
-export const LiquidScopeContext = createContext<Record<string, any> | null>(null);
+const LiquidScopeContext = createContext<Record<string, any>[]>([]);
 
 export function LiquidScopeProvider({
-  petition,
+  scope,
   children,
-}: PropsWithChildren<{
-  petition: LiquidScopeProvider_PetitionBaseFragment;
-}>) {
-  const intl = useIntl();
-
-  const scope = useMemo(() => {
-    return buildPetitionFieldsLiquidScope(petition, intl);
-  }, [petition.fields]);
-  return <LiquidScopeContext.Provider value={scope}>{children}</LiquidScopeContext.Provider>;
+}: PropsWithChildren<{ scope: Record<string, any> }>) {
+  const parentScopes = useContext(LiquidScopeContext);
+  const newScopes = useMemo(() => [...parentScopes, scope], [...parentScopes, scope]);
+  return <LiquidScopeContext.Provider value={newScopes}>{children}</LiquidScopeContext.Provider>;
 }
 
-LiquidScopeProvider.fragments = {
-  PetitionBase: gql`
-    fragment LiquidScopeProvider_PetitionBase on PetitionBase {
-      id
-      fields {
-        ...LiquidScopeProvider_PetitionField
-        children {
-          ...LiquidScopeProvider_PetitionField
-          replies {
-            ...LiquidScopeProvider_PetitionFieldReply
-          }
-        }
-        replies {
-          ...LiquidScopeProvider_PetitionFieldReply
-          children {
-            field {
-              ...LiquidScopeProvider_PetitionField
-            }
-            replies {
-              ...LiquidScopeProvider_PetitionFieldReply
-            }
-          }
-        }
-      }
-      variables {
-        name
-        defaultValue
-      }
-      customLists {
-        name
-        values
-      }
-      automaticNumberingConfig {
-        numberingType
-      }
-      standardListDefinitions {
-        listName
-        values {
-          key
-        }
-      }
-    }
-    fragment LiquidScopeProvider_PetitionField on PetitionField {
-      id
-      type
-      multiple
-      alias
-      options
-      visibility
-      math
-    }
-    fragment LiquidScopeProvider_PetitionFieldReply on PetitionFieldReply {
-      id
-      content
-      isAnonymized
-    }
-  `,
-};
+export function useLiquidScope() {
+  const scopes = useContext(LiquidScopeContext);
+  if (scopes.length === 0) {
+    console.warn("useLiquidScope used without LiquidScopeProvider");
+  }
+  return useMemo(() => Object.assign({}, ...scopes), [...scopes]);
+}

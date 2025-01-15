@@ -96,8 +96,8 @@ import {
 } from "@parallel/utils/filterPetitionFields";
 import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
+import { LiquidPetitionScopeProvider } from "@parallel/utils/liquid/LiquidPetitionScopeProvider";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
-import { LiquidScopeProvider } from "@parallel/utils/liquid/LiquidScopeProvider";
 import {
   useCreatePetitionComment,
   useDeletePetitionComment,
@@ -868,7 +868,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             />
           ) : null}
           <Stack flex="2" spacing={4} data-section="replies-fields">
-            <LiquidScopeProvider petition={petition}>
+            <LiquidPetitionScopeProvider petition={petition}>
               {filterPetitionFields(fieldsWithIndices, fieldLogic, filter).map((x, index) =>
                 x.type === "FIELD" ? (
                   <LiquidPetitionVariableProvider key={x.field.id} logic={x.fieldLogic}>
@@ -901,7 +901,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   <PetitionRepliesFilteredFields key={index} count={x.count} />
                 ),
               )}
-            </LiquidScopeProvider>
+            </LiquidPetitionScopeProvider>
           </Stack>
         </Box>
       </Box>
@@ -961,7 +961,7 @@ PetitionReplies.fragments = {
         ...getPetitionSignatureEnvironment_Petition
         ...useClosePetitionDialog_Petition
         ...useFieldLogic_PetitionBase
-        ...LiquidScopeProvider_PetitionBase
+        ...LiquidPetitionScopeProvider_PetitionBase
         ...PetitionRepliesSummary_Petition
         ...PetitionRepliesFieldComments_PetitionBase
         ...useArchiveFieldGroupReplyIntoProfileDialog_Petition
@@ -979,7 +979,7 @@ PetitionReplies.fragments = {
       ${getPetitionSignatureEnvironment.fragments.Petition}
       ${useClosePetitionDialog.fragments.Petition}
       ${useFieldLogic.fragments.PetitionBase}
-      ${LiquidScopeProvider.fragments.PetitionBase}
+      ${LiquidPetitionScopeProvider.fragments.PetitionBase}
       ${ProfileDrawer.fragments.Profile}
       ${ProfileDrawer.fragments.PetitionBase}
       ${PetitionVariablesCard.fragments.PetitionBase}

@@ -1,28 +1,26 @@
 import { LiquidError } from "liquidjs";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { useIntl } from "react-intl";
-import { isNullish } from "remeda";
 import { LiquidContext } from "./LiquidContext";
-import { LiquidScopeContext } from "./LiquidScopeProvider";
+import { useLiquidScope } from "./LiquidScopeProvider";
 
 export function useLiquid(text: string) {
   const intl = useIntl();
-  const scope = useContext(LiquidScopeContext);
-  if (isNullish(scope)) {
-    throw new Error("useLiquid must be used within a <LiquidScopeProvider/>");
-  }
   const liquid = useContext(LiquidContext)!;
-  if (text.includes("{{") || text.includes("{%")) {
-    try {
-      return liquid.parseAndRenderSync(text, scope, { globals: { intl } });
-    } catch (e) {
-      if (e instanceof LiquidError) {
-        // eslint-disable-next-line no-console
-        console.log(`Liquid error: ${e.message}`);
+  const scope = useLiquidScope();
+  return useMemo(() => {
+    if (text.includes("{{") || text.includes("{%")) {
+      try {
+        return liquid.parseAndRenderSync(text, scope, { globals: { intl } });
+      } catch (e) {
+        if (e instanceof LiquidError) {
+          // eslint-disable-next-line no-console
+          console.log(`Liquid error: ${e.message}`);
+        }
+        return "";
       }
-      return "";
+    } else {
+      return text;
     }
-  } else {
-    return text;
-  }
+  }, [text, scope]);
 }

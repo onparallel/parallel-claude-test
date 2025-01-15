@@ -24,8 +24,8 @@ import { ThemeProvider } from "../../utils/ThemeProvider";
 import { cleanupText } from "../../utils/cleanupText";
 import { evaluateFieldLogic } from "../../utils/fieldLogic";
 import { LiquidProvider } from "../../utils/liquid/LiquidContext";
+import { LiquidPetitionScopeProvider } from "../../utils/liquid/LiquidPetitionScopeProvider";
 import { LiquidPetitionVariableProvider } from "../../utils/liquid/LiquidPetitionVariableProvider";
-import { LiquidScopeProvider } from "../../utils/liquid/LiquidScopeProvider";
 import { useLiquidRender } from "../../utils/liquid/useLiquid";
 import { PdfDocumentGetProps } from "../../utils/pdf";
 
@@ -153,7 +153,7 @@ export default function PetitionExport({
 
   return (
     <LiquidProvider>
-      <LiquidScopeProvider petition={petition}>
+      <LiquidPetitionScopeProvider petition={petition}>
         <ThemeProvider theme={theme}>
           <Document>
             {pages.map((page, i) => (
@@ -215,7 +215,7 @@ export default function PetitionExport({
             ))}
           </Document>
         </ThemeProvider>
-      </LiquidScopeProvider>
+      </LiquidPetitionScopeProvider>
     </LiquidProvider>
   );
 }
@@ -609,7 +609,7 @@ PetitionExport.fragments = {
             }
           }
         }
-        ...LiquidScopeProvider_PetitionBase
+        ...LiquidPetitionScopeProvider_PetitionBase
         variables {
           name
           defaultValue
@@ -626,7 +626,7 @@ PetitionExport.fragments = {
       ${this.PetitionField}
       ${this.PetitionFieldReply}
       ${SignaturesBlock.fragments.SignatureConfig}
-      ${LiquidScopeProvider.fragments.PetitionBase}
+      ${LiquidPetitionScopeProvider.fragments.PetitionBase}
     `;
   },
   get PetitionFieldInner() {

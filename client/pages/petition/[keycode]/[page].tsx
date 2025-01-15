@@ -53,8 +53,8 @@ import { useAssertQuery, withAssertApolloQuery } from "@parallel/utils/apollo/us
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
 import { focusPetitionField } from "@parallel/utils/focusPetitionField";
+import { LiquidPetitionScopeProvider } from "@parallel/utils/liquid/LiquidPetitionScopeProvider";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
-import { LiquidScopeProvider } from "@parallel/utils/liquid/LiquidScopeProvider";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useGetPetitionPages } from "@parallel/utils/useGetPetitionPages";
@@ -365,7 +365,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                   <Flex flex="1" width="100%" padding={4} justify="center">
                     <Flex flexDirection="column" minWidth={0} maxWidth="container.sm" width="100%">
                       <Stack spacing={4} key={currentPage}>
-                        <LiquidScopeProvider petition={petition}>
+                        <LiquidPetitionScopeProvider petition={petition}>
                           <AnimatePresence initial={false}>
                             {fieldsWithLogic.map(({ field, logic }) => {
                               return (
@@ -382,7 +382,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                               );
                             })}
                           </AnimatePresence>
-                        </LiquidScopeProvider>
+                        </LiquidPetitionScopeProvider>
                         {pages.length === currentPage ? (
                           <Center paddingTop={4}>
                             <Button
@@ -511,7 +511,7 @@ const _fragments = {
         ...RecipientViewContents_PublicPetition
         ...RecipientViewProgressBar_PublicPetition
         ...useGetPetitionPages_PublicPetition
-        ...LiquidScopeProvider_PublicPetition
+        ...LiquidPetitionScopeProvider_PublicPetition
         ...useCompletingMessageDialog_PublicPetition
         ...RecipientViewFooter_PublicPetition
         ...RecipientViewPetitionStatusAlert_PublicPetition
@@ -524,7 +524,7 @@ const _fragments = {
       ${RecipientViewHeader.fragments.PublicContact}
       ${RecipientViewFooter.fragments.PublicPetition}
       ${useGetPetitionPages.fragments.PublicPetition}
-      ${LiquidScopeProvider.fragments.PublicPetition}
+      ${LiquidPetitionScopeProvider.fragments.PublicPetition}
       ${useCompletingMessageDialog.fragments.PublicPetition}
       ${RecipientViewPetitionStatusAlert.fragments.PublicPetition}
       ${RecipientViewSignatureSentAlert.fragments.PublicPetition}

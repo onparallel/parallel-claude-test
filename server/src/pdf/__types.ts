@@ -1,5 +1,5 @@
-import { Duration } from "date-fns";
 import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
+import { Duration } from "date-fns";
 import gql from "graphql-tag";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = T | null;
@@ -8202,7 +8202,7 @@ export type documentSignatures_SignatureConfigFragment = {
   signers: Array<{ fullName: string; email: string } | null>;
 };
 
-export type LiquidScopeProvider_PetitionBase_Petition_Fragment = {
+export type LiquidPetitionScopeProvider_PetitionBase_Petition_Fragment = {
   id: string;
   fields: Array<{
     id: string;
@@ -8246,7 +8246,7 @@ export type LiquidScopeProvider_PetitionBase_Petition_Fragment = {
   standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
 };
 
-export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
+export type LiquidPetitionScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
   id: string;
   fields: Array<{
     id: string;
@@ -8290,11 +8290,11 @@ export type LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment = {
   standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
 };
 
-export type LiquidScopeProvider_PetitionBaseFragment =
-  | LiquidScopeProvider_PetitionBase_Petition_Fragment
-  | LiquidScopeProvider_PetitionBase_PetitionTemplate_Fragment;
+export type LiquidPetitionScopeProvider_PetitionBaseFragment =
+  | LiquidPetitionScopeProvider_PetitionBase_Petition_Fragment
+  | LiquidPetitionScopeProvider_PetitionBase_PetitionTemplate_Fragment;
 
-export type LiquidScopeProvider_PetitionFieldFragment = {
+export type LiquidPetitionScopeProvider_PetitionFieldFragment = {
   id: string;
   type: PetitionFieldType;
   multiple: boolean;
@@ -8304,7 +8304,7 @@ export type LiquidScopeProvider_PetitionFieldFragment = {
   math: Array<{ [key: string]: any }> | null;
 };
 
-export type LiquidScopeProvider_PetitionFieldReplyFragment = {
+export type LiquidPetitionScopeProvider_PetitionFieldReplyFragment = {
   id: string;
   content: { [key: string]: any };
   isAnonymized: boolean;
@@ -8425,8 +8425,8 @@ export const SignaturesBlock_SignatureConfigFragmentDoc = gql`
     timezone
   }
 ` as unknown as DocumentNode<SignaturesBlock_SignatureConfigFragment, unknown>;
-export const LiquidScopeProvider_PetitionFieldFragmentDoc = gql`
-  fragment LiquidScopeProvider_PetitionField on PetitionField {
+export const LiquidPetitionScopeProvider_PetitionFieldFragmentDoc = gql`
+  fragment LiquidPetitionScopeProvider_PetitionField on PetitionField {
     id
     type
     multiple
@@ -8435,33 +8435,33 @@ export const LiquidScopeProvider_PetitionFieldFragmentDoc = gql`
     visibility
     math
   }
-` as unknown as DocumentNode<LiquidScopeProvider_PetitionFieldFragment, unknown>;
-export const LiquidScopeProvider_PetitionFieldReplyFragmentDoc = gql`
-  fragment LiquidScopeProvider_PetitionFieldReply on PetitionFieldReply {
+` as unknown as DocumentNode<LiquidPetitionScopeProvider_PetitionFieldFragment, unknown>;
+export const LiquidPetitionScopeProvider_PetitionFieldReplyFragmentDoc = gql`
+  fragment LiquidPetitionScopeProvider_PetitionFieldReply on PetitionFieldReply {
     id
     content
     isAnonymized
   }
-` as unknown as DocumentNode<LiquidScopeProvider_PetitionFieldReplyFragment, unknown>;
-export const LiquidScopeProvider_PetitionBaseFragmentDoc = gql`
-  fragment LiquidScopeProvider_PetitionBase on PetitionBase {
+` as unknown as DocumentNode<LiquidPetitionScopeProvider_PetitionFieldReplyFragment, unknown>;
+export const LiquidPetitionScopeProvider_PetitionBaseFragmentDoc = gql`
+  fragment LiquidPetitionScopeProvider_PetitionBase on PetitionBase {
     id
     fields {
-      ...LiquidScopeProvider_PetitionField
+      ...LiquidPetitionScopeProvider_PetitionField
       children {
-        ...LiquidScopeProvider_PetitionField
+        ...LiquidPetitionScopeProvider_PetitionField
         replies {
-          ...LiquidScopeProvider_PetitionFieldReply
+          ...LiquidPetitionScopeProvider_PetitionFieldReply
         }
       }
       replies {
-        ...LiquidScopeProvider_PetitionFieldReply
+        ...LiquidPetitionScopeProvider_PetitionFieldReply
         children {
           field {
-            ...LiquidScopeProvider_PetitionField
+            ...LiquidPetitionScopeProvider_PetitionField
           }
           replies {
-            ...LiquidScopeProvider_PetitionFieldReply
+            ...LiquidPetitionScopeProvider_PetitionFieldReply
           }
         }
       }
@@ -8484,9 +8484,9 @@ export const LiquidScopeProvider_PetitionBaseFragmentDoc = gql`
       }
     }
   }
-  ${LiquidScopeProvider_PetitionFieldFragmentDoc}
-  ${LiquidScopeProvider_PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<LiquidScopeProvider_PetitionBaseFragment, unknown>;
+  ${LiquidPetitionScopeProvider_PetitionFieldFragmentDoc}
+  ${LiquidPetitionScopeProvider_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<LiquidPetitionScopeProvider_PetitionBaseFragment, unknown>;
 export const PetitionExport_PetitionBaseFragmentDoc = gql`
   fragment PetitionExport_PetitionBase on PetitionBase {
     id
@@ -8514,7 +8514,7 @@ export const PetitionExport_PetitionBaseFragmentDoc = gql`
         }
       }
     }
-    ...LiquidScopeProvider_PetitionBase
+    ...LiquidPetitionScopeProvider_PetitionBase
     variables {
       name
       defaultValue
@@ -8531,7 +8531,7 @@ export const PetitionExport_PetitionBaseFragmentDoc = gql`
   ${PetitionExport_PetitionFieldFragmentDoc}
   ${PetitionExport_PetitionFieldReplyFragmentDoc}
   ${SignaturesBlock_SignatureConfigFragmentDoc}
-  ${LiquidScopeProvider_PetitionBaseFragmentDoc}
+  ${LiquidPetitionScopeProvider_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionExport_PetitionBaseFragment, unknown>;
 export const PetitionExport2_PetitionFieldInnerFragmentDoc = gql`
   fragment PetitionExport2_PetitionFieldInner on PetitionField {
@@ -8645,13 +8645,13 @@ export const PetitionExport2_PetitionBaseFragmentDoc = gql`
         }
       }
     }
-    ...LiquidScopeProvider_PetitionBase
+    ...LiquidPetitionScopeProvider_PetitionBase
     __typename
   }
   ${PetitionExport2_PetitionFieldFragmentDoc}
   ${PetitionExport2_PetitionFieldReplyFragmentDoc}
   ${documentSignatures_SignatureConfigFragmentDoc}
-  ${LiquidScopeProvider_PetitionBaseFragmentDoc}
+  ${LiquidPetitionScopeProvider_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionExport2_PetitionBaseFragment, unknown>;
 export const SignatureBoxesPage_PetitionBaseFragmentDoc = gql`
   fragment SignatureBoxesPage_PetitionBase on PetitionBase {

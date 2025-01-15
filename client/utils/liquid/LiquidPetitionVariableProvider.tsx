@@ -1,41 +1,7 @@
 import { Drop } from "liquidjs";
-import { PropsWithChildren, useContext, useMemo } from "react";
-import { isNullish } from "remeda";
+import { PropsWithChildren, useMemo } from "react";
 import { FieldLogic } from "../fieldLogic/types";
-import { LiquidScopeContext } from "./LiquidScopeProvider";
-
-export function LiquidPetitionVariableProvider({
-  logic,
-  children,
-}: PropsWithChildren<{
-  logic: FieldLogic;
-}>) {
-  const parent = useContext(LiquidScopeContext);
-  if (isNullish(parent)) {
-    throw new Error(
-      "<LiquidPetitionVariableProvider/> must be used within a <LiquidScopeProvider/>",
-    );
-  }
-  const scope = useMemo(
-    () =>
-      Object.assign(
-        {},
-        parent,
-        Object.fromEntries(
-          Object.keys(logic.finalVariables).map((key) => [
-            key,
-            new PetitionVariableDrop(
-              logic.finalVariables[key],
-              logic.currentVariables[key],
-              logic.previousVariables[key],
-            ),
-          ]),
-        ),
-      ),
-    [parent, logic],
-  );
-  return <LiquidScopeContext.Provider value={scope}>{children}</LiquidScopeContext.Provider>;
-}
+import { LiquidScopeProvider } from "./LiquidScopeProvider";
 
 class PetitionVariableDrop extends Drop {
   constructor(
@@ -49,4 +15,27 @@ class PetitionVariableDrop extends Drop {
   public override valueOf() {
     return this.final;
   }
+}
+
+export function LiquidPetitionVariableProvider({
+  logic,
+  children,
+}: PropsWithChildren<{
+  logic: FieldLogic;
+}>) {
+  const scope = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.keys(logic.finalVariables).map((key) => [
+          key,
+          new PetitionVariableDrop(
+            logic.finalVariables[key],
+            logic.currentVariables[key],
+            logic.previousVariables[key],
+          ),
+        ]),
+      ),
+    [logic],
+  );
+  return <LiquidScopeProvider scope={scope}>{children}</LiquidScopeProvider>;
 }

@@ -91,8 +91,8 @@ import {
   useGoToPetitionSection,
 } from "@parallel/utils/goToPetition";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
+import { LiquidPetitionScopeProvider } from "@parallel/utils/liquid/LiquidPetitionScopeProvider";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
-import { LiquidScopeProvider } from "@parallel/utils/liquid/LiquidScopeProvider";
 import {
   useCreatePetitionComment,
   useDeletePetitionComment,
@@ -816,7 +816,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                   minWidth={0}
                 >
                   <Stack spacing={4} key={0}>
-                    <LiquidScopeProvider
+                    <LiquidPetitionScopeProvider
                       petition={petition}
                       usePreviewReplies={petition.__typename === "PetitionTemplate"}
                     >
@@ -918,7 +918,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                           </LiquidPetitionVariableProvider>
                         );
                       })}
-                    </LiquidScopeProvider>
+                    </LiquidPetitionScopeProvider>
                     {pages.length === currentPage && isPetition ? (
                       <Center paddingTop={4}>
                         <Button
@@ -1033,7 +1033,7 @@ const _fragments = {
       ...useAllFieldsWithIndices_PetitionBase
       ...useGetPetitionPages_PetitionBase
       ...PetitionLayout_PetitionBase
-      ...LiquidScopeProvider_PetitionBase
+      ...LiquidPetitionScopeProvider_PetitionBase
       ...PreviewPetitionField_PetitionBase
       ...usePetitionCanFinalize_PetitionBase
       ...HiddenFieldDialog_PetitionBase
@@ -1054,7 +1054,7 @@ const _fragments = {
     ${useAllFieldsWithIndices.fragments.PetitionBase}
     ${validatePetitionFields.fragments.PetitionField}
     ${FieldErrorDialog.fragments.PetitionField}
-    ${LiquidScopeProvider.fragments.PetitionBase}
+    ${LiquidPetitionScopeProvider.fragments.PetitionBase}
     ${completedFieldReplies.fragments.PetitionField}
     ${HiddenFieldDialog.fragments.PetitionBase}
     ${HiddenFieldDialog.fragments.PetitionField}
