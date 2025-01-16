@@ -142,7 +142,6 @@ export class EInformaProfileExternalSourceIntegration
       method,
       headers: {
         Accept: "application/json",
-        "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
     });
@@ -269,7 +268,11 @@ export class EInformaProfileExternalSourceIntegration
       NIF_REGEX.test(search.companySearch) ||
       (DNI_REGEX.test(search.companySearch) && standardType === "INDIVIDUAL")
     ) {
-      return await this.entityDetails(integrationId, standardType, search.companySearch);
+      return await this.entityDetails(
+        integrationId,
+        standardType,
+        search.companySearch.toUpperCase(),
+      );
     }
 
     return await this.entitySearchByName(integrationId, standardType, locale, search);
@@ -473,8 +476,8 @@ export class EInformaProfileExternalSourceIntegration
       async (accessToken, { environment }) => {
         const url =
           environment === "test"
-            ? `/companies/${externalId.toUpperCase()}/test`
-            : `/companies/${externalId.toUpperCase()}/report`;
+            ? `/companies/${externalId}/test`
+            : `/companies/${externalId}/report`;
 
         return await this.apiRequest<EInformaEntityByIdResponse>(accessToken, url, "GET");
       },
