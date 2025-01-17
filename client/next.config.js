@@ -69,7 +69,16 @@ const config = {
                   ["img-src", "*"],
                   ["style-src", "'self'", "'unsafe-inline'", statics],
                   ["script-src", "'self'", "unsafe-inline", statics, ...THIRD_PARTY_SCRIPTS],
-                  ["connect-src", "*"],
+                  [
+                    "connect-src",
+                    "'self'",
+                    "*.segment.com",
+                    "*.segment.io",
+                    "*.canny.io",
+                    "*.intercom.io",
+                    "px.ads.linkedin.com",
+                    "localhost:50500", // Cuatrecasas integration
+                  ],
                   ["frame-src", "'self'", "changelog-widget.canny.io"],
                   ["font-src", "'self'", statics, "fonts.intercomcdn.com"],
                   [
