@@ -67,6 +67,22 @@ export function PetitionFieldMathOperatorSelect({
         }),
         icon: <AssignIcon />,
       },
+      {
+        value: "ASSIGNATION_IF_LOWER",
+        label: intl.formatMessage({
+          id: "component.petition-field-math-operator-select.assignation-if-lower",
+          defaultMessage: "Assign if lower",
+        }),
+        icon: <AssignIcon />,
+      },
+      {
+        value: "ASSIGNATION_IF_GREATER",
+        label: intl.formatMessage({
+          id: "component.petition-field-math-operator-select.assignation-if-greater",
+          defaultMessage: "Assign if greater",
+        }),
+        icon: <AssignIcon />,
+      },
     ],
     [],
   );

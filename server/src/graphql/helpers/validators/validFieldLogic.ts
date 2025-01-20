@@ -137,7 +137,17 @@ const PETITION_FIELD_MATH_OPERATION_SCHEMA = (fieldIdType: "string" | "number") 
         },
       ],
     },
-    operator: { enum: ["ASSIGNATION", "ADDITION", "SUBSTRACTION", "MULTIPLICATION", "DIVISION"] },
+    operator: {
+      enum: [
+        "ASSIGNATION",
+        "ASSIGNATION_IF_LOWER",
+        "ASSIGNATION_IF_GREATER",
+        "ADDITION",
+        "SUBSTRACTION",
+        "MULTIPLICATION",
+        "DIVISION",
+      ],
+    },
   },
 });
 

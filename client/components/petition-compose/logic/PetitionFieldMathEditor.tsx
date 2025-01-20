@@ -287,8 +287,8 @@ function PetitionFieldMathRow({
       ) : null}
       <Grid
         templateColumns={{
-          base: "auto minmax(130px, 1fr) 2fr auto 1fr",
-          xl: "auto 130px 3fr auto 2fr",
+          base: "auto minmax(160px, 1fr) 2fr auto 1fr",
+          xl: "auto 160px 3fr auto 2fr",
         }}
         alignItems="start"
         columnGap={2}

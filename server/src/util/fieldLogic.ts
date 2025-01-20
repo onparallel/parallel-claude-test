@@ -97,6 +97,8 @@ type PetitionFieldMathOperand =
 
 export type PetitionFieldMathOperator =
   | "ASSIGNATION"
+  | "ASSIGNATION_IF_LOWER"
+  | "ASSIGNATION_IF_GREATER"
   | "ADDITION"
   | "SUBSTRACTION"
   | "MULTIPLICATION"
@@ -671,6 +673,12 @@ function applyMathOperation(
     switch (operation.operator) {
       case "ASSIGNATION":
         result = value;
+        break;
+      case "ASSIGNATION_IF_LOWER":
+        result = Math.min(currentValue, value);
+        break;
+      case "ASSIGNATION_IF_GREATER":
+        result = Math.max(currentValue, value);
         break;
       case "ADDITION":
         result = currentValue + value;

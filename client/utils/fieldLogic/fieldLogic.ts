@@ -456,6 +456,12 @@ function applyMathOperation(
       case "ASSIGNATION":
         result = value;
         break;
+      case "ASSIGNATION_IF_LOWER":
+        result = value;
+        break;
+      case "ASSIGNATION_IF_GREATER":
+        result = value;
+        break;
       case "ADDITION":
         result = currentValue + value;
         break;

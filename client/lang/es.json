@@ -5990,6 +5990,16 @@
     "context": "Assign"
   },
   {
+    "term": "component.petition-field-math-operator-select.assignation-if-greater",
+    "definition": "Asigna si mayor",
+    "context": "Assign if greater"
+  },
+  {
+    "term": "component.petition-field-math-operator-select.assignation-if-lower",
+    "definition": "Asigna si menor",
+    "context": "Assign if lower"
+  },
+  {
     "term": "component.petition-field-math-operator-select.division",
     "definition": "Divide",
     "context": "Divide"

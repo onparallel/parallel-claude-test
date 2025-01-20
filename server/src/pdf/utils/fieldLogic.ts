@@ -458,6 +458,12 @@ function applyMathOperation(
       case "ASSIGNATION":
         result = value;
         break;
+      case "ASSIGNATION_IF_LOWER":
+        result = Math.min(currentValue, value);
+        break;
+      case "ASSIGNATION_IF_GREATER":
+        result = Math.max(currentValue, value);
+        break;
       case "ADDITION":
         result = currentValue + value;
         break;

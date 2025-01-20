@@ -71,6 +71,8 @@ export type PetitionFieldMathOperand =
 
 export type PetitionFieldMathOperator =
   | "ASSIGNATION"
+  | "ASSIGNATION_IF_LOWER"
+  | "ASSIGNATION_IF_GREATER"
   | "ADDITION"
   | "SUBSTRACTION"
   | "MULTIPLICATION"
