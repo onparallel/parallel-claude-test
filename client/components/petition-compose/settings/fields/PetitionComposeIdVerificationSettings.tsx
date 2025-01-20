@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import { Box, Stack, Text } from "@chakra-ui/react";
 import { MultiCheckboxSimpleSelect } from "@parallel/components/common/MultiCheckboxSimpleSelect";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
@@ -10,11 +11,10 @@ import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettin
 import { SettingsRow } from "../rows/SettingsRow";
 
 export function PetitionComposeIdVerificationSettings({
-  petition,
   field,
   onFieldEdit,
   isReadOnly,
-}: Pick<PetitionComposeFieldSettingsProps, "petition" | "field" | "onFieldEdit" | "isReadOnly">) {
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
   const documents = useTypesOfDocuments();
   const typesOfVerification = useTypesOfVerification();
 
@@ -215,3 +215,12 @@ function Option(props: OptionProps<TypesOfVerificationSelectOption>) {
     </components.Option>
   );
 }
+
+PetitionComposeIdVerificationSettings.fragments = {
+  PetitionField: gql`
+    fragment PetitionComposeIdVerificationSettings_PetitionField on PetitionField {
+      id
+      options
+    }
+  `,
+};

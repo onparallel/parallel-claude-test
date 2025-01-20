@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Box,
   FormControl,
@@ -304,3 +305,13 @@ export function PetitionComposeNumberSettings({
     </>
   );
 }
+
+PetitionComposeNumberSettings.fragments = {
+  PetitionField: gql`
+    fragment PetitionComposeNumberSettings_PetitionField on PetitionField {
+      id
+      options
+      isLinkedToProfileTypeField
+    }
+  `,
+};

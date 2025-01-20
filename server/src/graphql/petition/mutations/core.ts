@@ -79,6 +79,7 @@ import {
   chain,
   ifArgDefined,
   ifArgEquals,
+  ifArgNotUndefined,
   ifNotEmptyArray,
   ifSomeDefined,
   not,
@@ -153,6 +154,7 @@ import {
   fieldsBelongsToPetition,
   firstChildHasType,
   foldersAreInPath,
+  linkedProfileTypeFieldDoesNotHaveFormat,
   messageBelongToPetition,
   parentFieldIsInternal,
   petitionFieldsCanBeAssociated,
@@ -1262,9 +1264,12 @@ export const updatePetitionField = mutationField("updatePetitionField", {
         args.data.multiple ??
         (args.data.options?.standardList !== undefined ? true : undefined) ??
         args.data.options?.values ??
-        args.data.options?.labels ??
-        args.data.options?.format,
+        args.data.options?.labels,
       not(fieldIsLinkedToProfileTypeField("fieldId")),
+    ),
+    ifArgNotUndefined(
+      (args) => args.data.options?.format,
+      linkedProfileTypeFieldDoesNotHaveFormat("fieldId"),
     ),
     ifArgDefined(
       (args) => args.data.multiple,
@@ -3941,6 +3946,9 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
         ),
       ),
     ),
+    skipFormatErrors: nullable(
+      booleanArg({ description: "Pass true to skip prefilling fields with incompatible format" }),
+    ),
   },
   resolve: async (_, args, ctx) => {
     const petition = await ctx.petitions.createPetitionFromId(
@@ -4006,11 +4014,27 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
         (pf) => pf.from_petition_field_id === input.petitionFieldId,
       )!.id,
     }));
-    const data = await buildFieldGroupRepliesFromPrefillInput(petition.id, prefill, ctx);
+    const { replies, propertiesWithInvalidFormat } = await buildFieldGroupRepliesFromPrefillInput(
+      petition.id,
+      prefill,
+      ctx,
+    );
 
-    if (data.length > 0) {
+    if (propertiesWithInvalidFormat.length > 0 && !args.skipFormatErrors) {
+      throw new ApolloError(
+        "Some of the fields cannot be imported due to an invalid format",
+        "INVALID_FORMAT_ERROR",
+        {
+          profileTypeFieldIds: propertiesWithInvalidFormat.map((id) =>
+            toGlobalId("ProfileTypeField", id),
+          ),
+        },
+      );
+    }
+
+    if (replies.length > 0) {
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(petition.id, `User:${ctx.user!.id}`);
-      await createPetitionFieldRepliesFromPrefillData(petition.id, data, ctx);
+      await createPetitionFieldRepliesFromPrefillData(petition.id, replies, ctx);
     }
 
     return petition;
@@ -4047,10 +4071,13 @@ export const prefillPetitionFromProfiles = mutationField("prefillPetitionFromPro
       description:
         "Pass force=true to associate the profile to an empty field reply even if there is nothing to import from the profile",
     }),
+    skipFormatErrors: nullable(
+      booleanArg({ description: "Pass true to skip prefilling fields with incompatible format" }),
+    ),
   },
   validateArgs: notEmptyArray("prefill"),
   resolve: async (_, args, ctx) => {
-    const data = await buildFieldGroupRepliesFromPrefillInput(
+    const { replies, propertiesWithInvalidFormat } = await buildFieldGroupRepliesFromPrefillInput(
       args.petitionId,
       args.prefill.map((p, index) => ({
         ...p,
@@ -4059,7 +4086,7 @@ export const prefillPetitionFromProfiles = mutationField("prefillPetitionFromPro
       ctx,
     );
 
-    const emptyProfileIds = data
+    const emptyProfileIds = replies
       .filter((d) => d.childReplies.length === 0)
       .map((d) => d.associatedProfileId);
 
@@ -4071,12 +4098,24 @@ export const prefillPetitionFromProfiles = mutationField("prefillPetitionFromPro
       );
     }
 
-    if (data.length > 0) {
+    if (propertiesWithInvalidFormat.length > 0 && !args.skipFormatErrors) {
+      throw new ApolloError(
+        "Some of the fields cannot be imported due to an invalid format",
+        "INVALID_FORMAT_ERROR",
+        {
+          profileTypeFieldIds: propertiesWithInvalidFormat.map((id) =>
+            toGlobalId("ProfileTypeField", id),
+          ),
+        },
+      );
+    }
+
+    if (replies.length > 0) {
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
 
       // insert data in DB only after the two error checks have passed (NOTHING_TO_IMPORT_ERROR and PETITION_SEND_LIMIT_REACHED).
       // this will ensure nothing will be modified in DB if an error is thrown
-      await createPetitionFieldRepliesFromPrefillData(args.petitionId, data, ctx);
+      await createPetitionFieldRepliesFromPrefillData(args.petitionId, replies, ctx);
     }
 
     const profileIds = unique(args.prefill.flatMap((p) => p.profileIds));
@@ -4322,10 +4361,13 @@ export const createFieldGroupRepliesFromProfiles = mutationField(
         description:
           "Pass force=true to associate the profile to an empty field reply even if there is nothing to import from the profile",
       }),
+      skipFormatErrors: booleanArg({
+        description: "Pass true to skip prefilling fields with incompatible format",
+      }),
     },
     validateArgs: validateAnd(notEmptyArray("profileIds"), uniqueValues("profileIds")),
     resolve: async (_, args, ctx) => {
-      const data = await buildFieldGroupRepliesFromPrefillInput(
+      const { replies, propertiesWithInvalidFormat } = await buildFieldGroupRepliesFromPrefillInput(
         args.petitionId,
         [
           {
@@ -4337,7 +4379,7 @@ export const createFieldGroupRepliesFromProfiles = mutationField(
         ctx,
       );
 
-      const emptyProfileIds = data
+      const emptyProfileIds = replies
         .filter((d) => d.childReplies.length === 0)
         .map((d) => d.associatedProfileId);
 
@@ -4349,14 +4391,26 @@ export const createFieldGroupRepliesFromProfiles = mutationField(
         );
       }
 
-      if (data.length > 0) {
+      if (propertiesWithInvalidFormat.length > 0 && !args.skipFormatErrors) {
+        throw new ApolloError(
+          "Some of the fields cannot be imported due to an invalid format",
+          "INVALID_FORMAT_ERROR",
+          {
+            profileTypeFieldIds: propertiesWithInvalidFormat.map((id) =>
+              toGlobalId("ProfileTypeField", id),
+            ),
+          },
+        );
+      }
+
+      if (replies.length > 0) {
         await ctx.orgCredits.ensurePetitionHasConsumedCredit(
           args.petitionId,
           `User:${ctx.user!.id}`,
         );
         // insert data in DB only after the two error checks have passed (NOTHING_TO_IMPORT_ERROR and PETITION_SEND_LIMIT_REACHED).
         // this will ensure nothing will be modified in DB if an error is thrown
-        await createPetitionFieldRepliesFromPrefillData(args.petitionId, data, ctx);
+        await createPetitionFieldRepliesFromPrefillData(args.petitionId, replies, ctx);
       }
 
       const associations = await ctx.profiles.associateProfilesToPetition(

@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Box,
   NumberDecrementStepper,
@@ -297,3 +298,14 @@ export function PetitionComposeCheckboxSettings({
     </>
   );
 }
+
+PetitionComposeCheckboxSettings.fragments = {
+  PetitionField: gql`
+    fragment PetitionComposeCheckboxSettings_PetitionField on PetitionField {
+      id
+      options
+      optional
+      isLinkedToProfileTypeField
+    }
+  `,
+};

@@ -386,7 +386,6 @@ export const PetitionComposeFieldSettings = Object.assign(
           id
           type
           title
-          optional
           multiple
           options
           isInternal
@@ -395,15 +394,10 @@ export const PetitionComposeFieldSettings = Object.assign(
           showActivityInPdf
           isFixed
           position
-          visibility
           alias
           hasCommentsEnabled
           requireApproval
           isLinkedToProfileType
-          profileType {
-            id
-            name
-          }
           isLinkedToProfileTypeField
           parent {
             id
@@ -415,8 +409,23 @@ export const PetitionComposeFieldSettings = Object.assign(
             }
           }
           ...SettingsRowAlias_PetitionField
+          ...PetitionComposeShortTextSettings_PetitionField
+          ...PetitionComposeSelectSettings_PetitionField
+          ...PetitionComposeIdVerificationSettings_PetitionField
+          ...PetitionComposeHeadingSettings_PetitionField
+          ...PetitionComposeFileUploadSettings_PetitionField
+          ...PetitionComposeFieldGroupSettings_PetitionField
+          ...PetitionComposeCheckboxSettings_PetitionField
         }
         ${SettingsRowAlias.fragments.PetitionField}
+        ${PetitionComposeShortTextSettings.fragments.PetitionField}
+        ${PetitionComposeSelectSettings.fragments.PetitionField}
+        ${PetitionComposeIdVerificationSettings.fragments.PetitionField}
+        ${PetitionComposeHeadingSettings.fragments.PetitionField}
+        ${PetitionComposeFileUploadSettings.fragments.PetitionField}
+        ${PetitionComposeFieldGroupSettings.fragments.PetitionField}
+        ${PetitionComposeDynamicSelectFieldSettings.fragments.PetitionField}
+        ${PetitionComposeCheckboxSettings.fragments.PetitionField}
       `,
     },
   },

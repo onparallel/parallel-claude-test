@@ -331,6 +331,15 @@ function DynamicSelectOptionsDropzone({
   );
 }
 
+PetitionComposeDynamicSelectFieldSettings.fragments = {
+  PetitionField: gql`
+    fragment PetitionComposeDynamicSelectFieldSettings_PetitionField on PetitionField {
+      id
+      options
+    }
+  `,
+};
+
 PetitionComposeDynamicSelectFieldSettings.mutations = [
   gql`
     mutation DynamicSelectSettings_uploadDynamicSelectFieldFile(

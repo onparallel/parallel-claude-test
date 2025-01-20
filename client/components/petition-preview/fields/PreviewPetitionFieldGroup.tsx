@@ -47,6 +47,7 @@ import {
 } from "../clientMutations";
 import { usePreviewConfirmImportFromProfileDialog } from "../dialogs/PreviewConfirmImportFromProfileDialog";
 import { usePreviewImportFromProfileDialog } from "../dialogs/PreviewImportFromProfileDialog";
+import { usePreviewImportFromProfileFormatErrorDialog } from "../dialogs/PreviewImportFromProfileFormatErrorDialog";
 import { PreviewPetitionFieldKyc } from "./PreviewPetitionFieldKyc";
 import { PreviewPetitionFieldBackgroundCheck } from "./background-check/PreviewPetitionFieldBackgroundCheck";
 
@@ -132,6 +133,8 @@ export function PreviewPetitionFieldGroup({
   const showConfirmImportFromProfileDialog = usePreviewConfirmImportFromProfileDialog();
   const createFieldGroupRepliesFromProfiles = useCreateFieldGroupRepliesFromProfiles();
   const prefillPetitionFromProfiles = usePrefillPetitionFromProfiles();
+  const showPreviewImportFromProfileFormatErrorDialog =
+    usePreviewImportFromProfileFormatErrorDialog();
 
   const handleImportFromProfile = async (groupId?: string) => {
     if (isNullish(field.profileType)) {
@@ -184,6 +187,22 @@ export function PreviewPetitionFieldGroup({
               }
               return;
             }
+          } else if (isApolloError(e, "INVALID_FORMAT_ERROR")) {
+            try {
+              await showPreviewImportFromProfileFormatErrorDialog({
+                profileIds: response.profileIds,
+                profileTypeFieldIds: e.graphQLErrors?.[0].extensions
+                  ?.profileTypeFieldIds as string[],
+              });
+              await createFieldGroupRepliesFromProfiles({
+                petitionId: petition.id,
+                petitionFieldId: field.id,
+                parentReplyId: groupId,
+                profileIds: response.profileIds,
+                isCacheOnly,
+                skipFormatErrors: true,
+              });
+            } catch {}
           } else if (!isDialogError(e)) {
             showErrorToast(e);
           }
@@ -215,6 +234,21 @@ export function PreviewPetitionFieldGroup({
               }
               return;
             }
+          } else if (isApolloError(e, "INVALID_FORMAT_ERROR")) {
+            try {
+              await showPreviewImportFromProfileFormatErrorDialog({
+                profileIds: response.prefill.flatMap((p) => p.profileIds),
+                profileTypeFieldIds: e.graphQLErrors?.[0].extensions
+                  ?.profileTypeFieldIds as string[],
+              });
+              await prefillPetitionFromProfiles({
+                petitionId: petition.id,
+                parentReplyId: groupId,
+                prefill: response.prefill,
+                isCacheOnly,
+                skipFormatErrors: true,
+              });
+            } catch {}
           } else if (!isDialogError(e)) {
             showErrorToast(e);
           }

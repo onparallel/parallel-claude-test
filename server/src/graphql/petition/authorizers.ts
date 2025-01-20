@@ -1078,6 +1078,21 @@ export function fieldIsLinkedToProfileTypeField<
   };
 }
 
+export function linkedProfileTypeFieldDoesNotHaveFormat<
+  TypeName extends string,
+  FieldName extends string,
+  TFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(fieldIdArg: TFieldId): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const fieldIds = unMaybeArray(getArg(args, fieldIdArg));
+
+    const fields = await ctx.petitions.loadField(fieldIds);
+    const profileTypeFieldIds = fields.map((f) => f?.profile_type_field_id).filter(isNonNullish);
+    const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
+    return profileTypeFields.every((ptf) => isNonNullish(ptf) && isNullish(ptf.options.format));
+  };
+}
+
 export function fieldIsLinkedToProfileType<
   TypeName extends string,
   FieldName extends string,

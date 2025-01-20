@@ -4484,6 +4484,93 @@ describe("GraphQL/Petition Fields", () => {
       });
       expect(data).toBeNull();
     });
+
+    it("sends error if trying to update format on a profile-linked field with format", async () => {
+      const [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+      const [emailProfileTypeField] = await mocks.createRandomProfileTypeFields(
+        organization.id,
+        profileType.id,
+        1,
+        () => ({
+          type: "SHORT_TEXT",
+          options: { format: "EMAIL" },
+        }),
+      );
+
+      const [field] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "SHORT_TEXT",
+        parent_petition_field_id: fields[5].id,
+        profile_type_field_id: emailProfileTypeField.id,
+        options: { maxLength: 10000 },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", field.id),
+          data: {
+            options: { format: "IBAN" },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("updates format if trying to update on a profile-linked field with no format", async () => {
+      const [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+      const [emailProfileTypeField] = await mocks.createRandomProfileTypeFields(
+        organization.id,
+        profileType.id,
+        1,
+        () => ({
+          type: "SHORT_TEXT",
+          options: { format: null },
+        }),
+      );
+
+      const [field] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "SHORT_TEXT",
+        parent_petition_field_id: fields[5].id,
+        profile_type_field_id: emailProfileTypeField.id,
+        options: { maxLength: 10000 },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+              options
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", field.id),
+          data: {
+            options: { format: "IBAN" },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetitionField).toEqual({
+        id: toGlobalId("PetitionField", field.id),
+        options: {
+          format: "IBAN",
+          maxLength: 10000,
+        },
+      });
+    });
   });
 
   describe("changePetitionFieldType", () => {

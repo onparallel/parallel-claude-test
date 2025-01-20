@@ -1525,6 +1525,11 @@ type Mutation {
     petitionFieldId: GID!
     petitionId: GID!
     profileIds: [GID!]!
+
+    """
+    Pass true to skip prefilling fields with incompatible format
+    """
+    skipFormatErrors: Boolean
   ): PetitionField!
   createFieldGroupReplyFromProfile(
     """
@@ -1728,6 +1733,11 @@ type Mutation {
     Main profile to obtain the information from
     """
     profileId: GID!
+
+    """
+    Pass true to skip prefilling fields with incompatible format
+    """
+    skipFormatErrors: Boolean
 
     """
     Template that will be used to create the petition
@@ -2298,6 +2308,11 @@ type Mutation {
     parentReplyId: GID
     petitionId: GID!
     prefill: [CreatePetitionFromProfilePrefillInput!]!
+
+    """
+    Pass true to skip prefilling fields with incompatible format
+    """
+    skipFormatErrors: Boolean
   ): Petition!
   profileExternalSourceDetails(
     externalId: ID!

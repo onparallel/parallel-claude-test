@@ -183,4 +183,10 @@ PetitionComposeFileUploadSettings.fragments = {
       }
     }
   `,
+  PetitionField: gql`
+    fragment PetitionComposeFileUploadSettings_PetitionField on PetitionField {
+      id
+      options
+    }
+  `,
 };

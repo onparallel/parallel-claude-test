@@ -1,8 +1,10 @@
+import { gql } from "@apollo/client";
 import { Box, Stack, Text } from "@chakra-ui/react";
 import { ShortTextFormatSelect } from "@parallel/components/common/ShortTextFormatSelect";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useShortTextFormatsSelectOptions } from "@parallel/utils/useShortTextFormats";
 import { FormattedMessage } from "react-intl";
+import { isNonNullish } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRow } from "../rows/SettingsRow";
 
@@ -31,7 +33,7 @@ export function PetitionComposeShortTextSettings({
         >
           <Box flex={1}>
             <ShortTextFormatSelect
-              isDisabled={field.isLinkedToProfileTypeField}
+              isDisabled={isNonNullish(field.profileTypeField?.options?.format)}
               size="sm"
               data-testid="petition-compose-short-text-format-select"
               value={options.format}
@@ -59,3 +61,15 @@ export function PetitionComposeShortTextSettings({
     </>
   );
 }
+
+PetitionComposeShortTextSettings.fragments = {
+  PetitionField: gql`
+    fragment PetitionComposeShortTextSettings_PetitionField on PetitionField {
+      id
+      options
+      profileTypeField {
+        options
+      }
+    }
+  `,
+};

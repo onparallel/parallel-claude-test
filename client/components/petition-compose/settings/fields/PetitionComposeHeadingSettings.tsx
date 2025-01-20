@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import { Text } from "@chakra-ui/react";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { FormattedMessage } from "react-intl";
@@ -54,3 +55,13 @@ export function PetitionComposeHeadingSettings({
     </>
   );
 }
+
+PetitionComposeHeadingSettings.fragments = {
+  PetitionField: gql`
+    fragment PetitionComposeHeadingSettings_PetitionField on PetitionField {
+      id
+      options
+      visibility
+    }
+  `,
+};

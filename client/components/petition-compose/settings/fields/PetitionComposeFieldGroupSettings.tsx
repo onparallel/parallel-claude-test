@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import { Alert, AlertDescription, Button, HStack, Input, Text } from "@chakra-ui/react";
 import { ProfilesIcon } from "@parallel/chakra/icons";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
@@ -157,3 +158,17 @@ export function PetitionComposeFieldGroupSettings({
     </>
   );
 }
+
+PetitionComposeFieldGroupSettings.fragments = {
+  PetitionField: gql`
+    fragment PetitionComposeFieldGroupSettings_PetitionField on PetitionField {
+      id
+      options
+      isLinkedToProfileType
+      profileType {
+        id
+        name
+      }
+    }
+  `,
+};

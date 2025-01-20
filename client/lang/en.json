@@ -7620,6 +7620,16 @@
     "context": "Select a profile to import the information from"
   },
   {
+    "term": "component.preview-import-from-profile-format-error-dialog.body",
+    "definition": "Some properties are incompatible with the fields they are linked to. You can proceed but the following incompatible properties won't be imported:",
+    "context": "Some properties are incompatible with the fields they are linked to. You can proceed but the following incompatible properties won't be imported:"
+  },
+  {
+    "term": "component.preview-import-from-profile-format-error-dialog.header",
+    "definition": "Incompatible fields",
+    "context": "Incompatible fields"
+  },
+  {
     "term": "component.preview-petition-background-check.check-lists",
     "definition": "Run background check",
     "context": "Run background check"
@@ -13343,6 +13353,11 @@
     "term": "generic.previous-page",
     "definition": "Previous page",
     "context": "Previous page"
+  },
+  {
+    "term": "generic.proceed",
+    "definition": "Proceed",
+    "context": "Proceed"
   },
   {
     "term": "generic.product-news-label",

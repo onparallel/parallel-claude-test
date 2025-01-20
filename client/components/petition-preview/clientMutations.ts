@@ -806,6 +806,7 @@ export function useCreateFieldGroupRepliesFromProfiles() {
       force,
       isCacheOnly,
       profiles,
+      skipFormatErrors,
     }: {
       petitionId: string;
       petitionFieldId: string;
@@ -814,6 +815,7 @@ export function useCreateFieldGroupRepliesFromProfiles() {
       force?: boolean;
       isCacheOnly?: boolean;
       profiles?: PreviewPetitionFieldMutations_ProfileFragment[];
+      skipFormatErrors?: boolean;
     }) {
       if (isCacheOnly) {
         let _profiles = [];
@@ -894,6 +896,7 @@ export function useCreateFieldGroupRepliesFromProfiles() {
             parentReplyId,
             profileIds,
             force,
+            skipFormatErrors,
           },
         });
       }
@@ -954,6 +957,7 @@ export function usePrefillPetitionFromProfiles() {
       prefill,
       force,
       isCacheOnly,
+      skipFormatErrors,
     }: {
       petitionId: string;
       parentReplyId?: string;
@@ -963,6 +967,7 @@ export function usePrefillPetitionFromProfiles() {
       }[];
       force?: boolean;
       isCacheOnly?: boolean;
+      skipFormatErrors?: boolean;
     }) {
       if (isCacheOnly) {
         const allProfileIds = prefill.flatMap(({ profileIds }) => profileIds);
@@ -985,6 +990,7 @@ export function usePrefillPetitionFromProfiles() {
             parentReplyId,
             prefill,
             force,
+            skipFormatErrors,
           },
         });
       }
@@ -999,12 +1005,14 @@ const _prefillPetitionFromProfiles = gql`
     $parentReplyId: GID
     $prefill: [CreatePetitionFromProfilePrefillInput!]!
     $force: Boolean
+    $skipFormatErrors: Boolean
   ) {
     prefillPetitionFromProfiles(
       petitionId: $petitionId
       parentReplyId: $parentReplyId
       prefill: $prefill
       force: $force
+      skipFormatErrors: $skipFormatErrors
     ) {
       id
       fields {
@@ -1022,6 +1030,7 @@ const _createFieldGroupRepliesFromProfiles = gql`
     $parentReplyId: GID
     $profileIds: [GID!]!
     $force: Boolean
+    $skipFormatErrors: Boolean
   ) {
     createFieldGroupRepliesFromProfiles(
       petitionId: $petitionId
@@ -1029,6 +1038,7 @@ const _createFieldGroupRepliesFromProfiles = gql`
       parentReplyId: $parentReplyId
       profileIds: $profileIds
       force: $force
+      skipFormatErrors: $skipFormatErrors
     ) {
       ...useCreateFieldGroupRepliesFromProfiles_PetitionField
     }

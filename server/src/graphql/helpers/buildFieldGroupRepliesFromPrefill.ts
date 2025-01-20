@@ -4,6 +4,7 @@ import { ApiContext } from "../../context";
 import { CreatePetitionFieldReply, PetitionFieldReply } from "../../db/__types";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { UnwrapPromise } from "../../util/types";
+import { validateShortTextFormat } from "../../util/validateShortTextFormat";
 
 export async function buildFieldGroupRepliesFromPrefillInput(
   petitionId: number,
@@ -26,6 +27,8 @@ export async function buildFieldGroupRepliesFromPrefillInput(
     associatedProfileId: number;
     childReplies: Omit<CreatePetitionFieldReply, "parent_petition_field_reply_id">[];
   }[] = [];
+
+  const propertiesWithInvalidFormat: number[] = [];
 
   for (const input of prefill.filter((p) => p.profileIds.length > 0)) {
     const [parent, children] = groupsWithChildren.find(
@@ -64,6 +67,16 @@ export async function buildFieldGroupRepliesFromPrefillInput(
         const fileUploadIds = profileFiles.map((f) => f.file_upload_id).filter(isNonNullish);
 
         if (isNonNullish(profileValue)) {
+          if (
+            child.type === "SHORT_TEXT" &&
+            isNonNullish(child.options.format) &&
+            isNonNullish(profileValue.content.value) &&
+            !validateShortTextFormat(profileValue.content.value, child.options.format)
+          ) {
+            propertiesWithInvalidFormat.push(child.profile_type_field_id!);
+            continue;
+          }
+
           childReplies.push({
             petition_field_id: child.id,
             content: profileValue.content,
@@ -104,7 +117,7 @@ export async function buildFieldGroupRepliesFromPrefillInput(
     }
   }
 
-  return replies;
+  return { replies, propertiesWithInvalidFormat };
 }
 
 /**
@@ -113,7 +126,7 @@ export async function buildFieldGroupRepliesFromPrefillInput(
  */
 export async function createPetitionFieldRepliesFromPrefillData(
   petitionId: number,
-  data: UnwrapPromise<ReturnType<typeof buildFieldGroupRepliesFromPrefillInput>>,
+  data: UnwrapPromise<ReturnType<typeof buildFieldGroupRepliesFromPrefillInput>>["replies"],
   ctx: ApiContext,
 ) {
   const fieldChildren = (

@@ -7689,6 +7689,7 @@ export interface NexusGenArgTypes {
       petitionFieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
       profileIds: NexusGenScalars["GID"][]; // [GID!]!
+      skipFormatErrors?: boolean | null; // Boolean
     };
     createFieldGroupReplyFromProfile: {
       // args
@@ -7796,6 +7797,7 @@ export interface NexusGenArgTypes {
       petitionFieldId?: NexusGenScalars["GID"] | null; // GID
       prefill: NexusGenInputs["CreatePetitionFromProfilePrefillInput"][]; // [CreatePetitionFromProfilePrefillInput!]!
       profileId: NexusGenScalars["GID"]; // GID!
+      skipFormatErrors?: boolean | null; // Boolean
       templateId: NexusGenScalars["GID"]; // GID!
     };
     createPetitionListView: {
@@ -8237,6 +8239,7 @@ export interface NexusGenArgTypes {
       parentReplyId?: NexusGenScalars["GID"] | null; // GID
       petitionId: NexusGenScalars["GID"]; // GID!
       prefill: NexusGenInputs["CreatePetitionFromProfilePrefillInput"][]; // [CreatePetitionFromProfilePrefillInput!]!
+      skipFormatErrors?: boolean | null; // Boolean
     };
     profileExternalSourceDetails: {
       // args

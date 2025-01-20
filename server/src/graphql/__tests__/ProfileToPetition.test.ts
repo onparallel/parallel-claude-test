@@ -5820,9 +5820,9 @@ describe("GraphQL/Profiles to Petitions", () => {
       profileFields = await mocks.createRandomProfileTypeFields(
         organization.id,
         profileType.id,
-        2,
+        3,
         (i) => ({
-          type: ["SHORT_TEXT", "CHECKBOX"][i] as ProfileTypeFieldType,
+          type: ["SHORT_TEXT", "CHECKBOX", "SHORT_TEXT"][i] as ProfileTypeFieldType,
           options:
             i === 1
               ? {
@@ -5841,12 +5841,16 @@ describe("GraphQL/Profiles to Petitions", () => {
         type: "FIELD_GROUP",
         profile_type_id: profileType.id,
       }));
-      groupChildren = await mocks.createRandomPetitionFields(template.id, 2, (i) => ({
+      groupChildren = await mocks.createRandomPetitionFields(template.id, 3, (i) => ({
         parent_petition_field_id: templateFieldGroup.id,
         profile_type_field_id: profileFields[i].id,
-        type: ["SHORT_TEXT", "CHECKBOX"][i] as PetitionFieldType,
+        type: ["SHORT_TEXT", "CHECKBOX", "SHORT_TEXT"][i] as PetitionFieldType,
         options:
-          i === 1 ? { values: ["A", "B", "C"], labels: ["OPTION A", "OPTION B", "OPTION C"] } : {},
+          i === 1
+            ? { values: ["A", "B", "C"], labels: ["OPTION A", "OPTION B", "OPTION C"] }
+            : i === 2
+              ? { format: "EMAIL" }
+              : {},
       }));
     });
 
@@ -5961,6 +5965,219 @@ describe("GraphQL/Profiles to Petitions", () => {
                         content: { value: ["B", "C"] },
                       },
                     ],
+                  },
+                  {
+                    field: {
+                      type: "SHORT_TEXT",
+                      fromPetitionFieldId: toGlobalId("PetitionField", groupChildren[2].id),
+                      profileTypeField: {
+                        id: toGlobalId("ProfileTypeField", profileFields[2].id),
+                      },
+                    },
+                    replies: [],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("sends error if profile value does not match format in child field", async () => {
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.knex.from("profile_field_value").insert([
+        {
+          profile_id: profile.id,
+          profile_type_field_id: profileFields[0].id,
+          type: "SHORT_TEXT",
+          content: { value: "SHORT_TEXT reply" },
+          created_by_user_id: user.id,
+        },
+        {
+          profile_id: profile.id,
+          profile_type_field_id: profileFields[1].id,
+          type: "CHECKBOX",
+          content: { value: ["B", "C"] },
+          created_by_user_id: user.id,
+        },
+        {
+          profile_id: profile.id,
+          profile_type_field_id: profileFields[2].id,
+          type: "SHORT_TEXT",
+          content: { value: "this is my EMAIL reply" },
+          created_by_user_id: user.id,
+        },
+      ]);
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation (
+            $templateId: GID!
+            $petitionFieldId: GID
+            $profileId: GID!
+            $prefill: [CreatePetitionFromProfilePrefillInput!]!
+          ) {
+            createPetitionFromProfile(
+              templateId: $templateId
+              petitionFieldId: $petitionFieldId
+              profileId: $profileId
+              prefill: $prefill
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          templateId: toGlobalId("Petition", template.id),
+          petitionFieldId: toGlobalId("PetitionField", templateFieldGroup.id),
+          profileId: toGlobalId("Profile", profile.id),
+          prefill: [
+            {
+              petitionFieldId: toGlobalId("PetitionField", templateFieldGroup.id),
+              profileIds: [toGlobalId("Profile", profile.id)],
+            },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_FORMAT_ERROR", {
+        profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileFields[2].id)],
+      });
+      expect(data).toBeNull();
+    });
+
+    it("skips field with format error when providing skipFormatErrors flag", async () => {
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.knex.from("profile_field_value").insert([
+        {
+          profile_id: profile.id,
+          profile_type_field_id: profileFields[0].id,
+          type: "SHORT_TEXT",
+          content: { value: "SHORT_TEXT reply" },
+          created_by_user_id: user.id,
+        },
+        {
+          profile_id: profile.id,
+          profile_type_field_id: profileFields[1].id,
+          type: "CHECKBOX",
+          content: { value: ["B", "C"] },
+          created_by_user_id: user.id,
+        },
+        {
+          profile_id: profile.id,
+          profile_type_field_id: profileFields[2].id,
+          type: "SHORT_TEXT",
+          content: { value: "this is my EMAIL reply" },
+          created_by_user_id: user.id,
+        },
+      ]);
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation (
+            $templateId: GID!
+            $petitionFieldId: GID
+            $profileId: GID!
+            $prefill: [CreatePetitionFromProfilePrefillInput!]!
+            $skipFormatErrors: Boolean
+          ) {
+            createPetitionFromProfile(
+              templateId: $templateId
+              petitionFieldId: $petitionFieldId
+              profileId: $profileId
+              prefill: $prefill
+              skipFormatErrors: $skipFormatErrors
+            ) {
+              id
+              fields {
+                type
+                fromPetitionFieldId
+                replies {
+                  associatedProfile {
+                    id
+                  }
+                  children {
+                    field {
+                      type
+                      fromPetitionFieldId
+                      profileTypeField {
+                        id
+                      }
+                    }
+                    replies {
+                      content
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          templateId: toGlobalId("Petition", template.id),
+          petitionFieldId: toGlobalId("PetitionField", templateFieldGroup.id),
+          profileId: toGlobalId("Profile", profile.id),
+          prefill: [
+            {
+              petitionFieldId: toGlobalId("PetitionField", templateFieldGroup.id),
+              profileIds: [toGlobalId("Profile", profile.id)],
+            },
+          ],
+          skipFormatErrors: true,
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionFromProfile).toEqual({
+        id: expect.any(String),
+        fields: [
+          {
+            type: "FIELD_GROUP",
+            fromPetitionFieldId: toGlobalId("PetitionField", templateFieldGroup.id),
+            replies: [
+              {
+                associatedProfile: {
+                  id: toGlobalId("Profile", profile.id),
+                },
+                children: [
+                  {
+                    field: {
+                      type: "SHORT_TEXT",
+                      fromPetitionFieldId: toGlobalId("PetitionField", groupChildren[0].id),
+                      profileTypeField: {
+                        id: toGlobalId("ProfileTypeField", profileFields[0].id),
+                      },
+                    },
+                    replies: [
+                      {
+                        content: { value: "SHORT_TEXT reply" },
+                      },
+                    ],
+                  },
+                  {
+                    field: {
+                      type: "CHECKBOX",
+                      fromPetitionFieldId: toGlobalId("PetitionField", groupChildren[1].id),
+                      profileTypeField: {
+                        id: toGlobalId("ProfileTypeField", profileFields[1].id),
+                      },
+                    },
+                    replies: [
+                      {
+                        content: { value: ["B", "C"] },
+                      },
+                    ],
+                  },
+                  {
+                    field: {
+                      type: "SHORT_TEXT",
+                      fromPetitionFieldId: toGlobalId("PetitionField", groupChildren[2].id),
+                      profileTypeField: {
+                        id: toGlobalId("ProfileTypeField", profileFields[2].id),
+                      },
+                    },
+                    replies: [],
                   },
                 ],
               },
@@ -7869,6 +8086,152 @@ describe("GraphQL/Profiles to Petitions", () => {
         petition: {
           profiles: [{ id: toGlobalId("Profile", mikeRoss.id) }],
         },
+      });
+    });
+
+    it("sends error if profile value does not match format in child field", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileType.id,
+      }));
+
+      await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "SHORT_TEXT" as PetitionFieldType,
+        parent_petition_field_id: fieldGroup.id,
+        profile_type_field_id: propertiesIdx["SHORT_TEXT"].id,
+        options: { format: "EMAIL", maxLength: 100 },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $profileIds: [GID!]!) {
+            createFieldGroupRepliesFromProfiles(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              profileIds: $profileIds
+              force: true
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          profileIds: [toGlobalId("Profile", mikeRoss.id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_FORMAT_ERROR", {
+        profileTypeFieldIds: [toGlobalId("ProfileTypeField", propertiesIdx["SHORT_TEXT"].id)],
+      });
+      expect(data).toBeNull();
+    });
+
+    it("skips field with format error when providing skipFormatErrors flag", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileType.id,
+      }));
+
+      const children = await mocks.createRandomPetitionFields(
+        petition.id,
+        2,
+        (i) =>
+          [
+            {
+              type: "SHORT_TEXT" as PetitionFieldType,
+              parent_petition_field_id: fieldGroup.id,
+              profile_type_field_id: propertiesIdx["SHORT_TEXT"].id,
+              options: { format: "EMAIL", maxLength: 100 },
+            },
+            {
+              type: "NUMBER" as PetitionFieldType,
+              parent_petition_field_id: fieldGroup.id,
+              profile_type_field_id: propertiesIdx["NUMBER"].id,
+            },
+          ][i],
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $profileIds: [GID!]!) {
+            createFieldGroupRepliesFromProfiles(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              profileIds: $profileIds
+              skipFormatErrors: true
+            ) {
+              id
+              replies {
+                id
+                associatedProfile {
+                  id
+                }
+                children {
+                  field {
+                    id
+                    type
+                    profileTypeField {
+                      id
+                    }
+                  }
+                  replies {
+                    id
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          profileIds: [toGlobalId("Profile", mikeRoss.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createFieldGroupRepliesFromProfiles).toEqual({
+        id: toGlobalId("PetitionField", fieldGroup.id),
+        replies: [
+          {
+            id: expect.any(String),
+            associatedProfile: {
+              id: toGlobalId("Profile", mikeRoss.id),
+            },
+            children: [
+              {
+                field: {
+                  id: toGlobalId("PetitionField", children[0].id),
+                  type: "SHORT_TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SHORT_TEXT"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  id: toGlobalId("PetitionField", children[1].id),
+                  type: "NUMBER",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["NUMBER"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: 1234 },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       });
     });
   });

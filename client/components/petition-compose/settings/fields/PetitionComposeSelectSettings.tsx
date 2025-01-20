@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import { Box, Stack, Text } from "@chakra-ui/react";
 import { StandardListSelect } from "@parallel/components/common/StandardListSelect";
 import { UpdatePetitionFieldInput } from "@parallel/graphql/__types";
@@ -74,3 +75,13 @@ export function PetitionComposeSelectSettings({
     </>
   );
 }
+
+PetitionComposeSelectSettings.fragments = {
+  PetitionField: gql`
+    fragment PetitionComposeSelectSettings_PetitionField on PetitionField {
+      id
+      options
+      isLinkedToProfileTypeField
+    }
+  `,
+};

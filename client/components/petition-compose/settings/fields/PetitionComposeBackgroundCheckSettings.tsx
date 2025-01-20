@@ -131,6 +131,15 @@ export function PetitionComposeBackgroundCheckSettings({
   );
 }
 
+PetitionComposeBackgroundCheckSettings.fragments = {
+  PetitionField: gql`
+    fragment PetitionComposeBackgroundCheckSettings_PetitionField on PetitionField {
+      id
+      options
+    }
+  `,
+};
+
 const _mutations = [
   gql`
     mutation PetitionComposeBackgroundCheckSettings_updatePetitionFieldAutoSearchConfig(
