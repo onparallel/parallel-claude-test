@@ -584,6 +584,8 @@ export class Auth implements IAuth {
       if (error instanceof InvalidPasswordException) {
         res.status(400).send({ error: "InvalidPassword" });
         return;
+      } else if (error instanceof LimitExceededException) {
+        res.status(429).send({ error: "LimitExceededException" });
       } else if (
         error instanceof ExpiredCodeException ||
         error instanceof CodeMismatchException ||
