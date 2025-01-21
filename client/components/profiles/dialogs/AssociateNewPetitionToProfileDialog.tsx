@@ -24,6 +24,7 @@ import { OverflownText } from "@parallel/components/common/OverflownText";
 import { PetitionFieldReference } from "@parallel/components/common/PetitionFieldReference";
 import { PetitionSelect, PetitionSelectInstance } from "@parallel/components/common/PetitionSelect";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
+import { usePreviewImportFromProfileFormatErrorDialog } from "@parallel/components/petition-preview/dialogs/PreviewImportFromProfileFormatErrorDialog";
 import {
   CreatePetitionFromProfilePrefillInput,
   useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument,
@@ -32,6 +33,7 @@ import {
   useAssociateNewPetitionToProfileDialog_ProfileFragment,
   useAssociateNewPetitionToProfileDialog_ProfileTypeProcessFragment,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { useMemo, useRef } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
@@ -120,6 +122,9 @@ function AssociateNewPetitionToProfileDialogSelectTemplate({
     useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument,
   );
 
+  const showPreviewImportFromProfileFormatErrorDialog =
+    usePreviewImportFromProfileFormatErrorDialog();
+
   return (
     <ConfirmDialog
       size="lg"
@@ -147,19 +152,40 @@ function AssociateNewPetitionToProfileDialogSelectTemplate({
               const prefill = fillWithProfileData
                 ? generatePrefillData(relatedFieldGroupsWithCompatibleProfiles, groupId)
                 : [];
-              const res = await createPetitionFromProfile({
-                variables: {
-                  profileId: profile.id,
-                  templateId: templateId!,
-                  prefill,
-                  petitionFieldId: fillWithProfileData ? groupId : undefined,
-                },
-              });
 
-              if (isNonNullish(res?.data)) {
-                props.onResolve(res.data.createPetitionFromProfile.id);
-              } else {
-                props.onReject("ERROR");
+              const createPetition = async (skipFormatErrors: boolean) => {
+                const res = await createPetitionFromProfile({
+                  variables: {
+                    profileId: profile.id,
+                    templateId: templateId!,
+                    prefill,
+                    petitionFieldId: fillWithProfileData ? groupId : undefined,
+                    skipFormatErrors,
+                  },
+                });
+
+                if (isNonNullish(res?.data)) {
+                  props.onResolve(res.data.createPetitionFromProfile.id);
+                } else {
+                  props.onReject("ERROR");
+                }
+              };
+
+              try {
+                await createPetition(false);
+              } catch (e) {
+                if (isApolloError(e, "INVALID_FORMAT_ERROR")) {
+                  try {
+                    await showPreviewImportFromProfileFormatErrorDialog({
+                      profileIds: [profile.id],
+                      profileTypeFieldIds: e.graphQLErrors?.[0].extensions
+                        ?.profileTypeFieldIds as string[],
+                    });
+                    await createPetition(true);
+                  } catch {}
+                } else {
+                  props.onReject("ERROR");
+                }
               }
             } else {
               // we omit SELECT_FIELD_GROUP step and jump to the final if do not have multiple compatible group fields
@@ -306,6 +332,9 @@ function AssociateNewPetitionToProfileDialogSelectFieldGroup({
     useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument,
   );
 
+  const showPreviewImportFromProfileFormatErrorDialog =
+    usePreviewImportFromProfileFormatErrorDialog();
+
   return (
     <ConfirmDialog
       size="xl"
@@ -331,19 +360,39 @@ function AssociateNewPetitionToProfileDialogSelectFieldGroup({
                 groupId!,
               );
 
-              const res = await createPetitionFromProfile({
-                variables: {
-                  profileId: profile.id,
-                  templateId: template.id,
-                  prefill,
-                  petitionFieldId: groupId,
-                },
-              });
+              const createPetition = async (skipFormatErrors: boolean) => {
+                const res = await createPetitionFromProfile({
+                  variables: {
+                    profileId: profile.id,
+                    templateId: template.id,
+                    prefill,
+                    petitionFieldId: groupId,
+                    skipFormatErrors,
+                  },
+                });
 
-              if (isNonNullish(res?.data)) {
-                props.onResolve(res.data.createPetitionFromProfile.id);
-              } else {
-                props.onReject("ERROR");
+                if (isNonNullish(res?.data)) {
+                  props.onResolve(res.data.createPetitionFromProfile.id);
+                } else {
+                  props.onReject("ERROR");
+                }
+              };
+
+              try {
+                await createPetition(false);
+              } catch (e) {
+                if (isApolloError(e, "INVALID_FORMAT_ERROR")) {
+                  try {
+                    await showPreviewImportFromProfileFormatErrorDialog({
+                      profileIds: [profile.id],
+                      profileTypeFieldIds: e.graphQLErrors?.[0].extensions
+                        ?.profileTypeFieldIds as string[],
+                    });
+                    await createPetition(true);
+                  } catch {}
+                } else {
+                  props.onReject("ERROR");
+                }
               }
             } else {
               onStep(
@@ -478,6 +527,9 @@ function AssociateNewPetitionToProfileDialogPrefillFieldGroups({
     useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument,
   );
 
+  const showPreviewImportFromProfileFormatErrorDialog =
+    usePreviewImportFromProfileFormatErrorDialog();
+
   return (
     <ConfirmDialog
       size="3xl"
@@ -485,19 +537,39 @@ function AssociateNewPetitionToProfileDialogPrefillFieldGroups({
         containerProps: {
           as: "form",
           onSubmit: handleSubmit(async ({ prefill }) => {
-            const res = await createPetitionFromProfile({
-              variables: {
-                profileId: profile.id,
-                templateId: template.id,
-                prefill,
-                petitionFieldId: groupId,
-              },
-            });
+            const createPetition = async (skipFormatErrors: boolean) => {
+              const res = await createPetitionFromProfile({
+                variables: {
+                  profileId: profile.id,
+                  templateId: template.id,
+                  prefill,
+                  petitionFieldId: groupId,
+                  skipFormatErrors,
+                },
+              });
 
-            if (isNonNullish(res?.data)) {
-              props.onResolve(res.data.createPetitionFromProfile.id);
-            } else {
-              props.onReject("ERROR");
+              if (isNonNullish(res?.data)) {
+                props.onResolve(res.data.createPetitionFromProfile.id);
+              } else {
+                props.onReject("ERROR");
+              }
+            };
+
+            try {
+              await createPetition(false);
+            } catch (e) {
+              if (isApolloError(e, "INVALID_FORMAT_ERROR")) {
+                try {
+                  await showPreviewImportFromProfileFormatErrorDialog({
+                    profileIds: [profile.id],
+                    profileTypeFieldIds: e.graphQLErrors?.[0].extensions
+                      ?.profileTypeFieldIds as string[],
+                  });
+                  await createPetition(true);
+                } catch {}
+              } else {
+                props.onReject("ERROR");
+              }
             }
           }),
         },
@@ -645,12 +717,14 @@ const _mutations = [
       $templateId: GID!
       $prefill: [CreatePetitionFromProfilePrefillInput!]!
       $petitionFieldId: GID
+      $skipFormatErrors: Boolean
     ) {
       createPetitionFromProfile(
         profileId: $profileId
         templateId: $templateId
         prefill: $prefill
         petitionFieldId: $petitionFieldId
+        skipFormatErrors: $skipFormatErrors
       ) {
         id
       }

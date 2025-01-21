@@ -1,5 +1,5 @@
-import type { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
 import type { Duration } from "date-fns";
+import type { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
 import gql from "graphql-tag";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = T | null;
@@ -31048,6 +31048,7 @@ export type useAssociateNewPetitionToProfileDialog_createPetitionFromProfileMuta
     templateId: Scalars["GID"]["input"];
     prefill: Array<CreatePetitionFromProfilePrefillInput> | CreatePetitionFromProfilePrefillInput;
     petitionFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+    skipFormatErrors?: InputMaybe<Scalars["Boolean"]["input"]>;
   }>;
 
 export type useAssociateNewPetitionToProfileDialog_createPetitionFromProfileMutation = {
@@ -74854,12 +74855,14 @@ export const useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDoc
     $templateId: GID!
     $prefill: [CreatePetitionFromProfilePrefillInput!]!
     $petitionFieldId: GID
+    $skipFormatErrors: Boolean
   ) {
     createPetitionFromProfile(
       profileId: $profileId
       templateId: $templateId
       prefill: $prefill
       petitionFieldId: $petitionFieldId
+      skipFormatErrors: $skipFormatErrors
     ) {
       id
     }
