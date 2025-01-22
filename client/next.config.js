@@ -1,15 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const THIRD_PARTY_SCRIPTS = [
-  "cdnjs.cloudflare.com",
-  "cdn.segment.com",
-  "canny.io",
-  "js.userflow.com",
-  "widget.intercom.io",
-  "js.intercomcdn.com",
-  "www.googletagmanager.com",
-  "snap.licdn.com",
-  "px.ads.linkedin.com",
-];
 
 /** @type {import('next').NextConfig} */
 const config = {
@@ -67,8 +56,28 @@ const config = {
                 value: [
                   ["default-src", "'self'", statics],
                   ["img-src", "*"],
+                  [
+                    "media-src",
+                    "*",
+                    "'self'",
+                    "js.intercomcdn.com", // needed for intercom sounds
+                  ],
                   ["style-src", "'self'", "'unsafe-inline'", statics],
-                  ["script-src", "'self'", "'unsafe-inline'", statics, ...THIRD_PARTY_SCRIPTS],
+                  [
+                    "script-src",
+                    "'self'",
+                    "'unsafe-inline'",
+                    statics,
+                    "cdnjs.cloudflare.com",
+                    "cdn.segment.com",
+                    "canny.io",
+                    "js.userflow.com",
+                    "widget.intercom.io",
+                    "js.intercomcdn.com",
+                    "www.googletagmanager.com",
+                    "snap.licdn.com",
+                    "px.ads.linkedin.com",
+                  ],
                   [
                     "connect-src",
                     "'self'",
