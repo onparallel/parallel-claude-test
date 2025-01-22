@@ -62,7 +62,14 @@ const config = {
                     "'self'",
                     "js.intercomcdn.com", // needed for intercom sounds
                   ],
-                  ["style-src", "'self'", "'unsafe-inline'", statics],
+                  [
+                    "style-src",
+                    "'self'",
+                    "'unsafe-inline'",
+                    statics,
+                    "js.userflow.com",
+                    "fonts.googleapis.com", // userflow
+                  ],
                   [
                     "script-src",
                     "'self'",
@@ -93,7 +100,7 @@ const config = {
                     "localhost:50500", // Cuatrecasas integration
                   ],
                   ["frame-src", "'self'", "changelog-widget.canny.io"],
-                  ["font-src", "'self'", statics, "fonts.intercomcdn.com"],
+                  ["font-src", "'self'", statics, "fonts.gstatic.com", "fonts.intercomcdn.com"],
                   [
                     "report-uri",
                     `https://o488034.ingest.us.sentry.io/api/5547679/security/?${new URLSearchParams(
