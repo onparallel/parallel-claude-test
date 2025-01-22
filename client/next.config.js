@@ -72,6 +72,7 @@ const config = {
                   [
                     "connect-src",
                     "'self'",
+                    statics,
                     "*.segment.com",
                     "*.segment.io",
                     "*.canny.io",
