@@ -76,6 +76,9 @@ const config = {
                     "*.segment.io",
                     "*.canny.io",
                     "*.intercom.io",
+                    "wss://*.intercom.io",
+                    "*.userflow.com",
+                    "wss://*.userflow.com",
                     "px.ads.linkedin.com",
                     "localhost:50500", // Cuatrecasas integration
                   ],
