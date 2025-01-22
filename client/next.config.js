@@ -45,7 +45,8 @@ const config = {
     return config;
   },
   async headers() {
-    const statics = `${{ staging: "static-staging", production: "static" }[process.env.NEXT_PUBLIC_ENVIRONMENT]}.onparallel.com`;
+    const statics = (process.env.NEXT_PUBLIC_ASSETS_URL ?? "").replace("https://", "");
+    const uploads = `parallel-file-uploads-${process.env.NEXT_PUBLIC_ENVIRONMENT}.s3-accelerate.amazonaws.com`;
     return process.env.NODE_ENV === "production"
       ? [
           {
@@ -89,6 +90,7 @@ const config = {
                     "connect-src",
                     "'self'",
                     statics,
+                    uploads,
                     "*.segment.com",
                     "*.segment.io",
                     "*.canny.io",
