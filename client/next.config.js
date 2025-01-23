@@ -137,10 +137,9 @@ const config = {
                 key: "Content-Security-Policy-Report-Only",
                 value: [
                   ["default-src", "'self'", statics],
-                  ["img-src", "'self'", statics, "data:"],
+                  ["img-src", "'self'", statics, "data:", "cdn.redoc.ly"],
                   ["style-src", "'self'", statics, "'unsafe-inline'"],
-
-                  ["script-src", "'self'", "'unsafe-inline'", statics, "cdnjs.cloudflare.com"],
+                  ["script-src", "'self'", statics, "cdnjs.cloudflare.com"],
                   ["worker-src", "'self'", statics, "blob:"],
                 ]
                   .map((directive) => directive.join(" "))
