@@ -900,7 +900,7 @@ const _Petition = {
           - \`total\`: The total number of repliable fields in the category.
         
         Inside Parallel this progress is rendered as shown here:
-        ![progress explanation](https://static.onparallel.com/static/images/progressbar_states.png)
+        ![progress explanation](${process.env.ASSETS_URL}/static/images/progressbar_states.png)
       `,
       example: {
         external: {
