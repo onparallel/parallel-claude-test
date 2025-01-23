@@ -185,6 +185,11 @@ export function buildConfig() {
       mundimotoHost: process.env.BANKFLIP_MUNDIMOTO_HOST!,
       mundimotoApiKey: process.env.BANKFLIP_MUNDIMOTO_API_KEY!,
       mundimotoWebhookSecret: process.env.BANKFLIP_MUNDIMOTO_WEBHOOK_SECRET!,
+      // lexidy
+      lexidyOrgId: process.env.BANKFLIP_LEXIDY_ORG_GID,
+      lexidyHost: process.env.BANKFLIP_LEXIDY_HOST!,
+      lexidyApiKey: process.env.BANKFLIP_LEXIDY_API_KEY!,
+      lexidyWebhookSecret: process.env.BANKFLIP_LEXIDY_WEBHOOK_SECRET!,
     },
     oauth: {
       docusign: {
