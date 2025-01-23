@@ -138,6 +138,9 @@ const config = {
                 value: [
                   ["default-src", "'self'", statics],
                   ["img-src", "'self'", statics, "data:"],
+                  ["style-src", "'self'", statics, "'unsafe-inline'"],
+
+                  ["script-src", "'self'", "'unsafe-inline'", statics, "cdnjs.cloudflare.com"],
                   ["worker-src", "'self'", statics, "blob:"],
                 ]
                   .map((directive) => directive.join(" "))
@@ -154,6 +157,7 @@ const config = {
                   ["default-src", "'self'", statics],
                   ["img-src", "*"],
                   ["style-src", "'self'", "'unsafe-inline'", statics],
+                  ["script-src", "'self'", "'unsafe-inline'", statics, "cdnjs.cloudflare.com"],
                 ]
                   .map((directive) => directive.join(" "))
                   .join("; "),

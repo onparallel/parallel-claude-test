@@ -274,17 +274,17 @@ export function publicApi(container: Container) {
       contact: {
         name: "API Support",
         email: "devs@onparallel.com",
-        url: "https://www.onparallel.com/developers/api",
+        url: `${process.env.PARALLEL_URL}/developers/api`,
       },
       "x-logo": {
-        url: "https://static.onparallel.com/static/emails/logo.png",
+        url: `${process.env.ASSETS_URL}/static/emails/logo.png`,
         altText: "Parallel",
-        href: "https://www.onparallel.com",
+        href: process.env.PARALLEL_URL,
       },
     },
     servers: [
       {
-        url: "https://www.onparallel.com/api/v1",
+        url: `${process.env.PARALLEL_URL}/api/v1`,
         description: "Production server",
       },
     ],
