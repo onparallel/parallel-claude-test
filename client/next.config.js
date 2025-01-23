@@ -68,21 +68,13 @@ const config = {
                 key: "Content-Security-Policy-Report-Only",
                 value: [
                   ["default-src", "'self'", statics],
-                  ["img-src", "'self'", statics, "'data:'"],
-                  [
-                    "connect-src",
-                    "'self'",
-                    statics,
-                    "*.segment.com",
-                    "*.segment.io",
-                    "*.canny.io",
-                    "*.intercom.io",
-                    "wss://*.intercom.io",
-                  ],
-                  ["worker-src", "'self'", "'blob:'"],
+                  ["img-src", "'self'", statics, "data:"],
+                  ["connect-src", "'self'", statics],
+                  ["worker-src", "'self'", "blob:"],
                 ]
                   .map((directive) => directive.join(" "))
                   .join("; "),
+                ...common,
               },
             ],
           },
@@ -138,9 +130,8 @@ const config = {
                     "px.ads.linkedin.com",
                     "localhost:50500", // Cuatrecasas integration
                   ],
-                  ["worker-src", "'self'", statics][
-                    ("frame-src", "'self'", "changelog-widget.canny.io")
-                  ],
+                  ["worker-src", "'self'", statics],
+                  ["frame-src", "'self'", "changelog-widget.canny.io"],
                   ["font-src", "'self'", statics, "fonts.gstatic.com", "fonts.intercomcdn.com"],
                   [
                     "report-uri",
