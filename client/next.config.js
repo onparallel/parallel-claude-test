@@ -99,6 +99,7 @@ const config = {
                     "*.userflow.com",
                     "wss://*.userflow.com",
                     "px.ads.linkedin.com",
+                    "*.google-analytics.com",
                     "localhost:50500", // Cuatrecasas integration
                   ],
                   ["worker-src", "'self'", statics],
