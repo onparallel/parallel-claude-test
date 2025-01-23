@@ -736,8 +736,8 @@ function AddModule({
             items: dataSettings.items.map((item: any) => {
               const filter = omit(
                 petitionListViewsData!.me.petitionListViews.find((view) => view.id === item.filter)
-                  ?.data ?? { status: [], __typename: "" },
-                ["__typename"],
+                  ?.data ?? { status: [], path: "", __typename: "" },
+                ["path", "__typename"],
               );
               return {
                 ...item,
@@ -751,8 +751,8 @@ function AddModule({
             filters: dataSettings.filters.map((id: string) => {
               const filter = omit(
                 petitionListViewsData!.me.petitionListViews.find((view) => view.id === id)
-                  ?.data ?? { status: [], __typename: "" },
-                ["__typename"],
+                  ?.data ?? { status: [], path: "", __typename: "" },
+                ["path", "__typename"],
               );
               return filter;
             }),
@@ -766,8 +766,8 @@ function AddModule({
           const filter = omit(
             petitionListViewsData!.me.petitionListViews.find(
               (view) => view.id === dataSettings.filter,
-            )?.data ?? { status: [], __typename: "" },
-            ["__typename"],
+            )?.data ?? { status: [], path: "", __typename: "" },
+            ["path", "__typename"],
           );
           settings = {
             filters: filter,
