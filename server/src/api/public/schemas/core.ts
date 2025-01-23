@@ -898,9 +898,6 @@ const _Petition = {
           - \`replied\`: Replied but not approved.
           - \`optional\`: Non-replied fields that are optional.
           - \`total\`: The total number of repliable fields in the category.
-        
-        Inside Parallel this progress is rendered as shown here:
-        ![progress explanation](${process.env.ASSETS_URL}/static/images/progressbar_states.png)
       `,
       example: {
         external: {
