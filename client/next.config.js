@@ -69,13 +69,28 @@ const config = {
                 value: [
                   ["default-src", "'self'", statics],
                   ["img-src", "'self'", statics, "data:"],
-                  ["connect-src", "'self'", statics],
-                  ["worker-src", "'self'", "blob:"],
+                  ["worker-src", "'self'", statics, "blob:"],
                 ]
                   .map((directive) => directive.join(" "))
                   .join("; "),
                 ...common,
               },
+            ],
+          },
+          {
+            source: "/(pp|petition)/(.*)",
+            headers: [
+              {
+                key: "Content-Security-Policy-Report-Only",
+                value: [
+                  ["default-src", "'self'", statics],
+                  ["img-src", "*"],
+                  ["style-src", "'self'", "'unsafe-inline'", statics],
+                ]
+                  .map((directive) => directive.join(" "))
+                  .join("; "),
+              },
+              ...common,
             ],
           },
           {
