@@ -46,7 +46,7 @@ function DeveloperApi({ spec }: InferGetServerSidePropsType<typeof getServerSide
         />
       </Head>
       <Script
-        src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"
+        src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/js/redoc.standalone.js`}
         strategy="beforeInteractive"
       />
       <div ref={ref} />
