@@ -47,52 +47,8 @@ const config = {
   async headers() {
     const statics = (process.env.NEXT_PUBLIC_ASSETS_URL ?? "").replace("https://", "");
     const uploads = `parallel-file-uploads-${process.env.NEXT_PUBLIC_ENVIRONMENT}.s3-accelerate.amazonaws.com`;
-    const common = [
-      { key: "X-Frame-Options", value: "sameorigin" },
-      { key: "X-Download-Options", value: "noopen" },
-      { key: "X-Content-Type-Options", value: "nosniff" },
-      { key: "Referrer-Policy", value: "same-origin" },
-      { key: "X-XSS-Protection", value: "1" },
-      {
-        key: "Permissions-Policy",
-        value:
-          "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
-      },
-    ];
     return process.env.NODE_ENV === "production"
       ? [
-          {
-            source: "/developers/api",
-            headers: [
-              {
-                key: "Content-Security-Policy-Report-Only",
-                value: [
-                  ["default-src", "'self'", statics],
-                  ["img-src", "'self'", statics, "data:"],
-                  ["worker-src", "'self'", statics, "blob:"],
-                ]
-                  .map((directive) => directive.join(" "))
-                  .join("; "),
-                ...common,
-              },
-            ],
-          },
-          {
-            source: "/(pp|petition)/(.*)",
-            headers: [
-              {
-                key: "Content-Security-Policy-Report-Only",
-                value: [
-                  ["default-src", "'self'", statics],
-                  ["img-src", "*"],
-                  ["style-src", "'self'", "'unsafe-inline'", statics],
-                ]
-                  .map((directive) => directive.join(" "))
-                  .join("; "),
-              },
-              ...common,
-            ],
-          },
           {
             source: "/(.*)",
             headers: [
@@ -162,7 +118,46 @@ const config = {
                   .map((directive) => directive.join(" "))
                   .join("; "),
               },
-              ...common,
+              { key: "X-Frame-Options", value: "sameorigin" },
+              { key: "X-Download-Options", value: "noopen" },
+              { key: "X-Content-Type-Options", value: "nosniff" },
+              { key: "Referrer-Policy", value: "same-origin" },
+              { key: "X-XSS-Protection", value: "1" },
+              {
+                key: "Permissions-Policy",
+                value:
+                  "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
+              },
+            ],
+          },
+          {
+            source: "/developers/api",
+            headers: [
+              {
+                key: "Content-Security-Policy-Report-Only",
+                value: [
+                  ["default-src", "'self'", statics],
+                  ["img-src", "'self'", statics, "data:"],
+                  ["worker-src", "'self'", statics, "blob:"],
+                ]
+                  .map((directive) => directive.join(" "))
+                  .join("; "),
+              },
+            ],
+          },
+          {
+            source: "/(pp|petition)/(.*)",
+            headers: [
+              {
+                key: "Content-Security-Policy-Report-Only",
+                value: [
+                  ["default-src", "'self'", statics],
+                  ["img-src", "*"],
+                  ["style-src", "'self'", "'unsafe-inline'", statics],
+                ]
+                  .map((directive) => directive.join(" "))
+                  .join("; "),
+              },
             ],
           },
         ]
