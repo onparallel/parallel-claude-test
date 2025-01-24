@@ -47,6 +47,7 @@ const config = {
   async headers() {
     const statics = (process.env.NEXT_PUBLIC_ASSETS_URL ?? "").replace("https://", "");
     const uploads = `parallel-file-uploads-${process.env.NEXT_PUBLIC_ENVIRONMENT}.s3-accelerate.amazonaws.com`;
+    const tempUploads = `parallel-temporary-files-${process.env.NEXT_PUBLIC_ENVIRONMENT}.s3-accelerate.amazonaws.com`;
     return process.env.NODE_ENV === "production"
       ? [
           {
@@ -91,6 +92,7 @@ const config = {
                     "'self'",
                     statics,
                     uploads,
+                    tempUploads,
                     "*.segment.com",
                     "*.segment.io",
                     "*.canny.io",
