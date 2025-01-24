@@ -105,7 +105,7 @@ const config = {
                     "localhost:50500", // Cuatrecasas integration
                   ],
                   ["worker-src", "'self'", statics],
-                  ["frame-src", "'self'", "changelog-widget.canny.io"],
+                  ["frame-src", "'self'", "canny.io", "changelog-widget.canny.io"],
                   ["font-src", "'self'", statics, "fonts.gstatic.com", "fonts.intercomcdn.com"],
                   [
                     "report-uri",
