@@ -1,4 +1,8 @@
 import { I18nProps } from "@parallel/components/common/I18nProvider";
+import { Canny } from "@parallel/components/scripts/Canny";
+import { Segment } from "@parallel/components/scripts/Segment";
+import { csp } from "@parallel/utils/csp";
+import { randomBytes } from "crypto";
 import { promises as fs } from "fs";
 import Document, {
   DocumentContext,
@@ -11,6 +15,7 @@ import Document, {
 import { outdent } from "outdent";
 import { IntlConfig } from "react-intl";
 import { isNullish } from "remeda";
+import type { MyAppProps } from "./_app";
 
 const MESSAGES_CACHE = new Map<string, IntlConfig["messages"]>();
 
@@ -39,17 +44,7 @@ async function loadMessages(locale: string, isRecipient: boolean): Promise<IntlC
   }
 }
 
-const POLYFILLS = [
-  "globalThis",
-  "matchMedia",
-  "requestAnimationFrame",
-  "Array.prototype.at",
-  "Array.prototype.flat",
-  "Array.prototype.flatMap",
-  "Object.fromEntries",
-  "String.prototype.replaceAll",
-  "IntersectionObserver",
-];
+const POLYFILLS = ["matchMedia", "requestAnimationFrame", "IntersectionObserver"];
 
 const POLYFILLS_INTL = [
   "Intl.ListFormat",
@@ -59,7 +54,10 @@ const POLYFILLS_INTL = [
   "Intl.RelativeTimeFormat",
 ];
 
-interface MyDocumentProps extends I18nProps {}
+interface MyDocumentProps extends I18nProps {
+  isAppPage: boolean;
+  nonce: string;
+}
 
 class MyDocument extends Document<MyDocumentProps> {
   static override async getInitialProps(
@@ -69,6 +67,7 @@ class MyDocument extends Document<MyDocumentProps> {
     const isRecipientPage =
       ["/maintenance", "/thanks", "/update", "/404"].includes(ctx.pathname) ||
       ["/petition/", "/pp/"].some((prefix) => ctx.pathname.startsWith(prefix));
+    const isAppPage = ["/app/"].some((prefix) => ctx.pathname.startsWith(prefix));
     if (isNullish(locale)) {
       ctx.res!.writeHead(302, { Location: "/" }).end();
       return { html: "" } as any;
@@ -77,13 +76,20 @@ class MyDocument extends Document<MyDocumentProps> {
       return { html: "" } as any;
     }
     const messages = await loadMessages(locale, isRecipientPage);
+    const nonce = randomBytes(64).toString("base64");
+    csp(ctx, nonce);
     ctx.renderPage = () =>
       renderPage({
         // eslint-disable-next-line @typescript-eslint/naming-convention
         enhanceApp: (App) => (props) => (
           <App
-            {...props}
-            {...{ locale, messages, isRecipientPage, cookie: ctx.req?.headers["cookie"] ?? null }}
+            {...({
+              ...props,
+              locale,
+              messages,
+              isRecipientPage,
+              cookie: ctx.req?.headers["cookie"] ?? null,
+            } as MyAppProps)}
           />
         ),
       });
@@ -93,11 +99,13 @@ class MyDocument extends Document<MyDocumentProps> {
       locale,
       messages,
       isRecipientPage,
+      isAppPage,
+      nonce,
     };
   }
 
   override render() {
-    const { locale, messages, isRecipientPage: isRecipient } = this.props;
+    const { locale, messages, isRecipientPage, isAppPage, nonce } = this.props;
     const polyfillsUrl = `https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=${encodeURIComponent(
       [
         ...POLYFILLS,
@@ -105,7 +113,7 @@ class MyDocument extends Document<MyDocumentProps> {
       ].join(","),
     )}`;
     const localeDataUrl = `${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/lang/${
-      isRecipient ? "recipient/" : ""
+      isRecipientPage ? "recipient/" : ""
     }compiled/${locale}.js?v=${process.env.BUILD_ID}`;
     return (
       <Html>
@@ -114,7 +122,11 @@ class MyDocument extends Document<MyDocumentProps> {
           {process.env.NEXT_PUBLIC_ASSETS_URL ? (
             <link href={process.env.NEXT_PUBLIC_ASSETS_URL} rel="preconnect" />
           ) : null}
-          <link href="https://cdn.segment.com" rel="preconnect" />
+          {isAppPage && process.env.NODE_ENV !== "development" ? (
+            <>
+              <link href="https://cdn.segment.com" rel="preconnect" />
+            </>
+          ) : null}
           <link href={polyfillsUrl} rel="preload" as="script" crossOrigin="anonymous" />
           {process.env.NODE_ENV === "production" ? (
             <link href={localeDataUrl} rel="preload" as="script" crossOrigin="anonymous" />
@@ -133,14 +145,21 @@ class MyDocument extends Document<MyDocumentProps> {
               />
             )),
           )}
+          {isAppPage && process.env.NODE_ENV !== "development" ? (
+            <>
+              <Segment nonce={nonce} />
+              <Canny nonce={nonce} />
+            </>
+          ) : null}
         </Head>
         <body>
           <Main />
-          <script src={polyfillsUrl} crossOrigin="anonymous" />
+          <script src={polyfillsUrl} crossOrigin="anonymous" nonce={nonce} />
           {process.env.NODE_ENV === "production" ? (
             <script src={localeDataUrl} crossOrigin="anonymous" />
           ) : (
             <script
+              nonce={nonce}
               dangerouslySetInnerHTML={{
                 __html: outdent`
                   window.__LOCALE__ = "${locale}";
@@ -149,7 +168,7 @@ class MyDocument extends Document<MyDocumentProps> {
               }}
             />
           )}
-          <NextScript />
+          <NextScript nonce={nonce} />
         </body>
       </Html>
     );

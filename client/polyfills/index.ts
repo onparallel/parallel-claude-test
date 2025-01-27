@@ -1,5 +1,11 @@
+import "core-js/actual/array/at";
 import "core-js/actual/array/find-last";
+import "core-js/actual/array/flat";
+import "core-js/actual/array/flat-map";
 import "core-js/actual/array/with";
+import "core-js/actual/global-this";
+import "core-js/actual/object/from-entries";
 import "core-js/actual/promise/all-settled";
 import "core-js/actual/promise/with-resolvers";
+import "core-js/actual/string/replace-all";
 import "core-js/actual/structured-clone";

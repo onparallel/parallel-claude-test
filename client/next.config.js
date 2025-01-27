@@ -45,82 +45,11 @@ const config = {
     return config;
   },
   async headers() {
-    const statics = (process.env.NEXT_PUBLIC_ASSETS_URL ?? "").replace("https://", "");
-    const uploads = `parallel-file-uploads-${process.env.NEXT_PUBLIC_ENVIRONMENT}.s3-accelerate.amazonaws.com`;
-    const tempUploads = `parallel-temporary-files-${process.env.NEXT_PUBLIC_ENVIRONMENT}.s3-accelerate.amazonaws.com`;
     return process.env.NODE_ENV === "production"
       ? [
           {
             source: "/(.*)",
             headers: [
-              {
-                key: "Content-Security-Policy-Report-Only",
-                value: [
-                  ["default-src", "'self'", statics],
-                  ["img-src", "*"],
-                  [
-                    "media-src",
-                    "*",
-                    "'self'",
-                    "js.intercomcdn.com", // needed for intercom sounds
-                  ],
-                  [
-                    "style-src",
-                    "'self'",
-                    "'unsafe-inline'",
-                    statics,
-                    "js.userflow.com",
-                    "fonts.googleapis.com", // userflow
-                  ],
-                  [
-                    "script-src",
-                    "'self'",
-                    "'unsafe-inline'",
-                    statics,
-                    "cdnjs.cloudflare.com",
-                    "cdn.segment.com",
-                    "canny.io",
-                    "js.userflow.com",
-                    "widget.intercom.io",
-                    "js.intercomcdn.com",
-                    "www.googletagmanager.com",
-                    "snap.licdn.com",
-                    "px.ads.linkedin.com",
-                  ],
-                  [
-                    "connect-src",
-                    "'self'",
-                    statics,
-                    uploads,
-                    tempUploads,
-                    "*.segment.com",
-                    "*.segment.io",
-                    "*.canny.io",
-                    "*.intercom.io",
-                    "wss://*.intercom.io",
-                    "*.userflow.com",
-                    "wss://*.userflow.com",
-                    "px.ads.linkedin.com",
-                    "*.google-analytics.com",
-                    "localhost:50500", // Cuatrecasas integration
-                  ],
-                  ["worker-src", "'self'", statics],
-                  ["frame-src", "'self'", "canny.io", "changelog-widget.canny.io"],
-                  ["font-src", "'self'", statics, "fonts.gstatic.com", "fonts.intercomcdn.com"],
-                  [
-                    "report-uri",
-                    `https://o488034.ingest.us.sentry.io/api/5547679/security/?${new URLSearchParams(
-                      {
-                        sentry_key: "9b8d902a0e064afeb5e6c1c45086aea1",
-                        sentry_environment: process.env.NEXT_PUBLIC_ENVIRONMENT,
-                        sentry_release: process.env.BUILD_ID,
-                      },
-                    )}`,
-                  ],
-                ]
-                  .map((directive) => directive.join(" "))
-                  .join("; "),
-              },
               { key: "X-Frame-Options", value: "sameorigin" },
               { key: "X-Download-Options", value: "noopen" },
               { key: "X-Content-Type-Options", value: "nosniff" },
@@ -130,39 +59,6 @@ const config = {
                 key: "Permissions-Policy",
                 value:
                   "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
-              },
-            ],
-          },
-          {
-            source: "/developers/api",
-            headers: [
-              {
-                key: "Content-Security-Policy-Report-Only",
-                value: [
-                  ["default-src", "'self'", statics],
-                  ["img-src", "'self'", statics, "data:", "cdn.redoc.ly"],
-                  ["style-src", "'self'", statics, "'unsafe-inline'"],
-                  ["script-src", "'self'", statics, "cdnjs.cloudflare.com"],
-                  ["worker-src", "'self'", statics, "blob:"],
-                ]
-                  .map((directive) => directive.join(" "))
-                  .join("; "),
-              },
-            ],
-          },
-          {
-            source: "/(pp|petition)/(.*)",
-            headers: [
-              {
-                key: "Content-Security-Policy-Report-Only",
-                value: [
-                  ["default-src", "'self'", statics],
-                  ["img-src", "*"],
-                  ["style-src", "'self'", "'unsafe-inline'", statics],
-                  ["script-src", "'self'", "'unsafe-inline'", statics, "cdnjs.cloudflare.com"],
-                ]
-                  .map((directive) => directive.join(" "))
-                  .join("; "),
               },
             ],
           },

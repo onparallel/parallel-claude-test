@@ -26,8 +26,6 @@ import { isNullish, noop } from "remeda";
 import userflow from "userflow.js";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
-import { Canny } from "../scripts/Canny";
-import { Segment } from "../scripts/Segment";
 import { AppLayoutNavBar } from "./AppLayoutNavBar";
 
 const HIDE_INTERCOM_PATHS = ["/app/petitions/[petitionId]/preview"];
@@ -206,12 +204,6 @@ export const AppLayout = Object.assign(
             content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
           />
         </Head>
-        {process.env.NODE_ENV !== "development" ? (
-          <>
-            <Segment />
-            <Canny />
-          </>
-        ) : null}
         <DndProvider
           backend={HTML5Backend}
           context={typeof window !== "undefined" ? window : undefined}

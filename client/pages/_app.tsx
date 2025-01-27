@@ -10,7 +10,7 @@ import { AppProps } from "next/app";
 import Router from "next/router";
 import { useEffect, useRef } from "react";
 
-interface MyAppProps extends AppProps, I18nProps {
+export interface MyAppProps extends AppProps, I18nProps {
   cookie: string | null;
 }
 

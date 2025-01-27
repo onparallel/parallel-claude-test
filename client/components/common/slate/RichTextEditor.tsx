@@ -10,7 +10,6 @@ import {
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { formatList } from "@parallel/utils/slate/formatList";
 import { CustomEditor } from "@parallel/utils/slate/types";
-import { structuredClone } from "@parallel/utils/structuredClone";
 import { useConstant } from "@parallel/utils/useConstant";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { createAutoformatPlugin } from "@udecode/plate-autoformat";
