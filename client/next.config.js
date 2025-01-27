@@ -54,7 +54,7 @@ const config = {
             source: "/(.*)",
             headers: [
               {
-                key: "Content-Security-Policy",
+                key: "Content-Security-Policy-Report-Only",
                 value: [
                   ["default-src", "'self'", statics],
                   ["img-src", "*"],
@@ -137,7 +137,7 @@ const config = {
             source: "/developers/api",
             headers: [
               {
-                key: "Content-Security-Policy",
+                key: "Content-Security-Policy-Report-Only",
                 value: [
                   ["default-src", "'self'", statics],
                   ["img-src", "'self'", statics, "data:", "cdn.redoc.ly"],
@@ -154,7 +154,7 @@ const config = {
             source: "/(pp|petition)/(.*)",
             headers: [
               {
-                key: "Content-Security-Policy",
+                key: "Content-Security-Policy-Report-Only",
                 value: [
                   ["default-src", "'self'", statics],
                   ["img-src", "*"],
