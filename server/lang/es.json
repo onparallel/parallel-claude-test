@@ -1730,6 +1730,11 @@
     "context": "Contact"
   },
   {
+    "term": "profiles.default-relationship-type.contacted-via",
+    "definition": "Contactado a través de",
+    "context": "Contacted via"
+  },
+  {
     "term": "profiles.default-relationship-type.contract",
     "definition": "Contrato",
     "context": "Contract"
