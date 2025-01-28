@@ -21,7 +21,7 @@ export function csp(ctx: DocumentContext, nonce: string) {
         ["img-src", "*"],
         ["style-src", "'self'", "'unsafe-inline'", statics],
         ["script-src", "'self'", `'nonce-${nonce}'`, statics, "polyfill-fastly.io"],
-        ["connect-src", "'self'", statics, uploads],
+        ["connect-src", "'self'", statics, "*.segment.com", "*.segment.io"],
       ]),
     );
   } else if (ctx.pathname === "/app" || ctx.pathname.startsWith("/app/")) {
