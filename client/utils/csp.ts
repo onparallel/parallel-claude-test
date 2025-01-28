@@ -1,6 +1,6 @@
 import { DocumentContext } from "next/document";
 
-const REPORT_ONLY = true;
+const REPORT_ONLY = false;
 const HEADER = REPORT_ONLY ? "Content-Security-Policy-Report-Only" : "Content-Security-Policy";
 
 export function csp(ctx: DocumentContext, nonce: string) {
