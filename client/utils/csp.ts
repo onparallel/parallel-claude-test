@@ -30,7 +30,21 @@ export function csp(ctx: DocumentContext, nonce: string) {
           "js.userflow.com",
           "fonts.googleapis.com", // userflow
         ],
-        ["script-src", "'self'", `'nonce-${nonce}'`, statics, "js.userflow.com"],
+        [
+          "script-src",
+          "'self'",
+          `'nonce-${nonce}'`,
+          statics,
+          "cdnjs.cloudflare.com",
+          "cdn.segment.com",
+          "canny.io",
+          "js.userflow.com",
+          "widget.intercom.io",
+          "js.intercomcdn.com",
+          "www.googletagmanager.com",
+          "snap.licdn.com",
+          "px.ads.linkedin.com",
+        ],
         [
           "connect-src",
           "'self'",
