@@ -35,7 +35,7 @@ export function csp(ctx: DocumentContext, nonce: string) {
           "'self'",
           `'nonce-${nonce}'`,
           statics,
-          "cdnjs.cloudflare.com",
+          "polyfill-fastly.io",
           "cdn.segment.com",
           "canny.io",
           "js.userflow.com",
@@ -85,7 +85,7 @@ export function csp(ctx: DocumentContext, nonce: string) {
         ["default-src", "'self'", statics],
         ["img-src", "*"],
         ["style-src", "'self'", "'unsafe-inline'", statics],
-        ["script-src", "'self'", `'nonce-${nonce}'`, statics, "cdnjs.cloudflare.com"],
+        ["script-src", "'self'", `'nonce-${nonce}'`, statics, "polyfill-fastly.io"],
         ["connect-src", "'self'", statics, uploads],
       ]),
     );
@@ -96,7 +96,7 @@ export function csp(ctx: DocumentContext, nonce: string) {
         ["default-src", "'self'", statics],
         ["img-src", "'self'", statics, "data:", "cdn.redoc.ly"],
         ["style-src", "'self'", statics, "'unsafe-inline'"],
-        ["script-src", "'self'", `'nonce-${nonce}'`, statics, "cdnjs.cloudflare.com"],
+        ["script-src", "'self'", `'nonce-${nonce}'`, statics, "polyfill-fastly.io"],
         ["worker-src", "'self'", statics, "blob:"],
       ]),
     );
