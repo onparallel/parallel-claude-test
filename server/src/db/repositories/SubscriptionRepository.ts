@@ -48,7 +48,7 @@ export class SubscriptionRepository extends BaseRepository {
       );
 
       const byOrgId = groupBy(data, (d) => d.org_id);
-      return orgIds.map((orgId) => byOrgId[orgId].map(omit(["org_id"])) ?? []);
+      return orgIds.map((orgId) => byOrgId[orgId]?.map(omit(["org_id"])) ?? []);
     },
   );
 
