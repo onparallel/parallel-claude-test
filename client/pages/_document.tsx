@@ -124,7 +124,12 @@ class MyDocument extends Document<MyDocumentProps> {
           ) : null}
           {isAppPage && process.env.NODE_ENV !== "development" ? (
             <>
-              <link href="https://cdn.segment.com" rel="preconnect" />
+              <link
+                href="https://cdn.segment.com"
+                rel="preconnect"
+                crossOrigin="anonymous"
+                nonce={nonce}
+              />
             </>
           ) : null}
           <link href={polyfillsUrl} rel="preload" as="script" crossOrigin="anonymous" />
@@ -145,21 +150,20 @@ class MyDocument extends Document<MyDocumentProps> {
               />
             )),
           )}
+        </Head>
+        <body>
           {isAppPage && process.env.NODE_ENV !== "development" ? (
             <>
               <Segment nonce={nonce} />
               <Canny nonce={nonce} />
             </>
           ) : null}
-        </Head>
-        <body>
           <Main />
           <script src={polyfillsUrl} crossOrigin="anonymous" nonce={nonce} />
           {process.env.NODE_ENV === "production" ? (
             <script src={localeDataUrl} crossOrigin="anonymous" />
           ) : (
             <script
-              nonce={nonce}
               dangerouslySetInnerHTML={{
                 __html: outdent`
                   window.__LOCALE__ = "${locale}";

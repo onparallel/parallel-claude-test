@@ -2,7 +2,7 @@ import Script from "next/script";
 
 export const Segment = ({ nonce }: { nonce: string }) => {
   return (
-    <Script id="segment-loader" nonce={nonce}>
+    <Script id="segment-loader" nonce={nonce} strategy="beforeInteractive">
       {
         // eslint-disable-next-line formatjs/no-literal-string-in-jsx
         `

@@ -3,7 +3,7 @@ import Script from "next/script";
 export const Canny = ({ nonce }: { nonce: string }) => {
   return (
     <>
-      <Script id="canny-loader" nonce={nonce}>
+      <Script id="canny-loader" nonce={nonce} strategy="beforeInteractive">
         {
           // eslint-disable-next-line formatjs/no-literal-string-in-jsx
           `!function(w,d,i,s){function l(){if(!d.getElementById(i)){var f=d.getElementsByTagName(s)[0],e=d.createElement(s);e.type="text/javascript",e.async=!0,e.src="https://canny.io/sdk.js",f.parentNode.insertBefore(e,f)}}if("function"!=typeof w.Canny){var c=function(){c.q.push(arguments)};c.q=[],w.Canny=c,"complete"===d.readyState?l():w.attachEvent?w.attachEvent("onload",l):w.addEventListener("load",l,!1)}}(window,document,"canny-jssdk","script");`
