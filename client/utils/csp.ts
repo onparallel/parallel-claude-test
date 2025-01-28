@@ -10,7 +10,21 @@ export function csp(ctx: DocumentContext, nonce: string) {
   const statics = (process.env.NEXT_PUBLIC_ASSETS_URL ?? "").replace("https://", "");
   const uploads = `parallel-file-uploads-${process.env.NEXT_PUBLIC_ENVIRONMENT}.s3-accelerate.amazonaws.com`;
   const tempUploads = `parallel-temporary-files-${process.env.NEXT_PUBLIC_ENVIRONMENT}.s3-accelerate.amazonaws.com`;
-  if (ctx.pathname === "/app" || ctx.pathname.startsWith("/app/")) {
+  if (
+    ["/forgot", "/login", "/templates"].includes(ctx.pathname) ||
+    ["/templates/"].some((prefix) => ctx.pathname.startsWith(prefix))
+  ) {
+    ctx.res?.setHeader(
+      HEADER,
+      buildPolicy([
+        ["default-src", "'self'", statics],
+        ["img-src", "*"],
+        ["style-src", "'self'", "'unsafe-inline'", statics],
+        ["script-src", "'self'", `'nonce-${nonce}'`, statics, "polyfill-fastly.io"],
+        ["connect-src", "'self'", statics, uploads],
+      ]),
+    );
+  } else if (ctx.pathname === "/app" || ctx.pathname.startsWith("/app/")) {
     ctx.res?.setHeader(
       HEADER,
       buildPolicy([
