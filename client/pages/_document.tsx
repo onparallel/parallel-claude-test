@@ -67,7 +67,9 @@ class MyDocument extends Document<MyDocumentProps> {
     const isRecipientPage =
       ["/maintenance", "/thanks", "/update", "/404"].includes(ctx.pathname) ||
       ["/petition/", "/pp/"].some((prefix) => ctx.pathname.startsWith(prefix));
-    const isAppPage = ["/app/"].some((prefix) => ctx.pathname.startsWith(prefix));
+    const isAppPage =
+      ["/app"].includes(ctx.pathname) ||
+      ["/app/"].some((prefix) => ctx.pathname.startsWith(prefix));
     if (isNullish(locale)) {
       ctx.res!.writeHead(302, { Location: "/" }).end();
       return { html: "" } as any;
