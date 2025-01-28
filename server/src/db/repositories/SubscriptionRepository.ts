@@ -1,7 +1,12 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { groupBy, omit } from "remeda";
 import { MaybeArray, unMaybeArray } from "../../util/types";
-import { CreateEventSubscription, CreateEventSubscriptionSignatureKey } from "../__types";
+import {
+  CreateEventSubscription,
+  CreateEventSubscriptionSignatureKey,
+  EventSubscription,
+} from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 
@@ -27,10 +32,24 @@ export class SubscriptionRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at").where("type", "PETITION").orderBy("created_at", "desc"),
   );
 
-  readonly loadProfileEventSubscriptionsByUserId = this.buildLoadMultipleBy(
-    "event_subscription",
-    "user_id",
-    (q) => q.whereNull("deleted_at").where("type", "PROFILE").orderBy("created_at", "desc"),
+  readonly loadProfileEventSubscriptionsByOrgId = this.buildLoader<number, EventSubscription[]>(
+    async (orgIds, t) => {
+      const data = await this.raw<EventSubscription & { org_id: number }>(
+        /* sql */ `
+        select es.*, u.org_id 
+        from event_subscription es join "user" u on es.user_id = u.id
+        where es.deleted_at is null
+        and es.type = 'PROFILE'
+        and u.deleted_at is null
+        and u.org_id in ?
+      `,
+        [this.sqlIn(orgIds)],
+        t,
+      );
+
+      const byOrgId = groupBy(data, (d) => d.org_id);
+      return orgIds.map((orgId) => byOrgId[orgId].map(omit(["org_id"])) ?? []);
+    },
   );
 
   readonly loadEventSubscriptionSignatureKey = this.buildLoadBy(

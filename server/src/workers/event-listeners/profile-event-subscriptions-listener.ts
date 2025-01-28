@@ -18,12 +18,10 @@ export const profileEventSubscriptionsListener = listener(
       (p) => p.user_id!,
     );
 
-    if (userIds.length === 0) {
-      return;
-    }
-
     try {
-      await ctx.profiles.attachProfileEventsToUsers(event.id, userIds);
+      if (userIds.length > 0) {
+        await ctx.profiles.attachProfileEventsToUsers(event.id, userIds);
+      }
     } catch (error) {
       if (
         error instanceof DatabaseError &&
@@ -35,9 +33,9 @@ export const profileEventSubscriptionsListener = listener(
       }
     }
 
-    const activeSubscriptions = (
-      await ctx.subscriptions.loadProfileEventSubscriptionsByUserId(userIds)
-    ).flat();
+    const activeSubscriptions = await ctx.subscriptions.loadProfileEventSubscriptionsByOrgId(
+      profile.org_id,
+    );
 
     const userSubscriptions = await pFilter(
       activeSubscriptions,
