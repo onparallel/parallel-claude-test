@@ -30,8 +30,6 @@ export type ProfileRelationshipTypeAlias =
   | "p_main_contract__annex"
   | "p_addendum__amended_by"
   | "p_contract__counterparty"
-  | "p_contact_le_i"
-  | "p_contact_i_le"
   | "p_contact__contacted_via";
 
 type ProfileRelationshipTypeDefinition = Record<
@@ -1710,20 +1708,6 @@ export class ProfilesSetupService implements IProfilesSetupService {
           defaultMessage: "Counterparty",
         }),
       ],
-      p_contact_le_i: async () => [
-        await this.intl.getLocalizableUserText({
-          id: "profiles.default-relationship-type.contact",
-          defaultMessage: "Contact",
-        }),
-        null,
-      ],
-      p_contact_i_le: async () => [
-        await this.intl.getLocalizableUserText({
-          id: "profiles.default-relationship-type.contact",
-          defaultMessage: "Contact",
-        }),
-        null,
-      ],
       p_contact__contacted_via: async () => [
         await this.intl.getLocalizableUserText({
           id: "profiles.default-relationship-type.contact",
@@ -1760,9 +1744,6 @@ export class ProfilesSetupService implements IProfilesSetupService {
       p_associated_company: [["LEGAL_ENTITY"], ["LEGAL_ENTITY"]],
       p_main_contract__annex: [["CONTRACT"], ["CONTRACT"]],
       p_addendum__amended_by: [["CONTRACT"], ["CONTRACT"]],
-      // p_contact is a reciprocal relationship, but types are different and not every combination is valid
-      p_contact_le_i: [["LEGAL_ENTITY"], ["INDIVIDUAL"]],
-      p_contact_i_le: [["INDIVIDUAL"], ["LEGAL_ENTITY"]],
       p_contact__contacted_via: [["INDIVIDUAL"], ["INDIVIDUAL", "LEGAL_ENTITY"]],
     };
   }

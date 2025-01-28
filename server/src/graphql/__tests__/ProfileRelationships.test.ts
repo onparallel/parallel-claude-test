@@ -415,28 +415,29 @@ describe("GraphQL/Profile Relationships", () => {
             ),
           },
         },
+
         {
           direction: "RIGHT_LEFT",
           profileRelationshipType: {
             id: expect.any(String),
-            alias: "p_contact_le_i",
-            allowedLeftRightProfileTypeIds: [legalEntity.id].map((id) =>
+            alias: "p_contact__contacted_via",
+            allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
-            allowedRightLeftProfileTypeIds: [individual.id].map((id) =>
+            allowedRightLeftProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
           },
         },
         {
-          direction: "RIGHT_LEFT",
+          direction: "LEFT_RIGHT",
           profileRelationshipType: {
             id: expect.any(String),
-            alias: "p_contact_i_le",
+            alias: "p_contact__contacted_via",
             allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
-            allowedRightLeftProfileTypeIds: [legalEntity.id].map((id) =>
+            allowedRightLeftProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
           },
@@ -639,11 +640,24 @@ describe("GraphQL/Profile Relationships", () => {
           direction: "RIGHT_LEFT",
           profileRelationshipType: {
             id: expect.any(String),
-            alias: "p_contact_i_le",
+            alias: "p_contact__contacted_via",
             allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
-            allowedRightLeftProfileTypeIds: [legalEntity.id].map((id) =>
+            allowedRightLeftProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
+              toGlobalId("ProfileType", id),
+            ),
+          },
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profileRelationshipType: {
+            id: expect.any(String),
+            alias: "p_contact__contacted_via",
+            allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
+              toGlobalId("ProfileType", id),
+            ),
+            allowedRightLeftProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
           },
@@ -830,14 +844,14 @@ describe("GraphQL/Profile Relationships", () => {
           },
         },
         {
-          direction: "RIGHT_LEFT",
+          direction: "LEFT_RIGHT",
           profileRelationshipType: {
             id: expect.any(String),
-            alias: "p_contact_le_i",
-            allowedLeftRightProfileTypeIds: [legalEntity.id].map((id) =>
+            alias: "p_contact__contacted_via",
+            allowedLeftRightProfileTypeIds: [individual.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
-            allowedRightLeftProfileTypeIds: [individual.id].map((id) =>
+            allowedRightLeftProfileTypeIds: [individual.id, legalEntity.id].map((id) =>
               toGlobalId("ProfileType", id),
             ),
           },
