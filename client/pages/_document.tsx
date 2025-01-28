@@ -126,12 +126,7 @@ class MyDocument extends Document<MyDocumentProps> {
           ) : null}
           {isAppPage && process.env.NODE_ENV !== "development" ? (
             <>
-              <link
-                href="https://cdn.segment.com"
-                rel="preconnect"
-                crossOrigin="anonymous"
-                nonce={nonce}
-              />
+              <link href="https://cdn.segment.com" rel="preconnect" crossOrigin="anonymous" />
             </>
           ) : null}
           <link href={polyfillsUrl} rel="preload" as="script" crossOrigin="anonymous" />
@@ -161,7 +156,7 @@ class MyDocument extends Document<MyDocumentProps> {
             </>
           ) : null}
           <Main />
-          <script src={polyfillsUrl} crossOrigin="anonymous" nonce={nonce} />
+          <script src={polyfillsUrl} crossOrigin="anonymous" />
           {process.env.NODE_ENV === "production" ? (
             <script src={localeDataUrl} crossOrigin="anonymous" />
           ) : (

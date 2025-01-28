@@ -85,7 +85,7 @@ export function csp(ctx: DocumentContext, nonce: string) {
         ["default-src", "'self'", statics],
         ["img-src", "*"],
         ["style-src", "'self'", "'unsafe-inline'", statics],
-        ["script-src", "'self'", `'nonce-${nonce}'`, statics],
+        ["script-src", "'self'", `'nonce-${nonce}'`, statics, "cdnjs.cloudflare.com"],
         ["connect-src", "'self'", statics, uploads],
       ]),
     );
@@ -96,7 +96,7 @@ export function csp(ctx: DocumentContext, nonce: string) {
         ["default-src", "'self'", statics],
         ["img-src", "'self'", statics, "data:", "cdn.redoc.ly"],
         ["style-src", "'self'", statics, "'unsafe-inline'"],
-        ["script-src", "'self'", `'nonce-${nonce}'`, statics],
+        ["script-src", "'self'", `'nonce-${nonce}'`, statics, "cdnjs.cloudflare.com"],
         ["worker-src", "'self'", statics, "blob:"],
       ]),
     );
