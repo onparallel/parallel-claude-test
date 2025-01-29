@@ -10,6 +10,13 @@ export function csp(ctx: DocumentContext, nonce: string) {
   const statics = (process.env.NEXT_PUBLIC_ASSETS_URL ?? "").replace("https://", "");
   const uploads = `parallel-file-uploads-${process.env.NEXT_PUBLIC_ENVIRONMENT}.s3-accelerate.amazonaws.com`;
   const tempUploads = `parallel-temporary-files-${process.env.NEXT_PUBLIC_ENVIRONMENT}.s3-accelerate.amazonaws.com`;
+  const reportUri = `https://o488034.ingest.us.sentry.io/api/5547679/security/?${new URLSearchParams(
+    {
+      sentry_key: "9b8d902a0e064afeb5e6c1c45086aea1",
+      sentry_environment: process.env.NEXT_PUBLIC_ENVIRONMENT,
+      sentry_release: process.env.BUILD_ID,
+    },
+  )}`;
   if (
     ["/forgot", "/login", "/templates"].includes(ctx.pathname) ||
     ["/templates/"].some((prefix) => ctx.pathname.startsWith(prefix))
@@ -44,6 +51,7 @@ export function csp(ctx: DocumentContext, nonce: string) {
           "px.ads.linkedin.com",
           "*.google-analytics.com",
         ],
+        ["report-uri", reportUri],
       ]),
     );
   } else if (ctx.pathname === "/app" || ctx.pathname.startsWith("/app/")) {
@@ -101,14 +109,7 @@ export function csp(ctx: DocumentContext, nonce: string) {
         ["worker-src", "'self'", statics],
         ["frame-src", "'self'", "canny.io", "changelog-widget.canny.io"],
         ["font-src", "'self'", statics, "fonts.gstatic.com", "fonts.intercomcdn.com"],
-        [
-          "report-uri",
-          `https://o488034.ingest.us.sentry.io/api/5547679/security/?${new URLSearchParams({
-            sentry_key: "9b8d902a0e064afeb5e6c1c45086aea1",
-            sentry_environment: process.env.NEXT_PUBLIC_ENVIRONMENT,
-            sentry_release: process.env.BUILD_ID,
-          })}`,
-        ],
+        ["report-uri", reportUri],
       ]),
     );
   } else if (
@@ -123,6 +124,7 @@ export function csp(ctx: DocumentContext, nonce: string) {
         ["style-src", "'self'", "'unsafe-inline'", statics],
         ["script-src", "'self'", `'nonce-${nonce}'`, statics, "polyfill-fastly.io"],
         ["connect-src", "'self'", statics, uploads],
+        ["report-uri", reportUri],
       ]),
     );
   } else if (ctx.pathname === "/developers/api") {
@@ -134,6 +136,7 @@ export function csp(ctx: DocumentContext, nonce: string) {
         ["style-src", "'self'", statics, "'unsafe-inline'"],
         ["script-src", "'self'", `'nonce-${nonce}'`, statics, "polyfill-fastly.io"],
         ["worker-src", "'self'", statics, "blob:"],
+        ["report-uri", reportUri],
       ]),
     );
   }
