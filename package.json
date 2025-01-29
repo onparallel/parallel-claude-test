@@ -38,6 +38,7 @@
     "graphql": "^16.9.0",
     "@apollo/client": "^3.11.4",
     "@emotion/react": "^11.11.3",
+    "express": "^4.21.2",
     "prettier": "^3.3.3",
     "typescript": "^5.5.4",
     "@types/react": "^18.3.4",
