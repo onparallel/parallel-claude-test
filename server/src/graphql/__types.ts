@@ -2881,6 +2881,7 @@ export interface NexusGenFieldTypes {
     fromTemplate: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     fromTemplateFields: NexusGenRootTypes["PetitionFieldMini"][] | null; // [PetitionFieldMini!]
     id: NexusGenScalars["GID"]; // GID!
+    ignoreOwnerEvents: boolean; // Boolean!
     isEnabled: boolean; // Boolean!
     isFailing: boolean; // Boolean!
     name: string | null; // String
@@ -3373,6 +3374,7 @@ export interface NexusGenFieldTypes {
     fromProfileType: NexusGenRootTypes["ProfileType"] | null; // ProfileType
     fromProfileTypeFields: Array<NexusGenRootTypes["ProfileTypeField"] | null> | null; // [ProfileTypeField]
     id: NexusGenScalars["GID"]; // GID!
+    ignoreOwnerEvents: boolean; // Boolean!
     isEnabled: boolean; // Boolean!
     isFailing: boolean; // Boolean!
     name: string | null; // String
@@ -4417,6 +4419,7 @@ export interface NexusGenFieldTypes {
     // field return type
     eventsUrl: string; // String!
     id: NexusGenScalars["GID"]; // GID!
+    ignoreOwnerEvents: boolean; // Boolean!
     isEnabled: boolean; // Boolean!
     isFailing: boolean; // Boolean!
     name: string | null; // String
@@ -5741,6 +5744,7 @@ export interface NexusGenFieldTypeNames {
     fromTemplate: "PetitionBaseMini";
     fromTemplateFields: "PetitionFieldMini";
     id: "GID";
+    ignoreOwnerEvents: "Boolean";
     isEnabled: "Boolean";
     isFailing: "Boolean";
     name: "String";
@@ -6233,6 +6237,7 @@ export interface NexusGenFieldTypeNames {
     fromProfileType: "ProfileType";
     fromProfileTypeFields: "ProfileTypeField";
     id: "GID";
+    ignoreOwnerEvents: "Boolean";
     isEnabled: "Boolean";
     isFailing: "Boolean";
     name: "String";
@@ -7277,6 +7282,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     eventsUrl: "String";
     id: "GID";
+    ignoreOwnerEvents: "Boolean";
     isEnabled: "Boolean";
     isFailing: "Boolean";
     name: "String";
@@ -7769,6 +7775,7 @@ export interface NexusGenArgTypes {
       eventsUrl: string; // String!
       fromTemplateFieldIds?: NexusGenScalars["GID"][] | null; // [GID!]
       fromTemplateId?: NexusGenScalars["GID"] | null; // GID
+      ignoreOwnerEvents?: boolean | null; // Boolean
       name?: string | null; // String
     };
     createPetitionField: {
@@ -7854,6 +7861,7 @@ export interface NexusGenArgTypes {
       eventsUrl: string; // String!
       fromProfileTypeFieldIds?: NexusGenScalars["GID"][] | null; // [GID!]
       fromProfileTypeId?: NexusGenScalars["GID"] | null; // GID
+      ignoreOwnerEvents?: boolean | null; // Boolean
       name?: string | null; // String
     };
     createProfileFieldFileUploadLink: {
@@ -8761,6 +8769,7 @@ export interface NexusGenArgTypes {
       fromTemplateFieldIds?: NexusGenScalars["GID"][] | null; // [GID!]
       fromTemplateId?: NexusGenScalars["GID"] | null; // GID
       id: NexusGenScalars["GID"]; // GID!
+      ignoreOwnerEvents?: boolean | null; // Boolean
       isEnabled?: boolean | null; // Boolean
       name?: string | null; // String
     };
@@ -8843,6 +8852,7 @@ export interface NexusGenArgTypes {
       fromProfileTypeFieldIds?: NexusGenScalars["GID"][] | null; // [GID!]
       fromProfileTypeId?: NexusGenScalars["GID"] | null; // GID
       id: NexusGenScalars["GID"]; // GID!
+      ignoreOwnerEvents?: boolean | null; // Boolean
       isEnabled?: boolean | null; // Boolean
       name?: string | null; // String
     };

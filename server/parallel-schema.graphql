@@ -763,6 +763,7 @@ type EffectivePetitionUserPermission {
 interface EventSubscription {
   eventsUrl: String!
   id: GID!
+  ignoreOwnerEvents: Boolean!
   isEnabled: Boolean!
   isFailing: Boolean!
   name: String
@@ -1678,6 +1679,7 @@ type Mutation {
     eventsUrl: String!
     fromTemplateFieldIds: [GID!]
     fromTemplateId: GID
+    ignoreOwnerEvents: Boolean
     name: String
   ): PetitionEventSubscription!
 
@@ -1801,6 +1803,7 @@ type Mutation {
     eventsUrl: String!
     fromProfileTypeFieldIds: [GID!]
     fromProfileTypeId: GID
+    ignoreOwnerEvents: Boolean
     name: String
   ): ProfileEventSubscription!
   createProfileFieldFileUploadLink(
@@ -3060,6 +3063,7 @@ type Mutation {
     fromTemplateFieldIds: [GID!]
     fromTemplateId: GID
     id: GID!
+    ignoreOwnerEvents: Boolean
     isEnabled: Boolean
     name: String
   ): PetitionEventSubscription!
@@ -3175,6 +3179,7 @@ type Mutation {
     fromProfileTypeFieldIds: [GID!]
     fromProfileTypeId: GID
     id: GID!
+    ignoreOwnerEvents: Boolean
     isEnabled: Boolean
     name: String
   ): ProfileEventSubscription!
@@ -4385,6 +4390,7 @@ type PetitionEventSubscription implements EventSubscription {
   fromTemplate: PetitionBaseMini
   fromTemplateFields: [PetitionFieldMini!]
   id: GID!
+  ignoreOwnerEvents: Boolean!
   isEnabled: Boolean!
   isFailing: Boolean!
   name: String
@@ -5962,6 +5968,7 @@ type ProfileEventSubscription implements EventSubscription {
   fromProfileType: ProfileType
   fromProfileTypeFields: [ProfileTypeField]
   id: GID!
+  ignoreOwnerEvents: Boolean!
   isEnabled: Boolean!
   isFailing: Boolean!
   name: String

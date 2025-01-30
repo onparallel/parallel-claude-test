@@ -2,6 +2,7 @@ import { ApolloError, gql, useApolloClient, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
+  Checkbox,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -20,6 +21,7 @@ import {
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
@@ -60,6 +62,7 @@ interface CreateOrUpdatePetitionEventSubscriptionDialogProps {
       name: string | null;
       fromTemplateId: string | null;
       fromTemplateFieldIds: string[] | null;
+      ignoreOwnerEvents: boolean;
     },
   ) => Promise<string>;
   onAddSignatureKey: (
@@ -81,6 +84,7 @@ interface CreateOrUpdatePetitionEventSubscriptionDialogFormData {
     Omit<CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseFragment, "__typename">
   >;
   fromTemplateFields: PetitionFieldSelection[];
+  ignoreOwnerEvents: boolean;
 }
 
 const PETITION_EVENT_TYPES: PetitionEventType[] = [
@@ -178,6 +182,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
       eventTypes: eventSubscription?.eventTypes ?? [],
       fromTemplate: eventSubscription?.fromTemplate ?? null,
       fromTemplateFields: [],
+      ignoreOwnerEvents: eventSubscription?.ignoreOwnerEvents ?? false,
     },
   });
   const eventsMode = watch("eventsMode");
@@ -318,6 +323,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
                       isNonNullish(data.fromTemplate) && data.fromTemplateFields.length > 0
                         ? data.fromTemplateFields.map((f) => f.id)
                         : null,
+                    ignoreOwnerEvents: data.ignoreOwnerEvents,
                   }),
                 );
 
@@ -543,6 +549,22 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
                 </FormControl>
               </Stack>
             </PaddedCollapse>
+            <FormControl>
+              <Checkbox {...register("ignoreOwnerEvents")}>
+                <FormattedMessage
+                  id="component.create-event-subscription-dialog.ignore-owner-events"
+                  defaultMessage="Ignore events produced by this user"
+                />
+                <HelpPopover>
+                  <Text fontSize="sm">
+                    <FormattedMessage
+                      id="component.create-event-subscription-dialog.ignore-owner-events-popover"
+                      defaultMessage="If this option is enabled, we will not send events that are triggered by this user. This option is designed to prevent call loops in integrations where a token from this same user is used to perform actions through our API."
+                    />
+                  </Text>
+                </HelpPopover>
+              </Checkbox>
+            </FormControl>
           </Stack>
           <Stack>
             <Text>
@@ -661,6 +683,7 @@ CreateOrUpdatePetitionEventSubscriptionDialog.fragments = {
         isEnabled
         isFailing
         eventTypes
+        ignoreOwnerEvents
         fromTemplate {
           id
           name

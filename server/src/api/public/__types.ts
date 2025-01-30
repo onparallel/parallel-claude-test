@@ -674,6 +674,7 @@ export type EffectivePetitionUserPermission = {
 export type EventSubscription = {
   eventsUrl: Scalars["String"]["output"];
   id: Scalars["GID"]["output"];
+  ignoreOwnerEvents: Scalars["Boolean"]["output"];
   isEnabled: Scalars["Boolean"]["output"];
   isFailing: Scalars["Boolean"]["output"];
   name: Maybe<Scalars["String"]["output"]>;
@@ -1821,6 +1822,7 @@ export type MutationcreatePetitionEventSubscriptionArgs = {
   eventsUrl: Scalars["String"]["input"];
   fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
+  ignoreOwnerEvents?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -1905,6 +1907,7 @@ export type MutationcreateProfileEventSubscriptionArgs = {
   eventsUrl: Scalars["String"]["input"];
   fromProfileTypeFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   fromProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
+  ignoreOwnerEvents?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -2811,6 +2814,7 @@ export type MutationupdatePetitionEventSubscriptionArgs = {
   fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
   id: Scalars["GID"]["input"];
+  ignoreOwnerEvents?: InputMaybe<Scalars["Boolean"]["input"]>;
   isEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
 };
@@ -2893,6 +2897,7 @@ export type MutationupdateProfileEventSubscriptionArgs = {
   fromProfileTypeFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   fromProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
   id: Scalars["GID"]["input"];
+  ignoreOwnerEvents?: InputMaybe<Scalars["Boolean"]["input"]>;
   isEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
 };
@@ -3674,6 +3679,7 @@ export type PetitionEventSubscription = EventSubscription & {
   fromTemplate: Maybe<PetitionBaseMini>;
   fromTemplateFields: Maybe<Array<PetitionFieldMini>>;
   id: Scalars["GID"]["output"];
+  ignoreOwnerEvents: Scalars["Boolean"]["output"];
   isEnabled: Scalars["Boolean"]["output"];
   isFailing: Scalars["Boolean"]["output"];
   name: Maybe<Scalars["String"]["output"]>;
@@ -4656,6 +4662,7 @@ export type ProfileEventSubscription = EventSubscription & {
   fromProfileType: Maybe<ProfileType>;
   fromProfileTypeFields: Maybe<Array<Maybe<ProfileTypeField>>>;
   id: Scalars["GID"]["output"];
+  ignoreOwnerEvents: Scalars["Boolean"]["output"];
   isEnabled: Scalars["Boolean"]["output"];
   isFailing: Scalars["Boolean"]["output"];
   name: Maybe<Scalars["String"]["output"]>;

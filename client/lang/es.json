@@ -2005,6 +2005,16 @@
     "context": "Signature keys"
   },
   {
+    "term": "component.create-event-subscription-dialog.ignore-owner-events",
+    "definition": "Ignorar eventos producidos por este usuario",
+    "context": "Ignore events produced by this user"
+  },
+  {
+    "term": "component.create-event-subscription-dialog.ignore-owner-events-popover",
+    "definition": "Si esta opción está activada, no enviaremos eventos que sean producidos por este usuario. Esta opción está pensada para evitar bucles de llamadas en integraciones en las que un token de este mismo usuario se utilice para realizar acciones a través de nuestra API.",
+    "context": "If this option is enabled, we will not send events that are triggered by this user. This option is designed to prevent call loops in integrations where a token from this same user is used to perform actions through our API."
+  },
+  {
     "term": "component.create-event-subscription-dialog.invalid-event-types",
     "definition": "Por favor, selecciona al menos un tipo de evento.",
     "context": "Please, select at least one event type."

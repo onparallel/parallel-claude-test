@@ -1222,15 +1222,17 @@ export class Mocks {
     profileId: number,
     amount: number,
     types?: ProfileEventType[],
+    builder?: (i: number) => Partial<ProfileEvent>,
   ) {
     const eventTypes = types ?? ProfileEventTypeValues;
     const profileEvents = await this.knex<ProfileEvent>("profile_event")
       .insert(
-        range(0, amount || 1).map(() => ({
+        range(0, amount || 1).map((i) => ({
           org_id: orgId,
           type: eventTypes[Math.floor(Math.random() * eventTypes.length)],
           data: {},
           profile_id: profileId,
+          ...builder?.(i),
         })),
       )
       .returning("*");

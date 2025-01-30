@@ -121,6 +121,7 @@ export const createPetitionEventSubscription = mutationField("createPetitionEven
     fromTemplateId: globalIdArg("Petition"),
     fromTemplateFieldIds: list(nonNull(globalIdArg("PetitionField"))),
     challenge: nullable(booleanArg()),
+    ignoreOwnerEvents: booleanArg(),
   },
   validateArgs: validateAnd(validUrl("eventsUrl"), notEmptyArray("fromTemplateFieldIds")),
   resolve: async (_, args, ctx) => {
@@ -142,6 +143,7 @@ export const createPetitionEventSubscription = mutationField("createPetitionEven
         event_types: args.eventTypes,
         from_template_id: args.fromTemplateId,
         from_template_field_ids: args.fromTemplateFieldIds,
+        ignore_owner_events: args.ignoreOwnerEvents ?? false,
       },
       `User:${ctx.user!.id}`,
     );
@@ -172,6 +174,7 @@ export const createProfileEventSubscription = mutationField("createProfileEventS
     fromProfileTypeId: globalIdArg("ProfileType"),
     fromProfileTypeFieldIds: list(nonNull(globalIdArg("ProfileTypeField"))),
     challenge: nullable(booleanArg()),
+    ignoreOwnerEvents: booleanArg(),
   },
   validateArgs: validateAnd(validUrl("eventsUrl"), notEmptyArray("fromProfileTypeFieldIds")),
   resolve: async (_, args, ctx) => {
@@ -193,6 +196,7 @@ export const createProfileEventSubscription = mutationField("createProfileEventS
         event_types: args.eventTypes,
         from_profile_type_id: args.fromProfileTypeId,
         from_profile_type_field_ids: args.fromProfileTypeFieldIds,
+        ignore_owner_events: args.ignoreOwnerEvents ?? false,
       },
       `User:${ctx.user!.id}`,
     );
@@ -228,6 +232,7 @@ export const updatePetitionEventSubscription = mutationField("updatePetitionEven
     name: stringArg(),
     fromTemplateId: globalIdArg("Petition"),
     fromTemplateFieldIds: list(nonNull(globalIdArg("PetitionField"))),
+    ignoreOwnerEvents: booleanArg(),
   },
   validateArgs: validateAnd(validUrl("eventsUrl"), notEmptyArray("fromTemplateFieldIds")),
   resolve: async (_, args, ctx) => {
@@ -266,6 +271,10 @@ export const updatePetitionEventSubscription = mutationField("updatePetitionEven
       data.from_template_field_ids = args.fromTemplateFieldIds;
     }
 
+    if (isNonNullish(args.ignoreOwnerEvents)) {
+      data.ignore_owner_events = args.ignoreOwnerEvents;
+    }
+
     return await ctx.subscriptions.updateEventSubscription(args.id, data, `User:${ctx.user!.id}`);
   },
 });
@@ -296,6 +305,7 @@ export const updateProfileEventSubscription = mutationField("updateProfileEventS
     name: stringArg(),
     fromProfileTypeId: globalIdArg("ProfileType"),
     fromProfileTypeFieldIds: list(nonNull(globalIdArg("ProfileTypeField"))),
+    ignoreOwnerEvents: booleanArg(),
   },
   validateArgs: validateAnd(validUrl("eventsUrl"), notEmptyArray("fromProfileTypeFieldIds")),
   resolve: async (_, args, ctx) => {
@@ -332,6 +342,9 @@ export const updateProfileEventSubscription = mutationField("updateProfileEventS
     }
     if (args.fromProfileTypeFieldIds !== undefined) {
       data.from_profile_type_field_ids = args.fromProfileTypeFieldIds;
+    }
+    if (isNonNullish(args.ignoreOwnerEvents)) {
+      data.ignore_owner_events = args.ignoreOwnerEvents;
     }
 
     return await ctx.subscriptions.updateEventSubscription(args.id, data, `User:${ctx.user!.id}`);

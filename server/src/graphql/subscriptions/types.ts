@@ -9,6 +9,7 @@ export const EventSubscription = interfaceType({
     t.nonNull.boolean("isEnabled", { resolve: (o) => o.is_enabled });
     t.nonNull.boolean("isFailing", { resolve: (o) => o.is_failing });
     t.nonNull.string("eventsUrl", { resolve: (o) => o.endpoint });
+    t.nonNull.boolean("ignoreOwnerEvents", { resolve: (o) => o.ignore_owner_events });
     t.nonNull.list.nonNull.field("signatureKeys", {
       type: "EventSubscriptionSignatureKey",
       resolve: async (o, _, ctx) =>

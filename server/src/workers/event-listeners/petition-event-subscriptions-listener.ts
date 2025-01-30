@@ -50,6 +50,9 @@ export const petitionEventSubscriptionsListener = listener(
         if (s.from_template_id !== null && s.from_template_id !== petition.from_template_id) {
           return false;
         }
+        if (s.ignore_owner_events && "user_id" in event.data && s.user_id === event.data.user_id) {
+          return false;
+        }
         if (isNonNullish(s.from_template_field_ids) && "petition_field_id" in event.data) {
           if (event.data.petition_field_id === null) {
             // subscription is for a field event, but this event is not a field event

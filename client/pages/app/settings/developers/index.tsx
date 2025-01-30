@@ -99,6 +99,7 @@ function Subscriptions() {
         name: string | null;
         fromTemplateId: string | null;
         fromTemplateFieldIds: string[] | null;
+        ignoreOwnerEvents: boolean;
       },
     ) => {
       let subscriptionId = id;
@@ -111,6 +112,7 @@ function Subscriptions() {
             eventTypes: data.eventTypes,
             fromTemplateId: data.fromTemplateId,
             fromTemplateFieldIds: data.fromTemplateFieldIds,
+            ignoreOwnerEvents: data.ignoreOwnerEvents,
           },
         });
       } else {
@@ -151,6 +153,7 @@ function Subscriptions() {
         name: string | null;
         fromProfileTypeId: string | null;
         fromProfileTypeFieldIds: string[] | null;
+        ignoreOwnerEvents: boolean;
       },
     ) => {
       let subscriptionId = id;
@@ -163,6 +166,7 @@ function Subscriptions() {
             eventTypes: data.eventTypes,
             fromProfileTypeId: data.fromProfileTypeId,
             fromProfileTypeFieldIds: data.fromProfileTypeFieldIds,
+            ignoreOwnerEvents: data.ignoreOwnerEvents,
           },
         });
       } else {
@@ -987,6 +991,7 @@ const _mutations = [
       $name: String
       $fromTemplateId: GID
       $fromTemplateFieldIds: [GID!]
+      $ignoreOwnerEvents: Boolean
     ) {
       createPetitionEventSubscription(
         eventsUrl: $eventsUrl
@@ -994,6 +999,7 @@ const _mutations = [
         name: $name
         fromTemplateId: $fromTemplateId
         fromTemplateFieldIds: $fromTemplateFieldIds
+        ignoreOwnerEvents: $ignoreOwnerEvents
       ) {
         ...Subscriptions_PetitionEventSubscription
       }
@@ -1009,6 +1015,7 @@ const _mutations = [
       $name: String
       $fromTemplateId: GID
       $fromTemplateFieldIds: [GID!]
+      $ignoreOwnerEvents: Boolean
     ) {
       updatePetitionEventSubscription(
         id: $id
@@ -1018,6 +1025,7 @@ const _mutations = [
         name: $name
         fromTemplateId: $fromTemplateId
         fromTemplateFieldIds: $fromTemplateFieldIds
+        ignoreOwnerEvents: $ignoreOwnerEvents
       ) {
         ...Subscriptions_PetitionEventSubscription
         ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscription
@@ -1033,6 +1041,7 @@ const _mutations = [
       $name: String
       $fromProfileTypeId: GID
       $fromProfileTypeFieldIds: [GID!]
+      $ignoreOwnerEvents: Boolean
     ) {
       createProfileEventSubscription(
         eventsUrl: $eventsUrl
@@ -1040,6 +1049,7 @@ const _mutations = [
         name: $name
         fromProfileTypeId: $fromProfileTypeId
         fromProfileTypeFieldIds: $fromProfileTypeFieldIds
+        ignoreOwnerEvents: $ignoreOwnerEvents
       ) {
         ...Subscriptions_ProfileEventSubscription
       }
@@ -1055,6 +1065,7 @@ const _mutations = [
       $name: String
       $fromProfileTypeId: GID
       $fromProfileTypeFieldIds: [GID!]
+      $ignoreOwnerEvents: Boolean
     ) {
       updateProfileEventSubscription(
         id: $id
@@ -1064,6 +1075,7 @@ const _mutations = [
         name: $name
         fromProfileTypeId: $fromProfileTypeId
         fromProfileTypeFieldIds: $fromProfileTypeFieldIds
+        ignoreOwnerEvents: $ignoreOwnerEvents
       ) {
         ...Subscriptions_ProfileEventSubscription
         ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscription

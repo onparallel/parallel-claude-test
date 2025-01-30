@@ -49,6 +49,9 @@ export const profileEventSubscriptionsListener = listener(
         if (s.from_profile_type_id !== null && s.from_profile_type_id !== profile.profile_type_id) {
           return false;
         }
+        if (s.ignore_owner_events && "user_id" in event.data && s.user_id === event.data.user_id) {
+          return false;
+        }
         if (isNonNullish(s.from_profile_type_field_ids) && "profile_type_field_id" in event.data) {
           const profileTypeField = await ctx.profiles.loadProfileTypeField(
             event.data.profile_type_field_id,

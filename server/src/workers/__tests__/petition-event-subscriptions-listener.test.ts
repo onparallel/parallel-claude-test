@@ -48,7 +48,7 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
     mocks = new Mocks(knex);
 
     [organization] = await mocks.createRandomOrganizations(1);
-    users = await mocks.createRandomUsers(organization.id, 5);
+    users = await mocks.createRandomUsers(organization.id, 6);
 
     emailSpy = jest.spyOn(container.get<IEmailsService>(EMAILS), "sendDeveloperWebhookFailedEmail");
     fetchSpy = jest.spyOn(container.get<IFetchService>(FETCH_SERVICE), "fetch");
@@ -72,11 +72,13 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
     // users[2] -> WRITE. subscribed to PETITION_CREATED and PETITION_COMPLETED only on the petitionFromTemplate
     // users[3] -> WRITE. subscribed but not enabled
     // users[4] -> WRITE. not subscribed
+    // users[5] -> subscribed to PETITION_CREATED but ignores their own events
 
     await mocks.sharePetitions([petitionFromTemplate.id, petition.id], users[1].id, "READ");
     await mocks.sharePetitions([petitionFromTemplate.id, petition.id], users[2].id, "WRITE");
     await mocks.sharePetitions([petitionFromTemplate.id, petition.id], users[3].id, "WRITE");
     await mocks.sharePetitions([petitionFromTemplate.id, petition.id], users[4].id, "WRITE");
+    await mocks.sharePetitions([petitionFromTemplate.id, petition.id], users[5].id, "WRITE");
     subscriptions = await mocks.createEventSubscription([
       {
         type: "PETITION",
@@ -110,6 +112,15 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
         endpoint: "https://users.3.com/events",
         is_enabled: false,
         name: "users.3.webhook",
+      },
+      {
+        type: "PETITION",
+        user_id: users[5].id,
+        event_types: ["PETITION_CREATED"],
+        endpoint: "https://users.5.com/events",
+        is_enabled: true,
+        name: "users.5.webhook",
+        ignore_owner_events: true,
       },
     ]);
   });
@@ -159,7 +170,7 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
       createdAt: event.created_at,
     });
 
-    expect(fetchSpy).toHaveBeenCalledTimes(3);
+    expect(fetchSpy).toHaveBeenCalledTimes(4);
     expect(fetchSpy.mock.calls[0]).toMatchObject([
       "https://users.0.com/events",
       expectRequestInit(0, {
@@ -186,6 +197,18 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
     ]);
     expect(fetchSpy.mock.calls[2]).toMatchObject([
       "https://users.2.com/events",
+      expectRequestInit(0, {
+        method: "POST",
+        body,
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+        },
+      }),
+      { timeout: 15_000, maxRetries: 3 },
+    ]);
+    expect(fetchSpy.mock.calls[3]).toMatchObject([
+      "https://users.5.com/events",
       expectRequestInit(0, {
         method: "POST",
         body,
@@ -276,7 +299,7 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
       createdAt: event.created_at,
     });
 
-    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(fetchSpy).toHaveBeenCalledTimes(3);
     expect(fetchSpy.mock.calls[0]).toMatchObject([
       "https://users.0.com/events",
       expectRequestInit(0, {
@@ -344,6 +367,18 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
       }),
       { timeout: 15_000, maxRetries: 3 },
     ]);
+    expect(fetchSpy.mock.calls[2]).toMatchObject([
+      "https://users.5.com/events",
+      expectRequestInit(0, {
+        method: "POST",
+        body,
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+        },
+      }),
+      { timeout: 15_000, maxRetries: 3 },
+    ]);
   });
 
   it("sends email and sets subscription as failing when event can not be delivered", async () => {
@@ -371,7 +406,7 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
       ctx,
     );
 
-    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(fetchSpy).toHaveBeenCalledTimes(3);
     expect(emailSpy).toHaveBeenCalledTimes(1);
 
     const user0Subscription = subscriptions.find((s) => s.user_id === users[0].id)!;
@@ -395,5 +430,74 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
       .select("*");
 
     expect(failingSubscription.is_failing).toEqual(true);
+  });
+
+  it("does not send webhook event for user who ignores their own events", async () => {
+    const [event] = await mocks.createRandomPetitionEvents(
+      users[5].id,
+      petitionFromTemplate.id,
+      1,
+      ["PETITION_CREATED"],
+    );
+    await petitionEventSubscriptionsListener.handle(
+      {
+        id: event.id,
+        petition_id: event.petition_id,
+        type: "PETITION_CREATED",
+        data: { user_id: users[5].id },
+        created_at: event.created_at,
+        processed_at: event.processed_at,
+        processed_by: event.processed_by,
+      },
+      ctx,
+    );
+
+    const body = JSON.stringify({
+      id: toGlobalId("PetitionEvent", event.id),
+      petitionId: toGlobalId("Petition", event.petition_id),
+      type: event.type,
+      data: {
+        userId: toGlobalId("User", users[5].id),
+      },
+      createdAt: event.created_at,
+    });
+
+    expect(fetchSpy).toHaveBeenCalledTimes(3);
+    expect(fetchSpy.mock.calls[0]).toMatchObject([
+      "https://users.0.com/events",
+      expectRequestInit(0, {
+        method: "POST",
+        body,
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+        },
+      }),
+      { timeout: 15_000, maxRetries: 3 },
+    ]);
+    expect(fetchSpy.mock.calls[1]).toMatchObject([
+      "https://users.1.com/events",
+      expectRequestInit(0, {
+        method: "POST",
+        body,
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+        },
+      }),
+      { timeout: 15_000, maxRetries: 3 },
+    ]);
+    expect(fetchSpy.mock.calls[2]).toMatchObject([
+      "https://users.2.com/events",
+      expectRequestInit(0, {
+        method: "POST",
+        body,
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+        },
+      }),
+      { timeout: 15_000, maxRetries: 3 },
+    ]);
   });
 });

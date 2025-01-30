@@ -1146,6 +1146,7 @@ export interface EventSubscription {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  ignore_owner_events: boolean; // bool
 }
 
 export type CreateEventSubscription = PartialProps<
@@ -1165,6 +1166,7 @@ export type CreateEventSubscription = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
+  | "ignore_owner_events"
 >;
 
 export interface EventSubscriptionSignatureKey {

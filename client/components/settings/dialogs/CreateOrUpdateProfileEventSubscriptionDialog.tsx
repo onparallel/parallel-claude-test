@@ -2,6 +2,7 @@ import { ApolloError, gql, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
+  Checkbox,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -20,6 +21,7 @@ import {
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { ProfileTypeFieldSelect } from "@parallel/components/common/ProfileTypeFieldSelect";
@@ -53,6 +55,7 @@ interface CreateOrUpdateProfileEventSubscriptionDialogProps {
       name: string | null;
       fromProfileTypeId: string | null;
       fromProfileTypeFieldIds: string[] | null;
+      ignoreOwnerEvents: boolean;
     },
   ) => Promise<string>;
   onAddSignatureKey: (
@@ -68,6 +71,7 @@ interface CreateOrUpdateProfileEventSubscriptionDialogFormData {
   eventTypes: ProfileEventType[];
   fromProfileTypeId: Maybe<string>;
   fromProfileTypeFieldIds: string[];
+  ignoreOwnerEvents: boolean;
 }
 
 const PROFILE_EVENT_TYPES: ProfileEventType[] = [
@@ -131,6 +135,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
       eventTypes: eventSubscription?.profileEventTypes ?? [],
       fromProfileTypeId: eventSubscription?.fromProfileType?.id ?? null,
       fromProfileTypeFieldIds: eventSubscription?.fromProfileTypeFields?.map((f) => f?.id) ?? [],
+      ignoreOwnerEvents: eventSubscription?.ignoreOwnerEvents ?? false,
     },
   });
   const eventsMode = watch("eventsMode");
@@ -220,6 +225,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
                       data.fromProfileTypeFieldIds.length > 0
                         ? data.fromProfileTypeFieldIds
                         : null,
+                    ignoreOwnerEvents: data.ignoreOwnerEvents,
                   }),
                 );
 
@@ -435,6 +441,22 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
                 </FormControl>
               </Stack>
             </PaddedCollapse>
+            <FormControl>
+              <Checkbox {...register("ignoreOwnerEvents")}>
+                <FormattedMessage
+                  id="component.create-event-subscription-dialog.ignore-owner-events"
+                  defaultMessage="Ignore events produced by this user"
+                />
+                <HelpPopover>
+                  <Text fontSize="sm">
+                    <FormattedMessage
+                      id="component.create-event-subscription-dialog.ignore-owner-events-popover"
+                      defaultMessage="If this option is enabled, we will not send events that are triggered by this user. This option is designed to prevent call loops in integrations where a token from this same user is used to perform actions through our API."
+                    />
+                  </Text>
+                </HelpPopover>
+              </Checkbox>
+            </FormControl>
           </Stack>
           <Stack>
             <Text>
@@ -524,6 +546,7 @@ CreateOrUpdateProfileEventSubscriptionDialog.fragments = {
         eventsUrl
         isEnabled
         isFailing
+        ignoreOwnerEvents
         signatureKeys {
           ...CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKey
         }

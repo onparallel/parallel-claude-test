@@ -732,6 +732,7 @@ export interface EffectivePetitionUserPermission {
 export interface EventSubscription {
   eventsUrl: Scalars["String"]["output"];
   id: Scalars["GID"]["output"];
+  ignoreOwnerEvents: Scalars["Boolean"]["output"];
   isEnabled: Scalars["Boolean"]["output"];
   isFailing: Scalars["Boolean"]["output"];
   name?: Maybe<Scalars["String"]["output"]>;
@@ -1900,6 +1901,7 @@ export interface MutationcreatePetitionEventSubscriptionArgs {
   eventsUrl: Scalars["String"]["input"];
   fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
+  ignoreOwnerEvents?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
 }
 
@@ -1985,6 +1987,7 @@ export interface MutationcreateProfileEventSubscriptionArgs {
   eventsUrl: Scalars["String"]["input"];
   fromProfileTypeFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   fromProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
+  ignoreOwnerEvents?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
 }
 
@@ -2892,6 +2895,7 @@ export interface MutationupdatePetitionEventSubscriptionArgs {
   fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
   id: Scalars["GID"]["input"];
+  ignoreOwnerEvents?: InputMaybe<Scalars["Boolean"]["input"]>;
   isEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
 }
@@ -2974,6 +2978,7 @@ export interface MutationupdateProfileEventSubscriptionArgs {
   fromProfileTypeFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   fromProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
   id: Scalars["GID"]["input"];
+  ignoreOwnerEvents?: InputMaybe<Scalars["Boolean"]["input"]>;
   isEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
 }
@@ -3786,6 +3791,7 @@ export interface PetitionEventSubscription extends EventSubscription {
   fromTemplate?: Maybe<PetitionBaseMini>;
   fromTemplateFields?: Maybe<Array<PetitionFieldMini>>;
   id: Scalars["GID"]["output"];
+  ignoreOwnerEvents: Scalars["Boolean"]["output"];
   isEnabled: Scalars["Boolean"]["output"];
   isFailing: Scalars["Boolean"]["output"];
   name?: Maybe<Scalars["String"]["output"]>;
@@ -4816,6 +4822,7 @@ export interface ProfileEventSubscription extends EventSubscription {
   fromProfileType?: Maybe<ProfileType>;
   fromProfileTypeFields?: Maybe<Array<Maybe<ProfileTypeField>>>;
   id: Scalars["GID"]["output"];
+  ignoreOwnerEvents: Scalars["Boolean"]["output"];
   isEnabled: Scalars["Boolean"]["output"];
   isFailing: Scalars["Boolean"]["output"];
   name?: Maybe<Scalars["String"]["output"]>;
@@ -34261,6 +34268,7 @@ export type CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscript
   isEnabled: boolean;
   isFailing: boolean;
   eventTypes?: Array<PetitionEventType> | null;
+  ignoreOwnerEvents: boolean;
   fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
   fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
   signatureKeys: Array<{
@@ -34424,6 +34432,7 @@ export type CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscriptio
   eventsUrl: string;
   isEnabled: boolean;
   isFailing: boolean;
+  ignoreOwnerEvents: boolean;
   profileEventTypes?: Array<ProfileEventType> | null;
   signatureKeys: Array<{
     __typename?: "EventSubscriptionSignatureKey";
@@ -55857,6 +55866,7 @@ export type Subscriptions_PetitionEventSubscriptionFragment = {
   name?: string | null;
   eventsUrl: string;
   isFailing: boolean;
+  ignoreOwnerEvents: boolean;
   fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
   fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
   signatureKeys: Array<{
@@ -55873,6 +55883,7 @@ export type Subscriptions_ProfileEventSubscriptionFragment = {
   name?: string | null;
   eventsUrl: string;
   isFailing: boolean;
+  ignoreOwnerEvents: boolean;
   profileEventTypes?: Array<ProfileEventType> | null;
   fromProfileType?: {
     __typename?: "ProfileType";
@@ -55895,6 +55906,7 @@ export type Subscriptions_EventSubscription_PetitionEventSubscription_Fragment =
   isFailing: boolean;
   name?: string | null;
   eventTypes?: Array<PetitionEventType> | null;
+  ignoreOwnerEvents: boolean;
   signatureKeys: Array<{
     __typename?: "EventSubscriptionSignatureKey";
     id: string;
@@ -55911,6 +55923,7 @@ export type Subscriptions_EventSubscription_ProfileEventSubscription_Fragment = 
   isEnabled: boolean;
   isFailing: boolean;
   name?: string | null;
+  ignoreOwnerEvents: boolean;
   profileEventTypes?: Array<ProfileEventType> | null;
   signatureKeys: Array<{
     __typename?: "EventSubscriptionSignatureKey";
@@ -55935,6 +55948,7 @@ export type Subscriptions_createPetitionEventSubscriptionMutationVariables = Exa
   name?: InputMaybe<Scalars["String"]["input"]>;
   fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
   fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  ignoreOwnerEvents?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type Subscriptions_createPetitionEventSubscriptionMutation = {
@@ -55946,6 +55960,7 @@ export type Subscriptions_createPetitionEventSubscriptionMutation = {
     name?: string | null;
     eventsUrl: string;
     isFailing: boolean;
+    ignoreOwnerEvents: boolean;
     fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
     fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
     signatureKeys: Array<{
@@ -55964,6 +55979,7 @@ export type Subscriptions_updatePetitionEventSubscriptionMutationVariables = Exa
   name?: InputMaybe<Scalars["String"]["input"]>;
   fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
   fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  ignoreOwnerEvents?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type Subscriptions_updatePetitionEventSubscriptionMutation = {
@@ -55975,6 +55991,7 @@ export type Subscriptions_updatePetitionEventSubscriptionMutation = {
     name?: string | null;
     eventsUrl: string;
     isFailing: boolean;
+    ignoreOwnerEvents: boolean;
     fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
     fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
     signatureKeys: Array<{
@@ -55991,6 +56008,7 @@ export type Subscriptions_createProfileEventSubscriptionMutationVariables = Exac
   name?: InputMaybe<Scalars["String"]["input"]>;
   fromProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
   fromProfileTypeFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  ignoreOwnerEvents?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type Subscriptions_createProfileEventSubscriptionMutation = {
@@ -56001,6 +56019,7 @@ export type Subscriptions_createProfileEventSubscriptionMutation = {
     name?: string | null;
     eventsUrl: string;
     isFailing: boolean;
+    ignoreOwnerEvents: boolean;
     profileEventTypes?: Array<ProfileEventType> | null;
     fromProfileType?: {
       __typename?: "ProfileType";
@@ -56024,6 +56043,7 @@ export type Subscriptions_updateProfileEventSubscriptionMutationVariables = Exac
   name?: InputMaybe<Scalars["String"]["input"]>;
   fromProfileTypeId?: InputMaybe<Scalars["GID"]["input"]>;
   fromProfileTypeFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  ignoreOwnerEvents?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type Subscriptions_updateProfileEventSubscriptionMutation = {
@@ -56034,6 +56054,7 @@ export type Subscriptions_updateProfileEventSubscriptionMutation = {
     name?: string | null;
     eventsUrl: string;
     isFailing: boolean;
+    ignoreOwnerEvents: boolean;
     profileEventTypes?: Array<ProfileEventType> | null;
     fromProfileType?: {
       __typename?: "ProfileType";
@@ -56087,6 +56108,7 @@ export type Subscriptions_subscriptionsQuery = {
         isFailing: boolean;
         name?: string | null;
         eventTypes?: Array<PetitionEventType> | null;
+        ignoreOwnerEvents: boolean;
         signatureKeys: Array<{
           __typename?: "EventSubscriptionSignatureKey";
           id: string;
@@ -56102,6 +56124,7 @@ export type Subscriptions_subscriptionsQuery = {
         isEnabled: boolean;
         isFailing: boolean;
         name?: string | null;
+        ignoreOwnerEvents: boolean;
         profileEventTypes?: Array<ProfileEventType> | null;
         signatureKeys: Array<{
           __typename?: "EventSubscriptionSignatureKey";
@@ -70549,6 +70572,7 @@ export const CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscrip
       isEnabled
       isFailing
       eventTypes
+      ignoreOwnerEvents
       fromTemplate {
         id
         name
@@ -70595,6 +70619,7 @@ export const CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscripti
     eventsUrl
     isEnabled
     isFailing
+    ignoreOwnerEvents
     signatureKeys {
       ...CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKey
     }
@@ -78074,6 +78099,7 @@ export const Subscriptions_createPetitionEventSubscriptionDocument = gql`
     $name: String
     $fromTemplateId: GID
     $fromTemplateFieldIds: [GID!]
+    $ignoreOwnerEvents: Boolean
   ) {
     createPetitionEventSubscription(
       eventsUrl: $eventsUrl
@@ -78081,6 +78107,7 @@ export const Subscriptions_createPetitionEventSubscriptionDocument = gql`
       name: $name
       fromTemplateId: $fromTemplateId
       fromTemplateFieldIds: $fromTemplateFieldIds
+      ignoreOwnerEvents: $ignoreOwnerEvents
     ) {
       ...Subscriptions_PetitionEventSubscription
     }
@@ -78099,6 +78126,7 @@ export const Subscriptions_updatePetitionEventSubscriptionDocument = gql`
     $name: String
     $fromTemplateId: GID
     $fromTemplateFieldIds: [GID!]
+    $ignoreOwnerEvents: Boolean
   ) {
     updatePetitionEventSubscription(
       id: $id
@@ -78108,6 +78136,7 @@ export const Subscriptions_updatePetitionEventSubscriptionDocument = gql`
       name: $name
       fromTemplateId: $fromTemplateId
       fromTemplateFieldIds: $fromTemplateFieldIds
+      ignoreOwnerEvents: $ignoreOwnerEvents
     ) {
       ...Subscriptions_PetitionEventSubscription
       ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscription
@@ -78126,6 +78155,7 @@ export const Subscriptions_createProfileEventSubscriptionDocument = gql`
     $name: String
     $fromProfileTypeId: GID
     $fromProfileTypeFieldIds: [GID!]
+    $ignoreOwnerEvents: Boolean
   ) {
     createProfileEventSubscription(
       eventsUrl: $eventsUrl
@@ -78133,6 +78163,7 @@ export const Subscriptions_createProfileEventSubscriptionDocument = gql`
       name: $name
       fromProfileTypeId: $fromProfileTypeId
       fromProfileTypeFieldIds: $fromProfileTypeFieldIds
+      ignoreOwnerEvents: $ignoreOwnerEvents
     ) {
       ...Subscriptions_ProfileEventSubscription
     }
@@ -78151,6 +78182,7 @@ export const Subscriptions_updateProfileEventSubscriptionDocument = gql`
     $name: String
     $fromProfileTypeId: GID
     $fromProfileTypeFieldIds: [GID!]
+    $ignoreOwnerEvents: Boolean
   ) {
     updateProfileEventSubscription(
       id: $id
@@ -78160,6 +78192,7 @@ export const Subscriptions_updateProfileEventSubscriptionDocument = gql`
       name: $name
       fromProfileTypeId: $fromProfileTypeId
       fromProfileTypeFieldIds: $fromProfileTypeFieldIds
+      ignoreOwnerEvents: $ignoreOwnerEvents
     ) {
       ...Subscriptions_ProfileEventSubscription
       ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscription
