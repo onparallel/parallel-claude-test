@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto";
 import { Request, RequestHandler, Router } from "express";
 import { injectable } from "inversify";
 import { isNonNullish, isNullish } from "remeda";
@@ -105,13 +106,29 @@ export abstract class OAuthIntegration<
       })
       .get("/redirect", async (req, res, next) => {
         try {
-          const response = (success: boolean) => /* html */ `
-            <script>window.opener.postMessage({ success: ${success} }, "*");</script>
-          `;
+          const respond = (success: boolean) => {
+            const nonce = randomBytes(64).toString("base64");
+            res
+              .setHeader(
+                "Content-Security-Policy",
+                `default-src 'self'; script-src 'self' 'nonce-${nonce}'`,
+              )
+              .setHeader("X-Frame-Options", "sameorigin")
+              .setHeader("X-Download-Options", "noopen")
+              .setHeader("X-Content-Type-Options", "nosniff")
+              .setHeader("Referrer-Policy", "same-origin")
+              .setHeader("X-XSS-Protection", "1")
+              .setHeader(
+                "Permissions-Policy",
+                "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
+              ).send(/* html */ `
+                <script nonce="${nonce}">window.opener.postMessage({ success: ${success} }, "*");</script>
+              `);
+          };
 
           const { state: key, code } = req.query;
           if (typeof key !== "string" || typeof code !== "string") {
-            res.send(response(false));
+            respond(false);
           } else {
             const state = await this.getState(key);
 
@@ -134,8 +151,7 @@ export abstract class OAuthIntegration<
                 `Organization:${state.orgId}`,
               );
             }
-
-            res.send(response(true));
+            respond(true);
           }
         } catch (error) {
           next(error);
