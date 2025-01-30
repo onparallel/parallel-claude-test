@@ -1,5 +1,6 @@
 import { ErrorRequestHandler, Router } from "express";
 import { Container } from "inversify";
+import { CORS_SERVICE, ICorsService } from "../services/CorsService";
 import { ILogger, LOGGER } from "../services/Logger";
 import { auth } from "./auth";
 import { integrations } from "./integrations";
@@ -11,9 +12,10 @@ import { webhooks } from "./webhooks";
 
 export function api(container: Container) {
   const logger = container.get<ILogger>(LOGGER);
+  const cors = container.get<ICorsService>(CORS_SERVICE);
   const api = publicApi(container);
   return Router()
-    .use("/auth", auth)
+    .use("/auth", cors.handler(), auth)
     .use("/webhooks", webhooks)
     .use("/lambda", lambdas)
     .use("/v1", api.handler())

@@ -5,7 +5,6 @@ import { ApolloServer, ApolloServerPlugin } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginLandingPageDisabled } from "@apollo/server/plugin/disabled";
 import cookieParser from "cookie-parser";
-import cors from "cors";
 import express, { json } from "express";
 import graphqlUploadExpress from "graphql-upload/graphqlUploadExpress.js";
 import onFinished from "on-finished";
@@ -15,6 +14,7 @@ import { createContainer } from "./container";
 import { ApiContext } from "./context";
 import { UnknownError } from "./graphql/helpers/errors";
 import { schema } from "./schema";
+import { CORS_SERVICE, ICorsService } from "./services/CorsService";
 import { ILogger, LOGGER } from "./services/Logger";
 import { IRedis, REDIS } from "./services/Redis";
 import { loadEnv } from "./util/loadEnv";
@@ -84,6 +84,7 @@ if (process.env.TS_NODE_DEV) {
   const container = createContainer();
   const redis = container.get<IRedis>(REDIS);
   const logger = container.get<ILogger>(LOGGER);
+  const cors = container.get<ICorsService>(CORS_SERVICE);
   await Promise.all([redis.connect(), server.start()]);
 
   const port = process.env.PORT || 4000;
@@ -118,10 +119,10 @@ if (process.env.TS_NODE_DEV) {
       });
       next();
     })
-    .use("/api", cors(), cookieParser(), api(container))
+    .use("/api", cookieParser(), api(container))
     .use(
       "/graphql",
-      cors(),
+      cors.handler(),
       json({ limit: "2mb" }),
       graphqlUploadExpress(),
       expressMiddleware(server, {

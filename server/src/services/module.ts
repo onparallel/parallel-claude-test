@@ -22,6 +22,7 @@ import {
   IBackgroundCheckService,
 } from "./BackgroundCheckService";
 import { BANKFLIP_SERVICE, BankflipService, IBankflipService } from "./BankflipService";
+import { CORS_SERVICE, CorsService, ICorsService } from "./CorsService";
 import {
   DOCUMENT_PROCESSING_SERVICE,
   DocumentProcessingService,
@@ -111,6 +112,7 @@ export const servicesModule = new ContainerModule((bind) => {
     .to(BackgroundCheckService)
     .inSingletonScope();
   bind<IAiAssistantService>(AI_ASSISTANT_SERVICE).to(AiAssistantService).inSingletonScope();
+  bind<ICorsService>(CORS_SERVICE).to(CorsService).inSingletonScope();
 
   // Request Scope
   bind<IOrganizationCreditsService>(ORGANIZATION_CREDITS_SERVICE).to(OrganizationCreditsService);
