@@ -1546,7 +1546,7 @@ export type MutationcancelSignatureRequestArgs = {
 };
 
 export type MutationchangeOrganizationArgs = {
-  orgId?: InputMaybe<Scalars["GID"]["input"]>;
+  orgId: Scalars["GID"]["input"];
 };
 
 export type MutationchangePasswordArgs = {

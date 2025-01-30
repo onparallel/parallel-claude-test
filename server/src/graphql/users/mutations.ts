@@ -686,9 +686,16 @@ export const restoreLogin = mutationField("restoreLogin", {
 export const changeOrganization = mutationField("changeOrganization", {
   type: "Result",
   args: {
-    orgId: globalIdArg("Organization"),
+    orgId: nonNull(globalIdArg("Organization")),
   },
-  authorize: authenticate(),
+  authorize: authenticateAnd(async (_, { orgId }, ctx) => {
+    const org = await ctx.organizations.loadOrg(orgId);
+    if (!org || ["INACTIVE", "CHURNED"].includes(org.status)) {
+      return false;
+    }
+
+    return true;
+  }),
   resolve: async (_, args, ctx) => {
     const users = await ctx.users.loadUsersByUserDataId(ctx.realUser!.user_data_id);
     const user = users.find((u) => u.org_id === args.orgId);

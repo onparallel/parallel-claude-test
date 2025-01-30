@@ -1624,7 +1624,7 @@ export interface MutationcancelSignatureRequestArgs {
 }
 
 export interface MutationchangeOrganizationArgs {
-  orgId?: InputMaybe<Scalars["GID"]["input"]>;
+  orgId: Scalars["GID"]["input"];
 }
 
 export interface MutationchangePasswordArgs {
@@ -36783,7 +36783,7 @@ export type ChooseOrg_QueryQuery = {
 };
 
 export type ChooseOrg_changeOrganizationMutationVariables = Exact<{
-  orgId?: InputMaybe<Scalars["GID"]["input"]>;
+  orgId: Scalars["GID"]["input"];
 }>;
 
 export type ChooseOrg_changeOrganizationMutation = { changeOrganization: Result };
@@ -76262,7 +76262,7 @@ export const ChooseOrg_QueryDocument = gql`
   }
 ` as unknown as DocumentNode<ChooseOrg_QueryQuery, ChooseOrg_QueryQueryVariables>;
 export const ChooseOrg_changeOrganizationDocument = gql`
-  mutation ChooseOrg_changeOrganization($orgId: GID) {
+  mutation ChooseOrg_changeOrganization($orgId: GID!) {
     changeOrganization(orgId: $orgId)
   }
 ` as unknown as DocumentNode<

@@ -89,11 +89,11 @@ function Forgot() {
       });
       toast({
         title: intl.formatMessage({
-          id: "public.forgot-password.reset-success-toast-title",
+          id: "page.login.forgot-password-reset-success-toast-title",
           defaultMessage: "Password reset",
         }),
         description: intl.formatMessage({
-          id: "public.forgot-password.reset-success-toast-description",
+          id: "page.login.forgot-password-reset-success-toast-description",
           defaultMessage: "Your password has been reset successfully.",
         }),
         status: "success",

@@ -1212,7 +1212,7 @@ type Mutation {
   """
   cancelScheduledMessage(messageId: GID!, petitionId: GID!): PetitionMessage
   cancelSignatureRequest(petitionSignatureRequestId: GID!): PetitionSignatureRequest!
-  changeOrganization(orgId: GID): Result!
+  changeOrganization(orgId: GID!): Result!
 
   """
   Changes the password for the current logged in user.

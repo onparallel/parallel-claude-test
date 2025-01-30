@@ -84,6 +84,21 @@ function Login() {
           isClosable: true,
           duration: 10_000,
         });
+      } else if (error.error === "InactiveOrganization") {
+        toast({
+          title: intl.formatMessage({
+            id: "page.login.inactive-organization-toast-title",
+            defaultMessage: "Account deactivated",
+          }),
+          description: intl.formatMessage({
+            id: "page.login.inactive-organization-toast-description",
+            defaultMessage:
+              "You cannot access your account at this time as it has been deactivated. If you believe this is an error or wish to reactivate your account, please contact our support team at support@onparallel.com.",
+          }),
+          status: "error",
+          isClosable: true,
+          duration: 10_000,
+        });
       } else if (error.error === "NewPasswordRequired") {
         setPasswordChange({ type: "CHANGE", email, password });
       } else if (error.error === "UserNotConfirmedException") {
@@ -92,11 +107,11 @@ function Login() {
       } else if (error.error === "PasswordResetRequired") {
         toast({
           title: intl.formatMessage({
-            id: "public.forgot-password.reset-required-toast-title",
+            id: "page.login.password-reset-required-toast-title",
             defaultMessage: "Password reset",
           }),
           description: intl.formatMessage({
-            id: "public.forgot-password.reset-required-toast-description",
+            id: "page.login.password-reset-required-toast-description",
             defaultMessage: "A password reset is required.",
           }),
           status: "error",
@@ -110,11 +125,11 @@ function Login() {
       } else {
         toast({
           title: intl.formatMessage({
-            id: "public.login.invalid-login.title",
+            id: "page.login.invalid-login-toast-title",
             defaultMessage: "Invalid login",
           }),
           description: intl.formatMessage({
-            id: "public.login.invalid-login.description",
+            id: "page.login.invalid-login-toast-description",
             defaultMessage: "The email or password are invalid.",
           }),
           status: "error",
@@ -158,11 +173,11 @@ function Login() {
       });
       toast({
         title: intl.formatMessage({
-          id: "public.forgot-password.reset-success-toast-title",
+          id: "page.login.forgot-password-reset-success-toast-title",
           defaultMessage: "Password reset",
         }),
         description: intl.formatMessage({
-          id: "public.forgot-password.reset-success-toast-description",
+          id: "page.login.forgot-password-reset-success-toast-description",
           defaultMessage: "Your password has been reset successfully.",
         }),
         status: "success",
@@ -196,11 +211,11 @@ function Login() {
   return (
     <PublicLayout
       title={intl.formatMessage({
-        id: "public.login.title",
+        id: "page.login.title",
         defaultMessage: "Login",
       })}
       description={intl.formatMessage({
-        id: "public.login.meta-description",
+        id: "page.login.description",
         defaultMessage: "Login to your Parallel account",
       })}
       hideHeader
@@ -251,7 +266,7 @@ function Login() {
                   backLink={
                     <NormalLink role="button" onClick={() => setPasswordChange(null)}>
                       <FormattedMessage
-                        id="public.login.back-to-login-link"
+                        id="page.login.back-to-login-link"
                         defaultMessage="Go back to login"
                       />
                     </NormalLink>
@@ -264,7 +279,7 @@ function Login() {
                   backLink={
                     <NormalLink role="button" onClick={() => setPasswordChange(null)}>
                       <FormattedMessage
-                        id="public.login.back-to-login-link"
+                        id="page.login.back-to-login-link"
                         defaultMessage="Go back to login"
                       />
                     </NormalLink>

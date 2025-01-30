@@ -7493,7 +7493,7 @@ export interface NexusGenArgTypes {
     };
     changeOrganization: {
       // args
-      orgId?: NexusGenScalars["GID"] | null; // GID
+      orgId: NexusGenScalars["GID"]; // GID!
     };
     changePassword: {
       // args

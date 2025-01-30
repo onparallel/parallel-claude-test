@@ -190,7 +190,7 @@ const _queries = [
 
 const _mutations = [
   gql`
-    mutation ChooseOrg_changeOrganization($orgId: GID) {
+    mutation ChooseOrg_changeOrganization($orgId: GID!) {
       changeOrganization(orgId: $orgId)
     }
   `,

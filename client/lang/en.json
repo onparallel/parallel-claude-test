@@ -14810,6 +14810,11 @@
     "context": "Home"
   },
   {
+    "term": "page.login.back-to-login-link",
+    "definition": "Go back to login",
+    "context": "Go back to login"
+  },
+  {
     "term": "page.login.deactivated-user-toast-body",
     "definition": "Your account is deactivated. Please contact your organization's administrator.",
     "context": "Your account is deactivated. Please contact your organization's administrator."
@@ -14818,6 +14823,56 @@
     "term": "page.login.deactivated-user-toast-title",
     "definition": "Deactivated user",
     "context": "Deactivated user"
+  },
+  {
+    "term": "page.login.description",
+    "definition": "Login to your Parallel account",
+    "context": "Login to your Parallel account"
+  },
+  {
+    "term": "page.login.forgot-password-reset-success-toast-description",
+    "definition": "Your password has been reset successfully.",
+    "context": "Your password has been reset successfully."
+  },
+  {
+    "term": "page.login.forgot-password-reset-success-toast-title",
+    "definition": "Password reset",
+    "context": "Password reset"
+  },
+  {
+    "term": "page.login.inactive-organization-toast-description",
+    "definition": "You cannot access your account at this time as it has been deactivated. If you believe this is an error or wish to reactivate your account, please contact our support team at support@onparallel.com.",
+    "context": "You cannot access your account at this time as it has been deactivated. If you believe this is an error or wish to reactivate your account, please contact our support team at support@onparallel.com."
+  },
+  {
+    "term": "page.login.inactive-organization-toast-title",
+    "definition": "Account deactivated",
+    "context": "Account deactivated"
+  },
+  {
+    "term": "page.login.invalid-login-toast-description",
+    "definition": "The email or password are invalid.",
+    "context": "The email or password are invalid."
+  },
+  {
+    "term": "page.login.invalid-login-toast-title",
+    "definition": "Invalid login",
+    "context": "Invalid login"
+  },
+  {
+    "term": "page.login.password-reset-required-toast-description",
+    "definition": "A password reset is required.",
+    "context": "A password reset is required."
+  },
+  {
+    "term": "page.login.password-reset-required-toast-title",
+    "definition": "Password reset",
+    "context": "Password reset"
+  },
+  {
+    "term": "page.login.title",
+    "definition": "Login",
+    "context": "Login"
   },
   {
     "term": "page.maintenance.description",
@@ -17010,26 +17065,6 @@
     "context": "Password reset"
   },
   {
-    "term": "public.forgot-password.reset-required-toast-description",
-    "definition": "A password reset is required.",
-    "context": "A password reset is required."
-  },
-  {
-    "term": "public.forgot-password.reset-required-toast-title",
-    "definition": "Password reset",
-    "context": "Password reset"
-  },
-  {
-    "term": "public.forgot-password.reset-success-toast-description",
-    "definition": "Your password has been reset successfully.",
-    "context": "Your password has been reset successfully."
-  },
-  {
-    "term": "public.forgot-password.reset-success-toast-title",
-    "definition": "Password reset",
-    "context": "Password reset"
-  },
-  {
     "term": "public.forgot-password.send-button",
     "definition": "Send verification code",
     "context": "Send verification code"
@@ -17085,11 +17120,6 @@
     "context": "Go back to forgot password"
   },
   {
-    "term": "public.login.back-to-login-link",
-    "definition": "Go back to login",
-    "context": "Go back to login"
-  },
-  {
     "term": "public.login.explanation-with-sso",
     "definition": "Login using Single sign-on",
     "context": "Login using Single sign-on"
@@ -17105,16 +17135,6 @@
     "context": "Enter Parallel"
   },
   {
-    "term": "public.login.invalid-login.description",
-    "definition": "The email or password are invalid.",
-    "context": "The email or password are invalid."
-  },
-  {
-    "term": "public.login.invalid-login.title",
-    "definition": "Invalid login",
-    "context": "Invalid login"
-  },
-  {
     "term": "public.login.login-with-password",
     "definition": "Login with password",
     "context": "Login with password"
@@ -17123,11 +17143,6 @@
     "term": "public.login.login-with-sso",
     "definition": "Login with SSO",
     "context": "Login with SSO"
-  },
-  {
-    "term": "public.login.meta-description",
-    "definition": "Login to your Parallel account",
-    "context": "Login to your Parallel account"
   },
   {
     "term": "public.login.password-update-button",
@@ -17153,11 +17168,6 @@
     "term": "public.login.sso-enabled",
     "definition": "Single sign-on enabled",
     "context": "Single sign-on enabled"
-  },
-  {
-    "term": "public.login.title",
-    "definition": "Login",
-    "context": "Login"
   },
   {
     "term": "public.meta-description",

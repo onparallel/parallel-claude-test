@@ -233,8 +233,10 @@ export const User = objectType({
           (user) => user.status === "ACTIVE",
         );
         const usersByOrgId = indexBy(users, (u) => u.org_id);
-        const orgs = await ctx.organizations.loadOrg(unique(users.map((u) => u.org_id)));
-        return sortBy(orgs.filter(isNonNullish), (o) => usersByOrgId[o.id].created_at);
+        const orgs = (await ctx.organizations.loadOrg(unique(users.map((u) => u.org_id))))
+          .filter(isNonNullish)
+          .filter((o) => !["INACTIVE", "CHURNED"].includes(o.status));
+        return sortBy(orgs, (o) => usersByOrgId[o.id].created_at);
       },
     });
     t.list.field("petitionListViews", {

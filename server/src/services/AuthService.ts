@@ -324,7 +324,6 @@ export class Auth implements IAuth {
       const email = (payload["email"] as string).toLowerCase();
       const externalId = payload["identities"][0].userId as string;
       const users = await this.users.loadUsersByEmail(email);
-      // TODO check this when users have more than 1 organization
       let user = users.find((u) => u.org_id === orgId);
       const userData = user ? await this.users.loadUserData(user.user_data_id) : null;
       if (isNullish(user)) {
@@ -440,7 +439,9 @@ export class Auth implements IAuth {
             res.status(401).send({ error: "InactiveUser" });
             return;
           }
-          res.status(401).send({ error: "UnknownError" });
+          // there is no ACTIVE nor INACTIVE user in any ACTIVE organization,
+          // so, all user organizations should be INACTIVE or CHURNED
+          res.status(401).send({ error: "InactiveOrganization" });
           return;
         }
         const userData = await this.users.loadUserData(user.user_data_id);
@@ -637,25 +638,45 @@ export class Auth implements IAuth {
     );
   }
 
+  private async findFirstUserWithActiveOrganization(users: User[]) {
+    if (users.length === 0) {
+      return null;
+    }
+
+    const orgs = (await this.orgs.loadOrg(users.map((u) => u.org_id))).filter(isNonNullish);
+    // return first user with an active organization
+    return (
+      users.find((u) => {
+        const org = orgs.find((o) => o.id === u.org_id);
+        return org && !["INACTIVE", "CHURNED"].includes(org.status);
+      }) ?? null
+    );
+  }
+
+  /**
+   * returns first ACTIVE user on an ACTIVE organization by a cognitoId
+   */
   private async getUserFromAuthenticationResult(result: AuthenticationResultType) {
     if (result.IdToken) {
       const payload = decode(result.IdToken) as any;
       const cognitoId = payload["cognito:username"] as string;
-      // TODO manage when users.length > 1
-      const [user] = await this.users.loadUsersByCognitoId(cognitoId);
-      return user;
+      const users = await this.users.loadUsersByCognitoId(cognitoId);
+      return await this.findFirstUserWithActiveOrganization(users);
     } else {
       return null;
     }
   }
 
+  /**
+   * returns first INACTIVE user on an ACTIVE organization by a cognitoId
+   */
   private async getInactiveUserFromAuthenticationResult(result: AuthenticationResultType) {
     try {
       if (result.IdToken) {
         const payload = decode(result.IdToken) as any;
         const cognitoId = payload["cognito:username"] as string;
-        const [user] = await this.users.loadInactiveUsersByCognitoId(cognitoId);
-        return user;
+        const users = await this.users.loadInactiveUsersByCognitoId(cognitoId);
+        return await this.findFirstUserWithActiveOrganization(users);
       } else {
         return null;
       }
@@ -849,7 +870,11 @@ export class Auth implements IAuth {
               return [user] as [User];
             }
           }
-          return users.length > 0 ? ([users[0]] as [User]) : null;
+          const user = await this.findFirstUserWithActiveOrganization(users);
+          if (user) {
+            return [user] as [User];
+          }
+          return null;
         } catch (error) {
           this.logger.error(error);
           return null;
@@ -980,12 +1005,11 @@ export class Auth implements IAuth {
       this.getUser(email),
     ]);
     const definedUsers = users.filter(isNonNullish);
-    if (definedUsers.length === 0) {
+    const user = await this.findFirstUserWithActiveOrganization(definedUsers);
+    if (!user) {
       throw new ForbiddenError("Not authorized");
     }
 
-    // TODO which org to use??
-    const user = definedUsers[0];
     if (user.status === "INACTIVE") {
       throw new ApolloError(`Wrong user status`, "RESET_USER_PASSWORD_INACTIVE_ERROR");
     }

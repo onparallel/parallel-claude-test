@@ -14810,6 +14810,11 @@
     "context": "Home"
   },
   {
+    "term": "page.login.back-to-login-link",
+    "definition": "Volver atrás",
+    "context": "Go back to login"
+  },
+  {
     "term": "page.login.deactivated-user-toast-body",
     "definition": "Tu cuenta está desactivada. Por favor, ponte en contacto con el administrador de tu organización.",
     "context": "Your account is deactivated. Please contact your organization's administrator."
@@ -14818,6 +14823,56 @@
     "term": "page.login.deactivated-user-toast-title",
     "definition": "Usuario desactivado",
     "context": "Deactivated user"
+  },
+  {
+    "term": "page.login.description",
+    "definition": "Entre en tu cuenta de Parallel",
+    "context": "Login to your Parallel account"
+  },
+  {
+    "term": "page.login.forgot-password-reset-success-toast-description",
+    "definition": "Su contraseña ha sido restablecida con éxito.",
+    "context": "Your password has been reset successfully."
+  },
+  {
+    "term": "page.login.forgot-password-reset-success-toast-title",
+    "definition": "Contraseña restablecida",
+    "context": "Password reset"
+  },
+  {
+    "term": "page.login.inactive-organization-toast-description",
+    "definition": "No es posible acceder a tu cuenta en este momento ya que ha sido desactivada. Si crees que esto es un error o deseas reactivar tu cuenta, por favor contacta a nuestro equipo de soporte en support@onparallel.com.",
+    "context": "You cannot access your account at this time as it has been deactivated. If you believe this is an error or wish to reactivate your account, please contact our support team at support@onparallel.com."
+  },
+  {
+    "term": "page.login.inactive-organization-toast-title",
+    "definition": "Cuenta desactivada",
+    "context": "Account deactivated"
+  },
+  {
+    "term": "page.login.invalid-login-toast-description",
+    "definition": "El correo electrónico o la contraseña proporcionados no son válidos.",
+    "context": "The email or password are invalid."
+  },
+  {
+    "term": "page.login.invalid-login-toast-title",
+    "definition": "Acceso inválido",
+    "context": "Invalid login"
+  },
+  {
+    "term": "page.login.password-reset-required-toast-description",
+    "definition": "Se requiere que restablezcas la contraseña.",
+    "context": "A password reset is required."
+  },
+  {
+    "term": "page.login.password-reset-required-toast-title",
+    "definition": "Restablecer contraseña",
+    "context": "Password reset"
+  },
+  {
+    "term": "page.login.title",
+    "definition": "Entra en Parallel",
+    "context": "Login"
   },
   {
     "term": "page.maintenance.description",
@@ -17010,26 +17065,6 @@
     "context": "Password reset"
   },
   {
-    "term": "public.forgot-password.reset-required-toast-description",
-    "definition": "Se requiere que restablezcas la contraseña.",
-    "context": "A password reset is required."
-  },
-  {
-    "term": "public.forgot-password.reset-required-toast-title",
-    "definition": "Restablecer contraseña",
-    "context": "Password reset"
-  },
-  {
-    "term": "public.forgot-password.reset-success-toast-description",
-    "definition": "Su contraseña ha sido restablecida con éxito.",
-    "context": "Your password has been reset successfully."
-  },
-  {
-    "term": "public.forgot-password.reset-success-toast-title",
-    "definition": "Contraseña restablecida",
-    "context": "Password reset"
-  },
-  {
     "term": "public.forgot-password.send-button",
     "definition": "Enviar código de verificación",
     "context": "Send verification code"
@@ -17085,11 +17120,6 @@
     "context": "Go back to forgot password"
   },
   {
-    "term": "public.login.back-to-login-link",
-    "definition": "Volver atrás",
-    "context": "Go back to login"
-  },
-  {
     "term": "public.login.explanation-with-sso",
     "definition": "Accede mediante SSO",
     "context": "Login using Single sign-on"
@@ -17105,16 +17135,6 @@
     "context": "Enter Parallel"
   },
   {
-    "term": "public.login.invalid-login.description",
-    "definition": "El correo electrónico o la contraseña proporcionados no son válidos.",
-    "context": "The email or password are invalid."
-  },
-  {
-    "term": "public.login.invalid-login.title",
-    "definition": "Acceso inválido",
-    "context": "Invalid login"
-  },
-  {
     "term": "public.login.login-with-password",
     "definition": "Acceder con contraseña",
     "context": "Login with password"
@@ -17123,11 +17143,6 @@
     "term": "public.login.login-with-sso",
     "definition": "Acceder con SSO",
     "context": "Login with SSO"
-  },
-  {
-    "term": "public.login.meta-description",
-    "definition": "Entre en tu cuenta de Parallel",
-    "context": "Login to your Parallel account"
   },
   {
     "term": "public.login.password-update-button",
@@ -17153,11 +17168,6 @@
     "term": "public.login.sso-enabled",
     "definition": "SSO activado",
     "context": "Single sign-on enabled"
-  },
-  {
-    "term": "public.login.title",
-    "definition": "Entra en Parallel",
-    "context": "Login"
   },
   {
     "term": "public.meta-description",
