@@ -382,16 +382,11 @@ export class Auth implements IAuth {
             userData.last_name !== lastName ||
             userData.cognito_id !== cognitoId
           ) {
-            this.logger.error(`
-              User data mismatch.
-              existing: ${JSON.stringify(pick(userData, ["id", "first_name", "last_name", "cognito_id"]))}
-              incoming: ${JSON.stringify({ firstName, lastName, cognitoId })}
-            `);
             await this.users.updateUserData(
               userData.id,
               {
-                // first_name: firstName,
-                // last_name: lastName,
+                first_name: firstName,
+                last_name: lastName,
                 cognito_id: cognitoId,
                 is_sso_user: true,
               },
