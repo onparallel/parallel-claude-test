@@ -24,8 +24,7 @@ Authorization: Bearer QrUV6NYDk2KcXg96KrHCQTTuKyt5oU8ETHueF5awWZe6
 ## Rate limiting
 
 To ensure optimal performance and fair access to our API resources for all
-users, we have implemented rate limiting. Starting September 1st, API usage will
-be limited to 100 requests per minute per client.
+users, API usage is limited to 100 requests per minute per client.
 
 Rate limit information is provided through HTTP headers in two distinct formats:
 
