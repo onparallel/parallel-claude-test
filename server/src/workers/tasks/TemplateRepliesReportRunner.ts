@@ -60,6 +60,10 @@ function getPetitionSignatureStatus({
 }
 
 export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_REPORT"> {
+  private info(message: string) {
+    this.ctx.logger.info(`[TemplateRepliesReportRunner:${this.task.input.petition_id}] ${message}`);
+  }
+
   async run() {
     const {
       petition_id: templateId,
@@ -93,6 +97,8 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         endDate,
       ),
     ]);
+    this.info(`Loaded ${petitions.length} petitions`);
+
     const intl = await this.ctx.i18n.getIntl(template!.recipient_locale);
 
     const headers = this.buildExcelHeaders(includePreviewUrl, templateFields, intl);
@@ -109,11 +115,15 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         { chunkSize: 200, concurrency: 1 },
       );
 
+      this.info(`Loaded ${petitionsAccesses.length} accesses`);
+
       const petitionsMessages = await pMapChunk(
         ids,
         async (ids) => await this.ctx.readonlyPetitions.loadMessagesByPetitionId(ids),
         { chunkSize: 200, concurrency: 1 },
       );
+
+      this.info(`Loaded ${petitionsMessages.length} messages`);
 
       const composedPetitions = await pMapChunk(
         ids,
@@ -121,11 +131,15 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         { chunkSize: 200, concurrency: 1 },
       );
 
+      this.info(`Loaded ${composedPetitions.length} composed petitions`);
+
       const petitionsOwner = await pMapChunk(
         ids,
         async (ids) => await this.ctx.readonlyPetitions.loadPetitionOwner(ids),
         { chunkSize: 200, concurrency: 1 },
       );
+
+      this.info(`Loaded ${petitionsOwner.length} petition owners`);
 
       const petitionsTags = await pMapChunk(
         ids,
@@ -133,11 +147,15 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         { chunkSize: 200, concurrency: 1 },
       );
 
+      this.info(`Loaded ${petitionsTags.length} tags`);
+
       const petitionsEvents = await pMapChunk(
         ids,
         async (ids) => await this.ctx.readonlyPetitions.loadPetitionEventsByPetitionId(ids),
         { chunkSize: 200, concurrency: 1 },
       );
+
+      this.info(`Loaded ${petitionsEvents.length} events`);
 
       const latestSignatures = await pMapChunk(
         ids,
@@ -146,11 +164,15 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         { chunkSize: 200, concurrency: 1 },
       );
 
+      this.info(`Loaded ${latestSignatures.length} signatures`);
+
       const petitionsAccessesContacts = await Promise.all(
         petitionsAccesses.map((accesses) =>
           this.ctx.readonlyContacts.loadContactByAccessId(accesses.map((a) => a.id)),
         ),
       );
+
+      this.info(`Loaded ${petitionsAccessesContacts.length} contacts`);
 
       const petitionsOwnerUserData = await Promise.all(
         petitionsOwner.map((user) => this.ctx.users.loadUserDataByUserId(user!.id)),
@@ -171,7 +193,15 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         ),
       );
 
+      this.info(`Loaded ${petitionsFirstMessageUserData.length} user datas`);
+
       rows = petitions.map((petition, petitionIndex) => {
+        if (petitionIndex % 100 === 0) {
+          this.info(
+            `about to process petition ${petition.id} (${petitionIndex + 1}/${petitions.length})...`,
+          );
+        }
+
         const logic = evaluateFieldLogic(composedPetitions[petitionIndex]);
         const petitionFields = applyFieldVisibility(composedPetitions[petitionIndex]).filter(
           (f) => f.type !== "HEADING",
@@ -384,8 +414,10 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       });
     }
 
+    this.info("exporting data to excel...");
     const stream = await this.exportToExcel(headers, rows);
 
+    this.info("uploading excel file to temporary bucket...");
     const tmpFile = await this.uploadTemporaryFile({
       stream,
       filename: intl.formatMessage(
