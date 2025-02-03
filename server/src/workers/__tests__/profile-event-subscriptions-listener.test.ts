@@ -264,7 +264,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
       createdAt: event.created_at,
     });
 
-    expect(fetchSpy).toHaveBeenCalledTimes(4);
+    expect(fetchSpy).toHaveBeenCalledTimes(5);
     expect(fetchSpy.mock.calls[0]).toMatchObject([
       "https://users.0.com/events",
       expectRequestInit(0, {
@@ -303,6 +303,18 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
     ]);
     expect(fetchSpy.mock.calls[3]).toMatchObject([
       "https://users.3.com/events",
+      expectRequestInit(0, {
+        method: "POST",
+        body,
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+        },
+      }),
+      { timeout: 15_000, maxRetries: 3 },
+    ]);
+    expect(fetchSpy.mock.calls[4]).toMatchObject([
+      "https://users.5.com/events",
       expectRequestInit(0, {
         method: "POST",
         body,
@@ -385,7 +397,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
       createdAt: event.created_at,
     });
 
-    expect(fetchSpy).toHaveBeenCalledTimes(3);
+    expect(fetchSpy).toHaveBeenCalledTimes(4);
     expect(fetchSpy.mock.calls[0]).toMatchObject([
       "https://users.0.com/events",
       expectRequestInit(0, {
@@ -424,7 +436,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
       }),
       { timeout: 15_000, maxRetries: 3 },
     ]);
-    expect(fetchSpy.mock.calls[2]).toMatchObject([
+    expect(fetchSpy.mock.calls[3]).toMatchObject([
       "https://users.5.com/events",
       expectRequestInit(0, {
         method: "POST",
@@ -530,7 +542,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
       createdAt: event.created_at,
     });
 
-    expect(fetchSpy).toHaveBeenCalledTimes(4);
+    expect(fetchSpy).toHaveBeenCalledTimes(5);
     expect(fetchSpy.mock.calls[0]).toMatchObject([
       "https://users.0.com/events",
       expectRequestInit(0, {
@@ -623,6 +635,18 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
       }),
       { timeout: 15_000, maxRetries: 3 },
     ]);
+    expect(fetchSpy.mock.calls[4]).toMatchObject([
+      "https://users.5.com/events",
+      expectRequestInit(0, {
+        method: "POST",
+        body,
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+        },
+      }),
+      { timeout: 15_000, maxRetries: 3 },
+    ]);
   });
 
   it("sends email and sets subscription as failing when event can not be delivered", async () => {
@@ -655,7 +679,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
       ctx,
     );
 
-    expect(fetchSpy).toHaveBeenCalledTimes(4);
+    expect(fetchSpy).toHaveBeenCalledTimes(5);
     expect(emailSpy).toHaveBeenCalledTimes(1);
 
     const user0Subscription = subscriptions.find((s) => s.user_id === users[0].id)!;
@@ -749,7 +773,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
       createdAt: event.created_at,
     });
 
-    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(fetchSpy).toHaveBeenCalledTimes(3);
     expect(fetchSpy.mock.calls[0]).toMatchObject([
       "https://users.0.com/events",
       expectRequestInit(0, {
@@ -763,6 +787,18 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
       { timeout: 15_000, maxRetries: 3 },
     ]);
     expect(fetchSpy.mock.calls[1]).toMatchObject([
+      "https://users.2.com/events-unsubscribed-profile",
+      expectRequestInit(0, {
+        method: "POST",
+        body,
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+        },
+      }),
+      { timeout: 15_000, maxRetries: 3 },
+    ]);
+    expect(fetchSpy.mock.calls[2]).toMatchObject([
       "https://users.3.com/events",
       expectRequestInit(0, {
         method: "POST",
