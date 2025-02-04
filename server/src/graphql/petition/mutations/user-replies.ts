@@ -840,9 +840,13 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
         userId: ctx.user!.id,
         profileTypeFieldId: params.profileTypeFieldId,
       });
-
       if (!isAtLeast(effectivePermission, "WRITE")) {
         throw new ForbiddenError("User does not have WRITE permission on this field");
+      }
+
+      const userPermissions = await ctx.users.loadUserPermissions(ctx.user!.id);
+      if (!userPermissions.includes("PROFILES:CREATE_PROFILES")) {
+        throw new ForbiddenError("User does not have permission to write profiles");
       }
 
       const profileFieldValues = await ctx.profiles.loadProfileFieldValuesByProfileId(

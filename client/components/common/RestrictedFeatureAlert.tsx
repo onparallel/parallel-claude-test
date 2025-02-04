@@ -1,19 +1,21 @@
-import { Alert, AlertDescription, AlertIcon, Text } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, AlertProps, Text } from "@chakra-ui/react";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { FormattedMessage } from "react-intl";
 import { Link } from "./Link";
 
-export function RestrictedFeatureAlert() {
+export function RestrictedFeatureAlert({ children, ...props }: AlertProps) {
   const userCanListOrgUsers = useHasPermission("USERS:LIST_USERS");
   return (
-    <Alert status="info" rounded="md">
+    <Alert status="info" rounded="md" {...props}>
       <AlertIcon />
       <AlertDescription>
         <Text>
-          <FormattedMessage
-            id="component.restricted-feature-alert.restricted"
-            defaultMessage="This feature is restricted."
-          />
+          {children ?? (
+            <FormattedMessage
+              id="component.restricted-feature-alert.restricted"
+              defaultMessage="This feature is restricted."
+            />
+          )}
         </Text>
         <Text>
           <FormattedMessage

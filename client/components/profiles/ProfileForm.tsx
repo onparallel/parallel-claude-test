@@ -58,6 +58,7 @@ import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Link } from "../common/Link";
 import { ProfileReference } from "../common/ProfileReference";
+import { RestrictedFeatureAlert } from "../common/RestrictedFeatureAlert";
 import { Spacer } from "../common/Spacer";
 import { useImportFromExternalSourceDialog } from "./dialogs/ImportFromExternalSourceDialog";
 
@@ -131,8 +132,6 @@ export const ProfileForm = Object.assign(
       () => partition(profile.properties, (property) => property.field.myPermission !== "HIDDEN"),
       [profile.properties],
     );
-
-    const status = profile.status;
 
     const {
       register,
@@ -243,6 +242,8 @@ export const ProfileForm = Object.assign(
       }
     }
 
+    const userCanCreateProfiles = useHasPermission("PROFILES:CREATE_PROFILES");
+    const isFormDisabled = !userCanCreateProfiles || profile.status !== "OPEN";
     return (
       <Flex
         ref={ref}
@@ -476,7 +477,7 @@ export const ProfileForm = Object.assign(
             {profile.profileType.standardType === "INDIVIDUAL" ||
             profile.profileType.standardType === "LEGAL_ENTITY" ? (
               <IconButtonWithTooltip
-                isDisabled={profile.status !== "OPEN"}
+                isDisabled={isFormDisabled}
                 onClick={handleCheckExternalSourcesClick}
                 icon={<SearchIcon />}
                 size="sm"
@@ -524,6 +525,14 @@ export const ProfileForm = Object.assign(
             permanentDeletionAt={profile.permanentDeletionAt!}
           />
         ) : null}
+        {!userCanCreateProfiles && profile.status === "OPEN" ? (
+          <RestrictedFeatureAlert rounded="none">
+            <FormattedMessage
+              id="component.profile-form.cant-edit-profiles"
+              defaultMessage="You don't have permission to edit profiles."
+            />
+          </RestrictedFeatureAlert>
+        ) : null}
         {editedFieldsCount ? (
           <EditedFieldsAlert
             editedFieldsCount={editedFieldsCount}
@@ -556,7 +565,7 @@ export const ProfileForm = Object.assign(
                   setError={setError}
                   clearErrors={clearErrors}
                   fieldsWithIndices={suggestedFields}
-                  isDisabled={field.myPermission === "READ" || status !== "OPEN"}
+                  isDisabled={field.myPermission === "READ" || isFormDisabled}
                   onRefetch={onRefetch}
                   petitionId={petitionId}
                   properties={properties}

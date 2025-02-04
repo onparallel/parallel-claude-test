@@ -1079,6 +1079,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
   type: "Profile",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
+    contextUserHasPermission("PROFILES:CREATE_PROFILES"),
     userHasAccessToProfile("profileId"),
     profileIsNotAnonymized("profileId"),
     profileHasStatus("profileId", "OPEN"),
@@ -1243,6 +1244,7 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
   type: "ProfileFieldPropertyAndFileWithUploadData",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
+    contextUserHasPermission("PROFILES:CREATE_PROFILES"),
     userHasAccessToProfile("profileId"),
     profileHasStatus("profileId", "OPEN"),
     profileIsNotAnonymized("profileId"),
@@ -1381,6 +1383,7 @@ export const profileFieldFileUploadComplete = mutationField("profileFieldFileUpl
   type: list("ProfileFieldFile"),
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
+    contextUserHasPermission("PROFILES:CREATE_PROFILES"),
     userHasAccessToProfile("profileId"),
     profileHasStatus("profileId", "OPEN"),
     profileIsNotAnonymized("profileId"),
@@ -1428,6 +1431,7 @@ export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
   type: "Result",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
+    contextUserHasPermission("PROFILES:CREATE_PROFILES"),
     userHasAccessToProfile("profileId"),
     profileHasStatus("profileId", "OPEN"),
     profileIsNotAnonymized("profileId"),
@@ -1489,6 +1493,7 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
   type: list("ProfileFieldFile"),
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
+    contextUserHasPermission("PROFILES:CREATE_PROFILES"),
     userHasAccessToProfile("profileId"),
     profileHasStatus("profileId", "OPEN"),
     profileIsNotAnonymized("profileId"),
@@ -1580,6 +1585,7 @@ export const copyBackgroundCheckReplyToProfileFieldValue = mutationField(
     type: "ProfileFieldValue",
     authorize: authenticateAnd(
       userHasFeatureFlag("PROFILES"),
+      contextUserHasPermission("PROFILES:CREATE_PROFILES"),
       userHasAccessToProfile("profileId"),
       profileHasStatus("profileId", "OPEN"),
       profileIsNotAnonymized("profileId"),
@@ -2303,6 +2309,7 @@ export const completeProfileFromExternalSource = mutationField(
     type: nonNull("Profile"),
     authorize: authenticateAnd(
       userHasFeatureFlag("PROFILES"),
+      contextUserHasPermission("PROFILES:CREATE_PROFILES"),
       ifArgDefined(
         "profileId",
         and(
@@ -2311,7 +2318,6 @@ export const completeProfileFromExternalSource = mutationField(
           profileIsNotAnonymized("profileId" as never),
           profileMatchesProfileType("profileId" as never, "profileTypeId"),
         ),
-        contextUserHasPermission("PROFILES:CREATE_PROFILES"),
       ),
       userHasAccessToProfileType("profileTypeId"),
       not(profileTypeIsArchived("profileTypeId")),

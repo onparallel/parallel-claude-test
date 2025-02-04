@@ -10,6 +10,7 @@ import {
   ProfileSelectRerenderProvider,
   ProfileSelectSelection,
 } from "@parallel/components/common/ProfileSelect";
+import { RestrictedFeatureAlert } from "@parallel/components/common/RestrictedFeatureAlert";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   DialogProps,
@@ -31,6 +32,7 @@ import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { getProfileNamePreview } from "@parallel/utils/getProfileNamePreview";
 import { useReopenProfile } from "@parallel/utils/mutations/useReopenProfile";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { difference, isNonNullish, isNullish, sort, unique, zip } from "remeda";
@@ -59,6 +61,8 @@ function ArchiveFieldGroupReplyIntoProfileDialog({
 
   const unsavedSelectedProfiles = useRef<string[]>([]);
 
+  const userCanCreateProfiles = useHasPermission("PROFILES:CREATE_PROFILES");
+
   return (
     <ConfirmDialog
       size="4xl"
@@ -75,6 +79,15 @@ function ArchiveFieldGroupReplyIntoProfileDialog({
       }
       body={
         <Stack spacing={4}>
+          {userCanCreateProfiles ? null : (
+            <RestrictedFeatureAlert>
+              <FormattedMessage
+                id="component.associate-and-fill-profile-to-parallel-dialog.cant-create-profiles"
+                defaultMessage="You don't have permission to create or save the information in profiles."
+              />
+            </RestrictedFeatureAlert>
+          )}
+
           <Text>
             <FormattedMessage
               id="component.associate-and-fill-profile-to-parallel-dialog.body"
@@ -96,6 +109,7 @@ function ArchiveFieldGroupReplyIntoProfileDialog({
                 );
               }}
               onRefetch={onRefetch}
+              isDisabled={!userCanCreateProfiles}
             />
           ) : (
             <></>
@@ -126,11 +140,13 @@ function ArchiveFieldGroupReplyIntoProfileGrid({
   onRefetch,
   onSelectProfile,
   onSaveProfile,
+  isDisabled,
 }: {
   petition: useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment;
   onRefetch: () => void;
   onSelectProfile: (profileId: string) => void;
   onSaveProfile: (profileId: string) => void;
+  isDisabled?: boolean;
 }) {
   const fieldGroupsWithProfileTypes = zip(petition.fields, useFieldLogic(petition))
     .filter(
@@ -157,6 +173,7 @@ function ArchiveFieldGroupReplyIntoProfileGrid({
                 onSelectProfile={onSelectProfile}
                 onSaveProfile={onSaveProfile}
                 onRefetch={onRefetch}
+                isDisabled={isDisabled}
               />
             );
           });
@@ -174,6 +191,7 @@ interface ArchiveFieldGroupReplyIntoProfileRowProps {
   onSelectProfile: (profileId: string) => void;
   onSaveProfile: (profileId: string) => void;
   onRefetch: () => void;
+  isDisabled?: boolean;
 }
 
 function ArchiveFieldGroupReplyIntoProfileRow({
@@ -184,6 +202,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
   onSelectProfile,
   onSaveProfile,
   onRefetch,
+  isDisabled,
 }: ArchiveFieldGroupReplyIntoProfileRowProps) {
   const intl = useIntl();
 
@@ -472,7 +491,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
             )}
             createOptionPosition="first"
             profileTypeId={field?.profileType?.id}
-            isDisabled={!isEditing && isSaved}
+            isDisabled={(!isEditing && isSaved) || isDisabled}
           />
         </FormControl>
         {isSaved ? (
@@ -486,6 +505,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
                 setIsEditing(false);
                 setSelectedProfile(savedProfile.current);
               }}
+              isDisabled={isDisabled}
             />
           ) : (
             <IconButtonWithTooltip
@@ -497,6 +517,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
                 e.stopPropagation();
                 setIsEditing(true);
               }}
+              isDisabled={isDisabled}
             />
           )
         ) : null}
@@ -509,6 +530,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
             onClick={() => {
               archiveProfile(selectedProfile!);
             }}
+            isDisabled={isDisabled}
           >
             <FormattedMessage id="generic.update" defaultMessage="Update" />
           </Button>
@@ -533,7 +555,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
           colorScheme="primary"
           leftIcon={<SaveIcon />}
           onClick={() => archiveProfile(selectedProfile!)}
-          isDisabled={savedProfile.current?.id === selectedProfile?.id}
+          isDisabled={savedProfile.current?.id === selectedProfile?.id || isDisabled}
         >
           <FormattedMessage id="generic.save" defaultMessage="Save" />
         </Button>

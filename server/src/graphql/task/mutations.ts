@@ -864,7 +864,11 @@ export const createRemovePetitionPermissionMaybeTask = mutationField(
 export const createProfilesExcelImportTask = mutationField("createProfilesExcelImportTask", {
   description: "Creates a task for importing profiles from an excel file",
   type: "Task",
-  authorize: authenticateAnd(userHasAccessToProfileType("profileTypeId")),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    contextUserHasPermission("PROFILES:CREATE_PROFILES"),
+    userHasAccessToProfileType("profileTypeId"),
+  ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
     file: nonNull(uploadArg()),

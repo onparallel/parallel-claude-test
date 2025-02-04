@@ -3206,6 +3206,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
     description: "Archives the replies of a FIELD_GROUP field into a profile",
     authorize: authenticateAnd(
       userHasFeatureFlag("PROFILES"),
+      contextUserHasPermission("PROFILES:CREATE_PROFILES"),
       userHasAccessToProfile("profileId"),
       profileHasStatus("profileId", ["OPEN"]),
       profileIsNotAnonymized("profileId"),

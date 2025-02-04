@@ -405,6 +405,11 @@
     "context": "Select in which profile you want to save the information of each group."
   },
   {
+    "term": "component.associate-and-fill-profile-to-parallel-dialog.cant-create-profiles",
+    "definition": "No tienes permiso para crear ni guardar la información en perfiles.",
+    "context": "You don't have permission to create or save the information in profiles."
+  },
+  {
     "term": "component.associate-and-fill-profile-to-parallel-dialog.header",
     "definition": "Asociar {count, plural, =1{perfil} other{perfiles}}",
     "context": "Associate {count, plural, =1{profile} other{profiles}}"
@@ -7938,6 +7943,11 @@
     "term": "component.profile-form.associated-profiles-count",
     "definition": "{count, plural, =1 {# asociación} other {# asociaciones}}",
     "context": "{count, plural, =1 {# association} other {# associations}}"
+  },
+  {
+    "term": "component.profile-form.cant-edit-profiles",
+    "definition": "No tienes permiso para editar perfiles.",
+    "context": "You don't have permission to edit profiles."
   },
   {
     "term": "component.profile-form.check-external-sources-tooltip",
