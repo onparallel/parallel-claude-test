@@ -2695,56 +2695,42 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async getPetitionFieldsWithReplies(petitionIds: number[]) {
-    const fields = await this.withTransaction(async (t) => {
-      // if not disabled it will seq scan petition_field_reply rather than using the index on petition_field_id
-      await t.raw(/* sql */ `set local enable_seqscan = off;`);
-      return await this.raw<
-        PetitionField & {
-          replies: PetitionFieldReply[];
-        }
-      >(
-        /* sql */ `
-        select
-          pf.*,
-          coalesce( -- jsonb_agg filter (where ...) will return null if no rows match
-            case when count(*) filter (where pfr.id is not null) > 0 then
-              jsonb_agg(
-                pfr.* order by pfr.created_at asc
-              ) filter (
-                -- when file field types, filter replies with upload_complete
-                where
-                case when pfr.type in (
-                  'FILE_UPLOAD',
-                  'ES_TAX_DOCUMENTS',
-                  'ID_VERIFICATION',
-                  'DOW_JONES_KYC'
-                )
-                then fu.id is not null and fu.upload_complete
-                else true
-                end
-              )
-            end,
-            '[]'::jsonb
-          ) as replies
-        from petition_field pf
-        left join petition_field_reply as pfr on pfr.petition_field_id = pf.id and pfr.deleted_at is null
-        left join file_upload fu
-          on pfr.type in (
-            'FILE_UPLOAD',
-            'ES_TAX_DOCUMENTS',
-            'ID_VERIFICATION',
-            'DOW_JONES_KYC'
-          ) and (pfr.content->>'file_upload_id')::int = fu.id
-        where
-          pf.petition_id in ?
+    const fields = await this.raw<
+      PetitionField & {
+        replies: PetitionFieldReply[];
+      }
+    >(
+      /* sql */ `
+        with pf as (
+          select pf.* from petition_field pf
+          where pf.petition_id in ?
           and pf.deleted_at is null
-
-        group by pf.id; 
+        ), pfr as (
+          select * from petition_field_reply pfr
+          where pfr.petition_field_id in (select id from pf) and pfr.deleted_at is null
+        ), fu as (
+          select * from file_upload fu where fu.id in (
+            select (pfr.content->>'file_upload_id')::int from pfr
+            where pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'ID_VERIFICATION', 'DOW_JONES_KYC') and fu.upload_complete = true
+          )
+        ), aggr_replies as (
+          select pf.id as petition_field_id,
+            coalesce( -- jsonb_agg filter (where ...) will return null if no rows match
+              case when count(*) filter (where pfr.id is not null) > 0 then
+                jsonb_agg( pfr.* order by pfr.created_at asc ) filter (
+                  where case when pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'ID_VERIFICATION', 'DOW_JONES_KYC') then fu.id is not null else true end
+                )
+              end,
+              '[]'::jsonb
+            ) as replies
+          from pf
+          left join pfr on pfr.petition_field_id = pf.id
+          left join fu on (pfr.content->>'file_upload_id')::int = fu.id
+          group by pf.id
+        ) select * from pf join aggr_replies on pf.id = aggr_replies.petition_field_id
       `,
-        [this.sqlIn(petitionIds)],
-        t,
-      );
-    });
+      [this.sqlIn(petitionIds)],
+    );
 
     const fieldsByPetition = pipe(
       fields,
