@@ -51,6 +51,7 @@ export function csp(ctx: DocumentContext, nonce: string) {
           "px.ads.linkedin.com",
           "*.google-analytics.com",
         ],
+        ["font-src", "'self'", statics, "fonts.gstatic.com", "fonts.intercomcdn.com"],
         ["report-uri", reportUri],
       ]),
     );
