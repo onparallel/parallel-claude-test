@@ -255,11 +255,7 @@ function Login() {
                 onResendEmail={handleResendVerificationEmail}
               />
               {showContinueAs ? (
-                <AlreadyLoggedIn
-                  me={data!.me}
-                  onRelogin={() => setShowContinueAs(false)}
-                  onContinueAs={() => redirectToApp(data!.me.preferredLocale, true)}
-                />
+                <AlreadyLoggedIn me={data!.me} onRelogin={() => setShowContinueAs(false)} />
               ) : passwordChange?.type === "CHANGE" ? (
                 <PasswordChangeForm
                   onSubmit={handlePasswordChangeSubmit}
