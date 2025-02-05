@@ -7066,7 +7066,6 @@ export type UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimitFragment 
 
 export type AlreadyLoggedIn_UserFragment = {
   __typename?: "User";
-  preferredLocale: UserLocale;
   email: string;
   fullName?: string | null;
   avatarUrl?: string | null;
@@ -62021,7 +62020,6 @@ export const UpdateOrganizationCurrentUsagePeriodDialog_OrganizationUsageLimitFr
 >;
 export const AlreadyLoggedIn_UserFragmentDoc = gql`
   fragment AlreadyLoggedIn_User on User {
-    preferredLocale
     email
     fullName
     ...UserAvatar_User

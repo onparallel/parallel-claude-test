@@ -49,13 +49,8 @@ function Login() {
   const toast = useToast();
 
   function redirectToApp(locale?: UserLocale, continueToApp?: boolean) {
-    router.push(
-      typeof router.query.redirect === "string" && router.query.redirect.startsWith("/")
-        ? router.query.redirect
-        : "/app" + (continueToApp ? "?continue" : ""),
-      undefined,
-      { locale },
-    );
+    const href = `/${locale ?? ""}${typeof router.query.redirect === "string" && router.query.redirect.startsWith("/") ? router.query.redirect : "/app" + (continueToApp ? "?continue" : "")}`;
+    window.location.href = href;
   }
 
   async function handleLoginSubmit({ email, password }: LoginData) {
@@ -255,7 +250,11 @@ function Login() {
                 onResendEmail={handleResendVerificationEmail}
               />
               {showContinueAs ? (
-                <AlreadyLoggedIn me={data!.me} onRelogin={() => setShowContinueAs(false)} />
+                <AlreadyLoggedIn
+                  me={data!.me}
+                  onRelogin={() => setShowContinueAs(false)}
+                  onContinueAs={() => redirectToApp(data!.me.preferredLocale, true)}
+                />
               ) : passwordChange?.type === "CHANGE" ? (
                 <PasswordChangeForm
                   onSubmit={handlePasswordChangeSubmit}

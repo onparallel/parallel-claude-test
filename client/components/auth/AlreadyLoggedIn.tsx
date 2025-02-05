@@ -2,18 +2,15 @@ import { gql } from "@apollo/client";
 import { Box, Button, Text } from "@chakra-ui/react";
 import { NormalLink } from "@parallel/components/common/Link";
 import { AlreadyLoggedIn_UserFragment } from "@parallel/graphql/__types";
-import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
 import { UserAvatar } from "../common/UserAvatar";
 
 interface AlreadyLoggedInProps {
   me: AlreadyLoggedIn_UserFragment;
   onRelogin: () => void;
+  onContinueAs: () => void;
 }
-export function AlreadyLoggedIn({ me, onRelogin }: AlreadyLoggedInProps) {
-  const router = useRouter();
-  const href = `/${me.preferredLocale}${typeof router.query.redirect === "string" && router.query.redirect.startsWith("/") ? router.query.redirect : "/app?continue"}`;
-
+export function AlreadyLoggedIn({ me, onRelogin, onContinueAs }: AlreadyLoggedInProps) {
   return (
     <>
       <Box marginTop={4} textAlign="center">
@@ -27,15 +24,13 @@ export function AlreadyLoggedIn({ me, onRelogin }: AlreadyLoggedInProps) {
         </Text>
         {me.fullName ? <Text>({me.email})</Text> : null}
       </Box>
-
-      <Button as="a" href={href} marginTop={6} width="100%" colorScheme="primary">
+      <Button marginTop={6} width="100%" colorScheme="primary" type="submit" onClick={onContinueAs}>
         <FormattedMessage
           id="public.login.already-logged-in.continue-button"
           defaultMessage="Continue as {name}"
           values={{ name: me.fullName || me.email }}
         />
       </Button>
-
       <Box marginTop={4} textAlign="center">
         <NormalLink role="button" onClick={onRelogin}>
           <FormattedMessage
@@ -51,7 +46,6 @@ export function AlreadyLoggedIn({ me, onRelogin }: AlreadyLoggedInProps) {
 AlreadyLoggedIn.fragments = {
   User: gql`
     fragment AlreadyLoggedIn_User on User {
-      preferredLocale
       email
       fullName
       ...UserAvatar_User
