@@ -56,36 +56,6 @@ export function ProfileFormFieldFileUpload({
     await downloadProfileFieldFile(profileId, field.id, profileFieldFileId, preview);
   };
 
-  const handleDownloadLocalFile = async (file: File, preview: boolean) => {
-    if (!preview) {
-      downloadLocalFile(file);
-    } else {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result;
-        if (result) {
-          const type = file.type;
-          switch (type) {
-            case "image/jpeg":
-            case "image/png":
-            case "image/gif":
-            case "image/webp":
-              const image = new Image();
-              image.src = result.toString();
-              const w = window.open("", "_blank");
-              if (w) {
-                w.document.write(image.outerHTML);
-              }
-              break;
-            default:
-              downloadLocalFile(file);
-          }
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const showErrorDialog = useErrorDialog();
 
   return (
@@ -128,9 +98,7 @@ export function ProfileFormFieldFileUpload({
                         name={file.name}
                         type={file.type}
                         size={file.size}
-                        onPreview={(preview) =>
-                          type === "ADD" && handleDownloadLocalFile(file, preview)
-                        }
+                        onPreview={(preview) => type === "ADD" && downloadLocalFile(file, preview)}
                         onRemove={() => {
                           onChange(
                             actions.filter(

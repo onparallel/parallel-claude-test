@@ -1,10 +1,14 @@
-export async function downloadLocalFile(file: File) {
-  const response = await fetch(URL.createObjectURL(file));
-  const blob = await response.blob();
-  const url = window.URL.createObjectURL(blob);
+export async function downloadLocalFile(file: File, preview: boolean = false) {
+  const url = URL.createObjectURL(file);
   const link = document.createElement("a");
   link.href = url;
-  link.download = file.name;
+  if (preview) {
+    link.target = "_blank";
+  } else {
+    link.download = file.name;
+  }
   link.click();
-  window.URL.revokeObjectURL(url);
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 1000);
 }
