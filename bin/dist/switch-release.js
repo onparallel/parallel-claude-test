@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const client_cloudfront_1 = require("@aws-sdk/client-cloudfront");
 const client_ec2_1 = require("@aws-sdk/client-ec2");
 const client_elastic_load_balancing_1 = require("@aws-sdk/client-elastic-load-balancing");
-const client_sqs_1 = require("@aws-sdk/client-sqs");
 const chalk_1 = __importDefault(require("chalk"));
 const p_map_1 = __importDefault(require("p-map"));
 const remeda_1 = require("remeda");
@@ -16,10 +15,8 @@ const ssh_1 = require("./utils/ssh");
 const wait_1 = require("./utils/wait");
 const ec2 = new client_ec2_1.EC2Client({});
 const elb = new client_elastic_load_balancing_1.ElasticLoadBalancingClient({});
-const sqs = new client_sqs_1.SQSClient({});
 const cloudfront = new client_cloudfront_1.CloudFrontClient({});
 const OPS_DIR = "/home/ec2-user/main/ops/prod";
-const QUEUE_ARN_PREFIX = "arn:aws:sqs:eu-central-1:749273139513:";
 async function main() {
     const { commit: _commit, env } = await yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
@@ -150,14 +147,6 @@ async function main() {
         console.log(chalk_1.default.yellow `Starting workers on ${instance.InstanceId} ${instanceName}`);
         await (0, ssh_1.executeRemoteCommand)(ipAddress, `${OPS_DIR}/workers.sh start`);
         console.log(chalk_1.default.green.bold `Workers started on ${instance.InstanceId} ${instanceName}`);
-    });
-    const queueUrls = await sqs.send(new client_sqs_1.ListQueuesCommand()).then((r) => r.QueueUrls);
-    await (0, p_map_1.default)(queueUrls.filter((url) => url.endsWith(`-dl-${env}.fifo`) || url.endsWith(`-dl-${env}`)), async (url) => {
-        const queueName = url.match(/[^\/]+$/)[0];
-        await sqs.send(new client_sqs_1.StartMessageMoveTaskCommand({
-            SourceArn: QUEUE_ARN_PREFIX + queueName,
-            DestinationArn: QUEUE_ARN_PREFIX + queueName.replace("-dl-", "-"),
-        }));
     });
     await (0, p_map_1.default)(oldInstancesFull, async (instance) => {
         var _a, _b;
