@@ -60,7 +60,7 @@ export function csp(ctx: DocumentContext, nonce: string) {
       HEADER,
       buildPolicy([
         ["default-src", "'self'", statics],
-        ["img-src", "*"],
+        ["img-src", "*", "blob:"],
         [
           "media-src",
           "*",
