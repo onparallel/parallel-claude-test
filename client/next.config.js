@@ -107,7 +107,9 @@ module.exports = [
             tunnelRoute: "/monitoring",
             hideSourceMaps: true,
             disableLogger: true,
-            deleteSourcemapsAfterUpload: true,
+            sourcemaps: {
+              deleteSourcemapsAfterUpload: true,
+            },
           }),
       ]
     : []),
