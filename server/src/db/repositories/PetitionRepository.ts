@@ -245,7 +245,7 @@ export type PetitionSignatureRequestCancelData<CancelReason extends PetitionSign
 
 @injectable()
 export class PetitionRepository extends BaseRepository {
-  private readonly REPLY_EVENTS_DELAY_SECONDS = 60;
+  private readonly REPLY_EVENTS_DELAY_SECONDS = 15;
   constructor(
     @inject(KNEX) knex: Knex,
     @inject(PETITION_FILTER_REPOSITORY_HELPER)
