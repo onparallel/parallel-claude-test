@@ -9,6 +9,7 @@ import { FileAttachmentButton } from "@parallel/components/common/FileAttachment
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "@parallel/components/common/InternalFieldBadge";
 import { NakedLink } from "@parallel/components/common/Link";
+import { Spacer } from "@parallel/components/common/Spacer";
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { CommentsButton } from "@parallel/components/recipient-view/CommentsButton";
 import { RecipientViewPetitionFieldCheckbox } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldCheckbox";
@@ -448,17 +449,21 @@ export function RecipientViewPetitionFieldGroupCard({
   const tone = useTone();
   return (
     <Card as={Stack} padding={4} spacing={4} position="relative" id={id}>
-      {field.multiple ? (
+      {field.multiple || field.optional ? (
         <HStack minHeight="32px">
-          <Text width="100%">
-            {`${
-              field.options.groupName ??
-              intl.formatMessage({
-                id: "generic.group-name-fallback-reply",
-                defaultMessage: "Reply",
-              })
-            } ${index + 1}`}
-          </Text>
+          {field.multiple ? (
+            <Text width="100%">
+              {`${
+                field.options.groupName ??
+                intl.formatMessage({
+                  id: "generic.group-name-fallback-reply",
+                  defaultMessage: "Reply",
+                })
+              } ${index + 1}`}
+            </Text>
+          ) : (
+            <Spacer />
+          )}
 
           {isNonNullish(onRemoveReply) ? (
             <ConfimationPopover
