@@ -50,7 +50,7 @@ export interface AccessActivatedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -61,7 +61,7 @@ export interface AccessActivatedFromPublicPetitionLinkEvent extends PetitionEven
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -81,7 +81,7 @@ export interface AccessDeactivatedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   reason: Scalars["String"]["output"];
   type: PetitionEventType;
   user?: Maybe<User>;
@@ -94,7 +94,7 @@ export interface AccessDelegatedEvent extends PetitionEvent {
   id: Scalars["GID"]["output"];
   newAccess: PetitionAccess;
   originalAccess: PetitionAccess;
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -104,7 +104,7 @@ export interface AccessOpenedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -333,7 +333,7 @@ export interface CommentDeletedEvent extends PetitionEvent {
   id: Scalars["GID"]["output"];
   isGeneral: Scalars["Boolean"]["output"];
   isInternal: Scalars["Boolean"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -346,7 +346,7 @@ export interface CommentPublishedEvent extends PetitionEvent {
   id: Scalars["GID"]["output"];
   isGeneral: Scalars["Boolean"]["output"];
   isInternal: Scalars["Boolean"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -402,7 +402,7 @@ export interface ContactlessAccessUsedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -841,7 +841,7 @@ export interface GroupPermissionAddedEvent extends PetitionEvent {
   id: Scalars["GID"]["output"];
   permissionGroup?: Maybe<UserGroup>;
   permissionType: PetitionPermissionType;
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -853,7 +853,7 @@ export interface GroupPermissionEditedEvent extends PetitionEvent {
   id: Scalars["GID"]["output"];
   permissionGroup?: Maybe<UserGroup>;
   permissionType: PetitionPermissionType;
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -864,7 +864,7 @@ export interface GroupPermissionRemovedEvent extends PetitionEvent {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   permissionGroup?: Maybe<UserGroup>;
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -1008,7 +1008,7 @@ export interface MessageCancelledEvent extends PetitionEvent {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   message: PetitionMessage;
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   reason: Scalars["String"]["output"];
   type: PetitionEventType;
   user?: Maybe<User>;
@@ -1029,7 +1029,7 @@ export interface MessageScheduledEvent extends PetitionEvent {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   message: PetitionMessage;
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -1039,7 +1039,7 @@ export interface MessageSentEvent extends PetitionEvent {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   message: PetitionMessage;
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -3339,7 +3339,7 @@ export interface OwnershipTransferredEvent extends PetitionEvent {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   owner?: Maybe<User>;
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   previousOwner?: Maybe<User>;
   type: PetitionEventType;
   user?: Maybe<User>;
@@ -3455,6 +3455,7 @@ export interface Petition extends PetitionBase {
   tags: Array<Tag>;
   /** The preferred tone of organization. */
   tone: Tone;
+  type: PetitionBaseType;
   unreadGeneralCommentCount: Scalars["Int"]["output"];
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
@@ -3527,7 +3528,7 @@ export interface PetitionAnonymizedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -3646,6 +3647,7 @@ export interface PetitionBase {
   tags: Array<Tag>;
   /** The preferred tone of organization. */
   tone: Tone;
+  type: PetitionBaseType;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
   variables: Array<PetitionVariable>;
@@ -3655,6 +3657,7 @@ export interface PetitionBase {
 export interface PetitionBaseMini {
   __typename?: "PetitionBaseMini";
   currentSignatureRequest?: Maybe<PetitionSignatureRequestMini>;
+  full?: Maybe<PetitionBase>;
   /** The ID of the petition or template. */
   id: Scalars["GID"]["output"];
   /** Whether the template is publicly available or not */
@@ -3666,6 +3669,7 @@ export interface PetitionBaseMini {
   name?: Maybe<Scalars["String"]["output"]>;
   /** The status of the petition. */
   status?: Maybe<PetitionStatus>;
+  type: PetitionBaseType;
 }
 
 export type PetitionBaseOrFolder = Petition | PetitionFolder | PetitionTemplate;
@@ -3685,7 +3689,7 @@ export interface PetitionClonedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -3695,7 +3699,7 @@ export interface PetitionClosedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -3708,7 +3712,7 @@ export interface PetitionClosedNotifiedEvent extends PetitionEvent {
   /** The email message on HTML format. */
   emailBody?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -3719,7 +3723,7 @@ export interface PetitionCompletedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -3737,7 +3741,7 @@ export interface PetitionCreatedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -3753,7 +3757,7 @@ export interface PetitionDeletedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -3772,7 +3776,7 @@ export interface PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -4249,7 +4253,7 @@ export interface PetitionMessageBouncedEvent extends PetitionEvent {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   message: PetitionMessage;
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -4326,7 +4330,7 @@ export interface PetitionReminderBouncedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   reminder: PetitionReminder;
   type: PetitionEventType;
 }
@@ -4343,7 +4347,7 @@ export interface PetitionReopenedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -4496,7 +4500,7 @@ export interface PetitionTaggedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   tags: Array<Maybe<Tag>>;
   type: PetitionEventType;
   user?: Maybe<User>;
@@ -4600,6 +4604,7 @@ export interface PetitionTemplate extends PetitionBase {
   tags: Array<Tag>;
   /** The preferred tone of organization. */
   tone: Tone;
+  type: PetitionBaseType;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"]["output"];
   variables: Array<PetitionVariable>;
@@ -4616,7 +4621,7 @@ export interface PetitionUntaggedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   tags: Array<Maybe<Tag>>;
   type: PetitionEventType;
   user?: Maybe<User>;
@@ -4757,7 +4762,7 @@ export interface ProfileAssociatedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   profile?: Maybe<Profile>;
   type: PetitionEventType;
   user?: Maybe<User>;
@@ -4793,7 +4798,7 @@ export interface ProfileDisassociatedEvent extends PetitionEvent {
   data: Scalars["JSONObject"]["output"];
   disassociatedBy?: Maybe<UserOrPetitionAccess>;
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   profile?: Maybe<Profile>;
   type: PetitionEventType;
   user?: Maybe<User>;
@@ -6174,7 +6179,7 @@ export interface RecipientSignedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   signer?: Maybe<PetitionSigner>;
   type: PetitionEventType;
 }
@@ -6193,7 +6198,7 @@ export interface ReminderSentEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   reminder: PetitionReminder;
   type: PetitionEventType;
 }
@@ -6234,7 +6239,7 @@ export interface RemindersOptOutEvent extends PetitionEvent {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   other?: Maybe<Scalars["String"]["output"]>;
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   reason: Scalars["String"]["output"];
   type: PetitionEventType;
 }
@@ -6257,7 +6262,7 @@ export interface ReplyCreatedEvent extends PetitionEvent {
   data: Scalars["JSONObject"]["output"];
   field?: Maybe<PetitionField>;
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   reply?: Maybe<PetitionFieldReply>;
   type: PetitionEventType;
 }
@@ -6269,7 +6274,7 @@ export interface ReplyDeletedEvent extends PetitionEvent {
   deletedBy?: Maybe<UserOrPetitionAccess>;
   field?: Maybe<PetitionField>;
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -6279,7 +6284,7 @@ export interface ReplyStatusChangedEvent extends PetitionEvent {
   data: Scalars["JSONObject"]["output"];
   field?: Maybe<PetitionField>;
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   reply?: Maybe<PetitionFieldReply>;
   status: PetitionFieldReplyStatus;
   type: PetitionEventType;
@@ -6292,7 +6297,7 @@ export interface ReplyUpdatedEvent extends PetitionEvent {
   data: Scalars["JSONObject"]["output"];
   field?: Maybe<PetitionField>;
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   reply?: Maybe<PetitionFieldReply>;
   type: PetitionEventType;
   updatedBy?: Maybe<UserOrPetitionAccess>;
@@ -6320,7 +6325,7 @@ export interface SignatureCancelledEvent extends PetitionEvent {
   errorMessage?: Maybe<Scalars["String"]["output"]>;
   extraErrorData?: Maybe<Scalars["JSON"]["output"]>;
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -6339,7 +6344,7 @@ export interface SignatureCompletedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -6417,7 +6422,7 @@ export interface SignatureDeliveredEvent extends PetitionEvent {
   deliveredAt?: Maybe<Scalars["DateTime"]["output"]>;
   id: Scalars["GID"]["output"];
   openedAt?: Maybe<Scalars["DateTime"]["output"]>;
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   signature: PetitionSignatureRequest;
   signer?: Maybe<PetitionSigner>;
   type: PetitionEventType;
@@ -6428,7 +6433,7 @@ export interface SignatureOpenedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   signer?: Maybe<PetitionSigner>;
   type: PetitionEventType;
 }
@@ -6463,7 +6468,7 @@ export interface SignatureReminderEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -6473,7 +6478,7 @@ export interface SignatureStartedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   signature: PetitionSignatureRequest;
   type: PetitionEventType;
 }
@@ -6618,7 +6623,7 @@ export interface TemplateUsedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 }
 
@@ -6917,7 +6922,7 @@ export interface UserPermissionAddedEvent extends PetitionEvent {
   id: Scalars["GID"]["output"];
   permissionType: PetitionPermissionType;
   permissionUser?: Maybe<User>;
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -6929,7 +6934,7 @@ export interface UserPermissionEditedEvent extends PetitionEvent {
   id: Scalars["GID"]["output"];
   permissionType: PetitionPermissionType;
   permissionUser?: Maybe<User>;
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -6940,7 +6945,7 @@ export interface UserPermissionRemovedEvent extends PetitionEvent {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   permissionUser?: Maybe<User>;
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -13164,7 +13169,7 @@ export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragmen
   __typename?: "MessageScheduledEvent";
   id: string;
   createdAt: string;
-  petition?: { __typename?: "Petition"; id: string } | null;
+  petition?: { __typename?: "PetitionBaseMini"; id: string } | null;
   message: {
     __typename?: "PetitionMessage";
     id: string;
@@ -14879,7 +14884,7 @@ export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
 export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
   __typename?: "MessageScheduledEvent";
   createdAt: string;
-  petition?: { __typename?: "Petition"; id: string } | null;
+  petition?: { __typename?: "PetitionBaseMini"; id: string } | null;
   message: {
     __typename?: "PetitionMessage";
     id: string;
@@ -39507,7 +39512,7 @@ export type PetitionActivity_PetitionEvent_MessageScheduledEvent_Fragment = {
   __typename?: "MessageScheduledEvent";
   id: string;
   createdAt: string;
-  petition?: { __typename?: "Petition"; id: string } | null;
+  petition?: { __typename?: "PetitionBaseMini"; id: string } | null;
   message: {
     __typename?: "PetitionMessage";
     id: string;
@@ -40944,7 +40949,7 @@ export type PetitionActivity_eventsQuery = {
                 __typename?: "MessageScheduledEvent";
                 id: string;
                 createdAt: string;
-                petition?: { __typename?: "Petition"; id: string } | null;
+                petition?: { __typename?: "PetitionBaseMini"; id: string } | null;
                 message: {
                   __typename?: "PetitionMessage";
                   id: string;

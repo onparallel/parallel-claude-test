@@ -302,12 +302,12 @@ export class PetitionRepository extends BaseRepository {
 
   async userHasAccessToPetitions(
     userId: number,
-    petitionIds: number[],
+    petitionIds: MaybeArray<number>,
     permissionTypes?: PetitionPermissionType[],
   ) {
     const permissions = await this.userHasAccessToPetitionsRaw(
       userId,
-      petitionIds,
+      unMaybeArray(petitionIds),
       permissionTypes,
     );
     return permissions.every((p) => p);

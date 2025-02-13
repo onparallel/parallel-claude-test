@@ -1700,7 +1700,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -1710,7 +1710,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   AccessActivatedFromPublicPetitionLinkUserNotification: {
@@ -1727,7 +1727,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     reason: string; // String!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
@@ -1739,7 +1739,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     newAccess: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     originalAccess: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   AccessOpenedEvent: {
@@ -1748,7 +1748,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   AiCompletionLog: {
@@ -1900,7 +1900,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isGeneral: boolean; // Boolean!
     isInternal: boolean; // Boolean!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   CommentPublishedEvent: {
@@ -1912,7 +1912,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isGeneral: boolean; // Boolean!
     isInternal: boolean; // Boolean!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   ConnectionMetadata: {
@@ -1946,7 +1946,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   Dashboard: {
@@ -2181,7 +2181,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     permissionGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -2192,7 +2192,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     permissionGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -2202,7 +2202,7 @@ export interface NexusGenFieldTypes {
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     permissionGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -2259,7 +2259,7 @@ export interface NexusGenFieldTypes {
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     message: NexusGenRootTypes["PetitionMessage"]; // PetitionMessage!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     reason: string; // String!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
@@ -2278,7 +2278,7 @@ export interface NexusGenFieldTypes {
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     message: NexusGenRootTypes["PetitionMessage"]; // PetitionMessage!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   MessageSentEvent: {
@@ -2287,7 +2287,7 @@ export interface NexusGenFieldTypes {
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     message: NexusGenRootTypes["PetitionMessage"]; // PetitionMessage!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   Mutation: {
@@ -2642,7 +2642,7 @@ export interface NexusGenFieldTypes {
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     owner: NexusGenRootTypes["User"] | null; // User
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     previousOwner: NexusGenRootTypes["User"] | null; // User
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
@@ -2710,6 +2710,7 @@ export interface NexusGenFieldTypes {
     summaryConfig: NexusGenScalars["JSONObject"] | null; // JSONObject
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     tone: NexusGenEnums["Tone"]; // Tone!
+    type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
     unreadGeneralCommentCount: number; // Int!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     variables: NexusGenRootTypes["PetitionVariable"][]; // [PetitionVariable!]!
@@ -2746,7 +2747,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   PetitionAssociatedEvent: {
@@ -2779,12 +2780,14 @@ export interface NexusGenFieldTypes {
   PetitionBaseMini: {
     // field return type
     currentSignatureRequest: NexusGenRootTypes["PetitionSignatureRequestMini"] | null; // PetitionSignatureRequestMini
+    full: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     id: NexusGenScalars["GID"]; // GID!
     isPublicTemplate: boolean | null; // Boolean
     lastActivityAt: NexusGenScalars["DateTime"] | null; // DateTime
     myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
     name: string | null; // String
     status: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
+    type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
   };
   PetitionBaseOrFolderPagination: {
     // field return type
@@ -2796,7 +2799,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -2805,7 +2808,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -2816,7 +2819,7 @@ export interface NexusGenFieldTypes {
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     emailBody: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -2826,7 +2829,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   PetitionCompletedUserNotification: {
@@ -2842,7 +2845,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -2856,7 +2859,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   PetitionDisassociatedEvent: {
@@ -3083,7 +3086,7 @@ export interface NexusGenFieldTypes {
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     message: NexusGenRootTypes["PetitionMessage"]; // PetitionMessage!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   PetitionPagination: {
@@ -3115,7 +3118,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     reminder: NexusGenRootTypes["PetitionReminder"]; // PetitionReminder!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
@@ -3124,7 +3127,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -3195,7 +3198,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     tags: Array<NexusGenRootTypes["Tag"] | null>; // [Tag]!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
@@ -3257,6 +3260,7 @@ export interface NexusGenFieldTypes {
     standardListDefinitions: NexusGenRootTypes["StandardListDefinition"][]; // [StandardListDefinition!]!
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     tone: NexusGenEnums["Tone"]; // Tone!
+    type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     variables: NexusGenRootTypes["PetitionVariable"][]; // [PetitionVariable!]!
     variablesResult: NexusGenRootTypes["PetitionVariableResult"][]; // [PetitionVariableResult!]!
@@ -3266,7 +3270,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     tags: Array<NexusGenRootTypes["Tag"] | null>; // [Tag]!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
@@ -3328,7 +3332,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
@@ -3357,7 +3361,7 @@ export interface NexusGenFieldTypes {
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     disassociatedBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
@@ -3961,7 +3965,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     signer: NexusGenRootTypes["PetitionSigner"] | null; // PetitionSigner
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
@@ -3978,7 +3982,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     reminder: NexusGenRootTypes["PetitionReminder"]; // PetitionReminder!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
@@ -3997,7 +4001,7 @@ export interface NexusGenFieldTypes {
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     other: string | null; // String
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     reason: string; // String!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
@@ -4018,7 +4022,7 @@ export interface NexusGenFieldTypes {
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     reply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
@@ -4029,7 +4033,7 @@ export interface NexusGenFieldTypes {
     deletedBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   ReplyStatusChangedEvent: {
@@ -4038,7 +4042,7 @@ export interface NexusGenFieldTypes {
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     reply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply
     status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
@@ -4050,7 +4054,7 @@ export interface NexusGenFieldTypes {
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     reply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     updatedBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
@@ -4073,7 +4077,7 @@ export interface NexusGenFieldTypes {
     errorMessage: string | null; // String
     extraErrorData: NexusGenScalars["JSON"] | null; // JSON
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   SignatureCancelledUserNotification: {
@@ -4090,7 +4094,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   SignatureCompletedUserNotification: {
@@ -4122,7 +4126,7 @@ export interface NexusGenFieldTypes {
     deliveredAt: NexusGenScalars["DateTime"] | null; // DateTime
     id: NexusGenScalars["GID"]; // GID!
     openedAt: NexusGenScalars["DateTime"] | null; // DateTime
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     signature: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     signer: NexusGenRootTypes["PetitionSigner"] | null; // PetitionSigner
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
@@ -4132,7 +4136,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     signer: NexusGenRootTypes["PetitionSigner"] | null; // PetitionSigner
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
@@ -4152,7 +4156,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -4161,7 +4165,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     signature: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
@@ -4239,7 +4243,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   User: {
@@ -4334,7 +4338,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     permissionUser: NexusGenRootTypes["User"] | null; // User
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -4345,7 +4349,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     permissionUser: NexusGenRootTypes["User"] | null; // User
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -4355,7 +4359,7 @@ export interface NexusGenFieldTypes {
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     permissionUser: NexusGenRootTypes["User"] | null; // User
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -4489,6 +4493,7 @@ export interface NexusGenFieldTypes {
     standardListDefinitions: NexusGenRootTypes["StandardListDefinition"][]; // [StandardListDefinition!]!
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     tone: NexusGenEnums["Tone"]; // Tone!
+    type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     variables: NexusGenRootTypes["PetitionVariable"][]; // [PetitionVariable!]!
     variablesResult: NexusGenRootTypes["PetitionVariableResult"][]; // [PetitionVariableResult!]!
@@ -4498,7 +4503,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   PetitionPermission: {
@@ -4563,7 +4568,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
     user: "User";
   };
@@ -4573,7 +4578,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   AccessActivatedFromPublicPetitionLinkUserNotification: {
@@ -4590,7 +4595,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     reason: "String";
     type: "PetitionEventType";
     user: "User";
@@ -4602,7 +4607,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     newAccess: "PetitionAccess";
     originalAccess: "PetitionAccess";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   AccessOpenedEvent: {
@@ -4611,7 +4616,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   AiCompletionLog: {
@@ -4763,7 +4768,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isGeneral: "Boolean";
     isInternal: "Boolean";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   CommentPublishedEvent: {
@@ -4775,7 +4780,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isGeneral: "Boolean";
     isInternal: "Boolean";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   ConnectionMetadata: {
@@ -4809,7 +4814,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   Dashboard: {
@@ -5044,7 +5049,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     permissionGroup: "UserGroup";
     permissionType: "PetitionPermissionType";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
     user: "User";
   };
@@ -5055,7 +5060,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     permissionGroup: "UserGroup";
     permissionType: "PetitionPermissionType";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
     user: "User";
   };
@@ -5065,7 +5070,7 @@ export interface NexusGenFieldTypeNames {
     data: "JSONObject";
     id: "GID";
     permissionGroup: "UserGroup";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
     user: "User";
   };
@@ -5122,7 +5127,7 @@ export interface NexusGenFieldTypeNames {
     data: "JSONObject";
     id: "GID";
     message: "PetitionMessage";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     reason: "String";
     type: "PetitionEventType";
     user: "User";
@@ -5141,7 +5146,7 @@ export interface NexusGenFieldTypeNames {
     data: "JSONObject";
     id: "GID";
     message: "PetitionMessage";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   MessageSentEvent: {
@@ -5150,7 +5155,7 @@ export interface NexusGenFieldTypeNames {
     data: "JSONObject";
     id: "GID";
     message: "PetitionMessage";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   Mutation: {
@@ -5505,7 +5510,7 @@ export interface NexusGenFieldTypeNames {
     data: "JSONObject";
     id: "GID";
     owner: "User";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     previousOwner: "User";
     type: "PetitionEventType";
     user: "User";
@@ -5573,6 +5578,7 @@ export interface NexusGenFieldTypeNames {
     summaryConfig: "JSONObject";
     tags: "Tag";
     tone: "Tone";
+    type: "PetitionBaseType";
     unreadGeneralCommentCount: "Int";
     updatedAt: "DateTime";
     variables: "PetitionVariable";
@@ -5609,7 +5615,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   PetitionAssociatedEvent: {
@@ -5642,12 +5648,14 @@ export interface NexusGenFieldTypeNames {
   PetitionBaseMini: {
     // field return type name
     currentSignatureRequest: "PetitionSignatureRequestMini";
+    full: "PetitionBase";
     id: "GID";
     isPublicTemplate: "Boolean";
     lastActivityAt: "DateTime";
     myEffectivePermission: "EffectivePetitionUserPermission";
     name: "String";
     status: "PetitionStatus";
+    type: "PetitionBaseType";
   };
   PetitionBaseOrFolderPagination: {
     // field return type name
@@ -5659,7 +5667,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
     user: "User";
   };
@@ -5668,7 +5676,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
     user: "User";
   };
@@ -5679,7 +5687,7 @@ export interface NexusGenFieldTypeNames {
     data: "JSONObject";
     emailBody: "String";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
     user: "User";
   };
@@ -5689,7 +5697,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   PetitionCompletedUserNotification: {
@@ -5705,7 +5713,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
     user: "User";
   };
@@ -5719,7 +5727,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   PetitionDisassociatedEvent: {
@@ -5946,7 +5954,7 @@ export interface NexusGenFieldTypeNames {
     data: "JSONObject";
     id: "GID";
     message: "PetitionMessage";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   PetitionPagination: {
@@ -5978,7 +5986,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     reminder: "PetitionReminder";
     type: "PetitionEventType";
   };
@@ -5987,7 +5995,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
     user: "User";
   };
@@ -6058,7 +6066,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     tags: "Tag";
     type: "PetitionEventType";
     user: "User";
@@ -6120,6 +6128,7 @@ export interface NexusGenFieldTypeNames {
     standardListDefinitions: "StandardListDefinition";
     tags: "Tag";
     tone: "Tone";
+    type: "PetitionBaseType";
     updatedAt: "DateTime";
     variables: "PetitionVariable";
     variablesResult: "PetitionVariableResult";
@@ -6129,7 +6138,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     tags: "Tag";
     type: "PetitionEventType";
     user: "User";
@@ -6191,7 +6200,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     profile: "Profile";
     type: "PetitionEventType";
     user: "User";
@@ -6220,7 +6229,7 @@ export interface NexusGenFieldTypeNames {
     data: "JSONObject";
     disassociatedBy: "UserOrPetitionAccess";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     profile: "Profile";
     type: "PetitionEventType";
     user: "User";
@@ -6824,7 +6833,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     signer: "PetitionSigner";
     type: "PetitionEventType";
   };
@@ -6841,7 +6850,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     reminder: "PetitionReminder";
     type: "PetitionEventType";
   };
@@ -6860,7 +6869,7 @@ export interface NexusGenFieldTypeNames {
     data: "JSONObject";
     id: "GID";
     other: "String";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     reason: "String";
     type: "PetitionEventType";
   };
@@ -6881,7 +6890,7 @@ export interface NexusGenFieldTypeNames {
     data: "JSONObject";
     field: "PetitionField";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     reply: "PetitionFieldReply";
     type: "PetitionEventType";
   };
@@ -6892,7 +6901,7 @@ export interface NexusGenFieldTypeNames {
     deletedBy: "UserOrPetitionAccess";
     field: "PetitionField";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   ReplyStatusChangedEvent: {
@@ -6901,7 +6910,7 @@ export interface NexusGenFieldTypeNames {
     data: "JSONObject";
     field: "PetitionField";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     reply: "PetitionFieldReply";
     status: "PetitionFieldReplyStatus";
     type: "PetitionEventType";
@@ -6913,7 +6922,7 @@ export interface NexusGenFieldTypeNames {
     data: "JSONObject";
     field: "PetitionField";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     reply: "PetitionFieldReply";
     type: "PetitionEventType";
     updatedBy: "UserOrPetitionAccess";
@@ -6936,7 +6945,7 @@ export interface NexusGenFieldTypeNames {
     errorMessage: "String";
     extraErrorData: "JSON";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   SignatureCancelledUserNotification: {
@@ -6953,7 +6962,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   SignatureCompletedUserNotification: {
@@ -6985,7 +6994,7 @@ export interface NexusGenFieldTypeNames {
     deliveredAt: "DateTime";
     id: "GID";
     openedAt: "DateTime";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     signature: "PetitionSignatureRequest";
     signer: "PetitionSigner";
     type: "PetitionEventType";
@@ -6995,7 +7004,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     signer: "PetitionSigner";
     type: "PetitionEventType";
   };
@@ -7015,7 +7024,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
     user: "User";
   };
@@ -7024,7 +7033,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     signature: "PetitionSignatureRequest";
     type: "PetitionEventType";
   };
@@ -7102,7 +7111,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   User: {
@@ -7197,7 +7206,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     permissionType: "PetitionPermissionType";
     permissionUser: "User";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
     user: "User";
   };
@@ -7208,7 +7217,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     permissionType: "PetitionPermissionType";
     permissionUser: "User";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
     user: "User";
   };
@@ -7218,7 +7227,7 @@ export interface NexusGenFieldTypeNames {
     data: "JSONObject";
     id: "GID";
     permissionUser: "User";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
     user: "User";
   };
@@ -7352,6 +7361,7 @@ export interface NexusGenFieldTypeNames {
     standardListDefinitions: "StandardListDefinition";
     tags: "Tag";
     tone: "Tone";
+    type: "PetitionBaseType";
     updatedAt: "DateTime";
     variables: "PetitionVariable";
     variablesResult: "PetitionVariableResult";
@@ -7361,7 +7371,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     id: "GID";
-    petition: "Petition";
+    petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
   PetitionPermission: {

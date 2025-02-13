@@ -4025,6 +4025,10 @@ export function publicApi(container: Container) {
             data
             petition {
               id
+              type
+              myEffectivePermission {
+                permissionType
+              }
             }
             type
             createdAt
@@ -4039,7 +4043,12 @@ export function publicApi(container: Container) {
 
       return Ok(
         result.petitionEvents
-          .filter((e) => isNonNullish(e.petition))
+          .filter(
+            (e) =>
+              isNonNullish(e.petition) &&
+              e.petition.type === "PETITION" &&
+              isNonNullish(e.petition.myEffectivePermission),
+          )
           .map((e) => ({
             id: e.id,
             petitionId: e.petition!.id,

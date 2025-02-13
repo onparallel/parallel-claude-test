@@ -166,6 +166,10 @@ export const PetitionBase = interfaceType({
       prefixName: "Petition",
       description: "The ID of the petition or template.",
     });
+    t.field("type", {
+      type: "PetitionBaseType",
+      resolve: (o) => (o.is_template ? "TEMPLATE" : "PETITION"),
+    });
     t.nullable.string("name", {
       description: "The name of the petition.",
     });
@@ -432,6 +436,10 @@ export const PetitionBaseMini = objectType({
       prefixName: "Petition",
       description: "The ID of the petition or template.",
     });
+    t.field("type", {
+      type: "PetitionBaseType",
+      resolve: (o) => (o.is_template ? "TEMPLATE" : "PETITION"),
+    });
     t.nullable.string("name", {
       description: "The name of the petition.",
     });
@@ -461,6 +469,14 @@ export const PetitionBaseMini = objectType({
     });
     t.nullable.datetime("lastActivityAt", {
       resolve: (o) => o.last_activity_at,
+    });
+    t.nullable.field("full", {
+      type: "PetitionBase",
+      authorize: async (root, _, ctx) =>
+        await ctx.petitions.userHasAccessToPetitions(ctx.user!.id, root.id),
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadPetition(root.id);
+      },
     });
   },
 });
