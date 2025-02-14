@@ -68,6 +68,7 @@ export class AccountSetupService implements IAccountSetupService {
 
     await this.createDefaultPetitionListViewsForUser(user, userData.preferred_locale);
     await this.createDefaultProfileListViewsForUser(user);
+    await this.pinProfileTypesForUser(user);
 
     return user;
   }
@@ -280,5 +281,18 @@ export class AccountSetupService implements IAccountSetupService {
       })),
       `User:${user.id}`,
     );
+  }
+
+  private async pinProfileTypesForUser(user: User) {
+    const profileTypes = await this.profiles.loadProfileTypesByOrgId(user.org_id);
+    const legalEntity = profileTypes.find((pt) => pt.standard_type === "LEGAL_ENTITY");
+    const individual = profileTypes.find((pt) => pt.standard_type === "INDIVIDUAL");
+
+    if (legalEntity) {
+      await this.profiles.pinProfileType(legalEntity.id, user.id);
+    }
+    if (individual) {
+      await this.profiles.pinProfileType(individual.id, user.id);
+    }
   }
 }
