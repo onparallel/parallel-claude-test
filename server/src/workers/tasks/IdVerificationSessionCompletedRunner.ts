@@ -223,6 +223,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
         const jsonContents = pick(doc, [
           "type",
           "idNumber",
+          "number",
           "firstName",
           "surname",
           "birthDate",

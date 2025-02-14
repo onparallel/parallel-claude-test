@@ -458,6 +458,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
         const jsonContents = pick(doc, [
           "type",
           "idNumber",
+          "number",
           "firstName",
           "surname",
           "birthDate",

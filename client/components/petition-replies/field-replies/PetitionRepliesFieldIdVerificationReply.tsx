@@ -39,7 +39,10 @@ interface MetadataIDCard {
 interface InferredDataIDCard {
   type: string;
   surname: string | null;
+  /** ID of document's holder */
   idNumber: string | null;
+  /** ID of the document itself */
+  number: string | null;
   birthDate: string | null;
   createdAt: string;
   firstName: string | null;
@@ -105,7 +108,10 @@ function IDCardView({
 
   const nationality = metadata.inferred_data.nationality;
   const issuingCountry = metadata.inferred_data.issuingCountry;
-  const idNumber = metadata.inferred_data.idNumber;
+  const idNumber =
+    metadata.inferred_type === "PASSPORT"
+      ? metadata.inferred_data.number
+      : metadata.inferred_data.idNumber;
   const firstName = metadata.inferred_data.firstName;
   const surname = metadata.inferred_data.surname;
   const hasName = isNonNullish(firstName) || isNonNullish(surname);

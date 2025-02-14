@@ -64,6 +64,7 @@ export interface IdentityVerificationDocument {
   dataDocument: Maybe<IdentityVerificationDocumentInfo>;
   imagesDocument: Maybe<IdentityVerificationDocumentInfo>;
   idNumber: Maybe<string>;
+  number: Maybe<string>;
   firstName: Maybe<string>;
   surname: Maybe<string>;
   birthDate: Maybe<string>;

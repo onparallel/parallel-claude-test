@@ -102,7 +102,8 @@ interface BankflipIdentityVerificationDocument {
   type: BankflipIdentityVerificationDocumentType;
   dataDocument: Maybe<BankflipIdentityVerificationDocumentInfo>;
   imagesDocument: Maybe<BankflipIdentityVerificationDocumentInfo>;
-  idNumber: Maybe<string>;
+  idNumber: Maybe<string>; // ID of document's holder
+  number: Maybe<string>; // ID of the document itself
   firstName: Maybe<string>;
   surname: Maybe<string>;
   birthDate: Maybe<string>;
@@ -482,6 +483,7 @@ export class BankflipIdVerificationIntegration
     return {
       ...pick(doc, [
         "idNumber",
+        "number",
         "firstName",
         "surname",
         "birthPlace",

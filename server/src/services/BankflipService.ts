@@ -78,7 +78,8 @@ interface IdentityVerificationDocument {
   type: "id_card" | "passport" | "residence_permit" | "driver_license";
   dataDocument: Maybe<IdentityVerificationDocumentInfo>;
   imagesDocument: Maybe<IdentityVerificationDocumentInfo>;
-  idNumber: Maybe<string>;
+  idNumber: Maybe<string>; // ID of document's holder
+  number: Maybe<string>; // ID of the document itself
   firstName: Maybe<string>;
   surname: Maybe<string>;
   birthDate: Maybe<string>;
