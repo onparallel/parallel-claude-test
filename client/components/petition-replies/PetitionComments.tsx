@@ -162,7 +162,21 @@ export function PetitionComments({ petition, onSelectField }: PetitionCommentsPr
                         contactAsLink={false}
                       />
                       {`: `}
-                      {comment.isInternal ? (
+
+                      {comment.isApproval ? (
+                        <Badge
+                          color="gray.600"
+                          variant="outline"
+                          cursor="default"
+                          marginEnd={1}
+                          verticalAlign="baseline"
+                        >
+                          <FormattedMessage
+                            id="generic.approval-badge"
+                            defaultMessage="Evaluation"
+                          />
+                        </Badge>
+                      ) : comment.isInternal ? (
                         <Badge
                           color="gray.600"
                           variant="outline"
@@ -217,6 +231,7 @@ PetitionComments.fragments = {
         id
         createdAt
         isInternal
+        isApproval
         author {
           ...UserOrContactReference_UserOrPetitionAccess
         }

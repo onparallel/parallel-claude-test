@@ -40,6 +40,7 @@ import {
   fieldHasType,
   fieldTypeSwitch,
   fieldsBelongsToPetition,
+  petitionDoesNotHaveStartedProcess,
   petitionHasStatus,
   petitionIsNotAnonymized,
   repliesBelongsToPetition,
@@ -86,6 +87,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
+    petitionDoesNotHaveStartedProcess("petitionId"),
   ),
   validateArgs: validateCreateFileReplyInput("fieldId", "parentReplyId", "file"),
 
@@ -179,6 +181,7 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
     replyCanBeUpdated("replyId"),
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
+    petitionDoesNotHaveStartedProcess("petitionId"),
   ),
   validateArgs: validateUpdateFileReplyInput("file", "replyId"),
   resolve: async (_, args, ctx) => {
@@ -277,6 +280,7 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     chain(
       replyCanBeDeleted("replyId"),
       replyCanBeUpdated("replyId"),
@@ -340,6 +344,7 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
     }),
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
+    petitionDoesNotHaveStartedProcess("petitionId"),
   ),
   validateArgs: validateCreateFileReplyInput("fieldId", "parentReplyId"),
   resolve: async (_, { petitionId, fieldId, parentReplyId }, ctx) => {
@@ -477,6 +482,7 @@ export const bulkCreatePetitionReplies = mutationField("bulkCreatePetitionReplie
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
+    petitionDoesNotHaveStartedProcess("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     try {
@@ -512,6 +518,7 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
     fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
+    petitionDoesNotHaveStartedProcess("petitionId"),
   ),
   validateArgs: validateCreateFileReplyInput("fieldId", "parentReplyId"),
   resolve: async (_, args, ctx) => {
@@ -602,6 +609,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
     ),
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
+    petitionDoesNotHaveStartedProcess("petitionId"),
   ),
   validateArgs: validateAnd(
     notEmptyArray("fields"),
@@ -722,6 +730,7 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
     replyCanBeUpdated((args) => args.replies.map((r) => r.id)),
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
+    petitionDoesNotHaveStartedProcess("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -806,6 +815,14 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
         );
       } else if (updateCheck === "REPLY_NOT_FOUND") {
         throw new ForbiddenError("FORBIDDEN");
+      }
+
+      const [process] = await ctx.petitions.getPetitionStartedProcesses(params.petitionId);
+      if (isNonNullish(process)) {
+        throw new ApolloError(
+          `Petition has an ongoing ${process.toLowerCase()} process`,
+          `ONGOING_${process}_REQUEST_ERROR`,
+        );
       }
 
       const entity = isNonNullish(entityId)

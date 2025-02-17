@@ -41,22 +41,24 @@ export class PetitionFilterRepositoryHelper {
         q.joinRaw(
           /* sql */ `left join petition_tag pt on pt.petition_id = ${t("petition.id")}`,
         ).modify((q) => {
+          const conditions: string[] = [];
+          const bindings: any[] = [];
           for (const filter of tagsFilters) {
-            q = operator === "AND" ? q.and : q.or;
-
             switch (filter.operator) {
               case "CONTAINS":
               case "DOES_NOT_CONTAIN":
-                q = filter.operator.startsWith("DOES_NOT_") ? q.not : q;
-                q.havingRaw(/* sql */ `array_agg(distinct pt.tag_id) @> ?`, [
-                  sqlArray(this.knex, filter.value, "int"),
-                ]);
+                const condition = /* sql */ `array_agg(distinct pt.tag_id) @> ?`;
+                bindings.push(sqlArray(this.knex, filter.value, "int"));
+                conditions.push(
+                  filter.operator.startsWith("DOES_NOT_") ? `not (${condition})` : condition,
+                );
                 break;
               case "IS_EMPTY":
-                q.havingRaw(/* sql */ `count(distinct pt.tag_id) = 0`);
+                conditions.push(/* sql */ `count(distinct pt.tag_id) = 0`);
                 break;
             }
           }
+          q.havingRaw("(" + conditions.join(` ${operator.toLowerCase()} `) + ")", bindings);
         });
       });
     }
@@ -67,32 +69,36 @@ export class PetitionFilterRepositoryHelper {
         q.joinRaw(
           /* sql */ `join petition_permission pp2 on pp2.petition_id = ${t("petition.id")} and pp2.deleted_at is null`,
         ).modify((q) => {
+          const conditions: string[] = [];
+          const bindings: any[] = [];
           for (const filter of sharedWithFilters) {
             const { id, type } = fromGlobalId(filter.value);
             if (type !== "User" && type !== "UserGroup") {
               throw new Error(`Expected User or UserGroup, got ${type}`);
             }
             const column = type === "User" ? "user_id" : "user_group_id";
-            q = operator === "AND" ? q.and : q.or;
             switch (filter.operator) {
               case "SHARED_WITH":
-              case "NOT_SHARED_WITH":
-                q = filter.operator.startsWith("NOT_") ? q.not : q;
-                q.havingRaw(
-                  /* sql */ `? = any(array_remove(array_agg(distinct pp2.${column}), null))`,
-                  [id],
+              case "NOT_SHARED_WITH": {
+                const condition = /* sql */ `? = any(array_remove(array_agg(distinct pp2.${column}), null))`;
+                bindings.push(id);
+                conditions.push(
+                  filter.operator.startsWith("NOT_") ? `not (${condition})` : condition,
                 );
                 break;
+              }
               case "IS_OWNER":
-              case "NOT_IS_OWNER":
-                q = filter.operator.startsWith("NOT_") ? q.not : q;
-                q.havingRaw(
-                  /* sql */ `sum(case pp2.type when 'OWNER' then (pp2.user_id = ?)::int else 0 end) > 0`,
-                  [id],
+              case "NOT_IS_OWNER": {
+                const condition = /* sql */ `sum(case pp2.type when 'OWNER' then (pp2.user_id = ?)::int else 0 end) > 0`;
+                bindings.push(id);
+                conditions.push(
+                  filter.operator.startsWith("NOT_") ? `not (${condition})` : condition,
                 );
                 break;
+              }
             }
           }
+          q.havingRaw("(" + conditions.join(` ${operator.toLowerCase()} `) + ")", bindings);
         });
       });
     }
@@ -175,6 +181,73 @@ export class PetitionFilterRepositoryHelper {
 
     if (filter.permissionTypes && filter.permissionTypes.length > 0) {
       builders.push((q) => q.whereIn(t("petition_permission.type"), filter.permissionTypes!));
+    }
+
+    if (filter.approvals && filter.approvals.filters.length > 0) {
+      const { filters: approvalFilters, operator } = filter.approvals;
+      builders.push((q) => {
+        q.joinRaw(/* sql */ `
+            left join petition_approval_request_step pars 
+              on pars.petition_id = ${t("petition.id")}
+              and pars.deprecated_at is null
+              and pars.status != 'NOT_APPLICABLE'
+          `);
+
+        if (approvalFilters.some((f) => f.operator === "ASSIGNED_TO")) {
+          q.joinRaw(
+            /* sql */ `join petition_approval_request_step_approver parsa on parsa.petition_approval_request_step_id = pars.id`,
+          );
+        }
+        q.modify((q) => {
+          const conditions: string[] = [];
+          const bindings: any[] = [];
+          for (const filter of approvalFilters) {
+            if (filter.operator === "STATUS") {
+              switch (filter.value) {
+                case "WITHOUT_APPROVAL":
+                  conditions.push(
+                    /* sql */ `count(${t("petition.*")}) filter (where ${t("petition.approval_flow_config")} is null) > 0`,
+                  );
+                  break;
+                case "NOT_STARTED":
+                  // all steps in NOT_STARTED status, or no steps created yet but approval_flow_config not null
+                  conditions.push(
+                    /* sql */ `count(${t("petition.*")}) filter (where (pars.id is null or pars.status = 'NOT_STARTED') and (${t("petition.approval_flow_config")} is not null)) > 0`,
+                  );
+                  break;
+                case "PENDING":
+                  // any step in PENDING status
+                  conditions.push(
+                    /* sql */ `count(pars.*) filter (where pars.status = 'PENDING') > 0`,
+                  );
+                  break;
+                case "APPROVED":
+                  // all steps in APPROVED or SKIPPED status
+                  conditions.push(
+                    /* sql */ `(count(pars.*) > 0 and count(pars.*) filter (where pars.status = 'APPROVED' or pars.status = 'SKIPPED') = count(pars.*))`,
+                  );
+                  break;
+                case "REJECTED":
+                  // any step in REJECTED status
+                  conditions.push(
+                    /* sql */ `count(pars.*) filter (where pars.status = 'REJECTED') > 0`,
+                  );
+                  break;
+                default:
+                  break;
+              }
+            } else if (filter.operator === "ASSIGNED_TO") {
+              const { id, type } = fromGlobalId(filter.value);
+              if (type !== "User") {
+                throw new Error(`Expected User, got ${type}`);
+              }
+              conditions.push(/* sql */ `? = any(array_agg(distinct parsa.user_id))`);
+              bindings.push(id);
+            }
+          }
+          q.havingRaw("(" + conditions.join(` ${operator.toLowerCase()} `) + ")", bindings);
+        });
+      });
     }
   }
 }

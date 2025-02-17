@@ -759,65 +759,64 @@ interface CommentsButtonProps extends ButtonOptions, ThemingProps<"Button"> {
   isActive: boolean;
 }
 
-const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(function CommentsButton(
-  { commentCount, hasUnreadComments, isActive, ...props },
-  ref,
-) {
-  const intl = useIntl();
-  const common = {
-    "aria-pressed": isActive,
-    size: "sm",
-    variant: isActive ? "solid" : "ghost",
-    colorScheme: isActive ? "primary" : "gray",
-    padding: 2,
-    ...props,
-  } as const;
-  return commentCount > 0 ? (
-    <Button
-      flexDirection="row-reverse"
-      fontWeight="normal"
-      alignItems="center"
-      {...common}
-      ref={ref}
-    >
-      <Stack display="inline-flex" direction="row-reverse" alignItems="flex-end">
-        <CommentIcon fontSize="md" color={isActive ? "inherit" : "gray.700"} />
-        <Text
-          as="span"
-          aria-label={intl.formatMessage(
-            {
-              id: "generic.comments-button-label",
-              defaultMessage:
-                "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
-            },
-            { commentCount },
-          )}
-        >
-          {intl.formatNumber(commentCount)}
-        </Text>
-      </Stack>
-      <RecipientViewCommentsBadge
-        hasUnreadComments={hasUnreadComments}
-        isReversedPurple={isActive}
-        marginEnd={2}
+export const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
+  function CommentsButton({ commentCount, hasUnreadComments, isActive, ...props }, ref) {
+    const intl = useIntl();
+    const common = {
+      "aria-pressed": isActive,
+      size: "sm",
+      variant: isActive ? "solid" : "ghost",
+      colorScheme: isActive ? "primary" : "gray",
+      padding: 2,
+      ...props,
+    } as const;
+    return commentCount > 0 ? (
+      <Button
+        flexDirection="row-reverse"
+        fontWeight="normal"
+        alignItems="center"
+        {...common}
+        ref={ref}
+      >
+        <Stack display="inline-flex" direction="row-reverse" alignItems="flex-end">
+          <CommentIcon fontSize="md" color={isActive ? "inherit" : "gray.700"} />
+          <Text
+            as="span"
+            aria-label={intl.formatMessage(
+              {
+                id: "generic.comments-button-label",
+                defaultMessage:
+                  "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+              },
+              { commentCount },
+            )}
+          >
+            {intl.formatNumber(commentCount)}
+          </Text>
+        </Stack>
+        <RecipientViewCommentsBadge
+          hasUnreadComments={hasUnreadComments}
+          isReversedPurple={isActive}
+          marginEnd={2}
+        />
+      </Button>
+    ) : (
+      <IconButton
+        icon={<CommentIcon fontSize="md" />}
+        {...common}
+        aria-label={intl.formatMessage(
+          {
+            id: "generic.comments-button-label",
+            defaultMessage:
+              "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+          },
+          { commentCount },
+        )}
+        ref={ref}
       />
-    </Button>
-  ) : (
-    <IconButton
-      icon={<CommentIcon fontSize="md" />}
-      {...common}
-      aria-label={intl.formatMessage(
-        {
-          id: "generic.comments-button-label",
-          defaultMessage:
-            "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
-        },
-        { commentCount },
-      )}
-      ref={ref}
-    />
-  );
-});
+    );
+  },
+);
 
 const NoRepliesHintWithButton = chakraForwardRef<"div", StackProps & { href: string }>(
   function NoRepliesHintWithButton({ href, ...rest }, ref) {

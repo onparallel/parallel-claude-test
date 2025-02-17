@@ -37,7 +37,6 @@ import { fromGlobalId, fromGlobalIds, isGlobalId, toGlobalId } from "../../util/
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { isValueCompatible } from "../../util/isValueCompatible";
 import { keyBuilder } from "../../util/keyBuilder";
-import { petitionIsCompleted } from "../../util/petitionIsCompleted";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
 import { removeNotDefined } from "../../util/remedaExtensions";
@@ -74,6 +73,7 @@ import {
   OrgIntegration,
   Petition,
   PetitionAccess,
+  PetitionApprovalRequestStepStatus,
   PetitionAttachment,
   PetitionAttachmentType,
   PetitionContactNotification,
@@ -167,6 +167,14 @@ interface PetitionTagFilter {
   operator: "AND" | "OR";
 }
 
+interface PetitionApprovalsFilter {
+  operator: "AND" | "OR";
+  filters: {
+    operator: "ASSIGNED_TO" | "STATUS";
+    value: string;
+  }[];
+}
+
 export interface PetitionFilter {
   path?: string | null;
   status?: PetitionStatus[] | null;
@@ -178,6 +186,7 @@ export interface PetitionFilter {
   sharedWith?: PetitionSharedWithFilter | null;
   fromTemplateId?: number[] | null;
   permissionTypes?: PetitionPermissionType[] | null;
+  approvals?: PetitionApprovalsFilter | null;
 }
 
 type PetitionUserNotificationFilter =
@@ -205,6 +214,7 @@ export interface PetitionSignatureConfig {
   timezone: string;
   title: string | null;
   review?: boolean;
+  reviewAfterApproval?: boolean;
   allowAdditionalSigners?: boolean;
   message?: string;
   additionalSignersInfo?: PetitionSignatureConfigSigner[];
@@ -2863,42 +2873,6 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async completePetition(
-    petitionId: number,
-    userOrAccess: User | PetitionAccess,
-    extraData: Partial<Petition> = {},
-    t?: Knex.Transaction,
-  ) {
-    const isAccess = "keycode" in userOrAccess;
-    const updatedBy = `${isAccess ? "PetitionAccess" : "User"}:${userOrAccess.id}`;
-
-    const [composedPetition] = await this.getComposedPetitionFieldsAndVariables([petitionId]);
-    const canComplete = petitionIsCompleted(composedPetition, isAccess);
-
-    if (canComplete) {
-      const petition = await this.withTransaction(async (t) => {
-        await this.updateRemindersForPetitions(petitionId, null, t);
-        const [updated] = await this.from("petition", t)
-          .where("id", petitionId)
-          .update(
-            {
-              status: "COMPLETED",
-              updated_at: this.now(),
-              updated_by: updatedBy,
-              last_change_at: this.now(),
-              ...extraData,
-            },
-            "*",
-          );
-        return updated;
-      }, t);
-
-      return { petition, composedPetition };
-    } else {
-      throw new Error("CANT_COMPLETE_PETITION_ERROR");
-    }
-  }
-
   async processScheduledMessages() {
     return await this.from("petition_message")
       .where("status", "SCHEDULED")
@@ -3032,6 +3006,9 @@ export class PetitionRepository extends BaseRepository {
               ? sourcePetition.summary_config
               : null,
           standard_list_definition_override: this.json([]), // will be updated later
+          approval_flow_config: sourcePetition.approval_flow_config
+            ? this.json(sourcePetition.approval_flow_config)
+            : null,
           ...data,
         },
         t,
@@ -3227,9 +3204,10 @@ export class PetitionRepository extends BaseRepository {
       const newFieldIds = Object.fromEntries(clonedFields.map((f) => [f.from_id, f.id]));
 
       // on RTE texts, replace globalId placeholders with the field ids of the cloned petition
-      const rteUpdateData: Partial<Petition> = {};
+      // also on approvalFlowConfig, replace field ids with the new field ids
+      const petitionUpdateData: Partial<Petition> = {};
       if (isNonNullish(cloned.email_subject)) {
-        rteUpdateData.email_subject = replacePlaceholdersInText(
+        petitionUpdateData.email_subject = replacePlaceholdersInText(
           cloned.email_subject,
           (placeholder) => {
             if (isGlobalId(placeholder, "PetitionField")) {
@@ -3242,7 +3220,7 @@ export class PetitionRepository extends BaseRepository {
 
       for (const key of ["email_body", "closing_email_body", "completing_message_body"] as const) {
         if (isNonNullish(cloned[key])) {
-          rteUpdateData[key] = JSON.stringify(
+          petitionUpdateData[key] = JSON.stringify(
             replacePlaceholdersInSlate(safeJsonParse(cloned[key]) as SlateNode[], (placeholder) => {
               if (isGlobalId(placeholder, "PetitionField")) {
                 return toGlobalId("PetitionField", newFieldIds[fromGlobalId(placeholder).id]);
@@ -3253,8 +3231,32 @@ export class PetitionRepository extends BaseRepository {
         }
       }
 
-      if (Object.keys(rteUpdateData).length > 0) {
-        [cloned] = await this.updatePetition(cloned.id, rteUpdateData, createdBy, t);
+      const allReferencedLists: string[] = [];
+      if (
+        isNonNullish(cloned.approval_flow_config) &&
+        cloned.approval_flow_config.some((c) => isNonNullish(c.visibility))
+      ) {
+        // in approval flow config, update referenced field IDS with new fields
+        petitionUpdateData.approval_flow_config = JSON.stringify(
+          cloned.approval_flow_config.map((c) => {
+            const fieldLogic = c.visibility
+              ? mapFieldLogic<number, number>(
+                  { visibility: c.visibility },
+                  (oldId) => newFieldIds[oldId],
+                )
+              : null;
+
+            allReferencedLists.push(...(fieldLogic?.referencedLists ?? []));
+            return {
+              ...c,
+              visibility: fieldLogic?.field.visibility ?? null,
+            };
+          }),
+        );
+      }
+
+      if (Object.keys(petitionUpdateData).length > 0) {
+        [cloned] = await this.updatePetition(cloned.id, petitionUpdateData, createdBy, t);
       }
 
       if (options?.cloneReplies) {
@@ -3268,7 +3270,6 @@ export class PetitionRepository extends BaseRepository {
         (f) => isNonNullish(f.visibility) || isNonNullish(f.math),
       );
       if (fieldLogicUpdate.length > 0) {
-        const allReferencedLists: string[] = [];
         // update visibility conditions and math on cloned fields
         await this.raw<PetitionField>(
           /* sql */ `
@@ -3296,10 +3297,10 @@ export class PetitionRepository extends BaseRepository {
           ],
           t,
         );
+      }
 
-        if (!cloned.is_template && allReferencedLists.length > 0) {
-          await this.updateStandardListDefinitionOverride(cloned.id, unique(allReferencedLists), t);
-        }
+      if (!cloned.is_template && allReferencedLists.length > 0) {
+        await this.updateStandardListDefinitionOverride(cloned.id, unique(allReferencedLists), t);
       }
 
       const backgroundCheckFieldsUpdate = clonedFields.filter(
@@ -3929,7 +3930,7 @@ export class PetitionRepository extends BaseRepository {
       const rows = await this.from("petition_field_comment", t)
         .modify((q) => {
           if (!keys.some((k) => k.loadInternalComments)) {
-            q.where("is_internal", false);
+            q.where({ is_internal: false, approval_metadata: null });
           }
         })
         .whereIn("petition_id", unique(keys.map((x) => x.petitionId)))
@@ -3941,7 +3942,9 @@ export class PetitionRepository extends BaseRepository {
       const byId = groupBy(rows, (r) => r.petition_field_id!);
       return keys.map((id) => {
         const comments = this.sortComments(byId[id.petitionFieldId] ?? []);
-        return id.loadInternalComments ? comments : comments.filter((c) => c.is_internal === false);
+        return id.loadInternalComments
+          ? comments
+          : comments.filter((c) => c.is_internal === false && c.approval_metadata === null);
       });
     },
     { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "loadInternalComments"]) },
@@ -3959,7 +3962,7 @@ export class PetitionRepository extends BaseRepository {
       const rows = await this.from("petition_field_comment", t)
         .modify((q) => {
           if (!keys.some((k) => k.loadInternalComments)) {
-            q.where("is_internal", false);
+            q.where({ is_internal: false, approval_metadata: null });
           }
         })
         .whereIn("petition_id", unique(keys.map((x) => x.petitionId)))
@@ -3972,7 +3975,7 @@ export class PetitionRepository extends BaseRepository {
         const comments = this.sortComments(byId[key.petitionId] ?? []);
         return key.loadInternalComments
           ? comments
-          : comments.filter((c) => c.is_internal === false);
+          : comments.filter((c) => c.is_internal === false && c.approval_metadata === null);
       });
     },
     { cacheKeyFn: keyBuilder(["petitionId", "loadInternalComments"]) },
@@ -3993,7 +3996,7 @@ export class PetitionRepository extends BaseRepository {
           if (keys.every((k) => k.loadInternalComments)) {
             q.distinctOn("petition_field_id").orderBy("petition_field_id");
           } else if (keys.every((k) => !k.loadInternalComments)) {
-            q.where("is_internal", false)
+            q.where({ is_internal: false, approval_metadata: null })
               .distinctOn("petition_field_id")
               .orderBy("petition_field_id");
           } else {
@@ -4016,7 +4019,8 @@ export class PetitionRepository extends BaseRepository {
         const comments = this.sortComments(byId[id.petitionFieldId] ?? []);
         return id.loadInternalComments
           ? (comments[0] ?? null)
-          : (comments.filter((c) => c.is_internal === false)[0] ?? null);
+          : (comments.filter((c) => c.is_internal === false && c.approval_metadata === null)[0] ??
+              null);
       });
     },
     { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "loadInternalComments"]) },
@@ -4036,7 +4040,9 @@ export class PetitionRepository extends BaseRepository {
           if (keys.every((k) => k.loadInternalComments)) {
             q.distinctOn("petition_id").orderBy("petition_id");
           } else if (keys.every((k) => !k.loadInternalComments)) {
-            q.where("is_internal", false).distinctOn("petition_id").orderBy("petition_id");
+            q.where({ is_internal: false, approval_metadata: null })
+              .distinctOn("petition_id")
+              .orderBy("petition_id");
           } else {
             // on mixed keys we need to obtain both
             q.distinctOn("petition_id", "is_internal")
@@ -4056,7 +4062,8 @@ export class PetitionRepository extends BaseRepository {
         const comments = this.sortComments(byId[key.petitionId] ?? []);
         return key.loadInternalComments
           ? (comments[0] ?? null)
-          : (comments.filter((c) => c.is_internal === false)[0] ?? null);
+          : (comments.filter((c) => c.is_internal === false && c.approval_metadata === null)[0] ??
+              null);
       });
     },
     { cacheKeyFn: keyBuilder(["petitionId", "loadInternalComments"]) },
@@ -4698,6 +4705,11 @@ export class PetitionRepository extends BaseRepository {
       petitionFieldId: number | null;
       contentJson: any;
       isInternal: boolean;
+      approvalMetadata?: {
+        stepName: string;
+        status: PetitionApprovalRequestStepStatus;
+        rejectionType?: "TEMPORARY" | "DEFINITIVE";
+      };
     },
     user: User,
   ) {
@@ -4710,6 +4722,7 @@ export class PetitionRepository extends BaseRepository {
           content_json: this.json(data.contentJson),
           user_id: user.id,
           is_internal: data.isInternal,
+          approval_metadata: data.approvalMetadata ? this.json(data.approvalMetadata) : null,
           created_by: `User:${user.id}`,
         },
         t,
@@ -5692,6 +5705,35 @@ export class PetitionRepository extends BaseRepository {
       );
       return [...removedUserPermissions, ...removedGroupPermissions];
     }, t);
+  }
+
+  /** ensures every user in array has at least READ permission on the petition */
+  async ensureMinimalPermissions(petitionId: number, userIds: number[], createdBy: string) {
+    if (userIds.length === 0) {
+      return [];
+    }
+    return await pMapChunk(
+      userIds.map((userId) => ({
+        petition_id: petitionId,
+        user_id: userId,
+        type: "READ" as const,
+        created_by: createdBy,
+        updated_by: createdBy,
+      })),
+      async (chunk) =>
+        await this.raw<PetitionPermission>(
+          /* sql */ `
+            ? on conflict (petition_id, user_id)
+            where deleted_at is null and from_user_group_id is null and user_group_id is null 
+              do nothing returning *;
+          `,
+          [this.from("petition_permission").insert(chunk)],
+        ),
+      {
+        chunkSize: 100,
+        concurrency: 1,
+      },
+    );
   }
 
   private async removePetitionPermissionsById(
@@ -8898,5 +8940,28 @@ export class PetitionRepository extends BaseRepository {
           }),
         ),
       });
+  }
+
+  async getPetitionStartedProcesses(petitionId: number) {
+    const processes: ("SIGNATURE" | "APPROVAL")[] = [];
+    const currentSignature = await this.loadLatestPetitionSignatureByPetitionId.raw(petitionId);
+    if (
+      currentSignature &&
+      ["ENQUEUED", "PROCESSING", "PROCESSED", "CANCELLING"].includes(currentSignature.status)
+    ) {
+      processes.push("SIGNATURE");
+    }
+
+    const currentApprovalRequest = await this.from("petition_approval_request_step")
+      .where("petition_id", petitionId)
+      .whereNull("deprecated_at")
+      .whereIn("status", ["PENDING", "SKIPPED", "APPROVED", "REJECTED"])
+      .select("*");
+
+    if (currentApprovalRequest.length > 0) {
+      processes.push("APPROVAL");
+    }
+
+    return processes;
   }
 }

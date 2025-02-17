@@ -118,6 +118,7 @@ export function PetitionListHeader({
         "search",
         "path",
         "searchIn",
+        "approvals",
         "sort",
         "columns",
       ]) as Omit<PetitionListViewData, "__typename">,
@@ -158,6 +159,7 @@ export function PetitionListHeader({
               "search",
               "searchIn",
               "path",
+              "approvals",
               "sort",
               "columns",
             ]),
@@ -196,6 +198,7 @@ export function PetitionListHeader({
             "signature",
             "fromTemplateId",
             "search",
+            "approvals",
           ]),
         ).some(isNonNullish)
       ) {
@@ -223,6 +226,7 @@ export function PetitionListHeader({
               : {
                   tagsFilters: state.tagsFilters,
                   sharedWith: state.sharedWith,
+                  approvals: state.approvals,
                   ...pick(state, [
                     "status",
                     "signature",
@@ -346,6 +350,13 @@ PetitionListHeader.fragments = {
         search
         searchIn
         path
+        approvals {
+          operator
+          filters {
+            operator
+            value
+          }
+        }
         sort {
           field
           direction
@@ -399,8 +410,8 @@ const _mutations = [
 function viewsAreEqual(view1: Partial<PetitionListViewData>, view2: Partial<PetitionListViewData>) {
   return (
     isDeepEqual(
-      omit(view1, ["__typename", "sharedWith", "sort", "tagsFilters"]),
-      omit(view2, ["__typename", "sharedWith", "sort", "tagsFilters"]),
+      omit(view1, ["__typename", "sharedWith", "sort", "tagsFilters", "approvals"]),
+      omit(view2, ["__typename", "sharedWith", "sort", "tagsFilters", "approvals"]),
     ) &&
     isDeepEqual(
       isNonNullish(view1.sharedWith)
@@ -437,6 +448,20 @@ function viewsAreEqual(view1: Partial<PetitionListViewData>, view2: Partial<Peti
             filters: view2.tagsFilters.filters.map(omit(["__typename"])),
           }
         : view2.tagsFilters,
+    ) &&
+    isDeepEqual(
+      isNonNullish(view1.approvals)
+        ? {
+            ...omit(view1.approvals, ["__typename"]),
+            filters: view1.approvals.filters.map(omit(["__typename"])),
+          }
+        : view1.approvals,
+      isNonNullish(view2.approvals)
+        ? {
+            ...omit(view2.approvals, ["__typename"]),
+            filters: view2.approvals.filters.map(omit(["__typename"])),
+          }
+        : view2.approvals,
     )
   );
 }

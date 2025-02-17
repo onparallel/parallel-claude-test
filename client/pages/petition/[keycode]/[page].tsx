@@ -26,6 +26,7 @@ import { RecipientViewContents } from "@parallel/components/recipient-view/Recip
 import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
 import { RecipientViewHeader } from "@parallel/components/recipient-view/RecipientViewHeader";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
+import { RecipientViewPetitionApprovalsAlert } from "@parallel/components/recipient-view/RecipientViewPetitionApprovalsAlert";
 import { RecipientViewPetitionStatusAlert } from "@parallel/components/recipient-view/RecipientViewPetitionStatusAlert";
 import { RecipientViewProgressBar } from "@parallel/components/recipient-view/RecipientViewProgressBar";
 import { RecipientViewRefreshRepliesAlert } from "@parallel/components/recipient-view/RecipientViewRefreshRepliesAlert";
@@ -279,6 +280,11 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const isClosed = ["COMPLETED", "CLOSED"].includes(petition.status);
   const hasSignature = petition.signatureConfig?.review === false;
 
+  const showApprovalsAlert = petition.hasStartedProcess;
+
+  const showPetitionStatusAlert =
+    !showApprovalsAlert && ["COMPLETED", "CLOSED"].includes(petition.status);
+
   return (
     <LastSavedProvider>
       <RecipientViewSidebarContextProvider>
@@ -334,7 +340,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                 >
                   {/* Alerts container */}
                   <Box position="sticky" top={0} width="100%" zIndex={2}>
-                    {["COMPLETED", "CLOSED"].includes(petition.status) ? (
+                    {showPetitionStatusAlert ? (
                       !petition.signatureConfig ||
                       (petition.signatureConfig && petition.signatureStatus === "COMPLETED") ? (
                         <RecipientViewPetitionStatusAlert
@@ -359,6 +365,9 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                         }}
                       />
                     ) : null}
+                    {showApprovalsAlert ? (
+                      <RecipientViewPetitionApprovalsAlert tone={tone} />
+                    ) : null}
                   </Box>
                   {/* End Alerts container */}
                   {/* Content */}
@@ -374,7 +383,9 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                                     keycode={keycode}
                                     access={access!}
                                     field={field}
-                                    isDisabled={petition.status === "CLOSED"}
+                                    isDisabled={
+                                      petition.status === "CLOSED" || petition.hasStartedProcess
+                                    }
                                     fieldLogic={logic}
                                     onError={handleErrorFromFields}
                                   />
@@ -508,6 +519,7 @@ const _fragments = {
         }
         signatureStatus
         isCompletingMessageEnabled
+        hasStartedProcess
         ...RecipientViewContents_PublicPetition
         ...RecipientViewProgressBar_PublicPetition
         ...useGetPetitionPages_PublicPetition

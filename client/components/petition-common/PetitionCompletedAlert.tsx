@@ -3,7 +3,7 @@ import { FormattedMessage } from "react-intl";
 
 export function PetitionCompletedAlert(props: AlertProps) {
   return (
-    <Alert status="warning" {...props}>
+    <Alert status="success" {...props}>
       <AlertIcon />
       <AlertDescription>
         <FormattedMessage

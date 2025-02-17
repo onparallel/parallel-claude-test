@@ -2,6 +2,7 @@ import { parse as parseCookie } from "cookie";
 import { IncomingMessage } from "http";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isNonNullish, isNullish, unique } from "remeda";
+import { assert } from "ts-essentials";
 import { FeatureFlagName } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { verify } from "../../util/jwt";
@@ -286,6 +287,30 @@ export function organizationHasFeatureFlag<TypeName extends string, FieldName ex
       throw new ForbiddenError("Feature flag not found");
     }
 
+    return true;
+  };
+}
+
+export function publicPetitionDoesNotHaveOngoingProcess<
+  TypeName extends string,
+  FieldName extends string,
+  TKeycodeArg extends Arg<TypeName, FieldName, string>,
+>(keycodeArg: TKeycodeArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const keycode = getArg(args, keycodeArg);
+
+    const access = await ctx.petitions.loadAccessByKeycode(keycode);
+    assert(access, "Access not found");
+    const petitionId = access.petition_id;
+
+    const [process] = await ctx.petitions.getPetitionStartedProcesses(petitionId);
+
+    if (isNonNullish(process)) {
+      throw new ApolloError(
+        `Petition has an ongoing ${process.toLowerCase()} process`,
+        `ONGOING_${process}_REQUEST_ERROR`,
+      );
+    }
     return true;
   };
 }

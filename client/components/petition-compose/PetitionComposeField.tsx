@@ -1187,7 +1187,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             label={
               hasCondition
                 ? intl.formatMessage({
-                    id: "component.petition-compose-field.remove-condition",
+                    id: "generic.remove-condition",
                     defaultMessage: "Remove condition",
                   })
                 : intl.formatMessage({

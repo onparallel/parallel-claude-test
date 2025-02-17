@@ -180,6 +180,21 @@ export const PetitionFieldComment = objectType({
         "Whether the comment is internal (only visible to org users) or public (visible for users and accesses)",
       resolve: (root) => root.is_internal,
     });
+    t.boolean("isApproval", {
+      description:
+        "Whether the comment is part of approval process (only visible to org users and cannot be deleted or edited)",
+      resolve: (o) => isNonNullish(o.approval_metadata),
+    });
+    t.nullable.jsonObject("approvalMetadata", {
+      resolve: (o) => o.approval_metadata,
+    });
+    t.nonNull.list.nonNull.field("attachments", {
+      type: "PetitionCommentAttachment",
+      description: "A list of files attached to this comment.",
+      resolve: async (o, _, ctx) => {
+        return await ctx.petitionComments.loadPetitionCommentAttachmentsByCommentId(o.id);
+      },
+    });
     t.nullable.field("field", {
       type: "PetitionField",
       resolve: async (o, _, ctx) => {
@@ -196,5 +211,20 @@ export const PetitionFieldComment = objectType({
       },
     });
     t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
+  },
+});
+
+export const PetitionCommentAttachment = objectType({
+  name: "PetitionCommentAttachment",
+  description: "A file attachment on the petition field comment",
+  definition(t) {
+    t.globalId("id");
+    t.field("file", {
+      type: "FileUpload",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.files.loadFileUpload(o.file_upload_id))!;
+      },
+    });
+    t.implements("CreatedAt");
   },
 });

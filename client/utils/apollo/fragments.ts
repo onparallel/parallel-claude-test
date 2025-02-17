@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-export const FullPetitionSignerFragment = gql`
+const FullPetitionSigner = gql`
   fragment Fragments_FullPetitionSigner on PetitionSigner {
     contactId
     firstName
@@ -10,3 +10,17 @@ export const FullPetitionSignerFragment = gql`
     isPreset
   }
 `;
+
+const FullApprovalFlowConfig = gql`
+  fragment Fragments_FullApprovalFlowConfig on ApprovalFlowConfig {
+    name
+    type
+    values
+    visibility
+  }
+`;
+
+export const Fragments = {
+  FullPetitionSigner,
+  FullApprovalFlowConfig,
+};

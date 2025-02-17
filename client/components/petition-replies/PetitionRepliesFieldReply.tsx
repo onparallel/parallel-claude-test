@@ -468,7 +468,7 @@ export function PetitionRepliesFieldReply({
             data-action="approve-reply"
             icon={<CheckIcon />}
             label={intl.formatMessage({
-              id: "component.petition-replies-field-reply.approve",
+              id: "generic.approve",
               defaultMessage: "Approve",
             })}
             size="xs"
@@ -483,7 +483,7 @@ export function PetitionRepliesFieldReply({
             data-action="reject-reply"
             icon={<CloseIcon />}
             label={intl.formatMessage({
-              id: "component.petition-replies-field-reply.reject",
+              id: "generic.reject",
               defaultMessage: "Reject",
             })}
             size="xs"

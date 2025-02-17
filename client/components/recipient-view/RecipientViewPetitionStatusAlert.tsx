@@ -42,9 +42,8 @@ export function RecipientViewPetitionStatusAlert({
             <Text>
               <FormattedMessage
                 id="component.recipient-view-petition-status-alert.petition-completed-alert-1"
-                defaultMessage="<b>Information completed!</b> We have notified {name} for review and validation."
+                defaultMessage="<b>Information completed!</b> We have notified for review and validation."
                 values={{
-                  name,
                   tone,
                 }}
               />

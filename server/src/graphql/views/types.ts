@@ -1,5 +1,6 @@
 import { enumType, inputObjectType, interfaceType, objectType } from "nexus";
 import { ListViewTypeValues } from "../../db/__types";
+import { toGlobalId } from "../../util/globalId";
 import { mapProfileListViewDataFromDatabase } from "./helpers";
 
 export const ListView = interfaceType({
@@ -67,6 +68,31 @@ export const PetitionListViewData = objectType({
         },
       }),
     });
+    t.nullable.field("approvals", {
+      type: objectType({
+        name: "PetitionListViewDataApprovals",
+        definition(t) {
+          t.nonNull.field("operator", {
+            type: "PetitionApprovalsFilterLogicalOperator",
+          });
+          t.nonNull.list.nonNull.field("filters", {
+            type: objectType({
+              name: "PetitionListViewDataApprovalsFilters",
+              definition(t) {
+                t.nonNull.string("value");
+                t.nonNull.field("operator", {
+                  type: "PetitionApprovalsFilterOperator",
+                });
+              },
+            }),
+            resolve: (o) =>
+              o.filters.map((f: any) =>
+                f.operator === "ASSIGNED_TO" ? { ...f, value: toGlobalId("User", f.value) } : f,
+              ),
+          });
+        },
+      }),
+    });
     t.nullable.field("tagsFilters", {
       type: objectType({
         name: "PetitionListViewDataTags",
@@ -122,6 +148,7 @@ export const PetitionListViewData = objectType({
           "status",
           "signature",
           "sharedWith",
+          "approvals",
           "sentAt",
           "createdAt",
           "reminders",
@@ -145,6 +172,7 @@ export const PetitionListViewDataInput = inputObjectType({
     t.nullable.string("search");
     t.field("searchIn", { type: "PetitionListViewSearchIn" });
     t.string("path");
+    t.nullable.field("approvals", { type: "PetitionApprovalsFilterInput" });
     t.nullable.field("sort", {
       type: inputObjectType({
         name: "PetitionListViewSortInput",

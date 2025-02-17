@@ -81,6 +81,12 @@ export const PetitionViewTabs = Object.assign(
                     filters: view.data.tagsFilters.filters.map(omit(["__typename"])),
                   }
                 : view.data.tagsFilters,
+              approvals: isNonNullish(view.data.approvals)
+                ? {
+                    ...omit(view.data.approvals, ["__typename"]),
+                    filters: view.data.approvals.filters.map(omit(["__typename"])),
+                  }
+                : view.data.approvals,
               sort: isNonNullish(view.data.sort)
                 ? omit(view.data.sort, ["__typename"])
                 : view.data.sort,
@@ -188,6 +194,13 @@ export const PetitionViewTabs = Object.assign(
             search
             searchIn
             path
+            approvals {
+              operator
+              filters {
+                operator
+                value
+              }
+            }
             sort {
               field
               direction

@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Center, ListItem, ListItemProps, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon, EditIcon } from "@parallel/chakra/icons";
 import { SelectedSignerRow_PetitionSignerFragment } from "@parallel/graphql/__types";
-import { FullPetitionSignerFragment } from "@parallel/utils/apollo/fragments";
+import { Fragments } from "@parallel/utils/apollo/fragments";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
@@ -78,6 +78,6 @@ SelectedSignerRow.fragments = {
     fragment SelectedSignerRow_PetitionSigner on PetitionSigner {
       ...Fragments_FullPetitionSigner
     }
-    ${FullPetitionSignerFragment}
+    ${Fragments.FullPetitionSigner}
   `,
 };

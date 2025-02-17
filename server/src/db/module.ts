@@ -18,6 +18,8 @@ import { FileRepository } from "./repositories/FileRepository";
 import { IntegrationRepository } from "./repositories/IntegrationRepository";
 import { LicenseCodeRepository } from "./repositories/LicenseCodeRepository";
 import { OrganizationRepository } from "./repositories/OrganizationRepository";
+import { PetitionApprovalRequestRepository } from "./repositories/PetitionApprovalRequestRepository";
+import { PetitionCommentRepository } from "./repositories/PetitionCommentRepository";
 import { PetitionRepository } from "./repositories/PetitionRepository";
 import { ProfileRepository } from "./repositories/ProfileRepository";
 import { SubscriptionRepository } from "./repositories/SubscriptionRepository";
@@ -59,6 +61,8 @@ export const dbModule = new ContainerModule((bind) => {
   bind<ProfileRepository>(ProfileRepository).toSelf();
   bind<EventRepository>(EventRepository).toSelf();
   bind<DashboardRepository>(DashboardRepository).toSelf();
+  bind<PetitionApprovalRequestRepository>(PetitionApprovalRequestRepository).toSelf();
+  bind<PetitionCommentRepository>(PetitionCommentRepository).toSelf();
 
   // Repository helpers
   bind<ProfileValuesFilterRepositoryHelper>(PROFILE_VALUES_FILTER_REPOSITORY_HELPER).to(

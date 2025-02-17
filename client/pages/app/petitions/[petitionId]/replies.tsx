@@ -47,6 +47,7 @@ import {
 import { useAssociateProfileToPetitionDialog } from "@parallel/components/petition-common/dialogs/AssociateProfileToPetitionDialog";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
+import { PetitionApprovalsCard } from "@parallel/components/petition-replies/PetitionApprovalsCard";
 import { PetitionComments } from "@parallel/components/petition-replies/PetitionComments";
 import { PetitionRepliesContents } from "@parallel/components/petition-replies/PetitionRepliesContents";
 import {
@@ -75,6 +76,7 @@ import {
   PetitionReplies_PetitionFragment,
   PetitionReplies_approveOrRejectPetitionFieldRepliesDocument,
   PetitionReplies_associateProfileToPetitionDocument,
+  PetitionReplies_cancelPetitionApprovalRequestFlowDocument,
   PetitionReplies_closePetitionDocument,
   PetitionReplies_petitionDocument,
   PetitionReplies_sendPetitionClosedNotificationDocument,
@@ -84,6 +86,7 @@ import {
   PetitionSettings_cancelPetitionSignatureRequestDocument,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
+import { Fragments } from "@parallel/utils/apollo/fragments";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -121,6 +124,8 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, sumBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
+
+const GENERAL_COMMENTS_FIELD_ID = "general";
 
 const QUERY_STATE = {
   comments: string(),
@@ -291,7 +296,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   async function handleAddComment(content: any, isNote: boolean) {
     await createPetitionComment({
       petitionId,
-      petitionFieldId: activeFieldId === "general" ? null : activeFieldId,
+      petitionFieldId: activeFieldId === GENERAL_COMMENTS_FIELD_ID ? null : activeFieldId,
       content,
       isInternal: isNote,
     });
@@ -453,8 +458,14 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const showConfirmCancelOngoingSignature = useDialog(ConfirmCancelOngoingSignature);
 
+  const showConfirmCancelOngoingApprovals = useDialog(ConfirmCancelOngoingApprovals);
+
   const [cancelSignatureRequest] = useMutation(
     PetitionSettings_cancelPetitionSignatureRequestDocument,
+  );
+
+  const [cancelPetitionApprovalRequestFlow] = useMutation(
+    PetitionReplies_cancelPetitionApprovalRequestFlowDocument,
   );
 
   const handleClosePetition = useCallback(async () => {
@@ -465,7 +476,23 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             petition.currentSignatureRequest.status,
           )) ??
         false;
-      if (hasPendingSignature || petition.signatureConfig) {
+
+      const hasRejectedApproval = petition.currentApprovalRequestSteps?.some(
+        (s) => s.status === "REJECTED",
+      );
+
+      const pendingApproval = hasRejectedApproval
+        ? null
+        : petition.currentApprovalRequestSteps?.find((s) => s.status === "PENDING");
+
+      if (isNonNullish(pendingApproval)) {
+        await showConfirmCancelOngoingApprovals();
+        await cancelPetitionApprovalRequestFlow({
+          variables: {
+            petitionId: petition.id,
+          },
+        });
+      } else if (hasPendingSignature || petition.signatureConfig) {
         await showConfirmCancelOngoingSignature();
         if (hasPendingSignature) {
           await cancelSignatureRequest({
@@ -582,8 +609,19 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       setProfileId(profileId);
     } catch {}
   };
+
+  const handleToggleGeneralComments = useCallback(() => {
+    setActiveFieldId(
+      activeFieldId === GENERAL_COMMENTS_FIELD_ID ? null : GENERAL_COMMENTS_FIELD_ID,
+    );
+  }, [activeFieldId]);
   const drawerInitialRef = useRef<ProfileSelectInstance<false>>(null);
   const isMobile = useBreakpointValue({ base: true, lg: false });
+
+  const hasApprovals =
+    (petition.currentApprovalRequestSteps && petition.currentApprovalRequestSteps.length > 0) ||
+    (petition.approvalFlowConfig && petition.approvalFlowConfig.length > 0);
+
   return (
     <PetitionLayout
       key={petition.id}
@@ -617,7 +655,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       isRightPaneActive={Boolean(activeFieldId)}
       rightPane={
         isMobile ? (
-          activeFieldId && !!activeField ? (
+          (activeFieldId && !!activeField) || activeFieldId === GENERAL_COMMENTS_FIELD_ID ? (
             <Flex flex="1" flexDirection="column">
               <PetitionRepliesFieldComments
                 key={activeFieldId}
@@ -846,7 +884,16 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           ) : null}
         </Box>
         <Box padding={4} zIndex={1}>
-          {petition.isDocumentGenerationEnabled ? (
+          {me.hasPetitionApprovalFlow && hasApprovals ? (
+            <PetitionApprovalsCard
+              petition={petition}
+              user={me}
+              onRefetchPetition={refetch}
+              onToggleGeneralComments={handleToggleGeneralComments}
+              isShowingGeneralComments={activeFieldId === GENERAL_COMMENTS_FIELD_ID}
+              isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+            />
+          ) : petition.isDocumentGenerationEnabled ? (
             <PetitionSignaturesCard
               ref={signaturesRef as any}
               id="signatures"
@@ -855,6 +902,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               layerStyle="highlightable"
               marginBottom={4}
               onRefetchPetition={refetch}
+              onToggleGeneralComments={handleToggleGeneralComments}
+              isShowingGeneralComments={activeFieldId === GENERAL_COMMENTS_FIELD_ID}
               isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
             />
           ) : null}
@@ -954,6 +1003,13 @@ PetitionReplies.fragments = {
         variables {
           name
         }
+        approvalFlowConfig {
+          ...Fragments_FullApprovalFlowConfig
+        }
+        currentApprovalRequestSteps {
+          id
+          status
+        }
         ...PetitionRepliesField_Petition
         ...PetitionVariablesCard_PetitionBase
         ...PetitionSignaturesCard_Petition
@@ -970,7 +1026,9 @@ PetitionReplies.fragments = {
         ...ExportRepliesDialog_Petition
         ...useFieldsWithIndices_PetitionBase
         ...PetitionComments_PetitionBase
+        ...PetitionApprovalsCard_Petition
       }
+      ${Fragments.FullApprovalFlowConfig}
       ${PetitionLayout.fragments.PetitionBase}
       ${PetitionRepliesField.fragments.Petition}
       ${ShareButton.fragments.PetitionBase}
@@ -989,6 +1047,7 @@ PetitionReplies.fragments = {
       ${ExportRepliesDialog.fragments.Petition}
       ${useFieldsWithIndices.fragments.PetitionBase}
       ${PetitionComments.fragments.PetitionBase}
+      ${PetitionApprovalsCard.fragments.Petition}
     `;
   },
   get PetitionField() {
@@ -1098,6 +1157,20 @@ const _mutations = [
       }
     }
   `,
+  gql`
+    mutation PetitionReplies_cancelPetitionApprovalRequestFlow($petitionId: GID!) {
+      cancelPetitionApprovalRequestFlow(petitionId: $petitionId) {
+        id
+        petition {
+          id
+          currentApprovalRequestSteps {
+            id
+            status
+          }
+        }
+      }
+    }
+  `,
 ];
 
 function useUpdatePetitionFieldRepliesStatus() {
@@ -1140,6 +1213,34 @@ function ConfirmCancelOngoingSignature(props: DialogProps<{}, void>) {
   );
 }
 
+function ConfirmCancelOngoingApprovals(props: DialogProps<{}, void>) {
+  return (
+    <ConfirmDialog
+      header={
+        <FormattedMessage
+          id="component.confirm-disable-ongoing-approvals.header"
+          defaultMessage="Ongoing approvals"
+        />
+      }
+      body={
+        <FormattedMessage
+          id="component.confirm-disable-ongoing-approvals-petition-close.body"
+          defaultMessage="There is an ongoing approval process. If you close this parallel now, the process will be cancelled."
+        />
+      }
+      confirm={
+        <Button colorScheme="red" onClick={() => props.onResolve()}>
+          <FormattedMessage
+            id="component.confirm-disable-ongoing-approvals-petition-close.confirm"
+            defaultMessage="Cancel approvals and continue"
+          />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
 PetitionReplies.queries = [
   gql`
     query PetitionReplies_user {
@@ -1161,11 +1262,13 @@ PetitionReplies.queries = [
             }
           }
         }
+        hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
         hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
         ...ExportRepliesDialog_User
         ...PetitionSignaturesCard_User
         ...useUpdateIsReadNotification_User
         ...PetitionRepliesSummary_User
+        ...PetitionApprovalsCard_User
       }
       metadata {
         country
@@ -1177,6 +1280,7 @@ PetitionReplies.queries = [
     ${PetitionSignaturesCard.fragments.User}
     ${useUpdateIsReadNotification.fragments.User}
     ${PetitionRepliesSummary.fragments.User}
+    ${PetitionApprovalsCard.fragments.User}
   `,
   gql`
     query PetitionReplies_petition($id: GID!) {

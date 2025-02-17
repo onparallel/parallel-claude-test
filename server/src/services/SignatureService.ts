@@ -46,10 +46,6 @@ export interface ISignatureService {
     extraData?: Partial<PetitionSignatureRequest>,
     t?: Knex.Transaction,
   ): Promise<PetitionSignatureRequest[]>;
-  cancelPendingSignatureRequests(
-    petitionId: number,
-    canceller: PetitionAccess | User,
-  ): Promise<void>;
   sendSignatureReminders(
     signatures: MaybeArray<PetitionSignatureRequest>,
     userId: number,
@@ -228,7 +224,10 @@ export class SignatureService implements ISignatureService {
     });
   }
 
-  async cancelPendingSignatureRequests(petitionId: number, canceller: PetitionAccess | User) {
+  private async cancelPendingSignatureRequests(
+    petitionId: number,
+    canceller: PetitionAccess | User,
+  ) {
     const isAccess = "keycode" in canceller;
     const previousSignatureRequests = await this.petitions.loadPetitionSignaturesByPetitionId(
       petitionId,

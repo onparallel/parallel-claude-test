@@ -16,7 +16,7 @@ import {
   RecipientViewSignatureSentAlert_PublicPetitionFragment,
   Tone,
 } from "@parallel/graphql/__types";
-import { FullPetitionSignerFragment } from "@parallel/utils/apollo/fragments";
+import { Fragments } from "@parallel/utils/apollo/fragments";
 import { withError } from "@parallel/utils/promises/withError";
 import { FormattedMessage } from "react-intl";
 import { isNullish } from "remeda";
@@ -56,7 +56,7 @@ export function RecipientViewSignatureSentAlert({
         flexDirection={{ base: "column", md: "row" }}
         gap={{ base: 2, md: 6 }}
       >
-        <Flex alignItems={{ base: "start", md: "center" }}>
+        <Flex alignItems={{ base: "start", md: "center" }} flex="1">
           <AlertIcon />
           <AlertDescription>
             {isPendingStart ? (
@@ -169,7 +169,7 @@ RecipientViewSignatureSentAlert.fragments = {
       }
     }
     ${ContactListPopover.fragments.PetitionSigner}
-    ${FullPetitionSignerFragment}
+    ${Fragments.FullPetitionSigner}
   `,
 };
 

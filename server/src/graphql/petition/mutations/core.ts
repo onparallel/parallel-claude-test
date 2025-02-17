@@ -52,6 +52,7 @@ import {
   mapPetitionFieldReplyToProfileFieldValue,
   mapProfileTypeFieldToPetitionField,
 } from "../../../db/helpers/petitionProfileMapper";
+import { evaluateApprovalStepsVisibility } from "../../../util/approvalStepsLogic";
 import { chunkWhile } from "../../../util/arrays";
 import { buildAutomatedBackgroundCheckFieldQueries } from "../../../util/backgroundCheck";
 import { applyFieldVisibility, mapFieldLogic } from "../../../util/fieldLogic";
@@ -59,6 +60,7 @@ import { toBytes } from "../../../util/fileSize";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { isValueCompatible } from "../../../util/isValueCompatible";
+import { petitionIsCompleted } from "../../../util/petitionIsCompleted";
 import { isAtLeast } from "../../../util/profileTypeFieldPermission";
 import { pFlatMap } from "../../../util/promises/pFlatMap";
 import { withError } from "../../../util/promises/withError";
@@ -104,6 +106,7 @@ import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 import { notEmptyString } from "../../helpers/validators/notEmptyString";
 import { uniqueValues } from "../../helpers/validators/uniqueValues";
+import { validApprovalFlowConfigInput } from "../../helpers/validators/validApprovalFlowConfig";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { validateFieldLogicInput } from "../../helpers/validators/validFieldLogic";
 import { validFolderId } from "../../helpers/validators/validFolderId";
@@ -151,12 +154,14 @@ import {
   fieldIsNotBeingReferencedByAnotherFieldLogic,
   fieldIsNotFirstChild,
   fieldIsNotFixed,
+  fieldIsNotReferencedInApprovalFlowConfig,
   fieldsBelongsToPetition,
   firstChildHasType,
   foldersAreInPath,
   linkedProfileTypeFieldDoesNotHaveFormat,
   messageBelongToPetition,
   parentFieldIsInternal,
+  petitionDoesNotHaveStartedProcess,
   petitionFieldsCanBeAssociated,
   petitionHasRepliableFields,
   petitionHasStatus,
@@ -539,6 +544,7 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     ifArgDefined(
@@ -650,6 +656,10 @@ export const SignatureConfigInput = inputObjectType({
       description:
         "If true, lets the user review the replies before starting the signature process",
     });
+    t.nullable.boolean("reviewAfterApproval", {
+      description:
+        "Whether to review the replies after completing the approval steps. If true, review must be true",
+    });
     t.nonNull.boolean("allowAdditionalSigners", {
       description:
         "If true, allows the recipients or users of the petition to select additional signers",
@@ -732,8 +742,24 @@ export const closePetition = mutationField("closePetition", {
       );
       // all signature requests must be finished before the petition is closed
       if (signature && ["ENQUEUED", "PROCESSED", "PROCESSING"].includes(signature.status)) {
-        return false;
+        throw new ApolloError(
+          "Can't close the parallel with an ongoing signature process.",
+          "ONGOING_SIGNATURE_REQUEST_ERROR",
+        );
       }
+
+      const approvalSteps =
+        await ctx.approvalRequests.loadCurrentPetitionApprovalRequestStepsByPetitionId(
+          args.petitionId,
+        );
+
+      if (approvalSteps.some((s) => s.status === "PENDING")) {
+        throw new ApolloError(
+          "Can't close the parallel with a pending approval process.",
+          "ONGOING_APPROVAL_REQUEST_ERROR",
+        );
+      }
+
       return true;
     },
   ),
@@ -771,9 +797,9 @@ export const updatePetition = mutationField("updatePetition", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreNotPublicTemplates("petitionId"),
+
     ifSomeDefined(
       [
-        "data.locale",
         "data.description",
         "data.closingEmailBody",
         "data.isCompletingMessageEnabled",
@@ -787,9 +813,11 @@ export const updatePetition = mutationField("updatePetition", {
         "data.defaultPath",
         "data.defaultOnBehalfId",
         "data.automaticNumberingConfig",
+        "data.approvalFlowConfig",
       ],
-      petitionsAreEditable("petitionId"),
+      and(petitionsAreEditable("petitionId"), petitionDoesNotHaveStartedProcess("petitionId")),
     ),
+    ifSomeDefined(["data.signatureConfig", "data.locale"], petitionsAreEditable("petitionId")),
     ifSomeDefined(
       ["data.emailBody", "data.emailSubject"],
       or(petitionsAreEditable("petitionId"), petitionsAreOfTypePetition("petitionId")),
@@ -813,6 +841,7 @@ export const updatePetition = mutationField("updatePetition", {
         "data.defaultPath",
         "data.defaultOnBehalfId",
         "data.automaticNumberingConfig",
+        "data.approvalFlowConfig",
       ],
       petitionIsNotAnonymized("petitionId"),
     ),
@@ -830,6 +859,7 @@ export const updatePetition = mutationField("updatePetition", {
         "data.isReviewFlowEnabled",
         "data.isDocumentGenerationEnabled",
         "data.isInteractionWithRecipientsEnabled",
+        "data.approvalFlowConfig",
       ],
       petitionsAreOfTypeTemplate("petitionId"),
     ),
@@ -867,6 +897,7 @@ export const updatePetition = mutationField("updatePetition", {
           t.nullable.field("automaticNumberingConfig", {
             type: "AutomaticNumberingConfigInput",
           });
+          t.nullable.list.nonNull.field("approvalFlowConfig", { type: "ApprovalFlowConfigInput" });
         },
       }).asArg(),
     ),
@@ -883,7 +914,8 @@ export const updatePetition = mutationField("updatePetition", {
     validRichTextContent("data.description"),
     validRichTextContent("data.completingMessageBody", "petitionId"),
     validRemindersConfig("data.remindersConfig"),
-    validSignatureConfig("data.signatureConfig"),
+    validSignatureConfig("petitionId", "data.signatureConfig", "data.approvalFlowConfig"),
+    validApprovalFlowConfigInput("data.approvalFlowConfig", "petitionId"),
     inRange("data.anonymizeAfterMonths", 1),
     validPath("data.defaultPath"),
   ),
@@ -912,6 +944,7 @@ export const updatePetition = mutationField("updatePetition", {
       defaultPath,
       defaultOnBehalfId,
       automaticNumberingConfig,
+      approvalFlowConfig,
     } = args.data;
     const data: Partial<CreatePetition> = {};
     if (name !== undefined) {
@@ -1003,6 +1036,56 @@ export const updatePetition = mutationField("updatePetition", {
       }
     }
 
+    if (approvalFlowConfig !== undefined) {
+      let signatureConfig = data.signature_config;
+      if (!signatureConfig) {
+        const petition = await ctx.petitions.loadPetition(args.petitionId);
+        assert(petition, "Petition not found");
+        signatureConfig = petition.signature_config;
+      }
+
+      if (approvalFlowConfig === null) {
+        data.approval_flow_config = null;
+
+        // when nulling approvalFlowConfig, we need to also null  in signature_config
+        if (signatureConfig) {
+          data.signature_config = JSON.stringify({
+            ...signatureConfig,
+            reviewAfterApproval: null,
+          });
+        }
+      } else {
+        const referencedLists: string[] = [];
+        data.approval_flow_config = JSON.stringify(
+          approvalFlowConfig.map((config) => {
+            const fieldLogic = config.visibility
+              ? mapFieldLogic<string>({ visibility: config.visibility } as any, (fieldId) => {
+                  assert(typeof fieldId === "string", "Expected fieldId to be a string");
+                  return fromGlobalId(fieldId, "PetitionField").id;
+                })
+              : null;
+
+            if (fieldLogic?.referencedLists) {
+              referencedLists.push(...fieldLogic.referencedLists);
+            }
+
+            return {
+              ...config,
+              values: config.values.map((id) => fromGlobalId(id)),
+              visibility: fieldLogic?.field.visibility ?? null,
+            };
+          }),
+        );
+
+        if (referencedLists.length > 0) {
+          await ctx.petitions.updateStandardListDefinitionOverride(
+            args.petitionId,
+            unique(referencedLists),
+          );
+        }
+      }
+    }
+
     const [petition] = await ctx.petitions.updatePetition(
       args.petitionId,
       data,
@@ -1041,6 +1124,7 @@ export const createPetitionField = mutationField("createPetitionField", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     ifArgEquals("type", "ES_TAX_DOCUMENTS", userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD")),
     ifArgEquals("type", "DOW_JONES_KYC", userHasFeatureFlag("DOW_JONES_KYC")),
@@ -1138,6 +1222,7 @@ export const clonePetitionField = mutationField("clonePetitionField", {
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     not(fieldIsLinkedToProfileTypeField("fieldId")),
@@ -1162,10 +1247,12 @@ export const deletePetitionField = mutationField("deletePetitionField", {
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldIsNotFixed("fieldId"),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     fieldIsNotBeingReferencedByAnotherFieldLogic("petitionId", "fieldId"),
     fieldIsNotBeingUsedInAutoSearchConfig("petitionId", "fieldId"),
+    fieldIsNotReferencedInApprovalFlowConfig("petitionId", "fieldId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1225,6 +1312,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     ifArgEquals(
@@ -1570,6 +1658,7 @@ export const updatePetitionFieldAutoSearchConfig = mutationField(
       userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
       fieldsBelongsToPetition("petitionId", "fieldId"),
       petitionsAreEditable("petitionId"),
+      petitionDoesNotHaveStartedProcess("petitionId"),
       petitionsAreNotPublicTemplates("petitionId"),
       petitionIsNotAnonymized("petitionId"),
       fieldHasType("fieldId", "BACKGROUND_CHECK"),
@@ -2139,7 +2228,7 @@ export const sendPetition = mutationField("sendPetition", {
               name: (petition.name ?? messageSubject)
                 .slice(0, 255)
                 .concat(index === 0 ? "" : ` (${index + 1})`),
-              status: "PENDING",
+              status: petition.status === "DRAFT" ? "PENDING" : petition.status,
               closed_at: null,
             },
             `User:${ctx.user!.id}`,
@@ -2361,6 +2450,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     not(fieldHasType("fieldId", "FIELD_GROUP")),
     ifArgEquals("type", "ES_TAX_DOCUMENTS", userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD")),
@@ -2390,6 +2480,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
     petitionIsNotAnonymized("petitionId"),
     fieldIsNotBeingUsedInMathOperation("petitionId", "fieldId"),
     fieldIsNotBeingUsedInAutoSearchConfig("petitionId", "fieldId"),
+    fieldIsNotReferencedInApprovalFlowConfig("petitionId", "fieldId"),
     not(fieldIsLinkedToProfileTypeField("fieldId")),
   ),
   args: {
@@ -2496,19 +2587,16 @@ export const reopenPetition = mutationField("reopenPetition", {
     petitionId: nonNull(globalIdArg("Petition")),
   },
   resolve: async (_, args, ctx) => {
-    await ctx.petitions.withTransaction(async (t) => {
-      await Promise.all([
-        ctx.petitions.reopenPetition(args.petitionId, `User:${ctx.user!.id}`, t),
-        ctx.petitions.createEvent(
-          {
-            type: "PETITION_REOPENED",
-            petition_id: args.petitionId,
-            data: { user_id: ctx.user!.id },
-          },
-          t,
-        ),
-      ]);
+    await ctx.petitions.reopenPetition(args.petitionId, `User:${ctx.user!.id}`);
+
+    await ctx.approvalRequests.updatePetitionApprovalRequestStepsAsDeprecated(args.petitionId);
+
+    await ctx.petitions.createEvent({
+      type: "PETITION_REOPENED",
+      petition_id: args.petitionId,
+      data: { user_id: ctx.user!.id },
     });
+
     return (await ctx.petitions.loadPetition(args.petitionId))!;
   },
 });
@@ -2738,7 +2826,8 @@ export const modifyPetitionCustomProperty = mutationField("modifyPetitionCustomP
 export const completePetition = mutationField("completePetition", {
   description: outdent`
     Marks a petition as COMPLETED.
-    If the petition has a signature configured and does not require a review, starts the signing process.`,
+    If the petition has a signature configured and does not require a review, starts the signing process.
+    It the petition has a configured approval flow, calculates and creates every`,
   type: "Petition",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -2747,18 +2836,31 @@ export const completePetition = mutationField("completePetition", {
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     petitionIsNotAnonymized("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     try {
+      const [composedPetition] = await ctx.petitions.getComposedPetitionFieldsAndVariables([
+        args.petitionId,
+      ]);
+      const canComplete = petitionIsCompleted(composedPetition);
+      if (!canComplete) {
+        throw new Error("CANT_COMPLETE_PETITION_ERROR");
+      }
+
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
-      const response = await ctx.petitions.completePetition(args.petitionId, ctx.user!);
 
-      let petition = response.petition;
-
-      const backgroundCheckAutoSearchQueries = buildAutomatedBackgroundCheckFieldQueries(
-        response.composedPetition,
+      let [petition] = await ctx.petitions.updatePetition(
+        args.petitionId,
+        { status: "COMPLETED" },
+        `User:${ctx.user!.id}`,
       );
+
+      await ctx.petitions.updateRemindersForPetitions(args.petitionId, null);
+
+      const backgroundCheckAutoSearchQueries =
+        buildAutomatedBackgroundCheckFieldQueries(composedPetition);
 
       // run an automated background search for each field that has autoSearchConfig and the "name" field replied
       // if the query is the same as the last one or the field has a stored entity detail, it will not trigger a new search
@@ -2798,12 +2900,6 @@ export const completePetition = mutationField("completePetition", {
         }
       }
 
-      await ctx.petitions.createEvent({
-        type: "PETITION_COMPLETED",
-        petition_id: args.petitionId,
-        data: { user_id: ctx.user!.id },
-      });
-
       if (petition.signature_config) {
         if (petition.signature_config.review === false) {
           // start a new signature request, cancelling previous pending requests if any
@@ -2817,11 +2913,72 @@ export const completePetition = mutationField("completePetition", {
             ctx.user!,
           );
           petition = updatedPetition ?? petition;
-        } else {
-          // signature is configured to be reviewed after start, so just cancel if there are pending requests
-          await ctx.signature.cancelPendingSignatureRequests(petition.id, ctx.user!);
         }
       }
+
+      if (petition.approval_flow_config) {
+        const hasFeatureFlag = await ctx.featureFlags.userHasFeatureFlag(
+          ctx.user!.id,
+          "PETITION_APPROVAL_FLOW",
+        );
+
+        if (hasFeatureFlag) {
+          await ctx.approvalRequests.deleteNotStartedPetitionApprovalRequestStepsAndApproversByPetitionId(
+            petition.id,
+          );
+
+          const approvalLogic = evaluateApprovalStepsVisibility(
+            composedPetition,
+            petition.approval_flow_config,
+          );
+
+          // create every approval step. Step statuses will be NOT_STARTED or NOT_APPLICABLE, as completing the petition does not starts the approval flow, only calculates its steps
+          let firstVisibleStepIndex = -1;
+          const approvalRequestSteps =
+            await ctx.approvalRequests.createPetitionApprovalRequestSteps(
+              zip(petition.approval_flow_config, approvalLogic).map(
+                ([step, { isVisible }], index) => {
+                  if (isVisible && firstVisibleStepIndex === -1) {
+                    firstVisibleStepIndex = index;
+                  }
+                  return {
+                    petition_id: args.petitionId,
+                    status: isVisible ? "NOT_STARTED" : "NOT_APPLICABLE",
+                    approval_type: step.type,
+                    step_name: step.name,
+                    step_number: index,
+                  };
+                },
+              ),
+              `User:${ctx.user!.id}`,
+            );
+
+          // on each step, insert its approvers
+          for (const [step, config] of zip(approvalRequestSteps, petition.approval_flow_config)) {
+            const userGroupsIds = config.values
+              .filter((v) => v.type === "UserGroup")
+              .map((v) => v.id);
+            const groupMembers = (await ctx.userGroups.loadUserGroupMembers(userGroupsIds)).flat();
+            const userIds = unique([
+              ...config.values.filter((v) => v.type === "User").map((v) => v.id),
+              ...groupMembers.map((m) => m.user_id),
+            ]);
+
+            await ctx.approvalRequests.createPetitionApprovalRequestStepApprovers(
+              step.id,
+              userIds.map((id) => ({ id })),
+              `User:${ctx.user!.id}`,
+            );
+          }
+        }
+      }
+
+      await ctx.petitions.createEvent({
+        type: "PETITION_COMPLETED",
+        petition_id: args.petitionId,
+        data: { user_id: ctx.user!.id },
+      });
+
       return petition;
     } catch (error) {
       if (error instanceof Error) {
@@ -2986,6 +3143,7 @@ export const linkPetitionFieldChildren = mutationField("linkPetitionFieldChildre
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     fieldsBelongsToPetition("petitionId", "parentFieldId"),
@@ -3055,6 +3213,7 @@ export const unlinkPetitionFieldChildren = mutationField("unlinkPetitionFieldChi
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     fieldsBelongsToPetition("petitionId", "parentFieldId"),
@@ -3121,6 +3280,7 @@ export const linkFieldGroupToProfileType = mutationField("linkFieldGroupToProfil
     userHasFeatureFlag("PROFILES"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     fieldHasType("petitionFieldId", ["FIELD_GROUP"]),
@@ -3161,6 +3321,7 @@ export const createProfileLinkedPetitionField = mutationField("createProfileLink
     userHasFeatureFlag("PROFILES"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     fieldHasType("parentFieldId", "FIELD_GROUP"),
@@ -3843,6 +4004,7 @@ export const updatePetitionFieldGroupRelationships = mutationField(
       userHasFeatureFlag("PROFILES"),
       userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
       petitionsAreEditable("petitionId"),
+      petitionDoesNotHaveStartedProcess("petitionId"),
       petitionsAreNotPublicTemplates("petitionId"),
       petitionIsNotAnonymized("petitionId"),
       petitionFieldsCanBeAssociated("relationships"),
@@ -4457,6 +4619,7 @@ export const enableAutomaticNumberingOnPetitionFields = mutationField(
       userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
       petitionIsNotAnonymized("petitionId"),
       petitionsAreEditable("petitionId"),
+      petitionDoesNotHaveStartedProcess("petitionId"),
       petitionsAreNotPublicTemplates("petitionId"),
     ),
     args: {

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Flex } from "@chakra-ui/react";
-import { ThumbUpIcon } from "@parallel/chakra/icons";
+import { ThumbsUpIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment } from "@parallel/graphql/__types";
@@ -33,7 +33,7 @@ export function TimelinePetitionClosedNotifiedEvent({
 
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={ThumbUpIcon} color="white" backgroundColor="blue.500" />}
+      icon={<TimelineIcon icon={ThumbsUpIcon} color="white" backgroundColor="blue.500" />}
     >
       <Flex align="center">
         <Box>

@@ -740,6 +740,111 @@
     "context": "You have reached your plan's signatures limit"
   },
   {
+    "term": "petition-approval-request-step-canceled-email.access-parallel",
+    "definition": "You can access the parallel to request it again.",
+    "context": "You can access the parallel to request it again."
+  },
+  {
+    "term": "petition-approval-request-step-canceled-email.subject",
+    "definition": "Approval request cancelled",
+    "context": "Approval request cancelled"
+  },
+  {
+    "term": "petition-approval-request-step-canceled-email.text",
+    "definition": "The step \"{stepName}\" in <b>{petitionName}</b> has been cancelled.",
+    "context": "The step \"{stepName}\" in <b>{petitionName}</b> has been cancelled."
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.access-click-link",
+    "definition": "Follow the link below link to access.",
+    "context": "Follow the link below link to access."
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.access-information-button",
+    "definition": "Access the information",
+    "context": "Access the information"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.approved",
+    "definition": "Approved",
+    "context": "Approved"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.final",
+    "definition": "final",
+    "context": "final"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.not-final",
+    "definition": "modifications",
+    "context": "modifications"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.rejected",
+    "definition": "Rejected ({status})",
+    "context": "Rejected ({status})"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.result",
+    "definition": "Result is: {result}",
+    "context": "Result is: {result}"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.subject-canceled",
+    "definition": "{approvalName} has been canceled",
+    "context": "{approvalName} has been canceled"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.subject-completed",
+    "definition": "{approvalName} is completed",
+    "context": "{approvalName} is completed"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.text-canceled",
+    "definition": "The step \"{approvalName}\" in <b>{petitionName}</b> has been cancelled.",
+    "context": "The step \"{approvalName}\" in <b>{petitionName}</b> has been cancelled."
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.text-completed",
+    "definition": "The step \"{approvalName}\" in <b>{petitionName}</b> has been completed.",
+    "context": "The step \"{approvalName}\" in <b>{petitionName}</b> has been completed."
+  },
+  {
+    "term": "petition-approval-request-step-pending-email.access-click-link",
+    "definition": "Follow the link below link to access.",
+    "context": "Follow the link below link to access."
+  },
+  {
+    "term": "petition-approval-request-step-pending-email.number-of-attachments",
+    "definition": "{count, plural, =1 {# file} other {# files}} attached",
+    "context": "{count, plural, =1 {# file} other {# files}} attached"
+  },
+  {
+    "term": "petition-approval-request-step-pending-email.review-button",
+    "definition": "Review information",
+    "context": "Review information"
+  },
+  {
+    "term": "petition-approval-request-step-pending-email.subject",
+    "definition": "You have a pending approval",
+    "context": "You have a pending approval"
+  },
+  {
+    "term": "petition-approval-request-step-pending-email.subject-action-required",
+    "definition": "Action required",
+    "context": "Action required"
+  },
+  {
+    "term": "petition-approval-request-step-pending-email.subject-reminder",
+    "definition": "Reminder",
+    "context": "Reminder"
+  },
+  {
+    "term": "petition-approval-request-step-pending-email.text",
+    "definition": "{requester} has asked you to approve the following process.",
+    "context": "{requester} has asked you to approve the following process."
+  },
+  {
     "term": "petition-closed-notification.subject",
     "definition": "{senderName} confirmed receipt of the information.",
     "context": "{senderName} confirmed receipt of the information."

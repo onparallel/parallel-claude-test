@@ -1650,22 +1650,6 @@ export const CloudErrorIcon = createIcon({
   ),
 });
 
-export const ThumbUpIcon = createIcon({
-  displayName: "ThumbUpIcon",
-  viewBox: "0 0 24 24",
-  path: (
-    <g
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-    </g>
-  ),
-});
-
 export const SignatureIcon = createIcon({
   displayName: "SignatureIcon",
   viewBox: "0 0 24 24",
@@ -3064,6 +3048,38 @@ export const ShopIcon = createIcon({
       <path d="m18.31 12c2.02 0 3.5-1.64 3.3-3.65l-.28-2.75c-.36-2.6-1.36-3.6-3.98-3.6h-3.05l.7 7.01c.17 1.65 1.66 2.99 3.31 2.99z" />
       <path d="m5.64 12c1.65 0 3.14-1.34 3.3-2.99l.22-2.21.48001-4.8h-3.05001c-2.61999 0-3.62 1-3.98 3.6l-.27 2.75c-.2 2.01 1.28 3.65 3.3 3.65z" />
       <path d="m12 17c-1.67 0-2.5.83-2.5 2.5v2.5h5v-2.5c0-1.67-.83-2.5-2.5-2.5z" />
+    </g>
+  ),
+});
+
+export const ThumbsDownIcon = createIcon({
+  displayName: "ThumbsDownIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m17 13.0001-4 9c-.7956 0-1.5587-.3161-2.1213-.8787s-.8787-1.3256-.8787-2.1213v-4h-5.65997c-.28991.0033-.57706-.0565-.84157-.1752s-.50004-.2935-.69029-.5123c-.19024-.2188-.33064-.4763-.41148-.7547-.08083-.2785-.10017-.5711-.05666-.8578l1.38-8.99998c.07232-.47691.31457-.91161.68209-1.22401.36753-.3124.83558-.48145 1.31791-.47599h11.27997m0 10.99998v-10.99998m0 10.99998h2.67c.566.01 1.1159-.1881 1.5454-.5568.4296-.3687.7088-.8822.7846-1.4432v-6.99998c-.0758-.56094-.355-1.0745-.7846-1.44318-.4295-.36869-.9794-.56683-1.5454-.55682h-2.67" />
+    </g>
+  ),
+});
+
+export const ThumbsUpIcon = createIcon({
+  displayName: "ThumbsUpIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
     </g>
   ),
 });

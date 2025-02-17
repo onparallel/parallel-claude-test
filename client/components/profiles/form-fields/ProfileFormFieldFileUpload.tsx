@@ -1,22 +1,17 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, HStack, IconButton, Stack, Text } from "@chakra-ui/react";
-import { CloseIcon } from "@parallel/chakra/icons";
+import { Box, Center, Flex, HStack, Stack, Text } from "@chakra-ui/react";
 import { Dropzone } from "@parallel/components/common/Dropzone";
-import { FileIcon } from "@parallel/components/common/FileIcon";
-import { FileName } from "@parallel/components/common/FileName";
+import { FileAttachment } from "@parallel/components/common/FileAttachment";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { SuggestionsButton } from "@parallel/components/common/SuggestionsButton";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { discriminator } from "@parallel/utils/discriminator";
 import { downloadLocalFile } from "@parallel/utils/downloadLocalFile";
 import { useDownloadProfileFieldFile } from "@parallel/utils/useDownloadProfileFieldFile";
-import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
-import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import { nanoid } from "nanoid";
-import { useRef } from "react";
 import { Controller } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { differenceWith, isNullish, noop, sumBy } from "remeda";
+import { differenceWith, isNullish, sumBy } from "remeda";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import { ProfileFieldExpiresAtIcon } from "./ProfileFormFieldInputGroup";
 
@@ -78,12 +73,13 @@ export function ProfileFormFieldFileUpload({
                   }
                   const { filename, contentType, size } = file;
                   return (
-                    <ProfileFile
+                    <FileAttachment
                       key={id}
-                      name={filename}
-                      type={contentType}
+                      filename={filename}
+                      contentType={contentType}
                       size={size}
-                      onPreview={(preview) => handleDownloadAttachment(id, preview)}
+                      isComplete={true}
+                      onDownload={(preview) => handleDownloadAttachment(id, preview)}
                       onRemove={() => onChange([...(value ?? []), { type: "DELETE", id }])}
                       isDisabled={isDisabled}
                     />
@@ -93,12 +89,13 @@ export function ProfileFormFieldFileUpload({
                   .filter(discriminator("type", ["ADD", "COPY"]))
                   .map(({ id, file, type }) => {
                     return (
-                      <ProfileFile
+                      <FileAttachment
                         key={id}
-                        name={file.name}
-                        type={file.type}
+                        filename={file.name}
+                        contentType={file.type}
                         size={file.size}
-                        onPreview={(preview) => type === "ADD" && downloadLocalFile(file, preview)}
+                        isComplete={true}
+                        onDownload={(preview) => type === "ADD" && downloadLocalFile(file, preview)}
                         onRemove={() => {
                           onChange(
                             actions.filter(
@@ -182,111 +179,6 @@ export function ProfileFormFieldFileUpload({
         );
       }}
     />
-  );
-}
-
-interface ProfileFileProps {
-  name: string;
-  type: string;
-  size: number;
-  onRemove: () => void;
-  onPreview: (preview: boolean) => void;
-  isDisabled?: boolean;
-}
-
-function ProfileFile({ name, type, size, onRemove, onPreview, isDisabled }: ProfileFileProps) {
-  const intl = useIntl();
-
-  const nameRef = useRef<HTMLSpanElement>(null);
-  const isMouseOver = useIsMouseOver(nameRef);
-  const isShiftDown = useIsGlobalKeyDown("Shift");
-
-  return (
-    <Flex
-      tabIndex={0}
-      borderRadius="sm"
-      border="1px solid"
-      borderColor="gray.200"
-      paddingX={2}
-      height={8}
-      alignItems="center"
-      color="gray.600"
-      transition="200ms ease"
-      outline="none"
-      _hover={{
-        borderColor: "gray.300",
-        backgroundColor: "white",
-        color: "gray.700",
-      }}
-      _focus={{
-        borderColor: "gray.400",
-        backgroundColor: "white",
-        color: "gray.700",
-        shadow: "outline",
-      }}
-      aria-label={intl.formatMessage(
-        {
-          id: "component.profile-file.aria-label",
-          defaultMessage:
-            "Attached file: {filename}. To see the file, press Enter. {isReadOnly, select, true{} other {To remove it, press Delete.}}",
-        },
-        { filename: name, isReadOnly: isDisabled },
-      )}
-      onKeyDown={
-        isDisabled
-          ? noop
-          : (e) => {
-              switch (e.key) {
-                case "Enter":
-                  onPreview(isShiftDown ? false : true);
-                  break;
-                case "Delete":
-                case "Backspace":
-                  onRemove();
-                  break;
-              }
-            }
-      }
-    >
-      <FileIcon boxSize="18px" filename={name} contentType={type} hasFailed={false} />
-      <Flex marginX={2}>
-        <FileName
-          ref={nameRef}
-          value={name}
-          fontSize="sm"
-          fontWeight="500"
-          role="button"
-          cursor="pointer"
-          maxWidth="200px"
-          onClick={() => onPreview(isMouseOver && isShiftDown ? false : true)}
-        />
-        <Text as="span" fontSize="sm" color="gray.500" marginStart={1} whiteSpace="nowrap">
-          (<FileSize value={size} />)
-        </Text>
-      </Flex>
-      <IconButton
-        isDisabled={isDisabled}
-        tabIndex={-1}
-        variant="ghost"
-        aria-label={intl.formatMessage({
-          id: "component.profile-file.remove-attachment",
-          defaultMessage: "Remove attachment",
-        })}
-        _active={{
-          shadow: "none",
-        }}
-        _focus={{
-          shadow: "none",
-        }}
-        icon={<CloseIcon />}
-        boxSize={5}
-        minWidth={0}
-        fontSize="9px"
-        paddingX={0}
-        shadow="none"
-        onClick={onRemove}
-      />
-    </Flex>
   );
 }
 

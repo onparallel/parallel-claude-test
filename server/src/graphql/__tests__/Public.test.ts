@@ -398,6 +398,12 @@ describe("GraphQL/Public", () => {
       setCookieHeader(testClient, access.contact_id!, cookieValue);
     });
 
+    afterEach(async () => {
+      await mocks.knex("petition_signature_request").delete();
+      await mocks.knex("petition_approval_request_step_approver").delete();
+      await mocks.knex("petition_approval_request_step").delete();
+    });
+
     describe("publicPetitionFieldAttachmentDownloadLink", () => {
       it("generates a download link for a petition field attachment", async () => {
         const [file] = await mocks.createRandomFileUpload(1, () => ({
@@ -537,6 +543,10 @@ describe("GraphQL/Public", () => {
             is_internal: true,
             optional: true,
           }));
+        });
+
+        afterEach(async () => {
+          await mocks.knex.from("petition_field_reply").delete();
         });
 
         it("sends error when trying to create a reply on an internal field", async () => {
@@ -694,6 +704,14 @@ describe("GraphQL/Public", () => {
         });
 
         it("sends error if trying to create a reply on a single-reply field with a previously submitted reply", async () => {
+          await mocks.knex.from("petition_field_reply").insert({
+            content: JSON.stringify({ value: "a" }),
+            petition_field_id: shortTextField.id,
+            petition_access_id: access.id,
+            status: "PENDING",
+            type: "SHORT_TEXT",
+          });
+
           const { errors, data } = await testClient.execute(
             gql`
               mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
@@ -790,6 +808,66 @@ describe("GraphQL/Public", () => {
             expect(data).toBeNull();
             setCookieHeader(testClient, access.contact_id!, cookieValue);
           }
+        });
+
+        it("sends error when trying to create a reply with a pending signature request", async () => {
+          await mocks.knex
+            .from("petition_signature_request")
+            .insert({ petition_id: access.petition_id, signature_config: {}, status: "PROCESSED" });
+
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
+                  status
+                  content
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", shortTextField.id),
+                  content: { value: "x".repeat(10) },
+                },
+              ],
+            },
+          );
+          expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+          expect(data).toBeNull();
+        });
+
+        it("sends error when trying to create a reply with a pending approval request", async () => {
+          await mocks.knex.from("petition_approval_request_step").insert({
+            petition_id: access.petition_id,
+            step_number: 0,
+            step_name: "Step 1",
+            status: "PENDING",
+            approval_type: "ANY",
+          });
+
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+                publicCreatePetitionFieldReplies(keycode: $keycode, fields: $fields) {
+                  status
+                  content
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              fields: [
+                {
+                  id: toGlobalId("PetitionField", shortTextField.id),
+                  content: { value: "x".repeat(10) },
+                },
+              ],
+            },
+          );
+          expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+          expect(data).toBeNull();
         });
       });
 
@@ -1976,6 +2054,70 @@ describe("GraphQL/Public", () => {
           );
 
           expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+          expect(data).toBeNull();
+        });
+
+        it("sends error when trying to update a reply with a pending signature request", async () => {
+          await mocks.knex
+            .from("petition_signature_request")
+            .insert({ petition_id: access.petition_id, signature_config: {}, status: "PROCESSED" });
+
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
+                  id
+                  status
+                  content
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", textReply.id),
+                  content: { value: "updated reply" },
+                },
+              ],
+            },
+          );
+
+          expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+          expect(data).toBeNull();
+        });
+
+        it("sends error when trying to update a reply with a pending approval request", async () => {
+          await mocks.knex.from("petition_approval_request_step").insert({
+            petition_id: access.petition_id,
+            step_number: 0,
+            step_name: "Step 1",
+            status: "PENDING",
+            approval_type: "ANY",
+          });
+
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+                publicUpdatePetitionFieldReplies(keycode: $keycode, replies: $replies) {
+                  id
+                  status
+                  content
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              replies: [
+                {
+                  id: toGlobalId("PetitionFieldReply", textReply.id),
+                  content: { value: "updated reply" },
+                },
+              ],
+            },
+          );
+
+          expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
           expect(data).toBeNull();
         });
       });
@@ -3215,6 +3357,58 @@ describe("GraphQL/Public", () => {
           replies: [],
         });
       });
+
+      it("sends error when trying to delete a reply with a pending signature request", async () => {
+        const [simpleReply] = await mocks.createRandomTextReply(simpleField.id, access.id, 1);
+
+        await mocks.knex
+          .from("petition_signature_request")
+          .insert({ petition_id: access.petition_id, signature_config: {}, status: "PROCESSED" });
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!, $replyId: GID!) {
+              publicDeletePetitionFieldReply(keycode: $keycode, replyId: $replyId) {
+                id
+              }
+            }
+          `,
+          {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", simpleReply.id),
+          },
+        );
+        expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+        expect(data).toBeNull();
+      });
+
+      it("sends error when trying to delete a reply with a pending approval request", async () => {
+        const [simpleReply] = await mocks.createRandomTextReply(simpleField.id, access.id, 1);
+
+        await mocks.knex.from("petition_approval_request_step").insert({
+          petition_id: access.petition_id,
+          step_number: 0,
+          step_name: "Step 1",
+          status: "PENDING",
+          approval_type: "ANY",
+        });
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!, $replyId: GID!) {
+              publicDeletePetitionFieldReply(keycode: $keycode, replyId: $replyId) {
+                id
+              }
+            }
+          `,
+          {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", simpleReply.id),
+          },
+        );
+        expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+        expect(data).toBeNull();
+      });
     });
 
     describe("publicCreateFileUploadReply", () => {
@@ -3479,6 +3673,82 @@ describe("GraphQL/Public", () => {
         expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
           extra: { error_code: "FILE_SIZE_EXCEEDED_ERROR" },
         });
+        expect(data).toBeNull();
+      });
+
+      it("sends error when trying to create a file reply with a pending signature request", async () => {
+        await mocks.knex
+          .from("petition_signature_request")
+          .insert({ petition_id: access.petition_id, signature_config: {}, status: "PROCESSED" });
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!, $fieldId: GID!, $data: FileUploadInput!) {
+              publicCreateFileUploadReply(keycode: $keycode, fieldId: $fieldId, data: $data) {
+                presignedPostData {
+                  url
+                  fields
+                }
+                reply {
+                  id
+                  content
+                  status
+                }
+              }
+            }
+          `,
+          {
+            keycode: access.keycode,
+            fieldId: toGlobalId("PetitionField", fileUploadField.id),
+            data: {
+              contentType: "text/plain",
+              filename: "file.txt",
+              size: 500,
+            },
+          },
+        );
+
+        expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+        expect(data).toBeNull();
+      });
+
+      it("sends error when trying to create a file reply with a pending approval request", async () => {
+        await mocks.knex.from("petition_approval_request_step").insert({
+          petition_id: access.petition_id,
+          step_number: 0,
+          step_name: "Step 1",
+          status: "PENDING",
+          approval_type: "ANY",
+        });
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!, $fieldId: GID!, $data: FileUploadInput!) {
+              publicCreateFileUploadReply(keycode: $keycode, fieldId: $fieldId, data: $data) {
+                presignedPostData {
+                  url
+                  fields
+                }
+                reply {
+                  id
+                  content
+                  status
+                }
+              }
+            }
+          `,
+          {
+            keycode: access.keycode,
+            fieldId: toGlobalId("PetitionField", fileUploadField.id),
+            data: {
+              contentType: "text/plain",
+              filename: "file.txt",
+              size: 500,
+            },
+          },
+        );
+
+        expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
         expect(data).toBeNull();
       });
     });
@@ -4283,6 +4553,8 @@ describe("GraphQL/Public", () => {
             ],
           });
 
+          expect(backgroundCheckServiceSpy).toHaveBeenCalledTimes(4);
+
           expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(1, {
             name: "Simpson",
             date: null,
@@ -4429,6 +4701,123 @@ describe("GraphQL/Public", () => {
             },
             petition_access_id: access.id,
           });
+        });
+      });
+
+      describe("approval flow", () => {
+        beforeAll(async () => {
+          await mocks.createFeatureFlags([{ name: "PETITION_APPROVAL_FLOW", default_value: true }]);
+        });
+
+        it("calculates and creates approval steps if the petition has set an approval_flow_config", async () => {
+          const [petition] = await mocks.createRandomPetitions(org.id, user.id, 1, () => ({
+            status: "PENDING",
+          }));
+
+          const [field] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+            type: "TEXT",
+            optional: true,
+          }));
+
+          await mocks.knex
+            .from("petition")
+            .where("id", petition.id)
+            .update({
+              approval_flow_config: JSON.stringify([
+                { name: "Step 1", type: "ALL", values: [{ id: user.id, type: "User" }] },
+                {
+                  name: "Step 2",
+                  type: "ANY",
+                  values: [{ id: user.id, type: "User" }],
+                  visibility: {
+                    type: "SHOW",
+                    operator: "AND",
+                    conditions: [
+                      { modifier: "ANY", fieldId: field.id, operator: "EQUAL", value: "HELLO" },
+                    ],
+                  },
+                },
+              ]),
+            });
+
+          const [access] = await mocks.createPetitionAccess(
+            petition.id,
+            user.id,
+            [contact.id],
+            user.id,
+          );
+
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!) {
+                publicCompletePetition(keycode: $keycode) {
+                  id
+                  status
+                }
+              }
+            `,
+            { keycode: access.keycode },
+          );
+
+          expect(errors).toBeUndefined();
+          expect(data?.publicCompletePetition).toMatchObject({
+            id: toGlobalId("Petition", petition.id),
+            status: "COMPLETED",
+          });
+
+          const dbApprovalSteps = await mocks.knex
+            .from("petition_approval_request_step")
+            .where("petition_id", petition.id)
+            .whereNull("deprecated_at")
+            .orderBy("step_number", "ASC")
+            .select("*");
+
+          expect(dbApprovalSteps).toHaveLength(2);
+          expect(dbApprovalSteps.map(pick(["step_name", "step_number", "status"]))).toEqual([
+            { step_name: "Step 1", step_number: 0, status: "NOT_STARTED" },
+            { step_name: "Step 2", step_number: 1, status: "NOT_APPLICABLE" },
+          ]);
+
+          const dbApprovers = await mocks.knex
+            .from("petition_approval_request_step_approver")
+            .whereIn(
+              "petition_approval_request_step_id",
+              dbApprovalSteps.map((s) => s.id),
+            )
+            .select("*");
+
+          expect(
+            dbApprovers.map(
+              pick([
+                "user_id",
+                "petition_approval_request_step_id",
+                "approved_at",
+                "rejected_at",
+                "canceled_at",
+                "skipped_at",
+                "sent_at",
+              ]),
+            ),
+          ).toIncludeSameMembers([
+            {
+              user_id: user.id,
+              petition_approval_request_step_id: dbApprovalSteps[0].id,
+              approved_at: null,
+              rejected_at: null,
+              canceled_at: null,
+              skipped_at: null,
+              sent_at: null,
+            },
+            {
+              user_id: user.id,
+              petition_approval_request_step_id: dbApprovalSteps[1].id,
+              approved_at: null,
+              rejected_at: null,
+              canceled_at: null,
+              skipped_at: null,
+              sent_at: null,
+            },
+          ]);
         });
       });
     });

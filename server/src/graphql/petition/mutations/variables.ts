@@ -5,6 +5,7 @@ import { validateAnd } from "../../helpers/validateArgs";
 import { maxLength } from "../../helpers/validators/maxLength";
 import { validateRegex } from "../../helpers/validators/validateRegex";
 import {
+  petitionDoesNotHaveStartedProcess,
   petitionIsNotAnonymized,
   petitionsAreEditable,
   userHasAccessToPetitions,
@@ -22,6 +23,7 @@ export const createPetitionVariable = mutationField("createPetitionVariable", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     petitionVariableCanBeCreated("petitionId", "data"),
   ),
@@ -59,6 +61,7 @@ export const updatePetitionVariable = mutationField("updatePetitionVariable", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     petitionIsNotAnonymized("petitionId"),
   ),
   args: {
@@ -91,6 +94,7 @@ export const deletePetitionVariable = mutationField("deletePetitionVariable", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     variableIsNotBeingReferencedByFieldLogic("petitionId", "name"),
   ),

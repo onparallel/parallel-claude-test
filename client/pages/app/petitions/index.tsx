@@ -43,6 +43,7 @@ import { useMoveToFolderDialog } from "@parallel/components/petition-common/dial
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { useRenameDialog } from "@parallel/components/petition-common/dialogs/RenameDialog";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
+import { approvalsQueryItem } from "@parallel/components/petition-list/filters/PetitionListApprovalsFilter";
 import { sharedWithQueryItem } from "@parallel/components/petition-list/filters/PetitionListSharedWithFilter";
 import { tagFilterQueryItem } from "@parallel/components/petition-list/filters/PetitionListTagFilter";
 import { useNewTemplateDialog } from "@parallel/components/petition-new/dialogs/NewTemplateDialog";
@@ -115,6 +116,7 @@ const QUERY_STATE = {
   searchIn: values<SearchInOptions>(["EVERYWHERE", "CURRENT_FOLDER"]).orDefault("EVERYWHERE"),
   sort: sorting(SORTING),
   sharedWith: sharedWithQueryItem(),
+  approvals: approvalsQueryItem(),
   tagsFilters: tagFilterQueryItem(),
   fromTemplateId: string().list(),
   signature: values<PetitionSignatureStatusFilter>([
@@ -148,6 +150,14 @@ function Petitions() {
       : ({ field: "createdAt", direction: "DESC" } as const));
   const { data: queryObject } = useAssertQuery(Petitions_userDocument);
   const { me } = queryObject;
+
+  const fallbackColumns = me.hasPetitionApprovalFlow
+    ? DEFAULT_PETITION_COLUMN_SELECTION
+    : DEFAULT_PETITION_COLUMN_SELECTION.filter((c) => c !== "approvals");
+  const currentColumns = me.hasPetitionApprovalFlow
+    ? state.columns
+    : state.columns?.filter((c) => c !== "approvals");
+
   const { data, loading, refetch } = useQueryOrPreviousData(
     Petitions_petitionsDocument,
     {
@@ -163,10 +173,11 @@ function Petitions() {
           tags: state.tagsFilters,
           sharedWith: state.sharedWith,
           fromTemplateId: state.fromTemplateId,
+          approvals: state.approvals,
         },
         sortBy: [`${sort.field}_${sort.direction}`],
         ...(state.type === "PETITION"
-          ? getPetitionsTableIncludes(state.columns ?? DEFAULT_PETITION_COLUMN_SELECTION)
+          ? getPetitionsTableIncludes(currentColumns ?? fallbackColumns)
           : getTemplatesTableIncludes()),
       },
       fetchPolicy: "cache-and-network",
@@ -410,8 +421,7 @@ function Petitions() {
 
   const columns = usePetitionsTableColumns(state.type);
 
-  const selection =
-    state.type === "PETITION" ? (state.columns ?? DEFAULT_PETITION_COLUMN_SELECTION) : [];
+  const selection = state.type === "PETITION" ? (currentColumns ?? fallbackColumns) : [];
 
   const filteredColumns = useMemo(() => {
     if (state.type === "TEMPLATE") {
@@ -610,6 +620,7 @@ function Petitions() {
               "tagsFilters",
               "signature",
               "fromTemplateId",
+              "approvals",
             ])}
             onFilterChange={(key, value) => {
               setQueryState((current) => ({ ...current, [key]: value, page: 1 }));
@@ -633,7 +644,11 @@ function Petitions() {
                 <PetitionListHeader
                   shape={QUERY_STATE}
                   state={state}
-                  columns={columns}
+                  columns={
+                    me.hasPetitionApprovalFlow
+                      ? columns
+                      : columns.filter((c) => c.key !== "approvals")
+                  }
                   selection={selection}
                   onStateChange={setQueryState}
                   onReload={() => refetch()}
@@ -647,7 +662,8 @@ function Petitions() {
                 state.sharedWith ||
                 state.tagsFilters ||
                 state.status ||
-                state.signature ? (
+                state.signature ||
+                state.approvals ? (
                   <Center flex="1" minHeight="200px">
                     <Text color="gray.400" fontSize="lg">
                       <FormattedMessage
@@ -693,6 +709,7 @@ Petitions.fragments = {
     return gql`
       fragment Petitions_User on User {
         id
+        hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
         petitionListViews {
           ...PetitionViewTabs_PetitionListView
           ...PetitionListHeader_PetitionListView
@@ -761,6 +778,7 @@ const _queries = [
       $includeTags: Boolean!
       $includeLastActivityAt: Boolean!
       $includeLastRecipientActivityAt: Boolean!
+      $includeApprovals: Boolean!
     ) {
       petitions(
         offset: $offset

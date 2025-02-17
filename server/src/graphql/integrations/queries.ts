@@ -261,6 +261,14 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
         }
       }
 
+      const [process] = await ctx.petitions.getPetitionStartedProcesses(params.petitionId);
+      if (isNonNullish(process)) {
+        throw new ApolloError(
+          `Petition has an ongoing ${process.toLowerCase()} process`,
+          `ONGOING_${process}_REQUEST_ERROR`,
+        );
+      }
+
       const search = await ctx.backgroundCheck.entitySearch(query);
       if (isNonNullish(reply)) {
         // reply is defined but search criteria doesn't match, update it

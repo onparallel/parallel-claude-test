@@ -17,6 +17,13 @@ import { TimelineMessageScheduledEvent } from "./timeline/events/TimelineMessage
 import { TimelineMessageSentEvent } from "./timeline/events/TimelineMessageSentEvent";
 import { TimelineOwnershipTransferredEvent } from "./timeline/events/TimelineOwnershipTransferredEvent";
 import { TimelinePetitionAnonymizedEvent } from "./timeline/events/TimelinePetitionAnonymizedEvent";
+import { TimelinePetitionApprovalRequestStepApprovedEvent } from "./timeline/events/TimelinePetitionApprovalRequestStepApprovedEvent";
+import { TimelinePetitionApprovalRequestStepCanceledEvent } from "./timeline/events/TimelinePetitionApprovalRequestStepCanceledEvent";
+import { TimelinePetitionApprovalRequestStepFinishedEvent } from "./timeline/events/TimelinePetitionApprovalRequestStepFinishedEvent";
+import { TimelinePetitionApprovalRequestStepRejectedEvent } from "./timeline/events/TimelinePetitionApprovalRequestStepRejectedEvent";
+import { TimelinePetitionApprovalRequestStepReminderEvent } from "./timeline/events/TimelinePetitionApprovalRequestStepReminderEvent";
+import { TimelinePetitionApprovalRequestStepSkippedEvent } from "./timeline/events/TimelinePetitionApprovalRequestStepSkippedEvent";
+import { TimelinePetitionApprovalRequestStepStartedEvent } from "./timeline/events/TimelinePetitionApprovalRequestStepStartedEvent";
 import { TimelinePetitionClonedEvent } from "./timeline/events/TimelinePetitionClonedEvent";
 import { TimelinePetitionClosedEvent } from "./timeline/events/TimelinePetitionClosedEvent";
 import { TimelinePetitionClosedNotifiedEvent } from "./timeline/events/TimelinePetitionClosedNotifiedEvent";
@@ -143,6 +150,20 @@ export function PetitionActivityTimeline({ events }: PetitionActivityTimelinePro
             <TimelinePetitionUntaggedEvent event={event} />
           ) : event.__typename === "ContactlessAccessUsedEvent" ? (
             <TimelineContactlessAccessUsedEvent event={event} />
+          ) : event.__typename === "PetitionApprovalRequestStepStartedEvent" ? (
+            <TimelinePetitionApprovalRequestStepStartedEvent event={event} />
+          ) : event.__typename === "PetitionApprovalRequestStepApprovedEvent" ? (
+            <TimelinePetitionApprovalRequestStepApprovedEvent event={event} />
+          ) : event.__typename === "PetitionApprovalRequestStepRejectedEvent" ? (
+            <TimelinePetitionApprovalRequestStepRejectedEvent event={event} />
+          ) : event.__typename === "PetitionApprovalRequestStepSkippedEvent" ? (
+            <TimelinePetitionApprovalRequestStepSkippedEvent event={event} />
+          ) : event.__typename === "PetitionApprovalRequestStepReminderEvent" ? (
+            <TimelinePetitionApprovalRequestStepReminderEvent event={event} />
+          ) : event.__typename === "PetitionApprovalRequestStepFinishedEvent" ? (
+            <TimelinePetitionApprovalRequestStepFinishedEvent event={event} />
+          ) : event.__typename === "PetitionApprovalRequestStepCanceledEvent" ? (
+            <TimelinePetitionApprovalRequestStepCanceledEvent event={event} />
           ) : null}
         </Box>
       ))}
@@ -286,6 +307,26 @@ PetitionActivityTimeline.fragments = {
       ... on ContactlessAccessUsedEvent {
         ...TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEvent
       }
+      ... on PetitionApprovalRequestStepStartedEvent {
+        ...TimelinePetitionApprovalRequestStepStartedEvent_PetitionApprovalRequestStepStartedEvent
+      }
+      ... on PetitionApprovalRequestStepApprovedEvent {
+        ...TimelinePetitionApprovalRequestStepApprovedEvent_PetitionApprovalRequestStepApprovedEvent
+      }
+      ... on PetitionApprovalRequestStepRejectedEvent {
+        ...TimelinePetitionApprovalRequestStepRejectedEvent_PetitionApprovalRequestStepRejectedEvent
+      }
+      ... on PetitionApprovalRequestStepSkippedEvent {
+        ...TimelinePetitionApprovalRequestStepSkippedEvent_PetitionApprovalRequestStepSkippedEvent
+      }
+      ... on PetitionApprovalRequestStepReminderEvent {
+        ...TimelinePetitionApprovalRequestStepReminderEvent_PetitionApprovalRequestStepReminderEvent
+      }
+      ... on PetitionApprovalRequestStepFinishedEvent {
+        ...TimelinePetitionApprovalRequestStepFinishedEvent_PetitionApprovalRequestStepFinishedEvent
+      }
+      ... on PetitionApprovalRequestStepCanceledEvent {
+        ...TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEvent
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -331,5 +372,33 @@ PetitionActivityTimeline.fragments = {
     ${TimelinePetitionTaggedEvent.fragments.PetitionTaggedEvent}
     ${TimelinePetitionUntaggedEvent.fragments.PetitionUntaggedEvent}
     ${TimelineContactlessAccessUsedEvent.fragments.ContactlessAccessUsedEvent}
-  `,
+    ${
+      TimelinePetitionApprovalRequestStepStartedEvent.fragments
+        .PetitionApprovalRequestStepStartedEvent
+    }
+    ${
+      TimelinePetitionApprovalRequestStepApprovedEvent.fragments
+        .PetitionApprovalRequestStepApprovedEvent
+    }
+    ${
+      TimelinePetitionApprovalRequestStepRejectedEvent.fragments
+        .PetitionApprovalRequestStepRejectedEvent
+    }
+    ${
+      TimelinePetitionApprovalRequestStepSkippedEvent.fragments
+        .PetitionApprovalRequestStepSkippedEvent
+    }
+    ${
+      TimelinePetitionApprovalRequestStepReminderEvent.fragments
+        .PetitionApprovalRequestStepReminderEvent
+    }
+    ${
+      TimelinePetitionApprovalRequestStepFinishedEvent.fragments
+        .PetitionApprovalRequestStepFinishedEvent
+    }
+    ${
+      TimelinePetitionApprovalRequestStepCanceledEvent.fragments
+        .PetitionApprovalRequestStepCanceledEvent
+    }
+  }`,
 };

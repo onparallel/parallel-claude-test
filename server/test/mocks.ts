@@ -135,6 +135,11 @@ export class MockEmailsService implements IEmailsService {
   async sendSignatureCancelledDeclinedBySignerEmail() {}
   async sendTransferParallelsEmail() {}
   async sendProfilesExpiringPropertiesEmail() {}
+  async sendPetitionApprovalRequestStepPendingEmail() {}
+  async sendPetitionApprovalRequestStepReminderEmail() {}
+  async sendPetitionApprovalRequestStepApprovedEmail() {}
+  async sendPetitionApprovalRequestStepRejectedEmail() {}
+  async sendPetitionApprovalRequestStepCanceledEmail() {}
   async validateEmail(email: string) {
     return EMAIL_REGEX.test(email);
   }

@@ -90,7 +90,8 @@ export type FeatureFlagName =
   | "PDF_EXPORT_V2"
   | "SHOW_CONTACTS_BUTTON"
   | "KEY_PROCESSES"
-  | "DASHBOARDS";
+  | "DASHBOARDS"
+  | "PETITION_APPROVAL_FLOW";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -127,6 +128,7 @@ export const FeatureFlagNameValues = [
   "SHOW_CONTACTS_BUTTON",
   "KEY_PROCESSES",
   "DASHBOARDS",
+  "PETITION_APPROVAL_FLOW",
 ] as FeatureFlagName[];
 
 export type IntegrationType =
@@ -186,6 +188,32 @@ export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
 
 export const PetitionAccessStatusValues = ["ACTIVE", "INACTIVE"] as PetitionAccessStatus[];
 
+export type PetitionApprovalRequestStepApprovalType = "ANY" | "ALL";
+
+export const PetitionApprovalRequestStepApprovalTypeValues = [
+  "ANY",
+  "ALL",
+] as PetitionApprovalRequestStepApprovalType[];
+
+export type PetitionApprovalRequestStepStatus =
+  | "NOT_STARTED"
+  | "NOT_APPLICABLE"
+  | "PENDING"
+  | "APPROVED"
+  | "REJECTED"
+  | "CANCELED"
+  | "SKIPPED";
+
+export const PetitionApprovalRequestStepStatusValues = [
+  "NOT_STARTED",
+  "NOT_APPLICABLE",
+  "PENDING",
+  "APPROVED",
+  "REJECTED",
+  "CANCELED",
+  "SKIPPED",
+] as PetitionApprovalRequestStepStatus[];
+
 export type PetitionAttachmentType = "FRONT" | "ANNEX" | "BACK";
 
 export const PetitionAttachmentTypeValues = ["FRONT", "ANNEX", "BACK"] as PetitionAttachmentType[];
@@ -242,7 +270,14 @@ export type PetitionEventType =
   | "SIGNATURE_DELIVERED"
   | "PETITION_TAGGED"
   | "PETITION_UNTAGGED"
-  | "CONTACTLESS_ACCESS_USED";
+  | "CONTACTLESS_ACCESS_USED"
+  | "PETITION_APPROVAL_REQUEST_STEP_STARTED"
+  | "PETITION_APPROVAL_REQUEST_STEP_APPROVED"
+  | "PETITION_APPROVAL_REQUEST_STEP_REJECTED"
+  | "PETITION_APPROVAL_REQUEST_STEP_SKIPPED"
+  | "PETITION_APPROVAL_REQUEST_STEP_REMINDER"
+  | "PETITION_APPROVAL_REQUEST_STEP_FINISHED"
+  | "PETITION_APPROVAL_REQUEST_STEP_CANCELED";
 
 export const PetitionEventTypeValues = [
   "PETITION_CREATED",
@@ -291,6 +326,13 @@ export const PetitionEventTypeValues = [
   "PETITION_TAGGED",
   "PETITION_UNTAGGED",
   "CONTACTLESS_ACCESS_USED",
+  "PETITION_APPROVAL_REQUEST_STEP_STARTED",
+  "PETITION_APPROVAL_REQUEST_STEP_APPROVED",
+  "PETITION_APPROVAL_REQUEST_STEP_REJECTED",
+  "PETITION_APPROVAL_REQUEST_STEP_SKIPPED",
+  "PETITION_APPROVAL_REQUEST_STEP_REMINDER",
+  "PETITION_APPROVAL_REQUEST_STEP_FINISHED",
+  "PETITION_APPROVAL_REQUEST_STEP_CANCELED",
 ] as PetitionEventType[];
 
 export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";
@@ -684,7 +726,10 @@ export interface TableTypes {
   org_integration: OrgIntegration;
   petition: Petition;
   petition_access: PetitionAccess;
+  petition_approval_request_step: PetitionApprovalRequestStep;
+  petition_approval_request_step_approver: PetitionApprovalRequestStepApprover;
   petition_attachment: PetitionAttachment;
+  petition_comment_attachment: PetitionCommentAttachment;
   petition_contact_notification: PetitionContactNotification;
   petition_event: PetitionEvent;
   petition_field: PetitionField;
@@ -760,7 +805,10 @@ export interface TableCreateTypes {
   org_integration: CreateOrgIntegration;
   petition: CreatePetition;
   petition_access: CreatePetitionAccess;
+  petition_approval_request_step: CreatePetitionApprovalRequestStep;
+  petition_approval_request_step_approver: CreatePetitionApprovalRequestStepApprover;
   petition_attachment: CreatePetitionAttachment;
+  petition_comment_attachment: CreatePetitionCommentAttachment;
   petition_contact_notification: CreatePetitionContactNotification;
   petition_event: CreatePetitionEvent;
   petition_field: CreatePetitionField;
@@ -836,7 +884,10 @@ export interface TablePrimaryKeys {
   org_integration: "id";
   petition: "id";
   petition_access: "id";
+  petition_approval_request_step: "id";
+  petition_approval_request_step_approver: "id";
   petition_attachment: "id";
+  petition_comment_attachment: "id";
   petition_contact_notification: "id";
   petition_event: "id";
   petition_field: "id";
@@ -1444,6 +1495,7 @@ export interface Petition {
   enable_document_generation: boolean; // bool
   automatic_numbering_config: Maybe<any>; // jsonb
   standard_list_definition_override: any; // jsonb
+  approval_flow_config: Maybe<any>; // jsonb
 }
 
 export type CreatePetition = PartialProps<
@@ -1502,6 +1554,7 @@ export type CreatePetition = PartialProps<
   | "enable_document_generation"
   | "automatic_numbering_config"
   | "standard_list_definition_override"
+  | "approval_flow_config"
 >;
 
 export interface PetitionAccess {
@@ -1544,6 +1597,53 @@ export type CreatePetitionAccess = PartialProps<
   | "is_shared_by_link"
 >;
 
+export interface PetitionApprovalRequestStep {
+  id: number; // int4
+  petition_id: number; // int4
+  step_number: number; // int4
+  step_name: string; // varchar
+  status: PetitionApprovalRequestStepStatus; // petition_approval_request_step_status
+  approval_type: PetitionApprovalRequestStepApprovalType; // petition_approval_request_step_approval_type
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deprecated_at: Maybe<Date>; // timestamptz
+}
+
+export type CreatePetitionApprovalRequestStep = PartialProps<
+  Omit<PetitionApprovalRequestStep, "id">,
+  "created_at" | "created_by" | "updated_at" | "updated_by" | "deprecated_at"
+>;
+
+export interface PetitionApprovalRequestStepApprover {
+  id: number; // int4
+  petition_approval_request_step_id: number; // int4
+  user_id: number; // int4
+  sent_at: Maybe<Date>; // timestamptz
+  approved_at: Maybe<Date>; // timestamptz
+  rejected_at: Maybe<Date>; // timestamptz
+  canceled_at: Maybe<Date>; // timestamptz
+  skipped_at: Maybe<Date>; // timestamptz
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+}
+
+export type CreatePetitionApprovalRequestStepApprover = PartialProps<
+  Omit<PetitionApprovalRequestStepApprover, "id">,
+  | "sent_at"
+  | "approved_at"
+  | "rejected_at"
+  | "canceled_at"
+  | "skipped_at"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+>;
+
 export interface PetitionAttachment {
   id: number; // int4
   petition_id: number; // int4
@@ -1561,6 +1661,21 @@ export interface PetitionAttachment {
 export type CreatePetitionAttachment = PartialProps<
   Omit<PetitionAttachment, "id">,
   "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
+>;
+
+export interface PetitionCommentAttachment {
+  id: number; // int4
+  petition_comment_id: number; // int4
+  file_upload_id: number; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreatePetitionCommentAttachment = PartialProps<
+  Omit<PetitionCommentAttachment, "id">,
+  "created_at" | "created_by" | "deleted_at" | "deleted_by"
 >;
 
 export interface PetitionContactNotification {
@@ -1683,6 +1798,7 @@ export interface PetitionFieldComment {
   is_internal: boolean; // bool
   anonymized_at: Maybe<Date>; // timestamptz
   content_json: Maybe<any>; // jsonb
+  approval_metadata: Maybe<any>; // jsonb
 }
 
 export type CreatePetitionFieldComment = PartialProps<
@@ -1699,6 +1815,7 @@ export type CreatePetitionFieldComment = PartialProps<
   | "is_internal"
   | "anonymized_at"
   | "content_json"
+  | "approval_metadata"
 >;
 
 export interface PetitionFieldGroupRelationship {

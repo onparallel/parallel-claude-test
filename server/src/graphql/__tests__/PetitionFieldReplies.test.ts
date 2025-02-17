@@ -60,6 +60,11 @@ describe("GraphQL/Petition Field Replies", () => {
     await testClient.stop();
   });
 
+  afterEach(async () => {
+    await mocks.knex("petition_signature_request").delete();
+    await mocks.knex("petition_approval_request_step").delete();
+  });
+
   describe("createPetitionFieldReplies", () => {
     afterEach(async () => {
       await mocks.knex("petition_field_reply").delete();
@@ -1736,6 +1741,70 @@ describe("GraphQL/Petition Field Replies", () => {
           },
         ]);
       });
+
+      it("sends error when trying to update a reply with a pending signature request", async () => {
+        await mocks.knex
+          .from("petition_signature_request")
+          .insert({ petition_id: petition.id, signature_config: {}, status: "PROCESSED" });
+
+        const { data, errors } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+              updatePetitionFieldReplies(petitionId: $petitionId, replies: $replies) {
+                id
+                status
+                content
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            replies: [
+              {
+                id: toGlobalId("PetitionFieldReply", rejectedReply.id),
+                content: { value: "new reply" },
+              },
+            ],
+          },
+        );
+
+        expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+        expect(data).toBeNull();
+      });
+
+      it("sends error when trying to update a reply with a current approval request", async () => {
+        await mocks.knex.from("petition_approval_request_step").insert({
+          petition_id: petition.id,
+          step_number: 0,
+          step_name: "Step 1",
+          status: "PENDING",
+          approval_type: "ANY",
+        });
+
+        const { data, errors } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $replies: [UpdatePetitionFieldReplyInput!]!) {
+              updatePetitionFieldReplies(petitionId: $petitionId, replies: $replies) {
+                id
+                status
+                content
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            replies: [
+              {
+                id: toGlobalId("PetitionFieldReply", rejectedReply.id),
+                content: { value: "new reply" },
+              },
+            ],
+          },
+        );
+
+        expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+        expect(data).toBeNull();
+      });
     });
 
     describe("SELECT", () => {
@@ -3251,6 +3320,82 @@ describe("GraphQL/Petition Field Replies", () => {
       });
       expect(data).toBeNull();
     });
+
+    it("sends error when trying to create a file reply with a pending signature request", async () => {
+      await mocks.knex
+        .from("petition_signature_request")
+        .insert({ petition_id: petition.id, signature_config: {}, status: "PROCESSED" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $file: FileUploadInput!) {
+            createFileUploadReply(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
+              presignedPostData {
+                url
+                fields
+              }
+              reply {
+                id
+                content
+                status
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", fileUploadField.id),
+          file: {
+            contentType: "text/plain",
+            filename: "my_file.txt",
+            size: 500,
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to create a file reply with a pending approval request", async () => {
+      await mocks.knex.from("petition_approval_request_step").insert({
+        petition_id: petition.id,
+        step_number: 0,
+        step_name: "Step 1",
+        status: "PENDING",
+        approval_type: "ANY",
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $file: FileUploadInput!) {
+            createFileUploadReply(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
+              presignedPostData {
+                url
+                fields
+              }
+              reply {
+                id
+                content
+                status
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", fileUploadField.id),
+          file: {
+            contentType: "text/plain",
+            filename: "my_file.txt",
+            size: 500,
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+      expect(data).toBeNull();
+    });
   });
 
   describe("createFileUploadReplyComplete", () => {
@@ -3439,6 +3584,82 @@ describe("GraphQL/Petition Field Replies", () => {
         .select("*");
 
       expect(dbReply.content.old_file_upload_id).toBeUndefined();
+    });
+
+    it("sends error when trying to update a file reply with a pending signature request", async () => {
+      await mocks.knex
+        .from("petition_signature_request")
+        .insert({ petition_id: petition.id, signature_config: {}, status: "PROCESSED" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $replyId: GID!, $file: FileUploadInput!) {
+            updateFileUploadReply(petitionId: $petitionId, replyId: $replyId, file: $file) {
+              presignedPostData {
+                url
+                fields
+              }
+              reply {
+                id
+                content
+                status
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", fileUploadReply.id),
+          file: {
+            contentType: "text/plain",
+            filename: "my_file.txt",
+            size: 500,
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to update a file reply with a pending approval request", async () => {
+      await mocks.knex.from("petition_approval_request_step").insert({
+        petition_id: petition.id,
+        step_number: 0,
+        step_name: "Step 1",
+        status: "PENDING",
+        approval_type: "ANY",
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $replyId: GID!, $file: FileUploadInput!) {
+            updateFileUploadReply(petitionId: $petitionId, replyId: $replyId, file: $file) {
+              presignedPostData {
+                url
+                fields
+              }
+              reply {
+                id
+                content
+                status
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", fileUploadReply.id),
+          file: {
+            contentType: "text/plain",
+            filename: "my_file.txt",
+            size: 500,
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+      expect(data).toBeNull();
     });
   });
 
@@ -4139,6 +4360,65 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(errors).toContainGraphQLError("REPLY_ALREADY_APPROVED_ERROR");
       expect(data).toBeNull();
     });
+
+    it("sends error when trying to delete a reply with a pending signature request", async () => {
+      await mocks.knex
+        .from("petition_signature_request")
+        .insert({ petition_id: petition.id, signature_config: {}, status: "PROCESSED" });
+
+      const [userSimpleReply] = await mocks.createRandomTextReply(
+        textField.id,
+        petitionAccess.id,
+        1,
+      );
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $replyId: GID!) {
+            deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", userSimpleReply.id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to delete a reply with a pending approval request", async () => {
+      await mocks.knex.from("petition_approval_request_step").insert({
+        petition_id: petition.id,
+        step_number: 0,
+        step_name: "Step 1",
+        status: "APPROVED",
+        approval_type: "ANY",
+      });
+      const [userSimpleReply] = await mocks.createRandomTextReply(
+        textField.id,
+        petitionAccess.id,
+        1,
+      );
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $replyId: GID!) {
+            deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", userSimpleReply.id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+      expect(data).toBeNull();
+    });
   });
 
   describe("bulkCreatePetitionReplies", () => {
@@ -4255,6 +4535,88 @@ describe("GraphQL/Petition Field Replies", () => {
         { deleted_at: expect.any(Date) },
         { deleted_at: expect.any(Date) },
       ]);
+    });
+
+    it("sends error when trying to bulk create replies with a pending signature request", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        multiple: false,
+        type: "FIELD_GROUP",
+        alias: "field_group",
+      }));
+      await mocks.createRandomPetitionFields(petition.id, 2, (i) => ({
+        parent_petition_field_id: fieldGroup.id,
+        type: "TEXT",
+        alias: `child_${i}`,
+      }));
+
+      await mocks.knex
+        .from("petition_signature_request")
+        .insert({ petition_id: petition.id, signature_config: {}, status: "PROCESSED" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $replies: JSONObject!) {
+            bulkCreatePetitionReplies(petitionId: $petitionId, replies: $replies) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replies: {
+            field_group: {
+              child_0: "Hello",
+              child_1: "World",
+            },
+          },
+        },
+      );
+      expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to bulk create replies with a pending approval request", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        multiple: false,
+        type: "FIELD_GROUP",
+        alias: "field_group",
+      }));
+      await mocks.createRandomPetitionFields(petition.id, 2, (i) => ({
+        parent_petition_field_id: fieldGroup.id,
+        type: "TEXT",
+        alias: `child_${i}`,
+      }));
+
+      await mocks.knex.from("petition_approval_request_step").insert({
+        petition_id: petition.id,
+        step_number: 0,
+        step_name: "Step 1",
+        status: "PENDING",
+        approval_type: "ANY",
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $replies: JSONObject!) {
+            bulkCreatePetitionReplies(petitionId: $petitionId, replies: $replies) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replies: {
+            field_group: {
+              child_0: "Hello",
+              child_1: "World",
+            },
+          },
+        },
+      );
+      expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+      expect(data).toBeNull();
     });
   });
 
@@ -6094,6 +6456,75 @@ describe("GraphQL/Petition Field Replies", () => {
         },
       ]);
     });
+
+    it("sends error when trying to create a reply with a pending signature request", async () => {
+      await mocks.knex
+        .from("petition_signature_request")
+        .insert({ petition_id: petition.id, signature_config: {}, status: "PROCESSED" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", shortText.id),
+              content: { value: "My SHORT_TEXT reply" },
+            },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to create a reply with a pending approval request", async () => {
+      await mocks.knex.from("petition_approval_request_step").insert({
+        petition_id: petition.id,
+        step_number: 0,
+        step_name: "Step 1",
+        status: "PENDING",
+        approval_type: "ANY",
+      });
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", shortText.id),
+              content: { value: "My SHORT_TEXT reply" },
+            },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+      expect(data).toBeNull();
+    });
   });
 
   describe("createDowJonesKycReply", () => {
@@ -6194,6 +6625,96 @@ describe("GraphQL/Petition Field Replies", () => {
           ],
         },
       });
+    });
+
+    it("sends error when trying to create a reply with a pending signature request", async () => {
+      await mocks.knex
+        .from("petition_signature_request")
+        .insert({ petition_id: petition.id, signature_config: {}, status: "PROCESSED" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $profileId: ID!, $parentReplyId: GID) {
+            createDowJonesKycReply(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              profileId: $profileId
+              parentReplyId: $parentReplyId
+            ) {
+              parent {
+                field {
+                  id
+                }
+                children {
+                  field {
+                    id
+                  }
+                  replies {
+                    id
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", dowJones.id),
+          profileId: "123",
+          parentReplyId: toGlobalId("PetitionFieldReply", reply.id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to create a reply with a pending approval request", async () => {
+      await mocks.knex.from("petition_approval_request_step").insert({
+        petition_id: petition.id,
+        step_number: 0,
+        step_name: "Step 1",
+        status: "PENDING",
+        approval_type: "ANY",
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $profileId: ID!, $parentReplyId: GID) {
+            createDowJonesKycReply(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              profileId: $profileId
+              parentReplyId: $parentReplyId
+            ) {
+              parent {
+                field {
+                  id
+                }
+                children {
+                  field {
+                    id
+                  }
+                  replies {
+                    id
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", dowJones.id),
+          profileId: "123",
+          parentReplyId: toGlobalId("PetitionFieldReply", reply.id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+      expect(data).toBeNull();
     });
   });
 });

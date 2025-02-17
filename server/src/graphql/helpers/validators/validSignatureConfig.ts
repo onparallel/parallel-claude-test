@@ -1,23 +1,39 @@
-import { core } from "nexus";
 import { isNonNullish, isNullish } from "remeda";
 import { isValidTimezone } from "../../../util/time";
+import { NexusGenInputs } from "../../__types";
 import { ArgWithPath, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 import { EMAIL_REGEX } from "./validEmail";
 
 export function validSignatureConfig<TypeName extends string, FieldName extends string>(
-  prop: ArgWithPath<
+  petitionIdProp: ArgWithPath<TypeName, FieldName, number>,
+  signatureConfigProp: ArgWithPath<
     TypeName,
     FieldName,
-    core.GetGen2<"inputTypes", "SignatureConfigInput"> | null | undefined
+    NexusGenInputs["SignatureConfigInput"] | null | undefined
+  >,
+  approvalFlowConfigProp: ArgWithPath<
+    TypeName,
+    FieldName,
+    NexusGenInputs["ApprovalFlowConfigInput"][] | null | undefined
   >,
 ) {
   return (async (_, args, ctx, info) => {
-    const [signatureConfig, argName] = getArgWithPath(args, prop);
-    if (signatureConfig) {
-      const { orgIntegrationId, signersInfo, timezone, instructions, review, useCustomDocument } =
-        signatureConfig;
+    const [petitionId] = getArgWithPath(args, petitionIdProp);
+    const [approvalFlowConfigInput] = getArgWithPath(args, approvalFlowConfigProp);
+
+    const [signatureConfigInput, argName] = getArgWithPath(args, signatureConfigProp);
+    if (signatureConfigInput) {
+      const {
+        orgIntegrationId,
+        signersInfo,
+        timezone,
+        instructions,
+        review,
+        useCustomDocument,
+        reviewAfterApproval,
+      } = signatureConfigInput;
 
       const integration = await ctx.integrations.loadIntegration(orgIntegrationId);
       if (
@@ -54,6 +70,29 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
           `${argName}.review`,
           `Review is required when using a custom document.`,
         );
+      }
+
+      if (isNonNullish(reviewAfterApproval) && !review) {
+        throw new ArgValidationError(
+          info,
+          `${argName}.reviewAfterApproval`,
+          `review must be enabled to use reviewAfterApproval.`,
+        );
+      }
+
+      if (isNonNullish(reviewAfterApproval)) {
+        // prioritize the input value over the petition value
+        if (!approvalFlowConfigInput) {
+          const petition = await ctx.petitions.loadPetition(petitionId);
+          const approvalConfig = petition?.approval_flow_config;
+          if (!approvalConfig) {
+            throw new ArgValidationError(
+              info,
+              `${argName}.reviewAfterApproval`,
+              `petition must have a configured approval request.`,
+            );
+          }
+        }
       }
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

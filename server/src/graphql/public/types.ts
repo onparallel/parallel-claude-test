@@ -199,6 +199,13 @@ export const PublicPetition = objectType({
         return signature ? (signature.status === "COMPLETED" ? "COMPLETED" : "STARTED") : null;
       },
     });
+    t.boolean("hasStartedProcess", {
+      description: "Whether the petition has an ongoing signature or approval request",
+      resolve: async (root, _, ctx) => {
+        const processes = await ctx.petitions.getPetitionStartedProcesses(root.id);
+        return processes.length > 0;
+      },
+    });
     t.nonNull.field("tone", {
       type: "Tone",
       description: "The preferred tone of organization.",

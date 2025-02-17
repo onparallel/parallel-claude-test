@@ -503,9 +503,7 @@ describe("validateFieldLogic", () => {
             allFields,
             { variables: [], customLists: [], standardListDefinitions: [] },
           ),
-        ).rejects.toThrow(
-          `Can't find PetitionField:1101010 referenced in PetitionField:${textField.id}, condition 0`,
-        );
+        ).rejects.toThrow(`Can't find PetitionField:1101010 referenced in condition 0`);
       });
 
       it("referenced fields on conditions should not be deleted", async () => {
@@ -535,9 +533,7 @@ describe("validateFieldLogic", () => {
             allFields,
             { variables: [], customLists: [], standardListDefinitions: [] },
           ),
-        ).rejects.toThrow(
-          `Can't find PetitionField:${deletedField.id} referenced in PetitionField:${shortTextField.id}, condition 1`,
-        );
+        ).rejects.toThrow(`Can't find PetitionField:${deletedField.id} referenced in condition 1`);
       });
 
       it("referenced fields on conditions should all belong to the same petition", async () => {
@@ -574,7 +570,7 @@ describe("validateFieldLogic", () => {
             { variables: [], customLists: [], standardListDefinitions: [] },
           ),
         ).rejects.toThrow(
-          `Can't find PetitionField:${fieldOnAnotherPetition.id} referenced in PetitionField:${shortTextField.id}, condition 2`,
+          `Can't find PetitionField:${fieldOnAnotherPetition.id} referenced in condition 2`,
         );
       });
 

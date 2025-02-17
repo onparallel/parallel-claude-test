@@ -39,7 +39,7 @@ import {
   SignatureConfigInputSigner,
   SignatureConfigSigningMode,
 } from "@parallel/graphql/__types";
-import { FullPetitionSignerFragment } from "@parallel/utils/apollo/fragments";
+import { Fragments } from "@parallel/utils/apollo/fragments";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { withError } from "@parallel/utils/promises/withError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
@@ -70,6 +70,7 @@ export interface SignatureConfigDialogProps {
 interface SignatureConfigFormData {
   integration: SignatureConfigDialog_SignatureOrgIntegrationFragment;
   review: boolean;
+  reviewAfterApproval: Maybe<boolean>;
   title: Maybe<string>;
   allowAdditionalSigners: boolean;
   includePresetSigners: boolean;
@@ -95,13 +96,26 @@ export function SignatureConfigDialog({
     petition.signatureConfig ??
     (petition.__typename === "Petition" ? petition.currentSignatureRequest?.signatureConfig : null);
 
+  const petitionIsCompleted =
+    petition.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status);
+
+  const defaultReview = petitionIsCompleted ? true : (signatureConfig?.review ?? false);
+
+  const defaultReviewAfterApproval =
+    petition.__typename === "Petition" && petition.hasStartedProcess
+      ? true
+      : (signatureConfig?.reviewAfterApproval ?? null);
+
   const allSigners = (signatureConfig?.signers ?? []).filter(isNonNullish);
   const form = useForm<SignatureConfigFormData>({
     mode: "onSubmit",
     defaultValues: {
       integration:
         signatureConfig?.integration ?? integrations.find((i) => i.isDefault) ?? integrations[0],
-      review: petition.isReviewFlowEnabled ? (signatureConfig?.review ?? false) : false,
+      review: petition.isReviewFlowEnabled ? defaultReview : false,
+      reviewAfterApproval: isNonNullish(petition.approvalFlowConfig)
+        ? defaultReviewAfterApproval
+        : null,
       title: signatureConfig?.title ?? null,
       allowAdditionalSigners: petition.isInteractionWithRecipientsEnabled
         ? (signatureConfig?.allowAdditionalSigners ?? false)
@@ -161,6 +175,7 @@ export function SignatureConfigDialog({
         orgIntegrationId: data.integration.id,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         review: data.useCustomDocument ? true : data.review,
+        reviewAfterApproval: data.reviewAfterApproval,
         allowAdditionalSigners: data.allowAdditionalSigners,
         signingMode: data.signingMode,
         minSigners: data.minSigners,
@@ -215,6 +230,7 @@ export function SignatureConfigDialog({
             <SignatureConfigDialogBodyStep1
               integrations={integrations}
               petition={petition}
+              user={user}
               ref={titleRef}
             />
             <SignatureConfigDialogBodyStep2 petition={petition} />
@@ -245,204 +261,251 @@ export function SignatureConfigDialog({
   );
 }
 
-const SignatureConfigDialogBodyStep1 = chakraForwardRef<
-  "div",
-  Pick<SignatureConfigDialogProps, "integrations" | "petition">
->(function SignatureConfigDialogBodyStep1(
-  { integrations, petition }: Pick<SignatureConfigDialogProps, "integrations" | "petition">,
-  ref,
-) {
-  const intl = useIntl();
-  const { register, control, watch } = useFormContext<SignatureConfigFormData>();
+const SignatureConfigDialogBodyStep1 = chakraForwardRef<"div", SignatureConfigDialogProps>(
+  function SignatureConfigDialogBodyStep1(
+    { integrations, petition, user }: SignatureConfigDialogProps,
+    ref,
+  ) {
+    const intl = useIntl();
+    const { register, control, watch, setValue } = useFormContext<SignatureConfigFormData>();
 
-  const useCustomDocument = watch("useCustomDocument");
+    const useCustomDocument = watch("useCustomDocument");
+    const reviewAfterApproval = watch("reviewAfterApproval");
 
-  const signatureIntegrationReactProps = useReactSelectProps<
-    SignatureConfigDialog_SignatureOrgIntegrationFragment,
-    false
-  >();
+    const signatureIntegrationReactProps = useReactSelectProps<
+      SignatureConfigDialog_SignatureOrgIntegrationFragment,
+      false
+    >();
 
-  const petitionIsCompleted =
-    petition.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status);
+    const petitionIsCompleted =
+      petition.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status);
 
-  const titleRegister = useRegisterWithRef(ref, register, "title");
+    const hasApprovalFlow =
+      user.hasPetitionApprovalFlow && isNonNullish(petition.approvalFlowConfig);
 
-  const reactSelectProps = useReactSelectProps();
+    const titleRegister = useRegisterWithRef(ref, register, "title");
 
-  const reviewBeforeSendOptions = useMemo(
-    () => [
-      {
-        value: "NO",
-        label: intl.formatMessage({
-          id: "component.signature-config-dialog.review-before-send-option-no",
-          defaultMessage: "After the parallel is completed",
-        }),
-      },
-      {
-        value: "YES",
-        label: intl.formatMessage({
-          id: "component.signature-config-dialog.review-before-send-option-yes",
-          defaultMessage: "After reviewing the information",
-        }),
-      },
-    ],
-    [intl.locale],
-  );
+    const reactSelectProps = useReactSelectProps();
 
-  return (
-    <Stack spacing={4}>
-      <Stack spacing={2}>
-        <Text>
-          <FormattedMessage
-            id="component.signature-config-dialog.header-subtitle"
-            defaultMessage="Sign a PDF document using one of our integrated eSignature providers."
-          />
-        </Text>
-        <Flex>
-          <HelpCenterLink articleId={6022979} display="flex" alignItems="center">
+    const reviewBeforeSendOptions = useMemo(
+      () => [
+        ...(petitionIsCompleted
+          ? []
+          : [
+              {
+                value: "NO",
+                label: intl.formatMessage({
+                  id: "component.signature-config-dialog.review-before-send-option-no",
+                  defaultMessage: "After the parallel is completed",
+                }),
+              },
+            ]),
+        ...(petition.__typename === "Petition" && petition.hasStartedProcess
+          ? []
+          : [
+              {
+                value: "YES",
+                label: intl.formatMessage({
+                  id: "component.signature-config-dialog.review-before-send-option-yes",
+                  defaultMessage: "After reviewing the information",
+                }),
+              },
+            ]),
+        ...(hasApprovalFlow
+          ? [
+              {
+                value: "AFTER_APPROVAL",
+                label: intl.formatMessage({
+                  id: "component.signature-config-dialog.review-before-send-option-after-approval",
+                  defaultMessage: "After completing the approval steps",
+                }),
+              },
+            ]
+          : []),
+      ],
+      [intl.locale],
+    );
+
+    return (
+      <Stack spacing={4}>
+        <Stack spacing={2}>
+          <Text>
             <FormattedMessage
-              id="component.signature-config-dialog.header-help-link"
-              defaultMessage="More about eSignature"
+              id="component.signature-config-dialog.header-subtitle"
+              defaultMessage="Sign a PDF document using one of our integrated eSignature providers."
             />
-          </HelpCenterLink>
-        </Flex>
-      </Stack>
-      <FormControl hidden={integrations.length < 2}>
-        <FormLabel>
-          <FormattedMessage
-            id="component.signature-config-dialog.provider-label"
-            defaultMessage="eSignature provider"
-          />
-        </FormLabel>
-        <Controller
-          name="integration"
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <Select
-              {...signatureIntegrationReactProps}
-              getOptionLabel={(i) =>
-                i.environment === "DEMO"
-                  ? `${i.name} (${intl.formatMessage({
-                      id: "generic.signature-demo-environment-long",
-                      defaultMessage: "Test environment",
-                    })})`
-                  : i.name
-              }
-              getOptionValue={(p) => p.id}
-              value={integrations.find((i) => i.id === value.id)}
-              onChange={(value) => onChange(value!)}
-              options={integrations}
-              isSearchable={false}
-            />
-          )}
-        />
-      </FormControl>
-      <FormControl>
-        <FormLabel>
-          <FormattedMessage
-            id="component.signature-config-dialog.document-to-sign-label"
-            defaultMessage="Which document do you want to sign?"
-          />
-        </FormLabel>
-        <Controller
-          name="useCustomDocument"
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <RadioGroup
-              as={Stack}
-              spacing={2}
-              onChange={(value) => onChange(value === "CUSTOM")}
-              value={value ? "CUSTOM" : "REPLIES"}
-            >
-              <Radio backgroundColor="white" value="REPLIES">
-                <FormattedMessage
-                  id="component.signature-config-dialog.replies-document-label"
-                  defaultMessage="Document generated on the basis of the replies"
-                />
-              </Radio>
-              <Radio backgroundColor="white" value="CUSTOM">
-                <FormattedMessage
-                  id="component.signature-config-dialog.custom-document-label"
-                  defaultMessage="I will upload a document when launching the signature"
-                />
-                <HelpPopover>
-                  <FormattedMessage
-                    id="component.signature-config-dialog.custom-document-label-help"
-                    defaultMessage="The document will not be filled in automatically and cannot be edited. We will only add a signature page at the end of the document."
-                  />
-                </HelpPopover>
-              </Radio>
-            </RadioGroup>
-          )}
-        />
-      </FormControl>
-      <FormControl>
-        <FormLabel display="flex" alignItems="center">
-          <FormattedMessage
-            id="component.signature-config-dialog.title-label"
-            defaultMessage="Title of the document"
-          />
-          <Text color="gray.500" marginStart={1}>
-            (<FormattedMessage id="generic.optional" defaultMessage="Optional" />)
           </Text>
-
-          <HelpPopover>
-            <FormattedMessage
-              id="component.signature-config-dialog.title-help"
-              defaultMessage="Include a title on the signing document. It will also be used as the name of the file once signed."
-            />
-          </HelpPopover>
-        </FormLabel>
-        <Input
-          {...titleRegister}
-          placeholder={intl.formatMessage({
-            id: "component.signature-config-dialog.title-placeholder",
-            defaultMessage: "Enter a title...",
-          })}
-        />
-      </FormControl>
-
-      <FormControl isDisabled={petitionIsCompleted || !petition.isReviewFlowEnabled}>
-        <FormLabel>
-          <FormattedMessage
-            id="component.signature-config-dialog.review-before-send-label"
-            defaultMessage="When do you want the eSignature to start?"
-          />
-        </FormLabel>
-        <Controller
-          name="review"
-          control={control}
-          render={({ field: { onChange, value: review } }) => (
-            <>
-              <Select
-                {...reactSelectProps}
-                value={reviewBeforeSendOptions[review || useCustomDocument ? 1 : 0]}
-                options={reviewBeforeSendOptions}
-                onChange={(v: any) => onChange(v.value === "YES")}
-                isDisabled={
-                  useCustomDocument || petitionIsCompleted || !petition.isReviewFlowEnabled
-                }
+          <Flex>
+            <HelpCenterLink articleId={6022979} display="flex" alignItems="center">
+              <FormattedMessage
+                id="component.signature-config-dialog.header-help-link"
+                defaultMessage="More about eSignature"
               />
-              <Text marginTop={2} color="gray.500" fontSize="sm">
-                {review || useCustomDocument ? (
+            </HelpCenterLink>
+          </Flex>
+        </Stack>
+        <FormControl hidden={integrations.length < 2}>
+          <FormLabel>
+            <FormattedMessage
+              id="component.signature-config-dialog.provider-label"
+              defaultMessage="eSignature provider"
+            />
+          </FormLabel>
+          <Controller
+            name="integration"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <Select
+                {...signatureIntegrationReactProps}
+                getOptionLabel={(i) =>
+                  i.environment === "DEMO"
+                    ? `${i.name} (${intl.formatMessage({
+                        id: "generic.signature-demo-environment-long",
+                        defaultMessage: "Test environment",
+                      })})`
+                    : i.name
+                }
+                getOptionValue={(p) => p.id}
+                value={integrations.find((i) => i.id === value.id)}
+                onChange={(value) => onChange(value!)}
+                options={integrations}
+                isSearchable={false}
+              />
+            )}
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel>
+            <FormattedMessage
+              id="component.signature-config-dialog.document-to-sign-label"
+              defaultMessage="Which document do you want to sign?"
+            />
+          </FormLabel>
+          <Controller
+            name="useCustomDocument"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <RadioGroup
+                as={Stack}
+                spacing={2}
+                onChange={(value) => onChange(value === "CUSTOM")}
+                value={value ? "CUSTOM" : "REPLIES"}
+              >
+                <Radio backgroundColor="white" value="REPLIES">
                   <FormattedMessage
-                    id="component.signature-config-dialog.review-before-send-option-yes-explainer"
-                    defaultMessage="After reviewing the information you will have to start the signature manually."
+                    id="component.signature-config-dialog.replies-document-label"
+                    defaultMessage="Document generated on the basis of the replies"
                   />
-                ) : (
+                </Radio>
+                <Radio backgroundColor="white" value="CUSTOM">
                   <FormattedMessage
-                    id="component.signature-config-dialog.review-before-send-option-no-explainer"
-                    defaultMessage="The signature process will start when all the information has been completed."
+                    id="component.signature-config-dialog.custom-document-label"
+                    defaultMessage="I will upload a document when launching the signature"
                   />
-                )}
-              </Text>
-            </>
-          )}
-        />
-      </FormControl>
-    </Stack>
-  );
-});
+                  <HelpPopover>
+                    <FormattedMessage
+                      id="component.signature-config-dialog.custom-document-label-help"
+                      defaultMessage="The document will not be filled in automatically and cannot be edited. We will only add a signature page at the end of the document."
+                    />
+                  </HelpPopover>
+                </Radio>
+              </RadioGroup>
+            )}
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel display="flex" alignItems="center">
+            <FormattedMessage
+              id="component.signature-config-dialog.title-label"
+              defaultMessage="Title of the document"
+            />
+            <Text color="gray.500" marginStart={1}>
+              (<FormattedMessage id="generic.optional" defaultMessage="Optional" />)
+            </Text>
+
+            <HelpPopover>
+              <FormattedMessage
+                id="component.signature-config-dialog.title-help"
+                defaultMessage="Include a title on the signing document. It will also be used as the name of the file once signed."
+              />
+            </HelpPopover>
+          </FormLabel>
+          <Input
+            {...titleRegister}
+            placeholder={intl.formatMessage({
+              id: "component.signature-config-dialog.title-placeholder",
+              defaultMessage: "Enter a title...",
+            })}
+          />
+        </FormControl>
+
+        <FormControl
+          isDisabled={!petition.isReviewFlowEnabled || reviewBeforeSendOptions.length === 1}
+        >
+          <FormLabel>
+            <FormattedMessage
+              id="component.signature-config-dialog.review-before-send-label"
+              defaultMessage="When do you want the eSignature to start?"
+            />
+          </FormLabel>
+          <Controller
+            name="review"
+            control={control}
+            render={({ field: { onChange, value: review } }) => {
+              const selectValueIndex =
+                isNonNullish(reviewAfterApproval) &&
+                user.hasPetitionApprovalFlow &&
+                reviewAfterApproval
+                  ? reviewBeforeSendOptions.findIndex((o) => o.value === "AFTER_APPROVAL")
+                  : review
+                    ? reviewBeforeSendOptions.findIndex((o) => o.value === "YES")
+                    : reviewBeforeSendOptions.findIndex((o) => o.value === "NO");
+
+              return (
+                <>
+                  <Select
+                    {...reactSelectProps}
+                    value={reviewBeforeSendOptions[selectValueIndex !== -1 ? selectValueIndex : 0]}
+                    options={reviewBeforeSendOptions}
+                    onChange={(v: any) => {
+                      onChange(v.value !== "NO");
+                      if (isNonNullish(petition.approvalFlowConfig)) {
+                        setValue("reviewAfterApproval", v.value === "AFTER_APPROVAL" ? true : null);
+                      }
+                    }}
+                    isDisabled={
+                      !petition.isReviewFlowEnabled || reviewBeforeSendOptions.length === 1
+                    }
+                  />
+                  <Text marginTop={2} color="gray.500" fontSize="sm">
+                    {review || useCustomDocument ? (
+                      reviewAfterApproval ? (
+                        <FormattedMessage
+                          id="component.signature-config-dialog.review-before-send-option-after-approval-explainer"
+                          defaultMessage="After completing the approval steps, you will have to start the signature manually."
+                        />
+                      ) : (
+                        <FormattedMessage
+                          id="component.signature-config-dialog.review-before-send-option-yes-explainer"
+                          defaultMessage="After reviewing the information you will have to start the signature manually."
+                        />
+                      )
+                    ) : (
+                      <FormattedMessage
+                        id="component.signature-config-dialog.review-before-send-option-no-explainer"
+                        defaultMessage="The signature process will start when all the information has been completed."
+                      />
+                    )}
+                  </Text>
+                </>
+              );
+            }}
+          />
+        </FormControl>
+      </Stack>
+    );
+  },
+);
 
 function SignatureConfigDialogBodyStep2({
   petition,
@@ -778,9 +841,10 @@ SignatureConfigDialog.fragments = {
         minSigners
         instructions
         useCustomDocument
+        reviewAfterApproval
       }
       ${this.SignatureOrgIntegration}
-      ${FullPetitionSignerFragment}
+      ${Fragments.FullPetitionSigner}
     `;
   },
   get PetitionBase() {
@@ -793,6 +857,7 @@ SignatureConfigDialog.fragments = {
           ...SignatureConfigDialog_SignatureConfig
         }
         ... on Petition {
+          hasStartedProcess
           status
           accesses {
             id
@@ -810,10 +875,14 @@ SignatureConfigDialog.fragments = {
             }
           }
         }
+        approvalFlowConfig {
+          ...Fragments_FullApprovalFlowConfig
+        }
         ...SuggestedSigners_PetitionBase
       }
       ${this.SignatureConfig}
       ${SuggestedSigners.fragments.PetitionBase}
+      ${Fragments.FullApprovalFlowConfig}
     `;
   },
   get SignatureOrgIntegration() {
@@ -829,6 +898,8 @@ SignatureConfigDialog.fragments = {
   get User() {
     return gql`
       fragment SignatureConfigDialog_User on User {
+        id
+        hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
         firstName
         lastName
         email

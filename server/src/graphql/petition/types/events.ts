@@ -117,6 +117,20 @@ export const PetitionEvent = interfaceType({
         return "PetitionTaggedEvent";
       case "PETITION_UNTAGGED":
         return "PetitionUntaggedEvent";
+      case "PETITION_APPROVAL_REQUEST_STEP_STARTED":
+        return "PetitionApprovalRequestStepStartedEvent";
+      case "PETITION_APPROVAL_REQUEST_STEP_APPROVED":
+        return "PetitionApprovalRequestStepApprovedEvent";
+      case "PETITION_APPROVAL_REQUEST_STEP_REJECTED":
+        return "PetitionApprovalRequestStepRejectedEvent";
+      case "PETITION_APPROVAL_REQUEST_STEP_SKIPPED":
+        return "PetitionApprovalRequestStepSkippedEvent";
+      case "PETITION_APPROVAL_REQUEST_STEP_REMINDER":
+        return "PetitionApprovalRequestStepReminderEvent";
+      case "PETITION_APPROVAL_REQUEST_STEP_FINISHED":
+        return "PetitionApprovalRequestStepFinishedEvent";
+      case "PETITION_APPROVAL_REQUEST_STEP_CANCELED":
+        return "PetitionApprovalRequestStepCanceledEvent";
     }
   },
   sourceType: "petitionEvents.PetitionEvent",
@@ -824,3 +838,161 @@ export const PetitionUntaggedEvent = createPetitionEvent("PetitionUntaggedEvent"
     resolve: async (root, _, ctx) => await ctx.tags.loadTag(root.data.tag_ids),
   });
 });
+
+export const PetitionApprovalRequestStepStartedEvent = createPetitionEvent(
+  "PetitionApprovalRequestStepStartedEvent",
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
+      },
+    });
+    t.nonNull.field("approvalRequestStep", {
+      type: "PetitionApprovalRequestStep",
+      resolve: async (o, _, ctx) =>
+        (await ctx.approvalRequests.loadPetitionApprovalRequestStep(
+          o.data.petition_approval_request_step_id,
+        ))!,
+    });
+    t.nullable.field("comment", {
+      type: "PetitionFieldComment",
+      resolve: async (o, _, ctx) => {
+        if (o.data.petition_comment_id) {
+          return await ctx.petitions.loadPetitionFieldComment(o.data.petition_comment_id);
+        }
+        return null;
+      },
+    });
+  },
+);
+
+export const PetitionApprovalRequestStepApprovedEvent = createPetitionEvent(
+  "PetitionApprovalRequestStepApprovedEvent",
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
+      },
+    });
+    t.nonNull.field("approvalRequestStep", {
+      type: "PetitionApprovalRequestStep",
+      resolve: async (o, _, ctx) =>
+        (await ctx.approvalRequests.loadPetitionApprovalRequestStep(
+          o.data.petition_approval_request_step_id,
+        ))!,
+    });
+  },
+);
+
+export const PetitionApprovalRequestStepRejectedEvent = createPetitionEvent(
+  "PetitionApprovalRequestStepRejectedEvent",
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
+      },
+    });
+    t.nonNull.field("approvalRequestStep", {
+      type: "PetitionApprovalRequestStep",
+      resolve: async (o, _, ctx) =>
+        (await ctx.approvalRequests.loadPetitionApprovalRequestStep(
+          o.data.petition_approval_request_step_id,
+        ))!,
+    });
+    t.nullable.field("comment", {
+      type: "PetitionFieldComment",
+      resolve: async (o, _, ctx) => {
+        return await ctx.petitions.loadPetitionFieldComment(o.data.petition_comment_id);
+      },
+    });
+  },
+);
+
+export const PetitionApprovalRequestStepSkippedEvent = createPetitionEvent(
+  "PetitionApprovalRequestStepSkippedEvent",
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
+      },
+    });
+    t.nonNull.field("approvalRequestStep", {
+      type: "PetitionApprovalRequestStep",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.approvalRequests.loadPetitionApprovalRequestStep(
+          o.data.petition_approval_request_step_id,
+        ))!;
+      },
+    });
+    t.nullable.field("comment", {
+      type: "PetitionFieldComment",
+      resolve: async (o, _, ctx) => {
+        if (isNullish(o.data.petition_comment_id)) {
+          return null;
+        }
+        return await ctx.petitions.loadPetitionFieldComment(o.data.petition_comment_id);
+      },
+    });
+  },
+);
+
+export const PetitionApprovalRequestStepReminderEvent = createPetitionEvent(
+  "PetitionApprovalRequestStepReminderEvent",
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
+      },
+    });
+    t.nonNull.field("approvalRequestStep", {
+      type: "PetitionApprovalRequestStep",
+      resolve: async (o, _, ctx) =>
+        (await ctx.approvalRequests.loadPetitionApprovalRequestStep(
+          o.data.petition_approval_request_step_id,
+        ))!,
+    });
+  },
+);
+
+export const PetitionApprovalRequestStepFinishedEvent = createPetitionEvent(
+  "PetitionApprovalRequestStepFinishedEvent",
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
+      },
+    });
+    t.nonNull.field("approvalRequestStep", {
+      type: "PetitionApprovalRequestStep",
+      resolve: async (o, _, ctx) =>
+        (await ctx.approvalRequests.loadPetitionApprovalRequestStep(
+          o.data.petition_approval_request_step_id,
+        ))!,
+    });
+  },
+);
+
+export const PetitionApprovalRequestStepCanceledEvent = createPetitionEvent(
+  "PetitionApprovalRequestStepCanceledEvent",
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
+      },
+    });
+    t.nonNull.field("approvalRequestStep", {
+      type: "PetitionApprovalRequestStep",
+      resolve: async (o, _, ctx) =>
+        (await ctx.approvalRequests.loadPetitionApprovalRequestStep(
+          o.data.petition_approval_request_step_id,
+        ))!,
+    });
+  },
+);

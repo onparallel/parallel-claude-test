@@ -8,7 +8,7 @@ import {
   SuggestedSigners_UserFragment,
   Tone,
 } from "@parallel/graphql/__types";
-import { FullPetitionSignerFragment } from "@parallel/utils/apollo/fragments";
+import { Fragments } from "@parallel/utils/apollo/fragments";
 import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { ArrayUnionToUnion } from "@parallel/utils/types";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
@@ -332,7 +332,7 @@ SuggestedSigners.fragments = {
       fragment SuggestedSigners_PetitionSigner on PetitionSigner {
         ...Fragments_FullPetitionSigner
       }
-      ${FullPetitionSignerFragment}
+      ${Fragments.FullPetitionSigner}
     `;
   },
   get PublicContact() {

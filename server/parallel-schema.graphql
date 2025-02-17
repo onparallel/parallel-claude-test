@@ -88,6 +88,37 @@ enum AiCompletionLogStatus {
   PENDING
 }
 
+type ApprovalFlowConfig {
+  """
+  List of users that are assigned to approve this step.
+  """
+  approvers: [User]!
+  name: String!
+  type: ApprovalFlowType!
+
+  """
+  User or UserGroup GID
+  """
+  values: [ID!]!
+  visibility: JSONObject
+}
+
+input ApprovalFlowConfigInput {
+  name: String!
+  type: ApprovalFlowType!
+
+  """
+  User or UserGroup GID
+  """
+  values: [ID!]!
+  visibility: JSONObject
+}
+
+enum ApprovalFlowType {
+  ALL
+  ANY
+}
+
 enum ArchiveFieldGroupReplyIntoProfileConflictResolutionAction {
   APPEND
   IGNORE
@@ -800,6 +831,7 @@ enum FeatureFlag {
   PDF_EXPORT_V2
   PERMISSION_MANAGEMENT
   PETITION_ACCESS_RECIPIENT_URL_FIELD
+  PETITION_APPROVAL_FLOW
   PETITION_SIGNATURE
   PETITION_SUMMARY
   PROFILES
@@ -1171,6 +1203,16 @@ type Mutation {
   ): Petition!
 
   """
+  Approves the current approval request step. The step must be in PENDING status.
+  """
+  approvePetitionApprovalRequestStep(
+    approvalRequestStepId: GID!
+    attachments: [Upload!]
+    message: String!
+    petitionId: GID!
+  ): PetitionApprovalRequestStep!
+
+  """
   Archives the replies of a FIELD_GROUP field into a profile
   """
   archiveFieldGroupReplyIntoProfile(
@@ -1212,6 +1254,19 @@ type Mutation {
   Submits multiple replies on a petition at once given a JSON input where the keys are field aliases and values are the replie(s) for that field.
   """
   bulkCreatePetitionReplies(petitionId: GID!, replies: JSONObject!): Petition!
+
+  """
+  Cancels the provided approval request step, setting it as CANCELED and effectively canceling the whole request. The step must be in PENDING status.
+  """
+  cancelPetitionApprovalRequestFlow(petitionId: GID!): PetitionApprovalRequestStep!
+
+  """
+  Cancels the provided approval request step, setting it as NOT_STARTED. The step must be in PENDING status.
+  """
+  cancelPetitionApprovalRequestStep(
+    approvalRequestStepId: GID!
+    petitionId: GID!
+  ): PetitionApprovalRequestStep!
 
   """
   Cancels a scheduled petition message.
@@ -1278,6 +1333,7 @@ type Mutation {
   """
   Marks a petition as COMPLETED.
   If the petition has a signature configured and does not require a review, starts the signing process.
+  It the petition has a configured approval flow, calculates and creates every
   """
   completePetition(
     additionalSigners: [PublicPetitionSignerDataInput!]
@@ -2279,6 +2335,20 @@ type Mutation {
   petitionAttachmentUploadComplete(attachmentId: GID!, petitionId: GID!): PetitionAttachment!
 
   """
+  Generates a download link for a comment attachment
+  """
+  petitionCommentAttachmentDownloadLink(
+    attachmentId: GID!
+    commentId: GID!
+    petitionId: GID!
+
+    """
+    If true will use content-disposition inline instead of attachment
+    """
+    preview: Boolean
+  ): FileUploadDownloadLinkResult!
+
+  """
   Generates a download link for a field attachment
   """
   petitionFieldAttachmentDownloadLink(
@@ -2571,6 +2641,17 @@ type Mutation {
   reactivateAccesses(accessIds: [GID!]!, petitionId: GID!): [PetitionAccess!]!
 
   """
+  Rejects the current approval request step. Step must be in PENDING status.
+  """
+  rejectPetitionApprovalRequestStep(
+    approvalRequestStepId: GID!
+    attachments: [Upload!]
+    message: String!
+    petitionId: GID!
+    rejectionType: PetitionApprovalRequestStepRejectionType!
+  ): PetitionApprovalRequestStep!
+
+  """
   Removes the password on a petition or template
   """
   removePetitionPassword(petitionId: GID!): SupportMethodResponse!
@@ -2683,6 +2764,14 @@ type Mutation {
   ): [SendPetitionResult!]!
 
   """
+  Sends a reminder to the pending approvers of the provided approval request step. The step must be in PENDING status.
+  """
+  sendPetitionApprovalRequestStepReminder(
+    approvalRequestStepId: GID!
+    petitionId: GID!
+  ): PetitionApprovalRequestStep!
+
+  """
   Sends an email to all contacts of the petition confirming the replies are ok
   """
   sendPetitionClosedNotification(
@@ -2775,6 +2864,15 @@ type Mutation {
   ): FileUploadDownloadLinkResult!
 
   """
+  Skips the provided approval request step. Step must be in NOT_STARTED or PENDING status.
+  """
+  skipPetitionApprovalRequestStep(
+    approvalRequestStepId: GID!
+    message: String!
+    petitionId: GID!
+  ): PetitionApprovalRequestStep!
+
+  """
   Starts the completion of an async field
   """
   startAsyncFieldCompletion(
@@ -2782,6 +2880,16 @@ type Mutation {
     parentReplyId: GID
     petitionId: GID!
   ): AsyncFieldCompletionResponse!
+
+  """
+  Starts an approval request on the provided step. The step must be applicable and next in line.
+  """
+  startPetitionApprovalRequestStep(
+    approvalRequestStepId: GID!
+    attachments: [Upload!]
+    message: String
+    petitionId: GID!
+  ): PetitionApprovalRequestStep!
   startSignatureRequest(
     customDocumentTemporaryFileId: GID
     message: String
@@ -3671,6 +3779,7 @@ type Petition implements PetitionBase {
   Purpose of the anonymization
   """
   anonymizePurpose: String
+  approvalFlowConfig: [ApprovalFlowConfig!]
 
   """
   The attachments linked to this petition
@@ -3706,6 +3815,7 @@ type Petition implements PetitionBase {
   Time when the resource was created.
   """
   createdAt: DateTime!
+  currentApprovalRequestSteps: [PetitionApprovalRequestStep!]
 
   """
   The current signature request.
@@ -3775,6 +3885,7 @@ type Petition implements PetitionBase {
   The general comments for this petition
   """
   generalComments: [PetitionFieldComment!]!
+  hasStartedProcess: Boolean!
 
   """
   The ID of the petition or template.
@@ -3834,6 +3945,7 @@ type Petition implements PetitionBase {
   The name of the petition.
   """
   name: String
+  oldApprovalRequestSteps: [PetitionApprovalRequestStep!]!
   organization: Organization!
   owner: User!
   path: String!
@@ -4032,6 +4144,138 @@ type PetitionAnonymizedEvent implements PetitionEvent {
   type: PetitionEventType!
 }
 
+type PetitionApprovalRequestStep {
+  approvalType: PetitionApprovalRequestStepApprovalType!
+  approvers: [PetitionApprovalRequestStepApprover!]!
+  id: GID!
+  petition: Petition!
+  status: PetitionApprovalRequestStepStatus!
+  stepName: String!
+}
+
+enum PetitionApprovalRequestStepApprovalType {
+  ALL
+  ANY
+}
+
+type PetitionApprovalRequestStepApprovedEvent implements PetitionEvent {
+  approvalRequestStep: PetitionApprovalRequestStep!
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: PetitionBaseMini
+  type: PetitionEventType!
+  user: User
+}
+
+type PetitionApprovalRequestStepApprover {
+  approvedAt: DateTime
+  canceledAt: DateTime
+  id: GID!
+  rejectedAt: DateTime
+  sentAt: DateTime
+  skippedAt: DateTime
+  user: User
+}
+
+type PetitionApprovalRequestStepCanceledEvent implements PetitionEvent {
+  approvalRequestStep: PetitionApprovalRequestStep!
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: PetitionBaseMini
+  type: PetitionEventType!
+  user: User
+}
+
+type PetitionApprovalRequestStepFinishedEvent implements PetitionEvent {
+  approvalRequestStep: PetitionApprovalRequestStep!
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: PetitionBaseMini
+  type: PetitionEventType!
+  user: User
+}
+
+type PetitionApprovalRequestStepRejectedEvent implements PetitionEvent {
+  approvalRequestStep: PetitionApprovalRequestStep!
+  comment: PetitionFieldComment
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: PetitionBaseMini
+  type: PetitionEventType!
+  user: User
+}
+
+enum PetitionApprovalRequestStepRejectionType {
+  DEFINITIVE
+  TEMPORARY
+}
+
+type PetitionApprovalRequestStepReminderEvent implements PetitionEvent {
+  approvalRequestStep: PetitionApprovalRequestStep!
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: PetitionBaseMini
+  type: PetitionEventType!
+  user: User
+}
+
+type PetitionApprovalRequestStepSkippedEvent implements PetitionEvent {
+  approvalRequestStep: PetitionApprovalRequestStep!
+  comment: PetitionFieldComment
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: PetitionBaseMini
+  type: PetitionEventType!
+  user: User
+}
+
+type PetitionApprovalRequestStepStartedEvent implements PetitionEvent {
+  approvalRequestStep: PetitionApprovalRequestStep!
+  comment: PetitionFieldComment
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: PetitionBaseMini
+  type: PetitionEventType!
+  user: User
+}
+
+enum PetitionApprovalRequestStepStatus {
+  APPROVED
+  CANCELED
+  NOT_APPLICABLE
+  NOT_STARTED
+  PENDING
+  REJECTED
+  SKIPPED
+}
+
+input PetitionApprovalsFilterInput {
+  filters: [PetitionApprovalsFilterLine!]!
+  operator: PetitionApprovalsFilterLogicalOperator!
+}
+
+input PetitionApprovalsFilterLine {
+  operator: PetitionApprovalsFilterOperator!
+  value: String!
+}
+
+enum PetitionApprovalsFilterLogicalOperator {
+  AND
+  OR
+}
+
+enum PetitionApprovalsFilterOperator {
+  ASSIGNED_TO
+  STATUS
+}
+
 type PetitionAssociatedEvent implements ProfileEvent {
   createdAt: DateTime!
   data: JSONObject!
@@ -4075,6 +4319,7 @@ interface PetitionBase {
   Purpose of the anonymization
   """
   anonymizePurpose: String
+  approvalFlowConfig: [ApprovalFlowConfig!]
 
   """
   The attachments linked to this petition
@@ -4324,6 +4569,18 @@ type PetitionClosedNotifiedEvent implements PetitionEvent {
   user: User
 }
 
+"""
+A file attachment on the petition field comment
+"""
+type PetitionCommentAttachment implements CreatedAt {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  file: FileUpload!
+  id: GID!
+}
+
 type PetitionCompletedEvent implements PetitionEvent {
   completedBy: UserOrPetitionAccess
   createdAt: DateTime!
@@ -4423,6 +4680,13 @@ enum PetitionEventType {
   MESSAGE_SENT
   OWNERSHIP_TRANSFERRED
   PETITION_ANONYMIZED
+  PETITION_APPROVAL_REQUEST_STEP_APPROVED
+  PETITION_APPROVAL_REQUEST_STEP_CANCELED
+  PETITION_APPROVAL_REQUEST_STEP_FINISHED
+  PETITION_APPROVAL_REQUEST_STEP_REJECTED
+  PETITION_APPROVAL_REQUEST_STEP_REMINDER
+  PETITION_APPROVAL_REQUEST_STEP_SKIPPED
+  PETITION_APPROVAL_REQUEST_STEP_STARTED
   PETITION_CLONED
   PETITION_CLOSED
   PETITION_CLOSED_NOTIFIED
@@ -4603,6 +4867,13 @@ type PetitionFieldAttachmentUploadData {
 A comment on a petition field
 """
 type PetitionFieldComment {
+  approvalMetadata: JSONObject
+
+  """
+  A list of files attached to this comment.
+  """
+  attachments: [PetitionCommentAttachment!]!
+
   """
   The author of the comment.
   """
@@ -4634,6 +4905,11 @@ type PetitionFieldComment {
   """
   id: GID!
   isAnonymized: Boolean!
+
+  """
+  Whether the comment is part of approval process (only visible to org users and cannot be deleted or edited)
+  """
+  isApproval: Boolean!
 
   """
   Whether the comment has been edited after being published.
@@ -4917,6 +5193,7 @@ enum PetitionFieldType {
 }
 
 input PetitionFilter {
+  approvals: PetitionApprovalsFilterInput
   fromTemplateId: [GID!]
   locale: PetitionLocale
   path: String
@@ -4965,6 +5242,7 @@ type PetitionListView implements ListView {
 }
 
 enum PetitionListViewColumn {
+  approvals
   createdAt
   fromTemplateId
   lastActivityAt
@@ -4980,6 +5258,7 @@ enum PetitionListViewColumn {
 }
 
 type PetitionListViewData {
+  approvals: PetitionListViewDataApprovals
   columns: [PetitionListViewColumn!]
   fromTemplateId: [GID!]
   path: String!
@@ -4992,7 +5271,18 @@ type PetitionListViewData {
   tagsFilters: PetitionListViewDataTags
 }
 
+type PetitionListViewDataApprovals {
+  filters: [PetitionListViewDataApprovalsFilters!]!
+  operator: PetitionApprovalsFilterLogicalOperator!
+}
+
+type PetitionListViewDataApprovalsFilters {
+  operator: PetitionApprovalsFilterOperator!
+  value: String!
+}
+
 input PetitionListViewDataInput {
+  approvals: PetitionApprovalsFilterInput
   columns: [PetitionListViewColumn!]
   fromTemplateId: [GID!]
   path: String
@@ -5527,6 +5817,7 @@ type PetitionTemplate implements PetitionBase {
   Purpose of the anonymization
   """
   anonymizePurpose: String
+  approvalFlowConfig: [ApprovalFlowConfig!]
 
   """
   The attachments linked to this petition
@@ -6774,6 +7065,11 @@ type PublicPetition implements Timestamps {
   generalComments: [PublicPetitionFieldComment!]!
 
   """
+  Whether the petition has an ongoing signature or approval request
+  """
+  hasStartedProcess: Boolean!
+
+  """
   Shows if the petition has unread comments
   """
   hasUnreadComments: Boolean!
@@ -8008,6 +8304,11 @@ type SignatureConfig {
   review: Boolean!
 
   """
+  Whether the review should be done after the approval process.
+  """
+  reviewAfterApproval: Boolean
+
+  """
   The signers of the generated document.
   """
   signers: [PetitionSigner]!
@@ -8053,6 +8354,11 @@ input SignatureConfigInput {
   If true, lets the user review the replies before starting the signature process
   """
   review: Boolean!
+
+  """
+  Whether to review the replies after completing the approval steps. If true, review must be true
+  """
+  reviewAfterApproval: Boolean
   signersInfo: [SignatureConfigInputSigner!]!
   signingMode: SignatureConfigSigningMode!
 
@@ -8436,6 +8742,7 @@ input UpdatePetitionFieldReplyInput {
 input UpdatePetitionInput {
   anonymizeAfterMonths: Int
   anonymizePurpose: String
+  approvalFlowConfig: [ApprovalFlowConfigInput!]
   automaticNumberingConfig: AutomaticNumberingConfigInput
   closingEmailBody: JSON
   completingMessageBody: JSON

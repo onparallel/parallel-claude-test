@@ -44,8 +44,11 @@ import {
   usePetitionStateWrapper,
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
+import { PetitionApprovalsDefinitiveRejectedAlert } from "@parallel/components/petition-common/PetitionApprovalsDefinitiveRejectedAlert";
 import { PetitionCompletedAlert } from "@parallel/components/petition-common/PetitionCompletedAlert";
+import { PetitionPreviewApprovalsAlert } from "@parallel/components/petition-common/PetitionPreviewApprovalsAlert";
 import { PetitionPreviewSignatureReviewAlert } from "@parallel/components/petition-common/PetitionPreviewSignatureReviewAlert";
+import { useConfirmCancelPetitionApprovalDialog } from "@parallel/components/petition-common/dialogs/ConfirmCancelPetitionApprovalDialog";
 import {
   ConfirmPetitionSignersDialog,
   ConfirmPetitionSignersDialogResult,
@@ -73,6 +76,7 @@ import { RecipientViewRefreshRepliesAlert } from "@parallel/components/recipient
 import { RecipientViewSidebarContextProvider } from "@parallel/components/recipient-view/RecipientViewSidebarContextProvider";
 import {
   PetitionPreview_PetitionBaseFragment,
+  PetitionPreview_cancelPetitionApprovalRequestFlowDocument,
   PetitionPreview_completePetitionDocument,
   PetitionPreview_petitionDocument,
   PetitionPreview_updatePetitionDocument,
@@ -498,7 +502,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     }
   }, []);
 
-  const displayPetitionLimitReachedAlert =
+  const showPetitionLimitReachedAlert =
     me.organization.isPetitionUsageLimitReached && isPetition && petition.status === "DRAFT";
 
   const showGeneratePrefilledPublicLinkButton =
@@ -528,7 +532,25 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     isPetition &&
     !petition.signatureConfig?.review &&
     ["COMPLETED", "CLOSED"].includes(petition.status) &&
-    !petition.isAnonymized;
+    !petition.isAnonymized &&
+    !petition.hasStartedProcess;
+
+  const approvalIsDefinitiveRejected =
+    (isPetition && petition.currentApprovalRequestSteps?.some((s) => s.status === "REJECTED")) ??
+    false;
+
+  const showSignatureAlert =
+    isPetition &&
+    petition.status === "COMPLETED" &&
+    petition.signatureConfig?.review &&
+    !approvalIsDefinitiveRejected &&
+    !petition.signatureConfig?.reviewAfterApproval;
+
+  const showApprovalsAlert =
+    isPetition &&
+    petition.hasStartedProcess &&
+    !approvalIsDefinitiveRejected &&
+    (!showSignatureAlert || (showSignatureAlert && petition.signatureConfig?.reviewAfterApproval));
 
   const extendFlexColumn = {
     display: "flex",
@@ -575,6 +597,19 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
       isRead: false,
     });
   }
+
+  const [cancelPetitionApprovalRequestFlow] = useMutation(
+    PetitionPreview_cancelPetitionApprovalRequestFlowDocument,
+  );
+  const showConfirmCancelPetitionApprovalDialog = useConfirmCancelPetitionApprovalDialog();
+  const handleCancelApprovals = useCallback(async () => {
+    try {
+      await showConfirmCancelPetitionApprovalDialog();
+      await cancelPetitionApprovalRequestFlow({
+        variables: { petitionId: petition.id },
+      });
+    } catch {}
+  }, [petition]);
 
   const isMobile = useBreakpointValue({ base: true, lg: false });
 
@@ -724,7 +759,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               canFinalize={canFinalize}
               onFinalize={handleFinalize}
               isDisabled={
-                displayPetitionLimitReachedAlert ||
+                showPetitionLimitReachedAlert ||
                 petition.isAnonymized ||
                 myEffectivePermission === "READ"
               }
@@ -770,13 +805,15 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 </HStack>
               </Alert>
             ) : null}
-            {isPetition && petition.status === "COMPLETED" && petition.signatureConfig?.review ? (
-              <PetitionPreviewSignatureReviewAlert />
-            ) : null}
-            {displayPetitionLimitReachedAlert ? (
+
+            {showSignatureAlert ? <PetitionPreviewSignatureReviewAlert /> : null}
+
+            {showPetitionLimitReachedAlert ? (
               <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
             ) : null}
+
             {showPetitionCompletedAlert ? <PetitionCompletedAlert /> : null}
+
             {showRefreshRepliesAlert ? (
               <RecipientViewRefreshRepliesAlert
                 onRefetch={async () => {
@@ -785,6 +822,12 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 }}
               />
             ) : null}
+
+            {showApprovalsAlert ? (
+              <PetitionPreviewApprovalsAlert onCancelApprovals={handleCancelApprovals} />
+            ) : null}
+
+            {approvalIsDefinitiveRejected ? <PetitionApprovalsDefinitiveRejectedAlert /> : null}
           </Box>
           <OverrideWithOrganizationTheme
             cssVarsRoot=".with-organization-brand-theme"
@@ -863,7 +906,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                                 isDisabled={
                                   (isPetition && petition.status === "CLOSED") ||
                                   petition.isAnonymized ||
-                                  displayPetitionLimitReachedAlert
+                                  showPetitionLimitReachedAlert ||
+                                  (isPetition && petition.hasStartedProcess)
                                 }
                                 isCacheOnly={!isPetition}
                                 myEffectivePermission={myEffectivePermission}
@@ -975,6 +1019,7 @@ const _fragments = {
         permissionType
       }
       ... on Petition {
+        hasStartedProcess
         ...PetitionPreviewStartSignatureButton_Petition
         unreadGeneralCommentCount
         accesses {
@@ -983,6 +1028,10 @@ const _fragments = {
           isContactless
         }
         signatureRequests {
+          id
+          status
+        }
+        currentApprovalRequestSteps {
           id
           status
         }
@@ -1027,6 +1076,7 @@ const _fragments = {
       }
       signatureConfig {
         review
+        reviewAfterApproval
         timezone
         ...ConfirmPetitionSignersDialog_SignatureConfig
       }
@@ -1110,6 +1160,22 @@ const _mutations = [
       }
     }
     ${_fragments.PetitionBase}
+  `,
+
+  gql`
+    mutation PetitionPreview_cancelPetitionApprovalRequestFlow($petitionId: GID!) {
+      cancelPetitionApprovalRequestFlow(petitionId: $petitionId) {
+        id
+        petition {
+          id
+          hasStartedProcess
+          currentApprovalRequestSteps {
+            id
+            status
+          }
+        }
+      }
+    }
   `,
 ];
 

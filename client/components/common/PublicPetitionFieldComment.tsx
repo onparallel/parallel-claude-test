@@ -3,7 +3,7 @@ import { Box, Button, Circle, MenuItem, MenuList, Spacer, Stack, Text } from "@c
 import { PublicPetitionFieldComment_PublicPetitionFieldCommentFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
-import { KeyboardEvent, useRef, useState } from "react";
+import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
 import { DateTime } from "./DateTime";
@@ -28,12 +28,18 @@ export function PublicPetitionFieldComment({
 
   const isAuthor = comment.author?.__typename === "PublicContact" && comment.author.isMe;
 
+  useEffect(() => {
+    if (isEditing) {
+      requestAnimationFrame(() => {
+        editorRef.current?.focus();
+        editorRef.current?.setSelectionRange(content.length, content.length);
+      });
+    }
+  }, [isEditing]);
+
   function handleEditClick() {
     setContent(comment.contentPlainText ?? "");
     setIsEditing(true);
-    setTimeout(() => {
-      editorRef.current?.focus();
-    }, 100);
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {

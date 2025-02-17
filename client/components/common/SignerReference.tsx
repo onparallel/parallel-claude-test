@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Text, TextProps } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { SignerReference_PetitionSignerFragment } from "@parallel/graphql/__types";
-import { FullPetitionSignerFragment } from "@parallel/utils/apollo/fragments";
+import { Fragments } from "@parallel/utils/apollo/fragments";
 import { Maybe } from "@parallel/utils/types";
 import { DeletedContact } from "./DeletedContact";
 
@@ -31,6 +31,6 @@ SignerReference.fragments = {
     fragment SignerReference_PetitionSigner on PetitionSigner {
       ...Fragments_FullPetitionSigner
     }
-    ${FullPetitionSignerFragment}
+    ${Fragments.FullPetitionSigner}
   `,
 };

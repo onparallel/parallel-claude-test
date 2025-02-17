@@ -10,6 +10,9 @@ import { internalSignaturitAccountDepletedCredits } from "./emails/internal-sign
 import { invitation } from "./emails/invitation";
 import { organizationLimitsReached } from "./emails/organization-limits-reached";
 import { petitionAccessDelegated } from "./emails/petition-access-delegated";
+import { petitionApprovalRequestStepCanceled } from "./emails/petition-approval-request-step-canceled";
+import { petitionApprovalRequestStepFinished } from "./emails/petition-approval-request-step-finished";
+import { petitionApprovalRequestStepPending } from "./emails/petition-approval-request-step-pending";
 import { petitionClosedNotification } from "./emails/petition-closed-notification";
 import { petitionCompleted } from "./emails/petition-completed";
 import { petitionMessage } from "./emails/petition-message";
@@ -50,6 +53,9 @@ const builders = {
   "transfer-parallels": transferParallels,
   "profiles-expiring-properties": profilesExpiringProperties,
   "background-check-monitoring-changes": backgroundCheckMonitoringChanges,
+  "petition-approval-request-step-pending": petitionApprovalRequestStepPending,
+  "petition-approval-request-step-finished": petitionApprovalRequestStepFinished,
+  "petition-approval-request-step-canceled": petitionApprovalRequestStepCanceled,
 };
 
 export type EmailType = keyof typeof builders;

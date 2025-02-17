@@ -191,6 +191,23 @@ function assertOneOf<T>(value: any, options: T[], errorMessage?: string): assert
   assert(options.includes(value), errorMessage);
 }
 
+export function validateFieldLogicSchema(
+  logic: any,
+  fieldIdType: "string" | "number",
+): asserts logic is PetitionFieldLogic {
+  // validate input JSON schema before anything
+  const logicSchemaValidator = new Ajv({
+    allowUnionTypes: true,
+  }).compile<PetitionFieldLogic>(PETITION_FIELD_LOGIC_SCHEMA(fieldIdType));
+  const fieldLogic = {
+    visibility: logic.visibility ?? null,
+    math: logic.math ?? null,
+  };
+  if (!logicSchemaValidator(fieldLogic)) {
+    throw new Error(JSON.stringify(logicSchemaValidator.errors));
+  }
+}
+
 export function validateReferencingFieldsPositions<
   TField extends Pick<PetitionField, "id" | "position" | "parent_petition_field_id">,
 >(field: TField, referencedField: TField, allFields: TField[]) {
@@ -238,7 +255,7 @@ export async function validateFieldLogic<
     | "parent_petition_field_id"
   >,
 >(
-  field: TField,
+  field: Partial<TField>,
   allFields: TField[],
   props: {
     variables: PetitionVariable[];
@@ -257,14 +274,19 @@ export async function validateFieldLogic<
 
       assert(
         referencedField !== undefined,
-        `Can't find PetitionField:${c.fieldId} referenced in PetitionField:${field.id}, condition ${index}`,
+        `Can't find PetitionField:${c.fieldId} referenced in condition ${index}`,
       );
 
       if (!opts?.allowSelfReference) {
         assert(field.id !== referencedField.id, "Can't add a reference to field itself");
       }
-
-      validateReferencingFieldsPositions(field, referencedField, allFields);
+      if (
+        isNonNullish(field.id) &&
+        isNonNullish(field.position) &&
+        field.parent_petition_field_id !== undefined
+      ) {
+        validateReferencingFieldsPositions(field as any, referencedField, allFields);
+      }
 
       assert(referencedField.type !== "HEADING", `Conditions can't reference HEADING fields`);
       assert(
@@ -436,17 +458,11 @@ export async function validateFieldLogic<
   }
 
   if (!skipJsonSchemaValidation) {
-    const validator = new Ajv({
-      allowUnionTypes: true,
-    }).compile<PetitionFieldLogic>(PETITION_FIELD_LOGIC_SCHEMA("number"));
-
-    if (!validator(field)) {
-      throw new Error(JSON.stringify(validator.errors));
-    }
+    validateFieldLogicSchema(field, "number");
   }
 
   assert(
-    !field.visibility || field.type !== "HEADING" || !field.options.hasPageBreak,
+    !field.visibility || field.type !== "HEADING" || !field.options?.hasPageBreak,
     `Can't add visibility conditions on a heading with page break`,
   );
 
@@ -487,17 +503,12 @@ export function validateFieldLogicInput<
         return;
       }
 
-      // validate input JSON schema before anything
-      const logicSchemaValidator = new Ajv({
-        allowUnionTypes: true,
-      }).compile<PetitionFieldLogic>(PETITION_FIELD_LOGIC_SCHEMA("string"));
       const fieldLogic = {
         visibility: _fieldLogic.visibility ?? null,
         math: _fieldLogic.math ?? null,
       };
-      if (!logicSchemaValidator(fieldLogic)) {
-        throw new Error(JSON.stringify(logicSchemaValidator.errors));
-      }
+      // validate input JSON schema before anything
+      validateFieldLogicSchema(fieldLogic, "string");
 
       const petitionId = getArg(args, petitionIdProp);
       const fieldId = getArg(args, fieldIdProp);

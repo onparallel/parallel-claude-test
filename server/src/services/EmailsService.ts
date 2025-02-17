@@ -91,6 +91,30 @@ export interface IEmailsService {
     userId: number,
     profileFieldValues: { profileId: number; profileTypeFieldId: number }[],
   ): Promise<void>;
+  sendPetitionApprovalRequestStepPendingEmail(
+    approvalRequestStepId: number,
+    petitionCommentId: number | null,
+    userId: number,
+  ): Promise<void>;
+  sendPetitionApprovalRequestStepReminderEmail(
+    approvalRequestStepId: number,
+    userId: number,
+  ): Promise<void>;
+  sendPetitionApprovalRequestStepApprovedEmail(
+    approvalRequestStepId: number,
+    petitionCommentId: number,
+    userId: number,
+  ): Promise<void>;
+  sendPetitionApprovalRequestStepRejectedEmail(
+    approvalRequestStepId: number,
+    rejectionType: "TEMPORARY" | "DEFINITIVE",
+    petitionCommentId: number,
+    userId: number,
+  ): Promise<void>;
+  sendPetitionApprovalRequestStepCanceledEmail(
+    approvalRequestStepId: number,
+    userId: number,
+  ): Promise<void>;
 }
 export const EMAILS = Symbol.for("EMAILS");
 
@@ -372,6 +396,72 @@ export class EmailsService implements IEmailsService {
       ]),
       userId,
       profileFieldValues,
+    });
+  }
+
+  async sendPetitionApprovalRequestStepPendingEmail(
+    approvalRequestStepId: number,
+    petitionCommentId: number | null,
+    userId: number,
+  ) {
+    return await this.enqueueEmail("petition-approval-request-step-pending", {
+      id: this.buildQueueId("PetitionApprovalRequestStepPending", [approvalRequestStepId, userId]),
+      petition_approval_request_step_id: approvalRequestStepId,
+      petition_comment_id: petitionCommentId,
+      user_id: userId,
+      is_reminder: false,
+    });
+  }
+
+  async sendPetitionApprovalRequestStepReminderEmail(
+    approvalRequestStepId: number,
+    userId: number,
+  ) {
+    return await this.enqueueEmail("petition-approval-request-step-pending", {
+      id: this.buildQueueId("PetitionApprovalRequestStepPending", [approvalRequestStepId, userId]),
+      petition_approval_request_step_id: approvalRequestStepId,
+      petition_comment_id: null,
+      user_id: userId,
+      is_reminder: true,
+    });
+  }
+
+  async sendPetitionApprovalRequestStepApprovedEmail(
+    approvalRequestStepId: number,
+    petitionCommentId: number,
+    userId: number,
+  ) {
+    return await this.enqueueEmail("petition-approval-request-step-finished", {
+      id: this.buildQueueId("PetitionApprovalRequestStepApproved", [approvalRequestStepId, userId]),
+      petition_approval_request_step_id: approvalRequestStepId,
+      petition_comment_id: petitionCommentId,
+      user_id: userId,
+    });
+  }
+
+  async sendPetitionApprovalRequestStepRejectedEmail(
+    approvalRequestStepId: number,
+    rejectionType: "TEMPORARY" | "DEFINITIVE",
+    petitionCommentId: number,
+    userId: number,
+  ) {
+    return await this.enqueueEmail("petition-approval-request-step-finished", {
+      id: this.buildQueueId("PetitionApprovalRequestStepRejected", [approvalRequestStepId, userId]),
+      petition_approval_request_step_id: approvalRequestStepId,
+      petition_comment_id: petitionCommentId,
+      user_id: userId,
+      rejection_type: rejectionType,
+    });
+  }
+
+  async sendPetitionApprovalRequestStepCanceledEmail(
+    approvalRequestStepId: number,
+    userId: number,
+  ) {
+    return await this.enqueueEmail("petition-approval-request-step-canceled", {
+      id: this.buildQueueId("PetitionApprovalRequestStepCanceled", [approvalRequestStepId, userId]),
+      petition_approval_request_step_id: approvalRequestStepId,
+      user_id: userId,
     });
   }
 

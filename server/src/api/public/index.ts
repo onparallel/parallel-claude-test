@@ -1053,13 +1053,23 @@ export function publicApi(container: Container) {
         ${PetitionFragment}
       `;
 
-      const result = await client.request(ClosePetition_closePetitionDocument, {
-        petitionId: params.petitionId,
-        ...getPetitionIncludesFromQuery(query),
-      });
+      try {
+        const result = await client.request(ClosePetition_closePetitionDocument, {
+          petitionId: params.petitionId,
+          ...getPetitionIncludesFromQuery(query),
+        });
 
-      assert("id" in result.closePetition!);
-      return Ok(mapPetition(result.closePetition!));
+        assert("id" in result.closePetition!);
+        return Ok(mapPetition(result.closePetition!));
+      } catch (error) {
+        if (
+          containsGraphQLError(error, "ONGOING_SIGNATURE_REQUEST_ERROR") ||
+          containsGraphQLError(error, "ONGOING_APPROVAL_REQUEST_ERROR")
+        ) {
+          throw new ForbiddenError(error.message);
+        }
+        throw error;
+      }
     },
   );
 
@@ -1833,6 +1843,12 @@ export function publicApi(container: Container) {
           if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
             throw new BadRequestError("Invalid request body");
           }
+          if (
+            containsGraphQLError(error, "ONGOING_SIGNATURE_REQUEST_ERROR") ||
+            containsGraphQLError(error, "ONGOING_APPROVAL_REQUEST_ERROR")
+          ) {
+            throw new ForbiddenError(error.message);
+          }
 
           throw error;
         }
@@ -2253,8 +2269,12 @@ export function publicApi(container: Container) {
             );
           } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
             throw new ForbiddenError("You don't have enough credits to submit a reply");
+          } else if (
+            containsGraphQLError(error, "ONGOING_SIGNATURE_REQUEST_ERROR") ||
+            containsGraphQLError(error, "ONGOING_APPROVAL_REQUEST_ERROR")
+          ) {
+            throw new ForbiddenError(error.message);
           }
-
           throw error;
         }
       },
@@ -2378,6 +2398,11 @@ export function publicApi(container: Container) {
             });
           } else if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
             throw new BadRequestError("The reply is already approved and cannot be modified.");
+          } else if (
+            containsGraphQLError(error, "ONGOING_SIGNATURE_REQUEST_ERROR") ||
+            containsGraphQLError(error, "ONGOING_APPROVAL_REQUEST_ERROR")
+          ) {
+            throw new ForbiddenError(error.message);
           }
 
           throw error;
@@ -2415,7 +2440,13 @@ export function publicApi(container: Container) {
             throw new ConflictError(
               "You can't delete the last reply of a required FIELD_GROUP field",
             );
+          } else if (
+            containsGraphQLError(error, "ONGOING_SIGNATURE_REQUEST_ERROR") ||
+            containsGraphQLError(error, "ONGOING_APPROVAL_REQUEST_ERROR")
+          ) {
+            throw new ForbiddenError(error.message);
           }
+
           throw error;
         }
       },
@@ -2522,6 +2553,11 @@ export function publicApi(container: Container) {
         } catch (error) {
           if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
             throw new ForbiddenError("You don't have enough credits to submit a reply");
+          } else if (
+            containsGraphQLError(error, "ONGOING_SIGNATURE_REQUEST_ERROR") ||
+            containsGraphQLError(error, "ONGOING_APPROVAL_REQUEST_ERROR")
+          ) {
+            throw new ForbiddenError(error.message);
           }
           throw error;
         }
@@ -3178,6 +3214,8 @@ export function publicApi(container: Container) {
             throw new ConflictError("Please, provide a document to be signed");
           } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
             throw new ForbiddenError("You don't have enough credits to complete this parallel");
+          } else if (containsGraphQLError(error, "APPROVAL_REQUEST_STEP_NOT_COMPLETED")) {
+            throw new ForbiddenError(error.message);
           } else if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
             const { error_code: errorCode } = error.response.errors![0].extensions.extra as {
               error_code: string;

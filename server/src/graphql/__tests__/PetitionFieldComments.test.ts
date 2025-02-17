@@ -695,6 +695,39 @@ describe("GraphQL/Petition Fields Comments", () => {
         content,
       });
     });
+
+    it("sends error if its an approval request comment", async () => {
+      const [comment] = await mocks.createRandomCommentsFromUser(
+        user.id,
+        readField.id,
+        readPetition.id,
+        1,
+        () => ({ approval_metadata: JSON.stringify({ stepName: "Step 1", status: "APPROVED" }) }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldCommentId: GID!, $content: JSON!) {
+            updatePetitionComment(
+              petitionId: $petitionId
+              petitionFieldCommentId: $petitionFieldCommentId
+              content: $content
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          petitionFieldId: toGlobalId("PetitionField", readField.id),
+          petitionFieldCommentId: toGlobalId("PetitionFieldComment", comment.id),
+          content: mocks.createRandomCommentContent(),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("deletePetitionComment", () => {
@@ -812,6 +845,36 @@ describe("GraphQL/Petition Fields Comments", () => {
       expect(data?.deletePetitionComment).toEqual({
         id: toGlobalId("PetitionField", comment.petition_field_id!),
       });
+    });
+
+    it("sends error if its an approval request comment", async () => {
+      const [comment] = await mocks.createRandomCommentsFromUser(
+        user.id,
+        readField.id,
+        readPetition.id,
+        1,
+        () => ({ approval_metadata: JSON.stringify({ stepName: "Step 1", status: "APPROVED" }) }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldCommentId: GID!) {
+            deletePetitionComment(
+              petitionId: $petitionId
+              petitionFieldCommentId: $petitionFieldCommentId
+            ) {
+              __typename
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          petitionFieldCommentId: toGlobalId("PetitionFieldComment", comment.id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 });

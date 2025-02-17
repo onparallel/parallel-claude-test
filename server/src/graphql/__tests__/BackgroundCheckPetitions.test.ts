@@ -57,6 +57,11 @@ describe("Background Check - Petitions", () => {
     await testClient.stop();
   });
 
+  afterEach(async () => {
+    await mocks.knex("petition_signature_request").delete();
+    await mocks.knex("petition_approval_request_step").delete();
+  });
+
   describe("backgroundCheckEntitySearch", () => {
     let backgroundCheckServiceSpy: jest.SpyInstance;
     beforeEach(async () => {
@@ -360,6 +365,56 @@ describe("Background Check - Petitions", () => {
       expect(data).toBeNull();
 
       expect(backgroundCheckServiceSpy).not.toHaveBeenCalled();
+    });
+
+    it("sends error if there is an ongoing signature request", async () => {
+      await mocks.knex
+        .from("petition_signature_request")
+        .insert({ petition_id: petition.id, signature_config: {}, status: "PROCESSED" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($token: String!, $name: String!) {
+            backgroundCheckEntitySearch(token: $token, name: $name) {
+              totalCount
+            }
+          }
+        `,
+        {
+          token: buildToken({ petitionId: petition.id, fieldId: field.id }),
+          name: "Vladimir Putin",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if there is an ongoing approval request", async () => {
+      await mocks.knex.from("petition_approval_request_step").insert({
+        petition_id: petition.id,
+        step_number: 0,
+        step_name: "Step 1",
+        status: "APPROVED",
+        approval_type: "ANY",
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($token: String!, $name: String!) {
+            backgroundCheckEntitySearch(token: $token, name: $name) {
+              totalCount
+            }
+          }
+        `,
+        {
+          token: buildToken({ petitionId: petition.id, fieldId: field.id }),
+          name: "Vladimir Putin",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+      expect(data).toBeNull();
     });
   });
 
@@ -669,6 +724,52 @@ describe("Background Check - Petitions", () => {
         deleted_at: null,
         deleted_by: null,
       });
+    });
+
+    it("sends error if there is an ongoing signature request", async () => {
+      await mocks.knex
+        .from("petition_signature_request")
+        .insert({ petition_id: petition.id, signature_config: {}, status: "PROCESSED" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($token: String!, $entityId: String) {
+            updateBackgroundCheckEntity(token: $token, entityId: $entityId)
+          }
+        `,
+        {
+          token: buildToken({ petitionId: petition.id, fieldId: field.id }),
+          entityId: "Q7747",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if there is an ongoing approval request", async () => {
+      await mocks.knex.from("petition_approval_request_step").insert({
+        petition_id: petition.id,
+        step_number: 0,
+        step_name: "Step 1",
+        status: "APPROVED",
+        approval_type: "ANY",
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($token: String!, $entityId: String) {
+            updateBackgroundCheckEntity(token: $token, entityId: $entityId)
+          }
+        `,
+        {
+          token: buildToken({ petitionId: petition.id, fieldId: field.id }),
+          entityId: "Q7747",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+      expect(data).toBeNull();
     });
   });
 });

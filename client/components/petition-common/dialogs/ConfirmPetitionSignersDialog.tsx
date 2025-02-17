@@ -41,7 +41,7 @@ import {
   ConfirmPetitionSignersDialog_petitionDocument,
   SignatureConfigInputSigner,
 } from "@parallel/graphql/__types";
-import { FullPetitionSignerFragment } from "@parallel/utils/apollo/fragments";
+import { Fragments } from "@parallel/utils/apollo/fragments";
 import { FORMATS } from "@parallel/utils/dates";
 import { downloadLocalFile } from "@parallel/utils/downloadLocalFile";
 import { fullName } from "@parallel/utils/fullName";
@@ -651,7 +651,7 @@ ConfirmPetitionSignersDialog.fragments = {
         ...Fragments_FullPetitionSigner
         ...SelectedSignerRow_PetitionSigner
       }
-      ${FullPetitionSignerFragment}
+      ${Fragments.FullPetitionSigner}
       ${SelectedSignerRow.fragments.PetitionSigner}
     `;
   },

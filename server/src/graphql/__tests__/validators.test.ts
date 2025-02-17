@@ -1,7 +1,7 @@
 import { Knex } from "knex";
 import { createTestContainer } from "../../../test/testContainer";
 import { ApiContext } from "../../context";
-import { Contact, Organization, OrgIntegration, User } from "../../db/__types";
+import { Contact, Organization, OrgIntegration, Petition, User } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { deleteAllData } from "../../util/knexUtils";
@@ -161,6 +161,8 @@ describe("GraphQL custom validators", () => {
 
   describe("validSignatureConfig", () => {
     let contacts: Contact[];
+
+    let petition: Petition;
     beforeAll(async () => {
       await mocks.createFeatureFlags([{ name: "PETITION_SIGNATURE", default_value: false }]);
       await mocks.createFeatureFlagOverride("PETITION_SIGNATURE", {
@@ -189,13 +191,16 @@ describe("GraphQL custom validators", () => {
         },
       ]);
       contacts = await mocks.createRandomContacts(organizations[0].id, 2);
+
+      [petition] = await mocks.createRandomPetitions(organizations[0].id, users[0].id, 1);
     });
 
     it("validates the signature configuration", async () => {
       await expect(
-        validSignatureConfig("config")(
+        validSignatureConfig("petitionId", "config", "approvalFlowConfig")(
           {},
           {
+            petitionId: petition.id,
             config: {
               orgIntegrationId: signatureIntegration.id,
               signersInfo: contacts.map((c) => ({
@@ -209,6 +214,7 @@ describe("GraphQL custom validators", () => {
               allowAdditionalSigners: false,
               review: false,
             },
+            approvalFlowConfig: null,
           },
           { ...ctx, user: users[0] },
           {} as any,
@@ -218,9 +224,10 @@ describe("GraphQL custom validators", () => {
 
     it("throws error if used integration is of another organization", async () => {
       await expect(
-        validSignatureConfig("config")(
+        validSignatureConfig("petitionId", "config", "approvalFlowConfig")(
           {},
           {
+            petitionId: petition.id,
             config: {
               orgIntegrationId: org1SignatureIntegration.id,
               signersInfo: contacts.map((c) => ({
@@ -234,6 +241,7 @@ describe("GraphQL custom validators", () => {
               allowAdditionalSigners: false,
               review: false,
             },
+            approvalFlowConfig: null,
           },
           { ...ctx, user: users[0] },
           {} as any,
@@ -243,9 +251,10 @@ describe("GraphQL custom validators", () => {
 
     it("throws error if used integration is not of type SIGNATURE", async () => {
       await expect(
-        validSignatureConfig("config")(
+        validSignatureConfig("petitionId", "config", "approvalFlowConfig")(
           {},
           {
+            petitionId: petition.id,
             config: {
               orgIntegrationId: ssoIntegration.id,
               signersInfo: contacts.map((c) => ({
@@ -259,6 +268,7 @@ describe("GraphQL custom validators", () => {
               allowAdditionalSigners: false,
               review: false,
             },
+            approvalFlowConfig: null,
           },
           { ...ctx, user: users[0] },
           {} as any,
@@ -268,9 +278,10 @@ describe("GraphQL custom validators", () => {
 
     it("throws error if timezone is invalid", async () => {
       await expect(
-        validSignatureConfig("config")(
+        validSignatureConfig("petitionId", "config", "approvalFlowConfig")(
           {},
           {
+            petitionId: petition.id,
             config: {
               orgIntegrationId: signatureIntegration.id,
               signersInfo: contacts.map((c) => ({
@@ -284,6 +295,7 @@ describe("GraphQL custom validators", () => {
               allowAdditionalSigners: false,
               review: false,
             },
+            approvalFlowConfig: null,
           },
           { ...ctx, user: users[0] },
           {} as any,
@@ -293,9 +305,10 @@ describe("GraphQL custom validators", () => {
 
     it("don't throw error if title is not defined", async () => {
       await expect(
-        validSignatureConfig("config")(
+        validSignatureConfig("petitionId", "config", "approvalFlowConfig")(
           {},
           {
+            petitionId: petition.id,
             config: {
               orgIntegrationId: signatureIntegration.id,
               signersInfo: contacts.map((c) => ({
@@ -308,6 +321,7 @@ describe("GraphQL custom validators", () => {
               allowAdditionalSigners: false,
               review: false,
             },
+            approvalFlowConfig: null,
           },
           { ...ctx, user: users[0] },
           {} as any,
@@ -317,9 +331,10 @@ describe("GraphQL custom validators", () => {
 
     it("doesn't error if user didn't specify signers and recipient is not allowed to choose", async () => {
       await expect(
-        validSignatureConfig("config")(
+        validSignatureConfig("petitionId", "config", "approvalFlowConfig")(
           {},
           {
+            petitionId: petition.id,
             config: {
               orgIntegrationId: signatureIntegration.id,
               signersInfo: [],
@@ -328,6 +343,7 @@ describe("GraphQL custom validators", () => {
               allowAdditionalSigners: false,
               review: false,
             },
+            approvalFlowConfig: null,
           },
           { ...ctx, user: users[0] },
           {} as any,

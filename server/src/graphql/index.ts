@@ -72,3 +72,6 @@ export * from "./profile/types";
 export * from "./dashboard/mutations";
 export * from "./dashboard/queries";
 export * from "./dashboard/types";
+
+export * from "./petition-approval-request/mutations";
+export * from "./petition-approval-request/types";

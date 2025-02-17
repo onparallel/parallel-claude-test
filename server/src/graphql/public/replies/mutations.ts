@@ -39,6 +39,7 @@ import {
   fieldBelongsToAccess,
   fieldIsExternal,
   organizationHasFeatureFlag,
+  publicPetitionDoesNotHaveOngoingProcess,
   publicPetitionIsNotClosed,
   replyBelongsToAccess,
   replyBelongsToExternalField,
@@ -53,6 +54,7 @@ export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetit
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
+    publicPetitionDoesNotHaveOngoingProcess("keycode"),
     fieldHasType(
       (args) => args.fields.map((f) => f.id),
       [
@@ -115,6 +117,7 @@ export const publicUpdatePetitionFieldReplies = mutationField("publicUpdatePetit
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
+    publicPetitionDoesNotHaveOngoingProcess("keycode"),
     replyBelongsToExternalField((args) => args.replies.map((r) => r.id)),
     replyIsForFieldOfType(
       (args) => args.replies.map((r) => r.id),
@@ -168,6 +171,7 @@ export const publicDeletePetitionFieldReply = mutationField("publicDeletePetitio
   type: "PublicPetitionField",
   authorize: chain(
     authenticatePublicAccess("keycode"),
+    publicPetitionDoesNotHaveOngoingProcess("keycode"),
     replyCanBeDeleted("replyId"),
     replyBelongsToExternalField("replyId"),
     replyCanBeUpdated("replyId"),
@@ -261,6 +265,7 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
+    publicPetitionDoesNotHaveOngoingProcess("keycode"),
     fieldIsExternal("fieldId"),
     fieldHasType("fieldId", "FILE_UPLOAD"),
     fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
@@ -368,6 +373,7 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
+    publicPetitionDoesNotHaveOngoingProcess("keycode"),
     fieldIsExternal("fieldId"),
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"]),
     fieldTypeSwitch("fieldId", {
@@ -468,6 +474,7 @@ export const publicRetryAsyncFieldCompletion = mutationField("publicRetryAsyncFi
   },
   authorize: chain(
     authenticatePublicAccess("keycode"),
+    publicPetitionDoesNotHaveOngoingProcess("keycode"),
     fieldIsExternal("fieldId"),
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
     organizationHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD"),

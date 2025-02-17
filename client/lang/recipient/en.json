@@ -495,6 +495,16 @@
     "context": "Information"
   },
   {
+    "term": "component.recipient-view-petition-approvals-alert.alert-description-1",
+    "definition": "<b>Your information is being reviewed.</b> During this process, you will not be able to make changes.",
+    "context": "<b>Your information is being reviewed.</b> During this process, you will not be able to make changes."
+  },
+  {
+    "term": "component.recipient-view-petition-approvals-alert.alert-description-2",
+    "definition": "If you need to correct anything, you can write to us through the enabled comments.",
+    "context": "If you need to correct anything, you can write to us through the enabled comments."
+  },
+  {
     "term": "component.recipient-view-petition-field-card.add-another-reply",
     "definition": "Add another reply",
     "context": "Add another reply"
@@ -736,8 +746,8 @@
   },
   {
     "term": "component.recipient-view-petition-status-alert.petition-completed-alert-1",
-    "definition": "<b>Information completed!</b> We have notified {name} for review and validation.",
-    "context": "<b>Information completed!</b> We have notified {name} for review and validation."
+    "definition": "<b>Information completed!</b> We have notified for review and validation.",
+    "context": "<b>Information completed!</b> We have notified for review and validation."
   },
   {
     "term": "component.recipient-view-petition-status-alert.petition-completed-alert-2",

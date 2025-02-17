@@ -355,6 +355,41 @@
     "context": "Refresh"
   },
   {
+    "term": "component.approve-or-reject-petition-approval-flow-dialog.cannot-undo",
+    "definition": "Once confirmed, the action cannot be undone.",
+    "context": "Once confirmed, the action cannot be undone."
+  },
+  {
+    "term": "component.approve-or-reject-petition-approval-flow-dialog.confirm-submit",
+    "definition": "Confirm and submit",
+    "context": "Confirm and submit"
+  },
+  {
+    "term": "component.approve-or-reject-petition-approval-flow-dialog.final-rejection",
+    "definition": "Final rejection",
+    "context": "Final rejection"
+  },
+  {
+    "term": "component.approve-or-reject-petition-approval-flow-dialog.final-rejection-help",
+    "definition": "With the final rejection, no further progress can be made in the process.",
+    "context": "With the final rejection, no further progress can be made in the process."
+  },
+  {
+    "term": "component.approve-or-reject-petition-approval-flow-dialog.message-placeholder",
+    "definition": "Write a message with your assessment",
+    "context": "Write a message with your assessment"
+  },
+  {
+    "term": "component.approve-or-reject-petition-approval-flow-dialog.request-changes",
+    "definition": "Request changes",
+    "context": "Request changes"
+  },
+  {
+    "term": "component.approve-or-reject-petition-approval-flow-dialog.upload-documents",
+    "definition": "Upload documents",
+    "context": "Upload documents"
+  },
+  {
     "term": "component.appsumo-license-alert.contact-text-max-license",
     "definition": "Contact with us to increase your user and parallel limits.",
     "context": "Contact with us to increase your user and parallel limits."
@@ -1000,6 +1035,56 @@
     "context": "You have {count, plural, =1{# pending process} other{# pending processes}}"
   },
   {
+    "term": "component.configure-approval-steps-dialog.add-approval-button",
+    "definition": "Add approval",
+    "context": "Add approval"
+  },
+  {
+    "term": "component.configure-approval-steps-dialog.add-condition",
+    "definition": "Add condition",
+    "context": "Add condition"
+  },
+  {
+    "term": "component.configure-approval-steps-dialog.all",
+    "definition": "All approve",
+    "context": "All approve"
+  },
+  {
+    "term": "component.configure-approval-steps-dialog.any",
+    "definition": "Any of",
+    "context": "Any of"
+  },
+  {
+    "term": "component.configure-approval-steps-dialog.approval-x",
+    "definition": "Approval {index}",
+    "context": "Approval {index}"
+  },
+  {
+    "term": "component.configure-approval-steps-dialog.body",
+    "definition": "An approval step is activated after completing the form. The parallel cannot be closed until all approval steps have been completed.",
+    "context": "An approval step is activated after completing the form. The parallel cannot be closed until all approval steps have been completed."
+  },
+  {
+    "term": "component.configure-approval-steps-dialog.delete-approval",
+    "definition": "Delete approval",
+    "context": "Delete approval"
+  },
+  {
+    "term": "component.configure-approval-steps-dialog.header",
+    "definition": "Approval steps",
+    "context": "Approval steps"
+  },
+  {
+    "term": "component.configure-approval-steps-dialog.learn-more",
+    "definition": "More about approvals",
+    "context": "More about approvals"
+  },
+  {
+    "term": "component.configure-approval-steps-dialog.select-approvers",
+    "definition": "Select approvers",
+    "context": "Select approvers"
+  },
+  {
     "term": "component.configure-automate-search-dialog.body",
     "definition": "Select the fields to be used to automate the list search.",
     "context": "Select the fields to be used to automate the list search."
@@ -1123,6 +1208,26 @@
     "term": "component.confirm-activate-user-dialog.body",
     "definition": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?",
     "context": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
+  },
+  {
+    "term": "component.confirm-cancel-petition-approval-dialog.body",
+    "definition": "All pending or completed approvals will be cancelled and will have to be started again. This action is not reversible.",
+    "context": "All pending or completed approvals will be cancelled and will have to be started again. This action is not reversible."
+  },
+  {
+    "term": "component.confirm-cancel-petition-approval-dialog.header",
+    "definition": "Cancel approvals",
+    "context": "Cancel approvals"
+  },
+  {
+    "term": "component.confirm-cancel-petition-approval-flow-dialog.body",
+    "definition": "If you continue, the initiated approval will be cancelled and we will notify the approvers. You will be able to restart it later.",
+    "context": "If you continue, the initiated approval will be cancelled and we will notify the approvers. You will be able to restart it later."
+  },
+  {
+    "term": "component.confirm-cancel-petition-approval-flow-dialog.header",
+    "definition": "Do you want to cancel this approval?",
+    "context": "Do you want to cancel this approval?"
   },
   {
     "term": "component.confirm-change-view-all-dialog.body",
@@ -1340,6 +1445,21 @@
     "context": "Delete variable"
   },
   {
+    "term": "component.confirm-disable-ongoing-approvals-petition-close.body",
+    "definition": "There is an ongoing approval process. If you close this parallel now, the process will be cancelled.",
+    "context": "There is an ongoing approval process. If you close this parallel now, the process will be cancelled."
+  },
+  {
+    "term": "component.confirm-disable-ongoing-approvals-petition-close.confirm",
+    "definition": "Cancel approvals and continue",
+    "context": "Cancel approvals and continue"
+  },
+  {
+    "term": "component.confirm-disable-ongoing-approvals.header",
+    "definition": "Ongoing approvals",
+    "context": "Ongoing approvals"
+  },
+  {
     "term": "component.confirm-disable-ongoing-signature-petition-close.body",
     "definition": "There is an ongoing eSignature process. If you close this parallel now, the process will be cancelled.",
     "context": "There is an ongoing eSignature process. If you close this parallel now, the process will be cancelled."
@@ -1463,11 +1583,6 @@
     "term": "component.confirm-overwrite-options-dialog.body",
     "definition": "This field has options added. If you continue, they will be overwritten with the ones from the provided list.",
     "context": "This field has options added. If you continue, they will be overwritten with the ones from the provided list."
-  },
-  {
-    "term": "component.confirm-overwrite-options-dialog.confirm",
-    "definition": "Are you sure you want to continue?",
-    "context": "Are you sure you want to continue?"
   },
   {
     "term": "component.confirm-overwrite-options-dialog.header",
@@ -1755,6 +1870,16 @@
     "context": "The following contacts have opted out from receiving reminders for this parallel:"
   },
   {
+    "term": "component.confirm-send-reminder-petition-approval-flow-dialog.body",
+    "definition": "We will send a reminder to all users who have not yet been approved. Do you want to continue?",
+    "context": "We will send a reminder to all users who have not yet been approved. Do you want to continue?"
+  },
+  {
+    "term": "component.confirm-send-reminder-petition-approval-flow-dialog.header",
+    "definition": "Send reminder",
+    "context": "Send reminder"
+  },
+  {
     "term": "component.confirm-send-signature-reminder.body",
     "definition": "We will send a reminder to all contacts who still need to sign. Do you want to continue?",
     "context": "We will send a reminder to all contacts who still need to sign. Do you want to continue?"
@@ -1798,6 +1923,21 @@
     "term": "component.confirm-skip-forward-security.header",
     "definition": "Disable Forward Security",
     "context": "Disable Forward Security"
+  },
+  {
+    "term": "component.confirm-skip-petition-approval-flow-dialog.body",
+    "definition": "If you proceed, this step will be skipped and automatically approved, allowing you to continue the process. This action cannot be undone.",
+    "context": "If you proceed, this step will be skipped and automatically approved, allowing you to continue the process. This action cannot be undone."
+  },
+  {
+    "term": "component.confirm-skip-petition-approval-flow-dialog.header",
+    "definition": "Do you want to force this approval?",
+    "context": "Do you want to force this approval?"
+  },
+  {
+    "term": "component.confirm-skip-petition-approval-flow-dialog.message-placeholder",
+    "definition": "Write the reason for forcing the approval",
+    "context": "Write the reason for forcing the approval"
   },
   {
     "term": "component.confirm-transfer-petition-ownership-dialog.confirm-button",
@@ -3535,6 +3675,16 @@
     "context": "API access to the recipient's URL"
   },
   {
+    "term": "component.feature-flag-descriptions.petition-approval-flow-description",
+    "definition": "Allows setting up approval steps for petitions",
+    "context": "Allows setting up approval steps for petitions"
+  },
+  {
+    "term": "component.feature-flag-descriptions.petition-approval-flow-name",
+    "definition": "Approval steps",
+    "context": "Approval steps"
+  },
+  {
     "term": "component.feature-flag-descriptions.petition-signature-description",
     "definition": "Activates the signature integrations section so that the signature providers can be created and used.",
     "context": "Activates the signature integrations section so that the signature providers can be created and used."
@@ -3708,6 +3858,16 @@
     "term": "component.field-used-for-searches.see-configuration",
     "definition": "See configuration",
     "context": "See configuration"
+  },
+  {
+    "term": "component.file-attachment.label",
+    "definition": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete.",
+    "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
+  },
+  {
+    "term": "component.file-attachment.remove-attachment",
+    "definition": "Remove attachment",
+    "context": "Remove attachment"
   },
   {
     "term": "component.file-export-access-icon-button.access-file",
@@ -5120,6 +5280,136 @@
     "context": "Status"
   },
   {
+    "term": "component.petition-approvals-card.approved-at",
+    "definition": "Approved: {date}",
+    "context": "Approved: {date}"
+  },
+  {
+    "term": "component.petition-approvals-card.approved-toast-title",
+    "definition": "<b>{stepName}</b> was approved successfully",
+    "context": "<b>{stepName}</b> was approved successfully"
+  },
+  {
+    "term": "component.petition-approvals-card.approvers",
+    "definition": "Approvers ({approvalType, select, ANY{Any} other{All}})",
+    "context": "Approvers ({approvalType, select, ANY{Any} other{All}})"
+  },
+  {
+    "term": "component.petition-approvals-card.canceled-at",
+    "definition": "Canceled: {date}",
+    "context": "Canceled: {date}"
+  },
+  {
+    "term": "component.petition-approvals-card.canceled-toast-description",
+    "definition": "<b>{stepName}</b> was canceled successfully",
+    "context": "<b>{stepName}</b> was canceled successfully"
+  },
+  {
+    "term": "component.petition-approvals-card.conditioned-approval-poppover",
+    "definition": "This approval step is conditioned by the replies.",
+    "context": "This approval step is conditioned by the replies."
+  },
+  {
+    "term": "component.petition-approvals-card.force-approval",
+    "definition": "Force approval",
+    "context": "Force approval"
+  },
+  {
+    "term": "component.petition-approvals-card.no-approvers",
+    "definition": "No approvers",
+    "context": "No approvers"
+  },
+  {
+    "term": "component.petition-approvals-card.petition-status-not-completed",
+    "definition": "Complete the parallel to activate this action",
+    "context": "Complete the parallel to activate this action"
+  },
+  {
+    "term": "component.petition-approvals-card.previous-approvals",
+    "definition": "Previous approvals",
+    "context": "Previous approvals"
+  },
+  {
+    "term": "component.petition-approvals-card.rejected-at",
+    "definition": "Rejected: {date}",
+    "context": "Rejected: {date}"
+  },
+  {
+    "term": "component.petition-approvals-card.rejected-toast-description",
+    "definition": "<b>{stepName}</b> was rejected successfully",
+    "context": "<b>{stepName}</b> was rejected successfully"
+  },
+  {
+    "term": "component.petition-approvals-card.reminder-toast-description",
+    "definition": "The reminder for <b>{stepName}</b> has been sent successfully",
+    "context": "The reminder for <b>{stepName}</b> has been sent successfully"
+  },
+  {
+    "term": "component.petition-approvals-card.request-approval",
+    "definition": "Request approval",
+    "context": "Request approval"
+  },
+  {
+    "term": "component.petition-approvals-card.send-reminder",
+    "definition": "Send reminder",
+    "context": "Send reminder"
+  },
+  {
+    "term": "component.petition-approvals-card.sent-at",
+    "definition": "Request sent: {date}",
+    "context": "Request sent: {date}"
+  },
+  {
+    "term": "component.petition-approvals-card.skipped-at",
+    "definition": "Forced aproval: {date}",
+    "context": "Forced aproval: {date}"
+  },
+  {
+    "term": "component.petition-approvals-card.start-approval-toast-description",
+    "definition": "The approval step <b>{stepName}</b> has been started",
+    "context": "The approval step <b>{stepName}</b> has been started"
+  },
+  {
+    "term": "component.petition-approvals-card.status",
+    "definition": "Status",
+    "context": "Status"
+  },
+  {
+    "term": "component.petition-approvals-definitive-rejected-alert.description",
+    "definition": "This parallel has a <b>final rejected approval</b> process and cannot be edited.",
+    "context": "This parallel has a <b>final rejected approval</b> process and cannot be edited."
+  },
+  {
+    "term": "component.petition-approvals-step-status.approved",
+    "definition": "Approved",
+    "context": "Approved"
+  },
+  {
+    "term": "component.petition-approvals-step-status.approved-forced",
+    "definition": "Approved (forced)",
+    "context": "Approved (forced)"
+  },
+  {
+    "term": "component.petition-approvals-step-status.canceled",
+    "definition": "Canceled",
+    "context": "Canceled"
+  },
+  {
+    "term": "component.petition-approvals-step-status.no-applicable",
+    "definition": "Not applicable",
+    "context": "Not applicable"
+  },
+  {
+    "term": "component.petition-approvals-step-status.pending",
+    "definition": "Pending",
+    "context": "Pending"
+  },
+  {
+    "term": "component.petition-approvals-step-status.rejected",
+    "definition": "Rejected",
+    "context": "Rejected"
+  },
+  {
     "term": "component.petition-comments-and-notes-editor.comment-placeholder",
     "definition": "Write a comment",
     "context": "Write a comment"
@@ -5343,16 +5633,6 @@
     "term": "component.petition-compose-dynamic-select-field-settings.import-from-excel-label",
     "definition": "Import options from Excel",
     "context": "Import options from Excel"
-  },
-  {
-    "term": "component.petition-compose-field-attachment.label",
-    "definition": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete.",
-    "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
-  },
-  {
-    "term": "component.petition-compose-field-attachment.remove-attachment",
-    "definition": "Remove attachment",
-    "context": "Remove attachment"
   },
   {
     "term": "component.petition-compose-field-group-children.drag-field-to-link-error",
@@ -5665,11 +5945,6 @@
     "context": "Remove calculations"
   },
   {
-    "term": "component.petition-compose-field.remove-condition",
-    "definition": "Remove condition",
-    "context": "Remove condition"
-  },
-  {
     "term": "component.petition-compose-field.required-label",
     "definition": "Required",
     "context": "Required"
@@ -5913,6 +6188,31 @@
     "term": "component.petition-field-checkbox-settings.unlimited",
     "definition": "Unlimited",
     "context": "Unlimited"
+  },
+  {
+    "term": "component.petition-field-comment.approval-status-approved",
+    "definition": "Approved",
+    "context": "Approved"
+  },
+  {
+    "term": "component.petition-field-comment.approval-status-rejected",
+    "definition": "Rejected (changes requested)",
+    "context": "Rejected (changes requested)"
+  },
+  {
+    "term": "component.petition-field-comment.approval-status-rejected-definitive",
+    "definition": "Rejected (definitive)",
+    "context": "Rejected (definitive)"
+  },
+  {
+    "term": "component.petition-field-comment.approval-status-skipped",
+    "definition": "Approved (forced)",
+    "context": "Approved (forced)"
+  },
+  {
+    "term": "component.petition-field-comment.note-popover",
+    "definition": "This message is only visible for people in your organization.",
+    "context": "This message is only visible for people in your organization."
   },
   {
     "term": "component.petition-field-file-password.password",
@@ -6495,6 +6795,46 @@
     "context": "This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab."
   },
   {
+    "term": "component.petition-list-approvals-filter.approval-not-started",
+    "definition": "Approval not started",
+    "context": "Approval not started"
+  },
+  {
+    "term": "component.petition-list-approvals-filter.approved",
+    "definition": "Approved",
+    "context": "Approved"
+  },
+  {
+    "term": "component.petition-list-approvals-filter.assigned-to",
+    "definition": "assigned to",
+    "context": "assigned to"
+  },
+  {
+    "term": "component.petition-list-approvals-filter.pending",
+    "definition": "Pending",
+    "context": "Pending"
+  },
+  {
+    "term": "component.petition-list-approvals-filter.rejected",
+    "definition": "Rejected",
+    "context": "Rejected"
+  },
+  {
+    "term": "component.petition-list-approvals-filter.select-a-status",
+    "definition": "Select a status",
+    "context": "Select a status"
+  },
+  {
+    "term": "component.petition-list-approvals-filter.status",
+    "definition": "status is",
+    "context": "status is"
+  },
+  {
+    "term": "component.petition-list-approvals-filter.without-approval",
+    "definition": "Without approval",
+    "context": "Without approval"
+  },
+  {
     "term": "component.petition-list-header.hidden-filters-title",
     "definition": "Filters",
     "context": "Filters"
@@ -6578,6 +6918,21 @@
     "term": "component.petition-permission-row.default-owner",
     "definition": "Person starting the parallel",
     "context": "Person starting the parallel"
+  },
+  {
+    "term": "component.petition-preview-approvals-alert.approvals-in-progress",
+    "definition": "<b>The information is being evaluated or has already been approved</b> and cannot be edited.",
+    "context": "<b>The information is being evaluated or has already been approved</b> and cannot be edited."
+  },
+  {
+    "term": "component.petition-preview-approvals-alert.cancel-approvals",
+    "definition": "Cancel approvals",
+    "context": "Cancel approvals"
+  },
+  {
+    "term": "component.petition-preview-approvals-alert.cancel-approvals-instructions",
+    "definition": "If you need to correct something, cancel the approvals first.",
+    "context": "If you need to correct something, cancel the approvals first."
   },
   {
     "term": "component.petition-preview-signature-review-alert.signature-required",
@@ -6860,11 +7215,6 @@
     "context": "This document is valid"
   },
   {
-    "term": "component.petition-replies-field-reply.approve",
-    "definition": "Approve",
-    "context": "Approve"
-  },
-  {
     "term": "component.petition-replies-field-reply.es-tax-documents-identity-verification-error-header",
     "definition": "Identity Verification",
     "context": "Identity Verification"
@@ -6878,11 +7228,6 @@
     "term": "component.petition-replies-field-reply.manual-review-required",
     "definition": "We could not verify automatically that this is a valid document.",
     "context": "We could not verify automatically that this is a valid document."
-  },
-  {
-    "term": "component.petition-replies-field-reply.reject",
-    "definition": "Reject",
-    "context": "Reject"
   },
   {
     "term": "component.petition-replies-field.add-field-reply",
@@ -7008,6 +7353,21 @@
     "term": "component.petition-select.search-hint-template",
     "definition": "Type to search among the existing templates",
     "context": "Type to search among the existing templates"
+  },
+  {
+    "term": "component.petition-settings.approval-steps",
+    "definition": "Approval steps",
+    "context": "Approval steps"
+  },
+  {
+    "term": "component.petition-settings.approval-steps-description-1",
+    "definition": "Add approval steps to assign approvers to evaluate the process.",
+    "context": "Add approval steps to assign approvers to evaluate the process."
+  },
+  {
+    "term": "component.petition-settings.approval-steps-description-2",
+    "definition": "The parallel cannot be closed until all approval steps have been completed.",
+    "context": "The parallel cannot be closed until all approval steps have been completed."
   },
   {
     "term": "component.petition-settings.automatic-numbering-description",
@@ -7510,6 +7870,11 @@
     "context": "Calculation results"
   },
   {
+    "term": "component.petitions-table-columns.header-approvals",
+    "definition": "Approvals",
+    "context": "Approvals"
+  },
+  {
     "term": "component.petitions-table-columns.header-last-activity-at",
     "definition": "Last activity",
     "context": "Last activity"
@@ -7928,16 +8293,6 @@
     "term": "component.profile-field.set-expiration-button-label",
     "definition": "Set expiration",
     "context": "Set expiration"
-  },
-  {
-    "term": "component.profile-file.aria-label",
-    "definition": "Attached file: {filename}. To see the file, press Enter. {isReadOnly, select, true{} other {To remove it, press Delete.}}",
-    "context": "Attached file: {filename}. To see the file, press Enter. {isReadOnly, select, true{} other {To remove it, press Delete.}}"
-  },
-  {
-    "term": "component.profile-file.remove-attachment",
-    "definition": "Remove attachment",
-    "context": "Remove attachment"
   },
   {
     "term": "component.profile-form.associated-profiles-count",
@@ -9195,6 +9550,16 @@
     "context": "Information"
   },
   {
+    "term": "component.recipient-view-petition-approvals-alert.alert-description-1",
+    "definition": "<b>Your information is being reviewed.</b> During this process, you will not be able to make changes.",
+    "context": "<b>Your information is being reviewed.</b> During this process, you will not be able to make changes."
+  },
+  {
+    "term": "component.recipient-view-petition-approvals-alert.alert-description-2",
+    "definition": "If you need to correct anything, you can write to us through the enabled comments.",
+    "context": "If you need to correct anything, you can write to us through the enabled comments."
+  },
+  {
     "term": "component.recipient-view-petition-field-card.add-another-reply",
     "definition": "Add another reply",
     "context": "Add another reply"
@@ -9446,8 +9811,8 @@
   },
   {
     "term": "component.recipient-view-petition-status-alert.petition-completed-alert-1",
-    "definition": "<b>Information completed!</b> We have notified {name} for review and validation.",
-    "context": "<b>Information completed!</b> We have notified {name} for review and validation."
+    "definition": "<b>Information completed!</b> We have notified for review and validation.",
+    "context": "<b>Information completed!</b> We have notified for review and validation."
   },
   {
     "term": "component.recipient-view-petition-status-alert.petition-completed-alert-2",
@@ -10435,6 +10800,16 @@
     "context": "When do you want the eSignature to start?"
   },
   {
+    "term": "component.signature-config-dialog.review-before-send-option-after-approval",
+    "definition": "After completing the approval steps",
+    "context": "After completing the approval steps"
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send-option-after-approval-explainer",
+    "definition": "After completing the approval steps, you will have to start the signature manually.",
+    "context": "After completing the approval steps, you will have to start the signature manually."
+  },
+  {
     "term": "component.signature-config-dialog.review-before-send-option-no",
     "definition": "After the parallel is completed",
     "context": "After the parallel is completed"
@@ -10683,6 +11058,31 @@
     "term": "component.standard-list-select.sic",
     "definition": "SIC codes",
     "context": "SIC codes"
+  },
+  {
+    "term": "component.start-petition-approval-flow-dialog.body",
+    "definition": "The request for approval with an access to this parallel will be sent to the following users:",
+    "context": "The request for approval with an access to this parallel will be sent to the following users:"
+  },
+  {
+    "term": "component.start-petition-approval-flow-dialog.checkbox-include-information",
+    "definition": "Add additional information",
+    "context": "Add additional information"
+  },
+  {
+    "term": "component.start-petition-approval-flow-dialog.header",
+    "definition": "Request approval",
+    "context": "Request approval"
+  },
+  {
+    "term": "component.start-petition-approval-flow-dialog.message-placeholder",
+    "definition": "Write a message to be included in the email",
+    "context": "Write a message to be included in the email"
+  },
+  {
+    "term": "component.start-petition-approval-flow-dialog.upload-documents",
+    "definition": "Upload documents",
+    "context": "Upload documents"
   },
   {
     "term": "component.subscribed-notifications-icon.label",
@@ -11030,6 +11430,11 @@
     "context": "Someone wrote a (now deleted) comment on field {field} {timeAgo}"
   },
   {
+    "term": "component.timeline-comment-published-event.general-approval-note",
+    "definition": "{author} added an evaluation in <b>General</b> {timeAgo}",
+    "context": "{author} added an evaluation in <b>General</b> {timeAgo}"
+  },
+  {
     "term": "component.timeline-comment-published-event.general-comment",
     "definition": "{author} commented in <b>General</b> {timeAgo}",
     "context": "{author} commented in <b>General</b> {timeAgo}"
@@ -11143,6 +11548,41 @@
     "term": "component.timeline-petition-anonymized.description",
     "definition": "The parallel has been anonymized {timeAgo}",
     "context": "The parallel has been anonymized {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-approval-request-step-approved-event.description",
+    "definition": "{user} approved the process {timeAgo}",
+    "context": "{user} approved the process {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-approval-request-step-canceled-event.description",
+    "definition": "{user} canceled step \"{approvalStep}\" {timeAgo}",
+    "context": "{user} canceled step \"{approvalStep}\" {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-approval-request-step-finished-event.description",
+    "definition": "Completed \"{approvalStep}\" step {timeAgo}",
+    "context": "Completed \"{approvalStep}\" step {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-approval-request-step-rejected-event.description",
+    "definition": "{user} rejected the process {timeAgo}",
+    "context": "{user} rejected the process {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-approval-request-step-reminder-event.description",
+    "definition": "{user} sent a reminder to pending approvers {timeAgo}",
+    "context": "{user} sent a reminder to pending approvers {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-approval-request-step-skipped-event.description",
+    "definition": "{user} skipped step \"{approvalStep}\" {timeAgo}",
+    "context": "{user} skipped step \"{approvalStep}\" {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-approval-request-step-started-event.description",
+    "definition": "{user} initiated step \"{approvalStep}\" in this parallel {timeAgo}",
+    "context": "{user} initiated step \"{approvalStep}\" in this parallel {timeAgo}"
   },
   {
     "term": "component.timeline-petition-cloned-event.description",
@@ -12175,6 +12615,16 @@
     "context": "Apply changes"
   },
   {
+    "term": "generic.approval-badge",
+    "definition": "Evaluation",
+    "context": "Evaluation"
+  },
+  {
+    "term": "generic.approve",
+    "definition": "Approve",
+    "context": "Approve"
+  },
+  {
     "term": "generic.attach-files-to-pdf",
     "definition": "Attach files to PDF",
     "context": "Attach files to PDF"
@@ -13165,6 +13615,11 @@
     "context": "Not specified"
   },
   {
+    "term": "generic.not-started",
+    "definition": "Not started",
+    "context": "Not started"
+  },
+  {
     "term": "generic.note",
     "definition": "Note",
     "context": "Note"
@@ -13590,6 +14045,11 @@
     "context": "Guide me"
   },
   {
+    "term": "generic.reject",
+    "definition": "Reject",
+    "context": "Reject"
+  },
+  {
     "term": "generic.reload-data",
     "definition": "Reload",
     "context": "Reload"
@@ -13598,6 +14058,11 @@
     "term": "generic.remove",
     "definition": "Remove",
     "context": "Remove"
+  },
+  {
+    "term": "generic.remove-condition",
+    "definition": "Remove condition",
+    "context": "Remove condition"
   },
   {
     "term": "generic.reply-not-available",
@@ -14068,6 +14533,11 @@
     "term": "generic.yes",
     "definition": "Yes",
     "context": "Yes"
+  },
+  {
+    "term": "generic.yes-cancel",
+    "definition": "Yes, cancel",
+    "context": "Yes, cancel"
   },
   {
     "term": "generic.yes-continue",
@@ -15540,6 +16010,16 @@
     "context": "Grants users in this team permissions to view the list of users on the organization"
   },
   {
+    "term": "page.petition-compose.field-referenced-in-header",
+    "definition": "Field referenced",
+    "context": "Field referenced"
+  },
+  {
+    "term": "page.petition-compose.field-referenced-in-message",
+    "definition": "This field is referenced in <b>{configurationName}</b> and cannot be removed or modified.",
+    "context": "This field is referenced in <b>{configurationName}</b> and cannot be removed or modified."
+  },
+  {
     "term": "page.petition-compose.first-child-is-internal-error",
     "definition": "The first field of a group cannot be internal if the group is not.",
     "context": "The first field of a group cannot be internal if the group is not."
@@ -16653,11 +17133,6 @@
     "term": "petition-access.status-pending",
     "definition": "Pending",
     "context": "Pending"
-  },
-  {
-    "term": "petition-replies.note-popover",
-    "definition": "This note is only visible for people in your organization.",
-    "context": "This note is only visible for people in your organization."
   },
   {
     "term": "petition-replies.petition-field-reply.file-download",
@@ -17958,6 +18433,21 @@
     "term": "util.use-petition-signatrue-status-labels.processing",
     "definition": "Waiting for signature",
     "context": "Waiting for signature"
+  },
+  {
+    "term": "util.use-petition-table-colums.approval-status-approved",
+    "definition": "Approved",
+    "context": "Approved"
+  },
+  {
+    "term": "util.use-petition-table-colums.approval-status-pending",
+    "definition": "Pending",
+    "context": "Pending"
+  },
+  {
+    "term": "util.use-petition-table-colums.approval-status-rejected",
+    "definition": "Rejected",
+    "context": "Rejected"
   },
   {
     "term": "util.use-short-text-formats.email",

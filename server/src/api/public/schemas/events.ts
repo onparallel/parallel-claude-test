@@ -829,6 +829,113 @@ const PetitionEventSchemas = {
       },
     },
   },
+  PETITION_APPROVAL_REQUEST_STEP_STARTED: {
+    description: "An approval request step was started by an user",
+    properties: {
+      userId: {
+        description: "The ID of the user that started the approval request step",
+        type: "string",
+        example: toGlobalId("User", 5),
+      },
+      approvalRequestStepId: {
+        description: "The ID of the approval request step",
+        type: "string",
+        example: toGlobalId("PetitionApprovalRequestStep", 5),
+      },
+    },
+  },
+  PETITION_APPROVAL_REQUEST_STEP_APPROVED: {
+    description: "An approval request step was approved by one of the approver users",
+    properties: {
+      userId: {
+        description: "The ID of the user that approved the approval request step",
+        type: "string",
+        example: toGlobalId("User", 5),
+      },
+      approvalRequestStepId: {
+        description: "The ID of the approval request step",
+        type: "string",
+        example: toGlobalId("PetitionApprovalRequestStep", 5),
+      },
+    },
+  },
+  PETITION_APPROVAL_REQUEST_STEP_REJECTED: {
+    description: "An approval request step was rejected by one of the approver users",
+    properties: {
+      userId: {
+        description: "The ID of the user that rejected the approval request step",
+        type: "string",
+        example: toGlobalId("User", 5),
+      },
+      approvalRequestStepId: {
+        description: "The ID of the approval request step",
+        type: "string",
+        example: toGlobalId("PetitionApprovalRequestStep", 5),
+      },
+    },
+  },
+  PETITION_APPROVAL_REQUEST_STEP_SKIPPED: {
+    description: "An approval request step was skipped by one of the approver users",
+    properties: {
+      userId: {
+        description: "The ID of the user that skipped the approval request step",
+        type: "string",
+        example: toGlobalId("User", 5),
+      },
+      approvalRequestStepId: {
+        description: "The ID of the approval request step",
+        type: "string",
+        example: toGlobalId("PetitionApprovalRequestStep", 5),
+      },
+    },
+  },
+  PETITION_APPROVAL_REQUEST_STEP_REMINDER: {
+    description: "A reminder was sent to every pending approver of an approval request step",
+    properties: {
+      userId: {
+        description: "The ID of the user that sent the reminder",
+        type: "string",
+        example: toGlobalId("User", 5),
+      },
+      approvalRequestStepId: {
+        description: "The ID of the approval request step",
+        type: "string",
+        example: toGlobalId("PetitionApprovalRequestStep", 5),
+      },
+    },
+  },
+  PETITION_APPROVAL_REQUEST_STEP_FINISHED: {
+    description:
+      "The approval request step was finished. This means that every required approver has either approved or rejected the step.",
+    properties: {
+      userId: {
+        description: "The ID of the user that finished the approval request step",
+        type: "string",
+        example: toGlobalId("User", 5),
+      },
+      approvalRequestStepId: {
+        description: "The ID of the approval request step",
+        type: "string",
+        example: toGlobalId("PetitionApprovalRequestStep", 5),
+      },
+    },
+  },
+  PETITION_APPROVAL_REQUEST_STEP_CANCELED: {
+    description:
+      "The approval request step was canceled by any user. This action will effectively cancel the whole approval request.",
+    properties: {
+      userId: {
+        description: "The ID of the user that canceled the approval request step",
+        type: "string",
+        example: toGlobalId("User", 5),
+      },
+      approvalRequestStepId: {
+        description: "The ID of the approval request step",
+        type: "string",
+        example: toGlobalId("PetitionApprovalRequestStep", 5),
+      },
+    },
+  },
 } as Record<PetitionEventType, JsonSchema>;
 
 const _PetitionEvent = {

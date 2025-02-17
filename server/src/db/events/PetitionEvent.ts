@@ -206,6 +206,37 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     tag_ids: number[];
     tag_names: string[];
   };
+  PETITION_APPROVAL_REQUEST_STEP_STARTED: {
+    petition_approval_request_step_id: number;
+    user_id: number;
+    petition_comment_id?: number | null;
+  };
+  PETITION_APPROVAL_REQUEST_STEP_APPROVED: {
+    petition_approval_request_step_id: number;
+    user_id: number;
+  };
+  PETITION_APPROVAL_REQUEST_STEP_REJECTED: {
+    petition_approval_request_step_id: number;
+    user_id: number;
+    petition_comment_id: number;
+  };
+  PETITION_APPROVAL_REQUEST_STEP_SKIPPED: {
+    petition_approval_request_step_id: number;
+    user_id: number;
+    petition_comment_id: number | null;
+  };
+  PETITION_APPROVAL_REQUEST_STEP_REMINDER: {
+    petition_approval_request_step_id: number;
+    user_id: number;
+  };
+  PETITION_APPROVAL_REQUEST_STEP_FINISHED: {
+    petition_approval_request_step_id: number;
+    user_id: number;
+  };
+  PETITION_APPROVAL_REQUEST_STEP_CANCELED: {
+    petition_approval_request_step_id: number;
+    user_id: number;
+  };
 }[TType];
 
 export type GenericPetitionEvent<
@@ -413,6 +444,27 @@ export type PetitionUntaggedEvent<IsCreate extends boolean = false> = GenericPet
   IsCreate
 >;
 
+export type PetitionApprovalRequestStepStartedEvent<IsCreate extends boolean = false> =
+  GenericPetitionEvent<"PETITION_APPROVAL_REQUEST_STEP_STARTED", IsCreate>;
+
+export type PetitionApprovalRequestStepApprovedEvent<IsCreate extends boolean = false> =
+  GenericPetitionEvent<"PETITION_APPROVAL_REQUEST_STEP_APPROVED", IsCreate>;
+
+export type PetitionApprovalRequestStepRejectedEvent<IsCreate extends boolean = false> =
+  GenericPetitionEvent<"PETITION_APPROVAL_REQUEST_STEP_REJECTED", IsCreate>;
+
+export type PetitionApprovalRequestStepSkippedEvent<IsCreate extends boolean = false> =
+  GenericPetitionEvent<"PETITION_APPROVAL_REQUEST_STEP_SKIPPED", IsCreate>;
+
+export type PetitionApprovalRequestStepReminderEvent<IsCreate extends boolean = false> =
+  GenericPetitionEvent<"PETITION_APPROVAL_REQUEST_STEP_REMINDER", IsCreate>;
+
+export type PetitionApprovalRequestStepFinishedEvent<IsCreate extends boolean = false> =
+  GenericPetitionEvent<"PETITION_APPROVAL_REQUEST_STEP_FINISHED", IsCreate>;
+
+export type PetitionApprovalRequestStepCanceledEvent<IsCreate extends boolean = false> =
+  GenericPetitionEvent<"PETITION_APPROVAL_REQUEST_STEP_CANCELED", IsCreate>;
+
 export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionCreatedEvent<IsCreate>
   | PetitionCompletedEvent<IsCreate>
@@ -459,6 +511,13 @@ export type PetitionEvent<IsCreate extends boolean = false> =
   | ProfileAssociatedEvent<IsCreate>
   | ProfileDisassociatedEvent<IsCreate>
   | PetitionTaggedEvent<IsCreate>
-  | PetitionUntaggedEvent<IsCreate>;
+  | PetitionUntaggedEvent<IsCreate>
+  | PetitionApprovalRequestStepStartedEvent<IsCreate>
+  | PetitionApprovalRequestStepApprovedEvent<IsCreate>
+  | PetitionApprovalRequestStepRejectedEvent<IsCreate>
+  | PetitionApprovalRequestStepSkippedEvent<IsCreate>
+  | PetitionApprovalRequestStepReminderEvent<IsCreate>
+  | PetitionApprovalRequestStepFinishedEvent<IsCreate>
+  | PetitionApprovalRequestStepCanceledEvent<IsCreate>;
 
 export type CreatePetitionEvent = PetitionEvent<true>;

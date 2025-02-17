@@ -34,7 +34,11 @@ import {
   petitionsArePublicTemplates,
   userHasAccessToPetitions,
 } from "./authorizers";
-import { validPetitionSharedWithFilter, validPetitionTagFilter } from "./types/filters";
+import {
+  validApprovalsFilter,
+  validPetitionSharedWithFilter,
+  validPetitionTagFilter,
+} from "./types/filters";
 import { validatePublicPetitionLinkSlug } from "./validations";
 
 export const petitionsQuery = queryField((t) => {
@@ -55,6 +59,7 @@ export const petitionsQuery = queryField((t) => {
           t.nullable.list.nonNull.field("signature", { type: "PetitionSignatureStatusFilter" });
           t.nullable.list.nonNull.globalId("fromTemplateId", { prefixName: "Petition" });
           t.nullable.list.nonNull.field("permissionTypes", { type: "PetitionPermissionType" });
+          t.nullable.field("approvals", { type: "PetitionApprovalsFilterInput" });
         },
       }).asArg(),
       searchByNameOnly: booleanArg({
@@ -79,6 +84,7 @@ export const petitionsQuery = queryField((t) => {
     validateArgs: validateAnd(
       validPetitionSharedWithFilter("filters.sharedWith"),
       validPetitionTagFilter("filters.tags"),
+      validApprovalsFilter("filters.approvals"),
       async (_, args, ctx, info) => {
         const fromTemplateId = args.filters?.fromTemplateId;
         if (isNonNullish(fromTemplateId)) {

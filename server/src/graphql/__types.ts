@@ -117,6 +117,13 @@ declare global {
 }
 
 export interface NexusGenInputs {
+  ApprovalFlowConfigInput: {
+    // input type
+    name: string; // String!
+    type: NexusGenEnums["ApprovalFlowType"]; // ApprovalFlowType!
+    values: string[]; // [ID!]!
+    visibility?: NexusGenScalars["JSONObject"] | null; // JSONObject
+  };
   ArchiveFieldGroupReplyIntoProfileConflictResolutionInput: {
     // input type
     action: NexusGenEnums["ArchiveFieldGroupReplyIntoProfileConflictResolutionAction"]; // ArchiveFieldGroupReplyIntoProfileConflictResolutionAction!
@@ -221,8 +228,19 @@ export interface NexusGenInputs {
     name?: string | null; // String
     status?: NexusGenEnums["OrganizationStatus"] | null; // OrganizationStatus
   };
+  PetitionApprovalsFilterInput: {
+    // input type
+    filters: NexusGenInputs["PetitionApprovalsFilterLine"][]; // [PetitionApprovalsFilterLine!]!
+    operator: NexusGenEnums["PetitionApprovalsFilterLogicalOperator"]; // PetitionApprovalsFilterLogicalOperator!
+  };
+  PetitionApprovalsFilterLine: {
+    // input type
+    operator: NexusGenEnums["PetitionApprovalsFilterOperator"]; // PetitionApprovalsFilterOperator!
+    value: string; // String!
+  };
   PetitionFilter: {
     // input type
+    approvals?: NexusGenInputs["PetitionApprovalsFilterInput"] | null; // PetitionApprovalsFilterInput
     fromTemplateId?: NexusGenScalars["GID"][] | null; // [GID!]
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     path?: string | null; // String
@@ -235,6 +253,7 @@ export interface NexusGenInputs {
   };
   PetitionListViewDataInput: {
     // input type
+    approvals?: NexusGenInputs["PetitionApprovalsFilterInput"] | null; // PetitionApprovalsFilterInput
     columns?: NexusGenEnums["PetitionListViewColumn"][] | null; // [PetitionListViewColumn!]
     fromTemplateId?: NexusGenScalars["GID"][] | null; // [GID!]
     path?: string | null; // String
@@ -404,6 +423,7 @@ export interface NexusGenInputs {
     minSigners: number; // Int!
     orgIntegrationId: NexusGenScalars["GID"]; // GID!
     review: boolean; // Boolean!
+    reviewAfterApproval?: boolean | null; // Boolean
     signersInfo: NexusGenInputs["SignatureConfigInputSigner"][]; // [SignatureConfigInputSigner!]!
     signingMode: NexusGenEnums["SignatureConfigSigningMode"]; // SignatureConfigSigningMode!
     timezone: string; // String!
@@ -463,6 +483,7 @@ export interface NexusGenInputs {
     // input type
     anonymizeAfterMonths?: number | null; // Int
     anonymizePurpose?: string | null; // String
+    approvalFlowConfig?: NexusGenInputs["ApprovalFlowConfigInput"][] | null; // [ApprovalFlowConfigInput!]
     automaticNumberingConfig?: NexusGenInputs["AutomaticNumberingConfigInput"] | null; // AutomaticNumberingConfigInput
     closingEmailBody?: NexusGenScalars["JSON"] | null; // JSON
     completingMessageBody?: NexusGenScalars["JSON"] | null; // JSON
@@ -544,6 +565,7 @@ export interface NexusGenInputs {
 
 export interface NexusGenEnums {
   AiCompletionLogStatus: db.AiCompletionLogStatus;
+  ApprovalFlowType: "ALL" | "ANY";
   ArchiveFieldGroupReplyIntoProfileConflictResolutionAction: "APPEND" | "IGNORE" | "OVERWRITE";
   AutomaticNumberingType: "LETTERS" | "NUMBERS" | "ROMAN_NUMERALS";
   BackgroundCheckEntitySearchType: "COMPANY" | "PERSON";
@@ -585,12 +607,18 @@ export interface NexusGenEnums {
     | "lastName_ASC"
     | "lastName_DESC";
   PetitionAccessStatus: db.PetitionAccessStatus;
+  PetitionApprovalRequestStepApprovalType: db.PetitionApprovalRequestStepApprovalType;
+  PetitionApprovalRequestStepRejectionType: "DEFINITIVE" | "TEMPORARY";
+  PetitionApprovalRequestStepStatus: db.PetitionApprovalRequestStepStatus;
+  PetitionApprovalsFilterLogicalOperator: "AND" | "OR";
+  PetitionApprovalsFilterOperator: "ASSIGNED_TO" | "STATUS";
   PetitionAttachmentType: db.PetitionAttachmentType;
   PetitionBaseType: "PETITION" | "TEMPLATE";
   PetitionEventType: db.PetitionEventType;
   PetitionFieldReplyStatus: db.PetitionFieldReplyStatus;
   PetitionFieldType: db.PetitionFieldType;
   PetitionListViewColumn:
+    | "approvals"
     | "createdAt"
     | "fromTemplateId"
     | "lastActivityAt"
@@ -763,6 +791,12 @@ export interface NexusGenObjects {
   AccessDelegatedEvent: petitionEvents.AccessDelegatedEvent;
   AccessOpenedEvent: petitionEvents.AccessOpenedEvent;
   AiCompletionLog: db.AiCompletionLog;
+  ApprovalFlowConfig: {
+    name: string;
+    type: "ANY" | "ALL";
+    values: { id: number; type: "User" | "UserGroup" }[];
+    visibility?: any;
+  };
   AsyncFieldCompletionResponse: {
     // root type
     type: string; // String!
@@ -1164,6 +1198,15 @@ export interface NexusGenObjects {
     totalCount: number; // Int!
   };
   PetitionAnonymizedEvent: petitionEvents.PetitionAnonymizedEvent;
+  PetitionApprovalRequestStep: db.PetitionApprovalRequestStep;
+  PetitionApprovalRequestStepApprovedEvent: petitionEvents.PetitionApprovalRequestStepApprovedEvent;
+  PetitionApprovalRequestStepApprover: db.PetitionApprovalRequestStepApprover;
+  PetitionApprovalRequestStepCanceledEvent: petitionEvents.PetitionApprovalRequestStepCanceledEvent;
+  PetitionApprovalRequestStepFinishedEvent: petitionEvents.PetitionApprovalRequestStepFinishedEvent;
+  PetitionApprovalRequestStepRejectedEvent: petitionEvents.PetitionApprovalRequestStepRejectedEvent;
+  PetitionApprovalRequestStepReminderEvent: petitionEvents.PetitionApprovalRequestStepReminderEvent;
+  PetitionApprovalRequestStepSkippedEvent: petitionEvents.PetitionApprovalRequestStepSkippedEvent;
+  PetitionApprovalRequestStepStartedEvent: petitionEvents.PetitionApprovalRequestStepStartedEvent;
   PetitionAssociatedEvent: profileEvents.PetitionAssociatedEvent;
   PetitionAttachment: db.PetitionAttachment;
   PetitionAttachmentUploadData: {
@@ -1186,6 +1229,7 @@ export interface NexusGenObjects {
   PetitionClonedEvent: petitionEvents.PetitionClonedEvent;
   PetitionClosedEvent: petitionEvents.PetitionClosedEvent;
   PetitionClosedNotifiedEvent: petitionEvents.PetitionClosedNotifiedEvent;
+  PetitionCommentAttachment: db.PetitionCommentAttachment;
   PetitionCompletedEvent: petitionEvents.PetitionCompletedEvent;
   PetitionCompletedUserNotification: notifications.PetitionCompletedUserNotification;
   PetitionCreatedEvent: petitionEvents.PetitionCreatedEvent;
@@ -1235,6 +1279,7 @@ export interface NexusGenObjects {
   PetitionListView: db.PetitionListView;
   PetitionListViewData: {
     // root type
+    approvals?: NexusGenRootTypes["PetitionListViewDataApprovals"] | null; // PetitionListViewDataApprovals
     columns?: NexusGenEnums["PetitionListViewColumn"][] | null; // [PetitionListViewColumn!]
     fromTemplateId?: NexusGenScalars["GID"][] | null; // [GID!]
     path: string; // String!
@@ -1245,6 +1290,15 @@ export interface NexusGenObjects {
     sort?: NexusGenRootTypes["PetitionListViewSort"] | null; // PetitionListViewSort
     status?: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
     tagsFilters?: NexusGenRootTypes["PetitionListViewDataTags"] | null; // PetitionListViewDataTags
+  };
+  PetitionListViewDataApprovals: {
+    // root type
+    operator: NexusGenEnums["PetitionApprovalsFilterLogicalOperator"]; // PetitionApprovalsFilterLogicalOperator!
+  };
+  PetitionListViewDataApprovalsFilters: {
+    // root type
+    operator: NexusGenEnums["PetitionApprovalsFilterOperator"]; // PetitionApprovalsFilterOperator!
+    value: string; // String!
   };
   PetitionListViewDataSharedWith: {
     // root type
@@ -1763,6 +1817,14 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     status: NexusGenEnums["AiCompletionLogStatus"]; // AiCompletionLogStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  ApprovalFlowConfig: {
+    // field return type
+    approvers: Array<NexusGenRootTypes["User"] | null>; // [User]!
+    name: string; // String!
+    type: NexusGenEnums["ApprovalFlowType"]; // ApprovalFlowType!
+    values: string[]; // [ID!]!
+    visibility: NexusGenScalars["JSONObject"] | null; // JSONObject
   };
   AsyncFieldCompletionResponse: {
     // field return type
@@ -2307,11 +2369,14 @@ export interface NexusGenFieldTypes {
     adminCreateDashboard: NexusGenRootTypes["Dashboard"]; // Dashboard!
     anonymizePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     approveOrRejectPetitionFieldReplies: NexusGenRootTypes["Petition"]; // Petition!
+    approvePetitionApprovalRequestStep: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
     archiveFieldGroupReplyIntoProfile: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     archiveProfileType: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
     associateProfileToPetition: NexusGenRootTypes["PetitionProfile"]; // PetitionProfile!
     bulkCreateContacts: NexusGenRootTypes["BulkCreateContactsReturnType"]; // BulkCreateContactsReturnType!
     bulkCreatePetitionReplies: NexusGenRootTypes["Petition"]; // Petition!
+    cancelPetitionApprovalRequestFlow: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
+    cancelPetitionApprovalRequestStep: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
     cancelSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     changeOrganization: NexusGenEnums["Result"]; // Result!
@@ -2439,6 +2504,7 @@ export interface NexusGenFieldTypes {
     movePetitions: NexusGenEnums["Success"]; // Success!
     petitionAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionAttachmentUploadComplete: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
+    petitionCommentAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionFieldAttachmentUploadComplete: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
     pinProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
@@ -2472,6 +2538,7 @@ export interface NexusGenFieldTypes {
     publicUpdatePetitionComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicUpdatePetitionFieldReplies: NexusGenRootTypes["PublicPetitionFieldReply"][]; // [PublicPetitionFieldReply!]!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
+    rejectPetitionApprovalRequestStep: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
     removePetitionPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     removeProfileRelationship: NexusGenEnums["Success"]; // Success!
     removeProfileTypeProcess: NexusGenRootTypes["ProfileType"]; // ProfileType!
@@ -2491,6 +2558,7 @@ export interface NexusGenFieldTypes {
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
     scheduleProfileForDeletion: NexusGenRootTypes["Profile"][]; // [Profile!]!
     sendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
+    sendPetitionApprovalRequestStepReminder: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
     sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
     sendReminders: NexusGenRootTypes["PetitionReminder"][]; // [PetitionReminder!]!
     sendSignatureRequestReminders: NexusGenEnums["Result"]; // Result!
@@ -2499,7 +2567,9 @@ export interface NexusGenFieldTypes {
     signUp: NexusGenRootTypes["User"]; // User!
     signaturitIntegrationShowSecurityStamp: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     signedPetitionDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
+    skipPetitionApprovalRequestStep: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
     startAsyncFieldCompletion: NexusGenRootTypes["AsyncFieldCompletionResponse"]; // AsyncFieldCompletionResponse!
+    startPetitionApprovalRequestStep: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
     startSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     subscribeToProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -2662,6 +2732,7 @@ export interface NexusGenFieldTypes {
     accesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
+    approvalFlowConfig: NexusGenRootTypes["ApprovalFlowConfig"][] | null; // [ApprovalFlowConfig!]
     attachmentsList: NexusGenRootTypes["PetitionAttachmentsList"]; // PetitionAttachmentsList!
     automaticNumberingConfig: NexusGenRootTypes["AutomaticNumberingConfig"] | null; // AutomaticNumberingConfig
     closedAt: NexusGenScalars["DateTime"] | null; // DateTime
@@ -2669,6 +2740,7 @@ export interface NexusGenFieldTypes {
     completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    currentApprovalRequestSteps: NexusGenRootTypes["PetitionApprovalRequestStep"][] | null; // [PetitionApprovalRequestStep!]
     currentSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"] | null; // PetitionSignatureRequest
     customLists: NexusGenRootTypes["PetitionCustomList"][]; // [PetitionCustomList!]!
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -2684,6 +2756,7 @@ export interface NexusGenFieldTypes {
     fromTemplate: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     generalCommentCount: number; // Int!
     generalComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
+    hasStartedProcess: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isAnonymized: boolean; // Boolean!
     isCompletingMessageEnabled: boolean; // Boolean!
@@ -2703,6 +2776,7 @@ export interface NexusGenFieldTypes {
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
     name: string | null; // String
+    oldApprovalRequestSteps: NexusGenRootTypes["PetitionApprovalRequestStep"][]; // [PetitionApprovalRequestStep!]!
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
     path: string; // String!
@@ -2759,6 +2833,98 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+  };
+  PetitionApprovalRequestStep: {
+    // field return type
+    approvalType: NexusGenEnums["PetitionApprovalRequestStepApprovalType"]; // PetitionApprovalRequestStepApprovalType!
+    approvers: NexusGenRootTypes["PetitionApprovalRequestStepApprover"][]; // [PetitionApprovalRequestStepApprover!]!
+    id: NexusGenScalars["GID"]; // GID!
+    petition: NexusGenRootTypes["Petition"]; // Petition!
+    status: NexusGenEnums["PetitionApprovalRequestStepStatus"]; // PetitionApprovalRequestStepStatus!
+    stepName: string; // String!
+  };
+  PetitionApprovalRequestStepApprovedEvent: {
+    // field return type
+    approvalRequestStep: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+    user: NexusGenRootTypes["User"] | null; // User
+  };
+  PetitionApprovalRequestStepApprover: {
+    // field return type
+    approvedAt: NexusGenScalars["DateTime"] | null; // DateTime
+    canceledAt: NexusGenScalars["DateTime"] | null; // DateTime
+    id: NexusGenScalars["GID"]; // GID!
+    rejectedAt: NexusGenScalars["DateTime"] | null; // DateTime
+    sentAt: NexusGenScalars["DateTime"] | null; // DateTime
+    skippedAt: NexusGenScalars["DateTime"] | null; // DateTime
+    user: NexusGenRootTypes["User"] | null; // User
+  };
+  PetitionApprovalRequestStepCanceledEvent: {
+    // field return type
+    approvalRequestStep: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+    user: NexusGenRootTypes["User"] | null; // User
+  };
+  PetitionApprovalRequestStepFinishedEvent: {
+    // field return type
+    approvalRequestStep: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+    user: NexusGenRootTypes["User"] | null; // User
+  };
+  PetitionApprovalRequestStepRejectedEvent: {
+    // field return type
+    approvalRequestStep: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
+    comment: NexusGenRootTypes["PetitionFieldComment"] | null; // PetitionFieldComment
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+    user: NexusGenRootTypes["User"] | null; // User
+  };
+  PetitionApprovalRequestStepReminderEvent: {
+    // field return type
+    approvalRequestStep: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+    user: NexusGenRootTypes["User"] | null; // User
+  };
+  PetitionApprovalRequestStepSkippedEvent: {
+    // field return type
+    approvalRequestStep: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
+    comment: NexusGenRootTypes["PetitionFieldComment"] | null; // PetitionFieldComment
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+    user: NexusGenRootTypes["User"] | null; // User
+  };
+  PetitionApprovalRequestStepStartedEvent: {
+    // field return type
+    approvalRequestStep: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
+    comment: NexusGenRootTypes["PetitionFieldComment"] | null; // PetitionFieldComment
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+    petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+    user: NexusGenRootTypes["User"] | null; // User
   };
   PetitionAssociatedEvent: {
     // field return type
@@ -2832,6 +2998,12 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
+  };
+  PetitionCommentAttachment: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    file: NexusGenRootTypes["FileUpload"]; // FileUpload!
+    id: NexusGenScalars["GID"]; // GID!
   };
   PetitionCompletedEvent: {
     // field return type
@@ -2950,6 +3122,8 @@ export interface NexusGenFieldTypes {
   };
   PetitionFieldComment: {
     // field return type
+    approvalMetadata: NexusGenScalars["JSONObject"] | null; // JSONObject
+    attachments: NexusGenRootTypes["PetitionCommentAttachment"][]; // [PetitionCommentAttachment!]!
     author: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
     content: NexusGenScalars["JSON"] | null; // JSON
     contentHtml: string | null; // String
@@ -2958,6 +3132,7 @@ export interface NexusGenFieldTypes {
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
     isAnonymized: boolean; // Boolean!
+    isApproval: boolean; // Boolean!
     isEdited: boolean; // Boolean!
     isInternal: boolean; // Boolean!
     isUnread: boolean; // Boolean!
@@ -3038,6 +3213,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionListViewData: {
     // field return type
+    approvals: NexusGenRootTypes["PetitionListViewDataApprovals"] | null; // PetitionListViewDataApprovals
     columns: NexusGenEnums["PetitionListViewColumn"][] | null; // [PetitionListViewColumn!]
     fromTemplateId: NexusGenScalars["GID"][] | null; // [GID!]
     path: string; // String!
@@ -3048,6 +3224,16 @@ export interface NexusGenFieldTypes {
     sort: NexusGenRootTypes["PetitionListViewSort"] | null; // PetitionListViewSort
     status: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
     tagsFilters: NexusGenRootTypes["PetitionListViewDataTags"] | null; // PetitionListViewDataTags
+  };
+  PetitionListViewDataApprovals: {
+    // field return type
+    filters: NexusGenRootTypes["PetitionListViewDataApprovalsFilters"][]; // [PetitionListViewDataApprovalsFilters!]!
+    operator: NexusGenEnums["PetitionApprovalsFilterLogicalOperator"]; // PetitionApprovalsFilterLogicalOperator!
+  };
+  PetitionListViewDataApprovalsFilters: {
+    // field return type
+    operator: NexusGenEnums["PetitionApprovalsFilterOperator"]; // PetitionApprovalsFilterOperator!
+    value: string; // String!
   };
   PetitionListViewDataSharedWith: {
     // field return type
@@ -3217,6 +3403,7 @@ export interface NexusGenFieldTypes {
     // field return type
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
+    approvalFlowConfig: NexusGenRootTypes["ApprovalFlowConfig"][] | null; // [ApprovalFlowConfig!]
     attachmentsList: NexusGenRootTypes["PetitionAttachmentsList"]; // PetitionAttachmentsList!
     automaticNumberingConfig: NexusGenRootTypes["AutomaticNumberingConfig"] | null; // AutomaticNumberingConfig
     backgroundColor: string | null; // String
@@ -3741,6 +3928,7 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["PublicPetitionField"][]; // [PublicPetitionField!]!
     generalCommentCount: number; // Int!
     generalComments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
+    hasStartedProcess: boolean; // Boolean!
     hasUnreadComments: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isCompletingMessageEnabled: boolean; // Boolean!
@@ -4122,6 +4310,7 @@ export interface NexusGenFieldTypes {
     message: string | null; // String
     minSigners: number; // Int!
     review: boolean; // Boolean!
+    reviewAfterApproval: boolean | null; // Boolean
     signers: Array<NexusGenRootTypes["PetitionSigner"] | null>; // [PetitionSigner]!
     signingMode: NexusGenEnums["SignatureConfigSigningMode"]; // SignatureConfigSigningMode!
     timezone: string; // String!
@@ -4460,6 +4649,7 @@ export interface NexusGenFieldTypes {
     // field return type
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
+    approvalFlowConfig: NexusGenRootTypes["ApprovalFlowConfig"][] | null; // [ApprovalFlowConfig!]
     attachmentsList: NexusGenRootTypes["PetitionAttachmentsList"]; // PetitionAttachmentsList!
     automaticNumberingConfig: NexusGenRootTypes["AutomaticNumberingConfig"] | null; // AutomaticNumberingConfig
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
@@ -4636,6 +4826,14 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     status: "AiCompletionLogStatus";
     updatedAt: "DateTime";
+  };
+  ApprovalFlowConfig: {
+    // field return type name
+    approvers: "User";
+    name: "String";
+    type: "ApprovalFlowType";
+    values: "ID";
+    visibility: "JSONObject";
   };
   AsyncFieldCompletionResponse: {
     // field return type name
@@ -5180,11 +5378,14 @@ export interface NexusGenFieldTypeNames {
     adminCreateDashboard: "Dashboard";
     anonymizePetition: "SupportMethodResponse";
     approveOrRejectPetitionFieldReplies: "Petition";
+    approvePetitionApprovalRequestStep: "PetitionApprovalRequestStep";
     archiveFieldGroupReplyIntoProfile: "PetitionFieldReply";
     archiveProfileType: "ProfileType";
     associateProfileToPetition: "PetitionProfile";
     bulkCreateContacts: "BulkCreateContactsReturnType";
     bulkCreatePetitionReplies: "Petition";
+    cancelPetitionApprovalRequestFlow: "PetitionApprovalRequestStep";
+    cancelPetitionApprovalRequestStep: "PetitionApprovalRequestStep";
     cancelScheduledMessage: "PetitionMessage";
     cancelSignatureRequest: "PetitionSignatureRequest";
     changeOrganization: "Result";
@@ -5312,6 +5513,7 @@ export interface NexusGenFieldTypeNames {
     movePetitions: "Success";
     petitionAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionAttachmentUploadComplete: "PetitionAttachment";
+    petitionCommentAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionFieldAttachmentUploadComplete: "PetitionFieldAttachment";
     pinProfileType: "ProfileType";
@@ -5345,6 +5547,7 @@ export interface NexusGenFieldTypeNames {
     publicUpdatePetitionComment: "PublicPetitionFieldComment";
     publicUpdatePetitionFieldReplies: "PublicPetitionFieldReply";
     reactivateAccesses: "PetitionAccess";
+    rejectPetitionApprovalRequestStep: "PetitionApprovalRequestStep";
     removePetitionPassword: "SupportMethodResponse";
     removeProfileRelationship: "Success";
     removeProfileTypeProcess: "ProfileType";
@@ -5364,6 +5567,7 @@ export interface NexusGenFieldTypeNames {
     revokeUserAuthToken: "Result";
     scheduleProfileForDeletion: "Profile";
     sendPetition: "SendPetitionResult";
+    sendPetitionApprovalRequestStepReminder: "PetitionApprovalRequestStep";
     sendPetitionClosedNotification: "Petition";
     sendReminders: "PetitionReminder";
     sendSignatureRequestReminders: "Result";
@@ -5372,7 +5576,9 @@ export interface NexusGenFieldTypeNames {
     signUp: "User";
     signaturitIntegrationShowSecurityStamp: "SupportMethodResponse";
     signedPetitionDownloadLink: "FileUploadDownloadLinkResult";
+    skipPetitionApprovalRequestStep: "PetitionApprovalRequestStep";
     startAsyncFieldCompletion: "AsyncFieldCompletionResponse";
+    startPetitionApprovalRequestStep: "PetitionApprovalRequestStep";
     startSignatureRequest: "PetitionSignatureRequest";
     subscribeToProfile: "Profile";
     switchAutomaticReminders: "PetitionAccess";
@@ -5535,6 +5741,7 @@ export interface NexusGenFieldTypeNames {
     accesses: "PetitionAccess";
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
+    approvalFlowConfig: "ApprovalFlowConfig";
     attachmentsList: "PetitionAttachmentsList";
     automaticNumberingConfig: "AutomaticNumberingConfig";
     closedAt: "DateTime";
@@ -5542,6 +5749,7 @@ export interface NexusGenFieldTypeNames {
     completingMessageBody: "JSON";
     completingMessageSubject: "String";
     createdAt: "DateTime";
+    currentApprovalRequestSteps: "PetitionApprovalRequestStep";
     currentSignatureRequest: "PetitionSignatureRequest";
     customLists: "PetitionCustomList";
     customProperties: "JSONObject";
@@ -5557,6 +5765,7 @@ export interface NexusGenFieldTypeNames {
     fromTemplate: "PetitionBaseMini";
     generalCommentCount: "Int";
     generalComments: "PetitionFieldComment";
+    hasStartedProcess: "Boolean";
     id: "GID";
     isAnonymized: "Boolean";
     isCompletingMessageEnabled: "Boolean";
@@ -5576,6 +5785,7 @@ export interface NexusGenFieldTypeNames {
     metadata: "JSONObject";
     myEffectivePermission: "EffectivePetitionUserPermission";
     name: "String";
+    oldApprovalRequestSteps: "PetitionApprovalRequestStep";
     organization: "Organization";
     owner: "User";
     path: "String";
@@ -5632,6 +5842,98 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     petition: "PetitionBaseMini";
     type: "PetitionEventType";
+  };
+  PetitionApprovalRequestStep: {
+    // field return type name
+    approvalType: "PetitionApprovalRequestStepApprovalType";
+    approvers: "PetitionApprovalRequestStepApprover";
+    id: "GID";
+    petition: "Petition";
+    status: "PetitionApprovalRequestStepStatus";
+    stepName: "String";
+  };
+  PetitionApprovalRequestStepApprovedEvent: {
+    // field return type name
+    approvalRequestStep: "PetitionApprovalRequestStep";
+    createdAt: "DateTime";
+    data: "JSONObject";
+    id: "GID";
+    petition: "PetitionBaseMini";
+    type: "PetitionEventType";
+    user: "User";
+  };
+  PetitionApprovalRequestStepApprover: {
+    // field return type name
+    approvedAt: "DateTime";
+    canceledAt: "DateTime";
+    id: "GID";
+    rejectedAt: "DateTime";
+    sentAt: "DateTime";
+    skippedAt: "DateTime";
+    user: "User";
+  };
+  PetitionApprovalRequestStepCanceledEvent: {
+    // field return type name
+    approvalRequestStep: "PetitionApprovalRequestStep";
+    createdAt: "DateTime";
+    data: "JSONObject";
+    id: "GID";
+    petition: "PetitionBaseMini";
+    type: "PetitionEventType";
+    user: "User";
+  };
+  PetitionApprovalRequestStepFinishedEvent: {
+    // field return type name
+    approvalRequestStep: "PetitionApprovalRequestStep";
+    createdAt: "DateTime";
+    data: "JSONObject";
+    id: "GID";
+    petition: "PetitionBaseMini";
+    type: "PetitionEventType";
+    user: "User";
+  };
+  PetitionApprovalRequestStepRejectedEvent: {
+    // field return type name
+    approvalRequestStep: "PetitionApprovalRequestStep";
+    comment: "PetitionFieldComment";
+    createdAt: "DateTime";
+    data: "JSONObject";
+    id: "GID";
+    petition: "PetitionBaseMini";
+    type: "PetitionEventType";
+    user: "User";
+  };
+  PetitionApprovalRequestStepReminderEvent: {
+    // field return type name
+    approvalRequestStep: "PetitionApprovalRequestStep";
+    createdAt: "DateTime";
+    data: "JSONObject";
+    id: "GID";
+    petition: "PetitionBaseMini";
+    type: "PetitionEventType";
+    user: "User";
+  };
+  PetitionApprovalRequestStepSkippedEvent: {
+    // field return type name
+    approvalRequestStep: "PetitionApprovalRequestStep";
+    comment: "PetitionFieldComment";
+    createdAt: "DateTime";
+    data: "JSONObject";
+    id: "GID";
+    petition: "PetitionBaseMini";
+    type: "PetitionEventType";
+    user: "User";
+  };
+  PetitionApprovalRequestStepStartedEvent: {
+    // field return type name
+    approvalRequestStep: "PetitionApprovalRequestStep";
+    comment: "PetitionFieldComment";
+    createdAt: "DateTime";
+    data: "JSONObject";
+    id: "GID";
+    petition: "PetitionBaseMini";
+    type: "PetitionEventType";
+    user: "User";
   };
   PetitionAssociatedEvent: {
     // field return type name
@@ -5705,6 +6007,12 @@ export interface NexusGenFieldTypeNames {
     petition: "PetitionBaseMini";
     type: "PetitionEventType";
     user: "User";
+  };
+  PetitionCommentAttachment: {
+    // field return type name
+    createdAt: "DateTime";
+    file: "FileUpload";
+    id: "GID";
   };
   PetitionCompletedEvent: {
     // field return type name
@@ -5823,6 +6131,8 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionFieldComment: {
     // field return type name
+    approvalMetadata: "JSONObject";
+    attachments: "PetitionCommentAttachment";
     author: "UserOrPetitionAccess";
     content: "JSON";
     contentHtml: "String";
@@ -5831,6 +6141,7 @@ export interface NexusGenFieldTypeNames {
     field: "PetitionField";
     id: "GID";
     isAnonymized: "Boolean";
+    isApproval: "Boolean";
     isEdited: "Boolean";
     isInternal: "Boolean";
     isUnread: "Boolean";
@@ -5911,6 +6222,7 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionListViewData: {
     // field return type name
+    approvals: "PetitionListViewDataApprovals";
     columns: "PetitionListViewColumn";
     fromTemplateId: "GID";
     path: "String";
@@ -5921,6 +6233,16 @@ export interface NexusGenFieldTypeNames {
     sort: "PetitionListViewSort";
     status: "PetitionStatus";
     tagsFilters: "PetitionListViewDataTags";
+  };
+  PetitionListViewDataApprovals: {
+    // field return type name
+    filters: "PetitionListViewDataApprovalsFilters";
+    operator: "PetitionApprovalsFilterLogicalOperator";
+  };
+  PetitionListViewDataApprovalsFilters: {
+    // field return type name
+    operator: "PetitionApprovalsFilterOperator";
+    value: "String";
   };
   PetitionListViewDataSharedWith: {
     // field return type name
@@ -6090,6 +6412,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
+    approvalFlowConfig: "ApprovalFlowConfig";
     attachmentsList: "PetitionAttachmentsList";
     automaticNumberingConfig: "AutomaticNumberingConfig";
     backgroundColor: "String";
@@ -6614,6 +6937,7 @@ export interface NexusGenFieldTypeNames {
     fields: "PublicPetitionField";
     generalCommentCount: "Int";
     generalComments: "PublicPetitionFieldComment";
+    hasStartedProcess: "Boolean";
     hasUnreadComments: "Boolean";
     id: "GID";
     isCompletingMessageEnabled: "Boolean";
@@ -6995,6 +7319,7 @@ export interface NexusGenFieldTypeNames {
     message: "String";
     minSigners: "Int";
     review: "Boolean";
+    reviewAfterApproval: "Boolean";
     signers: "PetitionSigner";
     signingMode: "SignatureConfigSigningMode";
     timezone: "String";
@@ -7333,6 +7658,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
+    approvalFlowConfig: "ApprovalFlowConfig";
     attachmentsList: "PetitionAttachmentsList";
     automaticNumberingConfig: "AutomaticNumberingConfig";
     closingEmailBody: "JSON";
@@ -7485,6 +7811,13 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     };
+    approvePetitionApprovalRequestStep: {
+      // args
+      approvalRequestStepId: NexusGenScalars["GID"]; // GID!
+      attachments?: NexusGenScalars["Upload"][] | null; // [Upload!]
+      message: string; // String!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
     archiveFieldGroupReplyIntoProfile: {
       // args
       conflictResolutions: NexusGenInputs["ArchiveFieldGroupReplyIntoProfileConflictResolutionInput"][]; // [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
@@ -7512,6 +7845,15 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
       replies: NexusGenScalars["JSONObject"]; // JSONObject!
+    };
+    cancelPetitionApprovalRequestFlow: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    cancelPetitionApprovalRequestStep: {
+      // args
+      approvalRequestStepId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     cancelScheduledMessage: {
       // args
@@ -8250,6 +8592,13 @@ export interface NexusGenArgTypes {
       attachmentId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
+    petitionCommentAttachmentDownloadLink: {
+      // args
+      attachmentId: NexusGenScalars["GID"]; // GID!
+      commentId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      preview?: boolean | null; // Boolean
+    };
     petitionFieldAttachmentDownloadLink: {
       // args
       attachmentId: NexusGenScalars["GID"]; // GID!
@@ -8451,6 +8800,14 @@ export interface NexusGenArgTypes {
       accessIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
+    rejectPetitionApprovalRequestStep: {
+      // args
+      approvalRequestStepId: NexusGenScalars["GID"]; // GID!
+      attachments?: NexusGenScalars["Upload"][] | null; // [Upload!]
+      message: string; // String!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      rejectionType: NexusGenEnums["PetitionApprovalRequestStepRejectionType"]; // PetitionApprovalRequestStepRejectionType!
+    };
     removePetitionPassword: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
@@ -8543,6 +8900,11 @@ export interface NexusGenArgTypes {
       skipEmailSend?: boolean | null; // Boolean
       subject: string; // String!
     };
+    sendPetitionApprovalRequestStepReminder: {
+      // args
+      approvalRequestStepId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
     sendPetitionClosedNotification: {
       // args
       attachPdfExport: boolean; // Boolean!
@@ -8597,10 +8959,23 @@ export interface NexusGenArgTypes {
       petitionSignatureRequestId: NexusGenScalars["GID"]; // GID!
       preview?: boolean | null; // Boolean
     };
+    skipPetitionApprovalRequestStep: {
+      // args
+      approvalRequestStepId: NexusGenScalars["GID"]; // GID!
+      message: string; // String!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
     startAsyncFieldCompletion: {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
       parentReplyId?: NexusGenScalars["GID"] | null; // GID
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    startPetitionApprovalRequestStep: {
+      // args
+      approvalRequestStepId: NexusGenScalars["GID"]; // GID!
+      attachments?: NexusGenScalars["Upload"][] | null; // [Upload!]
+      message?: string | null; // String
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     startSignatureRequest: {
@@ -9462,6 +9837,7 @@ export interface NexusGenAbstractTypeMembers {
     | "BackgroundCheckEntitySearchCompany"
     | "BackgroundCheckEntitySearchPerson";
   CreatedAt:
+    | "PetitionCommentAttachment"
     | "PetitionFieldAttachment"
     | "PetitionMessage"
     | "PetitionReminder"
@@ -9504,6 +9880,13 @@ export interface NexusGenAbstractTypeMembers {
     | "MessageSentEvent"
     | "OwnershipTransferredEvent"
     | "PetitionAnonymizedEvent"
+    | "PetitionApprovalRequestStepApprovedEvent"
+    | "PetitionApprovalRequestStepCanceledEvent"
+    | "PetitionApprovalRequestStepFinishedEvent"
+    | "PetitionApprovalRequestStepRejectedEvent"
+    | "PetitionApprovalRequestStepReminderEvent"
+    | "PetitionApprovalRequestStepSkippedEvent"
+    | "PetitionApprovalRequestStepStartedEvent"
     | "PetitionClonedEvent"
     | "PetitionClosedEvent"
     | "PetitionClosedNotifiedEvent"
@@ -9622,10 +10005,18 @@ export interface NexusGenTypeInterfaces {
   Petition: "PetitionBase";
   PetitionAccess: "Timestamps";
   PetitionAnonymizedEvent: "PetitionEvent";
+  PetitionApprovalRequestStepApprovedEvent: "PetitionEvent";
+  PetitionApprovalRequestStepCanceledEvent: "PetitionEvent";
+  PetitionApprovalRequestStepFinishedEvent: "PetitionEvent";
+  PetitionApprovalRequestStepRejectedEvent: "PetitionEvent";
+  PetitionApprovalRequestStepReminderEvent: "PetitionEvent";
+  PetitionApprovalRequestStepSkippedEvent: "PetitionEvent";
+  PetitionApprovalRequestStepStartedEvent: "PetitionEvent";
   PetitionAssociatedEvent: "ProfileEvent";
   PetitionClonedEvent: "PetitionEvent";
   PetitionClosedEvent: "PetitionEvent";
   PetitionClosedNotifiedEvent: "PetitionEvent";
+  PetitionCommentAttachment: "CreatedAt";
   PetitionCompletedEvent: "PetitionEvent";
   PetitionCompletedUserNotification: "PetitionUserNotification";
   PetitionCreatedEvent: "PetitionEvent";

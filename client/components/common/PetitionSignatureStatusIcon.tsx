@@ -19,11 +19,13 @@ interface PetitionSignatureStatusIconProps {
   status: PetitionSignatureStatusFilter;
   environment?: SignatureOrgIntegrationEnvironment | null;
   tooltipPlacement?: PlacementWithLogical;
+  color?: string;
 }
 export function PetitionSignatureStatusIcon({
   status,
   environment,
   tooltipPlacement,
+  color,
 }: PetitionSignatureStatusIconProps) {
   const intl = useIntl();
 
@@ -43,13 +45,14 @@ export function PetitionSignatureStatusIcon({
     () => ({
       fontSize: "25px",
       color:
-        status === "COMPLETED"
+        color ??
+        (status === "COMPLETED"
           ? environment === "PRODUCTION"
             ? "gray.800"
             : "yellow.600"
           : environment === "PRODUCTION"
             ? "gray.300"
-            : "#DBBC8E",
+            : "#DBBC8E"),
     }),
     [environment, status],
   );

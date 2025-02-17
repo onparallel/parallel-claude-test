@@ -423,6 +423,10 @@ export const PetitionBase = interfaceType({
         return definitions;
       },
     });
+    t.nullable.list.nonNull.field("approvalFlowConfig", {
+      type: "ApprovalFlowConfig",
+      resolve: (o) => o.approval_flow_config,
+    });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   sourceType: "db.Petition",
@@ -651,6 +655,22 @@ export const Petition = objectType({
           loadInternalComments: true,
           petitionId: root.id,
         }),
+    });
+    t.nullable.list.nonNull.field("currentApprovalRequestSteps", {
+      type: "PetitionApprovalRequestStep",
+      resolve: async (o, _, ctx) =>
+        await ctx.approvalRequests.loadCurrentPetitionApprovalRequestStepsByPetitionId(o.id),
+    });
+    t.nonNull.list.nonNull.field("oldApprovalRequestSteps", {
+      type: "PetitionApprovalRequestStep",
+      resolve: async (o, _, ctx) =>
+        await ctx.approvalRequests.loadDeprecatedPetitionApprovalRequestStepsByPetitionId(o.id),
+    });
+    t.nonNull.boolean("hasStartedProcess", {
+      resolve: async (o, _, ctx) => {
+        const processes = await ctx.petitions.getPetitionStartedProcesses(o.id);
+        return processes.length > 0;
+      },
     });
   },
 });
@@ -1051,6 +1071,9 @@ export const SignatureConfig = objectType({
       description:
         "If true, lets the user review the replies before starting the signature process",
       resolve: (o) => o.review ?? false,
+    });
+    t.nullable.boolean("reviewAfterApproval", {
+      description: "Whether the review should be done after the approval process.",
     });
     t.boolean("allowAdditionalSigners", {
       description:

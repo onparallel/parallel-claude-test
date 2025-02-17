@@ -12,6 +12,8 @@ import { FileRepository } from "./db/repositories/FileRepository";
 import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
 import { LicenseCodeRepository } from "./db/repositories/LicenseCodeRepository";
 import { OrganizationRepository } from "./db/repositories/OrganizationRepository";
+import { PetitionApprovalRequestRepository } from "./db/repositories/PetitionApprovalRequestRepository";
+import { PetitionCommentRepository } from "./db/repositories/PetitionCommentRepository";
 import { PetitionRepository } from "./db/repositories/PetitionRepository";
 import { ProfileRepository } from "./db/repositories/ProfileRepository";
 import { SubscriptionRepository } from "./db/repositories/SubscriptionRepository";
@@ -152,6 +154,8 @@ export class ApiContext {
     public readonly views: ViewRepository,
     public readonly profiles: ProfileRepository,
     public readonly dashboards: DashboardRepository,
+    public readonly approvalRequests: PetitionApprovalRequestRepository,
+    public readonly petitionComments: PetitionCommentRepository,
   ) {}
 }
 
@@ -208,6 +212,8 @@ export class WorkerContext {
     public readonly profiles: ProfileRepository,
     public readonly events: EventRepository,
     public readonly dashboards: DashboardRepository,
+    public readonly approvalRequests: PetitionApprovalRequestRepository,
+    public readonly petitionComments: PetitionCommentRepository,
 
     @readOnly public readonly readonlyContacts: ContactRepository,
     @readOnly public readonly readonlyPetitions: PetitionRepository,

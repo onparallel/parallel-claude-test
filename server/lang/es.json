@@ -740,6 +740,111 @@
     "context": "You have reached your plan's signatures limit"
   },
   {
+    "term": "petition-approval-request-step-canceled-email.access-parallel",
+    "definition": "Puedes acceder al parallel para solicitarlo nuevamente.",
+    "context": "You can access the parallel to request it again."
+  },
+  {
+    "term": "petition-approval-request-step-canceled-email.subject",
+    "definition": "Solicitud de aprobación cancelada",
+    "context": "Approval request cancelled"
+  },
+  {
+    "term": "petition-approval-request-step-canceled-email.text",
+    "definition": "El paso \"{stepName}\" en <b>{petitionName}</b> ha sido cancelado. ",
+    "context": "The step \"{stepName}\" in <b>{petitionName}</b> has been cancelled."
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.access-click-link",
+    "definition": "Sigue el enlace siguiente para acceder.",
+    "context": "Follow the link below link to access."
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.access-information-button",
+    "definition": "Acceder a la información",
+    "context": "Access the information"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.approved",
+    "definition": "Aprobado",
+    "context": "Approved"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.final",
+    "definition": "definitivo",
+    "context": "final"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.not-final",
+    "definition": "modificaciones",
+    "context": "modifications"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.rejected",
+    "definition": "Rechazado ({status})",
+    "context": "Rejected ({status})"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.result",
+    "definition": "El resultado es: {result}",
+    "context": "Result is: {result}"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.subject-canceled",
+    "definition": "Se ha cancelado {approvalName}",
+    "context": "{approvalName} has been canceled"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.subject-completed",
+    "definition": "Se ha completado {approvalName}",
+    "context": "{approvalName} is completed"
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.text-canceled",
+    "definition": "Se ha cancelado el paso \"{approvalName}\" en <b>{petitionName}</b>.",
+    "context": "The step \"{approvalName}\" in <b>{petitionName}</b> has been cancelled."
+  },
+  {
+    "term": "petition-approval-request-step-finished-email.text-completed",
+    "definition": "Se ha completado el paso \"{approvalName}\" en <b>{petitionName}</b>.",
+    "context": "The step \"{approvalName}\" in <b>{petitionName}</b> has been completed."
+  },
+  {
+    "term": "petition-approval-request-step-pending-email.access-click-link",
+    "definition": "Sigue el enlace siguiente para acceder.",
+    "context": "Follow the link below link to access."
+  },
+  {
+    "term": "petition-approval-request-step-pending-email.number-of-attachments",
+    "definition": "{count, plural, =1 {# archivo} other {# archivos}} adjuntos",
+    "context": "{count, plural, =1 {# file} other {# files}} attached"
+  },
+  {
+    "term": "petition-approval-request-step-pending-email.review-button",
+    "definition": "Revisar la información",
+    "context": "Review information"
+  },
+  {
+    "term": "petition-approval-request-step-pending-email.subject",
+    "definition": "Tienes una aprobación pendiente",
+    "context": "You have a pending approval"
+  },
+  {
+    "term": "petition-approval-request-step-pending-email.subject-action-required",
+    "definition": "Acción requerida",
+    "context": "Action required"
+  },
+  {
+    "term": "petition-approval-request-step-pending-email.subject-reminder",
+    "definition": "Recordatorio",
+    "context": "Reminder"
+  },
+  {
+    "term": "petition-approval-request-step-pending-email.text",
+    "definition": "{requester} te ha solicitado aprobar el siguiente proceso.",
+    "context": "{requester} has asked you to approve the following process."
+  },
+  {
     "term": "petition-closed-notification.subject",
     "definition": "{senderName} ha confirmado la recepción de la información.",
     "context": "{senderName} confirmed receipt of the information."

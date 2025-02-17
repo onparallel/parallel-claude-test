@@ -13,7 +13,7 @@ function ConfirmOverwriteOptionsDialog(props: DialogProps) {
         />
       }
       body={
-        <Stack>
+        <Stack spacing={1}>
           <Text>
             <FormattedMessage
               id="component.confirm-overwrite-options-dialog.body"
@@ -22,7 +22,7 @@ function ConfirmOverwriteOptionsDialog(props: DialogProps) {
           </Text>
           <Text>
             <FormattedMessage
-              id="component.confirm-overwrite-options-dialog.confirm"
+              id="generic.confirm-continue"
               defaultMessage="Are you sure you want to continue?"
             />
           </Text>

@@ -112,6 +112,26 @@ export type AiCompletionLog = Timestamps & {
 
 export type AiCompletionLogStatus = "COMPLETED" | "FAILED" | "PENDING";
 
+export type ApprovalFlowConfig = {
+  /** List of users that are assigned to approve this step. */
+  approvers: Array<Maybe<User>>;
+  name: Scalars["String"]["output"];
+  type: ApprovalFlowType;
+  /** User or UserGroup GID */
+  values: Array<Scalars["ID"]["output"]>;
+  visibility: Maybe<Scalars["JSONObject"]["output"]>;
+};
+
+export type ApprovalFlowConfigInput = {
+  name: Scalars["String"]["input"];
+  type: ApprovalFlowType;
+  /** User or UserGroup GID */
+  values: Array<Scalars["ID"]["input"]>;
+  visibility?: InputMaybe<Scalars["JSONObject"]["input"]>;
+};
+
+export type ApprovalFlowType = "ALL" | "ANY";
+
 export type ArchiveFieldGroupReplyIntoProfileConflictResolutionAction =
   | "APPEND"
   | "IGNORE"
@@ -711,6 +731,7 @@ export type FeatureFlag =
   | "PDF_EXPORT_V2"
   | "PERMISSION_MANAGEMENT"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
+  | "PETITION_APPROVAL_FLOW"
   | "PETITION_SIGNATURE"
   | "PETITION_SUMMARY"
   | "PROFILES"
@@ -986,6 +1007,8 @@ export type Mutation = {
   anonymizePetition: SupportMethodResponse;
   /** Updates the status of a PENDING petition field replies to APPROVED or REJECTED */
   approveOrRejectPetitionFieldReplies: Petition;
+  /** Approves the current approval request step. The step must be in PENDING status. */
+  approvePetitionApprovalRequestStep: PetitionApprovalRequestStep;
   /** Archives the replies of a FIELD_GROUP field into a profile */
   archiveFieldGroupReplyIntoProfile: PetitionFieldReply;
   archiveProfileType: Array<ProfileType>;
@@ -995,6 +1018,10 @@ export type Mutation = {
   bulkCreateContacts: BulkCreateContactsReturnType;
   /** Submits multiple replies on a petition at once given a JSON input where the keys are field aliases and values are the replie(s) for that field. */
   bulkCreatePetitionReplies: Petition;
+  /** Cancels the provided approval request step, setting it as CANCELED and effectively canceling the whole request. The step must be in PENDING status. */
+  cancelPetitionApprovalRequestFlow: PetitionApprovalRequestStep;
+  /** Cancels the provided approval request step, setting it as NOT_STARTED. The step must be in PENDING status. */
+  cancelPetitionApprovalRequestStep: PetitionApprovalRequestStep;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
@@ -1019,6 +1046,7 @@ export type Mutation = {
   /**
    * Marks a petition as COMPLETED.
    * If the petition has a signature configured and does not require a review, starts the signing process.
+   * It the petition has a configured approval flow, calculates and creates every
    */
   completePetition: Petition;
   completeProfileFromExternalSource: Profile;
@@ -1244,6 +1272,8 @@ export type Mutation = {
   petitionAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the petition attachment was correctly uploaded to S3 */
   petitionAttachmentUploadComplete: PetitionAttachment;
+  /** Generates a download link for a comment attachment */
+  petitionCommentAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Generates a download link for a field attachment */
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
@@ -1308,6 +1338,8 @@ export type Mutation = {
   publicUpdatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
+  /** Rejects the current approval request step. Step must be in PENDING status. */
+  rejectPetitionApprovalRequestStep: PetitionApprovalRequestStep;
   /** Removes the password on a petition or template */
   removePetitionPassword: SupportMethodResponse;
   /** Disassociates two profiles with a relationship. */
@@ -1344,6 +1376,8 @@ export type Mutation = {
   scheduleProfileForDeletion: Array<Profile>;
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
   sendPetition: Array<SendPetitionResult>;
+  /** Sends a reminder to the pending approvers of the provided approval request step. The step must be in PENDING status. */
+  sendPetitionApprovalRequestStepReminder: PetitionApprovalRequestStep;
   /** Sends an email to all contacts of the petition confirming the replies are ok */
   sendPetitionClosedNotification: Petition;
   /** Sends a reminder for the specified petition accesses. */
@@ -1360,8 +1394,12 @@ export type Mutation = {
   signaturitIntegrationShowSecurityStamp: SupportMethodResponse;
   /** Generates a download link for the signed PDF petition. */
   signedPetitionDownloadLink: FileUploadDownloadLinkResult;
+  /** Skips the provided approval request step. Step must be in NOT_STARTED or PENDING status. */
+  skipPetitionApprovalRequestStep: PetitionApprovalRequestStep;
   /** Starts the completion of an async field */
   startAsyncFieldCompletion: AsyncFieldCompletionResponse;
+  /** Starts an approval request on the provided step. The step must be applicable and next in line. */
+  startPetitionApprovalRequestStep: PetitionApprovalRequestStep;
   startSignatureRequest: PetitionSignatureRequest;
   subscribeToProfile: Array<Profile>;
   /** Switches automatic reminders for the specified petition accesses. */
@@ -1514,6 +1552,13 @@ export type MutationapproveOrRejectPetitionFieldRepliesArgs = {
   status: PetitionFieldReplyStatus;
 };
 
+export type MutationapprovePetitionApprovalRequestStepArgs = {
+  approvalRequestStepId: Scalars["GID"]["input"];
+  attachments?: InputMaybe<Array<Scalars["Upload"]["input"]>>;
+  message: Scalars["String"]["input"];
+  petitionId: Scalars["GID"]["input"];
+};
+
 export type MutationarchiveFieldGroupReplyIntoProfileArgs = {
   conflictResolutions: Array<ArchiveFieldGroupReplyIntoProfileConflictResolutionInput>;
   expirations: Array<ArchiveFieldGroupReplyIntoProfileExpirationInput>;
@@ -1540,6 +1585,15 @@ export type MutationbulkCreateContactsArgs = {
 export type MutationbulkCreatePetitionRepliesArgs = {
   petitionId: Scalars["GID"]["input"];
   replies: Scalars["JSONObject"]["input"];
+};
+
+export type MutationcancelPetitionApprovalRequestFlowArgs = {
+  petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationcancelPetitionApprovalRequestStepArgs = {
+  approvalRequestStepId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationcancelScheduledMessageArgs = {
@@ -2279,6 +2333,13 @@ export type MutationpetitionAttachmentUploadCompleteArgs = {
   petitionId: Scalars["GID"]["input"];
 };
 
+export type MutationpetitionCommentAttachmentDownloadLinkArgs = {
+  attachmentId: Scalars["GID"]["input"];
+  commentId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  preview?: InputMaybe<Scalars["Boolean"]["input"]>;
+};
+
 export type MutationpetitionFieldAttachmentDownloadLinkArgs = {
   attachmentId: Scalars["GID"]["input"];
   fieldId: Scalars["GID"]["input"];
@@ -2480,6 +2541,14 @@ export type MutationreactivateAccessesArgs = {
   petitionId: Scalars["GID"]["input"];
 };
 
+export type MutationrejectPetitionApprovalRequestStepArgs = {
+  approvalRequestStepId: Scalars["GID"]["input"];
+  attachments?: InputMaybe<Array<Scalars["Upload"]["input"]>>;
+  message: Scalars["String"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  rejectionType: PetitionApprovalRequestStepRejectionType;
+};
+
 export type MutationremovePetitionPasswordArgs = {
   petitionId: Scalars["GID"]["input"];
 };
@@ -2572,6 +2641,11 @@ export type MutationsendPetitionArgs = {
   subject: Scalars["String"]["input"];
 };
 
+export type MutationsendPetitionApprovalRequestStepReminderArgs = {
+  approvalRequestStepId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+};
+
 export type MutationsendPetitionClosedNotificationArgs = {
   attachPdfExport: Scalars["Boolean"]["input"];
   emailBody: Scalars["JSON"]["input"];
@@ -2626,9 +2700,22 @@ export type MutationsignedPetitionDownloadLinkArgs = {
   preview?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
+export type MutationskipPetitionApprovalRequestStepArgs = {
+  approvalRequestStepId: Scalars["GID"]["input"];
+  message: Scalars["String"]["input"];
+  petitionId: Scalars["GID"]["input"];
+};
+
 export type MutationstartAsyncFieldCompletionArgs = {
   fieldId: Scalars["GID"]["input"];
   parentReplyId?: InputMaybe<Scalars["GID"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationstartPetitionApprovalRequestStepArgs = {
+  approvalRequestStepId: Scalars["GID"]["input"];
+  attachments?: InputMaybe<Array<Scalars["Upload"]["input"]>>;
+  message?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 };
 
@@ -3271,6 +3358,7 @@ export type Petition = PetitionBase & {
   anonymizeAfterMonths: Maybe<Scalars["Int"]["output"]>;
   /** Purpose of the anonymization */
   anonymizePurpose: Maybe<Scalars["String"]["output"]>;
+  approvalFlowConfig: Maybe<Array<ApprovalFlowConfig>>;
   /** The attachments linked to this petition */
   attachmentsList: PetitionAttachmentsList;
   /** The automatic numbering settings of the petition. */
@@ -3285,6 +3373,7 @@ export type Petition = PetitionBase & {
   completingMessageSubject: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
+  currentApprovalRequestSteps: Maybe<Array<PetitionApprovalRequestStep>>;
   /** The current signature request. */
   currentSignatureRequest: Maybe<PetitionSignatureRequest>;
   customLists: Array<PetitionCustomList>;
@@ -3311,6 +3400,7 @@ export type Petition = PetitionBase & {
   generalCommentCount: Scalars["Int"]["output"];
   /** The general comments for this petition */
   generalComments: Array<PetitionFieldComment>;
+  hasStartedProcess: Scalars["Boolean"]["output"];
   /** The ID of the petition or template. */
   id: Scalars["GID"]["output"];
   isAnonymized: Scalars["Boolean"]["output"];
@@ -3343,6 +3433,7 @@ export type Petition = PetitionBase & {
   myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]["output"]>;
+  oldApprovalRequestSteps: Array<PetitionApprovalRequestStep>;
   organization: Organization;
   owner: User;
   path: Scalars["String"]["output"];
@@ -3446,6 +3537,125 @@ export type PetitionAnonymizedEvent = PetitionEvent & {
   type: PetitionEventType;
 };
 
+export type PetitionApprovalRequestStep = {
+  approvalType: PetitionApprovalRequestStepApprovalType;
+  approvers: Array<PetitionApprovalRequestStepApprover>;
+  id: Scalars["GID"]["output"];
+  petition: Petition;
+  status: PetitionApprovalRequestStepStatus;
+  stepName: Scalars["String"]["output"];
+};
+
+export type PetitionApprovalRequestStepApprovalType = "ALL" | "ANY";
+
+export type PetitionApprovalRequestStepApprovedEvent = PetitionEvent & {
+  approvalRequestStep: PetitionApprovalRequestStep;
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition: Maybe<PetitionBaseMini>;
+  type: PetitionEventType;
+  user: Maybe<User>;
+};
+
+export type PetitionApprovalRequestStepApprover = {
+  approvedAt: Maybe<Scalars["DateTime"]["output"]>;
+  canceledAt: Maybe<Scalars["DateTime"]["output"]>;
+  id: Scalars["GID"]["output"];
+  rejectedAt: Maybe<Scalars["DateTime"]["output"]>;
+  sentAt: Maybe<Scalars["DateTime"]["output"]>;
+  skippedAt: Maybe<Scalars["DateTime"]["output"]>;
+  user: Maybe<User>;
+};
+
+export type PetitionApprovalRequestStepCanceledEvent = PetitionEvent & {
+  approvalRequestStep: PetitionApprovalRequestStep;
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition: Maybe<PetitionBaseMini>;
+  type: PetitionEventType;
+  user: Maybe<User>;
+};
+
+export type PetitionApprovalRequestStepFinishedEvent = PetitionEvent & {
+  approvalRequestStep: PetitionApprovalRequestStep;
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition: Maybe<PetitionBaseMini>;
+  type: PetitionEventType;
+  user: Maybe<User>;
+};
+
+export type PetitionApprovalRequestStepRejectedEvent = PetitionEvent & {
+  approvalRequestStep: PetitionApprovalRequestStep;
+  comment: Maybe<PetitionFieldComment>;
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition: Maybe<PetitionBaseMini>;
+  type: PetitionEventType;
+  user: Maybe<User>;
+};
+
+export type PetitionApprovalRequestStepRejectionType = "DEFINITIVE" | "TEMPORARY";
+
+export type PetitionApprovalRequestStepReminderEvent = PetitionEvent & {
+  approvalRequestStep: PetitionApprovalRequestStep;
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition: Maybe<PetitionBaseMini>;
+  type: PetitionEventType;
+  user: Maybe<User>;
+};
+
+export type PetitionApprovalRequestStepSkippedEvent = PetitionEvent & {
+  approvalRequestStep: PetitionApprovalRequestStep;
+  comment: Maybe<PetitionFieldComment>;
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition: Maybe<PetitionBaseMini>;
+  type: PetitionEventType;
+  user: Maybe<User>;
+};
+
+export type PetitionApprovalRequestStepStartedEvent = PetitionEvent & {
+  approvalRequestStep: PetitionApprovalRequestStep;
+  comment: Maybe<PetitionFieldComment>;
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition: Maybe<PetitionBaseMini>;
+  type: PetitionEventType;
+  user: Maybe<User>;
+};
+
+export type PetitionApprovalRequestStepStatus =
+  | "APPROVED"
+  | "CANCELED"
+  | "NOT_APPLICABLE"
+  | "NOT_STARTED"
+  | "PENDING"
+  | "REJECTED"
+  | "SKIPPED";
+
+export type PetitionApprovalsFilterInput = {
+  filters: Array<PetitionApprovalsFilterLine>;
+  operator: PetitionApprovalsFilterLogicalOperator;
+};
+
+export type PetitionApprovalsFilterLine = {
+  operator: PetitionApprovalsFilterOperator;
+  value: Scalars["String"]["input"];
+};
+
+export type PetitionApprovalsFilterLogicalOperator = "AND" | "OR";
+
+export type PetitionApprovalsFilterOperator = "ASSIGNED_TO" | "STATUS";
+
 export type PetitionAssociatedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
@@ -3480,6 +3690,7 @@ export type PetitionBase = {
   anonymizeAfterMonths: Maybe<Scalars["Int"]["output"]>;
   /** Purpose of the anonymization */
   anonymizePurpose: Maybe<Scalars["String"]["output"]>;
+  approvalFlowConfig: Maybe<Array<ApprovalFlowConfig>>;
   /** The attachments linked to this petition */
   attachmentsList: PetitionAttachmentsList;
   /** The automatic numbering settings of the petition. */
@@ -3621,6 +3832,14 @@ export type PetitionClosedNotifiedEvent = PetitionEvent & {
   user: Maybe<User>;
 };
 
+/** A file attachment on the petition field comment */
+export type PetitionCommentAttachment = CreatedAt & {
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"]["output"];
+  file: FileUpload;
+  id: Scalars["GID"]["output"];
+};
+
 export type PetitionCompletedEvent = PetitionEvent & {
   completedBy: Maybe<UserOrPetitionAccess>;
   createdAt: Scalars["DateTime"]["output"];
@@ -3715,6 +3934,13 @@ export type PetitionEventType =
   | "MESSAGE_SENT"
   | "OWNERSHIP_TRANSFERRED"
   | "PETITION_ANONYMIZED"
+  | "PETITION_APPROVAL_REQUEST_STEP_APPROVED"
+  | "PETITION_APPROVAL_REQUEST_STEP_CANCELED"
+  | "PETITION_APPROVAL_REQUEST_STEP_FINISHED"
+  | "PETITION_APPROVAL_REQUEST_STEP_REJECTED"
+  | "PETITION_APPROVAL_REQUEST_STEP_REMINDER"
+  | "PETITION_APPROVAL_REQUEST_STEP_SKIPPED"
+  | "PETITION_APPROVAL_REQUEST_STEP_STARTED"
   | "PETITION_CLONED"
   | "PETITION_CLOSED"
   | "PETITION_CLOSED_NOTIFIED"
@@ -3821,6 +4047,9 @@ export type PetitionFieldAttachmentUploadData = {
 
 /** A comment on a petition field */
 export type PetitionFieldComment = {
+  approvalMetadata: Maybe<Scalars["JSONObject"]["output"]>;
+  /** A list of files attached to this comment. */
+  attachments: Array<PetitionCommentAttachment>;
   /** The author of the comment. */
   author: Maybe<UserOrPetitionAccess>;
   /** The JSON content of the comment. */
@@ -3835,6 +4064,8 @@ export type PetitionFieldComment = {
   /** The ID of the petition field comment. */
   id: Scalars["GID"]["output"];
   isAnonymized: Scalars["Boolean"]["output"];
+  /** Whether the comment is part of approval process (only visible to org users and cannot be deleted or edited) */
+  isApproval: Scalars["Boolean"]["output"];
   /** Whether the comment has been edited after being published. */
   isEdited: Scalars["Boolean"]["output"];
   /** Whether the comment is internal (only visible to org users) or public (visible for users and accesses) */
@@ -3977,6 +4208,7 @@ export type PetitionFieldType =
   | "TEXT";
 
 export type PetitionFilter = {
+  approvals?: InputMaybe<PetitionApprovalsFilterInput>;
   fromTemplateId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   locale?: InputMaybe<PetitionLocale>;
   path?: InputMaybe<Scalars["String"]["input"]>;
@@ -4011,6 +4243,7 @@ export type PetitionListView = ListView & {
 };
 
 export type PetitionListViewColumn =
+  | "approvals"
   | "createdAt"
   | "fromTemplateId"
   | "lastActivityAt"
@@ -4025,6 +4258,7 @@ export type PetitionListViewColumn =
   | "tagsFilters";
 
 export type PetitionListViewData = {
+  approvals: Maybe<PetitionListViewDataApprovals>;
   columns: Maybe<Array<PetitionListViewColumn>>;
   fromTemplateId: Maybe<Array<Scalars["GID"]["output"]>>;
   path: Scalars["String"]["output"];
@@ -4037,7 +4271,18 @@ export type PetitionListViewData = {
   tagsFilters: Maybe<PetitionListViewDataTags>;
 };
 
+export type PetitionListViewDataApprovals = {
+  filters: Array<PetitionListViewDataApprovalsFilters>;
+  operator: PetitionApprovalsFilterLogicalOperator;
+};
+
+export type PetitionListViewDataApprovalsFilters = {
+  operator: PetitionApprovalsFilterOperator;
+  value: Scalars["String"]["output"];
+};
+
 export type PetitionListViewDataInput = {
+  approvals?: InputMaybe<PetitionApprovalsFilterInput>;
   columns?: InputMaybe<Array<PetitionListViewColumn>>;
   fromTemplateId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   path?: InputMaybe<Scalars["String"]["input"]>;
@@ -4372,6 +4617,7 @@ export type PetitionTemplate = PetitionBase & {
   anonymizeAfterMonths: Maybe<Scalars["Int"]["output"]>;
   /** Purpose of the anonymization */
   anonymizePurpose: Maybe<Scalars["String"]["output"]>;
+  approvalFlowConfig: Maybe<Array<ApprovalFlowConfig>>;
   /** The attachments linked to this petition */
   attachmentsList: PetitionAttachmentsList;
   /** The automatic numbering settings of the petition. */
@@ -5298,6 +5544,8 @@ export type PublicPetition = Timestamps & {
   generalCommentCount: Scalars["Int"]["output"];
   /** The general comments for this petition */
   generalComments: Array<PublicPetitionFieldComment>;
+  /** Whether the petition has an ongoing signature or approval request */
+  hasStartedProcess: Scalars["Boolean"]["output"];
   /** Shows if the petition has unread comments */
   hasUnreadComments: Scalars["Boolean"]["output"];
   /** The ID of the petition. */
@@ -6143,6 +6391,8 @@ export type SignatureConfig = {
   minSigners: Scalars["Int"]["output"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"]["output"];
+  /** Whether the review should be done after the approval process. */
+  reviewAfterApproval: Maybe<Scalars["Boolean"]["output"]>;
   /** The signers of the generated document. */
   signers: Array<Maybe<PetitionSigner>>;
   signingMode: SignatureConfigSigningMode;
@@ -6165,6 +6415,8 @@ export type SignatureConfigInput = {
   orgIntegrationId: Scalars["GID"]["input"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"]["input"];
+  /** Whether to review the replies after completing the approval steps. If true, review must be true */
+  reviewAfterApproval?: InputMaybe<Scalars["Boolean"]["input"]>;
   signersInfo: Array<SignatureConfigInputSigner>;
   signingMode: SignatureConfigSigningMode;
   /** The timezone used to generate the document. */
@@ -6441,6 +6693,7 @@ export type UpdatePetitionFieldReplyInput = {
 export type UpdatePetitionInput = {
   anonymizeAfterMonths?: InputMaybe<Scalars["Int"]["input"]>;
   anonymizePurpose?: InputMaybe<Scalars["String"]["input"]>;
+  approvalFlowConfig?: InputMaybe<Array<ApprovalFlowConfigInput>>;
   automaticNumberingConfig?: InputMaybe<AutomaticNumberingConfigInput>;
   closingEmailBody?: InputMaybe<Scalars["JSON"]["input"]>;
   completingMessageBody?: InputMaybe<Scalars["JSON"]["input"]>;

@@ -370,6 +370,21 @@ export function mapPetitionEventPayload(event: PetitionEvent) {
         contactId: toGlobalId("Contact", event.data.contact_id),
       };
     }
+    case "PETITION_APPROVAL_REQUEST_STEP_STARTED":
+    case "PETITION_APPROVAL_REQUEST_STEP_APPROVED":
+    case "PETITION_APPROVAL_REQUEST_STEP_REJECTED":
+    case "PETITION_APPROVAL_REQUEST_STEP_SKIPPED":
+    case "PETITION_APPROVAL_REQUEST_STEP_REMINDER":
+    case "PETITION_APPROVAL_REQUEST_STEP_FINISHED":
+    case "PETITION_APPROVAL_REQUEST_STEP_CANCELED":
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+        approvalRequestStepId: toGlobalId(
+          "PetitionApprovalRequestStep",
+          event.data.petition_approval_request_step_id,
+        ),
+      };
+
     default:
       return {};
   }

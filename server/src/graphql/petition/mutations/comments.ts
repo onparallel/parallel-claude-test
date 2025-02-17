@@ -1,11 +1,15 @@
 import { arg, booleanArg, mutationField, nonNull, nullable } from "nexus";
 import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { collectMentionsFromSlate } from "../../../util/slate/mentions";
 import { and, authenticateAnd, ifArgDefined, ifArgEquals, not } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
+import { RESULT } from "../../helpers/Result";
 import { jsonArg } from "../../helpers/scalars/JSON";
 import {
+  attachmentBelongsToPetitionComment,
+  commentIsNotFromApprovalRequest,
   commentsBelongsToPetition,
   fieldHasParent,
   fieldsAreNotInternal,
@@ -121,6 +125,7 @@ export const deletePetitionComment = mutationField("deletePetitionComment", {
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
     userIsOwnerOfPetitionFieldComment("petitionFieldCommentId"),
     petitionIsNotAnonymized("petitionId"),
+    commentIsNotFromApprovalRequest("petitionFieldCommentId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -163,6 +168,7 @@ export const updatePetitionComment = mutationField("updatePetitionComment", {
     userIsOwnerOfPetitionFieldComment("petitionFieldCommentId"),
     petitionIsNotAnonymized("petitionId"),
     usersCanBeMentionedInComment("content"),
+    commentIsNotFromApprovalRequest("petitionFieldCommentId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -219,3 +225,56 @@ export const updatePetitionComment = mutationField("updatePetitionComment", {
     }
   },
 });
+
+export const petitionCommentAttachmentDownloadLink = mutationField(
+  "petitionCommentAttachmentDownloadLink",
+  {
+    type: "FileUploadDownloadLinkResult",
+    description: "Generates a download link for a comment attachment",
+    authorize: authenticateAnd(
+      userHasAccessToPetitions("petitionId"),
+      commentsBelongsToPetition("petitionId", "commentId"),
+      attachmentBelongsToPetitionComment("attachmentId", "commentId"),
+    ),
+    args: {
+      petitionId: nonNull(globalIdArg("Petition")),
+      commentId: nonNull(globalIdArg("PetitionFieldComment")),
+      attachmentId: nonNull(globalIdArg("PetitionCommentAttachment")),
+      preview: booleanArg({
+        description: "If true will use content-disposition inline instead of attachment",
+      }),
+    },
+    resolve: async (_, args, ctx) => {
+      try {
+        const attachment = await ctx.petitionComments.loadPetitionCommentAttachment(
+          args.attachmentId,
+        );
+        assert(attachment, "Attachment not found");
+
+        const file = await ctx.files.loadFileUpload(attachment.file_upload_id);
+        if (!file) {
+          throw new Error(`FileUpload not found with id ${attachment.file_upload_id}`);
+        }
+        if (!file.upload_complete) {
+          await ctx.storage.fileUploads.getFileMetadata(file.path);
+          await ctx.files.markFileUploadComplete(file.id, `User:${ctx.user!.id}`);
+        }
+        return {
+          result: RESULT.SUCCESS,
+          file: file.upload_complete
+            ? file
+            : await ctx.files.loadFileUpload(file.id, { refresh: true }),
+          url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
+            file.path,
+            file.filename,
+            args.preview ? "inline" : "attachment",
+          ),
+        };
+      } catch {
+        return {
+          result: RESULT.FAILURE,
+        };
+      }
+    },
+  },
+);

@@ -16,6 +16,7 @@ import { CreatePetitionEvent, PetitionEvent } from "../events/PetitionEvent";
 import { CreateSystemEvent, SystemEvent } from "../events/SystemEvent";
 import { CreatePetitionUserNotification, PetitionUserNotification } from "../notifications";
 import { OrganizationUsageDetails } from "../repositories/OrganizationRepository";
+import { ApprovalRequestStepConfig } from "../repositories/PetitionApprovalRequestRepository";
 import {
   AutomaticNumberingConfig,
   PetitionCustomList,
@@ -50,6 +51,7 @@ export interface TableTypes
             db.StandardListDefinition,
             "list_name" | "list_version"
           >[];
+          approval_flow_config: ApprovalRequestStepConfig[] | null;
         }
       >;
       petition_signature_request: Replace<
@@ -88,6 +90,7 @@ export interface TableCreateTypes
           summary_config?: PetitionSummaryConfig | null;
           variables?: PetitionVariable[] | null;
           automatic_numbering_config?: AutomaticNumberingConfig | null;
+          approval_flow_config?: ApprovalRequestStepConfig[] | null;
         }
       >;
       petition_signature_request: Replace<

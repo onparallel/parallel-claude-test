@@ -43,7 +43,7 @@ app
   .get("/documents/*", async (req, res, next) => {
     const document = (req.params as any)[0] as string;
     const query = new URLSearchParams(req.query as any);
-    const url = encodeURIComponent(`http://localhost:5000/pdf/${document}?${query}`);
+    const url = encodeURIComponent(`http://localhost:5001/pdf/${document}?${query}`);
     res.send(/* html */ `
       <html>
       <body>
@@ -161,7 +161,7 @@ function header({ subject, from }: { subject: string; from: string }) {
   `;
 }
 
-const port = process.env.SERVER_STORIES_PORT || 5000;
+const port = process.env.SERVER_STORIES_PORT || 5001;
 
 app.listen(port, () => {
   console.log(`ready on http://localhost:${port}`);

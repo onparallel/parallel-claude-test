@@ -328,7 +328,7 @@ export function fieldIsNotBeingUsedInAutoSearchConfig<
               "PetitionField",
               fieldId,
             )} is being referenced on an autoSearchConfig`,
-            "FIELD_IS_BEING_REFERENCED_IN_AUTO_SEARCH_CONFIG",
+            "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG",
             { fieldId: toGlobalId("PetitionField", fieldId) },
           );
         }

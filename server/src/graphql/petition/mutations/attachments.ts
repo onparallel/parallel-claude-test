@@ -12,6 +12,7 @@ import {
   fieldsBelongsToPetition,
   isValidPetitionAttachmentReorder,
   petitionAttachmentBelongsToPetition,
+  petitionDoesNotHaveStartedProcess,
   petitionIsNotAnonymized,
   petitionsAreEditable,
   petitionsAreNotPublicTemplates,
@@ -177,6 +178,7 @@ export const createPetitionAttachmentUploadLink = mutationField(
       petitionsAreNotPublicTemplates("petitionId"),
       petitionIsNotAnonymized("petitionId"),
       petitionsAreEditable("petitionId"),
+      petitionDoesNotHaveStartedProcess("petitionId"),
       petitionCanUploadAttachments("petitionId", "data", 10),
     ),
     args: {
@@ -254,6 +256,7 @@ export const petitionAttachmentUploadComplete = mutationField("petitionAttachmen
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     const attachment = (await ctx.petitions.loadPetitionAttachment(args.attachmentId))!;
@@ -280,6 +283,7 @@ export const deletePetitionAttachment = mutationField("deletePetitionAttachment"
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     await ctx.petitions.deletePetitionAttachment(args.attachmentId, ctx.user!);
@@ -342,6 +346,7 @@ export const reorderPetitionAttachments = mutationField("reorderPetitionAttachme
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -369,6 +374,7 @@ export const updatePetitionAttachmentType = mutationField("updatePetitionAttachm
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     petitionsAreEditable("petitionId"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),

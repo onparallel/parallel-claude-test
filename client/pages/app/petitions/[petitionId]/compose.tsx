@@ -1,6 +1,12 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
-import { Box, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
-import { CalculatorIcon, ListIcon, PaperPlaneIcon, SettingsIcon } from "@parallel/chakra/icons";
+import { Box, Stack, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
+import {
+  AlertCircleIcon,
+  CalculatorIcon,
+  ListIcon,
+  PaperPlaneIcon,
+  SettingsIcon,
+} from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { SupportButton } from "@parallel/components/common/SupportButton";
@@ -469,6 +475,34 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             if (await tryFixReferencingFields(fieldId)) {
               await deleteField(false);
             }
+          } else if (isApolloError(e, "FIELD_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG")) {
+            await showErrorDialog.ignoringDialogErrors({
+              header: (
+                <Stack direction="row" spacing={2} align="center">
+                  <AlertCircleIcon role="presentation" />
+                  <Text>
+                    <FormattedMessage
+                      id="page.petition-compose.field-referenced-in-header"
+                      defaultMessage="Field referenced"
+                    />
+                  </Text>
+                </Stack>
+              ),
+              message: (
+                <FormattedMessage
+                  id="page.petition-compose.field-referenced-in-message"
+                  defaultMessage="This field is referenced in <b>{configurationName}</b> and cannot be removed or modified."
+                  values={{
+                    configurationName: intl
+                      .formatMessage({
+                        id: "component.petition-settings.approval-steps",
+                        defaultMessage: "Approval steps",
+                      })
+                      .toLowerCase(),
+                  }}
+                />
+              ),
+            });
           } else if (isApolloError(e, "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR")) {
             await withError(
               showErrorDialog({
@@ -661,7 +695,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           },
         });
       } catch (e) {
-        if (isApolloError(e, "FIELD_IS_BEING_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
+        if (isApolloError(e, "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
           await checkReferencedFieldInBackgroundCheck(fieldId);
         }
         if (isApolloError(e, "ALIAS_ALREADY_EXISTS")) {
@@ -778,7 +812,38 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         });
         cleanPreviewFieldReplies(apollo, fieldId);
         return;
-      } catch {}
+      } catch (e) {
+        if (isApolloError(e, "FIELD_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG")) {
+          await showErrorDialog.ignoringDialogErrors({
+            header: (
+              <Stack direction="row" spacing={2} align="center">
+                <AlertCircleIcon role="presentation" />
+                <Text>
+                  <FormattedMessage
+                    id="page.petition-compose.field-referenced-in-header"
+                    defaultMessage="Field referenced"
+                  />
+                </Text>
+              </Stack>
+            ),
+            message: (
+              <FormattedMessage
+                id="page.petition-compose.field-referenced-in-message"
+                defaultMessage="This field is referenced in <b>{configurationName}</b> and cannot be removed or modified."
+                values={{
+                  configurationName: intl
+                    .formatMessage({
+                      id: "component.petition-settings.approval-steps",
+                      defaultMessage: "Approval steps",
+                    })
+                    .toLowerCase(),
+                }}
+              />
+            ),
+          });
+          return;
+        }
+      }
       try {
         await confirmChangeFieldType();
         await changePetitionFieldType({
@@ -1059,7 +1124,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       try {
         await linkField();
       } catch (error) {
-        if (isApolloError(error, "FIELD_IS_BEING_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
+        if (isApolloError(error, "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
           await checkReferencedFieldInBackgroundCheck(
             (error.graphQLErrors[0]!.extensions?.fieldId ?? "") as string,
           );
@@ -1164,16 +1229,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             }),
           );
         } else if (isApolloError(error, "FIRST_CHILD_IS_INTERNAL_ERROR")) {
-          await withError(
-            showErrorDialog({
-              message: (
-                <FormattedMessage
-                  id="generic.first-child-is-internal-error"
-                  defaultMessage="The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
-                />
-              ),
-            }),
-          );
+          await showErrorDialog.ignoringDialogErrors({
+            message: (
+              <FormattedMessage
+                id="generic.first-child-is-internal-error"
+                defaultMessage="The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
+              />
+            ),
+          });
         } else if (isApolloError(error, "FIELD_IS_REFERENCED_ERROR")) {
           if (await tryFixReferencingFields(fieldId)) {
             await unlinkChild();
@@ -1222,7 +1285,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     petition.isRestricted ||
     isPublicTemplate ||
     petition.isAnonymized ||
-    myEffectivePermission === "READ";
+    myEffectivePermission === "READ" ||
+    (petition.__typename === "Petition" && petition.hasStartedProcess);
 
   return (
     <ToneProvider value={petition.organization.brandTheme.preferredTone}>
@@ -1355,6 +1419,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                     onUpdatePetition={handleUpdatePetition}
                     validPetitionFields={validPetitionFields}
                     onRefetch={() => refetch()}
+                    isDisabled={isReadOnly}
                   />
                 </TabPanel>
                 <TabPanel {...extendFlexColumn} padding={0} overflow="auto" paddingBottom="52px">
@@ -1465,6 +1530,7 @@ const _fragments = {
         }
         isAnonymized
         ... on Petition {
+          hasStartedProcess
           accesses {
             id
             status

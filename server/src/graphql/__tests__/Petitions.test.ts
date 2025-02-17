@@ -295,7 +295,7 @@ describe("GraphQL/Petitions", () => {
     await testClient.stop();
   });
 
-  describe("Queries", () => {
+  describe("petitions", () => {
     it("fetches all user petitions", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
@@ -790,7 +790,7 @@ describe("GraphQL/Petitions", () => {
       expect(data).toBeNull();
     });
 
-    it("fetches different versions of standard list defintions based on petition overrides", async () => {
+    it("fetches different versions of standard list definitions based on petition overrides", async () => {
       const petitions = await mocks.createRandomPetitions(
         organization.id,
         sessionUser.id,
@@ -3545,6 +3545,146 @@ describe("GraphQL/Petitions", () => {
         ],
       });
     });
+
+    it("nulls signatureConfig.reviewAfterApproval when removing approvalFlowConfig", async () => {
+      const [template] = await mocks.createRandomTemplates(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({
+          signature_config: JSON.stringify({
+            orgIntegrationId: 1,
+            signersInfo: [],
+            timezone: "Europe/Madrid",
+            title: "sign this",
+            review: true,
+            reviewAfterApproval: true,
+            minSigners: 1,
+            signingMode: "PARALLEL",
+          }),
+          approval_flow_config: JSON.stringify([
+            { name: "Step 1", type: "ANY", values: [{ id: sessionUser.id, type: "User" }] },
+          ]),
+        }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $data: UpdatePetitionInput!) {
+            updatePetition(petitionId: $petitionId, data: $data) {
+              approvalFlowConfig {
+                __typename
+              }
+              signatureConfig {
+                title
+                reviewAfterApproval
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", template.id),
+          data: { approvalFlowConfig: null },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetition).toEqual({
+        approvalFlowConfig: null,
+        signatureConfig: {
+          title: "sign this",
+          reviewAfterApproval: null,
+        },
+      });
+    });
+
+    it("sends error when trying to set signatureConfig.reviewAfterApproval with no approvalFlowConfig input", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $data: UpdatePetitionInput!) {
+            updatePetition(petitionId: $petitionId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petitions[5].id),
+          data: {
+            signatureConfig: {
+              allowAdditionalSigners: false,
+              minSigners: 1,
+              orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegrations[0].id),
+              review: true,
+              reviewAfterApproval: true,
+              signersInfo: [{ email: "mike@onparallel.com", firstName: "Mike" }],
+              signingMode: "PARALLEL",
+              timezone: "Europe/Madrid",
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        argName: "data.signatureConfig.reviewAfterApproval",
+        message: "petition must have a configured approval request.",
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error when setting signatureConfig.review = false and signatureConfig.reviewAfterApproval = true", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $data: UpdatePetitionInput!) {
+            updatePetition(petitionId: $petitionId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petitions[5].id),
+          data: {
+            signatureConfig: {
+              allowAdditionalSigners: false,
+              minSigners: 1,
+              orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegrations[0].id),
+              review: false,
+              reviewAfterApproval: true,
+              signersInfo: [{ email: "mike@onparallel.com", firstName: "Mike" }],
+              signingMode: "PARALLEL",
+              timezone: "Europe/Madrid",
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        argName: "data.signatureConfig.reviewAfterApproval",
+        message: "review must be enabled to use reviewAfterApproval.",
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error if trying to update approvalFlowConfig on a Petition", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $data: UpdatePetitionInput!) {
+            updatePetition(petitionId: $petitionId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          data: {
+            approvalFlowConfig: null,
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("Read-only petitions", () => {
@@ -4757,6 +4897,78 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("moves petition status to PENDING if sending a DRAFT", async () => {
+      const [petition] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ status: "DRAFT" }),
+      );
+      await mocks.createRandomPetitionFields(petition.id, 3);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
+            sendPetition(
+              petitionId: $petitionId
+              contactIdGroups: [$contactIds]
+              subject: $subject
+              body: $body
+            ) {
+              petition {
+                status
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIds: [toGlobalId("Contact", contacts[0].id)],
+          subject: "Hello!",
+          body: [],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.sendPetition).toEqual([{ petition: { status: "PENDING" } }]);
+    });
+
+    it("keeps petition in COMPLETED status if sending a COMPLETED", async () => {
+      const [petition] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ status: "COMPLETED" }),
+      );
+      await mocks.createRandomPetitionFields(petition.id, 3);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
+            sendPetition(
+              petitionId: $petitionId
+              contactIdGroups: [$contactIds]
+              subject: $subject
+              body: $body
+            ) {
+              petition {
+                status
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIds: [toGlobalId("Contact", contacts[0].id)],
+          subject: "Hello!",
+          body: [],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.sendPetition).toEqual([{ petition: { status: "COMPLETED" } }]);
+    });
   });
 
   describe("modifyPetitionCustomProperty", () => {
@@ -4942,6 +5154,8 @@ describe("GraphQL/Petitions", () => {
     let signers: { email: string; firstName: string; lastName: string }[];
 
     beforeAll(async () => {
+      await mocks.createFeatureFlags([{ name: "PETITION_APPROVAL_FLOW", default_value: true }]);
+
       limit = await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 10);
       signatureLimit = await mocks.createOrganizationUsageLimit(
         organization.id,
@@ -5162,7 +5376,7 @@ describe("GraphQL/Petitions", () => {
       });
     });
 
-    it("cancels the pending signature process when completing a second time", async () => {
+    it("sends error when a signature request is pending and user tries to complete again", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation (
@@ -5200,21 +5414,8 @@ describe("GraphQL/Petitions", () => {
         },
       });
 
-      expect(errors).toBeUndefined();
-
-      expect(data?.completePetition).toEqual({
-        id: toGlobalId("Petition", petitions[1].id),
-        status: "COMPLETED",
-        signatureRequests: [
-          { status: "ENQUEUED", cancelReason: null },
-          { status: "CANCELLED", cancelReason: "REQUEST_RESTARTED" },
-        ],
-        currentSignatureRequest: { status: "ENQUEUED" },
-        events: {
-          totalCount: 2,
-          items: [{ type: "SIGNATURE_CANCELLED" }, { type: "PETITION_COMPLETED" }],
-        },
-      });
+      expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+      expect(data).toBeNull();
     });
 
     it("when using our shared apiKey and signature usage reached limit, complete anyways but don't start signature", async () => {
@@ -5360,6 +5561,121 @@ describe("GraphQL/Petitions", () => {
         limit_name: "PETITION_SEND",
         used: 1,
         limit: 10,
+      });
+    });
+
+    it("calculates and creates approval steps if the petition has set an approval_flow_config", async () => {
+      const [petition] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({
+          status: "PENDING",
+        }),
+      );
+
+      const [field] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "TEXT",
+        optional: true,
+      }));
+
+      await mocks.knex
+        .from("petition")
+        .where("id", petition.id)
+        .update({
+          approval_flow_config: JSON.stringify([
+            { name: "Step 1", type: "ALL", values: [{ id: sessionUser.id, type: "User" }] },
+            {
+              name: "Step 2",
+              type: "ANY",
+              values: [{ id: sessionUser.id, type: "User" }],
+              visibility: {
+                type: "SHOW",
+                operator: "AND",
+                conditions: [
+                  { modifier: "ANY", fieldId: field.id, operator: "EQUAL", value: "HELLO" },
+                ],
+              },
+            },
+          ]),
+        });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!) {
+            completePetition(petitionId: $petitionId) {
+              id
+              status
+              events(offset: 0, limit: 100) {
+                totalCount
+                items {
+                  type
+                  data
+                }
+              }
+              currentApprovalRequestSteps {
+                id
+                status
+                approvalType
+                approvers {
+                  user {
+                    id
+                  }
+                  approvedAt
+                  canceledAt
+                  rejectedAt
+                  skippedAt
+                  sentAt
+                }
+              }
+            }
+          }
+        `,
+        { petitionId: toGlobalId("Petition", petition.id) },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.completePetition).toMatchObject({
+        id: toGlobalId("Petition", petition.id),
+        status: "COMPLETED",
+        events: {
+          totalCount: 1,
+          items: [
+            { type: "PETITION_COMPLETED", data: { userId: toGlobalId("User", sessionUser.id) } },
+          ],
+        },
+        currentApprovalRequestSteps: [
+          {
+            id: expect.any(String),
+            status: "NOT_STARTED",
+            approvalType: "ALL",
+            approvers: [
+              {
+                user: { id: toGlobalId("User", sessionUser.id) },
+                approvedAt: null,
+                canceledAt: null,
+                rejectedAt: null,
+                skippedAt: null,
+                sentAt: null,
+              },
+            ],
+          },
+          {
+            id: expect.any(String),
+            status: "NOT_APPLICABLE",
+            approvalType: "ANY",
+            approvers: [
+              {
+                user: { id: toGlobalId("User", sessionUser.id) },
+                approvedAt: null,
+                canceledAt: null,
+                rejectedAt: null,
+                skippedAt: null,
+                sentAt: null,
+              },
+            ],
+          },
+        ],
       });
     });
   });

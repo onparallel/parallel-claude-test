@@ -303,6 +303,17 @@ export function useFeatureFlags() {
         }),
         featureFlags: [
           {
+            name: "PETITION_APPROVAL_FLOW",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.petition-approval-flow-name",
+              defaultMessage: "Approval steps",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.petition-approval-flow-description",
+              defaultMessage: "Allows setting up approval steps for petitions",
+            }),
+          },
+          {
             name: "PUBLIC_PETITION_LINK_PREFILL_DATA",
             title: intl.formatMessage({
               id: "component.feature-flag-descriptions.prefill-data-public-links-name",

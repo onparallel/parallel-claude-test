@@ -495,6 +495,16 @@
     "context": "Information"
   },
   {
+    "term": "component.recipient-view-petition-approvals-alert.alert-description-1",
+    "definition": "{tone, select, INFORMAL{<b>Le tue informazioni sono in fase di valutazione.</b> Durante questo processo non potrai apportare modifiche.} other{<b>Le sue informazioni sono in fase di valutazione.</b> Durante questo processo non potrà apportare modifiche.}}",
+    "context": "<b>Your information is being reviewed.</b> During this process, you will not be able to make changes."
+  },
+  {
+    "term": "component.recipient-view-petition-approvals-alert.alert-description-2",
+    "definition": "{tone, select, INFORMAL{Se hai bisogno di correggere qualcosa, puoi scriverci tramite i commenti abilitati.} other{Se ha bisogno di correggere qualcosa, può scriverci tramite i commenti abilitati.}}",
+    "context": "If you need to correct anything, you can write to us through the enabled comments."
+  },
+  {
     "term": "component.recipient-view-petition-field-card.add-another-reply",
     "definition": "Aggiungi un'altra risposta",
     "context": "Add another reply"
@@ -736,8 +746,8 @@
   },
   {
     "term": "component.recipient-view-petition-status-alert.petition-completed-alert-1",
-    "definition": "{tone, select, INFORMAL{<b>Informazioni completate!</b> Abbiamo avvisato {name} per la revisione e la validazione.} other{<b>Informazioni completate,</b> abbiamo notificato a {name} per la revisione e la validazione.}}",
-    "context": "<b>Information completed!</b> We have notified {name} for review and validation."
+    "definition": "{tone, select, INFORMAL{<b>Informazioni completate!</b> Abbiamo avvisato per la revisione e la validazione.} other{<b>Informazioni completate,</b> abbiamo notificato per la revisione e la validazione.}}",
+    "context": "<b>Information completed!</b> We have notified for review and validation."
   },
   {
     "term": "component.recipient-view-petition-status-alert.petition-completed-alert-2",

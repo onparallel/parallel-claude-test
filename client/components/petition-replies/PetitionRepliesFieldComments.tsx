@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Alert,
   AlertDescription,
@@ -6,8 +6,8 @@ import {
   Box,
   Center,
   Flex,
-  HStack,
   Heading,
+  HStack,
   Spinner,
   Stack,
   Text,
@@ -15,12 +15,15 @@ import {
 import { ChevronLeftIcon, CommentIcon, NoteIcon } from "@parallel/chakra/icons";
 import {
   PetitionRepliesFieldComments_PetitionBaseFragment,
+  PetitionRepliesFieldComments_petitionCommentAttachmentDownloadLinkDocument,
   PetitionRepliesFieldComments_PetitionFieldFragment,
   PetitionRepliesFieldComments_petitionFieldQueryDocument,
   PetitionRepliesFieldComments_petitionQueryDocument,
 } from "@parallel/graphql/__types";
 import { useGetMyId } from "@parallel/utils/apollo/getMyId";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
+import { openNewWindow } from "@parallel/utils/openNewWindow";
+import { withError } from "@parallel/utils/promises/withError";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { useGetDefaultMentionables } from "@parallel/utils/useGetDefaultMentionables";
 import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
@@ -39,6 +42,7 @@ import {
   PetitionCommentsAndNotesEditor,
   PetitionCommentsAndNotesEditorInstance,
 } from "../petition-common/PetitionCommentsAndNotesEditor";
+import { useFailureGeneratingLinkDialog } from "./dialogs/FailureGeneratingLinkDialog";
 
 export interface PetitionRepliesFieldCommentsProps {
   petition: PetitionRepliesFieldComments_PetitionBaseFragment;
@@ -162,6 +166,31 @@ export function PetitionRepliesFieldComments({
   const handleMarkAsUnread = (commentId: string) => {
     onMarkAsUnread(commentId);
     markedAsUnreadIdsRef.current = [...markedAsUnreadIdsRef.current, commentId];
+  };
+
+  const [petitionCommentAttachmentDownloadLink] = useMutation(
+    PetitionRepliesFieldComments_petitionCommentAttachmentDownloadLinkDocument,
+  );
+  const showFailure = useFailureGeneratingLinkDialog();
+  const handleDownloadAttachment = async (
+    attachmentId: string,
+    commentId: string,
+    preview: boolean,
+  ) => {
+    await withError(
+      openNewWindow(async () => {
+        const { data } = await petitionCommentAttachmentDownloadLink({
+          variables: { petitionId, commentId, attachmentId, preview },
+        });
+
+        const { url, result, file } = data!.petitionCommentAttachmentDownloadLink;
+        if (result !== "SUCCESS") {
+          await withError(showFailure({ filename: file?.filename ?? "" }));
+          throw new Error();
+        }
+        return url!;
+      }),
+    );
   };
 
   return (
@@ -299,6 +328,7 @@ export function PetitionRepliesFieldComments({
                   onEdit={(content) => onUpdateComment(comment.id, content, comment.isInternal)}
                   onDelete={() => onDeleteComment(comment.id)}
                   onMarkAsUnread={() => handleMarkAsUnread(comment.id)}
+                  onDownloadAttachment={handleDownloadAttachment}
                 />
               ))}
             </Stack>
@@ -371,5 +401,28 @@ const _queries = [
       }
     }
     ${PetitionFieldComment.fragments.PetitionFieldComment}
+  `,
+];
+const _mutations = [
+  gql`
+    mutation PetitionRepliesFieldComments_petitionCommentAttachmentDownloadLink(
+      $petitionId: GID!
+      $commentId: GID!
+      $attachmentId: GID!
+      $preview: Boolean
+    ) {
+      petitionCommentAttachmentDownloadLink(
+        petitionId: $petitionId
+        commentId: $commentId
+        attachmentId: $attachmentId
+        preview: $preview
+      ) {
+        file {
+          filename
+        }
+        result
+        url
+      }
+    }
   `,
 ];

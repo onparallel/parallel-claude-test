@@ -2,11 +2,17 @@ import { list, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { firstBy, isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { PetitionListView, ProfileListView } from "../../db/__types";
+import { fromGlobalId } from "../../util/globalId";
+import { NexusGenInputs } from "../__types";
 import { authenticate, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validateAnd } from "../helpers/validateArgs";
-import { validPetitionSharedWithFilter, validPetitionTagFilter } from "../petition/types";
+import {
+  validApprovalsFilter,
+  validPetitionSharedWithFilter,
+  validPetitionTagFilter,
+} from "../petition/types";
 import { profileTypeIsArchived, userHasAccessToProfileType } from "../profile/authorizers";
 import {
   petitionListViewHasType,
@@ -19,6 +25,34 @@ import {
 } from "./authorizers";
 import { mapProfileListViewDataToDatabase } from "./helpers";
 import { validProfileListViewDataInput } from "./validations";
+
+function mapPetitionListViewData(input: NexusGenInputs["PetitionListViewDataInput"] | null) {
+  if (!input) {
+    return null;
+  }
+
+  return {
+    fromTemplateId: input.fromTemplateId ?? null,
+    path: input.path ?? "/",
+    search: input.search ?? null,
+    searchIn: input.searchIn ?? "EVERYWHERE",
+    sharedWith: input.sharedWith ?? null,
+    signature: input.signature ?? null,
+    status: input.status ?? null,
+    tagsFilters: input.tagsFilters ?? null,
+    approvals: input.approvals
+      ? {
+          ...input.approvals,
+          filters: input.approvals.filters.map((f) => ({
+            ...f,
+            value: f.operator === "ASSIGNED_TO" ? fromGlobalId(f.value, "User").id : f.value,
+          })),
+        }
+      : null,
+    sort: input.sort ?? null,
+    columns: input.columns ?? null,
+  };
+}
 
 // ###############
 // PETITION VIEWS
@@ -34,6 +68,7 @@ export const createPetitionListView = mutationField("createPetitionListView", {
   validateArgs: validateAnd(
     validPetitionSharedWithFilter("data.sharedWith"),
     validPetitionTagFilter("data.tagsFilters"),
+    validApprovalsFilter("data.approvals"),
     async (_, args, ctx, info) => {
       const fromTemplateId = args.data.fromTemplateId;
       if (isNonNullish(fromTemplateId)) {
@@ -50,10 +85,11 @@ export const createPetitionListView = mutationField("createPetitionListView", {
   resolve: async (_, args, ctx) => {
     const userViews = await ctx.views.loadPetitionListViewsByUserId(ctx.user!.id);
     const maxPosition = firstBy(userViews, [(v) => v.position, "desc"])?.position ?? -1;
+
     const [view] = await ctx.views.createPetitionListView(
       {
         name: args.name,
-        data: args.data,
+        data: mapPetitionListViewData(args.data),
         user_id: ctx.user!.id,
         position: maxPosition + 1,
       },
@@ -79,7 +115,8 @@ export const updatePetitionListView = mutationField("updatePetitionListView", {
         args.data?.sharedWith ??
         args.data?.signature ??
         args.data?.status ??
-        args.data?.tagsFilters,
+        args.data?.tagsFilters ??
+        args.data?.approvals,
       petitionListViewHasType("petitionListViewId", "CUSTOM"),
     ),
   ),
@@ -91,6 +128,7 @@ export const updatePetitionListView = mutationField("updatePetitionListView", {
   validateArgs: validateAnd(
     validPetitionSharedWithFilter("data.sharedWith"),
     validPetitionTagFilter("data.tagsFilters"),
+    validApprovalsFilter("data.approvals"),
     async (_, args, ctx, info) => {
       const fromTemplateId = args.data?.fromTemplateId;
       if (isNonNullish(fromTemplateId)) {
@@ -110,18 +148,7 @@ export const updatePetitionListView = mutationField("updatePetitionListView", {
       data.name = args.name;
     }
     if (args.data !== undefined) {
-      data.data = {
-        fromTemplateId: args.data?.fromTemplateId ?? null,
-        path: args.data?.path ?? "/",
-        search: args.data?.search ?? null,
-        searchIn: args.data?.searchIn ?? "EVERYWHERE",
-        sharedWith: args.data?.sharedWith ?? null,
-        signature: args.data?.signature ?? null,
-        status: args.data?.status ?? null,
-        tagsFilters: args.data?.tagsFilters ?? null,
-        sort: args.data?.sort ?? null,
-        columns: args.data?.columns ?? null,
-      };
+      data.data = mapPetitionListViewData(args.data);
     }
     return await ctx.views.updatePetitionListView(args.petitionListViewId, data, ctx.user!);
   },

@@ -1447,3 +1447,88 @@ export function usersCanBeMentionedInComment<
     return true;
   };
 }
+
+export function attachmentBelongsToPetitionComment<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, number>,
+  TArg2 extends Arg<TypeName, FieldName, number>,
+>(attachmentIdArg: TArg1, commentIdArg: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const attachment = await ctx.petitionComments.loadPetitionCommentAttachment(
+        getArg(args, attachmentIdArg),
+      );
+
+      return attachment?.petition_comment_id === getArg(args, commentIdArg);
+    } catch {}
+    return false;
+  };
+}
+
+export function commentIsNotFromApprovalRequest<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>,
+>(commentIdArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const commentId = getArg(args, commentIdArg);
+    const comment = await ctx.petitions.loadPetitionFieldComment(commentId);
+
+    return isNonNullish(comment) && comment.approval_metadata === null;
+  };
+}
+
+export function petitionDoesNotHaveStartedProcess<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>,
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const [process] = await ctx.petitions.getPetitionStartedProcesses(getArg(args, argName));
+    if (isNonNullish(process)) {
+      throw new ApolloError(
+        `Petition has an ongoing ${process.toLowerCase()} process`,
+        `ONGOING_${process}_REQUEST_ERROR`,
+      );
+    }
+
+    return true;
+  };
+}
+
+export function fieldIsNotReferencedInApprovalFlowConfig<
+  TypeName extends string,
+  FieldName extends string,
+>(
+  petitionIdArg: Arg<TypeName, FieldName, number>,
+  fieldIdArg: Arg<TypeName, FieldName, number>,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = getArg(args, petitionIdArg);
+    const fieldId = getArg(args, fieldIdArg);
+
+    const petition = await ctx.petitions.loadPetition(petitionId);
+    assert(petition, "petition expected to be defined");
+
+    if (!petition.approval_flow_config) {
+      return true;
+    }
+
+    if (
+      petition.approval_flow_config.some((config) =>
+        config.visibility?.conditions.some(
+          (condition) => "fieldId" in condition && condition.fieldId === fieldId,
+        ),
+      )
+    ) {
+      throw new ApolloError(
+        `The petition has an approval flow step that references this field`,
+        "FIELD_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG",
+        { fieldId: toGlobalId("PetitionField", fieldId) },
+      );
+    }
+
+    return true;
+  };
+}

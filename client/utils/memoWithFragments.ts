@@ -64,7 +64,7 @@ function checkSelectionSet(
     return true;
   }
   if (Array.isArray(a)) {
-    if (a.length !== b.length) {
+    if (a.length !== b?.length) {
       return false;
     }
     for (let i = 0; i < a.length; i++) {

@@ -1,7 +1,16 @@
 import { gql } from "@apollo/client";
-import { Flex, HStack, IconButton, Text, VisuallyHidden } from "@chakra-ui/react";
+import { Flex, HStack, IconButton, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
-import { BellSettingsIcon, FolderIcon, SignatureIcon } from "@parallel/chakra/icons";
+import {
+  AlertCircleIcon,
+  BellSettingsIcon,
+  FolderIcon,
+  ForbiddenIcon,
+  SignatureIcon,
+  ThumbsDownIcon,
+  ThumbsUpIcon,
+  TimeIcon,
+} from "@parallel/chakra/icons";
 import { CheckboxTableFilter } from "@parallel/components/common/CheckboxTableFilter";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { ContactReference } from "@parallel/components/common/ContactReference";
@@ -16,11 +25,13 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { WithIntl } from "@parallel/components/common/WithIntl";
 import { withProps } from "@parallel/components/common/withProps";
+import { PetitionListApprovalsFilter } from "@parallel/components/petition-list/filters/PetitionListApprovalsFilter";
 import { PetitionListSharedWithFilter } from "@parallel/components/petition-list/filters/PetitionListSharedWithFilter";
 import { PetitionListTagFilter } from "@parallel/components/petition-list/filters/PetitionListTagFilter";
 import { PetitionTemplateFilter } from "@parallel/components/petition-list/filters/PetitionTemplateFilter";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
 import {
+  PetitionApprovalRequestStepStatus,
   PetitionBaseType,
   PetitionListViewColumn,
   PetitionSignatureStatusFilter,
@@ -51,6 +62,7 @@ export const DEFAULT_PETITION_COLUMN_SELECTION: PetitionsTableColumn[] = [
   "recipients",
   "status",
   "signature",
+  "approvals",
   "sharedWith",
   "sentAt",
   "reminders",
@@ -82,6 +94,7 @@ export function getPetitionsTableIncludes(columns?: PetitionsTableColumn[]) {
     includeTags: columns ? columns.includes("tagsFilters") : true,
     includeLastActivityAt: columns ? columns.includes("lastActivityAt") : true,
     includeLastRecipientActivityAt: columns ? columns.includes("lastRecipientActivityAt") : true,
+    includeApprovals: columns ? columns.includes("approvals") : true,
   };
 }
 
@@ -98,6 +111,7 @@ export function getTemplatesTableIncludes() {
     includeTags: true,
     includeLastActivityAt: false,
     includeLastRecipientActivityAt: false,
+    includeApprovals: false,
   };
 }
 
@@ -318,6 +332,98 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
       ) : (
         <></>
       ),
+  },
+  {
+    key: "approvals",
+
+    label: (intl) =>
+      intl.formatMessage({
+        id: "component.petitions-table-columns.header-approvals",
+        defaultMessage: "Approvals",
+      }),
+    align: "left",
+    Filter: PetitionListApprovalsFilter,
+    headerProps: { padding: 0 },
+    cellProps: { padding: 0, minWidth: "72px" },
+    CellContent: ({ row }) => {
+      const status =
+        row.__typename === "Petition"
+          ? getApprovalStatus(row.currentApprovalRequestSteps ?? [])
+          : "NOT_STARTED";
+
+      const hasApprovals = row.__typename === "Petition" && isNonNullish(row.approvalFlowConfig);
+
+      const currentApprovalRequestSteps =
+        row.__typename === "Petition"
+          ? isNonNullish(row.currentApprovalRequestSteps) &&
+            row.currentApprovalRequestSteps.length > 0
+            ? row.currentApprovalRequestSteps
+            : (row.approvalFlowConfig?.map((stepConfig) => {
+                return {
+                  stepName: stepConfig.name,
+                  status: "NOT_STARTED" as PetitionApprovalRequestStepStatus,
+                };
+              }) ?? [])
+          : [];
+
+      if (!hasApprovals) {
+        return <>{"-"}</>;
+      }
+
+      return (
+        <SmallPopover
+          width="auto"
+          content={
+            <Stack>
+              {currentApprovalRequestSteps?.map((step, index) => {
+                return (
+                  <HStack key={index}>
+                    <ApprovalStatusIcon status={step.status} />
+                    <Text as="span">{step.stepName}</Text>
+                  </HStack>
+                );
+              })}
+            </Stack>
+          }
+        >
+          {status === "NOT_STARTED" ? (
+            <Text as="span" textStyle="hint" whiteSpace="nowrap">
+              <FormattedMessage id="generic.not-started" defaultMessage="Not started" />
+            </Text>
+          ) : status === "PENDING" ? (
+            <HStack color="yellow.600">
+              <TimeIcon />
+              <Text as="span" whiteSpace="nowrap">
+                <FormattedMessage
+                  id="util.use-petition-table-colums.approval-status-pending"
+                  defaultMessage="Pending"
+                />
+              </Text>
+            </HStack>
+          ) : status === "APPROVED" ? (
+            <HStack color="green.600">
+              <ThumbsUpIcon />
+              <Text as="span" whiteSpace="nowrap">
+                <FormattedMessage
+                  id="util.use-petition-table-colums.approval-status-approved"
+                  defaultMessage="Approved"
+                />
+              </Text>
+            </HStack>
+          ) : status === "REJECTED" ? (
+            <HStack color="red.600">
+              <ThumbsDownIcon />
+              <Text as="span" whiteSpace="nowrap">
+                <FormattedMessage
+                  id="util.use-petition-table-colums.approval-status-rejected"
+                  defaultMessage="Rejected"
+                />
+              </Text>
+            </HStack>
+          ) : null}
+        </SmallPopover>
+      );
+    },
   },
   {
     key: "sharedWith",
@@ -648,6 +754,52 @@ export const TEMPLATES_COLUMNS = (
   },
 ];
 
+function getApprovalStatus(steps: { status: PetitionApprovalRequestStepStatus }[]) {
+  // - Some step has PENDING status is PENDING
+  // - ALL steps has NOT_STARTED status is NOT_STARTED
+  // - All steps has SKIPPED or APPROVED status is APPROVED
+  // - Some step has REJECTED status is REJECTED
+  const filteredSteps = steps.filter((s) => s.status !== "NOT_APPLICABLE");
+
+  if (filteredSteps.some((step) => step.status === "PENDING")) {
+    return "PENDING";
+  }
+  if (filteredSteps.every((step) => step.status === "NOT_STARTED")) {
+    return "NOT_STARTED";
+  }
+  if (filteredSteps.some((step) => step.status === "REJECTED")) {
+    return "REJECTED";
+  }
+  if (filteredSteps.every((step) => step.status === "SKIPPED" || step.status === "APPROVED")) {
+    return "APPROVED";
+  }
+  return "NOT_STARTED";
+}
+
+function ApprovalStatusIcon({ status }: { status: PetitionApprovalRequestStepStatus }) {
+  switch (status) {
+    case "APPROVED":
+      return <ThumbsUpIcon color="green.600" />;
+    case "CANCELED":
+    case "REJECTED":
+      return <ThumbsDownIcon color="red.600" />;
+    case "PENDING":
+      return <TimeIcon color="yellow.600" />;
+    case "SKIPPED":
+      return (
+        <HStack spacing={0.5}>
+          <ThumbsUpIcon color="green.600" />
+          <AlertCircleIcon color="yellow.600" />
+        </HStack>
+      );
+    case "NOT_STARTED":
+      return <TimeIcon color="gray.600" />;
+    case "NOT_APPLICABLE":
+      return <ForbiddenIcon color="gray.400" />;
+    default:
+      return null;
+  }
+}
 export function usePetitionsTableColumns(
   type: PetitionBaseType,
 ): PetitionsTableColumns_PetitionBaseOrFolder[] {
@@ -715,6 +867,15 @@ usePetitionsTableColumns.fragments = {
         ...PetitionSignatureCellContent_Petition @include(if: $includeSignature)
         lastActivityAt @include(if: $includeLastActivityAt)
         lastRecipientActivityAt @include(if: $includeLastRecipientActivityAt)
+
+        approvalFlowConfig @include(if: $includeApprovals) {
+          name
+        }
+        currentApprovalRequestSteps @include(if: $includeApprovals) {
+          id
+          status
+          stepName
+        }
       }
       ... on PetitionTemplate {
         ...TemplateActiveSettingsIcons_PetitionTemplate

@@ -1,7 +1,7 @@
 import { enumType, inputObjectType } from "nexus";
 import { isNullish, partition, unique } from "remeda";
 import { assert } from "ts-essentials";
-import { fromGlobalId } from "../../../util/globalId";
+import { fromGlobalId, isGlobalId } from "../../../util/globalId";
 import { NexusGenInputs } from "../../__types";
 import { ArgWithPath, getArgWithPath } from "../../helpers/authorize";
 import { ArgValidationError } from "../../helpers/errors";
@@ -25,6 +25,32 @@ export const PetitionSharedWithFilter = inputObjectType({
             type: enumType({
               name: "FilterSharedWithOperator",
               members: ["SHARED_WITH", "NOT_SHARED_WITH", "IS_OWNER", "NOT_IS_OWNER"],
+            }),
+          });
+        },
+      }),
+    });
+  },
+});
+
+export const PetitionApprovalsFilterInput = inputObjectType({
+  name: "PetitionApprovalsFilterInput",
+  definition(t) {
+    t.nonNull.field("operator", {
+      type: enumType({
+        name: "PetitionApprovalsFilterLogicalOperator",
+        members: ["AND", "OR"],
+      }),
+    });
+    t.nonNull.list.nonNull.field("filters", {
+      type: inputObjectType({
+        name: "PetitionApprovalsFilterLine",
+        definition(t) {
+          t.nonNull.string("value");
+          t.nonNull.field("operator", {
+            type: enumType({
+              name: "PetitionApprovalsFilterOperator",
+              members: ["STATUS", "ASSIGNED_TO"],
             }),
           });
         },
@@ -163,6 +189,66 @@ export function validPetitionTagFilter<TypeName extends string, FieldName extend
         throw new ArgValidationError(info, argName, e.message.replace("Assertion Error: ", ""));
       }
       throw new ArgValidationError(info, argName, "Invalid tags filter");
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+export function validApprovalsFilter<TypeName extends string, FieldName extends string>(
+  prop: ArgWithPath<
+    TypeName,
+    FieldName,
+    NexusGenInputs["PetitionApprovalsFilterInput"] | null | undefined
+  >,
+) {
+  return (async (_, args, ctx, info) => {
+    const [approvals, argName] = getArgWithPath(args, prop);
+    if (isNullish(approvals)) {
+      return;
+    }
+
+    if (approvals.filters.length > 5) {
+      throw new ArgValidationError(
+        info,
+        `${argName}.filters`,
+        "A maximum of 5 filter lines is allowed",
+      );
+    }
+
+    for (const filter of approvals.filters) {
+      const index = approvals.filters.indexOf(filter);
+
+      if (filter.operator === "ASSIGNED_TO" && !isGlobalId(filter.value, "User")) {
+        throw new ArgValidationError(
+          info,
+          `${argName}.filters[${index}].value`,
+          "Value must be a user ID",
+        );
+      }
+      if (
+        filter.operator === "STATUS" &&
+        !["WITHOUT_APPROVAL", "NOT_STARTED", "PENDING", "APPROVED", "REJECTED"].includes(
+          filter.value,
+        )
+      ) {
+        throw new ArgValidationError(
+          info,
+          `${argName}.filters[${index}].value`,
+          "Invalid status value",
+        );
+      }
+    }
+
+    const userIds = approvals.filters
+      .filter((f) => f.operator === "ASSIGNED_TO")
+      .map((f) => fromGlobalId(f.value, "User").id);
+
+    const users = await ctx.users.loadUser(unique(userIds));
+    if (!users.every((u) => u?.org_id === ctx.user!.org_id)) {
+      throw new ArgValidationError(
+        info,
+        `${argName}.filters`,
+        "Users must belong to the same organization",
+      );
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

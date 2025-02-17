@@ -12,13 +12,15 @@ import {
 } from "nexus";
 import { outdent } from "outdent";
 import { DatabaseError } from "pg";
-import { isNonNullish, isNullish } from "remeda";
+import { isNonNullish, isNullish, unique, zip } from "remeda";
 import { getClientIp } from "request-ip";
 import { PetitionAccess, User } from "../../db/__types";
 import { Task } from "../../db/repositories/TaskRepository";
+import { evaluateApprovalStepsVisibility } from "../../util/approvalStepsLogic";
 import { buildAutomatedBackgroundCheckFieldQueries } from "../../util/backgroundCheck";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
+import { petitionIsCompleted } from "../../util/petitionIsCompleted";
 import { stallFor } from "../../util/promises/stallFor";
 import {
   interpolatePlaceholdersInSlate,
@@ -45,6 +47,7 @@ import {
   fetchPetitionAccess,
   fieldBelongsToAccess,
   getContactAuthCookieValue,
+  publicPetitionDoesNotHaveOngoingProcess,
   taskBelongsToAccess,
   validPublicPetitionLinkPrefill,
   validPublicPetitionLinkPrefillDataKeycode,
@@ -383,19 +386,31 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
     additionalSigners: list(nonNull("PublicPetitionSignerDataInput")),
     message: nullable("String"),
   },
-  authorize: authenticatePublicAccess("keycode"),
+  authorize: and(
+    authenticatePublicAccess("keycode"),
+    publicPetitionDoesNotHaveOngoingProcess("keycode"),
+  ),
   resolve: async (_, args, ctx) => {
     try {
-      const response = await ctx.petitions.completePetition(
-        ctx.access!.petition_id,
-        ctx.access!,
-        {},
-      );
-      let petition = response.petition;
+      const petitionId = ctx.access!.petition_id;
+      const [composedPetition] = await ctx.petitions.getComposedPetitionFieldsAndVariables([
+        petitionId,
+      ]);
+      const canComplete = petitionIsCompleted(composedPetition, true);
+      if (!canComplete) {
+        throw new Error("CANT_COMPLETE_PETITION_ERROR");
+      }
 
-      const backgroundCheckAutoSearchQueries = buildAutomatedBackgroundCheckFieldQueries(
-        response.composedPetition,
+      let [petition] = await ctx.petitions.updatePetition(
+        petitionId,
+        { status: "COMPLETED" },
+        `PetitionAccess:${ctx.access!.id}`,
       );
+
+      await ctx.petitions.updateRemindersForPetitions(petitionId, null);
+
+      const backgroundCheckAutoSearchQueries =
+        buildAutomatedBackgroundCheckFieldQueries(composedPetition);
 
       // run an automated background search for each field that has autoSearchConfig and the "name" field replied
       // if the query is the same as the last one or the field has a stored entity detail, it will not trigger a new search
@@ -435,12 +450,6 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
         }
       }
 
-      await ctx.petitions.createEvent({
-        type: "PETITION_COMPLETED",
-        petition_id: ctx.access!.petition_id,
-        data: { petition_access_id: ctx.access!.id },
-      });
-
       if (petition.signature_config) {
         if (petition.signature_config.review === false) {
           // start a new signature request, cancelling previous pending requests if any
@@ -454,9 +463,6 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
             ctx.access!,
           );
           petition = updatedPetition ?? petition;
-        } else {
-          // signature is configured to be reviewed after start, so just cancel if there are pending requests
-          await ctx.signature.cancelPendingSignatureRequests(petition.id, ctx.access!);
         }
       }
 
@@ -470,6 +476,68 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
           `PetitionAccess:${ctx.access!.id}`,
         );
       }
+
+      if (petition.approval_flow_config) {
+        const hasFeatureFlag = await ctx.featureFlags.orgHasFeatureFlag(
+          petition.org_id,
+          "PETITION_APPROVAL_FLOW",
+        );
+        if (hasFeatureFlag) {
+          await ctx.approvalRequests.deleteNotStartedPetitionApprovalRequestStepsAndApproversByPetitionId(
+            petition.id,
+          );
+
+          const approvalLogic = evaluateApprovalStepsVisibility(
+            composedPetition,
+            petition.approval_flow_config,
+          );
+
+          // create every approval step. Step statuses will be NOT_STARTED or NOT_APPLICABLE, as completing the petition does not starts the approval flow, only calculates its steps
+          let firstVisibleStepIndex = -1;
+          const approvalRequestSteps =
+            await ctx.approvalRequests.createPetitionApprovalRequestSteps(
+              zip(petition.approval_flow_config, approvalLogic).map(
+                ([step, { isVisible }], index) => {
+                  if (isVisible && firstVisibleStepIndex === -1) {
+                    firstVisibleStepIndex = index;
+                  }
+                  return {
+                    petition_id: petition.id,
+                    status: isVisible ? "NOT_STARTED" : "NOT_APPLICABLE",
+                    approval_type: step.type,
+                    step_name: step.name,
+                    step_number: index,
+                  };
+                },
+              ),
+              `PetitionAccess:${ctx.access!.id}`,
+            );
+
+          // on each step, insert its approvers
+          for (const [step, config] of zip(approvalRequestSteps, petition.approval_flow_config)) {
+            const userGroupsIds = config.values
+              .filter((v) => v.type === "UserGroup")
+              .map((v) => v.id);
+            const groupMembers = (await ctx.userGroups.loadUserGroupMembers(userGroupsIds)).flat();
+            const userIds = unique([
+              ...config.values.filter((v) => v.type === "User").map((v) => v.id),
+              ...groupMembers.map((m) => m.user_id),
+            ]);
+
+            await ctx.approvalRequests.createPetitionApprovalRequestStepApprovers(
+              step.id,
+              userIds.map((id) => ({ id })),
+              `PetitionAccess:${ctx.access!.id}`,
+            );
+          }
+        }
+      }
+
+      await ctx.petitions.createEvent({
+        type: "PETITION_COMPLETED",
+        petition_id: ctx.access!.petition_id,
+        data: { petition_access_id: ctx.access!.id },
+      });
 
       return petition;
     } catch (error) {

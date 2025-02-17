@@ -41,6 +41,30 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
       }
 
       if (
+        petition.approval_flow_config &&
+        petition.signature_config.review &&
+        petition.signature_config.reviewAfterApproval
+      ) {
+        // if approval step is required, check if it was completed
+        const currentApprovalSteps =
+          await ctx.approvalRequests.loadCurrentPetitionApprovalRequestStepsByPetitionId(
+            args.petitionId,
+          );
+
+        if (
+          currentApprovalSteps.length === 0 ||
+          !currentApprovalSteps.every((s) =>
+            ["NOT_APPLICABLE", "SKIPPED", "APPROVED"].includes(s.status),
+          )
+        ) {
+          throw new ApolloError(
+            `An approval flow is required to be completed before starting the signature request`,
+            "APPROVAL_REQUEST_STEP_NOT_COMPLETED",
+          );
+        }
+      }
+
+      if (
         petition.signature_config.useCustomDocument &&
         isNullish(args.customDocumentTemporaryFileId)
       ) {

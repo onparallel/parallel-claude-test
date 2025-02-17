@@ -32,6 +32,7 @@ import {
   ShieldIcon,
   ShortSearchIcon,
   SignatureIcon,
+  ThumbsUpIcon,
   TimeIcon,
   UserPlusIcon,
 } from "@parallel/chakra/icons";
@@ -47,6 +48,7 @@ import {
   PetitionSettings_updateTemplateDocumentThemeDocument,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
+import { Fragments } from "@parallel/utils/apollo/fragments";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { FORMATS } from "@parallel/utils/dates";
@@ -86,6 +88,7 @@ import {
   CompliancePeriodDialog,
   useCompliancePeriodDialog,
 } from "./dialogs/CompliancePeriodDialog";
+import { useConfigureApprovalStepsDialog } from "./dialogs/ConfigureApprovalStepsDialog";
 import { useConfigureAutomaticNumberingDialog } from "./dialogs/ConfigureAutomaticNumberingDialog";
 import { usePetitionDeadlineDialog } from "./dialogs/PetitionDeadlineDialog";
 import { useRestrictPetitionDialog } from "./dialogs/RestrictPetitionDialog";
@@ -100,6 +103,7 @@ export interface PetitionSettingsProps {
   onUpdatePetition: (value: UpdatePetitionInput) => Promise<void>;
   validPetitionFields: () => Promise<boolean>;
   onRefetch: () => Promise<any>;
+  isDisabled?: boolean;
 }
 
 function _PetitionSettings({
@@ -108,6 +112,7 @@ function _PetitionSettings({
   onRefetch,
   onUpdatePetition,
   validPetitionFields,
+  isDisabled,
 }: PetitionSettingsProps) {
   const locales = useAvailablePetitionLocales(user);
   const intl = useIntl();
@@ -385,12 +390,6 @@ function _PetitionSettings({
     } catch {}
   };
 
-  const settingIsDisabled =
-    isPublicTemplate ||
-    petition.isAnonymized ||
-    petition.isRestricted ||
-    myEffectivePermission === "READ";
-
   const [updateTemplateDocumentTheme] = useMutation(
     PetitionSettings_updateTemplateDocumentThemeDocument,
   );
@@ -446,6 +445,28 @@ function _PetitionSettings({
     } catch {}
   };
 
+  const showConfigureApprovalStepsDialog = useConfigureApprovalStepsDialog();
+  const handleUpdateApprovalSteps = async (enable: boolean) => {
+    assertTypename(petition, "PetitionTemplate");
+    if (enable) {
+      try {
+        const approvalFlowConfig = await showConfigureApprovalStepsDialog({
+          petitionId: petition.id,
+        });
+
+        await onUpdatePetition({
+          approvalFlowConfig,
+        });
+      } catch {}
+    } else {
+      try {
+        await onUpdatePetition({
+          approvalFlowConfig: null,
+        });
+      } catch {}
+    }
+  };
+
   return (
     <Stack padding={4} spacing={2}>
       <Heading as="h5" size="sm" marginY={1.5}>
@@ -477,7 +498,7 @@ function _PetitionSettings({
       />
       {petition.__typename === "PetitionTemplate" ? (
         <SettingsRowSwitch
-          isDisabled={settingIsDisabled}
+          isDisabled={isDisabled}
           icon={<ShortSearchIcon />}
           label={
             <FormattedMessage
@@ -507,10 +528,45 @@ function _PetitionSettings({
         />
       ) : null}
 
+      {user.hasPetitionApprovalFlow && petition.__typename === "PetitionTemplate" ? (
+        <SettingsRowButton
+          data-section="approval-steps"
+          isDisabled={isDisabled}
+          icon={<ThumbsUpIcon />}
+          label={
+            <FormattedMessage
+              id="component.petition-settings.approval-steps"
+              defaultMessage="Approval steps"
+            />
+          }
+          description={
+            <>
+              <Text fontSize="sm" marginBottom={2}>
+                <FormattedMessage
+                  id="component.petition-settings.approval-steps-description-1"
+                  defaultMessage="Add approval steps to assign approvers to evaluate the process."
+                />
+              </Text>
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="component.petition-settings.approval-steps-description-2"
+                  defaultMessage="The parallel cannot be closed until all approval steps have been completed."
+                />
+              </Text>
+            </>
+          }
+          controlId="approval-steps"
+          isActive={isNonNullish(petition.approvalFlowConfig)}
+          onAdd={() => handleUpdateApprovalSteps(true)}
+          onRemove={() => handleUpdateApprovalSteps(false)}
+          onConfig={() => handleUpdateApprovalSteps(true)}
+        />
+      ) : null}
+
       {petition.__typename === "PetitionTemplate" ? (
         <SettingsRowButton
           data-section="share-automatically"
-          isDisabled={settingIsDisabled}
+          isDisabled={isDisabled}
           icon={<ArrowShortRightIcon />}
           label={
             <FormattedMessage
@@ -535,7 +591,7 @@ function _PetitionSettings({
       {petition.__typename === "PetitionTemplate" ? (
         <SettingsRow
           controlId="default-path"
-          isDisabled={settingIsDisabled}
+          isDisabled={isDisabled}
           icon={<FolderIcon />}
           label={
             <FormattedMessage
@@ -575,7 +631,7 @@ function _PetitionSettings({
       !petition.isInteractionWithRecipientsEnabled ? null : (
         <SettingsRow
           controlId="petition-locale"
-          isDisabled={settingIsDisabled}
+          isDisabled={isDisabled}
           icon={<EmailIcon />}
           label={
             <FormattedMessage
@@ -604,7 +660,7 @@ function _PetitionSettings({
       )}
       <Divider />
       <SettingsRowSwitch
-        isDisabled={settingIsDisabled || petition.__typename === "Petition"}
+        isDisabled={isDisabled || petition.__typename === "Petition"}
         label={
           <Heading as="h5" size="sm">
             <FormattedMessage
@@ -654,7 +710,7 @@ function _PetitionSettings({
             <>
               <SettingsRowButton
                 data-section="share-by-link"
-                isDisabled={settingIsDisabled}
+                isDisabled={isDisabled}
                 icon={<LinkIcon />}
                 label={
                   <FormattedMessage id="generic.share-by-link" defaultMessage="Share by link" />
@@ -691,7 +747,7 @@ function _PetitionSettings({
                 </InputGroup>
               </SettingsRowButton>
               <SettingsRowButton
-                isDisabled={settingIsDisabled}
+                isDisabled={isDisabled}
                 icon={<BellSettingsIcon />}
                 label={
                   <FormattedMessage
@@ -709,7 +765,7 @@ function _PetitionSettings({
           ) : null}
           {user.hasSkipForwardSecurity ? (
             <SettingsRowSwitch
-              isDisabled={settingIsDisabled}
+              isDisabled={isDisabled}
               icon={<ShieldIcon />}
               label={
                 <FormattedMessage
@@ -730,7 +786,7 @@ function _PetitionSettings({
           ) : null}
           {user.hasHideRecipientViewContents ? (
             <SettingsRowSwitch
-              isDisabled={settingIsDisabled}
+              isDisabled={isDisabled}
               icon={<ListIcon />}
               label={
                 <FormattedMessage
@@ -753,7 +809,7 @@ function _PetitionSettings({
           ) : null}
           {user.hasSettingDelegateAccess ? (
             <SettingsRowSwitch
-              isDisabled={settingIsDisabled}
+              isDisabled={isDisabled}
               icon={<UserPlusIcon />}
               label={
                 <FormattedMessage
@@ -776,7 +832,7 @@ function _PetitionSettings({
       ) : null}
       <Divider />
       <SettingsRowSwitch
-        isDisabled={settingIsDisabled || petition.__typename === "Petition"}
+        isDisabled={isDisabled || petition.__typename === "Petition"}
         label={
           <Heading as="h5" size="sm">
             <FormattedMessage
@@ -819,7 +875,7 @@ function _PetitionSettings({
           {petition.__typename === "PetitionTemplate" ? (
             <SettingsRow
               controlId="template-document-theme"
-              isDisabled={settingIsDisabled}
+              isDisabled={isDisabled}
               icon={<DocumentIcon />}
               label={
                 <FormattedMessage
@@ -867,7 +923,7 @@ function _PetitionSettings({
             <SettingsRowButton
               data-section="esignature-settings"
               isDisabled={
-                !hasSignature || settingIsDisabled || ongoingSignatureRequest?.status === "ENQUEUED"
+                !hasSignature || isDisabled || ongoingSignatureRequest?.status === "ENQUEUED"
               }
               icon={<SignatureIcon />}
               label={
@@ -900,7 +956,7 @@ function _PetitionSettings({
 
           <SettingsRowButton
             data-section="auto-enumeration-settings"
-            isDisabled={settingIsDisabled}
+            isDisabled={isDisabled}
             icon={<FieldNumberIcon />}
             label={
               <HStack>
@@ -951,9 +1007,7 @@ function _PetitionSettings({
           controlId="petition-deadline"
           isActive={Boolean(petition.deadline)}
           icon={<FieldDateIcon />}
-          isDisabled={
-            petition.isAnonymized || petition.isRestricted || myEffectivePermission === "READ"
-          }
+          isDisabled={isDisabled}
           label={
             <FormattedMessage
               id="component.petition-settings.deadline-label"
@@ -972,21 +1026,14 @@ function _PetitionSettings({
             onChange={(value) =>
               withError(onUpdatePetition({ deadline: value?.toISOString() ?? null }))
             }
-            isDisabled={
-              petition.isAnonymized || petition.isRestricted || myEffectivePermission === "READ"
-            }
+            isDisabled={isDisabled}
           />
         </SettingsRow>
       ) : null}
 
       {user.hasAutoAnonymize ? (
         <SettingsRowButton
-          isDisabled={
-            isPublicTemplate ||
-            petition.isAnonymized ||
-            petition.isRestricted ||
-            myEffectivePermission !== "OWNER"
-          }
+          isDisabled={isDisabled || myEffectivePermission !== "OWNER"}
           icon={<TimeIcon />}
           label={
             <FormattedMessage
@@ -1042,6 +1089,7 @@ const fragments = {
   User: gql`
     fragment PetitionSettings_User on User {
       id
+      hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
       hasSettingDelegateAccess: hasFeatureFlag(featureFlag: SETTING_DELEGATE_ACCESS)
       hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
       hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
@@ -1083,6 +1131,9 @@ const fragments = {
       isRecipientViewContentsHidden
       isRestricted
       isRestrictedWithPassword
+      approvalFlowConfig {
+        ...Fragments_FullApprovalFlowConfig
+      }
       automaticNumberingConfig {
         numberingType
       }
@@ -1126,6 +1177,7 @@ const fragments = {
       }
       isAnonymized
     }
+    ${Fragments.FullApprovalFlowConfig}
     ${SignatureConfigDialog.fragments.PetitionBase}
     ${CompliancePeriodDialog.fragments.PetitionBase}
     ${PublicLinkSettingsDialog.fragments.PetitionTemplate}
