@@ -833,9 +833,14 @@ export interface NexusGenObjects {
   };
   BackgroundCheckEntityDetailsSanction: {
     // root type
+    datasets?: NexusGenRootTypes["BackgroundCheckEntityDetailsSanctionDatasets"][] | null; // [BackgroundCheckEntityDetailsSanctionDatasets!]
     id: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntityDetailsSanctionProperties"]; // BackgroundCheckEntityDetailsSanctionProperties!
     type: string; // String!
+  };
+  BackgroundCheckEntityDetailsSanctionDatasets: {
+    // root type
+    title: string; // String!
   };
   BackgroundCheckEntityDetailsSanctionProperties: {
     // root type
@@ -1830,9 +1835,14 @@ export interface NexusGenFieldTypes {
   };
   BackgroundCheckEntityDetailsSanction: {
     // field return type
+    datasets: NexusGenRootTypes["BackgroundCheckEntityDetailsSanctionDatasets"][] | null; // [BackgroundCheckEntityDetailsSanctionDatasets!]
     id: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntityDetailsSanctionProperties"]; // BackgroundCheckEntityDetailsSanctionProperties!
     type: string; // String!
+  };
+  BackgroundCheckEntityDetailsSanctionDatasets: {
+    // field return type
+    title: string; // String!
   };
   BackgroundCheckEntityDetailsSanctionProperties: {
     // field return type
@@ -4698,9 +4708,14 @@ export interface NexusGenFieldTypeNames {
   };
   BackgroundCheckEntityDetailsSanction: {
     // field return type name
+    datasets: "BackgroundCheckEntityDetailsSanctionDatasets";
     id: "String";
     properties: "BackgroundCheckEntityDetailsSanctionProperties";
     type: "String";
+  };
+  BackgroundCheckEntityDetailsSanctionDatasets: {
+    // field return type name
+    title: "String";
   };
   BackgroundCheckEntityDetailsSanctionProperties: {
     // field return type name

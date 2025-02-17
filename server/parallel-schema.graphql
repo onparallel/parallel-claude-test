@@ -203,9 +203,14 @@ type BackgroundCheckEntityDetailsRelationshipProperties {
 }
 
 type BackgroundCheckEntityDetailsSanction {
+  datasets: [BackgroundCheckEntityDetailsSanctionDatasets!]
   id: String!
   properties: BackgroundCheckEntityDetailsSanctionProperties!
   type: String!
+}
+
+type BackgroundCheckEntityDetailsSanctionDatasets {
+  title: String!
 }
 
 type BackgroundCheckEntityDetailsSanctionProperties {

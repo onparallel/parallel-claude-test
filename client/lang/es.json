@@ -14466,8 +14466,8 @@
   },
   {
     "term": "page.background-check-profile-details.authority",
-    "definition": "Autoridad",
-    "context": "Authority"
+    "definition": "Nombre del listado / Autoridad",
+    "context": "List name / Authority"
   },
   {
     "term": "page.background-check-profile-details.end-date",

@@ -169,6 +169,14 @@ export const BackgroundCheckEntityDetailsSanction = objectType({
   definition(t) {
     t.nonNull.string("id");
     t.nonNull.string("type");
+    t.nullable.list.nonNull.field("datasets", {
+      type: objectType({
+        name: "BackgroundCheckEntityDetailsSanctionDatasets",
+        definition(t) {
+          t.nonNull.string("title");
+        },
+      }),
+    });
     t.nonNull.field("properties", {
       type: objectType({
         name: "BackgroundCheckEntityDetailsSanctionProperties",

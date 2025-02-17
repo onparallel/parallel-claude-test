@@ -1,4 +1,5 @@
 import { inject, injectable } from "inversify";
+import { isNonNullish } from "remeda";
 import { CONFIG, Config } from "../../config";
 import { FETCH_SERVICE, FetchService } from "../FetchService";
 import {
@@ -18,6 +19,7 @@ interface OpenSanctionsPersonSchema {
   id: string;
   caption: string;
   schema: "Person";
+  score?: number;
   properties: {
     alias?: string[];
     name?: string[];
@@ -95,7 +97,7 @@ interface OpenSanctionsFamilyPersonSchema {
 
 interface OpenSanctionsSanctionSchema {
   id: string;
-  caption: string;
+  datasets: string[];
   schema: "Sanction";
   properties: {
     authority?: string[];
@@ -110,6 +112,7 @@ interface OpenSanctionsCompanySchema {
   id: string;
   caption: string;
   schema: "Company" | "Organization";
+  score?: number;
   properties: {
     name?: string[];
     alias?: string[];
@@ -156,6 +159,25 @@ interface OpenSanctionsMatchResponse {
       results: any[];
     }
   >;
+}
+interface CatalogDataSchema {
+  datasets: DatasetSchema[];
+  current: string[];
+  outdated: string[];
+  index_stale: boolean;
+}
+
+interface DatasetSchema {
+  name: string;
+  title: string;
+  summary: string;
+  url: string;
+  load: boolean;
+  entities_url: string;
+  version: string;
+  index_version: string;
+  index_current: boolean;
+  children: string[];
 }
 
 type OpenSanctionsEntityDetailsResponse = OpenSanctionsPersonSchema | OpenSanctionsCompanySchema;
@@ -236,13 +258,14 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
       "GET",
       `entities/${entityId}`,
     );
+    const catalogData = await this.apiCall<CatalogDataSchema>("GET", "catalog");
 
     switch (data.schema) {
       case "Person":
-        return this.personDetails(data as OpenSanctionsPersonSchema);
+        return this.personDetails(data as OpenSanctionsPersonSchema, catalogData);
       case "Company":
       case "Organization":
-        return this.companyDetails(data as OpenSanctionsCompanySchema);
+        return this.companyDetails(data as OpenSanctionsCompanySchema, catalogData);
       default:
         throw new Error("INVALID_ENTITY_SCHEMA");
     }
@@ -253,6 +276,7 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
       id: data.id,
       type: "Person",
       name: data.caption,
+      score: data.score,
       properties: {
         birthDate: data.properties.birthDate,
         gender: data.properties.gender,
@@ -267,6 +291,7 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
       id: data.id,
       type: "Company",
       name: data.caption,
+      score: data.score,
       properties: {
         incorporationDate: data.properties.incorporationDate,
         jurisdiction: data.properties.jurisdiction,
@@ -275,7 +300,10 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
     };
   }
 
-  private personDetails(data: OpenSanctionsPersonSchema): EntityDetailsResponse {
+  private personDetails(
+    data: OpenSanctionsPersonSchema,
+    catalogData: CatalogDataSchema,
+  ): EntityDetailsResponse {
     const person = {
       id: data.id,
       type: "Person",
@@ -319,13 +347,16 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
         ],
         sanctions: (data.properties.sanctions ?? [])
           .filter(this.isSanctionSchema)
-          .map(this.mapSanction),
+          .map((sanction) => this.mapSanction(sanction, catalogData)),
       },
       createdAt: new Date(),
     };
   }
 
-  private companyDetails(data: OpenSanctionsCompanySchema): EntityDetailsResponse {
+  private companyDetails(
+    data: OpenSanctionsCompanySchema,
+    catalogData: CatalogDataSchema,
+  ): EntityDetailsResponse {
     const company = {
       id: data.id,
       type: "Company",
@@ -348,7 +379,7 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
         ],
         sanctions: (data.properties.sanctions ?? [])
           .filter(this.isSanctionSchema)
-          .map(this.mapSanction),
+          .map((sanction) => this.mapSanction(sanction, catalogData)),
       },
       createdAt: new Date(),
     };
@@ -515,10 +546,18 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
     });
   }
 
-  private mapSanction(data: OpenSanctionsSanctionSchema): EntityDetailsSanction {
+  private mapSanction(
+    data: OpenSanctionsSanctionSchema,
+    catalogData: CatalogDataSchema,
+  ): EntityDetailsSanction {
+    const datasets = data.datasets
+      .map((name) => catalogData.datasets.find((d) => d.name === name))
+      .filter(isNonNullish);
+
     return {
       id: data.id,
       type: "Sanction",
+      datasets: datasets.map((d) => ({ title: d.title })),
       properties: {
         authority: data.properties.authority,
         program: data.properties.program,

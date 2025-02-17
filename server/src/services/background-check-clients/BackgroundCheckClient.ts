@@ -10,6 +10,7 @@ export interface EntitySearchPerson {
   id: string;
   type: "Person";
   name: string;
+  score?: number;
   properties: {
     birthDate?: string[];
     gender?: string[];
@@ -22,6 +23,7 @@ export interface EntitySearchCompany {
   id: string;
   type: "Company";
   name: string;
+  score?: number;
   properties: {
     incorporationDate?: string[];
     jurisdiction?: string[];
@@ -38,6 +40,7 @@ export interface EntitySearchResponse {
 export interface EntityDetailsSanction {
   id: string;
   type: "Sanction";
+  datasets?: { title: string }[];
   properties: {
     authority?: string[];
     program?: string[];

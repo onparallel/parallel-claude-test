@@ -644,7 +644,7 @@ export default function BackgroundCheckProfile(props: BackgroundCheckProfileProp
               <View style={tableStyles.table}>
                 <View style={tableStyles.headerRow}>
                   <Text style={[tableStyles.cell, tableStyles.headerCell, tableStyles.authority]}>
-                    Authority
+                    List name / Authority
                   </Text>
                   <Text style={[tableStyles.cell, tableStyles.headerCell, tableStyles.program]}>
                     Program
@@ -655,30 +655,34 @@ export default function BackgroundCheckProfile(props: BackgroundCheckProfileProp
                   <Text style={[tableStyles.cell, tableStyles.headerCell, tableStyles.to]}>To</Text>
                 </View>
 
-                {props.entity.properties?.sanctions?.map((sanction, i) => (
-                  <View key={i} style={tableStyles.row}>
-                    <Text style={[tableStyles.cell, tableStyles.bodyCell, tableStyles.authority]}>
-                      {sanction.properties?.authority?.join(" · ") ?? "-"}
-                    </Text>
-                    <Text style={[tableStyles.cell, tableStyles.bodyCell, tableStyles.program]}>
-                      <ListOfTexts values={sanction.properties?.program} />
-                    </Text>
-                    <Text style={[tableStyles.cell, tableStyles.bodyCell, tableStyles.from]}>
-                      {sanction.properties?.startDate
-                        ? sanction.properties.startDate
-                            .map((date) => formatPartialDate({ date }))
-                            .join(" · ")
-                        : "-"}
-                    </Text>
-                    <Text style={[tableStyles.cell, tableStyles.bodyCell, tableStyles.to]}>
-                      {sanction.properties?.endDate
-                        ? sanction.properties.endDate
-                            .map((date) => formatPartialDate({ date }))
-                            .join(" · ")
-                        : "-"}
-                    </Text>
-                  </View>
-                ))}
+                {props.entity.properties?.sanctions?.map((sanction, i) => {
+                  const authority = sanction.properties?.authority?.join(" · ") ?? "-";
+                  const datasets = sanction.datasets?.map((d) => d.title).join(" · ") || null;
+                  return (
+                    <View key={i} style={tableStyles.row}>
+                      <Text style={[tableStyles.cell, tableStyles.bodyCell, tableStyles.authority]}>
+                        {`${[datasets, authority].filter(isNonNullish).join(" / ")}`}
+                      </Text>
+                      <Text style={[tableStyles.cell, tableStyles.bodyCell, tableStyles.program]}>
+                        <ListOfTexts values={sanction.properties?.program} />
+                      </Text>
+                      <Text style={[tableStyles.cell, tableStyles.bodyCell, tableStyles.from]}>
+                        {sanction.properties?.startDate
+                          ? sanction.properties.startDate
+                              .map((date) => formatPartialDate({ date }))
+                              .join(" · ")
+                          : "-"}
+                      </Text>
+                      <Text style={[tableStyles.cell, tableStyles.bodyCell, tableStyles.to]}>
+                        {sanction.properties?.endDate
+                          ? sanction.properties.endDate
+                              .map((date) => formatPartialDate({ date }))
+                              .join(" · ")
+                          : "-"}
+                      </Text>
+                    </View>
+                  );
+                })}
               </View>
             ) : (
               <View>

@@ -232,9 +232,15 @@ export interface BackgroundCheckEntityDetailsRelationshipProperties {
 
 export interface BackgroundCheckEntityDetailsSanction {
   __typename?: "BackgroundCheckEntityDetailsSanction";
+  datasets?: Maybe<Array<BackgroundCheckEntityDetailsSanctionDatasets>>;
   id: Scalars["String"]["output"];
   properties: BackgroundCheckEntityDetailsSanctionProperties;
   type: Scalars["String"]["output"];
+}
+
+export interface BackgroundCheckEntityDetailsSanctionDatasets {
+  __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+  title: Scalars["String"]["output"];
 }
 
 export interface BackgroundCheckEntityDetailsSanctionProperties {
@@ -25221,6 +25227,10 @@ export type BackgroundCheckEntityDetailsSanctions_BackgroundCheckEntityDetailsSa
   __typename?: "BackgroundCheckEntityDetailsSanction";
   id: string;
   type: string;
+  datasets?: Array<{
+    __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+    title: string;
+  }> | null;
   properties: {
     __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
     authority?: Array<string> | null;
@@ -35658,6 +35668,10 @@ export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPersonFrag
       __typename?: "BackgroundCheckEntityDetailsSanction";
       id: string;
       type: string;
+      datasets?: Array<{
+        __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+        title: string;
+      }> | null;
       properties: {
         __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
         authority?: Array<string> | null;
@@ -35725,6 +35739,10 @@ export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompanyFra
       __typename?: "BackgroundCheckEntityDetailsSanction";
       id: string;
       type: string;
+      datasets?: Array<{
+        __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+        title: string;
+      }> | null;
       properties: {
         __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
         authority?: Array<string> | null;
@@ -35819,6 +35837,10 @@ export type BackgroundCheckProfileDetails_backgroundCheckEntityDetailsQuery = {
             __typename?: "BackgroundCheckEntityDetailsSanction";
             id: string;
             type: string;
+            datasets?: Array<{
+              __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+              title: string;
+            }> | null;
             properties: {
               __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
               authority?: Array<string> | null;
@@ -35895,6 +35917,10 @@ export type BackgroundCheckProfileDetails_backgroundCheckEntityDetailsQuery = {
             __typename?: "BackgroundCheckEntityDetailsSanction";
             id: string;
             type: string;
+            datasets?: Array<{
+              __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+              title: string;
+            }> | null;
             properties: {
               __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
               authority?: Array<string> | null;
@@ -65417,6 +65443,9 @@ export const BackgroundCheckEntityDetailsSanctions_BackgroundCheckEntityDetailsS
     fragment BackgroundCheckEntityDetailsSanctions_BackgroundCheckEntityDetailsSanction on BackgroundCheckEntityDetailsSanction {
       id
       type
+      datasets {
+        title
+      }
       properties {
         authority
         startDate

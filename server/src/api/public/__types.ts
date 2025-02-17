@@ -214,9 +214,14 @@ export type BackgroundCheckEntityDetailsRelationshipProperties = {
 };
 
 export type BackgroundCheckEntityDetailsSanction = {
+  datasets: Maybe<Array<BackgroundCheckEntityDetailsSanctionDatasets>>;
   id: Scalars["String"]["output"];
   properties: BackgroundCheckEntityDetailsSanctionProperties;
   type: Scalars["String"]["output"];
+};
+
+export type BackgroundCheckEntityDetailsSanctionDatasets = {
+  title: Scalars["String"]["output"];
 };
 
 export type BackgroundCheckEntityDetailsSanctionProperties = {

@@ -6,6 +6,7 @@ import { BackgroundCheckEntityDetailsSanctions_BackgroundCheckEntityDetailsSanct
 import { formatPartialDate } from "@parallel/utils/formatPartialDate";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
 
 export function BackgroundCheckEntityDetailsSanctions({
   sanctions,
@@ -56,6 +57,9 @@ BackgroundCheckEntityDetailsSanctions.fragments = {
       fragment BackgroundCheckEntityDetailsSanctions_BackgroundCheckEntityDetailsSanction on BackgroundCheckEntityDetailsSanction {
         id
         type
+        datasets {
+          title
+        }
         properties {
           authority
           startDate
@@ -79,17 +83,23 @@ function useBackgroundCheckSanctionsColumns() {
         key: "authority",
         label: intl.formatMessage({
           id: "page.background-check-profile-details.authority",
-          defaultMessage: "Authority",
+          defaultMessage: "List name / Authority",
         }),
         CellContent: ({ row }) => {
           const properties = row.properties ?? {};
-          return (
-            <>
-              {properties.authority
-                ? intl.formatList(properties.authority, { type: "conjunction" })
-                : "-"}
-            </>
-          );
+
+          const authorities = properties.authority
+            ? intl.formatList(properties.authority, { type: "conjunction" })
+            : "-";
+          const datasets =
+            row.datasets && row.datasets.length > 0
+              ? intl.formatList(
+                  row.datasets.map(({ title }) => title),
+                  { type: "conjunction" },
+                )
+              : null;
+
+          return <>{`${[datasets, authorities].filter(isNonNullish).join(" / ")}`}</>;
         },
       },
       {
