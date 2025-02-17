@@ -326,6 +326,7 @@ export function PublicLinkSettingsDialog({
                   </InputLeftAddon>
                   <Input
                     onChange={(e) => onChange(e.target.value.replace(/[^a-z0-9-]/gi, ""))}
+                    maxLength={30}
                     {...props}
                   />
                   <InputRightElement>

@@ -3517,11 +3517,12 @@ export class PetitionRepository extends BaseRepository {
       await retry(
         async () => {
           try {
+            const randomSuffix = `-${random(4)}`;
             await this.insert(
               "public_petition_link",
               {
                 template_id: toTemplateId,
-                slug: publicLink.slug.concat(`-${random(4)}`),
+                slug: publicLink.slug.slice(0, 30 - randomSuffix.length).concat(randomSuffix), // slugs should not contain more than 30 chars
                 created_by: createdBy,
                 ...pick(publicLink, [
                   "title",
