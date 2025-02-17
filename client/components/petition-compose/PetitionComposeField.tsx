@@ -931,7 +931,6 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                   onFieldEdit({
                     optional: !event.target.checked,
                     options: {
-                      ...field.options,
                       limit: {
                         ...field.options.limit,
                         min,
