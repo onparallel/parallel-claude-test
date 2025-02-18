@@ -817,7 +817,7 @@ export const updatePetition = mutationField("updatePetition", {
       ],
       and(petitionsAreEditable("petitionId"), petitionDoesNotHaveStartedProcess("petitionId")),
     ),
-    ifSomeDefined(["data.signatureConfig", "data.locale"], petitionsAreEditable("petitionId")),
+    ifSomeDefined(["data.locale"], petitionsAreEditable("petitionId")),
     ifSomeDefined(
       ["data.emailBody", "data.emailSubject"],
       or(petitionsAreEditable("petitionId"), petitionsAreOfTypePetition("petitionId")),

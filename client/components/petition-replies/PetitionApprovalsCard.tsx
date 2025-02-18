@@ -805,6 +805,7 @@ const _mutations = [
           id
           generalCommentCount
           unreadGeneralCommentCount
+          hasStartedProcess
         }
       }
     }

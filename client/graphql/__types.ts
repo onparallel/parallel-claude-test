@@ -27366,6 +27366,7 @@ export type PetitionApprovalsCard_startPetitionApprovalRequestStepMutation = {
       id: string;
       generalCommentCount: number;
       unreadGeneralCommentCount: number;
+      hasStartedProcess: boolean;
     };
     approvers: Array<{
       __typename?: "PetitionApprovalRequestStepApprover";
@@ -77729,6 +77730,7 @@ export const PetitionApprovalsCard_startPetitionApprovalRequestStepDocument = gq
         id
         generalCommentCount
         unreadGeneralCommentCount
+        hasStartedProcess
       }
     }
   }
