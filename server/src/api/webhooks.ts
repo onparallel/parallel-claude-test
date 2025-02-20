@@ -10,14 +10,14 @@ export const webhooks = Router()
     "/docusign/:petitionId/events",
     redirect(
       (req) =>
-        `${req.context.config.misc.parallelUrl}/api/integrations/signature/docusign/${req.params.petitionId}/events`,
+        `http://localhost:4000/api/integrations/signature/docusign/${req.params.petitionId}/events`,
     ),
   )
   .use(
     "/signaturit/:petitionId/events",
     redirect(
       (req) =>
-        `${req.context.config.misc.parallelUrl}/api/integrations/signature/signaturit/${req.params.petitionId}/events`,
+        `http://localhost:4000/api/integrations/signature/signaturit/${req.params.petitionId}/events`,
     ),
   )
   // bankflip webhook for ES_TAX_DOCUMENTS field completion
@@ -31,6 +31,7 @@ function redirect(url: (req: Request) => string): RequestHandler {
   return async (req, res, next) => {
     try {
       const headers = { ...req.headers } as any;
+      req.context.logger.info(JSON.stringify(headers, null, 2));
       delete headers["expect"];
       const response = await fetch(url(req), {
         method: req.method,
