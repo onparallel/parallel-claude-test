@@ -39,9 +39,7 @@ export class DocumentProcessingService implements IDocumentProcessingService {
     @inject(BANKFLIP_DOCUMENT_PROCESSING_INTEGRATION)
     private bankflipDocumentProcessingIntegration: BankflipDocumentProcessingIntegration,
     @inject(CONFIG) private config: Config,
-  ) {
-    this.bankflipDocumentProcessingIntegration.service = this;
-  }
+  ) {}
 
   private async getIntegration(integrationId: number) {
     const orgIntegration = await this.integrations.loadIntegration(integrationId);

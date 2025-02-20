@@ -1,5 +1,6 @@
 import "reflect-metadata";
 // keep this space to prevent import sorting, removing init from top
+import { RequestHandler, Router } from "express";
 import { injectable } from "inversify";
 import { Knex } from "knex";
 import { isNullish, omit } from "remeda";
@@ -24,6 +25,7 @@ export abstract class GenericIntegration<
 > {
   protected abstract type: TType;
   protected abstract provider: TProvider;
+  private handlers: ((router: Router) => void)[] = [];
 
   constructor(
     protected encryption: EncryptionService,
@@ -175,6 +177,18 @@ export abstract class GenericIntegration<
         t,
       );
     }
+  }
+
+  protected registerHandlers(registerFn: (router: Router) => void) {
+    this.handlers.push(registerFn);
+  }
+
+  public handler(...args: Parameters<RequestHandler>) {
+    const router = Router();
+    for (const handler of this.handlers) {
+      handler(router);
+    }
+    return router(...args);
   }
 }
 

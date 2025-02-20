@@ -64,9 +64,7 @@ export class IdVerificationService implements IIdVerificationService {
     @inject(CONFIG) private config: Config,
     @inject(BANKFLIP_ID_VERIFICATION_INTEGRATION)
     private bankflipIdVIntegration: BankflipIdVerificationIntegration,
-  ) {
-    this.bankflipIdVIntegration.service = this;
-  }
+  ) {}
 
   private async getIntegration(integrationId: number): Promise<IIdVerificationIntegration> {
     const orgIntegration = await this.integrations.loadIntegration(integrationId);

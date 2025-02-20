@@ -15,7 +15,7 @@ import { FileExport } from "../../../services/FileExportService";
 import { ILogger, LOGGER } from "../../../services/Logger";
 import { fromGlobalId, isGlobalId, toGlobalId } from "../../../util/globalId";
 import { JsonSchemaFor } from "../../../util/jsonSchema";
-import { WebhookIntegration } from "../../helpers/WebhookIntegration";
+import { GenericIntegration } from "../../helpers/GenericIntegration";
 import { IFileExportIntegration } from "../FileExportIntegration";
 
 class RequestError extends Error {
@@ -46,14 +46,11 @@ interface IManageFileExportContext {
 
 @injectable()
 export class IManageFileExportIntegration
-  extends WebhookIntegration<"FILE_EXPORT", "IMANAGE", IManageFileExportContext>
+  extends GenericIntegration<"FILE_EXPORT", "IMANAGE", IManageFileExportContext>
   implements IFileExportIntegration
 {
   protected override type = "FILE_EXPORT" as const;
   protected override provider = "IMANAGE" as const;
-
-  public override WEBHOOK_API_PREFIX = "/export/imanage";
-  public override service: any;
 
   constructor(
     @inject(CONFIG) private config: Config,
@@ -62,6 +59,35 @@ export class IManageFileExportIntegration
     @inject(IntegrationRepository) integrations: IntegrationRepository,
   ) {
     super(encryption, integrations);
+    super.registerHandlers((router) => {
+      router.use(
+        "/client/:clientId/export/:exportId",
+        json({
+          verify: (req, res, payload) => {
+            try {
+              JSON.parse(payload.toString());
+            } catch {
+              throw new RequestError(400, "Invalid request body");
+            }
+          },
+        }),
+        this.appendRequestLog(),
+        this.verifyHMAC(),
+        this.validateParams(),
+        Router({ mergeParams: true })
+          .post("/", this.fetchFileExportJson())
+          .post(
+            "/complete",
+            this.validateBodySchema({
+              type: "array",
+              minItems: 1,
+              items: FILE_SCHEMA,
+            }),
+            this.processCompletedFiles(),
+          ),
+        this.handleErrors(),
+      );
+    });
   }
 
   protected override getContext(
@@ -90,36 +116,6 @@ export class IManageFileExportIntegration
         signature,
       })}`;
     });
-  }
-
-  protected override webhookHandlers(router: Router) {
-    router.use(
-      "/client/:clientId/export/:exportId",
-      json({
-        verify: (req, res, payload) => {
-          try {
-            JSON.parse(payload.toString());
-          } catch {
-            throw new RequestError(400, "Invalid request body");
-          }
-        },
-      }),
-      this.appendRequestLog(),
-      this.verifyHMAC(),
-      this.validateParams(),
-      Router({ mergeParams: true })
-        .post("/", this.fetchFileExportJson())
-        .post(
-          "/complete",
-          this.validateBodySchema({
-            type: "array",
-            minItems: 1,
-            items: FILE_SCHEMA,
-          }),
-          this.processCompletedFiles(),
-        ),
-      this.handleErrors(),
-    );
   }
 
   private handleErrors(): ErrorRequestHandler {

@@ -110,7 +110,7 @@ export class DocusignClient extends BaseClient implements ISignatureClient {
           }),
           eventNotification: {
             includeHMAC: "true",
-            url: `${baseEventsUrl}/api/webhooks/docusign/${toGlobalId(
+            url: `${baseEventsUrl}/api/integrations/signature/docusign/${toGlobalId(
               "Petition",
               petitionId,
             )}/events`,

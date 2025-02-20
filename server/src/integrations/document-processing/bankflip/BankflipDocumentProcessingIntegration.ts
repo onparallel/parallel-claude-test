@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "crypto";
-import { json, Request, Router } from "express";
+import { json, Request } from "express";
 import { readFile } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
@@ -22,8 +22,11 @@ import { getBaseWebhookUrl } from "../../../util/getBaseWebhookUrl";
 import { never } from "../../../util/never";
 import { removePasswordFromPdf } from "../../../util/pdf";
 import { Maybe } from "../../../util/types";
-import { InvalidCredentialsError, InvalidRequestError } from "../../helpers/GenericIntegration";
-import { WebhookIntegration } from "../../helpers/WebhookIntegration";
+import {
+  GenericIntegration,
+  InvalidCredentialsError,
+  InvalidRequestError,
+} from "../../helpers/GenericIntegration";
 import { IDocumentProcessingIntegration } from "../DocumentProcessingIntegration";
 
 interface BankflipDocument {
@@ -114,11 +117,10 @@ export const BANKFLIP_DOCUMENT_PROCESSING_INTEGRATION = Symbol.for(
 
 @injectable()
 export class BankflipDocumentProcessingIntegration
-  extends WebhookIntegration<"DOCUMENT_PROCESSING", "BANKFLIP", {}, IDocumentProcessingService>
+  extends GenericIntegration<"DOCUMENT_PROCESSING", "BANKFLIP", {}>
   implements IDocumentProcessingIntegration
 {
-  public override WEBHOOK_API_PREFIX = "/document-processing/bankflip";
-  public override service!: IDocumentProcessingService;
+  public service?: IDocumentProcessingService;
 
   protected override type = "DOCUMENT_PROCESSING" as const;
   protected override provider = "BANKFLIP" as const;
@@ -131,6 +133,141 @@ export class BankflipDocumentProcessingIntegration
     @inject(CONFIG) private config: Config,
   ) {
     super(encryption, integrations);
+
+    this.registerHandlers((router) => {
+      router.post(
+        "/events",
+        json(), // need to parse body before verifying HMAC, so we can access req.body in the following middleware
+        async (req, res, next) => {
+          try {
+            if (
+              !req.body.payload?.analysisRequestId ||
+              isNullish(req.body.name) ||
+              req.body.name !== "ANALYSIS_REQUEST_COMPLETED"
+            ) {
+              // don't throw error if request body is invalid or incomplete
+              return res.sendStatus(200).end();
+            }
+
+            const body = req.body as {
+              name: string;
+              payload: {
+                analysisRequestId: string;
+              };
+            };
+
+            const docProcessingLog =
+              await req.context.integrations.loadDocumentProcessingLogByExternalId(
+                `BANKFLIP/${body.payload.analysisRequestId}`,
+              );
+
+            if (!docProcessingLog) {
+              // As this is a global webhook, we need to check if we have a log for this external ID.
+              // This way we can be sure we are in the correct environment, as the same APIKEY can be shared and used in multiple environments at the same time.
+              // If we don't find the log in database, it could mean the request is for another environment, so return OK and finish
+              return res.sendStatus(200).end();
+            }
+            const webhookSecret = await this.withCredentials(
+              docProcessingLog.integration_id,
+              async (credentials) => credentials.WEBHOOK_SECRET,
+            );
+            this.verifyHMAC(req, webhookSecret);
+
+            // TODO esto no esta bien
+            // don't await this, as we don't want to block the webhook response
+            this.withCredentials(docProcessingLog.integration_id, async (credentials) => {
+              const response = await this.apiRequest<BankflipPayslipAnalysisResult>(
+                credentials,
+                `/payslip/analysis-request/${body.payload.analysisRequestId}`,
+              );
+              const currencyData = (
+                await import(join(__dirname, "../../../../data/currencies/units.json"))
+              ).default as Record<string, number>;
+
+              return { response, currencyData };
+            }).then(({ response, currencyData }) => {
+              function convertMoney(
+                data?: { value: number | null; currency: string | null } | null,
+              ) {
+                if (!isNullish(data?.value) && !isNullish(data?.currency)) {
+                  const fractionalUnit = currencyData[data.currency];
+
+                  if (isNullish(fractionalUnit)) {
+                    throw new Error("CURRENCY_NOT_FOUND");
+                  }
+
+                  return {
+                    value: data.value / fractionalUnit,
+                    currency: data.currency,
+                  };
+                }
+
+                // either value or currency (or both) are null
+                return null;
+              }
+
+              function convertBoolean(value: "yes" | "no" | "unsure" | null) {
+                if (value === "yes") {
+                  return true;
+                }
+                if (value === "no") {
+                  return false;
+                }
+                return null;
+              }
+
+              function passesValidityCheck(
+                payslip: BankflipPayslip,
+                key: BankflipValidityCheckKey,
+              ) {
+                return (
+                  payslip.validityCheckResults?.some(
+                    (r) => r.validityCheck.key === key && r.result === true,
+                  ) ?? null
+                );
+              }
+
+              if (response.completed) {
+                this.service!.onCompleted<"PAYSLIP">(
+                  `BANKFLIP/${body.payload.analysisRequestId}`,
+                  response,
+                  (response: BankflipPayslipAnalysisResult) =>
+                    response.documentOutcomes.flatMap((outcome) =>
+                      (outcome.payslips ?? []).map((payslip) => ({
+                        periodStart: payslip.period?.start?.split("T")[0] ?? null,
+                        periodEnd: payslip.period?.end?.split("T")[0] ?? null,
+                        employeeName: payslip.employeeName ?? null,
+                        employeeId: payslip.employeeId?.number ?? null,
+                        employerName: payslip.employerName ?? null,
+                        employerId: payslip.employerId?.number ?? null,
+                        netPay: convertMoney(payslip.netPay),
+                        totalAccrued: convertMoney(payslip.totalAccrued),
+                        totalDeduction: convertMoney(payslip.totalDeduction),
+                        hasSeizures: convertBoolean(payslip.hasEmbargoes),
+                        hasAdvances: convertBoolean(payslip.hasAdvances),
+                        hasSickLeave: convertBoolean(payslip.hasSickLeave),
+                        isNotFromFuture: passesValidityCheck(payslip, "PayslipIsNotFromFuture"),
+                        hasEssentialData: passesValidityCheck(payslip, "PayslipHasEssentialData"),
+                        payMatchesCalculations: passesValidityCheck(
+                          payslip,
+                          "NetPayMatchesCalculation",
+                        ),
+                      })),
+                    ),
+                );
+              }
+            });
+
+            res.sendStatus(200).end();
+          } catch (error) {
+            if (error instanceof Error) {
+              req.context.logger.error(error.message, { stack: error.stack });
+            }
+            next(error);
+          }
+        },
+      );
+    });
   }
 
   private supportedDocumentTypes = ["PAYSLIP" as const];
@@ -153,135 +290,6 @@ export class BankflipDocumentProcessingIntegration
       default:
         never(`Unknown document type ${documentType}`);
     }
-  }
-
-  protected override webhookHandlers(router: Router) {
-    router.post(
-      "/events",
-      json(), // need to parse body before verifying HMAC, so we can access req.body in the following middleware
-      async (req, res, next) => {
-        try {
-          if (
-            !req.body.payload?.analysisRequestId ||
-            isNullish(req.body.name) ||
-            req.body.name !== "ANALYSIS_REQUEST_COMPLETED"
-          ) {
-            // don't throw error if request body is invalid or incomplete
-            return res.sendStatus(200).end();
-          }
-
-          const body = req.body as {
-            name: string;
-            payload: {
-              analysisRequestId: string;
-            };
-          };
-
-          const docProcessingLog =
-            await req.context.integrations.loadDocumentProcessingLogByExternalId(
-              `BANKFLIP/${body.payload.analysisRequestId}`,
-            );
-
-          if (!docProcessingLog) {
-            // As this is a global webhook, we need to check if we have a log for this external ID.
-            // This way we can be sure we are in the correct environment, as the same APIKEY can be shared and used in multiple environments at the same time.
-            // If we don't find the log in database, it could mean the request is for another environment, so return OK and finish
-            return res.sendStatus(200).end();
-          }
-          const webhookSecret = await this.withCredentials(
-            docProcessingLog.integration_id,
-            async (credentials) => credentials.WEBHOOK_SECRET,
-          );
-          this.verifyHMAC(req, webhookSecret);
-
-          // don't await this, as we don't want to block the webhook response
-          this.withCredentials(docProcessingLog.integration_id, async (credentials) => {
-            const response = await this.apiRequest<BankflipPayslipAnalysisResult>(
-              credentials,
-              `/payslip/analysis-request/${body.payload.analysisRequestId}`,
-            );
-            const currencyData = (
-              await import(join(__dirname, "../../../../data/currencies/units.json"))
-            ).default as Record<string, number>;
-
-            return { response, currencyData };
-          }).then(({ response, currencyData }) => {
-            function convertMoney(data?: { value: number | null; currency: string | null } | null) {
-              if (!isNullish(data?.value) && !isNullish(data?.currency)) {
-                const fractionalUnit = currencyData[data.currency];
-
-                if (isNullish(fractionalUnit)) {
-                  throw new Error("CURRENCY_NOT_FOUND");
-                }
-
-                return {
-                  value: data.value / fractionalUnit,
-                  currency: data.currency,
-                };
-              }
-
-              // either value or currency (or both) are null
-              return null;
-            }
-
-            function convertBoolean(value: "yes" | "no" | "unsure" | null) {
-              if (value === "yes") {
-                return true;
-              }
-              if (value === "no") {
-                return false;
-              }
-              return null;
-            }
-
-            function passesValidityCheck(payslip: BankflipPayslip, key: BankflipValidityCheckKey) {
-              return (
-                payslip.validityCheckResults?.some(
-                  (r) => r.validityCheck.key === key && r.result === true,
-                ) ?? null
-              );
-            }
-
-            if (response.completed) {
-              this.service.onCompleted<"PAYSLIP">(
-                `BANKFLIP/${body.payload.analysisRequestId}`,
-                response,
-                (response: BankflipPayslipAnalysisResult) =>
-                  response.documentOutcomes.flatMap((outcome) =>
-                    (outcome.payslips ?? []).map((payslip) => ({
-                      periodStart: payslip.period?.start?.split("T")[0] ?? null,
-                      periodEnd: payslip.period?.end?.split("T")[0] ?? null,
-                      employeeName: payslip.employeeName ?? null,
-                      employeeId: payslip.employeeId?.number ?? null,
-                      employerName: payslip.employerName ?? null,
-                      employerId: payslip.employerId?.number ?? null,
-                      netPay: convertMoney(payslip.netPay),
-                      totalAccrued: convertMoney(payslip.totalAccrued),
-                      totalDeduction: convertMoney(payslip.totalDeduction),
-                      hasSeizures: convertBoolean(payslip.hasEmbargoes),
-                      hasAdvances: convertBoolean(payslip.hasAdvances),
-                      hasSickLeave: convertBoolean(payslip.hasSickLeave),
-                      isNotFromFuture: passesValidityCheck(payslip, "PayslipIsNotFromFuture"),
-                      hasEssentialData: passesValidityCheck(payslip, "PayslipHasEssentialData"),
-                      payMatchesCalculations: passesValidityCheck(
-                        payslip,
-                        "NetPayMatchesCalculation",
-                      ),
-                    })),
-                  ),
-              );
-            }
-          });
-
-          res.sendStatus(200).end();
-        } catch (error) {
-          if (error instanceof Error) {
-            req.context.logger.error(error.message, { stack: error.stack });
-          }
-          next(error);
-        }
-      },
-    );
   }
 
   // returns a bse64-encoded decrypted version of the file
@@ -385,7 +393,7 @@ export class BankflipDocumentProcessingIntegration
 
     // search for a subscribed webhook on this API key
     const baseWebhookUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
-    const webhookUrl = `${baseWebhookUrl}/api/integrations${this.WEBHOOK_API_PREFIX}/events`;
+    const webhookUrl = `${baseWebhookUrl}/api/integrations/document-processing/bankflip/events`;
     const webhooks = await this.apiRequest<WebhookSubscriptionResponse>(
       data.settings.CREDENTIALS,
       `/webhook-subscription?${new URLSearchParams({

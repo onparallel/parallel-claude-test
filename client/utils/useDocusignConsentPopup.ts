@@ -50,7 +50,7 @@ export function useDocusignConsentPopup() {
       try {
         windowRef.current = await openNewWindow(
           () =>
-            `/api/oauth/docusign/authorize?${new URLSearchParams(
+            `/api/integrations/signature/docusign/oauth/authorize?${new URLSearchParams(
               params
                 ? {
                     ...params,

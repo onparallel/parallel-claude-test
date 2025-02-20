@@ -1,5 +1,5 @@
 import { randomBytes } from "crypto";
-import { Request, RequestHandler, Router } from "express";
+import { Request } from "express";
 import { injectable } from "inversify";
 import { isNonNullish, isNullish } from "remeda";
 import { authenticate } from "../../api/helpers/authenticate";
@@ -42,6 +42,79 @@ export abstract class OAuthIntegration<
     protected redis: IRedis,
   ) {
     super(encryption, integrations);
+    this.registerHandlers((router) => {
+      router
+        .get("/oauth/authorize", authenticate(), async (req, res, next) => {
+          try {
+            const state = await this.buildState(req);
+
+            if (!(await this.orgHasAccessToIntegration(state.orgId, state))) {
+              res.status(403).send("Not authorized");
+              return;
+            }
+            const key = random(16);
+            await this.storeState(key, state);
+            const url = await this.buildAuthorizationUrl(key, state);
+            res.redirect(url);
+          } catch (error) {
+            req.context.logger.error(error);
+            next(error);
+          }
+        })
+        .get("/oauth/redirect", async (req, res, next) => {
+          try {
+            const respond = (success: boolean) => {
+              const nonce = randomBytes(64).toString("base64");
+              res
+                .setHeader(
+                  "Content-Security-Policy",
+                  `default-src 'self'; script-src 'self' 'nonce-${nonce}'`,
+                )
+                .setHeader("X-Frame-Options", "sameorigin")
+                .setHeader("X-Download-Options", "noopen")
+                .setHeader("X-Content-Type-Options", "nosniff")
+                .setHeader("Referrer-Policy", "same-origin")
+                .setHeader("X-XSS-Protection", "1")
+                .setHeader(
+                  "Permissions-Policy",
+                  "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
+                ).send(/* html */ `
+                <script nonce="${nonce}">window.opener.postMessage({ success: ${success} }, "*");</script>
+              `);
+            };
+
+            const { state: key, code } = req.query;
+            if (typeof key !== "string" || typeof code !== "string") {
+              respond(false);
+            } else {
+              const state = await this.getState(key);
+
+              const settings = await this.fetchIntegrationSettings(code, state);
+              if (isNonNullish(state.id)) {
+                await this.updateOrgIntegration(state.id, {
+                  name: state.name,
+                  is_default: state.isDefault,
+                  settings,
+                  invalid_credentials: false,
+                });
+              } else {
+                await this.createOrgIntegration(
+                  {
+                    name: state.name,
+                    org_id: state.orgId,
+                    is_default: state.isDefault,
+                    settings,
+                  },
+                  `Organization:${state.orgId}`,
+                );
+              }
+              respond(true);
+            }
+          } catch (error) {
+            next(error);
+          }
+        });
+    });
   }
 
   protected async orgHasAccessToIntegration(orgId: number, state: TState): Promise<boolean> {
@@ -83,79 +156,5 @@ export abstract class OAuthIntegration<
       throw new Error("Missing state");
     }
     return JSON.parse(result);
-  }
-
-  public handler(): RequestHandler {
-    return Router()
-      .get("/authorize", authenticate(), async (req, res, next) => {
-        try {
-          const state = await this.buildState(req);
-
-          if (!(await this.orgHasAccessToIntegration(state.orgId, state))) {
-            res.status(403).send("Not authorized");
-            return;
-          }
-          const key = random(16);
-          await this.storeState(key, state);
-          const url = await this.buildAuthorizationUrl(key, state);
-          res.redirect(url);
-        } catch (error) {
-          req.context.logger.error(error);
-          next(error);
-        }
-      })
-      .get("/redirect", async (req, res, next) => {
-        try {
-          const respond = (success: boolean) => {
-            const nonce = randomBytes(64).toString("base64");
-            res
-              .setHeader(
-                "Content-Security-Policy",
-                `default-src 'self'; script-src 'self' 'nonce-${nonce}'`,
-              )
-              .setHeader("X-Frame-Options", "sameorigin")
-              .setHeader("X-Download-Options", "noopen")
-              .setHeader("X-Content-Type-Options", "nosniff")
-              .setHeader("Referrer-Policy", "same-origin")
-              .setHeader("X-XSS-Protection", "1")
-              .setHeader(
-                "Permissions-Policy",
-                "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
-              ).send(/* html */ `
-                <script nonce="${nonce}">window.opener.postMessage({ success: ${success} }, "*");</script>
-              `);
-          };
-
-          const { state: key, code } = req.query;
-          if (typeof key !== "string" || typeof code !== "string") {
-            respond(false);
-          } else {
-            const state = await this.getState(key);
-
-            const settings = await this.fetchIntegrationSettings(code, state);
-            if (isNonNullish(state.id)) {
-              await this.updateOrgIntegration(state.id, {
-                name: state.name,
-                is_default: state.isDefault,
-                settings,
-                invalid_credentials: false,
-              });
-            } else {
-              await this.createOrgIntegration(
-                {
-                  name: state.name,
-                  org_id: state.orgId,
-                  is_default: state.isDefault,
-                  settings,
-                },
-                `Organization:${state.orgId}`,
-              );
-            }
-            respond(true);
-          }
-        } catch (error) {
-          next(error);
-        }
-      });
   }
 }

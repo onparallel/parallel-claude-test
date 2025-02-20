@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "crypto";
-import { Request, Response, Router, json } from "express";
+import { Request, Response, json } from "express";
 import { inject, injectable } from "inversify";
 import { isNonNullish, omit, pick } from "remeda";
 import { CONFIG, Config } from "../../../config";
@@ -19,8 +19,11 @@ import { getBaseWebhookUrl } from "../../../util/getBaseWebhookUrl";
 import { fromGlobalId } from "../../../util/globalId";
 import { StopRetryError, retry } from "../../../util/retry";
 import { Maybe } from "../../../util/types";
-import { InvalidCredentialsError, InvalidRequestError } from "../../helpers/GenericIntegration";
-import { WebhookIntegration } from "../../helpers/WebhookIntegration";
+import {
+  GenericIntegration,
+  InvalidCredentialsError,
+  InvalidRequestError,
+} from "../../helpers/GenericIntegration";
 import {
   CreateIdentityVerificationSessionRequest,
   CreateIdentityVerificationSessionResponse,
@@ -140,12 +143,10 @@ interface BankflipSelfieDocument {
 
 @injectable()
 export class BankflipIdVerificationIntegration
-  extends WebhookIntegration<"ID_VERIFICATION", "BANKFLIP", {}, IIdVerificationService>
+  extends GenericIntegration<"ID_VERIFICATION", "BANKFLIP", {}>
   implements IIdVerificationIntegration
 {
-  public override WEBHOOK_API_PREFIX = "/id-verification/bankflip";
-  public override service!: IIdVerificationService;
-
+  public service?: IIdVerificationService;
   protected override type = "ID_VERIFICATION" as const;
   protected override provider = "BANKFLIP" as const;
 
@@ -160,6 +161,47 @@ export class BankflipIdVerificationIntegration
     @inject(LOGGER) private logger: ILogger,
   ) {
     super(encryption, integrations);
+    this.registerHandlers((router) => {
+      router.post(
+        "/:integrationId/events",
+        async (req, res, next) => {
+          try {
+            (req as any).webhookSecret = await this.withCredentials(
+              fromGlobalId(req.params.integrationId, "OrgIntegration").id,
+              async (credentials) => credentials.WEBHOOK_SECRET,
+            );
+            next();
+          } catch (error) {
+            next(error);
+          }
+        },
+        json({ verify: this.verifyHMAC }),
+        (req, res, next) => {
+          try {
+            const body = req.body as {
+              name: string;
+              payload: {
+                sessionId: string;
+              };
+            };
+
+            if (body.name === "SESSION_COMPLETED") {
+              this.service!.onSessionCompleted({
+                externalId: body.payload.sessionId,
+                integrationId: fromGlobalId(req.params.integrationId, "OrgIntegration").id,
+              });
+            }
+
+            res.sendStatus(200).end();
+          } catch (error) {
+            if (error instanceof Error) {
+              req.context.logger.error(error.message, { stack: error.stack });
+            }
+            next(error);
+          }
+        },
+      );
+    });
   }
 
   async createSession(
@@ -218,7 +260,7 @@ export class BankflipIdVerificationIntegration
               {
                 method: "POST",
                 body: JSON.stringify({
-                  webhookUrl: `${baseWebhookUrl}/api/integrations${this.WEBHOOK_API_PREFIX}/${metadata.integrationId}/events`,
+                  webhookUrl: `${baseWebhookUrl}/api/integrations/id-verification/bankflip/${metadata.integrationId}/events`,
                   customization,
                   metadata,
                   identityVerification: {
@@ -317,48 +359,6 @@ export class BankflipIdVerificationIntegration
         "buffer",
       );
     });
-  }
-
-  protected override webhookHandlers(router: Router) {
-    router.post(
-      "/:integrationId/events",
-      async (req, res, next) => {
-        try {
-          (req as any).webhookSecret = await this.withCredentials(
-            fromGlobalId(req.params.integrationId, "OrgIntegration").id,
-            async (credentials) => credentials.WEBHOOK_SECRET,
-          );
-          next();
-        } catch (error) {
-          next(error);
-        }
-      },
-      json({ verify: this.verifyHMAC }),
-      (req, res, next) => {
-        try {
-          const body = req.body as {
-            name: string;
-            payload: {
-              sessionId: string;
-            };
-          };
-
-          if (body.name === "SESSION_COMPLETED") {
-            this.service.onSessionCompleted({
-              externalId: body.payload.sessionId,
-              integrationId: fromGlobalId(req.params.integrationId, "OrgIntegration").id,
-            });
-          }
-
-          res.sendStatus(200).end();
-        } catch (error) {
-          if (error instanceof Error) {
-            req.context.logger.error(error.message, { stack: error.stack });
-          }
-          next(error);
-        }
-      },
-    );
   }
 
   private async apiRequest<T>(

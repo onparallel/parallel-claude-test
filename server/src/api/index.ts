@@ -6,7 +6,6 @@ import { auth } from "./auth";
 import { integrations } from "./integrations";
 import { lambdas } from "./lambdas";
 import { monitor } from "./monitor";
-import { oauth } from "./oauth";
 import { publicApi } from "./public/index";
 import { webhooks } from "./webhooks";
 
@@ -20,7 +19,6 @@ export function api(container: Container) {
     .use("/lambda", lambdas)
     .use("/v1", api.handler())
     .use("/docs", api.spec())
-    .use("/oauth", oauth(container))
     .use("/integrations", integrations(container))
     .use("/monitor", monitor(container))
     .use(((err, req, res, next) => {

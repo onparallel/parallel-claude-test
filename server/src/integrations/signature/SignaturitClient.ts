@@ -154,7 +154,7 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
               delivery_type: "email",
               signing_mode: opts.signingMode === "PARALLEL" ? "parallel" : "sequential",
               branding_id: brandingId,
-              events_url: `${baseEventsUrl}/api/webhooks/signaturit/${toGlobalId(
+              events_url: `${baseEventsUrl}/api/integrations/signature/signaturit/${toGlobalId(
                 "Petition",
                 petitionId,
               )}/events`,
