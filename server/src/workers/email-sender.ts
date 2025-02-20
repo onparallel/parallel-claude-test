@@ -27,7 +27,7 @@ import { signatureCancelledNoCreditsLeft } from "./emails/signature-cancelled-no
 import { signatureCancelledRequestError } from "./emails/signature-cancelled-request-error";
 import { transferParallels } from "./emails/transfer-parallels";
 import { RateLimitGuard } from "./helpers/RateLimitGuard";
-import { createQueueWorker } from "./helpers/createQueueWorker";
+import { createQueueWorker_OLD } from "./helpers/createQueueWorker_OLD";
 
 const builders = {
   "petition-completed": petitionCompleted,
@@ -73,7 +73,7 @@ export type EmailSenderWorkerPayload = {
 
 let limiter: RateLimitGuard | undefined;
 
-createQueueWorker("email-sender", async (payload, context, config) => {
+createQueueWorker_OLD("email-sender", async (payload, context, config) => {
   limiter ??= new RateLimitGuard(config.rateLimit);
   const builder = builders[payload.type];
   const emails = await builder(payload.payload as any, context);

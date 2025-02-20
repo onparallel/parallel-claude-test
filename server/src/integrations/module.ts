@@ -30,7 +30,12 @@ import {
 } from "./profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
 import { DocusignClient } from "./signature/DocusignClient";
 import { DocusignIntegration } from "./signature/DocusignIntegration";
-import { ISignatureClient, SIGNATURE_CLIENT } from "./signature/SignatureClient";
+import {
+  getSignatureClientFactory,
+  ISignatureClient,
+  SIGNATURE_CLIENT,
+  SIGNATURE_CLIENT_FACTORY,
+} from "./signature/SignatureClient";
 import { SignaturitClient } from "./signature/SignaturitClient";
 import { SignaturitIntegration } from "./signature/SignaturitIntegration";
 
@@ -42,9 +47,10 @@ export const integrationsModule = new ContainerModule((bind) => {
   bind<AzureOpenAiIntegration>(AzureOpenAiIntegration).toSelf();
 
   bind<SignaturitIntegration>(SignaturitIntegration).toSelf();
-  bind<ISignatureClient>(SIGNATURE_CLIENT).to(SignaturitClient).whenTargetNamed("SIGNATURIT");
   bind<DocusignIntegration>(DocusignIntegration).toSelf();
+  bind<ISignatureClient>(SIGNATURE_CLIENT).to(SignaturitClient).whenTargetNamed("SIGNATURIT");
   bind<ISignatureClient>(SIGNATURE_CLIENT).to(DocusignClient).whenTargetNamed("DOCUSIGN");
+  bind(SIGNATURE_CLIENT_FACTORY).toFactory(getSignatureClientFactory);
 
   bind<IDowJonesClient>(DOW_JONES_CLIENT).to(DowJonesClient);
   bind<DowJonesIntegration>(DowJonesIntegration).toSelf();

@@ -3,7 +3,7 @@ import { WorkerContext } from "../context";
 import { TaskName } from "../db/__types";
 import { Task } from "../db/repositories/TaskRepository";
 import { TaskRunner } from "./helpers/TaskRunner";
-import { createQueueWorker } from "./helpers/createQueueWorker";
+import { createQueueWorker_OLD } from "./helpers/createQueueWorker_OLD";
 import { BackgroundCheckProfilePdfRunner } from "./tasks/BackgroundCheckProfilePdfRunner";
 import { BankflipSessionCompletedRunner } from "./tasks/BankflipSessionCompletedRunner";
 import { BulkPetitionSendRunner } from "./tasks/BulkPetitionSendRunner";
@@ -51,7 +51,7 @@ export interface TaskWorkerPayload {
   taskName: TaskName;
 }
 
-createQueueWorker(
+createQueueWorker_OLD(
   "task-worker",
   async ({ taskId }, ctx) => {
     const task = await ctx.tasks.pickupTask(taskId, ctx.config.instanceName);

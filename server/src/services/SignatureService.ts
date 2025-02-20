@@ -1,4 +1,4 @@
-import { Container, inject, injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { countBy, isNonNullish, isNullish, omit } from "remeda";
 import { CONFIG, Config } from "../config";
@@ -9,17 +9,13 @@ import {
   User,
 } from "../db/__types";
 import { FileRepository } from "../db/repositories/FileRepository";
-import {
-  IntegrationProvider,
-  IntegrationRepository,
-} from "../db/repositories/IntegrationRepository";
+import { IntegrationRepository } from "../db/repositories/IntegrationRepository";
 import {
   PetitionRepository,
   PetitionSignatureConfig,
   PetitionSignatureConfigSigner,
   PetitionSignatureRequestCancelData,
 } from "../db/repositories/PetitionRepository";
-import { ISignatureClient, SIGNATURE_CLIENT } from "../integrations/signature/SignatureClient";
 import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
 import { MaybeArray, unMaybeArray } from "../util/types";
@@ -30,10 +26,6 @@ interface UpdateBrandingOpts {
   integrationId?: number;
 }
 export interface ISignatureService {
-  getClient<TClient extends ISignatureClient>(integration: {
-    id: number;
-    provider: IntegrationProvider<"SIGNATURE">;
-  }): TClient;
   createSignatureRequest(
     petitionId: number,
     signatureConfig: PetitionSignatureConfig,
@@ -71,19 +63,9 @@ export class SignatureService implements ISignatureService {
     private integrations: IntegrationRepository,
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(QUEUES_SERVICE) private queues: IQueuesService,
-    @inject(Container) private container: Container,
     @inject(FileRepository) private files: FileRepository,
     @inject(STORAGE_SERVICE) private storage: IStorageService,
   ) {}
-
-  public getClient<TClient extends ISignatureClient>(integration: {
-    id: number;
-    provider: IntegrationProvider<"SIGNATURE">;
-  }) {
-    const client = this.container.getNamed<TClient>(SIGNATURE_CLIENT, integration.provider);
-    client.configure(integration.id);
-    return client;
-  }
 
   async createSignatureRequest(
     petitionId: number,

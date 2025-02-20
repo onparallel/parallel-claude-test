@@ -8,7 +8,7 @@ import { CONFIG, Config } from "../config";
 import { TableTypes } from "../db/helpers/BaseRepository";
 import { awsLogger } from "../util/awsLogger";
 import { MaybeArray, unMaybeArray } from "../util/types";
-import { QueueWorkerPayload } from "../workers/helpers/createQueueWorker";
+import { QueueWorkerPayload_OLD } from "../workers/helpers/createQueueWorker_OLD";
 import { ILogger, LOGGER } from "./Logger";
 
 export interface IQueuesService {
@@ -17,13 +17,13 @@ export interface IQueuesService {
     messages:
       | {
           id: string;
-          body: QueueWorkerPayload<Q>;
+          body: QueueWorkerPayload_OLD<Q>;
           groupId?: string;
           deduplicationId?: string;
           delaySeconds?: number;
         }[]
       | {
-          body: QueueWorkerPayload<Q>;
+          body: QueueWorkerPayload_OLD<Q>;
           groupId?: string;
           deduplicationId?: string;
           delaySeconds?: number;
@@ -62,8 +62,8 @@ export class QueuesService implements IQueuesService {
   async enqueueMessages<Q extends keyof Config["queueWorkers"]>(
     queue: Q,
     messages:
-      | { id: string; body: QueueWorkerPayload<Q>; groupId?: string; delaySeconds?: number }[]
-      | { body: QueueWorkerPayload<Q>; groupId?: string; delaySeconds?: number },
+      | { id: string; body: QueueWorkerPayload_OLD<Q>; groupId?: string; delaySeconds?: number }[]
+      | { body: QueueWorkerPayload_OLD<Q>; groupId?: string; delaySeconds?: number },
     t?: Knex.Transaction,
   ) {
     if (isNonNullish(t)) {
@@ -88,13 +88,13 @@ export class QueuesService implements IQueuesService {
     messages:
       | {
           id: string;
-          body: QueueWorkerPayload<Q>;
+          body: QueueWorkerPayload_OLD<Q>;
           groupId?: string;
           deduplicationId?: string;
           delaySeconds?: number;
         }[]
       | {
-          body: QueueWorkerPayload<Q>;
+          body: QueueWorkerPayload_OLD<Q>;
           groupId?: string;
           deduplicationId?: string;
           delaySeconds?: number;

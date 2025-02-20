@@ -21,6 +21,7 @@ import { ISignatureService } from "../../services/SignatureService";
 import { fromGlobalId } from "../../util/globalId";
 import { Replace } from "../../util/types";
 import { GenericIntegration } from "../helpers/GenericIntegration";
+import { SIGNATURE_CLIENT_FACTORY, SignatureClientFactory } from "./SignatureClient";
 
 export interface SignaturitEventBody {
   document: {
@@ -75,6 +76,7 @@ export class SignaturitIntegration extends GenericIntegration<
     @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(IntegrationRepository) integrations: IntegrationRepository,
+    @inject(SIGNATURE_CLIENT_FACTORY) private signatureClientFactory: SignatureClientFactory,
   ) {
     super(encryption, integrations);
     this.registerHandlers((router) => {
@@ -423,10 +425,10 @@ export class SignaturitIntegration extends GenericIntegration<
 
   private async syncSignatureRequestSigners(signatureExternalId: string) {
     const signatureRequest = await this.fetchPetitionSignature(signatureExternalId);
-    const client = this.service!.getClient({
-      id: signatureRequest.signature_config.orgIntegrationId,
-      provider: "SIGNATURIT",
-    });
+    const client = this.signatureClientFactory(
+      "SIGNATURIT",
+      signatureRequest.signature_config.orgIntegrationId,
+    );
 
     const signature = await client.getSignatureRequest(signatureExternalId);
 

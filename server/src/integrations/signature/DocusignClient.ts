@@ -22,12 +22,13 @@ import {
 interface UserInfoResponse {
   accounts: { accountId: string; baseUri: string; isDefault: "true" | "false" }[];
 }
+
 @injectable()
 export class DocusignClient extends BaseClient implements ISignatureClient {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(I18N_SERVICE) private i18n: II18nService,
-    @inject(DocusignIntegration) private docusignOauth: DocusignIntegration,
+    @inject(DocusignIntegration) private docusignIntegration: DocusignIntegration,
   ) {
     super();
   }
@@ -47,7 +48,7 @@ export class DocusignClient extends BaseClient implements ISignatureClient {
       context: DocusignIntegrationContext & { userAccountId: string },
     ) => Promise<TResult>,
   ): Promise<TResult> {
-    return await this.docusignOauth.withCredentials(
+    return await this.docusignIntegration.withCredentials(
       this.integrationId,
       async ({ ACCESS_TOKEN: accessToken }, context) => {
         try {

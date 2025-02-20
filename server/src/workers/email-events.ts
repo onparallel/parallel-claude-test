@@ -1,11 +1,11 @@
-import { createQueueWorker } from "./helpers/createQueueWorker";
+import { createQueueWorker_OLD } from "./helpers/createQueueWorker_OLD";
 
 export interface EmailEventsWorkerPayload {
   eventType: string;
   mail: any;
 }
 
-createQueueWorker(
+createQueueWorker_OLD(
   "email-events",
   async (payload, context) => {
     if (!payload?.mail?.messageId) {

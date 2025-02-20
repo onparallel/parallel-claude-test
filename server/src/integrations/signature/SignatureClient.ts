@@ -1,4 +1,6 @@
+import { interfaces } from "inversify";
 import { ContactLocale } from "../../db/__types";
+import { IntegrationProvider } from "../../db/repositories/IntegrationRepository";
 import { BaseClient } from "../helpers/BaseClient";
 
 interface Document {
@@ -60,3 +62,18 @@ export interface ISignatureClient extends BaseClient {
 }
 
 export class CancelAbortedError extends Error {}
+
+export const SIGNATURE_CLIENT_FACTORY = Symbol.for("SIGNATURE_CLIENT_FACTORY");
+
+export function getSignatureClientFactory(context: interfaces.Context) {
+  return function signatureClientFactory(
+    provider: IntegrationProvider<"SIGNATURE">,
+    integrationId: number,
+  ): ISignatureClient {
+    const integration = context.container.getNamed<ISignatureClient>(SIGNATURE_CLIENT, provider);
+    integration.configure(integrationId);
+    return integration;
+  };
+}
+
+export type SignatureClientFactory = ReturnType<typeof getSignatureClientFactory>;

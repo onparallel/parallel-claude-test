@@ -1,6 +1,7 @@
+import "reflect-metadata";
+// keep this space to prevent import sorting, removing init from top
 import { SQSClient } from "@aws-sdk/client-sqs";
 import { fork } from "child_process";
-import { injectable } from "inversify";
 import { noop } from "remeda";
 import { Consumer } from "sqs-consumer";
 import yargs from "yargs";
@@ -19,7 +20,7 @@ import { SignatureWorkerPayload } from "../signature-worker";
 import { TaskWorkerPayload } from "../task-worker";
 import { EventProcessorPayload } from "./EventProcessor";
 
-export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
+export type QueueWorkerPayload_OLD<Q extends keyof Config["queueWorkers"]> = {
   "email-events": EmailEventsWorkerPayload;
   "email-sender": EmailSenderWorkerPayload;
   "event-processor": EventProcessorPayload;
@@ -28,7 +29,7 @@ export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
   "delay-queue": DelayQueuePayload;
 }[Q];
 
-export interface QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> {
+export interface QueueWorkerOptions_OLD<Q extends keyof Config["queueWorkers"]> {
   forkHandlers?: boolean;
   /**
    * Time in ms after which the process is killed with SIGTERM
@@ -36,36 +37,35 @@ export interface QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> {
   forkTimeout?:
     | number
     | ((
-        payload: QueueWorkerPayload<Q>,
+        payload: QueueWorkerPayload_OLD<Q>,
         context: WorkerContext,
         config: Config["queueWorkers"][Q],
       ) => MaybePromise<number>);
   onForkError?: (
     signal: NodeJS.Signals,
-    message: QueueWorkerPayload<Q>,
+    message: QueueWorkerPayload_OLD<Q>,
     context: WorkerContext,
     config: Config["queueWorkers"][Q],
   ) => MaybePromise<void>;
-  parser?: (message: string) => QueueWorkerPayload<Q>;
+  parser?: (message: string) => QueueWorkerPayload_OLD<Q>;
   batchSize?: number;
 }
 
-@injectable()
-export abstract class QueueWorker<T> {
-  abstract handler(payload: T): Promise<void>;
-}
-
-export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
+export async function createQueueWorker_OLD<Q extends keyof Config["queueWorkers"]>(
   name: Q,
-  workerImplementation: new (...args: any[]) => QueueWorker<QueueWorkerPayload<Q>>,
-  options?: QueueWorkerOptions<Q>,
+  handler: (
+    payload: QueueWorkerPayload_OLD<Q>,
+    context: WorkerContext,
+    config: Config["queueWorkers"][Q],
+  ) => Promise<void>,
+  options?: QueueWorkerOptions_OLD<Q>,
 ) {
   await loadEnv(`.${name}.env`);
 
   const script = process.argv[1];
 
   const { parser, forkHandlers, forkTimeout, onForkError, batchSize } = {
-    parser: (message: string) => JSON.parse(message) as QueueWorkerPayload<Q>,
+    parser: (message: string) => JSON.parse(message) as QueueWorkerPayload_OLD<Q>,
     forkHandlers: false,
     forkTimeout: 120_000,
     onForkError: noop,
@@ -84,16 +84,16 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
         }),
       async ({ payload }: { payload: string }) => {
         const container = createContainer();
-        const logger = container.get<ILogger>(LOGGER);
-        container.bind(workerImplementation).toSelf();
-        const worker = container.get<QueueWorker<QueueWorkerPayload<Q>>>(workerImplementation);
+        const config = container.get<Config>(CONFIG);
+        const context = container.get<WorkerContext>(WorkerContext);
+        const queueConfig = config.queueWorkers[name];
         try {
-          await worker.handler(parser(payload));
+          await handler(parser(payload), context, queueConfig);
         } catch (e) {
           if (e instanceof Error) {
-            logger.error(e.message, { stack: e.stack });
+            context.logger.error(e.message, { stack: e.stack });
           } else {
-            logger.error(e);
+            context.logger.error(e);
           }
           process.exit(1);
         }
@@ -106,9 +106,9 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
       () => {},
       async () => {
         const container = createContainer();
-        container.bind(workerImplementation).toSelf();
         const logger = container.get<ILogger>(LOGGER);
         const config = container.get<Config>(CONFIG);
+
         const queueConfig = config.queueWorkers[name];
         const consumer = Consumer.create({
           queueUrl: queueConfig.queueUrl,
@@ -159,9 +159,8 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                   }
                 } else {
                   try {
-                    const worker =
-                      container.get<QueueWorker<QueueWorkerPayload<Q>>>(workerImplementation);
-                    await worker.handler(parser(message.Body!));
+                    const context = container.get<WorkerContext>(WorkerContext);
+                    await handler(parser(message.Body!), context, config.queueWorkers[name]);
                   } catch (e) {
                     if (e instanceof Error) {
                       logger.error(e.message, { stack: e.stack });

@@ -5,9 +5,9 @@ import { petitionEventSubscriptionsListener } from "./event-listeners/petition-e
 import { profileEventSubscriptionsListener } from "./event-listeners/profile-event-subscriptions-listener";
 import { userNotificationsListener } from "./event-listeners/user-notifications-listener";
 import { EventProcessor } from "./helpers/EventProcessor";
-import { createQueueWorker } from "./helpers/createQueueWorker";
+import { createQueueWorker_OLD } from "./helpers/createQueueWorker_OLD";
 
-createQueueWorker(
+createQueueWorker_OLD(
   "event-processor",
   new EventProcessor()
     .register(userNotificationsListener)
