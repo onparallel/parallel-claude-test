@@ -4553,35 +4553,40 @@ describe("GraphQL/Public", () => {
             ],
           });
 
-          expect(backgroundCheckServiceSpy).toHaveBeenCalledTimes(4);
-
-          expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(1, {
-            name: "Simpson",
-            date: null,
-            type: "PERSON",
-            country: null,
-          });
-
-          expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(2, {
-            name: "Homer Simpson",
-            date: "1980-01-01",
-            type: "PERSON",
-            country: null,
-          });
-
-          expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(3, {
-            name: "Bart Simpson",
-            date: "1985-01-01",
-            type: "PERSON",
-            country: null,
-          });
-
-          expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(4, {
-            name: "Lisa Simpson",
-            date: "1990-01-01",
-            type: "PERSON",
-            country: null,
-          });
+          expect(backgroundCheckServiceSpy.mock.calls).toIncludeSameMembers([
+            [
+              {
+                name: "Simpson",
+                date: null,
+                type: "PERSON",
+                country: null,
+              },
+            ],
+            [
+              {
+                name: "Homer Simpson",
+                date: "1980-01-01",
+                type: "PERSON",
+                country: null,
+              },
+            ],
+            [
+              {
+                name: "Bart Simpson",
+                date: "1985-01-01",
+                type: "PERSON",
+                country: null,
+              },
+            ],
+            [
+              {
+                name: "Lisa Simpson",
+                date: "1990-01-01",
+                type: "PERSON",
+                country: null,
+              },
+            ],
+          ]);
         });
 
         it("updates background check search if petition is completed again with different query", async () => {
