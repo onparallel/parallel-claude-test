@@ -79,25 +79,37 @@ describe("repositories/PetitionRepository", () => {
     });
 
     test("returns an empty page without options", async () => {
-      const result = petitions.getPaginatedPetitionsForUser(user.org_id, user.id, {});
+      const result = petitions.getPaginatedPetitionsForUser({
+        orgId: user.org_id,
+        userId: user.id,
+        opts: {},
+      });
       expect(await result.totalCount).toBe(15);
       expect(await result.items).toHaveLength(0);
     });
 
     test("returns a slice of petitions", async () => {
-      const result = petitions.getPaginatedPetitionsForUser(user.org_id, user.id, {
-        offset: 5,
-        limit: 5,
+      const result = petitions.getPaginatedPetitionsForUser({
+        orgId: user.org_id,
+        userId: user.id,
+        opts: {
+          offset: 5,
+          limit: 5,
+        },
       });
       expect(await result.totalCount).toBe(15);
       expect(await result.items).toMatchObject(_petitions.slice(5, 10).map(pick(["id"])));
     });
 
     test("returns a slice of filtered petitions", async () => {
-      const result = petitions.getPaginatedPetitionsForUser(user.org_id, user.id, {
-        offset: 2,
-        limit: 5,
-        search: "good", // there's only 5 good petitions
+      const result = petitions.getPaginatedPetitionsForUser({
+        orgId: user.org_id,
+        userId: user.id,
+        opts: {
+          offset: 2,
+          limit: 5,
+          search: "good", // there's only 5 good petitions
+        },
       });
       expect(await result.totalCount).toBe(5);
       expect(await result.items).toMatchObject(
@@ -106,20 +118,28 @@ describe("repositories/PetitionRepository", () => {
     });
 
     test("searches petition by recipient name", async () => {
-      const result = petitions.getPaginatedPetitionsForUser(user.org_id, user.id, {
-        offset: 0,
-        limit: 10,
-        search: "jesse pinkm",
+      const result = petitions.getPaginatedPetitionsForUser({
+        orgId: user.org_id,
+        userId: user.id,
+        opts: {
+          offset: 0,
+          limit: 10,
+          search: "jesse pinkm",
+        },
       });
       expect(await result.totalCount).toBe(1);
       expect(await result.items).toMatchObject([_petitions[0]]);
     });
 
     test("searches petition by recipient email", async () => {
-      const result = petitions.getPaginatedPetitionsForUser(user.org_id, user.id, {
-        offset: 0,
-        limit: 10,
-        search: "jesse.pinkman@test.com",
+      const result = petitions.getPaginatedPetitionsForUser({
+        orgId: user.org_id,
+        userId: user.id,
+        opts: {
+          offset: 0,
+          limit: 10,
+          search: "jesse.pinkman@test.com",
+        },
       });
       expect(await result.totalCount).toBe(1);
       expect(await result.items).toMatchObject([_petitions[0]]);

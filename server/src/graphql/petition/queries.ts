@@ -114,18 +114,22 @@ export const petitionsQuery = queryField((t) => {
       if (isNonNullish(limit) && limit > 100) {
         ctx.logger.info(`User:${ctx.user!.id} from Org:${ctx.user!.org_id} using limit ${limit}`);
       }
-      return ctx.petitions.getPaginatedPetitionsForUser(ctx.user!.org_id, ctx.user!.id, {
-        search,
-        offset,
-        filters,
-        sortBy: sortBy?.map((value) => {
-          const [field, order] = parseSortBy(value);
-          return { field: field, order };
-        }),
-        limit,
-        searchByNameOnly: searchByNameOnly ?? false,
-        excludeAnonymized: excludeAnonymized ?? false,
-        excludePublicTemplates: excludePublicTemplates ?? false,
+      return ctx.petitions.getPaginatedPetitionsForUser({
+        orgId: ctx.user!.org_id,
+        userId: ctx.user!.id,
+        opts: {
+          search,
+          offset,
+          filters,
+          sortBy: sortBy?.map((value) => {
+            const [field, order] = parseSortBy(value);
+            return { field: field, order };
+          }),
+          limit,
+          searchByNameOnly: searchByNameOnly ?? false,
+          excludeAnonymized: excludeAnonymized ?? false,
+          excludePublicTemplates: excludePublicTemplates ?? false,
+        },
       });
     },
   });
@@ -328,27 +332,31 @@ export const templatesQuery = queryField((t) => {
         });
       } else {
         const userId = ctx.user!.id;
-        return ctx.petitions.getPaginatedPetitionsForUser(ctx.user!.org_id, userId, {
-          search,
-          limit,
-          offset,
-          sortBy: [{ field: "lastUsedAt", order: "desc" }],
-          filters: {
-            path,
-            type: "TEMPLATE",
-            locale,
-            sharedWith:
-              isOwner === true
-                ? {
-                    operator: "AND",
-                    filters: [{ operator: "IS_OWNER", value: toGlobalId("User", userId) }],
-                  }
-                : isOwner === false
+        return ctx.petitions.getPaginatedPetitionsForUser({
+          orgId: ctx.user!.org_id,
+          userId,
+          opts: {
+            search,
+            limit,
+            offset,
+            sortBy: [{ field: "lastUsedAt", order: "desc" }],
+            filters: {
+              path,
+              type: "TEMPLATE",
+              locale,
+              sharedWith:
+                isOwner === true
                   ? {
                       operator: "AND",
-                      filters: [{ operator: "NOT_IS_OWNER", value: toGlobalId("User", userId) }],
+                      filters: [{ operator: "IS_OWNER", value: toGlobalId("User", userId) }],
                     }
-                  : null,
+                  : isOwner === false
+                    ? {
+                        operator: "AND",
+                        filters: [{ operator: "NOT_IS_OWNER", value: toGlobalId("User", userId) }],
+                      }
+                    : null,
+            },
           },
         });
       }

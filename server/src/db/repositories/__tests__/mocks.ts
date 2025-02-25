@@ -1101,7 +1101,7 @@ export class Mocks {
         description: faker.lorem.paragraph(),
         title: faker.lorem.words(),
         is_active: true,
-        slug: faker.lorem.words(3).replaceAll(" ", "-").toLowerCase(),
+        slug: faker.lorem.words(3).replaceAll(" ", "-").toLowerCase().slice(0, 20),
         ...builder?.(),
       })
       .returning("*");
