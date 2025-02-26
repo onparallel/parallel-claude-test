@@ -6,12 +6,48 @@ const crypto = require("crypto");
 
 const HUBSPOT_ALIAS_REGEX = /^HS(?:IE)?_(.*)$/;
 
+async function waitFor(millis) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, millis);
+  });
+}
+
+async function retry(operation, options = { maxRetries: 0, delay: 0 }) {
+  if (options.maxRetries < 0) {
+    throw new Error("maxRetries option must be greater than or equal to 0");
+  }
+
+  let remainingRetries = options.maxRetries;
+
+  do {
+    try {
+      return await operation();
+    } catch (error) {
+      if (remainingRetries === 0 || error.message !== "RATE_LIMIT_EXCEEDED") {
+        throw error;
+      } else {
+        console.debug(
+          `Rate limit exceeded, retrying in ${options.delay}ms. Remaining retries: ${remainingRetries}`,
+        );
+        await waitFor(options.delay);
+      }
+    }
+  } while (remainingRetries-- > 0);
+
+  throw new Error(`Operation failed after ${options.maxRetries} retries`);
+}
+
 async function httpsRequest(url, options, data) {
   return new Promise((resolve, reject) => {
     const module = url.startsWith("https") ? https : http;
     const req = module.request(url, options, (res) => {
       if (res.statusCode < 200 || res.statusCode > 299) {
         return reject(new Error(`HTTP status code ${res.statusCode}`));
+      }
+      if (res.statusCode === 429) {
+        return reject(new Error("RATE_LIMIT_EXCEEDED"));
       }
 
       const body = [];
@@ -38,6 +74,10 @@ async function httpsRequest(url, options, data) {
 }
 
 function verifyRequestSignature(request) {
+  if (!request?.body || !request?.headers) {
+    return false;
+  }
+
   const signature1 = request.headers["x-parallel-signature-1"];
   const signature2 = request.headers["x-parallel-signature-2"];
 
@@ -91,30 +131,34 @@ async function fetchPetition(petitionId) {
  */
 async function fetchHubspotContact(email, properties) {
   console.debug("fetchHubspotContact", email, properties.join(", "));
-  const response = await httpsRequest(
-    "https://api.hubapi.com/crm/v3/objects/contacts/search",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
-      },
-    },
-    {
-      filterGroups: [
+  const response = await retry(
+    () =>
+      httpsRequest(
+        "https://api.hubapi.com/crm/v3/objects/contacts/search",
         {
-          filters: [
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+          },
+        },
+        {
+          filterGroups: [
             {
-              value: email,
-              propertyName: "email",
-              operator: "EQ",
+              filters: [
+                {
+                  value: email,
+                  propertyName: "email",
+                  operator: "EQ",
+                },
+              ],
             },
           ],
+          properties,
+          limit: 1,
         },
-      ],
-      properties,
-      limit: 1,
-    },
+      ),
+    { delay: 5_000, maxRetries: 5 },
   );
 
   console.debug(JSON.stringify(response, null, 2));
@@ -130,16 +174,20 @@ async function fetchHubspotContact(email, properties) {
  */
 async function createContact(properties) {
   console.debug("createContact", properties);
-  return await httpsRequest(
-    "https://api.hubapi.com/crm/v3/objects/contacts",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
-      },
-    },
-    { properties },
+  return await retry(
+    () =>
+      httpsRequest(
+        "https://api.hubapi.com/crm/v3/objects/contacts",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+          },
+        },
+        { properties },
+      ),
+    { delay: 5_000, maxRetries: 5 },
   );
 }
 
@@ -151,16 +199,20 @@ async function createContact(properties) {
  */
 async function updateContact(id, properties) {
   console.debug("updateContact", id, properties);
-  return await httpsRequest(
-    `https://api.hubapi.com/crm/v3/objects/contacts/${id}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
-      },
-    },
-    { properties },
+  return await retry(
+    () =>
+      httpsRequest(
+        `https://api.hubapi.com/crm/v3/objects/contacts/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+          },
+        },
+        { properties },
+      ),
+    { delay: 5_000, maxRetries: 5 },
   );
 }
 
@@ -267,9 +319,11 @@ function isValueCompatible(values, hsProp) {
   if (hsProp.type === "datetime") {
     return values.every((v) => isValidDatetime(v) || isValidDate(v));
   } else if (hsProp.type === "date") {
-    return values.every(isValidDate);
+    return values.every((v) => isValidDate(v) && !v.startsWith("0")); // 00xx-xx-xx is an invalid date according to hubspot
   } else if (hsProp.type === "file") {
     return values.every(isValidUrl);
+  } else if (hsProp.type === "number") {
+    return values.every((v) => !isNaN(v));
   }
 
   return true;
@@ -277,13 +331,17 @@ function isValueCompatible(values, hsProp) {
 
 async function fetchHubspotContactProperties() {
   console.debug("fetchHubspotContactProperties");
-  const response = await httpsRequest("https://api.hubapi.com/crm/v3/properties/contacts", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
-    },
-  });
+  const response = await retry(
+    () =>
+      httpsRequest("https://api.hubapi.com/crm/v3/properties/contacts", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+        },
+      }),
+    { delay: 5_000, maxRetries: 5 },
+  );
 
   return response.results;
 }
