@@ -9601,6 +9601,15 @@ export type DashboardEditDialog_petitionListViewsQuery = {
         signature?: Array<PetitionSignatureStatusFilter> | null;
         fromTemplateId?: Array<string> | null;
         path: string;
+        approvals?: {
+          __typename?: "PetitionListViewDataApprovals";
+          operator: PetitionApprovalsFilterLogicalOperator;
+          filters: Array<{
+            __typename?: "PetitionListViewDataApprovalsFilters";
+            operator: PetitionApprovalsFilterOperator;
+            value: string;
+          }>;
+        } | null;
         sharedWith?: {
           __typename?: "PetitionListViewDataSharedWith";
           operator: FilterSharedWithLogicalOperator;
@@ -75556,6 +75565,13 @@ export const DashboardEditDialog_petitionListViewsDocument = gql`
         name
         data {
           status
+          approvals {
+            operator
+            filters {
+              operator
+              value
+            }
+          }
           sharedWith {
             operator
             filters {

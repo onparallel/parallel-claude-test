@@ -180,6 +180,13 @@ const _queries = [
           name
           data {
             status
+            approvals {
+              operator
+              filters {
+                operator
+                value
+              }
+            }
             sharedWith {
               operator
               filters {
