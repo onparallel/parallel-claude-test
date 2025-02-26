@@ -595,7 +595,7 @@ export class PetitionRepository extends BaseRepository {
     }
 
     if (opts.excludePublicTemplates) {
-      builders.push((q) => q.where("template_public", false));
+      builders.push((q) => q.where("p.template_public", false));
     }
 
     const needsLastUsedAt =
