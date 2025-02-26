@@ -658,6 +658,28 @@ function AddModule({
 
   const profileTypeFields = data?.profileType?.fields ?? [];
 
+  function removeTypename(obj: any): any {
+    if (obj === null || obj === undefined) {
+      return obj;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map((item) => removeTypename(item));
+    }
+
+    if (typeof obj === "object") {
+      const result: any = {};
+      for (const key in obj) {
+        if (key !== "__typename") {
+          result[key] = removeTypename(obj[key]);
+        }
+      }
+      return result;
+    }
+
+    return obj;
+  }
+
   return (
     <Stack
       as="form"
@@ -741,7 +763,7 @@ function AddModule({
               );
               return {
                 ...item,
-                filter,
+                filter: removeTypename(filter),
               };
             }),
           } as PetitionsPieChartDashboardModuleSettingsInput;
@@ -754,7 +776,7 @@ function AddModule({
                   ?.data ?? { status: [], path: "", __typename: "" },
                 ["path", "__typename"],
               );
-              return filter;
+              return removeTypename(filter);
             }),
           } as PetitionsRatioDashboardModuleSettingsInput;
         } else if (type === "PETITION_BUTTON_DASHBOARD_MODULE") {
@@ -769,8 +791,9 @@ function AddModule({
             )?.data ?? { status: [], path: "", __typename: "" },
             ["path", "__typename"],
           );
+
           settings = {
-            filters: filter,
+            filters: removeTypename(filter),
           } as PetitionsNumberDashboardModuleSettingsInput;
         }
 
