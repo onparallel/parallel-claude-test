@@ -52,12 +52,8 @@ export const AppLayout = Object.assign(
     useOnMediaQueryChange(
       "sm",
       useCallback((matches) => {
-        if (!matches) {
+        if (!matches || HIDE_INTERCOM_PATHS.includes(router.pathname)) {
           window.intercomSettings = { hide_default_launcher: true };
-        } else {
-          window.intercomSettings = {
-            hide_default_launcher: HIDE_INTERCOM_PATHS.includes(router.pathname) ? true : false,
-          };
         }
         window.Intercom?.("update");
       }, []),
