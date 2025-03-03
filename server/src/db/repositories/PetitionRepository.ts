@@ -171,10 +171,13 @@ interface PetitionTagFilter {
 
 interface PetitionApprovalsFilter {
   operator: "AND" | "OR";
-  filters: {
-    operator: "ASSIGNED_TO" | "STATUS";
-    value: string;
-  }[];
+  filters: (
+    | {
+        operator: "STATUS";
+        value: "WITHOUT_APPROVAL" | "NOT_STARTED" | "PENDING" | "APPROVED" | "REJECTED";
+      }
+    | { operator: "ASSIGNED_TO"; value: number }
+  )[];
 }
 
 export interface PetitionFilter {

@@ -237,12 +237,8 @@ export class PetitionFilterRepositoryHelper {
                   break;
               }
             } else if (filter.operator === "ASSIGNED_TO") {
-              const { id, type } = fromGlobalId(filter.value);
-              if (type !== "User") {
-                throw new Error(`Expected User, got ${type}`);
-              }
               conditions.push(/* sql */ `? = any(array_agg(distinct parsa.user_id))`);
-              bindings.push(id);
+              bindings.push(filter.value);
             }
           }
           q.havingRaw("(" + conditions.join(` ${operator.toLowerCase()} `) + ")", bindings);

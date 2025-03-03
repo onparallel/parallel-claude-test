@@ -25,6 +25,7 @@ import {
 } from "../helpers/authorize";
 import { ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { mapPetitionFilterInput } from "../helpers/mapPetitionFilterInput";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { validateAnd } from "../helpers/validateArgs";
 import { validPath } from "../helpers/validators/validPath";
@@ -120,7 +121,7 @@ export const petitionsQuery = queryField((t) => {
         opts: {
           search,
           offset,
-          filters,
+          filters: filters ? mapPetitionFilterInput(filters) : undefined,
           sortBy: sortBy?.map((value) => {
             const [field, order] = parseSortBy(value);
             return { field: field, order };

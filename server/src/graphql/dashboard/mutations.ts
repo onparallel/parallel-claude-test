@@ -6,6 +6,7 @@ import { ProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
 import { authenticateAnd, ifArgDefined, realUserIsSuperAdmin } from "../helpers/authorize";
 import { ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { mapPetitionFilterInput } from "../helpers/mapPetitionFilterInput";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { petitionsAreOfTypeTemplate } from "../petition/authorizers";
@@ -115,7 +116,7 @@ export const createPetitionsNumberDashboardModule = mutationField(
           title,
           size,
           settings: {
-            filters: settings.filters,
+            filters: mapPetitionFilterInput(settings.filters),
           },
         },
         `User:${ctx.user!.id}`,
@@ -160,7 +161,10 @@ export const createPetitionsRatioDashboardModule = mutationField(
           size,
           settings: {
             graphicType: settings.graphicType,
-            filters: settings.filters as [PetitionFilter, PetitionFilter],
+            filters: settings.filters.map(mapPetitionFilterInput) as [
+              PetitionFilter,
+              PetitionFilter,
+            ],
           },
         },
         `User:${ctx.user!.id}`,
@@ -214,7 +218,10 @@ export const createPetitionsPieChartDashboardModule = mutationField(
           size,
           settings: {
             graphicType: settings.graphicType,
-            items: settings.items,
+            items: settings.items.map((i) => ({
+              ...i,
+              filter: mapPetitionFilterInput(i.filter),
+            })),
           },
         },
         `User:${ctx.user!.id}`,

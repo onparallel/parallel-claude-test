@@ -3,7 +3,7 @@ import { GraphQLResolveInfo } from "graphql";
 import { indexBy, isNonNullish, isNullish, partition } from "remeda";
 import { assert } from "ts-essentials";
 import { ApiContext } from "../../context";
-import { fromGlobalId } from "../../util/globalId";
+import { fromGlobalId, isGlobalId } from "../../util/globalId";
 import { validateProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
 import { NexusGenInputs } from "../__types";
 import { ArgWithPath, getArgWithPath } from "../helpers/authorize";
@@ -105,6 +105,55 @@ async function validatePetitionFilter(
           `${argName}.tags.filters[${filter.tags.filters.indexOf(tagFilter)}].value`,
           "Tags not found",
         );
+      }
+    }
+  }
+
+  if (isNonNullish(filter.approvals)) {
+    if (filter.approvals.filters.length > 5) {
+      throw new ArgValidationError(
+        info,
+        `${argName}.approvals.filters`,
+        "A maximum of 5 filter lines is allowed",
+      );
+    }
+
+    const userIds: { index: number; id: number }[] = [];
+    for (const f of filter.approvals.filters) {
+      const index = filter.approvals.filters.indexOf(f);
+
+      if (f.operator === "ASSIGNED_TO") {
+        if (!isGlobalId(f.value, "User")) {
+          throw new ArgValidationError(
+            info,
+            `${argName}.approvals.filters[${index}].value`,
+            "Must be a user ID",
+          );
+        }
+
+        userIds.push({ index, id: fromGlobalId(f.value, "User").id });
+      } else if (
+        f.operator === "STATUS" &&
+        !["WITHOUT_APPROVAL", "NOT_STARTED", "PENDING", "APPROVED", "REJECTED"].includes(f.value)
+      ) {
+        throw new ArgValidationError(
+          info,
+          `${argName}.approvals.filters[${index}].value`,
+          "Invalid status",
+        );
+      }
+    }
+
+    if (userIds.length > 0) {
+      const users = await ctx.users.loadUser(userIds.map((u) => u.id));
+      for (const { index, id } of userIds) {
+        const user = users.find((u) => u?.id === id);
+        if (!user || user.org_id !== ctx.user!.org_id)
+          throw new ArgValidationError(
+            info,
+            `${argName}.approvals.filters[${index}].value`,
+            "User not found",
+          );
       }
     }
   }
