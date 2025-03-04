@@ -44,7 +44,13 @@ export class Redis implements IRedis {
   public readonly sendRawCommand: RedisClient["sendCommand"];
 
   constructor(@inject(CONFIG) config: Config) {
-    this.client = redis.createClient({ socket: { ...config.redis } });
+    this.client = redis.createClient({
+      socket: {
+        ...config.redis,
+        ...// TODO replace with process.env.NODE_ENV === "production" after fixing the production redis
+        (process.env.ENV === "staging" ? { tls: true } : {}),
+      },
+    });
     this.sendRawCommand = this.client.sendCommand.bind(this.client);
   }
 

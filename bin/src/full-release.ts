@@ -1,4 +1,5 @@
 import { execSync } from "child_process";
+import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { run } from "./utils/run";
 
@@ -30,6 +31,9 @@ async function main() {
       type: "boolean",
       description: "Wether to skip the prune step",
     }).argv;
+
+  // redundant make sure the user is deploying on the intended environment
+  assert(env === process.env.ENV, "env mismatch");
 
   const commit = _commit.slice(0, 7);
 

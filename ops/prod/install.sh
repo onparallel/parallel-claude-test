@@ -6,10 +6,19 @@ BUILD_ID="parallel-${ENV}-${RELEASE}"
 
 sudo hostnamectl set-hostname "$INSTANCE_NAME"
 
+if [[ "$ENV" == "staging" ]]; then
+  EFS_ID="fs-04bd0d42c9572a6c1"
+elif [[ "$ENVIRONMENT" == "production" ]]; then
+  EFS_ID="fs-05b0e1c4df3ecd227"
+else
+  echo "ERROR: Unknown environment '$ENV'. Use 'production' or 'staging'."
+  exit 1
+fi
+
 # mount shared folder
 sudo mkdir -p /nfs/parallel
-sudo mount -t efs -o tls -O _netdev fs-05b0e1c4df3ecd227:/ /nfs/parallel
-echo "fs-05b0e1c4df3ecd227.efs.eu-central-1.amazonaws.com:/ /nfs/parallel nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" | sudo tee -a /etc/fstab > /dev/null
+sudo mount -t efs -o tls -O _netdev "${EFS_ID}:/" /nfs/parallel
+echo "${EFS_ID}.efs.eu-central-1.amazonaws.com:/ /nfs/parallel nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" | sudo tee -a /etc/fstab > /dev/null
 
 cd /home/ec2-user
 sed -i -e "s/#INSTANCE_NAME#/$INSTANCE_NAME/g;s/#ENV#/$ENV/g;s/#RELEASE#/$RELEASE/g;s/#INSTANCE_NUMBER#/$INSTANCE_NUMBER/g;s/#BUILD_ID#/$BUILD_ID/g" \

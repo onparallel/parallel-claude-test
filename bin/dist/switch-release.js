@@ -9,6 +9,7 @@ const client_elastic_load_balancing_1 = require("@aws-sdk/client-elastic-load-ba
 const chalk_1 = __importDefault(require("chalk"));
 const p_map_1 = __importDefault(require("p-map"));
 const remeda_1 = require("remeda");
+const ts_essentials_1 = require("ts-essentials");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 const ssh_1 = require("./utils/ssh");
@@ -30,6 +31,8 @@ async function main() {
         choices: ["staging", "production"],
         description: "The environment for the build",
     }).argv;
+    // redundant make sure the user is deploying on the intended environment
+    (0, ts_essentials_1.assert)(env === process.env.ENV, "env mismatch");
     const commit = _commit.slice(0, 7);
     const buildId = `parallel-${env}-${commit}`;
     const oldInstances = await elb

@@ -8,6 +8,7 @@ const client_ec2_1 = require("@aws-sdk/client-ec2");
 const chalk_1 = __importDefault(require("chalk"));
 const p_map_1 = __importDefault(require("p-map"));
 const remeda_1 = require("remeda");
+const ts_essentials_1 = require("ts-essentials");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 const ssh_1 = require("./utils/ssh");
@@ -21,19 +22,20 @@ const IMAGE_ID = "ami-099fed42d932fc153";
 const KMS_KEY_ID = "acf1d245-abe5-4ff8-a490-09dba3834c45";
 const SECURITY_GROUP_IDS = {
     production: ["sg-078abc8a772035e7a"],
-    staging: ["sg-083d7b4facd31a090"],
+    staging: ["sg-0235d45780bc85002"],
 };
-const REGION = "eu-central-1";
-const ENHANCED_MONITORING = true;
 const HOME_DIR = "/home/ec2-user";
 const OPS_DIR = `${HOME_DIR}/parallel/ops/prod`;
-const AVAILABILITY_ZONES = (0, remeda_1.range)(0, 9)
-    .map((i) => `${REGION}${["a", "b", "c"][i % 3]}`)
-    .reverse();
 const SUBNET_ID = {
-    "eu-central-1a": "subnet-d3cc68b9",
-    "eu-central-1b": "subnet-77f2e10a",
-    "eu-central-1c": "subnet-eb22c4a7",
+    production: {
+        "eu-central-1a": "subnet-d3cc68b9",
+        "eu-central-1b": "subnet-77f2e10a",
+        "eu-central-1c": "subnet-eb22c4a7",
+    },
+    staging: {
+        "eu-central-1a": "subnet-0324d190a292cbcdb",
+        "eu-central-1b": "subnet-001192e72de4dd2ca",
+    },
 };
 const NUM_INSTANCES = {
     production: 2,
@@ -54,6 +56,8 @@ async function main() {
         choices: ["staging", "production"],
         description: "The environment for the build",
     }).argv;
+    // redundant make sure the user is deploying on the intended environment
+    (0, ts_essentials_1.assert)(env === process.env.ENV, "env mismatch");
     const commit = _commit.slice(0, 7);
     const image = await ec2
         .send(new client_ec2_1.DescribeImagesCommand({
@@ -63,14 +67,17 @@ async function main() {
     (0, p_map_1.default)((0, remeda_1.range)(0, NUM_INSTANCES[env]), async (i) => {
         const name = `parallel-${env}-${commit}-${i + 1}`;
         const result = await (async () => {
-            while (AVAILABILITY_ZONES.length > 0) {
-                const az = AVAILABILITY_ZONES.pop();
+            const azs = (0, remeda_1.range)(0, 3)
+                .flatMap(() => Object.keys(SUBNET_ID[env]))
+                .reverse();
+            while (azs.length > 0) {
+                const az = azs.pop();
+                const subnet = SUBNET_ID[env][az];
                 try {
                     console.log((0, chalk_1.default) `Launching instance in ${az}...`);
                     return await ec2.send(new client_ec2_1.RunInstancesCommand({
                         ImageId: IMAGE_ID,
                         KeyName: KEY_NAME,
-                        SecurityGroupIds: SECURITY_GROUP_IDS[env],
                         IamInstanceProfile: {
                             Name: `parallel-server-${env}`,
                         },
@@ -79,7 +86,14 @@ async function main() {
                             AvailabilityZone: az,
                             Tenancy: client_ec2_1.Tenancy.default,
                         },
-                        SubnetId: SUBNET_ID[az],
+                        NetworkInterfaces: [
+                            {
+                                DeviceIndex: 0,
+                                AssociatePublicIpAddress: true,
+                                SubnetId: subnet,
+                                Groups: SECURITY_GROUP_IDS[env],
+                            },
+                        ],
                         MaxCount: 1,
                         MinCount: 1,
                         BlockDeviceMappings: [
@@ -96,7 +110,7 @@ async function main() {
                             },
                         ],
                         Monitoring: {
-                            Enabled: ENHANCED_MONITORING,
+                            Enabled: true,
                         },
                         TagSpecifications: [
                             {

@@ -33,11 +33,13 @@ type Environment = "staging" | "production";
 const BUILDER_IMAGE_ID = "ami-00b9dcacd09a560ee";
 const INSTANCE_TYPE = "c6i.2xlarge";
 const KEY_NAME = "ops";
-const SECURITY_GROUP_IDS = ["sg-0f7aae421410e4758"];
+const SECURITY_GROUP_IDS = {
+  production: ["sg-0f7aae421410e4758"],
+  staging: ["sg-099b8951613ae3bc0"],
+};
 const KMS_KEY_ID = "acf1d245-abe5-4ff8-a490-09dba3834c45";
-const SUBNET_ID = "subnet-d3cc68b9";
-const REGION = "eu-central-1";
-const AVAILABILITY_ZONE = `${REGION}a`;
+const AVAILABILITY_ZONE = `eu-central-1a`;
+const SUBNET_ID = { production: "subnet-d3cc68b9", staging: "subnet-0324d190a292cbcdb" };
 const ENHANCED_MONITORING = true;
 const YARN_CACHE_VOLUMES = ["vol-0d498fe71cba530de", "vol-02eb0c410dd9891c6"];
 
@@ -70,6 +72,9 @@ async function main() {
       description: "If the instance should be terminated after build",
     }).argv;
 
+  // redundant make sure the user is deploying on the intended environment
+  assert(env === process.env.ENV, "env mismatch");
+
   const ec2 = new EC2Client({});
 
   const commit = _commit.slice(0, 7);
@@ -100,19 +105,25 @@ async function main() {
     new RunInstancesCommand({
       ImageId: BUILDER_IMAGE_ID,
       KeyName: KEY_NAME,
-      SecurityGroupIds: SECURITY_GROUP_IDS,
       InstanceType: INSTANCE_TYPE,
       Placement: {
         AvailabilityZone: AVAILABILITY_ZONE,
         Tenancy: Tenancy.default,
       },
       IamInstanceProfile: { Name: "parallel-builder" },
-      SubnetId: SUBNET_ID,
       MaxCount: 1,
       MinCount: 1,
       Monitoring: {
         Enabled: ENHANCED_MONITORING,
       },
+      NetworkInterfaces: [
+        {
+          DeviceIndex: 0,
+          AssociatePublicIpAddress: true,
+          SubnetId: SUBNET_ID[env],
+          Groups: SECURITY_GROUP_IDS[env],
+        },
+      ],
       BlockDeviceMappings: [
         {
           DeviceName: "/dev/xvda",

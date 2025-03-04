@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = require("child_process");
+const ts_essentials_1 = require("ts-essentials");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 async function main() {
@@ -29,6 +30,8 @@ async function main() {
         type: "boolean",
         description: "Wether to skip the prune step",
     }).argv;
+    // redundant make sure the user is deploying on the intended environment
+    (0, ts_essentials_1.assert)(env === process.env.ENV, "env mismatch");
     const commit = _commit.slice(0, 7);
     for (const command of [
         `yarn build-release --commit ${commit} --env ${env} --force ${forceBuild}`,

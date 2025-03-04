@@ -15,6 +15,7 @@ import {
   ElasticLoadBalancingClient,
 } from "@aws-sdk/client-elastic-load-balancing";
 import chalk from "chalk";
+import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { run } from "./utils/run";
 
@@ -36,6 +37,9 @@ async function main() {
       choices: ["staging", "production"] satisfies Environment[],
       description: "The environment for the build",
     }).argv;
+
+  // redundant make sure the user is deploying on the intended environment
+  assert(env === process.env.ENV, "env mismatch");
 
   const liveInstances = await elb
     .send(new DescribeLoadBalancersCommand({ LoadBalancerNames: [`parallel-${env}`] }))

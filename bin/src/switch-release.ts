@@ -21,6 +21,7 @@ import {
 import chalk from "chalk";
 import pMap from "p-map";
 import { zip } from "remeda";
+import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { run } from "./utils/run";
 import { executeRemoteCommand } from "./utils/ssh";
@@ -46,6 +47,9 @@ async function main() {
       choices: ["staging", "production"] satisfies Environment[],
       description: "The environment for the build",
     }).argv;
+
+  // redundant make sure the user is deploying on the intended environment
+  assert(env === process.env.ENV, "env mismatch");
 
   const commit = _commit.slice(0, 7);
   const buildId = `parallel-${env}-${commit}`;

@@ -7,6 +7,7 @@ const client_cloudwatch_1 = require("@aws-sdk/client-cloudwatch");
 const client_ec2_1 = require("@aws-sdk/client-ec2");
 const client_elastic_load_balancing_1 = require("@aws-sdk/client-elastic-load-balancing");
 const chalk_1 = __importDefault(require("chalk"));
+const ts_essentials_1 = require("ts-essentials");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 const ec2 = new client_ec2_1.EC2Client({});
@@ -25,6 +26,8 @@ async function main() {
         choices: ["staging", "production"],
         description: "The environment for the build",
     }).argv;
+    // redundant make sure the user is deploying on the intended environment
+    (0, ts_essentials_1.assert)(env === process.env.ENV, "env mismatch");
     const liveInstances = await elb
         .send(new client_elastic_load_balancing_1.DescribeLoadBalancersCommand({ LoadBalancerNames: [`parallel-${env}`] }))
         .then((r) => r.LoadBalancerDescriptions[0].Instances.map((i) => i.InstanceId));
