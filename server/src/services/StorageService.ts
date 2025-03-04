@@ -12,7 +12,6 @@ import contentDisposition from "content-disposition";
 import { inject, injectable } from "inversify";
 import { chunk } from "remeda";
 import { Readable } from "stream";
-import { buffer } from "stream/consumers";
 import { Memoize } from "typescript-memoize";
 import { CONFIG, Config } from "../config";
 import { awsLogger } from "../util/awsLogger";
@@ -74,7 +73,7 @@ class StorageImpl implements IStorageImpl {
     const response = await this.s3.send(
       new GetObjectCommand({ Bucket: this.bucketName, Key: key }),
     );
-    return Readable.from(await buffer(response.Body! as Readable));
+    return response.Body! as Readable;
   }
 
   async downloadFileBase64(key: string) {
