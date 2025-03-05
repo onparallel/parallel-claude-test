@@ -444,6 +444,8 @@ export async function getTaskResultFileUrl(client: GraphQLClient, taskId: string
   } catch (error) {
     if (containsGraphQLError(error, "FILE_NOT_FOUND_ERROR")) {
       throw new ResourceNotFoundError("File is not ready");
+    } else {
+      throw error;
     }
   }
 }
