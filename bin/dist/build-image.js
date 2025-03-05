@@ -81,7 +81,7 @@ async function main() {
             const instance = (_b = (_a = result.Reservations) === null || _a === void 0 ? void 0 : _a[0].Instances) === null || _b === void 0 ? void 0 : _b[0];
             const isRunning = ((_c = instance === null || instance === void 0 ? void 0 : instance.State) === null || _c === void 0 ? void 0 : _c.Name) === client_ec2_1.InstanceStateName.running;
             if (isRunning) {
-                ipAddress = instance.PublicIpAddress;
+                ipAddress = instance.PrivateIpAddress;
             }
             return isRunning;
         }, chalk_1.default.italic `Instance {yellow pending}. Waiting 10 more seconds...`, 10000);
@@ -90,18 +90,15 @@ async function main() {
         await waitForInstance(ipAddress);
         console.log("Uploading build script to the new instance.");
         (0, child_process_1.execSync)(`scp \
-          -i ~/.ssh/ops.pem \
           -o "UserKnownHostsFile=/dev/null" \
           -o "StrictHostKeyChecking=no" \
           ${path_1.default.resolve(__dirname, `../../ops/prod/image/build-image-${image}.sh`)} ec2-user@${ipAddress}:~`, { stdio: "inherit" });
         (0, child_process_1.execSync)(`scp \
-          -i ~/.ssh/ops.pem \
           -o "UserKnownHostsFile=/dev/null" \
           -o "StrictHostKeyChecking=no" \
           ${path_1.default.resolve(__dirname, `../../ops/prod/image/authorized_keys`)} ec2-user@${ipAddress}:~`, { stdio: "inherit" });
         console.log("Executing build script.");
         (0, child_process_1.execSync)(`ssh \
-          -i ~/.ssh/ops.pem \
           -o "UserKnownHostsFile=/dev/null" \
           -o StrictHostKeyChecking=no \
           ec2-user@${ipAddress} /home/ec2-user/build-image-${image}.sh ${name}`, { stdio: "inherit" });
@@ -142,7 +139,6 @@ async function waitForInstance(ipAddress) {
     await (0, wait_1.waitFor)(async () => {
         try {
             (0, child_process_1.execSync)(`ssh \
-            -i ~/.ssh/ops.pem \
             -o ConnectTimeout=1 \
             -o "UserKnownHostsFile=/dev/null" \
             -o StrictHostKeyChecking=no \

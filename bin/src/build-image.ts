@@ -95,7 +95,7 @@ async function main() {
         const instance = result.Reservations?.[0].Instances?.[0];
         const isRunning = instance?.State?.Name === InstanceStateName.running;
         if (isRunning) {
-          ipAddress = instance!.PublicIpAddress;
+          ipAddress = instance!.PrivateIpAddress;
         }
         return isRunning;
       },
@@ -108,7 +108,6 @@ async function main() {
     console.log("Uploading build script to the new instance.");
     execSync(
       `scp \
-          -i ~/.ssh/ops.pem \
           -o "UserKnownHostsFile=/dev/null" \
           -o "StrictHostKeyChecking=no" \
           ${path.resolve(
@@ -119,7 +118,6 @@ async function main() {
     );
     execSync(
       `scp \
-          -i ~/.ssh/ops.pem \
           -o "UserKnownHostsFile=/dev/null" \
           -o "StrictHostKeyChecking=no" \
           ${path.resolve(
@@ -131,7 +129,6 @@ async function main() {
     console.log("Executing build script.");
     execSync(
       `ssh \
-          -i ~/.ssh/ops.pem \
           -o "UserKnownHostsFile=/dev/null" \
           -o StrictHostKeyChecking=no \
           ec2-user@${ipAddress} /home/ec2-user/build-image-${image}.sh ${name}`,
@@ -190,7 +187,6 @@ async function waitForInstance(ipAddress: string) {
       try {
         execSync(
           `ssh \
-            -i ~/.ssh/ops.pem \
             -o ConnectTimeout=1 \
             -o "UserKnownHostsFile=/dev/null" \
             -o StrictHostKeyChecking=no \

@@ -30,7 +30,7 @@ const WORK_DIR = "/home/ec2-user";
 
 type Environment = "staging" | "production";
 
-const BUILDER_IMAGE_ID = "ami-00b9dcacd09a560ee";
+const BUILDER_IMAGE_ID = "ami-0a3b27591ea8a32e9";
 const INSTANCE_TYPE = "c6i.2xlarge";
 const KEY_NAME = "ops";
 const SECURITY_GROUP_IDS = {

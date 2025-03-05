@@ -26,10 +26,6 @@ sudo hostnamectl set-hostname "$HOSTNAME"
 echo "cd ~/parallel/bin" >> ~/.bash_profile
 echo "export ENV=${ENVIRONMENT}" >> ~/.bash_profile
 
-# Add public keys
-cat authorized_keys >> .ssh/authorized_keys
-rm authorized_keys
-
 sudo yum update -y
 
 # install binary dependencies
