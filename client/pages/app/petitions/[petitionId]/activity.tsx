@@ -550,12 +550,6 @@ const _fragments = {
     ${ConfirmReactivateAccessDialog.fragments.PetitionAccess}
     ${useConfirmSendReminderDialog.fragments.Petition}
   `,
-  PetitionEvent: gql`
-    fragment PetitionActivity_PetitionEvent on PetitionEvent {
-      ...PetitionActivityTimeline_PetitionEvent
-    }
-    ${PetitionActivityTimeline.fragments.PetitionEvent}
-  `,
   Query: gql`
     fragment PetitionActivity_Query on Query {
       ...PetitionLayout_Query
@@ -655,14 +649,15 @@ const _queries = [
         ... on Petition {
           events(offset: $offset, limit: $limit) {
             items {
-              ...PetitionActivity_PetitionEvent
+              id
+              ...PetitionActivityTimeline_PetitionEvent
             }
             totalCount
           }
         }
       }
     }
-    ${_fragments.Petition}
+    ${PetitionActivityTimeline.fragments.PetitionEvent}
   `,
   gql`
     query PetitionActivity_petition($id: GID!) {

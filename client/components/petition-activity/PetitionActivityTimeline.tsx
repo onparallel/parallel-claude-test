@@ -327,6 +327,7 @@ PetitionActivityTimeline.fragments = {
       }
       ... on PetitionApprovalRequestStepCanceledEvent {
         ...TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEvent
+      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -372,33 +373,19 @@ PetitionActivityTimeline.fragments = {
     ${TimelinePetitionTaggedEvent.fragments.PetitionTaggedEvent}
     ${TimelinePetitionUntaggedEvent.fragments.PetitionUntaggedEvent}
     ${TimelineContactlessAccessUsedEvent.fragments.ContactlessAccessUsedEvent}
-    ${
-      TimelinePetitionApprovalRequestStepStartedEvent.fragments
-        .PetitionApprovalRequestStepStartedEvent
-    }
-    ${
-      TimelinePetitionApprovalRequestStepApprovedEvent.fragments
-        .PetitionApprovalRequestStepApprovedEvent
-    }
-    ${
-      TimelinePetitionApprovalRequestStepRejectedEvent.fragments
-        .PetitionApprovalRequestStepRejectedEvent
-    }
-    ${
-      TimelinePetitionApprovalRequestStepSkippedEvent.fragments
-        .PetitionApprovalRequestStepSkippedEvent
-    }
-    ${
-      TimelinePetitionApprovalRequestStepReminderEvent.fragments
-        .PetitionApprovalRequestStepReminderEvent
-    }
-    ${
-      TimelinePetitionApprovalRequestStepFinishedEvent.fragments
-        .PetitionApprovalRequestStepFinishedEvent
-    }
-    ${
-      TimelinePetitionApprovalRequestStepCanceledEvent.fragments
-        .PetitionApprovalRequestStepCanceledEvent
-    }
-  }`,
+    ${TimelinePetitionApprovalRequestStepStartedEvent.fragments
+      .PetitionApprovalRequestStepStartedEvent}
+    ${TimelinePetitionApprovalRequestStepApprovedEvent.fragments
+      .PetitionApprovalRequestStepApprovedEvent}
+    ${TimelinePetitionApprovalRequestStepRejectedEvent.fragments
+      .PetitionApprovalRequestStepRejectedEvent}
+    ${TimelinePetitionApprovalRequestStepSkippedEvent.fragments
+      .PetitionApprovalRequestStepSkippedEvent}
+    ${TimelinePetitionApprovalRequestStepReminderEvent.fragments
+      .PetitionApprovalRequestStepReminderEvent}
+    ${TimelinePetitionApprovalRequestStepFinishedEvent.fragments
+      .PetitionApprovalRequestStepFinishedEvent}
+    ${TimelinePetitionApprovalRequestStepCanceledEvent.fragments
+      .PetitionApprovalRequestStepCanceledEvent}
+  `,
 };

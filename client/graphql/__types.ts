@@ -1873,6 +1873,7 @@ export interface MutationcreateExportExcelTaskArgs {
 }
 
 export interface MutationcreateExportRepliesTaskArgs {
+  callbackUrl?: InputMaybe<Scalars["String"]["input"]>;
   pattern?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 }
@@ -2032,6 +2033,7 @@ export interface MutationcreatePetitionsRatioDashboardModuleArgs {
 }
 
 export interface MutationcreatePrintPdfTaskArgs {
+  callbackUrl?: InputMaybe<Scalars["String"]["input"]>;
   includeNdLinks?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionId: Scalars["GID"]["input"];
   skipAttachments?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -40862,1079 +40864,6 @@ export type PetitionActivity_PetitionFragment = {
   }>;
 };
 
-export type PetitionActivity_PetitionEvent_AccessActivatedEvent_Fragment = {
-  __typename?: "AccessActivatedEvent";
-  id: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-  access: {
-    __typename?: "PetitionAccess";
-    isContactless: boolean;
-    isSharedByLink: boolean;
-    delegateGranter?: {
-      __typename?: "User";
-      id: string;
-      fullName?: string | null;
-      status: UserStatus;
-      isMe: boolean;
-    } | null;
-    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-  };
-};
-
-export type PetitionActivity_PetitionEvent_AccessActivatedFromPublicPetitionLinkEvent_Fragment = {
-  __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
-  id: string;
-  createdAt: string;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-  };
-};
-
-export type PetitionActivity_PetitionEvent_AccessDeactivatedEvent_Fragment = {
-  __typename?: "AccessDeactivatedEvent";
-  id: string;
-  reason: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-  access: {
-    __typename?: "PetitionAccess";
-    isContactless: boolean;
-    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-  };
-};
-
-export type PetitionActivity_PetitionEvent_AccessDelegatedEvent_Fragment = {
-  __typename?: "AccessDelegatedEvent";
-  id: string;
-  createdAt: string;
-  originalAccess: {
-    __typename?: "PetitionAccess";
-    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-  };
-  newAccess: {
-    __typename?: "PetitionAccess";
-    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-  };
-};
-
-export type PetitionActivity_PetitionEvent_AccessOpenedEvent_Fragment = {
-  __typename?: "AccessOpenedEvent";
-  id: string;
-  createdAt: string;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-  };
-};
-
-export type PetitionActivity_PetitionEvent_CommentDeletedEvent_Fragment = {
-  __typename?: "CommentDeletedEvent";
-  id: string;
-  isInternal: boolean;
-  isGeneral: boolean;
-  createdAt: string;
-  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-  deletedBy?:
-    | {
-        __typename?: "PetitionAccess";
-        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-      }
-    | {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        status: UserStatus;
-        isMe: boolean;
-      }
-    | null;
-};
-
-export type PetitionActivity_PetitionEvent_CommentPublishedEvent_Fragment = {
-  __typename?: "CommentPublishedEvent";
-  id: string;
-  isInternal: boolean;
-  isGeneral: boolean;
-  createdAt: string;
-  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-  comment?: {
-    __typename?: "PetitionFieldComment";
-    isEdited: boolean;
-    isAnonymized: boolean;
-    isApproval: boolean;
-    contentHtml?: string | null;
-    author?:
-      | {
-          __typename?: "PetitionAccess";
-          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-        }
-      | {
-          __typename?: "User";
-          id: string;
-          fullName?: string | null;
-          status: UserStatus;
-          isMe: boolean;
-        }
-      | null;
-    mentions: Array<
-      | {
-          __typename?: "PetitionFieldCommentUserGroupMention";
-          mentionedId: string;
-          userGroup?: {
-            __typename?: "UserGroup";
-            id: string;
-            imMember: boolean;
-            name: string;
-            localizableName: { [locale in UserLocale]?: string };
-            type: UserGroupType;
-          } | null;
-        }
-      | {
-          __typename?: "PetitionFieldCommentUserMention";
-          mentionedId: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-            isMe: boolean;
-          } | null;
-        }
-    >;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_ContactlessAccessUsedEvent_Fragment = {
-  __typename?: "ContactlessAccessUsedEvent";
-  id: string;
-  createdAt: string;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-  };
-};
-
-export type PetitionActivity_PetitionEvent_GroupPermissionAddedEvent_Fragment = {
-  __typename?: "GroupPermissionAddedEvent";
-  id: string;
-  permissionType: PetitionPermissionType;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-  permissionGroup?: {
-    __typename?: "UserGroup";
-    name: string;
-    localizableName: { [locale in UserLocale]?: string };
-    type: UserGroupType;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_GroupPermissionEditedEvent_Fragment = {
-  __typename?: "GroupPermissionEditedEvent";
-  id: string;
-  permissionType: PetitionPermissionType;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-  permissionGroup?: {
-    __typename?: "UserGroup";
-    name: string;
-    localizableName: { [locale in UserLocale]?: string };
-    type: UserGroupType;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_GroupPermissionRemovedEvent_Fragment = {
-  __typename?: "GroupPermissionRemovedEvent";
-  id: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-  permissionGroup?: {
-    __typename?: "UserGroup";
-    name: string;
-    localizableName: { [locale in UserLocale]?: string };
-    type: UserGroupType;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_MessageCancelledEvent_Fragment = {
-  __typename?: "MessageCancelledEvent";
-  id: string;
-  reason: string;
-  createdAt: string;
-  message: {
-    __typename?: "PetitionMessage";
-    status: PetitionMessageStatus;
-    scheduledAt?: string | null;
-    emailSubject?: any | null;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-    };
-  };
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_MessageScheduledEvent_Fragment = {
-  __typename?: "MessageScheduledEvent";
-  id: string;
-  createdAt: string;
-  petition?: { __typename?: "PetitionBaseMini"; id: string } | null;
-  message: {
-    __typename?: "PetitionMessage";
-    id: string;
-    status: PetitionMessageStatus;
-    scheduledAt?: string | null;
-    emailSubject?: any | null;
-    emailBody?: string | null;
-    sentAt?: string | null;
-    sender: {
-      __typename?: "User";
-      id: string;
-      fullName?: string | null;
-      status: UserStatus;
-      isMe: boolean;
-    };
-    access: {
-      __typename?: "PetitionAccess";
-      delegateGranter?: {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        status: UserStatus;
-        isMe: boolean;
-      } | null;
-      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-    };
-  };
-};
-
-export type PetitionActivity_PetitionEvent_MessageSentEvent_Fragment = {
-  __typename?: "MessageSentEvent";
-  id: string;
-  createdAt: string;
-  message: {
-    __typename?: "PetitionMessage";
-    emailSubject?: any | null;
-    scheduledAt?: string | null;
-    isAnonymized: boolean;
-    openedAt?: string | null;
-    deliveredAt?: string | null;
-    bouncedAt?: string | null;
-    emailBody?: string | null;
-    sentAt?: string | null;
-    sender: {
-      __typename?: "User";
-      id: string;
-      fullName?: string | null;
-      status: UserStatus;
-      isMe: boolean;
-    };
-    access: {
-      __typename?: "PetitionAccess";
-      delegateGranter?: {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        status: UserStatus;
-        isMe: boolean;
-      } | null;
-      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-    };
-  };
-};
-
-export type PetitionActivity_PetitionEvent_OwnershipTransferredEvent_Fragment = {
-  __typename?: "OwnershipTransferredEvent";
-  id: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-  owner?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-  previousOwner?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionAnonymizedEvent_Fragment = {
-  __typename?: "PetitionAnonymizedEvent";
-  id: string;
-  createdAt: string;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionApprovalRequestStepApprovedEvent_Fragment = {
-  __typename?: "PetitionApprovalRequestStepApprovedEvent";
-  id: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionApprovalRequestStepCanceledEvent_Fragment = {
-  __typename?: "PetitionApprovalRequestStepCanceledEvent";
-  id: string;
-  createdAt: string;
-  approvalRequestStep: { __typename?: "PetitionApprovalRequestStep"; id: string; stepName: string };
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionApprovalRequestStepFinishedEvent_Fragment = {
-  __typename?: "PetitionApprovalRequestStepFinishedEvent";
-  id: string;
-  createdAt: string;
-  approvalRequestStep: { __typename?: "PetitionApprovalRequestStep"; id: string; stepName: string };
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionApprovalRequestStepRejectedEvent_Fragment = {
-  __typename?: "PetitionApprovalRequestStepRejectedEvent";
-  id: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionApprovalRequestStepReminderEvent_Fragment = {
-  __typename?: "PetitionApprovalRequestStepReminderEvent";
-  id: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionApprovalRequestStepSkippedEvent_Fragment = {
-  __typename?: "PetitionApprovalRequestStepSkippedEvent";
-  id: string;
-  createdAt: string;
-  approvalRequestStep: { __typename?: "PetitionApprovalRequestStep"; id: string; stepName: string };
-  comment?: { __typename?: "PetitionFieldComment"; id: string } | null;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionApprovalRequestStepStartedEvent_Fragment = {
-  __typename?: "PetitionApprovalRequestStepStartedEvent";
-  id: string;
-  createdAt: string;
-  approvalRequestStep: { __typename?: "PetitionApprovalRequestStep"; id: string; stepName: string };
-  comment?: { __typename?: "PetitionFieldComment"; id: string } | null;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionClonedEvent_Fragment = {
-  __typename?: "PetitionClonedEvent";
-  id: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionClosedEvent_Fragment = {
-  __typename?: "PetitionClosedEvent";
-  id: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionClosedNotifiedEvent_Fragment = {
-  __typename?: "PetitionClosedNotifiedEvent";
-  id: string;
-  emailBody?: string | null;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-  access: {
-    __typename?: "PetitionAccess";
-    delegateGranter?: { __typename?: "User"; id: string } | null;
-    granter?: {
-      __typename?: "User";
-      id: string;
-      fullName?: string | null;
-      status: UserStatus;
-      isMe: boolean;
-    } | null;
-    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-  };
-};
-
-export type PetitionActivity_PetitionEvent_PetitionCompletedEvent_Fragment = {
-  __typename?: "PetitionCompletedEvent";
-  id: string;
-  createdAt: string;
-  completedBy?:
-    | {
-        __typename?: "PetitionAccess";
-        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-      }
-    | {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        status: UserStatus;
-        isMe: boolean;
-      }
-    | null;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionCreatedEvent_Fragment = {
-  __typename?: "PetitionCreatedEvent";
-  id: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionDeletedEvent_Fragment = {
-  __typename?: "PetitionDeletedEvent";
-  id: string;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionMessageBouncedEvent_Fragment = {
-  __typename?: "PetitionMessageBouncedEvent";
-  id: string;
-  createdAt: string;
-  message: {
-    __typename?: "PetitionMessage";
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-    };
-  };
-};
-
-export type PetitionActivity_PetitionEvent_PetitionReminderBouncedEvent_Fragment = {
-  __typename?: "PetitionReminderBouncedEvent";
-  id: string;
-  createdAt: string;
-  reminder: {
-    __typename?: "PetitionReminder";
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-    };
-  };
-};
-
-export type PetitionActivity_PetitionEvent_PetitionReopenedEvent_Fragment = {
-  __typename?: "PetitionReopenedEvent";
-  id: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionTaggedEvent_Fragment = {
-  __typename?: "PetitionTaggedEvent";
-  id: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-  tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
-};
-
-export type PetitionActivity_PetitionEvent_PetitionUntaggedEvent_Fragment = {
-  __typename?: "PetitionUntaggedEvent";
-  id: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-  tags: Array<{ __typename?: "Tag"; name: string; color: string } | null>;
-};
-
-export type PetitionActivity_PetitionEvent_ProfileAssociatedEvent_Fragment = {
-  __typename?: "ProfileAssociatedEvent";
-  id: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-  profile?: {
-    __typename?: "Profile";
-    id: string;
-    localizableName: { [locale in UserLocale]?: string };
-    status: ProfileStatus;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_ProfileDisassociatedEvent_Fragment = {
-  __typename?: "ProfileDisassociatedEvent";
-  id: string;
-  createdAt: string;
-  disassociatedBy?:
-    | {
-        __typename?: "PetitionAccess";
-        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-      }
-    | {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        status: UserStatus;
-        isMe: boolean;
-      }
-    | null;
-  profile?: {
-    __typename?: "Profile";
-    id: string;
-    localizableName: { [locale in UserLocale]?: string };
-    status: ProfileStatus;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_RecipientSignedEvent_Fragment = {
-  __typename?: "RecipientSignedEvent";
-  id: string;
-  createdAt: string;
-  signer?: {
-    __typename?: "PetitionSigner";
-    contactId?: string | null;
-    firstName: string;
-    lastName?: string | null;
-    fullName: string;
-    email: string;
-    isPreset: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_ReminderSentEvent_Fragment = {
-  __typename?: "ReminderSentEvent";
-  id: string;
-  createdAt: string;
-  reminder: {
-    __typename?: "PetitionReminder";
-    type: PetitionReminderType;
-    createdAt: string;
-    emailBody?: string | null;
-    sender?: {
-      __typename?: "User";
-      id: string;
-      fullName?: string | null;
-      status: UserStatus;
-      isMe: boolean;
-    } | null;
-    access: {
-      __typename?: "PetitionAccess";
-      delegateGranter?: { __typename?: "User"; id: string } | null;
-      granter?: {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        status: UserStatus;
-        isMe: boolean;
-      } | null;
-      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-    };
-  };
-};
-
-export type PetitionActivity_PetitionEvent_RemindersOptOutEvent_Fragment = {
-  __typename?: "RemindersOptOutEvent";
-  id: string;
-  createdAt: string;
-  reason: string;
-  other?: string | null;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-  };
-};
-
-export type PetitionActivity_PetitionEvent_ReplyCreatedEvent_Fragment = {
-  __typename?: "ReplyCreatedEvent";
-  id: string;
-  createdAt: string;
-  field?: {
-    __typename?: "PetitionField";
-    id: string;
-    type: PetitionFieldType;
-    options: { [key: string]: any };
-    title?: string | null;
-    parent?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-    }>;
-  } | null;
-  createdBy?:
-    | {
-        __typename?: "PetitionAccess";
-        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-      }
-    | {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        status: UserStatus;
-        isMe: boolean;
-      }
-    | null;
-  reply?: {
-    __typename?: "PetitionFieldReply";
-    content: { [key: string]: any };
-    id: string;
-    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_ReplyDeletedEvent_Fragment = {
-  __typename?: "ReplyDeletedEvent";
-  id: string;
-  createdAt: string;
-  field?: {
-    __typename?: "PetitionField";
-    type: PetitionFieldType;
-    id: string;
-    title?: string | null;
-    parent?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-  } | null;
-  deletedBy?:
-    | {
-        __typename?: "PetitionAccess";
-        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-      }
-    | {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        status: UserStatus;
-        isMe: boolean;
-      }
-    | null;
-};
-
-export type PetitionActivity_PetitionEvent_ReplyStatusChangedEvent_Fragment = {
-  __typename?: "ReplyStatusChangedEvent";
-  id: string;
-  status: PetitionFieldReplyStatus;
-  createdAt: string;
-  field?: {
-    __typename?: "PetitionField";
-    id: string;
-    multiple: boolean;
-    title?: string | null;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-    }>;
-  } | null;
-  updatedBy?:
-    | {
-        __typename?: "PetitionAccess";
-        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-      }
-    | {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        status: UserStatus;
-        isMe: boolean;
-      }
-    | null;
-  reply?: {
-    __typename?: "PetitionFieldReply";
-    id: string;
-    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_ReplyUpdatedEvent_Fragment = {
-  __typename?: "ReplyUpdatedEvent";
-  id: string;
-  createdAt: string;
-  field?: {
-    __typename?: "PetitionField";
-    type: PetitionFieldType;
-    id: string;
-    title?: string | null;
-    parent?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-    }>;
-  } | null;
-  updatedBy?:
-    | {
-        __typename?: "PetitionAccess";
-        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-      }
-    | {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        status: UserStatus;
-        isMe: boolean;
-      }
-    | null;
-  reply?: {
-    __typename?: "PetitionFieldReply";
-    content: { [key: string]: any };
-    id: string;
-    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_SignatureCancelledEvent_Fragment = {
-  __typename?: "SignatureCancelledEvent";
-  id: string;
-  cancelType: PetitionSignatureCancelReason;
-  errorCode?: string | null;
-  errorMessage?: string | null;
-  cancellerReason?: string | null;
-  createdAt: string;
-  extraErrorData?: any | null;
-  cancelledBy?:
-    | {
-        __typename?: "PetitionAccess";
-        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-      }
-    | {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        status: UserStatus;
-        isMe: boolean;
-      }
-    | null;
-  canceller?: {
-    __typename?: "PetitionSigner";
-    contactId?: string | null;
-    firstName: string;
-    lastName?: string | null;
-    fullName: string;
-    email: string;
-    isPreset: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_SignatureCompletedEvent_Fragment = {
-  __typename?: "SignatureCompletedEvent";
-  id: string;
-  createdAt: string;
-};
-
-export type PetitionActivity_PetitionEvent_SignatureDeliveredEvent_Fragment = {
-  __typename?: "SignatureDeliveredEvent";
-  id: string;
-  createdAt: string;
-  openedAt?: string | null;
-  deliveredAt?: string | null;
-  bouncedAt?: string | null;
-  signature: {
-    __typename?: "PetitionSignatureRequest";
-    signatureConfig: {
-      __typename?: "SignatureConfig";
-      integration?: {
-        __typename?: "SignatureOrgIntegration";
-        provider: SignatureOrgIntegrationProvider;
-      } | null;
-    };
-  };
-  signer?: {
-    __typename?: "PetitionSigner";
-    contactId?: string | null;
-    firstName: string;
-    lastName?: string | null;
-    fullName: string;
-    email: string;
-    isPreset: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_SignatureOpenedEvent_Fragment = {
-  __typename?: "SignatureOpenedEvent";
-  id: string;
-  createdAt: string;
-  signer?: {
-    __typename?: "PetitionSigner";
-    contactId?: string | null;
-    firstName: string;
-    lastName?: string | null;
-    fullName: string;
-    email: string;
-    isPreset: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_SignatureReminderEvent_Fragment = {
-  __typename?: "SignatureReminderEvent";
-  id: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_SignatureStartedEvent_Fragment = {
-  __typename?: "SignatureStartedEvent";
-  id: string;
-  createdAt: string;
-  signature: {
-    __typename?: "PetitionSignatureRequest";
-    signatureConfig: {
-      __typename?: "SignatureConfig";
-      signingMode: SignatureConfigSigningMode;
-      message?: string | null;
-    };
-  };
-};
-
-export type PetitionActivity_PetitionEvent_TemplateUsedEvent_Fragment = {
-  __typename?: "TemplateUsedEvent";
-  id: string;
-};
-
-export type PetitionActivity_PetitionEvent_UserPermissionAddedEvent_Fragment = {
-  __typename?: "UserPermissionAddedEvent";
-  id: string;
-  permissionType: PetitionPermissionType;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-  permissionUser?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_UserPermissionEditedEvent_Fragment = {
-  __typename?: "UserPermissionEditedEvent";
-  id: string;
-  permissionType: PetitionPermissionType;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-  permissionUser?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEvent_UserPermissionRemovedEvent_Fragment = {
-  __typename?: "UserPermissionRemovedEvent";
-  id: string;
-  createdAt: string;
-  user?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-  permissionUser?: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    status: UserStatus;
-    isMe: boolean;
-  } | null;
-};
-
-export type PetitionActivity_PetitionEventFragment =
-  | PetitionActivity_PetitionEvent_AccessActivatedEvent_Fragment
-  | PetitionActivity_PetitionEvent_AccessActivatedFromPublicPetitionLinkEvent_Fragment
-  | PetitionActivity_PetitionEvent_AccessDeactivatedEvent_Fragment
-  | PetitionActivity_PetitionEvent_AccessDelegatedEvent_Fragment
-  | PetitionActivity_PetitionEvent_AccessOpenedEvent_Fragment
-  | PetitionActivity_PetitionEvent_CommentDeletedEvent_Fragment
-  | PetitionActivity_PetitionEvent_CommentPublishedEvent_Fragment
-  | PetitionActivity_PetitionEvent_ContactlessAccessUsedEvent_Fragment
-  | PetitionActivity_PetitionEvent_GroupPermissionAddedEvent_Fragment
-  | PetitionActivity_PetitionEvent_GroupPermissionEditedEvent_Fragment
-  | PetitionActivity_PetitionEvent_GroupPermissionRemovedEvent_Fragment
-  | PetitionActivity_PetitionEvent_MessageCancelledEvent_Fragment
-  | PetitionActivity_PetitionEvent_MessageScheduledEvent_Fragment
-  | PetitionActivity_PetitionEvent_MessageSentEvent_Fragment
-  | PetitionActivity_PetitionEvent_OwnershipTransferredEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionAnonymizedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionApprovalRequestStepApprovedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionApprovalRequestStepCanceledEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionApprovalRequestStepFinishedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionApprovalRequestStepRejectedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionApprovalRequestStepReminderEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionApprovalRequestStepSkippedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionApprovalRequestStepStartedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionClonedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionClosedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionClosedNotifiedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionCompletedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionCreatedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionDeletedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionMessageBouncedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionReminderBouncedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionReopenedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionTaggedEvent_Fragment
-  | PetitionActivity_PetitionEvent_PetitionUntaggedEvent_Fragment
-  | PetitionActivity_PetitionEvent_ProfileAssociatedEvent_Fragment
-  | PetitionActivity_PetitionEvent_ProfileDisassociatedEvent_Fragment
-  | PetitionActivity_PetitionEvent_RecipientSignedEvent_Fragment
-  | PetitionActivity_PetitionEvent_ReminderSentEvent_Fragment
-  | PetitionActivity_PetitionEvent_RemindersOptOutEvent_Fragment
-  | PetitionActivity_PetitionEvent_ReplyCreatedEvent_Fragment
-  | PetitionActivity_PetitionEvent_ReplyDeletedEvent_Fragment
-  | PetitionActivity_PetitionEvent_ReplyStatusChangedEvent_Fragment
-  | PetitionActivity_PetitionEvent_ReplyUpdatedEvent_Fragment
-  | PetitionActivity_PetitionEvent_SignatureCancelledEvent_Fragment
-  | PetitionActivity_PetitionEvent_SignatureCompletedEvent_Fragment
-  | PetitionActivity_PetitionEvent_SignatureDeliveredEvent_Fragment
-  | PetitionActivity_PetitionEvent_SignatureOpenedEvent_Fragment
-  | PetitionActivity_PetitionEvent_SignatureReminderEvent_Fragment
-  | PetitionActivity_PetitionEvent_SignatureStartedEvent_Fragment
-  | PetitionActivity_PetitionEvent_TemplateUsedEvent_Fragment
-  | PetitionActivity_PetitionEvent_UserPermissionAddedEvent_Fragment
-  | PetitionActivity_PetitionEvent_UserPermissionEditedEvent_Fragment
-  | PetitionActivity_PetitionEvent_UserPermissionRemovedEvent_Fragment;
-
 export type PetitionActivity_QueryFragment = {
   me: {
     __typename?: "User";
@@ -65970,6 +64899,1170 @@ export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragmentDoc = gq
   ${useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc}
   ${ProfileFieldBackgroundCheckSettings_ProfileTypeFragmentDoc}
 ` as unknown as DocumentNode<useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment, unknown>;
+export const TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc = gql`
+  fragment TimelinePetitionCreatedEvent_PetitionCreatedEvent on PetitionCreatedEvent {
+    user {
+      ...UserReference_User
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+` as unknown as DocumentNode<TimelinePetitionCreatedEvent_PetitionCreatedEventFragment, unknown>;
+export const TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc = gql`
+  fragment TimelinePetitionCompletedEvent_PetitionCompletedEvent on PetitionCompletedEvent {
+    completedBy {
+      ...UserOrContactReference_UserOrPetitionAccess
+    }
+    createdAt
+  }
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
+` as unknown as DocumentNode<
+  TimelinePetitionCompletedEvent_PetitionCompletedEventFragment,
+  unknown
+>;
+export const TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc = gql`
+  fragment TimelineAccessActivatedEvent_AccessActivatedEvent on AccessActivatedEvent {
+    user {
+      ...UserReference_User
+    }
+    access {
+      delegateGranter {
+        ...UserReference_User
+      }
+      contact {
+        ...ContactReference_Contact
+      }
+      isContactless
+      isSharedByLink
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<TimelineAccessActivatedEvent_AccessActivatedEventFragment, unknown>;
+export const TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc = gql`
+  fragment TimelineAccessDeactivatedEvent_AccessDeactivatedEvent on AccessDeactivatedEvent {
+    reason
+    user {
+      ...UserReference_User
+    }
+    access {
+      contact {
+        ...ContactReference_Contact
+      }
+      isContactless
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment,
+  unknown
+>;
+export const TimelineAccessOpenedEvent_AccessOpenedEventFragmentDoc = gql`
+  fragment TimelineAccessOpenedEvent_AccessOpenedEvent on AccessOpenedEvent {
+    access {
+      contact {
+        ...ContactReference_Contact
+      }
+    }
+    createdAt
+  }
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<TimelineAccessOpenedEvent_AccessOpenedEventFragment, unknown>;
+export const SentPetitionMessageDialog_PetitionMessageFragmentDoc = gql`
+  fragment SentPetitionMessageDialog_PetitionMessage on PetitionMessage {
+    emailBody
+    emailSubject
+    sentAt
+    scheduledAt
+    access {
+      contact {
+        ...ContactReference_Contact
+      }
+    }
+  }
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<SentPetitionMessageDialog_PetitionMessageFragment, unknown>;
+export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gql`
+  fragment TimelineMessageScheduledEvent_MessageScheduledEvent on MessageScheduledEvent {
+    petition {
+      id
+    }
+    message {
+      id
+      sender {
+        ...UserReference_User
+      }
+      status
+      scheduledAt
+      emailSubject
+      access {
+        delegateGranter {
+          ...UserReference_User
+        }
+        contact {
+          ...ContactReference_Contact
+        }
+      }
+      ...SentPetitionMessageDialog_PetitionMessage
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
+  ${SentPetitionMessageDialog_PetitionMessageFragmentDoc}
+` as unknown as DocumentNode<TimelineMessageScheduledEvent_MessageScheduledEventFragment, unknown>;
+export const TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc = gql`
+  fragment TimelineMessageCancelledEvent_MessageCancelledEvent on MessageCancelledEvent {
+    reason
+    message {
+      status
+      scheduledAt
+      emailSubject
+      access {
+        contact {
+          ...ContactReference_Contact
+        }
+      }
+    }
+    user {
+      ...UserReference_User
+    }
+    createdAt
+  }
+  ${ContactReference_ContactFragmentDoc}
+  ${UserReference_UserFragmentDoc}
+` as unknown as DocumentNode<TimelineMessageCancelledEvent_MessageCancelledEventFragment, unknown>;
+export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
+  fragment TimelineMessageSentEvent_MessageSentEvent on MessageSentEvent {
+    message {
+      sender {
+        ...UserReference_User
+      }
+      emailSubject
+      scheduledAt
+      access {
+        delegateGranter {
+          ...UserReference_User
+        }
+        contact {
+          ...ContactReference_Contact
+        }
+      }
+      isAnonymized
+      openedAt
+      deliveredAt
+      bouncedAt
+      ...SentPetitionMessageDialog_PetitionMessage
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
+  ${SentPetitionMessageDialog_PetitionMessageFragmentDoc}
+` as unknown as DocumentNode<TimelineMessageSentEvent_MessageSentEventFragment, unknown>;
+export const SentReminderMessageDialog_PetitionReminderFragmentDoc = gql`
+  fragment SentReminderMessageDialog_PetitionReminder on PetitionReminder {
+    access {
+      contact {
+        ...ContactReference_Contact
+      }
+    }
+    createdAt
+    emailBody
+  }
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<SentReminderMessageDialog_PetitionReminderFragment, unknown>;
+export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
+  fragment TimelineReminderSentEvent_ReminderSentEvent on ReminderSentEvent {
+    reminder {
+      type
+      sender {
+        ...UserReference_User
+      }
+      access {
+        delegateGranter {
+          id
+        }
+        granter {
+          ...UserReference_User
+        }
+        contact {
+          ...ContactReference_Contact
+        }
+      }
+      ...SentReminderMessageDialog_PetitionReminder
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
+  ${SentReminderMessageDialog_PetitionReminderFragmentDoc}
+` as unknown as DocumentNode<TimelineReminderSentEvent_ReminderSentEventFragment, unknown>;
+export const TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc = gql`
+  fragment TimelineSeeReplyButton_PetitionFieldReply on PetitionFieldReply {
+    id
+    parent {
+      id
+    }
+  }
+` as unknown as DocumentNode<TimelineSeeReplyButton_PetitionFieldReplyFragment, unknown>;
+export const TimelineSeeReplyButton_PetitionFieldFragmentDoc = gql`
+  fragment TimelineSeeReplyButton_PetitionField on PetitionField {
+    id
+    replies {
+      ...TimelineSeeReplyButton_PetitionFieldReply
+    }
+  }
+  ${TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<TimelineSeeReplyButton_PetitionFieldFragment, unknown>;
+export const TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc = gql`
+  fragment TimelineReplyCreatedEvent_ReplyCreatedEvent on ReplyCreatedEvent {
+    field {
+      id
+      type
+      options
+      parent {
+        id
+        ...PetitionFieldReference_PetitionField
+      }
+      ...TimelineSeeReplyButton_PetitionField
+      ...PetitionFieldReference_PetitionField
+    }
+    createdBy {
+      ...UserOrContactReference_UserOrPetitionAccess
+    }
+    reply {
+      ...TimelineSeeReplyButton_PetitionFieldReply
+      content
+    }
+    createdAt
+  }
+  ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${TimelineSeeReplyButton_PetitionFieldFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
+  ${TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<TimelineReplyCreatedEvent_ReplyCreatedEventFragment, unknown>;
+export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
+  fragment TimelineReplyUpdatedEvent_ReplyUpdatedEvent on ReplyUpdatedEvent {
+    field {
+      type
+      ...PetitionFieldReference_PetitionField
+      parent {
+        ...PetitionFieldReference_PetitionField
+      }
+      ...TimelineSeeReplyButton_PetitionField
+      ...PetitionFieldReference_PetitionField
+    }
+    updatedBy {
+      ...UserOrContactReference_UserOrPetitionAccess
+    }
+    reply {
+      content
+      ...TimelineSeeReplyButton_PetitionFieldReply
+    }
+    createdAt
+  }
+  ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${TimelineSeeReplyButton_PetitionFieldFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
+  ${TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment, unknown>;
+export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
+  fragment TimelineReplyDeletedEvent_ReplyDeletedEvent on ReplyDeletedEvent {
+    field {
+      type
+      ...PetitionFieldReference_PetitionField
+      parent {
+        ...PetitionFieldReference_PetitionField
+      }
+    }
+    deletedBy {
+      ...UserOrContactReference_UserOrPetitionAccess
+    }
+    createdAt
+  }
+  ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
+` as unknown as DocumentNode<TimelineReplyDeletedEvent_ReplyDeletedEventFragment, unknown>;
+export const Mention_PetitionFieldCommentMentionFragmentDoc = gql`
+  fragment Mention_PetitionFieldCommentMention on PetitionFieldCommentMention {
+    ... on PetitionFieldCommentUserMention {
+      mentionedId
+      user {
+        id
+        fullName
+        status
+        isMe
+      }
+    }
+    ... on PetitionFieldCommentUserGroupMention {
+      mentionedId
+      userGroup {
+        id
+        imMember
+        ...UserGroupReference_UserGroup
+      }
+    }
+  }
+  ${UserGroupReference_UserGroupFragmentDoc}
+` as unknown as DocumentNode<Mention_PetitionFieldCommentMentionFragment, unknown>;
+export const PetitionFieldCommentContent_PetitionFieldCommentFragmentDoc = gql`
+  fragment PetitionFieldCommentContent_PetitionFieldComment on PetitionFieldComment {
+    contentHtml
+    mentions {
+      ... on PetitionFieldCommentUserMention {
+        mentionedId
+      }
+      ... on PetitionFieldCommentUserGroupMention {
+        mentionedId
+      }
+      ...Mention_PetitionFieldCommentMention
+    }
+  }
+  ${Mention_PetitionFieldCommentMentionFragmentDoc}
+` as unknown as DocumentNode<PetitionFieldCommentContent_PetitionFieldCommentFragment, unknown>;
+export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gql`
+  fragment TimelineCommentPublishedEvent_CommentPublishedEvent on CommentPublishedEvent {
+    field {
+      id
+      ...PetitionFieldReference_PetitionField
+    }
+    comment {
+      author {
+        ...UserOrContactReference_UserOrPetitionAccess
+      }
+      isEdited
+      isAnonymized
+      ...PetitionFieldCommentContent_PetitionFieldComment
+      isApproval
+    }
+    isInternal
+    isGeneral
+    createdAt
+  }
+  ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
+  ${PetitionFieldCommentContent_PetitionFieldCommentFragmentDoc}
+` as unknown as DocumentNode<TimelineCommentPublishedEvent_CommentPublishedEventFragment, unknown>;
+export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
+  fragment TimelineCommentDeletedEvent_CommentDeletedEvent on CommentDeletedEvent {
+    field {
+      ...PetitionFieldReference_PetitionField
+    }
+    deletedBy {
+      ...UserOrContactReference_UserOrPetitionAccess
+    }
+    isInternal
+    isGeneral
+    createdAt
+  }
+  ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
+` as unknown as DocumentNode<TimelineCommentDeletedEvent_CommentDeletedEventFragment, unknown>;
+export const TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragmentDoc = gql`
+  fragment TimelineUserPermissionAddedEvent_UserPermissionAddedEvent on UserPermissionAddedEvent {
+    user {
+      ...UserReference_User
+    }
+    permissionUser {
+      ...UserReference_User
+    }
+    permissionType
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment,
+  unknown
+>;
+export const TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragmentDoc = gql`
+  fragment TimelineUserPermissionRemovedEvent_UserPermissionRemovedEvent on UserPermissionRemovedEvent {
+    user {
+      ...UserReference_User
+    }
+    permissionUser {
+      ...UserReference_User
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment,
+  unknown
+>;
+export const TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragmentDoc = gql`
+  fragment TimelineUserPermissionEditedEvent_UserPermissionEditedEvent on UserPermissionEditedEvent {
+    user {
+      ...UserReference_User
+    }
+    permissionUser {
+      ...UserReference_User
+    }
+    permissionType
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment,
+  unknown
+>;
+export const TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragmentDoc = gql`
+  fragment TimelineOwnershipTransferredEvent_OwnershipTransferredEvent on OwnershipTransferredEvent {
+    user {
+      ...UserReference_User
+    }
+    owner {
+      ...UserReference_User
+    }
+    previousOwner {
+      ...UserReference_User
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment,
+  unknown
+>;
+export const TimelinePetitionClosedEvent_PetitionClosedEventFragmentDoc = gql`
+  fragment TimelinePetitionClosedEvent_PetitionClosedEvent on PetitionClosedEvent {
+    user {
+      ...UserReference_User
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+` as unknown as DocumentNode<TimelinePetitionClosedEvent_PetitionClosedEventFragment, unknown>;
+export const TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragmentDoc = gql`
+  fragment TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEvent on PetitionClosedNotifiedEvent {
+    user {
+      ...UserReference_User
+    }
+    access {
+      delegateGranter {
+        id
+      }
+      granter {
+        ...UserReference_User
+      }
+      contact {
+        ...ContactReference_Contact
+      }
+    }
+    emailBody
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<
+  TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment,
+  unknown
+>;
+export const TimelinePetitionReopenedEvent_PetitionReopenedEventFragmentDoc = gql`
+  fragment TimelinePetitionReopenedEvent_PetitionReopenedEvent on PetitionReopenedEvent {
+    user {
+      ...UserReference_User
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+` as unknown as DocumentNode<TimelinePetitionReopenedEvent_PetitionReopenedEventFragment, unknown>;
+export const Fragments_FullPetitionSignerFragmentDoc = gql`
+  fragment Fragments_FullPetitionSigner on PetitionSigner {
+    contactId
+    firstName
+    lastName
+    fullName
+    email
+    isPreset
+  }
+` as unknown as DocumentNode<Fragments_FullPetitionSignerFragment, unknown>;
+export const SignerReference_PetitionSignerFragmentDoc = gql`
+  fragment SignerReference_PetitionSigner on PetitionSigner {
+    ...Fragments_FullPetitionSigner
+  }
+  ${Fragments_FullPetitionSignerFragmentDoc}
+` as unknown as DocumentNode<SignerReference_PetitionSignerFragment, unknown>;
+export const TimelineSignatureDeliveredEvent_SignatureDeliveredEventFragmentDoc = gql`
+  fragment TimelineSignatureDeliveredEvent_SignatureDeliveredEvent on SignatureDeliveredEvent {
+    createdAt
+    signature {
+      signatureConfig {
+        integration {
+          provider
+        }
+      }
+    }
+    signer {
+      ...SignerReference_PetitionSigner
+    }
+    openedAt
+    deliveredAt
+    bouncedAt
+  }
+  ${SignerReference_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineSignatureDeliveredEvent_SignatureDeliveredEventFragment,
+  unknown
+>;
+export const TimelineSignatureOpenedEvent_SignatureOpenedEventFragmentDoc = gql`
+  fragment TimelineSignatureOpenedEvent_SignatureOpenedEvent on SignatureOpenedEvent {
+    signer {
+      ...SignerReference_PetitionSigner
+    }
+    createdAt
+  }
+  ${SignerReference_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<TimelineSignatureOpenedEvent_SignatureOpenedEventFragment, unknown>;
+export const TimelineSignatureStartedEvent_SignatureStartedEventFragmentDoc = gql`
+  fragment TimelineSignatureStartedEvent_SignatureStartedEvent on SignatureStartedEvent {
+    createdAt
+    signature {
+      signatureConfig {
+        signingMode
+        message
+      }
+    }
+  }
+` as unknown as DocumentNode<TimelineSignatureStartedEvent_SignatureStartedEventFragment, unknown>;
+export const TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc = gql`
+  fragment TimelineSignatureCompletedEvent_SignatureCompletedEvent on SignatureCompletedEvent {
+    createdAt
+  }
+` as unknown as DocumentNode<
+  TimelineSignatureCompletedEvent_SignatureCompletedEventFragment,
+  unknown
+>;
+export const useSignatureCancelledRequestErrorMessage_SignatureCancelledEventFragmentDoc = gql`
+  fragment useSignatureCancelledRequestErrorMessage_SignatureCancelledEvent on SignatureCancelledEvent {
+    errorCode
+    extraErrorData
+    createdAt
+  }
+` as unknown as DocumentNode<
+  useSignatureCancelledRequestErrorMessage_SignatureCancelledEventFragment,
+  unknown
+>;
+export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc = gql`
+  fragment TimelineSignatureCancelledEvent_SignatureCancelledEvent on SignatureCancelledEvent {
+    ...useSignatureCancelledRequestErrorMessage_SignatureCancelledEvent
+    cancelledBy {
+      ...UserOrContactReference_UserOrPetitionAccess
+    }
+    canceller {
+      ...SignerReference_PetitionSigner
+    }
+    cancelType
+    errorCode
+    errorMessage
+    cancellerReason
+    createdAt
+  }
+  ${useSignatureCancelledRequestErrorMessage_SignatureCancelledEventFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
+  ${SignerReference_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineSignatureCancelledEvent_SignatureCancelledEventFragment,
+  unknown
+>;
+export const TimelineSignatureReminderEvent_SignatureReminderEventFragmentDoc = gql`
+  fragment TimelineSignatureReminderEvent_SignatureReminderEvent on SignatureReminderEvent {
+    user {
+      ...UserReference_User
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineSignatureReminderEvent_SignatureReminderEventFragment,
+  unknown
+>;
+export const TimelineAccessDelegatedEvent_AccessDelegatedEventFragmentDoc = gql`
+  fragment TimelineAccessDelegatedEvent_AccessDelegatedEvent on AccessDelegatedEvent {
+    originalAccess {
+      contact {
+        ...ContactReference_Contact
+      }
+    }
+    newAccess {
+      contact {
+        ...ContactReference_Contact
+      }
+    }
+    createdAt
+  }
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<TimelineAccessDelegatedEvent_AccessDelegatedEventFragment, unknown>;
+export const TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragmentDoc = gql`
+  fragment TimelineGroupPermissionAddedEvent_GroupPermissionAddedEvent on GroupPermissionAddedEvent {
+    user {
+      ...UserReference_User
+    }
+    permissionGroup {
+      ...UserGroupReference_UserGroup
+    }
+    permissionType
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment,
+  unknown
+>;
+export const TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragmentDoc = gql`
+  fragment TimelineGroupPermissionEditedEvent_GroupPermissionEditedEvent on GroupPermissionEditedEvent {
+    user {
+      ...UserReference_User
+    }
+    permissionGroup {
+      ...UserGroupReference_UserGroup
+    }
+    permissionType
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment,
+  unknown
+>;
+export const TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragmentDoc = gql`
+  fragment TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEvent on GroupPermissionRemovedEvent {
+    user {
+      ...UserReference_User
+    }
+    permissionGroup {
+      ...UserGroupReference_UserGroup
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment,
+  unknown
+>;
+export const TimelinePetitionClonedEvent_PetitionClonedEventFragmentDoc = gql`
+  fragment TimelinePetitionClonedEvent_PetitionClonedEvent on PetitionClonedEvent {
+    user {
+      ...UserReference_User
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+` as unknown as DocumentNode<TimelinePetitionClonedEvent_PetitionClonedEventFragment, unknown>;
+export const TimelineRemindersOptOutEvent_RemindersOptOutEventFragmentDoc = gql`
+  fragment TimelineRemindersOptOutEvent_RemindersOptOutEvent on RemindersOptOutEvent {
+    access {
+      contact {
+        ...ContactReference_Contact
+      }
+    }
+    createdAt
+    reason
+    other
+  }
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<TimelineRemindersOptOutEvent_RemindersOptOutEventFragment, unknown>;
+export const TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragmentDoc =
+  gql`
+    fragment TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEvent on AccessActivatedFromPublicPetitionLinkEvent {
+      access {
+        contact {
+          ...ContactReference_Contact
+        }
+      }
+      createdAt
+    }
+    ${ContactReference_ContactFragmentDoc}
+  ` as unknown as DocumentNode<
+    TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragment,
+    unknown
+  >;
+export const TimelineRecipientSignedEvent_RecipientSignedEventFragmentDoc = gql`
+  fragment TimelineRecipientSignedEvent_RecipientSignedEvent on RecipientSignedEvent {
+    signer {
+      ...SignerReference_PetitionSigner
+    }
+    createdAt
+  }
+  ${SignerReference_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<TimelineRecipientSignedEvent_RecipientSignedEventFragment, unknown>;
+export const TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragmentDoc = gql`
+  fragment TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEvent on PetitionMessageBouncedEvent {
+    message {
+      access {
+        contact {
+          ...ContactReference_Contact
+        }
+      }
+    }
+    createdAt
+  }
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<
+  TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragment,
+  unknown
+>;
+export const TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragmentDoc = gql`
+  fragment TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEvent on PetitionReminderBouncedEvent {
+    reminder {
+      access {
+        contact {
+          ...ContactReference_Contact
+        }
+      }
+    }
+    createdAt
+  }
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<
+  TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragment,
+  unknown
+>;
+export const TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragmentDoc = gql`
+  fragment TimelinePetitionAnonymizedEvent_PetitionAnonymizedEvent on PetitionAnonymizedEvent {
+    createdAt
+  }
+` as unknown as DocumentNode<
+  TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragment,
+  unknown
+>;
+export const TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragmentDoc = gql`
+  fragment TimelineReplyStatusChangedEvent_ReplyStatusChangedEvent on ReplyStatusChangedEvent {
+    field {
+      id
+      multiple
+      ...TimelineSeeReplyButton_PetitionField
+      ...PetitionFieldReference_PetitionField
+    }
+    updatedBy {
+      ...UserOrContactReference_UserOrPetitionAccess
+    }
+    reply {
+      ...TimelineSeeReplyButton_PetitionFieldReply
+    }
+    status
+    createdAt
+  }
+  ${TimelineSeeReplyButton_PetitionFieldFragmentDoc}
+  ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
+  ${TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragment,
+  unknown
+>;
+export const TimelineProfileAssociatedEvent_ProfileAssociatedEventFragmentDoc = gql`
+  fragment TimelineProfileAssociatedEvent_ProfileAssociatedEvent on ProfileAssociatedEvent {
+    user {
+      ...UserReference_User
+    }
+    profile {
+      ...ProfileReference_Profile
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${ProfileReference_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineProfileAssociatedEvent_ProfileAssociatedEventFragment,
+  unknown
+>;
+export const TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragmentDoc = gql`
+  fragment TimelineProfileDisassociatedEvent_ProfileDisassociatedEvent on ProfileDisassociatedEvent {
+    disassociatedBy {
+      ...UserOrContactReference_UserOrPetitionAccess
+    }
+    profile {
+      ...ProfileReference_Profile
+    }
+    createdAt
+  }
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
+  ${ProfileReference_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment,
+  unknown
+>;
+export const Tag_TagFragmentDoc = gql`
+  fragment Tag_Tag on Tag {
+    name
+    color
+  }
+` as unknown as DocumentNode<Tag_TagFragment, unknown>;
+export const TagReference_TagFragmentDoc = gql`
+  fragment TagReference_Tag on Tag {
+    ...Tag_Tag
+  }
+  ${Tag_TagFragmentDoc}
+` as unknown as DocumentNode<TagReference_TagFragment, unknown>;
+export const TimelinePetitionTaggedEvent_PetitionTaggedEventFragmentDoc = gql`
+  fragment TimelinePetitionTaggedEvent_PetitionTaggedEvent on PetitionTaggedEvent {
+    user {
+      ...UserReference_User
+    }
+    tags {
+      ...TagReference_Tag
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${TagReference_TagFragmentDoc}
+` as unknown as DocumentNode<TimelinePetitionTaggedEvent_PetitionTaggedEventFragment, unknown>;
+export const TimelinePetitionUntaggedEvent_PetitionUntaggedEventFragmentDoc = gql`
+  fragment TimelinePetitionUntaggedEvent_PetitionUntaggedEvent on PetitionUntaggedEvent {
+    user {
+      ...UserReference_User
+    }
+    tags {
+      ...TagReference_Tag
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${TagReference_TagFragmentDoc}
+` as unknown as DocumentNode<TimelinePetitionUntaggedEvent_PetitionUntaggedEventFragment, unknown>;
+export const TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEventFragmentDoc = gql`
+  fragment TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEvent on ContactlessAccessUsedEvent {
+    access {
+      contact {
+        ...ContactReference_Contact
+      }
+    }
+    createdAt
+  }
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEventFragment,
+  unknown
+>;
+export const TimelinePetitionApprovalRequestStepStartedEvent_PetitionApprovalRequestStepStartedEventFragmentDoc =
+  gql`
+    fragment TimelinePetitionApprovalRequestStepStartedEvent_PetitionApprovalRequestStepStartedEvent on PetitionApprovalRequestStepStartedEvent {
+      approvalRequestStep {
+        id
+        stepName
+      }
+      comment {
+        id
+      }
+      user {
+        ...UserReference_User
+      }
+      createdAt
+    }
+    ${UserReference_UserFragmentDoc}
+  ` as unknown as DocumentNode<
+    TimelinePetitionApprovalRequestStepStartedEvent_PetitionApprovalRequestStepStartedEventFragment,
+    unknown
+  >;
+export const TimelinePetitionApprovalRequestStepApprovedEvent_PetitionApprovalRequestStepApprovedEventFragmentDoc =
+  gql`
+    fragment TimelinePetitionApprovalRequestStepApprovedEvent_PetitionApprovalRequestStepApprovedEvent on PetitionApprovalRequestStepApprovedEvent {
+      user {
+        ...UserReference_User
+      }
+      createdAt
+    }
+    ${UserReference_UserFragmentDoc}
+  ` as unknown as DocumentNode<
+    TimelinePetitionApprovalRequestStepApprovedEvent_PetitionApprovalRequestStepApprovedEventFragment,
+    unknown
+  >;
+export const TimelinePetitionApprovalRequestStepRejectedEvent_PetitionApprovalRequestStepRejectedEventFragmentDoc =
+  gql`
+    fragment TimelinePetitionApprovalRequestStepRejectedEvent_PetitionApprovalRequestStepRejectedEvent on PetitionApprovalRequestStepRejectedEvent {
+      user {
+        ...UserReference_User
+      }
+      createdAt
+    }
+    ${UserReference_UserFragmentDoc}
+  ` as unknown as DocumentNode<
+    TimelinePetitionApprovalRequestStepRejectedEvent_PetitionApprovalRequestStepRejectedEventFragment,
+    unknown
+  >;
+export const TimelinePetitionApprovalRequestStepSkippedEvent_PetitionApprovalRequestStepSkippedEventFragmentDoc =
+  gql`
+    fragment TimelinePetitionApprovalRequestStepSkippedEvent_PetitionApprovalRequestStepSkippedEvent on PetitionApprovalRequestStepSkippedEvent {
+      approvalRequestStep {
+        id
+        stepName
+      }
+      comment {
+        id
+      }
+      user {
+        ...UserReference_User
+      }
+      createdAt
+    }
+    ${UserReference_UserFragmentDoc}
+  ` as unknown as DocumentNode<
+    TimelinePetitionApprovalRequestStepSkippedEvent_PetitionApprovalRequestStepSkippedEventFragment,
+    unknown
+  >;
+export const TimelinePetitionApprovalRequestStepReminderEvent_PetitionApprovalRequestStepReminderEventFragmentDoc =
+  gql`
+    fragment TimelinePetitionApprovalRequestStepReminderEvent_PetitionApprovalRequestStepReminderEvent on PetitionApprovalRequestStepReminderEvent {
+      user {
+        ...UserReference_User
+      }
+      createdAt
+    }
+    ${UserReference_UserFragmentDoc}
+  ` as unknown as DocumentNode<
+    TimelinePetitionApprovalRequestStepReminderEvent_PetitionApprovalRequestStepReminderEventFragment,
+    unknown
+  >;
+export const TimelinePetitionApprovalRequestStepFinishedEvent_PetitionApprovalRequestStepFinishedEventFragmentDoc =
+  gql`
+    fragment TimelinePetitionApprovalRequestStepFinishedEvent_PetitionApprovalRequestStepFinishedEvent on PetitionApprovalRequestStepFinishedEvent {
+      approvalRequestStep {
+        id
+        stepName
+      }
+      user {
+        ...UserReference_User
+      }
+      createdAt
+    }
+    ${UserReference_UserFragmentDoc}
+  ` as unknown as DocumentNode<
+    TimelinePetitionApprovalRequestStepFinishedEvent_PetitionApprovalRequestStepFinishedEventFragment,
+    unknown
+  >;
+export const TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEventFragmentDoc =
+  gql`
+    fragment TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEvent on PetitionApprovalRequestStepCanceledEvent {
+      approvalRequestStep {
+        id
+        stepName
+      }
+      user {
+        ...UserReference_User
+      }
+      createdAt
+    }
+    ${UserReference_UserFragmentDoc}
+  ` as unknown as DocumentNode<
+    TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEventFragment,
+    unknown
+  >;
+export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
+  fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
+    id
+    ... on PetitionCreatedEvent {
+      ...TimelinePetitionCreatedEvent_PetitionCreatedEvent
+    }
+    ... on PetitionCompletedEvent {
+      ...TimelinePetitionCompletedEvent_PetitionCompletedEvent
+    }
+    ... on AccessActivatedEvent {
+      ...TimelineAccessActivatedEvent_AccessActivatedEvent
+    }
+    ... on AccessDeactivatedEvent {
+      ...TimelineAccessDeactivatedEvent_AccessDeactivatedEvent
+    }
+    ... on AccessOpenedEvent {
+      ...TimelineAccessOpenedEvent_AccessOpenedEvent
+    }
+    ... on MessageScheduledEvent {
+      ...TimelineMessageScheduledEvent_MessageScheduledEvent
+    }
+    ... on MessageCancelledEvent {
+      ...TimelineMessageCancelledEvent_MessageCancelledEvent
+    }
+    ... on MessageSentEvent {
+      ...TimelineMessageSentEvent_MessageSentEvent
+    }
+    ... on ReminderSentEvent {
+      ...TimelineReminderSentEvent_ReminderSentEvent
+    }
+    ... on ReplyCreatedEvent {
+      ...TimelineReplyCreatedEvent_ReplyCreatedEvent
+    }
+    ... on ReplyUpdatedEvent {
+      ...TimelineReplyUpdatedEvent_ReplyUpdatedEvent
+    }
+    ... on ReplyDeletedEvent {
+      ...TimelineReplyDeletedEvent_ReplyDeletedEvent
+    }
+    ... on CommentPublishedEvent {
+      ...TimelineCommentPublishedEvent_CommentPublishedEvent
+    }
+    ... on CommentDeletedEvent {
+      ...TimelineCommentDeletedEvent_CommentDeletedEvent
+    }
+    ... on UserPermissionAddedEvent {
+      ...TimelineUserPermissionAddedEvent_UserPermissionAddedEvent
+    }
+    ... on UserPermissionRemovedEvent {
+      ...TimelineUserPermissionRemovedEvent_UserPermissionRemovedEvent
+    }
+    ... on UserPermissionEditedEvent {
+      ...TimelineUserPermissionEditedEvent_UserPermissionEditedEvent
+    }
+    ... on OwnershipTransferredEvent {
+      ...TimelineOwnershipTransferredEvent_OwnershipTransferredEvent
+    }
+    ... on PetitionClosedEvent {
+      ...TimelinePetitionClosedEvent_PetitionClosedEvent
+    }
+    ... on PetitionClosedNotifiedEvent {
+      ...TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEvent
+    }
+    ... on PetitionReopenedEvent {
+      ...TimelinePetitionReopenedEvent_PetitionReopenedEvent
+    }
+    ... on SignatureDeliveredEvent {
+      ...TimelineSignatureDeliveredEvent_SignatureDeliveredEvent
+    }
+    ... on SignatureOpenedEvent {
+      ...TimelineSignatureOpenedEvent_SignatureOpenedEvent
+    }
+    ... on SignatureStartedEvent {
+      ...TimelineSignatureStartedEvent_SignatureStartedEvent
+    }
+    ... on SignatureCompletedEvent {
+      ...TimelineSignatureCompletedEvent_SignatureCompletedEvent
+    }
+    ... on SignatureCancelledEvent {
+      ...TimelineSignatureCancelledEvent_SignatureCancelledEvent
+    }
+    ... on SignatureReminderEvent {
+      ...TimelineSignatureReminderEvent_SignatureReminderEvent
+    }
+    ... on AccessDelegatedEvent {
+      ...TimelineAccessDelegatedEvent_AccessDelegatedEvent
+    }
+    ... on GroupPermissionAddedEvent {
+      ...TimelineGroupPermissionAddedEvent_GroupPermissionAddedEvent
+    }
+    ... on GroupPermissionEditedEvent {
+      ...TimelineGroupPermissionEditedEvent_GroupPermissionEditedEvent
+    }
+    ... on GroupPermissionRemovedEvent {
+      ...TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEvent
+    }
+    ... on PetitionClonedEvent {
+      ...TimelinePetitionClonedEvent_PetitionClonedEvent
+    }
+    ... on RemindersOptOutEvent {
+      ...TimelineRemindersOptOutEvent_RemindersOptOutEvent
+    }
+    ... on AccessActivatedFromPublicPetitionLinkEvent {
+      ...TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEvent
+    }
+    ... on RecipientSignedEvent {
+      ...TimelineRecipientSignedEvent_RecipientSignedEvent
+    }
+    ... on PetitionMessageBouncedEvent {
+      ...TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEvent
+    }
+    ... on PetitionReminderBouncedEvent {
+      ...TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEvent
+    }
+    ... on PetitionAnonymizedEvent {
+      ...TimelinePetitionAnonymizedEvent_PetitionAnonymizedEvent
+    }
+    ... on ReplyStatusChangedEvent {
+      ...TimelineReplyStatusChangedEvent_ReplyStatusChangedEvent
+    }
+    ... on ProfileAssociatedEvent {
+      ...TimelineProfileAssociatedEvent_ProfileAssociatedEvent
+    }
+    ... on ProfileDisassociatedEvent {
+      ...TimelineProfileDisassociatedEvent_ProfileDisassociatedEvent
+    }
+    ... on PetitionTaggedEvent {
+      ...TimelinePetitionTaggedEvent_PetitionTaggedEvent
+    }
+    ... on PetitionUntaggedEvent {
+      ...TimelinePetitionUntaggedEvent_PetitionUntaggedEvent
+    }
+    ... on ContactlessAccessUsedEvent {
+      ...TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEvent
+    }
+    ... on PetitionApprovalRequestStepStartedEvent {
+      ...TimelinePetitionApprovalRequestStepStartedEvent_PetitionApprovalRequestStepStartedEvent
+    }
+    ... on PetitionApprovalRequestStepApprovedEvent {
+      ...TimelinePetitionApprovalRequestStepApprovedEvent_PetitionApprovalRequestStepApprovedEvent
+    }
+    ... on PetitionApprovalRequestStepRejectedEvent {
+      ...TimelinePetitionApprovalRequestStepRejectedEvent_PetitionApprovalRequestStepRejectedEvent
+    }
+    ... on PetitionApprovalRequestStepSkippedEvent {
+      ...TimelinePetitionApprovalRequestStepSkippedEvent_PetitionApprovalRequestStepSkippedEvent
+    }
+    ... on PetitionApprovalRequestStepReminderEvent {
+      ...TimelinePetitionApprovalRequestStepReminderEvent_PetitionApprovalRequestStepReminderEvent
+    }
+    ... on PetitionApprovalRequestStepFinishedEvent {
+      ...TimelinePetitionApprovalRequestStepFinishedEvent_PetitionApprovalRequestStepFinishedEvent
+    }
+    ... on PetitionApprovalRequestStepCanceledEvent {
+      ...TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEvent
+    }
+  }
+  ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
+  ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
+  ${TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc}
+  ${TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc}
+  ${TimelineAccessOpenedEvent_AccessOpenedEventFragmentDoc}
+  ${TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc}
+  ${TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc}
+  ${TimelineMessageSentEvent_MessageSentEventFragmentDoc}
+  ${TimelineReminderSentEvent_ReminderSentEventFragmentDoc}
+  ${TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc}
+  ${TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc}
+  ${TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc}
+  ${TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc}
+  ${TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc}
+  ${TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragmentDoc}
+  ${TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragmentDoc}
+  ${TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragmentDoc}
+  ${TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragmentDoc}
+  ${TimelinePetitionClosedEvent_PetitionClosedEventFragmentDoc}
+  ${TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragmentDoc}
+  ${TimelinePetitionReopenedEvent_PetitionReopenedEventFragmentDoc}
+  ${TimelineSignatureDeliveredEvent_SignatureDeliveredEventFragmentDoc}
+  ${TimelineSignatureOpenedEvent_SignatureOpenedEventFragmentDoc}
+  ${TimelineSignatureStartedEvent_SignatureStartedEventFragmentDoc}
+  ${TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc}
+  ${TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc}
+  ${TimelineSignatureReminderEvent_SignatureReminderEventFragmentDoc}
+  ${TimelineAccessDelegatedEvent_AccessDelegatedEventFragmentDoc}
+  ${TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragmentDoc}
+  ${TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragmentDoc}
+  ${TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragmentDoc}
+  ${TimelinePetitionClonedEvent_PetitionClonedEventFragmentDoc}
+  ${TimelineRemindersOptOutEvent_RemindersOptOutEventFragmentDoc}
+  ${TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragmentDoc}
+  ${TimelineRecipientSignedEvent_RecipientSignedEventFragmentDoc}
+  ${TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragmentDoc}
+  ${TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragmentDoc}
+  ${TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragmentDoc}
+  ${TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragmentDoc}
+  ${TimelineProfileAssociatedEvent_ProfileAssociatedEventFragmentDoc}
+  ${TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragmentDoc}
+  ${TimelinePetitionTaggedEvent_PetitionTaggedEventFragmentDoc}
+  ${TimelinePetitionUntaggedEvent_PetitionUntaggedEventFragmentDoc}
+  ${TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEventFragmentDoc}
+  ${TimelinePetitionApprovalRequestStepStartedEvent_PetitionApprovalRequestStepStartedEventFragmentDoc}
+  ${TimelinePetitionApprovalRequestStepApprovedEvent_PetitionApprovalRequestStepApprovedEventFragmentDoc}
+  ${TimelinePetitionApprovalRequestStepRejectedEvent_PetitionApprovalRequestStepRejectedEventFragmentDoc}
+  ${TimelinePetitionApprovalRequestStepSkippedEvent_PetitionApprovalRequestStepSkippedEventFragmentDoc}
+  ${TimelinePetitionApprovalRequestStepReminderEvent_PetitionApprovalRequestStepReminderEventFragmentDoc}
+  ${TimelinePetitionApprovalRequestStepFinishedEvent_PetitionApprovalRequestStepFinishedEventFragmentDoc}
+  ${TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEventFragmentDoc}
+` as unknown as DocumentNode<PetitionActivityTimeline_PetitionEventFragment, unknown>;
 export const PetitionRemindersConfig_RemindersConfigFragmentDoc = gql`
   fragment PetitionRemindersConfig_RemindersConfig on RemindersConfig {
     offset
@@ -66100,16 +66193,6 @@ export const ConfirmPetitionSignersDialog_PetitionFieldFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionFieldFragment, unknown>;
-export const Fragments_FullPetitionSignerFragmentDoc = gql`
-  fragment Fragments_FullPetitionSigner on PetitionSigner {
-    contactId
-    firstName
-    lastName
-    fullName
-    email
-    isPreset
-  }
-` as unknown as DocumentNode<Fragments_FullPetitionSignerFragment, unknown>;
 export const SuggestedSigners_PetitionSignerFragmentDoc = gql`
   fragment SuggestedSigners_PetitionSigner on PetitionSigner {
     ...Fragments_FullPetitionSigner
@@ -66281,12 +66364,6 @@ export const CreateFolderDialog_PetitionBaseFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<CreateFolderDialog_PetitionBaseFragment, unknown>;
-export const Tag_TagFragmentDoc = gql`
-  fragment Tag_Tag on Tag {
-    name
-    color
-  }
-` as unknown as DocumentNode<Tag_TagFragment, unknown>;
 export const TagSelect_TagFragmentDoc = gql`
   fragment TagSelect_Tag on Tag {
     id
@@ -69410,1160 +69487,6 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
   ${PetitionProfilesTable_PetitionFragmentDoc}
   ${validatePetitionFields_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivity_PetitionFragment, unknown>;
-export const TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc = gql`
-  fragment TimelinePetitionCreatedEvent_PetitionCreatedEvent on PetitionCreatedEvent {
-    user {
-      ...UserReference_User
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-` as unknown as DocumentNode<TimelinePetitionCreatedEvent_PetitionCreatedEventFragment, unknown>;
-export const TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc = gql`
-  fragment TimelinePetitionCompletedEvent_PetitionCompletedEvent on PetitionCompletedEvent {
-    completedBy {
-      ...UserOrContactReference_UserOrPetitionAccess
-    }
-    createdAt
-  }
-  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
-` as unknown as DocumentNode<
-  TimelinePetitionCompletedEvent_PetitionCompletedEventFragment,
-  unknown
->;
-export const TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc = gql`
-  fragment TimelineAccessActivatedEvent_AccessActivatedEvent on AccessActivatedEvent {
-    user {
-      ...UserReference_User
-    }
-    access {
-      delegateGranter {
-        ...UserReference_User
-      }
-      contact {
-        ...ContactReference_Contact
-      }
-      isContactless
-      isSharedByLink
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
-` as unknown as DocumentNode<TimelineAccessActivatedEvent_AccessActivatedEventFragment, unknown>;
-export const TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc = gql`
-  fragment TimelineAccessDeactivatedEvent_AccessDeactivatedEvent on AccessDeactivatedEvent {
-    reason
-    user {
-      ...UserReference_User
-    }
-    access {
-      contact {
-        ...ContactReference_Contact
-      }
-      isContactless
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
-` as unknown as DocumentNode<
-  TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment,
-  unknown
->;
-export const TimelineAccessOpenedEvent_AccessOpenedEventFragmentDoc = gql`
-  fragment TimelineAccessOpenedEvent_AccessOpenedEvent on AccessOpenedEvent {
-    access {
-      contact {
-        ...ContactReference_Contact
-      }
-    }
-    createdAt
-  }
-  ${ContactReference_ContactFragmentDoc}
-` as unknown as DocumentNode<TimelineAccessOpenedEvent_AccessOpenedEventFragment, unknown>;
-export const SentPetitionMessageDialog_PetitionMessageFragmentDoc = gql`
-  fragment SentPetitionMessageDialog_PetitionMessage on PetitionMessage {
-    emailBody
-    emailSubject
-    sentAt
-    scheduledAt
-    access {
-      contact {
-        ...ContactReference_Contact
-      }
-    }
-  }
-  ${ContactReference_ContactFragmentDoc}
-` as unknown as DocumentNode<SentPetitionMessageDialog_PetitionMessageFragment, unknown>;
-export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gql`
-  fragment TimelineMessageScheduledEvent_MessageScheduledEvent on MessageScheduledEvent {
-    petition {
-      id
-    }
-    message {
-      id
-      sender {
-        ...UserReference_User
-      }
-      status
-      scheduledAt
-      emailSubject
-      access {
-        delegateGranter {
-          ...UserReference_User
-        }
-        contact {
-          ...ContactReference_Contact
-        }
-      }
-      ...SentPetitionMessageDialog_PetitionMessage
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
-  ${SentPetitionMessageDialog_PetitionMessageFragmentDoc}
-` as unknown as DocumentNode<TimelineMessageScheduledEvent_MessageScheduledEventFragment, unknown>;
-export const TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc = gql`
-  fragment TimelineMessageCancelledEvent_MessageCancelledEvent on MessageCancelledEvent {
-    reason
-    message {
-      status
-      scheduledAt
-      emailSubject
-      access {
-        contact {
-          ...ContactReference_Contact
-        }
-      }
-    }
-    user {
-      ...UserReference_User
-    }
-    createdAt
-  }
-  ${ContactReference_ContactFragmentDoc}
-  ${UserReference_UserFragmentDoc}
-` as unknown as DocumentNode<TimelineMessageCancelledEvent_MessageCancelledEventFragment, unknown>;
-export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
-  fragment TimelineMessageSentEvent_MessageSentEvent on MessageSentEvent {
-    message {
-      sender {
-        ...UserReference_User
-      }
-      emailSubject
-      scheduledAt
-      access {
-        delegateGranter {
-          ...UserReference_User
-        }
-        contact {
-          ...ContactReference_Contact
-        }
-      }
-      isAnonymized
-      openedAt
-      deliveredAt
-      bouncedAt
-      ...SentPetitionMessageDialog_PetitionMessage
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
-  ${SentPetitionMessageDialog_PetitionMessageFragmentDoc}
-` as unknown as DocumentNode<TimelineMessageSentEvent_MessageSentEventFragment, unknown>;
-export const SentReminderMessageDialog_PetitionReminderFragmentDoc = gql`
-  fragment SentReminderMessageDialog_PetitionReminder on PetitionReminder {
-    access {
-      contact {
-        ...ContactReference_Contact
-      }
-    }
-    createdAt
-    emailBody
-  }
-  ${ContactReference_ContactFragmentDoc}
-` as unknown as DocumentNode<SentReminderMessageDialog_PetitionReminderFragment, unknown>;
-export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
-  fragment TimelineReminderSentEvent_ReminderSentEvent on ReminderSentEvent {
-    reminder {
-      type
-      sender {
-        ...UserReference_User
-      }
-      access {
-        delegateGranter {
-          id
-        }
-        granter {
-          ...UserReference_User
-        }
-        contact {
-          ...ContactReference_Contact
-        }
-      }
-      ...SentReminderMessageDialog_PetitionReminder
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
-  ${SentReminderMessageDialog_PetitionReminderFragmentDoc}
-` as unknown as DocumentNode<TimelineReminderSentEvent_ReminderSentEventFragment, unknown>;
-export const TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc = gql`
-  fragment TimelineSeeReplyButton_PetitionFieldReply on PetitionFieldReply {
-    id
-    parent {
-      id
-    }
-  }
-` as unknown as DocumentNode<TimelineSeeReplyButton_PetitionFieldReplyFragment, unknown>;
-export const TimelineSeeReplyButton_PetitionFieldFragmentDoc = gql`
-  fragment TimelineSeeReplyButton_PetitionField on PetitionField {
-    id
-    replies {
-      ...TimelineSeeReplyButton_PetitionFieldReply
-    }
-  }
-  ${TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<TimelineSeeReplyButton_PetitionFieldFragment, unknown>;
-export const TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc = gql`
-  fragment TimelineReplyCreatedEvent_ReplyCreatedEvent on ReplyCreatedEvent {
-    field {
-      id
-      type
-      options
-      parent {
-        id
-        ...PetitionFieldReference_PetitionField
-      }
-      ...TimelineSeeReplyButton_PetitionField
-      ...PetitionFieldReference_PetitionField
-    }
-    createdBy {
-      ...UserOrContactReference_UserOrPetitionAccess
-    }
-    reply {
-      ...TimelineSeeReplyButton_PetitionFieldReply
-      content
-    }
-    createdAt
-  }
-  ${PetitionFieldReference_PetitionFieldFragmentDoc}
-  ${TimelineSeeReplyButton_PetitionFieldFragmentDoc}
-  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
-  ${TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<TimelineReplyCreatedEvent_ReplyCreatedEventFragment, unknown>;
-export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
-  fragment TimelineReplyUpdatedEvent_ReplyUpdatedEvent on ReplyUpdatedEvent {
-    field {
-      type
-      ...PetitionFieldReference_PetitionField
-      parent {
-        ...PetitionFieldReference_PetitionField
-      }
-      ...TimelineSeeReplyButton_PetitionField
-      ...PetitionFieldReference_PetitionField
-    }
-    updatedBy {
-      ...UserOrContactReference_UserOrPetitionAccess
-    }
-    reply {
-      content
-      ...TimelineSeeReplyButton_PetitionFieldReply
-    }
-    createdAt
-  }
-  ${PetitionFieldReference_PetitionFieldFragmentDoc}
-  ${TimelineSeeReplyButton_PetitionFieldFragmentDoc}
-  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
-  ${TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment, unknown>;
-export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
-  fragment TimelineReplyDeletedEvent_ReplyDeletedEvent on ReplyDeletedEvent {
-    field {
-      type
-      ...PetitionFieldReference_PetitionField
-      parent {
-        ...PetitionFieldReference_PetitionField
-      }
-    }
-    deletedBy {
-      ...UserOrContactReference_UserOrPetitionAccess
-    }
-    createdAt
-  }
-  ${PetitionFieldReference_PetitionFieldFragmentDoc}
-  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
-` as unknown as DocumentNode<TimelineReplyDeletedEvent_ReplyDeletedEventFragment, unknown>;
-export const Mention_PetitionFieldCommentMentionFragmentDoc = gql`
-  fragment Mention_PetitionFieldCommentMention on PetitionFieldCommentMention {
-    ... on PetitionFieldCommentUserMention {
-      mentionedId
-      user {
-        id
-        fullName
-        status
-        isMe
-      }
-    }
-    ... on PetitionFieldCommentUserGroupMention {
-      mentionedId
-      userGroup {
-        id
-        imMember
-        ...UserGroupReference_UserGroup
-      }
-    }
-  }
-  ${UserGroupReference_UserGroupFragmentDoc}
-` as unknown as DocumentNode<Mention_PetitionFieldCommentMentionFragment, unknown>;
-export const PetitionFieldCommentContent_PetitionFieldCommentFragmentDoc = gql`
-  fragment PetitionFieldCommentContent_PetitionFieldComment on PetitionFieldComment {
-    contentHtml
-    mentions {
-      ... on PetitionFieldCommentUserMention {
-        mentionedId
-      }
-      ... on PetitionFieldCommentUserGroupMention {
-        mentionedId
-      }
-      ...Mention_PetitionFieldCommentMention
-    }
-  }
-  ${Mention_PetitionFieldCommentMentionFragmentDoc}
-` as unknown as DocumentNode<PetitionFieldCommentContent_PetitionFieldCommentFragment, unknown>;
-export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gql`
-  fragment TimelineCommentPublishedEvent_CommentPublishedEvent on CommentPublishedEvent {
-    field {
-      id
-      ...PetitionFieldReference_PetitionField
-    }
-    comment {
-      author {
-        ...UserOrContactReference_UserOrPetitionAccess
-      }
-      isEdited
-      isAnonymized
-      ...PetitionFieldCommentContent_PetitionFieldComment
-      isApproval
-    }
-    isInternal
-    isGeneral
-    createdAt
-  }
-  ${PetitionFieldReference_PetitionFieldFragmentDoc}
-  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
-  ${PetitionFieldCommentContent_PetitionFieldCommentFragmentDoc}
-` as unknown as DocumentNode<TimelineCommentPublishedEvent_CommentPublishedEventFragment, unknown>;
-export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
-  fragment TimelineCommentDeletedEvent_CommentDeletedEvent on CommentDeletedEvent {
-    field {
-      ...PetitionFieldReference_PetitionField
-    }
-    deletedBy {
-      ...UserOrContactReference_UserOrPetitionAccess
-    }
-    isInternal
-    isGeneral
-    createdAt
-  }
-  ${PetitionFieldReference_PetitionFieldFragmentDoc}
-  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
-` as unknown as DocumentNode<TimelineCommentDeletedEvent_CommentDeletedEventFragment, unknown>;
-export const TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragmentDoc = gql`
-  fragment TimelineUserPermissionAddedEvent_UserPermissionAddedEvent on UserPermissionAddedEvent {
-    user {
-      ...UserReference_User
-    }
-    permissionUser {
-      ...UserReference_User
-    }
-    permissionType
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-` as unknown as DocumentNode<
-  TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment,
-  unknown
->;
-export const TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragmentDoc = gql`
-  fragment TimelineUserPermissionRemovedEvent_UserPermissionRemovedEvent on UserPermissionRemovedEvent {
-    user {
-      ...UserReference_User
-    }
-    permissionUser {
-      ...UserReference_User
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-` as unknown as DocumentNode<
-  TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment,
-  unknown
->;
-export const TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragmentDoc = gql`
-  fragment TimelineUserPermissionEditedEvent_UserPermissionEditedEvent on UserPermissionEditedEvent {
-    user {
-      ...UserReference_User
-    }
-    permissionUser {
-      ...UserReference_User
-    }
-    permissionType
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-` as unknown as DocumentNode<
-  TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment,
-  unknown
->;
-export const TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragmentDoc = gql`
-  fragment TimelineOwnershipTransferredEvent_OwnershipTransferredEvent on OwnershipTransferredEvent {
-    user {
-      ...UserReference_User
-    }
-    owner {
-      ...UserReference_User
-    }
-    previousOwner {
-      ...UserReference_User
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-` as unknown as DocumentNode<
-  TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment,
-  unknown
->;
-export const TimelinePetitionClosedEvent_PetitionClosedEventFragmentDoc = gql`
-  fragment TimelinePetitionClosedEvent_PetitionClosedEvent on PetitionClosedEvent {
-    user {
-      ...UserReference_User
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-` as unknown as DocumentNode<TimelinePetitionClosedEvent_PetitionClosedEventFragment, unknown>;
-export const TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragmentDoc = gql`
-  fragment TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEvent on PetitionClosedNotifiedEvent {
-    user {
-      ...UserReference_User
-    }
-    access {
-      delegateGranter {
-        id
-      }
-      granter {
-        ...UserReference_User
-      }
-      contact {
-        ...ContactReference_Contact
-      }
-    }
-    emailBody
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
-` as unknown as DocumentNode<
-  TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment,
-  unknown
->;
-export const TimelinePetitionReopenedEvent_PetitionReopenedEventFragmentDoc = gql`
-  fragment TimelinePetitionReopenedEvent_PetitionReopenedEvent on PetitionReopenedEvent {
-    user {
-      ...UserReference_User
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-` as unknown as DocumentNode<TimelinePetitionReopenedEvent_PetitionReopenedEventFragment, unknown>;
-export const SignerReference_PetitionSignerFragmentDoc = gql`
-  fragment SignerReference_PetitionSigner on PetitionSigner {
-    ...Fragments_FullPetitionSigner
-  }
-  ${Fragments_FullPetitionSignerFragmentDoc}
-` as unknown as DocumentNode<SignerReference_PetitionSignerFragment, unknown>;
-export const TimelineSignatureDeliveredEvent_SignatureDeliveredEventFragmentDoc = gql`
-  fragment TimelineSignatureDeliveredEvent_SignatureDeliveredEvent on SignatureDeliveredEvent {
-    createdAt
-    signature {
-      signatureConfig {
-        integration {
-          provider
-        }
-      }
-    }
-    signer {
-      ...SignerReference_PetitionSigner
-    }
-    openedAt
-    deliveredAt
-    bouncedAt
-  }
-  ${SignerReference_PetitionSignerFragmentDoc}
-` as unknown as DocumentNode<
-  TimelineSignatureDeliveredEvent_SignatureDeliveredEventFragment,
-  unknown
->;
-export const TimelineSignatureOpenedEvent_SignatureOpenedEventFragmentDoc = gql`
-  fragment TimelineSignatureOpenedEvent_SignatureOpenedEvent on SignatureOpenedEvent {
-    signer {
-      ...SignerReference_PetitionSigner
-    }
-    createdAt
-  }
-  ${SignerReference_PetitionSignerFragmentDoc}
-` as unknown as DocumentNode<TimelineSignatureOpenedEvent_SignatureOpenedEventFragment, unknown>;
-export const TimelineSignatureStartedEvent_SignatureStartedEventFragmentDoc = gql`
-  fragment TimelineSignatureStartedEvent_SignatureStartedEvent on SignatureStartedEvent {
-    createdAt
-    signature {
-      signatureConfig {
-        signingMode
-        message
-      }
-    }
-  }
-` as unknown as DocumentNode<TimelineSignatureStartedEvent_SignatureStartedEventFragment, unknown>;
-export const TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc = gql`
-  fragment TimelineSignatureCompletedEvent_SignatureCompletedEvent on SignatureCompletedEvent {
-    createdAt
-  }
-` as unknown as DocumentNode<
-  TimelineSignatureCompletedEvent_SignatureCompletedEventFragment,
-  unknown
->;
-export const useSignatureCancelledRequestErrorMessage_SignatureCancelledEventFragmentDoc = gql`
-  fragment useSignatureCancelledRequestErrorMessage_SignatureCancelledEvent on SignatureCancelledEvent {
-    errorCode
-    extraErrorData
-    createdAt
-  }
-` as unknown as DocumentNode<
-  useSignatureCancelledRequestErrorMessage_SignatureCancelledEventFragment,
-  unknown
->;
-export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc = gql`
-  fragment TimelineSignatureCancelledEvent_SignatureCancelledEvent on SignatureCancelledEvent {
-    ...useSignatureCancelledRequestErrorMessage_SignatureCancelledEvent
-    cancelledBy {
-      ...UserOrContactReference_UserOrPetitionAccess
-    }
-    canceller {
-      ...SignerReference_PetitionSigner
-    }
-    cancelType
-    errorCode
-    errorMessage
-    cancellerReason
-    createdAt
-  }
-  ${useSignatureCancelledRequestErrorMessage_SignatureCancelledEventFragmentDoc}
-  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
-  ${SignerReference_PetitionSignerFragmentDoc}
-` as unknown as DocumentNode<
-  TimelineSignatureCancelledEvent_SignatureCancelledEventFragment,
-  unknown
->;
-export const TimelineSignatureReminderEvent_SignatureReminderEventFragmentDoc = gql`
-  fragment TimelineSignatureReminderEvent_SignatureReminderEvent on SignatureReminderEvent {
-    user {
-      ...UserReference_User
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-` as unknown as DocumentNode<
-  TimelineSignatureReminderEvent_SignatureReminderEventFragment,
-  unknown
->;
-export const TimelineAccessDelegatedEvent_AccessDelegatedEventFragmentDoc = gql`
-  fragment TimelineAccessDelegatedEvent_AccessDelegatedEvent on AccessDelegatedEvent {
-    originalAccess {
-      contact {
-        ...ContactReference_Contact
-      }
-    }
-    newAccess {
-      contact {
-        ...ContactReference_Contact
-      }
-    }
-    createdAt
-  }
-  ${ContactReference_ContactFragmentDoc}
-` as unknown as DocumentNode<TimelineAccessDelegatedEvent_AccessDelegatedEventFragment, unknown>;
-export const TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragmentDoc = gql`
-  fragment TimelineGroupPermissionAddedEvent_GroupPermissionAddedEvent on GroupPermissionAddedEvent {
-    user {
-      ...UserReference_User
-    }
-    permissionGroup {
-      ...UserGroupReference_UserGroup
-    }
-    permissionType
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-  ${UserGroupReference_UserGroupFragmentDoc}
-` as unknown as DocumentNode<
-  TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment,
-  unknown
->;
-export const TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragmentDoc = gql`
-  fragment TimelineGroupPermissionEditedEvent_GroupPermissionEditedEvent on GroupPermissionEditedEvent {
-    user {
-      ...UserReference_User
-    }
-    permissionGroup {
-      ...UserGroupReference_UserGroup
-    }
-    permissionType
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-  ${UserGroupReference_UserGroupFragmentDoc}
-` as unknown as DocumentNode<
-  TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment,
-  unknown
->;
-export const TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragmentDoc = gql`
-  fragment TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEvent on GroupPermissionRemovedEvent {
-    user {
-      ...UserReference_User
-    }
-    permissionGroup {
-      ...UserGroupReference_UserGroup
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-  ${UserGroupReference_UserGroupFragmentDoc}
-` as unknown as DocumentNode<
-  TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment,
-  unknown
->;
-export const TimelinePetitionClonedEvent_PetitionClonedEventFragmentDoc = gql`
-  fragment TimelinePetitionClonedEvent_PetitionClonedEvent on PetitionClonedEvent {
-    user {
-      ...UserReference_User
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-` as unknown as DocumentNode<TimelinePetitionClonedEvent_PetitionClonedEventFragment, unknown>;
-export const TimelineRemindersOptOutEvent_RemindersOptOutEventFragmentDoc = gql`
-  fragment TimelineRemindersOptOutEvent_RemindersOptOutEvent on RemindersOptOutEvent {
-    access {
-      contact {
-        ...ContactReference_Contact
-      }
-    }
-    createdAt
-    reason
-    other
-  }
-  ${ContactReference_ContactFragmentDoc}
-` as unknown as DocumentNode<TimelineRemindersOptOutEvent_RemindersOptOutEventFragment, unknown>;
-export const TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragmentDoc =
-  gql`
-    fragment TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEvent on AccessActivatedFromPublicPetitionLinkEvent {
-      access {
-        contact {
-          ...ContactReference_Contact
-        }
-      }
-      createdAt
-    }
-    ${ContactReference_ContactFragmentDoc}
-  ` as unknown as DocumentNode<
-    TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragment,
-    unknown
-  >;
-export const TimelineRecipientSignedEvent_RecipientSignedEventFragmentDoc = gql`
-  fragment TimelineRecipientSignedEvent_RecipientSignedEvent on RecipientSignedEvent {
-    signer {
-      ...SignerReference_PetitionSigner
-    }
-    createdAt
-  }
-  ${SignerReference_PetitionSignerFragmentDoc}
-` as unknown as DocumentNode<TimelineRecipientSignedEvent_RecipientSignedEventFragment, unknown>;
-export const TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragmentDoc = gql`
-  fragment TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEvent on PetitionMessageBouncedEvent {
-    message {
-      access {
-        contact {
-          ...ContactReference_Contact
-        }
-      }
-    }
-    createdAt
-  }
-  ${ContactReference_ContactFragmentDoc}
-` as unknown as DocumentNode<
-  TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragment,
-  unknown
->;
-export const TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragmentDoc = gql`
-  fragment TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEvent on PetitionReminderBouncedEvent {
-    reminder {
-      access {
-        contact {
-          ...ContactReference_Contact
-        }
-      }
-    }
-    createdAt
-  }
-  ${ContactReference_ContactFragmentDoc}
-` as unknown as DocumentNode<
-  TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragment,
-  unknown
->;
-export const TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragmentDoc = gql`
-  fragment TimelinePetitionAnonymizedEvent_PetitionAnonymizedEvent on PetitionAnonymizedEvent {
-    createdAt
-  }
-` as unknown as DocumentNode<
-  TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragment,
-  unknown
->;
-export const TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragmentDoc = gql`
-  fragment TimelineReplyStatusChangedEvent_ReplyStatusChangedEvent on ReplyStatusChangedEvent {
-    field {
-      id
-      multiple
-      ...TimelineSeeReplyButton_PetitionField
-      ...PetitionFieldReference_PetitionField
-    }
-    updatedBy {
-      ...UserOrContactReference_UserOrPetitionAccess
-    }
-    reply {
-      ...TimelineSeeReplyButton_PetitionFieldReply
-    }
-    status
-    createdAt
-  }
-  ${TimelineSeeReplyButton_PetitionFieldFragmentDoc}
-  ${PetitionFieldReference_PetitionFieldFragmentDoc}
-  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
-  ${TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragment,
-  unknown
->;
-export const TimelineProfileAssociatedEvent_ProfileAssociatedEventFragmentDoc = gql`
-  fragment TimelineProfileAssociatedEvent_ProfileAssociatedEvent on ProfileAssociatedEvent {
-    user {
-      ...UserReference_User
-    }
-    profile {
-      ...ProfileReference_Profile
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-  ${ProfileReference_ProfileFragmentDoc}
-` as unknown as DocumentNode<
-  TimelineProfileAssociatedEvent_ProfileAssociatedEventFragment,
-  unknown
->;
-export const TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragmentDoc = gql`
-  fragment TimelineProfileDisassociatedEvent_ProfileDisassociatedEvent on ProfileDisassociatedEvent {
-    disassociatedBy {
-      ...UserOrContactReference_UserOrPetitionAccess
-    }
-    profile {
-      ...ProfileReference_Profile
-    }
-    createdAt
-  }
-  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
-  ${ProfileReference_ProfileFragmentDoc}
-` as unknown as DocumentNode<
-  TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment,
-  unknown
->;
-export const TagReference_TagFragmentDoc = gql`
-  fragment TagReference_Tag on Tag {
-    ...Tag_Tag
-  }
-  ${Tag_TagFragmentDoc}
-` as unknown as DocumentNode<TagReference_TagFragment, unknown>;
-export const TimelinePetitionTaggedEvent_PetitionTaggedEventFragmentDoc = gql`
-  fragment TimelinePetitionTaggedEvent_PetitionTaggedEvent on PetitionTaggedEvent {
-    user {
-      ...UserReference_User
-    }
-    tags {
-      ...TagReference_Tag
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-  ${TagReference_TagFragmentDoc}
-` as unknown as DocumentNode<TimelinePetitionTaggedEvent_PetitionTaggedEventFragment, unknown>;
-export const TimelinePetitionUntaggedEvent_PetitionUntaggedEventFragmentDoc = gql`
-  fragment TimelinePetitionUntaggedEvent_PetitionUntaggedEvent on PetitionUntaggedEvent {
-    user {
-      ...UserReference_User
-    }
-    tags {
-      ...TagReference_Tag
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-  ${TagReference_TagFragmentDoc}
-` as unknown as DocumentNode<TimelinePetitionUntaggedEvent_PetitionUntaggedEventFragment, unknown>;
-export const TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEventFragmentDoc = gql`
-  fragment TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEvent on ContactlessAccessUsedEvent {
-    access {
-      contact {
-        ...ContactReference_Contact
-      }
-    }
-    createdAt
-  }
-  ${ContactReference_ContactFragmentDoc}
-` as unknown as DocumentNode<
-  TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEventFragment,
-  unknown
->;
-export const TimelinePetitionApprovalRequestStepStartedEvent_PetitionApprovalRequestStepStartedEventFragmentDoc =
-  gql`
-    fragment TimelinePetitionApprovalRequestStepStartedEvent_PetitionApprovalRequestStepStartedEvent on PetitionApprovalRequestStepStartedEvent {
-      approvalRequestStep {
-        id
-        stepName
-      }
-      comment {
-        id
-      }
-      user {
-        ...UserReference_User
-      }
-      createdAt
-    }
-    ${UserReference_UserFragmentDoc}
-  ` as unknown as DocumentNode<
-    TimelinePetitionApprovalRequestStepStartedEvent_PetitionApprovalRequestStepStartedEventFragment,
-    unknown
-  >;
-export const TimelinePetitionApprovalRequestStepApprovedEvent_PetitionApprovalRequestStepApprovedEventFragmentDoc =
-  gql`
-    fragment TimelinePetitionApprovalRequestStepApprovedEvent_PetitionApprovalRequestStepApprovedEvent on PetitionApprovalRequestStepApprovedEvent {
-      user {
-        ...UserReference_User
-      }
-      createdAt
-    }
-    ${UserReference_UserFragmentDoc}
-  ` as unknown as DocumentNode<
-    TimelinePetitionApprovalRequestStepApprovedEvent_PetitionApprovalRequestStepApprovedEventFragment,
-    unknown
-  >;
-export const TimelinePetitionApprovalRequestStepRejectedEvent_PetitionApprovalRequestStepRejectedEventFragmentDoc =
-  gql`
-    fragment TimelinePetitionApprovalRequestStepRejectedEvent_PetitionApprovalRequestStepRejectedEvent on PetitionApprovalRequestStepRejectedEvent {
-      user {
-        ...UserReference_User
-      }
-      createdAt
-    }
-    ${UserReference_UserFragmentDoc}
-  ` as unknown as DocumentNode<
-    TimelinePetitionApprovalRequestStepRejectedEvent_PetitionApprovalRequestStepRejectedEventFragment,
-    unknown
-  >;
-export const TimelinePetitionApprovalRequestStepSkippedEvent_PetitionApprovalRequestStepSkippedEventFragmentDoc =
-  gql`
-    fragment TimelinePetitionApprovalRequestStepSkippedEvent_PetitionApprovalRequestStepSkippedEvent on PetitionApprovalRequestStepSkippedEvent {
-      approvalRequestStep {
-        id
-        stepName
-      }
-      comment {
-        id
-      }
-      user {
-        ...UserReference_User
-      }
-      createdAt
-    }
-    ${UserReference_UserFragmentDoc}
-  ` as unknown as DocumentNode<
-    TimelinePetitionApprovalRequestStepSkippedEvent_PetitionApprovalRequestStepSkippedEventFragment,
-    unknown
-  >;
-export const TimelinePetitionApprovalRequestStepReminderEvent_PetitionApprovalRequestStepReminderEventFragmentDoc =
-  gql`
-    fragment TimelinePetitionApprovalRequestStepReminderEvent_PetitionApprovalRequestStepReminderEvent on PetitionApprovalRequestStepReminderEvent {
-      user {
-        ...UserReference_User
-      }
-      createdAt
-    }
-    ${UserReference_UserFragmentDoc}
-  ` as unknown as DocumentNode<
-    TimelinePetitionApprovalRequestStepReminderEvent_PetitionApprovalRequestStepReminderEventFragment,
-    unknown
-  >;
-export const TimelinePetitionApprovalRequestStepFinishedEvent_PetitionApprovalRequestStepFinishedEventFragmentDoc =
-  gql`
-    fragment TimelinePetitionApprovalRequestStepFinishedEvent_PetitionApprovalRequestStepFinishedEvent on PetitionApprovalRequestStepFinishedEvent {
-      approvalRequestStep {
-        id
-        stepName
-      }
-      user {
-        ...UserReference_User
-      }
-      createdAt
-    }
-    ${UserReference_UserFragmentDoc}
-  ` as unknown as DocumentNode<
-    TimelinePetitionApprovalRequestStepFinishedEvent_PetitionApprovalRequestStepFinishedEventFragment,
-    unknown
-  >;
-export const TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEventFragmentDoc =
-  gql`
-    fragment TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEvent on PetitionApprovalRequestStepCanceledEvent {
-      approvalRequestStep {
-        id
-        stepName
-      }
-      user {
-        ...UserReference_User
-      }
-      createdAt
-    }
-    ${UserReference_UserFragmentDoc}
-  ` as unknown as DocumentNode<
-    TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEventFragment,
-    unknown
-  >;
-export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
-  fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
-    id
-    ... on PetitionCreatedEvent {
-      ...TimelinePetitionCreatedEvent_PetitionCreatedEvent
-    }
-    ... on PetitionCompletedEvent {
-      ...TimelinePetitionCompletedEvent_PetitionCompletedEvent
-    }
-    ... on AccessActivatedEvent {
-      ...TimelineAccessActivatedEvent_AccessActivatedEvent
-    }
-    ... on AccessDeactivatedEvent {
-      ...TimelineAccessDeactivatedEvent_AccessDeactivatedEvent
-    }
-    ... on AccessOpenedEvent {
-      ...TimelineAccessOpenedEvent_AccessOpenedEvent
-    }
-    ... on MessageScheduledEvent {
-      ...TimelineMessageScheduledEvent_MessageScheduledEvent
-    }
-    ... on MessageCancelledEvent {
-      ...TimelineMessageCancelledEvent_MessageCancelledEvent
-    }
-    ... on MessageSentEvent {
-      ...TimelineMessageSentEvent_MessageSentEvent
-    }
-    ... on ReminderSentEvent {
-      ...TimelineReminderSentEvent_ReminderSentEvent
-    }
-    ... on ReplyCreatedEvent {
-      ...TimelineReplyCreatedEvent_ReplyCreatedEvent
-    }
-    ... on ReplyUpdatedEvent {
-      ...TimelineReplyUpdatedEvent_ReplyUpdatedEvent
-    }
-    ... on ReplyDeletedEvent {
-      ...TimelineReplyDeletedEvent_ReplyDeletedEvent
-    }
-    ... on CommentPublishedEvent {
-      ...TimelineCommentPublishedEvent_CommentPublishedEvent
-    }
-    ... on CommentDeletedEvent {
-      ...TimelineCommentDeletedEvent_CommentDeletedEvent
-    }
-    ... on UserPermissionAddedEvent {
-      ...TimelineUserPermissionAddedEvent_UserPermissionAddedEvent
-    }
-    ... on UserPermissionRemovedEvent {
-      ...TimelineUserPermissionRemovedEvent_UserPermissionRemovedEvent
-    }
-    ... on UserPermissionEditedEvent {
-      ...TimelineUserPermissionEditedEvent_UserPermissionEditedEvent
-    }
-    ... on OwnershipTransferredEvent {
-      ...TimelineOwnershipTransferredEvent_OwnershipTransferredEvent
-    }
-    ... on PetitionClosedEvent {
-      ...TimelinePetitionClosedEvent_PetitionClosedEvent
-    }
-    ... on PetitionClosedNotifiedEvent {
-      ...TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEvent
-    }
-    ... on PetitionReopenedEvent {
-      ...TimelinePetitionReopenedEvent_PetitionReopenedEvent
-    }
-    ... on SignatureDeliveredEvent {
-      ...TimelineSignatureDeliveredEvent_SignatureDeliveredEvent
-    }
-    ... on SignatureOpenedEvent {
-      ...TimelineSignatureOpenedEvent_SignatureOpenedEvent
-    }
-    ... on SignatureStartedEvent {
-      ...TimelineSignatureStartedEvent_SignatureStartedEvent
-    }
-    ... on SignatureCompletedEvent {
-      ...TimelineSignatureCompletedEvent_SignatureCompletedEvent
-    }
-    ... on SignatureCancelledEvent {
-      ...TimelineSignatureCancelledEvent_SignatureCancelledEvent
-    }
-    ... on SignatureReminderEvent {
-      ...TimelineSignatureReminderEvent_SignatureReminderEvent
-    }
-    ... on AccessDelegatedEvent {
-      ...TimelineAccessDelegatedEvent_AccessDelegatedEvent
-    }
-    ... on GroupPermissionAddedEvent {
-      ...TimelineGroupPermissionAddedEvent_GroupPermissionAddedEvent
-    }
-    ... on GroupPermissionEditedEvent {
-      ...TimelineGroupPermissionEditedEvent_GroupPermissionEditedEvent
-    }
-    ... on GroupPermissionRemovedEvent {
-      ...TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEvent
-    }
-    ... on PetitionClonedEvent {
-      ...TimelinePetitionClonedEvent_PetitionClonedEvent
-    }
-    ... on RemindersOptOutEvent {
-      ...TimelineRemindersOptOutEvent_RemindersOptOutEvent
-    }
-    ... on AccessActivatedFromPublicPetitionLinkEvent {
-      ...TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEvent
-    }
-    ... on RecipientSignedEvent {
-      ...TimelineRecipientSignedEvent_RecipientSignedEvent
-    }
-    ... on PetitionMessageBouncedEvent {
-      ...TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEvent
-    }
-    ... on PetitionReminderBouncedEvent {
-      ...TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEvent
-    }
-    ... on PetitionAnonymizedEvent {
-      ...TimelinePetitionAnonymizedEvent_PetitionAnonymizedEvent
-    }
-    ... on ReplyStatusChangedEvent {
-      ...TimelineReplyStatusChangedEvent_ReplyStatusChangedEvent
-    }
-    ... on ProfileAssociatedEvent {
-      ...TimelineProfileAssociatedEvent_ProfileAssociatedEvent
-    }
-    ... on ProfileDisassociatedEvent {
-      ...TimelineProfileDisassociatedEvent_ProfileDisassociatedEvent
-    }
-    ... on PetitionTaggedEvent {
-      ...TimelinePetitionTaggedEvent_PetitionTaggedEvent
-    }
-    ... on PetitionUntaggedEvent {
-      ...TimelinePetitionUntaggedEvent_PetitionUntaggedEvent
-    }
-    ... on ContactlessAccessUsedEvent {
-      ...TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEvent
-    }
-    ... on PetitionApprovalRequestStepStartedEvent {
-      ...TimelinePetitionApprovalRequestStepStartedEvent_PetitionApprovalRequestStepStartedEvent
-    }
-    ... on PetitionApprovalRequestStepApprovedEvent {
-      ...TimelinePetitionApprovalRequestStepApprovedEvent_PetitionApprovalRequestStepApprovedEvent
-    }
-    ... on PetitionApprovalRequestStepRejectedEvent {
-      ...TimelinePetitionApprovalRequestStepRejectedEvent_PetitionApprovalRequestStepRejectedEvent
-    }
-    ... on PetitionApprovalRequestStepSkippedEvent {
-      ...TimelinePetitionApprovalRequestStepSkippedEvent_PetitionApprovalRequestStepSkippedEvent
-    }
-    ... on PetitionApprovalRequestStepReminderEvent {
-      ...TimelinePetitionApprovalRequestStepReminderEvent_PetitionApprovalRequestStepReminderEvent
-    }
-    ... on PetitionApprovalRequestStepFinishedEvent {
-      ...TimelinePetitionApprovalRequestStepFinishedEvent_PetitionApprovalRequestStepFinishedEvent
-    }
-    ... on PetitionApprovalRequestStepCanceledEvent {
-      ...TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEvent
-    }
-  }
-  ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
-  ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
-  ${TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc}
-  ${TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc}
-  ${TimelineAccessOpenedEvent_AccessOpenedEventFragmentDoc}
-  ${TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc}
-  ${TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc}
-  ${TimelineMessageSentEvent_MessageSentEventFragmentDoc}
-  ${TimelineReminderSentEvent_ReminderSentEventFragmentDoc}
-  ${TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc}
-  ${TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc}
-  ${TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc}
-  ${TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc}
-  ${TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc}
-  ${TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragmentDoc}
-  ${TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragmentDoc}
-  ${TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragmentDoc}
-  ${TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragmentDoc}
-  ${TimelinePetitionClosedEvent_PetitionClosedEventFragmentDoc}
-  ${TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragmentDoc}
-  ${TimelinePetitionReopenedEvent_PetitionReopenedEventFragmentDoc}
-  ${TimelineSignatureDeliveredEvent_SignatureDeliveredEventFragmentDoc}
-  ${TimelineSignatureOpenedEvent_SignatureOpenedEventFragmentDoc}
-  ${TimelineSignatureStartedEvent_SignatureStartedEventFragmentDoc}
-  ${TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc}
-  ${TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc}
-  ${TimelineSignatureReminderEvent_SignatureReminderEventFragmentDoc}
-  ${TimelineAccessDelegatedEvent_AccessDelegatedEventFragmentDoc}
-  ${TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragmentDoc}
-  ${TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragmentDoc}
-  ${TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragmentDoc}
-  ${TimelinePetitionClonedEvent_PetitionClonedEventFragmentDoc}
-  ${TimelineRemindersOptOutEvent_RemindersOptOutEventFragmentDoc}
-  ${TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEventFragmentDoc}
-  ${TimelineRecipientSignedEvent_RecipientSignedEventFragmentDoc}
-  ${TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragmentDoc}
-  ${TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragmentDoc}
-  ${TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragmentDoc}
-  ${TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragmentDoc}
-  ${TimelineProfileAssociatedEvent_ProfileAssociatedEventFragmentDoc}
-  ${TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragmentDoc}
-  ${TimelinePetitionTaggedEvent_PetitionTaggedEventFragmentDoc}
-  ${TimelinePetitionUntaggedEvent_PetitionUntaggedEventFragmentDoc}
-  ${TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEventFragmentDoc}
-  ${TimelinePetitionApprovalRequestStepStartedEvent_PetitionApprovalRequestStepStartedEventFragmentDoc}
-  ${TimelinePetitionApprovalRequestStepApprovedEvent_PetitionApprovalRequestStepApprovedEventFragmentDoc}
-  ${TimelinePetitionApprovalRequestStepRejectedEvent_PetitionApprovalRequestStepRejectedEventFragmentDoc}
-  ${TimelinePetitionApprovalRequestStepSkippedEvent_PetitionApprovalRequestStepSkippedEventFragmentDoc}
-  ${TimelinePetitionApprovalRequestStepReminderEvent_PetitionApprovalRequestStepReminderEventFragmentDoc}
-  ${TimelinePetitionApprovalRequestStepFinishedEvent_PetitionApprovalRequestStepFinishedEventFragmentDoc}
-  ${TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEventFragmentDoc}
-` as unknown as DocumentNode<PetitionActivityTimeline_PetitionEventFragment, unknown>;
-export const PetitionActivity_PetitionEventFragmentDoc = gql`
-  fragment PetitionActivity_PetitionEvent on PetitionEvent {
-    ...PetitionActivityTimeline_PetitionEvent
-  }
-  ${PetitionActivityTimeline_PetitionEventFragmentDoc}
-` as unknown as DocumentNode<PetitionActivity_PetitionEventFragment, unknown>;
 export const PetitionHeader_QueryFragmentDoc = gql`
   fragment PetitionHeader_Query on Query {
     me {
@@ -80473,14 +79396,15 @@ export const PetitionActivity_eventsDocument = gql`
       ... on Petition {
         events(offset: $offset, limit: $limit) {
           items {
-            ...PetitionActivity_PetitionEvent
+            id
+            ...PetitionActivityTimeline_PetitionEvent
           }
           totalCount
         }
       }
     }
   }
-  ${PetitionActivity_PetitionEventFragmentDoc}
+  ${PetitionActivityTimeline_PetitionEventFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivity_eventsQuery, PetitionActivity_eventsQueryVariables>;
 export const PetitionActivity_petitionDocument = gql`
   query PetitionActivity_petition($id: GID!) {
