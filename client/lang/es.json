@@ -3756,7 +3756,7 @@
   },
   {
     "term": "component.feature-flag-descriptions.remove-preview-files-description",
-    "definition": "Quita la capacidad de previsualizar archivos",
+    "definition": "Quita la capacidad de previsualizar archivos pdf e imágenes directamente en el navegador.",
     "context": "Removes the option to open images and pdf files in the browser."
   },
   {
