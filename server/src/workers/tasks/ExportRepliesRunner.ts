@@ -35,9 +35,9 @@ export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
           locale: userData!.preferred_locale,
           include: ["excel-file", "petition-field-files", "latest-signature"],
           onProgress: async (progress) => {
-            this.ctx.logger.info(
-              `Exporting files for Petition:${petitionId}: ${Math.round(progress * 100)}%`,
-            );
+            // this.ctx.logger.info(
+            //   `Exporting files for Petition:${petitionId}: ${Math.round(progress * 100)}%`,
+            // );
             await this.onProgress(progress * 100 * 0.95);
           },
         },

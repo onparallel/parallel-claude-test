@@ -301,7 +301,7 @@ export class FileExportService implements IFileExportService {
           for (const reply of field.replies) {
             const file = filesById[reply.content["file_upload_id"]];
             if (file?.upload_complete) {
-              context.logger.info(`Exporting FileUpload:${file.id}...`);
+              // context.logger.info(`Exporting FileUpload:${file.id}...`);
               yield await processFile(
                 context.storage.fileUploads,
                 file.path,
