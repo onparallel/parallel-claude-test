@@ -21,6 +21,7 @@ import {
   BadRequestError,
   ConflictError,
   ForbiddenError,
+  InvalidParameterError,
   ResourceNotFoundError,
   UnauthorizedError,
 } from "../rest/errors";
@@ -2665,30 +2666,80 @@ export function publicApi(container: Container) {
         query: {
           format: enumParam({
             values: ["pdf", "zip"],
-            required: true,
+            required: false,
             description: "The format of the export.",
           }),
           noredirect: booleanParam({
             required: false,
             description: "If param is true, response will be a temporary link.",
           }),
+          callbackUrl: stringParam({
+            required: false,
+            description: outdent`
+              If provided the endpoint will return right away with a taskId.
+              When the export is ready Parallel will notify on the provided URL.
+
+              Use this same endpoint with the provided taskId to get the file.
+            `,
+          }),
+          taskId: idParam({
+            type: "Task",
+            required: false,
+            description: outdent`
+              The taskId returned when the callbackUrl was provided.
+
+              Use this param to get the file when the export is ready.
+            `,
+          }),
         },
         tags: ["Parallel replies"],
         responses: {
-          201: SuccessResponse(FileDownload),
+          201: SuccessResponse({
+            type: "object",
+            oneOf: [
+              FileDownload,
+              {
+                type: "object",
+                properties: { taskId: { type: "string" } },
+                required: ["taskId"],
+                additionalProperties: false,
+              },
+            ],
+          } as const),
           302: RedirectResponse("Redirect to the resource on AWS S3"),
+          404: ErrorResponse({ description: "File is not ready" }),
           500: ErrorResponse({ description: "Error generating the file" }),
         },
       },
       async ({ client, params, query, req, signal }) => {
-        if (query.format === "zip") {
+        if (isNullish(query.format) && isNullish(query.taskId)) {
+          throw new InvalidParameterError(
+            "format",
+            undefined,
+            "query",
+            "Parameter is missing but it is required",
+          );
+        }
+        if (isNonNullish(query.taskId)) {
+          const url = await getTaskResultFileUrl(client, query.taskId);
+          if (query.noredirect) {
+            return Created({ file: url }, url);
+          } else {
+            return Redirect(url);
+          }
+        } else if (query.format === "zip") {
           req.setTimeout(300_000 + 10_000);
           const _mutation = gql`
             mutation ExportPetitionReplies_createExportRepliesTask(
               $petitionId: GID!
               $pattern: String
+              $callbackUrl: String
             ) {
-              createExportRepliesTask(petitionId: $petitionId, pattern: $pattern) {
+              createExportRepliesTask(
+                petitionId: $petitionId
+                pattern: $pattern
+                callbackUrl: $callbackUrl
+              ) {
                 ...Task
               }
             }
@@ -2699,10 +2750,14 @@ export function publicApi(container: Container) {
               ExportPetitionReplies_createExportRepliesTaskDocument,
               {
                 petitionId: params.petitionId,
+                callbackUrl: query.callbackUrl,
               },
             );
-            await waitForTask(client, result.createExportRepliesTask, { signal });
-            const url = await getTaskResultFileUrl(client, result.createExportRepliesTask);
+            if (isNonNullish(query.callbackUrl)) {
+              return Created({ taskId: result.createExportRepliesTask.id });
+            }
+            await waitForTask(client, result.createExportRepliesTask.id, { signal });
+            const url = await getTaskResultFileUrl(client, result.createExportRepliesTask.id);
             if (query.noredirect) {
               return Created({ file: url }, url);
             } else {
@@ -2714,8 +2769,11 @@ export function publicApi(container: Container) {
         } else if (query.format === "pdf") {
           req.setTimeout(120_000 + 10_000);
           const _mutation = gql`
-            mutation ExportPetitionReplies_createPrintPdfTask($petitionId: GID!) {
-              createPrintPdfTask(petitionId: $petitionId) {
+            mutation ExportPetitionReplies_createPrintPdfTask(
+              $petitionId: GID!
+              $callbackUrl: String
+            ) {
+              createPrintPdfTask(petitionId: $petitionId, callbackUrl: $callbackUrl) {
                 ...Task
               }
             }
@@ -2723,9 +2781,13 @@ export function publicApi(container: Container) {
           `;
           const result = await client.request(ExportPetitionReplies_createPrintPdfTaskDocument, {
             petitionId: params.petitionId,
+            callbackUrl: query.callbackUrl,
           });
-          await waitForTask(client, result.createPrintPdfTask, { signal });
-          const url = await getTaskResultFileUrl(client, result.createPrintPdfTask);
+          if (isNonNullish(query.callbackUrl)) {
+            return Created({ taskId: result.createPrintPdfTask.id });
+          }
+          await waitForTask(client, result.createPrintPdfTask.id, { signal });
+          const url = await getTaskResultFileUrl(client, result.createPrintPdfTask.id);
           if (query.noredirect) {
             return Created({ file: url }, url);
           } else {
@@ -2857,7 +2919,7 @@ export function publicApi(container: Container) {
 
         if (status === "PROCESSING") {
           assert(isNonNullish(task), "Expected task to be defined");
-          await waitForTask(client, task, { signal });
+          await waitForTask(client, task.id, { signal });
         }
 
         const result = await client.request(SharePetition_petitionDocument, {
@@ -2897,7 +2959,7 @@ export function publicApi(container: Container) {
 
         if (status === "PROCESSING") {
           assert(isNonNullish(task), "Expected task to be defined");
-          await waitForTask(client, task, { signal });
+          await waitForTask(client, task.id, { signal });
         }
 
         return NoContent();
@@ -2948,7 +3010,7 @@ export function publicApi(container: Container) {
 
         if (status === "PROCESSING") {
           assert(isNonNullish(task), "Expected task to be defined");
-          await waitForTask(client, task, { signal });
+          await waitForTask(client, task.id, { signal });
         }
 
         return NoContent();
@@ -2999,7 +3061,7 @@ export function publicApi(container: Container) {
 
         if (status === "PROCESSING") {
           assert(isNonNullish(task), "Expected task to be defined");
-          await waitForTask(client, task, { signal });
+          await waitForTask(client, task.id, { signal });
         }
 
         return NoContent();

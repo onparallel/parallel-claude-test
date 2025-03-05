@@ -8052,6 +8052,7 @@ export interface NexusGenArgTypes {
     };
     createExportRepliesTask: {
       // args
+      callbackUrl?: string | null; // String
       pattern?: string | null; // String
       petitionId: NexusGenScalars["GID"]; // GID!
     };
@@ -8211,6 +8212,7 @@ export interface NexusGenArgTypes {
     };
     createPrintPdfTask: {
       // args
+      callbackUrl?: string | null; // String
       includeNdLinks?: boolean | null; // Boolean
       petitionId: NexusGenScalars["GID"]; // GID!
       skipAttachments?: boolean | null; // Boolean

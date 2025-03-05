@@ -13,7 +13,7 @@ import { emptyRTEValue, fromPlainText, fromPlainTextWithMentions } from "../../u
 import { isValidDate } from "../../util/time";
 import { Maybe, unMaybeArray, UnwrapArray } from "../../util/types";
 import { FormDataFile, RestParameter } from "../rest/core";
-import { BadRequestError, InternalError } from "../rest/errors";
+import { BadRequestError, InternalError, ResourceNotFoundError } from "../rest/errors";
 import {
   buildDefinition,
   buildParse,
@@ -44,7 +44,6 @@ import {
   ProfileFragment,
   ProfileTypeFieldFragment,
   TagFragmentDoc,
-  TaskFragment as TaskType,
   TemplateFragment,
   waitForTask_TaskDocument,
 } from "./__types";
@@ -389,7 +388,7 @@ export function mapSignatureRequest<T extends PetitionSignatureRequestFragment>(
   };
 }
 
-export async function waitForTask(client: GraphQLClient, task: TaskType, options: WaitForOptions) {
+export async function waitForTask(client: GraphQLClient, taskId: string, options: WaitForOptions) {
   const _query = gql`
     query waitForTask_Task($id: GID!) {
       task(id: $id) {
@@ -405,7 +404,7 @@ export async function waitForTask(client: GraphQLClient, task: TaskType, options
   let now;
   while ((now = performance.now()) < maxTime) {
     const result = await client.request(waitForTask_TaskDocument, {
-      id: task.id,
+      id: taskId,
     });
     switch (result.task.status) {
       case "ENQUEUED":
@@ -427,7 +426,7 @@ export async function waitForTask(client: GraphQLClient, task: TaskType, options
   throw new InternalError("MAX TIMEOUT");
 }
 
-export async function getTaskResultFileUrl(client: GraphQLClient, task: TaskType) {
+export async function getTaskResultFileUrl(client: GraphQLClient, taskId: string) {
   const _mutation = gql`
     mutation getTaskResultFileUrl_getTaskResultFile($taskId: GID!) {
       getTaskResultFile(taskId: $taskId) {
@@ -435,11 +434,18 @@ export async function getTaskResultFileUrl(client: GraphQLClient, task: TaskType
       }
     }
   `;
-  const { getTaskResultFile } = await client.request(
-    getTaskResultFileUrl_getTaskResultFileDocument,
-    { taskId: task.id },
-  );
-  return getTaskResultFile.url;
+
+  try {
+    const { getTaskResultFile } = await client.request(
+      getTaskResultFileUrl_getTaskResultFileDocument,
+      { taskId },
+    );
+    return getTaskResultFile.url;
+  } catch (error) {
+    if (containsGraphQLError(error, "FILE_NOT_FOUND_ERROR")) {
+      throw new ResourceNotFoundError("File is not ready");
+    }
+  }
 }
 
 export async function uploadFile(

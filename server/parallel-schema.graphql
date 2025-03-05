@@ -1566,7 +1566,14 @@ type Mutation {
   """
   Creates a task for exporting a ZIP file with petition replies and sends it to the queue
   """
-  createExportRepliesTask(pattern: String, petitionId: GID!): Task!
+  createExportRepliesTask(
+    """
+    URL to send a POST request when the task is completed
+    """
+    callbackUrl: String
+    pattern: String
+    petitionId: GID!
+  ): Task!
 
   """
   Creates replies on a FIELD_GROUP field with the provided profiles
@@ -1845,7 +1852,15 @@ type Mutation {
   """
   Creates a task for printing a PDF of the petition and sends it to the queue
   """
-  createPrintPdfTask(includeNdLinks: Boolean, petitionId: GID!, skipAttachments: Boolean): Task!
+  createPrintPdfTask(
+    """
+    URL to send a POST request when the task is completed
+    """
+    callbackUrl: String
+    includeNdLinks: Boolean
+    petitionId: GID!
+    skipAttachments: Boolean
+  ): Task!
   createProfile(
     fields: [UpdateProfileFieldValueInput!]
     profileTypeId: GID!

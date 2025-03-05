@@ -741,6 +741,7 @@ export type FeatureFlag =
   | "RECIPIENT_LANG_IT"
   | "RECIPIENT_LANG_PT"
   | "REMOVE_PARALLEL_BRANDING"
+  | "REMOVE_PREVIEW_FILES"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SETTING_DELEGATE_ACCESS"
   | "SHOW_CONTACTS_BUTTON"
@@ -1792,6 +1793,7 @@ export type MutationcreateExportExcelTaskArgs = {
 };
 
 export type MutationcreateExportRepliesTaskArgs = {
+  callbackUrl?: InputMaybe<Scalars["String"]["input"]>;
   pattern?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 };
@@ -1951,6 +1953,7 @@ export type MutationcreatePetitionsRatioDashboardModuleArgs = {
 };
 
 export type MutationcreatePrintPdfTaskArgs = {
+  callbackUrl?: InputMaybe<Scalars["String"]["input"]>;
   includeNdLinks?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionId: Scalars["GID"]["input"];
   skipAttachments?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -9391,6 +9394,7 @@ export type DownloadFileReply_fileUploadReplyDownloadLinkMutation = {
 export type ExportPetitionReplies_createExportRepliesTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   pattern?: InputMaybe<Scalars["String"]["input"]>;
+  callbackUrl?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type ExportPetitionReplies_createExportRepliesTaskMutation = {
@@ -9404,6 +9408,7 @@ export type ExportPetitionReplies_createExportRepliesTaskMutation = {
 
 export type ExportPetitionReplies_createPrintPdfTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
+  callbackUrl?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type ExportPetitionReplies_createPrintPdfTaskMutation = {
@@ -13187,8 +13192,12 @@ export const DownloadFileReply_fileUploadReplyDownloadLinkDocument = gql`
   DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables
 >;
 export const ExportPetitionReplies_createExportRepliesTaskDocument = gql`
-  mutation ExportPetitionReplies_createExportRepliesTask($petitionId: GID!, $pattern: String) {
-    createExportRepliesTask(petitionId: $petitionId, pattern: $pattern) {
+  mutation ExportPetitionReplies_createExportRepliesTask(
+    $petitionId: GID!
+    $pattern: String
+    $callbackUrl: String
+  ) {
+    createExportRepliesTask(petitionId: $petitionId, pattern: $pattern, callbackUrl: $callbackUrl) {
       ...Task
     }
   }
@@ -13198,8 +13207,8 @@ export const ExportPetitionReplies_createExportRepliesTaskDocument = gql`
   ExportPetitionReplies_createExportRepliesTaskMutationVariables
 >;
 export const ExportPetitionReplies_createPrintPdfTaskDocument = gql`
-  mutation ExportPetitionReplies_createPrintPdfTask($petitionId: GID!) {
-    createPrintPdfTask(petitionId: $petitionId) {
+  mutation ExportPetitionReplies_createPrintPdfTask($petitionId: GID!, $callbackUrl: String) {
+    createPrintPdfTask(petitionId: $petitionId, callbackUrl: $callbackUrl) {
       ...Task
     }
   }

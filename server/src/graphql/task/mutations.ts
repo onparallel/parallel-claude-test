@@ -44,6 +44,7 @@ import { validateFile } from "../helpers/validators/validateFile";
 import { validBooleanValue } from "../helpers/validators/validBooleanValue";
 import { validFileUploadInput } from "../helpers/validators/validFileUploadInput";
 import { validExportFileRenamePattern } from "../helpers/validators/validTextWithPlaceholders";
+import { validUrl } from "../helpers/validators/validUrl";
 import {
   authenticateBackgroundCheckToken,
   userHasAccessToIntegrations,
@@ -75,6 +76,9 @@ export const createPrintPdfTask = mutationField("createPrintPdfTask", {
     petitionId: nonNull(globalIdArg("Petition")),
     skipAttachments: nullable(booleanArg()),
     includeNdLinks: nullable(booleanArg()),
+    callbackUrl: nullable(
+      stringArg({ description: "URL to send a POST request when the task is completed" }),
+    ),
   },
   resolve: async (_, args, ctx) =>
     await ctx.tasks.createTask(
@@ -85,6 +89,7 @@ export const createPrintPdfTask = mutationField("createPrintPdfTask", {
           petition_id: args.petitionId,
           skip_attachments: args.skipAttachments ?? false,
           include_netdocuments_links: args.includeNdLinks ?? false,
+          callback_url: args.callbackUrl,
         },
       },
       `User:${ctx.user!.id}`,
@@ -102,8 +107,11 @@ export const createExportRepliesTask = mutationField("createExportRepliesTask", 
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     pattern: nullable("String"),
+    callbackUrl: nullable(
+      stringArg({ description: "URL to send a POST request when the task is completed" }),
+    ),
   },
-  validateArgs: validExportFileRenamePattern("pattern"),
+  validateArgs: validateAnd(validExportFileRenamePattern("pattern"), validUrl("callbackUrl")),
   resolve: async (_, args, ctx) => {
     return await ctx.tasks.createTask(
       {
@@ -112,6 +120,7 @@ export const createExportRepliesTask = mutationField("createExportRepliesTask", 
         input: {
           petition_id: args.petitionId,
           pattern: args.pattern,
+          callback_url: args.callbackUrl,
         },
       },
       `User:${ctx.user!.id}`,

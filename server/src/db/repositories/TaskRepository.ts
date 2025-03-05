@@ -11,12 +11,18 @@ export type TaskInput<TName extends TaskName> = {
    * Generates ZIP file containing xlsx file with with petition replies and comments, and every uploaded file reply.
    * Pattern can be used to rename file replies.
    */
-  EXPORT_REPLIES: { petition_id: number; pattern?: Maybe<string> };
+  EXPORT_REPLIES: {
+    petition_id: number;
+    pattern?: Maybe<string>;
+    // optionally send a POST request to this URL when the task is completed
+    callback_url?: Maybe<string>;
+  };
   /** generates a PDF version of the petition */
   PRINT_PDF: {
     petition_id: number;
     skip_attachments?: boolean;
     include_netdocuments_links?: boolean;
+    callback_url?: Maybe<string>;
   };
   /** generates xlsx file containing petition text replies and comments */
   EXPORT_EXCEL: { petition_id: number };

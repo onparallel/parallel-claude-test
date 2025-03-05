@@ -1,8 +1,10 @@
 import fastSafeStringify from "fast-safe-stringify";
+import { isNonNullish } from "remeda";
 import { Readable } from "stream";
 import { WorkerContext } from "../../context";
 import { TaskName } from "../../db/__types";
 import { Task, TaskOutput } from "../../db/repositories/TaskRepository";
+import { toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 
 export abstract class TaskRunner<T extends TaskName> {
@@ -18,10 +20,11 @@ export abstract class TaskRunner<T extends TaskName> {
 
   async runTask() {
     this.abort = new AbortController();
-
+    let success = false;
     try {
       const output = await this.run({ signal: this.abort.signal });
       await this.ctx.tasks.taskCompleted(this.task.id, output, this.ctx.config.instanceName);
+      success = true;
     } catch (error) {
       this.abort.abort();
       if (error instanceof Error) {
@@ -35,9 +38,27 @@ export abstract class TaskRunner<T extends TaskName> {
         this.ctx.logger.error(`Unknnown Error ${fastSafeStringify(error)}`);
         await this.ctx.tasks.taskFailed(
           this.task.id,
-          { message: `Unknnown Error ${fastSafeStringify(error)}` },
+          { message: `Unknown Error ${fastSafeStringify(error)}` },
           this.ctx.config.instanceName,
         );
+      }
+    } finally {
+      try {
+        if ("callback_url" in this.task.input && isNonNullish(this.task.input.callback_url)) {
+          await this.ctx.fetch.fetch(
+            this.task.input.callback_url,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                success,
+                taskId: toGlobalId("Task", this.task.id),
+              }),
+            },
+            { timeout: 10_000 },
+          );
+        }
+      } catch (e) {
+        this.ctx.logger.info(`Error in callback request ${fastSafeStringify(e)}`);
       }
     }
   }

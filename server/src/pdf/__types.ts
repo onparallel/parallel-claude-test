@@ -741,6 +741,7 @@ export type FeatureFlag =
   | "RECIPIENT_LANG_IT"
   | "RECIPIENT_LANG_PT"
   | "REMOVE_PARALLEL_BRANDING"
+  | "REMOVE_PREVIEW_FILES"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SETTING_DELEGATE_ACCESS"
   | "SHOW_CONTACTS_BUTTON"
@@ -1792,6 +1793,7 @@ export type MutationcreateExportExcelTaskArgs = {
 };
 
 export type MutationcreateExportRepliesTaskArgs = {
+  callbackUrl?: InputMaybe<Scalars["String"]["input"]>;
   pattern?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 };
@@ -1951,6 +1953,7 @@ export type MutationcreatePetitionsRatioDashboardModuleArgs = {
 };
 
 export type MutationcreatePrintPdfTaskArgs = {
+  callbackUrl?: InputMaybe<Scalars["String"]["input"]>;
   includeNdLinks?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionId: Scalars["GID"]["input"];
   skipAttachments?: InputMaybe<Scalars["Boolean"]["input"]>;
