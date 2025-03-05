@@ -319,6 +319,7 @@ export const AppLayout = Object.assign(
               hasIdVerification: hasIntegration(integration: ID_VERIFICATION)
             }
             hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
+            hasRemovePreviewFiles: hasFeatureFlag(featureFlag: REMOVE_PREVIEW_FILES)
           }
           realMe {
             id

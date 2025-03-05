@@ -26,6 +26,7 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
+import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { useMetadata } from "@parallel/utils/withMetadata";
 import { isPast, sub } from "date-fns";
 import { useEffect, useState } from "react";
@@ -167,7 +168,7 @@ function ExpirationDateRow({
 
   const { browserName } = useMetadata();
   const downloadReplyFile = useDownloadReplyFile();
-
+  const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
   const { name, expiryAlertAheadTime } = field.profileTypeField!;
 
   const expiryDate = watch(`expirations.${index}.expiryDate` as const);
@@ -219,7 +220,11 @@ function ExpirationDateRow({
                 <SimpleFileButton
                   isDisabled={!file.uploadComplete}
                   onClick={async () => {
-                    await downloadReplyFile(petitionId, reply, true);
+                    await downloadReplyFile(
+                      petitionId,
+                      reply,
+                      userHasRemovePreviewFiles ? false : true,
+                    );
                   }}
                   filename={file.filename}
                   contentType={file.contentType}

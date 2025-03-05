@@ -4,6 +4,7 @@ import { DownloadIcon, EyeIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { CopyOrDownloadReplyButton_PetitionFieldReplyFragment } from "@parallel/graphql/__types";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
+import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import useMergedRef from "@react-hook/merged-ref";
@@ -98,8 +99,11 @@ const ReplyDownloadButton = chakraForwardRef<
   { contentType: string; onDownload: (preview: boolean) => void; isDisabled: boolean }
 >(function ReplyDownloadButton({ contentType, onDownload, ...props }, ref) {
   const intl = useIntl();
+  const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
   const isPreviewable =
-    !!contentType && (contentType === "application/pdf" || contentType.startsWith("image/"));
+    !userHasRemovePreviewFiles &&
+    !!contentType &&
+    (contentType === "application/pdf" || contentType.startsWith("image/"));
   const innerRef = useRef<HTMLElement>(null);
   const _ref = useMergedRef(ref, innerRef);
   const isMouseOver = useIsMouseOver(innerRef);

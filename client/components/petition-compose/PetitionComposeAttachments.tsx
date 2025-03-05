@@ -19,6 +19,7 @@ import {
   BackCoverIcon,
   ChevronDownIcon,
   DeleteIcon,
+  DownloadIcon,
   DragHandleIcon,
   EyeIcon,
   FrontCoverIcon,
@@ -44,6 +45,7 @@ import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { uploadFile, UploadFileError } from "@parallel/utils/uploadFile";
+import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { useIsAnimated } from "@parallel/utils/useIsAnimated";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
@@ -661,6 +663,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
   ref,
 ) {
   const intl = useIntl();
+  const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
   const dragControls = useDragControls();
   const y = useMotionValue(0);
   const isAnimated = useIsAnimated(y);
@@ -856,14 +859,26 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
             ref={previewRef}
             size="sm"
             fontSize="md"
-            icon={<EyeIcon />}
-            label={intl.formatMessage({
-              id: "component.petition-compose-attachments.preview",
-              defaultMessage: "Preview file. ⇧ + click to download",
-            })}
+            icon={userHasRemovePreviewFiles ? <DownloadIcon /> : <EyeIcon />}
+            label={
+              userHasRemovePreviewFiles
+                ? intl.formatMessage({
+                    id: "generic.download-file",
+                    defaultMessage: "Download file",
+                  })
+                : intl.formatMessage({
+                    id: "component.petition-compose-attachments.preview",
+                    defaultMessage: "Preview file. ⇧ + click to download",
+                  })
+            }
             variant="ghost"
             isDisabled={!isComplete}
-            onClick={() => onPreview(id, isMouseOver && isShiftDown ? false : true)}
+            onClick={() =>
+              onPreview(
+                id,
+                userHasRemovePreviewFiles ? false : isMouseOver && isShiftDown ? false : true,
+              )
+            }
           />
           <IconButtonWithTooltip
             size="sm"

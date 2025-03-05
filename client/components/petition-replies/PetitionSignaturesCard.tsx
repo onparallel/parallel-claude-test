@@ -15,6 +15,7 @@ import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import { useAddNewSignature } from "@parallel/utils/useAddNewSignature";
+import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { usePageVisibility } from "@parallel/utils/usePageVisibility";
 import { useCallback, useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -270,12 +271,17 @@ export function PetitionSignaturesCardBody({
     [cancelSignatureRequest],
   );
 
+  const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
   const handleDownloadSignedDoc = useCallback(
     async (petitionSignatureRequestId: string, downloadAuditTrail: boolean) => {
       await withError(
         openNewWindow(async () => {
           const { data } = await downloadSignedDoc({
-            variables: { petitionSignatureRequestId, downloadAuditTrail, preview: true },
+            variables: {
+              petitionSignatureRequestId,
+              downloadAuditTrail,
+              preview: userHasRemovePreviewFiles ? false : true,
+            },
           });
           const { url, result } = data!.signedPetitionDownloadLink;
           if (result !== "SUCCESS") {

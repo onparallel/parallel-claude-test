@@ -802,6 +802,7 @@ export type FeatureFlag =
   | "RECIPIENT_LANG_IT"
   | "RECIPIENT_LANG_PT"
   | "REMOVE_PARALLEL_BRANDING"
+  | "REMOVE_PREVIEW_FILES"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SETTING_DELEGATE_ACCESS"
   | "SHOW_CONTACTS_BUTTON"
@@ -7260,6 +7261,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -10446,6 +10448,7 @@ export type AdminSettingsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -10513,6 +10516,7 @@ export type AppLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -10677,6 +10681,7 @@ export type DevelopersLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -10773,6 +10778,7 @@ export type OrganizationSettingsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -11020,6 +11026,7 @@ export type PetitionLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -11087,6 +11094,7 @@ export type ProfileLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -11371,6 +11379,7 @@ export type ReportsSidebarLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -11438,6 +11447,7 @@ export type SidebarLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -11506,6 +11516,7 @@ export type UserGroupLayout_QueryFragment = {
     initials?: string | null;
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -11636,6 +11647,7 @@ export type UserSettingsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -12828,6 +12840,7 @@ export type OrganizationProfilesLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -36080,6 +36093,7 @@ export type Admin_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -36166,6 +36180,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -36326,6 +36341,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -36613,6 +36629,7 @@ export type AdminOrganizationsMembers_queryQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -36814,6 +36831,7 @@ export type AdminOrganizations_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -36910,6 +36928,7 @@ export type AdminSupportMethods_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -37024,6 +37043,7 @@ export type Alerts_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -37860,6 +37880,7 @@ export type Contact_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -38053,6 +38074,7 @@ export type Contacts_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -38135,6 +38157,7 @@ export type Home_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -38385,6 +38408,7 @@ export type OrganizationBranding_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasRemovedParallelBranding: boolean;
     hasPdfExportV2: boolean;
     hasProfilesAccess: boolean;
@@ -38492,6 +38516,7 @@ export type OrganizationCompliance_userQuery = {
     initials?: string | null;
     hasAutoAnonymize: boolean;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -38577,6 +38602,7 @@ export type OrganizationGeneral_userQuery = {
     initials?: string | null;
     hasCustomHost: boolean;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -38771,6 +38797,7 @@ export type OrganizationGroup_userQuery = {
     initials?: string | null;
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -38878,6 +38905,7 @@ export type PermissionsGroup_userQuery = {
     hasLoginAsAccess: boolean;
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
@@ -39106,6 +39134,7 @@ export type OrganizationGroups_userQuery = {
     initials?: string | null;
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -39175,6 +39204,7 @@ export type OrganizationSettings_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -39246,6 +39276,7 @@ export type OrganizationIntegrations_userQuery = {
     hasPetitionSignature: boolean;
     hasDowJonesFeature: boolean;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -39393,6 +39424,7 @@ export type IntegrationsSignature_userQuery = {
     initials?: string | null;
     hasPetitionSignature: boolean;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDocusignSandbox: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -39639,6 +39671,7 @@ export type OrganizationProfileType_userQuery = {
     initials?: string | null;
     hasKeyProcessesFeature: boolean;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -40113,6 +40146,7 @@ export type OrganizationProfileTypes_userQuery = {
     initials?: string | null;
     hasCreateProfileType: boolean;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -40265,6 +40299,7 @@ export type OrganizationUsage_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -40470,6 +40505,7 @@ export type OrganizationUsers_userQuery = {
     initials?: string | null;
     hasGhostLogin: boolean;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -41917,6 +41953,7 @@ export type PetitionActivity_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -43728,6 +43765,7 @@ export type PetitionActivity_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -44797,6 +44835,7 @@ export type PetitionCompose_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasPetitionApprovalFlow: boolean;
     hasSettingDelegateAccess: boolean;
@@ -47040,6 +47079,7 @@ export type PetitionCompose_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasPetitionApprovalFlow: boolean;
     hasSettingDelegateAccess: boolean;
@@ -48023,6 +48063,7 @@ export type PetitionMessages_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     hasDashboardsAccess: boolean;
@@ -48093,6 +48134,7 @@ export type PetitionMessages_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     hasDashboardsAccess: boolean;
@@ -49690,6 +49732,7 @@ export type PetitionPreview_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -52186,6 +52229,7 @@ export type PetitionPreview_userQuery = {
     initials?: string | null;
     hasPublicLinkPrefill: boolean;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -55143,6 +55187,7 @@ export type PetitionReplies_userQuery = {
     hasPetitionApprovalFlow: boolean;
     hasProfilesAccess: boolean;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasExportCuatrecasas: boolean;
     hasSummaryAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -56363,6 +56408,7 @@ export type Petitions_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasPetitionApprovalFlow: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -56937,6 +56983,7 @@ export type NewPetition_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -57131,6 +57178,7 @@ export type ProfileDetail_userQuery = {
     initials?: string | null;
     hasKeyProcessesFeature: boolean;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -57400,6 +57448,7 @@ export type Profiles_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -57636,6 +57685,7 @@ export type Reports_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -57711,6 +57761,7 @@ export type Overview_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -57786,6 +57837,7 @@ export type ReportsReplies_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -57861,6 +57913,7 @@ export type ReportsTemplates_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -57930,6 +57983,7 @@ export type Account_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasOnBehalfOf: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -58040,6 +58094,7 @@ export type Account_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasOnBehalfOf: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -58397,6 +58452,7 @@ export type Subscriptions_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -58498,6 +58554,7 @@ export type Tokens_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -58567,6 +58624,7 @@ export type Settings_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -58644,6 +58702,7 @@ export type Security_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
@@ -63182,6 +63241,12 @@ export type useHasPermission_MeQuery = {
   me: { __typename?: "User"; id: string; permissions: Array<string> };
 };
 
+export type useHasRemovePreviewFiles_MeQueryVariables = Exact<{ [key: string]: never }>;
+
+export type useHasRemovePreviewFiles_MeQuery = {
+  me: { __typename?: "User"; id: string; hasRemovePreviewFiles: boolean };
+};
+
 export type useLoginAs_loginAsMutationVariables = Exact<{
   userId: Scalars["GID"]["input"];
 }>;
@@ -64729,6 +64794,7 @@ export const AppLayout_QueryFragmentDoc = gql`
         hasIdVerification: hasIntegration(integration: ID_VERIFICATION)
       }
       hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
+      hasRemovePreviewFiles: hasFeatureFlag(featureFlag: REMOVE_PREVIEW_FILES)
     }
     realMe {
       id
@@ -82895,6 +82961,17 @@ export const useHasPermission_MeDocument = gql`
     }
   }
 ` as unknown as DocumentNode<useHasPermission_MeQuery, useHasPermission_MeQueryVariables>;
+export const useHasRemovePreviewFiles_MeDocument = gql`
+  query useHasRemovePreviewFiles_Me {
+    me {
+      id
+      hasRemovePreviewFiles: hasFeatureFlag(featureFlag: REMOVE_PREVIEW_FILES)
+    }
+  }
+` as unknown as DocumentNode<
+  useHasRemovePreviewFiles_MeQuery,
+  useHasRemovePreviewFiles_MeQueryVariables
+>;
 export const useLoginAs_loginAsDocument = gql`
   mutation useLoginAs_loginAs($userId: GID!) {
     loginAs(userId: $userId)

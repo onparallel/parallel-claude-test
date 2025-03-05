@@ -3755,6 +3755,16 @@
     "context": "Remove Parallel branding"
   },
   {
+    "term": "component.feature-flag-descriptions.remove-preview-files-description",
+    "definition": "Removes the option to open images and pdf files in the browser.",
+    "context": "Removes the option to open images and pdf files in the browser."
+  },
+  {
+    "term": "component.feature-flag-descriptions.remove-preview-files-name",
+    "definition": "Remove preview files",
+    "context": "Remove preview files"
+  },
+  {
     "term": "component.feature-flag-descriptions.remove-why-we-use-parallel-description",
     "definition": "Removes the \"Why we use Parallel?\" block in mails to recipients",
     "context": "Removes the \"Why we use Parallel?\" block in mails to recipients"

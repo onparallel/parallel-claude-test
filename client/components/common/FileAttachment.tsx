@@ -1,6 +1,7 @@
 import { CircularProgress, Flex, IconButton, Text } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import { useRef } from "react";
@@ -41,6 +42,7 @@ export const FileAttachment = chakraForwardRef<"div", FileAttachmentProps>(funct
   const nameRef = useRef<HTMLSpanElement>(null);
   const isMouseOver = useIsMouseOver(nameRef);
   const isShiftDown = useIsGlobalKeyDown("Shift");
+  const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
 
   return (
     <Flex
@@ -80,7 +82,7 @@ export const FileAttachment = chakraForwardRef<"div", FileAttachmentProps>(funct
           : (e) => {
               switch (e.key) {
                 case "Enter":
-                  onDownload(isShiftDown ? false : true);
+                  onDownload(userHasRemovePreviewFiles ? false : isShiftDown ? false : true);
                   break;
                 case "Delete":
                 case "Backspace":
@@ -104,7 +106,10 @@ export const FileAttachment = chakraForwardRef<"div", FileAttachmentProps>(funct
           onClick={
             uploadHasFailed
               ? undefined
-              : () => onDownload(isMouseOver && isShiftDown ? false : true)
+              : () =>
+                  onDownload(
+                    userHasRemovePreviewFiles ? false : isMouseOver && isShiftDown ? false : true,
+                  )
           }
         />
         <Text as="span" fontSize="sm" color="gray.500" marginStart={1} whiteSpace="nowrap">

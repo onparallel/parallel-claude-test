@@ -303,6 +303,17 @@ export function useFeatureFlags() {
         }),
         featureFlags: [
           {
+            name: "REMOVE_PREVIEW_FILES",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.remove-preview-files-name",
+              defaultMessage: "Remove preview files",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.remove-preview-files-description",
+              defaultMessage: "Removes the option to open images and pdf files in the browser.",
+            }),
+          },
+          {
             name: "PETITION_APPROVAL_FLOW",
             title: intl.formatMessage({
               id: "component.feature-flag-descriptions.petition-approval-flow-name",

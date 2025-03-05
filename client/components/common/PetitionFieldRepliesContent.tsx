@@ -16,6 +16,7 @@ import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { withError } from "@parallel/utils/promises/withError";
 import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
+import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, pick } from "remeda";
@@ -67,12 +68,16 @@ const PetitionFieldRepliesContentFile = chakraForwardRef<"ul", PetitionFieldRepl
   function PetitionFieldRepliesContentFile({ petitionId, field, replies, sample, ...props }, ref) {
     const downloadReplyFile = useDownloadReplyFile();
     const isShiftDown = useIsGlobalKeyDown("Shift");
-
+    const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
     const buttons = replies.map((reply) => (
       <SimpleFileButton
         key={undefined}
         {...pick(reply.content!, ["filename", "contentType"])}
-        onClick={() => withError(downloadReplyFile(petitionId, reply, !isShiftDown))}
+        onClick={() =>
+          withError(
+            downloadReplyFile(petitionId, reply, userHasRemovePreviewFiles ? false : !isShiftDown),
+          )
+        }
       />
     ));
     return buttons.length === 0 ? (

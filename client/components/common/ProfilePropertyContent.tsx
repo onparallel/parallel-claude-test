@@ -15,6 +15,7 @@ import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { withError } from "@parallel/utils/promises/withError";
 import { assertType } from "@parallel/utils/types";
 import { useDownloadProfileFieldFile } from "@parallel/utils/useDownloadProfileFieldFile";
+import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { MouseEvent } from "react";
 import { FormattedDate, FormattedMessage, FormattedNumber, useIntl } from "react-intl";
@@ -78,6 +79,7 @@ const ProfileFieldFiles = chakraForwardRef<"ul" | "div", ProfilePropertyContentP
     assert(files !== undefined, "files must be defined if field type is FILE");
     const downloadProfileFieldFile = useDownloadProfileFieldFile();
     const isShiftDown = useIsGlobalKeyDown("Shift");
+    const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
     const buttons =
       files?.map((file) => (
         <SimpleFileButton
@@ -86,7 +88,14 @@ const ProfileFieldFiles = chakraForwardRef<"ul" | "div", ProfilePropertyContentP
           onClick={
             isNonNullish(profileId) && isNonNullish(file.id)
               ? () =>
-                  withError(downloadProfileFieldFile(profileId, field.id, file.id!, !isShiftDown))
+                  withError(
+                    downloadProfileFieldFile(
+                      profileId,
+                      field.id,
+                      file.id!,
+                      userHasRemovePreviewFiles ? false : !isShiftDown,
+                    ),
+                  )
               : undefined
           }
         />

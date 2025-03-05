@@ -15,6 +15,7 @@ import { ThumbsDownIcon, ThumbsUpIcon } from "@parallel/chakra/icons";
 import { PetitionFieldComment_PetitionFieldCommentFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
+import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { KeyboardEvent, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
@@ -85,6 +86,8 @@ export function PetitionFieldComment({
   }
 
   const approvalMetadata = comment.isApproval ? comment.approvalMetadata : null;
+
+  const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
 
   return (
     <Box
@@ -265,7 +268,13 @@ export function PetitionFieldComment({
               <FileAttachmentButton
                 key={attachment.id}
                 file={attachment.file}
-                onClick={() => onDownloadAttachment(attachment.id, comment.id, !isShiftDown)}
+                onClick={() =>
+                  onDownloadAttachment(
+                    attachment.id,
+                    comment.id,
+                    userHasRemovePreviewFiles ? false : !isShiftDown,
+                  )
+                }
               />
             );
           })}

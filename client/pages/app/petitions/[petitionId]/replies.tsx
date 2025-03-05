@@ -114,6 +114,7 @@ import { useFileExportTask } from "@parallel/utils/tasks/useFileExportTask";
 import { usePrintPdfTask } from "@parallel/utils/tasks/usePrintPdfTask";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
+import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
@@ -209,7 +210,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const wrapper = usePetitionStateWrapper();
   const [updatePetition] = useMutation(PetitionReplies_updatePetitionDocument);
   const downloadReplyFile = useDownloadReplyFile();
-
+  const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
   const updatePetitionFieldRepliesStatus = useUpdatePetitionFieldRepliesStatus();
   async function handleUpdateRepliesStatus(
     petitionFieldId: string,
@@ -249,7 +250,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       case "DOWNLOAD_FILE":
       case "PREVIEW_FILE":
         try {
-          await downloadReplyFile(petitionId, reply, action === "PREVIEW_FILE");
+          await downloadReplyFile(
+            petitionId,
+            reply,
+            userHasRemovePreviewFiles ? false : action === "PREVIEW_FILE",
+          );
         } catch {}
         break;
     }
