@@ -8,7 +8,7 @@ sudo hostnamectl set-hostname "$INSTANCE_NAME"
 
 if [[ "$ENV" == "staging" ]]; then
   EFS_ID="fs-04bd0d42c9572a6c1"
-elif [[ "$ENVIRONMENT" == "production" ]]; then
+elif [[ "$ENV" == "production" ]]; then
   EFS_ID="fs-05b0e1c4df3ecd227"
 else
   echo "ERROR: Unknown environment '$ENV'. Use 'production' or 'staging'."
