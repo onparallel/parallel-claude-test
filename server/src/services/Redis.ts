@@ -47,8 +47,7 @@ export class Redis implements IRedis {
     this.client = redis.createClient({
       socket: {
         ...config.redis,
-        ...// TODO replace with process.env.NODE_ENV === "production" after fixing the production redis
-        (process.env.ENV === "staging" ? { tls: true } : {}),
+        ...(process.env.NODE_ENV === "production" ? { tls: true } : {}),
       },
     });
     this.sendRawCommand = this.client.sendCommand.bind(this.client);
