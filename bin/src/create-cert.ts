@@ -4,6 +4,11 @@ import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { run } from "./utils/run";
 
+const LB_DOMAIN = {
+  production: "lb.onparallel.com",
+  staging: "lb-staging.onparallel.com",
+}[process.env.ENV as "production" | "staging"];
+
 async function main() {
   const { domain } = await yargs.usage("Usage: $0 --domain [domain]").option("domain", {
     required: true,
@@ -17,8 +22,8 @@ async function main() {
 
   const result = await resolveCname(domain);
   assert(
-    result.length === 1 && result[0] === "lb.onparallel.com",
-    `${domain} is not pointing to lb.onparallel.com`,
+    result.length === 1 && result[0] === LB_DOMAIN,
+    `${domain} is not pointing to ${LB_DOMAIN}`,
   );
 
   execSync(`certbot certonly \
