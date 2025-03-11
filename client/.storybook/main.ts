@@ -1,12 +1,7 @@
 import type { StorybookConfig } from "@storybook/nextjs";
 
-import { resolve, dirname } from "path";
-import { fileURLToPath } from "url";
-import { merge } from "webpack-merge";
-
-// Get the directory name from the URL
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { resolve } from "path";
+const { merge } = require("webpack-merge");
 
 const config: StorybookConfig = {
   stories: ["../stories/**/*.stories.tsx"],
@@ -35,4 +30,4 @@ const config: StorybookConfig = {
   },
 };
 
-export default config;
+module.exports = config;

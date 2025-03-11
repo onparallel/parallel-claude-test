@@ -12,13 +12,10 @@ const config: StorybookConfig = {
   core: {
     disableTelemetry: true,
   },
-  framework: {
-    name: "@storybook/server-webpack5",
-    options: {},
+  features: {
+    storyStoreV7: false,
   },
-  docs: {
-    autodocs: true,
-  },
+  framework: "@storybook/server-webpack5",
 };
 
-export default config;
+module.exports = config;
