@@ -77,13 +77,13 @@ import {
   PetitionReplies_approveOrRejectPetitionFieldRepliesDocument,
   PetitionReplies_associateProfileToPetitionDocument,
   PetitionReplies_cancelPetitionApprovalRequestFlowDocument,
+  PetitionReplies_cancelSignatureRequestDocument,
   PetitionReplies_closePetitionDocument,
   PetitionReplies_petitionDocument,
   PetitionReplies_sendPetitionClosedNotificationDocument,
   PetitionReplies_updatePetitionDocument,
   PetitionReplies_updatePetitionFieldRepliesStatusDocument,
   PetitionReplies_userDocument,
-  PetitionSettings_cancelPetitionSignatureRequestDocument,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { Fragments } from "@parallel/utils/apollo/fragments";
@@ -465,9 +465,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const showConfirmCancelOngoingApprovals = useDialog(ConfirmCancelOngoingApprovals);
 
-  const [cancelSignatureRequest] = useMutation(
-    PetitionSettings_cancelPetitionSignatureRequestDocument,
-  );
+  const [cancelSignatureRequest] = useMutation(PetitionReplies_cancelSignatureRequestDocument);
 
   const [cancelPetitionApprovalRequestFlow] = useMutation(
     PetitionReplies_cancelPetitionApprovalRequestFlowDocument,
@@ -1172,6 +1170,18 @@ const _mutations = [
             id
             status
           }
+        }
+      }
+    }
+  `,
+  gql`
+    mutation PetitionReplies_cancelSignatureRequest($petitionSignatureRequestId: GID!) {
+      cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
+        id
+        status
+        petition {
+          id
+          hasStartedProcess
         }
       }
     }

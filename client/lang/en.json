@@ -1470,16 +1470,6 @@
     "context": "Cancel eSignature and continue"
   },
   {
-    "term": "component.confirm-disable-ongoing-signature.body",
-    "definition": "There is an ongoing eSignature process. If you disable eSignature this process will be cancelled.",
-    "context": "There is an ongoing eSignature process. If you disable eSignature this process will be cancelled."
-  },
-  {
-    "term": "component.confirm-disable-ongoing-signature.confirm",
-    "definition": "Disable eSignature",
-    "context": "Disable eSignature"
-  },
-  {
     "term": "component.confirm-disable-ongoing-signature.header",
     "definition": "Ongoing eSignature",
     "context": "Ongoing eSignature"
@@ -6950,11 +6940,6 @@
     "context": "<b>Pending eSignature</b>, you can start it from the {tabName} tab."
   },
   {
-    "term": "component.petition-preview-signature-review-alert.signature-review",
-    "definition": "If you make any changes, don't forget to click the <b>Finish</b> button again.",
-    "context": "If you make any changes, don't forget to click the <b>Finish</b> button again."
-  },
-  {
     "term": "component.petition-profiles-table.add-profile",
     "definition": "Add profile",
     "context": "Add profile"
@@ -10898,11 +10883,6 @@
     "term": "component.signature-config-dialog.title-placeholder",
     "definition": "Enter a title...",
     "context": "Enter a title..."
-  },
-  {
-    "term": "component.signature-sent-alert.petition-completed-alert-2",
-    "definition": "If you make any changes, don't forget to hit the <b>Finalize</b> button again.",
-    "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
   },
   {
     "term": "component.signature-sent-alert.petition-requires-signature-alert-1",

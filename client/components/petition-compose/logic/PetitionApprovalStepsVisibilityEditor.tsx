@@ -46,7 +46,7 @@ export function PetitionApprovalStepsVisibilityEditor({
     ({
       type: "SHOW",
       operator: "AND",
-      conditions: [defaultFieldCondition(field)],
+      conditions: field && field.type !== "HEADING" ? [defaultFieldCondition(field)] : [{}],
     } as PetitionFieldVisibility);
   function setVisibility(dispatch: (prev: PetitionFieldVisibility) => PetitionFieldVisibility) {
     onChange(dispatch(visibility));
@@ -72,6 +72,10 @@ export function PetitionApprovalStepsVisibilityEditor({
   const updateCondition = function (index: number, condition: PetitionFieldLogicCondition) {
     setConditions((conditions) => conditions.map((c, i) => (i === index ? condition : c)));
   };
+
+  const lastCondition = visibility.conditions[visibility.conditions.length - 1];
+  const lastConditionFieldId = "fieldId" in lastCondition ? lastCondition.fieldId : null;
+  const lastConditionField = allFields.find((f) => f.id === lastConditionFieldId);
 
   return (
     <PetitionFieldLogicContext petition={petition} field={field} includeSelf>
@@ -188,6 +192,7 @@ export function PetitionApprovalStepsVisibilityEditor({
           <Box>
             {visibility.conditions.length < 15 && !isReadOnly ? (
               <PetitionFieldLogicAddConditionButton
+                isDisabled={!lastConditionField || lastConditionField.type === "HEADING"}
                 conditions={visibility.conditions}
                 onAddCondition={(condition) =>
                   setConditions((conditions) => [...conditions, condition])

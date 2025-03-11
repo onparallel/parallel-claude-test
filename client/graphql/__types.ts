@@ -20703,18 +20703,6 @@ export type PetitionSettings_updatePetitionRestrictionMutation = {
       };
 };
 
-export type PetitionSettings_cancelPetitionSignatureRequestMutationVariables = Exact<{
-  petitionSignatureRequestId: Scalars["GID"]["input"];
-}>;
-
-export type PetitionSettings_cancelPetitionSignatureRequestMutation = {
-  cancelSignatureRequest: {
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-  };
-};
-
 export type PetitionSettings_createPublicPetitionLinkMutationVariables = Exact<{
   templateId: Scalars["GID"]["input"];
   title: Scalars["String"]["input"];
@@ -28657,6 +28645,7 @@ export type PetitionSignaturesCard_cancelSignatureRequestMutation = {
     id: string;
     status: PetitionSignatureRequestStatus;
     cancelReason?: string | null;
+    petition: { __typename?: "Petition"; id: string; hasStartedProcess: boolean };
   };
 };
 
@@ -54092,6 +54081,19 @@ export type PetitionReplies_cancelPetitionApprovalRequestFlowMutation = {
   };
 };
 
+export type PetitionReplies_cancelSignatureRequestMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"]["input"];
+}>;
+
+export type PetitionReplies_cancelSignatureRequestMutation = {
+  cancelSignatureRequest: {
+    __typename?: "PetitionSignatureRequest";
+    id: string;
+    status: PetitionSignatureRequestStatus;
+    petition: { __typename?: "Petition"; id: string; hasStartedProcess: boolean };
+  };
+};
+
 export type PetitionReplies_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type PetitionReplies_userQuery = {
@@ -75898,17 +75900,6 @@ export const PetitionSettings_updatePetitionRestrictionDocument = gql`
   PetitionSettings_updatePetitionRestrictionMutation,
   PetitionSettings_updatePetitionRestrictionMutationVariables
 >;
-export const PetitionSettings_cancelPetitionSignatureRequestDocument = gql`
-  mutation PetitionSettings_cancelPetitionSignatureRequest($petitionSignatureRequestId: GID!) {
-    cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
-      id
-      status
-    }
-  }
-` as unknown as DocumentNode<
-  PetitionSettings_cancelPetitionSignatureRequestMutation,
-  PetitionSettings_cancelPetitionSignatureRequestMutationVariables
->;
 export const PetitionSettings_createPublicPetitionLinkDocument = gql`
   mutation PetitionSettings_createPublicPetitionLink(
     $templateId: GID!
@@ -76850,6 +76841,10 @@ export const PetitionSignaturesCard_cancelSignatureRequestDocument = gql`
       id
       status
       cancelReason
+      petition {
+        id
+        hasStartedProcess
+      }
     }
   }
 ` as unknown as DocumentNode<
@@ -80108,6 +80103,21 @@ export const PetitionReplies_cancelPetitionApprovalRequestFlowDocument = gql`
 ` as unknown as DocumentNode<
   PetitionReplies_cancelPetitionApprovalRequestFlowMutation,
   PetitionReplies_cancelPetitionApprovalRequestFlowMutationVariables
+>;
+export const PetitionReplies_cancelSignatureRequestDocument = gql`
+  mutation PetitionReplies_cancelSignatureRequest($petitionSignatureRequestId: GID!) {
+    cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
+      id
+      status
+      petition {
+        id
+        hasStartedProcess
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionReplies_cancelSignatureRequestMutation,
+  PetitionReplies_cancelSignatureRequestMutationVariables
 >;
 export const PetitionReplies_userDocument = gql`
   query PetitionReplies_user {

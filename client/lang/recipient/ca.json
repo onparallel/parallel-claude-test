@@ -815,11 +815,6 @@
     "context": "Search..."
   },
   {
-    "term": "component.signature-sent-alert.petition-completed-alert-2",
-    "definition": "{tone, select, INFORMAL{Si realitzes qualsevol canvi} other{Si realitza qualsevol canvi}}, no {tone, select, INFORMAL{oblidis} other{oblidi}} fer clic de nou en el botó de <b>Finalitzar</b>.",
-    "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
-  },
-  {
     "term": "component.signature-sent-alert.petition-requires-signature-alert-1",
     "definition": "<b>Signatura digital pendent,</b> {tone, select, INFORMAL{enviarem el document a signar quan es revisi la informació.} other{li enviarem el document a signar una vegada hagi estat revisada la informació.}}",
     "context": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."

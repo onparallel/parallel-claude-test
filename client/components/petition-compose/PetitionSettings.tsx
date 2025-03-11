@@ -39,7 +39,6 @@ import {
 import {
   PetitionSettings_PetitionBaseFragment,
   PetitionSettings_UserFragment,
-  PetitionSettings_cancelPetitionSignatureRequestDocument,
   PetitionSettings_createPublicPetitionLinkDocument,
   PetitionSettings_enableAutomaticNumberingOnPetitionFieldsDocument,
   PetitionSettings_updatePetitionRestrictionDocument,
@@ -139,10 +138,6 @@ function _PetitionSettings({
 
   const showSignatureConfigDialog = useSignatureConfigDialog();
 
-  const [cancelSignatureRequest] = useMutation(
-    PetitionSettings_cancelPetitionSignatureRequestDocument,
-  );
-
   const [updatePetitionRestriction] = useMutation(
     PetitionSettings_updatePetitionRestrictionDocument,
   );
@@ -160,20 +155,11 @@ function _PetitionSettings({
     } catch {}
   }
 
-  const showConfirmDisableOngoingSignature = useDialog(ConfirmDisableOngoingSignature);
   async function handleSignatureChange(value: boolean) {
     if (value) {
       await handleConfigureSignatureClick();
     } else {
       try {
-        if (ongoingSignatureRequest) {
-          await showConfirmDisableOngoingSignature();
-          await cancelSignatureRequest({
-            variables: {
-              petitionSignatureRequestId: ongoingSignatureRequest.id,
-            },
-          });
-        }
         await onUpdatePetition({ signatureConfig: null });
       } catch {}
     }
@@ -1216,14 +1202,6 @@ const mutations = [
     }
   `,
   gql`
-    mutation PetitionSettings_cancelPetitionSignatureRequest($petitionSignatureRequestId: GID!) {
-      cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
-        id
-        status
-      }
-    }
-  `,
-  gql`
     mutation PetitionSettings_createPublicPetitionLink(
       $templateId: GID!
       $title: String!
@@ -1376,34 +1354,6 @@ function DeadlineInput({
         </InputRightElement>
       )}
     </InputGroup>
-  );
-}
-
-function ConfirmDisableOngoingSignature(props: DialogProps<{}, void>) {
-  return (
-    <ConfirmDialog
-      header={
-        <FormattedMessage
-          id="component.confirm-disable-ongoing-signature.header"
-          defaultMessage="Ongoing eSignature"
-        />
-      }
-      body={
-        <FormattedMessage
-          id="component.confirm-disable-ongoing-signature.body"
-          defaultMessage="There is an ongoing eSignature process. If you disable eSignature this process will be cancelled."
-        />
-      }
-      confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="component.confirm-disable-ongoing-signature.confirm"
-            defaultMessage="Disable eSignature"
-          />
-        </Button>
-      }
-      {...props}
-    />
   );
 }
 

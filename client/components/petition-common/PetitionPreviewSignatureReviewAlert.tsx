@@ -20,12 +20,6 @@ export function PetitionPreviewSignatureReviewAlert(props: AlertProps) {
               }}
             />
           </Text>
-          <Text>
-            <FormattedMessage
-              id="component.petition-preview-signature-review-alert.signature-review"
-              defaultMessage="If you make any changes, don't forget to click the <b>Finish</b> button again."
-            />
-          </Text>
         </Stack>
       </AlertDescription>
     </Alert>

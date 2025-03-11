@@ -815,11 +815,6 @@
     "context": "Search..."
   },
   {
-    "term": "component.signature-sent-alert.petition-completed-alert-2",
-    "definition": "",
-    "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
-  },
-  {
     "term": "component.signature-sent-alert.petition-requires-signature-alert-1",
     "definition": "",
     "context": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."

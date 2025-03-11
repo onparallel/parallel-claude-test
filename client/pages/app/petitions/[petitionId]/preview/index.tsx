@@ -539,16 +539,23 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     (isPetition && petition.currentApprovalRequestSteps?.some((s) => s.status === "REJECTED")) ??
     false;
 
+  const currentApprovalsStarted =
+    isPetition &&
+    isNonNullish(petition.currentApprovalRequestSteps) &&
+    petition.currentApprovalRequestSteps.some(
+      (s) => s.status === "APPROVED" || s.status === "SKIPPED" || s.status === "PENDING",
+    );
+
   const showSignatureAlert =
     isPetition &&
     petition.status === "COMPLETED" &&
     petition.signatureConfig?.review &&
     !approvalIsDefinitiveRejected &&
-    !petition.signatureConfig?.reviewAfterApproval;
+    (!petition.signatureConfig?.reviewAfterApproval || !currentApprovalsStarted);
 
   const showApprovalsAlert =
     isPetition &&
-    petition.hasStartedProcess &&
+    currentApprovalsStarted &&
     !approvalIsDefinitiveRejected &&
     (!showSignatureAlert || (showSignatureAlert && petition.signatureConfig?.reviewAfterApproval));
 

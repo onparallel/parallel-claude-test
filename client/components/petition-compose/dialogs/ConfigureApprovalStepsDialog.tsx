@@ -31,12 +31,13 @@ import {
   ConfigureApprovalStepsDialog_petitionDocument,
 } from "@parallel/graphql/__types";
 import { Fragments } from "@parallel/utils/apollo/fragments";
+import { PetitionFieldLogicCondition } from "@parallel/utils/fieldLogic/types";
 import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, omit } from "remeda";
+import { isNonNullish, isNullish, omit } from "remeda";
 import { PetitionApprovalStepsVisibilityEditor } from "../logic/PetitionApprovalStepsVisibilityEditor";
 import { PetitionFieldVisibilityEditor } from "../logic/PetitionFieldVisibilityEditor";
 
@@ -271,6 +272,9 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
     },
     [searchUsers, searchUserGroups],
   );
+  const validCondition = (c: PetitionFieldLogicCondition) => {
+    return ("fieldId" in c && !c.fieldId) || isNullish(c.value) ? false : true;
+  };
 
   return (
     <Stack
@@ -332,15 +336,21 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
         </FormControl>
       </Grid>
       {hasVisbility && isNonNullish(petition) ? (
-        <FormControl isInvalid={errors.approvals?.[index]?.type ? true : false}>
+        <FormControl>
           <Controller
             name={`approvals.${index}.visibility`}
             control={control}
+            rules={{
+              validate: (value) => {
+                return isNonNullish(value) && value.conditions.every(validCondition);
+              },
+            }}
             render={({ field: { onChange, value } }) => {
               return (
                 <PetitionApprovalStepsVisibilityEditor
                   petition={petition}
                   value={value as any}
+                  showErrors={errors.approvals?.[index]?.visibility ? true : false}
                   onChange={(v) => {
                     onChange(v);
                   }}

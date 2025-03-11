@@ -117,14 +117,7 @@ export function RecipientViewSignatureSentAlert({
                   />
                 )}
               </Text>
-            )}{" "}
-            <Text as="span">
-              <FormattedMessage
-                id="component.signature-sent-alert.petition-completed-alert-2"
-                defaultMessage="If you make any changes, don't forget to hit the <b>Finalize</b> button again."
-                values={{ tone }}
-              />
-            </Text>
+            )}
           </AlertDescription>
         </Flex>
         {petition.latestSignatureRequest && !isPendingStart && (

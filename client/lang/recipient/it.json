@@ -815,11 +815,6 @@
     "context": "Search..."
   },
   {
-    "term": "component.signature-sent-alert.petition-completed-alert-2",
-    "definition": "{tone, select, INFORMAL{Se fai delle modifiche} other{Se fa delle modifiche}}, non {tone, select, INFORMAL{dimenticare} other{dimentichi}} di cliccare di nuovo sul pulsante <b>Finalizza</b>.",
-    "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
-  },
-  {
     "term": "component.signature-sent-alert.petition-requires-signature-alert-1",
     "definition": "<b>Firma digitale in attesa,</b> {tone, select, INFORMAL{invieremo il documento da firmare dopo la revisione delle informazioni.} other{le invieremo il documento da firmare una volta che le informazioni siano state revisionate.}}",
     "context": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."

@@ -79,6 +79,10 @@ const _mutations = [
         id
         status
         cancelReason
+        petition {
+          id
+          hasStartedProcess
+        }
       }
     }
   `,

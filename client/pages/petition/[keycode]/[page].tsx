@@ -67,7 +67,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, omit } from "remeda";
+import { isNonNullish, isNullish, omit } from "remeda";
 import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getInitialProps>>;
@@ -280,7 +280,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const isClosed = ["COMPLETED", "CLOSED"].includes(petition.status);
   const hasSignature = petition.signatureConfig?.review === false;
 
-  const showApprovalsAlert = petition.hasStartedProcess;
+  const showApprovalsAlert = petition.hasStartedProcess && isNullish(petition.signatureStatus);
 
   const showPetitionStatusAlert =
     !showApprovalsAlert && ["COMPLETED", "CLOSED"].includes(petition.status);
