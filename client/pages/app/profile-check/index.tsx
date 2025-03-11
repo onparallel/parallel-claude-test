@@ -187,7 +187,9 @@ function ProfileSearch({ fieldId, petitionId, profileTypeIds, parentReplyId }: P
             <Button
               colorScheme="primary"
               leftIcon={<SaveIcon />}
-              isDisabled={!currentSearch}
+              isDisabled={
+                !currentSearch || petitionFieldData.petitionField.petition.type === "TEMPLATE"
+              }
               onClick={handleSaveProfileSearchData}
             >
               {savedProfileIds.length ? (
@@ -251,8 +253,10 @@ function ProfileSearchTabs({
     setTabIndex(index);
   };
 
-  const profileTypeId = options?.searchIn[tabIndex]?.profileTypeId;
-  const profileTypeFieldIds = options?.searchIn[tabIndex]?.profileTypeFieldIds ?? [];
+  const profileTypeId = profileTypesData.profileTypes.items[tabIndex].id;
+  const profileTypeFieldIds =
+    options?.searchIn?.find((s: any) => s.profileTypeId === profileTypeId).profileTypeFieldIds ??
+    [];
 
   const columns = useProfileSearchTableColumns({
     profileTypesData,
@@ -261,16 +265,10 @@ function ProfileSearchTabs({
   });
 
   const [tableRows, totalCount] = useMemo(() => {
-    let rows =
+    const rows =
       conflictCheckProfileSearchData?.conflictCheckProfileSearch.filter(
         (profile) => profile.profileType.id === profileTypeId,
       ) ?? [];
-    if (search) {
-      const _search = search.toLowerCase();
-      rows = rows.filter((t) =>
-        t.properties.some((p) => p.value?.content?.value?.toLowerCase().includes(_search)),
-      );
-    }
 
     return [rows.slice((page - 1) * items, page * items), rows.length];
   }, [profileTypeId, conflictCheckProfileSearchData, page, search, items]);
@@ -613,6 +611,9 @@ const _queries = [
       petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
         id
         options
+        petition {
+          type
+        }
       }
     }
   `,

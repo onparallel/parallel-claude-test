@@ -56165,7 +56165,14 @@ export type ProfileSearch_petitionFieldQueryVariables = Exact<{
 }>;
 
 export type ProfileSearch_petitionFieldQuery = {
-  petitionField: { __typename?: "PetitionField"; id: string; options: { [key: string]: any } };
+  petitionField: {
+    __typename?: "PetitionField";
+    id: string;
+    options: { [key: string]: any };
+    petition:
+      | { __typename?: "Petition"; type: PetitionBaseType }
+      | { __typename?: "PetitionTemplate"; type: PetitionBaseType };
+  };
 };
 
 export type ProfileSearch_profileTypesQueryVariables = Exact<{
@@ -80504,6 +80511,9 @@ export const ProfileSearch_petitionFieldDocument = gql`
     petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
       id
       options
+      petition {
+        type
+      }
     }
   }
 ` as unknown as DocumentNode<

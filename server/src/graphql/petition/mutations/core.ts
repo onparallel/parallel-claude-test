@@ -1184,15 +1184,7 @@ export const createPetitionField = mutationField("createPetitionField", {
         props.options.integrationId =
           integrations.find((i) => i.is_default)?.id ?? integrations[0]?.id ?? null;
       } else if (type === "PROFILE_SEARCH") {
-        const standardProfileTypes = (
-          await ctx.profiles.loadProfileTypesByOrgId(ctx.user!.org_id)
-        ).filter((pt) => isNonNullish(pt.standard_type));
-        props.options.searchIn = standardProfileTypes.map((pt) => ({
-          profileTypeId: pt.id,
-          profileTypeFieldIds: (pt.profile_name_pattern as (number | string)[]).filter(
-            (v) => typeof v === "number",
-          ),
-        }));
+        props.options = await ctx.petitions.buildDefaultProfileSearchOptions(ctx.user!.org_id);
       }
 
       return props;

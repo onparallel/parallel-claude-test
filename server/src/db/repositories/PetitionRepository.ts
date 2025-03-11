@@ -5077,19 +5077,7 @@ export class PetitionRepository extends BaseRepository {
         props.options.integrationId =
           integrations.find((i) => i.is_default)?.id ?? integrations[0]?.id ?? null;
       } else if (type === "PROFILE_SEARCH") {
-        const standardProfileTypes = await this.from("profile_type", t)
-          .where("org_id", user.org_id)
-          .whereNotNull("standard_type")
-          .whereNull("deleted_at")
-          .whereNull("archived_at")
-          .orderBy("id", "asc");
-
-        props.options.searchIn = standardProfileTypes.map((pt) => ({
-          profileTypeId: pt.id,
-          profileTypeFieldIds: (pt.profile_name_pattern as (number | string)[]).filter(
-            (v) => typeof v === "number",
-          ),
-        }));
+        props.options = await this.buildDefaultProfileSearchOptions(user.org_id, t);
       }
 
       const [updated] = await this.updatePetitionField(
@@ -5105,6 +5093,49 @@ export class PetitionRepository extends BaseRepository {
 
       return updated;
     });
+  }
+
+  async buildDefaultProfileSearchOptions(orgId: number, t?: Knex.Transaction) {
+    const standardProfileTypes = await this.from("profile_type", t)
+      .where("org_id", orgId)
+      .whereNotNull("standard_type")
+      .whereNull("deleted_at")
+      .whereNull("archived_at")
+      .orderBy("id", "asc");
+
+    const searchIn = [];
+    const individual = standardProfileTypes.find((pt) => pt.standard_type === "INDIVIDUAL");
+    if (individual) {
+      searchIn.push({ profileTypeId: individual.id, profileTypeFieldIds: [] });
+    }
+
+    const legalEntity = standardProfileTypes.find((pt) => pt.standard_type === "LEGAL_ENTITY");
+    if (legalEntity) {
+      const profileTypeFields = await this.from("profile_type_field", t)
+        .where("profile_type_id", legalEntity.id)
+        .whereNull("deleted_at")
+        .whereIn("alias", ["p_trade_name", "p_entity_name"])
+        .select("id");
+      searchIn.push({
+        profileTypeId: legalEntity.id,
+        profileTypeFieldIds: profileTypeFields.map((f) => f.id),
+      });
+    }
+
+    const contract = standardProfileTypes.find((pt) => pt.standard_type === "CONTRACT");
+    if (contract) {
+      const profileTypeFields = await this.from("profile_type_field", t)
+        .where("profile_type_id", contract.id)
+        .whereNull("deleted_at")
+        .whereIn("alias", ["p_counterparty"])
+        .select("id");
+      searchIn.push({
+        profileTypeId: contract.id,
+        profileTypeFieldIds: profileTypeFields.map((f) => f.id),
+      });
+    }
+
+    return { searchIn };
   }
 
   readonly loadPetitionPermission = this.buildLoadBy("petition_permission", "id", (q) =>

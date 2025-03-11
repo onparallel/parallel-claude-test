@@ -43,6 +43,7 @@ import {
   petitionDoesNotHaveStartedProcess,
   petitionHasStatus,
   petitionIsNotAnonymized,
+  petitionsAreOfTypePetition,
   repliesBelongsToPetition,
   replyCanBeDeleted,
   replyCanBeUpdated,
@@ -598,6 +599,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
   type: list("PetitionFieldReply"),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreOfTypePetition("petitionId"),
     fieldsBelongsToPetition("petitionId", (args) => args.fields.map((field) => field.id)),
     fieldCanBeReplied((args) => args.fields, "overwriteExisting"),
     replyIsForFieldOfType(
