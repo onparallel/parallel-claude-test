@@ -18,7 +18,7 @@ import {
 import { Select } from "@parallel/chakra/components";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
-import { FieldOptions } from "@parallel/utils/petitionFields";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

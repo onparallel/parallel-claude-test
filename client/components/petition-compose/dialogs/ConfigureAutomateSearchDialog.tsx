@@ -9,7 +9,7 @@ import {
   PetitionComposeFieldSettings_PetitionFieldFragment,
   UpdatePetitionFieldAutoSearchConfigInput,
 } from "@parallel/graphql/__types";
-import { FieldOptions } from "@parallel/utils/petitionFields";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";

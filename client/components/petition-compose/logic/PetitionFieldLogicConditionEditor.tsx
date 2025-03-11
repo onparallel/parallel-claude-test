@@ -25,10 +25,11 @@ import {
   PetitionFieldLogicConditionMultipleValueModifier,
   PseudoPetitionFieldVisibilityConditionOperator,
 } from "@parallel/utils/fieldLogic/types";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { isCompatibleListType } from "@parallel/utils/isCompatibleListType";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { never } from "@parallel/utils/never";
-import { FieldOptions, getDynamicSelectValues } from "@parallel/utils/petitionFields";
+import { getDynamicSelectValues } from "@parallel/utils/petitionFields";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
 import { unMaybeArray } from "@parallel/utils/types";
 import { Fragment, useEffect, useMemo, useState } from "react";
@@ -144,6 +145,23 @@ function ConditionMultipleValueModifier({
                   defaultMessage: "no. of replies",
                 }),
             value: "NUMBER_OF_REPLIES",
+          },
+        ];
+      } else if (conditionField.type === "PROFILE_SEARCH") {
+        return [
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.any",
+              defaultMessage: "any",
+            }),
+            value: "ANY",
+          },
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.none",
+              defaultMessage: "none",
+            }),
+            value: "NONE",
           },
         ];
       } else {
@@ -461,6 +479,14 @@ function ConditionPredicate({
               },
             );
           }
+        } else if (referencedField.type === "PROFILE_SEARCH") {
+          options.push({
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.has-profile-match",
+              defaultMessage: "has a match",
+            }),
+            value: "HAS_PROFILE_MATCH",
+          });
         } else if (
           isNonNullish(referencedField) &&
           !isFileTypeField(referencedField.type) &&
@@ -666,7 +692,9 @@ function ConditionPredicate({
     }
   };
 
-  return isFieldCondition && !isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES" ? (
+  return isFieldCondition &&
+    ((!isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES") ||
+      referencedField?.type === "PROFILE_SEARCH") ? (
     isReadOnly ? (
       <Box as="span">{options.find((o) => o.value === operator)?.label}</Box>
     ) : (

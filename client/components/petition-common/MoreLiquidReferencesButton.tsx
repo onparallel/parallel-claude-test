@@ -16,8 +16,8 @@ import {
   MoreLiquidReferencesButton_PetitionFieldFragment,
   PetitionField,
 } from "@parallel/graphql/__types";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
-import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

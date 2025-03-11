@@ -59,7 +59,7 @@ export function CopyOrDownloadReplyButton({
         <CopyToClipboardButton
           size="xs"
           fontSize="md"
-          text={content}
+          text={reply.field!.type === "PROFILE_SEARCH" ? content.search : content}
           isDisabled={reply.isAnonymized}
         />
       )}

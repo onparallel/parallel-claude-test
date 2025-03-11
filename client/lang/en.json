@@ -3715,6 +3715,16 @@
     "context": "Pre-fill public links with JWT query"
   },
   {
+    "term": "component.feature-flag-descriptions.profile-search-field-description",
+    "definition": "Grants access to the profile search field",
+    "context": "Grants access to the profile search field"
+  },
+  {
+    "term": "component.feature-flag-descriptions.profile-search-field-name",
+    "definition": "Profile search field",
+    "context": "Profile search field"
+  },
+  {
     "term": "component.feature-flag-descriptions.profiles-description",
     "definition": "Grants access to profiles",
     "context": "Grants access to profiles"
@@ -6520,6 +6530,11 @@
     "context": "is after the"
   },
   {
+    "term": "component.petition-field-visibility-editor.has-profile-match",
+    "definition": "has a match",
+    "context": "has a match"
+  },
+  {
     "term": "component.petition-field-visibility-editor.have-reply",
     "definition": "has replies",
     "context": "has replies"
@@ -7223,6 +7238,16 @@
     "term": "component.petition-replies-field-reply.manual-review-required",
     "definition": "We could not verify automatically that this is a valid document.",
     "context": "We could not verify automatically that this is a valid document."
+  },
+  {
+    "term": "component.petition-replies-field-reply.profile-search-no-relevant-results",
+    "definition": "No relevant results",
+    "context": "No relevant results"
+  },
+  {
+    "term": "component.petition-replies-field-reply.profile-search-no-results",
+    "definition": "No results",
+    "context": "No results"
   },
   {
     "term": "component.petition-replies-field.add-field-reply",
@@ -8105,6 +8130,31 @@
     "context": "Please wait while we perform the search..."
   },
   {
+    "term": "component.preview-petition-field-profile-search.approved-profile",
+    "definition": "This profile has been approved",
+    "context": "This profile has been approved"
+  },
+  {
+    "term": "component.preview-petition-field-profile-search.modify-search",
+    "definition": "Modify search",
+    "context": "Modify search"
+  },
+  {
+    "term": "component.preview-petition-field-profile-search.rejected-profile",
+    "definition": "This profile has been rejected",
+    "context": "This profile has been rejected"
+  },
+  {
+    "term": "component.preview-petition-field-profile-search.run-profile-search",
+    "definition": "Run profile search",
+    "context": "Run profile search"
+  },
+  {
+    "term": "component.preview-petition-field-profile-search.wait-perform-search",
+    "definition": "Running profile search...",
+    "context": "Running profile search..."
+  },
+  {
     "term": "component.print-pdf-task.confirm",
     "definition": "Download PDF",
     "context": "Download PDF"
@@ -8483,6 +8533,16 @@
     "term": "component.profile-relationships-table.remove-relationship",
     "definition": "Remove association",
     "context": "Remove association"
+  },
+  {
+    "term": "component.profile-search-table.mark-as-relevant",
+    "definition": "Mark as relevant",
+    "context": "Mark as relevant"
+  },
+  {
+    "term": "component.profile-search-table.relevant",
+    "definition": "Relevant",
+    "context": "Relevant"
   },
   {
     "term": "component.profile-select.add-profile",
@@ -9588,6 +9648,11 @@
     "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox-exact",
     "definition": "{count}/{total} submitted",
     "context": "{count}/{total} submitted"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.searches-uploaded",
+    "definition": "{count, plural, =1 {1 search uploaded} other {# searches uploaded}}",
+    "context": "{count, plural, =1 {1 search uploaded} other {# searches uploaded}}"
   },
   {
     "term": "component.recipient-view-petition-field-checkbox.select-placeholder",
@@ -13765,6 +13830,11 @@
     "context": "Phone number"
   },
   {
+    "term": "generic.petition-field-type-profile-search",
+    "definition": "Profile search",
+    "context": "Profile search"
+  },
+  {
     "term": "generic.petition-field-type-select",
     "definition": "Select",
     "context": "Select"
@@ -14503,6 +14573,11 @@
     "term": "generic.users",
     "definition": "Users",
     "context": "Users"
+  },
+  {
+    "term": "generic.view-profile",
+    "definition": "View profile",
+    "context": "View profile"
   },
   {
     "term": "generic.weeks",
@@ -16113,6 +16188,41 @@
     "term": "page.preview.toast-title-signature-sent",
     "definition": "Signature sent",
     "context": "Signature sent"
+  },
+  {
+    "term": "page.profile-check.save-profile-search-success",
+    "definition": "Profile search saved",
+    "context": "Profile search saved"
+  },
+  {
+    "term": "page.profile-check.save-whitout-relevant",
+    "definition": "Save without relevant results",
+    "context": "Save without relevant results"
+  },
+  {
+    "term": "page.profile-check.save-with-relevant",
+    "definition": "Save whit {count} relevant results",
+    "context": "Save whit {count} relevant results"
+  },
+  {
+    "term": "page.profile-check.search",
+    "definition": "Search",
+    "context": "Search"
+  },
+  {
+    "term": "page.profile-check.search-in-profiles",
+    "definition": "Search in profiles...",
+    "context": "Search in profiles..."
+  },
+  {
+    "term": "page.profile-check.showing-results-for",
+    "definition": "Showing results for: <b>{search}</b>",
+    "context": "Showing results for: <b>{search}</b>"
+  },
+  {
+    "term": "page.profile-check.title",
+    "definition": "Profile check",
+    "context": "Profile check"
   },
   {
     "term": "page.profile-details.general",
@@ -18203,6 +18313,11 @@
     "term": "util.get-petition-field-type-description.phone",
     "definition": "Create a field for phone number entries.",
     "context": "Create a field for phone number entries."
+  },
+  {
+    "term": "util.get-petition-field-type-description.profile-search-description",
+    "definition": "Search for matches in selected profile fields to detect potential conflicts or risks that require review.",
+    "context": "Search for matches in selected profile fields to detect potential conflicts or risks that require review."
   },
   {
     "term": "util.get-petition-field-type-description.select-description",

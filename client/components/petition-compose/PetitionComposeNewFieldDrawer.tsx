@@ -222,6 +222,7 @@ export const PetitionComposeNewFieldDrawer = Object.assign(
         fragment PetitionComposeNewFieldDrawer_User on User {
           hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
           hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
+          hasProfileSearchField: hasFeatureFlag(featureFlag: PROFILE_SEARCH_FIELD)
           hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
           hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
         }

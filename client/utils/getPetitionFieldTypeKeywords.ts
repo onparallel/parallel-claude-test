@@ -293,6 +293,18 @@ export function getPetitionFieldTypeKeywords(type: PetitionFieldType) {
       ];
     case "ID_VERIFICATION":
       return ["id", "dni"];
+    case "PROFILE_SEARCH":
+      return [
+        "search",
+        "buscar",
+        "búsqueda",
+        "buscar",
+        "perfil",
+        "profile",
+        "person",
+        "people",
+        "conflict",
+      ];
     default:
       throw new Error(`Missing keywords PetitionFieldType  "${type}"`);
   }

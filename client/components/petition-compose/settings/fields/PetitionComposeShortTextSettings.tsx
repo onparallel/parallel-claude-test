@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Stack, Text } from "@chakra-ui/react";
 import { ShortTextFormatSelect } from "@parallel/components/common/ShortTextFormatSelect";
-import { FieldOptions } from "@parallel/utils/petitionFields";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { useShortTextFormatsSelectOptions } from "@parallel/utils/useShortTextFormats";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";

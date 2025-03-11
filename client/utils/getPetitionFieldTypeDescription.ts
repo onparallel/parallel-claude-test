@@ -89,6 +89,12 @@ export function getPetitionFieldTypeDescription(intl: IntlShape, type: PetitionF
         id: "util.get-petition-field-type-description.id-verification-description",
         defaultMessage: "Take an ID photo and a selfie for identity verification.",
       });
+    case "PROFILE_SEARCH":
+      return intl.formatMessage({
+        id: "util.get-petition-field-type-description.profile-search-description",
+        defaultMessage:
+          "Search for matches in selected profile fields to detect potential conflicts or risks that require review.",
+      });
     default:
       throw new Error(`Missing description PetitionFieldType  "${type}"`);
   }

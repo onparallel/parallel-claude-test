@@ -1,7 +1,8 @@
 import { PetitionField } from "@parallel/graphql/__types";
 import { format } from "date-fns";
+import { FieldOptions } from "../fieldOptions";
 import { isFileTypeField } from "../isFileTypeField";
-import { FieldOptions, getFirstDynamicSelectValue } from "../petitionFields";
+import { getFirstDynamicSelectValue } from "../petitionFields";
 import { PetitionFieldLogicCondition } from "./types";
 
 /**
@@ -30,7 +31,9 @@ export function defaultFieldCondition<T extends Pick<PetitionField, "id" | "type
           ? "GREATER_THAN"
           : field.type === "DATE" || field.type === "DATE_TIME"
             ? "LESS_THAN"
-            : "EQUAL",
+            : field.type === "PROFILE_SEARCH"
+              ? "HAS_PROFILE_MATCH"
+              : "EQUAL",
     value:
       conditionValue === undefined ? defaultFieldConditionValue(field, column) : conditionValue,
     column,

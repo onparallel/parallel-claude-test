@@ -4104,6 +4104,7 @@ export interface NexusGenFieldTypes {
     accesses: NexusGenRootTypes["PublicPetitionAccessPagination"]; // PublicPetitionAccessPagination!
     backgroundCheckEntityDetails: NexusGenRootTypes["BackgroundCheckEntityDetails"]; // BackgroundCheckEntityDetails!
     backgroundCheckEntitySearch: NexusGenRootTypes["BackgroundCheckEntitySearch"]; // BackgroundCheckEntitySearch!
+    conflictCheckProfileSearch: NexusGenRootTypes["Profile"][]; // [Profile!]!
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
     contactsByEmail: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
@@ -7113,6 +7114,7 @@ export interface NexusGenFieldTypeNames {
     accesses: "PublicPetitionAccessPagination";
     backgroundCheckEntityDetails: "BackgroundCheckEntityDetails";
     backgroundCheckEntitySearch: "BackgroundCheckEntitySearch";
+    conflictCheckProfileSearch: "Profile";
     contact: "Contact";
     contacts: "ContactPagination";
     contactsByEmail: "Contact";
@@ -9533,6 +9535,12 @@ export interface NexusGenArgTypes {
       name: string; // String!
       token: string; // String!
       type?: NexusGenEnums["BackgroundCheckEntitySearchType"] | null; // BackgroundCheckEntitySearchType
+    };
+    conflictCheckProfileSearch: {
+      // args
+      fieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      search: string; // String!
     };
     contact: {
       // args

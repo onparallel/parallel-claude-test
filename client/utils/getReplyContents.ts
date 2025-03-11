@@ -6,9 +6,9 @@ import {
 import { IntlShape } from "react-intl";
 import { isNonNullish } from "remeda";
 import { FORMATS, prettifyTimezone } from "./dates";
+import { FieldOptions } from "./fieldOptions";
 import { formatNumberWithPrefix } from "./formatNumberWithPrefix";
 import { isFileTypeField } from "./isFileTypeField";
-import { FieldOptions } from "./petitionFields";
 import { assertType } from "./types";
 
 export function getReplyContents({
@@ -23,7 +23,7 @@ export function getReplyContents({
   const { type, options } = petitionField;
   if (reply.isAnonymized) {
     return [null];
-  } else if (isFileTypeField(type) || type === "BACKGROUND_CHECK") {
+  } else if (isFileTypeField(type) || type === "BACKGROUND_CHECK" || type === "PROFILE_SEARCH") {
     return [reply.content];
   } else if (type === "NUMBER") {
     return [formatNumberWithPrefix(intl, reply.content.value, options as FieldOptions["NUMBER"])];

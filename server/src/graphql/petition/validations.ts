@@ -85,9 +85,14 @@ export function validateCreatePetitionFieldReplyInput<
         await validateReplyContent(field, reply.content);
       } catch (e) {
         if (e instanceof ValidateReplyContentError) {
-          throw new InvalidReplyError(info, argName + `[${index}].content`, e.message, {
-            subcode: e.code,
-          });
+          throw new InvalidReplyError(
+            info,
+            argName + [`[${index}]`, "content", e.argName].filter((v) => !!v).join("."),
+            e.message,
+            {
+              subcode: e.code,
+            },
+          );
         } else {
           throw e;
         }
@@ -124,6 +129,21 @@ export function validateCreatePetitionFieldReplyInput<
           );
         }
       }
+
+      // for PROFILE_SEARCH, make sure user has access to profile ids provided
+      if (field.type === "PROFILE_SEARCH") {
+        const profileIds = (reply.content.profileIds as string[]).map(
+          (id) => fromGlobalId(id, "Profile").id,
+        );
+        const profiles = await ctx.profiles.loadProfile(unique(profileIds));
+        if (isNullish(ctx.user) || profiles.some((p) => !p || p.org_id !== ctx.user?.org_id)) {
+          throw new InvalidReplyError(
+            info,
+            argName + `[${index}].content.profileIds`,
+            `Profile ID is invalid`,
+          );
+        }
+      }
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
@@ -140,23 +160,35 @@ export function validateUpdatePetitionFieldReplyInput<
       ctx.petitions.loadFieldReply(replyIds),
     ]);
 
-    const byReplyId = groupBy(replyContents, (r) => r.id);
-    for (const [replyId, fieldReplies] of Object.entries(byReplyId)) {
+    const replyCountByFieldId: Record<number, number> = {};
+    for (const [index, { content, id: replyId }] of replyContents.entries()) {
+      const reply = replies.find((r) => r!.id === replyId);
+      const field = fields.find((f) => f!.id === reply!.petition_field_id)!;
+
+      replyCountByFieldId[field.id] = (replyCountByFieldId[field.id] || 0) + 1;
+      if (!field.multiple && replyCountByFieldId[field.id] > 1) {
+        throw new InvalidReplyError(
+          info,
+          argName + `[${index}].content`,
+          `Can't submit more than one reply on a single reply field`,
+        );
+      }
+
       try {
-        const reply = replies.find((r) => r!.id === parseInt(replyId));
-        const field = fields.find((f) => f!.id === reply!.petition_field_id)!;
-
-        if (!field.multiple && fieldReplies.length > 1) {
-          throw new Error(`Can't submit more than one reply on a single reply field`);
+        await validateReplyContent(field, content);
+      } catch (e) {
+        if (e instanceof ValidateReplyContentError) {
+          throw new InvalidReplyError(
+            info,
+            argName + [`[${index}]`, "content", e.argName].filter((v) => !!v).join("."),
+            e.message,
+            {
+              subcode: e.code,
+            },
+          );
+        } else {
+          throw e;
         }
-
-        for (const reply of fieldReplies) {
-          await validateReplyContent(field, reply.content);
-        }
-      } catch (error: any) {
-        throw new InvalidReplyError(info, argName, error.message, {
-          subcode: error.code,
-        });
       }
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

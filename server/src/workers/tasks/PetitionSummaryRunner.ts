@@ -191,7 +191,11 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
     // ############################
     const liquid = createLiquid();
     const fieldsInfoScope = zippedFields
-      .filter(([[field], { isVisible }]) => isVisible && field.type !== "BACKGROUND_CHECK") // don't include BACKGROUND_CHECK fields in summary scope
+      .filter(
+        ([[field], { isVisible }]) =>
+          // don't include this type fields in summary scope
+          isVisible && !["BACKGROUND_CHECK", "PROFILE_SEARCH"].includes(field.type),
+      )
       .map(([[field, index, childrenFieldIndexes], logic]) => ({
         title: field.title,
         description: field.description
@@ -212,7 +216,9 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
                 content: replyContent(field.type, reply.content),
                 children: zipX(reply.children!, childLogic, childrenFieldIndexes!)
                   .filter(
-                    ([{ field }, logic]) => logic.isVisible && field.type !== "BACKGROUND_CHECK",
+                    ([{ field }, logic]) =>
+                      logic.isVisible &&
+                      !["BACKGROUND_CHECK", "PROFILE_SEARCH"].includes(field.type),
                   )
                   .map(([{ field, replies }, logic, childIndex]) => ({
                     field: {

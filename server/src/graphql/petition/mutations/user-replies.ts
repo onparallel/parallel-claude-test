@@ -641,6 +641,16 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
 
       const fields = await ctx.petitions.loadField(unique(args.fields.map((field) => field.id)));
 
+      if (fields.some((f) => f?.type === "PROFILE_SEARCH")) {
+        const hasFeatureFlag = await ctx.featureFlags.orgHasFeatureFlag(
+          ctx.user!.org_id,
+          "PROFILE_SEARCH_FIELD",
+        );
+        if (!hasFeatureFlag) {
+          throw new ForbiddenError("Feature flag missing");
+        }
+      }
+
       const fileReplyIds = args.fields
         .filter((field) => isFileTypeField(fields.find((f) => f!.id === field.id)!.type))
         .map((field) => fromGlobalId(field.content.petitionFieldReplyId, "PetitionFieldReply").id);

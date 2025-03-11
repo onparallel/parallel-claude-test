@@ -4,7 +4,7 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
-import { FieldOptions } from "@parallel/utils/petitionFields";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { waitFor } from "@parallel/utils/promises/waitFor";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";

@@ -49,6 +49,7 @@ import { usePreviewConfirmImportFromProfileDialog } from "../dialogs/PreviewConf
 import { usePreviewImportFromProfileDialog } from "../dialogs/PreviewImportFromProfileDialog";
 import { usePreviewImportFromProfileFormatErrorDialog } from "../dialogs/PreviewImportFromProfileFormatErrorDialog";
 import { PreviewPetitionFieldKyc } from "./PreviewPetitionFieldKyc";
+import { PreviewPetitionFieldProfileSearch } from "./PreviewPetitionFieldProfileSearch";
 import { PreviewPetitionFieldBackgroundCheck } from "./background-check/PreviewPetitionFieldBackgroundCheck";
 
 export interface PreviewPetitionFieldGroupProps
@@ -548,6 +549,14 @@ function PreviewPetitionFieldGroupField(props: {
           isCacheOnly={isCacheOnly}
           hasIdVerificationFeature={hasIdVerificationFeature}
         />
+      ) : field.type === "PROFILE_SEARCH" ? (
+        <PreviewPetitionFieldProfileSearch
+          {...commonProps}
+          user={user}
+          petition={petition}
+          onRefreshField={onRefreshField}
+          isCacheOnly={isCacheOnly}
+        />
       ) : null}
     </Box>
   );
@@ -557,8 +566,10 @@ PreviewPetitionFieldGroup.fragments = {
   User: gql`
     fragment PreviewPetitionFieldGroup_User on User {
       ...PreviewPetitionFieldBackgroundCheck_User
+      ...PreviewPetitionFieldProfileSearch_User
     }
     ${PreviewPetitionFieldBackgroundCheck.fragments.User}
+    ${PreviewPetitionFieldProfileSearch.fragments.User}
   `,
   PetitionBase: gql`
     fragment PreviewPetitionFieldGroup_PetitionBase on PetitionBase {

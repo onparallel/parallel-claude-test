@@ -739,6 +739,13 @@ export const PublicPetitionFieldReply = objectType({
         } else if (root.type === "BACKGROUND_CHECK") {
           // make sure to not expose this field in public context
           return {};
+        } else if (root.type === "PROFILE_SEARCH") {
+          return {
+            // evaluateFieldLogic on PROFILE_SEARCH fields looks for value.length
+            // se we need to expose an array with the same length, values are not important
+            // so, we just expose this for the field logic to be calculated correctly
+            value: root.content.value.map((v: unknown) => "x"),
+          };
         } else {
           return root.content ?? {};
         }

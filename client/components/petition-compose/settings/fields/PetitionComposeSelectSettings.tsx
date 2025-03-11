@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Stack, Text } from "@chakra-ui/react";
 import { StandardListSelect } from "@parallel/components/common/StandardListSelect";
 import { UpdatePetitionFieldInput } from "@parallel/graphql/__types";
-import { FieldOptions } from "@parallel/utils/petitionFields";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { FormattedMessage } from "react-intl";
 import { useConfirmOverwriteOptionsDialog } from "../../dialogs/ConfirmOverwriteOptionsDialog";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";

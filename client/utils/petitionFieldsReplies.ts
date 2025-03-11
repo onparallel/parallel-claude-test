@@ -6,8 +6,8 @@ import {
   mapReplyContents_PetitionFieldDataFragment,
 } from "@parallel/graphql/__types";
 import { difference, groupBy, isNonNullish, isNullish } from "remeda";
+import { FieldOptions } from "./fieldOptions";
 import { isFileTypeField } from "./isFileTypeField";
-import { FieldOptions } from "./petitionFields";
 
 interface CreatePetitionFieldReplyInputWithParent extends CreatePetitionFieldReplyInput {
   replyParentId?: string;

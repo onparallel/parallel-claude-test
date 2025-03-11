@@ -8,12 +8,12 @@ import {
   PetitionFieldType,
 } from "@parallel/graphql/__types";
 import { FORMATS, prettifyTimezone } from "@parallel/utils/dates";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
 import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { never } from "@parallel/utils/never";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
-import { FieldOptions } from "@parallel/utils/petitionFields";
 import { withError } from "@parallel/utils/promises/withError";
 import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
 import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";

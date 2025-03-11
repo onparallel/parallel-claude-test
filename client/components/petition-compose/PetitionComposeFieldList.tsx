@@ -19,7 +19,7 @@ import {
   PetitionFieldMath,
   PetitionFieldVisibility,
 } from "@parallel/utils/fieldLogic/types";
-import { FieldOptions } from "@parallel/utils/petitionFields";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { Maybe } from "@parallel/utils/types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";

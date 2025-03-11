@@ -348,6 +348,17 @@ export function useFeatureFlags() {
             }),
           },
           {
+            name: "PROFILE_SEARCH_FIELD",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.profile-search-field-name",
+              defaultMessage: "Profile search field",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.profile-search-field-description",
+              defaultMessage: "Grants access to the profile search field",
+            }),
+          },
+          {
             name: "CREATE_PROFILE_TYPE",
             title: intl.formatMessage({
               id: "component.feature-flag-descriptions.create-profile-type-name",

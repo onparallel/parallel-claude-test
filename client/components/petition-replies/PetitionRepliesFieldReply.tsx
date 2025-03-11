@@ -1,11 +1,23 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Grid, GridItem, HStack, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
+import {
+  Badge,
+  Box,
+  Flex,
+  Grid,
+  GridItem,
+  HStack,
+  Stack,
+  Text,
+  VisuallyHidden,
+} from "@chakra-ui/react";
 import {
   BusinessIcon,
   CheckIcon,
   CloseIcon,
   EditSimpleIcon,
+  EyeIcon,
   LockClosedIcon,
+  ShortSearchIcon,
   UserIcon,
 } from "@parallel/chakra/icons";
 import {
@@ -15,12 +27,12 @@ import {
   PetitionRepliesFieldReply_PetitionFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS, prettifyTimezone } from "@parallel/utils/dates";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { getReplyContents } from "@parallel/utils/getReplyContents";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
-import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { Fragment, useRef } from "react";
@@ -32,6 +44,7 @@ import { FileSize } from "../common/FileSize";
 import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
+import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
 import { UserOrContactReference } from "../common/UserOrContactReference";
 import { BackgroundCheckRiskLabel } from "../petition-common/BackgroundCheckRiskLabel";
 import { DowJonesRiskLabel } from "../petition-common/DowJonesRiskLabel";
@@ -304,6 +317,123 @@ export function PetitionRepliesFieldReply({
                       </Box>
                     </Flex>
                   </Stack>
+                ) : type === "PROFILE_SEARCH" ? (
+                  <Stack spacing={content?.value.length === 0 ? 0.5 : 3}>
+                    <Flex flexWrap="wrap" gap={2} alignItems="baseline" minHeight={6}>
+                      <VisuallyHidden>
+                        {intl.formatMessage({
+                          id: "generic.search",
+                          defaultMessage: "Search",
+                        })}
+                      </VisuallyHidden>
+                      <ShortSearchIcon />
+                      <Text as="span">{content?.search}</Text>
+                      <Text as="span" color="gray.500" fontSize="sm">
+                        {`(${intl.formatMessage(
+                          {
+                            id: "generic.n-results",
+                            defaultMessage:
+                              "{count, plural,=0{No results} =1 {1 result} other {# results}}",
+                          },
+                          {
+                            count: content?.totalResults ?? 0,
+                          },
+                        )})`}
+                      </Text>
+                    </Flex>
+                    {content?.value.length === 0 ? (
+                      <Box>
+                        <Badge colorScheme="green" variant="outline">
+                          {content?.totalResults > 0 ? (
+                            <FormattedMessage
+                              id="component.petition-replies-field-reply.profile-search-no-relevant-results"
+                              defaultMessage="No relevant results"
+                            />
+                          ) : (
+                            <FormattedMessage
+                              id="component.petition-replies-field-reply.profile-search-no-results"
+                              defaultMessage="No results"
+                            />
+                          )}
+                        </Badge>
+                      </Box>
+                    ) : (
+                      content?.value.map((profile: any, index: number) =>
+                        isNonNullish(profile) ? (
+                          <Stack key={profile.id} paddingStart={1}>
+                            <HStack>
+                              <IconButtonWithTooltip
+                                as="a"
+                                href={`/app/profiles/${profile.id}/general`}
+                                icon={<EyeIcon />}
+                                size="xs"
+                                label={intl.formatMessage({
+                                  id: "generic.view-profile",
+                                  defaultMessage: "View profile",
+                                })}
+                              />
+                              <Text as="span">
+                                <LocalizableUserTextRender
+                                  value={profile.name}
+                                  default={
+                                    <Text textStyle="hint" as="span">
+                                      <FormattedMessage
+                                        id="generic.unnamed-profile"
+                                        defaultMessage="Unnamed profile"
+                                      />
+                                    </Text>
+                                  }
+                                />
+                              </Text>
+                            </HStack>
+
+                            <Stack spacing={0.5} paddingStart={3}>
+                              {profile.fields.map((field: any) => (
+                                <Text key={field.id} as="span" fontWeight={500}>
+                                  <LocalizableUserTextRender
+                                    value={field.name}
+                                    default={
+                                      <Text textStyle="hint" as="span">
+                                        <FormattedMessage
+                                          id="generic.unnamed-profile-type-field"
+                                          defaultMessage="Unnamed property"
+                                        />
+                                      </Text>
+                                    }
+                                  />
+                                  :
+                                  {isNonNullish(field.value) && field.value.length ? (
+                                    <Text as="span" fontWeight={400} marginStart={1}>
+                                      {field.value}
+                                    </Text>
+                                  ) : (
+                                    <Text
+                                      as="span"
+                                      fontWeight={400}
+                                      textStyle="hint"
+                                      marginStart={1}
+                                    >
+                                      <FormattedMessage
+                                        id="component.profile-property-content.no-value"
+                                        defaultMessage="No value"
+                                      />
+                                    </Text>
+                                  )}
+                                </Text>
+                              ))}
+                            </Stack>
+                          </Stack>
+                        ) : (
+                          <Text textStyle="hint" as="span" key={index}>
+                            <FormattedMessage
+                              id="generic.deleted-profile"
+                              defaultMessage="Deleted profile"
+                            />
+                          </Text>
+                        ),
+                      )
+                    )}
+                  </Stack>
                 ) : isFileTypeField(type) ? (
                   <Stack flex="1">
                     <Flex flexWrap="wrap" gap={1.5} alignItems="center" minHeight={6}>
@@ -366,7 +496,7 @@ export function PetitionRepliesFieldReply({
                       </Text>
                     ) : (
                       <BreakLines>{content}</BreakLines>
-                    )}{" "}
+                    )}
                     {reply.field?.type === "DATE_TIME" &&
                     currentTimezone !== reply.content.timezone ? (
                       <HelpPopover>

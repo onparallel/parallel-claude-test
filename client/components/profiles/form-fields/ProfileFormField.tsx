@@ -16,10 +16,10 @@ import {
 import { FORMATS, prettifyTimezone } from "@parallel/utils/dates";
 import { discriminator } from "@parallel/utils/discriminator";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useSupportedUserLocales } from "@parallel/utils/locales";
-import { FieldOptions } from "@parallel/utils/petitionFields";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { unMaybeArray } from "@parallel/utils/types";
 import usePrevious from "@react-hook/previous";

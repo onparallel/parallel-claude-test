@@ -1,6 +1,6 @@
 import { extension } from "mime-types";
 import { arg, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
-import { findLast, isNonNullish, isNullish, minBy, pick } from "remeda";
+import { findLast, isNonNullish, isNullish, minBy, pick, unique, zip } from "remeda";
 import { assert } from "ts-essentials";
 import {
   ContactLocaleValues,
@@ -10,7 +10,7 @@ import {
   StandardListDefinitionListTypeValues,
 } from "../../../db/__types";
 import { ReplyStatusChangedEvent } from "../../../db/events/PetitionEvent";
-import { mapFieldOptions } from "../../../db/helpers/fieldOptions";
+import { mapFieldOptions, PetitionFieldOptions } from "../../../db/helpers/fieldOptions";
 import { defaultBrandTheme } from "../../../util/BrandTheme";
 import {
   mapFieldLogic,
@@ -765,6 +765,10 @@ export const PetitionFieldType = enumType({
     { name: "FIELD_GROUP", description: "A group of fields" },
     { name: "BACKGROUND_CHECK", description: "Run a background check of entities" },
     { name: "ID_VERIFICATION", description: "A field for verification of identity documents" },
+    {
+      name: "PROFILE_SEARCH",
+      description: "A field for performing searches in the profiles database",
+    },
   ],
 });
 
@@ -1312,6 +1316,56 @@ export const PetitionFieldReply = objectType({
                   properties: pick(root.content.entity.properties, ["topics"]),
                 }
               : null,
+          };
+        } else if (root.type === "PROFILE_SEARCH") {
+          const field = await ctx.petitions.loadFieldForReply(root.id);
+          assert(field?.type === "PROFILE_SEARCH", "Field not found for reply");
+          const { searchIn } = field.options as PetitionFieldOptions["PROFILE_SEARCH"];
+
+          const profileTypeIds = unique(searchIn.map((s) => s.profileTypeId));
+          const profileTypeFieldIds = unique(searchIn.flatMap((s) => s.profileTypeFieldIds));
+          const profileIds = unique(root.content.value as number[]);
+
+          const profileTypes = (await ctx.profiles.loadProfileType(profileTypeIds)).filter(
+            isNonNullish,
+          );
+          const profiles = await ctx.profiles.loadProfile(profileIds);
+
+          const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
+          const profileValues = await ctx.profiles.loadProfileFieldValuesByProfileId(profileIds);
+
+          return {
+            search: root.content.search,
+            totalResults: root.content.totalResults,
+            profileTypes: profileTypes.map((pt) => ({
+              id: toGlobalId("ProfileType", pt.id),
+              name: pt.name,
+            })),
+            value: zip(profiles, profileValues).map(([p, values]) => {
+              if (!p) {
+                return null;
+              }
+              const fieldIds =
+                searchIn.find((s) => s.profileTypeId === p.profile_type_id)?.profileTypeFieldIds ??
+                [];
+
+              const profileType = profileTypes.find((pt) => pt.id === p.profile_type_id)!;
+
+              return {
+                id: toGlobalId("Profile", p.id),
+                name: p.localizable_name,
+                profileType: {
+                  id: toGlobalId("ProfileType", profileType.id),
+                  standardType: profileType.standard_type,
+                },
+                fields: fieldIds.map((ptfId) => ({
+                  id: toGlobalId("ProfileTypeField", ptfId),
+                  name: profileTypeFields.find((ptf) => ptf?.id === ptfId)!.name,
+                  value:
+                    values.find((v) => v.profile_type_field_id === ptfId)?.content?.value ?? null,
+                })),
+              };
+            }),
           };
         } else {
           return root.content ?? {};

@@ -44,9 +44,10 @@ import {
   useStartAsyncFieldCompletion,
   useUpdatePetitionFieldReply,
 } from "./clientMutations";
+import { PreviewPetitionFieldBackgroundCheck } from "./fields/background-check/PreviewPetitionFieldBackgroundCheck";
 import { PreviewPetitionFieldGroup } from "./fields/PreviewPetitionFieldGroup";
 import { PreviewPetitionFieldKyc } from "./fields/PreviewPetitionFieldKyc";
-import { PreviewPetitionFieldBackgroundCheck } from "./fields/background-check/PreviewPetitionFieldBackgroundCheck";
+import { PreviewPetitionFieldProfileSearch } from "./fields/PreviewPetitionFieldProfileSearch";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
@@ -356,6 +357,15 @@ export function PreviewPetitionField({
           isCacheOnly={isCacheOnly}
           hasIdVerificationFeature={hasIdVerificationFeature}
         />
+      ) : field.type === "PROFILE_SEARCH" ? (
+        <PreviewPetitionFieldProfileSearch
+          {...props}
+          {...commonProps}
+          user={user}
+          petition={petition}
+          onRefreshField={handleRefreshAsyncField}
+          isCacheOnly={isCacheOnly}
+        />
       ) : null}
     </RecipientViewPetitionFieldCard>
   );
@@ -367,9 +377,11 @@ PreviewPetitionField.fragments = {
       id
       ...PreviewPetitionFieldBackgroundCheck_User
       ...PreviewPetitionFieldGroup_User
+      ...PreviewPetitionFieldProfileSearch_User
     }
     ${PreviewPetitionFieldBackgroundCheck.fragments.User}
     ${PreviewPetitionFieldGroup.fragments.User}
+    ${PreviewPetitionFieldProfileSearch.fragments.User}
   `,
   PetitionBase: gql`
     fragment PreviewPetitionField_PetitionBase on PetitionBase {

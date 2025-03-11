@@ -11,7 +11,7 @@ import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { FieldOptions } from "@parallel/utils/petitionFields";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
 import { ChangeEvent, forwardRef, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

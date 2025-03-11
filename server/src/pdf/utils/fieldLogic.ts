@@ -300,7 +300,7 @@ function fieldConditionIsMet(
         ? (reply.content.value?.[condition.column]?.[1] ?? null)
         : reply.content.value;
 
-    return evaluatePredicate(_value, operator, value, petition);
+    return evaluatePredicate(_value, operator, value, petition, field.type);
   }
 
   const { type, options } = field;
@@ -317,7 +317,7 @@ function fieldConditionIsMet(
         options,
         replies,
       });
-      return evaluatePredicate(completed.length, operator, value, petition);
+      return evaluatePredicate(completed.length, operator, value, petition, field.type);
     default:
       return false;
   }
@@ -333,18 +333,33 @@ function variableConditionIsMet(
 }
 
 function evaluatePredicate(
-  reply: string | number | string[],
+  reply: string | number | string[] | any[],
   operator: PetitionFieldLogicConditionOperator,
   value: string | string[] | number | null,
   petition: FieldLogicPetitionInput,
+  fieldType?: PetitionFieldType, // this is required to distinguish between empty CHECKBOX and empty PROFILE_SEARCH reply
 ) {
   try {
-    if (reply === undefined || value === undefined || value === null) {
+    if (reply === undefined) {
+      return false;
+    }
+
+    // PROFILE_SEARCH
+    if (fieldType === "PROFILE_SEARCH" && Array.isArray(reply)) {
+      switch (operator) {
+        case "HAS_PROFILE_MATCH":
+          return reply.length > 0;
+        default:
+          return false;
+      }
+    }
+
+    if (value === undefined || value === null) {
       return false;
     }
 
     // CHECKBOX
-    if (Array.isArray(reply)) {
+    if (fieldType === "CHECKBOX" && Array.isArray(reply)) {
       const standardList = petition.standardListDefinitions.find((l) => l.listName === value);
 
       switch (operator) {

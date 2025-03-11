@@ -92,7 +92,8 @@ export type FeatureFlagName =
   | "KEY_PROCESSES"
   | "DASHBOARDS"
   | "PETITION_APPROVAL_FLOW"
-  | "REMOVE_PREVIEW_FILES";
+  | "REMOVE_PREVIEW_FILES"
+  | "PROFILE_SEARCH_FIELD";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -131,6 +132,7 @@ export const FeatureFlagNameValues = [
   "DASHBOARDS",
   "PETITION_APPROVAL_FLOW",
   "REMOVE_PREVIEW_FILES",
+  "PROFILE_SEARCH_FIELD",
 ] as FeatureFlagName[];
 
 export type IntegrationType =
@@ -361,7 +363,8 @@ export type PetitionFieldType =
   | "DATE_TIME"
   | "FIELD_GROUP"
   | "BACKGROUND_CHECK"
-  | "ID_VERIFICATION";
+  | "ID_VERIFICATION"
+  | "PROFILE_SEARCH";
 
 export const PetitionFieldTypeValues = [
   "TEXT",
@@ -380,6 +383,7 @@ export const PetitionFieldTypeValues = [
   "FIELD_GROUP",
   "BACKGROUND_CHECK",
   "ID_VERIFICATION",
+  "PROFILE_SEARCH",
 ] as PetitionFieldType[];
 
 export type PetitionMessageStatus = "SCHEDULED" | "CANCELLED" | "PROCESSING" | "PROCESSED";

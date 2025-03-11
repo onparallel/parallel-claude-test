@@ -13,8 +13,8 @@ import {
   DynamicSelectSettings_uploadDynamicSelectFieldFileDocument,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
-import { FieldOptions } from "@parallel/utils/petitionFields";
 import { withError } from "@parallel/utils/promises/withError";
 import { untranslated } from "@parallel/utils/untranslated";
 import { useMemo, useState } from "react";

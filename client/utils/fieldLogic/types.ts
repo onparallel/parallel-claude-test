@@ -51,7 +51,8 @@ export type PetitionFieldLogicConditionOperator =
   | "NUMBER_OF_SUBREPLIES"
   | "ANY_IS_IN_LIST"
   | "ALL_IS_IN_LIST"
-  | "NONE_IS_IN_LIST";
+  | "NONE_IS_IN_LIST"
+  | "HAS_PROFILE_MATCH";
 
 export type PseudoPetitionFieldVisibilityConditionOperator =
   | PetitionFieldLogicConditionOperator

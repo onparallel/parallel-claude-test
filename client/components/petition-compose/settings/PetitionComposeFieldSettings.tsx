@@ -97,7 +97,9 @@ export const PetitionComposeFieldSettings = Object.assign(
 
       const parentIsInternal = isFieldGroupChild ? field.parent!.isInternal : false;
 
-      const canOnlyBeInternal = ["DOW_JONES_KYC", "BACKGROUND_CHECK"].includes(field.type);
+      const canOnlyBeInternal = ["DOW_JONES_KYC", "BACKGROUND_CHECK", "PROFILE_SEARCH"].includes(
+        field.type,
+      );
 
       const isInternalFieldDisabled =
         isReadOnly ||
@@ -115,6 +117,7 @@ export const PetitionComposeFieldSettings = Object.assign(
         "DOW_JONES_KYC",
         "BACKGROUND_CHECK",
         "ID_VERIFICATION",
+        "PROFILE_SEARCH",
       ].includes(field.type);
 
       const isReplyable = !["HEADING", "FIELD_GROUP"].includes(field.type);
@@ -164,7 +167,9 @@ export const PetitionComposeFieldSettings = Object.assign(
                       if (type !== field.type) {
                         const isTypeChangeNotAllowed =
                           isFieldGroupChild &&
-                          (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK") &&
+                          (type === "DOW_JONES_KYC" ||
+                            type === "BACKGROUND_CHECK" ||
+                            type === "PROFILE_SEARCH") &&
                           field.position === 0 &&
                           !field.parent!.isInternal;
 
@@ -273,6 +278,7 @@ export const PetitionComposeFieldSettings = Object.assign(
             {(isFieldGroupChild && !isFileTypeField(field.type)) ||
             field.type === "DOW_JONES_KYC" ||
             field.type === "BACKGROUND_CHECK" ||
+            field.type === "PROFILE_SEARCH" ||
             !petition.isDocumentGenerationEnabled ? null : (
               <SettingsRowGroup
                 label={

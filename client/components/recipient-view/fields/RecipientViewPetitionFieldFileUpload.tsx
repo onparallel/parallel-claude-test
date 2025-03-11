@@ -24,7 +24,7 @@ import { PetitionFieldType } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FORMATS } from "@parallel/utils/dates";
-import { FieldOptions, FileUploadAccepts } from "@parallel/utils/petitionFields";
+import { FieldOptions, FileUploadAccepts } from "@parallel/utils/fieldOptions";
 import { MaybePromise } from "@parallel/utils/types";
 import { useCheckIfFileIsPasswordProtected } from "@parallel/utils/useCheckIfFileIsPasswordProtected";
 import { useFileUploadFormats } from "@parallel/utils/useFileUploadFormats";

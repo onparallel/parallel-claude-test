@@ -1128,6 +1128,7 @@ export const createPetitionField = mutationField("createPetitionField", {
     petitionsAreNotPublicTemplates("petitionId"),
     ifArgEquals("type", "ES_TAX_DOCUMENTS", userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD")),
     ifArgEquals("type", "DOW_JONES_KYC", userHasFeatureFlag("DOW_JONES_KYC")),
+    ifArgEquals("type", "PROFILE_SEARCH", userHasFeatureFlag("PROFILE_SEARCH_FIELD")),
     petitionIsNotAnonymized("petitionId"),
     ifArgDefined(
       "parentFieldId",
@@ -1182,6 +1183,16 @@ export const createPetitionField = mutationField("createPetitionField", {
 
         props.options.integrationId =
           integrations.find((i) => i.is_default)?.id ?? integrations[0]?.id ?? null;
+      } else if (type === "PROFILE_SEARCH") {
+        const standardProfileTypes = (
+          await ctx.profiles.loadProfileTypesByOrgId(ctx.user!.org_id)
+        ).filter((pt) => isNonNullish(pt.standard_type));
+        props.options.searchIn = standardProfileTypes.map((pt) => ({
+          profileTypeId: pt.id,
+          profileTypeFieldIds: (pt.profile_name_pattern as (number | string)[]).filter(
+            (v) => typeof v === "number",
+          ),
+        }));
       }
 
       return props;
@@ -1326,7 +1337,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       not(
         chain(
           fieldHasType("fieldId", ["FIELD_GROUP"]),
-          firstChildHasType("fieldId", ["DOW_JONES_KYC", "BACKGROUND_CHECK"]),
+          firstChildHasType("fieldId", ["DOW_JONES_KYC", "BACKGROUND_CHECK", "PROFILE_SEARCH"]),
         ),
       ),
     ),
@@ -1341,7 +1352,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     ),
     ifArgDefined(
       (args) => args.data.isInternal ?? args.data.showInPdf,
-      not(fieldHasType("fieldId", ["DOW_JONES_KYC", "BACKGROUND_CHECK"])),
+      not(fieldHasType("fieldId", ["DOW_JONES_KYC", "BACKGROUND_CHECK", "PROFILE_SEARCH"])),
     ),
     ifArgDefined(
       (args) => args.data.alias,
@@ -1361,7 +1372,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     ),
     ifArgDefined(
       (args) => args.data.multiple,
-      not(fieldHasType("fieldId", ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"])),
+      not(fieldHasType("fieldId", ["ES_TAX_DOCUMENTS", "ID_VERIFICATION", "PROFILE_SEARCH"])),
     ),
     ifArgDefined(
       (args) =>
@@ -2454,6 +2465,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
     petitionsAreNotPublicTemplates("petitionId"),
     not(fieldHasType("fieldId", "FIELD_GROUP")),
     ifArgEquals("type", "ES_TAX_DOCUMENTS", userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD")),
+    ifArgEquals("type", "PROFILE_SEARCH", userHasFeatureFlag("PROFILE_SEARCH_FIELD")),
     ifArgEquals(
       "type",
       "DOW_JONES_KYC",

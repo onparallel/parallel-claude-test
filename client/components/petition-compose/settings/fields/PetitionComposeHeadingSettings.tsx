@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Text } from "@chakra-ui/react";
-import { FieldOptions } from "@parallel/utils/petitionFields";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";

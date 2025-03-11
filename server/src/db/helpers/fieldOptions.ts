@@ -405,6 +405,32 @@ const SCHEMAS = {
       },
     },
   },
+  PROFILE_SEARCH: {
+    type: "object",
+    additionalProperties: false,
+    required: ["searchIn"],
+    properties: {
+      searchIn: {
+        type: "array",
+        items: {
+          type: "object",
+          additionalProperties: false,
+          required: ["profileTypeId", "profileTypeFieldIds"],
+          properties: {
+            profileTypeId: {
+              type: "number",
+            },
+            profileTypeFieldIds: {
+              type: "array",
+              items: {
+                type: "number",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 } as const;
 
 export type PetitionFieldOptions = {
@@ -436,22 +462,13 @@ export function defaultFieldProperties(
   // Always inherit optional
   const optional = field?.optional ?? false;
 
-  const multiple =
-    type === "FILE_UPLOAD" // FILE_UPLOAD always true
-      ? true
-      : type === "CHECKBOX" // CHECKBOX always false
+  const multiple = ["FILE_UPLOAD", "DOW_JONES_KYC", "FIELD_GROUP", "PROFILE_SEARCH"].includes(type) // these are always true
+    ? true
+    : ["CHECKBOX", "HEADING", "BACKGROUND_CHECK"].includes(type) // these are always false
+      ? false
+      : field?.type === "FILE_UPLOAD" // Inherit if not coming from a FILE_UPLOAD
         ? false
-        : type === "HEADING" // HEADING always false
-          ? false
-          : type === "BACKGROUND_CHECK" // BACKGROUND_CHECK always false
-            ? false
-            : type === "DOW_JONES_KYC" // DOW_JONES_KYC always true
-              ? true
-              : type === "FIELD_GROUP" // FIELD_GROUP always true
-                ? true
-                : field?.type === "FILE_UPLOAD" // Inherit if not coming from a FILE_UPLOAD
-                  ? false
-                  : (field?.multiple ?? false);
+        : (field?.multiple ?? false);
 
   const alias = type === "HEADING" ? null : (field?.alias ?? null);
 
@@ -588,6 +605,12 @@ export function defaultFieldProperties(
           },
         };
       }
+      case "PROFILE_SEARCH": {
+        return {
+          // will be filled later
+          searchIn: [],
+        };
+      }
       default:
         throw new Error();
     }
@@ -596,14 +619,12 @@ export function defaultFieldProperties(
   return {
     optional,
     multiple,
-    is_internal:
-      type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK"
-        ? true
-        : (field?.is_internal ?? false),
-    show_in_pdf:
-      type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK"
-        ? false
-        : (field?.show_in_pdf ?? true),
+    is_internal: ["DOW_JONES", "BACKGROUND_CHECK", "PROFILE_SEARCH"].includes(type)
+      ? true
+      : (field?.is_internal ?? false),
+    show_in_pdf: ["DOW_JONES", "BACKGROUND_CHECK", "PROFILE_SEARCH"].includes(type)
+      ? false
+      : (field?.show_in_pdf ?? true),
     alias,
     has_comments_enabled: type === "HEADING" ? false : true,
     require_approval:
@@ -732,6 +753,13 @@ export async function mapFieldOptions(
   } else if (type === "ID_VERIFICATION") {
     // don't expose integrationId until we allow to configure it on frontend
     return pick(options, ["config", "attachToPdf"]);
+  } else if (type === "PROFILE_SEARCH") {
+    return {
+      searchIn: (options as PetitionFieldOptions["PROFILE_SEARCH"]).searchIn.map((s) => ({
+        profileTypeId: toGlobalId("ProfileType", s.profileTypeId),
+        profileTypeFieldIds: s.profileTypeFieldIds.map((id) => toGlobalId("ProfileTypeField", id)),
+      })),
+    };
   }
 
   return options;

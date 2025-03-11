@@ -7,7 +7,7 @@ import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 import { PetitionFieldIndex } from "./fieldIndices";
-import { FieldOptions } from "./petitionFields";
+import { FieldOptions } from "./fieldOptions";
 
 type PartialField = validatePetitionFields_PetitionFieldFragment;
 

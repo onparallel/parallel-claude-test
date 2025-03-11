@@ -4,7 +4,7 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { SimpleSelect, toSimpleSelectOption } from "@parallel/components/common/SimpleSelect";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
-import { DynamicSelectOption, FieldOptions } from "@parallel/utils/petitionFields";
+import { DynamicSelectOption, FieldOptions } from "@parallel/utils/fieldOptions";
 import { Maybe } from "@parallel/utils/types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
@@ -20,7 +20,6 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-
 export type DynamicSelectValue = [string, Maybe<string>][];
 
 export interface RecipientViewPetitionFieldDynamicSelectProps

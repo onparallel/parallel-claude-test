@@ -39,9 +39,14 @@ export const excludedFieldsTarget = [
   "DYNAMIC_SELECT",
   "DOW_JONES_KYC",
   "BACKGROUND_CHECK",
+  "PROFILE_SEARCH",
 ] as PetitionFieldType[];
 
-export const excludedFieldsOrigin = ["HEADING", "DYNAMIC_SELECT"] as PetitionFieldType[];
+export const excludedFieldsOrigin = [
+  "HEADING",
+  "DYNAMIC_SELECT",
+  "PROFILE_SEARCH",
+] as PetitionFieldType[];
 
 export const MapFieldsTable = Object.assign(
   chakraForwardRef<"table", MapFieldsTableProps>(function MapFieldsTable(

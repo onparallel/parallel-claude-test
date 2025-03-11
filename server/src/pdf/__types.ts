@@ -735,6 +735,7 @@ export type FeatureFlag =
   | "PETITION_SIGNATURE"
   | "PETITION_SUMMARY"
   | "PROFILES"
+  | "PROFILE_SEARCH_FIELD"
   | "PUBLIC_PETITION_LINK_PREFILL_DATA"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "RECIPIENT_LANG_CA"
@@ -4203,6 +4204,8 @@ export type PetitionFieldType =
   | "NUMBER"
   /** A phone formatted field. */
   | "PHONE"
+  /** A field for performing searches in the profiles database */
+  | "PROFILE_SEARCH"
   /** A select field. */
   | "SELECT"
   /** A short text field. */

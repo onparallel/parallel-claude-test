@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Alert, AlertDescription, Button, HStack, Input, Text } from "@chakra-ui/react";
 import { ProfilesIcon } from "@parallel/chakra/icons";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
-import { FieldOptions } from "@parallel/utils/petitionFields";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

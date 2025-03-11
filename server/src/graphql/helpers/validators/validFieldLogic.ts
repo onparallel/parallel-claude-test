@@ -51,6 +51,7 @@ const PETITION_FIELD_LOGIC_CONDITION_SCHEMA = (fieldIdType: "string" | "number")
             "ANY_IS_IN_LIST",
             "ALL_IS_IN_LIST",
             "NONE_IS_IN_LIST",
+            "HAS_PROFILE_MATCH",
           ],
         },
         value: {
@@ -301,6 +302,10 @@ export async function validateFieldLogic<
 
       // check operator/modifier compatibility
       if (c.modifier === "NUMBER_OF_REPLIES") {
+        assert(
+          referencedField.type !== "PROFILE_SEARCH",
+          "Can't reference PROFILE_SEARCH field with NUMBER_OF_REPLIES modifier",
+        );
         assertOneOf(
           c.operator,
           [
@@ -366,6 +371,20 @@ export async function validateFieldLogic<
             `Invalid value ${c.value} for field of type ${
               referencedField.type
             }. Should be one of: ${options.join(", ")}`,
+          );
+        } else if (referencedField.type === "PROFILE_SEARCH") {
+          assert(
+            c.operator === "HAS_PROFILE_MATCH",
+            `Invalid operator ${c.operator} for field of type ${referencedField.type}`,
+          );
+          assert(
+            c.value === null,
+            `Invalid value ${c.value} for field of type ${referencedField.type}`,
+          );
+          assertOneOf(
+            c.modifier,
+            ["ANY", "NONE"] as const,
+            `Invalid modifier ${c.modifier} for operator ${c.operator}`,
           );
         }
       }

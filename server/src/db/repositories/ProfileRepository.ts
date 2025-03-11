@@ -2866,4 +2866,38 @@ export class ProfileRepository extends BaseRepository {
     },
     { cacheKeyFn: keyBuilder(["profileId", "processId"]) },
   );
+
+  async conflictCheckSearch(
+    search: string,
+    orgId: number,
+    profileTypeIds: number[],
+    profileTypeFieldIds: number[],
+  ) {
+    if (profileTypeIds.length === 0 || profileTypeFieldIds.length === 0) {
+      return [];
+    }
+
+    return await this.raw<Profile>(
+      /* sql */ `
+      select * from profile p 
+      where p.id in (
+        select distinct(profile_id) from profile_field_value pfv 
+        join profile_type_field ptf on ptf.id = pfv.profile_type_field_id
+        join profile_type pt on pt.id = ptf.profile_type_id
+        where pfv.deleted_at is null 
+        and pfv.removed_at is null
+        and ptf.deleted_at is null
+        and pt.deleted_at is null
+        and pfv.type in ('TEXT', 'SHORT_TEXT')
+        and strict_word_similarity(?, coalesce(pfv."content"->>'value', '')) > 0.3
+        and ptf.id in ?
+        and pt.id in ?
+        and pt.org_id = ?
+      )
+      and p.deleted_at is null
+      and p.anonymized_at is null; 
+    `,
+      [search, this.sqlIn(profileTypeFieldIds), this.sqlIn(profileTypeIds), orgId],
+    );
+  }
 }

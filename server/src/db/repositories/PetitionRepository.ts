@@ -5076,6 +5076,20 @@ export class PetitionRepository extends BaseRepository {
 
         props.options.integrationId =
           integrations.find((i) => i.is_default)?.id ?? integrations[0]?.id ?? null;
+      } else if (type === "PROFILE_SEARCH") {
+        const standardProfileTypes = await this.from("profile_type", t)
+          .where("org_id", user.org_id)
+          .whereNotNull("standard_type")
+          .whereNull("deleted_at")
+          .whereNull("archived_at")
+          .orderBy("id", "asc");
+
+        props.options.searchIn = standardProfileTypes.map((pt) => ({
+          profileTypeId: pt.id,
+          profileTypeFieldIds: (pt.profile_name_pattern as (number | string)[]).filter(
+            (v) => typeof v === "number",
+          ),
+        }));
       }
 
       const [updated] = await this.updatePetitionField(
@@ -7813,7 +7827,7 @@ export class PetitionRepository extends BaseRepository {
       if (
         !field ||
         isFileTypeField(field.type) ||
-        ["HEADING", "BACKGROUND_CHECK"].includes(field.type)
+        ["HEADING", "BACKGROUND_CHECK", "PROFILE_SEARCH"].includes(field.type)
       ) {
         continue;
       }

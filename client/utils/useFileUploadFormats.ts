@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
-import { FileUploadAccepts } from "./petitionFields";
+import { FileUploadAccepts } from "./fieldOptions";
 
 export function useFileUploadFormats() {
   const intl = useIntl();

@@ -100,6 +100,7 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
           "BACKGROUND_CHECK",
           ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
           "ID_VERIFICATION",
+          ...(user.hasProfileSearchField ? ["PROFILE_SEARCH"] : []),
         ],
       },
       {

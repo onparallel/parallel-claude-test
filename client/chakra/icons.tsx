@@ -3083,3 +3083,22 @@ export const ThumbsUpIcon = createIcon({
     </g>
   ),
 });
+
+export const ProfileSearchIcon = createIcon({
+  displayName: "ProfileSearchIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      stroke="currentColor"
+      fill="none"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m14.8889 19.7778c2.7 0 4.8889-2.1889 4.8889-4.8889 0-2.7001-2.1889-4.8889-4.8889-4.8889-2.7001 0-4.8889 2.1888-4.8889 4.8889 0 2.7 2.1888 4.8889 4.8889 4.8889z" />
+      <path d="m21 21-2.6583-2.6583" />
+      <path d="m13 14v-1.3333m-2.6667-2.6667h-4.66663c-.70725 0-1.38552.281-1.88562.781-.5001.5001-.78105 1.1784-.78105 1.8857v1.3333" />
+      <path d="m8 8c1.65685 0 3-1.34315 3-3s-1.34315-3-3-3-3 1.34315-3 3 1.34315 3 3 3z" />
+    </g>
+  ),
+});

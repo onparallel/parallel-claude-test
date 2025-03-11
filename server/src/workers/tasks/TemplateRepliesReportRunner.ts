@@ -101,7 +101,11 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
 
     const intl = await this.ctx.i18n.getIntl(template!.recipient_locale);
 
-    const headers = this.buildExcelHeaders(includePreviewUrl, templateFields, intl);
+    const headers = this.buildExcelHeaders(
+      includePreviewUrl,
+      templateFields.filter((f) => f.type !== "PROFILE_SEARCH"),
+      intl,
+    );
     let rows: Record<string, Maybe<string | Date>>[] = [];
 
     const parallelUrl = this.ctx.config.misc.parallelUrl;
@@ -335,6 +339,10 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           parent: Pick<PetitionField, "options" | "from_petition_field_id"> | null,
           replies: Pick<PetitionFieldReply, "content" | "type">[],
         ) {
+          if (field.type === "PROFILE_SEARCH") {
+            return;
+          }
+
           const columnId = `field-${field.from_petition_field_id ?? field.id}`.concat(
             isNonNullish(field.reply_group_index) ? `-${field.reply_group_index}` : "",
           );

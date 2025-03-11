@@ -796,6 +796,7 @@ export type FeatureFlag =
   | "PETITION_SIGNATURE"
   | "PETITION_SUMMARY"
   | "PROFILES"
+  | "PROFILE_SEARCH_FIELD"
   | "PUBLIC_PETITION_LINK_PREFILL_DATA"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "RECIPIENT_LANG_CA"
@@ -4337,6 +4338,8 @@ export type PetitionFieldType =
   | "NUMBER"
   /** A phone formatted field. */
   | "PHONE"
+  /** A field for performing searches in the profiles database */
+  | "PROFILE_SEARCH"
   /** A select field. */
   | "SELECT"
   /** A short text field. */
@@ -6047,6 +6050,8 @@ export interface Query {
   accesses: PublicPetitionAccessPagination;
   backgroundCheckEntityDetails: BackgroundCheckEntityDetails;
   backgroundCheckEntitySearch: BackgroundCheckEntitySearch;
+  /** Run a search on PROFILE_SEARCH petition field */
+  conflictCheckProfileSearch: Array<Profile>;
   contact?: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;
@@ -6144,6 +6149,12 @@ export interface QuerybackgroundCheckEntitySearchArgs {
   name: Scalars["String"]["input"];
   token: Scalars["String"]["input"];
   type?: InputMaybe<BackgroundCheckEntitySearchType>;
+}
+
+export interface QueryconflictCheckProfileSearchArgs {
+  fieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  search: Scalars["String"]["input"];
 }
 
 export interface QuerycontactArgs {
@@ -19792,6 +19803,7 @@ export type PetitionComposeNewFieldDrawer_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
   hasDowJonesField: boolean;
+  hasProfileSearchField: boolean;
   hasBackgroundCheck: boolean;
   hasProfilesAccess: boolean;
 };
@@ -20207,6 +20219,7 @@ export type PetitionFieldTypeSelect_UserFragment = {
   hasEsTaxDocumentsField: boolean;
   hasDowJonesField: boolean;
   hasBackgroundCheck: boolean;
+  hasProfileSearchField: boolean;
 };
 
 export type PetitionFieldTypeSelectDropdown_UserFragment = {
@@ -20214,6 +20227,7 @@ export type PetitionFieldTypeSelectDropdown_UserFragment = {
   hasEsTaxDocumentsField: boolean;
   hasDowJonesField: boolean;
   hasBackgroundCheck: boolean;
+  hasProfileSearchField: boolean;
 };
 
 export type PetitionRemindersConfig_RemindersConfigFragment = {
@@ -22761,6 +22775,7 @@ export type PetitionComposeFieldSettings_UserFragment = {
   hasEsTaxDocumentsField: boolean;
   hasDowJonesField: boolean;
   hasBackgroundCheck: boolean;
+  hasProfileSearchField: boolean;
   organization: { __typename?: "Organization"; hasDocumentProcessingIntegration: boolean };
 };
 
@@ -23722,6 +23737,7 @@ export type PreviewPetitionField_UserFragment = {
   __typename?: "User";
   id: string;
   hasBackgroundCheck: boolean;
+  hasProfileSearchField: boolean;
 };
 
 export type PreviewPetitionField_PetitionBase_Petition_Fragment = {
@@ -25384,6 +25400,7 @@ export type PreviewPetitionFieldGroup_UserFragment = {
   __typename?: "User";
   id: string;
   hasBackgroundCheck: boolean;
+  hasProfileSearchField: boolean;
 };
 
 export type PreviewPetitionFieldGroup_PetitionBase_Petition_Fragment = {
@@ -26057,6 +26074,26 @@ export type PreviewPetitionFieldKyc_PetitionBase_PetitionTemplate_Fragment = {
 export type PreviewPetitionFieldKyc_PetitionBaseFragment =
   | PreviewPetitionFieldKyc_PetitionBase_Petition_Fragment
   | PreviewPetitionFieldKyc_PetitionBase_PetitionTemplate_Fragment;
+
+export type PreviewPetitionFieldProfileSearch_UserFragment = {
+  __typename?: "User";
+  id: string;
+  hasProfileSearchField: boolean;
+};
+
+export type PreviewPetitionFieldProfileSearch_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+};
+
+export type PreviewPetitionFieldProfileSearch_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+};
+
+export type PreviewPetitionFieldProfileSearch_PetitionBaseFragment =
+  | PreviewPetitionFieldProfileSearch_PetitionBase_Petition_Fragment
+  | PreviewPetitionFieldProfileSearch_PetitionBase_PetitionTemplate_Fragment;
 
 export type BackgroundCheckEntityDetailsCompanyBasic_BackgroundCheckEntityDetailsCompanyFragment = {
   __typename?: "BackgroundCheckEntityDetailsCompany";
@@ -43762,6 +43799,7 @@ export type PetitionCompose_QueryFragment = {
     hasAutoAnonymize: boolean;
     hasEsTaxDocumentsField: boolean;
     hasDowJonesField: boolean;
+    hasProfileSearchField: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     hasRecipientLangCA: boolean;
@@ -46006,6 +46044,7 @@ export type PetitionCompose_userQuery = {
     hasAutoAnonymize: boolean;
     hasEsTaxDocumentsField: boolean;
     hasDowJonesField: boolean;
+    hasProfileSearchField: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     hasRecipientLangCA: boolean;
@@ -48655,6 +48694,7 @@ export type PetitionPreview_QueryFragment = {
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     hasOnBehalfOf: boolean;
+    hasProfileSearchField: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -51152,6 +51192,7 @@ export type PetitionPreview_userQuery = {
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     hasOnBehalfOf: boolean;
+    hasProfileSearchField: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -56082,6 +56123,117 @@ export type NewPetition_templateQuery = {
         }>;
       }
     | null;
+};
+
+export type ProfileSearch_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  name: { [locale in UserLocale]?: string };
+};
+
+export type ProfileSearch_ProfileFragment = {
+  __typename?: "Profile";
+  id: string;
+  name: string;
+  localizableName: { [locale in UserLocale]?: string };
+  status: ProfileStatus;
+  profileType: { __typename?: "ProfileType"; id: string };
+  properties: Array<{
+    __typename?: "ProfileFieldProperty";
+    value?: {
+      __typename?: "ProfileFieldValue";
+      id: string;
+      content?: { [key: string]: any } | null;
+    } | null;
+    files?: Array<{
+      __typename?: "ProfileFieldFile";
+      id?: string;
+      file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
+    }> | null;
+    field: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      type: ProfileTypeFieldType;
+      options: { [key: string]: any };
+    };
+  }>;
+};
+
+export type ProfileSearch_petitionFieldQueryVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  petitionFieldId: Scalars["GID"]["input"];
+}>;
+
+export type ProfileSearch_petitionFieldQuery = {
+  petitionField: { __typename?: "PetitionField"; id: string; options: { [key: string]: any } };
+};
+
+export type ProfileSearch_profileTypesQueryVariables = Exact<{
+  filter?: InputMaybe<ProfileTypeFilter>;
+}>;
+
+export type ProfileSearch_profileTypesQuery = {
+  profileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      pluralName: { [locale in UserLocale]?: string };
+      fields: Array<{
+        __typename?: "ProfileTypeField";
+        id: string;
+        name: { [locale in UserLocale]?: string };
+      }>;
+    }>;
+  };
+};
+
+export type ProfileSearch_conflictCheckProfileSearchQueryVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  fieldId: Scalars["GID"]["input"];
+  search: Scalars["String"]["input"];
+}>;
+
+export type ProfileSearch_conflictCheckProfileSearchQuery = {
+  conflictCheckProfileSearch: Array<{
+    __typename?: "Profile";
+    id: string;
+    name: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
+    profileType: { __typename?: "ProfileType"; id: string };
+    properties: Array<{
+      __typename?: "ProfileFieldProperty";
+      value?: {
+        __typename?: "ProfileFieldValue";
+        id: string;
+        content?: { [key: string]: any } | null;
+      } | null;
+      files?: Array<{
+        __typename?: "ProfileFieldFile";
+        id?: string;
+        file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
+      }> | null;
+      field: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        type: ProfileTypeFieldType;
+        options: { [key: string]: any };
+      };
+    }>;
+  }>;
+};
+
+export type ProfileSearch_createPetitionFieldRepliesMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  fields: Array<CreatePetitionFieldReplyInput> | CreatePetitionFieldReplyInput;
+  overwriteExisting?: InputMaybe<Scalars["Boolean"]["input"]>;
+}>;
+
+export type ProfileSearch_createPetitionFieldRepliesMutation = {
+  createPetitionFieldReplies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
 };
 
 export type ProfileDetail_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -67269,6 +67421,11 @@ export const PreviewImportFromProfileFormatErrorDialog_ProfileTypeFragmentDoc = 
   PreviewImportFromProfileFormatErrorDialog_ProfileTypeFragment,
   unknown
 >;
+export const PreviewPetitionFieldProfileSearch_PetitionBaseFragmentDoc = gql`
+  fragment PreviewPetitionFieldProfileSearch_PetitionBase on PetitionBase {
+    id
+  }
+` as unknown as DocumentNode<PreviewPetitionFieldProfileSearch_PetitionBaseFragment, unknown>;
 export const TestModeSignatureBadge_UserFragmentDoc = gql`
   fragment TestModeSignatureBadge_User on User {
     hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
@@ -70318,6 +70475,7 @@ export const PetitionFieldTypeSelectDropdown_UserFragmentDoc = gql`
     hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
     hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
     hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
+    hasProfileSearchField: hasFeatureFlag(featureFlag: PROFILE_SEARCH_FIELD)
   }
 ` as unknown as DocumentNode<PetitionFieldTypeSelectDropdown_UserFragment, unknown>;
 export const PetitionFieldTypeSelect_UserFragmentDoc = gql`
@@ -70345,6 +70503,7 @@ export const PetitionComposeNewFieldDrawer_UserFragmentDoc = gql`
   fragment PetitionComposeNewFieldDrawer_User on User {
     hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
     hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
+    hasProfileSearchField: hasFeatureFlag(featureFlag: PROFILE_SEARCH_FIELD)
     hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
     hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
   }
@@ -71322,20 +71481,30 @@ export const PreviewPetitionFieldBackgroundCheck_UserFragmentDoc = gql`
     hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
   }
 ` as unknown as DocumentNode<PreviewPetitionFieldBackgroundCheck_UserFragment, unknown>;
+export const PreviewPetitionFieldProfileSearch_UserFragmentDoc = gql`
+  fragment PreviewPetitionFieldProfileSearch_User on User {
+    id
+    hasProfileSearchField: hasFeatureFlag(featureFlag: PROFILE_SEARCH_FIELD)
+  }
+` as unknown as DocumentNode<PreviewPetitionFieldProfileSearch_UserFragment, unknown>;
 export const PreviewPetitionFieldGroup_UserFragmentDoc = gql`
   fragment PreviewPetitionFieldGroup_User on User {
     ...PreviewPetitionFieldBackgroundCheck_User
+    ...PreviewPetitionFieldProfileSearch_User
   }
   ${PreviewPetitionFieldBackgroundCheck_UserFragmentDoc}
+  ${PreviewPetitionFieldProfileSearch_UserFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionFieldGroup_UserFragment, unknown>;
 export const PreviewPetitionField_UserFragmentDoc = gql`
   fragment PreviewPetitionField_User on User {
     id
     ...PreviewPetitionFieldBackgroundCheck_User
     ...PreviewPetitionFieldGroup_User
+    ...PreviewPetitionFieldProfileSearch_User
   }
   ${PreviewPetitionFieldBackgroundCheck_UserFragmentDoc}
   ${PreviewPetitionFieldGroup_UserFragmentDoc}
+  ${PreviewPetitionFieldProfileSearch_UserFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionField_UserFragment, unknown>;
 export const PetitionPreviewStartSignatureButton_UserFragmentDoc = gql`
   fragment PetitionPreviewStartSignatureButton_User on User {
@@ -72530,6 +72699,54 @@ export const NewPetition_PetitionBaseOrFolderFragmentDoc = gql`
   ${PublicTemplateCard_PetitionTemplateFragmentDoc}
   ${FolderCard_PetitionFolderFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_PetitionBaseOrFolderFragment, unknown>;
+export const ProfileSearch_ProfileTypeFragmentDoc = gql`
+  fragment ProfileSearch_ProfileType on ProfileType {
+    id
+    name
+  }
+` as unknown as DocumentNode<ProfileSearch_ProfileTypeFragment, unknown>;
+export const ProfilePropertyContent_ProfileFieldValueFragmentDoc = gql`
+  fragment ProfilePropertyContent_ProfileFieldValue on ProfileFieldValue {
+    content
+  }
+` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldValueFragment, unknown>;
+export const ProfilePropertyContent_ProfileFieldFileFragmentDoc = gql`
+  fragment ProfilePropertyContent_ProfileFieldFile on ProfileFieldFile {
+    id @include(if: true)
+    file {
+      filename
+      contentType
+    }
+  }
+` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldFileFragment, unknown>;
+export const ProfileSearch_ProfileFragmentDoc = gql`
+  fragment ProfileSearch_Profile on Profile {
+    id
+    name
+    profileType {
+      id
+    }
+    properties {
+      value {
+        id
+        ...ProfilePropertyContent_ProfileFieldValue
+      }
+      files {
+        id
+        ...ProfilePropertyContent_ProfileFieldFile
+      }
+      field {
+        id
+        ...ProfilePropertyContent_ProfileTypeField
+      }
+    }
+    ...ProfileReference_Profile
+  }
+  ${ProfilePropertyContent_ProfileFieldValueFragmentDoc}
+  ${ProfilePropertyContent_ProfileFieldFileFragmentDoc}
+  ${ProfilePropertyContent_ProfileTypeFieldFragmentDoc}
+  ${ProfileReference_ProfileFragmentDoc}
+` as unknown as DocumentNode<ProfileSearch_ProfileFragment, unknown>;
 export const useProfileTableColumns_ProfileTypeFragmentDoc = gql`
   fragment useProfileTableColumns_ProfileType on ProfileType {
     id
@@ -74027,20 +74244,6 @@ export const usePinProfileType_UserFragmentDoc = gql`
   }
   ${usePinProfileType_ProfileTypeFragmentDoc}
 ` as unknown as DocumentNode<usePinProfileType_UserFragment, unknown>;
-export const ProfilePropertyContent_ProfileFieldFileFragmentDoc = gql`
-  fragment ProfilePropertyContent_ProfileFieldFile on ProfileFieldFile {
-    id @include(if: true)
-    file {
-      filename
-      contentType
-    }
-  }
-` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldFileFragment, unknown>;
-export const ProfilePropertyContent_ProfileFieldValueFragmentDoc = gql`
-  fragment ProfilePropertyContent_ProfileFieldValue on ProfileFieldValue {
-    content
-  }
-` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldValueFragment, unknown>;
 export const useProfileTableColumns_ProfileFieldPropertyFragmentDoc = gql`
   fragment useProfileTableColumns_ProfileFieldProperty on ProfileFieldProperty {
     field {
@@ -80296,6 +80499,70 @@ export const NewPetition_templateDocument = gql`
   }
   ${TemplateDetailsModal_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_templateQuery, NewPetition_templateQueryVariables>;
+export const ProfileSearch_petitionFieldDocument = gql`
+  query ProfileSearch_petitionField($petitionId: GID!, $petitionFieldId: GID!) {
+    petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
+      id
+      options
+    }
+  }
+` as unknown as DocumentNode<
+  ProfileSearch_petitionFieldQuery,
+  ProfileSearch_petitionFieldQueryVariables
+>;
+export const ProfileSearch_profileTypesDocument = gql`
+  query ProfileSearch_profileTypes($filter: ProfileTypeFilter) {
+    profileTypes(filter: $filter, limit: 100, offset: 0) {
+      items {
+        id
+        name
+        fields {
+          id
+          name
+        }
+        ...ProfileTypeReference_ProfileType
+      }
+      totalCount
+    }
+  }
+  ${ProfileTypeReference_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<
+  ProfileSearch_profileTypesQuery,
+  ProfileSearch_profileTypesQueryVariables
+>;
+export const ProfileSearch_conflictCheckProfileSearchDocument = gql`
+  query ProfileSearch_conflictCheckProfileSearch(
+    $petitionId: GID!
+    $fieldId: GID!
+    $search: String!
+  ) {
+    conflictCheckProfileSearch(petitionId: $petitionId, fieldId: $fieldId, search: $search) {
+      ...ProfileSearch_Profile
+    }
+  }
+  ${ProfileSearch_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  ProfileSearch_conflictCheckProfileSearchQuery,
+  ProfileSearch_conflictCheckProfileSearchQueryVariables
+>;
+export const ProfileSearch_createPetitionFieldRepliesDocument = gql`
+  mutation ProfileSearch_createPetitionFieldReplies(
+    $petitionId: GID!
+    $fields: [CreatePetitionFieldReplyInput!]!
+    $overwriteExisting: Boolean
+  ) {
+    createPetitionFieldReplies(
+      petitionId: $petitionId
+      fields: $fields
+      overwriteExisting: $overwriteExisting
+    ) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  ProfileSearch_createPetitionFieldRepliesMutation,
+  ProfileSearch_createPetitionFieldRepliesMutationVariables
+>;
 export const ProfileDetail_userDocument = gql`
   query ProfileDetail_user {
     ...ProfileLayout_Query

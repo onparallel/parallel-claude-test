@@ -276,7 +276,7 @@ export class FileExportService implements IFileExportService {
         printer: IPrinter;
       },
     ): AsyncGenerator<T> {
-      if (field.type === "HEADING") {
+      if (field.type === "HEADING" || field.type === "PROFILE_SEARCH") {
         // do nothing
       } else if (field.type === "FIELD_GROUP") {
         for (const groupReply of field.replies) {

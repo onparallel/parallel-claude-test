@@ -1,6 +1,6 @@
 import { IntlShape } from "react-intl";
 import { isNonNullish } from "remeda";
-import { FieldOptions } from "./petitionFields";
+import { FieldOptions } from "./fieldOptions";
 
 export function formatNumberWithPrefix(
   intl: IntlShape,

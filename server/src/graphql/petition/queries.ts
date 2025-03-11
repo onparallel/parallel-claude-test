@@ -12,7 +12,7 @@ import {
 } from "nexus";
 import { countBy, isNonNullish, sort, unique, zip } from "remeda";
 import { assert } from "ts-essentials";
-import { selectOptionsValuesAndLabels } from "../../db/helpers/fieldOptions";
+import { PetitionFieldOptions, selectOptionsValuesAndLabels } from "../../db/helpers/fieldOptions";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import {
@@ -21,6 +21,7 @@ import {
   authenticateAnd,
   ifArgDefined,
   ifArgEquals,
+  not,
   or,
 } from "../helpers/authorize";
 import { ArgValidationError, ForbiddenError } from "../helpers/errors";
@@ -31,9 +32,13 @@ import { validateAnd } from "../helpers/validateArgs";
 import { validPath } from "../helpers/validators/validPath";
 import { contextUserHasPermission } from "../users/authorizers";
 import {
+  fieldHasType,
   fieldsBelongsToPetition,
+  petitionHasStatus,
+  petitionIsNotAnonymized,
   petitionsArePublicTemplates,
   userHasAccessToPetitions,
+  userHasFeatureFlag,
 } from "./authorizers";
 import {
   validApprovalsFilter,
@@ -483,5 +488,38 @@ export const standardListDefinition = queryField("standardListDefinition", {
         label: valuesAndLabels.find(([value]) => value === v.key)?.[1],
       })),
     };
+  },
+});
+
+export const conflictCheckProfileSearch = queryField("conflictCheckProfileSearch", {
+  description: "Run a search on PROFILE_SEARCH petition field",
+  type: list("Profile"),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILE_SEARCH_FIELD"),
+    userHasAccessToPetitions("petitionId"),
+    petitionIsNotAnonymized("petitionId"),
+    not(petitionHasStatus("petitionId", "CLOSED")),
+    fieldsBelongsToPetition("petitionId", "fieldId"),
+    fieldHasType("fieldId", "PROFILE_SEARCH"),
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    search: nonNull(stringArg()),
+  },
+  resolve: async (_, { fieldId, search }, ctx) => {
+    const field = await ctx.petitions.loadField(fieldId);
+    assert(field, "Field must be defined");
+
+    const { searchIn } = field.options as PetitionFieldOptions["PROFILE_SEARCH"];
+    const profileTypeIds = searchIn.map((s) => s.profileTypeId);
+    const profileTypeFieldIds = searchIn.flatMap((s) => s.profileTypeFieldIds);
+
+    return await ctx.profiles.conflictCheckSearch(
+      search,
+      ctx.user!.org_id,
+      profileTypeIds,
+      profileTypeFieldIds,
+    );
   },
 });

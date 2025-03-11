@@ -4,7 +4,7 @@ import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
 import { PetitionComposeBackgroundCheckSettings_updatePetitionFieldAutoSearchConfigDocument } from "@parallel/graphql/__types";
-import { FieldOptions } from "@parallel/utils/petitionFields";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { useConfigureAutomateSearchDialog } from "../../dialogs/ConfigureAutomateSearchDialog";

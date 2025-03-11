@@ -105,6 +105,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
               ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
               ...(user.hasDowJonesField ? ["DOW_JONES_KYC"] : []),
               "ID_VERIFICATION",
+              ...(user.hasProfileSearchField ? ["PROFILE_SEARCH"] : []),
             ],
           },
         ] as { category: string; fields: PetitionFieldType[] }[];
@@ -346,6 +347,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
           hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
           hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
           hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
+          hasProfileSearchField: hasFeatureFlag(featureFlag: PROFILE_SEARCH_FIELD)
         }
       `,
     },

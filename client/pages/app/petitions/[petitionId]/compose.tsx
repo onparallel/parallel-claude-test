@@ -85,8 +85,8 @@ import {
   PetitionFieldMath,
   PetitionFieldVisibility,
 } from "@parallel/utils/fieldLogic/types";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
-import { FieldOptions } from "@parallel/utils/petitionFields";
 import { waitFor } from "@parallel/utils/promises/waitFor";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
@@ -860,7 +860,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     const childrenLength = field.children?.length ?? 0;
     let _position = isNonNullish(position) && childrenLength > position ? position + 1 : 0;
     if (
-      (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK") &&
+      (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK" || type === "PROFILE_SEARCH") &&
       childrenLength === 0 &&
       !field.isInternal
     ) {
@@ -878,7 +878,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       throw new Error("FIRST_CHILD_IS_INTERNAL_ERROR");
     } else {
       if (
-        (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK") &&
+        (type === "DOW_JONES_KYC" || type === "BACKGROUND_CHECK" || type === "PROFILE_SEARCH") &&
         childrenLength > 0 &&
         _position === 0 &&
         !field.isInternal

@@ -71,17 +71,19 @@ export function ExportRepliesProgressDialog({
         return;
       }
       // extract every reply of fields and FIELD_GROUP children. In this case we don't need to group replies by parentReplyId
-      const replies = petition.fields.flatMap((field) => {
-        if (field.type === "FIELD_GROUP") {
-          return (
-            field.children?.flatMap((child) =>
-              child.replies.map((reply) => ({ reply, field: child })),
-            ) ?? []
-          );
-        } else {
-          return field.replies.map((reply) => ({ reply, field }));
-        }
-      });
+      const replies = petition.fields
+        .flatMap((field) => {
+          if (field.type === "FIELD_GROUP") {
+            return (
+              field.children?.flatMap((child) =>
+                child.replies.map((reply) => ({ reply, field: child })),
+              ) ?? []
+            );
+          } else {
+            return field.replies.map((reply) => ({ reply, field }));
+          }
+        })
+        .filter(({ field }) => field.type !== "PROFILE_SEARCH");
 
       const hasTextReplies = !!replies.find((r) => !isFileTypeField(r.field.type));
 

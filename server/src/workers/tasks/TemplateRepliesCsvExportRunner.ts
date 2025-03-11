@@ -50,7 +50,7 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
 
     const headers = this.buildExcelHeaders(
       allTemplateFields
-        .filter((f) => isNonNullish(f.alias))
+        .filter((f) => isNonNullish(f.alias) && f.type !== "PROFILE_SEARCH")
         .map((f) => ({ ...f, alias: f.alias! })),
     );
 
@@ -128,6 +128,10 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
           parent: Pick<AliasedPetitionField, "options" | "from_petition_field_id" | "alias"> | null,
           replies: Pick<PetitionFieldReply, "content" | "type">[],
         ) {
+          if (field.type === "PROFILE_SEARCH") {
+            return;
+          }
+
           const columnId = `field-${field.from_petition_field_id ?? field.id}`.concat(
             isNonNullish(field.reply_group_index) ? `-${field.reply_group_index}` : "",
           );
