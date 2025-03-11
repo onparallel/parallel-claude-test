@@ -1,7 +1,6 @@
 import type { StorybookConfig } from "@storybook/nextjs";
-
 import { resolve } from "path";
-const { merge } = require("webpack-merge");
+import { merge } from "webpack-merge";
 
 const config: StorybookConfig = {
   stories: ["../stories/**/*.stories.tsx"],
@@ -30,4 +29,4 @@ const config: StorybookConfig = {
   },
 };
 
-module.exports = config;
+export default config;

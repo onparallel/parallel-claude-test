@@ -4,7 +4,6 @@ import { Meta, StoryFn } from "@storybook/react";
 import copy from "copy-to-clipboard";
 import { useState } from "react";
 import * as allIcons from "../chakra/icons";
-import { StoryDecorator } from "./decorators";
 
 function Icons() {
   const [copied, setCopied] = useState("");
@@ -41,7 +40,6 @@ function Icons() {
 export default {
   title: "Icons",
   component: Icons,
-  decorators: [StoryDecorator],
 } as Meta<typeof Icons>;
 
 export const All: StoryFn<typeof Icons> = () => <Icons />;
