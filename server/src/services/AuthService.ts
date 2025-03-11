@@ -701,12 +701,12 @@ export class Auth implements IAuth {
   }
 
   private async deleteSessionFromRedis(token: string) {
-    await this.redis.delete(
-      `session:${token}:idToken`,
-      `session:${token}:accessToken`,
-      `session:${token}:refreshToken`,
-      `session:${token}:meta`,
-    );
+    await Promise.all([
+      this.redis.delete(`session:${token}:idToken`),
+      this.redis.delete(`session:${token}:accessToken`),
+      this.redis.delete(`session:${token}:refreshToken`),
+      this.redis.delete(`session:${token}:meta`),
+    ]);
   }
 
   private async storeSessionInRedis(session: CognitoSession) {
