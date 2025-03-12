@@ -1,4 +1,4 @@
-import { subMonths, subYears } from "date-fns";
+import { subDays, subMonths, subYears } from "date-fns";
 import { isNonNullish, isNullish } from "remeda";
 import { ProfileFieldValue } from "../../db/__types";
 import { ProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
@@ -12,19 +12,21 @@ import {
  *
  * @param fromDate - The starting date to check from.
  * @param toDate - The ending date to check against.
- * @param frequency - A string representing the frequency period, formatted as `${number}_${"MONTHS"|"YEARS"}`.
+ * @param frequency - A string representing the frequency period, formatted as `${number}_${"MONTHS"|"YEARS"|"DAYS"}`.
  * @returns true if fromDate is after the date obtained by subtracting the frequency period from toDate, otherwise false.
  */
 function isWithinFrequencyPeriod(
   fromDate: Date,
   toDate: Date,
-  frequency: `${number}_${"MONTHS" | "YEARS"}`,
+  frequency: `${number}_${"MONTHS" | "YEARS" | "DAYS"}`,
 ) {
   const [amount, unit] = frequency.split("_");
   if (unit === "MONTHS") {
     return fromDate > subMonths(toDate, parseInt(amount));
   } else if (unit === "YEARS") {
     return fromDate > subYears(toDate, parseInt(amount));
+  } else if (unit === "DAYS") {
+    return fromDate > subDays(toDate, parseInt(amount));
   }
 
   return true;

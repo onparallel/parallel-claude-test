@@ -47,7 +47,8 @@ type FrequencyFixedOption =
   | "9_MONTHS"
   | "6_MONTHS"
   | "3_MONTHS"
-  | "1_MONTHS";
+  | "1_MONTHS"
+  | "1_DAYS";
 
 export interface ProfileFieldBackgroundCheckSettings {
   hasMonitoring?: boolean;
@@ -253,6 +254,16 @@ export function ProfileFieldBackgroundCheckSettings({
           {
             id: "generic.n-months",
             defaultMessage: "{count, plural, =1 {1 month} other {# months}}",
+          },
+          { count },
+        ),
+      })),
+      ...([1] as const).map((count) => ({
+        value: `${count}_DAYS` as const,
+        label: intl.formatMessage(
+          {
+            id: "generic.n-days",
+            defaultMessage: "{count, plural, =1 {1 day} other {# days}}",
           },
           { count },
         ),

@@ -3466,7 +3466,7 @@
   },
   {
     "term": "component.feature-flag-descriptions.auto-anonymize-description",
-    "definition": "Permite incluir un periodo para que las peticiones se anonimicen automaticamente pasados x dias de su cierre.",
+    "definition": "Permite incluir un periodo para que las peticiones se anonimicen automaticamente pasados x días de su cierre.",
     "context": "Allows setting up a period of time for the parallels to be automatically anonymized after x days of their closing."
   },
   {
@@ -8258,6 +8258,11 @@
     "term": "component.profile-field-background-check.remove-search",
     "definition": "Descartar búsqueda",
     "context": "Remove search"
+  },
+  {
+    "term": "component.profile-field-background-check.results-monitored-x-days",
+    "definition": "Los resultados se monitorizan cada {count, plural, =1 {día} other {# días}}.",
+    "context": "The results are monitored every {count, plural, =1 {day} other {# days}}."
   },
   {
     "term": "component.profile-field-background-check.results-monitored-x-months",
@@ -13538,6 +13543,11 @@
     "term": "generic.move-to",
     "definition": "Mover a...",
     "context": "Move to..."
+  },
+  {
+    "term": "generic.n-days",
+    "definition": "{count, plural, =1 {1 día} other {# días}}",
+    "context": "{count, plural, =1 {1 day} other {# days}}"
   },
   {
     "term": "generic.n-days-after",

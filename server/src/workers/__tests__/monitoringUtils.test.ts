@@ -324,6 +324,26 @@ describe("monitoringUtils", () => {
       ).toEqual(false);
     });
 
+    test("fixed frequency - daily (refreshes)", () => {
+      expect(
+        requiresRefresh(new Date("2024-03-02"))(
+          { created_at: new Date("2024-03-01") },
+          { searchFrequency: { type: "FIXED", frequency: "1_DAYS" } },
+          [],
+        ),
+      ).toEqual(true);
+    });
+
+    test("fixed frequency - daily (does not refresh)", () => {
+      expect(
+        requiresRefresh(new Date("2024-03-02"))(
+          { created_at: new Date("2024-03-02") },
+          { searchFrequency: { type: "FIXED", frequency: "1_DAYS" } },
+          [],
+        ),
+      ).toEqual(false);
+    });
+
     test("variable frequency - high", () => {
       expect(
         requiresRefresh(new Date("2024-03-01"))(

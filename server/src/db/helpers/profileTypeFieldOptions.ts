@@ -16,6 +16,7 @@ const SEARCH_FREQUENCY = [
   "6_MONTHS",
   "3_MONTHS",
   "1_MONTHS",
+  "1_DAYS",
 ] as const;
 
 const SCHEMAS = {

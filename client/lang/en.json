@@ -8260,6 +8260,11 @@
     "context": "Remove search"
   },
   {
+    "term": "component.profile-field-background-check.results-monitored-x-days",
+    "definition": "The results are monitored every {count, plural, =1 {day} other {# days}}.",
+    "context": "The results are monitored every {count, plural, =1 {day} other {# days}}."
+  },
+  {
     "term": "component.profile-field-background-check.results-monitored-x-months",
     "definition": "The results are monitored every {count, plural, =1 {month} other {# months}}.",
     "context": "The results are monitored every {count, plural, =1 {month} other {# months}}."
@@ -13538,6 +13543,11 @@
     "term": "generic.move-to",
     "definition": "Move to...",
     "context": "Move to..."
+  },
+  {
+    "term": "generic.n-days",
+    "definition": "{count, plural, =1 {1 day} other {# days}}",
+    "context": "{count, plural, =1 {1 day} other {# days}}"
   },
   {
     "term": "generic.n-days-after",

@@ -514,19 +514,25 @@ export function ProfileFormFieldBackgroundCheck({
                         id="component.profile-field-background-check.active-monitoring"
                         defaultMessage="Active monitoring"
                       />{" "}
-                      {monitoringFrequency![1] === "MONTHS" ? (
+                      {monitoringFrequency![1] === "DAYS" ? (
+                        <FormattedMessage
+                          id="component.profile-field-background-check.results-monitored-x-days"
+                          defaultMessage="The results are monitored every {count, plural, =1 {day} other {# days}}."
+                          values={{ count: parseInt(monitoringFrequency![0]) }}
+                        />
+                      ) : monitoringFrequency![1] === "MONTHS" ? (
                         <FormattedMessage
                           id="component.profile-field-background-check.results-monitored-x-months"
                           defaultMessage="The results are monitored every {count, plural, =1 {month} other {# months}}."
                           values={{ count: parseInt(monitoringFrequency![0]) }}
                         />
-                      ) : (
+                      ) : monitoringFrequency![1] === "YEARS" ? (
                         <FormattedMessage
                           id="component.profile-field-background-check.results-monitored-x-years"
                           defaultMessage="The results are monitored every {count, plural, =1 {year} other {# years}}."
                           values={{ count: parseInt(monitoringFrequency![0]) }}
                         />
-                      )}
+                      ) : null}
                     </Text>
                   }
                   placement="bottom"
