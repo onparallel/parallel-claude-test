@@ -17,7 +17,7 @@ export class ExportExcelRunner extends TaskRunner<"EXPORT_EXCEL"> {
 
     const userData = await this.ctx.users.loadUserDataByUserId(this.task.user_id);
 
-    const exportExcel = await this.ctx.fileExport
+    const exportExcel = await this.ctx.petitionFiles
       .getPetitionFiles(
         petitionId,
         this.task.user_id,

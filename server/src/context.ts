@@ -25,6 +25,8 @@ import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
 import { ViewRepository } from "./db/repositories/ViewRepository";
 import { DOW_JONES_CLIENT, IDowJonesClient } from "./integrations/dow-jones/DowJonesClient";
+import { IFileExportIntegration } from "./integrations/file-export/FileExportIntegration";
+import { IMANAGE_FILE_EXPORT_INTEGRATION } from "./integrations/file-export/imanage/IManageFileExportIntegration";
 import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./services/AccountSetupService";
 import { AI_COMPLETION_SERVICE, IAiCompletionService } from "./services/AiCompletionService";
 import { ANALYTICS, IAnalyticsService } from "./services/AnalyticsService";
@@ -45,7 +47,6 @@ import {
   IEventSubscriptionService,
 } from "./services/EventSubscriptionService";
 import { FETCH_SERVICE, IFetchService } from "./services/FetchService";
-import { FILE_EXPORT_SERVICE, IFileExportService } from "./services/FileExportService";
 import { I18N_SERVICE, II18nService } from "./services/I18nService";
 import { ID_VERIFICATION_SERVICE, IdVerificationService } from "./services/IdVerificationService";
 import { IImageService, IMAGE_SERVICE } from "./services/ImageService";
@@ -64,6 +65,7 @@ import {
   ORGANIZATION_LAYOUT_SERVICE,
 } from "./services/OrganizationLayoutService";
 import { IPetitionBinder, PETITION_BINDER } from "./services/PetitionBinder";
+import { PETITION_FILES_SERVICE, PetitionFilesService } from "./services/PetitionFilesService";
 import {
   IPetitionImportExportService,
   PETITION_IMPORT_EXPORT_SERVICE,
@@ -193,8 +195,9 @@ export class WorkerContext {
     @inject(ID_VERIFICATION_SERVICE) public readonly idVerification: IdVerificationService,
     @inject(DOCUMENT_PROCESSING_SERVICE)
     public readonly documentProcessing: IDocumentProcessingService,
-    @inject(FILE_EXPORT_SERVICE) public readonly fileExport: IFileExportService,
+    @inject(PETITION_FILES_SERVICE) public readonly petitionFiles: PetitionFilesService,
     @inject(PROFILE_IMPORT_SERVICE) public readonly profileImport: IProfileImportService,
+    @inject(IMANAGE_FILE_EXPORT_INTEGRATION) public readonly iManageExport: IFileExportIntegration,
 
     // Repositories
     public readonly contacts: ContactRepository,

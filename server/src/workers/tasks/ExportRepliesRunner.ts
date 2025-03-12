@@ -23,7 +23,7 @@ export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
 
     // TODO: any error inside getPetitionFiles is not being captured. we should fix this...
     const zipFile = createZipFile(
-      this.ctx.fileExport.getPetitionFiles<ZipFileInput>(
+      this.ctx.petitionFiles.getPetitionFiles<ZipFileInput>(
         petitionId,
         this.task.user_id,
         async (storage, path, filename) => ({

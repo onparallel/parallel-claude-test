@@ -36,7 +36,6 @@ import {
   IEventSubscriptionService,
 } from "./EventSubscriptionService";
 import { FETCH_SERVICE, FetchService, IFetchService } from "./FetchService";
-import { FILE_EXPORT_SERVICE, FileExportService, IFileExportService } from "./FileExportService";
 import { I18N_SERVICE, I18nService, II18nService } from "./I18nService";
 import {
   ID_VERIFICATION_SERVICE,
@@ -62,6 +61,7 @@ import {
   OrganizationLayoutService,
 } from "./OrganizationLayoutService";
 import { IPetitionBinder, PETITION_BINDER, PetitionBinder } from "./PetitionBinder";
+import { PETITION_FILES_SERVICE, PetitionFilesService } from "./PetitionFilesService";
 import {
   IPetitionImportExportService,
   PETITION_IMPORT_EXPORT_SERVICE,
@@ -138,6 +138,6 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IProfileExternalSourcesService>(PROFILE_EXTERNAL_SOURCE_SERVICE).to(
     ProfileExternalSourcesService,
   );
-  bind<IFileExportService>(FILE_EXPORT_SERVICE).to(FileExportService);
+  bind<PetitionFilesService>(PETITION_FILES_SERVICE).to(PetitionFilesService);
   bind<IProfileImportService>(PROFILE_IMPORT_SERVICE).to(ProfileImportService);
 });

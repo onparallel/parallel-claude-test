@@ -1,18 +1,13 @@
 import { inject, injectable } from "inversify";
 import { indexBy, isNonNullish, isNullish, omit } from "remeda";
-import sanitizeFilename from "sanitize-filename";
 import { Readable } from "stream";
-import { assert } from "ts-essentials";
 import { PetitionExcelExport } from "../api/helpers/PetitionExcelExport";
 import { Config, CONFIG } from "../config";
-import { FileExportLog, PetitionField, UserLocale } from "../db/__types";
+import { PetitionField, UserLocale } from "../db/__types";
 import { ContactRepository } from "../db/repositories/ContactRepository";
 import { FileRepository } from "../db/repositories/FileRepository";
-import { IntegrationRepository } from "../db/repositories/IntegrationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
-import { IFileExportIntegration } from "../integrations/file-export/FileExportIntegration";
-import { IMANAGE_FILE_EXPORT_INTEGRATION } from "../integrations/file-export/imanage/IManageFileExportIntegration";
 import { getAllFieldsWithIndices } from "../util/fieldIndices";
 import { applyFieldVisibility, evaluateFieldLogic } from "../util/fieldLogic";
 import { isFileTypeField } from "../util/isFileTypeField";
@@ -25,7 +20,7 @@ import { ILogger, LOGGER } from "./Logger";
 import { IPrinter, PRINTER } from "./Printer";
 import { IStorageImpl, IStorageService, STORAGE_SERVICE } from "./StorageService";
 
-export const FILE_EXPORT_SERVICE = Symbol.for("FILE_EXPORT_SERVICE");
+export const PETITION_FILES_SERVICE = Symbol.for("PETITION_FILES_SERVICE");
 
 interface GetPetitionFilesOptions {
   locale: UserLocale;
@@ -34,52 +29,10 @@ interface GetPetitionFilesOptions {
   onProgress?: (value: number) => Promise<void>;
 }
 
-export type FileExportMetadata =
-  | {
-      id: number;
-      type: "PetitionFieldReply" | "Petition";
-      metadata: any;
-    }
-  | {
-      id: number;
-      type: "PetitionSignatureRequest";
-      documentType: "signed-document" | "audit-trail";
-      metadata: any;
-    };
-
-export type FileExport = {
-  id: string;
-  metadata: FileExportMetadata;
-  filename: string;
-  temporary_url: string;
-  status: "WAITING" | "OK" | "NOK";
-  error?: string;
-  url?: string;
-};
-
-export interface IFileExportService {
-  getPetitionFiles<T>(
-    petitionId: number,
-    userId: number,
-    processFile: (storage: IStorageImpl, path: string, filename: string) => Promise<T>,
-    options: GetPetitionFilesOptions,
-  ): AsyncGenerator<T>;
-
-  buildWindowUrl(integrationId: number, fileExportLogId: number): Promise<string>;
-
-  createPetitionFilesExportLog(
-    integrationId: number,
-    petitionId: number,
-    filenamePattern: string | null,
-    userId: number,
-    onProgress?: (progress: number) => Promise<void>,
-  ): Promise<FileExportLog>;
-}
 @injectable()
-export class FileExportService implements IFileExportService {
+export class PetitionFilesService {
   constructor(
     @inject(PetitionRepository) private petitions: PetitionRepository,
-    @inject(IntegrationRepository) private integrations: IntegrationRepository,
     @inject(FileRepository) private files: FileRepository,
     @inject(UserRepository) private users: UserRepository,
     @inject(ContactRepository) private contacts: ContactRepository,
@@ -88,72 +41,7 @@ export class FileExportService implements IFileExportService {
     @inject(LOGGER) private logger: ILogger,
     @inject(I18N_SERVICE) private i18n: II18nService,
     @inject(CONFIG) private config: Config,
-    @inject(IMANAGE_FILE_EXPORT_INTEGRATION) private iManageFileExport: IFileExportIntegration,
   ) {}
-
-  private async getIntegration(integrationId: number) {
-    const integration = await this.integrations.loadIntegration(integrationId);
-    assert(integration?.type === "FILE_EXPORT", "Invalid integration");
-
-    switch (integration.provider) {
-      case "IMANAGE":
-        return this.iManageFileExport;
-      default:
-        throw new Error(`Provider ${integration.provider} not supported`);
-    }
-  }
-
-  async buildWindowUrl(integrationId: number, fileExportLogId: number) {
-    const integration = await this.getIntegration(integrationId);
-    return await integration.buildWindowUrl(integrationId, fileExportLogId);
-  }
-
-  async createPetitionFilesExportLog(
-    integrationId: number,
-    petitionId: number,
-    filenamePattern: string | null,
-    userId: number,
-    onProgress?: (progress: number) => Promise<void>,
-  ): Promise<FileExportLog> {
-    const userData = await this.users.loadUserDataByUserId(userId);
-    assert(userData, `User ${userId} not found`);
-    const files = this.getPetitionFiles<FileExport>(
-      petitionId,
-      userId,
-      async (storage, path, filename, metadata) => ({
-        id: random(16),
-        status: "WAITING",
-        metadata,
-        filename: sanitizeFilename(filename),
-        temporary_url: await storage.getSignedDownloadEndpoint(path, filename, "inline"),
-      }),
-      {
-        include: ["excel-file", "petition-field-files", "latest-signature"],
-        locale: userData.preferred_locale,
-        pattern: filenamePattern,
-        onProgress,
-      },
-    );
-
-    let next: IteratorResult<FileExport>;
-    const exportedFiles: FileExport[] = [];
-    while (!(next = await files.next()).done) {
-      exportedFiles.push(next.value);
-    }
-
-    if (exportedFiles.length === 0) {
-      throw new Error(`No files to export on Petition:${petitionId}`);
-    }
-
-    return await this.integrations.createFileExportLog(
-      {
-        integration_id: integrationId,
-        created_by_user_id: userId,
-        json_export: exportedFiles,
-      },
-      `User:${userId}`,
-    );
-  }
 
   async *getPetitionFiles<T>(
     petitionId: number,
@@ -162,7 +50,7 @@ export class FileExportService implements IFileExportService {
       storage: IStorageImpl,
       path: string,
       filename: string,
-      metadata: FileExportMetadata,
+      metadata: any,
     ) => Promise<T>,
     options: GetPetitionFilesOptions,
   ): AsyncGenerator<T> {

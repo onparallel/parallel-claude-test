@@ -11,12 +11,11 @@ import {
   IntegrationRepository,
 } from "../../../db/repositories/IntegrationRepository";
 import { ENCRYPTION_SERVICE, EncryptionService } from "../../../services/EncryptionService";
-import { FileExport } from "../../../services/FileExportService";
 import { ILogger, LOGGER } from "../../../services/Logger";
 import { fromGlobalId, isGlobalId, toGlobalId } from "../../../util/globalId";
 import { JsonSchemaFor } from "../../../util/jsonSchema";
 import { GenericIntegration } from "../../helpers/GenericIntegration";
-import { IFileExportIntegration } from "../FileExportIntegration";
+import { FileExport, IFileExportIntegration } from "../FileExportIntegration";
 
 class RequestError extends Error {
   constructor(

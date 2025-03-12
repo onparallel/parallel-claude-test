@@ -5,7 +5,6 @@ import { Knex } from "knex";
 import PostgresInterval from "postgres-interval";
 import { groupBy, indexBy } from "remeda";
 import { LocalizableUserText } from "../../graphql";
-import { FileExport } from "../../services/FileExportService";
 import { PetitionFieldMath, PetitionFieldVisibility } from "../../util/fieldLogic";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
@@ -65,7 +64,7 @@ export interface TableTypes
       >;
       profile_type: Replace<db.ProfileType, { name: LocalizableUserText }>;
       profile_type_field: Replace<db.ProfileTypeField, { name: LocalizableUserText }>;
-      file_export_log: Replace<db.FileExportLog, { json_export: FileExport[] }>;
+      file_export_log: Replace<db.FileExportLog, { json_export: any[] }>;
       standard_list_definition: Replace<
         db.StandardListDefinition,
         {
