@@ -473,6 +473,8 @@ export const removePetitionPassword = mutationField("removePetitionPassword", {
       await ctx.petitions.updatePetition(
         petitionId,
         {
+          restricted_by_user_id: null,
+          restricted_at: null,
           restricted_password_hash: null,
           restricted_password_salt: null,
         },
