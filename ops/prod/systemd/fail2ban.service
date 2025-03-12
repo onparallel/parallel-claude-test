@@ -9,13 +9,13 @@ PartOf=iptables.service firewalld.service ip6tables.service ipset.service nftabl
 Type=simple
 Environment=PYTHONNOUSERSITE=1
 Environment=PYTHONPATH=/usr/local/lib/python3.9/site-packages
-ExecStartPre=/bin/mkdir -p /run/fail2ban
+ExecStartPre=/bin/mkdir -p /var/run/fail2ban
 ExecStart=/usr/local/bin/fail2ban-server -xf start
 # if should be logged in systemd journal, use following line or set logtarget to sysout in fail2ban.local
 # ExecStart=/usr/local/bin/fail2ban-server -xf --logtarget=sysout start
 ExecStop=/usr/local/bin/fail2ban-client stop
 ExecReload=/usr/local/bin/fail2ban-client reload
-PIDFile=/run/fail2ban/fail2ban.pid
+PIDFile=/var/run/fail2ban/fail2ban.pid
 Restart=on-failure
 RestartPreventExitStatus=0 255
 
