@@ -1,5 +1,6 @@
 import { GraphQLClient } from "graphql-request";
 import { inject, injectable } from "inversify";
+import { Readable } from "stream";
 import { CONFIG, Config } from "../config";
 import { ContactLocale } from "../db/__types";
 import { buildPdf } from "../pdf/buildPdf";
@@ -30,17 +31,17 @@ export interface IPrinter {
       locale: ContactLocale;
       useExportV2?: boolean;
     },
-  ): Promise<{ stream: NodeJS.ReadableStream; metadata: DocumentMetadata }>;
+  ): Promise<{ stream: Readable; metadata: DocumentMetadata }>;
   annexCoverPage(
     userId: number,
     props: AnnexCoverPageProps,
     locale: ContactLocale,
-  ): Promise<NodeJS.ReadableStream>;
-  imageToPdf(userId: number, props: ImageToPdfProps): Promise<NodeJS.ReadableStream>;
+  ): Promise<Readable>;
+  imageToPdf(userId: number, props: ImageToPdfProps): Promise<Readable>;
   backgroundCheckProfile(
     userId: number,
     props: Omit<BackgroundCheckProfileProps, "assetsUrl">,
-  ): Promise<NodeJS.ReadableStream>;
+  ): Promise<Readable>;
   signatureBoxesPage(
     userId: number,
     data: Omit<SignatureBoxesPageInitialData, "petitionId"> & {
@@ -48,11 +49,11 @@ export interface IPrinter {
       locale: ContactLocale;
       useExportV2?: boolean;
     },
-  ): Promise<{ stream: NodeJS.ReadableStream; metadata: DocumentMetadata }>;
+  ): Promise<{ stream: Readable; metadata: DocumentMetadata }>;
   damagedFilePage(
     props: DamagedFilePageProps,
     locale: ContactLocale,
-  ): Promise<{ stream: NodeJS.ReadableStream; metadata: DocumentMetadata }>;
+  ): Promise<{ stream: Readable; metadata: DocumentMetadata }>;
 }
 
 export const PRINTER = Symbol.for("PRINTER");

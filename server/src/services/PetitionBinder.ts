@@ -6,6 +6,7 @@ import pMap from "p-map";
 import { resolve } from "path";
 import { isNonNullish, isNullish } from "remeda";
 import sanitizeFilename from "sanitize-filename";
+import { Readable } from "stream";
 import {
   FileUpload,
   OrganizationTheme,
@@ -515,7 +516,7 @@ export class PetitionBinder implements IPetitionBinder {
     ).filter(isNonNullish);
   }
 
-  private async writeTemporaryFile(stream: MaybePromise<NodeJS.ReadableStream>, extension: string) {
+  private async writeTemporaryFile(stream: MaybePromise<Readable>, extension: string) {
     const path = resolve(this.temporaryDirectory, `${random(10)}.${extension}`);
     await writeFile(path, await stream);
     return path;

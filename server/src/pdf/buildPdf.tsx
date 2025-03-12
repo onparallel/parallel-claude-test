@@ -152,7 +152,7 @@ export async function buildPdf<ID, P extends {}, M extends Record<string, any>>(
   document: PdfDocument<ID, P, M>,
   initial: ID,
   context: PdfDocumentGetPropsContext,
-): Promise<{ stream: NodeJS.ReadableStream; metadata: { [K in keyof M]: M[K][] } }> {
+): Promise<{ stream: Readable; metadata: { [K in keyof M]: M[K][] } }> {
   const messages = await loadMessages(context.locale);
   const props = document.getProps ? await document.getProps(initial, context) : initial;
   const intlProps: IntlConfig = {
@@ -230,8 +230,10 @@ export async function buildPdf<ID, P extends {}, M extends Record<string, any>>(
     }
     Font.registerHyphenationCallback(await createHyphenationCallback(context.locale ?? "en"));
     return {
-      stream: await renderToStream(
-        <IntlProvider {...intlProps}>{createElement<P>(document, props as any)}</IntlProvider>,
+      stream: Readable.from(
+        await renderToStream(
+          <IntlProvider {...intlProps}>{createElement<P>(document, props as any)}</IntlProvider>,
+        ),
       ),
       metadata: {} as any,
     };
