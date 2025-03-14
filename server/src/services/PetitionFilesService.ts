@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { indexBy, isNonNullish, isNullish, omit } from "remeda";
+import { indexBy, isNonNullish, isNullish } from "remeda";
 import { Readable } from "stream";
 import { PetitionExcelExport } from "../api/helpers/PetitionExcelExport";
 import { Config, CONFIG } from "../config";
@@ -14,19 +14,39 @@ import { isFileTypeField } from "../util/isFileTypeField";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { renderTextWithPlaceholders } from "../util/slate/placeholders";
 import { random } from "../util/token";
-import { Maybe, UnwrapArray } from "../util/types";
+import { UnwrapArray } from "../util/types";
 import { I18N_SERVICE, II18nService } from "./I18nService";
 import { ILogger, LOGGER } from "./Logger";
 import { IPrinter, PRINTER } from "./Printer";
-import { IStorageImpl, IStorageService, STORAGE_SERVICE } from "./StorageService";
+import { IStorageService, STORAGE_SERVICE } from "./StorageService";
 
 export const PETITION_FILES_SERVICE = Symbol.for("PETITION_FILES_SERVICE");
+
+type GetPetitionFilesInclude =
+  | "PETITION_EXCEL_EXPORT"
+  | "PETITION_FILE_FIELD_REPLIES"
+  | "PETITION_LATEST_SIGNATURE";
 
 interface GetPetitionFilesOptions {
   locale: UserLocale;
   pattern?: string | null;
-  include: ("excel-file" | "petition-field-files" | "latest-signature")[];
-  onProgress?: (value: number) => Promise<void>;
+  include: GetPetitionFilesInclude[];
+}
+
+export type GetPetitionFilesResultMetadata =
+  | { type: "PETITION_EXCEL_EXPORT"; petitionId: number }
+  | { type: "PETITION_FILE_FIELD_REPLIES"; fieldId: number; replyId: number }
+  | {
+      type: "PETITION_LATEST_SIGNATURE";
+      subtype: "SIGNED_DOCUMENT" | "AUDIT_TRAIL";
+      petitionSignatureRequestId: number;
+    };
+
+interface GetPetitionFilesResult {
+  filename: string;
+  getStream: () => Promise<Readable>;
+  getDownloadUrl: () => Promise<string>;
+  metadata: GetPetitionFilesResultMetadata;
 }
 
 @injectable()
@@ -43,43 +63,33 @@ export class PetitionFilesService {
     @inject(CONFIG) private config: Config,
   ) {}
 
-  async *getPetitionFiles<T>(
-    petitionId: number,
-    userId: number,
-    processFile: (
-      storage: IStorageImpl,
-      path: string,
-      filename: string,
-      metadata: any,
-    ) => Promise<T>,
-    options: GetPetitionFilesOptions,
-  ): AsyncGenerator<T> {
+  async getPetitionFiles(petitionId: number, userId: number, options: GetPetitionFilesOptions) {
+    const results: GetPetitionFilesResult[] = [];
     this.logger.info(`Exporting files on Petition:${petitionId} ...`);
-    this.logger.info(JSON.stringify(omit(options, ["onProgress"]), null, 2));
-    const includeXlsx = options.include.includes("excel-file");
-    const includeFiles = options.include.includes("petition-field-files");
-    const includeSignature = options.include.includes("latest-signature");
+    this.logger.info(JSON.stringify(options, null, 2));
+    const includeXlsx = options.include.includes("PETITION_EXCEL_EXPORT");
+    const includeFileReplies = options.include.includes("PETITION_FILE_FIELD_REPLIES");
+    const includeSignature = options.include.includes("PETITION_LATEST_SIGNATURE");
+
+    const intl = await this.i18n.getIntl(options.locale);
 
     const [composedPetition] = await this.petitions.getComposedPetitionFieldsAndVariables([
       petitionId,
     ]);
 
-    const indices = Object.fromEntries(
-      getAllFieldsWithIndices(composedPetition.fields).map(([field, fieldIndex]) => [
-        field.id,
-        fieldIndex,
-      ]),
-    );
+    // TODO evaluateFieldLogic se ejecuta 2 veces
     const logic = evaluateFieldLogic(composedPetition);
     const visibleFields = applyFieldVisibility(composedPetition);
-    const allReplies = visibleFields
+
+    const allVisibleReplies = visibleFields
       .flatMap((f) => [
         ...f.replies,
         ...f.replies.flatMap((r) => r.children?.flatMap((c) => c.replies) ?? []),
       ])
       .filter((r) => r.type !== "FIELD_GROUP");
 
-    const fileReplies = allReplies.filter(
+    // get all valid FILE type replies
+    const fileReplies = allVisibleReplies.filter(
       (r) =>
         isFileTypeField(r.type) &&
         isNonNullish(r.content.file_upload_id) &&
@@ -87,21 +97,19 @@ export class PetitionFilesService {
         r.status !== "REJECTED",
     );
 
-    const backgroundCheckEntityReplies = allReplies.filter(
+    // get all BACKGROUND_CHECK ENTITY replies
+    const backgroundCheckEntityReplies = allVisibleReplies.filter(
       (r) => r.type === "BACKGROUND_CHECK" && isNonNullish(r.content.entity),
     );
-
-    const files = await this.files.loadFileUpload(
-      fileReplies.map((reply) => reply.content["file_upload_id"]),
-    );
-    const filesById = indexBy(files.filter(isNonNullish), (f) => f.id);
 
     const latestPetitionSignature =
       await this.petitions.loadLatestPetitionSignatureByPetitionId(petitionId);
 
+    // totalFiles may differ in 1 from the actual number of files exported
+    // as we do not know at this point if the excel file will be generated or no
     const totalFiles = [
-      includeXlsx ? 1 : 0, // excel file may contain text replies and/or field comments
-      includeFiles ? fileReplies.length + backgroundCheckEntityReplies.length : 0,
+      includeXlsx ? 1 : 0, // excel file is built only of petition contains text replies, background checks, variables and/or field comments
+      includeFileReplies ? fileReplies.length + backgroundCheckEntityReplies.length : 0,
       includeSignature && isNonNullish(latestPetitionSignature?.file_upload_id) ? 1 : 0,
       includeSignature && isNonNullish(latestPetitionSignature?.file_upload_audit_trail_id) ? 1 : 0,
     ].reduce((a, b) => a + b, 0);
@@ -109,20 +117,31 @@ export class PetitionFilesService {
     this.logger.info(`Found ${totalFiles} files...`);
 
     if (totalFiles === 0) {
-      return;
+      return [];
     }
 
-    let processedFiles = 0;
+    const files = await this.files.loadFileUpload(
+      fileReplies.map((reply) => reply.content["file_upload_id"]),
+    );
+    const filesById = indexBy(files.filter(isNonNullish), (f) => f.id);
 
-    const intl = await this.i18n.getIntl(options.locale);
     const excelWorkbook = new PetitionExcelExport(intl, this.config.misc.parallelUrl, {
       contacts: this.contacts,
       petitions: this.petitions,
       users: this.users,
     });
     await excelWorkbook.init();
-    const seen = new Set<string>();
 
+    excelWorkbook.addPetitionVariables(logic[0].finalVariables);
+
+    const indices = Object.fromEntries(
+      getAllFieldsWithIndices(composedPetition.fields).map(([field, fieldIndex]) => [
+        field.id,
+        fieldIndex,
+      ]),
+    );
+
+    const seen = new Set<string>();
     function resolveFileName(
       field: Pick<PetitionField, "id" | "title">,
       pattern: string | null | undefined,
@@ -152,18 +171,13 @@ export class PetitionFilesService {
       return filename;
     }
 
-    async function* processField(
+    const processField = async (
       field: UnwrapArray<typeof visibleFields> & {
-        group_name?: Maybe<string>;
+        group_name?: string | null;
         group_number?: number;
       },
       options: GetPetitionFilesOptions,
-      context: {
-        logger: ILogger;
-        storage: IStorageService;
-        printer: IPrinter;
-      },
-    ): AsyncGenerator<T> {
+    ) => {
       if (field.type === "HEADING" || field.type === "PROFILE_SEARCH") {
         // do nothing
       } else if (field.type === "FIELD_GROUP") {
@@ -171,7 +185,7 @@ export class PetitionFilesService {
           const groupIndex = field.replies.indexOf(groupReply);
           // process every child field on every reply group
           for (const child of groupReply.children ?? []) {
-            yield* processField(
+            await processField(
               {
                 ...child.field,
                 children: [],
@@ -180,48 +194,72 @@ export class PetitionFilesService {
                 group_name: field.options.groupName ?? null,
               },
               options,
-              context,
             );
           }
         }
       } else {
-        if (includeFiles && isFileTypeField(field.type)) {
+        if (includeFileReplies && isFileTypeField(field.type)) {
           for (const reply of field.replies) {
             const file = filesById[reply.content["file_upload_id"]];
             if (file?.upload_complete) {
-              // context.logger.info(`Exporting FileUpload:${file.id}...`);
-              yield await processFile(
-                context.storage.fileUploads,
-                file.path,
-                resolveFileName(field, options.pattern, file.filename),
-                { type: "PetitionFieldReply", id: reply.id, metadata: reply.metadata },
-              );
-              await options.onProgress?.(++processedFiles / totalFiles);
+              // this.logger.info(`Exporting FileUpload:${file.id}...`);
+              const filename = resolveFileName(field, options.pattern, file.filename);
+
+              results.push({
+                filename,
+                getDownloadUrl: () => {
+                  return this.storage.fileUploads.getSignedDownloadEndpoint(
+                    file.path,
+                    filename,
+                    "inline",
+                  );
+                },
+                getStream: () => {
+                  return this.storage.fileUploads.downloadFile(file.path);
+                },
+                metadata: {
+                  type: "PETITION_FILE_FIELD_REPLIES",
+                  fieldId: field.id,
+                  replyId: reply.id,
+                },
+              });
             }
           }
         }
 
-        if (includeFiles && field.type === "BACKGROUND_CHECK") {
+        if (includeFileReplies && field.type === "BACKGROUND_CHECK") {
           // on BACKGROUND_CHECK fields, export the PDF if reply has set "entity"
           for (const reply of field.replies.filter((r) => isNonNullish(r.content.entity))) {
-            const path = random(16);
-            await context.storage.temporaryFiles.uploadFile(
-              path,
-              "application/pdf",
-              Readable.from(await context.printer.backgroundCheckProfile(userId, reply.content)),
+            // this.logger.info(`Exporting BackgroundCheck PetitionFieldReply:${reply.id}...`);
+            const filename = resolveFileName(
+              field,
+              options.pattern,
+              `${reply.content.entity.type}-${reply.content.entity.id}.pdf`,
             );
-            context.logger.info(`Exporting BackgroundCheck PetitionFieldReply:${reply.id}...`);
-            yield await processFile(
-              context.storage.temporaryFiles,
-              path,
-              resolveFileName(
-                field,
-                options.pattern,
-                `${reply.content.entity.type}-${reply.content.entity.id}.pdf`,
-              ),
-              { type: "PetitionFieldReply", id: reply.id, metadata: reply.metadata },
-            );
-            await options.onProgress?.(++processedFiles / totalFiles);
+            results.push({
+              filename,
+              getDownloadUrl: async () => {
+                const path = random(16);
+                await this.storage.temporaryFiles.uploadFile(
+                  path,
+                  "application/pdf",
+                  await this.printer.backgroundCheckProfile(userId, reply.content),
+                );
+                return this.storage.temporaryFiles.getSignedDownloadEndpoint(
+                  path,
+                  filename,
+                  "inline",
+                );
+              },
+              getStream: () => {
+                return this.printer.backgroundCheckProfile(userId, reply.content);
+              },
+              metadata: {
+                type: "PETITION_FILE_FIELD_REPLIES",
+                fieldId: field.id,
+                replyId: reply.id,
+              },
+            });
           }
         }
 
@@ -229,36 +267,37 @@ export class PetitionFilesService {
           excelWorkbook.addPetitionFieldReply(field);
         }
       }
-    }
-
-    excelWorkbook.addPetitionVariables(logic[0].finalVariables);
+    };
 
     for (const field of visibleFields) {
-      yield* processField(field, options, {
-        logger: this.logger,
-        storage: this.storage,
-        printer: this.printer,
-      });
+      await processField(field, options);
     }
 
     await excelWorkbook.addPetitionFieldComments(visibleFields);
 
     if (includeXlsx && excelWorkbook.hasRows()) {
-      this.logger.info(`Exporting excel file...`);
-      yield await excelWorkbook.export(async (stream, filename) => {
-        const path = random(16);
-        await this.storage.temporaryFiles.uploadFile(
-          path,
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          stream,
-        );
-        return await processFile(this.storage.temporaryFiles, path, filename, {
-          type: "Petition",
-          id: petitionId,
-          metadata: composedPetition.metadata,
-        });
+      // this.logger.info(`Exporting excel file...`);
+      const filename = `${intl.formatMessage({
+        id: "petition-excel-export.replies",
+        defaultMessage: "Replies",
+      })}.xlsx`;
+
+      results.push({
+        filename,
+        getDownloadUrl: async () => {
+          const path = random(16);
+          await this.storage.temporaryFiles.uploadFile(
+            path,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            await excelWorkbook.export(),
+          );
+          return this.storage.temporaryFiles.getSignedDownloadEndpoint(path, filename, "inline");
+        },
+        getStream: () => {
+          return excelWorkbook.export();
+        },
+        metadata: { type: "PETITION_EXCEL_EXPORT", petitionId },
       });
-      await options.onProgress?.(++processedFiles / totalFiles);
     }
 
     if (includeSignature && latestPetitionSignature?.status === "COMPLETED") {
@@ -267,40 +306,59 @@ export class PetitionFilesService {
           latestPetitionSignature.file_upload_id,
         );
         if (signedPetition?.upload_complete) {
-          this.logger.info(
-            `Exporting PetitionSignature:${latestPetitionSignature.id} signed doc...`,
-          );
-          yield await processFile(
-            this.storage.fileUploads,
-            signedPetition.path,
-            signedPetition.filename,
-            {
-              type: "PetitionSignatureRequest",
-              documentType: "signed-document",
-              id: latestPetitionSignature.id,
-              metadata: latestPetitionSignature.metadata,
+          // this.logger.info(
+          //   `Exporting PetitionSignature:${latestPetitionSignature.id} signed doc...`,
+          // );
+          results.push({
+            filename: signedPetition.filename,
+            getDownloadUrl: () => {
+              return this.storage.fileUploads.getSignedDownloadEndpoint(
+                signedPetition.path,
+                signedPetition.filename,
+                "inline",
+              );
             },
-          );
-          await options.onProgress?.(++processedFiles / totalFiles);
-        }
-      }
-      if (isNonNullish(latestPetitionSignature.file_upload_audit_trail_id)) {
-        const auditTrail = await this.files.loadFileUpload(
-          latestPetitionSignature.file_upload_audit_trail_id,
-        );
-        if (auditTrail?.upload_complete) {
-          this.logger.info(
-            `Exporting PetitionSignature:${latestPetitionSignature.id} audit trail...`,
-          );
-          yield await processFile(this.storage.fileUploads, auditTrail.path, auditTrail.filename, {
-            type: "PetitionSignatureRequest",
-            documentType: "audit-trail",
-            id: latestPetitionSignature.id,
-            metadata: latestPetitionSignature.metadata,
+            getStream: () => {
+              return this.storage.fileUploads.downloadFile(signedPetition.path);
+            },
+            metadata: {
+              type: "PETITION_LATEST_SIGNATURE",
+              subtype: "SIGNED_DOCUMENT",
+              petitionSignatureRequestId: latestPetitionSignature.id,
+            },
           });
-          await options.onProgress?.(++processedFiles / totalFiles);
+        }
+        if (isNonNullish(latestPetitionSignature.file_upload_audit_trail_id)) {
+          const auditTrail = await this.files.loadFileUpload(
+            latestPetitionSignature.file_upload_audit_trail_id,
+          );
+          if (auditTrail?.upload_complete) {
+            // this.logger.info(
+            //   `Exporting PetitionSignature:${latestPetitionSignature.id} audit trail...`,
+            // );
+            results.push({
+              filename: auditTrail.filename,
+              getDownloadUrl: () => {
+                return this.storage.fileUploads.getSignedDownloadEndpoint(
+                  auditTrail.path,
+                  auditTrail.filename,
+                  "inline",
+                );
+              },
+              getStream: () => {
+                return this.storage.fileUploads.downloadFile(auditTrail.path);
+              },
+              metadata: {
+                type: "PETITION_LATEST_SIGNATURE",
+                subtype: "AUDIT_TRAIL",
+                petitionSignatureRequestId: latestPetitionSignature.id,
+              },
+            });
+          }
         }
       }
     }
+
+    return results;
   }
 }

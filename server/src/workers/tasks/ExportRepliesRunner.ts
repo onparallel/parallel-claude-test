@@ -1,5 +1,4 @@
-import sanitizeFilename from "sanitize-filename";
-import { createZipFile, ZipFileInput } from "../../util/createZipFile";
+import { createZipFile } from "../../util/createZipFile";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { TaskRunner } from "../helpers/TaskRunner";
 
@@ -21,27 +20,21 @@ export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
 
     const userData = await this.ctx.users.loadUserDataByUserId(this.task.user_id);
 
-    // TODO: any error inside getPetitionFiles is not being captured. we should fix this...
     const zipFile = createZipFile(
-      this.ctx.petitionFiles.getPetitionFiles<ZipFileInput>(
-        petitionId,
-        this.task.user_id,
-        async (storage, path, filename) => ({
-          filename: sanitizeFilename(filename),
-          stream: await storage.downloadFile(path),
-        }),
-        {
-          pattern: pattern ?? undefined,
-          locale: userData!.preferred_locale,
-          include: ["excel-file", "petition-field-files", "latest-signature"],
-          onProgress: async (progress) => {
-            // this.ctx.logger.info(
-            //   `Exporting files for Petition:${petitionId}: ${Math.round(progress * 100)}%`,
-            // );
-            await this.onProgress(progress * 100 * 0.95);
-          },
+      await this.ctx.petitionFiles.getPetitionFiles(petitionId, this.task.user_id, {
+        pattern: pattern ?? undefined,
+        locale: userData!.preferred_locale,
+        include: [
+          "PETITION_EXCEL_EXPORT",
+          "PETITION_FILE_FIELD_REPLIES",
+          "PETITION_LATEST_SIGNATURE",
+        ],
+      }),
+      {
+        onProgress: (processed, totalCount) => {
+          this.onProgress((processed / totalCount) * 100 * 0.95);
         },
-      ),
+      },
     );
 
     const tmpFile = await this.uploadTemporaryFile({

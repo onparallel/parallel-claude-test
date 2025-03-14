@@ -10,10 +10,12 @@ import {
   EnhancedOrgIntegration,
   IntegrationRepository,
 } from "../../../db/repositories/IntegrationRepository";
+import { PetitionRepository } from "../../../db/repositories/PetitionRepository";
 import { ENCRYPTION_SERVICE, EncryptionService } from "../../../services/EncryptionService";
 import { ILogger, LOGGER } from "../../../services/Logger";
 import { fromGlobalId, isGlobalId, toGlobalId } from "../../../util/globalId";
 import { JsonSchemaFor } from "../../../util/jsonSchema";
+import { never } from "../../../util/never";
 import { GenericIntegration } from "../../helpers/GenericIntegration";
 import { FileExport, IFileExportIntegration } from "../FileExportIntegration";
 
@@ -54,6 +56,7 @@ export class IManageFileExportIntegration
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(LOGGER) private logger: ILogger,
+    @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(ENCRYPTION_SERVICE) encryption: EncryptionService,
     @inject(IntegrationRepository) integrations: IntegrationRepository,
   ) {
@@ -242,59 +245,85 @@ export class IManageFileExportIntegration
     };
   }
 
-  private fetchFileExportJson(): RequestHandler {
-    function mapFileExport(f: FileExport) {
-      function calculateStatus({ status, url, metadata }: FileExport) {
-        if (status !== "WAITING") {
-          return { status, url };
-        }
-
-        // files in WAITING status may have an iManage URL if they were previously exported
-        // so if we find the FILE_EXPORT_IMANAGE_URL in metadata, we can return it
-        switch (metadata.type) {
-          case "Petition":
-          case "PetitionFieldReply":
-            if (isNonNullish(metadata.metadata.FILE_EXPORT_IMANAGE_URL)) {
-              return { status: "OK", url: metadata.metadata.FILE_EXPORT_IMANAGE_URL as string };
-            }
-            if (metadata.metadata.FILE_EXPORT_IMANAGE_URL === null) {
-              return { status: "NOK", url: null };
-            }
-            break;
-          case "PetitionSignatureRequest":
-            if (metadata.documentType === "signed-document") {
-              if (isNonNullish(metadata.metadata.SIGNED_DOCUMENT_FILE_EXPORT_IMANAGE_URL)) {
-                return {
-                  status: "OK",
-                  url: metadata.metadata.SIGNED_DOCUMENT_FILE_EXPORT_IMANAGE_URL as string,
-                };
-              }
-              if (metadata.metadata.SIGNED_DOCUMENT_FILE_EXPORT_IMANAGE_URL === null) {
-                return { status: "NOK", url: null };
-              }
-            } else if (metadata.documentType === "audit-trail") {
-              if (isNonNullish(metadata.metadata.AUDIT_TRAIL_FILE_EXPORT_IMANAGE_URL)) {
-                return {
-                  status: "OK",
-                  url: metadata.metadata.AUDIT_TRAIL_FILE_EXPORT_IMANAGE_URL as string,
-                };
-              }
-              if (metadata.metadata.AUDIT_TRAIL_FILE_EXPORT_IMANAGE_URL === null) {
-                return { status: "NOK", url: null };
-              }
-            }
-            break;
-        }
-
-        return { status: "WAITING", url: null };
-      }
-      return {
-        id: f.id,
-        filename: f.filename,
-        temporaryUrl: f.temporary_url,
-        ...calculateStatus(f),
-      };
+  /*
+   * entity can be a petition, petition_field_reply or petition_signature_request
+   * if entity is null or undefined, the most possible case is that the entity has been deleted so we have to ignore it
+   */
+  private resolveMetadataUrl(
+    entity: { metadata: Record<string, string | null | undefined> } | null | undefined,
+    key: string,
+  ) {
+    if (!entity) {
+      return null;
     }
+
+    const url = entity.metadata[key];
+    if (url) {
+      return { status: "OK", url };
+    }
+    if (url === null) {
+      return { status: "NOK", url: null };
+    }
+    return { status: "WAITING", url: null };
+  }
+
+  private async fetchFileExportStatus(files: FileExport[]) {
+    const [petitionId] = files
+      .map((f) => (f.metadata.type === "PETITION_EXCEL_EXPORT" ? f.metadata.petitionId : null))
+      .filter(isNonNullish);
+    const fieldReplyIds = files
+      .map((f) => (f.metadata.type === "PETITION_FILE_FIELD_REPLIES" ? f.metadata.replyId : null))
+      .filter(isNonNullish);
+    const [signatureId] = files
+      .map((f) =>
+        f.metadata.type === "PETITION_LATEST_SIGNATURE"
+          ? f.metadata.petitionSignatureRequestId
+          : null,
+      )
+      .filter(isNonNullish);
+
+    const petition = isNonNullish(petitionId)
+      ? await this.petitions.loadPetition(petitionId)
+      : null;
+
+    const replies =
+      fieldReplyIds.length > 0 ? await this.petitions.loadFieldReply(fieldReplyIds) : [];
+
+    const signatureRequest = isNonNullish(signatureId)
+      ? await this.petitions.loadPetitionSignatureById(signatureId)
+      : null;
+
+    return files.map((file) => {
+      if (file.status !== "WAITING") {
+        return { status: file.status, url: file.url };
+      }
+
+      switch (file.metadata.type) {
+        case "PETITION_EXCEL_EXPORT": {
+          return this.resolveMetadataUrl(petition, "FILE_EXPORT_IMANAGE_URL");
+        }
+        case "PETITION_FILE_FIELD_REPLIES": {
+          const replyId = file.metadata.replyId;
+          const reply = replies.find((r) => r?.id === replyId);
+          return this.resolveMetadataUrl(reply, "FILE_EXPORT_IMANAGE_URL");
+        }
+        case "PETITION_LATEST_SIGNATURE": {
+          if (file.metadata.subtype === "SIGNED_DOCUMENT") {
+            return this.resolveMetadataUrl(
+              signatureRequest,
+              "SIGNED_DOCUMENT_FILE_EXPORT_IMANAGE_URL",
+            );
+          } else if (file.metadata.subtype === "AUDIT_TRAIL") {
+            return this.resolveMetadataUrl(signatureRequest, "AUDIT_TRAIL_FILE_EXPORT_IMANAGE_URL");
+          } else {
+            never(`Unknown subtype: ${file.metadata.subtype}`);
+          }
+        }
+      }
+    });
+  }
+
+  private fetchFileExportJson(): RequestHandler {
     return async (req, res, next) => {
       try {
         this.logger.info("Fetching file export JSON...");
@@ -304,7 +333,22 @@ export class IManageFileExportIntegration
           throw new RequestError(403, "Invalid file export log ID");
         }
 
-        return res.json(log.json_export.map(mapFileExport)).status(200).end();
+        const exportStatus = await this.fetchFileExportStatus(log.json_export);
+
+        return res
+          .json(
+            zip(log.json_export, exportStatus)
+              .filter(([, s]) => isNonNullish(s)) // filter null statuses, as those files may have been deleted
+              .map(([e, s]) => ({
+                id: e.id,
+                filename: e.filename,
+                temporaryUrl: e.temporary_url,
+                status: s!.status,
+                url: s!.url,
+              })),
+          )
+          .status(200)
+          .end();
       } catch (error) {
         next(error);
       }
@@ -359,26 +403,29 @@ export class IManageFileExportIntegration
           file.error = result.status === "NOK" ? result.error : undefined;
 
           switch (file.metadata.type) {
-            case "Petition":
+            case "PETITION_EXCEL_EXPORT":
               await req.context.petitions.attachPetitionMetadata(
-                file.metadata.id,
+                file.metadata.petitionId,
                 { FILE_EXPORT_IMANAGE_URL: file.url ?? null },
                 `User:${log.created_by_user_id}`,
               );
               break;
-            case "PetitionFieldReply":
+            case "PETITION_FILE_FIELD_REPLIES":
               await req.context.petitions.attachPetitionFieldReplyMetadata(
-                file.metadata.id,
+                file.metadata.replyId,
                 { FILE_EXPORT_IMANAGE_URL: file.url ?? null },
                 `User:${log.created_by_user_id}`,
               );
               break;
-            case "PetitionSignatureRequest":
-              await req.context.petitions.attachPetitionSignatureRequestMetadata(file.metadata.id, {
-                [file.metadata.documentType === "signed-document"
-                  ? "SIGNED_DOCUMENT_FILE_EXPORT_IMANAGE_URL"
-                  : "AUDIT_TRAIL_FILE_EXPORT_IMANAGE_URL"]: file.url ?? null,
-              });
+            case "PETITION_LATEST_SIGNATURE":
+              await req.context.petitions.attachPetitionSignatureRequestMetadata(
+                file.metadata.petitionSignatureRequestId,
+                {
+                  [file.metadata.subtype === "SIGNED_DOCUMENT"
+                    ? "SIGNED_DOCUMENT_FILE_EXPORT_IMANAGE_URL"
+                    : "AUDIT_TRAIL_FILE_EXPORT_IMANAGE_URL"]: file.url ?? null,
+                },
+              );
           }
         }
 

@@ -1,19 +1,8 @@
-type FileExportMetadata =
-  | {
-      id: number;
-      type: "PetitionFieldReply" | "Petition";
-      metadata: any;
-    }
-  | {
-      id: number;
-      type: "PetitionSignatureRequest";
-      documentType: "signed-document" | "audit-trail";
-      metadata: any;
-    };
+import { GetPetitionFilesResultMetadata } from "../../services/PetitionFilesService";
 
 export type FileExport = {
   id: string;
-  metadata: FileExportMetadata;
+  metadata: GetPetitionFilesResultMetadata;
   filename: string;
   temporary_url: string;
   status: "WAITING" | "OK" | "NOK";

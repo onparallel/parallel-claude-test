@@ -159,7 +159,7 @@ export class PetitionExcelExport {
     await this.fieldCommentsTab.addFieldComments(fields);
   }
 
-  public async export<T>(outputFn: (stream: Readable, filename: string) => Promise<T>): Promise<T> {
+  public async export() {
     const stream = new Readable();
     // remove the tabs that only contain the headings row
     if (this.textRepliesTab.rowCount === 1) {
@@ -171,13 +171,7 @@ export class PetitionExcelExport {
     stream.push(await this.wb.xlsx.writeBuffer());
     stream.push(null); // end of stream
 
-    return await outputFn(
-      stream,
-      `${this.intl.formatMessage({
-        id: "petition-excel-export.replies",
-        defaultMessage: "Replies",
-      })}.xlsx`,
-    );
+    return stream;
   }
 
   public hasRows() {

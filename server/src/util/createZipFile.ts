@@ -1,24 +1,36 @@
 import archiver from "archiver";
 import { PassThrough, pipeline, Readable } from "stream";
 
-export interface ZipFileInput {
+interface ZipFileInput {
   filename: string;
-  stream: Readable;
+  getStream: () => Promise<Readable>;
 }
 
-export function createZipFile(files: AsyncGenerator<ZipFileInput>) {
+export function createZipFile(
+  files: ZipFileInput[],
+  options?: { onProgress?: (processed: number, totalCount: number) => void },
+) {
   const zip = archiver("zip");
-  function processFile(result: IteratorResult<ZipFileInput>) {
-    if (result.done) {
+
+  const totalCount = files.length;
+  let progress = 0;
+  async function processFile(file: ZipFileInput | undefined) {
+    if (!file) {
       zip.finalize();
     } else {
-      const { stream, filename } = result.value;
-      stream.on("end", () => files.next().then(processFile));
+      const { getStream, filename } = file;
+      const stream = await getStream();
+      stream.on("end", () => {
+        options?.onProgress?.(++progress, totalCount);
+        processFile(files.pop());
+      });
       stream.on("error", (err) => zip.emit("error", err));
       zip.append(stream, { name: filename });
     }
   }
-  files.next().then(processFile);
+
+  processFile(files.pop());
+
   // workaround until this is fixed https://github.com/aws/aws-sdk-js-v3/issues/2522
   const passThrough = new PassThrough();
   return pipeline(zip, passThrough, () => {}) as Readable;

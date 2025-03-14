@@ -1,4 +1,4 @@
-import sanitizeFilename from "sanitize-filename";
+import pMap from "p-map";
 import { assert } from "ts-essentials";
 import { FileExportLog } from "../../db/__types";
 import { FileExport } from "../../integrations/file-export/FileExportIntegration";
@@ -26,10 +26,6 @@ export class FileExportRunner extends TaskRunner<"FILE_EXPORT"> {
       petitionId,
       pattern,
       this.task.user_id,
-      async (progress) => {
-        this.ctx.logger.info(`[FileExportRunner:${this.task.id}]: ${Math.round(progress * 100)}%`);
-        await this.onProgress(progress * 100 * 0.95);
-      },
     );
 
     return {
@@ -43,33 +39,39 @@ export class FileExportRunner extends TaskRunner<"FILE_EXPORT"> {
     petitionId: number,
     filenamePattern: string | null,
     userId: number,
-    onProgress?: (progress: number) => Promise<void>,
   ): Promise<FileExportLog> {
     const userData = await this.ctx.users.loadUserDataByUserId(userId);
     assert(userData, `User ${userId} not found`);
-    const files = this.ctx.petitionFiles.getPetitionFiles<FileExport>(
-      petitionId,
-      userId,
-      async (storage, path, filename, metadata) => ({
-        id: random(16),
-        status: "WAITING",
-        metadata,
-        filename: sanitizeFilename(filename),
-        temporary_url: await storage.getSignedDownloadEndpoint(path, filename, "inline"),
-      }),
-      {
-        include: ["excel-file", "petition-field-files", "latest-signature"],
-        locale: userData.preferred_locale,
-        pattern: filenamePattern,
-        onProgress,
-      },
-    );
+    const files = await this.ctx.petitionFiles.getPetitionFiles(petitionId, userId, {
+      include: [
+        "PETITION_EXCEL_EXPORT",
+        "PETITION_FILE_FIELD_REPLIES",
+        "PETITION_LATEST_SIGNATURE",
+      ],
+      locale: userData.preferred_locale,
+      pattern: filenamePattern,
+    });
 
-    let next: IteratorResult<FileExport>;
-    const exportedFiles: FileExport[] = [];
-    while (!(next = await files.next()).done) {
-      exportedFiles.push(next.value);
-    }
+    let progress = 0;
+    const exportedFiles = await pMap(
+      files,
+      async (f) => {
+        this.ctx.logger.info(
+          `[FileExportRunner:${this.task.id}]: ${Math.round((progress / files.length) * 100)}%`,
+        );
+        const temporaryUrl = await f.getDownloadUrl();
+        await this.onProgress((++progress / files.length) * 100 * 0.95);
+
+        return {
+          id: random(16),
+          status: "WAITING",
+          metadata: f.metadata,
+          filename: f.filename,
+          temporary_url: temporaryUrl,
+        } as FileExport;
+      },
+      { concurrency: 1 },
+    );
 
     if (exportedFiles.length === 0) {
       throw new Error(`No files to export on Petition:${petitionId}`);
