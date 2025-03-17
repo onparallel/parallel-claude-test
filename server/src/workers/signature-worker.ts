@@ -480,7 +480,7 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
     return signature;
   }
 
-  findSignerExternalId(
+  private findSignerExternalId(
     documents: SignatureResponse["documents"],
     signer: PetitionSignatureConfigSigner,
     signerIndex: number,

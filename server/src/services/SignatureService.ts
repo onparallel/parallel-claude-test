@@ -85,12 +85,21 @@ export class SignatureService implements ISignatureService {
 
     await this.cancelPendingSignatureRequests(petitionId, starter);
 
+    const sanitizedSigners = (signatureConfig.additionalSignersInfo ?? [])
+      .concat(signatureConfig.signersInfo)
+      .map((s) => ({
+        ...s,
+        email: s.email.replace(
+          // Remove control characters, zero-width spaces, direction markers, and other invisible formatting characters
+          /[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF\u00AD]/g,
+          "",
+        ),
+      }));
+
     const signatureRequest = await this.petitions.createPetitionSignature(petitionId, {
       signature_config: {
         ...omit(signatureConfig, ["additionalSignersInfo"]),
-        signersInfo: (signatureConfig.additionalSignersInfo ?? []).concat(
-          signatureConfig.signersInfo,
-        ),
+        signersInfo: sanitizedSigners,
       },
     });
 
