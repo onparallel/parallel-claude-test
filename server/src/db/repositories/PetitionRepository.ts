@@ -2719,27 +2719,22 @@ export class PetitionRepository extends BaseRepository {
       }
     >(
       /* sql */ `
-        with pf as (
-          select pf.*
-          from petition_field pf
-          where pf.petition_id in ? and pf.deleted_at is null
-        ),
-        pfr as (
-          select
-            pfr.petition_field_id,
-            jsonb_agg(pfr.* order by pfr.created_at asc) replies
+        select
+            pf.*,
+            coalesce(pfr_replies.replies, '[]'::jsonb) as replies
+        from petition_field pf
+        left join lateral (
+          select jsonb_agg(pfr.* order by pfr.created_at) as replies
           from petition_field_reply pfr
           left join file_upload fu on
-            pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'ID_VERIFICATION', 'DOW_JONES_KYC') and fu.upload_complete = true
-            and fu.id = (pfr.content->>'file_upload_id')::int and fu.deleted_at is null
-          where pfr.petition_field_id in (select id from pf) and pfr.deleted_at is null
-            -- discard files where upload failed
+              pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'ID_VERIFICATION', 'DOW_JONES_KYC') and fu.upload_complete = true
+              and fu.id = (pfr.content->>'file_upload_id')::int and fu.deleted_at is null
+          where pfr.petition_field_id = pf.id
+            and pfr.deleted_at is null
+            -- if field is "file" check if upload is complete
             and (pfr.type not in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'ID_VERIFICATION', 'DOW_JONES_KYC') or fu.id is not null)
-          group by pfr.petition_field_id
-        )
-        select pf.*, coalesce(pfr.replies, '[]'::jsonb) as replies
-        from pf
-        left join pfr on pf.id = pfr.petition_field_id
+        ) pfr_replies on true
+        where pf.petition_id in ? and pf.deleted_at is null
       `,
       [this.sqlIn(petitionIds)],
     );
