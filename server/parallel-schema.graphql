@@ -3832,6 +3832,7 @@ type Petition implements PetitionBase {
   Time when the resource was created.
   """
   createdAt: DateTime!
+  currentApprovalRequestStatus: PetitionApprovalRequestStatus!
   currentApprovalRequestSteps: [PetitionApprovalRequestStep!]
 
   """
@@ -4159,6 +4160,17 @@ type PetitionAnonymizedEvent implements PetitionEvent {
   id: GID!
   petition: PetitionBaseMini
   type: PetitionEventType!
+}
+
+"""
+The status of the petition approval request.
+"""
+enum PetitionApprovalRequestStatus {
+  APPROVED
+  NOT_STARTED
+  NO_APPROVAL
+  PENDING
+  REJECTED
 }
 
 type PetitionApprovalRequestStep {
@@ -7068,6 +7080,7 @@ type PublicPetition implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
+  currentApprovalRequestStatus: PetitionApprovalRequestStatus!
   customLists: [PetitionCustomList!]!
 
   """
@@ -7445,6 +7458,7 @@ type PublicPetitionMessage {
 }
 
 type PublicPetitionSignatureRequest {
+  cancelReason: String
   id: GID!
   signerStatus: [PetitionSignatureRequestSignerStatus!]!
 

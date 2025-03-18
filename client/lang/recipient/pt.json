@@ -335,11 +335,6 @@
     "context": "We will send the document to sign to each contact after the one before has signed:"
   },
   {
-    "term": "component.recipient-view-confirm-petition-signers-dialog.header",
-    "definition": "Iniciar a assinatura",
-    "context": "Start signature"
-  },
-  {
     "term": "component.recipient-view-confirm-petition-signers-dialog.include-message",
     "definition": "Incluir mensagem",
     "context": "Include message"
@@ -368,11 +363,6 @@
     "term": "component.recipient-view-confirm-petition-signers-dialog.signers-added",
     "definition": "Ainda não adicionaste signatários",
     "context": "You haven't added any signers yet"
-  },
-  {
-    "term": "component.recipient-view-confirm-petition-signers-dialog.start-signature-button",
-    "definition": "Iniciar assinatura",
-    "context": "Start signature"
   },
   {
     "term": "component.recipient-view-contactless-form.access",
@@ -503,6 +493,16 @@
     "term": "component.recipient-view-petition-approvals-alert.alert-description-2",
     "definition": "Se precisar corrigir algo, pode nos escrever através dos comentários habilitados.",
     "context": "If you need to correct anything, you can write to us through the enabled comments."
+  },
+  {
+    "term": "component.recipient-view-petition-approvals-alert.alert-description-3",
+    "definition": "O seu processo foi <b>revisado e finalizado.</b>",
+    "context": "Your process has been <b>reviewed and finalised.</b>"
+  },
+  {
+    "term": "component.recipient-view-petition-approvals-alert.alert-description-4",
+    "definition": "Se precisar de mais informações ou tiver alguma dúvida, pode escrever para nós através dos comentários.",
+    "context": "If you need more information or have any questions, please write to us in the comments."
   },
   {
     "term": "component.recipient-view-petition-field-card.add-another-reply",
@@ -740,14 +740,19 @@
     "context": "Start"
   },
   {
+    "term": "component.recipient-view-petition-status-alert.petition-and-signature-completed-alert-1",
+    "definition": "<b>Informação e assinatura concluídas!</b>",
+    "context": "<b>Information and signature completed!</b>"
+  },
+  {
     "term": "component.recipient-view-petition-status-alert.petition-closed-alert",
-    "definition": "Este parallel foi encerrado. Se deseja realizar alterações, por favor, contacte {name}.",
-    "context": "This parallel has been closed. If you need to make any changes, please reach out to {name}."
+    "definition": "Este processo foi completado. Se deseja realizar alterações, por favor, contacte {name}.",
+    "context": "This process has been completed. If you need to make any changes, please reach out to {name}."
   },
   {
     "term": "component.recipient-view-petition-status-alert.petition-completed-alert-1",
-    "definition": "{tone, select, INFORMAL{<b>Informação completada!</b> Avisámos para que seja revista e validada.} other{<b>Informação completada,</b> notificámos para a revisão e validação.}}",
-    "context": "<b>Information completed!</b> We have notified for review and validation."
+    "definition": "<b>Informação completada!</b>",
+    "context": "<b>Information completed!</b>"
   },
   {
     "term": "component.recipient-view-petition-status-alert.petition-completed-alert-2",
@@ -823,6 +828,11 @@
     "term": "component.signature-sent-alert.petition-signature-request-sent-alert",
     "definition": "<b>Documento enviado para assinatura</b> a {name} ({email}){count, plural, =0{} other{ e <a># mais</a>}}.",
     "context": "<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{ and <a># more</a>}}."
+  },
+  {
+    "term": "component.signature-sent-alert.petition-signature-request-sent-alert-2",
+    "definition": "{tone, select, INFORMAL{Se precisa fazer alguma mudança, pode escrever pra gente nos} other{Se precisar fazer alguma alteração, pode nos escrever através dos}} comentários.",
+    "context": "If you need to make any changes, you can write us through the comments."
   },
   {
     "term": "component.signature-sent-alert.petition-signature-request-sent-alert-sequential",
@@ -958,6 +968,11 @@
     "term": "generic.comments-button-label",
     "definition": "{commentCount, plural, =0 {Sem comentários} =1 {# comentário} other {# comentários}}",
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}"
+  },
+  {
+    "term": "generic.contact",
+    "definition": "Contatar",
+    "context": "Contact"
   },
   {
     "term": "generic.continue",
@@ -1263,6 +1278,11 @@
     "term": "generic.start",
     "definition": "Iniciar",
     "context": "Start"
+  },
+  {
+    "term": "generic.start-signature",
+    "definition": "Iniciar assinatura",
+    "context": "Start signature"
   },
   {
     "term": "generic.submit",

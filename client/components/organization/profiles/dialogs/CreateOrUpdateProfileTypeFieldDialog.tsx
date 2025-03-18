@@ -26,7 +26,7 @@ import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/RestrictedPetitionFieldAlert";
+import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
 import {
   CreateProfileTypeFieldInput,
   ProfileTypeFieldType,

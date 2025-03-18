@@ -26,23 +26,21 @@ import { RecipientViewContents } from "@parallel/components/recipient-view/Recip
 import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
 import { RecipientViewHeader } from "@parallel/components/recipient-view/RecipientViewHeader";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
-import { RecipientViewPetitionApprovalsAlert } from "@parallel/components/recipient-view/RecipientViewPetitionApprovalsAlert";
-import { RecipientViewPetitionStatusAlert } from "@parallel/components/recipient-view/RecipientViewPetitionStatusAlert";
 import { RecipientViewProgressBar } from "@parallel/components/recipient-view/RecipientViewProgressBar";
-import { RecipientViewRefreshRepliesAlert } from "@parallel/components/recipient-view/RecipientViewRefreshRepliesAlert";
 import {
   RecipientViewMobileNavigation,
   RecipientViewSidebar,
 } from "@parallel/components/recipient-view/RecipientViewSidebar";
 import { RecipientViewSidebarContextProvider } from "@parallel/components/recipient-view/RecipientViewSidebarContextProvider";
-import { RecipientViewSignatureSentAlert } from "@parallel/components/recipient-view/RecipientViewSignatureSentAlert";
+import { RecipientViewPetitionAlerts } from "@parallel/components/recipient-view/alerts/RecipientViewPetitionAlerts";
+import { RecipientViewRefreshRepliesAlert } from "@parallel/components/recipient-view/alerts/RecipientViewRefreshRepliesAlert";
 import { useCompletingMessageDialog } from "@parallel/components/recipient-view/dialogs/CompletingMessageDialog";
 import {
   RecipientViewConfirmPetitionSignersDialogResult,
   useRecipientViewConfirmPetitionSignersDialog,
 } from "@parallel/components/recipient-view/dialogs/RecipientViewConfirmPetitionSignersDialog";
 import { useRecipientViewReviewBeforeSignDialog } from "@parallel/components/recipient-view/dialogs/RecipientViewReviewBeforeSignDialog";
-
+import { useSignatureStatusDialog } from "@parallel/components/recipient-view/dialogs/SignatureStatusDialog";
 import { RecipientViewPetitionField } from "@parallel/components/recipient-view/fields/RecipientViewPetitionField";
 import {
   RecipientView_accessDocument,
@@ -54,9 +52,12 @@ import { useAssertQuery, withAssertApolloQuery } from "@parallel/utils/apollo/us
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
 import { focusPetitionField } from "@parallel/utils/focusPetitionField";
+import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
 import { LiquidPetitionScopeProvider } from "@parallel/utils/liquid/LiquidPetitionScopeProvider";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
+import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
+import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useGetPetitionPages } from "@parallel/utils/useGetPetitionPages";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
@@ -67,7 +68,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, isNullish, omit } from "remeda";
+import { isNonNullish, omit } from "remeda";
 import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getInitialProps>>;
@@ -75,6 +76,7 @@ type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getIniti
 function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const intl = useIntl();
   const router = useRouter();
+
   const {
     data: { access },
     refetch: refetchAccess,
@@ -277,14 +279,27 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
     }
   }, []);
 
+  const [_, setFieldId] = useFieldCommentsQueryState();
+
+  const handleShowGeneralComments = useCallback(() => {
+    setFieldId("general");
+  }, [setFieldId]);
+
+  const showSignatureStatusDialog = useSignatureStatusDialog();
+  async function handleCheckSignatureStatusClick() {
+    const petition = await handleRefetchPetition();
+    await withError(showSignatureStatusDialog({ petition: petition! }));
+  }
+
+  const signatureStatus = getPetitionSignatureStatus({
+    status: petition.status,
+    currentSignatureRequest: petition.latestSignatureRequest,
+    signatureConfig: petition.signatureConfig,
+  });
+
   const isClosed = ["COMPLETED", "CLOSED"].includes(petition.status);
   const hasSignature =
     !!petition.signatureConfig?.isEnabled && petition.signatureConfig.review === false;
-
-  const showApprovalsAlert = petition.hasStartedProcess && isNullish(petition.signatureStatus);
-
-  const showPetitionStatusAlert =
-    !showApprovalsAlert && ["COMPLETED", "CLOSED"].includes(petition.status);
 
   return (
     <LastSavedProvider>
@@ -341,22 +356,6 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                 >
                   {/* Alerts container */}
                   <Box position="sticky" top={0} width="100%" zIndex={2}>
-                    {showPetitionStatusAlert ? (
-                      !petition.signatureConfig?.isEnabled ||
-                      petition.signatureStatus === "COMPLETED" ? (
-                        <RecipientViewPetitionStatusAlert
-                          petition={petition}
-                          granter={granter}
-                          tone={tone}
-                        />
-                      ) : (
-                        <RecipientViewSignatureSentAlert
-                          petition={petition}
-                          tone={tone}
-                          onRefetch={handleRefetchPetition}
-                        />
-                      )
-                    ) : null}
                     {showRefreshRepliesAlert ? (
                       <RecipientViewRefreshRepliesAlert
                         tone={tone}
@@ -366,9 +365,16 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                         }}
                       />
                     ) : null}
-                    {showApprovalsAlert ? (
-                      <RecipientViewPetitionApprovalsAlert tone={tone} />
-                    ) : null}
+                    <RecipientViewPetitionAlerts
+                      tone={tone}
+                      currentApprovalRequestStatus={petition.currentApprovalRequestStatus}
+                      petitionStatus={petition.status}
+                      signatureStatus={signatureStatus}
+                      signatureConfig={petition.signatureConfig}
+                      granterFullName={granter?.fullName}
+                      onCheckSignatureStatus={handleCheckSignatureStatusClick}
+                      onContact={handleShowGeneralComments}
+                    />
                   </Box>
                   {/* End Alerts container */}
                   {/* Content */}
@@ -515,12 +521,13 @@ const _fragments = {
         signatureConfig {
           isEnabled
           review
+          ...RecipientViewPetitionAlerts_PublicSignatureConfig
         }
         recipients {
           ...RecipientViewHeader_PublicContact
         }
-        signatureStatus
         isCompletingMessageEnabled
+        currentApprovalRequestStatus
         hasStartedProcess
         ...RecipientViewContents_PublicPetition
         ...RecipientViewProgressBar_PublicPetition
@@ -528,9 +535,9 @@ const _fragments = {
         ...LiquidPetitionScopeProvider_PublicPetition
         ...useCompletingMessageDialog_PublicPetition
         ...RecipientViewFooter_PublicPetition
-        ...RecipientViewPetitionStatusAlert_PublicPetition
-        ...RecipientViewSignatureSentAlert_PublicPetition
         ...usePetitionCanFinalize_PublicPetition
+        ...getPetitionSignatureStatus_PublicPetition
+        ...RecipientViewSignatureStatusDialog_PublicPetition
       }
       ${focusPetitionField.fragments.PublicPetitionField}
       ${RecipientViewContents.fragments.PublicPetition}
@@ -540,21 +547,20 @@ const _fragments = {
       ${useGetPetitionPages.fragments.PublicPetition}
       ${LiquidPetitionScopeProvider.fragments.PublicPetition}
       ${useCompletingMessageDialog.fragments.PublicPetition}
-      ${RecipientViewPetitionStatusAlert.fragments.PublicPetition}
-      ${RecipientViewSignatureSentAlert.fragments.PublicPetition}
       ${usePetitionCanFinalize.fragments.PublicPetition}
       ${RecipientViewPetitionField.fragments.PublicPetitionField}
       ${completedFieldReplies.fragments.PublicPetitionField}
+      ${getPetitionSignatureStatus.fragments.PublicPetition}
+      ${RecipientViewPetitionAlerts.fragments.PublicSignatureConfig}
+      ${useSignatureStatusDialog.fragments.PublicPetition}
     `;
   },
   get PublicUser() {
     return gql`
       fragment RecipientView_PublicUser on PublicUser {
         ...RecipientViewContents_PublicUser
-        ...RecipientViewPetitionStatusAlert_PublicUser
       }
       ${RecipientViewContents.fragments.PublicUser}
-      ${RecipientViewPetitionStatusAlert.fragments.PublicUser}
     `;
   },
   ConnectionMetadata: gql`

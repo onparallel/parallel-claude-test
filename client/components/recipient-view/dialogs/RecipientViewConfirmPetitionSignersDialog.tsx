@@ -153,10 +153,7 @@ function RecipientViewConfirmPetitionSignersDialog({
       header={
         <HStack>
           <SignatureIcon />
-          <FormattedMessage
-            id="component.recipient-view-confirm-petition-signers-dialog.header"
-            defaultMessage="Start signature"
-          />
+          <FormattedMessage id="generic.start-signature" defaultMessage="Start signature" />
         </HStack>
       }
       body={
@@ -357,10 +354,7 @@ function RecipientViewConfirmPetitionSignersDialog({
           type="submit"
           isDisabled={allSigners.length === 0}
         >
-          <FormattedMessage
-            id="component.recipient-view-confirm-petition-signers-dialog.start-signature-button"
-            defaultMessage="Start signature"
-          />
+          <FormattedMessage id="generic.start-signature" defaultMessage="Start signature" />
         </Button>
       }
       {...props}

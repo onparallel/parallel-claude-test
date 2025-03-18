@@ -335,11 +335,6 @@
     "context": "We will send the document to sign to each contact after the one before has signed:"
   },
   {
-    "term": "component.recipient-view-confirm-petition-signers-dialog.header",
-    "definition": "Start signature",
-    "context": "Start signature"
-  },
-  {
     "term": "component.recipient-view-confirm-petition-signers-dialog.include-message",
     "definition": "Include message",
     "context": "Include message"
@@ -368,11 +363,6 @@
     "term": "component.recipient-view-confirm-petition-signers-dialog.signers-added",
     "definition": "You haven't added any signers yet",
     "context": "You haven't added any signers yet"
-  },
-  {
-    "term": "component.recipient-view-confirm-petition-signers-dialog.start-signature-button",
-    "definition": "Start signature",
-    "context": "Start signature"
   },
   {
     "term": "component.recipient-view-contactless-form.access",
@@ -503,6 +493,16 @@
     "term": "component.recipient-view-petition-approvals-alert.alert-description-2",
     "definition": "If you need to correct anything, you can write to us through the enabled comments.",
     "context": "If you need to correct anything, you can write to us through the enabled comments."
+  },
+  {
+    "term": "component.recipient-view-petition-approvals-alert.alert-description-3",
+    "definition": "Your process has been <b>reviewed and finalised.</b>",
+    "context": "Your process has been <b>reviewed and finalised.</b>"
+  },
+  {
+    "term": "component.recipient-view-petition-approvals-alert.alert-description-4",
+    "definition": "If you need more information or have any questions, please write to us in the comments.",
+    "context": "If you need more information or have any questions, please write to us in the comments."
   },
   {
     "term": "component.recipient-view-petition-field-card.add-another-reply",
@@ -740,14 +740,19 @@
     "context": "Start"
   },
   {
+    "term": "component.recipient-view-petition-status-alert.petition-and-signature-completed-alert-1",
+    "definition": "<b>Information and signature completed!</b>",
+    "context": "<b>Information and signature completed!</b>"
+  },
+  {
     "term": "component.recipient-view-petition-status-alert.petition-closed-alert",
-    "definition": "This parallel has been closed. If you need to make any changes, please reach out to {name}.",
-    "context": "This parallel has been closed. If you need to make any changes, please reach out to {name}."
+    "definition": "This process has been completed. If you need to make any changes, please reach out to {name}.",
+    "context": "This process has been completed. If you need to make any changes, please reach out to {name}."
   },
   {
     "term": "component.recipient-view-petition-status-alert.petition-completed-alert-1",
-    "definition": "<b>Information completed!</b> We have notified for review and validation.",
-    "context": "<b>Information completed!</b> We have notified for review and validation."
+    "definition": "<b>Information completed!</b>",
+    "context": "<b>Information completed!</b>"
   },
   {
     "term": "component.recipient-view-petition-status-alert.petition-completed-alert-2",
@@ -823,6 +828,11 @@
     "term": "component.signature-sent-alert.petition-signature-request-sent-alert",
     "definition": "<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{ and <a># more</a>}}.",
     "context": "<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{ and <a># more</a>}}."
+  },
+  {
+    "term": "component.signature-sent-alert.petition-signature-request-sent-alert-2",
+    "definition": "If you need to make any changes, you can write us through the comments.",
+    "context": "If you need to make any changes, you can write us through the comments."
   },
   {
     "term": "component.signature-sent-alert.petition-signature-request-sent-alert-sequential",
@@ -958,6 +968,11 @@
     "term": "generic.comments-button-label",
     "definition": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}"
+  },
+  {
+    "term": "generic.contact",
+    "definition": "Contact",
+    "context": "Contact"
   },
   {
     "term": "generic.continue",
@@ -1263,6 +1278,11 @@
     "term": "generic.start",
     "definition": "Start",
     "context": "Start"
+  },
+  {
+    "term": "generic.start-signature",
+    "definition": "Start signature",
+    "context": "Start signature"
   },
   {
     "term": "generic.submit",

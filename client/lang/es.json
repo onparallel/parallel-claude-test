@@ -1210,16 +1210,6 @@
     "context": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
   },
   {
-    "term": "component.confirm-cancel-petition-approval-dialog.body",
-    "definition": "Se cancelarán todas las aprobaciones pendientes o completadas y tendrán que iniciarse de nuevo. Esta acción no es reversible.",
-    "context": "All pending or completed approvals will be cancelled and will have to be started again. This action is not reversible."
-  },
-  {
-    "term": "component.confirm-cancel-petition-approval-dialog.header",
-    "definition": "Cancelar aprobaciones",
-    "context": "Cancel approvals"
-  },
-  {
     "term": "component.confirm-cancel-petition-approval-flow-dialog.body",
     "definition": "Si continúas se cancelará la aprobación iniciada y notificaremos a los aprobadores. Podrás volver a iniciarla después.",
     "context": "If you continue, the initiated approval will be cancelled and we will notify the approvers. You will be able to restart it later."
@@ -1658,16 +1648,6 @@
     "term": "component.confirm-petition-signers-dialog.signer-added-by-recipient",
     "definition": "Firmantes añadidos por el destinatario",
     "context": "Signers added by the recipient"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.start-signature-button",
-    "definition": "Iniciar firma",
-    "context": "Start signature"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.start-signature-header",
-    "definition": "Iniciar la firma",
-    "context": "Start signature"
   },
   {
     "term": "component.confirm-petition-signers-dialog.upload-document-sign",
@@ -5290,6 +5270,21 @@
     "context": "Status"
   },
   {
+    "term": "component.petition-approvals-alert.approvals-in-progress",
+    "definition": "<b>Hay un proceso de aprobación en curso.</b>",
+    "context": "<b>There is an ongoing approval process.</b>"
+  },
+  {
+    "term": "component.petition-approvals-alert.cancel-approvals",
+    "definition": "Cancelar aprobaciones",
+    "context": "Cancel approvals"
+  },
+  {
+    "term": "component.petition-approvals-alert.cancel-approvals-instructions",
+    "definition": "Si necesitas corregir algo, cancela las aprobaciones primero.",
+    "context": "If you need to change something, cancel the approvals first."
+  },
+  {
     "term": "component.petition-approvals-card.approved-at",
     "definition": "Aprobado: {date}",
     "context": "Approved: {date}"
@@ -5420,6 +5415,11 @@
     "context": "Rejected"
   },
   {
+    "term": "component.petition-closed-alert.description",
+    "definition": "<b>Parallel cerrado</b>, si quieres realizar cualquier cambio, reabre el parallel.",
+    "context": "<b>Parallel closed</b>, if you want to make any changes, reopen the parallel."
+  },
+  {
     "term": "component.petition-comments-and-notes-editor.comment-placeholder",
     "definition": "Escribe un comentario",
     "context": "Write a comment"
@@ -5455,6 +5455,26 @@
     "context": "<b>Parallel completed</b>, if you make any changes, the parallel must be <b>finalized again</b>."
   },
   {
+    "term": "component.petition-completed-alert.description-approved",
+    "definition": "<b>Parallel completado y aprobado</b>, si quieres hacer cualquier cambio, debes cancelar el proceso de aprobación.",
+    "context": "<b>Parallel completed and approved</b>, if you want to make any changes, you must cancel the approval process."
+  },
+  {
+    "term": "component.petition-completed-alert.description-signed",
+    "definition": "<b>Parallel completado y firmado</b>, si realizas cualquier cambio, se deberá <b>finalizar y firmar el parallel</b> de nuevo.",
+    "context": "<b>Parallel completed and signed</b>, if you make any changes, the parallel must be <b>finalized and signed again</b>."
+  },
+  {
+    "term": "component.petition-completed-alert.description-signed-and-approved",
+    "definition": "<b>Parallel completado, firmado y aprobado</b>, si quieres hacer cualquier cambio, debes cancelar el proceso de aprobación.",
+    "context": "<b>Parallel completed, signed and approved</b>, if you want to make any changes, you must cancel the approval process."
+  },
+  {
+    "term": "component.petition-completed-alert.start-approvals",
+    "definition": "Iniciar aprobaciones",
+    "context": "Start approvals"
+  },
+  {
     "term": "component.petition-compliance-period-dialog.anonymize-after-label",
     "definition": "Anonimizar los datos después de {input} {count, plural, =1{mes} other{meses}}",
     "context": "Anonymize data after {input} {count, plural, =1{month} other{months}}"
@@ -5478,6 +5498,11 @@
     "term": "component.petition-compliance-period-dialog.purpose-of-treatment.placeholder",
     "definition": "Describe brevemente la finalidad del tratamiento de datos.",
     "context": "Briefly describe the purpose of the data processing."
+  },
+  {
+    "term": "component.petition-compose-and-preview-alerts.restart-approvals",
+    "definition": "Reiniciar aprobaciones",
+    "context": "Restart approvals"
   },
   {
     "term": "component.petition-compose-attachments.add-attachment",
@@ -6935,24 +6960,9 @@
     "context": "Person starting the parallel"
   },
   {
-    "term": "component.petition-preview-approvals-alert.approvals-in-progress",
-    "definition": "<b>La información está siendo evaluada o ya ha sido aprobada</b> y no puede editarse.",
-    "context": "<b>The information is being evaluated or has already been approved</b> and cannot be edited."
-  },
-  {
-    "term": "component.petition-preview-approvals-alert.cancel-approvals",
-    "definition": "Cancelar aprobaciones",
-    "context": "Cancel approvals"
-  },
-  {
-    "term": "component.petition-preview-approvals-alert.cancel-approvals-instructions",
-    "definition": "Si necesitas corregir algo, cancela las aprobaciones primero.",
-    "context": "If you need to correct something, cancel the approvals first."
-  },
-  {
-    "term": "component.petition-preview-signature-review-alert.signature-required",
-    "definition": "<b>Firma pendiente</b>, puedes iniciarla desde la pestaña de {tabName}.",
-    "context": "<b>Pending eSignature</b>, you can start it from the {tabName} tab."
+    "term": "component.petition-preview-only-alert.description",
+    "definition": "<b>Solo previsualización</b> - Los cambios que añadas como respuestas o comentarios no se guardarán. Para completar y enviar esta plantilla dale a <b>{button}</b>.",
+    "context": "<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
   },
   {
     "term": "component.petition-profiles-table.add-profile",
@@ -7708,6 +7718,16 @@
     "term": "component.petition-signature-request.signer-status.dates.signed-at",
     "definition": "Firma completada: {signedAt}",
     "context": "Signature completed: {signedAt}"
+  },
+  {
+    "term": "component.petition-signature-sent-alert.signature-sent",
+    "definition": "<b>Parallel enviado a firmar</b>",
+    "context": "<b>Parallel sent to sign</b>"
+  },
+  {
+    "term": "component.petition-signature-sent-alert.signature-sent-description",
+    "definition": "Si necesitas cambiar algo, cancela la firma primero.",
+    "context": "If you need to change anything, cancel the signature first."
   },
   {
     "term": "component.petition-signatures-card.add-signature-label",
@@ -9450,11 +9470,6 @@
     "context": "We will send the document to sign to each contact after the one before has signed:"
   },
   {
-    "term": "component.recipient-view-confirm-petition-signers-dialog.header",
-    "definition": "Iniciar la firma",
-    "context": "Start signature"
-  },
-  {
     "term": "component.recipient-view-confirm-petition-signers-dialog.include-message",
     "definition": "Incluir mensaje",
     "context": "Include message"
@@ -9483,11 +9498,6 @@
     "term": "component.recipient-view-confirm-petition-signers-dialog.signers-added",
     "definition": "No has añadido firmantes todavía",
     "context": "You haven't added any signers yet"
-  },
-  {
-    "term": "component.recipient-view-confirm-petition-signers-dialog.start-signature-button",
-    "definition": "Iniciar firma",
-    "context": "Start signature"
   },
   {
     "term": "component.recipient-view-contactless-form.access",
@@ -9616,8 +9626,18 @@
   },
   {
     "term": "component.recipient-view-petition-approvals-alert.alert-description-2",
-    "definition": "{tone, select, INFORMAL{Si necesitas corregir algo, puedes escribirnos a través de los comentarios habilitados.} other{Si necesita corregir algo, puede escribirnos a través de los comentarios habilitados.}}",
+    "definition": "{tone, select, INFORMAL{Si necesitas corregir algo, puedes} other{Si necesita corregir algo, puede}} escribirnos a través de los comentarios habilitados.",
     "context": "If you need to correct anything, you can write to us through the enabled comments."
+  },
+  {
+    "term": "component.recipient-view-petition-approvals-alert.alert-description-3",
+    "definition": "{tone, select, INFORMAL{Tu proceso ha sido} other{Su proceso ha sido}} <b>revisado y finalizado.</b>",
+    "context": "Your process has been <b>reviewed and finalised.</b>"
+  },
+  {
+    "term": "component.recipient-view-petition-approvals-alert.alert-description-4",
+    "definition": "{tone, select, INFORMAL{Si necesitas más información o tienes alguna duda, puedes} other{Si necesita más información o tiene alguna duda, puede}} escribirnos a través de los comentarios.",
+    "context": "If you need more information or have any questions, please write to us in the comments."
   },
   {
     "term": "component.recipient-view-petition-field-card.add-another-reply",
@@ -9870,14 +9890,19 @@
     "context": "Start"
   },
   {
+    "term": "component.recipient-view-petition-status-alert.petition-and-signature-completed-alert-1",
+    "definition": "<b>¡Información y firma completada!</b>",
+    "context": "<b>Information and signature completed!</b>"
+  },
+  {
     "term": "component.recipient-view-petition-status-alert.petition-closed-alert",
-    "definition": "Este parallel ha sido cerrado. Si deseas realizar cambios, por favor, contacta con {name}.",
-    "context": "This parallel has been closed. If you need to make any changes, please reach out to {name}."
+    "definition": "Este proceso ha sido completado. Si deseas realizar cambios, por favor, contacta con {name}.",
+    "context": "This process has been completed. If you need to make any changes, please reach out to {name}."
   },
   {
     "term": "component.recipient-view-petition-status-alert.petition-completed-alert-1",
-    "definition": "{tone, select, INFORMAL{<b>¡Información completada!</b> Hemos avisado para que se revise y valide.} other{<b>Información completada,</b> hemos notificado para su revisión y validación.}}",
-    "context": "<b>Information completed!</b> We have notified for review and validation."
+    "definition": "<b>¡Información completada!</b>",
+    "context": "<b>Information completed!</b>"
   },
   {
     "term": "component.recipient-view-petition-status-alert.petition-completed-alert-2",
@@ -10963,6 +10988,11 @@
     "term": "component.signature-sent-alert.petition-signature-request-sent-alert",
     "definition": "<b>Documento enviado para firmar</b> a {name} ({email}){count, plural, =0{} other{ y <a># más</a>}}.",
     "context": "<b>Document sent for signature</b> to {name} ({email}){count, plural, =0{} other{ and <a># more</a>}}."
+  },
+  {
+    "term": "component.signature-sent-alert.petition-signature-request-sent-alert-2",
+    "definition": "{tone, select, INFORMAL{Si necesitas hacer algún cambio, puedes} other{Si necesita hacer algún cambio, puede}} escribirnos a través de los comentarios.",
+    "context": "If you need to make any changes, you can write us through the comments."
   },
   {
     "term": "component.signature-sent-alert.petition-signature-request-sent-alert-sequential",
@@ -12265,11 +12295,6 @@
     "context": "eSignature sent"
   },
   {
-    "term": "component.use-start-signature-request.start",
-    "definition": "Iniciar firma",
-    "context": "Start signature"
-  },
-  {
     "term": "component.user-dropdown-empty.invite-button",
     "definition": "Invitar gente",
     "context": "Invite people"
@@ -12733,6 +12758,11 @@
     "term": "generic.close",
     "definition": "Cerrar",
     "context": "Close"
+  },
+  {
+    "term": "generic.close-petition",
+    "definition": "Cerrar parallel",
+    "context": "Close parallel"
   },
   {
     "term": "generic.collapse",
@@ -14278,6 +14308,11 @@
     "term": "generic.start",
     "definition": "Empezar",
     "context": "Start"
+  },
+  {
+    "term": "generic.start-signature",
+    "definition": "Iniciar firma",
+    "context": "Start signature"
   },
   {
     "term": "generic.submit",
@@ -16170,11 +16205,6 @@
     "context": "Review reply"
   },
   {
-    "term": "page.preview.template-only-cache-alert",
-    "definition": "<b>Solo previsualización</b> - Los cambios que añadas como respuestas o comentarios no se guardarán. Para completar y enviar esta plantilla dale a <b>{button}</b>.",
-    "context": "<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
-  },
-  {
     "term": "page.preview.toast-description-parallel-completed",
     "definition": "Comprueba que esté todo bien para cerrar el parallel.",
     "context": "Check that everything is OK to close the parallel."
@@ -16433,11 +16463,6 @@
     "term": "page.replies.export-replies",
     "definition": "Exportar respuestas",
     "context": "Export replies"
-  },
-  {
-    "term": "page.replies.finalize-petition-button",
-    "definition": "Cerrar parallel",
-    "context": "Close parallel"
   },
   {
     "term": "page.replies.list-of-contents",

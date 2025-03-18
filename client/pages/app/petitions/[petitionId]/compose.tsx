@@ -24,7 +24,7 @@ import {
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
 import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
-import { PetitionCompletedAlert } from "@parallel/components/petition-common/PetitionCompletedAlert";
+import { PetitionComposeAndPreviewAlerts } from "@parallel/components/petition-common/alerts/PetitionComposeAndPreviewAlerts";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { AddNewFieldPlaceholderProvider } from "@parallel/components/petition-compose/AddNewFieldPlaceholderProvider";
 import { PetitionComposeAttachments } from "@parallel/components/petition-compose/PetitionComposeAttachments";
@@ -86,12 +86,17 @@ import {
   PetitionFieldVisibility,
 } from "@parallel/utils/fieldLogic/types";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
+import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
+import { useCancelApprovalRequestFlow } from "@parallel/utils/hooks/useCancelApprovalRequestFlow";
+import { useClosePetition } from "@parallel/utils/hooks/useClosePetition";
+import { useStartApprovalRequestStep } from "@parallel/utils/hooks/useStartApprovalRequestStep";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { waitFor } from "@parallel/utils/promises/waitFor";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
+import { useStartSignatureRequest } from "@parallel/utils/useStartSignatureRequest";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
@@ -1269,17 +1274,39 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     title.focus();
   }
 
+  const showPetitionLimitReachedAlert =
+    petition.__typename === "Petition" &&
+    me.organization.isPetitionUsageLimitReached &&
+    petition.status === "DRAFT";
+  const limitValue = me.organization.petitionsPeriod?.limit ?? 0;
+  const signatureStatus =
+    petition.__typename === "Petition"
+      ? getPetitionSignatureStatus({
+          status: petition.status,
+          currentSignatureRequest: petition.currentSignatureRequest,
+          signatureConfig: petition.signatureConfig,
+        })
+      : "NO_SIGNATURE";
+
+  const { handleStartSignature } = useStartSignatureRequest({
+    user: me,
+    petition: petition as any,
+  });
+
+  const { handleCancelApprovals } = useCancelApprovalRequestFlow(petition.id);
+
+  const { handleStartApprovalFlow } = useStartApprovalRequestStep({ petition });
+
+  const { handleClosePetition } = useClosePetition({
+    onRefetch: () => refetch(),
+  });
+
   const extendFlexColumn = {
     display: "flex",
     flexDirection: "column",
     flex: 1,
     minHeight: 0,
   } as const;
-
-  const displayPetitionLimitReachedAlert =
-    me.organization.isPetitionUsageLimitReached &&
-    petition?.__typename === "Petition" &&
-    petition.status === "DRAFT";
 
   const isReadOnly =
     petition.isRestricted ||
@@ -1435,13 +1462,20 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         }
       >
         <Box position="sticky" top={0} zIndex={2}>
-          {displayPetitionLimitReachedAlert ? (
-            <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
-          ) : null}
-          {petition?.__typename === "Petition" &&
-          ["COMPLETED", "CLOSED"].includes(petition.status) &&
-          !petition.isAnonymized ? (
-            <PetitionCompletedAlert />
+          {showPetitionLimitReachedAlert ? <PetitionLimitReachedAlert limit={limitValue} /> : null}
+          {petition.__typename === "Petition" ? (
+            <PetitionComposeAndPreviewAlerts
+              onCancelApprovals={handleCancelApprovals}
+              onStartApprovals={() => handleStartApprovalFlow()}
+              onStartSignature={handleStartSignature}
+              onClosePetition={() => {
+                handleClosePetition(petition);
+              }}
+              petitionStatus={petition.status}
+              signatureStatus={signatureStatus}
+              approvalsStatus={petition.currentApprovalRequestStatus}
+              signatureAfterApprovals={petition.signatureConfig?.reviewAfterApproval}
+            />
           ) : null}
         </Box>
         <Box
@@ -1530,6 +1564,7 @@ const _fragments = {
         }
         isAnonymized
         ... on Petition {
+          status
           hasStartedProcess
           accesses {
             id
@@ -1543,7 +1578,9 @@ const _fragments = {
               name
             }
           }
+          currentApprovalRequestStatus
           ...useSendPetitionHandler_Petition
+          ...getPetitionSignatureStatus_Petition
         }
         ... on PetitionTemplate {
           isPublic
@@ -1558,6 +1595,8 @@ const _fragments = {
         ...PetitionComposeFieldSettings_PetitionBase
         ...useFieldsWithIndices_PetitionBase
         ...PetitionComposeNewFieldDrawer_PetitionBase
+        ...useStartApprovalRequestStep_PetitionBase
+        ...useClosePetition_PetitionBase
       }
       ${this.PetitionField}
       ${PetitionLayout.fragments.PetitionBase}
@@ -1570,6 +1609,10 @@ const _fragments = {
       ${PetitionComposeFieldSettings.fragments.PetitionBase}
       ${useFieldsWithIndices.fragments.PetitionBase}
       ${PetitionComposeNewFieldDrawer.fragments.PetitionBase}
+      ${getPetitionSignatureStatus.fragments.Petition}
+      ${useStartSignatureRequest.fragments.Petition}
+      ${useStartApprovalRequestStep.fragments.PetitionBase}
+      ${useClosePetition.fragments.PetitionBase}
     `;
   },
   get PetitionField() {
@@ -1632,9 +1675,6 @@ const _fragments = {
         ...PetitionLayout_Query
         me {
           id
-          ...PetitionSettings_User
-          ...useUpdateIsReadNotification_User
-          ...useSendPetitionHandler_User
           organization {
             id
             isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
@@ -1642,8 +1682,12 @@ const _fragments = {
               limit
             }
           }
+          ...PetitionSettings_User
+          ...useUpdateIsReadNotification_User
+          ...useSendPetitionHandler_User
           ...PetitionComposeFieldSettings_User
           ...PetitionComposeNewFieldDrawer_User
+          ...useStartSignatureRequest_User
         }
         profileTypes(limit: 100, offset: 0) {
           totalCount
@@ -1663,6 +1707,7 @@ const _fragments = {
       ${PetitionComposeNewFieldDrawer.fragments.User}
       ${PetitionComposeNewFieldDrawer.fragments.ProfileType}
       ${useCreatePetitionFieldGroupProfileTypeDialog.fragments.ProfileType}
+      ${useStartSignatureRequest.fragments.User}
     `;
   },
 };

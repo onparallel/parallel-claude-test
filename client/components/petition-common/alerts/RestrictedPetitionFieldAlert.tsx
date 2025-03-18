@@ -1,10 +1,10 @@
 /** no-recipient */
 import { Alert, AlertDescription, AlertIcon, AlertProps, HStack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { SupportButton } from "@parallel/components/common/SupportButton";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { usePetitionFieldTypeLabel } from "@parallel/utils/petitionFields";
 import { FormattedMessage, useIntl } from "react-intl";
-import { SupportButton } from "../common/SupportButton";
 
 export interface RestrictedPetitionFieldAlertProps extends AlertProps {
   fieldType: PetitionFieldType;

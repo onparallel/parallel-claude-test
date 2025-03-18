@@ -287,10 +287,7 @@ export function ConfirmPetitionSignersDialog(
               defaultMessage="Edit signers"
             />
           ) : (
-            <FormattedMessage
-              id="component.confirm-petition-signers-dialog.start-signature-header"
-              defaultMessage="Start signature"
-            />
+            <FormattedMessage id="generic.start-signature" defaultMessage="Start signature" />
           )}
         </HStack>
       }
@@ -620,10 +617,7 @@ export function ConfirmPetitionSignersDialog(
           {props.isUpdate ? (
             <FormattedMessage id="generic.save" defaultMessage="Save" />
           ) : (
-            <FormattedMessage
-              id="component.confirm-petition-signers-dialog.start-signature-button"
-              defaultMessage="Start signature"
-            />
+            <FormattedMessage id="generic.start-signature" defaultMessage="Start signature" />
           )}
         </Button>
       }

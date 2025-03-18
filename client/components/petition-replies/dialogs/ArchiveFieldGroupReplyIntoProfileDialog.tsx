@@ -41,13 +41,11 @@ import { useResolveProfilePropertiesConflictsDialog } from "./ResolveProfileProp
 
 interface ArchiveFieldGroupReplyIntoProfileDialogProps {
   petitionId: string;
-  groupsWithProfileTypesCount: number;
   onRefetch: () => void;
 }
 
 function ArchiveFieldGroupReplyIntoProfileDialog({
   petitionId,
-  groupsWithProfileTypesCount,
   onRefetch,
   ...props
 }: DialogProps<ArchiveFieldGroupReplyIntoProfileDialogProps>) {
@@ -71,11 +69,7 @@ function ArchiveFieldGroupReplyIntoProfileDialog({
       hasCloseButton={true}
       {...props}
       header={
-        <FormattedMessage
-          id="component.associate-and-fill-profile-to-parallel-dialog.header"
-          defaultMessage="Associate {count, plural, =1{profile} other{profiles}}"
-          values={{ count: groupsWithProfileTypesCount }}
-        />
+        petition && petition.__typename === "Petition" ? <DialogHeader petition={petition} /> : null
       }
       body={
         <Stack spacing={4}>
@@ -607,6 +601,7 @@ useArchiveFieldGroupReplyIntoProfileDialog.fragments = {
         id
       }
       replies {
+        id
         ...useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReply
       }
       ...getProfileNamePreview_PetitionField
@@ -781,6 +776,35 @@ function RestrictedProfilePropertiesDialog({ ...props }: DialogProps<{}>) {
     />
   );
 }
+
 export function useRestrictedProfilePropertiesDialog() {
   return useDialog(RestrictedProfilePropertiesDialog);
+}
+
+function DialogHeader({
+  petition,
+}: {
+  petition: useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment;
+}) {
+  const fieldLogic = useFieldLogic(petition);
+
+  const repliesFieldGroupsWithProfileTypes = zip(petition.fields, fieldLogic)
+    .filter(
+      ([field, { isVisible }]) =>
+        isVisible &&
+        field.type === "FIELD_GROUP" &&
+        field.isLinkedToProfileType &&
+        field.replies.length > 0,
+    )
+    .flatMap(([f]) => f.replies);
+
+  const groupsWithProfileTypesCount = repliesFieldGroupsWithProfileTypes.length;
+
+  return (
+    <FormattedMessage
+      id="component.associate-and-fill-profile-to-parallel-dialog.header"
+      defaultMessage="Associate {count, plural, =1{profile} other{profiles}}"
+      values={{ count: groupsWithProfileTypesCount }}
+    />
+  );
 }

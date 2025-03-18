@@ -22,6 +22,7 @@ import { toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { renderSlateToHtml } from "../../../util/slate/render";
+import { getPetitionApprovalRequestStatus } from "../../helpers/getPetitionApprovalRequestStatus";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -45,6 +46,12 @@ export const PetitionStatus = enumType({
       description: "The petition has been closed by a user.",
     },
   ],
+});
+
+export const PetitionApprovalRequestStatus = enumType({
+  name: "PetitionApprovalRequestStatus",
+  description: "The status of the petition approval request.",
+  members: ["PENDING", "NOT_STARTED", "APPROVED", "REJECTED", "NO_APPROVAL"],
 });
 
 export const PetitionBaseType = enumType({
@@ -660,6 +667,15 @@ export const Petition = objectType({
       type: "PetitionApprovalRequestStep",
       resolve: async (o, _, ctx) =>
         await ctx.approvalRequests.loadCurrentPetitionApprovalRequestStepsByPetitionId(o.id),
+    });
+    t.field("currentApprovalRequestStatus", {
+      type: "PetitionApprovalRequestStatus",
+      resolve: async (o, _, ctx) => {
+        const steps =
+          await ctx.approvalRequests.loadCurrentPetitionApprovalRequestStepsByPetitionId(o.id);
+
+        return getPetitionApprovalRequestStatus(steps);
+      },
     });
     t.nonNull.list.nonNull.field("oldApprovalRequestSteps", {
       type: "PetitionApprovalRequestStep",

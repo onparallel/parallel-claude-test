@@ -1,14 +1,10 @@
 import { gql, useMutation } from "@apollo/client";
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
   Badge,
   Box,
   Button,
   Center,
   Flex,
-  HStack,
   Stack,
   Tab,
   TabList,
@@ -44,11 +40,8 @@ import {
   usePetitionStateWrapper,
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
-import { PetitionApprovalsDefinitiveRejectedAlert } from "@parallel/components/petition-common/PetitionApprovalsDefinitiveRejectedAlert";
-import { PetitionCompletedAlert } from "@parallel/components/petition-common/PetitionCompletedAlert";
-import { PetitionPreviewApprovalsAlert } from "@parallel/components/petition-common/PetitionPreviewApprovalsAlert";
-import { PetitionPreviewSignatureReviewAlert } from "@parallel/components/petition-common/PetitionPreviewSignatureReviewAlert";
-import { useConfirmCancelPetitionApprovalDialog } from "@parallel/components/petition-common/dialogs/ConfirmCancelPetitionApprovalDialog";
+import { PetitionComposeAndPreviewAlerts } from "@parallel/components/petition-common/alerts/PetitionComposeAndPreviewAlerts";
+import { PetitionPreviewOnlyAlert } from "@parallel/components/petition-common/alerts/PetitionPreviewOnlyAlert";
 import {
   ConfirmPetitionSignersDialog,
   ConfirmPetitionSignersDialogResult,
@@ -72,11 +65,10 @@ import { PetitionRepliesFieldComments } from "@parallel/components/petition-repl
 import { RecipientViewContents } from "@parallel/components/recipient-view/RecipientViewContents";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressBar } from "@parallel/components/recipient-view/RecipientViewProgressBar";
-import { RecipientViewRefreshRepliesAlert } from "@parallel/components/recipient-view/RecipientViewRefreshRepliesAlert";
 import { RecipientViewSidebarContextProvider } from "@parallel/components/recipient-view/RecipientViewSidebarContextProvider";
+import { RecipientViewRefreshRepliesAlert } from "@parallel/components/recipient-view/alerts/RecipientViewRefreshRepliesAlert";
 import {
   PetitionPreview_PetitionBaseFragment,
-  PetitionPreview_cancelPetitionApprovalRequestFlowDocument,
   PetitionPreview_completePetitionDocument,
   PetitionPreview_petitionDocument,
   PetitionPreview_updatePetitionDocument,
@@ -89,11 +81,15 @@ import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
 import { useAllFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { focusPetitionField } from "@parallel/utils/focusPetitionField";
+import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
 import {
   useBuildUrlToPetitionSection,
   useGoToPetition,
   useGoToPetitionSection,
 } from "@parallel/utils/goToPetition";
+import { useCancelApprovalRequestFlow } from "@parallel/utils/hooks/useCancelApprovalRequestFlow";
+import { useClosePetition } from "@parallel/utils/hooks/useClosePetition";
+import { useStartApprovalRequestStep } from "@parallel/utils/hooks/useStartApprovalRequestStep";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { LiquidPetitionScopeProvider } from "@parallel/utils/liquid/LiquidPetitionScopeProvider";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
@@ -110,6 +106,7 @@ import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useGetPetitionPages } from "@parallel/utils/useGetPetitionPages";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
+import { useStartSignatureRequest } from "@parallel/utils/useStartSignatureRequest";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { waitForElement } from "@parallel/utils/waitForElement";
@@ -504,8 +501,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     }
   }, []);
 
-  const showPetitionLimitReachedAlert =
-    me.organization.isPetitionUsageLimitReached && isPetition && petition.status === "DRAFT";
+  const isPetitionUsageLimitReached = me.organization.isPetitionUsageLimitReached;
 
   const showGeneratePrefilledPublicLinkButton =
     me.hasPublicLinkPrefill &&
@@ -529,43 +525,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     (petition.signatureRequests.length === 0 ||
       ["COMPLETED", "CANCELLING", "CANCELLED"].includes(petition.signatureRequests[0].status) ||
       petition.status !== "COMPLETED");
-
-  const showPetitionCompletedAlert =
-    isPetition &&
-    (!petition.signatureConfig ||
-      !petition.signatureConfig.isEnabled ||
-      !petition.signatureConfig.review) &&
-    ["COMPLETED", "CLOSED"].includes(petition.status) &&
-    !petition.isAnonymized &&
-    !petition.hasStartedProcess;
-
-  const approvalIsDefinitiveRejected =
-    (isPetition && petition.currentApprovalRequestSteps?.some((s) => s.status === "REJECTED")) ??
-    false;
-
-  const currentApprovalsStarted =
-    isPetition &&
-    isNonNullish(petition.currentApprovalRequestSteps) &&
-    petition.currentApprovalRequestSteps.some(
-      (s) => s.status === "APPROVED" || s.status === "SKIPPED" || s.status === "PENDING",
-    );
-
-  const showSignatureAlert =
-    isPetition &&
-    petition.status === "COMPLETED" &&
-    !!petition.signatureConfig?.isEnabled &&
-    petition.signatureConfig.review &&
-    !approvalIsDefinitiveRejected &&
-    (!petition.signatureConfig?.reviewAfterApproval || !currentApprovalsStarted);
-
-  const showApprovalsAlert =
-    isPetition &&
-    currentApprovalsStarted &&
-    !approvalIsDefinitiveRejected &&
-    (!showSignatureAlert ||
-      (showSignatureAlert &&
-        !!petition.signatureConfig?.isEnabled &&
-        petition.signatureConfig.reviewAfterApproval));
 
   const extendFlexColumn = {
     display: "flex",
@@ -613,20 +572,36 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     });
   }
 
-  const [cancelPetitionApprovalRequestFlow] = useMutation(
-    PetitionPreview_cancelPetitionApprovalRequestFlowDocument,
-  );
-  const showConfirmCancelPetitionApprovalDialog = useConfirmCancelPetitionApprovalDialog();
-  const handleCancelApprovals = useCallback(async () => {
-    try {
-      await showConfirmCancelPetitionApprovalDialog();
-      await cancelPetitionApprovalRequestFlow({
-        variables: { petitionId: petition.id },
-      });
-    } catch {}
-  }, [petition]);
-
   const isMobile = useBreakpointValue({ base: true, lg: false });
+
+  const showPetitionLimitReachedAlert =
+    petition.__typename === "Petition" &&
+    me.organization.isPetitionUsageLimitReached &&
+    petition.status === "DRAFT";
+
+  const limitValue = me.organization.petitionsPeriod?.limit ?? 0;
+
+  const signatureStatus =
+    petition.__typename === "Petition"
+      ? getPetitionSignatureStatus({
+          status: petition.status,
+          currentSignatureRequest: petition.currentSignatureRequest,
+          signatureConfig: petition.signatureConfig,
+        })
+      : "NO_SIGNATURE";
+
+  const { handleStartSignature } = useStartSignatureRequest({
+    user: me,
+    petition: petition as any,
+  });
+
+  const { handleCancelApprovals } = useCancelApprovalRequestFlow(petition.id);
+
+  const { handleStartApprovalFlow } = useStartApprovalRequestStep({ petition });
+
+  const { handleClosePetition } = useClosePetition({
+    onRefetch: () => refetch(),
+  });
 
   return (
     <RecipientViewSidebarContextProvider>
@@ -774,7 +749,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               canFinalize={canFinalize}
               onFinalize={handleFinalize}
               isDisabled={
-                showPetitionLimitReachedAlert ||
+                isPetitionUsageLimitReached ||
                 petition.isAnonymized ||
                 myEffectivePermission === "READ"
               }
@@ -785,49 +760,17 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               borderBottomColor="gray.200"
             />
           )}
+          {/* Alerts box */}
           <Box>
             {!isPetition ? (
-              <Alert status="info">
-                <AlertIcon />
-                <HStack>
-                  <AlertDescription flex={1}>
-                    <FormattedMessage
-                      id="page.preview.template-only-cache-alert"
-                      defaultMessage="<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
-                      values={{
-                        button: (
-                          <FormattedMessage
-                            id="generic.create-petition"
-                            defaultMessage="Create parallel"
-                          />
-                        ),
-                      }}
-                    />
-                  </AlertDescription>
-                  {showGeneratePrefilledPublicLinkButton ? (
-                    <Button
-                      size="sm"
-                      colorScheme="blue"
-                      marginStart={2}
-                      onClick={() => handleGeneratePrefilledPublicLinkClick()}
-                    >
-                      <FormattedMessage
-                        id="page.preview.generate-prefilled-link"
-                        defaultMessage="Generate prefilled link"
-                      />
-                    </Button>
-                  ) : null}
-                </HStack>
-              </Alert>
+              <PetitionPreviewOnlyAlert
+                onGeneratePrefilledLink={
+                  showGeneratePrefilledPublicLinkButton
+                    ? handleGeneratePrefilledPublicLinkClick
+                    : undefined
+                }
+              />
             ) : null}
-
-            {showSignatureAlert ? <PetitionPreviewSignatureReviewAlert /> : null}
-
-            {showPetitionLimitReachedAlert ? (
-              <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
-            ) : null}
-
-            {showPetitionCompletedAlert ? <PetitionCompletedAlert /> : null}
 
             {showRefreshRepliesAlert ? (
               <RecipientViewRefreshRepliesAlert
@@ -838,12 +781,26 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               />
             ) : null}
 
-            {showApprovalsAlert ? (
-              <PetitionPreviewApprovalsAlert onCancelApprovals={handleCancelApprovals} />
+            {showPetitionLimitReachedAlert ? (
+              <PetitionLimitReachedAlert limit={limitValue} />
             ) : null}
 
-            {approvalIsDefinitiveRejected ? <PetitionApprovalsDefinitiveRejectedAlert /> : null}
+            {isPetition ? (
+              <PetitionComposeAndPreviewAlerts
+                onCancelApprovals={handleCancelApprovals}
+                onStartApprovals={() => handleStartApprovalFlow()}
+                onStartSignature={handleStartSignature}
+                onClosePetition={() => {
+                  handleClosePetition(petition);
+                }}
+                petitionStatus={petition.status}
+                signatureStatus={signatureStatus}
+                approvalsStatus={petition.currentApprovalRequestStatus}
+                signatureAfterApprovals={petition.signatureConfig?.reviewAfterApproval}
+              />
+            ) : null}
           </Box>
+          {/* End of alerts box */}
           <OverrideWithOrganizationTheme
             cssVarsRoot=".with-organization-brand-theme"
             brandTheme={me.organization.brandTheme}
@@ -921,7 +878,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                                 isDisabled={
                                   (isPetition && petition.status === "CLOSED") ||
                                   petition.isAnonymized ||
-                                  showPetitionLimitReachedAlert ||
+                                  isPetitionUsageLimitReached ||
                                   (isPetition && petition.hasStartedProcess)
                                 }
                                 isCacheOnly={!isPetition}
@@ -1029,12 +986,12 @@ const _fragments = {
           preferredTone
         }
       }
-      tone
       isAnonymized
       myEffectivePermission {
         permissionType
       }
       ... on Petition {
+        status
         hasStartedProcess
         ...PetitionPreviewStartSignatureButton_Petition
         unreadGeneralCommentCount
@@ -1047,12 +1004,11 @@ const _fragments = {
           id
           status
         }
-        currentApprovalRequestSteps {
-          id
-          status
-        }
+        currentApprovalRequestStatus
         ...RecipientViewProgressBar_Petition
         ...useSendPetitionHandler_Petition
+        ...getPetitionSignatureStatus_Petition
+        ...useStartSignatureRequest_Petition
       }
       ... on PetitionTemplate {
         ...GeneratePrefilledPublicLinkDialog_PetitionTemplate
@@ -1064,7 +1020,6 @@ const _fragments = {
       fields {
         id
         unreadCommentCount
-        position
         ...PreviewPetitionField_PetitionField
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
@@ -1107,6 +1062,8 @@ const _fragments = {
       ...validatePetitionFields_PetitionBase
       ...RecipientViewContents_PetitionBase
       ...PetitionComments_PetitionBase
+      ...useStartApprovalRequestStep_PetitionBase
+      ...useClosePetition_PetitionBase
     }
     ${focusPetitionField.fragments.PetitionField}
     ${RecipientViewContents.fragments.PetitionBase}
@@ -1129,6 +1086,10 @@ const _fragments = {
     ${usePetitionCanFinalize.fragments.PetitionBase}
     ${validatePetitionFields.fragments.PetitionBase}
     ${PetitionComments.fragments.PetitionBase}
+    ${getPetitionSignatureStatus.fragments.Petition}
+    ${useStartSignatureRequest.fragments.Petition}
+    ${useStartApprovalRequestStep.fragments.PetitionBase}
+    ${useClosePetition.fragments.PetitionBase}
   `,
   Query: gql`
     fragment PetitionPreview_Query on Query {
@@ -1137,7 +1098,6 @@ const _fragments = {
         id
         organization {
           id
-          name
           isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
           petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
             limit
@@ -1150,6 +1110,7 @@ const _fragments = {
         ...ConfirmPetitionSignersDialog_User
         ...PreviewPetitionField_User
         ...PetitionPreviewStartSignatureButton_User
+        ...useStartSignatureRequest_User
       }
     }
     ${PetitionLayout.fragments.Query}
@@ -1158,6 +1119,7 @@ const _fragments = {
     ${useSendPetitionHandler.fragments.User}
     ${ConfirmPetitionSignersDialog.fragments.User}
     ${PetitionPreviewStartSignatureButton.fragments.User}
+    ${useStartSignatureRequest.fragments.User}
   `,
 };
 
@@ -1177,22 +1139,6 @@ const _mutations = [
       }
     }
     ${_fragments.PetitionBase}
-  `,
-
-  gql`
-    mutation PetitionPreview_cancelPetitionApprovalRequestFlow($petitionId: GID!) {
-      cancelPetitionApprovalRequestFlow(petitionId: $petitionId) {
-        id
-        petition {
-          id
-          hasStartedProcess
-          currentApprovalRequestSteps {
-            id
-            status
-          }
-        }
-      }
-    }
   `,
 ];
 

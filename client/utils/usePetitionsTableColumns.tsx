@@ -347,9 +347,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     cellProps: { padding: 0, minWidth: "72px" },
     CellContent: ({ row }) => {
       const status =
-        row.__typename === "Petition"
-          ? getApprovalStatus(row.currentApprovalRequestSteps ?? [])
-          : "NOT_STARTED";
+        row.__typename === "Petition" ? row.currentApprovalRequestStatus : "NO_APPROVAL";
 
       const hasApprovals = row.__typename === "Petition" && isNonNullish(row.approvalFlowConfig);
 
@@ -366,7 +364,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
               }) ?? [])
           : [];
 
-      if (!hasApprovals) {
+      if (!hasApprovals || status === "NO_APPROVAL") {
         return <>{"-"}</>;
       }
 
@@ -754,28 +752,6 @@ export const TEMPLATES_COLUMNS = (
   },
 ];
 
-function getApprovalStatus(steps: { status: PetitionApprovalRequestStepStatus }[]) {
-  // - Some step has PENDING status is PENDING
-  // - ALL steps has NOT_STARTED status is NOT_STARTED
-  // - All steps has SKIPPED or APPROVED status is APPROVED
-  // - Some step has REJECTED status is REJECTED
-  const filteredSteps = steps.filter((s) => s.status !== "NOT_APPLICABLE");
-
-  if (filteredSteps.some((step) => step.status === "PENDING")) {
-    return "PENDING";
-  }
-  if (filteredSteps.every((step) => step.status === "NOT_STARTED")) {
-    return "NOT_STARTED";
-  }
-  if (filteredSteps.some((step) => step.status === "REJECTED")) {
-    return "REJECTED";
-  }
-  if (filteredSteps.every((step) => step.status === "SKIPPED" || step.status === "APPROVED")) {
-    return "APPROVED";
-  }
-  return "NOT_STARTED";
-}
-
 function ApprovalStatusIcon({ status }: { status: PetitionApprovalRequestStepStatus }) {
   switch (status) {
     case "APPROVED":
@@ -867,7 +843,6 @@ usePetitionsTableColumns.fragments = {
         ...PetitionSignatureCellContent_Petition @include(if: $includeSignature)
         lastActivityAt @include(if: $includeLastActivityAt)
         lastRecipientActivityAt @include(if: $includeLastRecipientActivityAt)
-
         approvalFlowConfig @include(if: $includeApprovals) {
           name
         }
@@ -876,6 +851,7 @@ usePetitionsTableColumns.fragments = {
           status
           stepName
         }
+        currentApprovalRequestStatus @include(if: $includeApprovals)
       }
       ... on PetitionTemplate {
         ...TemplateActiveSettingsIcons_PetitionTemplate

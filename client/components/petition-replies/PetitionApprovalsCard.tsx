@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
@@ -37,11 +37,11 @@ import {
   PetitionApprovalsCard_cancelPetitionApprovalRequestStepDocument,
   PetitionApprovalsCard_PetitionApprovalRequestStepApproverFragment,
   PetitionApprovalsCard_PetitionApprovalRequestStepFragment,
+  PetitionApprovalsCard_petitionDocument,
   PetitionApprovalsCard_PetitionFragment,
   PetitionApprovalsCard_rejectPetitionApprovalRequestStepDocument,
   PetitionApprovalsCard_sendPetitionApprovalRequestStepReminderDocument,
   PetitionApprovalsCard_skipPetitionApprovalRequestStepDocument,
-  PetitionApprovalsCard_startPetitionApprovalRequestStepDocument,
   PetitionApprovalsCard_UserFragment,
   PetitionStatus,
 } from "@parallel/graphql/__types";
@@ -49,11 +49,13 @@ import { Fragments } from "@parallel/utils/apollo/fragments";
 import { FORMATS } from "@parallel/utils/dates";
 import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
+import { useStartApprovalRequestStep } from "@parallel/utils/hooks/useStartApprovalRequestStep";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import { useAddNewSignature } from "@parallel/utils/useAddNewSignature";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
-import { Fragment, useRef, useState } from "react";
+import { usePageVisibility } from "@parallel/utils/usePageVisibility";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 import { Card } from "../common/Card";
@@ -94,6 +96,7 @@ export function PetitionApprovalsCard({
   isShowingGeneralComments,
   isDisabled,
 }: PetitionApprovalsCardProps) {
+  usePetitionApprovalsCardPolling(petition);
   const intl = useIntl();
   const toast = useToast();
   const tabsRefs = useMultipleRefs<HTMLButtonElement>();
@@ -146,6 +149,8 @@ export function PetitionApprovalsCard({
       : pendingOrNotStartedStepIndex,
   );
   const showGenericErrorToast = useGenericErrorToast();
+
+  const signatureIndex = approvalStepsWithSignature.findIndex((step) => step.id === "signature");
 
   let currentSignatureRequest: Maybe<
     UnwrapArray<PetitionApprovalsCard_PetitionFragment["signatureRequests"]>
@@ -224,21 +229,7 @@ export function PetitionApprovalsCard({
     });
   };
 
-  const showStartApprovalToast = (stepName: string) => {
-    toast({
-      description: intl.formatMessage(
-        {
-          id: "component.petition-approvals-card.start-approval-toast-description",
-          defaultMessage: "The approval step <b>{stepName}</b> has been started",
-        },
-        {
-          stepName,
-        },
-      ),
-      status: "success",
-      isClosable: true,
-    });
-  };
+  const { handleStartApprovalFlow } = useStartApprovalRequestStep({ petition });
 
   const showConfirmCancelPetitionApprovalFlowDialog = useConfirmCancelPetitionApprovalFlowDialog();
   const [cancelPetitionApprovalRequestStep] = useMutation(
@@ -313,39 +304,6 @@ export function PetitionApprovalsCard({
     }
   };
 
-  const showStartPetitionApprovalFlowDialog = useStartPetitionApprovalFlowDialog();
-
-  const [startPetitionApprovalRequestStep] = useMutation(
-    PetitionApprovalsCard_startPetitionApprovalRequestStepDocument,
-  );
-
-  const handleStartApprovalFlow = async (
-    step: PetitionApprovalsCard_PetitionApprovalRequestStepFragment,
-  ) => {
-    try {
-      const { message, attachments } = await showStartPetitionApprovalFlowDialog({ step });
-
-      if (
-        isNonNullish(petition.currentApprovalRequestSteps) &&
-        petition.currentApprovalRequestSteps.length > 0
-      ) {
-        await startPetitionApprovalRequestStep({
-          variables: {
-            petitionId: petition.id,
-            attachments,
-            message,
-            approvalRequestStepId: step.id,
-          },
-        });
-        showStartApprovalToast(step.stepName);
-      }
-    } catch (error) {
-      if (!isDialogError(error)) {
-        showGenericErrorToast(error);
-      }
-    }
-  };
-
   const showConfirmSkipPetitionApprovalFlowDialog = useConfirmSkipPetitionApprovalFlowDialog();
   const [skipPetitionApprovalRequestStep] = useMutation(
     PetitionApprovalsCard_skipPetitionApprovalRequestStepDocument,
@@ -403,8 +361,6 @@ export function PetitionApprovalsCard({
       }
     }
   };
-
-  const signatureIndex = approvalStepsWithSignature.findIndex((step) => step.id === "signature");
 
   const checkIfNextOrCurrentStep = (
     steps: PetitionApprovalRequestStep[],
@@ -645,8 +601,13 @@ PetitionApprovalsCard.fragments = {
           review
           reviewAfterApproval
         }
+        signatureRequests {
+          id
+          status
+        }
         ...getPetitionSignatureStatus_Petition
         ...getPetitionSignatureEnvironment_Petition
+        ...useStartApprovalRequestStep_PetitionBase
       }
       ${UserReference.fragments.User}
       ${Fragments.FullApprovalFlowConfig}
@@ -656,6 +617,7 @@ PetitionApprovalsCard.fragments = {
       ${this.PetitionApprovalRequestStep}
       ${getPetitionSignatureStatus.fragments.Petition}
       ${getPetitionSignatureEnvironment.fragments.Petition}
+      ${useStartApprovalRequestStep.fragments.PetitionBase}
     `;
   },
   get User() {
@@ -826,6 +788,17 @@ const _mutations = [
       }
     }
     ${PetitionApprovalsCard.fragments.PetitionApprovalRequestStep}
+  `,
+];
+
+const _queries = [
+  gql`
+    query PetitionApprovalsCard_petition($petitionId: GID!) {
+      petition(id: $petitionId) {
+        ...PetitionApprovalsCard_Petition
+      }
+    }
+    ${PetitionApprovalsCard.fragments.Petition}
   `,
 ];
 
@@ -1260,4 +1233,29 @@ function OlderPetitionApprovalStepRows({
       ))}
     </>
   );
+}
+
+const POLL_INTERVAL = 30_000;
+
+function usePetitionApprovalsCardPolling(petition: PetitionApprovalsCard_PetitionFragment) {
+  const current = petition.signatureRequests.at(0);
+  const isPageVisible = usePageVisibility();
+  const { startPolling, stopPolling } = useQuery(PetitionApprovalsCard_petitionDocument, {
+    pollInterval: POLL_INTERVAL,
+    variables: { petitionId: petition.id },
+    skip: !isPageVisible,
+  });
+
+  useEffect(() => {
+    if (current && current.status !== "CANCELLED" && isNullish(current.auditTrailFilename)) {
+      startPolling(POLL_INTERVAL);
+    } else if (
+      (current?.status === "COMPLETED" && isNonNullish(current.auditTrailFilename)) ||
+      current?.status === "CANCELLED"
+    ) {
+      stopPolling();
+    }
+
+    return stopPolling;
+  }, [current?.status, current?.auditTrailFilename]);
 }

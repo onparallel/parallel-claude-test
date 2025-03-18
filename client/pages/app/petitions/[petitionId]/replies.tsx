@@ -31,13 +31,7 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { ProfileSelectInstance } from "@parallel/components/common/ProfileSelect";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { ShareButton } from "@parallel/components/common/ShareButton";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import {
-  DialogProps,
-  isDialogError,
-  useDialog,
-  withDialogs,
-} from "@parallel/components/common/dialogs/DialogProvider";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import {
   PetitionLayout,
@@ -63,31 +57,22 @@ import { PetitionSignaturesCard } from "@parallel/components/petition-replies/Pe
 import { PetitionVariablesCard } from "@parallel/components/petition-replies/PetitionVariablesCard";
 import { ProfileDrawer } from "@parallel/components/petition-replies/ProfileDrawer";
 import { useArchiveFieldGroupReplyIntoProfileDialog } from "@parallel/components/petition-replies/dialogs/ArchiveFieldGroupReplyIntoProfileDialog";
-import { useClosePetitionDialog } from "@parallel/components/petition-replies/dialogs/ClosePetitionDialog";
-import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/dialogs/ConfirmResendCompletedNotificationDialog";
 import {
   ExportRepliesDialog,
   useExportRepliesDialog,
 } from "@parallel/components/petition-replies/dialogs/ExportRepliesDialog";
 import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesProgressDialog";
-import { useSolveUnreviewedRepliesDialog } from "@parallel/components/petition-replies/dialogs/SolveUnreviewedRepliesDialog";
 import {
   PetitionFieldReplyStatus,
   PetitionReplies_PetitionFragment,
-  PetitionReplies_approveOrRejectPetitionFieldRepliesDocument,
   PetitionReplies_associateProfileToPetitionDocument,
-  PetitionReplies_cancelPetitionApprovalRequestFlowDocument,
-  PetitionReplies_cancelSignatureRequestDocument,
-  PetitionReplies_closePetitionDocument,
   PetitionReplies_petitionDocument,
-  PetitionReplies_sendPetitionClosedNotificationDocument,
   PetitionReplies_updatePetitionDocument,
   PetitionReplies_updatePetitionFieldRepliesStatusDocument,
   PetitionReplies_userDocument,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { Fragments } from "@parallel/utils/apollo/fragments";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
@@ -99,6 +84,7 @@ import {
 } from "@parallel/utils/filterPetitionFields";
 import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
+import { useClosePetition } from "@parallel/utils/hooks/useClosePetition";
 import { LiquidPetitionScopeProvider } from "@parallel/utils/liquid/LiquidPetitionScopeProvider";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import {
@@ -108,11 +94,10 @@ import {
 } from "@parallel/utils/mutations/comments";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { string, useQueryState, useQueryStateSlice } from "@parallel/utils/queryState";
-import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { useExportRepliesTask } from "@parallel/utils/tasks/useExportRepliesTask";
 import { useFileExportTask } from "@parallel/utils/tasks/useFileExportTask";
 import { usePrintPdfTask } from "@parallel/utils/tasks/usePrintPdfTask";
-import { Maybe, UnwrapPromise } from "@parallel/utils/types";
+import { UnwrapPromise } from "@parallel/utils/types";
 import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
 import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
@@ -238,6 +223,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     });
   }
 
+  const { handleClosePetition } = useClosePetition({ onRefetch: () => refetch() });
+
   const handleUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
       return await updatePetition({ variables: { petitionId, data } });
@@ -354,80 +341,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   );
   const hasLinkedToProfileTypeFields = allFields.some((f) => f.isLinkedToProfileTypeField);
 
-  const showClosePetitionDialog = useClosePetitionDialog();
-  const [sendPetitionClosedNotification] = useMutation(
-    PetitionReplies_sendPetitionClosedNotificationDocument,
-  );
-  const petitionAlreadyNotifiedDialog = useConfirmResendCompletedNotificationDialog();
-  const handleFinishPetition = useCallback(
-    async ({ requiredMessage }: { requiredMessage: boolean }) => {
-      const showToast = (includeDescription?: boolean) => {
-        toast({
-          title: intl.formatMessage({
-            id: "page.replies.parallel-closed-toast-header",
-            defaultMessage: "Parallel closed",
-          }),
-          description: includeDescription
-            ? intl.formatMessage({
-                id: "page.replies.parallel-closed-toast-description",
-                defaultMessage: "The recipient has been notified.",
-              })
-            : undefined,
-          status: "success" as const,
-          duration: 3000,
-          isClosable: true,
-        });
-      };
-
-      let message: Maybe<RichTextEditorValue> = null;
-      let pdfExportTitle: Maybe<string> = null;
-      let attachPdfExport = false;
-
-      try {
-        const data = await showClosePetitionDialog({
-          petition,
-          hasLinkedToProfileTypeFields,
-          requiredMessage,
-        });
-
-        message = data.message;
-        pdfExportTitle = data.pdfExportTitle;
-        attachPdfExport = data.attachPdfExport;
-
-        if (message) {
-          await sendPetitionClosedNotification({
-            variables: {
-              petitionId: petition.id,
-              emailBody: message,
-              attachPdfExport,
-              pdfExportTitle,
-            },
-          });
-        }
-        showToast(!!message);
-      } catch (error) {
-        // rethrow error to avoid continuing flow on function handleClosePetition
-        if (isDialogError(error)) {
-          throw error;
-        }
-        if (isApolloError(error, "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR")) {
-          await petitionAlreadyNotifiedDialog();
-          await sendPetitionClosedNotification({
-            variables: {
-              petitionId: petition.id,
-              emailBody: message,
-              attachPdfExport,
-              pdfExportTitle,
-              force: true,
-            },
-          });
-          showToast(!!message);
-        }
-      }
-    },
-    [petition, intl.locale, hasLinkedToProfileTypeFields],
-  );
-
   const repliesFieldGroupsWithProfileTypes = zip(petition.fields, fieldLogic)
     .filter(
       ([field, { isVisible }]) =>
@@ -449,109 +362,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     try {
       await showArchiveFieldGroupReplyIntoProfileDialog({
         petitionId: petition.id,
-        groupsWithProfileTypesCount: fieldGroupsWithProfileTypesTotal,
         onRefetch: () => refetch(),
       });
     } catch {}
   };
-
-  const showSolveUnreviewedRepliesDialog = useSolveUnreviewedRepliesDialog();
-  const [approveOrRejectReplies] = useMutation(
-    PetitionReplies_approveOrRejectPetitionFieldRepliesDocument,
-  );
-  const [closePetition] = useMutation(PetitionReplies_closePetitionDocument);
-
-  const showConfirmCancelOngoingSignature = useDialog(ConfirmCancelOngoingSignature);
-
-  const showConfirmCancelOngoingApprovals = useDialog(ConfirmCancelOngoingApprovals);
-
-  const [cancelSignatureRequest] = useMutation(PetitionReplies_cancelSignatureRequestDocument);
-
-  const [cancelPetitionApprovalRequestFlow] = useMutation(
-    PetitionReplies_cancelPetitionApprovalRequestFlowDocument,
-  );
-
-  const handleClosePetition = useCallback(async () => {
-    try {
-      const hasPendingSignature =
-        (petition.currentSignatureRequest &&
-          ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(
-            petition.currentSignatureRequest.status,
-          )) ??
-        false;
-
-      const hasRejectedApproval = petition.currentApprovalRequestSteps?.some(
-        (s) => s.status === "REJECTED",
-      );
-
-      const pendingApproval = hasRejectedApproval
-        ? null
-        : petition.currentApprovalRequestSteps?.find((s) => s.status === "PENDING");
-
-      if (isNonNullish(pendingApproval)) {
-        await showConfirmCancelOngoingApprovals();
-        await cancelPetitionApprovalRequestFlow({
-          variables: {
-            petitionId: petition.id,
-          },
-        });
-      } else if (hasPendingSignature || petition.signatureConfig?.isEnabled) {
-        await showConfirmCancelOngoingSignature();
-        if (hasPendingSignature) {
-          await cancelSignatureRequest({
-            variables: {
-              petitionSignatureRequestId: petition.currentSignatureRequest!.id,
-            },
-          });
-        }
-        await updatePetition({
-          variables: {
-            petitionId: petition.id,
-            data: { signatureConfig: null },
-          },
-        });
-        refetch();
-      }
-
-      const hasUnreviewedReplies = petition.fields.some((f) =>
-        f.replies.some((r) => r.status === "PENDING" && f.requireApproval),
-      );
-
-      const option =
-        petition.isReviewFlowEnabled && hasUnreviewedReplies
-          ? await showSolveUnreviewedRepliesDialog()
-          : "NOTHING";
-
-      await handleFinishPetition({ requiredMessage: false });
-
-      if (hasUnreviewedReplies && option !== "NOTHING") {
-        await approveOrRejectReplies({
-          variables: {
-            petitionId,
-            status: option === "APPROVE" ? "APPROVED" : "REJECTED",
-          },
-        });
-      }
-
-      await closePetition({
-        variables: {
-          petitionId,
-        },
-      });
-
-      if (hasLinkedToProfileTypeFields) {
-        await handleAssociateAndFillProfile();
-      }
-    } catch {}
-  }, [
-    petition,
-    approveOrRejectReplies,
-    closePetition,
-    handleFinishPetition,
-    cancelSignatureRequest,
-    handleAssociateAndFillProfile,
-    hasLinkedToProfileTypeFields,
-  ]);
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
   const handlePetitionSharingClick = async function () {
@@ -621,9 +435,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const drawerInitialRef = useRef<ProfileSelectInstance<false>>(null);
   const isMobile = useBreakpointValue({ base: true, lg: false });
 
-  const hasApprovals =
-    (petition.currentApprovalRequestSteps && petition.currentApprovalRequestSteps.length > 0) ||
-    (petition.approvalFlowConfig && petition.approvalFlowConfig.length > 0);
+  const hasApprovals = petition.approvalFlowConfig && petition.approvalFlowConfig.length > 0;
 
   return (
     <PetitionLayout
@@ -814,13 +626,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             data-action="close-petition"
             colorScheme="primary"
             leftIcon={<CheckIcon />}
-            onClick={handleClosePetition}
+            onClick={() => handleClosePetition(petition)}
           >
             <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
-              <FormattedMessage
-                id="page.replies.finalize-petition-button"
-                defaultMessage="Close parallel"
-              />
+              <FormattedMessage id="generic.close-petition" defaultMessage="Close parallel" />
             </Text>
           </Button>
         )}
@@ -991,10 +800,6 @@ PetitionReplies.fragments = {
             isLinkedToProfileTypeField
           }
         }
-        currentSignatureRequest {
-          id
-          status
-        }
         myEffectivePermission {
           permissionType
         }
@@ -1009,16 +814,11 @@ PetitionReplies.fragments = {
         approvalFlowConfig {
           ...Fragments_FullApprovalFlowConfig
         }
-        currentApprovalRequestSteps {
-          id
-          status
-        }
         ...PetitionRepliesField_Petition
         ...PetitionVariablesCard_PetitionBase
         ...PetitionSignaturesCard_Petition
         ...getPetitionSignatureStatus_Petition
         ...getPetitionSignatureEnvironment_Petition
-        ...useClosePetitionDialog_Petition
         ...useFieldLogic_PetitionBase
         ...LiquidPetitionScopeProvider_PetitionBase
         ...PetitionRepliesSummary_Petition
@@ -1030,6 +830,7 @@ PetitionReplies.fragments = {
         ...useFieldsWithIndices_PetitionBase
         ...PetitionComments_PetitionBase
         ...PetitionApprovalsCard_Petition
+        ...useClosePetition_PetitionBase
       }
       ${Fragments.FullApprovalFlowConfig}
       ${PetitionLayout.fragments.PetitionBase}
@@ -1038,7 +839,6 @@ PetitionReplies.fragments = {
       ${PetitionSignaturesCard.fragments.Petition}
       ${getPetitionSignatureStatus.fragments.Petition}
       ${getPetitionSignatureEnvironment.fragments.Petition}
-      ${useClosePetitionDialog.fragments.Petition}
       ${useFieldLogic.fragments.PetitionBase}
       ${LiquidPetitionScopeProvider.fragments.PetitionBase}
       ${ProfileDrawer.fragments.Profile}
@@ -1051,6 +851,7 @@ PetitionReplies.fragments = {
       ${useFieldsWithIndices.fragments.PetitionBase}
       ${PetitionComments.fragments.PetitionBase}
       ${PetitionApprovalsCard.fragments.Petition}
+      ${useClosePetition.fragments.PetitionBase}
     `;
   },
   get PetitionField() {
@@ -1081,25 +882,6 @@ const _mutations = [
     ${PetitionLayout.fragments.PetitionBase}
   `,
   gql`
-    mutation PetitionReplies_closePetition($petitionId: GID!) {
-      closePetition(petitionId: $petitionId) {
-        ...PetitionReplies_Petition
-      }
-    }
-    ${PetitionReplies.fragments.Petition}
-  `,
-  gql`
-    mutation PetitionReplies_approveOrRejectPetitionFieldReplies(
-      $petitionId: GID!
-      $status: PetitionFieldReplyStatus!
-    ) {
-      approveOrRejectPetitionFieldReplies(petitionId: $petitionId, status: $status) {
-        ...PetitionReplies_Petition
-      }
-    }
-    ${PetitionReplies.fragments.Petition}
-  `,
-  gql`
     mutation PetitionReplies_updatePetitionFieldRepliesStatus(
       $petitionId: GID!
       $petitionFieldId: GID!
@@ -1124,30 +906,11 @@ const _mutations = [
           status
           ...PetitionRepliesFieldReply_PetitionFieldReply
         }
-        
-      }
-      ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
-    }
-  `,
-  gql`
-    mutation PetitionReplies_sendPetitionClosedNotification(
-      $petitionId: GID!
-      $emailBody: JSON!
-      $attachPdfExport: Boolean!
-      $pdfExportTitle: String
-      $force: Boolean
-    ) {
-      sendPetitionClosedNotification(
-        petitionId: $petitionId
-        emailBody: $emailBody
-        attachPdfExport: $attachPdfExport
-        pdfExportTitle: $pdfExportTitle
-        force: $force
-      ) {
-        id
       }
     }
+    ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
   `,
+
   gql`
     mutation PetitionReplies_associateProfileToPetition($petitionId: GID!, $profileId: GID!) {
       associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
@@ -1156,32 +919,6 @@ const _mutations = [
           profiles {
             id
           }
-        }
-      }
-    }
-  `,
-  gql`
-    mutation PetitionReplies_cancelPetitionApprovalRequestFlow($petitionId: GID!) {
-      cancelPetitionApprovalRequestFlow(petitionId: $petitionId) {
-        id
-        petition {
-          id
-          currentApprovalRequestSteps {
-            id
-            status
-          }
-        }
-      }
-    }
-  `,
-  gql`
-    mutation PetitionReplies_cancelSignatureRequest($petitionSignatureRequestId: GID!) {
-      cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
-        id
-        status
-        petition {
-          id
-          hasStartedProcess
         }
       }
     }
@@ -1197,62 +934,6 @@ function useUpdatePetitionFieldRepliesStatus() {
       variables: VariablesOf<typeof PetitionReplies_updatePetitionFieldRepliesStatusDocument>,
     ) => await updatePetitionFieldRepliesStatus({ variables }),
     [updatePetitionFieldRepliesStatus],
-  );
-}
-
-function ConfirmCancelOngoingSignature(props: DialogProps<{}, void>) {
-  return (
-    <ConfirmDialog
-      header={
-        <FormattedMessage
-          id="component.confirm-disable-ongoing-signature.header"
-          defaultMessage="Ongoing eSignature"
-        />
-      }
-      body={
-        <FormattedMessage
-          id="component.confirm-disable-ongoing-signature-petition-close.body"
-          defaultMessage="There is an ongoing eSignature process. If you close this parallel now, the process will be cancelled."
-        />
-      }
-      confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="component.confirm-disable-ongoing-signature-petition-close.confirm"
-            defaultMessage="Cancel eSignature and continue"
-          />
-        </Button>
-      }
-      {...props}
-    />
-  );
-}
-
-function ConfirmCancelOngoingApprovals(props: DialogProps<{}, void>) {
-  return (
-    <ConfirmDialog
-      header={
-        <FormattedMessage
-          id="component.confirm-disable-ongoing-approvals.header"
-          defaultMessage="Ongoing approvals"
-        />
-      }
-      body={
-        <FormattedMessage
-          id="component.confirm-disable-ongoing-approvals-petition-close.body"
-          defaultMessage="There is an ongoing approval process. If you close this parallel now, the process will be cancelled."
-        />
-      }
-      confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="component.confirm-disable-ongoing-approvals-petition-close.confirm"
-            defaultMessage="Cancel approvals and continue"
-          />
-        </Button>
-      }
-      {...props}
-    />
   );
 }
 

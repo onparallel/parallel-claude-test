@@ -608,6 +608,12 @@ export interface NexusGenEnums {
     | "lastName_ASC"
     | "lastName_DESC";
   PetitionAccessStatus: db.PetitionAccessStatus;
+  PetitionApprovalRequestStatus:
+    | "APPROVED"
+    | "NOT_STARTED"
+    | "NO_APPROVAL"
+    | "PENDING"
+    | "REJECTED";
   PetitionApprovalRequestStepApprovalType: db.PetitionApprovalRequestStepApprovalType;
   PetitionApprovalRequestStepRejectionType: "DEFINITIVE" | "TEMPORARY";
   PetitionApprovalRequestStepStatus: db.PetitionApprovalRequestStepStatus;
@@ -2743,6 +2749,7 @@ export interface NexusGenFieldTypes {
     completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    currentApprovalRequestStatus: NexusGenEnums["PetitionApprovalRequestStatus"]; // PetitionApprovalRequestStatus!
     currentApprovalRequestSteps: NexusGenRootTypes["PetitionApprovalRequestStep"][] | null; // [PetitionApprovalRequestStep!]
     currentSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"] | null; // PetitionSignatureRequest
     customLists: NexusGenRootTypes["PetitionCustomList"][]; // [PetitionCustomList!]!
@@ -3926,6 +3933,7 @@ export interface NexusGenFieldTypes {
     completingMessageBody: string | null; // String
     completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    currentApprovalRequestStatus: NexusGenEnums["PetitionApprovalRequestStatus"]; // PetitionApprovalRequestStatus!
     customLists: NexusGenRootTypes["PetitionCustomList"][]; // [PetitionCustomList!]!
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
     fields: NexusGenRootTypes["PublicPetitionField"][]; // [PublicPetitionField!]!
@@ -4053,6 +4061,7 @@ export interface NexusGenFieldTypes {
   };
   PublicPetitionSignatureRequest: {
     // field return type
+    cancelReason: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
     signerStatus: NexusGenRootTypes["PetitionSignatureRequestSignerStatus"][]; // [PetitionSignatureRequestSignerStatus!]!
     status: NexusGenEnums["PetitionSignatureRequestStatus"]; // PetitionSignatureRequestStatus!
@@ -5755,6 +5764,7 @@ export interface NexusGenFieldTypeNames {
     completingMessageBody: "JSON";
     completingMessageSubject: "String";
     createdAt: "DateTime";
+    currentApprovalRequestStatus: "PetitionApprovalRequestStatus";
     currentApprovalRequestSteps: "PetitionApprovalRequestStep";
     currentSignatureRequest: "PetitionSignatureRequest";
     customLists: "PetitionCustomList";
@@ -6938,6 +6948,7 @@ export interface NexusGenFieldTypeNames {
     completingMessageBody: "String";
     completingMessageSubject: "String";
     createdAt: "DateTime";
+    currentApprovalRequestStatus: "PetitionApprovalRequestStatus";
     customLists: "PetitionCustomList";
     deadline: "DateTime";
     fields: "PublicPetitionField";
@@ -7065,6 +7076,7 @@ export interface NexusGenFieldTypeNames {
   };
   PublicPetitionSignatureRequest: {
     // field return type name
+    cancelReason: "String";
     id: "GID";
     signerStatus: "PetitionSignatureRequestSignerStatus";
     status: "PetitionSignatureRequestStatus";

@@ -13,6 +13,7 @@ import { safeJsonParse } from "../../util/safeJsonParse";
 import { renderSlateWithMentionsToHtml } from "../../util/slate/mentions";
 import { renderSlateWithPlaceholdersToHtml } from "../../util/slate/placeholders";
 import { renderSlateToText } from "../../util/slate/render";
+import { getPetitionApprovalRequestStatus } from "../helpers/getPetitionApprovalRequestStatus";
 
 export const PublicPetitionAccess = objectType({
   name: "PublicPetitionAccess",
@@ -136,6 +137,9 @@ export const PublicPetitionSignatureRequest = objectType({
       type: "PetitionSignatureRequestStatus",
       description: "The status of the petition signature.",
     });
+    t.nullable.string("cancelReason", {
+      resolve: (o) => o.cancel_reason,
+    });
   },
 });
 
@@ -206,6 +210,15 @@ export const PublicPetition = objectType({
       resolve: async (root, _, ctx) => {
         const processes = await ctx.petitions.getPetitionStartedProcesses(root.id);
         return processes.length > 0;
+      },
+    });
+    t.field("currentApprovalRequestStatus", {
+      type: "PetitionApprovalRequestStatus",
+      resolve: async (o, _, ctx) => {
+        const steps =
+          await ctx.approvalRequests.loadCurrentPetitionApprovalRequestStepsByPetitionId(o.id);
+
+        return getPetitionApprovalRequestStatus(steps);
       },
     });
     t.nonNull.field("tone", {

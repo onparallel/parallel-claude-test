@@ -92,8 +92,8 @@ export type FeatureFlagName =
   | "KEY_PROCESSES"
   | "DASHBOARDS"
   | "PETITION_APPROVAL_FLOW"
-  | "REMOVE_PREVIEW_FILES"
-  | "PROFILE_SEARCH_FIELD";
+  | "PROFILE_SEARCH_FIELD"
+  | "REMOVE_PREVIEW_FILES";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -131,8 +131,8 @@ export const FeatureFlagNameValues = [
   "KEY_PROCESSES",
   "DASHBOARDS",
   "PETITION_APPROVAL_FLOW",
-  "REMOVE_PREVIEW_FILES",
   "PROFILE_SEARCH_FIELD",
+  "REMOVE_PREVIEW_FILES",
 ] as FeatureFlagName[];
 
 export type IntegrationType =

@@ -9,7 +9,7 @@ import {
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { useTone } from "@parallel/components/common/ToneProvider";
-import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/RestrictedPetitionFieldAlert";
+import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FORMATS } from "@parallel/utils/dates";
 import { centeredPopup, isWindowBlockedError, openNewWindow } from "@parallel/utils/openNewWindow";

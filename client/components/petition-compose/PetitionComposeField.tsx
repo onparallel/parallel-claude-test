@@ -94,7 +94,7 @@ import { HelpCenterLink } from "../common/HelpCenterLink";
 import { HelpPopover } from "../common/HelpPopover";
 import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
 import { NumberingBadge } from "../common/NumberingBadge";
-import { RestrictedPetitionFieldAlert } from "../petition-common/RestrictedPetitionFieldAlert";
+import { RestrictedPetitionFieldAlert } from "../petition-common/alerts/RestrictedPetitionFieldAlert";
 import { PetitionComposeFieldGroupChildren } from "./PetitionComposeFieldGroupChildren";
 import { PetitionFieldMathEditor } from "./logic/PetitionFieldMathEditor";
 

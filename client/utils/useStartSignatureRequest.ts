@@ -160,7 +160,7 @@ export function useStartSignatureRequest({
     },
     buttonLabel: startSignature
       ? intl.formatMessage({
-          id: "component.use-start-signature-request.start",
+          id: "generic.start-signature",
           defaultMessage: "Start signature",
         })
       : canFinalize

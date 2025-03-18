@@ -1,15 +1,26 @@
 import { gql } from "@apollo/client";
 import {
-  getPetitionSignatureStatus_PetitionFragment,
+  PetitionSignatureRequestStatus,
   PetitionSignatureStatusFilter,
 } from "@parallel/graphql/__types";
 import { isNonNullish } from "remeda";
+
+interface PetitionSignatureStatusProps {
+  status: string;
+  currentSignatureRequest?: {
+    status: PetitionSignatureRequestStatus;
+    cancelReason?: string | null;
+  } | null;
+  signatureConfig?: {
+    review: boolean;
+  } | null;
+}
 
 export function getPetitionSignatureStatus({
   status,
   currentSignatureRequest,
   signatureConfig,
-}: getPetitionSignatureStatus_PetitionFragment): PetitionSignatureStatusFilter {
+}: PetitionSignatureStatusProps): PetitionSignatureStatusFilter {
   if (
     signatureConfig?.isEnabled &&
     ["COMPLETED", "CLOSED"].includes(status) &&
@@ -50,6 +61,19 @@ getPetitionSignatureStatus.fragments = {
       }
       signatureConfig {
         isEnabled
+        review
+      }
+    }
+  `,
+  PublicPetition: gql`
+    fragment getPetitionSignatureStatus_PublicPetition on PublicPetition {
+      status
+      latestSignatureRequest {
+        id
+        status
+        cancelReason
+      }
+      signatureConfig {
         review
       }
     }

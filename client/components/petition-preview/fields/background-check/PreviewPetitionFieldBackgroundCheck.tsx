@@ -14,7 +14,7 @@ import {
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
-import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/RestrictedPetitionFieldAlert";
+import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
 import {
   PreviewPetitionFieldBackgroundCheck_PetitionBaseFragment,
   PreviewPetitionFieldBackgroundCheck_UserFragment,

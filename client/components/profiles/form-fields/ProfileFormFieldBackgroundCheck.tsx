@@ -15,7 +15,7 @@ import { BusinessIcon, RepeatIcon, SearchIcon, UserIcon } from "@parallel/chakra
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
-import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/RestrictedPetitionFieldAlert";
+import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
 import {
   ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueDocument,
   ProfileFormFieldBackgroundCheck_updateProfileFieldValueDocument,
