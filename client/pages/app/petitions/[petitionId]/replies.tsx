@@ -495,7 +495,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             petitionId: petition.id,
           },
         });
-      } else if (hasPendingSignature || petition.signatureConfig) {
+      } else if (hasPendingSignature || petition.signatureConfig?.isEnabled) {
         await showConfirmCancelOngoingSignature();
         if (hasPendingSignature) {
           await cancelSignatureRequest({

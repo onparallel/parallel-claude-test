@@ -116,7 +116,7 @@ export class PetitionFilterRepositoryHelper {
           if (filter.signature!.includes("NO_SIGNATURE")) {
             // no signature configured nor any previous signature request
             q.or.whereRaw(/* sql */ `
-              ${t("petition.signature_config")} is null
+              (${t("petition.signature_config")} is null or (${t("petition.signature_config")}->>'isEnabled')::boolean = 'false')
               and ${t("petition.latest_signature_status")} is null
             `);
           }
@@ -124,6 +124,7 @@ export class PetitionFilterRepositoryHelper {
             // signature is configured, awaiting to complete the petition
             q.or.whereRaw(/* sql */ `
               ${t("petition.signature_config")} is not null
+              and (${t("petition.signature_config")}->>'isEnabled')::boolean = 'true'
               and ${t("petition.latest_signature_status")} is null
               and ${t("petition.status")} in ('DRAFT', 'PENDING')
             `);
@@ -134,6 +135,7 @@ export class PetitionFilterRepositoryHelper {
             // and signature is still configured
             q.or.whereRaw(/* sql */ `
               ${t("petition.signature_config")} is not null 
+              and (${t("petition.signature_config")}->>'isEnabled')::boolean = 'true'
               and ${t("petition.status")} in ('COMPLETED', 'CLOSED')
               and (
                 ${t("petition.latest_signature_status")} is null
@@ -152,7 +154,7 @@ export class PetitionFilterRepositoryHelper {
           if (filter.signature!.includes("COMPLETED")) {
             // signature completed, everyone signed
             q.or.whereRaw(/* sql */ `
-              ${t("petition.signature_config")} is null
+              (${t("petition.signature_config")} is null or (${t("petition.signature_config")}->>'isEnabled')::boolean = 'false')
               and ${t("petition.latest_signature_status")} is not null
               and ${t("petition.latest_signature_status")} = 'COMPLETED'
             `);
@@ -166,7 +168,7 @@ export class PetitionFilterRepositoryHelper {
                 ${t("petition.latest_signature_status")} = 'CANCELLED'
                 or ( 
                   ${t("petition.latest_signature_status")} = 'CANCELLED_BY_USER'
-                  and ${t("petition.signature_config")} is null
+                  and (${t("petition.signature_config")} is null or (${t("petition.signature_config")}->>'isEnabled')::boolean = 'false')
                 )
               )
             `);

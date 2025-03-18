@@ -3,6 +3,7 @@ import { inject, injectable } from "inversify";
 import { isNonNullish, isNullish, pick } from "remeda";
 import { ContactLocale, ContactLocaleValues } from "../../db/__types";
 import { SignatureDeliveredEvent } from "../../db/events/PetitionEvent";
+import { TableTypes } from "../../db/helpers/BaseRepository";
 import {
   EnhancedOrgIntegration,
   IntegrationRepository,
@@ -10,7 +11,6 @@ import {
 } from "../../db/repositories/IntegrationRepository";
 import {
   PetitionRepository,
-  PetitionSignatureConfig,
   PetitionSignatureConfigSigner,
 } from "../../db/repositories/PetitionRepository";
 import { Tone } from "../../emails/utils/types";
@@ -19,7 +19,6 @@ import { ENCRYPTION_SERVICE, EncryptionService } from "../../services/Encryption
 import { FETCH_SERVICE, IFetchService } from "../../services/FetchService";
 import { ISignatureService } from "../../services/SignatureService";
 import { fromGlobalId } from "../../util/globalId";
-import { Replace } from "../../util/types";
 import { GenericIntegration } from "../helpers/GenericIntegration";
 import { SIGNATURE_CLIENT_FACTORY, SignatureClientFactory } from "./SignatureClient";
 
@@ -348,10 +347,7 @@ export class SignaturitIntegration extends GenericIntegration<
   }
 
   private async findSigner(
-    signatureConfig: Replace<
-      PetitionSignatureConfig,
-      { signersInfo: (PetitionSignatureConfigSigner & { externalId: string })[] }
-    >,
+    signatureConfig: TableTypes["petition_signature_request"]["signature_config"],
     document: SignaturitEventBody["document"],
   ): Promise<[PetitionSignatureConfigSigner & { externalId: string }, number]> {
     let signerIndex = signatureConfig.signersInfo.findIndex(

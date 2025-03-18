@@ -10,6 +10,7 @@ import {
   PetitionSignatureRequest,
   PetitionStatus,
 } from "../../db/__types";
+import { PetitionSignatureConfig } from "../../db/repositories/PetitionRepository";
 import { backgroundCheckFieldReplyUrl } from "../../util/backgroundCheck";
 import { FORMATS } from "../../util/dates";
 import { applyFieldVisibility, evaluateFieldLogic } from "../../util/fieldLogic";
@@ -28,10 +29,10 @@ function getPetitionSignatureStatus({
 }: {
   status: PetitionStatus;
   currentSignatureRequest?: PetitionSignatureRequest | null;
-  signatureConfig?: any;
+  signatureConfig: PetitionSignatureConfig | null;
 }) {
   if (
-    isNonNullish(signatureConfig) &&
+    signatureConfig?.isEnabled &&
     ["COMPLETED", "CLOSED"].includes(status) &&
     (!currentSignatureRequest ||
       currentSignatureRequest.status === "COMPLETED" ||
@@ -50,7 +51,7 @@ function getPetitionSignatureStatus({
     } else {
       return currentSignatureRequest.status as "COMPLETED" | "CANCELLED";
     }
-  } else if (isNonNullish(signatureConfig) && ["DRAFT", "PENDING"].includes(status)) {
+  } else if (signatureConfig?.isEnabled && ["DRAFT", "PENDING"].includes(status)) {
     // petition has signature configured but it's not yet completed
     return "NOT_STARTED";
   }

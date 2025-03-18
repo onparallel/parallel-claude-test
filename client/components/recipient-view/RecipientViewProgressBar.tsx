@@ -156,7 +156,8 @@ export const RecipientViewProgressBar = Object.assign(
                 onClick={onFinalize}
               >
                 {canFinalize ? (
-                  petition.signatureConfig?.review === false ? (
+                  petition.signatureConfig?.isEnabled &&
+                  petition.signatureConfig.review === false ? (
                     <FormattedMessage
                       id="generic.finalize-and-sign-button"
                       defaultMessage="Finalize and sign"
@@ -197,6 +198,7 @@ export const RecipientViewProgressBar = Object.assign(
               ...RecipientViewProgressBar_PetitionField
             }
             signatureConfig {
+              isEnabled
               review
             }
             ...useFieldLogic_PetitionBase
@@ -240,6 +242,7 @@ export const RecipientViewProgressBar = Object.assign(
               ...RecipientViewProgressBar_PublicPetitionField
             }
             signatureConfig {
+              isEnabled
               review
             }
             ...useFieldLogic_PublicPetition

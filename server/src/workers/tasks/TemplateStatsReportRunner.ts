@@ -90,7 +90,7 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
       return !isSent && isNonNullish(this.findFirstRecipientReplyEvent(events));
     });
 
-    const hasSignature = isNonNullish(template.signature_config);
+    const hasSignature = !!template.signature_config?.isEnabled;
     const funnel = this.getPetitionsConversionFunnel(petitionsWithEvents, hasSignature);
 
     return {

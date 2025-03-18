@@ -268,14 +268,12 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
             fieldId: field.id,
           }));
         } else {
-          return (
-            {
-              ...replies[0].content,
-              replyId: replies[0].id,
-              metadata: replies[0].metadata,
-              fieldId: field.id,
-            } ?? null
-          );
+          return {
+            ...replies[0].content,
+            replyId: replies[0].id,
+            metadata: replies[0].metadata,
+            fieldId: field.id,
+          };
         }
       case "DYNAMIC_SELECT":
         if (replies.length > 1) {
@@ -341,10 +339,9 @@ function mapPetitionBase<T extends Pick<PetitionFragment, "fromTemplate" | "sign
   return {
     ...omit(petition, ["fromTemplate", "signatureConfig"]),
     fromTemplateId: petition.fromTemplate?.id ?? null,
-    signers:
-      petition.signatureConfig === undefined
-        ? undefined // signers not included in response
-        : (petition.signatureConfig?.signers ?? null),
+    signers: !petition.signatureConfig?.isEnabled
+      ? undefined // signers not included in response
+      : (petition.signatureConfig?.signers ?? null),
   };
 }
 

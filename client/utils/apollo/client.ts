@@ -375,6 +375,11 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
             values: { merge: mergeArraysBy(["key"]) },
           },
         },
+        PetitionSignatureRequest: {
+          fields: {
+            signatureConfig: { merge: false },
+          },
+        },
       },
     }).restore(initialState ?? {}),
     typeDefs,

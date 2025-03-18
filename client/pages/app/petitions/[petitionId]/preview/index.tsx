@@ -361,7 +361,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         setShowErrors(true);
         if (canFinalize && isPetition) {
           let completeSignerInfoData: ConfirmPetitionSignersDialogResult | null = null;
-          if (petition.signatureConfig?.review === false) {
+          if (petition.signatureConfig?.isEnabled && petition.signatureConfig.review === false) {
             completeSignerInfoData = await showConfirmPetitionSignersDialog({
               user: me,
               signatureConfig: petition.signatureConfig,
@@ -370,10 +370,12 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             });
           }
 
-          await showTestSignatureDialog(
-            petition.signatureConfig?.integration?.environment,
-            petition.signatureConfig?.integration?.name,
-          );
+          if (petition.signatureConfig?.isEnabled) {
+            await showTestSignatureDialog(
+              petition.signatureConfig.integration?.environment,
+              petition.signatureConfig.integration?.name,
+            );
+          }
 
           if (completeSignerInfoData !== null) {
             await updatePetition({
@@ -398,7 +400,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             },
           });
 
-          if (!petition.signatureConfig) {
+          if (!petition.signatureConfig?.isEnabled) {
             if (!toast.isActive("petition-completed-toast")) {
               toast({
                 id: "petition-completed-toast",
@@ -415,7 +417,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               });
             }
             router.push(`/app/petitions/${query.petitionId}/replies`);
-          } else if (petition.signatureConfig?.review) {
+          } else if (petition.signatureConfig.review) {
             if (!toast.isActive("petition-completed-toast")) {
               toast({
                 id: "petition-completed-toast",
@@ -520,7 +522,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 
   const showStartSignatureButton =
     isPetition &&
-    petition.signatureConfig &&
+    !!petition.signatureConfig?.isEnabled &&
     petition.signatureConfig.review === false &&
     !petition.isInteractionWithRecipientsEnabled &&
     petition.isDocumentGenerationEnabled &&
@@ -530,7 +532,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 
   const showPetitionCompletedAlert =
     isPetition &&
-    !petition.signatureConfig?.review &&
+    (!petition.signatureConfig ||
+      !petition.signatureConfig.isEnabled ||
+      !petition.signatureConfig.review) &&
     ["COMPLETED", "CLOSED"].includes(petition.status) &&
     !petition.isAnonymized &&
     !petition.hasStartedProcess;
@@ -549,7 +553,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const showSignatureAlert =
     isPetition &&
     petition.status === "COMPLETED" &&
-    petition.signatureConfig?.review &&
+    !!petition.signatureConfig?.isEnabled &&
+    petition.signatureConfig.review &&
     !approvalIsDefinitiveRejected &&
     (!petition.signatureConfig?.reviewAfterApproval || !currentApprovalsStarted);
 
@@ -557,7 +562,10 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     isPetition &&
     currentApprovalsStarted &&
     !approvalIsDefinitiveRejected &&
-    (!showSignatureAlert || (showSignatureAlert && petition.signatureConfig?.reviewAfterApproval));
+    (!showSignatureAlert ||
+      (showSignatureAlert &&
+        !!petition.signatureConfig?.isEnabled &&
+        petition.signatureConfig.reviewAfterApproval));
 
   const extendFlexColumn = {
     display: "flex",
@@ -979,7 +987,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                             petition.isAnonymized || isClosed || myEffectivePermission === "READ"
                           }
                         >
-                          {petition.signatureConfig?.review === false ? (
+                          {petition.signatureConfig?.isEnabled &&
+                          petition.signatureConfig?.review === false ? (
                             <FormattedMessage
                               id="generic.finalize-and-sign-button"
                               defaultMessage="Finalize and sign"
@@ -1082,6 +1091,7 @@ const _fragments = {
         }
       }
       signatureConfig {
+        isEnabled
         review
         reviewAfterApproval
         timezone

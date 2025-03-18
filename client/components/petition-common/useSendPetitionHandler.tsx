@@ -52,11 +52,12 @@ export function useSendPetitionHandler(
       const currentRecipientIds = petition.accesses
         .filter((a) => isNonNullish(a.contact) && a.status === "ACTIVE")
         .map((a) => a.contact!.id);
-
-      await showTestSignatureDialog(
-        petition.signatureConfig?.integration?.environment,
-        petition.signatureConfig?.integration?.name,
-      );
+      if (petition.signatureConfig?.isEnabled) {
+        await showTestSignatureDialog(
+          petition.signatureConfig.integration?.environment,
+          petition.signatureConfig.integration?.name,
+        );
+      }
 
       const {
         recipientIdGroups,
@@ -221,6 +222,7 @@ useSendPetitionHandler.fragments = {
         }
       }
       signatureConfig {
+        isEnabled
         integration {
           id
           environment

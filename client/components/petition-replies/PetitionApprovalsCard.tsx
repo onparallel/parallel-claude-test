@@ -130,7 +130,7 @@ export function PetitionApprovalsCard({
     {
       id: "signature",
       stepName: "eSignature",
-      status: isNonNullish(petition.signatureConfig) ? signatureStatus : "APPROVED",
+      status: !!petition.signatureConfig?.isEnabled ? signatureStatus : "APPROVED",
       approvalType: "ANY",
       approvers: [],
     },
@@ -151,7 +151,7 @@ export function PetitionApprovalsCard({
     UnwrapArray<PetitionApprovalsCard_PetitionFragment["signatureRequests"]>
   > = petition.signatureRequests[0];
   if (
-    petition.signatureConfig &&
+    petition.signatureConfig?.isEnabled &&
     isNonNullish(currentSignatureRequest) &&
     ["COMPLETED", "CANCELLING", "CANCELLED"].includes(currentSignatureRequest.status)
   ) {
@@ -507,7 +507,7 @@ export function PetitionApprovalsCard({
               onClick={onToggleGeneralComments}
             />
             {signatureIndex === tabIndex &&
-            (!petition.signatureConfig ||
+            (!petition.signatureConfig?.isEnabled ||
               currentSignatureRequest?.status === "COMPLETED" ||
               currentSignatureRequest?.status === "CANCELLED") ? (
               <IconButtonWithTooltip
@@ -641,6 +641,7 @@ PetitionApprovalsCard.fragments = {
         }
         ...PetitionSignaturesCard_Petition
         signatureConfig {
+          isEnabled
           review
           reviewAfterApproval
         }

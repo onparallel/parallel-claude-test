@@ -94,7 +94,7 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
               if (
                 isNonNullish(row.recipientAsSigner) &&
                 row.recipientAsSigner !== "" &&
-                isNonNullish(petition.signature_config) &&
+                !!petition.signature_config?.isEnabled &&
                 petition.signature_config.signersInfo.every(
                   (signer) => signer.email !== contact.email,
                 )

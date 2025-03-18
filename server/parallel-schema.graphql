@@ -7510,6 +7510,7 @@ type PublicSignatureConfig {
   Instructions for the signers
   """
   instructions: String
+  isEnabled: Boolean!
 
   """
   The minimum number of signers required to complete the signature process
@@ -8318,6 +8319,7 @@ type SignatureConfig {
   The signature integration selected for this signature config.
   """
   integration: SignatureOrgIntegration
+  isEnabled: Boolean!
   message: String
 
   """
@@ -8366,6 +8368,11 @@ input SignatureConfigInput {
   The instructions to be shown to the user or recipient before starting the signature process
   """
   instructions: String
+
+  """
+  Whether to enable the signature process with this configuration.
+  """
+  isEnabled: Boolean!
 
   """
   The minimum amount of signers required to start the signature process

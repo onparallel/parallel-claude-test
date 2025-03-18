@@ -65,6 +65,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
       [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
         status: "COMPLETED",
         signature_config: JSON.stringify({
+          isEnabled: true,
           orgIntegrationId: orgIntegration.id,
           signersInfo: [{ firstName: "Mike", lastName: "Ross", email: "mike@onparallel.com" }],
           timezone: "Europe/Madrid",
@@ -127,6 +128,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
         .where("id", petition.id)
         .update({
           signature_config: JSON.stringify({
+            isEnabled: true,
             orgIntegrationId: orgIntegration.id,
             signersInfo: [{ firstName: "Mike", lastName: "Ross", email: "mike@onparallel.com" }],
             timezone: "Europe/Madrid",
@@ -168,6 +170,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
         .where("id", petition.id)
         .update({
           signature_config: JSON.stringify({
+            isEnabled: true,
             orgIntegrationId: orgIntegration.id,
             signersInfo: [{ firstName: "Mike", lastName: "Ross", email: "mike@onparallel.com" }],
             timezone: "Europe/Madrid",
@@ -221,6 +224,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
         .where("id", petition.id)
         .update({
           signature_config: JSON.stringify({
+            isEnabled: true,
             orgIntegrationId: orgIntegration.id,
             signersInfo: [{ firstName: "Mike", lastName: "Ross", email: "mike@onparallel.com" }],
             timezone: "Europe/Madrid",

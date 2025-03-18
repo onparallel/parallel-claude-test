@@ -629,6 +629,9 @@ export const SignatureConfigInput = inputObjectType({
   name: "SignatureConfigInput",
   description: "The signature settings for the petition",
   definition(t) {
+    t.nonNull.boolean("isEnabled", {
+      description: "Whether to enable the signature process with this configuration.",
+    });
     t.nonNull.globalId("orgIntegrationId", {
       prefixName: "OrgIntegration",
       description: "The Global ID of the signature integration to be used.",
@@ -1039,6 +1042,7 @@ export const updatePetition = mutationField("updatePetition", {
     if (approvalFlowConfig !== undefined) {
       let signatureConfig = data.signature_config;
       if (!signatureConfig) {
+        // if new signature configuration is not provided on update mutation, look for the one stored in petition
         const petition = await ctx.petitions.loadPetition(args.petitionId);
         assert(petition, "Petition not found");
         signatureConfig = petition.signature_config;
@@ -1047,7 +1051,7 @@ export const updatePetition = mutationField("updatePetition", {
       if (approvalFlowConfig === null) {
         data.approval_flow_config = null;
 
-        // when nulling approvalFlowConfig, we need to also null  in signature_config
+        // when nulling approvalFlowConfig, we need to also null reviewAfterApproval in signature_config
         if (signatureConfig) {
           data.signature_config = JSON.stringify({
             ...signatureConfig,
@@ -2904,7 +2908,7 @@ export const completePetition = mutationField("completePetition", {
         }
       }
 
-      if (petition.signature_config) {
+      if (petition.signature_config?.isEnabled) {
         if (petition.signature_config.review === false) {
           // start a new signature request, cancelling previous pending requests if any
           const { petition: updatedPetition } = await ctx.signature.createSignatureRequest(

@@ -5786,6 +5786,7 @@ export type PublicSignatureConfig = {
   allowAdditionalSigners: Scalars["Boolean"]["output"];
   /** Instructions for the signers */
   instructions: Maybe<Scalars["String"]["output"]>;
+  isEnabled: Scalars["Boolean"]["output"];
   /** The minimum number of signers required to complete the signature process */
   minSigners: Scalars["Int"]["output"];
   /** If true, lets the user review the replies before starting the signature process */
@@ -5820,6 +5821,8 @@ export type Query = {
   accesses: PublicPetitionAccessPagination;
   backgroundCheckEntityDetails: BackgroundCheckEntityDetails;
   backgroundCheckEntitySearch: BackgroundCheckEntitySearch;
+  /** Run a search on PROFILE_SEARCH petition field */
+  conflictCheckProfileSearch: Array<Profile>;
   contact: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;
@@ -5917,6 +5920,12 @@ export type QuerybackgroundCheckEntitySearchArgs = {
   name: Scalars["String"]["input"];
   token: Scalars["String"]["input"];
   type?: InputMaybe<BackgroundCheckEntitySearchType>;
+};
+
+export type QueryconflictCheckProfileSearchArgs = {
+  fieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  search: Scalars["String"]["input"];
 };
 
 export type QuerycontactArgs = {
@@ -6392,6 +6401,7 @@ export type SignatureConfig = {
   instructions: Maybe<Scalars["String"]["output"]>;
   /** The signature integration selected for this signature config. */
   integration: Maybe<SignatureOrgIntegration>;
+  isEnabled: Scalars["Boolean"]["output"];
   message: Maybe<Scalars["String"]["output"]>;
   /** The minimum number of signers required to sign the document */
   minSigners: Scalars["Int"]["output"];
@@ -6415,6 +6425,8 @@ export type SignatureConfigInput = {
   allowAdditionalSigners: Scalars["Boolean"]["input"];
   /** The instructions to be shown to the user or recipient before starting the signature process */
   instructions?: InputMaybe<Scalars["String"]["input"]>;
+  /** Whether to enable the signature process with this configuration. */
+  isEnabled: Scalars["Boolean"]["input"];
   /** The minimum amount of signers required to start the signature process */
   minSigners: Scalars["Int"]["input"];
   /** The Global ID of the signature integration to be used. */
@@ -7237,6 +7249,7 @@ export type PetitionFragment = {
   }>;
   tags?: Array<{ id: string; name: string }>;
   signatureConfig?: {
+    isEnabled: boolean;
     signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
   } | null;
   progress?: {
@@ -7777,6 +7790,7 @@ export type GetPetitions_petitionsQuery = {
           }>;
           tags?: Array<{ id: string; name: string }>;
           signatureConfig?: {
+            isEnabled: boolean;
             signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
           } | null;
           progress?: {
@@ -7921,6 +7935,7 @@ export type CreatePetition_petitionMutation = {
         }>;
         tags?: Array<{ id: string; name: string }>;
         signatureConfig?: {
+          isEnabled: boolean;
           signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
         } | null;
         progress?: {
@@ -8062,6 +8077,7 @@ export type GetPetition_petitionQuery = {
         }>;
         tags?: Array<{ id: string; name: string }>;
         signatureConfig?: {
+          isEnabled: boolean;
           signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
         } | null;
         progress?: {
@@ -8100,6 +8116,7 @@ export type UpdatePetition_petitionQuery = {
     | {
         __typename: "Petition";
         signatureConfig: {
+          isEnabled: boolean;
           allowAdditionalSigners: boolean;
           review: boolean;
           timezone: string;
@@ -8113,6 +8130,7 @@ export type UpdatePetition_petitionQuery = {
     | {
         __typename: "PetitionTemplate";
         signatureConfig: {
+          isEnabled: boolean;
           allowAdditionalSigners: boolean;
           review: boolean;
           timezone: string;
@@ -8240,6 +8258,7 @@ export type UpdatePetition_updatePetitionMutation = {
         }>;
         tags?: Array<{ id: string; name: string }>;
         signatureConfig?: {
+          isEnabled: boolean;
           signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
         } | null;
         progress?: {
@@ -8387,6 +8406,7 @@ export type ClosePetition_closePetitionMutation = {
     }>;
     tags?: Array<{ id: string; name: string }>;
     signatureConfig?: {
+      isEnabled: boolean;
       signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
     } | null;
     progress?: {
@@ -8526,6 +8546,7 @@ export type ReopenPetition_reopenPetitionMutation = {
     }>;
     tags?: Array<{ id: string; name: string }>;
     signatureConfig?: {
+      isEnabled: boolean;
       signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
     } | null;
     progress?: {
@@ -8682,6 +8703,7 @@ export type TagPetition_tagPetitionMutation = {
         }>;
         tags?: Array<{ id: string; name: string }>;
         signatureConfig?: {
+          isEnabled: boolean;
           signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
         } | null;
         progress?: {
@@ -8892,6 +8914,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
       }>;
       tags?: Array<{ id: string; name: string }>;
       signatureConfig?: {
+        isEnabled: boolean;
         signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
       } | null;
       progress?: {
@@ -11955,6 +11978,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
     }>;
     tags?: Array<{ id: string; name: string }>;
     signatureConfig?: {
+      isEnabled: boolean;
       signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
     } | null;
     progress?: {
@@ -12229,6 +12253,7 @@ export const PetitionFragmentDoc = gql`
       ...Tag
     }
     signatureConfig @include(if: $includeSigners) {
+      isEnabled
       signers {
         email
         firstName
@@ -12721,6 +12746,7 @@ export const UpdatePetition_petitionDocument = gql`
     petition(id: $petitionId) {
       __typename
       signatureConfig {
+        isEnabled
         allowAdditionalSigners
         integration {
           id

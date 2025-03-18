@@ -96,6 +96,7 @@ export const PublicSignatureConfig = objectType({
     t.field("signingMode", {
       type: "SignatureConfigSigningMode",
     });
+    t.nonNull.boolean("isEnabled");
   },
   sourceType: /* ts */ `{
     signersInfo: any[];
@@ -105,6 +106,7 @@ export const PublicSignatureConfig = objectType({
     minSigners: number;
     instructions?: string;
     signingMode: "PARALLEL" | "SEQUENTIAL";
+    isEnabled: boolean;
   }`,
 });
 

@@ -67,7 +67,10 @@ export async function petitionCompleted(
   );
 
   const isSigned = isNonNullish(payload.signer);
-  const isManualStartSignature = !isSigned && petition.signature_config?.review === true;
+  const isManualStartSignature =
+    !isSigned &&
+    !!petition.signature_config?.isEnabled &&
+    petition.signature_config.review === true;
 
   for (const userData of subscribedUsersData) {
     const { html, text, subject, from } = await buildEmail(

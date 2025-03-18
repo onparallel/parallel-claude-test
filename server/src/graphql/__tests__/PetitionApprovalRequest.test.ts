@@ -848,6 +848,7 @@ describe("GraphQL/Petition Approval Request", () => {
         .where("id", petition.id)
         .update({
           signature_config: JSON.stringify({
+            isEnabled: true,
             orgIntegrationId: 0,
             signersInfo: [],
             timezone: "Europe/Madrid",

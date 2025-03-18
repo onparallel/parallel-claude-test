@@ -420,6 +420,7 @@ export interface NexusGenInputs {
     // input type
     allowAdditionalSigners: boolean; // Boolean!
     instructions?: string | null; // String
+    isEnabled: boolean; // Boolean!
     minSigners: number; // Int!
     orgIntegrationId: NexusGenScalars["GID"]; // GID!
     review: boolean; // Boolean!
@@ -1553,6 +1554,7 @@ export interface NexusGenObjects {
     minSigners: number;
     instructions?: string;
     signingMode: "PARALLEL" | "SEQUENTIAL";
+    isEnabled: boolean;
   };
   PublicUser: db.User;
   Query: {};
@@ -1599,6 +1601,7 @@ export interface NexusGenObjects {
     message?: string;
     signingMode: "PARALLEL" | "SEQUENTIAL";
     useCustomDocument?: boolean;
+    isEnabled: boolean;
   };
   SignatureDeliveredEvent: petitionEvents.SignatureDeliveredEvent;
   SignatureOpenedEvent: petitionEvents.SignatureOpenedEvent;
@@ -4084,6 +4087,7 @@ export interface NexusGenFieldTypes {
     additionalSigners: NexusGenRootTypes["PetitionSigner"][]; // [PetitionSigner!]!
     allowAdditionalSigners: boolean; // Boolean!
     instructions: string | null; // String
+    isEnabled: boolean; // Boolean!
     minSigners: number; // Int!
     review: boolean; // Boolean!
     signers: NexusGenRootTypes["PetitionSigner"][]; // [PetitionSigner!]!
@@ -4308,6 +4312,7 @@ export interface NexusGenFieldTypes {
     allowAdditionalSigners: boolean; // Boolean!
     instructions: string | null; // String
     integration: NexusGenRootTypes["SignatureOrgIntegration"] | null; // SignatureOrgIntegration
+    isEnabled: boolean; // Boolean!
     message: string | null; // String
     minSigners: number; // Int!
     review: boolean; // Boolean!
@@ -7094,6 +7099,7 @@ export interface NexusGenFieldTypeNames {
     additionalSigners: "PetitionSigner";
     allowAdditionalSigners: "Boolean";
     instructions: "String";
+    isEnabled: "Boolean";
     minSigners: "Int";
     review: "Boolean";
     signers: "PetitionSigner";
@@ -7318,6 +7324,7 @@ export interface NexusGenFieldTypeNames {
     allowAdditionalSigners: "Boolean";
     instructions: "String";
     integration: "SignatureOrgIntegration";
+    isEnabled: "Boolean";
     message: "String";
     minSigners: "Int";
     review: "Boolean";

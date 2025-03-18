@@ -57,6 +57,7 @@ function petitionsBuilder(orgId: number, signatureIntegrationId: number) {
     signature_config:
       index === 5
         ? {
+            isEnabled: true,
             signersInfo: [],
             orgIntegrationId: signatureIntegrationId,
             review: false,
@@ -1312,6 +1313,7 @@ describe("GraphQL/Petitions", () => {
           status: null,
           name: "KYC",
           signature_config: {
+            isEnabled: true,
             title: "aaaa",
             review: false,
             orgIntegrationId: signatureIntegrations[1].id,
@@ -1398,6 +1400,7 @@ describe("GraphQL/Petitions", () => {
           status: null,
           name: "KYC",
           signature_config: {
+            isEnabled: true,
             title: "aaaa",
             review: false,
             orgIntegrationId: otherOrgSignatureIntegration.id,
@@ -3553,6 +3556,7 @@ describe("GraphQL/Petitions", () => {
         1,
         () => ({
           signature_config: JSON.stringify({
+            isEnabled: false,
             orgIntegrationId: 1,
             signersInfo: [],
             timezone: "Europe/Madrid",
@@ -3576,6 +3580,7 @@ describe("GraphQL/Petitions", () => {
                 __typename
               }
               signatureConfig {
+                isEnabled
                 title
                 reviewAfterApproval
               }
@@ -3592,6 +3597,7 @@ describe("GraphQL/Petitions", () => {
       expect(data?.updatePetition).toEqual({
         approvalFlowConfig: null,
         signatureConfig: {
+          isEnabled: false,
           title: "sign this",
           reviewAfterApproval: null,
         },
@@ -3611,6 +3617,7 @@ describe("GraphQL/Petitions", () => {
           petitionId: toGlobalId("Petition", petitions[5].id),
           data: {
             signatureConfig: {
+              isEnabled: true,
               allowAdditionalSigners: false,
               minSigners: 1,
               orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegrations[0].id),
@@ -3644,6 +3651,7 @@ describe("GraphQL/Petitions", () => {
           petitionId: toGlobalId("Petition", petitions[5].id),
           data: {
             signatureConfig: {
+              isEnabled: false,
               allowAdditionalSigners: false,
               minSigners: 1,
               orgIntegrationId: toGlobalId("OrgIntegration", signatureIntegrations[0].id),
@@ -5216,6 +5224,7 @@ describe("GraphQL/Petitions", () => {
         signature_config:
           i === 1
             ? {
+                isEnabled: true,
                 orgIntegrationId: signatureIntegration.id,
                 signersInfo: [],
                 timezone: "Europe/Madrid",
@@ -5225,6 +5234,7 @@ describe("GraphQL/Petitions", () => {
               }
             : i === 2
               ? {
+                  isEnabled: true,
                   orgIntegrationId: sharedSignaturitIntegration.id,
                   signersInfo: [],
                   timezone: "Europe/Madrid",
@@ -5458,6 +5468,7 @@ describe("GraphQL/Petitions", () => {
         .knex("petition")
         .update({
           signature_config: {
+            isEnabled: true,
             orgIntegrationId: signatureIntegration.id,
             signersInfo: [
               { firstName: "Mariano", lastName: "Rodriguez", email: "mariano@onparallel.com" },

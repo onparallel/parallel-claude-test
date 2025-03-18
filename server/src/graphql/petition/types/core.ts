@@ -1098,6 +1098,7 @@ export const SignatureConfig = objectType({
     t.nonNull.boolean("useCustomDocument", {
       resolve: (o) => o.useCustomDocument ?? false,
     });
+    t.nonNull.boolean("isEnabled");
   },
   sourceType: /* ts */ `{
     orgIntegrationId: number;
@@ -1116,6 +1117,7 @@ export const SignatureConfig = objectType({
     message?: string;
     signingMode: "PARALLEL" | "SEQUENTIAL"
     useCustomDocument?: boolean;
+    isEnabled: boolean;
   }`,
 });
 

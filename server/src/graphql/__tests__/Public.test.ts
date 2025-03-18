@@ -3882,6 +3882,7 @@ describe("GraphQL/Public", () => {
           [petition] = await mocks.createRandomPetitions(org.id, user.id, 1, () => ({
             status: "DRAFT",
             signature_config: {
+              isEnabled: true,
               review: false,
               orgIntegrationId: signatureIntegration.id,
               signersInfo: [

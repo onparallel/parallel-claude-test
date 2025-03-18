@@ -228,6 +228,7 @@ export interface PetitionSignatureConfig {
   signingMode: "PARALLEL" | "SEQUENTIAL";
   useCustomDocument?: boolean | null;
   customDocumentTemporaryFileId?: number;
+  isEnabled: boolean;
 }
 
 export interface PetitionSummaryConfig {

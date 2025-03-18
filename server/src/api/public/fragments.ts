@@ -188,6 +188,7 @@ export const PetitionFragment = gql`
       ...Tag
     }
     signatureConfig @include(if: $includeSigners) {
+      isEnabled
       signers {
         email
         firstName

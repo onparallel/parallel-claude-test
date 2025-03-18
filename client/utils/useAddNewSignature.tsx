@@ -10,7 +10,7 @@ import {
   useAddNewSignature_UserFragment,
 } from "@parallel/graphql/__types";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
-import { isNonNullish, omit, pick } from "remeda";
+import { isNonNullish, pick } from "remeda";
 import { assertTypenameArray } from "./apollo/typename";
 
 interface useAddNewSignatureProps {
@@ -23,7 +23,7 @@ export function useAddNewSignature({ user, petition }: useAddNewSignatureProps) 
     petition.signatureRequests[0];
   const signatureIntegrations = user.organization.signatureIntegrations.items;
   if (
-    petition.signatureConfig &&
+    petition.signatureConfig?.isEnabled &&
     isNonNullish(current) &&
     ["COMPLETED", "CANCELLING", "CANCELLED"].includes(current.status)
   ) {
@@ -39,27 +39,28 @@ export function useAddNewSignature({ user, petition }: useAddNewSignatureProps) 
   return async () => {
     assertTypenameArray(signatureIntegrations, "SignatureOrgIntegration");
     try {
-      if (current?.status === "COMPLETED" && isNonNullish(current.signatureConfig.integration)) {
+      if (current?.status === "COMPLETED" && isNonNullish(petition.signatureConfig?.integration)) {
         await showConfirmRestartSignature();
         await updateSignatureConfig({
           variables: {
             petitionId: petition.id,
             signatureConfig: {
-              orgIntegrationId: current.signatureConfig.integration.id,
-              signersInfo: current.signatureConfig.signers.map((s) =>
-                omit(s!, ["__typename", "fullName"]),
+              isEnabled: true,
+              orgIntegrationId: petition.signatureConfig.integration!.id,
+              signersInfo: petition.signatureConfig.signers.map((s) =>
+                pick(s!, ["contactId", "email", "firstName", "lastName", "isPreset"]),
               ),
-              ...pick(current.signatureConfig, [
+              ...pick(petition.signatureConfig, [
                 "allowAdditionalSigners",
                 "minSigners",
                 "review",
                 "signingMode",
-                "timezone",
                 "instructions",
                 "title",
                 "useCustomDocument",
                 "reviewAfterApproval",
               ]),
+              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
             },
           },
         });
@@ -100,14 +101,29 @@ useAddNewSignature.fragments = {
     fragment useAddNewSignature_Petition on Petition {
       id
       ...SignatureConfigDialog_PetitionBase
+      signatureConfig {
+        allowAdditionalSigners
+        minSigners
+        review
+        signingMode
+        instructions
+        title
+        useCustomDocument
+        reviewAfterApproval
+        integration {
+          id
+        }
+        signers {
+          contactId
+          email
+          firstName
+          lastName
+          isPreset
+        }
+      }
       signatureRequests {
         id
         status
-        signatureConfig {
-          ...SignatureConfigDialog_SignatureConfig
-          timezone
-          reviewAfterApproval
-        }
       }
     }
     ${SignatureConfigDialog.fragments.PetitionBase}

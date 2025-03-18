@@ -59,6 +59,9 @@ const fragments = {
         ...CurrentSignatureRequestRow_PetitionSignatureRequest
         ...OlderSignatureRequestRows_PetitionSignatureRequest
       }
+      signatureConfig {
+        isEnabled
+      }
       ...getPetitionSignatureEnvironment_Petition
       generalCommentCount
       unreadGeneralCommentCount
@@ -149,7 +152,7 @@ export const PetitionSignaturesCard = Object.assign(
       petition.signatureRequests[0];
 
     if (
-      petition.signatureConfig &&
+      petition.signatureConfig?.isEnabled &&
       isNonNullish(current) &&
       ["COMPLETED", "CANCELLING", "CANCELLED"].includes(current.status)
     ) {
@@ -178,7 +181,7 @@ export const PetitionSignaturesCard = Object.assign(
                 hasUnreadComments={petition.unreadGeneralCommentCount > 0}
                 onClick={onToggleGeneralComments}
               />
-              {!petition.signatureConfig ||
+              {!petition.signatureConfig?.isEnabled ||
               current?.status === "COMPLETED" ||
               current?.status === "CANCELLED" ? (
                 <IconButtonWithTooltip
@@ -246,7 +249,7 @@ export function PetitionSignaturesCardBody({
    * So we move the current to the older requests to give space in the Card for a new request
    */
   if (
-    petition.signatureConfig &&
+    petition.signatureConfig?.isEnabled &&
     isNonNullish(current) &&
     ["COMPLETED", "CANCELLING", "CANCELLED"].includes(current.status)
   ) {
@@ -320,9 +323,9 @@ export function PetitionSignaturesCardBody({
     [sendSignatureRequestReminders],
   );
 
-  return current || older.length > 0 || petition.signatureConfig ? (
+  return current || older.length > 0 || petition.signatureConfig?.isEnabled ? (
     <Grid templateColumns="auto 1fr auto" alignItems="center">
-      {petition.signatureConfig && !current ? (
+      {petition.signatureConfig?.isEnabled && !current ? (
         <NewSignatureRequestRow
           user={user}
           petition={petition}

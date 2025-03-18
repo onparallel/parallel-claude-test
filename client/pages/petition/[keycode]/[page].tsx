@@ -165,7 +165,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
       try {
         if (canFinalize) {
           let confirmSignerInfoData: RecipientViewConfirmPetitionSignersDialogResult | null = null;
-          if (petition.signatureConfig?.review === false) {
+          if (petition.signatureConfig?.isEnabled && petition.signatureConfig.review === false) {
             confirmSignerInfoData = await showConfirmPetitionSignersDialog({
               keycode,
               access,
@@ -179,7 +179,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
               message: confirmSignerInfoData?.message,
             },
           });
-          if (petition.signatureConfig?.review) {
+          if (petition.signatureConfig?.isEnabled && petition.signatureConfig.review) {
             await showReviewBeforeSigningDialog({
               name: isNonNullish(granter)
                 ? granter.fullName
@@ -278,7 +278,8 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   }, []);
 
   const isClosed = ["COMPLETED", "CLOSED"].includes(petition.status);
-  const hasSignature = petition.signatureConfig?.review === false;
+  const hasSignature =
+    !!petition.signatureConfig?.isEnabled && petition.signatureConfig.review === false;
 
   const showApprovalsAlert = petition.hasStartedProcess && isNullish(petition.signatureStatus);
 
@@ -341,8 +342,8 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                   {/* Alerts container */}
                   <Box position="sticky" top={0} width="100%" zIndex={2}>
                     {showPetitionStatusAlert ? (
-                      !petition.signatureConfig ||
-                      (petition.signatureConfig && petition.signatureStatus === "COMPLETED") ? (
+                      !petition.signatureConfig?.isEnabled ||
+                      petition.signatureStatus === "COMPLETED" ? (
                         <RecipientViewPetitionStatusAlert
                           petition={petition}
                           granter={granter}
@@ -512,6 +513,7 @@ const _fragments = {
           ...focusPetitionField_PublicPetitionField
         }
         signatureConfig {
+          isEnabled
           review
         }
         recipients {

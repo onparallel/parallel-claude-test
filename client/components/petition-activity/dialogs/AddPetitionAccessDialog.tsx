@@ -157,7 +157,7 @@ export function AddPetitionAccessDialog({
   const sendAsUser = watch("sendAsUser");
 
   const isMissingSigners =
-    isNonNullish(signatureConfig) &&
+    !!signatureConfig?.isEnabled &&
     !signatureConfig.review &&
     !signatureConfig.allowAdditionalSigners &&
     signatureConfig.signers.length < signatureConfig.minSigners;
@@ -238,7 +238,7 @@ export function AddPetitionAccessDialog({
     try {
       const { signers, allowAdditionalSigners } = await showConfirmPetitionSignersDialog({
         user,
-        signatureConfig: signatureConfig,
+        signatureConfig,
         isUpdate: true,
         petitionId: petition.id,
         isInteractionWithRecipientsEnabled: petition.isInteractionWithRecipientsEnabled,
@@ -246,14 +246,14 @@ export function AddPetitionAccessDialog({
 
       updateSignatureConfig({
         signatureConfig: {
-          ...omit(signatureConfig!, [
+          ...omit(signatureConfig, [
             "allowAdditionalSigners",
             "signers",
             "integration",
             "__typename",
           ]),
-          timezone: signatureConfig!.timezone,
-          orgIntegrationId: signatureConfig!.integration!.id,
+          timezone: signatureConfig.timezone,
+          orgIntegrationId: signatureConfig.integration!.id,
           signersInfo: signers,
           allowAdditionalSigners,
         },
@@ -610,6 +610,7 @@ AddPetitionAccessDialog.fragments = {
   `,
   SignatureConfig: gql`
     fragment AddPetitionAccessDialog_SignatureConfig on SignatureConfig {
+      isEnabled
       review
       timezone
       title

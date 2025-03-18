@@ -42,7 +42,9 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
         throw new Error(`Owner of petition Petition:${petitionId} not found`);
       }
 
-      const documentTitle = petition.signature_config?.title ?? null;
+      const documentTitle = petition.signature_config?.isEnabled
+        ? (petition.signature_config?.title ?? null)
+        : null;
 
       await this.onProgress(25);
 

@@ -33,7 +33,7 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
     async (root, args, ctx) => {
       const petition = (await ctx.petitions.loadPetition(args.petitionId))!;
 
-      if (!petition.signature_config) {
+      if (!petition.signature_config?.isEnabled) {
         throw new ApolloError(
           `Petition:${petition.id} was expected to have signature_config set`,
           "MISSING_SIGNATURE_CONFIG_ERROR",

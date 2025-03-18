@@ -58,7 +58,7 @@ export interface TableTypes
         db.PetitionSignatureRequest,
         {
           signature_config: Replace<
-            PetitionSignatureConfig,
+            Omit<PetitionSignatureConfig, "isEnabled">,
             { signersInfo: (PetitionSignatureConfigSigner & { externalId: string })[] }
           >;
         }
@@ -95,7 +95,7 @@ export interface TableCreateTypes
       >;
       petition_signature_request: Replace<
         db.CreatePetitionSignatureRequest,
-        { signature_config: PetitionSignatureConfig }
+        { signature_config: Omit<PetitionSignatureConfig, "isEnabled"> }
       >;
       profile_type_field: Replace<db.CreateProfileTypeField, { name: LocalizableUserText }>;
     }

@@ -18,7 +18,7 @@ export function approvalRequestStepIsNextWithStatus<
     const statuses = unMaybeArray(status);
 
     const petition = await ctx.petitions.loadPetition(petitionId);
-    if (petition?.signature_config && !petition.signature_config.reviewAfterApproval) {
+    if (petition?.signature_config?.isEnabled && !petition.signature_config.reviewAfterApproval) {
       throw new ForbiddenError("A signature process is required before starting approval request");
     }
 

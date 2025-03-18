@@ -54,7 +54,7 @@ export function TemplateActiveSettingsIcons({
       {!template.isPublic && template.defaultPermissions && template.defaultPermissions.length ? (
         <TemplateIconDefaultPermissions template={template} />
       ) : null}
-      {template.signatureConfig ? (
+      {template.signatureConfig?.isEnabled ? (
         <TemplateIconSignature signatureConfig={template.signatureConfig} />
       ) : null}
       {template.remindersConfig ? (
@@ -79,6 +79,7 @@ TemplateActiveSettingsIcons.fragments = {
         isActive
       }
       signatureConfig {
+        isEnabled
         ...TemplateIconSignature_SignatureConfig
       }
       remindersConfig {

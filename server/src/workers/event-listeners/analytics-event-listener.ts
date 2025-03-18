@@ -221,7 +221,7 @@ async function trackPetitionCompletedEvent(event: PetitionCompletedEvent, ctx: W
       org_id: toGlobalId("Organization", owner.org_id),
       company_id: toGlobalId("Organization", owner.org_id),
       petition_id: event.petition_id,
-      requires_signature: isNonNullish(petition.signature_config),
+      requires_signature: !!petition.signature_config?.isEnabled,
       same_domain: ownerData.email.split("@")[1] === completedByEmail.split("@")[1],
     },
   });

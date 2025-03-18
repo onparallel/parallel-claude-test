@@ -653,7 +653,7 @@ export function petitionCanUploadCustomSignatureDocument<
   return async (_, args, ctx) => {
     const petition = await ctx.petitions.loadPetition(getArg(args, petitionIdArg));
 
-    if (!petition?.signature_config) {
+    if (!petition?.signature_config?.isEnabled) {
       throw new ApolloError(
         "Petition was expected to have signature_config set",
         "MISSING_SIGNATURE_CONFIG_ERROR",

@@ -58,7 +58,7 @@ import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, noop } from "remeda";
+import { isNonNullish, noop, omit, pick } from "remeda";
 import { CloseButton } from "../common/CloseButton";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { Divider } from "../common/Divider";
@@ -117,7 +117,7 @@ function _PetitionSettings({
   const intl = useIntl();
 
   const signatureIntegrations = user.organization.signatureIntegrations.items;
-  const hasSignature = signatureIntegrations.length > 0;
+  const hasSignatureIntegrations = signatureIntegrations.length > 0;
   const hasDemoSignature =
     signatureIntegrations.length === 1 &&
     signatureIntegrations[0].__typename === "SignatureOrgIntegration" &&
@@ -160,7 +160,20 @@ function _PetitionSettings({
       await handleConfigureSignatureClick();
     } else {
       try {
-        await onUpdatePetition({ signatureConfig: null });
+        await onUpdatePetition({
+          // everything the same, except isEnabled: false
+          signatureConfig: petition.signatureConfig
+            ? {
+                ...omit(petition.signatureConfig, ["integration", "signers", "__typename"]),
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                signersInfo: petition.signatureConfig.signers
+                  .filter(isNonNullish)
+                  .map(pick(["firstName", "lastName", "email", "contactId", "isPreset"])),
+                orgIntegrationId: petition.signatureConfig.integration!.id,
+                isEnabled: false,
+              }
+            : null,
+        });
       } catch {}
     }
   }
@@ -905,11 +918,13 @@ function _PetitionSettings({
             </SettingsRow>
           ) : null}
 
-          {petition.signatureConfig || hasSignature ? (
+          {petition.signatureConfig?.isEnabled || hasSignatureIntegrations ? (
             <SettingsRowButton
               data-section="esignature-settings"
               isDisabled={
-                !hasSignature || isDisabled || ongoingSignatureRequest?.status === "ENQUEUED"
+                !hasSignatureIntegrations ||
+                isDisabled ||
+                ongoingSignatureRequest?.status === "ENQUEUED"
               }
               icon={<SignatureIcon />}
               label={
@@ -932,7 +947,7 @@ function _PetitionSettings({
                   ) : null}
                 </HStack>
               }
-              isActive={Boolean(petition.signatureConfig)}
+              isActive={Boolean(petition.signatureConfig?.isEnabled)}
               onAdd={() => handleSignatureChange(true)}
               onRemove={() => handleSignatureChange(false)}
               onConfig={() => handleConfigureSignatureClick()}
@@ -1072,104 +1087,140 @@ function _PetitionSettings({
 }
 
 const fragments = {
-  User: gql`
-    fragment PetitionSettings_User on User {
-      id
-      hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
-      hasSettingDelegateAccess: hasFeatureFlag(featureFlag: SETTING_DELEGATE_ACCESS)
-      hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
-      hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
-      hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
-      ...useAvailablePetitionLocales_User
-      ...TestModeSignatureBadge_User
-      ...PublicLinkSettingsDialog_User
-      organization {
+  get User() {
+    return gql`
+      fragment PetitionSettings_User on User {
         id
-        signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
-          items {
-            ... on SignatureOrgIntegration {
-              ...SignatureConfigDialog_SignatureOrgIntegration
+        hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
+        hasSettingDelegateAccess: hasFeatureFlag(featureFlag: SETTING_DELEGATE_ACCESS)
+        hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
+        hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
+        hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
+        ...useAvailablePetitionLocales_User
+        ...TestModeSignatureBadge_User
+        ...PublicLinkSettingsDialog_User
+        organization {
+          id
+          signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
+            items {
+              ... on SignatureOrgIntegration {
+                ...SignatureConfigDialog_SignatureOrgIntegration
+              }
             }
           }
+          pdfDocumentThemes {
+            id
+            name
+          }
         }
-        pdfDocumentThemes {
+        ...SignatureConfigDialog_User
+      }
+      ${useAvailablePetitionLocales.fragments.User}
+      ${TestModeSignatureBadge.fragments.User}
+      ${PublicLinkSettingsDialog.fragments.User}
+      ${SignatureConfigDialog.fragments.SignatureOrgIntegration}
+      ${SignatureConfigDialog.fragments.User}
+    `;
+  },
+  get SignatureConfig() {
+    return gql`
+      fragment PetitionSettings_SignatureConfig on SignatureConfig {
+        useCustomDocument
+        title
+        timezone
+        signingMode
+        signers {
+          contactId
+          email
+          firstName
+          fullName
+          isPreset
+          lastName
+        }
+        reviewAfterApproval
+        review
+        minSigners
+        message
+        isEnabled
+        integration {
           id
-          name
         }
+        instructions
+        allowAdditionalSigners
       }
-      ...SignatureConfigDialog_User
-    }
-    ${useAvailablePetitionLocales.fragments.User}
-    ${TestModeSignatureBadge.fragments.User}
-    ${PublicLinkSettingsDialog.fragments.User}
-    ${SignatureConfigDialog.fragments.SignatureOrgIntegration}
-    ${SignatureConfigDialog.fragments.User}
-  `,
-  PetitionBase: gql`
-    fragment PetitionSettings_PetitionBase on PetitionBase {
-      id
-      locale
-      skipForwardSecurity
-      isDelegateAccessEnabled
-      isInteractionWithRecipientsEnabled
-      isReviewFlowEnabled
-      isDocumentGenerationEnabled
-      isRecipientViewContentsHidden
-      isRestricted
-      isRestrictedWithPassword
-      approvalFlowConfig {
-        ...Fragments_FullApprovalFlowConfig
-      }
-      automaticNumberingConfig {
-        numberingType
-      }
-      selectedDocumentTheme {
+    `;
+  },
+  get PetitionBase() {
+    return gql`
+      fragment PetitionSettings_PetitionBase on PetitionBase {
         id
-        name
-      }
-      myEffectivePermission {
-        permissionType
-      }
-      ...SignatureConfigDialog_PetitionBase
-      ...CompliancePeriodDialog_PetitionBase
-      ... on Petition {
-        status
-        deadline
-        currentSignatureRequest {
-          id
-          status
+        locale
+        skipForwardSecurity
+        isDelegateAccessEnabled
+        isInteractionWithRecipientsEnabled
+        isReviewFlowEnabled
+        isDocumentGenerationEnabled
+        isRecipientViewContentsHidden
+        isRestricted
+        isRestrictedWithPassword
+        approvalFlowConfig {
+          ...Fragments_FullApprovalFlowConfig
         }
-        fromTemplate {
+        automaticNumberingConfig {
+          numberingType
+        }
+        selectedDocumentTheme {
           id
           name
         }
+        myEffectivePermission {
+          permissionType
+        }
+        signatureConfig {
+          ...PetitionSettings_SignatureConfig
+        }
+        ...SignatureConfigDialog_PetitionBase
+        ...CompliancePeriodDialog_PetitionBase
+        ... on Petition {
+          status
+          deadline
+          currentSignatureRequest {
+            id
+            status
+          }
+          fromTemplate {
+            id
+            name
+          }
+        }
+        ... on PetitionTemplate {
+          isPublic
+          ...PublicLinkSettingsDialog_PetitionTemplate
+          remindersConfig {
+            ...PetitionRemindersConfig_RemindersConfig
+          }
+          publicLink {
+            id
+            url
+            isActive
+            ...PublicLinkSettingsDialog_PublicPetitionLink
+          }
+          defaultPermissions {
+            id
+          }
+          defaultPath
+        }
+        isAnonymized
       }
-      ... on PetitionTemplate {
-        isPublic
-        ...PublicLinkSettingsDialog_PetitionTemplate
-        remindersConfig {
-          ...PetitionRemindersConfig_RemindersConfig
-        }
-        publicLink {
-          id
-          url
-          isActive
-          ...PublicLinkSettingsDialog_PublicPetitionLink
-        }
-        defaultPermissions {
-          id
-        }
-        defaultPath
-      }
-      isAnonymized
-    }
-    ${Fragments.FullApprovalFlowConfig}
-    ${SignatureConfigDialog.fragments.PetitionBase}
-    ${CompliancePeriodDialog.fragments.PetitionBase}
-    ${PublicLinkSettingsDialog.fragments.PetitionTemplate}
-    ${useConfigureRemindersDialog.fragments.RemindersConfig}
-    ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
-  `,
+      ${this.SignatureConfig}
+      ${Fragments.FullApprovalFlowConfig}
+      ${SignatureConfigDialog.fragments.PetitionBase}
+      ${CompliancePeriodDialog.fragments.PetitionBase}
+      ${PublicLinkSettingsDialog.fragments.PetitionTemplate}
+      ${useConfigureRemindersDialog.fragments.RemindersConfig}
+      ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
+    `;
+  },
 };
 
 const mutations = [

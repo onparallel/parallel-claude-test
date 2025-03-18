@@ -450,7 +450,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
         }
       }
 
-      if (petition.signature_config) {
+      if (petition.signature_config?.isEnabled) {
         if (petition.signature_config.review === false) {
           // start a new signature request, cancelling previous pending requests if any
           const { petition: updatedPetition } = await ctx.signature.createSignatureRequest(
@@ -467,7 +467,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
       }
 
       if (
-        isNullish(petition.signature_config) || // signature is not configured, process has finished
+        !petition.signature_config?.isEnabled || // signature is not configured, process has finished
         petition.signature_config.review === true // signature needs to be manually started, send email to user
       ) {
         await ctx.emails.sendPetitionCompletedEmail(

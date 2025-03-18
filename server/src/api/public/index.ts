@@ -888,6 +888,7 @@ export function publicApi(container: Container) {
             petition(id: $petitionId) {
               __typename
               signatureConfig {
+                isEnabled
                 allowAdditionalSigners
                 integration {
                   id
@@ -930,7 +931,7 @@ export function publicApi(container: Container) {
             petitionId: params.petitionId,
           });
 
-          if (isNullish(queryResult.petition!.signatureConfig)) {
+          if (!queryResult.petition!.signatureConfig?.isEnabled) {
             throw new ConflictError(
               "Cannot update signers on a petition without a signature configuration",
             );

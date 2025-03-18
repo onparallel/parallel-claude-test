@@ -11,7 +11,7 @@ export function getPetitionSignatureStatus({
   signatureConfig,
 }: getPetitionSignatureStatus_PetitionFragment): PetitionSignatureStatusFilter {
   if (
-    isNonNullish(signatureConfig) &&
+    signatureConfig?.isEnabled &&
     ["COMPLETED", "CLOSED"].includes(status) &&
     (!currentSignatureRequest ||
       currentSignatureRequest.status === "COMPLETED" ||
@@ -30,7 +30,7 @@ export function getPetitionSignatureStatus({
     } else {
       return currentSignatureRequest.status as "COMPLETED" | "CANCELLED";
     }
-  } else if (isNonNullish(signatureConfig) && ["DRAFT", "PENDING"].includes(status)) {
+  } else if (signatureConfig?.isEnabled && ["DRAFT", "PENDING"].includes(status)) {
     // petition has signature configured but it's not yet completed
     return "NOT_STARTED";
   }
@@ -49,6 +49,7 @@ getPetitionSignatureStatus.fragments = {
         cancelReason
       }
       signatureConfig {
+        isEnabled
         review
       }
     }

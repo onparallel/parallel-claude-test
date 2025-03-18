@@ -98,7 +98,7 @@ export class SignatureService implements ISignatureService {
 
     const signatureRequest = await this.petitions.createPetitionSignature(petitionId, {
       signature_config: {
-        ...omit(signatureConfig, ["additionalSignersInfo"]),
+        ...omit(signatureConfig, ["additionalSignersInfo", "isEnabled"]),
         signersInfo: sanitizedSigners,
       },
     });

@@ -39,7 +39,8 @@ export function useStartSignatureRequest({
   const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();
   const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
 
-  const reviewBeforeSigning = petition.signatureConfig?.review ?? false;
+  const reviewBeforeSigning =
+    !!petition.signatureConfig?.isEnabled && petition.signatureConfig.review;
   const startSignature = reviewBeforeSigning || petition.status === "COMPLETED";
   const { canFinalize } = usePetitionCanFinalize(petition);
 
@@ -112,6 +113,7 @@ export function useStartSignatureRequest({
             petitionId: petition.id,
             signatureConfig: {
               ...omit(petition.signatureConfig!, ["integration", "signers", "__typename"]),
+              isEnabled: true,
               timezone: petition.signatureConfig!.timezone,
               orgIntegrationId: petition.signatureConfig!.integration!.id,
               allowAdditionalSigners: allowMoreSigners,
@@ -187,6 +189,7 @@ useStartSignatureRequest.fragments = {
       status
       isInteractionWithRecipientsEnabled
       signatureConfig {
+        isEnabled
         timezone
         integration {
           id

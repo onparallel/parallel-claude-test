@@ -1264,6 +1264,7 @@ export class Mocks {
           title: "sign this!",
           allowAdditionalSigners: true,
           review: false,
+          isEnabled: true,
         },
         data: {},
         event_logs: [],

@@ -92,9 +92,7 @@ export function SignatureConfigDialog({
 }: DialogProps<SignatureConfigDialogProps, SignatureConfigInput>) {
   const intl = useIntl();
 
-  const signatureConfig =
-    petition.signatureConfig ??
-    (petition.__typename === "Petition" ? petition.currentSignatureRequest?.signatureConfig : null);
+  const signatureConfig = petition.signatureConfig;
 
   const petitionIsCompleted =
     petition.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status);
@@ -171,6 +169,7 @@ export function SignatureConfigDialog({
     } else {
       const data = form.getValues();
       props.onResolve({
+        isEnabled: true,
         title: data.title || null,
         orgIntegrationId: data.integration.id,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -289,7 +288,7 @@ const SignatureConfigDialogBodyStep1 = chakraForwardRef<"div", SignatureConfigDi
 
     const reviewBeforeSendOptions = useMemo(
       () => [
-        ...(petitionIsCompleted
+        ...(petitionIsCompleted || useCustomDocument
           ? []
           : [
               {
@@ -323,7 +322,7 @@ const SignatureConfigDialogBodyStep1 = chakraForwardRef<"div", SignatureConfigDi
             ]
           : []),
       ],
-      [intl.locale],
+      [intl.locale, useCustomDocument],
     );
 
     return (
@@ -828,6 +827,7 @@ SignatureConfigDialog.fragments = {
   get SignatureConfig() {
     return gql`
       fragment SignatureConfigDialog_SignatureConfig on SignatureConfig {
+        isEnabled
         integration {
           ...SignatureConfigDialog_SignatureOrgIntegration
         }
@@ -867,11 +867,6 @@ SignatureConfigDialog.fragments = {
               firstName
               lastName
               email
-            }
-          }
-          currentSignatureRequest {
-            signatureConfig {
-              ...SignatureConfigDialog_SignatureConfig
             }
           }
         }

@@ -132,7 +132,7 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
               />
             </Text>
             <PaddedCollapse in={isEnabled}>
-              {petition.signatureConfig ? (
+              {petition.signatureConfig?.isEnabled ? (
                 <CloseableAlert status="info" rounded="md" marginBottom={2}>
                   <AlertIcon />
                   <AlertDescription>
@@ -197,7 +197,7 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
           isPublic
           locale
           signatureConfig {
-            __typename
+            isEnabled
           }
           myEffectivePermission {
             permissionType

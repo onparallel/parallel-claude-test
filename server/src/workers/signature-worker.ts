@@ -105,7 +105,7 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
     if (!organization) {
       throw new Error(`Organization:${petition.org_id} not found`);
     }
-    if (!petition.signature_config) {
+    if (!petition.signature_config?.isEnabled) {
       throw new Error(`Signature is not enabled on petition with id ${signature.petition_id}`);
     }
 
@@ -370,7 +370,13 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
       });
       await this.petitions.updatePetition(
         petition.id,
-        { signature_config: null }, // when completed, set signature_config to null so the signatures card on replies page don't show a "pending start" row
+        {
+          // when completed, turn signature_config "off" so the signatures card on replies page don't show a "pending start" row
+          signature_config: {
+            ...petition.signature_config!,
+            isEnabled: false,
+          },
+        },
         this.config.instanceName,
       );
 
