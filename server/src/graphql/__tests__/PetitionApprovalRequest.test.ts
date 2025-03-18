@@ -66,7 +66,7 @@ describe("GraphQL/Petition Approval Request", () => {
               : null,
       }));
 
-      const [step] = await mocks.knex.from("petition_approval_request_step").insert(
+      const [approvedStep] = await mocks.knex.from("petition_approval_request_step").insert(
         {
           approval_type: "ANY",
           petition_id: petitions[2].id,
@@ -76,11 +76,48 @@ describe("GraphQL/Petition Approval Request", () => {
         },
         "*",
       );
-      await mocks.knex.from("petition_approval_request_step_approver").insert({
-        petition_approval_request_step_id: step.id,
-        user_id: otherUsers[0].id,
-        approved_at: new Date(),
-      });
+      await mocks.knex.from("petition_approval_request_step_approver").insert([
+        {
+          petition_approval_request_step_id: approvedStep.id,
+          user_id: otherUsers[0].id,
+          approved_at: new Date(),
+        },
+        {
+          petition_approval_request_step_id: approvedStep.id,
+          user_id: user.id,
+        },
+      ]);
+
+      const [step1, pendingStep] = await mocks.knex.from("petition_approval_request_step").insert(
+        [
+          {
+            approval_type: "ANY",
+            petition_id: petitions[1].id,
+            step_name: "Step 1",
+            step_number: 1,
+            status: "APPROVED",
+          },
+          {
+            approval_type: "ANY",
+            petition_id: petitions[1].id,
+            step_name: "Step 2",
+            step_number: 2,
+            status: "PENDING",
+          },
+        ],
+        "*",
+      );
+      await mocks.knex.from("petition_approval_request_step_approver").insert([
+        {
+          petition_approval_request_step_id: step1.id,
+          user_id: user.id,
+          approved_at: new Date(),
+        },
+        {
+          petition_approval_request_step_id: pendingStep.id,
+          user_id: user.id,
+        },
+      ]);
     });
 
     it("fetches petitions by multiple approval status", async () => {
@@ -140,6 +177,7 @@ describe("GraphQL/Petition Approval Request", () => {
               operator: "AND",
               filters: [
                 { operator: "STATUS", value: "APPROVED" },
+                // should never return items, as ASSIGNED_TO filter only applies where status="PENDING"
                 { operator: "ASSIGNED_TO", value: toGlobalId("User", user.id) },
               ],
             },
@@ -151,6 +189,37 @@ describe("GraphQL/Petition Approval Request", () => {
       expect(data.petitions).toEqual({
         totalCount: 0,
         items: [],
+      });
+    });
+
+    it("filters by petitions with pending approval steps and assigned to user", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filters: PetitionFilter) {
+            petitions(offset: 0, limit: 100, filters: $filters) {
+              totalCount
+              items {
+                ... on PetitionBase {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          filters: {
+            approvals: {
+              operator: "AND",
+              filters: [{ operator: "ASSIGNED_TO", value: toGlobalId("User", user.id) }],
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data.petitions).toEqual({
+        totalCount: 1,
+        items: [{ id: toGlobalId("Petition", petitions[1].id) }],
       });
     });
   });

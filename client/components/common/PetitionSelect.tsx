@@ -55,6 +55,7 @@ const _queries = [
       $search: String
       $filters: PetitionFilter
       $sortBy: [QueryPetitions_OrderBy!]
+      $minEffectivePermission: PetitionPermissionType
       $excludePublicTemplates: Boolean
     ) {
       petitions(
@@ -65,6 +66,7 @@ const _queries = [
         sortBy: $sortBy
         searchByNameOnly: true
         excludeAnonymized: true
+        minEffectivePermission: $minEffectivePermission
         excludePublicTemplates: $excludePublicTemplates
       ) {
         items {
@@ -96,7 +98,7 @@ export interface PetitionSelectProps<
   excludePublicTemplates?: boolean;
   isSync?: IsSync;
   defaultOptions?: boolean;
-  permissionTypes?: PetitionPermissionType[];
+  minEffectivePermission?: PetitionPermissionType;
   fromTemplateId?: string[];
   noOfLines?: number;
 }
@@ -116,7 +118,7 @@ export const PetitionSelect = Object.assign(
       placeholder: _placeholder,
       excludePetitions,
       excludePublicTemplates,
-      permissionTypes,
+      minEffectivePermission,
       fromTemplateId,
       ...props
     }: PetitionSelectProps<IsMulti, IsSync, OptionType>,
@@ -137,9 +139,9 @@ export const PetitionSelect = Object.assign(
             limit: 100,
             filters: {
               type,
-              permissionTypes,
               fromTemplateId,
             },
+            minEffectivePermission,
             excludePublicTemplates,
             search,
             sortBy: "lastUsedAt_DESC",

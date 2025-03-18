@@ -73,6 +73,8 @@ describe("GraphQL/Petitions", () => {
 
   let organization: Organization;
   let sessionUser: User;
+  let contacts: Contact[];
+
   let sessionUserData: UserData;
   let collaboratorUser: User;
   let petitions: Petition[];
@@ -288,6 +290,44 @@ describe("GraphQL/Petitions", () => {
         values: JSON.stringify([{ key: "AR" }]),
         source_name: "Basel",
         created_by: "User:1",
+      },
+    ]);
+
+    contacts = await mocks.createRandomContacts(organization.id, 3);
+
+    await mocks.knex.from("petition_access").insert([
+      ...contacts.map((c) => ({
+        created_by: `User:1`,
+        created_at: new Date(),
+        updated_by: `User:1`,
+        updated_at: new Date(),
+        petition_id: petitions[0].id,
+        contact_id: c.id,
+        keycode: faker.string.uuid(),
+        status: "ACTIVE" as const,
+        granter_id: sessionUser.id,
+      })),
+      {
+        created_by: `User:1`,
+        created_at: new Date(),
+        updated_by: `User:1`,
+        updated_at: new Date(),
+        petition_id: petitions[2].id,
+        contact_id: contacts[0].id,
+        keycode: faker.string.uuid(),
+        status: "ACTIVE" as const,
+        granter_id: sessionUser.id,
+      },
+      {
+        created_by: `User:1`,
+        created_at: new Date(),
+        updated_by: `User:1`,
+        updated_at: new Date(),
+        petition_id: petitions[3].id,
+        contact_id: contacts[0].id,
+        keycode: faker.string.uuid(),
+        status: "INACTIVE" as const,
+        granter_id: sessionUser.id,
       },
     ]);
   });
@@ -555,7 +595,6 @@ describe("GraphQL/Petitions", () => {
           }
         `,
       });
-
       expect(templates).not.toBeNull();
       const { items } = templates!.templates;
 
@@ -1054,6 +1093,64 @@ describe("GraphQL/Petitions", () => {
             ]),
           },
         ],
+      });
+    });
+
+    it("searches for petitions with a given recipient email", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($search: String) {
+            petitions(limit: 100, offset: 0, search: $search) {
+              totalCount
+              items {
+                ... on PetitionBase {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          search: contacts[0].email.slice(0, 5),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.petitions).toEqual({
+        totalCount: 2,
+        items: expect.toIncludeSameMembers([
+          { id: toGlobalId("Petition", petitions[0].id) },
+          { id: toGlobalId("Petition", petitions[2].id) },
+        ]),
+      });
+    });
+
+    it("searches for petitions with a given recipient name", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($search: String) {
+            petitions(limit: 100, offset: 0, search: $search) {
+              totalCount
+              items {
+                ... on PetitionBase {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          search: `${contacts[0].first_name} ${contacts[0].last_name?.slice(0, 4)}`,
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.petitions).toEqual({
+        totalCount: 2,
+        items: expect.toIncludeSameMembers([
+          { id: toGlobalId("Petition", petitions[0].id) },
+          { id: toGlobalId("Petition", petitions[2].id) },
+        ]),
       });
     });
   });

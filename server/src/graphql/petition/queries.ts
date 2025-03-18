@@ -64,13 +64,17 @@ export const petitionsQuery = queryField((t) => {
           t.nullable.field("sharedWith", { type: "PetitionSharedWithFilter" });
           t.nullable.list.nonNull.field("signature", { type: "PetitionSignatureStatusFilter" });
           t.nullable.list.nonNull.globalId("fromTemplateId", { prefixName: "Petition" });
-          t.nullable.list.nonNull.field("permissionTypes", { type: "PetitionPermissionType" });
+          t.nullable.list.nonNull.field("permissionTypes", {
+            type: "PetitionPermissionType",
+            deprecation: "NOT USED",
+          });
           t.nullable.field("approvals", { type: "PetitionApprovalsFilterInput" });
         },
       }).asArg(),
       searchByNameOnly: booleanArg({
         description: "Search applies only on petition name",
       }),
+      minEffectivePermission: arg({ type: "PetitionPermissionType" }),
       excludeAnonymized: booleanArg({
         description: "Exclude anonymized petitions from result",
       }),
@@ -114,6 +118,7 @@ export const petitionsQuery = queryField((t) => {
         searchByNameOnly,
         excludeAnonymized,
         excludePublicTemplates,
+        minEffectivePermission,
       },
       ctx,
     ) => {
@@ -132,6 +137,7 @@ export const petitionsQuery = queryField((t) => {
             return { field: field, order };
           }),
           limit,
+          minEffectivePermission,
           searchByNameOnly: searchByNameOnly ?? false,
           excludeAnonymized: excludeAnonymized ?? false,
           excludePublicTemplates: excludePublicTemplates ?? false,

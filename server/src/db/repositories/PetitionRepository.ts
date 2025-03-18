@@ -190,7 +190,7 @@ export interface PetitionFilter {
   profileIds?: number[] | null;
   sharedWith?: PetitionSharedWithFilter | null;
   fromTemplateId?: number[] | null;
-  permissionTypes?: PetitionPermissionType[] | null;
+  minEffectivePermission?: PetitionPermissionType | null;
   approvals?: PetitionApprovalsFilter | null;
 }
 
@@ -520,6 +520,7 @@ export class PetitionRepository extends BaseRepository {
           | "lastRecipientActivityAt"
         >[];
         filters?: PetitionFilter | null;
+        minEffectivePermission?: PetitionPermissionType | null;
       } & PageOpts;
     }
   >(async ({ orgId, userId, opts }, include) => {
@@ -549,15 +550,20 @@ export class PetitionRepository extends BaseRepository {
           q.whereSearch("p.name", search);
         } else {
           if (type === "PETITION") {
-            q.joinRaw(/* sql */ `left join petition_access pa on p.id = pa.petition_id `).joinRaw(
-              /* sql */ `left join contact c on pa.contact_id = c.id and c.deleted_at is null`,
-            );
+            q.joinRaw(/* sql */ `
+              left join lateral (
+                select jsonb_agg(jsonb_build_object('full_name', concat(c.first_name, ' ', c.last_name), 'email', c.email)) as contacts
+                from petition_access pa
+                join contact c on pa.contact_id = c.id and c.deleted_at is null
+                where p.id = pa.petition_id and pa.status = 'ACTIVE'
+              ) c on true`);
           }
           q.where((q) => {
             q.whereSearch("p.name", search)
               .orWhere((q) => {
                 q.where("p.path", "<>", "/").and.whereExists((q) =>
                   q
+                    .select(this.knex.raw("1"))
                     .fromRaw(
                       /* sql */ `unnest(regexp_split_to_array(trim(both '/' from p.path), '/')) part`,
                     )
@@ -566,10 +572,14 @@ export class PetitionRepository extends BaseRepository {
               })
               .orWhere((q) => {
                 if (type === "PETITION") {
-                  q.whereNull("c.deleted_at").andWhere((q) =>
+                  q.whereExists((q) =>
                     q
-                      .whereSearch(this.knex.raw(`concat(c.first_name, ' ', c.last_name)`), search)
-                      .or.whereSearch("c.email", search),
+                      .select(this.knex.raw("1"))
+                      .fromRaw(
+                        /* sql */ `jsonb_to_recordset(c.contacts) as contact(full_name text, email text)`,
+                      )
+                      .whereSearch("full_name", search)
+                      .or.whereSearch("email", search),
                   );
                 } else {
                   q.whereSearch("p.template_description", search);
@@ -581,12 +591,7 @@ export class PetitionRepository extends BaseRepository {
     }
 
     if (filters) {
-      this.petitionFilter.applyPetitionFilter(
-        builders,
-        omit(filters, ["path"]),
-        { petition: "p", petition_permission: "pp" },
-        type,
-      );
+      this.petitionFilter.applyPetitionFilter(builders, omit(filters, ["path"]), type);
       if (isNonNullish(filters.path)) {
         builders.push((q) => q.whereRaw(/* sql */ `starts_with(p.path, ?)`, [filters.path]));
       }
@@ -602,6 +607,15 @@ export class PetitionRepository extends BaseRepository {
       builders.push((q) => q.where("p.template_public", false));
     }
 
+    if (isNonNullish(opts.minEffectivePermission)) {
+      builders.push((q) =>
+        q.whereRaw(
+          "pp.effective_permission <= ?::petition_permission_type",
+          opts.minEffectivePermission,
+        ),
+      );
+    }
+
     const needsLastUsedAt =
       opts.sortBy?.some((s) => s.field === "lastUsedAt") && type === "TEMPLATE";
     const needsSentAt = opts.sortBy?.some((s) => s.field === "sentAt") && type === "PETITION";
@@ -612,7 +626,7 @@ export class PetitionRepository extends BaseRepository {
         this.knex
           .fromRaw("petition as p")
           .joinRaw(
-            /* sql */ `join petition_permission pp on p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null`,
+            /* sql */ `join lateral (select min(pp.type) as effective_permission from petition_permission pp where pp.petition_id = p.id and pp.user_id = ? and pp.deleted_at is null) pp on true`,
             [userId],
           )
           .where("p.org_id", orgId)
@@ -621,26 +635,23 @@ export class PetitionRepository extends BaseRepository {
           .modify(function (q) {
             builders.forEach((b) => b.call(this, q));
             if (needsSentAt) {
-              q.joinRaw(/* sql */ `left join petition_message pm on p.id = pm.petition_id`);
+              q.joinRaw(
+                /* sql */ `left join lateral(select min(coalesce(pm.scheduled_at, pm.created_at)) as sent_at from petition_message pm where pm.petition_id = p.id) pm on true`,
+              );
             }
             if (needsLastUsedAt) {
               q.joinRaw(
-                /* sql */ `left join petition plua on plua.from_template_id = p.id and plua.deleted_at is null and plua.created_by = ?`,
+                /* sql */ `left join lateral (select max(plua.created_at) as last_used_at from petition plua where plua.from_template_id = p.id and plua.deleted_at is null and plua.created_by = ?) plua on true`,
                 [`User:${userId}`],
               );
             }
           })
-          .groupBy("p.id")
           .select(
             "p.*",
-            this.knex.raw(/* sql */ `min(pp.type) as effective_permission`),
-            needsSentAt
-              ? this.knex.raw(/* sql */ `min(coalesce(pm.scheduled_at, pm.created_at)) as sent_at`)
-              : this.knex.raw(/* sql */ `null::timestamptz as sent_at`),
+            "pp.effective_permission",
+            needsSentAt ? "pm.sent_at" : this.knex.raw(/* sql */ `null::timestamptz as sent_at`),
             needsLastUsedAt
-              ? this.knex.raw(
-                  /* sql */ `greatest(max(plua.created_at), min(p.created_at)) as last_used_at`,
-                )
+              ? this.knex.raw(/* sql */ `greatest(plua.last_used_at, p.created_at) as last_used_at`)
               : this.knex.raw(/* sql */ `null::timestamptz as last_used_at`),
           ),
       )
@@ -766,7 +777,6 @@ export class PetitionRepository extends BaseRepository {
       >,
     );
     if (e) {
-      console.log(e);
       throw e;
     }
 

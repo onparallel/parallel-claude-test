@@ -6295,6 +6295,7 @@ export interface QuerypetitionsArgs {
   excludePublicTemplates?: InputMaybe<Scalars["Boolean"]["input"]>;
   filters?: InputMaybe<PetitionFilter>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
+  minEffectivePermission?: InputMaybe<PetitionPermissionType>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   searchByNameOnly?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -7988,6 +7989,7 @@ export type PetitionSelect_petitionsQueryVariables = Exact<{
   search?: InputMaybe<Scalars["String"]["input"]>;
   filters?: InputMaybe<PetitionFilter>;
   sortBy?: InputMaybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
+  minEffectivePermission?: InputMaybe<PetitionPermissionType>;
   excludePublicTemplates?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
@@ -73028,6 +73030,7 @@ export const PetitionSelect_petitionsDocument = gql`
     $search: String
     $filters: PetitionFilter
     $sortBy: [QueryPetitions_OrderBy!]
+    $minEffectivePermission: PetitionPermissionType
     $excludePublicTemplates: Boolean
   ) {
     petitions(
@@ -73038,6 +73041,7 @@ export const PetitionSelect_petitionsDocument = gql`
       sortBy: $sortBy
       searchByNameOnly: true
       excludeAnonymized: true
+      minEffectivePermission: $minEffectivePermission
       excludePublicTemplates: $excludePublicTemplates
     ) {
       items {

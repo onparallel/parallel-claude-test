@@ -226,14 +226,21 @@ export class Mocks {
     userBuilder?: (index: number) => Partial<User>,
     userDataBuilder?: (index: number) => Partial<UserData>,
   ) {
+    const emails = new Set<string>();
     const userDatas = await this.knex<UserData>("user_data").insert(
       range(0, amount || 1).map<CreateUserData>((index) => {
         const firstName = faker.person.firstName();
         const lastName = faker.person.lastName();
+        // ensure emails are unique
+        let email = faker.internet.email({ firstName, lastName }).toLowerCase();
+        while (emails.has(email)) {
+          email = faker.internet.email({ firstName, lastName }).toLowerCase();
+        }
+        emails.add(email);
         return {
           first_name: firstName,
           last_name: lastName,
-          email: faker.internet.email({ firstName, lastName }).toLowerCase(),
+          email,
           cognito_id: faker.string.uuid(),
           preferred_locale: randomUserPreferredLocale(),
           ...userDataBuilder?.(index),

@@ -68,7 +68,7 @@ function AssociatePetitionToProfileDialog({
                   defaultOptions
                   fromTemplateId={fromTemplateId}
                   excludePetitions={excludePetitions}
-                  permissionTypes={["OWNER", "WRITE"]}
+                  minEffectivePermission="WRITE"
                   value={value}
                   onChange={(v) => {
                     onChange(v?.id ?? null);

@@ -7841,6 +7841,7 @@ type Query {
     Number of elements to take from the list.
     """
     limit: Int
+    minEffectivePermission: PetitionPermissionType
 
     """
     Number of elements to skip from the list.

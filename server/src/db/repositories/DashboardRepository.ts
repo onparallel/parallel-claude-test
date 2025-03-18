@@ -203,10 +203,13 @@ export class DashboardRepository extends BaseRepository {
   }
 
   private petitionsCountQuery(orgId: number, filters: PetitionFilter) {
-    assert(isNullish(filters.permissionTypes), "permissionTypes filter not supported");
+    assert(
+      isNullish(filters.minEffectivePermission),
+      "minEffectivePermission filter not supported",
+    );
 
     const builders: Knex.QueryCallbackWithArgs[] = [];
-    this.petitionFilter.applyPetitionFilter(builders, filters, { petition: "p" }, "PETITION");
+    this.petitionFilter.applyPetitionFilter(builders, filters, "PETITION");
 
     return (
       this.from({ p: "petition" })
@@ -220,7 +223,6 @@ export class DashboardRepository extends BaseRepository {
           }
         })
         // this group by is necessary for some of the builders to work
-        .groupBy("p.id")
         .select(this.knex.raw(/* sql */ `distinct p.id`))
     );
   }

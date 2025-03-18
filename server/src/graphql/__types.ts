@@ -9688,6 +9688,7 @@ export interface NexusGenArgTypes {
       excludePublicTemplates?: boolean | null; // Boolean
       filters?: NexusGenInputs["PetitionFilter"] | null; // PetitionFilter
       limit?: number | null; // Int
+      minEffectivePermission?: NexusGenEnums["PetitionPermissionType"] | null; // PetitionPermissionType
       offset?: number | null; // Int
       search?: string | null; // String
       searchByNameOnly?: boolean | null; // Boolean

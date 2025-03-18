@@ -6,4 +6,5 @@ module.exports = {
   globalSetup: "./test/setup.ts",
   testMatch: ["**/__tests__/**/*.test.ts?(x)"],
   testTimeout: 12000,
+  coveragePathIgnorePatterns: ["/node_modules/", "/src/emails/", "src/pdf/"],
 };
