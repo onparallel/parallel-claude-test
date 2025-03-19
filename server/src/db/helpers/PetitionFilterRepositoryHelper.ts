@@ -105,7 +105,10 @@ export class PetitionFilterRepositoryHelper {
         q.joinRaw(
           /* sql */ `join lateral (select array_agg(distinct profile_ids) as profile_ids from petition_profile where petition_id = p.id) pp3 on true`,
         );
-        q.whereRaw(`pp3.profile_ids @> ?`, sqlArray(this.knex, filter.profileIds!, "int"));
+        q.whereRaw(
+          `pp3.profile_ids is not null and pp3.profile_ids @> ?`,
+          sqlArray(this.knex, filter.profileIds!, "int"),
+        );
       });
     }
 

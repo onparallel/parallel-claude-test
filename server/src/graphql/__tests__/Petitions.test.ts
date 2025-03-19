@@ -221,6 +221,9 @@ describe("GraphQL/Petitions", () => {
     // petitions[0] and petitions[1] are shared to another user
     await mocks.sharePetitions([petitions[0].id, petitions[1].id], sameOrgUser.id, "WRITE");
 
+    // petitions of another user (should not be visible to session user)
+    await mocks.createRandomPetitions(organization.id, sameOrgUser.id, 10);
+
     // a public template from secondary organization
     [publicTemplate] = await mocks.createRandomPetitions(otherOrg.id, otherUser.id, 1, () => ({
       recipient_locale: "en",

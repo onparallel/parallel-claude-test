@@ -190,7 +190,6 @@ export interface PetitionFilter {
   profileIds?: number[] | null;
   sharedWith?: PetitionSharedWithFilter | null;
   fromTemplateId?: number[] | null;
-  minEffectivePermission?: PetitionPermissionType | null;
   approvals?: PetitionApprovalsFilter | null;
 }
 
@@ -626,7 +625,7 @@ export class PetitionRepository extends BaseRepository {
         this.knex
           .fromRaw("petition as p")
           .joinRaw(
-            /* sql */ `join lateral (select min(pp.type) as effective_permission from petition_permission pp where pp.petition_id = p.id and pp.user_id = ? and pp.deleted_at is null) pp on true`,
+            /* sql */ `join lateral (select min(pp.type) as effective_permission from petition_permission pp where pp.petition_id = p.id and pp.user_id = ? and pp.deleted_at is null) pp on pp.effective_permission is not null`,
             [userId],
           )
           .where("p.org_id", orgId)

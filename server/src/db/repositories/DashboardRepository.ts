@@ -203,11 +203,6 @@ export class DashboardRepository extends BaseRepository {
   }
 
   private petitionsCountQuery(orgId: number, filters: PetitionFilter) {
-    assert(
-      isNullish(filters.minEffectivePermission),
-      "minEffectivePermission filter not supported",
-    );
-
     const builders: Knex.QueryCallbackWithArgs[] = [];
     this.petitionFilter.applyPetitionFilter(builders, filters, "PETITION");
 
