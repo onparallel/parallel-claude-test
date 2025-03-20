@@ -291,11 +291,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
     await withError(showSignatureStatusDialog({ petition: petition! }));
   }
 
-  const signatureStatus = getPetitionSignatureStatus({
-    status: petition.status,
-    currentSignatureRequest: petition.latestSignatureRequest,
-    signatureConfig: petition.signatureConfig,
-  });
+  const signatureStatus = getPetitionSignatureStatus(petition);
 
   const isClosed = ["COMPLETED", "CLOSED"].includes(petition.status);
   const hasSignature =

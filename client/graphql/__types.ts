@@ -56515,11 +56515,14 @@ export type RecipientView_PublicPetitionAccessFragment = {
         isPreset: boolean;
       }>;
     } | null;
-    latestSignatureRequest?: {
+    currentSignatureRequest?: {
       __typename?: "PublicPetitionSignatureRequest";
       id: string;
       status: PetitionSignatureRequestStatus;
       cancelReason?: string | null;
+    } | null;
+    latestSignatureRequest?: {
+      __typename?: "PublicPetitionSignatureRequest";
       signerStatus: Array<{
         __typename?: "PetitionSignatureRequestSignerStatus";
         status: string;
@@ -56735,11 +56738,14 @@ export type RecipientView_PublicPetitionFragment = {
     id: string;
     hasRemoveParallelBranding: boolean;
   };
-  latestSignatureRequest?: {
+  currentSignatureRequest?: {
     __typename?: "PublicPetitionSignatureRequest";
     id: string;
     status: PetitionSignatureRequestStatus;
     cancelReason?: string | null;
+  } | null;
+  latestSignatureRequest?: {
+    __typename?: "PublicPetitionSignatureRequest";
     signerStatus: Array<{
       __typename?: "PetitionSignatureRequestSignerStatus";
       status: string;
@@ -56950,11 +56956,14 @@ export type RecipientView_publicCompletePetitionMutation = {
       id: string;
       hasRemoveParallelBranding: boolean;
     };
-    latestSignatureRequest?: {
+    currentSignatureRequest?: {
       __typename?: "PublicPetitionSignatureRequest";
       id: string;
       status: PetitionSignatureRequestStatus;
       cancelReason?: string | null;
+    } | null;
+    latestSignatureRequest?: {
+      __typename?: "PublicPetitionSignatureRequest";
       signerStatus: Array<{
         __typename?: "PetitionSignatureRequestSignerStatus";
         status: string;
@@ -57178,11 +57187,14 @@ export type RecipientView_accessQuery = {
           isPreset: boolean;
         }>;
       } | null;
-      latestSignatureRequest?: {
+      currentSignatureRequest?: {
         __typename?: "PublicPetitionSignatureRequest";
         id: string;
         status: PetitionSignatureRequestStatus;
         cancelReason?: string | null;
+      } | null;
+      latestSignatureRequest?: {
+        __typename?: "PublicPetitionSignatureRequest";
         signerStatus: Array<{
           __typename?: "PetitionSignatureRequestSignerStatus";
           status: string;
@@ -58443,13 +58455,17 @@ export type getPetitionSignatureStatus_PetitionFragment = {
 export type getPetitionSignatureStatus_PublicPetitionFragment = {
   __typename?: "PublicPetition";
   status: PetitionStatus;
-  latestSignatureRequest?: {
+  currentSignatureRequest?: {
     __typename?: "PublicPetitionSignatureRequest";
     id: string;
     status: PetitionSignatureRequestStatus;
     cancelReason?: string | null;
   } | null;
-  signatureConfig?: { __typename?: "PublicSignatureConfig"; review: boolean } | null;
+  signatureConfig?: {
+    __typename?: "PublicSignatureConfig";
+    isEnabled: boolean;
+    review: boolean;
+  } | null;
 };
 
 export type getProfileNamePreview_ProfileTypeFragment = {
@@ -72217,12 +72233,13 @@ export const usePetitionCanFinalize_PublicPetitionFragmentDoc = gql`
 export const getPetitionSignatureStatus_PublicPetitionFragmentDoc = gql`
   fragment getPetitionSignatureStatus_PublicPetition on PublicPetition {
     status
-    latestSignatureRequest {
+    currentSignatureRequest: latestSignatureRequest {
       id
       status
       cancelReason
     }
     signatureConfig {
+      isEnabled
       review
     }
   }

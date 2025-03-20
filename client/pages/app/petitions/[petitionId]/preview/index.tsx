@@ -582,13 +582,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const limitValue = me.organization.petitionsPeriod?.limit ?? 0;
 
   const signatureStatus =
-    petition.__typename === "Petition"
-      ? getPetitionSignatureStatus({
-          status: petition.status,
-          currentSignatureRequest: petition.currentSignatureRequest,
-          signatureConfig: petition.signatureConfig,
-        })
-      : "NO_SIGNATURE";
+    petition.__typename === "Petition" ? getPetitionSignatureStatus(petition) : "NO_SIGNATURE";
 
   const { handleStartSignature } = useStartSignatureRequest({
     user: me,
