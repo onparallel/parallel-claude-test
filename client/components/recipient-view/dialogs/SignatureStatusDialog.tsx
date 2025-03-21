@@ -73,6 +73,7 @@ useSignatureStatusDialog.fragments = {
         signingMode
       }
       latestSignatureRequest {
+        id
         signerStatus {
           signer {
             fullName

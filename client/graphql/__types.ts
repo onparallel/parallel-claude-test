@@ -35092,6 +35092,7 @@ export type RecipientViewSignatureStatusDialog_PublicPetitionFragment = {
   } | null;
   latestSignatureRequest?: {
     __typename?: "PublicPetitionSignatureRequest";
+    id: string;
     signerStatus: Array<{
       __typename?: "PetitionSignatureRequestSignerStatus";
       status: string;
@@ -56523,6 +56524,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
     } | null;
     latestSignatureRequest?: {
       __typename?: "PublicPetitionSignatureRequest";
+      id: string;
       signerStatus: Array<{
         __typename?: "PetitionSignatureRequestSignerStatus";
         status: string;
@@ -56746,6 +56748,7 @@ export type RecipientView_PublicPetitionFragment = {
   } | null;
   latestSignatureRequest?: {
     __typename?: "PublicPetitionSignatureRequest";
+    id: string;
     signerStatus: Array<{
       __typename?: "PetitionSignatureRequestSignerStatus";
       status: string;
@@ -56964,6 +56967,7 @@ export type RecipientView_publicCompletePetitionMutation = {
     } | null;
     latestSignatureRequest?: {
       __typename?: "PublicPetitionSignatureRequest";
+      id: string;
       signerStatus: Array<{
         __typename?: "PetitionSignatureRequestSignerStatus";
         status: string;
@@ -57195,6 +57199,7 @@ export type RecipientView_accessQuery = {
       } | null;
       latestSignatureRequest?: {
         __typename?: "PublicPetitionSignatureRequest";
+        id: string;
         signerStatus: Array<{
           __typename?: "PetitionSignatureRequestSignerStatus";
           status: string;
@@ -72251,6 +72256,7 @@ export const RecipientViewSignatureStatusDialog_PublicPetitionFragmentDoc = gql`
       signingMode
     }
     latestSignatureRequest {
+      id
       signerStatus {
         signer {
           fullName
