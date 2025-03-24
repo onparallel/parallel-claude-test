@@ -57,6 +57,7 @@ import {
 import {
   CreatePetitionFieldInput,
   PetitionCompose_PetitionFieldFragment,
+  PetitionCompose_cancelSignatureRequestDocument,
   PetitionCompose_changePetitionFieldTypeDocument,
   PetitionCompose_clonePetitionFieldDocument,
   PetitionCompose_createPetitionFieldDocument,
@@ -1289,11 +1290,25 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const { handleCancelApprovals } = useCancelApprovalRequestFlow(petition.id);
 
-  const { handleStartApprovalFlow } = useStartApprovalRequestStep({ petition });
+  const { handleStartApprovalFlow, hasNotStartedApprovals } = useStartApprovalRequestStep({
+    petition,
+  });
 
   const { handleClosePetition } = useClosePetition({
     onRefetch: () => refetch(),
   });
+
+  const [cancelSignatureRequest] = useMutation(PetitionCompose_cancelSignatureRequestDocument);
+
+  const handleCancelSignature = useCallback(async () => {
+    if (petition.__typename === "Petition" && petition.currentSignatureRequest) {
+      await cancelSignatureRequest({
+        variables: {
+          petitionSignatureRequestId: petition.currentSignatureRequest.id,
+        },
+      });
+    }
+  }, [petition]);
 
   const extendFlexColumn = {
     display: "flex",
@@ -1465,10 +1480,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onClosePetition={() => {
                 handleClosePetition(petition);
               }}
+              onCancelSignature={handleCancelSignature}
               petitionStatus={petition.status}
               signatureStatus={signatureStatus}
               approvalsStatus={petition.currentApprovalRequestStatus}
               signatureAfterApprovals={petition.signatureConfig?.reviewAfterApproval}
+              hasNotStartedApprovals={hasNotStartedApprovals}
             />
           ) : null}
         </Box>
@@ -1573,6 +1590,10 @@ const _fragments = {
             }
           }
           currentApprovalRequestStatus
+          currentSignatureRequest {
+            id
+            status
+          }
           ...useSendPetitionHandler_Petition
           ...getPetitionSignatureStatus_Petition
         }
@@ -1973,6 +1994,19 @@ const _mutations = [
     ${PetitionLayout.fragments.PetitionBase}
     ${PetitionComposeNewFieldDrawer.fragments.PetitionBase}
     ${_fragments.PetitionField}
+  `,
+  gql`
+    mutation PetitionCompose_cancelSignatureRequest($petitionSignatureRequestId: GID!) {
+      cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
+        id
+        status
+        cancelReason
+        petition {
+          id
+          hasStartedProcess
+        }
+      }
+    }
   `,
 ];
 

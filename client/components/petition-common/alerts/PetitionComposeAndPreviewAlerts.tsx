@@ -24,22 +24,26 @@ export interface PetitionComposeAlertsProps {
   petitionStatus: PetitionStatus;
   signatureStatus: PetitionSignatureStatusFilter;
   approvalsStatus: PetitionApprovalRequestStatus;
+  hasNotStartedApprovals?: boolean;
   signatureAfterApprovals?: boolean | null;
   onStartSignature: () => void;
   onStartApprovals: () => void;
   onCancelApprovals: () => void;
   onClosePetition: () => void;
+  onCancelSignature: () => void;
 }
 
 export function PetitionComposeAndPreviewAlerts({
   petitionStatus,
   signatureStatus,
   approvalsStatus,
+  hasNotStartedApprovals = false,
   signatureAfterApprovals = false,
   onStartSignature,
   onStartApprovals,
   onCancelApprovals,
   onClosePetition,
+  onCancelSignature,
 }: PetitionComposeAlertsProps) {
   const showSignatureAlert = petitionStatus === "COMPLETED" && signatureStatus === "PROCESSING";
 
@@ -52,9 +56,13 @@ export function PetitionComposeAndPreviewAlerts({
       {petitionStatus === "CLOSED" ? (
         <PetitionClosedAlert />
       ) : showSignatureAlert ? (
-        <PetitionSignatureSentAlert />
+        <PetitionSignatureSentAlert onCancelSignature={onCancelSignature} />
       ) : showApprovalsAlert ? (
-        <PetitionApprovalsAlert onCancelApprovals={onCancelApprovals} />
+        <PetitionApprovalsAlert
+          onStartApprovals={onStartApprovals}
+          onCancelApprovals={onCancelApprovals}
+          hasNotStartedApprovals={hasNotStartedApprovals}
+        />
       ) : showApprovalsRejectedAlert ? (
         <PetitionApprovalsDefinitiveRejectedAlert
           onClosePetition={onClosePetition}
@@ -76,10 +84,17 @@ export function PetitionComposeAndPreviewAlerts({
 }
 
 interface PetitionApprovalsAlertProps extends AlertProps {
+  onStartApprovals: () => void;
   onCancelApprovals: () => void;
+  hasNotStartedApprovals: boolean;
 }
 
-function PetitionApprovalsAlert({ onCancelApprovals, ...props }: PetitionApprovalsAlertProps) {
+function PetitionApprovalsAlert({
+  onStartApprovals,
+  onCancelApprovals,
+  hasNotStartedApprovals,
+  ...props
+}: PetitionApprovalsAlertProps) {
   return (
     <Alert status="warning" {...props}>
       <AlertIcon as={TimeIcon} color="orange.600" />
@@ -99,36 +114,78 @@ function PetitionApprovalsAlert({ onCancelApprovals, ...props }: PetitionApprova
           </Text>
         </AlertDescription>
         <Box alignSelf={{ base: "flex-start", md: "center" }}>
-          <Button colorScheme="red" onClick={onCancelApprovals}>
-            <FormattedMessage
-              id="component.petition-approvals-alert.cancel-approvals"
-              defaultMessage="Cancel approvals"
-            />
-          </Button>
+          {hasNotStartedApprovals ? (
+            <ButtonWithMoreOptions
+              backgroundColor="white"
+              moreOptionsButtonProps={{
+                backgroundColor: "white",
+              }}
+              onClick={onStartApprovals}
+              options={
+                <MenuList minWidth="fit-content">
+                  <MenuItem onClick={onCancelApprovals}>
+                    <FormattedMessage
+                      id="component.petition-approvals-alert.cancel-approvals"
+                      defaultMessage="Cancel approvals"
+                    />
+                  </MenuItem>
+                </MenuList>
+              }
+            >
+              <FormattedMessage
+                id="component.petition-approvals-alert.start-approval"
+                defaultMessage="Start approval"
+              />
+            </ButtonWithMoreOptions>
+          ) : (
+            <Button colorScheme="red" onClick={onCancelApprovals}>
+              <FormattedMessage
+                id="component.petition-approvals-alert.cancel-approvals"
+                defaultMessage="Cancel approvals"
+              />
+            </Button>
+          )}
         </Box>
       </Flex>
     </Alert>
   );
 }
 
-function PetitionSignatureSentAlert(props: AlertProps) {
+interface PetitionSignatureSentAlertProps extends AlertProps {
+  onCancelSignature: () => void;
+}
+
+function PetitionSignatureSentAlert({
+  onCancelSignature,
+  ...props
+}: PetitionSignatureSentAlertProps) {
   return (
     <Alert status="warning" {...props}>
       <AlertIcon as={TimeIcon} color="orange.600" />
-      <AlertDescription>
-        <Text>
-          <FormattedMessage
-            id="component.petition-signature-sent-alert.signature-sent"
-            defaultMessage="<b>Parallel sent to sign</b>"
-          />
-        </Text>
-        <Text>
-          <FormattedMessage
-            id="component.petition-signature-sent-alert.signature-sent-description"
-            defaultMessage="If you need to change anything, cancel the signature first."
-          />
-        </Text>
-      </AlertDescription>
+      <Flex flexDirection={{ base: "column", md: "row" }} gap={2} flex={1} justify="space-between">
+        <AlertDescription>
+          <Text>
+            <FormattedMessage
+              id="component.petition-signature-sent-alert.signature-sent"
+              defaultMessage="<b>Parallel sent to sign</b>"
+            />
+          </Text>
+          <Text>
+            <FormattedMessage
+              id="component.petition-signature-sent-alert.signature-sent-description"
+              defaultMessage="If you need to change anything, cancel the signature first."
+            />
+          </Text>
+        </AlertDescription>
+        <Box alignSelf={{ base: "flex-start", md: "center" }}>
+          <Button colorScheme="red" onClick={onCancelSignature}>
+            <FormattedMessage
+              id="component.petition-signature-sent-alert.cancel-signature"
+              defaultMessage="Cancel signature"
+            />
+          </Button>
+        </Box>
+      </Flex>
     </Alert>
   );
 }
@@ -200,10 +257,7 @@ function PetitionCompletedAlert({
 
           {showStartSignatureButton && approvalsStatus === "APPROVED" ? (
             <ButtonWithMoreOptions
-              backgroundColor="white"
-              moreOptionsButtonProps={{
-                backgroundColor: "white",
-              }}
+              colorScheme="primary"
               onClick={onStartSignature}
               options={
                 <MenuList minWidth="fit-content">
@@ -219,17 +273,14 @@ function PetitionCompletedAlert({
               <FormattedMessage id="generic.start-signature" defaultMessage="Start signature" />
             </ButtonWithMoreOptions>
           ) : showStartSignatureButton ? (
-            <Button onClick={onStartSignature} backgroundColor="white">
+            <Button onClick={onStartSignature} colorScheme="primary">
               <FormattedMessage id="generic.start-signature" defaultMessage="Start signature" />
             </Button>
           ) : null}
 
           {showClosePetitionButton && approvalsStatus === "APPROVED" ? (
             <ButtonWithMoreOptions
-              backgroundColor="white"
-              moreOptionsButtonProps={{
-                backgroundColor: "white",
-              }}
+              colorScheme="primary"
               onClick={onClosePetition}
               options={
                 <MenuList minWidth="fit-content">
@@ -245,7 +296,7 @@ function PetitionCompletedAlert({
               <FormattedMessage id="generic.close-petition" defaultMessage="Close parallel" />
             </ButtonWithMoreOptions>
           ) : showClosePetitionButton ? (
-            <Button onClick={onClosePetition} backgroundColor="white">
+            <Button onClick={onClosePetition} colorScheme="primary">
               <FormattedMessage id="generic.close-petition" defaultMessage="Close parallel" />
             </Button>
           ) : null}

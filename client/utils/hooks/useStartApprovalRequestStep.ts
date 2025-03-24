@@ -45,6 +45,12 @@ export function useStartApprovalRequestStep({
     useStartApprovalRequestStep_startPetitionApprovalRequestStepDocument,
   );
 
+  const hasNotStartedApprovals =
+    petition.__typename === "Petition" &&
+    isNonNullish(petition.currentApprovalRequestSteps) &&
+    petition.currentApprovalRequestSteps.some((s) => s.status === "NOT_STARTED") &&
+    !petition.currentApprovalRequestSteps.some((s) => s.status === "PENDING");
+
   const handleStartApprovalFlow = useCallback(
     async (step?: PetitionApprovalsCard_PetitionApprovalRequestStepFragment) => {
       try {
@@ -89,7 +95,7 @@ export function useStartApprovalRequestStep({
     ],
   );
 
-  return { handleStartApprovalFlow };
+  return { handleStartApprovalFlow, hasNotStartedApprovals };
 }
 
 useStartApprovalRequestStep.fragments = {
@@ -106,6 +112,7 @@ useStartApprovalRequestStep.fragments = {
     fragment useStartApprovalRequestStep_PetitionBase on PetitionBase {
       id
       ... on Petition {
+        hasStartedProcess
         currentApprovalRequestStatus
         currentApprovalRequestSteps {
           ...useStartApprovalRequestStep_PetitionApprovalRequestStep

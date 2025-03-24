@@ -133,7 +133,11 @@ export function PetitionApprovalsCard({
     {
       id: "signature",
       stepName: "eSignature",
-      status: !!petition.signatureConfig?.isEnabled ? signatureStatus : "APPROVED",
+      status: !!petition.signatureConfig?.isEnabled
+        ? reviewAfterApproval && petition.currentApprovalRequestStatus !== "APPROVED"
+          ? "NOT_APPLICABLE"
+          : signatureStatus
+        : "APPROVED",
       approvalType: "ANY",
       approvers: [],
     },
@@ -568,6 +572,7 @@ PetitionApprovalsCard.fragments = {
       fragment PetitionApprovalsCard_Petition on Petition {
         id
         status
+        currentApprovalRequestStatus
         generalCommentCount
         unreadGeneralCommentCount
         approvalFlowConfig {
@@ -648,18 +653,12 @@ const _mutations = [
         ...PetitionApprovalsCard_PetitionApprovalRequestStep
         petition {
           id
-          currentApprovalRequestSteps {
-            id
-            ...PetitionApprovalsCard_PetitionApprovalRequestStep
-          }
-          oldApprovalRequestSteps {
-            id
-            ...PetitionApprovalsCard_PetitionApprovalRequestStep
-          }
+          ...PetitionApprovalsCard_Petition
         }
       }
     }
     ${PetitionApprovalsCard.fragments.PetitionApprovalRequestStep}
+    ${PetitionApprovalsCard.fragments.Petition}
   `,
   gql`
     mutation PetitionApprovalsCard_skipPetitionApprovalRequestStep(
@@ -676,16 +675,12 @@ const _mutations = [
         ...PetitionApprovalsCard_PetitionApprovalRequestStep
         petition {
           id
-          generalCommentCount
-          unreadGeneralCommentCount
-          currentApprovalRequestSteps {
-            id
-            ...PetitionApprovalsCard_PetitionApprovalRequestStep
-          }
+          ...PetitionApprovalsCard_Petition
         }
       }
     }
     ${PetitionApprovalsCard.fragments.PetitionApprovalRequestStep}
+    ${PetitionApprovalsCard.fragments.Petition}
   `,
   gql`
     mutation PetitionApprovalsCard_rejectPetitionApprovalRequestStep(
@@ -706,20 +701,12 @@ const _mutations = [
         ...PetitionApprovalsCard_PetitionApprovalRequestStep
         petition {
           id
-          generalCommentCount
-          unreadGeneralCommentCount
-          currentApprovalRequestSteps {
-            id
-            ...PetitionApprovalsCard_PetitionApprovalRequestStep
-          }
-          oldApprovalRequestSteps {
-            id
-            ...PetitionApprovalsCard_PetitionApprovalRequestStep
-          }
+          ...PetitionApprovalsCard_Petition
         }
       }
     }
     ${PetitionApprovalsCard.fragments.PetitionApprovalRequestStep}
+    ${PetitionApprovalsCard.fragments.Petition}
   `,
   gql`
     mutation PetitionApprovalsCard_approvePetitionApprovalRequestStep(
@@ -738,16 +725,12 @@ const _mutations = [
         ...PetitionApprovalsCard_PetitionApprovalRequestStep
         petition {
           id
-          generalCommentCount
-          unreadGeneralCommentCount
-          currentApprovalRequestSteps {
-            id
-            ...PetitionApprovalsCard_PetitionApprovalRequestStep
-          }
+          ...PetitionApprovalsCard_Petition
         }
       }
     }
     ${PetitionApprovalsCard.fragments.PetitionApprovalRequestStep}
+    ${PetitionApprovalsCard.fragments.Petition}
   `,
   gql`
     mutation PetitionApprovalsCard_startPetitionApprovalRequestStep(
@@ -766,13 +749,12 @@ const _mutations = [
         ...PetitionApprovalsCard_PetitionApprovalRequestStep
         petition {
           id
-          generalCommentCount
-          unreadGeneralCommentCount
-          hasStartedProcess
+          ...PetitionApprovalsCard_Petition
         }
       }
     }
     ${PetitionApprovalsCard.fragments.PetitionApprovalRequestStep}
+    ${PetitionApprovalsCard.fragments.Petition}
   `,
   gql`
     mutation PetitionApprovalsCard_sendPetitionApprovalRequestStepReminder(

@@ -37,12 +37,13 @@ export default {
     signatureStatus: "NOT_STARTED" as PetitionSignatureStatusFilter,
     approvalsStatus: "NO_APPROVAL" as PetitionApprovalRequestStatus,
     signatureAfterApprovals: false,
+    hasNotStartedApprovals: false,
     onStartSignature: () => {},
     onStartApprovals: () => {},
     onCancelApprovals: () => {},
     onClosePetition: () => {},
+    onCancelSignature: () => {},
   },
-  // For better organization of properties in Storybook controls
   argTypes: {
     petitionStatus: {
       control: {
@@ -88,6 +89,13 @@ export default {
         category: "Configuration",
       },
     },
+    hasNotStartedApprovals: {
+      control: "boolean",
+      description: "If there are pending approvals to start",
+      table: {
+        category: "Configuration",
+      },
+    },
     onStartSignature: {
       action: "startSignature",
       description: "Function to start the signature process",
@@ -112,6 +120,13 @@ export default {
     onClosePetition: {
       action: "closePetition",
       description: "Function to close the petition",
+      table: {
+        category: "Actions",
+      },
+    },
+    onCancelSignature: {
+      action: "cancelSignature",
+      description: "Function to cancel the signature process",
       table: {
         category: "Actions",
       },
@@ -199,6 +214,18 @@ export const completedPendingApprovals: Story = {
     signatureStatus: "NOT_STARTED",
     approvalsStatus: "PENDING",
     onCancelApprovals: () => alert("Cancel approvals"),
+  },
+};
+
+export const completedPendingApprovalsWithApprovalsToStart: Story = {
+  name: "COMPLETED - Pending Approvals with Approvals to Start",
+  args: {
+    petitionStatus: "COMPLETED",
+    signatureStatus: "NOT_STARTED",
+    approvalsStatus: "PENDING",
+    hasNotStartedApprovals: true,
+    onCancelApprovals: () => alert("Cancel approvals"),
+    onStartApprovals: () => alert("Start approvals"),
   },
 };
 

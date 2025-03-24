@@ -69,6 +69,7 @@ import { RecipientViewSidebarContextProvider } from "@parallel/components/recipi
 import { RecipientViewRefreshRepliesAlert } from "@parallel/components/recipient-view/alerts/RecipientViewRefreshRepliesAlert";
 import {
   PetitionPreview_PetitionBaseFragment,
+  PetitionPreview_cancelSignatureRequestDocument,
   PetitionPreview_completePetitionDocument,
   PetitionPreview_petitionDocument,
   PetitionPreview_updatePetitionDocument,
@@ -591,11 +592,25 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 
   const { handleCancelApprovals } = useCancelApprovalRequestFlow(petition.id);
 
-  const { handleStartApprovalFlow } = useStartApprovalRequestStep({ petition });
+  const { handleStartApprovalFlow, hasNotStartedApprovals } = useStartApprovalRequestStep({
+    petition,
+  });
 
   const { handleClosePetition } = useClosePetition({
     onRefetch: () => refetch(),
   });
+
+  const [cancelSignatureRequest] = useMutation(PetitionPreview_cancelSignatureRequestDocument);
+
+  const handleCancelSignature = useCallback(async () => {
+    if (petition.__typename === "Petition" && petition.currentSignatureRequest) {
+      await cancelSignatureRequest({
+        variables: {
+          petitionSignatureRequestId: petition.currentSignatureRequest.id,
+        },
+      });
+    }
+  }, [petition]);
 
   return (
     <RecipientViewSidebarContextProvider>
@@ -787,10 +802,12 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 onClosePetition={() => {
                   handleClosePetition(petition);
                 }}
+                onCancelSignature={handleCancelSignature}
                 petitionStatus={petition.status}
                 signatureStatus={signatureStatus}
                 approvalsStatus={petition.currentApprovalRequestStatus}
                 signatureAfterApprovals={petition.signatureConfig?.reviewAfterApproval}
+                hasNotStartedApprovals={hasNotStartedApprovals}
               />
             ) : null}
           </Box>
@@ -998,6 +1015,10 @@ const _fragments = {
           id
           status
         }
+        currentSignatureRequest {
+          id
+          status
+        }
         currentApprovalRequestStatus
         ...RecipientViewProgressBar_Petition
         ...useSendPetitionHandler_Petition
@@ -1133,6 +1154,19 @@ const _mutations = [
       }
     }
     ${_fragments.PetitionBase}
+  `,
+  gql`
+    mutation PetitionPreview_cancelSignatureRequest($petitionSignatureRequestId: GID!) {
+      cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
+        id
+        status
+        cancelReason
+        petition {
+          id
+          hasStartedProcess
+        }
+      }
+    }
   `,
 ];
 

@@ -5285,6 +5285,11 @@
     "context": "If you need to change something, cancel the approvals first."
   },
   {
+    "term": "component.petition-approvals-alert.start-approval",
+    "definition": "Iniciar aprobación",
+    "context": "Start approval"
+  },
+  {
     "term": "component.petition-approvals-card.approved-at",
     "definition": "Aprobado: {date}",
     "context": "Approved: {date}"
@@ -7718,6 +7723,11 @@
     "term": "component.petition-signature-request.signer-status.dates.signed-at",
     "definition": "Firma completada: {signedAt}",
     "context": "Signature completed: {signedAt}"
+  },
+  {
+    "term": "component.petition-signature-sent-alert.cancel-signature",
+    "definition": "Cancelar firma",
+    "context": "Cancel signature"
   },
   {
     "term": "component.petition-signature-sent-alert.signature-sent",

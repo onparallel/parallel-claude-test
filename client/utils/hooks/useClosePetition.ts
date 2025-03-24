@@ -165,7 +165,7 @@ export function useClosePetition({ onRefetch }: useClosePetitionProps) {
           onRefetch?.();
         }
         // Handle pending signature
-        else if (hasPendingSignature || petition.signatureConfig) {
+        else if (hasPendingSignature) {
           await showConfirmCancelOngoingSignature();
           if (hasPendingSignature) {
             await cancelSignatureRequest({
