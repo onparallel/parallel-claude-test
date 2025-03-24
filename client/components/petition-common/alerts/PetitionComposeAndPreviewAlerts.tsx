@@ -247,7 +247,7 @@ function PetitionCompletedAlert({
         </AlertDescription>
         <Box>
           {showStartApprovalsButton ? (
-            <Button onClick={onStartApprovals} backgroundColor="white">
+            <Button onClick={onStartApprovals} colorScheme="primary">
               <FormattedMessage
                 id="component.petition-completed-alert.start-approvals"
                 defaultMessage="Start approvals"
