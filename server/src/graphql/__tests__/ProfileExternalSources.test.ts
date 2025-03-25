@@ -1448,7 +1448,7 @@ describe("Profile External Sources", () => {
         expect(pick(data?.completeProfileFromExternalSource, ["id", "events"])).toEqual({
           id: toGlobalId("Profile", legalEntity.id),
           events: {
-            totalCount: 4,
+            totalCount: 3,
             items: [
               {
                 type: "PROFILE_UPDATED",
@@ -1476,17 +1476,6 @@ describe("Profile External Sources", () => {
                     legalEntityPTFsByAlias["p_city"].id,
                   ),
                   alias: "p_city",
-                },
-              },
-              {
-                type: "PROFILE_FIELD_VALUE_UPDATED",
-                data: {
-                  userId: toGlobalId("User", user.id),
-                  profileTypeFieldId: toGlobalId(
-                    "ProfileTypeField",
-                    legalEntityPTFsByAlias["p_tax_id"].id,
-                  ),
-                  alias: "p_tax_id",
                 },
               },
             ],

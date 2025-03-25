@@ -73,16 +73,13 @@ import {
   PetitionMessageContextService,
 } from "./PetitionMessageContextService";
 import { IPrinter, PRINTER, Printer } from "./Printer";
+import { PROFILE_EXPORT_SERVICE, ProfileExportService } from "./ProfileExportService";
 import {
   IProfileExternalSourcesService,
   PROFILE_EXTERNAL_SOURCE_SERVICE,
   ProfileExternalSourcesService,
 } from "./ProfileExternalSourcesService";
-import {
-  IProfileImportService,
-  PROFILE_IMPORT_SERVICE,
-  ProfileImportService,
-} from "./ProfileImportService";
+import { PROFILE_IMPORT_SERVICE, ProfileImportService } from "./ProfileImportService";
 import {
   IProfilesSetupService,
   PROFILES_SETUP_SERVICE,
@@ -139,5 +136,6 @@ export const servicesModule = new ContainerModule((bind) => {
     ProfileExternalSourcesService,
   );
   bind<PetitionFilesService>(PETITION_FILES_SERVICE).to(PetitionFilesService);
-  bind<IProfileImportService>(PROFILE_IMPORT_SERVICE).to(ProfileImportService);
+  bind<ProfileImportService>(PROFILE_IMPORT_SERVICE).to(ProfileImportService);
+  bind<ProfileExportService>(PROFILE_EXPORT_SERVICE).to(ProfileExportService);
 });

@@ -178,10 +178,7 @@ export const profiles = queryField((t) => {
           throw e;
         }
       }
-      const columnMap = {
-        createdAt: "created_at",
-        name: "name_en",
-      } as const;
+
       return ctx.profiles.getPaginatedProfileForOrg(
         ctx.user!.org_id,
         {
@@ -191,7 +188,7 @@ export const profiles = queryField((t) => {
           filter: filter as any,
           sortBy: sortBy?.map((value) => {
             const [field, order] = parseSortBy(value);
-            return { field: columnMap[field], order };
+            return { field, order };
           }),
         },
         profileTypeFieldsById,

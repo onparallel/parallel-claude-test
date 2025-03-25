@@ -394,7 +394,8 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
             },
           },
         ],
-        ctx.user!,
+        ctx.user!.org_id,
+        ctx.user!.id,
       );
 
       return search;

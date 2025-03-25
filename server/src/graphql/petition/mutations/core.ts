@@ -45,6 +45,8 @@ import {
 import {
   ProfileFieldExpiryUpdatedEvent,
   ProfileFieldFileAddedEvent,
+  ProfileFieldFileRemovedEvent,
+  ProfileFieldValueUpdatedEvent,
 } from "../../../db/events/ProfileEvent";
 import { defaultFieldProperties } from "../../../db/helpers/fieldOptions";
 import {
@@ -3754,15 +3756,16 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         ctx.user!.id,
       );
 
-      await ctx.profiles.createProfileUpdatedEvents(
+      const profileUpdatedEvents: (
+        | ProfileFieldValueUpdatedEvent<true>
+        | ProfileFieldFileAddedEvent<true>
+        | ProfileFieldFileRemovedEvent<true>
+        | ProfileFieldExpiryUpdatedEvent<true>
+      )[] = buildProfileUpdatedEventsData(
         profile!.id,
-        buildProfileUpdatedEventsData(
-          profile!.id,
-          updateProfileFieldValues,
-          currentValues,
-          previousValues,
-          ctx.user!,
-        ),
+        updateProfileFieldValues,
+        currentValues,
+        previousValues,
         ctx.user!,
       );
 
@@ -3771,21 +3774,24 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           deleteProfileFieldFileIds,
           ctx.user!.id,
         );
-        await ctx.profiles.createProfileUpdatedEvents(
-          profile!.id,
-          deletedProfileFiles.map((f) => ({
-            type: "PROFILE_FIELD_FILE_REMOVED",
-            profile_id: profile!.id,
-            org_id: ctx.user!.org_id,
-            data: {
-              user_id: ctx.user!.id,
-              profile_type_field_id: f.profile_type_field_id,
-              profile_field_file_id: f.id,
-              alias:
-                profileTypeFields.find((ptf) => ptf.id === f.profile_type_field_id)!.alias ?? null,
-            },
-          })),
-          ctx.user!,
+
+        profileUpdatedEvents.push(
+          ...deletedProfileFiles.map(
+            (f) =>
+              ({
+                type: "PROFILE_FIELD_FILE_REMOVED",
+                profile_id: profile!.id,
+                org_id: ctx.user!.org_id,
+                data: {
+                  user_id: ctx.user!.id,
+                  profile_type_field_id: f.profile_type_field_id,
+                  profile_field_file_id: f.id,
+                  alias:
+                    profileTypeFields.find((ptf) => ptf.id === f.profile_type_field_id)!.alias ??
+                    null,
+                },
+              }) satisfies ProfileFieldFileRemovedEvent<true>,
+          ),
         );
       }
 
@@ -3814,40 +3820,36 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
             ctx.user!.id,
           );
 
-          await ctx.profiles.createProfileUpdatedEvents(
-            profile!.id,
-            [
-              ...profileFieldFiles.map(
-                (pff) =>
-                  ({
+          profileUpdatedEvents.push(
+            ...profileFieldFiles.map(
+              (pff) =>
+                ({
+                  org_id: ctx.user!.org_id,
+                  profile_id: pff.profile_id,
+                  type: "PROFILE_FIELD_FILE_ADDED",
+                  data: {
+                    user_id: ctx.user!.id,
+                    profile_type_field_id: pff.profile_type_field_id,
+                    profile_field_file_id: pff.id,
+                    alias: profileTypeField?.alias ?? null,
+                  },
+                }) satisfies ProfileFieldFileAddedEvent<true>,
+            ),
+            ...(expiration?.expiryDate !== undefined
+              ? [
+                  {
                     org_id: ctx.user!.org_id,
-                    profile_id: pff.profile_id,
-                    type: "PROFILE_FIELD_FILE_ADDED",
+                    profile_id: profile!.id,
+                    type: "PROFILE_FIELD_EXPIRY_UPDATED",
                     data: {
                       user_id: ctx.user!.id,
-                      profile_type_field_id: pff.profile_type_field_id,
-                      profile_field_file_id: pff.id,
+                      profile_type_field_id: profileTypeField.id,
+                      expiry_date: expiration?.expiryDate ?? null,
                       alias: profileTypeField?.alias ?? null,
                     },
-                  }) satisfies ProfileFieldFileAddedEvent<true>,
-              ),
-              ...(expiration?.expiryDate !== undefined
-                ? [
-                    {
-                      org_id: ctx.user!.org_id,
-                      profile_id: profile!.id,
-                      type: "PROFILE_FIELD_EXPIRY_UPDATED",
-                      data: {
-                        user_id: ctx.user!.id,
-                        profile_type_field_id: profileTypeField.id,
-                        expiry_date: expiration?.expiryDate ?? null,
-                        alias: profileTypeField?.alias ?? null,
-                      },
-                    } satisfies ProfileFieldExpiryUpdatedEvent<true>,
-                  ]
-                : []),
-            ],
-            ctx.user!,
+                  } satisfies ProfileFieldExpiryUpdatedEvent<true>,
+                ]
+              : []),
           );
         }
       }
@@ -3993,6 +3995,15 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
             );
           }
         }
+      }
+
+      if (profileUpdatedEvents.length > 0) {
+        await ctx.profiles.createProfileUpdatedEvents(
+          profile!.id,
+          profileUpdatedEvents,
+          ctx.user!.org_id,
+          ctx.user!.id,
+        );
       }
 
       return await ctx.petitions.updatePetitionFieldReply(

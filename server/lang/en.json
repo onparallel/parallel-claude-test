@@ -1045,49 +1045,59 @@
     "context": "Follow the link below link to access."
   },
   {
-    "term": "profile-import.data-tab-name",
+    "term": "profiles-excel.data-tab-name",
     "definition": "Data",
     "context": "Data"
   },
   {
-    "term": "profile-import.field-with-expiry.header",
+    "term": "profiles-excel.field-with-expiry.header",
     "definition": "{name} expiry date",
     "context": "{name} expiry date"
   },
   {
-    "term": "profile-import.instructions-tab-name",
+    "term": "profiles-excel.instructions-tab-name",
     "definition": "Instructions",
     "context": "Instructions"
   },
   {
-    "term": "profile-import.instructions.header",
-    "definition": "Instructions",
-    "context": "Instructions"
-  },
-  {
-    "term": "profile-import.instructions.line-1",
-    "definition": "- Do not modify the content of the top two rows.",
-    "context": "- Do not modify the content of the top two rows."
-  },
-  {
-    "term": "profile-import.instructions.line-2",
-    "definition": "- Dates should be added as text (with leading ') and format yyyy-MM-dd. e.g. '2022-01-01",
-    "context": "- Dates should be added as text (with leading ') and format yyyy-MM-dd. e.g. '2022-01-01"
-  },
-  {
-    "term": "profile-import.instructions.line-3",
-    "definition": "- Phones should be added with country code prefix and no spaces. e.g. +1234567890",
-    "context": "- Phones should be added with country code prefix and no spaces. e.g. +1234567890"
-  },
-  {
-    "term": "profile-import.instructions.line-4",
+    "term": "profiles-excel.instructions.country-format",
     "definition": "- Countries should be added as ISO 3166-1 alpha-2 codes. e.g. US, ES, FR",
     "context": "- Countries should be added as ISO 3166-1 alpha-2 codes. e.g. US, ES, FR"
   },
   {
-    "term": "profile-import.model-file-name",
+    "term": "profiles-excel.instructions.date-format",
+    "definition": "- Dates should be added as text (with leading ') and format yyyy-MM-dd. e.g. '2022-01-01",
+    "context": "- Dates should be added as text (with leading ') and format yyyy-MM-dd. e.g. '2022-01-01"
+  },
+  {
+    "term": "profiles-excel.instructions.header",
+    "definition": "Instructions",
+    "context": "Instructions"
+  },
+  {
+    "term": "profiles-excel.instructions.phone-format",
+    "definition": "- Phones should be added with country code prefix and no spaces. e.g. +1234567890",
+    "context": "- Phones should be added with country code prefix and no spaces. e.g. +1234567890"
+  },
+  {
+    "term": "profiles-excel.instructions.profile-id-column",
+    "definition": "- Do not modify the contents of the first column.",
+    "context": "- Do not modify the contents of the first column."
+  },
+  {
+    "term": "profiles-excel.instructions.top-rows",
+    "definition": "- Do not modify the content of the top two rows.",
+    "context": "- Do not modify the content of the top two rows."
+  },
+  {
+    "term": "profiles-excel.model-file-name",
     "definition": "model",
     "context": "model"
+  },
+  {
+    "term": "profiles-excel.profile-id-header",
+    "definition": "ID",
+    "context": "ID"
   },
   {
     "term": "profiles-expiring-properties.showing-active-alerts-count",

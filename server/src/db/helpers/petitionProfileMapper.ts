@@ -105,24 +105,24 @@ export function mapPetitionFieldReplyToProfileFieldValue(
 }
 
 export function contentsAreEqual(
-  value: Pick<ProfileFieldValue, "content" | "type">,
-  reply: Pick<PetitionFieldReply, "content">,
+  a: Pick<ProfileFieldValue, "content" | "type">,
+  b: { content: any },
 ) {
-  if (value.type === "BACKGROUND_CHECK") {
+  if (a.type === "BACKGROUND_CHECK") {
     return (
-      value.content.query?.name === reply.content.query?.name &&
-      value.content.query?.date === reply.content.query?.date &&
-      value.content.query?.type === reply.content.query?.type &&
-      value.content.query?.country === reply.content.query?.country &&
-      value.content.entity?.id === reply.content.entity?.id
+      a.content?.query?.name === b.content?.query?.name &&
+      a.content?.query?.date === b.content?.query?.date &&
+      a.content?.query?.type === b.content?.query?.type &&
+      a.content?.query?.country === b.content?.query?.country &&
+      a.content?.entity?.id === b.content?.entity?.id
     );
-  } else if (value.type === "CHECKBOX") {
+  } else if (a.type === "CHECKBOX") {
     // contents are equal if both arrays contain exactly the same elements in any order
     return (
-      value.content.value.length === reply.content.value.length &&
-      value.content.value.every((v: string) => reply.content.value.includes(v))
+      a.content?.value.length === b.content?.value.length &&
+      a.content?.value.every((v: string) => b.content?.value.includes(v))
     );
   } else {
-    return value.content.value === reply.content.value;
+    return a.content?.value === b.content?.value;
   }
 }

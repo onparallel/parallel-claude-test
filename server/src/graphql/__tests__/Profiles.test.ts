@@ -79,7 +79,7 @@ describe("GraphQL/Profiles", () => {
     }
   }
 
-  async function updateProfileValue(profileId: number, fields: UpdateProfileFieldValueInput[]) {
+  async function updateProfileValue(profileId: string, fields: UpdateProfileFieldValueInput[]) {
     const { data, errors } = await testClient.execute(
       gql`
         mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
@@ -4340,12 +4340,14 @@ describe("GraphQL/Profiles", () => {
     });
 
     it("sends profile_field_value_updated event when updating select field options with null substitutions", async () => {
-      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
-        {
-          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
-          content: { value: "ES" },
-        },
-      ]);
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[1].id, 1);
+      await mocks.knex.from("profile_field_value").insert({
+        profile_id: profile.id,
+        profile_type_field_id: profileTypeField3.id,
+        content: { value: "ES" },
+        created_by_user_id: sessionUser.id,
+        type: "SELECT",
+      });
 
       const { errors } = await testClient.execute(
         gql`
@@ -4392,32 +4394,29 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
-          profileId: profile.id,
+          profileId: toGlobalId("Profile", profile.id),
         },
       );
 
       expect(queryErrors).toBeUndefined();
       expect(data?.profile).toEqual({
-        id: profile.id,
+        id: toGlobalId("Profile", profile.id),
         events: {
-          totalCount: 4,
-          items: [
-            { type: "PROFILE_UPDATED" },
-            { type: "PROFILE_FIELD_VALUE_UPDATED" },
-            { type: "PROFILE_FIELD_VALUE_UPDATED" },
-            { type: "PROFILE_CREATED" },
-          ],
+          totalCount: 2,
+          items: [{ type: "PROFILE_UPDATED" }, { type: "PROFILE_FIELD_VALUE_UPDATED" }],
         },
       });
     });
 
     it("sends profile_field_value_updated event when updating select field options with non-null substitutions", async () => {
-      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
-        {
-          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
-          content: { value: "ES" },
-        },
-      ]);
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[1].id, 1);
+      await mocks.knex.from("profile_field_value").insert({
+        profile_id: profile.id,
+        profile_type_field_id: profileTypeField3.id,
+        content: { value: "ES" },
+        created_by_user_id: sessionUser.id,
+        type: "SELECT",
+      });
 
       const { errors } = await testClient.execute(
         gql`
@@ -4467,21 +4466,16 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
-          profileId: profile.id,
+          profileId: toGlobalId("Profile", profile.id),
         },
       );
 
       expect(queryErrors).toBeUndefined();
       expect(data?.profile).toEqual({
-        id: profile.id,
+        id: toGlobalId("Profile", profile.id),
         events: {
-          totalCount: 4,
-          items: [
-            { type: "PROFILE_UPDATED" },
-            { type: "PROFILE_FIELD_VALUE_UPDATED" },
-            { type: "PROFILE_FIELD_VALUE_UPDATED" },
-            { type: "PROFILE_CREATED" },
-          ],
+          totalCount: 2,
+          items: [{ type: "PROFILE_UPDATED" }, { type: "PROFILE_FIELD_VALUE_UPDATED" }],
         },
       });
     });
@@ -5295,6 +5289,116 @@ describe("GraphQL/Profiles", () => {
         },
       });
     });
+
+    it("updates values in multiple profiles", async () => {
+      const profiles = await mocks.createRandomProfiles(organization.id, profileTypes[1].id, 3);
+      const values = await mocks.knex.from("profile_field_value").insert(
+        [
+          {
+            profile_id: profiles[0].id,
+            content: { value: "ES" },
+            profile_type_field_id: profileTypeField3.id,
+            type: "SELECT",
+            created_by_user_id: sessionUser.id,
+          },
+          {
+            profile_id: profiles[1].id,
+            content: { value: "ES" },
+            profile_type_field_id: profileTypeField3.id,
+            type: "SELECT",
+            created_by_user_id: sessionUser.id,
+          },
+          {
+            profile_id: profiles[2].id,
+            content: { value: "AR" },
+            profile_type_field_id: profileTypeField3.id,
+            type: "SELECT",
+            created_by_user_id: sessionUser.id,
+          },
+        ],
+        "*",
+      );
+
+      const { errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField3.id),
+          data: {
+            options: {
+              values: [
+                { value: "AR", label: { es: "Argentina", en: "Argentina" } },
+                { value: "FR", label: { es: "Francia", en: "France" } },
+              ],
+            },
+            substitutions: [{ old: "ES", new: "FR" }],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const profileEvents = await mocks.knex
+        .from("profile_event")
+        .whereIn("profile_id", [profiles[0].id, profiles[1].id, profiles[2].id])
+        .orderBy("profile_id", "asc")
+        .orderBy("created_at", "desc")
+        .orderBy("id", "desc")
+        .select(["profile_id", "type", "data"]);
+
+      expect(profileEvents).toEqual([
+        {
+          profile_id: profiles[0].id,
+          type: "PROFILE_UPDATED",
+          data: {
+            user_id: sessionUser.id,
+          },
+        },
+        {
+          profile_id: profiles[0].id,
+          type: "PROFILE_FIELD_VALUE_UPDATED",
+          data: {
+            user_id: sessionUser.id,
+            profile_type_field_id: profileTypeField3.id,
+            current_profile_field_value_id: expect.any(Number),
+            previous_profile_field_value_id: values[0].id,
+            alias: null,
+          },
+        },
+        {
+          profile_id: profiles[1].id,
+          type: "PROFILE_UPDATED",
+          data: {
+            user_id: sessionUser.id,
+          },
+        },
+        {
+          profile_id: profiles[1].id,
+          type: "PROFILE_FIELD_VALUE_UPDATED",
+          data: {
+            user_id: sessionUser.id,
+            profile_type_field_id: profileTypeField3.id,
+            current_profile_field_value_id: expect.any(Number),
+            previous_profile_field_value_id: values[1].id,
+            alias: null,
+          },
+        },
+      ]);
+    });
   });
 
   describe("updateProfileTypeFieldPositions", () => {
@@ -5672,6 +5776,184 @@ describe("GraphQL/Profiles", () => {
           },
           value: null,
         })),
+      });
+    });
+
+    it("does not remove current value or create events if the new value is exactly the same", async () => {
+      const [profile] = await mocks.createRandomProfiles(
+        organization.id,
+        profileTypes[0].id,
+        1,
+        () => ({
+          status: "OPEN",
+        }),
+      );
+
+      await mocks.knex.from("profile_field_value").insert({
+        profile_id: profile.id,
+        type: profileType0Fields[0].type,
+        profile_type_field_id: profileType0Fields[0].id,
+        content: { value: "John" },
+        created_by_user_id: sessionUser.id,
+      });
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileId: GID!
+            $fields: [UpdateProfileFieldValueInput!]!
+            $propertiesFilter: [ProfileFieldPropertyFilter!]!
+          ) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              properties(filter: $propertiesFilter) {
+                field {
+                  id
+                }
+                value {
+                  content
+                }
+              }
+              events(offset: 0, limit: 100) {
+                totalCount
+                items {
+                  type
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          propertiesFilter: [
+            { profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id) },
+          ],
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+              content: { value: "John" },
+            },
+          ],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileFieldValue).toEqual({
+        id: toGlobalId("Profile", profile.id),
+        properties: [
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+            },
+            value: {
+              content: { value: "John" },
+            },
+          },
+        ],
+        events: {
+          totalCount: 0,
+          items: [],
+        },
+      });
+
+      const dbValues = await mocks.knex.from("profile_field_value").where("profile_id", profile.id);
+
+      expect(dbValues).toHaveLength(1);
+      expect(dbValues[0]).toMatchObject({
+        deleted_at: null,
+        removed_at: null,
+        content: { value: "John" },
+      });
+    });
+
+    it("does not remove current value or create events if the new expiry date is exactly the same", async () => {
+      const [profile] = await mocks.createRandomProfiles(
+        organization.id,
+        profileTypes[0].id,
+        1,
+        () => ({
+          status: "OPEN",
+        }),
+      );
+
+      await mocks.knex.from("profile_field_value").insert({
+        profile_id: profile.id,
+        type: profileType0Fields[5].type,
+        profile_type_field_id: profileType0Fields[5].id,
+        content: { value: "YB5340186" },
+        expiry_date: "2030-01-01",
+        created_by_user_id: sessionUser.id,
+      });
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileId: GID!
+            $fields: [UpdateProfileFieldValueInput!]!
+            $propertiesFilter: [ProfileFieldPropertyFilter!]!
+          ) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              properties(filter: $propertiesFilter) {
+                field {
+                  id
+                }
+                value {
+                  content
+                  expiryDate
+                }
+              }
+              events(offset: 0, limit: 100) {
+                totalCount
+                items {
+                  type
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          propertiesFilter: [
+            { profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[5].id) },
+          ],
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[5].id),
+              expiryDate: "2030-01-01",
+            },
+          ],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileFieldValue).toEqual({
+        id: toGlobalId("Profile", profile.id),
+        properties: [
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[5].id),
+            },
+            value: {
+              content: { value: "YB5340186" },
+              expiryDate: "2030-01-01",
+            },
+          },
+        ],
+        events: {
+          totalCount: 0,
+          items: [],
+        },
+      });
+
+      const dbValues = await mocks.knex.from("profile_field_value").where("profile_id", profile.id);
+
+      expect(dbValues).toHaveLength(1);
+      expect(dbValues[0]).toMatchObject({
+        deleted_at: null,
+        removed_at: null,
+        content: { value: "YB5340186" },
+        expiry_date: "2030-01-01",
       });
     });
 

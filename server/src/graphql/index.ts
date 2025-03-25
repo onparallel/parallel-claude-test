@@ -1,3 +1,6 @@
+export * from "./contact/mutations";
+export * from "./contact/queries";
+export * from "./contact/types";
 export * from "./helpers/image";
 export * from "./helpers/Result";
 export * from "./helpers/scalars/DateTime";
@@ -5,12 +8,9 @@ export * from "./helpers/scalars/Duration";
 export * from "./helpers/scalars/JSON";
 export * from "./helpers/scalars/LocalizableUserText";
 export * from "./helpers/scalars/Upload";
+export * from "./helpers/sortBy";
 export * from "./helpers/Success";
 export * from "./helpers/timestamps";
-
-export * from "./contact/mutations";
-export * from "./contact/queries";
-export * from "./contact/types";
 
 export * from "./organization/mutations";
 export * from "./organization/queries";

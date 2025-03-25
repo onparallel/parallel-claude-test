@@ -25,7 +25,7 @@ import {
   zip,
 } from "remeda";
 import { Task } from "../../db/repositories/TaskRepository";
-import { CellError, InvalidDataError, UnknownIdError } from "../../services/ProfileImportService";
+import { CellError, InvalidDataError, UnknownIdError } from "../../services/ProfileExcelService";
 import { toBytes } from "../../util/fileSize";
 import { toGlobalId } from "../../util/globalId";
 import { withError } from "../../util/promises/withError";
@@ -43,6 +43,7 @@ import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validBooleanValue } from "../helpers/validators/validBooleanValue";
 import { validFileUploadInput } from "../helpers/validators/validFileUploadInput";
+import { validSortByInput } from "../helpers/validators/validSortByField";
 import { validExportFileRenamePattern } from "../helpers/validators/validTextWithPlaceholders";
 import { validUrl } from "../helpers/validators/validUrl";
 import {
@@ -60,7 +61,10 @@ import {
   userHasFeatureFlag,
 } from "../petition/authorizers";
 import { userHasAccessToUsers } from "../petition/mutations/authorizers";
-import { userHasAccessToProfileType } from "../profile/authorizers";
+import {
+  profileTypeFieldBelongsToProfileType,
+  userHasAccessToProfileType,
+} from "../profile/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
 import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
@@ -295,6 +299,7 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
       "DOW_JONES_PROFILE_DOWNLOAD",
       "TEMPLATE_REPLIES_CSV_EXPORT",
       "BACKGROUND_CHECK_PROFILE_PDF",
+      "PROFILES_EXCEL_EXPORT",
     ]),
   ),
   args: {
@@ -309,7 +314,8 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
       | Task<"TEMPLATE_REPLIES_REPORT">
       | Task<"DOW_JONES_PROFILE_DOWNLOAD">
       | Task<"TEMPLATE_REPLIES_CSV_EXPORT">
-      | Task<"BACKGROUND_CHECK_PROFILE_PDF">;
+      | Task<"BACKGROUND_CHECK_PROFILE_PDF">
+      | Task<"PROFILES_EXCEL_EXPORT">;
 
     const file = isNonNullish(task.output)
       ? await ctx.files.loadTemporaryFile(task.output.temporary_file_id)
@@ -896,11 +902,7 @@ export const createProfilesExcelImportTask = mutationField("createProfilesExcelI
 
     try {
       // catch any parsing error before starting the task
-      await ctx.profileImport.parseAndValidateExcelData(
-        args.profileTypeId,
-        importData,
-        ctx.user!.id,
-      );
+      await ctx.profileImport.parseExcelData(args.profileTypeId, importData, ctx.user!.id, true);
 
       // all good, create a temporary file with data and start the task
       const path = random(16);
@@ -950,5 +952,45 @@ export const createProfilesExcelImportTask = mutationField("createProfilesExcelI
       }
       throw error;
     }
+  },
+});
+
+export const createProfilesExcelExportTask = mutationField("createProfilesExcelExportTask", {
+  description: "Creates a task for exporting profiles with specific filters",
+  type: "Task",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfileType("profileTypeId"),
+    profileTypeFieldBelongsToProfileType("profileTypeFieldIds", "profileTypeId"),
+  ),
+  args: {
+    profileTypeId: nonNull(globalIdArg("ProfileType")),
+    profileTypeFieldIds: nonNull(list(nonNull(globalIdArg("ProfileTypeField")))),
+    search: stringArg(),
+    filter: "ProfileFilter",
+    sortBy: list(nonNull("SortByInput")),
+    locale: nonNull("UserLocale"),
+  },
+  validateArgs: validSortByInput("sortBy", ["name", "createdAt"]),
+  resolve: async (_, args, ctx) => {
+    return await ctx.tasks.createTask(
+      {
+        name: "PROFILES_EXCEL_EXPORT",
+        input: {
+          profile_type_id: args.profileTypeId,
+          profile_type_field_ids: args.profileTypeFieldIds,
+          search: args.search ?? null,
+          filter: (args.filter as any) ?? null,
+          sortBy:
+            args.sortBy?.map((s) => ({
+              field: s.field as "name" | "createdAt",
+              direction: s.direction,
+            })) ?? null,
+          locale: args.locale,
+        },
+        user_id: ctx.user!.id,
+      },
+      `User:${ctx.user!.id}`,
+    );
   },
 });

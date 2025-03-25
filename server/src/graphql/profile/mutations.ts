@@ -31,7 +31,6 @@ import {
   FileUpload,
   Profile,
   ProfileFieldFile,
-  ProfileFieldValue,
   ProfileTypeField,
   ProfileTypeProcess,
 } from "../../db/__types";
@@ -561,15 +560,22 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
               ctx.user!.id,
             );
 
-          const currentByPtfId = indexBy(currentValues, (v) => v.profile_type_field_id);
-          const previousByPtfId = indexBy(previousValues, (v) => v.profile_type_field_id);
-
-          if (previousValues.length > 0) {
+          const previousByProfileId = groupBy(previousValues, (v) => v.profile_id);
+          for (const [_profileId, previous] of Object.entries(previousByProfileId)) {
+            const profileId = parseInt(_profileId);
             await ctx.profiles.createProfileUpdatedEvents(
-              previousValues[0].profile_id,
-              previousValues.map((f) => {
-                const current = currentByPtfId[f.profile_type_field_id] as ProfileFieldValue;
-                const previous = previousByPtfId[f.profile_type_field_id] as ProfileFieldValue;
+              profileId,
+              previous.map((f) => {
+                const current = currentValues.find(
+                  (v) =>
+                    v.profile_id === profileId &&
+                    v.profile_type_field_id === f.profile_type_field_id,
+                );
+                const previous = previousValues.find(
+                  (v) =>
+                    v.profile_id === profileId &&
+                    v.profile_type_field_id === f.profile_type_field_id,
+                );
 
                 return {
                   org_id: ctx.user!.org_id,
@@ -587,7 +593,8 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
                   },
                 };
               }),
-              ctx.user!,
+              ctx.user!.org_id,
+              ctx.user!.id,
             );
           }
         }
@@ -655,7 +662,8 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
                     user_id: ctx.user!.id,
                   },
                 })),
-                ctx.user!,
+                ctx.user!.org_id,
+                ctx.user!.id,
                 t,
               );
             }
@@ -988,7 +996,8 @@ export const createProfile = mutationField("createProfile", {
       await ctx.profiles.createProfileUpdatedEvents(
         profile.id,
         buildProfileUpdatedEventsData(profile.id, fields, currentValues, [], ctx.user!),
-        ctx.user!,
+        ctx.user!.org_id,
+        ctx.user!.id,
       );
 
       return updatedProfile!;
@@ -1233,7 +1242,8 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
         previousValues,
         ctx.user!,
       ),
-      ctx.user!,
+      ctx.user!.org_id,
+      ctx.user!.id,
     );
 
     return updatedProfile!;
@@ -1340,7 +1350,8 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
               ]
             : []),
         ],
-        ctx.user!,
+        ctx.user!.org_id,
+        ctx.user!.id,
       );
     } else {
       // no new files, update expiryDate on all uploaded files
@@ -1363,7 +1374,8 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
             alias: profileTypeField?.alias ?? null,
           },
         },
-        ctx.user!,
+        ctx.user!.org_id,
+        ctx.user!.id,
       );
     }
 
@@ -1478,7 +1490,8 @@ export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
               alias: profileTypeField?.alias ?? null,
             },
           })),
-          ctx.user!,
+          ctx.user!.org_id,
+          ctx.user!.id,
         );
       }
 
@@ -1572,7 +1585,8 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
             ]
           : []),
       ],
-      ctx.user!,
+      ctx.user!.org_id,
+      ctx.user!.id,
     );
 
     return files;
@@ -1639,7 +1653,8 @@ export const copyBackgroundCheckReplyToProfileFieldValue = mutationField(
             },
           },
         ],
-        ctx.user!,
+        ctx.user!.org_id,
+        ctx.user!.id,
       );
 
       return (await ctx.profiles.loadProfileFieldValue({ profileId, profileTypeFieldId }))!;
@@ -2468,7 +2483,8 @@ export const completeProfileFromExternalSource = mutationField(
             ctx.user!,
             entity.integration_id,
           ),
-          ctx.user!,
+          ctx.user!.org_id,
+          ctx.user!.id,
         );
 
         return updatedProfile!;
@@ -2679,10 +2695,15 @@ export const profileImportExcelModelDownloadLink = mutationField(
       locale: nonNull("UserLocale"),
     },
     resolve: async (_, { profileTypeId, locale }, ctx) => {
-      return await ctx.profileImport.generateProfileImportExcelModelDownloadUrl(
-        profileTypeId,
-        locale,
-        ctx.user!,
+      const { stream, filename, contentType } =
+        await ctx.profileImport.generateProfileImportExcelModel(profileTypeId, locale, ctx.user!);
+
+      const path = random(16);
+      await ctx.storage.temporaryFiles.uploadFile(path, contentType, stream);
+      return await ctx.storage.temporaryFiles.getSignedDownloadEndpoint(
+        path,
+        filename,
+        "attachment",
       );
     },
   },

@@ -75,11 +75,12 @@ import {
   PETITION_MESSAGE_CONTEXT_SERVICE,
 } from "./services/PetitionMessageContextService";
 import { IPrinter, PRINTER } from "./services/Printer";
+import { PROFILE_EXPORT_SERVICE, ProfileExportService } from "./services/ProfileExportService";
 import {
   IProfileExternalSourcesService,
   PROFILE_EXTERNAL_SOURCE_SERVICE,
 } from "./services/ProfileExternalSourcesService";
-import { IProfileImportService, PROFILE_IMPORT_SERVICE } from "./services/ProfileImportService";
+import { PROFILE_IMPORT_SERVICE, ProfileImportService } from "./services/ProfileImportService";
 import { IProfilesSetupService, PROFILES_SETUP_SERVICE } from "./services/ProfilesSetupService";
 import { IQueuesService, QUEUES_SERVICE } from "./services/QueuesService";
 import { IRedis, REDIS } from "./services/Redis";
@@ -125,8 +126,7 @@ export class ApiContext {
     @inject(BACKGROUND_CHECK_SERVICE) public readonly backgroundCheck: IBackgroundCheckService,
     @inject(EVENT_SUBSCRIPTION_SERVICE)
     public readonly eventSubscription: IEventSubscriptionService,
-    @inject(PROFILE_IMPORT_SERVICE) public readonly profileImport: IProfileImportService,
-
+    @inject(PROFILE_IMPORT_SERVICE) public readonly profileImport: ProfileImportService,
     // Setup services
     @inject(ACCOUNT_SETUP_SERVICE) public readonly accountSetup: IAccountSetupService,
     @inject(INTEGRATIONS_SETUP_SERVICE)
@@ -196,7 +196,8 @@ export class WorkerContext {
     @inject(DOCUMENT_PROCESSING_SERVICE)
     public readonly documentProcessing: IDocumentProcessingService,
     @inject(PETITION_FILES_SERVICE) public readonly petitionFiles: PetitionFilesService,
-    @inject(PROFILE_IMPORT_SERVICE) public readonly profileImport: IProfileImportService,
+    @inject(PROFILE_IMPORT_SERVICE) public readonly profileImport: ProfileImportService,
+    @inject(PROFILE_EXPORT_SERVICE) public readonly profileExport: ProfileExportService,
     @inject(IMANAGE_FILE_EXPORT_INTEGRATION) public readonly iManageExport: IFileExportIntegration,
 
     // Repositories

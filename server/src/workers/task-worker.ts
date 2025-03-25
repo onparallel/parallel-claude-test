@@ -18,6 +18,7 @@ import { PetitionSharingRunner } from "./tasks/PetitionSharingRunner";
 import { PetitionSummaryRunner } from "./tasks/PetitionSummaryRunner";
 import { PrintPdfRunner } from "./tasks/PrintPdfRunner";
 import { ProfileNamePatternUpdatedRunner } from "./tasks/ProfileNamePatternUpdatedRunner";
+import { ProfilesExcelExportRunner } from "./tasks/ProfilesExcelExportRunner";
 import { ProfilesExcelImportRunner } from "./tasks/ProfilesExcelImportRunner";
 import { TemplateRepliesCsvExportRunner } from "./tasks/TemplateRepliesCsvExportRunner";
 import { TemplateRepliesReportRunner } from "./tasks/TemplateRepliesReportRunner";
@@ -43,6 +44,7 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   FILE_EXPORT: FileExportRunner,
   CLOSE_PETITIONS: ClosePetitionsRunner,
   PROFILES_EXCEL_IMPORT: ProfilesExcelImportRunner,
+  PROFILES_EXCEL_EXPORT: ProfilesExcelExportRunner,
   DASHBOARD_REFRESH: DashboardRefreshRunner,
 };
 

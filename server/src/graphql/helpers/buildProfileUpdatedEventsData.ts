@@ -4,6 +4,7 @@ import {
   ProfileFieldExpiryUpdatedEvent,
   ProfileFieldValueUpdatedEvent,
 } from "../../db/events/ProfileEvent";
+import { contentsAreEqual } from "../../db/helpers/petitionProfileMapper";
 
 export function buildProfileUpdatedEventsData(
   profileId: number,
@@ -19,11 +20,14 @@ export function buildProfileUpdatedEventsData(
   return fields.flatMap((f) => {
     const current = currentByPtfId[f.profileTypeFieldId] as ProfileFieldValue | undefined;
     const previous = previousByPtfId[f.profileTypeFieldId] as ProfileFieldValue | undefined;
-    const expiryChanged =
-      f.expiryDate !== undefined &&
-      (previous?.expiry_date?.valueOf() ?? null) !== (f.expiryDate?.valueOf() ?? null);
+    const expiryChanged = (current?.expiry_date ?? null) !== (previous?.expiry_date ?? null);
+
     return [
-      ...(isNonNullish(current) || isNonNullish(previous)
+      ...((isNonNullish(current) || isNonNullish(previous)) &&
+      !contentsAreEqual(
+        { type: current?.type ?? previous!.type, content: current?.content },
+        { content: previous?.content },
+      )
         ? [
             {
               org_id: user.org_id,

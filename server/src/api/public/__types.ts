@@ -1159,6 +1159,8 @@ export type Mutation = {
   createProfileTypeField: ProfileTypeField;
   /** Creates and associates a key process on a profile type */
   createProfileTypeProcess: ProfileTypeProcess;
+  /** Creates a task for exporting profiles with specific filters */
+  createProfilesExcelExportTask: Task;
   /** Creates a task for importing profiles from an excel file */
   createProfilesExcelImportTask: Task;
   createProfilesNumberDashboardModule: Dashboard;
@@ -2015,6 +2017,15 @@ export type MutationcreateProfileTypeProcessArgs = {
   processName: Scalars["LocalizableUserText"]["input"];
   profileTypeId: Scalars["GID"]["input"];
   templateIds: Array<Scalars["GID"]["input"]>;
+};
+
+export type MutationcreateProfilesExcelExportTaskArgs = {
+  filter?: InputMaybe<ProfileFilter>;
+  locale: UserLocale;
+  profileTypeFieldIds: Array<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+  search?: InputMaybe<Scalars["String"]["input"]>;
+  sortBy?: InputMaybe<Array<SortByInput>>;
 };
 
 export type MutationcreateProfilesExcelImportTaskArgs = {
@@ -3377,6 +3388,7 @@ export type Petition = PetitionBase & {
   completingMessageSubject: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
+  currentApprovalRequestStatus: PetitionApprovalRequestStatus;
   currentApprovalRequestSteps: Maybe<Array<PetitionApprovalRequestStep>>;
   /** The current signature request. */
   currentSignatureRequest: Maybe<PetitionSignatureRequest>;
@@ -3540,6 +3552,14 @@ export type PetitionAnonymizedEvent = PetitionEvent & {
   petition: Maybe<PetitionBaseMini>;
   type: PetitionEventType;
 };
+
+/** The status of the petition approval request. */
+export type PetitionApprovalRequestStatus =
+  | "APPROVED"
+  | "NOT_STARTED"
+  | "NO_APPROVAL"
+  | "PENDING"
+  | "REJECTED";
 
 export type PetitionApprovalRequestStep = {
   approvalType: PetitionApprovalRequestStepApprovalType;
@@ -5542,6 +5562,7 @@ export type PublicPetition = Timestamps & {
   completingMessageSubject: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
+  currentApprovalRequestStatus: PetitionApprovalRequestStatus;
   customLists: Array<PetitionCustomList>;
   /** The deadline of the petition. */
   deadline: Maybe<Scalars["DateTime"]["output"]>;
@@ -5739,6 +5760,7 @@ export type PublicPetitionMessage = {
 };
 
 export type PublicPetitionSignatureRequest = {
+  cancelReason: Maybe<Scalars["String"]["output"]>;
   id: Scalars["GID"]["output"];
   signerStatus: Array<PetitionSignatureRequestSignerStatus>;
   /** The status of the petition signature. */
@@ -6054,6 +6076,7 @@ export type QuerypetitionsArgs = {
   excludePublicTemplates?: InputMaybe<Scalars["Boolean"]["input"]>;
   filters?: InputMaybe<PetitionFilter>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
+  minEffectivePermission?: InputMaybe<PetitionPermissionType>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   searchByNameOnly?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -6521,6 +6544,13 @@ export type SignatureStartedEvent = PetitionEvent & {
   type: PetitionEventType;
 };
 
+export type SortByDirection = "ASC" | "DESC";
+
+export type SortByInput = {
+  direction: SortByDirection;
+  field: Scalars["String"]["input"];
+};
+
 export type StandardListDefinition = {
   id: Scalars["GID"]["output"];
   listName: Scalars["String"]["output"];
@@ -6591,6 +6621,7 @@ export type TaskName =
   | "PETITION_SHARING"
   | "PETITION_SUMMARY"
   | "PRINT_PDF"
+  | "PROFILES_EXCEL_EXPORT"
   | "PROFILES_EXCEL_IMPORT"
   | "PROFILE_NAME_PATTERN_UPDATED"
   | "TEMPLATES_OVERVIEW_REPORT"

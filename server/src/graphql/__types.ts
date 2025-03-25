@@ -439,6 +439,11 @@ export interface NexusGenInputs {
     isPreset?: boolean | null; // Boolean
     lastName?: string | null; // String
   };
+  SortByInput: {
+    // input type
+    direction: NexusGenEnums["SortByDirection"]; // SortByDirection!
+    field: string; // String!
+  };
   UpdateContactInput: {
     // input type
     firstName?: string | null; // String
@@ -757,6 +762,7 @@ export interface NexusGenEnums {
   SignatureConfigSigningMode: "PARALLEL" | "SEQUENTIAL";
   SignatureOrgIntegrationEnvironment: "DEMO" | "PRODUCTION";
   SignatureOrgIntegrationProvider: "DOCUSIGN" | "SIGNATURIT";
+  SortByDirection: "ASC" | "DESC";
   StandardListDefinitionListType: db.StandardListDefinitionListType;
   Success: "SUCCESS";
   TaskName: db.TaskName;
@@ -2453,6 +2459,7 @@ export interface NexusGenFieldTypes {
     createProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     createProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     createProfileTypeProcess: NexusGenRootTypes["ProfileTypeProcess"]; // ProfileTypeProcess!
+    createProfilesExcelExportTask: NexusGenRootTypes["Task"]; // Task!
     createProfilesExcelImportTask: NexusGenRootTypes["Task"]; // Task!
     createProfilesNumberDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
     createProfilesPieChartDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
@@ -5468,6 +5475,7 @@ export interface NexusGenFieldTypeNames {
     createProfileType: "ProfileType";
     createProfileTypeField: "ProfileTypeField";
     createProfileTypeProcess: "ProfileTypeProcess";
+    createProfilesExcelExportTask: "Task";
     createProfilesExcelImportTask: "Task";
     createProfilesNumberDashboardModule: "Dashboard";
     createProfilesPieChartDashboardModule: "Dashboard";
@@ -8294,6 +8302,15 @@ export interface NexusGenArgTypes {
       processName: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
       profileTypeId: NexusGenScalars["GID"]; // GID!
       templateIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    createProfilesExcelExportTask: {
+      // args
+      filter?: NexusGenInputs["ProfileFilter"] | null; // ProfileFilter
+      locale: NexusGenEnums["UserLocale"]; // UserLocale!
+      profileTypeFieldIds: NexusGenScalars["GID"][]; // [GID!]!
+      profileTypeId: NexusGenScalars["GID"]; // GID!
+      search?: string | null; // String
+      sortBy?: NexusGenInputs["SortByInput"][] | null; // [SortByInput!]
     };
     createProfilesExcelImportTask: {
       // args

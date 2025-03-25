@@ -67,6 +67,7 @@ import {
   Profiles_profilesDocument,
   Profiles_updateProfileListViewDocument,
   Profiles_userDocument,
+  UserLocale,
 } from "@parallel/graphql/__types";
 import {
   ProfileFieldValuesFilterCondition,
@@ -97,6 +98,7 @@ import {
   useQueryStateSlice,
   values,
 } from "@parallel/utils/queryState";
+import { useProfilesExcelExportTask } from "@parallel/utils/tasks/useProfilesExcelExportTask";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { usePinProfileType } from "@parallel/utils/usePinProfileType";
@@ -392,6 +394,8 @@ function Profiles() {
     } catch {}
   };
 
+  const [handleExportProfilesToExcelTask] = useProfilesExcelExportTask();
+
   const showColumnVisibilityDialog = useColumnVisibilityDialog();
   const handleEditColumns = async () => {
     try {
@@ -480,6 +484,27 @@ function Profiles() {
                     <FormattedMessage
                       id="page.profiles.import-from-excel"
                       defaultMessage="Import from Excel"
+                    />
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() =>
+                      handleExportProfilesToExcelTask({
+                        locale: intl.locale as UserLocale,
+                        profileTypeId: queryState.type!,
+                        profileTypeFieldIds:
+                          queryState.columns
+                            ?.filter((c) => c.startsWith("field_"))
+                            .map((c) => c.slice("field_".length)) ?? [],
+                        values: queryState.values,
+                        status: [queryState.status],
+                        search: queryState.search,
+                        sortBy: queryState.sort,
+                      })
+                    }
+                  >
+                    <FormattedMessage
+                      id="page.profiles.export-to-excel"
+                      defaultMessage="Export to Excel"
                     />
                   </MenuItem>
                 </MenuList>

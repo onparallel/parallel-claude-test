@@ -2,9 +2,10 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { Maybe, Replace } from "../../util/types";
-import { Task as DbTask, TaskName } from "../__types";
+import { Task as DbTask, TaskName, UserLocale } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
+import { ProfileFilter } from "./ProfileRepository";
 
 export type TaskInput<TName extends TaskName> = {
   /**
@@ -103,6 +104,14 @@ export type TaskInput<TName extends TaskName> = {
   PROFILES_EXCEL_IMPORT: {
     profile_type_id: number;
     temporary_file_id: number;
+  };
+  PROFILES_EXCEL_EXPORT: {
+    locale: UserLocale;
+    profile_type_id: number;
+    profile_type_field_ids: number[];
+    search: string | null;
+    filter: Pick<ProfileFilter, "values" | "status"> | null;
+    sortBy: { field: "name" | "createdAt"; direction: "ASC" | "DESC" }[] | null;
   };
   DASHBOARD_REFRESH: {
     dashboard_id: number;
@@ -256,6 +265,9 @@ export type TaskOutput<TName extends TaskName> = {
     success: boolean;
     count: number;
     error?: any;
+  };
+  PROFILES_EXCEL_EXPORT: {
+    temporary_file_id: number;
   };
   DASHBOARD_REFRESH: {
     success: boolean;

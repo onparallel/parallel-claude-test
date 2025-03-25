@@ -23,10 +23,11 @@ export class ProfilesExcelImportRunner extends TaskRunner<"PROFILES_EXCEL_IMPORT
 
     const importData = await importFromExcel(file);
 
-    const data = await this.ctx.profileImport.parseAndValidateExcelData(
+    const data = await this.ctx.profileImport.parseExcelData(
       profileTypeId,
       importData,
       user.id,
+      false, // no need to validate field contents again, we already did that in the mutation that triggered this task
     );
 
     await this.ctx.profileImport.importDataIntoProfiles(

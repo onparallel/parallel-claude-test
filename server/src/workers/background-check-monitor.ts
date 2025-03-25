@@ -67,6 +67,7 @@ createCronWorker("background-check-monitor", async (ctx) => {
               },
             },
           ],
+          profile.org_id,
           null,
         );
 
@@ -126,6 +127,7 @@ createCronWorker("background-check-monitor", async (ctx) => {
               },
             },
           ],
+          profile.org_id,
           null,
         );
 

@@ -929,7 +929,8 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
             },
           },
         ],
-        ctx.user!,
+        ctx.user!.org_id,
+        ctx.user!.id,
       );
     }
 

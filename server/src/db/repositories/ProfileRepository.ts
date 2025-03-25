@@ -1,4 +1,3 @@
-import { addSeconds, differenceInSeconds } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import pMap from "p-map";
@@ -67,9 +66,9 @@ import {
   ProfileFieldFileAddedEvent,
   ProfileFieldFileRemovedEvent,
   ProfileFieldValueUpdatedEvent,
-  ProfileUpdatedEvent,
 } from "../events/ProfileEvent";
 import { BaseRepository, PageOpts, Pagination } from "../helpers/BaseRepository";
+import { contentsAreEqual } from "../helpers/petitionProfileMapper";
 import {
   ProfileTypeFieldOptions,
   profileTypeFieldSelectValues,
@@ -90,8 +89,6 @@ export interface ProfileFilter {
 
 @injectable()
 export class ProfileRepository extends BaseRepository {
-  private readonly PROFILE_UPDATED_EVENT_DELAY_SECONDS = 15;
-
   constructor(
     @inject(KNEX) knex: Knex,
     @inject(QUEUES_SERVICE) private queues: IQueuesService,
@@ -674,10 +671,15 @@ export class ProfileRepository extends BaseRepository {
     opts: {
       search?: string | null;
       filter?: ProfileFilter | null;
-      sortBy?: SortBy<"created_at" | "name_en" | "name_es">[];
+      sortBy?: SortBy<"createdAt" | "name">[] | null;
     } & PageOpts,
     profileTypeFieldsById?: Record<number, ProfileTypeField>,
   ) {
+    const columnMap = {
+      createdAt: "created_at",
+      name: "name_en",
+    } as const;
+
     return this.getPagination<Profile>(
       this.knex
         .with(
@@ -733,12 +735,11 @@ export class ProfileRepository extends BaseRepository {
             q.orderByRaw(
               opts.sortBy
                 .map((s) => {
-                  if (s.field === "name_en") {
+                  const field = columnMap[s.field];
+                  if (field === "name_en") {
                     return `"localizable_name"->>'en' ${s.order}`;
-                  } else if (s.field === "name_es") {
-                    return `"localizable_name"->>'es' ${s.order}`;
                   } else {
-                    return `"${s.field}" ${s.order}`;
+                    return `"${field}" ${s.order}`;
                   }
                 })
                 .join(", "),
@@ -1046,8 +1047,7 @@ export class ProfileRepository extends BaseRepository {
     }
 
     return await this.withTransaction(async (t) => {
-      const profileType = (await this.loadProfileTypeForProfileId.raw(profileId, t))!;
-      const previousValues = await this.from("profile_field_value", t)
+      const profileValues = await this.from("profile_field_value", t)
         .whereNull("deleted_at")
         .whereNull("removed_at")
         .where("profile_id", profileId)
@@ -1055,16 +1055,44 @@ export class ProfileRepository extends BaseRepository {
           "profile_type_field_id",
           fields.map((f) => f.profileTypeFieldId),
         )
-        .update({ removed_at: this.now(), removed_by_user_id: userId })
-        .returning("*");
+        .select("*");
+
+      const profileValuesByPtfId = indexBy(profileValues, (v) => v.profile_type_field_id);
+
+      const removedFields = fields.filter((f) => f.content === null);
+      const updatedFields = fields.filter((f) => {
+        const currentValue = profileValuesByPtfId[f.profileTypeFieldId];
+        return (
+          f.content !== null &&
+          (!currentValue ||
+            (isNonNullish(f.content) && !contentsAreEqual(f as any, currentValue)) ||
+            f.expiryDate !== currentValue.expiry_date)
+        );
+      });
+
+      // mark as removed values with null content, or with distinct content or expiryDate from its current value
+      const removeOrUpdateFields = [...removedFields, ...updatedFields];
+
+      const previousValues =
+        removeOrUpdateFields.length > 0
+          ? await this.from("profile_field_value", t)
+              .whereNull("deleted_at")
+              .whereNull("removed_at")
+              .where("profile_id", profileId)
+              .whereIn(
+                "profile_type_field_id",
+                removeOrUpdateFields.map((f) => f.profileTypeFieldId),
+              )
+              .update({ removed_at: this.now(), removed_by_user_id: userId })
+              .returning("*")
+          : [];
       const previousByPtfId = indexBy(previousValues, (v) => v.profile_type_field_id);
-      // fields with undefined content will grab new content from previous values, as it may update only its expiry date
-      const fieldsWithContent = fields.filter((f) => f.content !== null);
+
       const currentValues =
-        fieldsWithContent.length > 0
+        updatedFields.length > 0
           ? await this.insert(
               "profile_field_value",
-              fieldsWithContent.map((f) => ({
+              updatedFields.map((f) => ({
                 profile_id: profileId,
                 profile_type_field_id: f.profileTypeFieldId,
                 type: f.type,
@@ -1083,8 +1111,9 @@ export class ProfileRepository extends BaseRepository {
           : [];
       this.loadProfileFieldValuesByProfileId.dataloader.clear(profileId);
 
+      const profileType = (await this.loadProfileTypeForProfileId.raw(profileId, t))!;
       const pattern = profileType.profile_name_pattern as (string | number)[];
-      if (fields.some((f) => pattern.includes(f.profileTypeFieldId))) {
+      if (removeOrUpdateFields.some((f) => pattern.includes(f.profileTypeFieldId))) {
         const profileValues = await this.raw<{
           profileId: number;
           values: {
@@ -1248,34 +1277,6 @@ export class ProfileRepository extends BaseRepository {
     return profileEvents;
   }
 
-  private async updateEvent(
-    eventId: number,
-    data: Partial<ProfileEvent>,
-    notifyAfter?: number,
-    t?: Knex.Transaction,
-  ) {
-    const [event] = await this.from("profile_event", t).where("id", eventId).update(data, "*");
-    await this.queues.enqueueEvents(event, "profile_event", notifyAfter, t);
-
-    return event;
-  }
-
-  private async createEventWithDelay(
-    events: MaybeArray<CreateProfileEvent>,
-    notifyAfter: number,
-    t?: Knex.Transaction,
-  ) {
-    const eventsArray = unMaybeArray(events);
-    if (eventsArray.length === 0) {
-      return [];
-    }
-
-    const profileEvents = await this.insert("profile_event", eventsArray, t);
-    await this.queues.enqueueEvents(profileEvents, "profile_event", notifyAfter, t);
-
-    return profileEvents;
-  }
-
   async createProfileUpdatedEvents(
     profileId: number,
     events: MaybeArray<
@@ -1284,58 +1285,29 @@ export class ProfileRepository extends BaseRepository {
       | ProfileFieldFileRemovedEvent<true>
       | ProfileFieldValueUpdatedEvent<true>
     >,
-    user: User | null,
+    orgId: number,
+    userId: number | null,
     t?: Knex.Transaction,
   ) {
-    if (unMaybeArray(events).length === 0) {
+    const eventsArray = unMaybeArray(events);
+    if (eventsArray.length === 0) {
       return;
     }
 
-    const profile = (await this.loadProfile(profileId))!;
-    const [profileUpdatedEvent] = await this.raw<ProfileUpdatedEvent | null>(
-      /* sql */ `
-       with cte as (
-          select *, rank() over (partition by profile_id order by created_at desc) _rank
-          from profile_event
-          where profile_id = ?
-        ) 
-      select * from cte where _rank = 1
-      and type = 'PROFILE_UPDATED'
-      `,
-      [profile.id],
-      t,
-    );
-
-    await this.createEvent(events, t);
-
-    if (
-      user &&
-      profileUpdatedEvent &&
-      profileUpdatedEvent.data.user_id === user.id &&
-      differenceInSeconds(new Date(), profileUpdatedEvent.created_at) <
-        this.PROFILE_UPDATED_EVENT_DELAY_SECONDS
-    ) {
-      await this.updateEvent(
-        profileUpdatedEvent.id,
-        // make sure this created_at is greater than inserted events (equal created_at will move this event to 2nd position in event list)
-        { created_at: addSeconds(new Date(), 1) },
-        this.PROFILE_UPDATED_EVENT_DELAY_SECONDS,
-        t,
-      );
-    } else {
-      await this.createEventWithDelay(
+    await this.createEvent(
+      [
+        ...eventsArray,
         {
           type: "PROFILE_UPDATED",
-          profile_id: profile.id,
-          org_id: profile.org_id,
+          profile_id: profileId,
+          org_id: orgId,
           data: {
-            user_id: user?.id ?? null,
+            user_id: userId,
           },
         },
-        this.PROFILE_UPDATED_EVENT_DELAY_SECONDS,
-        t,
-      );
-    }
+      ],
+      t,
+    );
   }
 
   getPaginatedExpirableProfileFieldProperties(

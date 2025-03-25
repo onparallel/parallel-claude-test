@@ -175,7 +175,10 @@ describe("Background Check - Profiles", () => {
       const profileEvents = await mocks.knex
         .from("profile_event")
         .where("profile_id", profile.id)
-        .orderBy("created_at", "desc")
+        .orderBy([
+          { column: "created_at", order: "desc" },
+          { column: "id", order: "desc" },
+        ])
         .select("*");
 
       expect(profileEvents.map(pick(["org_id", "profile_id", "type", "data"]))).toEqual([
@@ -360,7 +363,10 @@ describe("Background Check - Profiles", () => {
       const profileEvents = await mocks.knex
         .from("profile_event")
         .where("profile_id", profile.id)
-        .orderBy("created_at", "desc")
+        .orderBy([
+          { column: "created_at", order: "desc" },
+          { column: "id", order: "desc" },
+        ])
         .select("*");
 
       expect(profileEvents.map(pick(["org_id", "profile_id", "type", "data"]))).toEqual([
@@ -382,6 +388,14 @@ describe("Background Check - Profiles", () => {
             current_profile_field_value_id: pfvs[1].id,
             previous_profile_field_value_id: pfvs[0].id,
             alias: null,
+          },
+        },
+        {
+          org_id: organization.id,
+          profile_id: profile.id,
+          type: "PROFILE_UPDATED",
+          data: {
+            user_id: user.id,
           },
         },
         {
@@ -506,7 +520,10 @@ describe("Background Check - Profiles", () => {
       const profileEvents = await mocks.knex
         .from("profile_event")
         .where("profile_id", profile.id)
-        .orderBy("created_at", "desc")
+        .orderBy([
+          { column: "created_at", order: "desc" },
+          { column: "id", order: "desc" },
+        ])
         .select("*");
 
       expect(profileEvents).toHaveLength(2);
@@ -1013,7 +1030,10 @@ describe("Background Check - Profiles", () => {
       const profileEvents = await mocks.knex
         .from("profile_event")
         .where("profile_id", profile.id)
-        .orderBy("created_at", "desc")
+        .orderBy([
+          { column: "created_at", order: "desc" },
+          { column: "id", order: "desc" },
+        ])
         .select("*");
 
       expect(profileEvents).toHaveLength(2);
@@ -1165,7 +1185,10 @@ describe("Background Check - Profiles", () => {
       const profileEvents = await mocks.knex
         .from("profile_event")
         .where("profile_id", profile.id)
-        .orderBy("created_at", "desc")
+        .orderBy([
+          { column: "created_at", order: "desc" },
+          { column: "id", order: "desc" },
+        ])
         .select("*");
 
       expect(profileEvents).toHaveLength(2);

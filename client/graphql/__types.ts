@@ -1239,6 +1239,8 @@ export interface Mutation {
   createProfileTypeField: ProfileTypeField;
   /** Creates and associates a key process on a profile type */
   createProfileTypeProcess: ProfileTypeProcess;
+  /** Creates a task for exporting profiles with specific filters */
+  createProfilesExcelExportTask: Task;
   /** Creates a task for importing profiles from an excel file */
   createProfilesExcelImportTask: Task;
   createProfilesNumberDashboardModule: Dashboard;
@@ -2095,6 +2097,15 @@ export interface MutationcreateProfileTypeProcessArgs {
   processName: Scalars["LocalizableUserText"]["input"];
   profileTypeId: Scalars["GID"]["input"];
   templateIds: Array<Scalars["GID"]["input"]>;
+}
+
+export interface MutationcreateProfilesExcelExportTaskArgs {
+  filter?: InputMaybe<ProfileFilter>;
+  locale: UserLocale;
+  profileTypeFieldIds: Array<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+  search?: InputMaybe<Scalars["String"]["input"]>;
+  sortBy?: InputMaybe<Array<SortByInput>>;
 }
 
 export interface MutationcreateProfilesExcelImportTaskArgs {
@@ -6784,6 +6795,13 @@ export interface SignatureStartedEvent extends PetitionEvent {
   type: PetitionEventType;
 }
 
+export type SortByDirection = "ASC" | "DESC";
+
+export interface SortByInput {
+  direction: SortByDirection;
+  field: Scalars["String"]["input"];
+}
+
 export interface StandardListDefinition {
   __typename?: "StandardListDefinition";
   id: Scalars["GID"]["output"];
@@ -6860,6 +6878,7 @@ export type TaskName =
   | "PETITION_SHARING"
   | "PETITION_SUMMARY"
   | "PRINT_PDF"
+  | "PROFILES_EXCEL_EXPORT"
   | "PROFILES_EXCEL_IMPORT"
   | "PROFILE_NAME_PATTERN_UPDATED"
   | "TEMPLATES_OVERVIEW_REPORT"
@@ -61506,6 +61525,34 @@ export type usePrintPdfTask_taskQuery = {
   task: { __typename?: "Task"; id: string; status: TaskStatus; output?: any | null };
 };
 
+export type useProfilesExcelExportTask_createProfilesExcelExportTaskMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+  profileTypeFieldIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  locale: UserLocale;
+  values?: InputMaybe<ProfileFieldValuesFilter>;
+  status?: InputMaybe<Array<ProfileStatus> | ProfileStatus>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
+  sortBy?: InputMaybe<Array<SortByInput> | SortByInput>;
+}>;
+
+export type useProfilesExcelExportTask_createProfilesExcelExportTaskMutation = {
+  createProfilesExcelExportTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    progress?: number | null;
+    output?: any | null;
+  };
+};
+
+export type useProfilesExcelExportTask_getTaskResultFileMutationVariables = Exact<{
+  taskId: Scalars["GID"]["input"];
+}>;
+
+export type useProfilesExcelExportTask_getTaskResultFileMutation = {
+  getTaskResultFile: { __typename?: "TaskResultFile"; url: string; filename: string };
+};
+
 export type useProfilesExcelImportTask_createProfilesExcelImportTaskMutationVariables = Exact<{
   profileTypeId: Scalars["GID"]["input"];
   file: Scalars["Upload"]["input"];
@@ -82236,6 +82283,43 @@ export const usePrintPdfTask_taskDocument = gql`
     }
   }
 ` as unknown as DocumentNode<usePrintPdfTask_taskQuery, usePrintPdfTask_taskQueryVariables>;
+export const useProfilesExcelExportTask_createProfilesExcelExportTaskDocument = gql`
+  mutation useProfilesExcelExportTask_createProfilesExcelExportTask(
+    $profileTypeId: GID!
+    $profileTypeFieldIds: [GID!]!
+    $locale: UserLocale!
+    $values: ProfileFieldValuesFilter
+    $status: [ProfileStatus!]
+    $search: String
+    $sortBy: [SortByInput!]
+  ) {
+    createProfilesExcelExportTask(
+      profileTypeId: $profileTypeId
+      profileTypeFieldIds: $profileTypeFieldIds
+      locale: $locale
+      filter: { values: $values, status: $status }
+      search: $search
+      sortBy: $sortBy
+    ) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useProfilesExcelExportTask_createProfilesExcelExportTaskMutation,
+  useProfilesExcelExportTask_createProfilesExcelExportTaskMutationVariables
+>;
+export const useProfilesExcelExportTask_getTaskResultFileDocument = gql`
+  mutation useProfilesExcelExportTask_getTaskResultFile($taskId: GID!) {
+    getTaskResultFile(taskId: $taskId, preview: true) {
+      url
+      filename
+    }
+  }
+` as unknown as DocumentNode<
+  useProfilesExcelExportTask_getTaskResultFileMutation,
+  useProfilesExcelExportTask_getTaskResultFileMutationVariables
+>;
 export const useProfilesExcelImportTask_createProfilesExcelImportTaskDocument = gql`
   mutation useProfilesExcelImportTask_createProfilesExcelImportTask(
     $profileTypeId: GID!

@@ -1396,13 +1396,6 @@ describe("ProfileLinkedPetitionFields", () => {
                 userId: toGlobalId("User", user.id),
               },
             },
-            {
-              type: "PETITION_ASSOCIATED",
-              data: {
-                petitionId: toGlobalId("Petition", petition.id),
-                userId: toGlobalId("User", user.id),
-              },
-            },
             ...[
               "p_risk_assessment",
               "p_passport_document",
@@ -1451,6 +1444,13 @@ describe("ProfileLinkedPetitionFields", () => {
                 alias,
               },
             })),
+            {
+              type: "PETITION_ASSOCIATED",
+              data: {
+                petitionId: toGlobalId("Petition", petition.id),
+                userId: toGlobalId("User", user.id),
+              },
+            },
           ],
         },
       });
@@ -1863,13 +1863,6 @@ describe("ProfileLinkedPetitionFields", () => {
                 userId: toGlobalId("User", user.id),
               },
             },
-            {
-              type: "PETITION_ASSOCIATED",
-              data: {
-                petitionId: toGlobalId("Petition", petition.id),
-                userId: toGlobalId("User", user.id),
-              },
-            },
             ...[
               "p_poa_document",
               "p_risk_assessment",
@@ -1918,6 +1911,13 @@ describe("ProfileLinkedPetitionFields", () => {
                 alias,
               },
             })),
+            {
+              type: "PETITION_ASSOCIATED",
+              data: {
+                petitionId: toGlobalId("Petition", petition.id),
+                userId: toGlobalId("User", user.id),
+              },
+            },
           ],
         },
       });
@@ -2336,13 +2336,6 @@ describe("ProfileLinkedPetitionFields", () => {
                 userId: toGlobalId("User", user.id),
               },
             },
-            {
-              type: "PETITION_ASSOCIATED",
-              data: {
-                petitionId: toGlobalId("Petition", petition.id),
-                userId: toGlobalId("User", user.id),
-              },
-            },
             ...["p_amendments", "p_original_document"].map((alias) => ({
               type: "PROFILE_FIELD_FILE_ADDED",
               data: {
@@ -2408,6 +2401,13 @@ describe("ProfileLinkedPetitionFields", () => {
                 },
               }),
             ),
+            {
+              type: "PETITION_ASSOCIATED",
+              data: {
+                petitionId: toGlobalId("Petition", petition.id),
+                userId: toGlobalId("User", user.id),
+              },
+            },
           ],
         },
       });
@@ -2991,18 +2991,11 @@ describe("ProfileLinkedPetitionFields", () => {
         associatedProfile: {
           id: createProfileData!.createProfile.id,
           events: {
-            totalCount: 26,
+            totalCount: 27,
             items: [
               {
                 type: "PROFILE_UPDATED",
                 data: {
-                  userId: toGlobalId("User", user.id),
-                },
-              },
-              {
-                type: "PETITION_ASSOCIATED",
-                data: {
-                  petitionId: toGlobalId("Petition", petition.id),
                   userId: toGlobalId("User", user.id),
                 },
               },
@@ -3045,7 +3038,20 @@ describe("ProfileLinkedPetitionFields", () => {
                   alias,
                 },
               })),
+              {
+                type: "PETITION_ASSOCIATED",
+                data: {
+                  petitionId: toGlobalId("Petition", petition.id),
+                  userId: toGlobalId("User", user.id),
+                },
+              },
               // EVENTS FROM BEFORE
+              {
+                type: "PROFILE_UPDATED",
+                data: {
+                  userId: toGlobalId("User", user.id),
+                },
+              },
               {
                 type: "PROFILE_FIELD_VALUE_UPDATED",
                 data: {
@@ -3199,13 +3205,6 @@ describe("ProfileLinkedPetitionFields", () => {
           totalCount: 22,
           items: [
             {
-              type: "PETITION_ASSOCIATED",
-              data: {
-                petitionId: toGlobalId("Petition", petition.id),
-                userId: toGlobalId("User", user.id),
-              },
-            },
-            {
               type: "PROFILE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
@@ -3242,6 +3241,13 @@ describe("ProfileLinkedPetitionFields", () => {
                 alias,
               },
             })),
+            {
+              type: "PETITION_ASSOCIATED",
+              data: {
+                petitionId: toGlobalId("Petition", petition.id),
+                userId: toGlobalId("User", user.id),
+              },
+            },
             {
               type: "PROFILE_CREATED",
               data: {
@@ -4199,13 +4205,6 @@ describe("ProfileLinkedPetitionFields", () => {
                 userId: toGlobalId("User", user.id),
               },
             },
-            {
-              type: "PETITION_ASSOCIATED",
-              data: {
-                petitionId: toGlobalId("Petition", petition.id),
-                userId: toGlobalId("User", user.id),
-              },
-            },
             ...[
               "p_poa_document",
               "p_risk_assessment",
@@ -4248,6 +4247,13 @@ describe("ProfileLinkedPetitionFields", () => {
                 alias,
               },
             })),
+            {
+              type: "PETITION_ASSOCIATED",
+              data: {
+                petitionId: toGlobalId("Petition", petition.id),
+                userId: toGlobalId("User", user.id),
+              },
+            },
           ],
         },
       });
@@ -4754,13 +4760,6 @@ describe("ProfileLinkedPetitionFields", () => {
                 userId: toGlobalId("User", user.id),
               },
             },
-            {
-              type: "PETITION_ASSOCIATED",
-              data: {
-                petitionId: toGlobalId("Petition", petition.id),
-                userId: toGlobalId("User", user.id),
-              },
-            },
             ...["p_risk_assessment", "p_passport_document", "p_proof_of_address_document"].map(
               (alias) => ({
                 type: "PROFILE_FIELD_FILE_ADDED",
@@ -4804,6 +4803,13 @@ describe("ProfileLinkedPetitionFields", () => {
                 alias,
               },
             })),
+            {
+              type: "PETITION_ASSOCIATED",
+              data: {
+                petitionId: toGlobalId("Petition", petition.id),
+                userId: toGlobalId("User", user.id),
+              },
+            },
           ],
         },
       });
@@ -5266,18 +5272,11 @@ describe("ProfileLinkedPetitionFields", () => {
       ).toEqual({
         id: createProfileData.createProfile.id,
         events: {
-          totalCount: 28,
+          totalCount: 29,
           items: [
             {
               type: "PROFILE_UPDATED",
               data: {
-                userId: toGlobalId("User", user.id),
-              },
-            },
-            {
-              type: "PETITION_ASSOCIATED",
-              data: {
-                petitionId: toGlobalId("Petition", petition.id),
                 userId: toGlobalId("User", user.id),
               },
             },
@@ -5324,9 +5323,31 @@ describe("ProfileLinkedPetitionFields", () => {
               "p_entity_type",
               "p_trade_name",
               "p_entity_name",
-              "p_risk",
-              "p_entity_name",
             ].map((alias) => ({
+              type: "PROFILE_FIELD_VALUE_UPDATED",
+              data: {
+                userId: toGlobalId("User", user.id),
+                profileTypeFieldId: toGlobalId(
+                  "ProfileTypeField",
+                  legalEntityProfileTypeFields[alias].id,
+                ),
+                alias,
+              },
+            })),
+            {
+              type: "PETITION_ASSOCIATED",
+              data: {
+                petitionId: toGlobalId("Petition", petition.id),
+                userId: toGlobalId("User", user.id),
+              },
+            },
+            {
+              type: "PROFILE_UPDATED",
+              data: {
+                userId: toGlobalId("User", user.id),
+              },
+            },
+            ...["p_risk", "p_entity_name"].map((alias) => ({
               type: "PROFILE_FIELD_VALUE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
@@ -5791,29 +5812,6 @@ describe("ProfileLinkedPetitionFields", () => {
                   userId: toGlobalId("User", user.id),
                 },
               },
-              {
-                type: "PROFILE_RELATIONSHIP_CREATED",
-                data: {
-                  userId: toGlobalId("User", user.id),
-                  profileRelationshipId: expect.any(String),
-                  relationshipAlias: "p_legal_representative__legally_represented",
-                },
-              },
-              {
-                type: "PROFILE_RELATIONSHIP_CREATED",
-                data: {
-                  userId: toGlobalId("User", user.id),
-                  profileRelationshipId: expect.any(String),
-                  relationshipAlias: "p_director__managed_by",
-                },
-              },
-              {
-                type: "PETITION_ASSOCIATED",
-                data: {
-                  petitionId: toGlobalId("Petition", petition.id),
-                  userId: toGlobalId("User", user.id),
-                },
-              },
               ...[
                 "p_poa_document",
                 "p_risk_assessment",
@@ -5862,6 +5860,29 @@ describe("ProfileLinkedPetitionFields", () => {
                   alias,
                 },
               })),
+              {
+                type: "PROFILE_RELATIONSHIP_CREATED",
+                data: {
+                  userId: toGlobalId("User", user.id),
+                  profileRelationshipId: expect.any(String),
+                  relationshipAlias: "p_legal_representative__legally_represented",
+                },
+              },
+              {
+                type: "PROFILE_RELATIONSHIP_CREATED",
+                data: {
+                  userId: toGlobalId("User", user.id),
+                  profileRelationshipId: expect.any(String),
+                  relationshipAlias: "p_director__managed_by",
+                },
+              },
+              {
+                type: "PETITION_ASSOCIATED",
+                data: {
+                  petitionId: toGlobalId("Petition", petition.id),
+                  userId: toGlobalId("User", user.id),
+                },
+              },
             ],
           },
           relationships: expect.toIncludeSameMembers([
@@ -5999,13 +6020,6 @@ describe("ProfileLinkedPetitionFields", () => {
                   userId: toGlobalId("User", user.id),
                 },
               },
-              {
-                type: "PETITION_ASSOCIATED",
-                data: {
-                  petitionId: toGlobalId("Petition", petition.id),
-                  userId: toGlobalId("User", user.id),
-                },
-              },
               ...[
                 "p_poa_document",
                 "p_risk_assessment",
@@ -6054,6 +6068,13 @@ describe("ProfileLinkedPetitionFields", () => {
                   alias,
                 },
               })),
+              {
+                type: "PETITION_ASSOCIATED",
+                data: {
+                  petitionId: toGlobalId("Petition", petition.id),
+                  userId: toGlobalId("User", user.id),
+                },
+              },
             ],
           },
           relationships: [
