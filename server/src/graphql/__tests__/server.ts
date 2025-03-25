@@ -14,7 +14,7 @@ import { schema } from "./../../schema";
 export type TestClient = UnwrapPromise<ReturnType<typeof initServer>>;
 
 export const initServer = async () => {
-  const container = createTestContainer();
+  const container = await createTestContainer();
   const stack: any[] = [];
   const server = new ApolloServer<ApiContext>({ schema });
 

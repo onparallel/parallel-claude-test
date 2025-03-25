@@ -29,28 +29,51 @@ import {
   MockStorage,
 } from "./mocks";
 
-export function createTestContainer() {
+export async function createTestContainer() {
   const container = createContainer();
-  container.rebind<ILogger>(LOGGER).toConstantValue(console);
-  container.rebind<IRedis>(REDIS).to(MockRedis).inSingletonScope();
-  container.rebind<IAnalyticsService>(ANALYTICS).to(MockAnalyticsService).inSingletonScope();
-  container.rebind<IEmailsService>(EMAILS).to(MockEmailsService).inSingletonScope();
-  container.rebind<IQueuesService>(QUEUES_SERVICE).to(MockQueuesService).inSingletonScope();
-  container.rebind<IFetchService>(FETCH_SERVICE).to(MockFetchService).inSingletonScope();
-  container.rebind<IStorageService>(STORAGE_SERVICE).to(MockStorage).inSingletonScope();
+
+  await container.unbind(LOGGER);
+  container.bind<ILogger>(LOGGER).toConstantValue(console);
+
+  await container.unbind(REDIS);
+  container.bind<IRedis>(REDIS).to(MockRedis).inSingletonScope();
+
+  await container.unbind(ANALYTICS);
+  container.bind<IAnalyticsService>(ANALYTICS).to(MockAnalyticsService).inSingletonScope();
+
+  await container.unbind(EMAILS);
+  container.bind<IEmailsService>(EMAILS).to(MockEmailsService).inSingletonScope();
+
+  await container.unbind(QUEUES_SERVICE);
+  container.bind<IQueuesService>(QUEUES_SERVICE).to(MockQueuesService).inSingletonScope();
+
+  await container.unbind(FETCH_SERVICE);
+  container.bind<IFetchService>(FETCH_SERVICE).to(MockFetchService).inSingletonScope();
+
+  await container.unbind(STORAGE_SERVICE);
+  container.bind<IStorageService>(STORAGE_SERVICE).to(MockStorage).inSingletonScope();
+
+  await container.unbind(AI_ASSISTANT_SERVICE);
   container
-    .rebind<IAiAssistantService>(AI_ASSISTANT_SERVICE)
+    .bind<IAiAssistantService>(AI_ASSISTANT_SERVICE)
     .to(MockAiAssistantService)
     .inSingletonScope();
+
+  await container.unbind(BACKGROUND_CHECK_SERVICE);
   container
-    .rebind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE)
+    .bind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE)
     .to(MockBackgroundCheckService)
     .inSingletonScope();
 
-  container.rebind<IAuth>(AUTH).to(MockAuth);
-  container.rebind<IDowJonesClient>(DOW_JONES_CLIENT).to(MockDowJonesClient);
+  await container.unbind(AUTH);
+  container.bind<IAuth>(AUTH).to(MockAuth);
+
+  await container.unbind(DOW_JONES_CLIENT);
+  container.bind<IDowJonesClient>(DOW_JONES_CLIENT).to(MockDowJonesClient);
+
+  await container.unbind(EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION);
   container
-    .rebind<IProfileExternalSourceIntegration>(EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION)
+    .bind<IProfileExternalSourceIntegration>(EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION)
     .to(MockEInformaProfileExternalSourceIntegration);
 
   return container;

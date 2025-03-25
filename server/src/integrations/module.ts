@@ -35,40 +35,46 @@ import {
   ISignatureClient,
   SIGNATURE_CLIENT,
   SIGNATURE_CLIENT_FACTORY,
+  SignatureClientFactory,
 } from "./signature/SignatureClient";
 import { SignaturitClient } from "./signature/SignaturitClient";
 import { SignaturitIntegration } from "./signature/SignaturitIntegration";
 
-export const integrationsModule = new ContainerModule((bind) => {
-  bind<IAiCompletionClient<any>>(AI_COMPLETION_CLIENT)
+export const integrationsModule = new ContainerModule((options) => {
+  options
+    .bind<IAiCompletionClient<any>>(AI_COMPLETION_CLIENT)
     .to(AzureOpenAiClient)
-    .whenTargetNamed("AZURE_OPEN_AI");
+    .whenNamed("AZURE_OPEN_AI");
 
-  bind<AzureOpenAiIntegration>(AzureOpenAiIntegration).toSelf();
+  options.bind<AzureOpenAiIntegration>(AzureOpenAiIntegration).toSelf();
 
-  bind<SignaturitIntegration>(SignaturitIntegration).toSelf();
-  bind<DocusignIntegration>(DocusignIntegration).toSelf();
-  bind<ISignatureClient>(SIGNATURE_CLIENT).to(SignaturitClient).whenTargetNamed("SIGNATURIT");
-  bind<ISignatureClient>(SIGNATURE_CLIENT).to(DocusignClient).whenTargetNamed("DOCUSIGN");
-  bind(SIGNATURE_CLIENT_FACTORY).toFactory(getSignatureClientFactory);
+  options.bind<SignaturitIntegration>(SignaturitIntegration).toSelf();
+  options.bind<DocusignIntegration>(DocusignIntegration).toSelf();
+  options.bind<ISignatureClient>(SIGNATURE_CLIENT).to(SignaturitClient).whenNamed("SIGNATURIT");
+  options.bind<ISignatureClient>(SIGNATURE_CLIENT).to(DocusignClient).whenNamed("DOCUSIGN");
+  options
+    .bind<SignatureClientFactory>(SIGNATURE_CLIENT_FACTORY)
+    .toFactory(getSignatureClientFactory);
 
-  bind<IDowJonesClient>(DOW_JONES_CLIENT).to(DowJonesClient);
-  bind<DowJonesIntegration>(DowJonesIntegration).toSelf();
+  options.bind<IDowJonesClient>(DOW_JONES_CLIENT).to(DowJonesClient);
+  options.bind<DowJonesIntegration>(DowJonesIntegration).toSelf();
 
-  bind<IIdVerificationIntegration>(BANKFLIP_ID_VERIFICATION_INTEGRATION).to(
-    BankflipIdVerificationIntegration,
-  );
+  options
+    .bind<IIdVerificationIntegration>(BANKFLIP_ID_VERIFICATION_INTEGRATION)
+    .to(BankflipIdVerificationIntegration);
 
-  bind<IDocumentProcessingIntegration>(BANKFLIP_DOCUMENT_PROCESSING_INTEGRATION).to(
-    BankflipDocumentProcessingIntegration,
-  );
+  options
+    .bind<IDocumentProcessingIntegration>(BANKFLIP_DOCUMENT_PROCESSING_INTEGRATION)
+    .to(BankflipDocumentProcessingIntegration);
 
-  bind<IProfileExternalSourceIntegration>(EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION).to(
-    EInformaProfileExternalSourceIntegration,
-  );
-  bind<IProfileExternalSourceIntegration>(COMPANIES_HOUSE_PROFILE_EXTERNAL_SOURCE_INTEGRATION).to(
-    CompaniesHouseProfileExternalSourceIntegration,
-  );
+  options
+    .bind<IProfileExternalSourceIntegration>(EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION)
+    .to(EInformaProfileExternalSourceIntegration);
+  options
+    .bind<IProfileExternalSourceIntegration>(COMPANIES_HOUSE_PROFILE_EXTERNAL_SOURCE_INTEGRATION)
+    .to(CompaniesHouseProfileExternalSourceIntegration);
 
-  bind<IFileExportIntegration>(IMANAGE_FILE_EXPORT_INTEGRATION).to(IManageFileExportIntegration);
+  options
+    .bind<IFileExportIntegration>(IMANAGE_FILE_EXPORT_INTEGRATION)
+    .to(IManageFileExportIntegration);
 });

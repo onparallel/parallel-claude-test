@@ -17,7 +17,7 @@ import {
 } from "../__types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { SortBy } from "../helpers/utils";
-import { KNEX } from "../knex";
+import { KNEX, KNEX_READ_ONLY } from "../knex";
 
 @injectable()
 export class ContactRepository extends BaseRepository {
@@ -432,5 +432,12 @@ export class ContactRepository extends BaseRepository {
         first_name: "",
         last_name: "",
       });
+  }
+}
+
+@injectable()
+export class ReadOnlyContactRepository extends ContactRepository {
+  constructor(@inject(KNEX_READ_ONLY) knex: Knex) {
+    super(knex);
   }
 }

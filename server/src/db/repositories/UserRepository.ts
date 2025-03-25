@@ -5,8 +5,8 @@ import { keyBuilder } from "../../util/keyBuilder";
 import { Maybe, MaybeArray, unMaybeArray } from "../../util/types";
 import { CreateUser, CreateUserData, User, UserData, UserGroupPermissionName } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
-import { KNEX } from "../knex";
-import { SystemRepository } from "./SystemRepository";
+import { KNEX, KNEX_READ_ONLY } from "../knex";
+import { ReadOnlySystemRepository, SystemRepository } from "./SystemRepository";
 
 @injectable()
 export class UserRepository extends BaseRepository {
@@ -408,4 +408,14 @@ export class UserRepository extends BaseRepository {
       return userDataIds.map((id) => resultsById[id]?.path ?? null);
     },
   );
+}
+
+@injectable()
+export class ReadOnlyUserRepository extends UserRepository {
+  constructor(
+    @inject(KNEX_READ_ONLY) knex: Knex,
+    @inject(ReadOnlySystemRepository) system: ReadOnlySystemRepository,
+  ) {
+    super(knex, system);
+  }
 }

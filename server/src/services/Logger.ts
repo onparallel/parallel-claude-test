@@ -1,6 +1,6 @@
 import { CloudWatchLogs } from "@aws-sdk/client-cloudwatch-logs";
 import stringify from "fast-safe-stringify";
-import { interfaces } from "inversify";
+import { ResolutionContext } from "inversify";
 import winston from "winston";
 import WinstonCloudWatch from "winston-cloudwatch";
 import { CONFIG, Config } from "../config";
@@ -19,8 +19,8 @@ export interface ILogger {
   readonly debug: LogMethod;
 }
 
-export function createLogger({ container }: interfaces.Context): ILogger {
-  const config = container.get<Config>(CONFIG);
+export function createLogger(context: ResolutionContext): ILogger {
+  const config = context.get<Config>(CONFIG);
   const logger = winston.createLogger({
     transports: [
       new winston.transports.Console({

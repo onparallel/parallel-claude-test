@@ -4,7 +4,7 @@ import { groupBy, omit, sortBy } from "remeda";
 import { MaybeArray, unMaybeArray } from "../../util/types";
 import { CreateTag, PetitionTag, Tag, User } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
-import { KNEX } from "../knex";
+import { KNEX, KNEX_READ_ONLY } from "../knex";
 
 @injectable()
 export class TagRepository extends BaseRepository {
@@ -120,5 +120,12 @@ export class TagRepository extends BaseRepository {
       })
       .delete()
       .returning("*");
+  }
+}
+
+@injectable()
+export class ReadOnlyTagRepository extends TagRepository {
+  constructor(@inject(KNEX_READ_ONLY) knex: Knex) {
+    super(knex);
   }
 }

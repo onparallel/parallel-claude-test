@@ -16,7 +16,7 @@ describe("repositories/OrganizationRepository", () => {
   let organizations: OrganizationRepository;
 
   beforeAll(async () => {
-    container = createTestContainer();
+    container = await createTestContainer();
     knex = container.get(KNEX);
     mocks = new Mocks(knex);
     organizations = container.get(OrganizationRepository);

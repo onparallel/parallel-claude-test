@@ -17,7 +17,7 @@ describe("repositories/FeatureFlagRepository", () => {
   let user2: User;
 
   beforeAll(async () => {
-    container = createTestContainer();
+    container = await createTestContainer();
     knex = container.get<Knex>(KNEX);
     ff = container.get(FeatureFlagRepository);
 

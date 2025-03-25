@@ -4,7 +4,7 @@ import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { MaybeArray, unMaybeArray } from "../../util/types";
 import { CreateSystemEvent } from "../events/SystemEvent";
 import { BaseRepository } from "../helpers/BaseRepository";
-import { KNEX } from "../knex";
+import { KNEX, KNEX_READ_ONLY } from "../knex";
 
 @injectable()
 export class SystemRepository extends BaseRepository {
@@ -30,5 +30,12 @@ export class SystemRepository extends BaseRepository {
       .where({ type: "USER_LOGGED_IN" })
       .whereRaw(/* sql */ `(("data" ->> 'user_id')::int) = ?`, [userId])
       .select("*");
+  }
+}
+
+@injectable()
+export class ReadOnlySystemRepository extends SystemRepository {
+  constructor(@inject(KNEX_READ_ONLY) knex: Knex, @inject(QUEUES_SERVICE) queues: IQueuesService) {
+    super(knex, queues);
   }
 }

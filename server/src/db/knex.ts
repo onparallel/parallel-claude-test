@@ -1,5 +1,5 @@
 import { readFileSync } from "fs";
-import { createTaggedDecorator, interfaces } from "inversify";
+import { ResolutionContext } from "inversify";
 import { Knex, knex } from "knex";
 import pg from "pg";
 import { parse } from "postgres-interval";
@@ -27,17 +27,16 @@ pg.types.setTypeParser(pg.types.builtins.DATE, (value) => value);
 pg.types.setTypeParser(pg.types.builtins.NUMERIC, (value) => parseFloat(value));
 
 export const KNEX = Symbol.for("KNEX");
-
-export const readOnly = createTaggedDecorator({ key: "db", value: "read-only" });
+export const KNEX_READ_ONLY = Symbol.for("KNEX_READ_ONLY");
 
 declare module "knex/types/tables" {
   interface Tables extends TableTypes {}
 }
 
 export function createKnex(mode: keyof Config["db"]) {
-  return function ({ container }: interfaces.Context): Knex {
-    const config = container.get<Config>(CONFIG);
-    const logger = container.get<ILogger>(LOGGER);
+  return function (context: ResolutionContext): Knex {
+    const config = context.get<Config>(CONFIG);
+    const logger = context.get<ILogger>(LOGGER);
     const connection = config.db[mode];
     const instance = knex({
       client: "pg",

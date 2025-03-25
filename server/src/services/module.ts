@@ -91,51 +91,58 @@ import { ISignatureService, SIGNATURE, SignatureService } from "./SignatureServi
 import { ISmtp, SMTP, Smtp } from "./Smtp";
 import { IStorageService, STORAGE_SERVICE, StorageService } from "./StorageService";
 
-export const servicesModule = new ContainerModule((bind) => {
+export const servicesModule = new ContainerModule((options) => {
   // Singleton Scope
-  bind<ILogger>(LOGGER).toDynamicValue(createLogger).inSingletonScope();
-  bind<IQueuesService>(QUEUES_SERVICE).to(QueuesService).inSingletonScope();
-  bind<IEmailsService>(EMAILS).to(EmailsService).inSingletonScope();
-  bind<IAnalyticsService>(ANALYTICS).to(AnalyticsService).inSingletonScope();
-  bind<IRedis>(REDIS).to(Redis).inSingletonScope();
-  bind<ISmtp>(SMTP).to(Smtp).inSingletonScope();
-  bind<IPrinter>(PRINTER).to(Printer).inSingletonScope();
-  bind<IStorageService>(STORAGE_SERVICE).to(StorageService).inSingletonScope();
-  bind<IFetchService>(FETCH_SERVICE).to(FetchService).inSingletonScope();
-  bind<IImageService>(IMAGE_SERVICE).to(ImageService).inSingletonScope();
-  bind<II18nService>(I18N_SERVICE).to(I18nService).inSingletonScope();
-  bind<IEncryptionService>(ENCRYPTION_SERVICE).to(EncryptionService).inSingletonScope();
-  bind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE)
+  options.bind<ILogger>(LOGGER).toDynamicValue(createLogger).inSingletonScope();
+  options.bind<IQueuesService>(QUEUES_SERVICE).to(QueuesService).inSingletonScope();
+  options.bind<IEmailsService>(EMAILS).to(EmailsService).inSingletonScope();
+  options.bind<IAnalyticsService>(ANALYTICS).to(AnalyticsService).inSingletonScope();
+  options.bind<IRedis>(REDIS).to(Redis).inSingletonScope();
+  options.bind<ISmtp>(SMTP).to(Smtp).inSingletonScope();
+  options.bind<IPrinter>(PRINTER).to(Printer).inSingletonScope();
+  options.bind<IStorageService>(STORAGE_SERVICE).to(StorageService).inSingletonScope();
+  options.bind<IFetchService>(FETCH_SERVICE).to(FetchService).inSingletonScope();
+  options.bind<IImageService>(IMAGE_SERVICE).to(ImageService).inSingletonScope();
+  options.bind<II18nService>(I18N_SERVICE).to(I18nService).inSingletonScope();
+  options.bind<IEncryptionService>(ENCRYPTION_SERVICE).to(EncryptionService).inSingletonScope();
+  options
+    .bind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE)
     .to(BackgroundCheckService)
     .inSingletonScope();
-  bind<IAiAssistantService>(AI_ASSISTANT_SERVICE).to(AiAssistantService).inSingletonScope();
-  bind<ICorsService>(CORS_SERVICE).to(CorsService).inSingletonScope();
+  options.bind<IAiAssistantService>(AI_ASSISTANT_SERVICE).to(AiAssistantService).inSingletonScope();
+  options.bind<ICorsService>(CORS_SERVICE).to(CorsService).inSingletonScope();
 
   // Request Scope
-  bind<IOrganizationCreditsService>(ORGANIZATION_CREDITS_SERVICE).to(OrganizationCreditsService);
-  bind<IAiCompletionService>(AI_COMPLETION_SERVICE).to(AiCompletionService);
-  bind<IPetitionBinder>(PETITION_BINDER).to(PetitionBinder);
-  bind<IAuth>(AUTH).to(Auth);
-  bind<IPetitionImportExportService>(PETITION_IMPORT_EXPORT_SERVICE).to(
-    PetitionImportExportService,
-  );
-  bind<ISignatureService>(SIGNATURE).to(SignatureService);
-  bind<IOrgLimitsService>(ORG_LIMITS_SERVICE).to(OrgLimitsService);
-  bind<IBankflipService>(BANKFLIP_SERVICE).to(BankflipService);
-  bind<IOrganizationLayoutService>(ORGANIZATION_LAYOUT_SERVICE).to(OrganizationLayoutService);
-  bind<IAccountSetupService>(ACCOUNT_SETUP_SERVICE).to(AccountSetupService);
-  bind<IIntegrationsSetupService>(INTEGRATIONS_SETUP_SERVICE).to(IntegrationsSetupService);
-  bind<IProfilesSetupService>(PROFILES_SETUP_SERVICE).to(ProfilesSetupService);
-  bind<IPetitionMessageContextService>(PETITION_MESSAGE_CONTEXT_SERVICE).to(
-    PetitionMessageContextService,
-  );
-  bind<IEventSubscriptionService>(EVENT_SUBSCRIPTION_SERVICE).to(EventSubscriptionService);
-  bind<IIdVerificationService>(ID_VERIFICATION_SERVICE).to(IdVerificationService);
-  bind<IDocumentProcessingService>(DOCUMENT_PROCESSING_SERVICE).to(DocumentProcessingService);
-  bind<IProfileExternalSourcesService>(PROFILE_EXTERNAL_SOURCE_SERVICE).to(
-    ProfileExternalSourcesService,
-  );
-  bind<PetitionFilesService>(PETITION_FILES_SERVICE).to(PetitionFilesService);
-  bind<ProfileImportService>(PROFILE_IMPORT_SERVICE).to(ProfileImportService);
-  bind<ProfileExportService>(PROFILE_EXPORT_SERVICE).to(ProfileExportService);
+  options
+    .bind<IOrganizationCreditsService>(ORGANIZATION_CREDITS_SERVICE)
+    .to(OrganizationCreditsService);
+  options.bind<IAiCompletionService>(AI_COMPLETION_SERVICE).to(AiCompletionService);
+  options.bind<IPetitionBinder>(PETITION_BINDER).to(PetitionBinder);
+  options.bind<IAuth>(AUTH).to(Auth);
+  options
+    .bind<IPetitionImportExportService>(PETITION_IMPORT_EXPORT_SERVICE)
+    .to(PetitionImportExportService);
+  options.bind<ISignatureService>(SIGNATURE).to(SignatureService);
+  options.bind<IOrgLimitsService>(ORG_LIMITS_SERVICE).to(OrgLimitsService);
+  options.bind<IBankflipService>(BANKFLIP_SERVICE).to(BankflipService);
+  options
+    .bind<IOrganizationLayoutService>(ORGANIZATION_LAYOUT_SERVICE)
+    .to(OrganizationLayoutService);
+  options.bind<IAccountSetupService>(ACCOUNT_SETUP_SERVICE).to(AccountSetupService);
+  options.bind<IIntegrationsSetupService>(INTEGRATIONS_SETUP_SERVICE).to(IntegrationsSetupService);
+  options.bind<IProfilesSetupService>(PROFILES_SETUP_SERVICE).to(ProfilesSetupService);
+  options
+    .bind<IPetitionMessageContextService>(PETITION_MESSAGE_CONTEXT_SERVICE)
+    .to(PetitionMessageContextService);
+  options.bind<IEventSubscriptionService>(EVENT_SUBSCRIPTION_SERVICE).to(EventSubscriptionService);
+  options.bind<IIdVerificationService>(ID_VERIFICATION_SERVICE).to(IdVerificationService);
+  options
+    .bind<IDocumentProcessingService>(DOCUMENT_PROCESSING_SERVICE)
+    .to(DocumentProcessingService);
+  options
+    .bind<IProfileExternalSourcesService>(PROFILE_EXTERNAL_SOURCE_SERVICE)
+    .to(ProfileExternalSourcesService);
+  options.bind<PetitionFilesService>(PETITION_FILES_SERVICE).to(PetitionFilesService);
+  options.bind(PROFILE_IMPORT_SERVICE).to(ProfileImportService);
+  options.bind(PROFILE_EXPORT_SERVICE).to(ProfileExportService);
 });

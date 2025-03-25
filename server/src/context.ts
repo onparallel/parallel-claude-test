@@ -2,8 +2,7 @@ import express from "express";
 import { inject, injectable } from "inversify";
 import { CONFIG, Config } from "./config";
 import { Contact, Organization, PetitionAccess, User } from "./db/__types";
-import { readOnly } from "./db/knex";
-import { ContactRepository } from "./db/repositories/ContactRepository";
+import { ContactRepository, ReadOnlyContactRepository } from "./db/repositories/ContactRepository";
 import { DashboardRepository } from "./db/repositories/DashboardRepository";
 import { EmailLogRepository } from "./db/repositories/EmailLogRepository";
 import { EventRepository } from "./db/repositories/EventRepository";
@@ -14,15 +13,18 @@ import { LicenseCodeRepository } from "./db/repositories/LicenseCodeRepository";
 import { OrganizationRepository } from "./db/repositories/OrganizationRepository";
 import { PetitionApprovalRequestRepository } from "./db/repositories/PetitionApprovalRequestRepository";
 import { PetitionCommentRepository } from "./db/repositories/PetitionCommentRepository";
-import { PetitionRepository } from "./db/repositories/PetitionRepository";
+import {
+  PetitionRepository,
+  ReadOnlyPetitionRepository,
+} from "./db/repositories/PetitionRepository";
 import { ProfileRepository } from "./db/repositories/ProfileRepository";
 import { SubscriptionRepository } from "./db/repositories/SubscriptionRepository";
 import { SystemRepository } from "./db/repositories/SystemRepository";
-import { TagRepository } from "./db/repositories/TagRepository";
+import { ReadOnlyTagRepository, TagRepository } from "./db/repositories/TagRepository";
 import { TaskRepository } from "./db/repositories/TaskRepository";
 import { UserAuthenticationRepository } from "./db/repositories/UserAuthenticationRepository";
 import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
-import { UserRepository } from "./db/repositories/UserRepository";
+import { ReadOnlyUserRepository, UserRepository } from "./db/repositories/UserRepository";
 import { ViewRepository } from "./db/repositories/ViewRepository";
 import { DOW_JONES_CLIENT, IDowJonesClient } from "./integrations/dow-jones/DowJonesClient";
 import { IFileExportIntegration } from "./integrations/file-export/FileExportIntegration";
@@ -219,9 +221,9 @@ export class WorkerContext {
     public readonly approvalRequests: PetitionApprovalRequestRepository,
     public readonly petitionComments: PetitionCommentRepository,
 
-    @readOnly public readonly readonlyContacts: ContactRepository,
-    @readOnly public readonly readonlyPetitions: PetitionRepository,
-    @readOnly public readonly readonlyUsers: UserRepository,
-    @readOnly public readonly readonlyTags: TagRepository,
+    public readonly readonlyContacts: ReadOnlyContactRepository,
+    public readonly readonlyPetitions: ReadOnlyPetitionRepository,
+    public readonly readonlyUsers: ReadOnlyUserRepository,
+    public readonly readonlyTags: ReadOnlyTagRepository,
   ) {}
 }

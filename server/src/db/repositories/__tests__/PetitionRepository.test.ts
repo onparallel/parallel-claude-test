@@ -43,7 +43,7 @@ describe("repositories/PetitionRepository", () => {
   let contact: Contact;
 
   beforeAll(async () => {
-    container = createTestContainer();
+    container = await createTestContainer();
     knex = container.get(KNEX);
     mocks = new Mocks(knex);
 

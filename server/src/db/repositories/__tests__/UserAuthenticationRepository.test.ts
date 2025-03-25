@@ -17,7 +17,7 @@ describe("repositories/UserAuthenticationRepository", () => {
   let authTokens: UserAuthenticationToken[];
 
   beforeAll(async () => {
-    container = createTestContainer();
+    container = await createTestContainer();
     knex = container.get(KNEX);
     mocks = new Mocks(knex);
     userAuth = container.get(UserAuthenticationRepository);

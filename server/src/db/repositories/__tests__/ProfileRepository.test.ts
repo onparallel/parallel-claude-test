@@ -24,7 +24,7 @@ describe("repositories/ProfileRepository", () => {
   let repo: ProfileRepository;
 
   beforeAll(async () => {
-    container = createTestContainer();
+    container = await createTestContainer();
     knex = container.get<Knex>(KNEX);
     repo = container.get(ProfileRepository);
     mocks = new Mocks(knex);

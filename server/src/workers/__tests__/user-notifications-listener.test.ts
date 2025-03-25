@@ -26,7 +26,7 @@ describe("Worker - User Notifications Listener", () => {
   let access: PetitionAccess;
 
   beforeAll(async () => {
-    const container = createTestContainer();
+    const container = await createTestContainer();
     ctx = container.get<WorkerContext>(WorkerContext);
     knex = container.get<Knex>(KNEX);
     mocks = new Mocks(knex);

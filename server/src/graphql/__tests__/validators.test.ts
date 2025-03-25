@@ -26,7 +26,7 @@ describe("GraphQL custom validators", () => {
   let ssoIntegration: OrgIntegration;
 
   beforeAll(async () => {
-    const container = createTestContainer();
+    const container = await createTestContainer();
     knex = container.get<Knex>(KNEX);
     ctx = container.get<ApiContext>(ApiContext);
     mocks = new Mocks(knex);

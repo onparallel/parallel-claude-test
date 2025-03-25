@@ -16,7 +16,7 @@ describe("OrgLimitsService", () => {
   let orgLimitsService: IOrgLimitsService;
 
   beforeAll(async () => {
-    container = createTestContainer();
+    container = await createTestContainer();
     knex = container.get(KNEX);
     mocks = new Mocks(knex);
     orgLimitsService = container.get<IOrgLimitsService>(ORG_LIMITS_SERVICE);

@@ -16,7 +16,7 @@ describe("repositories/ContactRepository", () => {
   let mocks: Mocks;
 
   beforeAll(async () => {
-    container = createTestContainer();
+    container = await createTestContainer();
     knex = container.get<Knex>(KNEX);
     c = container.get(ContactRepository);
   });

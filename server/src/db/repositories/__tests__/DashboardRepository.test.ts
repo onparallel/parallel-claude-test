@@ -33,7 +33,7 @@ describe("DashboardRepository", () => {
   const users: User[] = [];
 
   beforeAll(async () => {
-    container = createTestContainer();
+    container = await createTestContainer();
     knex = container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
     dashboards = container.get(DashboardRepository);

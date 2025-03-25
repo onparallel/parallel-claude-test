@@ -123,7 +123,7 @@ import {
   PetitionFilterRepositoryHelper,
 } from "../helpers/PetitionFilterRepositoryHelper";
 import { SortBy } from "../helpers/utils";
-import { KNEX } from "../knex";
+import { KNEX, KNEX_READ_ONLY } from "../knex";
 import {
   CommentCreatedUserNotification,
   CreatePetitionUserNotification,
@@ -131,7 +131,7 @@ import {
   GenericPetitionUserNotification,
   PetitionUserNotification,
 } from "../notifications";
-import { FileRepository } from "./FileRepository";
+import { FileRepository, ReadOnlyFileRepository } from "./FileRepository";
 
 export interface PetitionVariable {
   name: string;
@@ -263,10 +263,10 @@ export class PetitionRepository extends BaseRepository {
   private readonly REPLY_EVENTS_DELAY_SECONDS = 15;
   constructor(
     @inject(KNEX) knex: Knex,
+    @inject(LOGGER) private logger: ILogger,
     @inject(PETITION_FILTER_REPOSITORY_HELPER)
     private petitionFilter: PetitionFilterRepositoryHelper,
     @inject(QUEUES_SERVICE) private queues: QueuesService,
-    @inject(LOGGER) private logger: ILogger,
     @inject(FileRepository) private files: FileRepository,
   ) {
     super(knex);
@@ -9022,5 +9022,19 @@ export class PetitionRepository extends BaseRepository {
     }
 
     return processes;
+  }
+}
+
+@injectable()
+export class ReadOnlyPetitionRepository extends PetitionRepository {
+  constructor(
+    @inject(KNEX_READ_ONLY) knex: Knex,
+    @inject(LOGGER) logger: ILogger,
+    @inject(PETITION_FILTER_REPOSITORY_HELPER)
+    petitionFilter: PetitionFilterRepositoryHelper,
+    @inject(QUEUES_SERVICE) queues: QueuesService,
+    @inject(ReadOnlyFileRepository) files: ReadOnlyFileRepository,
+  ) {
+    super(knex, logger, petitionFilter, queues, files);
   }
 }

@@ -30,7 +30,7 @@ describe("validateFieldLogic", () => {
   let allFields: PetitionField[];
 
   beforeAll(async () => {
-    container = createTestContainer();
+    container = await createTestContainer();
     ctx = container.get<ApiContext>(ApiContext);
     knex = container.get(KNEX);
     mocks = new Mocks(knex);

@@ -42,10 +42,9 @@ export class AiCompletionService implements IAiCompletionService {
   ) {}
 
   private getClient(integration: { id: number; provider: AiCompletionProvider }) {
-    const client = this.container.getNamed<IAiCompletionClient<any>>(
-      AI_COMPLETION_CLIENT,
-      integration.provider,
-    );
+    const client = this.container.get<IAiCompletionClient<any>>(AI_COMPLETION_CLIENT, {
+      name: integration.provider,
+    });
     client.configure(integration.id);
     return client;
   }

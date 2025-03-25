@@ -1,4 +1,4 @@
-import { interfaces } from "inversify";
+import { ResolutionContext } from "inversify";
 import { ContactLocale } from "../../db/__types";
 import { IntegrationProvider } from "../../db/repositories/IntegrationRepository";
 import { BaseClient } from "../helpers/BaseClient";
@@ -65,12 +65,12 @@ export class CancelAbortedError extends Error {}
 
 export const SIGNATURE_CLIENT_FACTORY = Symbol.for("SIGNATURE_CLIENT_FACTORY");
 
-export function getSignatureClientFactory(context: interfaces.Context) {
+export function getSignatureClientFactory(context: ResolutionContext) {
   return function signatureClientFactory(
     provider: IntegrationProvider<"SIGNATURE">,
     integrationId: number,
   ): ISignatureClient {
-    const integration = context.container.getNamed<ISignatureClient>(SIGNATURE_CLIENT, provider);
+    const integration = context.get<ISignatureClient>(SIGNATURE_CLIENT, { name: provider });
     integration.configure(integrationId);
     return integration;
   };

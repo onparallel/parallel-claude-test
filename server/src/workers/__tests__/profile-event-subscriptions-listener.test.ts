@@ -52,7 +52,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
   let profiles: Profile[];
 
   beforeAll(async () => {
-    const container = createTestContainer();
+    const container = await createTestContainer();
     ctx = container.get<WorkerContext>(WorkerContext);
     knex = container.get<Knex>(KNEX);
     mocks = new Mocks(knex);

@@ -37,10 +37,9 @@ export class BackgroundCheckService implements IBackgroundCheckService {
   ) {}
 
   private getClient() {
-    return this.container.getNamed<IBackgroundCheckClient>(
-      BACKGROUND_CHECK_CLIENT,
-      "OPEN_SANCTIONS",
-    );
+    return this.container.get<IBackgroundCheckClient>(BACKGROUND_CHECK_CLIENT, {
+      name: "OPEN_SANCTIONS",
+    });
   }
 
   async entitySearch(query: EntitySearchRequest): Promise<EntitySearchResponse> {

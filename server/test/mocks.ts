@@ -1,10 +1,13 @@
 import { faker } from "@faker-js/faker/locale/af_ZA";
 import { RedisCommandRawReply } from "@redis/client/dist/lib/commands";
 import { IncomingMessage } from "http";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { Readable } from "stream";
 import { ProfileTypeStandardType, User, UserLocale } from "../src/db/__types";
-import { EnhancedOrgIntegration } from "../src/db/repositories/IntegrationRepository";
+import {
+  EnhancedOrgIntegration,
+  IntegrationRepository,
+} from "../src/db/repositories/IntegrationRepository";
 import { UserAuthenticationRepository } from "../src/db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../src/db/repositories/UserRepository";
 import { EMAIL_REGEX } from "../src/graphql/helpers/validators/validEmail";
@@ -22,14 +25,21 @@ import {
   EInformaSearchParams,
 } from "../src/integrations/profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
 import { BackgroundCheckProfileProps } from "../src/pdf/documents/BackgroundCheckProfile";
-import { IAiAssistantService } from "../src/services/AiAssistantService";
+import {
+  AI_ASSISTANT_SERVICE,
+  AiAssistantService,
+  IAiAssistantService,
+} from "../src/services/AiAssistantService";
 import { IAnalyticsService } from "../src/services/AnalyticsService";
 import { IAuth } from "../src/services/AuthService";
 import { IBackgroundCheckService } from "../src/services/BackgroundCheckService";
 import { IEmailsService } from "../src/services/EmailsService";
-import { IFetchService } from "../src/services/FetchService";
+import { ENCRYPTION_SERVICE, EncryptionService } from "../src/services/EncryptionService";
+import { FETCH_SERVICE, IFetchService } from "../src/services/FetchService";
+import { I18N_SERVICE, II18nService } from "../src/services/I18nService";
+import { ILogger, LOGGER } from "../src/services/Logger";
 import { IQueuesService } from "../src/services/QueuesService";
-import { IRedis } from "../src/services/Redis";
+import { IRedis, REDIS } from "../src/services/Redis";
 import { IStorageImpl, IStorageService } from "../src/services/StorageService";
 import {
   EntityDetailsResponse,
@@ -314,6 +324,18 @@ export class MockEInformaProfileExternalSourceIntegration
   extends EInformaProfileExternalSourceIntegration
   implements IProfileExternalSourceIntegration
 {
+  constructor(
+    @inject(IntegrationRepository) integrations: IntegrationRepository,
+    @inject(I18N_SERVICE) i18n: II18nService,
+    @inject(ENCRYPTION_SERVICE) encryption: EncryptionService,
+    @inject(FETCH_SERVICE) fetch: IFetchService,
+    @inject(REDIS) redis: IRedis,
+    @inject(LOGGER) logger: ILogger,
+    @inject(AI_ASSISTANT_SERVICE) aiAssistant: AiAssistantService,
+  ) {
+    super(integrations, i18n, encryption, fetch, redis, logger, aiAssistant);
+  }
+
   public override async fetchAccessToken() {
     return "mocked-access-token";
   }

@@ -12,7 +12,7 @@ import {
   PublicFileUpload,
 } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
-import { KNEX } from "../knex";
+import { KNEX, KNEX_READ_ONLY } from "../knex";
 
 @injectable()
 export class FileRepository extends BaseRepository {
@@ -187,5 +187,12 @@ export class FileRepository extends BaseRepository {
       .returning("*");
 
     return row;
+  }
+}
+
+@injectable()
+export class ReadOnlyFileRepository extends FileRepository {
+  constructor(@inject(KNEX_READ_ONLY) knex: Knex, @inject(LOGGER) logger: ILogger) {
+    super(knex, logger);
   }
 }

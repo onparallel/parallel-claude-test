@@ -22,7 +22,7 @@ describe("repositories/UserGroupRepository", () => {
   let petition: Petition;
 
   beforeAll(async () => {
-    container = createTestContainer();
+    container = await createTestContainer();
     knex = container.get<Knex>(KNEX);
     userGroupsRepo = container.get(UserGroupRepository);
     petitionsRepo = container.get(PetitionRepository);
