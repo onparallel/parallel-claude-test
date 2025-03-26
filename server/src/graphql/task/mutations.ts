@@ -881,7 +881,7 @@ export const createProfilesExcelImportTask = mutationField("createProfilesExcelI
   type: "Task",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    contextUserHasPermission("PROFILES:CREATE_PROFILES"),
+    contextUserHasPermission(["PROFILES:CREATE_PROFILES", "PROFILES:IMPORT_EXPORT_PROFILES"]),
     userHasAccessToProfileType("profileTypeId"),
   ),
   args: {
@@ -960,7 +960,7 @@ export const createProfilesExcelExportTask = mutationField("createProfilesExcelE
   type: "Task",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    contextUserHasPermission("PROFILES:EXPORT_PROFILES"),
+    contextUserHasPermission("PROFILES:IMPORT_EXPORT_PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
     profileTypeFieldBelongsToProfileType("profileTypeFieldIds", "profileTypeId"),
   ),

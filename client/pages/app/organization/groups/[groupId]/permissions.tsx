@@ -332,15 +332,15 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
                   }),
                 },
                 {
-                  name: "PROFILES:EXPORT_PROFILES",
+                  name: "PROFILES:IMPORT_EXPORT_PROFILES",
                   title: intl.formatMessage({
-                    id: "page.permissions-group.profiles-export",
-                    defaultMessage: "Export profiles",
+                    id: "page.permissions-group.profiles-import-export",
+                    defaultMessage: "Import and export profiles",
                   }),
                   description: intl.formatMessage({
-                    id: "page.permissions-group.profiles-export-description",
+                    id: "page.permissions-group.profiles-import-export-description",
                     defaultMessage:
-                      "Grants users in this team permissions to export profiles to Excel.",
+                      "Grants users in this team permissions to import and export profiles to Excel.",
                   }),
                 },
               ],

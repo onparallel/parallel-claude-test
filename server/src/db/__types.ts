@@ -662,7 +662,7 @@ export type UserGroupPermissionName =
   | "TEAMS:READ_PERMISSIONS"
   | "TEAMS:UPDATE_PERMISSIONS"
   | "PETITIONS:LIST_PUBLIC_TEMPLATES"
-  | "PROFILES:EXPORT_PROFILES";
+  | "PROFILES:IMPORT_EXPORT_PROFILES";
 
 export const UserGroupPermissionNameValues = [
   "SUPERADMIN",
@@ -697,7 +697,7 @@ export const UserGroupPermissionNameValues = [
   "TEAMS:READ_PERMISSIONS",
   "TEAMS:UPDATE_PERMISSIONS",
   "PETITIONS:LIST_PUBLIC_TEMPLATES",
-  "PROFILES:EXPORT_PROFILES",
+  "PROFILES:IMPORT_EXPORT_PROFILES",
 ] as UserGroupPermissionName[];
 
 export type UserGroupType = "NORMAL" | "ALL_USERS" | "INITIAL";

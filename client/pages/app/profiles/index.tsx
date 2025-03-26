@@ -157,7 +157,7 @@ function Profiles() {
   const userCanDeleteProfiles = useHasPermission("PROFILES:DELETE_PROFILES");
   const userCanCloseOpenProfiles = useHasPermission("PROFILES:CLOSE_PROFILES");
   const userCanDeletePermanently = useHasPermission("PROFILES:DELETE_PERMANENTLY_PROFILES");
-  const userCanExportProfiles = useHasPermission("PROFILES:EXPORT_PROFILES");
+  const userCanImportExportProfiles = useHasPermission("PROFILES:IMPORT_EXPORT_PROFILES");
 
   const { data: queryObject } = useAssertQueryOrPreviousData(Profiles_userDocument, {
     variables: { profileTypeId: queryState.type! },
@@ -473,21 +473,22 @@ function Profiles() {
           </HStack>
           <Spacer minW={4} />
           <Box>
-            <ButtonWithMoreOptions
-              colorScheme="primary"
-              onClick={handleCreateProfile}
-              isDisabled={
-                !userCanCreateProfiles || isNullish(profileType) || !profileType.canCreate
-              }
-              options={
-                <MenuList minWidth={0}>
-                  <MenuItem onClick={handleImportProfilesFromExcel}>
-                    <FormattedMessage
-                      id="page.profiles.import-from-excel"
-                      defaultMessage="Import from Excel"
-                    />
-                  </MenuItem>
-                  {userCanExportProfiles ? (
+            {userCanImportExportProfiles ? (
+              <ButtonWithMoreOptions
+                colorScheme="primary"
+                onClick={handleCreateProfile}
+                isDisabled={
+                  !userCanCreateProfiles || isNullish(profileType) || !profileType.canCreate
+                }
+                options={
+                  <MenuList minWidth={0}>
+                    <MenuItem onClick={handleImportProfilesFromExcel}>
+                      <FormattedMessage
+                        id="page.profiles.import-from-excel"
+                        defaultMessage="Import from Excel"
+                      />
+                    </MenuItem>
+
                     <MenuItem
                       onClick={() =>
                         handleExportProfilesToExcelTask({
@@ -509,27 +510,52 @@ function Profiles() {
                         defaultMessage="Export to Excel"
                       />
                     </MenuItem>
-                  ) : null}
-                </MenuList>
-              }
-            >
-              <FormattedMessage
-                id="generic.create-name"
-                defaultMessage="Create {name}"
-                values={{
-                  name: profileType
-                    ? localizableUserTextRender({
-                        value: profileType.name,
-                        intl,
-                        default: intl.formatMessage({
-                          id: "generic.unnamed-profile-type",
-                          defaultMessage: "Unnamed profile type",
-                        }),
-                      }).toLowerCase()
-                    : "",
-                }}
-              />
-            </ButtonWithMoreOptions>
+                  </MenuList>
+                }
+              >
+                <FormattedMessage
+                  id="generic.create-name"
+                  defaultMessage="Create {name}"
+                  values={{
+                    name: profileType
+                      ? localizableUserTextRender({
+                          value: profileType.name,
+                          intl,
+                          default: intl.formatMessage({
+                            id: "generic.unnamed-profile-type",
+                            defaultMessage: "Unnamed profile type",
+                          }),
+                        }).toLowerCase()
+                      : "",
+                  }}
+                />
+              </ButtonWithMoreOptions>
+            ) : (
+              <Button
+                colorScheme="primary"
+                onClick={handleCreateProfile}
+                isDisabled={
+                  !userCanCreateProfiles || isNullish(profileType) || !profileType.canCreate
+                }
+              >
+                <FormattedMessage
+                  id="generic.create-name"
+                  defaultMessage="Create {name}"
+                  values={{
+                    name: profileType
+                      ? localizableUserTextRender({
+                          value: profileType.name,
+                          intl,
+                          default: intl.formatMessage({
+                            id: "generic.unnamed-profile-type",
+                            defaultMessage: "Unnamed profile type",
+                          }),
+                        }).toLowerCase()
+                      : "",
+                  }}
+                />
+              </Button>
+            )}
           </Box>
         </Flex>
         <Flex direction="column" flex={1} minHeight={0} paddingBottom={16}>
