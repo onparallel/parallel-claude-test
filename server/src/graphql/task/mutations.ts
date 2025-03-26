@@ -960,6 +960,7 @@ export const createProfilesExcelExportTask = mutationField("createProfilesExcelE
   type: "Task",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
+    contextUserHasPermission("PROFILES:EXPORT_PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
     profileTypeFieldBelongsToProfileType("profileTypeFieldIds", "profileTypeId"),
   ),

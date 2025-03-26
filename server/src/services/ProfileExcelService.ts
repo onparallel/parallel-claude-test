@@ -2,7 +2,7 @@ import { Workbook } from "exceljs";
 import { injectable } from "inversify";
 import pMap from "p-map";
 import { IntlShape } from "react-intl";
-import { isNonNullish, range } from "remeda";
+import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { ProfileTypeField, UserLocale } from "../db/__types";
 import { profileTypeFieldSelectValues } from "../db/helpers/profileTypeFieldOptions";
@@ -118,16 +118,14 @@ export abstract class ProfileExcelService {
             validationSheet.getCell(`A${idx + 1}`).value = opt.value;
           });
 
-          // Set validation for each cell in the data column
-          for (const rowNumber of range(3, 1000)) {
-            dataTab.getCell(rowNumber, column.number).dataValidation = {
-              type: "list",
-              allowBlank: true,
-              formulae: [`='_${column.key}'!$A$1:$A$${options.length}`],
-              showErrorMessage: true,
-              errorStyle: "error",
-            };
-          }
+          // Set dropdown validation for a cell range in the column
+          (dataTab as any).dataValidations.add(`${column.letter}3:${column.letter}9999`, {
+            type: "list",
+            allowBlank: true,
+            formulae: [`='_${column.key}'!$A$1:$A$${options.length}`],
+            showErrorMessage: true,
+            errorStyle: "error",
+          });
         }
       }
     }

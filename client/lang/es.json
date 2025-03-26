@@ -15975,6 +15975,16 @@
     "context": "Grants users in this team permissions to permanently delete profiles."
   },
   {
+    "term": "page.permissions-group.profiles-export",
+    "definition": "Exportar perfiles",
+    "context": "Export profiles"
+  },
+  {
+    "term": "page.permissions-group.profiles-export-description",
+    "definition": "Concede a los usuarios en este equipo permisos para exportar perfiles a Excel.",
+    "context": "Grants users in this team permissions to export profiles to Excel."
+  },
+  {
     "term": "page.permissions-group.profiles-list",
     "definition": "Ver perfiles",
     "context": "List profiles"

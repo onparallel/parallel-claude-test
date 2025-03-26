@@ -331,6 +331,18 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
                       "Grants users in this team permissions to manage profile alerts subscriptions.",
                   }),
                 },
+                {
+                  name: "PROFILES:EXPORT_PROFILES",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.profiles-export",
+                    defaultMessage: "Export profiles",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.profiles-export-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to export profiles to Excel.",
+                  }),
+                },
               ],
             },
           ]

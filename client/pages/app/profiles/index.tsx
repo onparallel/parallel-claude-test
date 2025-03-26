@@ -157,6 +157,7 @@ function Profiles() {
   const userCanDeleteProfiles = useHasPermission("PROFILES:DELETE_PROFILES");
   const userCanCloseOpenProfiles = useHasPermission("PROFILES:CLOSE_PROFILES");
   const userCanDeletePermanently = useHasPermission("PROFILES:DELETE_PERMANENTLY_PROFILES");
+  const userCanExportProfiles = useHasPermission("PROFILES:EXPORT_PROFILES");
 
   const { data: queryObject } = useAssertQueryOrPreviousData(Profiles_userDocument, {
     variables: { profileTypeId: queryState.type! },
@@ -486,27 +487,29 @@ function Profiles() {
                       defaultMessage="Import from Excel"
                     />
                   </MenuItem>
-                  <MenuItem
-                    onClick={() =>
-                      handleExportProfilesToExcelTask({
-                        locale: intl.locale as UserLocale,
-                        profileTypeId: queryState.type!,
-                        profileTypeFieldIds:
-                          queryState.columns
-                            ?.filter((c) => c.startsWith("field_"))
-                            .map((c) => c.slice("field_".length)) ?? [],
-                        values: queryState.values,
-                        status: [queryState.status],
-                        search: queryState.search,
-                        sortBy: queryState.sort,
-                      })
-                    }
-                  >
-                    <FormattedMessage
-                      id="page.profiles.export-to-excel"
-                      defaultMessage="Export to Excel"
-                    />
-                  </MenuItem>
+                  {userCanExportProfiles ? (
+                    <MenuItem
+                      onClick={() =>
+                        handleExportProfilesToExcelTask({
+                          locale: intl.locale as UserLocale,
+                          profileTypeId: queryState.type!,
+                          profileTypeFieldIds:
+                            queryState.columns
+                              ?.filter((c) => c.startsWith("field_"))
+                              .map((c) => c.slice("field_".length)) ?? [],
+                          values: queryState.values,
+                          status: [queryState.status],
+                          search: queryState.search,
+                          sortBy: queryState.sort,
+                        })
+                      }
+                    >
+                      <FormattedMessage
+                        id="page.profiles.export-to-excel"
+                        defaultMessage="Export to Excel"
+                      />
+                    </MenuItem>
+                  ) : null}
                 </MenuList>
               }
             >
