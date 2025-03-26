@@ -128,6 +128,7 @@ export class ProfileExportService extends ProfileExcelService {
       profiles.map((p) => p.id),
     );
 
+    let rowIndex = 0;
     for (const [profile, profileValues] of zip(profiles, profilesValues)) {
       const row: Record<string, string> = { "profile-id": toGlobalId("Profile", profile.id) };
 
@@ -147,7 +148,8 @@ export class ProfileExportService extends ProfileExcelService {
         }
       }
 
-      worksheet.addRow(row);
+      // data is inserted starting from row 3, as first two rows are headers
+      worksheet.insertRow(3 + rowIndex++, row);
     }
   }
 

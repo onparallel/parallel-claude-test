@@ -1065,6 +1065,21 @@
     "context": "- Countries should be added as ISO 3166-1 alpha-2 codes. e.g. US, ES, FR"
   },
   {
+    "term": "profiles-excel.instructions.data-format",
+    "definition": "Data format",
+    "context": "Data format"
+  },
+  {
+    "term": "profiles-excel.instructions.data-format-explanation-line-1",
+    "definition": "- The following columns can only have the indicated values",
+    "context": "- The following columns can only have the indicated values"
+  },
+  {
+    "term": "profiles-excel.instructions.data-format-explanation-line-2",
+    "definition": "- If the column allows multiple values (M), separate them with a comma.",
+    "context": "- If the column allows multiple values (M), separate them with a comma."
+  },
+  {
     "term": "profiles-excel.instructions.date-format",
     "definition": "- Dates should be added as text (with leading ') and format yyyy-MM-dd. e.g. '2022-01-01",
     "context": "- Dates should be added as text (with leading ') and format yyyy-MM-dd. e.g. '2022-01-01"

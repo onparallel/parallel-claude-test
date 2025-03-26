@@ -1,11 +1,13 @@
 import { Workbook } from "exceljs";
 import { injectable } from "inversify";
+import pMap from "p-map";
 import { IntlShape } from "react-intl";
-import { isNonNullish } from "remeda";
+import { isNonNullish, range } from "remeda";
 import { assert } from "ts-essentials";
 import { ProfileTypeField, UserLocale } from "../db/__types";
+import { profileTypeFieldSelectValues } from "../db/helpers/profileTypeFieldOptions";
 import { LocalizableUserText } from "../graphql";
-import { toGlobalId } from "../util/globalId";
+import { fromGlobalId, isGlobalId, toGlobalId } from "../util/globalId";
 
 @injectable()
 export abstract class ProfileExcelService {
@@ -93,16 +95,41 @@ export abstract class ProfileExcelService {
       });
     }
 
-    // adjust column width to max value length
     for (const column of dataTab.columns) {
       let maxLength = 10;
       column.eachCell?.((cell) => {
+        // adjust column width to max value length
         const colLength = cell.value?.toString().length;
         if (colLength && colLength > maxLength) {
           maxLength = colLength;
         }
       });
       column.width = maxLength;
+
+      if (column.key && isGlobalId(column.key, "ProfileTypeField")) {
+        const field = profileTypeFieldsById[fromGlobalId(column.key).id];
+        if (field.type === "SELECT") {
+          const options = await profileTypeFieldSelectValues(field.options);
+
+          // Create a hidden sheet for validation lists
+          const validationSheet = workbook.addWorksheet("_" + column.key, { state: "veryHidden" });
+          // Add options in column A
+          options.forEach((opt, idx) => {
+            validationSheet.getCell(`A${idx + 1}`).value = opt.value;
+          });
+
+          // Set validation for each cell in the data column
+          for (const rowNumber of range(3, 1000)) {
+            dataTab.getCell(rowNumber, column.number).dataValidation = {
+              type: "list",
+              allowBlank: true,
+              formulae: [`='_${column.key}'!$A$1:$A$${options.length}`],
+              showErrorMessage: true,
+              errorStyle: "error",
+            };
+          }
+        }
+      }
     }
 
     await this.addInstructionsTab(
@@ -121,13 +148,13 @@ export abstract class ProfileExcelService {
     hasProfileIdColumn: boolean,
     intl: IntlShape,
   ) {
-    const instructionsTab = workbook.addWorksheet(
+    const worksheet = workbook.addWorksheet(
       intl.formatMessage({
         id: "profiles-excel.instructions-tab-name",
         defaultMessage: "Instructions",
       }),
     );
-    instructionsTab.addRows(
+    worksheet.addRows(
       [
         [
           intl.formatMessage({
@@ -171,6 +198,58 @@ export abstract class ProfileExcelService {
           }),
         ],
       ].filter((r) => r[0] !== null),
+    );
+
+    const listFields = fields.filter((f) => f.type === "SELECT" || f.type === "CHECKBOX");
+    if (listFields.length === 0) {
+      return;
+    }
+
+    // for each SELECT or CHECKBOX column, show here their valid options
+    worksheet.addRows([
+      [],
+      [
+        intl.formatMessage({
+          id: "profiles-excel.instructions.data-format",
+          defaultMessage: "Data format",
+        }),
+      ],
+      [
+        intl.formatMessage({
+          id: "profiles-excel.instructions.data-format-explanation-line-1",
+          defaultMessage: "- The following columns can only have the indicated values",
+        }),
+      ],
+      [
+        intl.formatMessage({
+          id: "profiles-excel.instructions.data-format-explanation-line-2",
+          defaultMessage: "- If the column allows multiple values (M), separate them with a comma.",
+        }),
+      ],
+    ]);
+
+    const dataFormatRow = worksheet.addRow(
+      listFields.map(
+        (f) => this.localizableText(f.name, intl) + (f.type === "CHECKBOX" ? " (M)" : ""),
+      ),
+    );
+
+    dataFormatRow.eachCell((c) => {
+      c.style = {
+        font: { bold: true },
+      };
+    });
+
+    await pMap(
+      listFields,
+      async (field, i) => {
+        const values = await profileTypeFieldSelectValues(field.options);
+        const cell = dataFormatRow.getCell(i + 1);
+        values.forEach((v, n) => {
+          worksheet.getCell(cell.row + 1 + n, cell.col).value = v.value;
+        });
+      },
+      { concurrency: 1 },
     );
   }
 
