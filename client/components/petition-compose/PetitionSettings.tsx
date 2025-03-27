@@ -58,7 +58,7 @@ import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, noop, omit, pick } from "remeda";
+import { isNonNullish, noop, pick } from "remeda";
 import { CloseButton } from "../common/CloseButton";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { Divider } from "../common/Divider";
@@ -164,7 +164,16 @@ function _PetitionSettings({
           // everything the same, except isEnabled: false
           signatureConfig: petition.signatureConfig
             ? {
-                ...omit(petition.signatureConfig, ["integration", "signers", "__typename"]),
+                ...pick(petition.signatureConfig, [
+                  "allowAdditionalSigners",
+                  "instructions",
+                  "minSigners",
+                  "review",
+                  "reviewAfterApproval",
+                  "signingMode",
+                  "title",
+                  "useCustomDocument",
+                ]),
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                 signersInfo: petition.signatureConfig.signers
                   .filter(isNonNullish)
