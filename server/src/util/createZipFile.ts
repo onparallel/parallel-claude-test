@@ -1,37 +1,76 @@
 import archiver from "archiver";
+import { createReadStream, createWriteStream } from "fs";
+import { mkdir, rm } from "fs/promises";
+import { tmpdir } from "os";
+import PQueue from "p-queue";
+import path from "path";
 import { PassThrough, pipeline, Readable } from "stream";
+import { promisify } from "util";
+import { constants } from "zlib";
+import { random } from "./token";
 
 interface ZipFileInput {
   filename: string;
   getStream: () => Promise<Readable>;
 }
 
+const pipelineAsync = promisify(pipeline);
+
 export function createZipFile(
   files: ZipFileInput[],
   options?: { onProgress?: (processed: number, totalCount: number) => void },
-) {
-  const zip = archiver("zip");
-
-  const totalCount = files.length;
+): Readable {
+  const zip = archiver("zip", { zlib: { level: constants.Z_BEST_SPEED } });
+  const tempRoot = path.resolve(tmpdir(), `zip-${random(10)}`);
+  // zip 1 file at a time
+  // first file is processed right away from the download stream
+  // the rest go through the file system to speed up the process as they can be downloaded while
+  // previous files are being zipped
+  const zipQueue = new PQueue({ concurrency: 1 });
+  const queue = new PQueue({ concurrency: 4 });
   let progress = 0;
-  async function processFile(file: ZipFileInput | undefined) {
-    if (!file) {
-      zip.finalize();
-    } else {
-      const { getStream, filename } = file;
-      const stream = await getStream();
-      stream.on("end", () => {
-        options?.onProgress?.(++progress, totalCount);
-        processFile(files.pop());
-      });
-      stream.on("error", (err) => zip.emit("error", err));
-      zip.append(stream, { name: filename });
+  (async () => {
+    try {
+      await queue.addAll(
+        files.map((file, i) => async () => {
+          if (i < 1) {
+            await zipQueue.add(() => processFile(file));
+          } else {
+            const { getStream, filename } = file;
+            const stream = await getStream();
+            const tempPath = path.resolve(tempRoot, `${i}`);
+            const filePath = path.resolve(tempPath, filename);
+            await mkdir(tempPath, { recursive: true });
+            await pipelineAsync(stream, createWriteStream(filePath));
+            await zipQueue.add(() =>
+              processFile({
+                getStream: async () => createReadStream(filePath),
+                filename,
+              }),
+            );
+            await rm(tempPath, { recursive: true });
+          }
+          options?.onProgress?.(++progress, files.length);
+        }),
+        {},
+      );
+      await zip.finalize();
+    } catch (err) {
+      zip.emit("error", err);
+    } finally {
+      return rm(tempRoot, { recursive: true });
     }
+  })().then();
+
+  async function processFile(file: ZipFileInput) {
+    const { getStream, filename } = file;
+    const stream = await getStream();
+    return await new Promise<void>((resolve, reject) => {
+      stream.on("end", () => resolve());
+      stream.on("error", (err) => reject(err));
+      zip.append(stream, { name: filename });
+    });
   }
 
-  processFile(files.pop());
-
-  // workaround until this is fixed https://github.com/aws/aws-sdk-js-v3/issues/2522
-  const passThrough = new PassThrough();
-  return pipeline(zip, passThrough, () => {}) as Readable;
+  return pipeline(zip, new PassThrough(), () => {}) as Readable;
 }
