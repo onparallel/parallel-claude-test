@@ -26,7 +26,7 @@ type Environment = "staging" | "production";
 
 const INSTANCE_TYPES = {
   production: "t3.large",
-  staging: "t3.medium",
+  staging: "t3.large",
 } satisfies Record<Environment, _InstanceType>;
 const KEY_NAME = "ops";
 const IMAGE_ID = "ami-07acb4da058299d07";
