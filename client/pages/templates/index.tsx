@@ -13,7 +13,6 @@ import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCa
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { useIntl } from "react-intl";
 import { indexBy } from "remeda";
-import { PublicFooterCTA } from "../../components/public/layout/PublicFooterCTA";
 
 function Templates({ samples }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
@@ -47,7 +46,7 @@ function Templates({ samples }: InferGetServerSidePropsType<typeof getServerSide
           );
         })}
       </PublicTemplatesContainer>
-      <PublicFooterCTA />
+      {/* <PublicFooterCTA /> */}
     </PublicLayout>
   );
 }

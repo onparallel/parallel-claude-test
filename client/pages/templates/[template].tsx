@@ -156,14 +156,14 @@ function LandingTemplateDetails({
                   />
                 </Text>
                 <HStack paddingTop={4}>
-                  <NakedLink href="/signup">
+                  {/* <NakedLink href="/signup">
                     <Button as="a" colorScheme="primary">
                       <FormattedMessage
                         id="public.try-for-free-button"
                         defaultMessage="Try for free"
                       />
                     </Button>
-                  </NakedLink>
+                  </NakedLink> */}
                   {template.publicLinkUrl ? (
                     <NakedLink href={template.publicLinkUrl}>
                       <Button as="a" variant="outline" target="_blank" onClick={handleClickPreview}>

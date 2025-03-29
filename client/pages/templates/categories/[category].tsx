@@ -16,7 +16,6 @@ import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCa
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy } from "remeda";
-import { PublicFooterCTA } from "../../../components/public/layout/PublicFooterCTA";
 
 function LandingTemplatesCategory({
   samples,
@@ -78,7 +77,7 @@ function LandingTemplatesCategory({
           </Grid>
         </Stack>
       </PublicTemplatesContainer>
-      <PublicFooterCTA />
+      {/* <PublicFooterCTA /> */}
     </PublicLayout>
   );
 }
