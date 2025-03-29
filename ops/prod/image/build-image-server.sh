@@ -12,7 +12,7 @@ coreruleset_version="4.12.0" # https://github.com/coreruleset/coreruleset/releas
 ngx_devel_kit_version="0.3.4" # https://github.com/vision5/ngx_devel_kit/releases
 set_misc_nginx_module_version="0.33" # https://github.com/openresty/set-misc-nginx-module/tags
 headers_more_nginx_module_version="0.38" # https://github.com/openresty/headers-more-nginx-module/tags
-image_exiftool_version="13.23" # https://exiftool.org/
+image_exiftool_version="13.25" # https://exiftool.org/
 
 # Add public keys
 cat authorized_keys >> .ssh/authorized_keys
