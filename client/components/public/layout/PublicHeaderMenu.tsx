@@ -11,9 +11,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 export function PublicHeaderMenu(props: StackProps) {
   const router = useRouter();
   const intl = useIntl();
-  function trackCTAClick() {
-    window.analytics?.track("Register CTA Clicked", { from: "public-header" });
-  }
 
   function handleLangChange(event: ChangeEvent<HTMLSelectElement>) {
     const locale = event.target.value;
