@@ -101,7 +101,6 @@ useProfilesExcelExportTask.mutations = [
   gql`
     mutation useProfilesExcelExportTask_createProfilesExcelExportTask(
       $profileTypeId: GID!
-      $profileTypeFieldIds: [GID!]!
       $locale: UserLocale!
       $values: ProfileFieldValuesFilter
       $status: [ProfileStatus!]
@@ -110,7 +109,6 @@ useProfilesExcelExportTask.mutations = [
     ) {
       createProfilesExcelExportTask(
         profileTypeId: $profileTypeId
-        profileTypeFieldIds: $profileTypeFieldIds
         locale: $locale
         filter: { values: $values, status: $status }
         search: $search

@@ -494,10 +494,6 @@ function Profiles() {
                         handleExportProfilesToExcelTask({
                           locale: intl.locale as UserLocale,
                           profileTypeId: queryState.type!,
-                          profileTypeFieldIds:
-                            queryState.columns
-                              ?.filter((c) => c.startsWith("field_"))
-                              .map((c) => c.slice("field_".length)) ?? [],
                           values: queryState.values,
                           status: [queryState.status],
                           search: queryState.search,

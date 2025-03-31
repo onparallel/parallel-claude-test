@@ -108,10 +108,9 @@ export type TaskInput<TName extends TaskName> = {
   PROFILES_EXCEL_EXPORT: {
     locale: UserLocale;
     profile_type_id: number;
-    profile_type_field_ids: number[];
     search: string | null;
     filter: Pick<ProfileFilter, "values" | "status"> | null;
-    sortBy: { field: "name" | "createdAt"; direction: "ASC" | "DESC" }[] | null;
+    sort_by: { field: "name" | "createdAt"; direction: "ASC" | "DESC" }[] | null;
   };
   DASHBOARD_REFRESH: {
     dashboard_id: number;

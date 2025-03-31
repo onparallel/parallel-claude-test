@@ -24,6 +24,13 @@ export abstract class ProfileExcelService {
       intl.formatMessage({ id: "profiles-excel.data-tab-name", defaultMessage: "Data" }),
     );
 
+    await this.addInstructionsTab(
+      workbook,
+      columns.filter((c) => typeof c === "number").map((id) => profileTypeFieldsById[id]),
+      columns.includes("profile-id"),
+      intl,
+    );
+
     dataTab.columns = columns.flatMap((column) => {
       if (column === "profile-id") {
         return [
@@ -109,20 +116,11 @@ export abstract class ProfileExcelService {
       if (column.key && isGlobalId(column.key, "ProfileTypeField")) {
         const field = profileTypeFieldsById[fromGlobalId(column.key).id];
         if (field.type === "SELECT") {
-          const options = await profileTypeFieldSelectValues(field.options);
-
-          // Create a hidden sheet for validation lists
-          const validationSheet = workbook.addWorksheet("_" + column.key, { state: "veryHidden" });
-          // Add options in column A
-          options.forEach((opt, idx) => {
-            validationSheet.getCell(`A${idx + 1}`).value = opt.value;
-          });
-
           // Set dropdown validation for a cell range in the column
           (dataTab as any).dataValidations.add(`${column.letter}3:${column.letter}9999`, {
             type: "list",
             allowBlank: true,
-            formulae: [`='_${column.key}'!$A$1:$A$${options.length}`],
+            formulae: [`=_${column.key}`], // these are defined names in the instructions tab
             showErrorMessage: true,
             errorStyle: "error",
           });
@@ -130,19 +128,12 @@ export abstract class ProfileExcelService {
       }
     }
 
-    await this.addInstructionsTab(
-      workbook,
-      columns.filter((c) => typeof c === "number").map((id) => profileTypeFieldsById[id]),
-      columns.includes("profile-id"),
-      intl,
-    );
-
     return workbook;
   }
 
   private async addInstructionsTab(
     workbook: Workbook,
-    fields: Pick<ProfileTypeField, "name" | "type" | "options">[],
+    fields: Pick<ProfileTypeField, "id" | "name" | "type" | "options">[],
     hasProfileIdColumn: boolean,
     intl: IntlShape,
   ) {
@@ -246,9 +237,18 @@ export abstract class ProfileExcelService {
         values.forEach((v, n) => {
           worksheet.getCell(cell.row + 1 + n, cell.col).value = v.value;
         });
+
+        const firstCell = worksheet.getCell(cell.row + 1, cell.col);
+        const lastCell = worksheet.getCell(cell.row + values.length, cell.col);
+        workbook.definedNames.add(
+          `${worksheet.name}!${firstCell.address}:${lastCell.address}`,
+          `_${toGlobalId("ProfileTypeField", field.id)}`,
+        );
       },
       { concurrency: 1 },
     );
+
+    return worksheet;
   }
 
   protected localizableText(v: LocalizableUserText, intl: IntlShape) {

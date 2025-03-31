@@ -2102,7 +2102,6 @@ export interface MutationcreateProfileTypeProcessArgs {
 export interface MutationcreateProfilesExcelExportTaskArgs {
   filter?: InputMaybe<ProfileFilter>;
   locale: UserLocale;
-  profileTypeFieldIds: Array<Scalars["GID"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
   search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<SortByInput>>;
@@ -61527,7 +61526,6 @@ export type usePrintPdfTask_taskQuery = {
 
 export type useProfilesExcelExportTask_createProfilesExcelExportTaskMutationVariables = Exact<{
   profileTypeId: Scalars["GID"]["input"];
-  profileTypeFieldIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
   locale: UserLocale;
   values?: InputMaybe<ProfileFieldValuesFilter>;
   status?: InputMaybe<Array<ProfileStatus> | ProfileStatus>;
@@ -82286,7 +82284,6 @@ export const usePrintPdfTask_taskDocument = gql`
 export const useProfilesExcelExportTask_createProfilesExcelExportTaskDocument = gql`
   mutation useProfilesExcelExportTask_createProfilesExcelExportTask(
     $profileTypeId: GID!
-    $profileTypeFieldIds: [GID!]!
     $locale: UserLocale!
     $values: ProfileFieldValuesFilter
     $status: [ProfileStatus!]
@@ -82295,7 +82292,6 @@ export const useProfilesExcelExportTask_createProfilesExcelExportTaskDocument = 
   ) {
     createProfilesExcelExportTask(
       profileTypeId: $profileTypeId
-      profileTypeFieldIds: $profileTypeFieldIds
       locale: $locale
       filter: { values: $values, status: $status }
       search: $search

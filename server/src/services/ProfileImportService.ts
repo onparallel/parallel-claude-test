@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { indexBy, isNonNullish, zip } from "remeda";
+import { indexBy, isNonNullish, unique, zip } from "remeda";
 import { Readable } from "stream";
 import { assert } from "ts-essentials";
 import { ProfileTypeFieldType, User, UserLocale } from "../db/__types";
@@ -52,7 +52,7 @@ export class ProfileImportService extends ProfileExcelService {
     );
 
     const workbook = await this.initializeExcelWorkbook(
-      fields.map((f) => f.field.id),
+      unique(fields.map((f) => f.field.id)),
       fieldsById,
       intl,
     );

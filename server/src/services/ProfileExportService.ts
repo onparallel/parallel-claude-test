@@ -1,6 +1,6 @@
 import Excel from "exceljs";
 import { inject, injectable } from "inversify";
-import { indexBy, isNonNullish, zip } from "remeda";
+import { indexBy, unique, zip } from "remeda";
 import { Readable } from "stream";
 import { assert } from "ts-essentials";
 import { Profile, ProfileFieldValue, ProfileTypeField, UserLocale } from "../db/__types";
@@ -26,7 +26,6 @@ export class ProfileExportService extends ProfileExcelService {
 
   async exportToExcel(
     profileTypeId: number,
-    fieldIds: number[],
     search: string | null,
     filter: Pick<ProfileFilter, "values" | "status"> | null,
     sortBy: { field: "name" | "createdAt"; direction: "ASC" | "DESC" }[] | null,
@@ -46,11 +45,19 @@ export class ProfileExportService extends ProfileExcelService {
 
     const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
 
-    // columns in excel will be fields defined in fieldIds other than FILE and BACKGROUND_CHECK
-    // fields that have HIDDEN permission for the user are included in the excel but data is not exported.
-    const excelColumns = fieldIds.filter((id) => isNonNullish(profileTypeFieldsById[id]));
+    // columns in excel will be all fields other than FILE and BACKGROUND_CHECK
+    // fields that have HIDDEN permission will not be included in excel
+    const fieldsWithPermissions = zip(
+      profileTypeFields,
+      await this.profiles.loadProfileTypeFieldUserEffectivePermission(
+        profileTypeFields.map(({ id }) => ({ profileTypeFieldId: id, userId })),
+      ),
+    )
+      .filter(([_, permission]) => isAtLeast(permission, "READ"))
+      .map(([field]) => field);
+
     const workbook = await this.initializeExcelWorkbook(
-      ["profile-id", ...excelColumns],
+      unique(["profile-id", ...fieldsWithPermissions.map((f) => f.id)]),
       profileTypeFieldsById,
       intl,
     );
@@ -83,13 +90,7 @@ export class ProfileExportService extends ProfileExcelService {
       const items = await pagination.items;
 
       // write profiles into worksheet in chunks of 100
-      await this.writeProfilesData(
-        items,
-        excelColumns,
-        profileTypeFieldsById,
-        userId,
-        workbook.worksheets[0],
-      );
+      await this.writeProfilesData(items, fieldsWithPermissions, workbook.worksheets[0]);
 
       offset += items.length;
       await onProgress?.(offset, totalCount);
@@ -115,15 +116,9 @@ export class ProfileExportService extends ProfileExcelService {
 
   private async writeProfilesData(
     profiles: Profile[],
-    profileTypeFieldIds: number[],
-    profileTypeFieldsById: Record<number, ProfileTypeField>,
-    userId: number,
+    fieldsWithPermissions: ProfileTypeField[],
     worksheet: Excel.Worksheet,
   ) {
-    const permissions = await this.profiles.loadProfileTypeFieldUserEffectivePermission(
-      profileTypeFieldIds.map((id) => ({ profileTypeFieldId: id, userId })),
-    );
-
     const profilesValues = await this.profiles.loadProfileFieldValuesByProfileId(
       profiles.map((p) => p.id),
     );
@@ -132,17 +127,13 @@ export class ProfileExportService extends ProfileExcelService {
     for (const [profile, profileValues] of zip(profiles, profilesValues)) {
       const row: Record<string, string> = { "profile-id": toGlobalId("Profile", profile.id) };
 
-      for (const [fieldId, permission] of zip(profileTypeFieldIds, permissions)) {
-        const field = profileTypeFieldsById[fieldId];
-        const globalId = toGlobalId("ProfileTypeField", fieldId);
+      for (const field of fieldsWithPermissions) {
+        const globalId = toGlobalId("ProfileTypeField", field.id);
 
-        assert(field, `Invalid profile type field id ${fieldId}`);
-        const fieldValue = profileValues.find((v) => v.profile_type_field_id === fieldId);
+        assert(field, `Invalid profile type field id ${field.id}`);
+        const fieldValue = profileValues.find((v) => v.profile_type_field_id === field.id);
 
-        if (isAtLeast(permission, "READ")) {
-          row[globalId] = this.stringifyProfileFieldValue(field, fieldValue);
-        }
-
+        row[globalId] = this.stringifyProfileFieldValue(field, fieldValue);
         if (field.is_expirable && !field.options.useReplyAsExpiryDate) {
           row[`${globalId}-expiry`] = fieldValue?.expiry_date ?? "";
         }

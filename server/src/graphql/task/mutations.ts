@@ -61,10 +61,7 @@ import {
   userHasFeatureFlag,
 } from "../petition/authorizers";
 import { userHasAccessToUsers } from "../petition/mutations/authorizers";
-import {
-  profileTypeFieldBelongsToProfileType,
-  userHasAccessToProfileType,
-} from "../profile/authorizers";
+import { userHasAccessToProfileType } from "../profile/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
 import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
@@ -962,11 +959,9 @@ export const createProfilesExcelExportTask = mutationField("createProfilesExcelE
     userHasFeatureFlag("PROFILES"),
     contextUserHasPermission("PROFILES:IMPORT_EXPORT_PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
-    profileTypeFieldBelongsToProfileType("profileTypeFieldIds", "profileTypeId"),
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
-    profileTypeFieldIds: nonNull(list(nonNull(globalIdArg("ProfileTypeField")))),
     search: stringArg(),
     filter: "ProfileFilter",
     sortBy: list(nonNull("SortByInput")),
@@ -979,10 +974,9 @@ export const createProfilesExcelExportTask = mutationField("createProfilesExcelE
         name: "PROFILES_EXCEL_EXPORT",
         input: {
           profile_type_id: args.profileTypeId,
-          profile_type_field_ids: args.profileTypeFieldIds,
           search: args.search ?? null,
           filter: (args.filter as any) ?? null,
-          sortBy:
+          sort_by:
             args.sortBy?.map((s) => ({
               field: s.field as "name" | "createdAt",
               direction: s.direction,

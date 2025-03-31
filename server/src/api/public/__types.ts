@@ -2022,7 +2022,6 @@ export type MutationcreateProfileTypeProcessArgs = {
 export type MutationcreateProfilesExcelExportTaskArgs = {
   filter?: InputMaybe<ProfileFilter>;
   locale: UserLocale;
-  profileTypeFieldIds: Array<Scalars["GID"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
   search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<SortByInput>>;

@@ -5,10 +5,9 @@ export class ProfilesExcelExportRunner extends TaskRunner<"PROFILES_EXCEL_EXPORT
   async run() {
     const {
       profile_type_id: profileTypeId,
-      profile_type_field_ids: profileTypeFieldIds,
       search,
       filter,
-      sortBy,
+      sort_by: sortBy,
       locale,
     } = this.task.input;
 
@@ -18,7 +17,6 @@ export class ProfilesExcelExportRunner extends TaskRunner<"PROFILES_EXCEL_EXPORT
 
     const { stream, filename, contentType } = await this.ctx.profileExport.exportToExcel(
       profileTypeId,
-      profileTypeFieldIds,
       search,
       filter,
       sortBy,

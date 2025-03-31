@@ -8307,7 +8307,6 @@ export interface NexusGenArgTypes {
       // args
       filter?: NexusGenInputs["ProfileFilter"] | null; // ProfileFilter
       locale: NexusGenEnums["UserLocale"]; // UserLocale!
-      profileTypeFieldIds: NexusGenScalars["GID"][]; // [GID!]!
       profileTypeId: NexusGenScalars["GID"]; // GID!
       search?: string | null; // String
       sortBy?: NexusGenInputs["SortByInput"][] | null; // [SortByInput!]
