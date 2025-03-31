@@ -98,7 +98,7 @@ export function PetitionFieldComment({
         comment.isUnread
           ? "primary.50"
           : comment.isInternal || comment.isApproval
-            ? "yellow.50"
+            ? "yellow.100"
             : "white"
       }
     >
