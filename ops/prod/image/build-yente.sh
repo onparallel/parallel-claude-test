@@ -1,3 +1,5 @@
+#! /bin/bash
+
 # make sure to copy all files in image/yente
 
 sudo hostnamectl set-hostname yente
@@ -19,6 +21,9 @@ sudo htpasswd -bB /etc/nginx/.htpasswd "$username" "$password"
 sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
+sudo yum install -y cronie
+sudo systemctl enable crond.service
+sudo systemctl start crond.service
 sudo python3 -m venv /opt/certbot/
 sudo /opt/certbot/bin/pip install --upgrade pip
 sudo /opt/certbot/bin/pip install certbot certbot
@@ -26,7 +31,7 @@ sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
 
 echo "0 0,12 * * * root /opt/certbot/bin/python -c 'import random; import time; time.sleep(random.random() * 3600)' && sudo certbot renew --quiet" | sudo tee -a /etc/crontab > /dev/null
 
-curl --silent --location --output release.tar.gz https://github.com/opensanctions/yente/archive/refs/tags/v4.1.0.tar.gz
+curl --silent --location --output release.tar.gz https://github.com/opensanctions/yente/archive/refs/tags/v4.2.3.tar.gz
 mkdir release
 tar -xf release.tar.gz --directory release --strip-components 1
 rm release.tar.gz
@@ -43,10 +48,6 @@ sudo systemctl enable nginx
 
 sudo systemctl start docker
 sudo systemctl start yente
-
-
-# sudo certbot certonly --webroot -w /usr/share/nginx/html -m santi@onparallel.com --agree-tos -d yente-green.parallel.so
-# sudo certbot certonly --webroot -w /usr/share/nginx/html -m santi@onparallel.com --agree-tos -d yente-blue.parallel.so
 
 sudo systemctl start nginx
 
