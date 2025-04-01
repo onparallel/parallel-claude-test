@@ -4176,8 +4176,8 @@
   },
   {
     "term": "component.import-profiles-from-excel-dialog.import-error-details",
-    "definition": "Hemos detectado algún error en la fila {row}, columna {col}.",
-    "context": "We have detected an error in row {row}, column {col}."
+    "definition": "Hemos detectado algún error en la celda {col}{row}.",
+    "context": "We have detected an error in cell {col}{row}."
   },
   {
     "term": "component.import-replies-dialog.checkbox-overwrite-replies",

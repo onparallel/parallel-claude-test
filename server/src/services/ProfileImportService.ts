@@ -124,7 +124,6 @@ export class ProfileImportService extends ProfileExcelService {
     profileTypeId: number,
     excelData: string[][],
     userId: number,
-    validate?: boolean,
   ): Promise<{ profileId: number | null; values: ParsedProfileFieldValue[] }[]> {
     // 1st row: property names
     // 2nd row: property IDs
@@ -210,18 +209,16 @@ export class ProfileImportService extends ProfileExcelService {
                 : cell.value,
         };
 
-        if (validate) {
-          try {
-            // cache validation result for this field and content.
-            // This is to avoid validating the same field and content multiple times
-            const key = `${field.id}-${JSON.stringify(content)}`;
-            if (!validationsCache.get(key)) {
-              await validateProfileFieldValue(field, content);
-              validationsCache.set(key, true);
-            }
-          } catch (error) {
-            throw new CellError(cell, error instanceof Error ? error.message : "UNKNOWN");
+        try {
+          // cache validation result for this field and content.
+          // This is to avoid validating the same field and content multiple times
+          const key = `${field.id}-${JSON.stringify(content)}`;
+          if (!validationsCache.get(key)) {
+            await validateProfileFieldValue(field, content);
+            validationsCache.set(key, true);
           }
+        } catch (error) {
+          throw new CellError(cell, error instanceof Error ? error.message : "UNKNOWN");
         }
 
         const expiryCell =

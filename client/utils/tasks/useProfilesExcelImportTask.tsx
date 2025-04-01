@@ -9,8 +9,7 @@ import {
 import { useProfilesExcelImportTask_createProfilesExcelImportTaskDocument } from "@parallel/graphql/__types";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNullish } from "remeda";
-import { isApolloError } from "../apollo/isApolloError";
+import { isNonNullish, isNullish } from "remeda";
 import { letters, nth } from "../generators";
 import { withError } from "../promises/withError";
 
@@ -40,7 +39,7 @@ export function useProfilesExcelImportTask() {
               <Text marginBottom={2}>
                 <FormattedMessage
                   id="component.import-profiles-from-excel-dialog.import-error-details"
-                  defaultMessage="We have detected an error in row {row}, column {col}."
+                  defaultMessage="We have detected an error in cell {col}{row}."
                   values={{ row: cell.row, col: nth(letters(), cell.col - 1) }}
                 />
               </Text>
@@ -64,6 +63,18 @@ export function useProfilesExcelImportTask() {
     ) => {
       const [taskError, taskResult] = await withError(async () => {
         return await showTaskProgressDialog({
+          onCompleted: async (task) => {
+            if (!task.output.success && isNonNullish(task.output.error)) {
+              const code = task.output.error.code;
+              if (code === "INVALID_FILE_ERROR") {
+                await withError(showImportErrorDialog());
+              }
+              if (code === "INVALID_CELL_ERROR") {
+                const cell = task.output.error.cell as ErrorCell;
+                await withError(showImportErrorDialog(cell));
+              }
+            }
+          },
           initTask: async () => {
             setIsLoading(true);
             try {
@@ -77,18 +88,6 @@ export function useProfilesExcelImportTask() {
               }
               return data.createProfilesExcelImportTask;
             } catch (error) {
-              if (isApolloError(error)) {
-                const code = error.graphQLErrors[0]?.extensions?.code;
-                if (code === "INVALID_FILE_ERROR") {
-                  await withError(showImportErrorDialog());
-                  throw new Error("CANCELLED");
-                }
-                if (code === "INVALID_CELL_ERROR") {
-                  const cell = error.graphQLErrors[0]?.extensions?.cell as ErrorCell;
-                  await withError(showImportErrorDialog(cell));
-                  throw new Error("CANCELLED");
-                }
-              }
               throw new Error("SERVER_ERROR");
             }
           },

@@ -25,16 +25,13 @@ import {
   zip,
 } from "remeda";
 import { Task } from "../../db/repositories/TaskRepository";
-import { CellError, InvalidDataError, UnknownIdError } from "../../services/ProfileExcelService";
 import { toBytes } from "../../util/fileSize";
 import { toGlobalId } from "../../util/globalId";
-import { withError } from "../../util/promises/withError";
 import { isValidTimezone } from "../../util/time";
 import { random } from "../../util/token";
 import { authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { importFromExcel } from "../helpers/importDataFromExcel";
 import { datetimeArg } from "../helpers/scalars/DateTime";
 import { uploadArg } from "../helpers/scalars/Upload";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
@@ -892,63 +889,33 @@ export const createProfilesExcelImportTask = mutationField("createProfilesExcelI
   resolve: async (_, args, ctx) => {
     const file = await args.file;
 
-    const [importError, importData] = await withError(importFromExcel(file.createReadStream()));
-    if (importError) {
-      throw new ApolloError("Invalid file", "INVALID_FILE_ERROR");
-    }
-
-    try {
-      // catch any parsing error before starting the task
-      await ctx.profileImport.parseExcelData(args.profileTypeId, importData, ctx.user!.id, true);
-
-      // all good, create a temporary file with data and start the task
-      const path = random(16);
-      const uploadResponse = await ctx.storage.temporaryFiles.uploadFile(
+    const path = random(16);
+    const uploadResponse = await ctx.storage.temporaryFiles.uploadFile(
+      path,
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      file.createReadStream(),
+    );
+    const tmpFile = await ctx.files.createTemporaryFile(
+      {
+        content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        filename: file.filename,
         path,
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        file.createReadStream(),
-      );
-      const tmpFile = await ctx.files.createTemporaryFile(
-        {
-          content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          filename: file.filename,
-          path,
-          size: uploadResponse["ContentLength"]?.toString() ?? "0",
-        },
-        `User:${ctx.user!.id}`,
-      );
+        size: uploadResponse["ContentLength"]?.toString() ?? "0",
+      },
+      `User:${ctx.user!.id}`,
+    );
 
-      return await ctx.tasks.createTask(
-        {
-          name: "PROFILES_EXCEL_IMPORT",
-          input: {
-            profile_type_id: args.profileTypeId,
-            temporary_file_id: tmpFile.id,
-          },
-          user_id: ctx.user!.id,
+    return await ctx.tasks.createTask(
+      {
+        name: "PROFILES_EXCEL_IMPORT",
+        input: {
+          profile_type_id: args.profileTypeId,
+          temporary_file_id: tmpFile.id,
         },
-        `User:${ctx.user!.id}`,
-      );
-    } catch (error) {
-      if (error instanceof InvalidDataError) {
-        throw new ApolloError(error.message, "INVALID_FILE_ERROR");
-      }
-      if (error instanceof CellError) {
-        throw new ApolloError(error.message, "INVALID_CELL_ERROR", {
-          cell: error.cell,
-        });
-      }
-      if (error instanceof UnknownIdError) {
-        throw new ApolloError(error.message, "INVALID_CELL_ERROR", {
-          cell: {
-            col: importData[1].indexOf(error.id) + 1,
-            row: 2,
-            value: error.id,
-          },
-        });
-      }
-      throw error;
-    }
+        user_id: ctx.user!.id,
+      },
+      `User:${ctx.user!.id}`,
+    );
   },
 });
 

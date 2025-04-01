@@ -262,8 +262,11 @@ export type TaskOutput<TName extends TaskName> = {
   };
   PROFILES_EXCEL_IMPORT: {
     success: boolean;
-    count: number;
-    error?: any;
+    count?: number;
+    error?: {
+      code: string;
+      cell?: { col: number; row: number; value: string };
+    };
   };
   PROFILES_EXCEL_EXPORT: {
     temporary_file_id: number;

@@ -19,12 +19,14 @@ interface TaskProgressDialogProps {
   confirmText?: ReactNode;
   dialogHeader?: ReactNode;
   initTask: () => Promise<TaskProgressDialog_TaskFragment>;
+  onCompleted?: (task: TaskProgressDialog_TaskFragment) => Promise<void>;
 }
 export function TaskProgressDialog({
   keycode,
   confirmText,
   dialogHeader,
   initTask,
+  onCompleted,
   ...props
 }: DialogProps<TaskProgressDialogProps, TaskProgressDialog_TaskFragment>) {
   const apollo = useApolloClient();
@@ -69,6 +71,7 @@ export function TaskProgressDialog({
         setTask(updatedTask);
         if (updatedTask.status === "COMPLETED") {
           done();
+          await onCompleted?.(updatedTask);
         } else if (updatedTask.status === "FAILED") {
           done();
           props.onReject("SERVER_ERROR");

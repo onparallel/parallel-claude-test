@@ -1,5 +1,7 @@
 import { assert } from "ts-essentials";
 import { importFromExcel } from "../../graphql/helpers/importDataFromExcel";
+import { CellError, InvalidDataError, UnknownIdError } from "../../services/ProfileExcelService";
+import { withError } from "../../util/promises/withError";
 import { TaskRunner } from "../helpers/TaskRunner";
 
 export class ProfilesExcelImportRunner extends TaskRunner<"PROFILES_EXCEL_IMPORT"> {
@@ -21,24 +23,60 @@ export class ProfilesExcelImportRunner extends TaskRunner<"PROFILES_EXCEL_IMPORT
 
     const file = await this.ctx.storage.temporaryFiles.downloadFile(temporaryFile.path);
 
-    const importData = await importFromExcel(file);
+    const [importError, importData] = await withError(importFromExcel(file));
+    if (importError) {
+      return {
+        success: false,
+        error: {
+          code: "INVALID_FILE_ERROR",
+        },
+      };
+    }
 
-    const data = await this.ctx.profileImport.parseExcelData(
-      profileTypeId,
-      importData,
-      user.id,
-      false, // no need to validate field contents again, we already did that in the mutation that triggered this task
-    );
+    try {
+      const data = await this.ctx.profileImport.parseExcelData(profileTypeId, importData, user.id);
 
-    await this.ctx.profileImport.importDataIntoProfiles(
-      profileTypeId,
-      data,
-      user,
-      async (count, total) => {
-        await this.onProgress((count / total) * 100);
-      },
-    );
+      await this.ctx.profileImport.importDataIntoProfiles(
+        profileTypeId,
+        data,
+        user,
+        async (count, total) => {
+          await this.onProgress((count / total) * 100);
+        },
+      );
 
-    return { success: true, count: data.length };
+      return { success: true, count: data.length };
+    } catch (error) {
+      if (error instanceof InvalidDataError) {
+        return {
+          success: false,
+          error: {
+            code: "INVALID_FILE_ERROR",
+          },
+        };
+      } else if (error instanceof CellError) {
+        return {
+          success: false,
+          error: {
+            code: "INVALID_CELL_ERROR",
+            cell: error.cell,
+          },
+        };
+      } else if (error instanceof UnknownIdError) {
+        return {
+          success: false,
+          error: {
+            code: "INVALID_CELL_ERROR",
+            cell: {
+              col: importData[1].indexOf(error.id) + 1,
+              row: 2,
+              value: error.id,
+            },
+          },
+        };
+      }
+
+      throw error;
+    }
   }
 }
