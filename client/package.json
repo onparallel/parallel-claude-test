@@ -107,7 +107,7 @@
     "react-select": "^5.8.0",
     "react-window": "^1.8.10",
     "read-excel-file": "^5.8.5",
-    "redoc": "^2.3.0",
+    "redoc": "^2.4.0",
     "remeda": "^1.61.0",
     "request-ip": "^3.3.0",
     "sanitize-filename": "^1.6.3",
