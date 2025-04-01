@@ -1,31 +1,70 @@
-import Ajv from "ajv";
 import { isPossiblePhoneNumber } from "libphonenumber-js";
 import { isNonNullish } from "remeda";
 import { TableTypes } from "../db/helpers/BaseRepository";
 import { profileTypeFieldSelectValues } from "../db/helpers/profileTypeFieldOptions";
-import { JsonSchemaFor } from "./jsonSchema";
 import { isValidDate } from "./time";
 import { validateShortTextFormat } from "./validateShortTextFormat";
 
-const stringValueSchema = (maxLength?: number) =>
-  ({
-    type: "object",
-    required: ["value"],
-    properties: {
-      value: { type: "string", maxLength },
-    },
-    additionalProperties: false,
-  }) as JsonSchemaFor<{ value: string }>;
+function assertSingleValueProperty<T extends "string" | "number" | "object">(
+  content: any,
+  type: T,
+): asserts content is { value: { string: string; number: number; object: any }[T] } {
+  if (!content) {
+    throw new Error("content is required");
+  }
+  let keys;
+  if (
+    !(
+      typeof content === "object" &&
+      (keys = Object.keys(content)).length === 1 &&
+      keys[0] === "value" &&
+      typeof content.value === type
+    )
+  ) {
+    throw new Error(`content must contain a single ${type} value property`);
+  }
+}
 
-const stringArrayValueSchema = () =>
-  ({
-    type: "object",
-    required: ["value"],
-    properties: {
-      value: { type: "array", items: { type: "string" } },
-    },
-    additionalProperties: false,
-  }) as JsonSchemaFor<{ value: string[] }>;
+function assertString(content: any, maxLength?: number): asserts content is { value: string } {
+  assertSingleValueProperty(content, "string");
+  if (maxLength !== undefined && content.value.length > maxLength) {
+    throw new Error(`content value must be ${maxLength} characters or less`);
+  }
+}
+
+function assertStringArray(content: any): asserts content is { value: string[] } {
+  assertSingleValueProperty(content, "object");
+  if (
+    !(
+      Array.isArray(content.value) && content.value.every((value: any) => typeof value === "string")
+    )
+  ) {
+    throw new Error("content must contain a string array value");
+  }
+}
+
+function assertPhone(content: any): asserts content is { value: string; pretty?: string } {
+  if (!content) {
+    throw new Error("content is required");
+  }
+  let keys;
+  if (
+    !(
+      typeof content === "object" &&
+      (keys = Object.keys(content)).includes("value") &&
+      typeof content.value === "string"
+    )
+  ) {
+    throw new Error(`content must contain a string value property`);
+  }
+  if (keys.length >= 2) {
+    if (keys.includes("pretty") && typeof content.pretty === "string") {
+      // fine
+    } else {
+      throw new Error(`content must not contain additional properties`);
+    }
+  }
+}
 
 const MAX_SHORT_TEXT_SIZE = 1_000;
 const MAX_TEXT_SIZE = 10_000;
@@ -34,22 +73,9 @@ export async function validateProfileFieldValue(
   field: Pick<TableTypes["profile_type_field"], "type" | "options">,
   content: any,
 ) {
-  const ajv = new Ajv();
-
-  function assertContent<T>(schema: JsonSchemaFor<T>, content: any): asserts content is T {
-    if (!content) {
-      throw new Error("Content is required");
-    }
-    const valid = ajv.validate(schema, content);
-    if (!valid) {
-      throw new Error(ajv.errorsText());
-    }
-  }
-
   switch (field.type) {
     case "SELECT": {
-      assertContent(stringValueSchema(), content);
-
+      assertString(content);
       const values = await profileTypeFieldSelectValues(field.options);
       if (!values.find((option) => content.value === option.value)) {
         throw new Error("Value is not a valid option");
@@ -57,8 +83,7 @@ export async function validateProfileFieldValue(
       return;
     }
     case "CHECKBOX": {
-      assertContent(stringArrayValueSchema(), content);
-
+      assertStringArray(content);
       const values = await profileTypeFieldSelectValues(field.options);
       const invalidValue = content.value.find(
         (value) => !values.find((option) => value === option.value),
@@ -74,8 +99,7 @@ export async function validateProfileFieldValue(
       return;
     }
     case "SHORT_TEXT": {
-      assertContent(stringValueSchema(MAX_SHORT_TEXT_SIZE), content);
-
+      assertString(content, MAX_SHORT_TEXT_SIZE);
       if (isNonNullish(field.options.format)) {
         if (!validateShortTextFormat(content.value, field.options.format)) {
           throw new Error(`Value is not valid according to format ${field.options.format}.`);
@@ -87,46 +111,25 @@ export async function validateProfileFieldValue(
       return;
     }
     case "TEXT": {
-      assertContent(stringValueSchema(MAX_TEXT_SIZE), content);
+      assertString(content, MAX_TEXT_SIZE);
       return;
     }
     case "DATE": {
-      assertContent(stringValueSchema(), content);
+      assertString(content);
       if (!isValidDate(content.value)) {
         throw new Error("Value is not a valid datetime");
       }
       return;
     }
     case "PHONE": {
-      assertContent<{ value: string; pretty?: string }>(
-        {
-          type: "object",
-          required: ["value"],
-          properties: {
-            value: { type: "string" },
-            pretty: { type: "string" },
-          },
-          additionalProperties: false,
-        },
-        content,
-      );
+      assertPhone(content);
       if (!isPossiblePhoneNumber(content.value)) {
         throw new Error("Value is not a valid phone number");
       }
       return;
     }
     case "NUMBER": {
-      assertContent<{ value: number }>(
-        {
-          type: "object",
-          required: ["value"],
-          properties: {
-            value: { type: "number" },
-          },
-          additionalProperties: false,
-        },
-        content,
-      );
+      assertSingleValueProperty(content, "number");
 
       if (isNaN(Number(content.value))) {
         throw new Error("Value is not a valid number");
