@@ -43,6 +43,7 @@ async function main() {
         Filters: [
             { Name: "tag:Release", Values: [commit] },
             { Name: "tag:Environment", Values: [env] },
+            { Name: "tag:App", Values: ["server"] },
             { Name: "instance-state-name", Values: [client_ec2_1.InstanceStateName.running] },
         ],
     }))
@@ -51,7 +52,12 @@ async function main() {
         throw new Error(`No running instances for environment ${env} and release ${commit}.`);
     }
     const addresses = await ec2
-        .send(new client_ec2_1.DescribeAddressesCommand({ Filters: [{ Name: "tag:Environment", Values: [env] }] }))
+        .send(new client_ec2_1.DescribeAddressesCommand({
+        Filters: [
+            { Name: "tag:Environment", Values: [env] },
+            { Name: "tag:App", Values: ["server"] },
+        ],
+    }))
         .then((r) => r.Addresses);
     const availableAddresses = addresses.filter((a) => !oldInstances.some((i) => a.InstanceId === i.InstanceId));
     if (availableAddresses.length < newInstances.length) {

@@ -64,6 +64,7 @@ async function main() {
         Filters: [
           { Name: "tag:Release", Values: [commit] },
           { Name: "tag:Environment", Values: [env] },
+          { Name: "tag:App", Values: ["server"] },
           { Name: "instance-state-name", Values: [InstanceStateName.running] },
         ],
       }),
@@ -75,7 +76,14 @@ async function main() {
   }
 
   const addresses = await ec2
-    .send(new DescribeAddressesCommand({ Filters: [{ Name: "tag:Environment", Values: [env] }] }))
+    .send(
+      new DescribeAddressesCommand({
+        Filters: [
+          { Name: "tag:Environment", Values: [env] },
+          { Name: "tag:App", Values: ["server"] },
+        ],
+      }),
+    )
     .then((r) => r.Addresses!);
 
   const availableAddresses = addresses.filter(
