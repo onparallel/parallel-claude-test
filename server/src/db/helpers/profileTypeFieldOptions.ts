@@ -19,6 +19,16 @@ const SEARCH_FREQUENCY = [
   "1_DAYS",
 ] as const;
 
+export const STANDARD_LIST_NAMES = [
+  "COUNTRIES",
+  "EU_COUNTRIES",
+  "NON_EU_COUNTRIES",
+  "CURRENCIES",
+  "CNAE",
+  "NACE",
+  "SIC",
+] as const;
+
 const SCHEMAS = {
   TEXT: {
     type: "object",
@@ -95,16 +105,7 @@ const SCHEMAS = {
       showOptionsWithColors: { type: ["boolean", "null"] },
       standardList: {
         type: ["string", "null"],
-        enum: [
-          "COUNTRIES",
-          "EU_COUNTRIES",
-          "NON_EU_COUNTRIES",
-          "CURRENCIES",
-          "CNAE",
-          "NACE",
-          "SIC",
-          null,
-        ],
+        enum: [...STANDARD_LIST_NAMES, null],
       },
     },
   },
@@ -128,16 +129,7 @@ const SCHEMAS = {
       },
       standardList: {
         type: ["string", "null"],
-        enum: [
-          "COUNTRIES",
-          "EU_COUNTRIES",
-          "NON_EU_COUNTRIES",
-          "CURRENCIES",
-          "CNAE",
-          "NACE",
-          "SIC",
-          null,
-        ],
+        enum: [...STANDARD_LIST_NAMES, null],
       },
     },
   },

@@ -80,6 +80,7 @@ import {
   ProfileExternalSourcesService,
 } from "./ProfileExternalSourcesService";
 import { PROFILE_IMPORT_SERVICE, ProfileImportService } from "./ProfileImportService";
+import { PROFILE_VALIDATION_SERVICE, ProfileValidationService } from "./ProfileValidationService";
 import {
   IProfilesSetupService,
   PROFILES_SETUP_SERVICE,
@@ -145,4 +146,6 @@ export const servicesModule = new ContainerModule((options) => {
   options.bind<PetitionFilesService>(PETITION_FILES_SERVICE).to(PetitionFilesService);
   options.bind(PROFILE_IMPORT_SERVICE).to(ProfileImportService);
   options.bind(PROFILE_EXPORT_SERVICE).to(ProfileExportService);
+
+  options.bind(PROFILE_VALIDATION_SERVICE).to(ProfileValidationService);
 });

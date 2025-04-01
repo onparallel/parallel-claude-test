@@ -83,6 +83,10 @@ import {
   PROFILE_EXTERNAL_SOURCE_SERVICE,
 } from "./services/ProfileExternalSourcesService";
 import { PROFILE_IMPORT_SERVICE, ProfileImportService } from "./services/ProfileImportService";
+import {
+  PROFILE_VALIDATION_SERVICE,
+  ProfileValidationService,
+} from "./services/ProfileValidationService";
 import { IProfilesSetupService, PROFILES_SETUP_SERVICE } from "./services/ProfilesSetupService";
 import { IQueuesService, QUEUES_SERVICE } from "./services/QueuesService";
 import { IRedis, REDIS } from "./services/Redis";
@@ -105,6 +109,7 @@ export class ApiContext {
   constructor(
     @inject(CONFIG) public config: Config,
     @inject(LOGGER) public logger: ILogger,
+
     // Services
     @inject(AUTH) public readonly auth: IAuth,
     @inject(EMAILS) public readonly emails: IEmailsService,
@@ -128,16 +133,19 @@ export class ApiContext {
     @inject(BACKGROUND_CHECK_SERVICE) public readonly backgroundCheck: IBackgroundCheckService,
     @inject(EVENT_SUBSCRIPTION_SERVICE)
     public readonly eventSubscription: IEventSubscriptionService,
+    @inject(ID_VERIFICATION_SERVICE) public readonly idVerification: IdVerificationService,
+    @inject(PROFILE_EXTERNAL_SOURCE_SERVICE)
+    public readonly profileExternalSources: IProfileExternalSourcesService,
     @inject(PROFILE_IMPORT_SERVICE) public readonly profileImport: ProfileImportService,
+    @inject(PROFILE_VALIDATION_SERVICE)
+    public readonly profileValidation: ProfileValidationService,
+
     // Setup services
     @inject(ACCOUNT_SETUP_SERVICE) public readonly accountSetup: IAccountSetupService,
     @inject(INTEGRATIONS_SETUP_SERVICE)
     public readonly integrationsSetup: IIntegrationsSetupService,
     @inject(PROFILES_SETUP_SERVICE)
     public readonly profilesSetup: IProfilesSetupService,
-    @inject(ID_VERIFICATION_SERVICE) public readonly idVerification: IdVerificationService,
-    @inject(PROFILE_EXTERNAL_SOURCE_SERVICE)
-    public readonly profileExternalSources: IProfileExternalSourcesService,
 
     // Repositories
     public readonly contacts: ContactRepository,

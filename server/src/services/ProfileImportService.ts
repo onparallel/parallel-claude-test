@@ -10,7 +10,6 @@ import { isAtLeast } from "../util/profileTypeFieldPermission";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { isValidDate } from "../util/time";
 import { Maybe, UnwrapArray } from "../util/types";
-import { validateProfileFieldValue } from "../util/validateProfileFieldValue";
 import { I18N_SERVICE, II18nService } from "./I18nService";
 import {
   CellData,
@@ -19,6 +18,8 @@ import {
   ProfileExcelService,
   UnknownIdError,
 } from "./ProfileExcelService";
+import { PROFILE_VALIDATION_SERVICE, ProfileValidationService } from "./ProfileValidationService";
+
 export const PROFILE_IMPORT_SERVICE = Symbol.for("PROFILE_IMPORT_SERVICE");
 
 interface ParsedProfileFieldValue {
@@ -33,6 +34,7 @@ interface ParsedProfileFieldValue {
 export class ProfileImportService extends ProfileExcelService {
   constructor(
     @inject(I18N_SERVICE) private i18n: II18nService,
+    @inject(PROFILE_VALIDATION_SERVICE) private profileValidation: ProfileValidationService,
     @inject(ProfileRepository) private profiles: ProfileRepository,
   ) {
     super();
@@ -164,8 +166,6 @@ export class ProfileImportService extends ProfileExcelService {
       values: ParsedProfileFieldValue[];
     }[] = [];
 
-    const validationsCache = new Map<string, boolean>();
-
     for (const contentById of cellRows) {
       // validate profileId value, if it exists
       const profileId = this.validateProfileIdCell(contentById["profile-id"]);
@@ -210,13 +210,7 @@ export class ProfileImportService extends ProfileExcelService {
         };
 
         try {
-          // cache validation result for this field and content.
-          // This is to avoid validating the same field and content multiple times
-          const key = `${field.id}-${JSON.stringify(content)}`;
-          if (!validationsCache.get(key)) {
-            await validateProfileFieldValue(field, content);
-            validationsCache.set(key, true);
-          }
+          await this.profileValidation.validateProfileFieldValueContent(field, content);
         } catch (error) {
           throw new CellError(cell, error instanceof Error ? error.message : "UNKNOWN");
         }

@@ -54,7 +54,6 @@ import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
 import { random } from "../../util/token";
-import { validateProfileFieldValue } from "../../util/validateProfileFieldValue";
 import { RESULT } from "../helpers/Result";
 import { SUCCESS } from "../helpers/Success";
 import { and, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
@@ -932,7 +931,10 @@ export const createProfile = mutationField("createProfile", {
           try {
             // validate fields content before creating the profile.
             // this way we can avoid creating the profile if the content is invalid
-            await validateProfileFieldValue(profileTypeField, field.content);
+            await ctx.profileValidation.validateProfileFieldValueContent(
+              profileTypeField,
+              field.content,
+            );
           } catch (e) {
             if (e instanceof Error) {
               aggregatedErrors.push({
@@ -1168,7 +1170,10 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
           field.content.value !== ""
         ) {
           try {
-            await validateProfileFieldValue(profileTypeField, field.content);
+            await ctx.profileValidation.validateProfileFieldValueContent(
+              profileTypeField,
+              field.content,
+            );
           } catch (e) {
             if (e instanceof Error) {
               aggregatedErrors.push({
@@ -2427,7 +2432,10 @@ export const completeProfileFromExternalSource = mutationField(
         try {
           // fields should already be validated as entity.parsed_data is validated before storing it on DB
           // just in case, validate again
-          await validateProfileFieldValue(field.profileTypeField, field.content);
+          await ctx.profileValidation.validateProfileFieldValueContent(
+            field.profileTypeField,
+            field.content,
+          );
         } catch (error) {
           aggregatedErrors.push({
             profileTypeFieldId: toGlobalId("ProfileTypeField", field.profileTypeField.id),

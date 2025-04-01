@@ -18,8 +18,8 @@ import {
   ProfileExternalSourceSearchParamDefinition,
 } from "../integrations/profile-external-source/ProfileExternalSourceIntegration";
 import { isAtLeast } from "../util/profileTypeFieldPermission";
-import { validateProfileFieldValue } from "../util/validateProfileFieldValue";
 import { ILogger, LOGGER } from "./Logger";
+import { PROFILE_VALIDATION_SERVICE, ProfileValidationService } from "./ProfileValidationService";
 
 export const PROFILE_EXTERNAL_SOURCE_SERVICE = Symbol.for("PROFILE_EXTERNAL_SOURCE_SERVICE");
 
@@ -67,6 +67,8 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
     eInformaIntegration: IProfileExternalSourceIntegration,
     @inject(COMPANIES_HOUSE_PROFILE_EXTERNAL_SOURCE_INTEGRATION)
     companiesHouseIntegration: IProfileExternalSourceIntegration,
+    @inject(PROFILE_VALIDATION_SERVICE)
+    private profileValidation: ProfileValidationService,
     @inject(LOGGER) private logger: ILogger,
   ) {
     this.availableIntegrations = [eInformaIntegration, companiesHouseIntegration];
@@ -167,7 +169,7 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
           this.logger.info(`Field with id ${profileTypeFieldId} not found. Skipping...`);
           return false;
         }
-        await validateProfileFieldValue(field, content);
+        await this.profileValidation.validateProfileFieldValueContent(field, content);
         return true;
       } catch (error) {
         if (error instanceof Error) {
@@ -188,7 +190,7 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
           this.logger.warn(`Field with alias ${alias} not found. Skipping...`);
           return false;
         }
-        await validateProfileFieldValue(field, content);
+        await this.profileValidation.validateProfileFieldValueContent(field, content);
         return true;
       } catch (error) {
         if (error instanceof Error) {
