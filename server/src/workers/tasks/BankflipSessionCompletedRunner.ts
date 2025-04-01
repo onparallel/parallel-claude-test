@@ -468,11 +468,9 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
           "expirationDate",
           "issuingCountry",
           "unexpiredDocument",
-          "matchesExpectedDocument",
           "faceFrontSide",
           "uncompromisedDocument",
           "notShownScreen",
-          "coherentDates",
           "checkedMRZ",
           "createdAt",
         ]);
@@ -570,7 +568,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
         },
         metadata: {
           inferred_type: "VIDEOSELFIE",
-          inferred_data: pick(idVerificationSummary.selfie, ["liveness", "onlyOneFace"]),
+          inferred_data: pick(idVerificationSummary.selfie, ["liveness"]),
         },
       });
     }

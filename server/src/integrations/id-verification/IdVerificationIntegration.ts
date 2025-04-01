@@ -74,11 +74,9 @@ export interface IdentityVerificationDocument {
   expirationDate: Maybe<string>;
   issuingCountry: Maybe<string>;
   unexpiredDocument: Maybe<number>;
-  matchesExpectedDocument: Maybe<number>;
   faceFrontSide: Maybe<number>;
   uncompromisedDocument: Maybe<number>;
   notShownScreen: Maybe<number>;
-  coherentDates: Maybe<number>;
   checkedMRZ: Maybe<number>;
   createdAt: string;
 }
@@ -88,7 +86,6 @@ export interface SelfieDocument {
   videoDocument: Maybe<IdentityVerificationDocumentInfo>;
   createdAt: string;
   liveness: Maybe<number>;
-  onlyOneFace: Maybe<number>;
 }
 
 export interface IIdVerificationIntegration {

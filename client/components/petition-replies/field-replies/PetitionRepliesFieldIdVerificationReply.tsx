@@ -28,7 +28,6 @@ interface MetadataLiveness {
 
 interface InferredDataLiveness {
   liveness: number;
-  onlyOneFace: number;
 }
 
 interface MetadataIDCard {
@@ -50,14 +49,12 @@ interface InferredDataIDCard {
   birthPlace: string | null;
   checkedMRZ: number | null;
   nationality: string | null;
-  coherentDates: number | null;
   faceFrontSide: number | null;
   expirationDate: string | null;
   issuingCountry: string | null;
   notShownScreen: number | null;
   unexpiredDocument: number | null;
   uncompromisedDocument: number | null;
-  matchesExpectedDocument: number | null;
 }
 
 export function PetitionRepliesFieldIdVerificationReply({
@@ -285,15 +282,6 @@ function LivenessView({
           maxScore={100}
           threshold={50}
         />
-        <PetitionRepliesMetadataScore
-          label={intl.formatMessage({
-            id: "component.petition-replies-field-id-verification-reply.only-one-face",
-            defaultMessage: "Only one face",
-          })}
-          score={metadata.inferred_data.onlyOneFace}
-          maxScore={100}
-          threshold={50}
-        />
       </Stack>
     </HStack>
   );
@@ -324,13 +312,6 @@ function useMetadataScores(
 
     return [
       {
-        score: metadata.inferred_data.matchesExpectedDocument,
-        label: intl.formatMessage({
-          id: "component.petition-replies-field-id-verification-reply.matched-expected-document",
-          defaultMessage: "Matched expected document",
-        }),
-      },
-      {
         score: metadata.inferred_data.faceFrontSide,
         label: intl.formatMessage({
           id: "component.petition-replies-field-id-verification-reply.face-front-side",
@@ -349,13 +330,6 @@ function useMetadataScores(
         label: intl.formatMessage({
           id: "component.petition-replies-field-id-verification-reply.not-shown-screen",
           defaultMessage: "Not shown screen",
-        }),
-      },
-      {
-        score: metadata.inferred_data.coherentDates,
-        label: intl.formatMessage({
-          id: "component.petition-replies-field-id-verification-reply.coherent-dates",
-          defaultMessage: "Coherent dates",
         }),
       },
       {

@@ -115,21 +115,16 @@ interface BankflipIdentityVerificationDocument {
   issueDate: Maybe<string>;
   expirationDate: Maybe<string>;
   unexpiredDocument: Maybe<number>;
-  matchesExpectedDocument: Maybe<number>;
   faceFrontSide: Maybe<number>;
   uncompromisedDocument: Maybe<number>;
   notShownScreen: Maybe<number>;
-  coherentDates: Maybe<number>;
   checkedMRZ: Maybe<number>;
   issuingCountry: Maybe<string>;
   documentSecurity: Maybe<boolean>;
   documentRead: Maybe<boolean>;
   notForged: Maybe<number>;
   notPrinted: Maybe<number>;
-  faceMatching: Maybe<number>;
   notSyntheticDocument: Maybe<number>;
-  authenticNFCChip: Maybe<number>;
-  frontBackSameDocument: Maybe<number>;
   createdAt: string;
 }
 
@@ -138,7 +133,6 @@ interface BankflipSelfieDocument {
   videoDocument: Maybe<BankflipIdentityVerificationDocumentInfo>;
   createdAt: string;
   liveness: Maybe<number>;
-  onlyOneFace: Maybe<number>;
 }
 
 @injectable()
@@ -493,11 +487,9 @@ export class BankflipIdVerificationIntegration
         "expirationDate",
         "issuingCountry",
         "unexpiredDocument",
-        "matchesExpectedDocument",
         "faceFrontSide",
         "uncompromisedDocument",
         "notShownScreen",
-        "coherentDates",
         "checkedMRZ",
         "createdAt",
       ]),
@@ -511,7 +503,7 @@ export class BankflipIdVerificationIntegration
 
   private mapIdVerificationSelfie(selfie: BankflipSelfieDocument): SelfieDocument {
     return {
-      ...pick(selfie, ["onlyOneFace", "liveness", "createdAt"]),
+      ...pick(selfie, ["liveness", "createdAt"]),
       pictureDocument: isNonNullish(selfie.pictureDocument)
         ? this.mapDocumentInfo(selfie.pictureDocument)
         : null,

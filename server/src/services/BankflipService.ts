@@ -88,21 +88,16 @@ interface IdentityVerificationDocument {
   issueDate: Maybe<string>;
   expirationDate: Maybe<string>;
   unexpiredDocument: Maybe<number>;
-  matchesExpectedDocument: Maybe<number>;
   faceFrontSide: Maybe<number>;
   uncompromisedDocument: Maybe<number>;
   notShownScreen: Maybe<number>;
-  coherentDates: Maybe<number>;
   checkedMRZ: Maybe<number>;
   issuingCountry: Maybe<string>;
   documentSecurity: Maybe<boolean>;
   documentRead: Maybe<boolean>;
   notForged: Maybe<number>;
   notPrinted: Maybe<number>;
-  faceMatching: Maybe<number>;
   notSyntheticDocument: Maybe<number>;
-  authenticNFCChip: Maybe<number>;
-  frontBackSameDocument: Maybe<number>;
   createdAt: string;
 }
 
@@ -145,7 +140,6 @@ interface IdentityVerificationSummaryResponse {
     videoDocument: Maybe<IdentityVerificationDocumentInfo>;
     createdAt: string;
     liveness: Maybe<number>;
-    onlyOneFace: Maybe<number>;
   }>;
 }
 interface SessionResponse {

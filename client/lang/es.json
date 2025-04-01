@@ -7140,11 +7140,6 @@
     "context": "Checked MRZ"
   },
   {
-    "term": "component.petition-replies-field-id-verification-reply.coherent-dates",
-    "definition": "Fechas coherentes",
-    "context": "Coherent dates"
-  },
-  {
     "term": "component.petition-replies-field-id-verification-reply.date-of-birth",
     "definition": "Fecha de nacimiento",
     "context": "Date of birth"
@@ -7195,11 +7190,6 @@
     "context": "Liveness"
   },
   {
-    "term": "component.petition-replies-field-id-verification-reply.matched-expected-document",
-    "definition": "Documento coincidente esperado",
-    "context": "Matched expected document"
-  },
-  {
     "term": "component.petition-replies-field-id-verification-reply.nationality",
     "definition": "Nacionalidad",
     "context": "Nationality"
@@ -7208,11 +7198,6 @@
     "term": "component.petition-replies-field-id-verification-reply.not-shown-screen",
     "definition": "No mostrado en pantalla",
     "context": "Not shown screen"
-  },
-  {
-    "term": "component.petition-replies-field-id-verification-reply.only-one-face",
-    "definition": "Solo una cara",
-    "context": "Only one face"
   },
   {
     "term": "component.petition-replies-field-id-verification-reply.passport-number",

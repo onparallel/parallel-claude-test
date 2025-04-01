@@ -233,11 +233,9 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
           "expirationDate",
           "issuingCountry",
           "unexpiredDocument",
-          "matchesExpectedDocument",
           "faceFrontSide",
           "uncompromisedDocument",
           "notShownScreen",
-          "coherentDates",
           "checkedMRZ",
           "createdAt",
         ]);
@@ -344,7 +342,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
           external_id: session.id,
         },
         metadata: {
-          inferred_data: pick(summary.selfie, ["liveness", "onlyOneFace"]),
+          inferred_data: pick(summary.selfie, ["liveness"]),
           inferred_type: "VIDEOSELFIE",
         },
       });
