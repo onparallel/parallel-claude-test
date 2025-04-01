@@ -124,6 +124,8 @@ export class MockAnalyticsService implements IAnalyticsService {
 
 @injectable()
 export class MockEmailsService implements IEmailsService {
+  async onPetitionMessageBounced() {}
+  async onPetitionReminderBounced() {}
   async sendBackgroundCheckMonitoringChangesEmail() {}
   async sendAppSumoActivateAccountEmail() {}
   async sendPetitionMessageEmail() {}

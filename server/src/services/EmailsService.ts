@@ -4,8 +4,12 @@ import emailProviders from "email-providers/all.json";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import pMap from "p-map";
+import { assert } from "ts-essentials";
 import { OrganizationUsageLimitName } from "../db/__types";
-import type { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
+import {
+  PetitionRepository,
+  type PetitionSignatureConfigSigner,
+} from "../db/repositories/PetitionRepository";
 import { ProfilesExpiringPropertiesEmailProps } from "../emails/emails/app/ProfilesExpiringPropertiesEmail";
 import { EMAIL_REGEX } from "../graphql/helpers/validators/validEmail";
 import { Maybe, MaybeArray, unMaybeArray } from "../util/types";
@@ -115,12 +119,17 @@ export interface IEmailsService {
     approvalRequestStepId: number,
     userId: number,
   ): Promise<void>;
+  onPetitionMessageBounced(petitionMessageId: number, updatedBy: string): Promise<void>;
+  onPetitionReminderBounced(petitionReminderId: number, updatedBy: string): Promise<void>;
 }
 export const EMAILS = Symbol.for("EMAILS");
 
 @injectable()
 export class EmailsService implements IEmailsService {
-  constructor(@inject(QUEUES_SERVICE) private queues: QueuesService) {}
+  constructor(
+    @inject(QUEUES_SERVICE) private queues: QueuesService,
+    @inject(PetitionRepository) private petitions: PetitionRepository,
+  ) {}
 
   private async enqueueEmail<T extends keyof EmailPayload>(
     type: T,
@@ -485,5 +494,45 @@ export class EmailsService implements IEmailsService {
 
   async validateEmail(email: string) {
     return EMAIL_REGEX.test(email) && (await this.resolveMx.load(email.split("@")[1]));
+  }
+
+  async onPetitionMessageBounced(petitionMessageId: number, updatedBy: string) {
+    const message = await this.petitions.loadMessage(petitionMessageId);
+    assert(message, `Message ${petitionMessageId} not found`);
+
+    await this.petitions.markPetitionAccessEmailBounceStatus(
+      message.petition_access_id,
+      true,
+      updatedBy,
+    );
+    await this.petitions.deactivateAccesses(
+      message.petition_id,
+      [message.petition_access_id],
+      updatedBy,
+    );
+    await this.sendPetitionMessageBouncedEmail(message.id);
+    await this.petitions.createEvent({
+      type: "PETITION_MESSAGE_BOUNCED",
+      data: { petition_message_id: message.id },
+      petition_id: message.petition_id,
+    });
+  }
+
+  async onPetitionReminderBounced(petitionReminderId: number, updatedBy: string) {
+    const reminder = await this.petitions.loadReminder(petitionReminderId);
+    assert(reminder, `Reminder ${petitionReminderId} not found`);
+    const access = await this.petitions.loadAccess(reminder.petition_access_id);
+    assert(access, `Access ${reminder.petition_access_id} not found`);
+
+    await this.petitions.markPetitionAccessEmailBounceStatus(access.id, true, updatedBy);
+    await this.petitions.updateRemindersForPetitions(access.petition_id, null);
+    await this.petitions.cancelScheduledMessagesByAccessIds([access.id]);
+    await this.petitions.createEvent({
+      type: "PETITION_REMINDER_BOUNCED",
+      data: {
+        petition_reminder_id: reminder.id,
+      },
+      petition_id: access.petition_id,
+    });
   }
 }

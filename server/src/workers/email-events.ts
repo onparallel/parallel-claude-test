@@ -43,43 +43,9 @@ createQueueWorker_OLD(
 
       // bounce can come from a PetitionMessage or a PetitionReminder
       if (message) {
-        await Promise.all([
-          context.petitions.markPetitionAccessEmailBounceStatus(
-            message.petition_access_id,
-            true,
-            context.config.instanceName,
-          ),
-          context.petitions.deactivateAccesses(
-            message.petition_id,
-            [message.petition_access_id],
-            context.config.instanceName,
-          ),
-          context.emails.sendPetitionMessageBouncedEmail(message.id),
-          context.petitions.createEvent({
-            type: "PETITION_MESSAGE_BOUNCED",
-            data: { petition_message_id: message.id },
-            petition_id: message.petition_id,
-          }),
-        ]);
+        await context.emails.onPetitionMessageBounced(message.id, context.config.instanceName);
       } else if (reminder) {
-        const access = (await context.petitions.loadAccess(reminder.petition_access_id))!;
-
-        await Promise.all([
-          context.petitions.markPetitionAccessEmailBounceStatus(
-            access.id,
-            true,
-            context.config.instanceName,
-          ),
-          context.petitions.updateRemindersForPetitions(access.petition_id, null),
-          context.petitions.cancelScheduledMessagesByAccessIds([access.id]),
-          context.petitions.createEvent({
-            type: "PETITION_REMINDER_BOUNCED",
-            data: {
-              petition_reminder_id: reminder.id,
-            },
-            petition_id: access.petition_id,
-          }),
-        ]);
+        await context.emails.onPetitionReminderBounced(reminder.id, context.config.instanceName);
       }
     } else if (event === "complaint") {
       if (message || reminder) {

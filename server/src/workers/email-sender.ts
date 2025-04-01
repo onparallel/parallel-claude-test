@@ -94,37 +94,57 @@ createQueueWorker_OLD("email-sender", async (payload, context, config) => {
       }
       const attachments = await context.emailLogs.getEmailAttachments(email.id);
       await limiter.waitUntilAllowed();
-      const result = await context.smtp.sendEmail({
-        from: email.from,
-        to: email.to,
-        subject: email.subject,
-        html: email.html,
-        text: email.text,
-        replyTo: email.reply_to ?? undefined,
-        headers: {
-          "X-SES-CONFIGURATION-SET":
-            context.config.ses.configurationSet[email.track_opens ? "tracking" : "noTracking"],
-        },
-        attachments: await pMap(
-          attachments,
-          async (attachment) => ({
-            filename: attachment.filename,
-            contentType: attachment.content_type,
-            content: await context.storage.temporaryFiles.downloadFile(attachment.path),
-          }),
-          { concurrency: 1 },
-        ),
-      });
-      await context.emailLogs.updateWithResponse(
-        email.id,
-        {
-          response: JSON.stringify(result),
-          external_id: result.response.startsWith("250 Ok")
-            ? result.response.replace(/^250 Ok /, "")
-            : null,
-        },
-        context.config.instanceName,
-      );
+      try {
+        const result = await context.smtp.sendEmail({
+          from: email.from,
+          to: email.to,
+          subject: email.subject,
+          html: email.html,
+          text: email.text,
+          replyTo: email.reply_to ?? undefined,
+          headers: {
+            "X-SES-CONFIGURATION-SET":
+              context.config.ses.configurationSet[email.track_opens ? "tracking" : "noTracking"],
+          },
+          attachments: await pMap(
+            attachments,
+            async (attachment) => ({
+              filename: attachment.filename,
+              contentType: attachment.content_type,
+              content: await context.storage.temporaryFiles.downloadFile(attachment.path),
+            }),
+            { concurrency: 1 },
+          ),
+        });
+        await context.emailLogs.updateWithResponse(
+          email.id,
+          {
+            response: JSON.stringify(result),
+            external_id: result.response.startsWith("250 Ok")
+              ? result.response.replace(/^250 Ok /, "")
+              : null,
+          },
+          context.config.instanceName,
+        );
+      } catch (error) {
+        if ((error as any)?.rejectedErrors?.some?.((err: any) => err?.responseCode === 501)) {
+          // invalid address errors (incorrect email syntax, invalid configurations, etc)
+          // emails could not be delivered
+          if (email.created_from.startsWith("PetitionMessage:")) {
+            return await context.emails.onPetitionMessageBounced(
+              parseInt(email.created_from.replace("PetitionMessage:", "")),
+              context.config.instanceName,
+            );
+          } else if (email.created_from.startsWith("PetitionReminder:")) {
+            return await context.emails.onPetitionReminderBounced(
+              parseInt(email.created_from.replace("PetitionReminder:", "")),
+              context.config.instanceName,
+            );
+          }
+        }
+
+        throw error;
+      }
     }
   }
 });
