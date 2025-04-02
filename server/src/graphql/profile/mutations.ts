@@ -37,7 +37,6 @@ import {
 import {
   ProfileFieldExpiryUpdatedEvent,
   ProfileFieldFileAddedEvent,
-  ProfileRelationshipCreatedEvent,
   ProfileRelationshipRemovedEvent,
 } from "../../db/events/ProfileEvent";
 import {
@@ -2011,7 +2010,7 @@ export const createProfileRelationship = mutationField("createProfileRelationshi
     );
     await ctx.profiles.withTransaction(async (t) => {
       try {
-        const relationships = await ctx.profiles.createProfileRelationship(
+        await ctx.profiles.createProfileRelationship(
           args.relationships.map((r) => {
             const relationshipType = relationshipTypes.find(
               (rt) => rt!.id === r.profileRelationshipTypeId,
@@ -2031,39 +2030,6 @@ export const createProfileRelationship = mutationField("createProfileRelationshi
           }),
           ctx.user!,
           false,
-          t,
-        );
-
-        await ctx.profiles.createEvent(
-          relationships.flatMap(
-            (r) =>
-              [
-                {
-                  org_id: ctx.user!.org_id,
-                  profile_id: r.left_side_profile_id,
-                  type: "PROFILE_RELATIONSHIP_CREATED",
-                  data: {
-                    user_id: ctx.user!.id,
-                    profile_relationship_id: r.id,
-                    profile_relationship_type_alias: relationshipTypes.find(
-                      (rt) => rt!.id === r.profile_relationship_type_id,
-                    )!.alias,
-                  },
-                },
-                {
-                  org_id: ctx.user!.org_id,
-                  profile_id: r.right_side_profile_id,
-                  type: "PROFILE_RELATIONSHIP_CREATED",
-                  data: {
-                    user_id: ctx.user!.id,
-                    profile_relationship_id: r.id,
-                    profile_relationship_type_alias: relationshipTypes.find(
-                      (rt) => rt!.id === r.profile_relationship_type_id,
-                    )!.alias,
-                  },
-                },
-              ] satisfies ProfileRelationshipCreatedEvent<true>[],
-          ),
           t,
         );
       } catch (error) {

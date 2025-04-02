@@ -3915,7 +3915,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           );
 
         if (repliesWithAssociatedProfiles.length > 0) {
-          const newRelationships = await ctx.profiles.createProfileRelationship(
+          await ctx.profiles.createProfileRelationship(
             repliesWithAssociatedProfiles.flatMap((reply) =>
               // every reply associated with a profile may have one or more possible relationships
               fieldRelationships
@@ -3973,27 +3973,6 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
             ctx.user!,
             true,
           );
-
-          if (newRelationships.length > 0) {
-            const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
-              unique(newRelationships.map((r) => r.profile_relationship_type_id)),
-            );
-
-            await ctx.profiles.createEvent(
-              newRelationships.map((r) => ({
-                type: "PROFILE_RELATIONSHIP_CREATED",
-                org_id: ctx.user!.org_id,
-                profile_id: profile!.id,
-                data: {
-                  user_id: ctx.user!.id,
-                  profile_relationship_id: r.id,
-                  profile_relationship_type_alias: relationshipTypes.find(
-                    (rt) => rt!.id === r.profile_relationship_type_id,
-                  )!.alias,
-                },
-              })),
-            );
-          }
         }
       }
 

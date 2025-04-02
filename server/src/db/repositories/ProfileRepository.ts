@@ -2419,8 +2419,13 @@ export class ProfileRepository extends BaseRepository {
     ignoreConflicts = false,
     t?: Knex.Transaction,
   ) {
-    const query = this.from("profile_relationship", t).insert(
-      unMaybeArray(data).map((d) => ({
+    const dataArr = unMaybeArray(data);
+    if (dataArr.length === 0) {
+      return;
+    }
+
+    const query = this.knex.from("profile_relationship").insert(
+      dataArr.map((d) => ({
         ...d,
         created_by_user_id: user.id,
         org_id: user.org_id,
@@ -2432,7 +2437,39 @@ export class ProfileRepository extends BaseRepository {
       query.onConflict().ignore();
     }
 
-    return await query;
+    const events = await this.raw<ProfileEvent>(
+      /* sql */ `
+        with pr as (?)
+        insert into profile_event (org_id, profile_id, type, data)
+        select
+          ?::int as org_id,
+          pr.left_side_profile_id,
+          'PROFILE_RELATIONSHIP_CREATED'::profile_event_type,
+          jsonb_build_object(
+            'user_id', ?::int,
+            'profile_relationship_id', pr.id,
+            'profile_relationship_type_id', pr.profile_relationship_type_id,
+            'profile_relationship_type_alias', prt.alias
+          )
+        from pr join profile_relationship_type prt on pr.profile_relationship_type_id = prt.id
+        union all
+        select
+          ?::int as org_id,
+          pr.right_side_profile_id,
+          'PROFILE_RELATIONSHIP_CREATED'::profile_event_type,
+          jsonb_build_object(
+            'user_id', ?::int,
+            'profile_relationship_id', pr.id,
+            'profile_relationship_type_id', pr.profile_relationship_type_id,
+            'profile_relationship_type_alias', prt.alias
+          )
+          from pr join profile_relationship_type prt on pr.profile_relationship_type_id = prt.id
+        returning *
+      `,
+      [query, user.org_id, user.id, user.org_id, user.id],
+      t,
+    );
+    await this.queues.enqueueEvents(events, "profile_event", undefined, t);
   }
 
   async removeProfileRelationships(profileRelationshipIds: number[], user: User) {

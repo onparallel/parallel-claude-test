@@ -5865,7 +5865,7 @@ describe("ProfileLinkedPetitionFields", () => {
                 data: {
                   userId: toGlobalId("User", user.id),
                   profileRelationshipId: expect.any(String),
-                  relationshipAlias: "p_legal_representative__legally_represented",
+                  relationshipAlias: "p_director__managed_by",
                 },
               },
               {
@@ -5873,7 +5873,7 @@ describe("ProfileLinkedPetitionFields", () => {
                 data: {
                   userId: toGlobalId("User", user.id),
                   profileRelationshipId: expect.any(String),
-                  relationshipAlias: "p_director__managed_by",
+                  relationshipAlias: "p_legal_representative__legally_represented",
                 },
               },
               {
