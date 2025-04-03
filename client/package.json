@@ -85,7 +85,7 @@
     "mime-match": "^1.0.2",
     "motion-number": "^0.1.7",
     "nanoid": "^5.0.9",
-    "next": "^14.2.25",
+    "next": "^14.2.26",
     "next-plugin-graphql": "^0.0.2",
     "node-fetch": "^2.6.12",
     "outdent": "^0.8.0",
