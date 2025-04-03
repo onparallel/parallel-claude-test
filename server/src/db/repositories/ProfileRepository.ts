@@ -9,13 +9,11 @@ import {
   isNonNullish,
   isNullish,
   map,
-  mapValues,
   omit,
   partition,
   pick,
   pipe,
   sortBy,
-  times,
   unique,
   uniqueBy,
   zip,
@@ -59,6 +57,7 @@ import {
   ProfileTypeStandardType,
   User,
   UserLocale,
+  UserLocaleValues,
 } from "../__types";
 import {
   CreateProfileEvent,
@@ -853,69 +852,54 @@ export class ProfileRepository extends BaseRepository {
       ),
     );
 
-    // on SELECT properties, we need to replace the value with the label.
-    const profileValuesWithSelectLabels = profileValues.map((pv) => ({
-      profileId: pv.profileId,
-      values: mapValues(pv.values, (value, fieldId) => {
-        if (isNonNullish(selectValuesById[fieldId])) {
-          const selectValue = selectValuesById[fieldId].find((v) => v.value === value);
-          return selectValue
-            ? { en: selectValue.label["en"], es: selectValue.label["es"] }
-            : { en: value, es: value };
-        } else {
-          return value;
-        }
-      }),
-    }));
-
     return await this.raw<Profile>(
       /* sql */ `
-        with pv(id, values) as ( 
-          ?
-        ),
-        names as (
-          select
-            id,
-            substring(trim(both from concat(${times(pattern.length, () => "?::text").join(",")})), 1, 255) as en,
-            substring(trim(both from concat(${times(pattern.length, () => "?::text").join(",")})), 1, 255) as es
-          from pv
-        )
+        with n (id, localizable_name) as (?)
         update "profile" p set
-          localizable_name = ?,
+          localizable_name = n.localizable_name,
           updated_by = ?,
           updated_at = now()
-        from names
-        where names.id = p.id
+        from n 
+        where n.id = p.id
         returning p.*;
       `,
       [
         this.sqlValues(
-          profileValuesWithSelectLabels.map((pv) => [pv.profileId, JSON.stringify(pv.values)]),
+          profileValues.map((pv) => [
+            pv.profileId,
+            JSON.stringify(
+              Object.fromEntries(
+                UserLocaleValues.map((locale, i, locales) => {
+                  return [
+                    locale,
+                    pattern
+                      .map((p) => {
+                        if (typeof p === "string") {
+                          return p;
+                        } else {
+                          if (isNonNullish(selectValuesById[p])) {
+                            const value = selectValuesById[p].find((v) => v.value === pv.values[p]);
+                            return isNonNullish(value)
+                              ? (value.label[locale] ??
+                                  locales.toSpliced(i, 1).map((l) => value.label[l]).find!(
+                                    isNonNullish,
+                                  ) ??
+                                  "")
+                              : "";
+                          } else {
+                            return pv.values[p] ?? "";
+                          }
+                        }
+                      })
+                      .join("")
+                      .trim(),
+                  ];
+                }),
+              ),
+            ),
+          ]),
           ["int", "jsonb"],
         ),
-        ...pattern.map((p) =>
-          typeof p === "string"
-            ? p
-            : isNonNullish(selectValuesById[p])
-              ? this.knex.raw(`coalesce(pv.values->?->>'en', pv.values->?->>'es', '')`, [
-                  `${p}`,
-                  `${p}`,
-                ])
-              : this.knex.raw(`coalesce(pv.values->>?, '')`, [`${p}`]),
-        ),
-        ...pattern.map((p) =>
-          typeof p === "string"
-            ? p
-            : isNonNullish(selectValuesById[p])
-              ? this.knex.raw(`coalesce(pv.values->?->>'es', pv.values->?->>'en', '')`, [
-                  `${p}`,
-                  `${p}`,
-                ])
-              : this.knex.raw(`coalesce(pv.values->>?, '')`, [`${p}`]),
-        ),
-        Object.keys(selectValuesById).length > 0
-          ? this.knex.raw(`jsonb_build_object('en', en, 'es', es)`)
-          : this.knex.raw(`jsonb_build_object('en', en)`),
         updatedBy,
       ],
       t,
