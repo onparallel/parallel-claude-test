@@ -13,6 +13,7 @@ import { hashString } from "../../util/token";
 import { KeysOfType, MaybeArray, Replace, unMaybeArray } from "../../util/types";
 import type * as db from "../__types";
 import { CreatePetitionEvent, PetitionEvent } from "../events/PetitionEvent";
+import { CreateProfileEvent, ProfileEvent } from "../events/ProfileEvent";
 import { CreateSystemEvent, SystemEvent } from "../events/SystemEvent";
 import { CreatePetitionUserNotification, PetitionUserNotification } from "../notifications";
 import { OrganizationUsageDetails } from "../repositories/OrganizationRepository";
@@ -36,6 +37,7 @@ export interface TableTypes
         { visibility: PetitionFieldVisibility | null; math: PetitionFieldMath[] | null }
       >;
       petition_event: PetitionEvent;
+      profile_event: ProfileEvent;
       petition_user_notification: PetitionUserNotification;
       system_event: SystemEvent;
       organization: Replace<db.Organization, { usage_details: OrganizationUsageDetails }>;
@@ -81,6 +83,7 @@ export interface TableCreateTypes
     db.TableCreateTypes,
     {
       petition_event: CreatePetitionEvent;
+      profile_event: CreateProfileEvent;
       system_event: CreateSystemEvent;
       petition_user_notification: CreatePetitionUserNotification;
       petition: Replace<

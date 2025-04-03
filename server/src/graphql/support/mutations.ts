@@ -1,10 +1,11 @@
 import Ajv from "ajv";
 import { booleanArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { isNonNullish, isNullish, unique } from "remeda";
+import { assert } from "ts-essentials";
 import { UserGroupPermissionName } from "../../db/__types";
 import { toBytes } from "../../util/fileSize";
 import { fullName } from "../../util/fullName";
-import { toGlobalId } from "../../util/globalId";
+import { fromGlobalId, isGlobalId, toGlobalId } from "../../util/globalId";
 import { parseStandardListDefinitionsData } from "../../util/parseStandardListDefinitionsData";
 import { random } from "../../util/token";
 import { RESULT } from "../helpers/Result";
@@ -1252,6 +1253,222 @@ export const updateStandardListDefinitions = mutationField("updateStandardListDe
       return {
         result: RESULT.FAILURE,
         message: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  },
+});
+
+export const associateProfilesToPetitionsExcel = mutationField(
+  "associateProfilesToPetitionsExcel",
+  {
+    type: "SupportMethodResponse",
+    description:
+      "Associates profiles to petitions from an excel file. First column must contain Profile ID, second column must contain Petition ID. Duplicated entries or existing associations will be ignored.",
+    authorize: superAdminAccess(),
+    args: {
+      orgId: nonNull(globalIdArg("Organization", { description: "Global ID of the organization" })),
+      file: nonNull(uploadArg()),
+    },
+    validateArgs: validateFile("file", {
+      contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      maxSize: toBytes(10, "MB"),
+    }),
+    resolve: async (_, args, ctx) => {
+      try {
+        const file = await args.file;
+        const importData = (await importFromExcel(file.createReadStream())).filter(
+          // filter rows with empty string
+          (row) => row[0]?.trim() !== "" && row[1]?.trim() !== "",
+        );
+
+        // validate excel format and Global IDs
+        const createData = importData.map((row, rowIndex) => {
+          assert(row.length === 2, `Error in row ${rowIndex + 1}: Must contain exactly 2 columns`);
+          assert(
+            isGlobalId(row[0], "Profile"),
+            `[Error in cell A${rowIndex + 1}]: Must contain Profile ID`,
+          );
+          assert(
+            isGlobalId(row[1], "Petition"),
+            `[Error in cell B${rowIndex + 1}]: Must contain Petition ID`,
+          );
+
+          return {
+            profile_id: fromGlobalId(row[0], "Profile").id,
+            petition_id: fromGlobalId(row[1], "Petition").id,
+          };
+        });
+
+        // validate profiles and petitions exist and belong to the organization
+        const [firstInvalidProfileId] = await ctx.profiles.getInvalidIdsByOrg(
+          unique(createData.map((c) => c.profile_id)),
+          args.orgId,
+        );
+        if (firstInvalidProfileId) {
+          const rowIndex = createData.findIndex((d) => d.profile_id === firstInvalidProfileId);
+          throw new Error(`[Error in cell A${rowIndex + 1}]: Invalid Profile ID`);
+        }
+
+        const [firstInvalidPetitionId] = await ctx.petitions.getInvalidIdsByOrg(
+          unique(createData.map((c) => c.petition_id)),
+          args.orgId,
+        );
+        if (firstInvalidPetitionId) {
+          const rowIndex = createData.findIndex((d) => d.petition_id === firstInvalidPetitionId);
+          throw new Error(`[Error in cell B${rowIndex + 1}]: Invalid Petition ID`);
+        }
+
+        await ctx.profiles.associateProfilesToPetition(createData, ctx.user!);
+
+        return {
+          result: RESULT.SUCCESS,
+          message: `associations created successfully`,
+        };
+      } catch (error) {
+        return {
+          result: RESULT.FAILURE,
+          message:
+            error instanceof Error
+              ? error.message.startsWith("Assertion Error:")
+                ? error.message.replace("Assertion Error: ", "")
+                : error.message
+              : "Unknown error",
+        };
+      }
+    },
+  },
+);
+
+export const createProfileRelationshipsExcel = mutationField("createProfileRelationshipsExcel", {
+  type: "SupportMethodResponse",
+  description:
+    "Creates relationships between profiles from an excel file. 1st and 2nd columns must be Profile IDs, 3rd column is the relationship alias. Direction is inferred from the profile IDs order.",
+  authorize: superAdminAccess(),
+  args: {
+    orgId: nonNull(globalIdArg("Organization", { description: "Global ID of the organization" })),
+    file: nonNull(uploadArg()),
+  },
+  validateArgs: validateFile("file", {
+    contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    maxSize: toBytes(10, "MB"),
+  }),
+  resolve: async (_, args, ctx) => {
+    try {
+      const file = await args.file;
+
+      const data = (await importFromExcel(file.createReadStream())).filter(
+        // filter rows with empty string
+        (row) => row[0]?.trim() !== "" && row[1]?.trim() !== "",
+      );
+
+      // validate excel format and Global IDs
+      const createData = data.map((row, rowIndex) => {
+        assert(row.length === 3, `[Error in row ${rowIndex + 1}]: Must contain exactly 3 columns`);
+        assert(
+          isGlobalId(row[0], "Profile"),
+          `[Error in cell A${rowIndex + 1}]: Must contain Profile ID`,
+        );
+        assert(
+          isGlobalId(row[1], "Profile"),
+          `[Error in cell B${rowIndex + 1}]: Must contain Profile ID`,
+        );
+        assert(
+          row[2]?.trim() !== "",
+          `[Error in cell C${rowIndex + 1}]: Must contain relationship alias`,
+        );
+
+        return {
+          left_side_profile_id: fromGlobalId(row[0], "Profile").id,
+          right_side_profile_id: fromGlobalId(row[1], "Profile").id,
+          relationship_alias: row[2],
+        };
+      });
+
+      // validate profiles and relationships exist and belong to the organization
+      const profileIds = createData.map((row) => [
+        row.left_side_profile_id,
+        row.right_side_profile_id,
+      ]);
+
+      const [firstInvalidProfileId] = await ctx.profiles.getInvalidIdsByOrg(
+        unique(profileIds.flat()),
+        args.orgId,
+      );
+      if (firstInvalidProfileId) {
+        const rowIndex = profileIds.findIndex(
+          ([l, r]) => l === firstInvalidProfileId || r === firstInvalidProfileId,
+        );
+        // check whether the invalid profile ID is in the left or right side of the relationship (columns A and B of excel file)
+        const colIndex = profileIds.at(rowIndex)![0] === firstInvalidProfileId ? "A" : "B";
+        throw new Error(`[Error in cell ${colIndex}${rowIndex + 1}]: Invalid Profile ID`);
+      }
+
+      const aliases = createData.map((row) => row.relationship_alias);
+      const orgRelationships = await ctx.profiles.loadProfileRelationshipTypesByOrgId(args.orgId);
+      const validOrgAliases = orgRelationships.map((r) => r.alias);
+
+      const [firstInvalidAlias] = aliases.filter((alias) => !validOrgAliases.includes(alias));
+      if (firstInvalidAlias) {
+        const rowIndex = aliases.indexOf(firstInvalidAlias);
+        throw new Error(`[Error in cell C${rowIndex + 1}]: Invalid relationship alias`);
+      }
+
+      const profiles = (
+        await ctx.profiles.loadProfile(
+          unique(
+            createData.flatMap((row) => [row.left_side_profile_id, row.right_side_profile_id]),
+          ),
+        )
+      ).filter(isNonNullish);
+
+      const [firstInvalidRelationship] = await ctx.profiles.getInvalidRelationships(
+        args.orgId,
+        createData.map((row) => ({
+          leftSideProfileTypeId: profiles.find((p) => p.id === row.left_side_profile_id)!
+            .profile_type_id,
+          rightSideProfileTypeId: profiles.find((p) => p.id === row.right_side_profile_id)!
+            .profile_type_id,
+          profileRelationshipTypeId: orgRelationships.find(
+            (r) => r.alias === row.relationship_alias,
+          )!.id,
+        })),
+      );
+
+      if (firstInvalidRelationship) {
+        const rowIndex = createData.findIndex(
+          (row) =>
+            firstInvalidRelationship.leftSideProfileTypeId ===
+              profiles.find((p) => p.id === row.left_side_profile_id)!.profile_type_id &&
+            firstInvalidRelationship.rightSideProfileTypeId ===
+              profiles.find((p) => p.id === row.right_side_profile_id)!.profile_type_id,
+        );
+        throw new Error(`[Error in cell C${rowIndex + 1}]: Invalid relationship`);
+      }
+
+      await ctx.profiles.createProfileRelationship(
+        createData.map((d) => ({
+          left_side_profile_id: d.left_side_profile_id,
+          right_side_profile_id: d.right_side_profile_id,
+          profile_relationship_type_id: orgRelationships.find(
+            (r) => r.alias === d.relationship_alias,
+          )!.id,
+        })),
+        ctx.user!,
+      );
+
+      return {
+        result: RESULT.SUCCESS,
+        message: `relationships created successfully`,
+      };
+    } catch (error) {
+      return {
+        result: RESULT.FAILURE,
+        message:
+          error instanceof Error
+            ? error.message.startsWith("Assertion Error:")
+              ? error.message.replace("Assertion Error: ", "")
+              : error.message
+            : "Unknown error",
       };
     }
   },

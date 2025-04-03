@@ -3854,31 +3854,9 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         }
       }
 
-      const associations = await ctx.profiles.associateProfilesToPetition(
+      await ctx.profiles.associateProfilesToPetition(
         [{ petition_id: args.petitionId, profile_id: profile!.id }],
-        `User:${ctx.user!.id}`,
-      );
-
-      await ctx.petitions.createEvent(
-        associations.map((a) => ({
-          type: "PROFILE_ASSOCIATED",
-          petition_id: a.petition_id,
-          data: {
-            user_id: ctx.user!.id,
-            profile_id: a.profile_id,
-          },
-        })),
-      );
-      await ctx.profiles.createEvent(
-        associations.map((a) => ({
-          type: "PETITION_ASSOCIATED",
-          org_id: ctx.user!.org_id,
-          profile_id: a.profile_id,
-          data: {
-            user_id: ctx.user!.id,
-            petition_id: a.petition_id,
-          },
-        })),
+        ctx.user!,
       );
 
       // these are the possible field relationships with petitionFieldId in any of the sides.
@@ -3971,7 +3949,6 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                 }),
             ),
             ctx.user!,
-            true,
           );
         }
       }
@@ -4118,7 +4095,7 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
       ctx.user!,
     );
 
-    const associations = await ctx.profiles.associateProfilesToPetition(
+    await ctx.profiles.associateProfilesToPetition(
       uniqueBy(
         [
           {
@@ -4134,30 +4111,7 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
         ],
         (p) => p.profile_id,
       ),
-      `User:${ctx.user!.id}`,
-    );
-
-    await ctx.petitions.createEvent(
-      associations.map((a) => ({
-        type: "PROFILE_ASSOCIATED",
-        petition_id: a.petition_id,
-        data: {
-          user_id: ctx.user!.id,
-          profile_id: a.profile_id,
-        },
-      })),
-    );
-
-    await ctx.profiles.createEvent(
-      associations.map((a) => ({
-        type: "PETITION_ASSOCIATED",
-        org_id: ctx.user!.org_id,
-        profile_id: a.profile_id,
-        data: {
-          user_id: ctx.user!.id,
-          petition_id: a.petition_id,
-        },
-      })),
+      ctx.user!,
     );
 
     if (args.prefill.length === 0) {
@@ -4281,33 +4235,12 @@ export const prefillPetitionFromProfiles = mutationField("prefillPetitionFromPro
 
     const profileIds = unique(args.prefill.flatMap((p) => p.profileIds));
 
-    const associations = await ctx.profiles.associateProfilesToPetition(
+    await ctx.profiles.associateProfilesToPetition(
       profileIds.map((profileId) => ({
         profile_id: profileId,
         petition_id: args.petitionId,
       })),
-      `User:${ctx.user!.id}`,
-    );
-    await ctx.petitions.createEvent(
-      associations.map((a) => ({
-        type: "PROFILE_ASSOCIATED",
-        petition_id: a.petition_id,
-        data: {
-          user_id: ctx.user!.id,
-          profile_id: a.profile_id,
-        },
-      })),
-    );
-    await ctx.profiles.createEvent(
-      associations.map((a) => ({
-        type: "PETITION_ASSOCIATED",
-        org_id: ctx.user!.org_id,
-        profile_id: a.profile_id,
-        data: {
-          user_id: ctx.user!.id,
-          petition_id: a.petition_id,
-        },
-      })),
+      ctx.user!,
     );
 
     return (await ctx.petitions.loadPetition(args.petitionId))!;
@@ -4436,32 +4369,9 @@ export const createFieldGroupReplyFromProfile = mutationField("createFieldGroupR
       }
     }
 
-    const associations = await ctx.profiles.associateProfilesToPetition(
+    await ctx.profiles.associateProfilesToPetition(
       [{ profile_id: args.profileId, petition_id: args.petitionId }],
-      `User:${ctx.user!.id}`,
-    );
-
-    await ctx.petitions.createEvent(
-      associations.map((a) => ({
-        type: "PROFILE_ASSOCIATED",
-        petition_id: a.petition_id,
-        data: {
-          user_id: ctx.user!.id,
-          profile_id: a.profile_id,
-        },
-      })),
-    );
-
-    await ctx.profiles.createEvent(
-      associations.map((a) => ({
-        type: "PETITION_ASSOCIATED",
-        org_id: ctx.user!.org_id,
-        profile_id: a.profile_id,
-        data: {
-          user_id: ctx.user!.id,
-          petition_id: a.petition_id,
-        },
-      })),
+      ctx.user!,
     );
 
     if (profileLinkedChildren.length > 0) {
@@ -4574,33 +4484,12 @@ export const createFieldGroupRepliesFromProfiles = mutationField(
         await createPetitionFieldRepliesFromPrefillData(args.petitionId, replies, ctx);
       }
 
-      const associations = await ctx.profiles.associateProfilesToPetition(
+      await ctx.profiles.associateProfilesToPetition(
         args.profileIds.map((profileId) => ({
           profile_id: profileId,
           petition_id: args.petitionId,
         })),
-        `User:${ctx.user!.id}`,
-      );
-      await ctx.petitions.createEvent(
-        associations.map((a) => ({
-          type: "PROFILE_ASSOCIATED",
-          petition_id: a.petition_id,
-          data: {
-            user_id: ctx.user!.id,
-            profile_id: a.profile_id,
-          },
-        })),
-      );
-      await ctx.profiles.createEvent(
-        associations.map((a) => ({
-          type: "PETITION_ASSOCIATED",
-          org_id: ctx.user!.org_id,
-          profile_id: a.profile_id,
-          data: {
-            user_id: ctx.user!.id,
-            petition_id: a.petition_id,
-          },
-        })),
+        ctx.user!,
       );
 
       return (await ctx.petitions.loadField(args.petitionFieldId))!;

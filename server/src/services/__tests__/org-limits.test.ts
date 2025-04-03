@@ -1,4 +1,4 @@
-import { Duration, subMonths } from "date-fns";
+import { Duration, startOfDay, subMonths } from "date-fns";
 import { Container } from "inversify";
 import { Knex } from "knex";
 import { createTestContainer } from "../../../test/testContainer";
@@ -50,7 +50,7 @@ describe("OrgLimitsService", () => {
         },
       }));
 
-      const startDate = subMonths(new Date(), 1);
+      const startDate = startOfDay(subMonths(new Date(), 1));
       await mocks.knex.from("organization_usage_limit").insert({
         org_id: organization.id,
         limit_name: "PETITION_SEND",
@@ -100,7 +100,7 @@ describe("OrgLimitsService", () => {
         },
       }));
 
-      const startDate = subMonths(new Date(), 1);
+      const startDate = startOfDay(subMonths(new Date(), 1));
       await mocks.knex.from("organization_usage_limit").insert({
         org_id: organization.id,
         limit_name: "PETITION_SEND",
@@ -151,7 +151,7 @@ describe("OrgLimitsService", () => {
         },
       }));
 
-      const startDate = subMonths(new Date(), 13);
+      const startDate = startOfDay(subMonths(new Date(), 13));
       await mocks.knex.from("organization_usage_limit").insert({
         org_id: organization.id,
         limit_name: "SIGNATURIT_SHARED_APIKEY",
@@ -201,7 +201,7 @@ describe("OrgLimitsService", () => {
         },
       }));
 
-      const startDate = subMonths(new Date(), 1);
+      const startDate = startOfDay(subMonths(new Date(), 1));
       await mocks.knex.from("organization_usage_limit").insert({
         org_id: organization.id,
         limit_name: "SIGNATURIT_SHARED_APIKEY",
@@ -251,7 +251,7 @@ describe("OrgLimitsService", () => {
         },
       }));
 
-      const startDate = subMonths(new Date(), 1);
+      const startDate = startOfDay(subMonths(new Date(), 1));
       await mocks.knex.from("organization_usage_limit").insert({
         org_id: organization.id,
         limit_name: "SIGNATURIT_SHARED_APIKEY",
@@ -290,7 +290,7 @@ describe("OrgLimitsService", () => {
         usage_details: {}, // no renewal
       }));
 
-      const startDate = subMonths(new Date(), 1);
+      const startDate = startOfDay(subMonths(new Date(), 1));
       await mocks.knex.from("organization_usage_limit").insert([
         {
           org_id: organization.id,
@@ -298,7 +298,7 @@ describe("OrgLimitsService", () => {
           limit: 100,
           used: 10,
           period: mocks.interval({ months: 1 }),
-          period_start_date: subMonths(startDate, 1),
+          period_start_date: startOfDay(subMonths(startDate, 1)),
           period_end_date: startDate,
           cycle_number: 2,
         },
@@ -330,7 +330,7 @@ describe("OrgLimitsService", () => {
           limit: 100,
           used: 10,
           period: duration({ months: 1 }),
-          period_start_date: subMonths(startDate, 1),
+          period_start_date: startOfDay(subMonths(startDate, 1)),
           period_end_date: startDate,
           cycle_number: 2,
         },
@@ -375,7 +375,7 @@ describe("OrgLimitsService", () => {
         },
       }));
 
-      const startDate = subMonths(new Date(), 1);
+      const startDate = startOfDay(subMonths(new Date(), 1));
       await mocks.knex.from("organization_usage_limit").insert({
         org_id: organization.id,
         limit_name: "PETITION_SEND",
@@ -461,7 +461,7 @@ describe("OrgLimitsService", () => {
         usage_details: orgUsageDetails[i],
       }));
 
-      const baseDate = new Date();
+      const baseDate = startOfDay(new Date());
 
       await mocks.knex.from("organization_usage_limit").insert([
         {
@@ -470,8 +470,8 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 200,
           period: mocks.interval({ months: 1 }),
-          period_start_date: subMonths(baseDate, 2),
-          period_end_date: subMonths(baseDate, 1),
+          period_start_date: startOfDay(subMonths(baseDate, 2)),
+          period_end_date: startOfDay(subMonths(baseDate, 1)),
           cycle_number: 1,
         },
         {
@@ -480,7 +480,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 203,
           period: mocks.interval({ months: 1 }),
-          period_start_date: subMonths(baseDate, 1),
+          period_start_date: startOfDay(subMonths(baseDate, 1)),
           period_end_date: null,
           cycle_number: 2,
         },
@@ -490,7 +490,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 30,
           period: mocks.interval({ months: 2 }),
-          period_start_date: subMonths(baseDate, 2),
+          period_start_date: startOfDay(subMonths(baseDate, 2)),
           period_end_date: null,
           cycle_number: 30,
         },
@@ -500,7 +500,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 203,
           period: mocks.interval({ months: 3 }),
-          period_start_date: subMonths(baseDate, 3),
+          period_start_date: startOfDay(subMonths(baseDate, 3)),
           period_end_date: null,
           cycle_number: 1,
         },
@@ -510,7 +510,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 203,
           period: mocks.interval({ months: 2 }),
-          period_start_date: subMonths(baseDate, 2),
+          period_start_date: startOfDay(subMonths(baseDate, 2)),
           period_end_date: null,
           cycle_number: 30,
         },
@@ -520,7 +520,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 150,
           period: mocks.interval({ months: 3 }),
-          period_start_date: subMonths(baseDate, 3),
+          period_start_date: startOfDay(subMonths(baseDate, 3)),
           period_end_date: null,
           cycle_number: 1,
         },
@@ -530,7 +530,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 30,
           period: mocks.interval({ months: 2 }),
-          period_start_date: subMonths(baseDate, 2),
+          period_start_date: startOfDay(subMonths(baseDate, 2)),
           period_end_date: null,
           cycle_number: 2,
         },
@@ -540,7 +540,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 150,
           period: mocks.interval({ months: 3 }),
-          period_start_date: subMonths(baseDate, 3),
+          period_start_date: startOfDay(subMonths(baseDate, 3)),
           period_end_date: null,
           cycle_number: 2,
         },
@@ -550,7 +550,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 300,
           period: mocks.interval({ months: 2 }),
-          period_start_date: subMonths(baseDate, 2),
+          period_start_date: startOfDay(subMonths(baseDate, 2)),
           period_end_date: null,
           cycle_number: 2,
         },
@@ -574,8 +574,8 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 200,
           period: duration({ months: 1 }),
-          period_start_date: subMonths(baseDate, 2),
-          period_end_date: subMonths(baseDate, 1),
+          period_start_date: startOfDay(subMonths(baseDate, 2)),
+          period_end_date: startOfDay(subMonths(baseDate, 1)),
           cycle_number: 1,
         },
         {
@@ -584,7 +584,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 200,
           period: duration({ months: 1 }),
-          period_start_date: subMonths(baseDate, 1),
+          period_start_date: startOfDay(subMonths(baseDate, 1)),
           period_end_date: expect.any(Date),
           cycle_number: 2,
         },
@@ -604,7 +604,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 30,
           period: duration({ months: 2 }),
-          period_start_date: subMonths(baseDate, 2),
+          period_start_date: startOfDay(subMonths(baseDate, 2)),
           period_end_date: expect.any(Date),
           cycle_number: 30,
         },
@@ -636,7 +636,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 200,
           period: duration({ months: 3 }),
-          period_start_date: subMonths(baseDate, 3),
+          period_start_date: startOfDay(subMonths(baseDate, 3)),
           period_end_date: expect.any(Date),
           cycle_number: 1,
         },
@@ -656,7 +656,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 203,
           period: duration({ months: 2 }),
-          period_start_date: subMonths(baseDate, 2),
+          period_start_date: startOfDay(subMonths(baseDate, 2)),
           period_end_date: expect.any(Date),
           cycle_number: 30,
         },
@@ -678,7 +678,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 150,
           period: duration({ months: 3 }),
-          period_start_date: subMonths(baseDate, 3),
+          period_start_date: startOfDay(subMonths(baseDate, 3)),
           period_end_date: expect.any(Date),
           cycle_number: 1,
         },
@@ -698,7 +698,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 30,
           period: duration({ months: 2 }),
-          period_start_date: subMonths(baseDate, 2),
+          period_start_date: startOfDay(subMonths(baseDate, 2)),
           period_end_date: expect.any(Date),
           cycle_number: 2,
         },
@@ -730,7 +730,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 150,
           period: duration({ months: 3 }),
-          period_start_date: subMonths(baseDate, 3),
+          period_start_date: startOfDay(subMonths(baseDate, 3)),
           period_end_date: expect.any(Date),
           cycle_number: 2,
         },
@@ -750,7 +750,7 @@ describe("OrgLimitsService", () => {
           limit: 200,
           used: 300,
           period: duration({ months: 2 }),
-          period_start_date: subMonths(baseDate, 2),
+          period_start_date: startOfDay(subMonths(baseDate, 2)),
           period_end_date: expect.any(Date),
           cycle_number: 2,
         },

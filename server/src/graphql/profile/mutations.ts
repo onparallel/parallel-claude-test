@@ -1776,38 +1776,14 @@ export const associateProfileToPetition = mutationField("associateProfileToPetit
     profileId: nonNull(globalIdArg("Profile")),
   },
   resolve: async (_, { petitionId, profileId }, ctx) => {
-    const [association] = await ctx.profiles.associateProfilesToPetition(
+    await ctx.profiles.associateProfilesToPetition(
       [{ profile_id: profileId, petition_id: petitionId }],
-      `User:${ctx.user!.id}`,
+      ctx.user!,
     );
 
-    if (!association) {
-      throw new ApolloError(
-        "Profile already associated to petition",
-        "PROFILE_ALREADY_ASSOCIATED_TO_PETITION",
-      );
-    }
-
-    await ctx.petitions.createEvent({
-      type: "PROFILE_ASSOCIATED",
-      petition_id: association.petition_id,
-      data: {
-        user_id: ctx.user!.id,
-        profile_id: association.profile_id,
-      },
-    });
-
-    await ctx.profiles.createEvent({
-      type: "PETITION_ASSOCIATED",
-      org_id: ctx.user!.org_id,
-      profile_id: association.profile_id,
-      data: {
-        user_id: ctx.user!.id,
-        petition_id: association.petition_id,
-      },
-    });
-
-    return association;
+    const pp = await ctx.profiles.getPetitionProfile(petitionId, profileId);
+    assert(pp, "Profile not associated to petition");
+    return pp;
   },
 });
 
@@ -2008,43 +1984,27 @@ export const createProfileRelationship = mutationField("createProfileRelationshi
     const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
       unique(args.relationships.map((r) => r.profileRelationshipTypeId)),
     );
-    await ctx.profiles.withTransaction(async (t) => {
-      try {
-        await ctx.profiles.createProfileRelationship(
-          args.relationships.map((r) => {
-            const relationshipType = relationshipTypes.find(
-              (rt) => rt!.id === r.profileRelationshipTypeId,
-            )!;
-            const [leftId, rightId] = relationshipType?.is_reciprocal
-              ? // if relationship is reciprocal, always insert lower profile_id on left and higher on right
-                // this way we can avoid duplicating reciprocal relationships with different directions
-                [args.profileId, r.profileId].sort()
-              : r.direction === "LEFT_RIGHT"
-                ? [args.profileId, r.profileId]
-                : [r.profileId, args.profileId];
-            return {
-              profile_relationship_type_id: r.profileRelationshipTypeId,
-              left_side_profile_id: leftId,
-              right_side_profile_id: rightId,
-            };
-          }),
-          ctx.user!,
-          false,
-          t,
-        );
-      } catch (error) {
-        if (
-          error instanceof DatabaseError &&
-          error.constraint === "profile_relationship__avoid_duplicates"
-        ) {
-          throw new ApolloError(
-            "The provided profiles are already associated",
-            "PROFILES_ALREADY_ASSOCIATED_ERROR",
-          );
-        }
-        throw error;
-      }
-    });
+
+    await ctx.profiles.createProfileRelationship(
+      args.relationships.map((r) => {
+        const relationshipType = relationshipTypes.find(
+          (rt) => rt!.id === r.profileRelationshipTypeId,
+        )!;
+        const [leftId, rightId] = relationshipType?.is_reciprocal
+          ? // if relationship is reciprocal, always insert lower profile_id on left and higher on right
+            // this way we can avoid duplicating reciprocal relationships with different directions
+            [args.profileId, r.profileId].sort()
+          : r.direction === "LEFT_RIGHT"
+            ? [args.profileId, r.profileId]
+            : [r.profileId, args.profileId];
+        return {
+          profile_relationship_type_id: r.profileRelationshipTypeId,
+          left_side_profile_id: leftId,
+          right_side_profile_id: rightId,
+        };
+      }),
+      ctx.user!,
+    );
 
     return (await ctx.profiles.loadProfile(args.profileId))!;
   },

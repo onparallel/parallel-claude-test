@@ -31,7 +31,7 @@ export interface IQueuesService {
     t?: Knex.Transaction,
   ): Promise<void>;
   enqueueEvents<TName extends "petition_event" | "system_event" | "profile_event">(
-    events: MaybeArray<TableTypes[TName]>,
+    events: MaybeArray<Pick<TableTypes[TName], "id" | "type" | "created_at">>,
     tableName: TName,
     delaySeconds?: number,
     t?: Knex.Transaction,
@@ -130,7 +130,7 @@ export class QueuesService implements IQueuesService {
   }
 
   async enqueueEvents<TName extends "petition_event" | "system_event" | "profile_event">(
-    events: MaybeArray<TableTypes[TName]>,
+    events: MaybeArray<Pick<TableTypes[TName], "id" | "type" | "created_at">>,
     tableName: TName,
     delaySeconds?: number,
     t?: Knex.Transaction,

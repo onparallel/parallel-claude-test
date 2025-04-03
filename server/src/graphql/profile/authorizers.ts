@@ -439,22 +439,22 @@ export function profilesCanBeAssociated<
 
     const profilesById = indexBy(profiles, (p) => p.id);
 
-    if (
-      !(await ctx.profiles.profileRelationshipsAreAllowed(
-        ctx.user!.org_id,
-        relationshipsData.map((r) => ({
-          leftSideProfileTypeId:
-            r.direction === "RIGHT_LEFT"
-              ? profilesById[r.profileId].profile_type_id
-              : profilesById[profileId].profile_type_id,
-          rightSideProfileTypeId:
-            r.direction === "LEFT_RIGHT"
-              ? profilesById[r.profileId].profile_type_id
-              : profilesById[profileId].profile_type_id,
-          profileRelationshipTypeId: r.profileRelationshipTypeId,
-        })),
-      ))
-    ) {
+    const invalidRelationships = await ctx.profiles.getInvalidRelationships(
+      ctx.user!.org_id,
+      relationshipsData.map((r) => ({
+        leftSideProfileTypeId:
+          r.direction === "RIGHT_LEFT"
+            ? profilesById[r.profileId].profile_type_id
+            : profilesById[profileId].profile_type_id,
+        rightSideProfileTypeId:
+          r.direction === "LEFT_RIGHT"
+            ? profilesById[r.profileId].profile_type_id
+            : profilesById[profileId].profile_type_id,
+        profileRelationshipTypeId: r.profileRelationshipTypeId,
+      })),
+    );
+
+    if (invalidRelationships.length > 0) {
       throw new ApolloError(
         "The provided profiles cannot be associated",
         "INVALID_PROFILE_RELATIONSHIP_TYPE_ERROR",

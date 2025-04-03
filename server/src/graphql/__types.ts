@@ -2388,6 +2388,7 @@ export interface NexusGenFieldTypes {
     archiveFieldGroupReplyIntoProfile: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     archiveProfileType: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
     associateProfileToPetition: NexusGenRootTypes["PetitionProfile"]; // PetitionProfile!
+    associateProfilesToPetitionsExcel: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     bulkCreateContacts: NexusGenRootTypes["BulkCreateContactsReturnType"]; // BulkCreateContactsReturnType!
     bulkCreatePetitionReplies: NexusGenRootTypes["Petition"]; // Petition!
     cancelPetitionApprovalRequestFlow: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
@@ -2456,6 +2457,7 @@ export interface NexusGenFieldTypes {
     createProfileLinkedPetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createProfileListView: NexusGenRootTypes["ProfileListView"]; // ProfileListView!
     createProfileRelationship: NexusGenRootTypes["Profile"]; // Profile!
+    createProfileRelationshipsExcel: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     createProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     createProfileTypeProcess: NexusGenRootTypes["ProfileTypeProcess"]; // ProfileTypeProcess!
@@ -3309,6 +3311,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionProfile: {
     // field return type
+    id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["Petition"]; // Petition!
     profile: NexusGenRootTypes["Profile"]; // Profile!
   };
@@ -5404,6 +5407,7 @@ export interface NexusGenFieldTypeNames {
     archiveFieldGroupReplyIntoProfile: "PetitionFieldReply";
     archiveProfileType: "ProfileType";
     associateProfileToPetition: "PetitionProfile";
+    associateProfilesToPetitionsExcel: "SupportMethodResponse";
     bulkCreateContacts: "BulkCreateContactsReturnType";
     bulkCreatePetitionReplies: "Petition";
     cancelPetitionApprovalRequestFlow: "PetitionApprovalRequestStep";
@@ -5472,6 +5476,7 @@ export interface NexusGenFieldTypeNames {
     createProfileLinkedPetitionField: "PetitionField";
     createProfileListView: "ProfileListView";
     createProfileRelationship: "Profile";
+    createProfileRelationshipsExcel: "SupportMethodResponse";
     createProfileType: "ProfileType";
     createProfileTypeField: "ProfileTypeField";
     createProfileTypeProcess: "ProfileTypeProcess";
@@ -6325,6 +6330,7 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionProfile: {
     // field return type name
+    id: "GID";
     petition: "Petition";
     profile: "Profile";
   };
@@ -7865,6 +7871,11 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       profileId: NexusGenScalars["GID"]; // GID!
     };
+    associateProfilesToPetitionsExcel: {
+      // args
+      file: NexusGenScalars["Upload"]; // Upload!
+      orgId: NexusGenScalars["GID"]; // GID!
+    };
     bulkCreateContacts: {
       // args
       file: NexusGenScalars["Upload"]; // Upload!
@@ -8286,6 +8297,11 @@ export interface NexusGenArgTypes {
       // args
       profileId: NexusGenScalars["GID"]; // GID!
       relationships: NexusGenInputs["CreateProfileRelationshipInput"][]; // [CreateProfileRelationshipInput!]!
+    };
+    createProfileRelationshipsExcel: {
+      // args
+      file: NexusGenScalars["Upload"]; // Upload!
+      orgId: NexusGenScalars["GID"]; // GID!
     };
     createProfileType: {
       // args

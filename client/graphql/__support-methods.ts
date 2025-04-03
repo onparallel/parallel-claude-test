@@ -34,6 +34,47 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "associateProfilesToPetitionsExcel",
+      description:
+        "Associates profiles to petitions from an excel file. First column must contain Profile ID, second column must contain Petition ID. Duplicated entries or existing associations will be ignored.",
+      args: [
+        {
+          name: "file",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Upload", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "orgId",
+          description: "Global ID of the organization",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "closePetitionsFromTemplate",
       description:
         "Closes every parallel with status PENDING or COMPLETED that was created from the selected template. Parallels with ongoing signatures will NOT be closed.",
@@ -369,6 +410,47 @@ export const supportMethods: {
         {
           name: "orgId",
           description: "e.g. yw7RQt2cQ4XDHdrbtL3",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
+      name: "createProfileRelationshipsExcel",
+      description:
+        "Creates relationships between profiles from an excel file. 1st and 2nd columns must be Profile IDs, 3rd column is the relationship alias. Direction is inferred from the profile IDs order.",
+      args: [
+        {
+          name: "file",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Upload", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "orgId",
+          description: "Global ID of the organization",
           type: {
             kind: "NON_NULL",
             name: null,

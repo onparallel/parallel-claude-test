@@ -41,7 +41,6 @@ import {
   Petition,
   PetitionProfile,
   Profile,
-  ProfileEvent,
   ProfileEventType,
   ProfileFieldFile,
   ProfileFieldValue,
@@ -59,8 +58,10 @@ import {
   UserLocale,
   UserLocaleValues,
 } from "../__types";
+import { PetitionEvent } from "../events/PetitionEvent";
 import {
   CreateProfileEvent,
+  ProfileEvent,
   ProfileFieldExpiryUpdatedEvent,
   ProfileFieldFileAddedEvent,
   ProfileFieldFileRemovedEvent,
@@ -1535,28 +1536,113 @@ export class ProfileRepository extends BaseRepository {
     },
   );
 
+  async getPetitionProfile(
+    petitionId: number,
+    profileId: number,
+  ): Promise<PetitionProfile | undefined> {
+    const [petitionProfile] = await this.from("petition_profile")
+      .where({
+        petition_id: petitionId,
+        profile_id: profileId,
+      })
+      .select("*");
+    return petitionProfile;
+  }
+
   async associateProfilesToPetition(
     data: CreatePetitionProfile[],
-    createdBy: string,
+    user: User,
     t?: Knex.Transaction,
   ) {
     if (data.length === 0) {
-      return [];
+      return;
     }
 
-    return await this.raw<PetitionProfile>(
-      /* sql */ `
-        ?
-        on conflict (petition_id, profile_id)
-        do nothing -- association is already there, ignore row
-        returning *;
-      `,
-      [
-        this.from("petition_profile").insert(
-          data.map((d) => ({ ...d, created_at: this.now(), created_by: createdBy })),
-        ),
-      ],
-      t,
+    await pMapChunk(
+      data,
+      async (dataChunk) => {
+        const events = await this.raw<
+          | ({ source: "profile_events" } & Pick<ProfileEvent, "id" | "type" | "created_at">)
+          | ({ source: "petition_events" } & Pick<PetitionEvent, "id" | "type" | "created_at">)
+        >(
+          /* sql */ `
+              with pp as (
+                insert into petition_profile (profile_id, petition_id, created_by)
+                select t.profile_id, t.petition_id, ? as created_by 
+                from (?) as t(profile_id, petition_id)
+                on conflict (profile_id, petition_id)
+                do nothing
+                returning *
+              ),
+              profile_events as (
+                insert into profile_event (org_id, profile_id, type, data)
+                select
+                  ?::int as org_id,
+                  pp.profile_id,
+                  'PETITION_ASSOCIATED'::profile_event_type,
+                  jsonb_build_object(
+                    'user_id', ?::int,
+                    'petition_id', pp.petition_id
+                  )
+                from pp
+                returning *
+              ),
+              petition_events as (
+                insert into petition_event (petition_id, type, data)
+                select
+                  pp.petition_id,
+                  'PROFILE_ASSOCIATED'::petition_event_type,
+                  jsonb_build_object(
+                    'user_id', ?::int,
+                    'profile_id', pp.profile_id
+                  )
+                from pp
+                returning *
+              )
+              select 
+                id, 
+                org_id, 
+                null as petition_id,
+                profile_id, 
+                type::text as type, 
+                data,
+                created_at,
+                'profile_events' as source 
+              from profile_events
+              union all
+              select 
+                id, 
+                null as org_id, 
+                petition_id, 
+                null as profile_id,
+                type::text as type, 
+                data,
+                created_at,
+                'petition_events' as source 
+              from petition_events
+            `,
+          [
+            `User:${user.id}`,
+            this.sqlValues(
+              dataChunk.map((c) => [c.profile_id, c.petition_id]),
+              ["int", "int"],
+            ),
+            user.org_id,
+            user.id,
+            user.id,
+          ],
+          t,
+        );
+
+        const [petitionEvents, profileEvents] = partition(
+          events,
+          (e) => e.source === "petition_events",
+        );
+
+        await this.queues.enqueueEvents(petitionEvents, "petition_event", undefined, t);
+        await this.queues.enqueueEvents(profileEvents, "profile_event", undefined, t);
+      },
+      { concurrency: 1, chunkSize: 1000 },
     );
   }
 
@@ -2360,39 +2446,6 @@ export class ProfileRepository extends BaseRepository {
     );
   }
 
-  async profileRelationshipsAreAllowed(
-    orgId: number,
-    relationships: {
-      leftSideProfileTypeId: number;
-      profileRelationshipTypeId: number;
-      rightSideProfileTypeId: number;
-    }[],
-  ) {
-    // for the association to be possible we need to find 2 rows with the same relationship type id.
-    // - 1st row will be with the left profile type id and direction LEFT_RIGHT
-    // - 2nd row will be with the right profile type id and direction RIGHT_LEFT
-    const allowedRelationships = await this.from("profile_relationship_type_allowed_profile_type")
-      .where("org_id", orgId)
-      .whereIn(
-        "profile_relationship_type_id",
-        relationships.map((r) => r.profileRelationshipTypeId),
-      )
-      .whereNull("deleted_at");
-
-    return relationships.every((r) => {
-      const allowed = allowedRelationships.filter(
-        (ar) =>
-          ar.profile_relationship_type_id === r.profileRelationshipTypeId &&
-          ((ar.allowed_profile_type_id === r.leftSideProfileTypeId &&
-            ar.direction === "LEFT_RIGHT") ||
-            (ar.allowed_profile_type_id === r.rightSideProfileTypeId &&
-              ar.direction === "RIGHT_LEFT")),
-      );
-
-      return allowed.length === 2;
-    });
-  }
-
   readonly loadProfileRelationship = this.buildLoadBy("profile_relationship", "id", (q) =>
     q.whereNull("deleted_at").whereNull("removed_at"),
   );
@@ -2400,7 +2453,6 @@ export class ProfileRepository extends BaseRepository {
   async createProfileRelationship(
     data: MaybeArray<Omit<CreateProfileRelationship, "org_id" | "created_by_user_id">>,
     user: User,
-    ignoreConflicts = false,
     t?: Knex.Transaction,
   ) {
     const dataArr = unMaybeArray(data);
@@ -2408,51 +2460,68 @@ export class ProfileRepository extends BaseRepository {
       return;
     }
 
-    const query = this.knex.from("profile_relationship").insert(
-      dataArr.map((d) => ({
-        ...d,
-        created_by_user_id: user.id,
-        org_id: user.org_id,
-      })),
-      "*",
-    );
-
-    if (ignoreConflicts) {
-      query.onConflict().ignore();
-    }
-
-    const events = await this.raw<ProfileEvent>(
-      /* sql */ `
-        with pr as (?)
-        insert into profile_event (org_id, profile_id, type, data)
-        select
-          ?::int as org_id,
-          pr.left_side_profile_id,
-          'PROFILE_RELATIONSHIP_CREATED'::profile_event_type,
-          jsonb_build_object(
-            'user_id', ?::int,
-            'profile_relationship_id', pr.id,
-            'profile_relationship_type_id', pr.profile_relationship_type_id,
-            'profile_relationship_type_alias', prt.alias
+    const events = await pMapChunk(
+      dataArr,
+      async (dataChunk) => {
+        return await this.raw<ProfileEvent>(
+          /* sql */ `
+          with pr as (
+            insert into profile_relationship (org_id, left_side_profile_id, right_side_profile_id, profile_relationship_type_id, created_by_user_id)
+            select ?::int as org_id, t.left_side_profile_id, t.right_side_profile_id, t.profile_relationship_type_id, ?::int as created_by_user_id 
+            from (?) as t(left_side_profile_id, right_side_profile_id, profile_relationship_type_id) 
+            on conflict (org_id, left_side_profile_id, profile_relationship_type_id, right_side_profile_id) where deleted_at is null and removed_at is null
+            do nothing
+            returning *
           )
-        from pr join profile_relationship_type prt on pr.profile_relationship_type_id = prt.id
-        union all
-        select
-          ?::int as org_id,
-          pr.right_side_profile_id,
-          'PROFILE_RELATIONSHIP_CREATED'::profile_event_type,
-          jsonb_build_object(
-            'user_id', ?::int,
-            'profile_relationship_id', pr.id,
-            'profile_relationship_type_id', pr.profile_relationship_type_id,
-            'profile_relationship_type_alias', prt.alias
-          )
+          insert into profile_event (org_id, profile_id, type, data)
+          select
+            ?::int as org_id,
+            pr.left_side_profile_id,
+            'PROFILE_RELATIONSHIP_CREATED'::profile_event_type,
+            jsonb_build_object(
+              'user_id', ?::int,
+              'profile_relationship_id', pr.id,
+              'profile_relationship_type_id', pr.profile_relationship_type_id,
+              'profile_relationship_type_alias', prt.alias
+            )
           from pr join profile_relationship_type prt on pr.profile_relationship_type_id = prt.id
-        returning *
-      `,
-      [query, user.org_id, user.id, user.org_id, user.id],
-      t,
+          union all
+          select
+            ?::int as org_id,
+            pr.right_side_profile_id,
+            'PROFILE_RELATIONSHIP_CREATED'::profile_event_type,
+            jsonb_build_object(
+              'user_id', ?::int,
+              'profile_relationship_id', pr.id,
+              'profile_relationship_type_id', pr.profile_relationship_type_id,
+              'profile_relationship_type_alias', prt.alias
+            )
+            from pr join profile_relationship_type prt on pr.profile_relationship_type_id = prt.id
+          returning *
+        `,
+          [
+            user.org_id,
+            user.id,
+            this.sqlValues(
+              dataChunk.map((c) => [
+                c.left_side_profile_id,
+                c.right_side_profile_id,
+                c.profile_relationship_type_id,
+              ]),
+              ["int", "int", "int"],
+            ),
+            user.org_id,
+            user.id,
+            user.org_id,
+            user.id,
+          ],
+          t,
+        );
+      },
+      { concurrency: 1, chunkSize: 1000 },
     );
+
+    // postpone event enqueuing until all queries were executed, to ensure no conflicts thrown
     await this.queues.enqueueEvents(events, "profile_event", undefined, t);
   }
 
@@ -2897,5 +2966,71 @@ export class ProfileRepository extends BaseRepository {
         threshold: 0.3,
       },
     );
+  }
+
+  /**
+   * Returns a subset of the provided profileIds that do not exist in the organization or are deleted
+   */
+  async getInvalidIdsByOrg(profileIds: number[], orgId: number) {
+    if (profileIds.length === 0) {
+      return [];
+    }
+
+    const rows = await this.raw<{ id: number }>(
+      /* sql */ `
+      with ids as (
+        select * from (?) as t(id)
+      )
+      select i.id from ids i
+      left join profile p on p.id = i.id and p.deleted_at is null and p.org_id = ?
+      where p.id is null
+    `,
+      [
+        this.sqlValues(
+          profileIds.map((id) => [id]),
+          ["int"],
+        ),
+        orgId,
+      ],
+    );
+
+    return rows.map((r) => r.id);
+  }
+
+  async getInvalidRelationships(
+    orgId: number,
+    relationships: {
+      leftSideProfileTypeId: number;
+      profileRelationshipTypeId: number;
+      rightSideProfileTypeId: number;
+    }[],
+  ) {
+    if (relationships.length === 0) {
+      return [];
+    }
+
+    // for the association to be possible we need to find 2 rows with the same relationship type id.
+    // - 1st row will be with the left profile type id and direction LEFT_RIGHT
+    // - 2nd row will be with the right profile type id and direction RIGHT_LEFT
+    const allowedRelationships = await this.from("profile_relationship_type_allowed_profile_type")
+      .where("org_id", orgId)
+      .whereIn(
+        "profile_relationship_type_id",
+        unique(relationships.map((r) => r.profileRelationshipTypeId)),
+      )
+      .whereNull("deleted_at");
+
+    return relationships.filter((r) => {
+      const allowed = allowedRelationships.filter(
+        (ar) =>
+          ar.profile_relationship_type_id === r.profileRelationshipTypeId &&
+          ((ar.allowed_profile_type_id === r.leftSideProfileTypeId &&
+            ar.direction === "LEFT_RIGHT") ||
+            (ar.allowed_profile_type_id === r.rightSideProfileTypeId &&
+              ar.direction === "RIGHT_LEFT")),
+      );
+
+      return allowed.length !== 2;
+    });
   }
 }

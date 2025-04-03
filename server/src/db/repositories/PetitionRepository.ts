@@ -9024,6 +9024,35 @@ export class PetitionRepository extends BaseRepository {
 
     return processes;
   }
+
+  /**
+   * Returns a subset of the provided petitionIds that do not exist in the organization or are deleted
+   */
+  async getInvalidIdsByOrg(petitionIds: number[], orgId: number) {
+    if (petitionIds.length === 0) {
+      return [];
+    }
+
+    const rows = await this.raw<{ id: number }>(
+      /* sql */ `
+      with ids as (
+        select * from (?) as t(id)
+      )
+      select i.id from ids i
+      left join petition p on p.id = i.id and p.deleted_at is null and p.org_id = ?
+      where p.id is null
+    `,
+      [
+        this.sqlValues(
+          petitionIds.map((id) => [id]),
+          ["int"],
+        ),
+        orgId,
+      ],
+    );
+
+    return rows.map((r) => r.id);
+  }
 }
 
 @injectable()

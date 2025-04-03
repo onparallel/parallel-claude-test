@@ -1016,6 +1016,8 @@ export type Mutation = {
   archiveProfileType: Array<ProfileType>;
   /** Associates a profile to a petition */
   associateProfileToPetition: PetitionProfile;
+  /** Associates profiles to petitions from an excel file. First column must contain Profile ID, second column must contain Petition ID. Duplicated entries or existing associations will be ignored. */
+  associateProfilesToPetitionsExcel: SupportMethodResponse;
   /** Load contacts from an excel file, creating the ones not found on database */
   bulkCreateContacts: BulkCreateContactsReturnType;
   /** Submits multiple replies on a petition at once given a JSON input where the keys are field aliases and values are the replie(s) for that field. */
@@ -1155,6 +1157,8 @@ export type Mutation = {
   createProfileListView: ProfileListView;
   /** Associates a profile with one or more relationships. */
   createProfileRelationship: Profile;
+  /** Creates relationships between profiles from an excel file. 1st and 2nd columns must be Profile IDs, 3rd column is the relationship alias. Direction is inferred from the profile IDs order. */
+  createProfileRelationshipsExcel: SupportMethodResponse;
   createProfileType: ProfileType;
   createProfileTypeField: ProfileTypeField;
   /** Creates and associates a key process on a profile type */
@@ -1581,6 +1585,11 @@ export type MutationassociateProfileToPetitionArgs = {
   profileId: Scalars["GID"]["input"];
 };
 
+export type MutationassociateProfilesToPetitionsExcelArgs = {
+  file: Scalars["Upload"]["input"];
+  orgId: Scalars["GID"]["input"];
+};
+
 export type MutationbulkCreateContactsArgs = {
   file: Scalars["Upload"]["input"];
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -2001,6 +2010,11 @@ export type MutationcreateProfileListViewArgs = {
 export type MutationcreateProfileRelationshipArgs = {
   profileId: Scalars["GID"]["input"];
   relationships: Array<CreateProfileRelationshipInput>;
+};
+
+export type MutationcreateProfileRelationshipsExcelArgs = {
+  file: Scalars["Upload"]["input"];
+  orgId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateProfileTypeArgs = {
@@ -4438,6 +4452,7 @@ export type PetitionPermissionType = "OWNER" | "READ" | "WRITE";
 export type PetitionPermissionTypeRW = "READ" | "WRITE";
 
 export type PetitionProfile = {
+  id: Scalars["GID"]["output"];
   petition: Petition;
   profile: Profile;
 };

@@ -545,6 +545,7 @@ export const ProfileFieldPropertyAndFileWithUploadData = objectType({
 export const PetitionProfile = objectType({
   name: "PetitionProfile",
   definition(t) {
+    t.nonNull.globalId("id");
     t.nonNull.field("petition", {
       type: "Petition",
       resolve: async (o, _, ctx) => {

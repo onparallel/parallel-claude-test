@@ -8147,11 +8147,12 @@ describe("GraphQL/Profiles", () => {
       });
     });
 
-    it("sends error if linking same petition and profile multiple times", async () => {
+    it("does not send error if linking same petition and profile multiple times", async () => {
       const { errors: link1Errors, data: link1Data } = await testClient.execute(
         gql`
           mutation ($petitionId: GID!, $profileId: GID!) {
             associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
+              id
               profile {
                 id
               }
@@ -8166,6 +8167,7 @@ describe("GraphQL/Profiles", () => {
 
       expect(link1Errors).toBeUndefined();
       expect(link1Data?.associateProfileToPetition).toEqual({
+        id: expect.any(String),
         profile: {
           id: toGlobalId("Profile", profile.id),
         },
@@ -8175,9 +8177,7 @@ describe("GraphQL/Profiles", () => {
         gql`
           mutation ($petitionId: GID!, $profileId: GID!) {
             associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
-              profile {
-                id
-              }
+              id
             }
           }
         `,
@@ -8187,8 +8187,10 @@ describe("GraphQL/Profiles", () => {
         },
       );
 
-      expect(link2Errors).toContainGraphQLError("PROFILE_ALREADY_ASSOCIATED_TO_PETITION");
-      expect(link2Data).toBeNull();
+      expect(link2Errors).toBeUndefined();
+      expect(link2Data?.associateProfileToPetition).toEqual({
+        id: link1Data.associateProfileToPetition.id,
+      });
 
       const petitionProfiles = await mocks.knex
         .from("petition_profile")

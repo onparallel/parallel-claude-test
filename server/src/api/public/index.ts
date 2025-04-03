@@ -3508,9 +3508,6 @@ export function publicApi(container: Container) {
         },
         responses: {
           200: SuccessResponse(Profile),
-          409: ErrorResponse({
-            description: "The profile is already associated to the parallel",
-          }),
         },
         tags: ["Parallels"],
       },
@@ -3532,25 +3529,18 @@ export function publicApi(container: Container) {
           ${ProfileFragment}
         `;
 
-        try {
-          const response = await client.request(
-            AssociatePetitionToProfile_associateProfileToPetitionDocument,
-            {
-              profileId: body.profileId,
-              petitionId: params.petitionId,
-              ...getProfileIncludesFromQuery(query),
-            },
-          );
+        const response = await client.request(
+          AssociatePetitionToProfile_associateProfileToPetitionDocument,
+          {
+            profileId: body.profileId,
+            petitionId: params.petitionId,
+            ...getProfileIncludesFromQuery(query),
+          },
+        );
 
-          assert("id" in response.associateProfileToPetition.profile);
+        assert("id" in response.associateProfileToPetition.profile);
 
-          return Ok(mapProfile(response.associateProfileToPetition.profile));
-        } catch (error) {
-          if (containsGraphQLError(error, "PROFILE_ALREADY_ASSOCIATED_TO_PETITION")) {
-            throw new ConflictError("The profile is already associated to this parallel");
-          }
-          throw error;
-        }
+        return Ok(mapProfile(response.associateProfileToPetition.profile));
       },
     );
 

@@ -1241,6 +1241,18 @@ type Mutation {
   associateProfileToPetition(petitionId: GID!, profileId: GID!): PetitionProfile!
 
   """
+  Associates profiles to petitions from an excel file. First column must contain Profile ID, second column must contain Petition ID. Duplicated entries or existing associations will be ignored.
+  """
+  associateProfilesToPetitionsExcel(
+    file: Upload!
+
+    """
+    Global ID of the organization
+    """
+    orgId: GID!
+  ): SupportMethodResponse!
+
+  """
   Load contacts from an excel file, creating the ones not found on database
   """
   bulkCreateContacts(
@@ -1917,6 +1929,18 @@ type Mutation {
     profileId: GID!
     relationships: [CreateProfileRelationshipInput!]!
   ): Profile!
+
+  """
+  Creates relationships between profiles from an excel file. 1st and 2nd columns must be Profile IDs, 3rd column is the relationship alias. Direction is inferred from the profile IDs order.
+  """
+  createProfileRelationshipsExcel(
+    file: Upload!
+
+    """
+    Global ID of the organization
+    """
+    orgId: GID!
+  ): SupportMethodResponse!
   createProfileType(name: LocalizableUserText!, pluralName: LocalizableUserText!): ProfileType!
   createProfileTypeField(data: CreateProfileTypeFieldInput!, profileTypeId: GID!): ProfileTypeField!
 
@@ -5551,6 +5575,7 @@ enum PetitionPermissionTypeRW {
 }
 
 type PetitionProfile {
+  id: GID!
   petition: Petition!
   profile: Profile!
 }

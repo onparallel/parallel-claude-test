@@ -1168,22 +1168,22 @@ export function petitionFieldsCanBeAssociated<
 
     const fieldsById = indexBy(petitionFields, (f) => f!.id);
 
-    if (
-      !(await ctx.profiles.profileRelationshipsAreAllowed(
-        ctx.user!.org_id,
-        relationships.map((r) => ({
-          leftSideProfileTypeId:
-            r.direction === "LEFT_RIGHT"
-              ? fieldsById[r.leftSidePetitionFieldId]!.profile_type_id!
-              : fieldsById[r.rightSidePetitionFieldId]!.profile_type_id!,
-          rightSideProfileTypeId:
-            r.direction === "LEFT_RIGHT"
-              ? fieldsById[r.rightSidePetitionFieldId]!.profile_type_id!
-              : fieldsById[r.leftSidePetitionFieldId]!.profile_type_id!,
-          profileRelationshipTypeId: r.profileRelationshipTypeId,
-        })),
-      ))
-    ) {
+    const invalidRelationships = await ctx.profiles.getInvalidRelationships(
+      ctx.user!.org_id,
+      relationships.map((r) => ({
+        leftSideProfileTypeId:
+          r.direction === "LEFT_RIGHT"
+            ? fieldsById[r.leftSidePetitionFieldId]!.profile_type_id!
+            : fieldsById[r.rightSidePetitionFieldId]!.profile_type_id!,
+        rightSideProfileTypeId:
+          r.direction === "LEFT_RIGHT"
+            ? fieldsById[r.rightSidePetitionFieldId]!.profile_type_id!
+            : fieldsById[r.leftSidePetitionFieldId]!.profile_type_id!,
+        profileRelationshipTypeId: r.profileRelationshipTypeId,
+      })),
+    );
+
+    if (invalidRelationships.length > 0) {
       throw new ApolloError(
         "The provided profiles cannot be associated",
         "INVALID_PROFILE_RELATIONSHIP_TYPE_ERROR",

@@ -2025,7 +2025,7 @@ describe("GraphQL/Profile Relationships", () => {
       });
     });
 
-    it("sends error when trying to create a reciprocal relationship twice with different directions", async () => {
+    it("creates only once when trying to create a reciprocal relationship twice with different directions", async () => {
       const [individualAProfile, individualBProfile] = await mocks.createRandomProfiles(
         organization.id,
         0,
@@ -2040,6 +2040,14 @@ describe("GraphQL/Profile Relationships", () => {
           mutation ($profileId: GID!, $relationships: [CreateProfileRelationshipInput!]!) {
             createProfileRelationship(profileId: $profileId, relationships: $relationships) {
               id
+              relationships {
+                relationshipType {
+                  alias
+                }
+                rightSideProfile {
+                  id
+                }
+              }
             }
           }
         `,
@@ -2066,8 +2074,20 @@ describe("GraphQL/Profile Relationships", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("PROFILES_ALREADY_ASSOCIATED_ERROR");
-      expect(data).toBeNull();
+      expect(errors).toBeUndefined();
+      expect(data?.createProfileRelationship).toEqual({
+        id: toGlobalId("Profile", individualAProfile.id),
+        relationships: [
+          {
+            relationshipType: {
+              alias: "p_close_associate",
+            },
+            rightSideProfile: {
+              id: toGlobalId("Profile", individualBProfile.id),
+            },
+          },
+        ],
+      });
     });
   });
 
