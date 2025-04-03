@@ -1,3 +1,4 @@
+import fastSafeStringify from "fast-safe-stringify";
 import pMap from "p-map";
 import { unMaybeArray } from "../util/types";
 import { appSumoActivateAccount } from "./emails/appsumo-activate-account";
@@ -131,19 +132,25 @@ createQueueWorker_OLD("email-sender", async (payload, context, config) => {
           // invalid address errors (incorrect email syntax, invalid configurations, etc)
           // emails could not be delivered
           if (email.created_from.startsWith("PetitionMessage:")) {
-            return await context.emails.onPetitionMessageBounced(
+            await context.emails.onPetitionMessageBounced(
               parseInt(email.created_from.replace("PetitionMessage:", "")),
               context.config.instanceName,
             );
           } else if (email.created_from.startsWith("PetitionReminder:")) {
-            return await context.emails.onPetitionReminderBounced(
+            await context.emails.onPetitionReminderBounced(
               parseInt(email.created_from.replace("PetitionReminder:", "")),
               context.config.instanceName,
             );
           }
-        }
 
-        throw error;
+          await context.emailLogs.updateWithResponse(
+            email.id,
+            { response: fastSafeStringify(error) },
+            context.config.instanceName,
+          );
+        } else {
+          throw error;
+        }
       }
     }
   }
