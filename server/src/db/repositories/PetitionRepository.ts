@@ -7276,7 +7276,6 @@ export class PetitionRepository extends BaseRepository {
         and p.is_template = false
         and p.status != 'DRAFT' 
         and p.deleted_at is null
-        and p.anonymized_at is null
         and (?::timestamptz is null or ?::timestamptz is null or p.created_at between ? and ?)
     `,
       [
