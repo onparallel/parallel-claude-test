@@ -307,6 +307,7 @@ export class PetitionRepository extends BaseRepository {
         deleted_at: null,
         anonymized_at: null,
       })
+      .whereNot("status", "DRAFT")
       .mmodify((q) => {
         if (startDate && endDate) {
           q.andWhereBetween("created_at", [startDate, endDate]);
@@ -7275,6 +7276,7 @@ export class PetitionRepository extends BaseRepository {
         and p.is_template = false
         and p.status != 'DRAFT' 
         and p.deleted_at is null
+        and p.anonymized_at is null
         and (?::timestamptz is null or ?::timestamptz is null or p.created_at between ? and ?)
     `,
       [
