@@ -1,13 +1,11 @@
 import archiver from "archiver";
 import { createReadStream, createWriteStream } from "fs";
-import { mkdir, rm } from "fs/promises";
-import { tmpdir } from "os";
+import { mkdir } from "fs/promises";
 import PQueue from "p-queue";
 import path from "path";
 import { PassThrough, pipeline, Readable } from "stream";
 import { promisify } from "util";
 import { constants } from "zlib";
-import { random } from "./token";
 
 interface ZipFileInput {
   filename: string;
@@ -17,11 +15,11 @@ interface ZipFileInput {
 const pipelineAsync = promisify(pipeline);
 
 export function createZipFile(
+  tempRoot: string,
   files: ZipFileInput[],
   options?: { onProgress?: (processed: number, totalCount: number) => void },
 ): Readable {
   const zip = archiver("zip", { zlib: { level: constants.Z_BEST_SPEED } });
-  const tempRoot = path.resolve(tmpdir(), `zip-${random(10)}`);
   // zip 1 file at a time
   // first file is processed right away from the download stream
   // the rest go through the file system to speed up the process as they can be downloaded while
@@ -48,7 +46,6 @@ export function createZipFile(
                 filename,
               }),
             );
-            await rm(tempPath, { recursive: true });
           }
           options?.onProgress?.(++progress, files.length);
         }),
@@ -57,8 +54,6 @@ export function createZipFile(
       await zip.finalize();
     } catch (err) {
       zip.emit("error", err);
-    } finally {
-      return rm(tempRoot, { recursive: true });
     }
   })().then();
 
