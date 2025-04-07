@@ -46,7 +46,6 @@ import {
   ProfileFieldExpiryUpdatedEvent,
   ProfileFieldFileAddedEvent,
   ProfileFieldFileRemovedEvent,
-  ProfileFieldValueUpdatedEvent,
 } from "../../../db/events/ProfileEvent";
 import { defaultFieldProperties } from "../../../db/helpers/fieldOptions";
 import {
@@ -93,7 +92,6 @@ import {
   buildFieldGroupRepliesFromPrefillInput,
   createPetitionFieldRepliesFromPrefillData,
 } from "../../helpers/buildFieldGroupRepliesFromPrefill";
-import { buildProfileUpdatedEventsData } from "../../helpers/buildProfileUpdatedEventsData";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { importFromExcel } from "../../helpers/importDataFromExcel";
 import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectValues";
@@ -3529,11 +3527,11 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
       // if content is null, it means the value will be removed from the profile
       // expiryDate must be defined (or null) if the field is expirable
       const updateProfileFieldValues: {
+        profileId: number;
         profileTypeFieldId: number;
         type: ProfileTypeFieldType;
         content: any;
         expiryDate?: string | null;
-        alias: string | null;
       }[] = [];
 
       for (const { field, replies } of simpleReplies) {
@@ -3581,6 +3579,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                * IGNORE/APPEND: will keep the current profile field value and ignore the reply
                */
               updateProfileFieldValues.push({
+                profileId: profile!.id,
                 ...mapPetitionFieldReplyToProfileFieldValue(
                   reply ?? { type: field.type, content: null },
                 ),
@@ -3589,7 +3588,6 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                   reply && profileTypeField.options.useReplyAsExpiryDate
                     ? reply.content.value
                     : expiration?.expiryDate,
-                alias: profileTypeField.alias,
               });
             }
           }
@@ -3606,13 +3604,13 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           }
 
           updateProfileFieldValues.push({
+            profileId: profile!.id,
             ...mapPetitionFieldReplyToProfileFieldValue(reply),
             profileTypeFieldId: field.profile_type_field_id!,
             expiryDate:
               reply && profileTypeField.options.useReplyAsExpiryDate
                 ? reply.content.value
                 : expiration?.expiryDate,
-            alias: profileTypeField.alias,
           });
         }
       }
@@ -3750,24 +3748,11 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         );
       }
 
-      const { currentValues, previousValues } = await ctx.profiles.updateProfileFieldValue(
-        profile!.id,
-        updateProfileFieldValues,
-        ctx.user!.id,
-      );
-
-      const profileUpdatedEvents: (
-        | ProfileFieldValueUpdatedEvent<true>
+      const profileFileEvents: (
         | ProfileFieldFileAddedEvent<true>
         | ProfileFieldFileRemovedEvent<true>
         | ProfileFieldExpiryUpdatedEvent<true>
-      )[] = buildProfileUpdatedEventsData(
-        profile!.id,
-        updateProfileFieldValues,
-        currentValues,
-        previousValues,
-        ctx.user!,
-      );
+      )[] = [];
 
       if (deleteProfileFieldFileIds.length > 0) {
         const deletedProfileFiles = await ctx.profiles.deleteProfileFieldFiles(
@@ -3775,7 +3760,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           ctx.user!.id,
         );
 
-        profileUpdatedEvents.push(
+        profileFileEvents.push(
           ...deletedProfileFiles.map(
             (f) =>
               ({
@@ -3820,7 +3805,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
             ctx.user!.id,
           );
 
-          profileUpdatedEvents.push(
+          profileFileEvents.push(
             ...profileFieldFiles.map(
               (pff) =>
                 ({
@@ -3953,14 +3938,13 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         }
       }
 
-      if (profileUpdatedEvents.length > 0) {
-        await ctx.profiles.createProfileUpdatedEvents(
-          profile!.id,
-          profileUpdatedEvents,
-          ctx.user!.org_id,
-          ctx.user!.id,
-        );
-      }
+      await ctx.profiles.createEvent(profileFileEvents);
+
+      await ctx.profiles.updateProfileFieldValues(
+        updateProfileFieldValues,
+        ctx.user!.id,
+        ctx.user!.org_id,
+      );
 
       return await ctx.petitions.updatePetitionFieldReply(
         args.parentReplyId,

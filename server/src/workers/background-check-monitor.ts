@@ -29,13 +29,10 @@ createCronWorker("background-check-monitor", async (ctx) => {
           `[Organization:${org.id}][Profile:${value.profile_id}][ProfileFieldValue:${value.id}] Updating entity details`,
         );
         const newDetails = await ctx.backgroundCheck.entityProfileDetails(value.content.entity.id);
-        const {
-          currentValues: [currentValue],
-          previousValues: [previousValue],
-        } = await ctx.profiles.updateProfileFieldValue(
-          value.profile_id,
+        await ctx.profiles.updateProfileFieldValues(
           [
             {
+              profileId: value.profile_id,
               profileTypeFieldId: value.profile_type_field_id,
               type: "BACKGROUND_CHECK",
               content: {
@@ -45,30 +42,7 @@ createCronWorker("background-check-monitor", async (ctx) => {
             },
           ],
           null,
-        );
-
-        const profile = (await ctx.profiles.loadProfile(value.profile_id))!;
-        const profileTypeField = await ctx.profiles.loadProfileTypeField(
-          value.profile_type_field_id,
-        );
-        await ctx.profiles.createProfileUpdatedEvents(
-          value.profile_id,
-          [
-            {
-              org_id: profile.org_id,
-              profile_id: profile.id,
-              type: "PROFILE_FIELD_VALUE_UPDATED",
-              data: {
-                user_id: null,
-                current_profile_field_value_id: currentValue?.id ?? null,
-                previous_profile_field_value_id: previousValue?.id ?? null,
-                profile_type_field_id: value.profile_type_field_id,
-                alias: profileTypeField?.alias ?? null,
-              },
-            },
-          ],
-          profile.org_id,
-          null,
+          org.id,
         );
 
         if (isNotifiableEntityDifference(value.content.entity, newDetails)) {
@@ -89,13 +63,10 @@ createCronWorker("background-check-monitor", async (ctx) => {
         );
         const newSearch = await ctx.backgroundCheck.entitySearch(value.content.query);
 
-        const {
-          currentValues: [currentValue],
-          previousValues: [previousValue],
-        } = await ctx.profiles.updateProfileFieldValue(
-          value.profile_id,
+        await ctx.profiles.updateProfileFieldValues(
           [
             {
+              profileId: value.profile_id,
               profileTypeFieldId: value.profile_type_field_id,
               type: "BACKGROUND_CHECK",
               content: {
@@ -105,32 +76,8 @@ createCronWorker("background-check-monitor", async (ctx) => {
             },
           ],
           null,
+          org.id,
         );
-
-        const profile = (await ctx.profiles.loadProfile(value.profile_id))!;
-        const profileTypeField = await ctx.profiles.loadProfileTypeField(
-          value.profile_type_field_id,
-        );
-        await ctx.profiles.createProfileUpdatedEvents(
-          value.profile_id,
-          [
-            {
-              org_id: profile.org_id,
-              profile_id: profile.id,
-              type: "PROFILE_FIELD_VALUE_UPDATED",
-              data: {
-                user_id: null,
-                current_profile_field_value_id: currentValue?.id ?? null,
-                previous_profile_field_value_id: previousValue?.id ?? null,
-                profile_type_field_id: value.profile_type_field_id,
-                alias: profileTypeField?.alias ?? null,
-              },
-            },
-          ],
-          profile.org_id,
-          null,
-        );
-
         if (isNotifiableSearchDifference(value.content.search, newSearch)) {
           ctx.logger.info(
             `[Organization:${org.id}][Profile:${value.profile_id}][ProfileFieldValue:${value.id}] Search results have changed`,

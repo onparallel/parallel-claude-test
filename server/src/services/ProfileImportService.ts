@@ -1,12 +1,12 @@
 import { inject, injectable } from "inversify";
-import { indexBy, isNonNullish, unique, zip } from "remeda";
+import { indexBy, isNonNullish, partition, unique, zip } from "remeda";
 import { Readable } from "stream";
 import { assert } from "ts-essentials";
 import { ProfileTypeFieldType, User, UserLocale } from "../db/__types";
 import { ProfileRepository } from "../db/repositories/ProfileRepository";
-import { buildProfileUpdatedEventsData } from "../graphql/helpers/buildProfileUpdatedEventsData";
 import { fromGlobalId, isGlobalId, toGlobalId } from "../util/globalId";
 import { isAtLeast } from "../util/profileTypeFieldPermission";
+import { pMapChunk } from "../util/promises/pMapChunk";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { isValidDate } from "../util/time";
 import { Maybe, UnwrapArray } from "../util/types";
@@ -92,34 +92,40 @@ export class ProfileImportService extends ProfileExcelService {
     onProgress?: (count: number, total: number) => Promise<void>,
   ) {
     let count = 0;
-    for (const { profileId: _profileId, values } of data) {
-      const profileId =
-        _profileId ??
-        (
-          await this.profiles.createProfile(
-            {
-              localizable_name: { en: "" },
-              org_id: user.org_id,
-              profile_type_id: profileTypeId,
-            },
-            user.id,
-          )
-        ).id;
-
-      const { currentValues, previousValues } = await this.profiles.updateProfileFieldValue(
-        profileId,
-        values,
-        user.id,
-      );
-      await this.profiles.createProfileUpdatedEvents(
-        profileId,
-        buildProfileUpdatedEventsData(profileId, values, currentValues, previousValues, user),
-        user.org_id,
-        user.id,
-      );
-
-      await onProgress?.(++count, data.length);
-    }
+    await pMapChunk(
+      data,
+      async (chunk) => {
+        const [updates, creates] = partition(chunk, (item) => isNonNullish(item.profileId));
+        const profiles = await this.profiles.createProfiles(
+          creates.map(() => ({
+            localizable_name: { en: "" },
+            org_id: user.org_id,
+            profile_type_id: profileTypeId,
+          })),
+          user.id,
+        );
+        await this.profiles.updateProfileFieldValues(
+          [
+            ...zip(creates, profiles).flatMap(([create, profile]) =>
+              create.values.map((values) => ({
+                profileId: profile.id,
+                ...values,
+              })),
+            ),
+            ...updates.flatMap((update) =>
+              update.values.map((values) => ({
+                profileId: update.profileId!,
+                ...values,
+              })),
+            ),
+          ],
+          user.id,
+          user.org_id,
+        );
+        await onProgress?.((count = count + chunk.length), data.length);
+      },
+      { chunkSize: 30, concurrency: 1 },
+    );
   }
 
   async parseExcelData(

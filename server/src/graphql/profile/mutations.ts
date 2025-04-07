@@ -56,7 +56,6 @@ import { random } from "../../util/token";
 import { RESULT } from "../helpers/Result";
 import { SUCCESS } from "../helpers/Success";
 import { and, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
-import { buildProfileUpdatedEventsData } from "../helpers/buildProfileUpdatedEventsData";
 import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { dateArg } from "../helpers/scalars/DateTime";
@@ -970,7 +969,7 @@ export const createProfile = mutationField("createProfile", {
       });
     }
 
-    const profile = await ctx.profiles.createProfile(
+    const [profile] = await ctx.profiles.createProfiles(
       {
         localizable_name: { en: "", es: "" },
         org_id: ctx.user!.org_id,
@@ -988,20 +987,12 @@ export const createProfile = mutationField("createProfile", {
     }
 
     if (fields.length > 0) {
-      const { currentValues, profile: updatedProfile } = await ctx.profiles.updateProfileFieldValue(
-        profile.id,
-        fields,
+      await ctx.profiles.updateProfileFieldValues(
+        fields.map((f) => ({ ...f, profileId: profile.id })),
         ctx.user!.id,
-      );
-
-      await ctx.profiles.createProfileUpdatedEvents(
-        profile.id,
-        buildProfileUpdatedEventsData(profile.id, fields, currentValues, [], ctx.user!),
         ctx.user!.org_id,
-        ctx.user!.id,
       );
-
-      return updatedProfile!;
+      return (await ctx.profiles.loadProfile(profile.id))!;
     }
 
     return profile;
@@ -1209,8 +1200,8 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
 
         return {
           ...field,
+          profileId,
           type: profileTypeField.type,
-          alias: profileTypeField.alias,
           expiryDate: field.expiryDate
             ? // priorize expiryDate argument if set
               field.expiryDate
@@ -1231,26 +1222,14 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
       });
     }
 
-    const {
-      profile: updatedProfile,
-      currentValues,
-      previousValues,
-    } = await ctx.profiles.updateProfileFieldValue(profileId, fieldsWithZonedExpires, ctx.user!.id);
-
-    await ctx.profiles.createProfileUpdatedEvents(
-      profileId,
-      buildProfileUpdatedEventsData(
-        profile.id,
-        fieldsWithZonedExpires,
-        currentValues,
-        previousValues,
-        ctx.user!,
-      ),
-      ctx.user!.org_id,
+    await ctx.profiles.updateProfileFieldValues(
+      fieldsWithZonedExpires,
       ctx.user!.id,
+      ctx.user!.org_id,
     );
-
-    return updatedProfile!;
+    ctx.profiles.loadProfileFieldValue.dataloader.clearAll();
+    ctx.profiles.loadProfileFieldValuesByProfileId.dataloader.clear(profileId);
+    return (await ctx.profiles.loadProfile(profileId, { refresh: true }))!;
   },
 });
 
@@ -1624,13 +1603,10 @@ export const copyBackgroundCheckReplyToProfileFieldValue = mutationField(
     resolve: async (_, { profileId, profileTypeFieldId, expiryDate, replyId }, ctx) => {
       const reply = await ctx.petitions.loadFieldReply(replyId);
 
-      const {
-        currentValues: [currentValue],
-        previousValues: [previousValue],
-      } = await ctx.profiles.updateProfileFieldValue(
-        profileId,
+      await ctx.profiles.updateProfileFieldValues(
         [
           {
+            profileId,
             profileTypeFieldId,
             type: "BACKGROUND_CHECK",
             content: reply!.content,
@@ -1638,27 +1614,7 @@ export const copyBackgroundCheckReplyToProfileFieldValue = mutationField(
           },
         ],
         ctx.user!.id,
-      );
-
-      const profileTypeField = await ctx.profiles.loadProfileTypeField(profileTypeFieldId);
-      await ctx.profiles.createProfileUpdatedEvents(
-        profileId,
-        [
-          {
-            org_id: ctx.user!.org_id,
-            profile_id: profileId,
-            type: "PROFILE_FIELD_VALUE_UPDATED",
-            data: {
-              user_id: ctx.user!.id,
-              current_profile_field_value_id: currentValue?.id ?? null,
-              previous_profile_field_value_id: previousValue?.id ?? null,
-              profile_type_field_id: profileTypeFieldId,
-              alias: profileTypeField?.alias ?? null,
-            },
-          },
-        ],
         ctx.user!.org_id,
-        ctx.user!.id,
       );
 
       return (await ctx.profiles.loadProfileFieldValue({ profileId, profileTypeFieldId }))!;
@@ -2376,52 +2332,33 @@ export const completeProfileFromExternalSource = mutationField(
         });
       }
 
-      const profile = args.profileId
-        ? await ctx.profiles.loadProfile(args.profileId)
-        : await ctx.profiles.createProfile(
-            {
-              localizable_name: { en: "", es: "" },
-              org_id: ctx.user!.org_id,
-              profile_type_id: args.profileTypeId,
-            },
+      const [profile] = args.profileId
+        ? [await ctx.profiles.loadProfile(args.profileId)]
+        : await ctx.profiles.createProfiles(
+            [
+              {
+                localizable_name: { en: "", es: "" },
+                org_id: ctx.user!.org_id,
+                profile_type_id: args.profileTypeId,
+              },
+            ],
             ctx.user!.id,
           );
       assert(profile, "Profile not found");
 
       if (fields.length > 0) {
-        const _fields = fields.map((f) => ({
-          profileTypeFieldId: f.profileTypeField.id,
-          type: f.profileTypeField.type,
-          content: f.content,
-          alias: f.profileTypeField.alias,
-        }));
-
-        const {
-          currentValues,
-          previousValues,
-          profile: updatedProfile,
-        } = await ctx.profiles.updateProfileFieldValue(
-          profile.id,
-          _fields,
+        await ctx.profiles.updateProfileFieldValues(
+          fields.map((f) => ({
+            profileId: profile.id,
+            profileTypeFieldId: f.profileTypeField.id,
+            type: f.profileTypeField.type,
+            content: f.content,
+          })),
           ctx.user!.id,
+          ctx.user!.org_id,
           entity.integration_id,
         );
-
-        await ctx.profiles.createProfileUpdatedEvents(
-          profile.id,
-          buildProfileUpdatedEventsData(
-            profile.id,
-            _fields,
-            currentValues,
-            previousValues,
-            ctx.user!,
-            entity.integration_id,
-          ),
-          ctx.user!.org_id,
-          ctx.user!.id,
-        );
-
-        return updatedProfile!;
+        return (await ctx.profiles.loadProfile(profile.id))!;
       }
 
       return profile;

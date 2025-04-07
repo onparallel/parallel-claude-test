@@ -68,7 +68,6 @@ import {
   ProfileFieldValueUpdatedEvent,
 } from "../events/ProfileEvent";
 import { BaseRepository, PageOpts, Pagination } from "../helpers/BaseRepository";
-import { contentsAreEqual } from "../helpers/petitionProfileMapper";
 import {
   ProfileTypeFieldOptions,
   profileTypeFieldSelectValues,
@@ -752,30 +751,34 @@ export class ProfileRepository extends BaseRepository {
     );
   }
 
-  async createProfile(data: Omit<CreateProfile, "name">, userId: number) {
+  async createProfiles(data: MaybeArray<CreateProfile>, userId: number) {
+    const dataArr = unMaybeArray(data);
+    if (dataArr.length === 0) {
+      return [];
+    }
+
     return await this.withTransaction(async (t) => {
-      const [profile] = await this.insert(
+      const profiles = await this.insert(
         "profile",
-        {
-          ...data,
-          name: "", // deprecated
+        dataArr.map((p) => ({
+          ...p,
           created_at: this.now(),
           created_by: `User:${userId}`,
-        },
+        })),
         t,
       );
       await this.createEvent(
-        {
-          org_id: data.org_id,
-          profile_id: profile.id,
+        profiles.map((p) => ({
+          org_id: p.org_id,
+          profile_id: p.id,
           type: "PROFILE_CREATED",
           data: {
             user_id: userId,
           },
-        },
+        })),
         t,
       );
-      return profile;
+      return profiles;
     });
   }
 
@@ -833,9 +836,9 @@ export class ProfileRepository extends BaseRepository {
   }
 
   async updateProfileNamesWithPattern(
-    pattern: (number | string)[],
     profileValues: {
       profileId: number;
+      pattern: (number | string)[];
       values: {
         [profileTypeFieldId: number]: string | null;
       };
@@ -843,7 +846,12 @@ export class ProfileRepository extends BaseRepository {
     updatedBy: string,
     t?: Knex.Transaction,
   ) {
-    const profileTypeFieldIds = pattern.filter((p) => typeof p === "number") as number[];
+    if (profileValues.length === 0) {
+      return;
+    }
+    const profileTypeFieldIds = unique(
+      profileValues.flatMap((pv) => pv.pattern.filter((p) => typeof p === "number") as number[]),
+    );
     const profileTypeFields = await this.loadProfileTypeField.raw(profileTypeFieldIds, t);
     const selectValuesById = Object.fromEntries(
       await pMap(
@@ -853,7 +861,7 @@ export class ProfileRepository extends BaseRepository {
       ),
     );
 
-    return await this.raw<Profile>(
+    await this.raw<Profile>(
       /* sql */ `
         with n (id, localizable_name) as (?)
         update "profile" p set
@@ -873,7 +881,7 @@ export class ProfileRepository extends BaseRepository {
                 UserLocaleValues.map((locale, i, locales) => {
                   return [
                     locale,
-                    pattern
+                    pv.pattern
                       .map((p) => {
                         if (typeof p === "string") {
                           return p;
@@ -944,7 +952,11 @@ export class ProfileRepository extends BaseRepository {
         await pMapChunk(
           profileValues,
           async (chunk) => {
-            await this.updateProfileNamesWithPattern(pattern, chunk, updatedBy, t);
+            await this.updateProfileNamesWithPattern(
+              chunk.map((c) => ({ ...c, pattern })),
+              updatedBy,
+              t,
+            );
           },
           {
             concurrency: 1,
@@ -1010,132 +1022,228 @@ export class ProfileRepository extends BaseRepository {
     });
   }
 
-  async updateProfileFieldValue(
-    profileId: number,
-    _fields: {
+  async updateProfileFieldValues(
+    fields: {
+      profileId: number;
       profileTypeFieldId: number;
       type: ProfileTypeFieldType;
       content?: Record<string, any> | null;
       expiryDate?: string | null;
     }[],
     userId: number | null,
+    orgId: number,
     externalSourceIntegrationId?: number,
   ) {
     //ignore fields that have no content and no expiry date
-    const fields = _fields.filter((f) => f.content !== undefined || f.expiryDate !== undefined);
-    if (fields.length === 0) {
-      return {
-        profile: await this.loadProfile.raw(profileId),
-        previousValues: [],
-        currentValues: [],
-      };
+    const _fields = fields.filter((f) => f.content !== undefined || f.expiryDate !== undefined);
+    if (_fields.length === 0) {
+      return;
     }
-
-    return await this.withTransaction(async (t) => {
-      const profileValues = await this.from("profile_field_value", t)
-        .whereNull("deleted_at")
-        .whereNull("removed_at")
-        .where("profile_id", profileId)
-        .whereIn(
-          "profile_type_field_id",
-          fields.map((f) => f.profileTypeFieldId),
-        )
-        .select("*");
-
-      const profileValuesByPtfId = indexBy(profileValues, (v) => v.profile_type_field_id);
-
-      const removedFields = fields.filter((f) => f.content === null);
-      const updatedFields = fields.filter((f) => {
-        const currentValue = profileValuesByPtfId[f.profileTypeFieldId];
-        return (
-          f.content !== null &&
-          (!currentValue ||
-            (isNonNullish(f.content) && !contentsAreEqual(f as any, currentValue)) ||
-            f.expiryDate !== currentValue.expiry_date)
-        );
-      });
-
-      // mark as removed values with null content, or with distinct content or expiryDate from its current value
-      const removeOrUpdateFields = [...removedFields, ...updatedFields];
-
-      const previousValues =
-        removeOrUpdateFields.length > 0
-          ? await this.from("profile_field_value", t)
-              .whereNull("deleted_at")
-              .whereNull("removed_at")
-              .where("profile_id", profileId)
-              .whereIn(
-                "profile_type_field_id",
-                removeOrUpdateFields.map((f) => f.profileTypeFieldId),
-              )
-              .update({ removed_at: this.now(), removed_by_user_id: userId })
-              .returning("*")
-          : [];
-      const previousByPtfId = indexBy(previousValues, (v) => v.profile_type_field_id);
-
-      const currentValues =
-        updatedFields.length > 0
-          ? await this.insert(
-              "profile_field_value",
-              updatedFields.map((f) => ({
-                profile_id: profileId,
-                profile_type_field_id: f.profileTypeFieldId,
-                type: f.type,
-                content:
-                  f.content !== undefined
-                    ? f.content
-                    : previousByPtfId[f.profileTypeFieldId]?.content,
-                created_by_user_id: userId,
-                ...(f.expiryDate !== undefined
-                  ? { expiry_date: f.expiryDate }
-                  : { expiry_date: previousByPtfId[f.profileTypeFieldId]?.expiry_date ?? null }),
-                external_source_integration_id: externalSourceIntegrationId,
-              })),
-              t,
+    await this.withTransaction(async (t) => {
+      const events = await this.raw<ProfileEvent>(
+        /* sql */ `
+          with new_values as (
+            select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date)
+          ),
+          with_no_previous_values as (
+            -- insert values where a profile_field_value does not exist yet
+            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id)
+            select 
+              nv.profile_id, 
+              nv.profile_type_field_id, 
+              nv.type, 
+              nv.content,
+              case(nv.expiry_date) when '-infinity'::date then null else nv.expiry_date end,
+              ?,
+              ?
+            from new_values nv
+            left join profile_field_value pfv2 on pfv2.profile_id = nv.profile_id and pfv2.profile_type_field_id = nv.profile_type_field_id and pfv2.removed_at is null
+            where pfv2.id is null and nv.content is not null
+            returning *
+          ),
+          removed_previous_values as (
+            -- remove previous values that are being updated or removed
+            update profile_field_value pfv
+              set removed_at = now(),
+              removed_by_user_id = ?
+            from new_values nv
+            where 
+              pfv.profile_id = nv.profile_id 
+              and pfv.profile_type_field_id = nv.profile_type_field_id
+            and (
+              nv.content is null -- explicitly removed
+              or (nv.content != 'null'::jsonb and not profile_field_value_content_is_equal(pfv.type, pfv.content, nv.content)) -- explicitly updated
+              or (nv.expiry_date != '-infinity'::date and (
+                (nv.expiry_date is null and pfv.expiry_date is not null)
+                or (nv.expiry_date is not null and (pfv.expiry_date is null or pfv.expiry_date != nv.expiry_date))
+              )) -- explicitly updated expiry date
             )
-          : [];
-      this.loadProfileFieldValuesByProfileId.dataloader.clear(profileId);
+            and pfv.removed_at is null
+            returning pfv.*
+          ),
+          with_previous_values as (
+            -- insert values where a profile_field_value existed already
+            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id)
+            select 
+              nv.profile_id,
+              nv.profile_type_field_id, 
+              nv.type,
+              case(nv.content) when 'null'::jsonb then rpv.content else nv.content end,
+              case(nv.expiry_date) when '-infinity'::date then rpv.expiry_date else nv.expiry_date end,
+              ?,
+              ?
+            from removed_previous_values rpv
+            join new_values nv on nv.profile_id = rpv.profile_id and rpv.profile_type_field_id = nv.profile_type_field_id
+            where nv.content is not null
+            returning *
+          ),
+          events as (
+            insert into profile_event (org_id, profile_id, type, data)
+            select ?::int as org_id, profile_id, type, data from (
+              -- events for values that did not exist before
+              select
+                wnpv.profile_id as profile_id,
+                'PROFILE_FIELD_VALUE_UPDATED'::profile_event_type as type,
+                jsonb_build_object(
+                  'user_id', wnpv.created_by_user_id,
+                  'profile_type_field_id', wnpv.profile_type_field_id,
+                  'current_profile_field_value_id', wnpv.id,
+                  'previous_profile_field_value_id', null,
+                  'alias', ptf.alias
+                ) as data,
+                ptf.position
+              from with_no_previous_values wnpv
+              join profile_type_field ptf on wnpv.profile_type_field_id = ptf.id
+              union all
+              -- expiry events for values that did not exist before
+              select
+                wnpv.profile_id as profile_id,
+                'PROFILE_FIELD_EXPIRY_UPDATED'::profile_event_type as type,
+                jsonb_build_object(
+                  'user_id', wnpv.created_by_user_id,
+                  'profile_type_field_id', wnpv.profile_type_field_id,
+                  'expiry_date', wnpv.expiry_date,
+                  'alias', ptf.alias
+                ) as data,
+                ptf.position
+              from with_no_previous_values wnpv
+              join profile_type_field ptf on wnpv.profile_type_field_id = ptf.id
+              where wnpv.expiry_date is not null
+              union all
+              -- events for values that existed before and were updated or removed
+              select
+                rpv.profile_id as profile_id,
+                'PROFILE_FIELD_VALUE_UPDATED'::profile_event_type as type,
+                jsonb_build_object(
+                  'user_id', rpv.removed_by_user_id,
+                  'profile_type_field_id', rpv.profile_type_field_id,
+                  'current_profile_field_value_id', wpv.id,
+                  'previous_profile_field_value_id', rpv.id,
+                  'alias', ptf.alias
+                ) as data,
+                ptf.position
+              from removed_previous_values rpv
+              left join with_previous_values wpv on wpv.profile_type_field_id = rpv.profile_type_field_id
+              join profile_type_field ptf on rpv.profile_type_field_id = ptf.id
+              where wpv.id is not null or not profile_field_value_content_is_equal(wpv.type, rpv.content,  wpv.content)
+              union all
+              -- expiry events for values that existed before and were updated
+              select
+                rpv.profile_id as profile_id,
+                'PROFILE_FIELD_EXPIRY_UPDATED'::profile_event_type as type,
+                jsonb_build_object(
+                  'user_id', rpv.removed_by_user_id,
+                  'profile_type_field_id', wpv.profile_type_field_id,
+                  'expiry_date', wpv.expiry_date,
+                  'alias', ptf.alias
+                ) as data,
+                ptf.position
+              from removed_previous_values rpv
+              left join with_previous_values wpv on wpv.profile_type_field_id = rpv.profile_type_field_id
+              join profile_type_field ptf on rpv.profile_type_field_id = ptf.id
+              where wpv.id is not null and rpv.expiry_date is distinct from wpv.expiry_date
+            ) e
+            order by profile_id asc, position asc, (case when type = 'PROFILE_FIELD_VALUE_UPDATED' then 0 else 1 end) asc
+            returning *
+          ),
+          profile_updated_events as (
+            -- force create PROFILE_UPDATED after all other events
+            insert into profile_event (org_id, profile_id, type, data)
+            select
+              ?::int as org_id,
+              t.profile_id as profile_id,
+              'PROFILE_UPDATED'::profile_event_type as type,
+              jsonb_build_object('user_id', t.user_id) as data from (
+                select distinct profile_id, created_by_user_id as user_id from with_no_previous_values
+                union
+                select distinct profile_id, removed_by_user_id as user_id from removed_previous_values
+              ) t
+            returning *
+          )
+          select * from events
+          union all
+          select * from profile_updated_events
+        `,
+        [
+          // new_values
+          this.sqlValues(
+            _fields.map((f) => [
+              f.profileId,
+              f.profileTypeFieldId,
+              f.type,
+              // undefined ('null'::jsonb) uses previous value, null removes
+              f.content === undefined ? "null" : f.content ? JSON.stringify(f.content) : null,
+              // undefined ('-infinity'::date) uses previous value, null removes
+              f.expiryDate === undefined ? "-infinity" : (f.expiryDate ?? null),
+            ]),
+            ["int", "int", "profile_type_field_type", "jsonb", "date"],
+          ),
+          // with_no_previous_values
+          ...[userId, externalSourceIntegrationId ?? null],
+          // removed_previous_values
+          ...[userId],
+          // with_previous_values
+          ...[userId, externalSourceIntegrationId ?? null],
+          // events
+          orgId,
+          orgId,
+        ],
+        t,
+      );
+      await this.queues.enqueueEvents(events, "profile_event", undefined, t);
 
-      const profileType = (await this.loadProfileTypeForProfileId.raw(profileId, t))!;
-      const pattern = profileType.profile_name_pattern as (string | number)[];
-      if (removeOrUpdateFields.some((f) => pattern.includes(f.profileTypeFieldId))) {
-        const profileValues = await this.raw<{
-          profileId: number;
-          values: {
-            [profileTypeFieldId: number]: string | null;
-          };
-        }>(
-          /* sql */ `
-          select 
-            p.id "profileId",
+      const profileValues = await this.raw<{
+        profileId: number;
+        pattern: number[];
+        values: {
+          [profileTypeFieldId: number]: string | null;
+        };
+      }>(
+        /* sql */ `
+          select
+            p.id as "profileId",
+            t.profile_name_pattern as "pattern",
             jsonb_object_agg(
-              coalesce(pfv.profile_type_field_id, 0), 
+              t.profile_type_field_id,
               pfv.content->>'value'
             ) as values
-          from "profile" p
-          left join profile_field_value pfv
-            on pfv.profile_id = p.id and pfv.profile_type_field_id in ?
-            and pfv.removed_at is null and pfv.deleted_at is null
-          where
-            p.id = ?
-            and p.deleted_at is null 
-            group by p.id;
+          from profile p
+          join lateral (
+            select t.profile_name_pattern, t.part::int as profile_type_field_id from (
+              select pt.profile_name_pattern, jsonb_array_elements(pt.profile_name_pattern) part
+              from profile_type pt
+              where pt.id = p.profile_type_id
+            ) t where jsonb_typeof(t.part) = 'number'
+          ) t on true
+          left join profile_field_value pfv on p.id = pfv.profile_id and pfv.profile_type_field_id = t.profile_type_field_id and pfv.removed_at is null and pfv.deleted_at is null
+          where p.id in ?
+          group by p.id, t.profile_name_pattern
         `,
-          [this.sqlIn(pattern.filter((p) => typeof p === "number")), profileId],
-          t,
-        );
+        [this.sqlIn(unique(_fields.map((f) => f.profileId)))],
+        t,
+      );
 
-        const [profile] = await this.updateProfileNamesWithPattern(
-          pattern,
-          profileValues,
-          `User:${userId}`,
-          t,
-        );
-
-        return { profile, previousValues, currentValues };
-      } else {
-        return { profile: await this.loadProfile.raw(profileId, t), previousValues, currentValues };
-      }
+      await this.updateProfileNamesWithPattern(profileValues, `User:${userId}`, t);
     });
   }
 

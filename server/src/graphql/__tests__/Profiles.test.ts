@@ -1371,7 +1371,7 @@ describe("GraphQL/Profiles", () => {
           },
         ],
         events: {
-          items: [
+          items: expect.toIncludeSameMembers([
             {
               type: "PROFILE_UPDATED",
               profile: { id: profile.id },
@@ -1428,7 +1428,7 @@ describe("GraphQL/Profiles", () => {
                 id: toGlobalId("User", sessionUser.id),
               },
             },
-          ],
+          ]),
           totalCount: 8,
         },
       });
@@ -5954,6 +5954,95 @@ describe("GraphQL/Profiles", () => {
         removed_at: null,
         content: { value: "YB5340186" },
         expiry_date: "2030-01-01",
+      });
+    });
+
+    it("does not remove current value or create events if the new value is exactly the same - CHECKBOX", async () => {
+      const [profile] = await mocks.createRandomProfiles(
+        organization.id,
+        profileTypes[3].id,
+        1,
+        () => ({
+          status: "OPEN",
+        }),
+      );
+
+      await mocks.knex.from("profile_field_value").insert({
+        profile_id: profile.id,
+        type: profileType3Fields[4].type,
+        profile_type_field_id: profileType3Fields[4].id,
+        content: { value: ["A", "C"] },
+        created_by_user_id: sessionUser.id,
+      });
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileId: GID!
+            $fields: [UpdateProfileFieldValueInput!]!
+            $propertiesFilter: [ProfileFieldPropertyFilter!]!
+          ) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              properties(filter: $propertiesFilter) {
+                field {
+                  id
+                }
+                value {
+                  content
+                  expiryDate
+                }
+              }
+              events(offset: 0, limit: 100) {
+                totalCount
+                items {
+                  type
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          propertiesFilter: [
+            { profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id) },
+          ],
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+              content: { value: ["C", "A"] }, // order should not matter
+            },
+          ],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileFieldValue).toEqual({
+        id: toGlobalId("Profile", profile.id),
+        properties: [
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+            },
+            value: {
+              content: { value: ["A", "C"] },
+              expiryDate: null,
+            },
+          },
+        ],
+        events: {
+          totalCount: 0,
+          items: [],
+        },
+      });
+
+      const dbValues = await mocks.knex.from("profile_field_value").where("profile_id", profile.id);
+
+      expect(dbValues).toHaveLength(1);
+      expect(dbValues[0]).toMatchObject({
+        deleted_at: null,
+        removed_at: null,
+        content: { value: ["A", "C"] },
       });
     });
 

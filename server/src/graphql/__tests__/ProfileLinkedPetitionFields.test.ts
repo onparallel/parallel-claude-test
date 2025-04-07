@@ -1396,23 +1396,7 @@ describe("ProfileLinkedPetitionFields", () => {
                 userId: toGlobalId("User", user.id),
               },
             },
-            ...[
-              "p_risk_assessment",
-              "p_passport_document",
-              "p_id_document",
-              "p_proof_of_address_document",
-            ].map((alias) => ({
-              type: "PROFILE_FIELD_FILE_ADDED",
-              data: {
-                userId: toGlobalId("User", user.id),
-                profileFieldFileId: expect.any(String),
-                profileTypeFieldId: toGlobalId(
-                  "ProfileTypeField",
-                  individualProfileTypeFields[alias].id,
-                ),
-                alias,
-              },
-            })),
+
             ...[
               "p_occupation",
               "p_background_check",
@@ -1437,6 +1421,23 @@ describe("ProfileLinkedPetitionFields", () => {
               type: "PROFILE_FIELD_VALUE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                profileTypeFieldId: toGlobalId(
+                  "ProfileTypeField",
+                  individualProfileTypeFields[alias].id,
+                ),
+                alias,
+              },
+            })),
+            ...[
+              "p_risk_assessment",
+              "p_passport_document",
+              "p_id_document",
+              "p_proof_of_address_document",
+            ].map((alias) => ({
+              type: "PROFILE_FIELD_FILE_ADDED",
+              data: {
+                userId: toGlobalId("User", user.id),
+                profileFieldFileId: expect.any(String),
                 profileTypeFieldId: toGlobalId(
                   "ProfileTypeField",
                   individualProfileTypeFields[alias].id,
@@ -1864,24 +1865,6 @@ describe("ProfileLinkedPetitionFields", () => {
               },
             },
             ...[
-              "p_poa_document",
-              "p_risk_assessment",
-              "p_financial_statements",
-              "p_ubo_statement",
-              "p_ownership_structure",
-            ].map((alias) => ({
-              type: "PROFILE_FIELD_FILE_ADDED",
-              data: {
-                userId: toGlobalId("User", user.id),
-                profileFieldFileId: expect.any(String),
-                profileTypeFieldId: toGlobalId(
-                  "ProfileTypeField",
-                  legalEntityProfileTypeFields[alias].id,
-                ),
-                alias,
-              },
-            })),
-            ...[
               "p_poa_registered",
               "p_poa_revocation_conditions",
               "p_poa_expiration_date",
@@ -1904,6 +1887,24 @@ describe("ProfileLinkedPetitionFields", () => {
               type: "PROFILE_FIELD_VALUE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                profileTypeFieldId: toGlobalId(
+                  "ProfileTypeField",
+                  legalEntityProfileTypeFields[alias].id,
+                ),
+                alias,
+              },
+            })),
+            ...[
+              "p_poa_document",
+              "p_risk_assessment",
+              "p_financial_statements",
+              "p_ubo_statement",
+              "p_ownership_structure",
+            ].map((alias) => ({
+              type: "PROFILE_FIELD_FILE_ADDED",
+              data: {
+                userId: toGlobalId("User", user.id),
+                profileFieldFileId: expect.any(String),
                 profileTypeFieldId: toGlobalId(
                   "ProfileTypeField",
                   legalEntityProfileTypeFields[alias].id,
@@ -2336,18 +2337,7 @@ describe("ProfileLinkedPetitionFields", () => {
                 userId: toGlobalId("User", user.id),
               },
             },
-            ...["p_amendments", "p_original_document"].map((alias) => ({
-              type: "PROFILE_FIELD_FILE_ADDED",
-              data: {
-                userId: toGlobalId("User", user.id),
-                profileFieldFileId: expect.any(String),
-                profileTypeFieldId: toGlobalId(
-                  "ProfileTypeField",
-                  contractProfileTypeFields[alias].id,
-                ),
-                alias,
-              },
-            })),
+
             ...[
               "p_legal_contact_email",
               "p_legal_contact_full_name",
@@ -2401,6 +2391,18 @@ describe("ProfileLinkedPetitionFields", () => {
                 },
               }),
             ),
+            ...["p_amendments", "p_original_document"].map((alias) => ({
+              type: "PROFILE_FIELD_FILE_ADDED",
+              data: {
+                userId: toGlobalId("User", user.id),
+                profileFieldFileId: expect.any(String),
+                profileTypeFieldId: toGlobalId(
+                  "ProfileTypeField",
+                  contractProfileTypeFields[alias].id,
+                ),
+                alias,
+              },
+            })),
             {
               type: "PETITION_ASSOCIATED",
               data: {
@@ -2682,6 +2684,111 @@ describe("ProfileLinkedPetitionFields", () => {
       ]);
     });
 
+    it("does not update value or create event if BACKGROUND_CHECK value is already present on profile and its the same", async () => {
+      const [profile] = await mocks.createRandomProfiles(organization.id, individual.id, 1);
+
+      await mocks.knex.from("profile_field_value").insert({
+        profile_id: profile.id,
+        type: "BACKGROUND_CHECK",
+        created_by_user_id: user.id,
+        profile_type_field_id: individualProfileTypeFields["p_background_check"].id,
+        content: {
+          query: { name: "Mike Wazowski", date: null, type: "Person" },
+          search: {
+            totalCount: 0,
+            items: [],
+            createdAt: new Date(),
+          },
+          entity: { id: "1", type: "Person", name: "Mike Wazowski", properties: {} },
+        },
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+            $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            $propertiesFilter: [ProfileFieldPropertyFilter!]!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: $expirations
+            ) {
+              id
+              associatedProfile {
+                id
+                properties(filter: $propertiesFilter) {
+                  field {
+                    type
+                    alias
+                  }
+                  files {
+                    id
+                  }
+                  value {
+                    id
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", individualField.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", individualReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          conflictResolutions: [],
+          expirations: [],
+          propertiesFilter: [
+            {
+              profileTypeFieldId: toGlobalId(
+                "ProfileTypeField",
+                individualProfileTypeFields["p_background_check"].id,
+              ),
+            },
+          ],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", individualReply.id),
+        associatedProfile: {
+          id: toGlobalId("Profile", profile.id),
+          properties: [
+            {
+              field: {
+                type: "BACKGROUND_CHECK",
+                alias: "p_background_check",
+              },
+              files: null,
+              value: {
+                id: expect.any(String),
+                content: {
+                  query: { name: "Mike Wazowski", date: null, type: "Person" },
+                  search: {
+                    totalCount: 0,
+                    createdAt: expect.any(String),
+                  },
+                  entity: { id: "1", type: "Person", name: "Mike Wazowski", properties: {} },
+                },
+              },
+            },
+          ],
+        },
+      });
+    });
+
     it("sends error when expiration info is required and not provided", async () => {
       const [profile] = await mocks.createRandomProfiles(organization.id, contract.id, 1);
 
@@ -2886,6 +2993,7 @@ describe("ProfileLinkedPetitionFields", () => {
       );
 
       expect(createProfileErrors).toBeUndefined();
+
       expect(createProfileData?.createProfile).toEqual({
         id: expect.any(String),
         events: {
@@ -2992,18 +3100,33 @@ describe("ProfileLinkedPetitionFields", () => {
           id: createProfileData!.createProfile.id,
           events: {
             totalCount: 27,
-            items: [
+            items: expect.toIncludeSameMembers([
               {
                 type: "PROFILE_UPDATED",
                 data: {
                   userId: toGlobalId("User", user.id),
                 },
               },
-              ...["p_amendments", "p_original_document"].map((alias) => ({
-                type: "PROFILE_FIELD_FILE_ADDED",
+              ...[
+                "p_notes",
+                "p_performance_metrics",
+                "p_renewal_terms",
+                "p_billing_contact_full_name",
+                "p_contract_value",
+                "p_termination_clauses",
+                "p_confidentiality_agreement",
+                "p_contract_currency",
+                "p_compliance_obligations",
+                "p_legal_contact_full_name",
+                "p_dispute_resolution_mechanism",
+                "p_legal_contact_email",
+                "p_billing_contact_email",
+                "p_security_provisions",
+                "p_payment_terms",
+              ].map((alias) => ({
+                type: "PROFILE_FIELD_VALUE_UPDATED",
                 data: {
                   userId: toGlobalId("User", user.id),
-                  profileFieldFileId: expect.any(String),
                   profileTypeFieldId: toGlobalId(
                     "ProfileTypeField",
                     contractProfileTypeFields[alias].id,
@@ -3011,26 +3134,11 @@ describe("ProfileLinkedPetitionFields", () => {
                   alias,
                 },
               })),
-              ...[
-                "p_legal_contact_email",
-                "p_legal_contact_full_name",
-                "p_billing_contact_email",
-                "p_billing_contact_full_name",
-                "p_notes",
-                "p_security_provisions",
-                "p_compliance_obligations",
-                "p_dispute_resolution_mechanism",
-                "p_performance_metrics",
-                "p_confidentiality_agreement",
-                "p_termination_clauses",
-                "p_renewal_terms",
-                "p_payment_terms",
-                "p_contract_currency",
-                "p_contract_value",
-              ].map((alias) => ({
-                type: "PROFILE_FIELD_VALUE_UPDATED",
+              ...["p_amendments", "p_original_document"].map((alias) => ({
+                type: "PROFILE_FIELD_FILE_ADDED",
                 data: {
                   userId: toGlobalId("User", user.id),
+                  profileFieldFileId: expect.any(String),
                   profileTypeFieldId: toGlobalId(
                     "ProfileTypeField",
                     contractProfileTypeFields[alias].id,
@@ -3053,17 +3161,6 @@ describe("ProfileLinkedPetitionFields", () => {
                 },
               },
               {
-                type: "PROFILE_FIELD_VALUE_UPDATED",
-                data: {
-                  userId: toGlobalId("User", user.id),
-                  profileTypeFieldId: toGlobalId(
-                    "ProfileTypeField",
-                    contractProfileTypeFields["p_jurisdiction"].id,
-                  ),
-                  alias: "p_jurisdiction",
-                },
-              },
-              {
                 type: "PROFILE_FIELD_EXPIRY_UPDATED",
                 data: {
                   userId: toGlobalId("User", user.id),
@@ -3075,29 +3172,44 @@ describe("ProfileLinkedPetitionFields", () => {
                   expiryDate: "2022-01-01",
                 },
               },
-              ...["p_expiration_date", "p_effective_date", "p_contract_type", "p_counterparty"].map(
-                (alias) => ({
-                  type: "PROFILE_FIELD_VALUE_UPDATED",
-                  data: {
-                    userId: toGlobalId("User", user.id),
-                    profileTypeFieldId: toGlobalId(
-                      "ProfileTypeField",
-                      contractProfileTypeFields[alias].id,
-                    ),
-                    alias,
-                  },
-                }),
-              ),
+              ...[
+                "p_jurisdiction",
+                "p_expiration_date",
+                "p_effective_date",
+                "p_contract_type",
+                "p_counterparty",
+              ].map((alias) => ({
+                type: "PROFILE_FIELD_VALUE_UPDATED",
+                data: {
+                  userId: toGlobalId("User", user.id),
+                  profileTypeFieldId: toGlobalId(
+                    "ProfileTypeField",
+                    contractProfileTypeFields[alias].id,
+                  ),
+                  alias,
+                },
+              })),
               {
                 type: "PROFILE_CREATED",
                 data: {
                   userId: toGlobalId("User", user.id),
                 },
               },
-            ],
+            ]),
           },
         },
       });
+
+      // make sure first event is PROFILE_UPDATED
+      expect(
+        data?.archiveFieldGroupReplyIntoProfile.associatedProfile.events.items[0].type,
+      ).toEqual("PROFILE_UPDATED");
+      //make sure last event is PROFILE_CREATED
+      expect(
+        data?.archiveFieldGroupReplyIntoProfile.associatedProfile.events.items[
+          data?.archiveFieldGroupReplyIntoProfile.associatedProfile.events.items.length - 1
+        ].type,
+      ).toEqual("PROFILE_CREATED");
     });
 
     it("skips file if it already exists on the profile and it has the same path", async () => {
@@ -4206,23 +4318,6 @@ describe("ProfileLinkedPetitionFields", () => {
               },
             },
             ...[
-              "p_poa_document",
-              "p_risk_assessment",
-              "p_ubo_statement",
-              "p_ownership_structure",
-            ].map((alias) => ({
-              type: "PROFILE_FIELD_FILE_ADDED",
-              data: {
-                userId: toGlobalId("User", user.id),
-                profileFieldFileId: expect.any(String),
-                profileTypeFieldId: toGlobalId(
-                  "ProfileTypeField",
-                  legalEntityProfileTypeFields[alias].id,
-                ),
-                alias,
-              },
-            })),
-            ...[
               "p_poa_registered",
               "p_poa_revocation_conditions",
               "p_poa_expiration_date",
@@ -4240,6 +4335,23 @@ describe("ProfileLinkedPetitionFields", () => {
               type: "PROFILE_FIELD_VALUE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                profileTypeFieldId: toGlobalId(
+                  "ProfileTypeField",
+                  legalEntityProfileTypeFields[alias].id,
+                ),
+                alias,
+              },
+            })),
+            ...[
+              "p_poa_document",
+              "p_risk_assessment",
+              "p_ubo_statement",
+              "p_ownership_structure",
+            ].map((alias) => ({
+              type: "PROFILE_FIELD_FILE_ADDED",
+              data: {
+                userId: toGlobalId("User", user.id),
+                profileFieldFileId: expect.any(String),
                 profileTypeFieldId: toGlobalId(
                   "ProfileTypeField",
                   legalEntityProfileTypeFields[alias].id,
@@ -4760,20 +4872,6 @@ describe("ProfileLinkedPetitionFields", () => {
                 userId: toGlobalId("User", user.id),
               },
             },
-            ...["p_risk_assessment", "p_passport_document", "p_proof_of_address_document"].map(
-              (alias) => ({
-                type: "PROFILE_FIELD_FILE_ADDED",
-                data: {
-                  userId: toGlobalId("User", user.id),
-                  profileFieldFileId: expect.any(String),
-                  profileTypeFieldId: toGlobalId(
-                    "ProfileTypeField",
-                    individualProfileTypeFields[alias].id,
-                  ),
-                  alias,
-                },
-              }),
-            ),
             ...[
               "p_occupation",
               "p_background_check",
@@ -4803,6 +4901,20 @@ describe("ProfileLinkedPetitionFields", () => {
                 alias,
               },
             })),
+            ...["p_risk_assessment", "p_passport_document", "p_proof_of_address_document"].map(
+              (alias) => ({
+                type: "PROFILE_FIELD_FILE_ADDED",
+                data: {
+                  userId: toGlobalId("User", user.id),
+                  profileFieldFileId: expect.any(String),
+                  profileTypeFieldId: toGlobalId(
+                    "ProfileTypeField",
+                    individualProfileTypeFields[alias].id,
+                  ),
+                  alias,
+                },
+              }),
+            ),
             {
               type: "PETITION_ASSOCIATED",
               data: {
@@ -5263,6 +5375,14 @@ describe("ProfileLinkedPetitionFields", () => {
         },
       );
 
+      await mocks.knex
+        .from("petition_field_reply")
+        .whereIn(
+          "id",
+          deletedReplies.map((r) => r.id),
+        )
+        .update({ deleted_at: null, deleted_by: null });
+
       expect(errors).toBeUndefined();
       expect(data?.archiveFieldGroupReplyIntoProfile.id).toEqual(
         toGlobalId("PetitionFieldReply", legalEntityReply.id),
@@ -5273,13 +5393,43 @@ describe("ProfileLinkedPetitionFields", () => {
         id: createProfileData.createProfile.id,
         events: {
           totalCount: 29,
-          items: [
+          items: expect.toIncludeSameMembers([
             {
               type: "PROFILE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
               },
             },
+            ...[
+              "p_risk",
+              "p_entity_name",
+              "p_poa_registered",
+              "p_poa_revocation_conditions",
+              "p_poa_expiration_date",
+              "p_poa_effective_date",
+              "p_poa_scope",
+              "p_poa_types",
+              "p_main_business_activity",
+              "p_date_of_incorporation",
+              "p_country_of_incorporation",
+              "p_zip",
+              "p_city",
+              "p_registered_address",
+              "p_tax_id",
+              "p_registration_number",
+              "p_entity_type",
+              "p_trade_name",
+            ].map((alias) => ({
+              type: "PROFILE_FIELD_VALUE_UPDATED",
+              data: {
+                userId: toGlobalId("User", user.id),
+                profileTypeFieldId: toGlobalId(
+                  "ProfileTypeField",
+                  legalEntityProfileTypeFields[alias].id,
+                ),
+                alias,
+              },
+            })),
             ...["p_poa_document", "p_risk_assessment", "p_financial_statements"].map((alias) => ({
               type: "PROFILE_FIELD_FILE_ADDED",
               data: {
@@ -5301,36 +5451,6 @@ describe("ProfileLinkedPetitionFields", () => {
                   legalEntityProfileTypeFields[alias].id,
                 ),
                 profileFieldFileId: expect.any(String),
-                alias,
-              },
-            })),
-            ...[
-              "p_poa_registered",
-              "p_poa_revocation_conditions",
-              "p_poa_expiration_date",
-              "p_poa_effective_date",
-              "p_poa_scope",
-              "p_poa_types",
-              "p_risk",
-              "p_main_business_activity",
-              "p_date_of_incorporation",
-              "p_country_of_incorporation",
-              "p_zip",
-              "p_city",
-              "p_registered_address",
-              "p_tax_id",
-              "p_registration_number",
-              "p_entity_type",
-              "p_trade_name",
-              "p_entity_name",
-            ].map((alias) => ({
-              type: "PROFILE_FIELD_VALUE_UPDATED",
-              data: {
-                userId: toGlobalId("User", user.id),
-                profileTypeFieldId: toGlobalId(
-                  "ProfileTypeField",
-                  legalEntityProfileTypeFields[alias].id,
-                ),
                 alias,
               },
             })),
@@ -5364,9 +5484,14 @@ describe("ProfileLinkedPetitionFields", () => {
                 userId: toGlobalId("User", user.id),
               },
             },
-          ],
+          ]),
         },
       });
+
+      // make sure first event is PROFILE_UPDATED
+      expect(
+        data?.archiveFieldGroupReplyIntoProfile.associatedProfile.events.items[0].type,
+      ).toEqual("PROFILE_UPDATED");
 
       expect(
         data.archiveFieldGroupReplyIntoProfile.associatedProfile.properties.slice(0, 31),
@@ -5696,14 +5821,6 @@ describe("ProfileLinkedPetitionFields", () => {
           value: null,
         },
       ]);
-
-      await mocks.knex
-        .from("petition_field_reply")
-        .whereIn(
-          "id",
-          deletedReplies.map((r) => r.id),
-        )
-        .update({ deleted_at: null, deleted_by: null });
     });
 
     it("creates profile relationships based on the relationships between fields", async () => {
@@ -5813,24 +5930,6 @@ describe("ProfileLinkedPetitionFields", () => {
                 },
               },
               ...[
-                "p_poa_document",
-                "p_risk_assessment",
-                "p_financial_statements",
-                "p_ubo_statement",
-                "p_ownership_structure",
-              ].map((alias) => ({
-                type: "PROFILE_FIELD_FILE_ADDED",
-                data: {
-                  userId: toGlobalId("User", user.id),
-                  profileFieldFileId: expect.any(String),
-                  profileTypeFieldId: toGlobalId(
-                    "ProfileTypeField",
-                    legalEntityProfileTypeFields[alias].id,
-                  ),
-                  alias,
-                },
-              })),
-              ...[
                 "p_poa_registered",
                 "p_poa_revocation_conditions",
                 "p_poa_expiration_date",
@@ -5853,6 +5952,24 @@ describe("ProfileLinkedPetitionFields", () => {
                 type: "PROFILE_FIELD_VALUE_UPDATED",
                 data: {
                   userId: toGlobalId("User", user.id),
+                  profileTypeFieldId: toGlobalId(
+                    "ProfileTypeField",
+                    legalEntityProfileTypeFields[alias].id,
+                  ),
+                  alias,
+                },
+              })),
+              ...[
+                "p_poa_document",
+                "p_risk_assessment",
+                "p_financial_statements",
+                "p_ubo_statement",
+                "p_ownership_structure",
+              ].map((alias) => ({
+                type: "PROFILE_FIELD_FILE_ADDED",
+                data: {
+                  userId: toGlobalId("User", user.id),
+                  profileFieldFileId: expect.any(String),
                   profileTypeFieldId: toGlobalId(
                     "ProfileTypeField",
                     legalEntityProfileTypeFields[alias].id,
@@ -6021,24 +6138,6 @@ describe("ProfileLinkedPetitionFields", () => {
                 },
               },
               ...[
-                "p_poa_document",
-                "p_risk_assessment",
-                "p_financial_statements",
-                "p_ubo_statement",
-                "p_ownership_structure",
-              ].map((alias) => ({
-                type: "PROFILE_FIELD_FILE_ADDED",
-                data: {
-                  userId: toGlobalId("User", user.id),
-                  profileFieldFileId: expect.any(String),
-                  profileTypeFieldId: toGlobalId(
-                    "ProfileTypeField",
-                    legalEntityProfileTypeFields[alias].id,
-                  ),
-                  alias,
-                },
-              })),
-              ...[
                 "p_poa_registered",
                 "p_poa_revocation_conditions",
                 "p_poa_expiration_date",
@@ -6061,6 +6160,24 @@ describe("ProfileLinkedPetitionFields", () => {
                 type: "PROFILE_FIELD_VALUE_UPDATED",
                 data: {
                   userId: toGlobalId("User", user.id),
+                  profileTypeFieldId: toGlobalId(
+                    "ProfileTypeField",
+                    legalEntityProfileTypeFields[alias].id,
+                  ),
+                  alias,
+                },
+              })),
+              ...[
+                "p_poa_document",
+                "p_risk_assessment",
+                "p_financial_statements",
+                "p_ubo_statement",
+                "p_ownership_structure",
+              ].map((alias) => ({
+                type: "PROFILE_FIELD_FILE_ADDED",
+                data: {
+                  userId: toGlobalId("User", user.id),
+                  profileFieldFileId: expect.any(String),
                   profileTypeFieldId: toGlobalId(
                     "ProfileTypeField",
                     legalEntityProfileTypeFields[alias].id,

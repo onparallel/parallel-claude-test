@@ -897,40 +897,17 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
         ? await ctx.backgroundCheck.entityProfileDetails(entityId, ctx.user!.id)
         : null;
 
-      const {
-        currentValues: [currentValue],
-        previousValues: [previousValue],
-      } = await ctx.profiles.updateProfileFieldValue(
-        params.profileId,
+      await ctx.profiles.updateProfileFieldValues(
         [
           {
+            profileId: params.profileId,
             profileTypeFieldId: params.profileTypeFieldId,
             type: "BACKGROUND_CHECK",
             content: { ...pfv.content, entity },
           },
         ],
         ctx.user!.id,
-      );
-
-      const profileTypeField = await ctx.profiles.loadProfileTypeField(params.profileTypeFieldId);
-      await ctx.profiles.createProfileUpdatedEvents(
-        params.profileId,
-        [
-          {
-            org_id: ctx.user!.org_id,
-            profile_id: params.profileId,
-            type: "PROFILE_FIELD_VALUE_UPDATED",
-            data: {
-              user_id: ctx.user!.id,
-              current_profile_field_value_id: currentValue?.id ?? null,
-              previous_profile_field_value_id: previousValue?.id ?? null,
-              profile_type_field_id: params.profileTypeFieldId,
-              alias: profileTypeField?.alias ?? null,
-            },
-          },
-        ],
         ctx.user!.org_id,
-        ctx.user!.id,
       );
     }
 
