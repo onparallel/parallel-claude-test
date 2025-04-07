@@ -1801,6 +1801,8 @@ export type MutationcreateEventSubscriptionSignatureKeyArgs = {
 };
 
 export type MutationcreateExportExcelTaskArgs = {
+  callbackUrl?: InputMaybe<Scalars["String"]["input"]>;
+  exportEmptyFile?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 };
 

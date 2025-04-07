@@ -133,7 +133,14 @@ export const createExportExcelTask = mutationField("createExportExcelTask", {
   authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
+    callbackUrl: stringArg({
+      description: "URL to send a POST request when the task is completed",
+    }),
+    exportEmptyFile: booleanArg({
+      description: "Export an empty file if no text replies nor comments are found",
+    }),
   },
+  validateArgs: validUrl("callbackUrl"),
   resolve: async (_, args, ctx) => {
     return await ctx.tasks.createTask(
       {
@@ -141,6 +148,8 @@ export const createExportExcelTask = mutationField("createExportExcelTask", {
         user_id: ctx.user!.id,
         input: {
           petition_id: args.petitionId,
+          callback_url: args.callbackUrl,
+          export_empty_file: args.exportEmptyFile ?? false,
         },
       },
       `User:${ctx.user!.id}`,

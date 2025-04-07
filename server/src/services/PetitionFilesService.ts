@@ -31,6 +31,7 @@ interface GetPetitionFilesOptions {
   locale: UserLocale;
   pattern?: string | null;
   include: GetPetitionFilesInclude[];
+  includeEmptyExcel?: boolean;
 }
 
 export type GetPetitionFilesResultMetadata =
@@ -275,7 +276,7 @@ export class PetitionFilesService {
 
     await excelWorkbook.addPetitionFieldComments(visibleFields);
 
-    if (includeXlsx && excelWorkbook.hasRows()) {
+    if (includeXlsx && (excelWorkbook.hasRows() || options.includeEmptyExcel)) {
       // this.logger.info(`Exporting excel file...`);
       const filename = `${intl.formatMessage({
         id: "petition-excel-export.replies",
@@ -289,12 +290,12 @@ export class PetitionFilesService {
           await this.storage.temporaryFiles.uploadFile(
             path,
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            await excelWorkbook.export(),
+            await excelWorkbook.export(options.includeEmptyExcel),
           );
           return this.storage.temporaryFiles.getSignedDownloadEndpoint(path, filename, "inline");
         },
         getStream: () => {
-          return excelWorkbook.export();
+          return excelWorkbook.export(options.includeEmptyExcel);
         },
         metadata: { type: "PETITION_EXCEL_EXPORT", petitionId },
       });

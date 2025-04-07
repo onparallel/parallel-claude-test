@@ -1801,6 +1801,8 @@ export type MutationcreateEventSubscriptionSignatureKeyArgs = {
 };
 
 export type MutationcreateExportExcelTaskArgs = {
+  callbackUrl?: InputMaybe<Scalars["String"]["input"]>;
+  exportEmptyFile?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 };
 
@@ -9501,6 +9503,20 @@ export type ExportPetitionReplies_createPrintPdfTaskMutation = {
   };
 };
 
+export type ExportPetitionReplies_createExportExcelTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  callbackUrl?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type ExportPetitionReplies_createExportExcelTaskMutation = {
+  createExportExcelTask: {
+    id: string;
+    progress: number | null;
+    status: TaskStatus;
+    output: any | null;
+  };
+};
+
 export type GetPermissions_permissionsQueryVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
 }>;
@@ -13305,6 +13321,21 @@ export const ExportPetitionReplies_createPrintPdfTaskDocument = gql`
 ` as unknown as DocumentNode<
   ExportPetitionReplies_createPrintPdfTaskMutation,
   ExportPetitionReplies_createPrintPdfTaskMutationVariables
+>;
+export const ExportPetitionReplies_createExportExcelTaskDocument = gql`
+  mutation ExportPetitionReplies_createExportExcelTask($petitionId: GID!, $callbackUrl: String) {
+    createExportExcelTask(
+      petitionId: $petitionId
+      callbackUrl: $callbackUrl
+      exportEmptyFile: true
+    ) {
+      ...Task
+    }
+  }
+  ${TaskFragmentDoc}
+` as unknown as DocumentNode<
+  ExportPetitionReplies_createExportExcelTaskMutation,
+  ExportPetitionReplies_createExportExcelTaskMutationVariables
 >;
 export const GetPermissions_permissionsDocument = gql`
   query GetPermissions_permissions($petitionId: GID!) {

@@ -8088,6 +8088,8 @@ export interface NexusGenArgTypes {
     };
     createExportExcelTask: {
       // args
+      callbackUrl?: string | null; // String
+      exportEmptyFile?: boolean | null; // Boolean
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     createExportRepliesTask: {

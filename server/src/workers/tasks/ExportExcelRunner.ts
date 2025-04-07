@@ -2,7 +2,7 @@ import { TaskRunner } from "../helpers/TaskRunner";
 
 export class ExportExcelRunner extends TaskRunner<"EXPORT_EXCEL"> {
   async run() {
-    const { petition_id: petitionId } = this.task.input;
+    const { petition_id: petitionId, export_empty_file: exportEmptyFile } = this.task.input;
 
     if (!this.task.user_id) {
       throw new Error(`Task ${this.task.id} is missing user_id`);
@@ -22,10 +22,12 @@ export class ExportExcelRunner extends TaskRunner<"EXPORT_EXCEL"> {
       {
         locale: userData!.preferred_locale,
         include: ["PETITION_EXCEL_EXPORT"],
+        includeEmptyExcel: exportEmptyFile,
       },
     );
 
     if (!exportExcel) {
+      // excel file was not exported as petitions does not have text replies nor comments
       throw new Error(`No replies to export to xlsx file on Petition:${petitionId}`);
     }
 

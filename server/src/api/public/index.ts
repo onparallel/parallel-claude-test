@@ -69,6 +69,7 @@ import {
   EventSubscriptions_createProfileEventSubscriptionDocument,
   EventSubscriptions_deleteSubscriptionDocument,
   EventSubscriptions_getSubscriptionsDocument,
+  ExportPetitionReplies_createExportExcelTaskDocument,
   ExportPetitionReplies_createExportRepliesTaskDocument,
   ExportPetitionReplies_createPrintPdfTaskDocument,
   ExportTemplate_createTemplateRepliesCsvExportTaskDocument,
@@ -2666,7 +2667,7 @@ export function publicApi(container: Container) {
       `,
         query: {
           format: enumParam({
-            values: ["pdf", "zip"],
+            values: ["pdf", "zip", "excel"],
             required: false,
             description: "The format of the export.",
           }),
@@ -2789,6 +2790,37 @@ export function publicApi(container: Container) {
           }
           await waitForTask(client, result.createPrintPdfTask.id, { signal });
           const url = await getTaskResultFileUrl(client, result.createPrintPdfTask.id);
+          if (query.noredirect) {
+            return Created({ file: url }, url);
+          } else {
+            return Redirect(url);
+          }
+        } else if (query.format === "excel") {
+          req.setTimeout(120_000 + 2_000);
+          const _mutation = gql`
+            mutation ExportPetitionReplies_createExportExcelTask(
+              $petitionId: GID!
+              $callbackUrl: String
+            ) {
+              createExportExcelTask(
+                petitionId: $petitionId
+                callbackUrl: $callbackUrl
+                exportEmptyFile: true
+              ) {
+                ...Task
+              }
+            }
+            ${TaskFragment}
+          `;
+          const result = await client.request(ExportPetitionReplies_createExportExcelTaskDocument, {
+            petitionId: params.petitionId,
+            callbackUrl: query.callbackUrl,
+          });
+          if (isNonNullish(query.callbackUrl)) {
+            return Created({ taskId: result.createExportExcelTask.id });
+          }
+          await waitForTask(client, result.createExportExcelTask.id, { signal });
+          const url = await getTaskResultFileUrl(client, result.createExportExcelTask.id);
           if (query.noredirect) {
             return Created({ file: url }, url);
           } else {

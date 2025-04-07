@@ -159,14 +159,16 @@ export class PetitionExcelExport {
     await this.fieldCommentsTab.addFieldComments(fields);
   }
 
-  public async export() {
+  public async export(includeEmpty?: boolean) {
     const stream = new Readable();
-    // remove the tabs that only contain the headings row
-    if (this.textRepliesTab.rowCount === 1) {
-      this.wb.removeWorksheet(this.textRepliesTab.worksheetName);
-    }
-    if (this.fieldCommentsTab.rowCount === 1) {
-      this.wb.removeWorksheet(this.fieldCommentsTab.worksheetName);
+    // remove the tabs that only contain the headings row if includeEmpty is false
+    if (!includeEmpty) {
+      if (this.textRepliesTab.rowCount === 1) {
+        this.wb.removeWorksheet(this.textRepliesTab.worksheetName);
+      }
+      if (this.fieldCommentsTab.rowCount === 1) {
+        this.wb.removeWorksheet(this.fieldCommentsTab.worksheetName);
+      }
     }
     stream.push(await this.wb.xlsx.writeBuffer());
     stream.push(null); // end of stream

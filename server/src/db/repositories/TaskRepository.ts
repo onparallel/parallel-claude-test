@@ -26,7 +26,12 @@ export type TaskInput<TName extends TaskName> = {
     callback_url?: Maybe<string>;
   };
   /** generates xlsx file containing petition text replies and comments */
-  EXPORT_EXCEL: { petition_id: number };
+  EXPORT_EXCEL: {
+    petition_id: number;
+    callback_url?: Maybe<string>;
+    // if excel file turns out to be empty, it will be exported anyway
+    export_empty_file?: boolean;
+  };
   /**
    * Generates a xlsx file containing every petition coming from the selected template,
    * with its recipients information, send dates and replies
