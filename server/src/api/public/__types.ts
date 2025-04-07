@@ -7199,6 +7199,7 @@ export type PetitionSignatureRequestFragment = {
 
 export type PetitionFragment = {
   id: string;
+  path: string;
   name: string | null;
   status: PetitionStatus;
   deadline: string | null;
@@ -7324,6 +7325,7 @@ export type PetitionFragment = {
 export type TemplateFragment = {
   id: string;
   name: string | null;
+  path: string;
   description: any | null;
   locale: PetitionLocale;
   createdAt: string;
@@ -7740,6 +7742,7 @@ export type GetPetitions_petitionsQuery = {
     items: Array<
       | {
           id: string;
+          path: string;
           name: string | null;
           status: PetitionStatus;
           deadline: string | null;
@@ -7885,6 +7888,7 @@ export type CreatePetition_petitionMutation = {
   createPetition:
     | {
         id: string;
+        path: string;
         name: string | null;
         status: PetitionStatus;
         deadline: string | null;
@@ -8027,6 +8031,7 @@ export type GetPetition_petitionQuery = {
   petition:
     | {
         id: string;
+        path: string;
         name: string | null;
         status: PetitionStatus;
         deadline: string | null;
@@ -8208,6 +8213,7 @@ export type UpdatePetition_updatePetitionMutation = {
   updatePetition:
     | {
         id: string;
+        path: string;
         name: string | null;
         status: PetitionStatus;
         deadline: string | null;
@@ -8356,6 +8362,7 @@ export type ClosePetition_closePetitionMutationVariables = Exact<{
 export type ClosePetition_closePetitionMutation = {
   closePetition: {
     id: string;
+    path: string;
     name: string | null;
     status: PetitionStatus;
     deadline: string | null;
@@ -8496,6 +8503,7 @@ export type ReopenPetition_reopenPetitionMutationVariables = Exact<{
 export type ReopenPetition_reopenPetitionMutation = {
   reopenPetition: {
     id: string;
+    path: string;
     name: string | null;
     status: PetitionStatus;
     deadline: string | null;
@@ -8653,6 +8661,7 @@ export type TagPetition_tagPetitionMutation = {
   tagPetition:
     | {
         id: string;
+        path: string;
         name: string | null;
         status: PetitionStatus;
         deadline: string | null;
@@ -8864,6 +8873,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
     result: Result;
     petition: {
       id: string;
+      path: string;
       name: string | null;
       status: PetitionStatus;
       deadline: string | null;
@@ -9948,6 +9958,7 @@ export type GetTemplates_templatesQuery = {
       | {
           id: string;
           name: string | null;
+          path: string;
           description: any | null;
           locale: PetitionLocale;
           createdAt: string;
@@ -9992,6 +10003,7 @@ export type GetTemplate_templateQuery = {
     | {
         id: string;
         name: string | null;
+        path: string;
         description: any | null;
         locale: PetitionLocale;
         createdAt: string;
@@ -11928,6 +11940,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutationVariables = Exact<{
 export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
   bulkCreatePetitionReplies: {
     id: string;
+    path: string;
     name: string | null;
     status: PetitionStatus;
     deadline: string | null;
@@ -12254,6 +12267,7 @@ export const PetitionSignatureRequestFragmentDoc = gql`
 export const PetitionFragmentDoc = gql`
   fragment Petition on Petition {
     id
+    path
     name
     status
     deadline
@@ -12341,6 +12355,7 @@ export const TemplateFragmentDoc = gql`
   fragment Template on PetitionTemplate {
     id
     name
+    path
     description
     locale
     createdAt

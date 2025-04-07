@@ -144,6 +144,7 @@ export const PetitionSignatureRequestFragment = gql`
 export const PetitionFragment = gql`
   fragment Petition on Petition {
     id
+    path
     name
     status
     deadline
@@ -232,6 +233,7 @@ export const TemplateFragment = gql`
   fragment Template on PetitionTemplate {
     id
     name
+    path
     description
     locale
     createdAt

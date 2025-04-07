@@ -799,6 +799,7 @@ const _Petition = {
   required: [
     "id",
     "name",
+    "path",
     "status",
     "deadline",
     "locale",
@@ -811,6 +812,11 @@ const _Petition = {
       description: "The ID of the parallel",
       type: "string",
       example: toGlobalId("Petition", 42),
+    },
+    path: {
+      description: "The path of the parallel",
+      type: "string",
+      example: "/",
     },
     name: {
       description: "The name of the parallel",
@@ -947,7 +953,7 @@ const _Template = {
   title: "Template",
   type: "object",
   additionalProperties: false,
-  required: ["id", "name", "description", "locale", "createdAt", "customProperties"],
+  required: ["id", "name", "path", "description", "locale", "createdAt", "customProperties"],
   properties: {
     id: {
       description: "The ID of the template",
@@ -958,6 +964,11 @@ const _Template = {
       description: "The name of the template",
       type: ["string", "null"],
       example: "My parallel",
+    },
+    path: {
+      description: "The path of the template",
+      type: "string",
+      example: "/",
     },
     description: {
       description: "The description of the template",
