@@ -11,7 +11,7 @@ const fetchToFile_1 = require("../utils/fetchToFile");
 const getAvailableFileName_1 = require("../utils/getAvailableFileName");
 const run_1 = require("../utils/run");
 const helpers_1 = require("./helpers");
-const TEMPLATE_ID = "6Y8DSH92uxPaJ4BZPFDrr";
+// const TEMPLATE_ID = "6Y8DSH92uxPaJ4BZPFDrr";
 async function main() {
     const DOWNLOAD = {
         excel: true,

@@ -7,7 +7,7 @@ import { getAvailableFileName } from "../utils/getAvailableFileName";
 import { run } from "../utils/run";
 import { paginatedRequest } from "./helpers";
 
-const TEMPLATE_ID = "6Y8DSH92uxPaJ4BZPFDrr";
+// const TEMPLATE_ID = "6Y8DSH92uxPaJ4BZPFDrr";
 
 async function main() {
   const DOWNLOAD = {
