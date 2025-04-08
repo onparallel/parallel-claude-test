@@ -1150,7 +1150,7 @@ export class ProfileRepository extends BaseRepository {
                 ) as data,
                 ptf.position
               from removed_previous_values rpv
-              left join with_previous_values wpv on wpv.profile_type_field_id = rpv.profile_type_field_id
+              left join with_previous_values wpv on wpv.profile_type_field_id = rpv.profile_type_field_id and wpv.profile_id = rpv.profile_id
               join profile_type_field ptf on rpv.profile_type_field_id = ptf.id
               where wpv.id is not null or not profile_field_value_content_is_equal(wpv.type, rpv.content,  wpv.content)
               union all
@@ -1166,7 +1166,7 @@ export class ProfileRepository extends BaseRepository {
                 ) as data,
                 ptf.position
               from removed_previous_values rpv
-              left join with_previous_values wpv on wpv.profile_type_field_id = rpv.profile_type_field_id
+              left join with_previous_values wpv on wpv.profile_type_field_id = rpv.profile_type_field_id and wpv.profile_id = rpv.profile_id
               join profile_type_field ptf on rpv.profile_type_field_id = ptf.id
               where wpv.id is not null and rpv.expiry_date is distinct from wpv.expiry_date
             ) e
