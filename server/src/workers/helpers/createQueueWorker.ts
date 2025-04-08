@@ -35,11 +35,7 @@ export interface QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> {
    */
   forkTimeout?:
     | number
-    | ((
-        payload: QueueWorkerPayload<Q>,
-        context: WorkerContext,
-        config: Config["queueWorkers"][Q],
-      ) => MaybePromise<number>);
+    | ((payload: QueueWorkerPayload<Q>, config: Config["queueWorkers"][Q]) => MaybePromise<number>);
   onForkError?: (
     signal: NodeJS.Signals,
     message: QueueWorkerPayload<Q>,
@@ -124,11 +120,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                     const timeout =
                       typeof forkTimeout === "number"
                         ? forkTimeout
-                        : await forkTimeout(
-                            parser(message.Body!),
-                            container.get<WorkerContext>(WorkerContext),
-                            queueConfig,
-                          );
+                        : await forkTimeout(parser(message.Body!), queueConfig);
                     return await new Promise<void>((resolve, reject) => {
                       fork(
                         script,
