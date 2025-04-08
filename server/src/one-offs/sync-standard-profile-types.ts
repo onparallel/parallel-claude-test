@@ -12,13 +12,13 @@ import {
   ProfileTypeStandardType,
   ProfileTypeStandardTypeValues,
 } from "../db/__types";
-import { ProfileTypeFieldOptions } from "../db/helpers/profileTypeFieldOptions";
 import { KNEX } from "../db/knex";
 import {
   PROFILES_SETUP_SERVICE,
   ProfileRelationshipTypeAlias,
   ProfilesSetupService,
 } from "../services/ProfilesSetupService";
+import { ProfileTypeFieldOptions } from "../services/ProfileTypeFieldService";
 import { loadEnv } from "../util/loadEnv";
 import { waitFor } from "../util/promises/waitFor";
 

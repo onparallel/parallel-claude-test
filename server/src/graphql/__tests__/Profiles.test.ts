@@ -17,7 +17,6 @@ import {
   User,
   UserGroup,
 } from "../../db/__types";
-import { defaultProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
@@ -3549,7 +3548,7 @@ describe("GraphQL/Profiles", () => {
         alias: "alias",
         isExpirable: true,
         expiryAlertAheadTime: { months: 1 },
-        options: defaultProfileTypeFieldOptions("SHORT_TEXT"),
+        options: {},
         position: 3,
         type: "SHORT_TEXT",
         isUsedInProfileName: false,

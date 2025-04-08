@@ -39,15 +39,9 @@ import {
   ProfileFieldFileAddedEvent,
   ProfileRelationshipRemovedEvent,
 } from "../../db/events/ProfileEvent";
-import {
-  ProfileTypeFieldOptions,
-  defaultProfileTypeFieldOptions,
-  mapProfileTypeFieldOptions,
-  profileTypeFieldSelectValues,
-  validateProfileTypeFieldOptions,
-} from "../../db/helpers/profileTypeFieldOptions";
 import { ProfileRepository } from "../../db/repositories/ProfileRepository";
 import { ProfileExternalSourceRequestError } from "../../integrations/profile-external-source/ProfileExternalSourceIntegration";
+import { ProfileTypeFieldOptions } from "../../services/ProfileTypeFieldService";
 import { toBytes } from "../../util/fileSize";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
@@ -342,9 +336,9 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
   },
   resolve: async (_, args, ctx) => {
     try {
-      const options = await mapProfileTypeFieldOptions(
+      const options = await ctx.profileTypeFields.mapProfileTypeFieldOptions(
         args.data.type,
-        args.data.options ?? defaultProfileTypeFieldOptions(args.data.type),
+        args.data.options ?? ctx.profileTypeFields.defaultProfileTypeFieldOptions(args.data.type),
         (type, id) => fromGlobalId(id, type).id,
       );
 
@@ -460,17 +454,18 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
         );
       }
 
-      const options = await mapProfileTypeFieldOptions(
+      const options = await ctx.profileTypeFields.mapProfileTypeFieldOptions(
         profileTypeField.type,
         { ...profileTypeField.options, ...args.data.options },
         (type, id) => fromGlobalId(id, type).id,
       );
 
       try {
-        await validateProfileTypeFieldOptions(profileTypeField.type, options, {
-          profileTypeId: args.profileTypeId,
-          loadProfileTypeField: ctx.profiles.loadProfileTypeField,
-        });
+        await ctx.profileValidation.validateProfileTypeFieldOptions(
+          profileTypeField.type,
+          options,
+          args.profileTypeId,
+        );
       } catch (error) {
         if (error instanceof Error) {
           throw new ArgValidationError(info, "data.options", error.message);
@@ -516,8 +511,10 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
             so the user can choose a substitution for the option and try again.
           */
 
-        const currentValues = await profileTypeFieldSelectValues(profileTypeField.options);
-        const newValues = await profileTypeFieldSelectValues(
+        const currentValues = await ctx.profileTypeFields.loadProfileTypeFieldSelectValues(
+          profileTypeField.options,
+        );
+        const newValues = await ctx.profileTypeFields.loadProfileTypeFieldSelectValues(
           args.data.options as ProfileTypeFieldOptions["SELECT" | "CHECKBOX"],
         );
         const removedOptionsWithoutSubstitutions = pipe(
@@ -2567,7 +2564,11 @@ export const profileImportExcelModelDownloadLink = mutationField(
     },
     resolve: async (_, { profileTypeId, locale }, ctx) => {
       const { stream, filename, contentType } =
-        await ctx.profileImport.generateProfileImportExcelModel(profileTypeId, locale, ctx.user!);
+        await ctx.profileExcelImport.generateProfileImportExcelModel(
+          profileTypeId,
+          locale,
+          ctx.user!,
+        );
 
       const path = random(16);
       await ctx.storage.temporaryFiles.uploadFile(path, contentType, stream);

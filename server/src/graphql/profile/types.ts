@@ -11,7 +11,6 @@ import {
   ProfileTypeFieldTypeValues,
   ProfileTypeStandardTypeValues,
 } from "../../db/__types";
-import { mapProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import { toGlobalId } from "../../util/globalId";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
@@ -175,8 +174,10 @@ export const ProfileTypeField = objectType({
       },
     });
     t.jsonObject("options", {
-      resolve: async (o) =>
-        await mapProfileTypeFieldOptions(o.type, o.options, (type, id) => toGlobalId(type, id)),
+      resolve: async (o, _, ctx) =>
+        await ctx.profileTypeFields.mapProfileTypeFieldOptions(o.type, o.options, (type, id) =>
+          toGlobalId(type, id),
+        ),
     });
     t.nullable.string("alias");
     t.boolean("isExpirable", { resolve: (o) => o.is_expirable });

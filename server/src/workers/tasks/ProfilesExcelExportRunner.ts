@@ -15,7 +15,7 @@ export class ProfilesExcelExportRunner extends TaskRunner<"PROFILES_EXCEL_EXPORT
       throw new Error(`Task ${this.task.id} is missing user_id`);
     }
 
-    const { stream, filename, contentType } = await this.ctx.profileExport.exportToExcel(
+    const { stream, filename, contentType } = await this.ctx.profileExcelExport.export(
       profileTypeId,
       search,
       filter,

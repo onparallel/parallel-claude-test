@@ -5,13 +5,13 @@ import { IntlShape } from "react-intl";
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { ProfileTypeField, UserLocale } from "../db/__types";
-import { profileTypeFieldSelectValues } from "../db/helpers/profileTypeFieldOptions";
 import { LocalizableUserText } from "../graphql";
 import { fromGlobalId, isGlobalId, toGlobalId } from "../util/globalId";
+import { ProfileTypeFieldService } from "./ProfileTypeFieldService";
 
 @injectable()
 export abstract class ProfileExcelService {
-  constructor() {}
+  constructor(private profileTypeFields: ProfileTypeFieldService) {}
 
   protected async initializeExcelWorkbook(
     columns: ("profile-id" | number)[],
@@ -232,7 +232,7 @@ export abstract class ProfileExcelService {
     await pMap(
       listFields,
       async (field, i) => {
-        const values = await profileTypeFieldSelectValues(field.options);
+        const values = await this.profileTypeFields.loadProfileTypeFieldSelectValues(field.options);
         const cell = dataFormatRow.getCell(i + 1);
         values.forEach((v, n) => {
           worksheet.getCell(cell.row + 1 + n, cell.col).value = v.value;

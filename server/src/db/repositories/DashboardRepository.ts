@@ -2,6 +2,10 @@ import { inject } from "inversify";
 import { Knex } from "knex";
 import { indexBy, isNonNullish, isNullish, sumBy, unique } from "remeda";
 import { assert } from "ts-essentials";
+import {
+  PROFILE_TYPE_FIELD_SERVICE,
+  ProfileTypeFieldService,
+} from "../../services/ProfileTypeFieldService";
 import { hashString } from "../../util/token";
 import { Replace } from "../../util/types";
 import {
@@ -17,7 +21,6 @@ import {
   PETITION_FILTER_REPOSITORY_HELPER,
   PetitionFilterRepositoryHelper,
 } from "../helpers/PetitionFilterRepositoryHelper";
-import { profileTypeFieldSelectValues } from "../helpers/profileTypeFieldOptions";
 import {
   PROFILE_VALUES_FILTER_REPOSITORY_HELPER,
   ProfileValuesFilterRepositoryHelper,
@@ -95,6 +98,8 @@ export class DashboardRepository extends BaseRepository {
     private profileValuesFilter: ProfileValuesFilterRepositoryHelper,
     @inject(PETITION_FILTER_REPOSITORY_HELPER)
     private petitionFilter: PetitionFilterRepositoryHelper,
+    @inject(PROFILE_TYPE_FIELD_SERVICE)
+    private profileTypeFields: ProfileTypeFieldService,
   ) {
     super(knex);
   }
@@ -580,7 +585,9 @@ export class DashboardRepository extends BaseRepository {
       .groupBy("p_all.group_by_value")
       .from("p_all");
 
-    const groupByValues = await profileTypeFieldSelectValues(groupByField.options);
+    const groupByValues = await this.profileTypeFields.loadProfileTypeFieldSelectValues(
+      groupByField.options,
+    );
     const showOptionsWithColors = !!groupByField.options.showOptionsWithColors;
     return {
       items: data.map((d) => {

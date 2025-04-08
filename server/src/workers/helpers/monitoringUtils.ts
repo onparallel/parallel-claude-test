@@ -1,11 +1,11 @@
 import { subDays, subMonths, subYears } from "date-fns";
 import { isNonNullish, isNullish } from "remeda";
 import { ProfileFieldValue } from "../../db/__types";
-import { ProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import {
   EntityDetailsResponse,
   EntitySearchResponse,
 } from "../../services/background-check-clients/BackgroundCheckClient";
+import { ProfileTypeFieldOptions } from "../../services/ProfileTypeFieldService";
 
 /**
  * Determines if a date is within a specified frequency period before another date.

@@ -1,9 +1,4 @@
 import { isNonNullish, isNullish, unique } from "remeda";
-import {
-  mapProfileTypeFieldOptions,
-  profileTypeFieldSelectValues,
-  validateProfileTypeFieldOptions,
-} from "../../db/helpers/profileTypeFieldOptions";
 import { discriminator } from "../../util/discriminator";
 import { fromGlobalId } from "../../util/globalId";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
@@ -58,15 +53,16 @@ export function validProfileTypeFieldOptions<
     const [data, argName] = getArgWithPath(args, dataArg);
     if (isNonNullish(data.options)) {
       try {
-        const options = await mapProfileTypeFieldOptions(
+        const options = await ctx.profileTypeFields.mapProfileTypeFieldOptions(
           data.type,
           data.options,
           (type, id) => fromGlobalId(id, type).id,
         );
-        await validateProfileTypeFieldOptions(data.type, options, {
+        await ctx.profileValidation.validateProfileTypeFieldOptions(
+          data.type,
+          options,
           profileTypeId,
-          loadProfileTypeField: ctx.profiles.loadProfileTypeField,
-        });
+        );
       } catch (e) {
         if (e instanceof Error) {
           throw new ArgValidationError(info, argName, e.message);
@@ -86,7 +82,9 @@ export function validProfileTypeFieldSubstitution<
     const [data, argName] = getArgWithPath(args, dataArg);
 
     if (isNonNullish(data.substitutions) && isNonNullish(data.options?.values)) {
-      const values = await profileTypeFieldSelectValues(data.options as any);
+      const values = await ctx.profileTypeFields.loadProfileTypeFieldSelectValues(
+        data.options as any,
+      );
       if (
         !data.substitutions.every((s) => isNullish(s.new) || values.some((v) => v.value === s.new))
       ) {

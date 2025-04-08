@@ -8,9 +8,9 @@ import {
   ProfileTypeFieldPermissionType,
   ProfileTypeFieldType,
 } from "../../db/__types";
-import { optionsIncludeProfileTypeFieldId } from "../../db/helpers/profileTypeFieldOptions";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { MaybeArray, unMaybeArray } from "../../util/types";
+import { walkObject } from "../../util/walkObject";
 import { NexusGenInputs } from "../__types";
 import { Arg, ArgAuthorizer, getArg } from "../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../helpers/errors";
@@ -324,6 +324,19 @@ export function profileTypeFieldIsNotUsedInMonitoringRules<
   profileTypeIdArg: TProfileTypeId,
   profileTypeFieldIdArg: TProfileTypeFieldId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
+  function optionsIncludeProfileTypeFieldId(options: any, ids: number[]) {
+    try {
+      walkObject(options, (key, value) => {
+        if (key === "profileTypeFieldId" && typeof value === "number" && ids.includes(value)) {
+          throw new Error();
+        }
+      });
+      return false;
+    } catch {
+      return true;
+    }
+  }
+
   return async (_, args, ctx) => {
     const profileTypeId = getArg(args, profileTypeIdArg);
     const profileTypeFieldIds = unMaybeArray(getArg(args, profileTypeFieldIdArg));

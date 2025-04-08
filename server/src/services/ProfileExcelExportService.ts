@@ -11,20 +11,22 @@ import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { I18N_SERVICE, II18nService } from "./I18nService";
 import { ILogger, LOGGER } from "./Logger";
 import { ProfileExcelService } from "./ProfileExcelService";
+import { PROFILE_TYPE_FIELD_SERVICE, ProfileTypeFieldService } from "./ProfileTypeFieldService";
 
-export const PROFILE_EXPORT_SERVICE = Symbol.for("PROFILE_EXPORT_SERVICE");
+export const PROFILE_EXCEL_EXPORT_SERVICE = Symbol.for("PROFILE_EXCEL_EXPORT_SERVICE");
 
 @injectable()
-export class ProfileExportService extends ProfileExcelService {
+export class ProfileExcelExportService extends ProfileExcelService {
   constructor(
     @inject(ProfileRepository) private profiles: ProfileRepository,
     @inject(I18N_SERVICE) private i18n: II18nService,
     @inject(LOGGER) private logger: ILogger,
+    @inject(PROFILE_TYPE_FIELD_SERVICE) profileTypeFields: ProfileTypeFieldService,
   ) {
-    super();
+    super(profileTypeFields);
   }
 
-  async exportToExcel(
+  async export(
     profileTypeId: number,
     search: string | null,
     filter: Pick<ProfileFilter, "values" | "status"> | null,

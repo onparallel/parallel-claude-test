@@ -1,4 +1,5 @@
 import { isNonNullish } from "remeda";
+import { ProfileTypeFieldOptions } from "../../services/ProfileTypeFieldService";
 import {
   ContactLocale,
   CreatePetitionField,
@@ -10,7 +11,6 @@ import {
   ProfileTypeFieldTypeValues,
 } from "../__types";
 import { defaultFieldProperties } from "./fieldOptions";
-import { ProfileTypeFieldOptions } from "./profileTypeFieldOptions";
 
 const FIELD_TYPE_MAP: Record<ProfileTypeFieldType, PetitionFieldType> = {
   TEXT: "TEXT",

@@ -77,12 +77,22 @@ import {
   PETITION_MESSAGE_CONTEXT_SERVICE,
 } from "./services/PetitionMessageContextService";
 import { IPrinter, PRINTER } from "./services/Printer";
-import { PROFILE_EXPORT_SERVICE, ProfileExportService } from "./services/ProfileExportService";
+import {
+  PROFILE_EXCEL_EXPORT_SERVICE,
+  ProfileExcelExportService,
+} from "./services/ProfileExcelExportService";
+import {
+  PROFILE_EXCEL_IMPORT_SERVICE,
+  ProfileExcelImportService,
+} from "./services/ProfileExcelImportService";
 import {
   IProfileExternalSourcesService,
   PROFILE_EXTERNAL_SOURCE_SERVICE,
 } from "./services/ProfileExternalSourcesService";
-import { PROFILE_IMPORT_SERVICE, ProfileImportService } from "./services/ProfileImportService";
+import {
+  PROFILE_TYPE_FIELD_SERVICE,
+  ProfileTypeFieldService,
+} from "./services/ProfileTypeFieldService";
 import {
   PROFILE_VALIDATION_SERVICE,
   ProfileValidationService,
@@ -136,9 +146,12 @@ export class ApiContext {
     @inject(ID_VERIFICATION_SERVICE) public readonly idVerification: IdVerificationService,
     @inject(PROFILE_EXTERNAL_SOURCE_SERVICE)
     public readonly profileExternalSources: IProfileExternalSourcesService,
-    @inject(PROFILE_IMPORT_SERVICE) public readonly profileImport: ProfileImportService,
+    @inject(PROFILE_EXCEL_IMPORT_SERVICE)
+    public readonly profileExcelImport: ProfileExcelImportService,
     @inject(PROFILE_VALIDATION_SERVICE)
     public readonly profileValidation: ProfileValidationService,
+    @inject(PROFILE_TYPE_FIELD_SERVICE)
+    public readonly profileTypeFields: ProfileTypeFieldService,
 
     // Setup services
     @inject(ACCOUNT_SETUP_SERVICE) public readonly accountSetup: IAccountSetupService,
@@ -206,8 +219,10 @@ export class WorkerContext {
     @inject(DOCUMENT_PROCESSING_SERVICE)
     public readonly documentProcessing: IDocumentProcessingService,
     @inject(PETITION_FILES_SERVICE) public readonly petitionFiles: PetitionFilesService,
-    @inject(PROFILE_IMPORT_SERVICE) public readonly profileImport: ProfileImportService,
-    @inject(PROFILE_EXPORT_SERVICE) public readonly profileExport: ProfileExportService,
+    @inject(PROFILE_EXCEL_IMPORT_SERVICE)
+    public readonly profileExcelImport: ProfileExcelImportService,
+    @inject(PROFILE_EXCEL_EXPORT_SERVICE)
+    public readonly profileExcelExport: ProfileExcelExportService,
     @inject(IMANAGE_FILE_EXPORT_INTEGRATION) public readonly iManageExport: IFileExportIntegration,
 
     // Repositories

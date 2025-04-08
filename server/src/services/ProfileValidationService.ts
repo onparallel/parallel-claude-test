@@ -1,20 +1,29 @@
-import DataLoader from "dataloader";
-import { injectable } from "inversify";
+import Ajv from "ajv";
+import addFormats from "ajv-formats";
+import { inject, injectable } from "inversify";
 import { isPossiblePhoneNumber } from "libphonenumber-js";
-import pMap from "p-map";
-import { isNonNullish } from "remeda";
-import { ProfileTypeField } from "../db/__types";
-import {
-  profileTypeFieldSelectValues,
-  STANDARD_LIST_NAMES,
-} from "../db/helpers/profileTypeFieldOptions";
+import { difference, isNonNullish, unique } from "remeda";
+import { ProfileTypeField, ProfileTypeFieldType } from "../db/__types";
+import { ProfileRepository } from "../db/repositories/ProfileRepository";
 import { isValidDate } from "../util/time";
 import { validateShortTextFormat } from "../util/validateShortTextFormat";
+import {
+  PROFILE_TYPE_FIELD_SERVICE,
+  ProfileTypeFieldOptions,
+  ProfileTypeFieldService,
+  SCHEMAS,
+} from "./ProfileTypeFieldService";
 
 export const PROFILE_VALIDATION_SERVICE = Symbol.for("PROFILE_VALIDATION_SERVICE");
 
 @injectable()
 export class ProfileValidationService {
+  constructor(
+    @inject(ProfileRepository) private profiles: ProfileRepository,
+    @inject(PROFILE_TYPE_FIELD_SERVICE)
+    private profileTypeFields: ProfileTypeFieldService,
+  ) {}
+
   private MAX_SHORT_TEXT_SIZE = 1_000;
   private MAX_TEXT_SIZE = 10_000;
 
@@ -26,8 +35,8 @@ export class ProfileValidationService {
       case "SELECT": {
         this.assertString(content);
 
-        const values = await this.profileTypeFieldValues(field);
-        if (!values.includes(content.value)) {
+        const values = await this.profileTypeFields.loadProfileTypeFieldSelectValues(field.options);
+        if (!values.some((v) => v.value === content.value)) {
           throw new Error("Value is not a valid option");
         }
         return;
@@ -35,8 +44,8 @@ export class ProfileValidationService {
       case "CHECKBOX": {
         this.assertStringArray(content);
 
-        const values = await this.profileTypeFieldValues(field);
-        const invalidValue = content.value.find((value) => !values.includes(value));
+        const values = await this.profileTypeFields.loadProfileTypeFieldSelectValues(field.options);
+        const invalidValue = content.value.find((value) => !values.some((v) => v.value === value));
         if (isNonNullish(invalidValue)) {
           throw new Error("Value is not a valid option");
         }
@@ -89,26 +98,85 @@ export class ProfileValidationService {
     }
   }
 
-  private readonly standardListValuesDataloader = new DataLoader<
-    (typeof STANDARD_LIST_NAMES)[number],
-    string[]
-  >(async (keys) => {
-    return await pMap(
-      keys,
-      async (standardList) => {
-        const data = await profileTypeFieldSelectValues({ standardList, values: [] });
-        return data.map((v) => v.value);
-      },
-      { concurrency: 1 },
-    );
-  });
+  async validateProfileTypeFieldOptions(
+    type: ProfileTypeFieldType,
+    options: any,
+    profileTypeId: number,
+  ) {
+    const ajv = new Ajv();
+    addFormats(ajv, ["date-time"]);
 
-  private async profileTypeFieldValues(
-    field: Pick<ProfileTypeField, "type" | "options">,
-  ): Promise<string[]> {
-    return field.options.standardList
-      ? await this.standardListValuesDataloader.load(field.options.standardList)
-      : (field.options.values as { value: string }[]).map((v) => v.value);
+    const valid = ajv.validate(SCHEMAS[type], options);
+    if (!valid) {
+      throw new Error(ajv.errorsText());
+    }
+
+    if (type === "BACKGROUND_CHECK") {
+      await this.validateBackgroundCheckOptions(options, profileTypeId);
+    }
+  }
+
+  private async validateBackgroundCheckOptions(
+    options: ProfileTypeFieldOptions["BACKGROUND_CHECK"],
+    profileTypeId: number,
+  ) {
+    if (isNonNullish(options.monitoring?.activationCondition?.profileTypeFieldId)) {
+      const profileTypeField = await this.profiles.loadProfileTypeField(
+        options.monitoring.activationCondition.profileTypeFieldId,
+      );
+      if (
+        !profileTypeField ||
+        profileTypeField.type !== "SELECT" ||
+        profileTypeField.profile_type_id !== profileTypeId
+      ) {
+        throw new Error("Invalid profileTypeFieldId");
+      }
+
+      // make sure every value in activation conditions is a valid option on SELECT field
+      const selectValues = unique(
+        (
+          await this.profileTypeFields.loadProfileTypeFieldSelectValues(profileTypeField.options)
+        ).map((v) => v.value),
+      );
+      if (
+        !unique(options.monitoring.activationCondition.values).every((activationValue) =>
+          selectValues.includes(activationValue),
+        )
+      ) {
+        throw new Error("Invalid activation values");
+      }
+    }
+
+    if (options.monitoring?.searchFrequency.type === "VARIABLE") {
+      const profileTypeField = await this.profiles.loadProfileTypeField(
+        options.monitoring.searchFrequency.profileTypeFieldId,
+      );
+      if (
+        !profileTypeField ||
+        profileTypeField.type !== "SELECT" ||
+        profileTypeField.profile_type_id !== profileTypeId
+      ) {
+        throw new Error("Invalid profileTypeFieldId");
+      }
+
+      // every SELECT value has to be set on variable searchFrequency options
+      const selectValues = unique(
+        (
+          await this.profileTypeFields.loadProfileTypeFieldSelectValues(
+            profileTypeField.options as ProfileTypeFieldOptions["SELECT"],
+          )
+        ).map((v) => v.value),
+      );
+      const searchFrequencyValues = unique(
+        options.monitoring.searchFrequency.options.map((o) => o.value),
+      );
+      if (
+        selectValues.length !== searchFrequencyValues.length ||
+        difference(selectValues, searchFrequencyValues).length !== 0
+      ) {
+        throw new Error("Invalid variable searchFrequency options");
+      }
+    }
   }
 
   private assertSingleValueProperty<T extends "string" | "number" | "object">(

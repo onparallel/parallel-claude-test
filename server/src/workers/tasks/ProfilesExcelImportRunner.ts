@@ -34,9 +34,13 @@ export class ProfilesExcelImportRunner extends TaskRunner<"PROFILES_EXCEL_IMPORT
     }
 
     try {
-      const data = await this.ctx.profileImport.parseExcelData(profileTypeId, importData, user.id);
+      const data = await this.ctx.profileExcelImport.parseExcelData(
+        profileTypeId,
+        importData,
+        user.id,
+      );
 
-      await this.ctx.profileImport.importDataIntoProfiles(
+      await this.ctx.profileExcelImport.importDataIntoProfiles(
         profileTypeId,
         data,
         user,

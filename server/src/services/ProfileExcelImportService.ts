@@ -18,9 +18,10 @@ import {
   ProfileExcelService,
   UnknownIdError,
 } from "./ProfileExcelService";
+import { PROFILE_TYPE_FIELD_SERVICE, ProfileTypeFieldService } from "./ProfileTypeFieldService";
 import { PROFILE_VALIDATION_SERVICE, ProfileValidationService } from "./ProfileValidationService";
 
-export const PROFILE_IMPORT_SERVICE = Symbol.for("PROFILE_IMPORT_SERVICE");
+export const PROFILE_EXCEL_IMPORT_SERVICE = Symbol.for("PROFILE_EXCEL_IMPORT_SERVICE");
 
 interface ParsedProfileFieldValue {
   profileTypeFieldId: number;
@@ -31,13 +32,14 @@ interface ParsedProfileFieldValue {
 }
 
 @injectable()
-export class ProfileImportService extends ProfileExcelService {
+export class ProfileExcelImportService extends ProfileExcelService {
   constructor(
     @inject(I18N_SERVICE) private i18n: II18nService,
     @inject(PROFILE_VALIDATION_SERVICE) private profileValidation: ProfileValidationService,
     @inject(ProfileRepository) private profiles: ProfileRepository,
+    @inject(PROFILE_TYPE_FIELD_SERVICE) profileTypeFields: ProfileTypeFieldService,
   ) {
-    super();
+    super(profileTypeFields);
   }
 
   async generateProfileImportExcelModel(profileTypeId: number, locale: UserLocale, user: User) {

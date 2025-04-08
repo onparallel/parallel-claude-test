@@ -20,6 +20,11 @@ import {
 } from "remeda";
 import { assert } from "ts-essentials";
 import { LocalizableUserText } from "../../graphql";
+import {
+  PROFILE_TYPE_FIELD_SERVICE,
+  ProfileTypeFieldOptions,
+  ProfileTypeFieldService,
+} from "../../services/ProfileTypeFieldService";
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { keyBuilder } from "../../util/keyBuilder";
 import { ProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
@@ -69,10 +74,6 @@ import {
 } from "../events/ProfileEvent";
 import { BaseRepository, PageOpts, Pagination } from "../helpers/BaseRepository";
 import {
-  ProfileTypeFieldOptions,
-  profileTypeFieldSelectValues,
-} from "../helpers/profileTypeFieldOptions";
-import {
   PROFILE_VALUES_FILTER_REPOSITORY_HELPER,
   ProfileValuesFilterRepositoryHelper,
 } from "../helpers/ProfileValuesFilterRepositoryHelper";
@@ -93,6 +94,8 @@ export class ProfileRepository extends BaseRepository {
     @inject(QUEUES_SERVICE) private queues: IQueuesService,
     @inject(PROFILE_VALUES_FILTER_REPOSITORY_HELPER)
     private profileValuesFilter: ProfileValuesFilterRepositoryHelper,
+    @inject(PROFILE_TYPE_FIELD_SERVICE)
+    private profileTypeFields: ProfileTypeFieldService,
   ) {
     super(knex);
   }
@@ -856,7 +859,11 @@ export class ProfileRepository extends BaseRepository {
     const selectValuesById = Object.fromEntries(
       await pMap(
         profileTypeFields.filter((f) => f?.type === "SELECT"),
-        async (field) => [field!.id, await profileTypeFieldSelectValues(field!.options)] as const,
+        async (field) =>
+          [
+            field!.id,
+            await this.profileTypeFields.loadProfileTypeFieldSelectValues(field!.options),
+          ] as const,
         { concurrency: 10 },
       ),
     );

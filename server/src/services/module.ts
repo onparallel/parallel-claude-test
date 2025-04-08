@@ -73,13 +73,20 @@ import {
   PetitionMessageContextService,
 } from "./PetitionMessageContextService";
 import { IPrinter, PRINTER, Printer } from "./Printer";
-import { PROFILE_EXPORT_SERVICE, ProfileExportService } from "./ProfileExportService";
+import {
+  PROFILE_EXCEL_EXPORT_SERVICE,
+  ProfileExcelExportService,
+} from "./ProfileExcelExportService";
+import {
+  PROFILE_EXCEL_IMPORT_SERVICE,
+  ProfileExcelImportService,
+} from "./ProfileExcelImportService";
 import {
   IProfileExternalSourcesService,
   PROFILE_EXTERNAL_SOURCE_SERVICE,
   ProfileExternalSourcesService,
 } from "./ProfileExternalSourcesService";
-import { PROFILE_IMPORT_SERVICE, ProfileImportService } from "./ProfileImportService";
+import { PROFILE_TYPE_FIELD_SERVICE, ProfileTypeFieldService } from "./ProfileTypeFieldService";
 import { PROFILE_VALIDATION_SERVICE, ProfileValidationService } from "./ProfileValidationService";
 import {
   IProfilesSetupService,
@@ -144,8 +151,9 @@ export const servicesModule = new ContainerModule((options) => {
     .bind<IProfileExternalSourcesService>(PROFILE_EXTERNAL_SOURCE_SERVICE)
     .to(ProfileExternalSourcesService);
   options.bind<PetitionFilesService>(PETITION_FILES_SERVICE).to(PetitionFilesService);
-  options.bind(PROFILE_IMPORT_SERVICE).to(ProfileImportService);
-  options.bind(PROFILE_EXPORT_SERVICE).to(ProfileExportService);
+  options.bind(PROFILE_EXCEL_IMPORT_SERVICE).to(ProfileExcelImportService);
+  options.bind(PROFILE_EXCEL_EXPORT_SERVICE).to(ProfileExcelExportService);
 
   options.bind(PROFILE_VALIDATION_SERVICE).to(ProfileValidationService);
+  options.bind(PROFILE_TYPE_FIELD_SERVICE).to(ProfileTypeFieldService);
 });
