@@ -5,9 +5,9 @@ exports.request = request;
 /**
  * fetches all items of a paginated endpoint
  */
-async function* paginatedRequest(path, { query = new URLSearchParams(), method = "GET", body, }) {
-    let offset = 0;
-    let index = 0;
+async function* paginatedRequest(path, { query = new URLSearchParams(), method = "GET", body, initialOffset = 0, }) {
+    let index = initialOffset;
+    let offset = initialOffset;
     let totalCount = 0;
     do {
         const result = await request(path, {

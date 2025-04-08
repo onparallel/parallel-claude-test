@@ -7,10 +7,16 @@ export async function* paginatedRequest<T>(
     query = new URLSearchParams(),
     method = "GET",
     body,
-  }: { query?: URLSearchParams; method?: string; body?: Record<string, any> },
+    initialOffset = 0,
+  }: {
+    query?: URLSearchParams;
+    method?: string;
+    body?: Record<string, any>;
+    initialOffset?: number;
+  },
 ) {
-  let offset = 0;
-  let index = 0;
+  let index = initialOffset;
+  let offset = initialOffset;
   let totalCount = 0;
   do {
     const result = await request<{ items: T[]; totalCount: number }>(path, {
