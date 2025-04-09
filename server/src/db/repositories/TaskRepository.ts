@@ -270,7 +270,7 @@ export type TaskOutput<TName extends TaskName> = {
     count?: number;
     error?: {
       code: string;
-      cell?: { col: number; row: number; value: string };
+      cell?: { col: number; row: number; value: string | null };
     };
   };
   PROFILES_EXCEL_EXPORT: {
