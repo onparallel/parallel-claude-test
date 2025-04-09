@@ -1199,7 +1199,13 @@ export class ProfileRepository extends BaseRepository {
               f.profileTypeFieldId,
               f.type,
               // undefined ('null'::jsonb) uses previous value, null removes
-              f.content === undefined ? "null" : f.content ? JSON.stringify(f.content) : null,
+              f.content === undefined
+                ? "null"
+                : f.content
+                  ? JSON.stringify(
+                      this.profileTypeFields.sanitizeProfileFieldValueContent(f.type, f.content),
+                    )
+                  : null,
               // undefined ('-infinity'::date) uses previous value, null removes
               f.expiryDate === undefined ? "-infinity" : (f.expiryDate ?? null),
             ]),

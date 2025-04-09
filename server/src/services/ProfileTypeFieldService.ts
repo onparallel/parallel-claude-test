@@ -4,6 +4,7 @@ import { FromSchema } from "json-schema-to-ts";
 import pMap from "p-map";
 import { join } from "path";
 import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { ProfileTypeFieldType, UserLocale, UserLocaleValues } from "../db/__types";
 import { LOCALIZABLE_USER_TEXT_SCHEMA } from "../graphql";
 import { walkObject } from "../util/walkObject";
@@ -259,6 +260,20 @@ export class ProfileTypeFieldService {
       return this.standardListsLoader.load(key.standardList);
     } else {
       return key.values;
+    }
+  }
+
+  sanitizeProfileFieldValueContent(type: ProfileTypeFieldType, content: any) {
+    switch (type) {
+      case "PHONE":
+        assert(typeof content.value === "string", "Expected value to be a string");
+        return {
+          value: content.value.replace(/[^\d+]/g, ""), // remove all non-digits or +
+          // pretty value is calculated in gql resolver and not required to be stored
+        };
+
+      default:
+        return content;
     }
   }
 
