@@ -65,13 +65,14 @@ export class ProfileExcelExportService extends ProfileExcelService {
     );
 
     let offset = 0;
+    const limit = 5000;
     let totalCount: number | null = null;
     do {
-      this.logger.info(`Fetching profiles from ${offset} to ${offset + 100}`);
+      this.logger.info(`Fetching profiles from ${offset} to ${offset + limit}`);
       const pagination = this.profiles.getPaginatedProfileForOrg(
         profileType.org_id,
         {
-          limit: 5000,
+          limit,
           offset,
           search,
           filter: {
@@ -91,8 +92,8 @@ export class ProfileExcelExportService extends ProfileExcelService {
 
       const items = await pagination.items;
 
-      // write profiles into worksheet in chunks of 100
-      await this.writeProfilesData(items, fieldsWithPermissions, workbook.worksheets[0]);
+      // write profiles into worksheet in chunks
+      await this.writeProfilesData(items, fieldsWithPermissions, workbook.worksheets[0], offset);
 
       offset += items.length;
       await onProgress?.(offset, totalCount);
@@ -120,6 +121,7 @@ export class ProfileExcelExportService extends ProfileExcelService {
     profiles: Profile[],
     fieldsWithPermissions: ProfileTypeField[],
     worksheet: Excel.Worksheet,
+    offset: number,
   ) {
     const profilesValues = await this.profiles.loadProfileFieldValuesByProfileId(
       profiles.map((p) => p.id),
@@ -142,7 +144,7 @@ export class ProfileExcelExportService extends ProfileExcelService {
       }
 
       // data is inserted starting from row 3, as first two rows are headers
-      worksheet.insertRow(3 + rowIndex++, row);
+      worksheet.insertRow(3 + offset + rowIndex++, row);
     }
   }
 
