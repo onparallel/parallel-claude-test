@@ -207,15 +207,18 @@ export class ProfileExcelImportService extends ProfileExcelService {
           throw new CellError(cell, "You do not have write permission for this field");
         }
 
-        const content = {
-          value:
-            field.type === "NUMBER"
-              ? parseFloat(cell.value)
-              : field.type === "CHECKBOX"
-                ? // split the checkbox value by commas (ignoring escaped commas) and trim whitespace from each item
-                  cell.value.split(/(?<!\\),/).map((x) => x.trim())
-                : cell.value,
-        };
+        const content =
+          cell.value && cell.value.trim() !== ""
+            ? {
+                value:
+                  field.type === "NUMBER"
+                    ? parseFloat(cell.value)
+                    : field.type === "CHECKBOX"
+                      ? // split the checkbox value by commas (ignoring escaped commas) and trim whitespace from each item
+                        cell.value.split(/(?<!\\),/).map((x) => x.trim())
+                      : cell.value,
+              }
+            : null;
 
         try {
           await this.profileValidation.validateProfileFieldValueContent(field, content);
@@ -229,7 +232,12 @@ export class ProfileExcelImportService extends ProfileExcelService {
             : field.is_expirable
               ? contentById[`${toGlobalId("ProfileTypeField", field.id)}-expiry`]
               : null;
-        if (expiryCell && expiryCell.value !== "" && !isValidDate(expiryCell.value)) {
+        if (
+          expiryCell &&
+          expiryCell.value &&
+          expiryCell.value !== "" &&
+          !isValidDate(expiryCell.value)
+        ) {
           throw new CellError(expiryCell, "Invalid date format");
         }
 

@@ -257,7 +257,7 @@ export abstract class ProfileExcelService {
 }
 
 export interface CellData {
-  value: string;
+  value: string | null;
   row: number;
   col: number;
 }
