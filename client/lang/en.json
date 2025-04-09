@@ -17835,16 +17835,6 @@
     "context": "Verification link sent"
   },
   {
-    "term": "public.sign-up-button",
-    "definition": "Sign up",
-    "context": "Sign up"
-  },
-  {
-    "term": "public.sign-up-for-free-button",
-    "definition": "Sign up for free",
-    "context": "Sign up for free"
-  },
-  {
     "term": "public.signup.meta-description",
     "definition": "Signup on Parallel",
     "context": "Signup on Parallel"
@@ -17938,16 +17928,6 @@
     "term": "public.templates.meta-description",
     "definition": "Learn more about Parallel templates",
     "context": "Learn more about Parallel templates"
-  },
-  {
-    "term": "public.templates.want-to-use-our-templates",
-    "definition": "Do you want to use our templates?",
-    "context": "Do you want to use our templates?"
-  },
-  {
-    "term": "public.try-for-free-button",
-    "definition": "Try for free",
-    "context": "Try for free"
   },
   {
     "term": "recipient-view.cant-find-email-help",

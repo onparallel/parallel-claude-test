@@ -13,7 +13,7 @@ import { CheckboxTypeLabel } from "@parallel/components/petition-common/Checkbox
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
-import { ChangeEvent, forwardRef, useEffect, useState } from "react";
+import { ChangeEvent, forwardRef, useCallback, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   components,
@@ -57,7 +57,11 @@ const haveChanges = ({
   value: string[];
   max: number;
 }) => {
-  return max === 1 ? checked[0] !== value[0] : checked.length !== value.length;
+  if (max === 1) return checked[0] !== value[0];
+
+  if (checked.length !== value.length) return true;
+
+  return checked.some((item) => !value.includes(item));
 };
 
 function CustomIcon() {
@@ -82,7 +86,7 @@ export function RecipientViewPetitionFieldCheckbox({
   const hasStandardList = isNonNullish(field.options.standardList);
   const { type = "UNLIMITED", max = 1 } = options.limit ?? {};
   const reply = field.replies.length > 0 ? field.replies[0] : undefined;
-  const isRejected = reply?.status === "REJECTED" ?? false;
+  const isRejected = reply?.status === "REJECTED" || false;
   const showRadio = max === 1 && type !== "UNLIMITED";
   const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);
   const [checkedItems, setCheckedItems] = useState<string[]>(reply?.content?.value ?? []);
@@ -95,32 +99,38 @@ export function RecipientViewPetitionFieldCheckbox({
     if (hasAlreadyRepliedError) {
       setHasAlreadyRepliedError(false);
     }
-  }, [reply]);
+  }, [reply, max, hasAlreadyRepliedError]);
 
-  const handleUpdate = async (value: string[]) => {
-    setIsSaving(true);
-    try {
-      await onUpdateReply(reply!.id, { value });
-    } catch (e) {
-      onError(e);
-    }
-    setIsSaving(false);
-  };
-
-  const handleCreate = async (value: string[]) => {
-    setIsSaving(true);
-    try {
-      await onCreateReply({ value });
-    } catch (e) {
-      if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
-        setHasAlreadyRepliedError(true);
+  const handleUpdate = useCallback(
+    async (value: string[]) => {
+      setIsSaving(true);
+      try {
+        await onUpdateReply(reply!.id, { value });
+      } catch (e) {
+        onError(e);
       }
-      onError(e);
-    }
-    setIsSaving(false);
-  };
+      setIsSaving(false);
+    },
+    [reply, onUpdateReply, onError],
+  );
 
-  const handleDelete = async () => {
+  const handleCreate = useCallback(
+    async (value: string[]) => {
+      setIsSaving(true);
+      try {
+        await onCreateReply({ value });
+      } catch (e) {
+        if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
+          setHasAlreadyRepliedError(true);
+        }
+        onError(e);
+      }
+      setIsSaving(false);
+    },
+    [onCreateReply, onError],
+  );
+
+  const handleDelete = useCallback(async () => {
     setIsSaving(true);
     try {
       await onDeleteReply(reply!.id);
@@ -128,7 +138,7 @@ export function RecipientViewPetitionFieldCheckbox({
       onError(e);
     }
     setIsSaving(false);
-  };
+  }, [reply, onDeleteReply, onError]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -167,7 +177,7 @@ export function RecipientViewPetitionFieldCheckbox({
     }
   };
 
-  const checkedItemsLenght = (reply?.content?.value ?? []).length;
+  const checkedItemsLength = (reply?.content?.value ?? []).length;
 
   return (
     <RecipientViewPetitionFieldLayout
@@ -177,7 +187,7 @@ export function RecipientViewPetitionFieldCheckbox({
       onDownloadAttachment={onDownloadAttachment}
     >
       <Stack
-        id={`reply-${field.id}${reply?.parent ? `-${reply!.parent.id}` : ""}${
+        id={`reply-${field.id}${reply?.parent ? `-${reply.parent.id}` : ""}${
           reply?.id ? `-${reply.id}` : ""
         }`}
       >
@@ -193,7 +203,7 @@ export function RecipientViewPetitionFieldCheckbox({
               {")"}
             </Text>
           ) : null}
-          {!isSaving && checkedItemsLenght ? (
+          {!isSaving && checkedItemsLength > 0 ? (
             <Box as="span" color={isInvalid || hasAlreadyRepliedError ? "red.600" : "gray.600"}>
               {showRadio ? null : "("}
               {hasAlreadyRepliedError ? (
@@ -210,13 +220,13 @@ export function RecipientViewPetitionFieldCheckbox({
                 <FormattedMessage
                   id="component.recipient-view-petition-field-card.replies-submitted-checkbox-exact"
                   defaultMessage="{count}/{total} submitted"
-                  values={{ count: checkedItemsLenght, total: max }}
+                  values={{ count: checkedItemsLength, total: max }}
                 />
               ) : (
                 <FormattedMessage
                   id="component.recipient-view-petition-field-card.replies-submitted-checkbox-count"
                   defaultMessage="{count} submitted"
-                  values={{ count: checkedItemsLenght }}
+                  values={{ count: checkedItemsLength }}
                 />
               )}
               {showRadio ? null : ")"}

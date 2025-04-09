@@ -151,7 +151,6 @@ export function PetitionLayout({
         ref={headerRef}
         petition={petition}
         me={me}
-        onUpdatePetition={onUpdatePetition}
         onRefetch={onRefetch}
         section={section!}
         actions={headerActions}

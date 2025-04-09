@@ -29,7 +29,8 @@ export const HeaderNameEditable = Object.assign(
   chakraForwardRef<"div", HeaderNameEditableProps, HeaderNameEditableInstance>(
     function HeaderNameEditable({ petition, state, onNameChange, ...props }, ref) {
       const intl = useIntl();
-      const [name, setName] = useState(petition.name ?? "");
+      const petitionName = petition.name ?? "";
+      const [name, setName] = useState(petitionName);
 
       const isPublic = petition.__typename === "PetitionTemplate" && petition.isPublic;
 
@@ -63,7 +64,9 @@ export const HeaderNameEditable = Object.assign(
           onSubmit={() => {
             const trimmed = name.trim();
             setName(trimmed);
-            onNameChange(trimmed);
+            if (trimmed !== petitionName) {
+              onNameChange(trimmed);
+            }
           }}
           onBlur={() => {
             setName(name.trim());

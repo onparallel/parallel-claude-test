@@ -1881,6 +1881,8 @@ export interface MutationcreateEventSubscriptionSignatureKeyArgs {
 }
 
 export interface MutationcreateExportExcelTaskArgs {
+  callbackUrl?: InputMaybe<Scalars["String"]["input"]>;
+  exportEmptyFile?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionId: Scalars["GID"]["input"];
 }
 
@@ -55662,17 +55664,6 @@ export type Petitions_petitionsQuery = {
   };
 };
 
-export type Petitions_updatePetitionMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  data: UpdatePetitionInput;
-}>;
-
-export type Petitions_updatePetitionMutation = {
-  updatePetition:
-    | { __typename?: "Petition"; id: string; name?: string | null }
-    | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
-};
-
 export type Petitions_movePetitionsMutationVariables = Exact<{
   ids?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
   folderIds?: InputMaybe<Array<Scalars["ID"]["input"]> | Scalars["ID"]["input"]>;
@@ -60259,6 +60250,17 @@ export type useStartApprovalRequestStep_startPetitionApprovalRequestStepMutation
       user?: { __typename?: "User"; id: string; fullName?: string | null; email: string } | null;
     }>;
   };
+};
+
+export type useUpdatePetitionName_updatePetitionMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  data: UpdatePetitionInput;
+}>;
+
+export type useUpdatePetitionName_updatePetitionMutation = {
+  updatePetition:
+    | { __typename?: "Petition"; id: string; name?: string | null }
+    | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
 };
 
 export type LiquidPetitionScopeProvider_PetitionBase_Petition_Fragment = {
@@ -80643,17 +80645,6 @@ export const Petitions_petitionsDocument = gql`
   }
   ${Petitions_PetitionBaseOrFolderFragmentDoc}
 ` as unknown as DocumentNode<Petitions_petitionsQuery, Petitions_petitionsQueryVariables>;
-export const Petitions_updatePetitionDocument = gql`
-  mutation Petitions_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
-    updatePetition(petitionId: $petitionId, data: $data) {
-      id
-      name
-    }
-  }
-` as unknown as DocumentNode<
-  Petitions_updatePetitionMutation,
-  Petitions_updatePetitionMutationVariables
->;
 export const Petitions_movePetitionsDocument = gql`
   mutation Petitions_movePetitions(
     $ids: [GID!]
@@ -81654,6 +81645,17 @@ export const useStartApprovalRequestStep_startPetitionApprovalRequestStepDocumen
 ` as unknown as DocumentNode<
   useStartApprovalRequestStep_startPetitionApprovalRequestStepMutation,
   useStartApprovalRequestStep_startPetitionApprovalRequestStepMutationVariables
+>;
+export const useUpdatePetitionName_updatePetitionDocument = gql`
+  mutation useUpdatePetitionName_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
+    updatePetition(petitionId: $petitionId, data: $data) {
+      id
+      name
+    }
+  }
+` as unknown as DocumentNode<
+  useUpdatePetitionName_updatePetitionMutation,
+  useUpdatePetitionName_updatePetitionMutationVariables
 >;
 export const usePetitionCommentsMutations_getUsersOrGroupsDocument = gql`
   query usePetitionCommentsMutations_getUsersOrGroups($ids: [ID!]!) {

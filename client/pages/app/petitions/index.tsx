@@ -57,7 +57,6 @@ import {
   Petitions_movePetitionsDocument,
   Petitions_petitionsDocument,
   Petitions_renameFolderDocument,
-  Petitions_updatePetitionDocument,
   Petitions_userDocument,
 } from "@parallel/graphql/__types";
 import { isTypename } from "@parallel/utils/apollo/typename";
@@ -65,6 +64,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
+import { useUpdatePetitionName } from "@parallel/utils/hooks/useUpdatePetitionName";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
@@ -352,7 +352,7 @@ function Petitions() {
     }
   }, []);
 
-  const [updatePetition] = useMutation(Petitions_updatePetitionDocument);
+  const updatePetitionName = useUpdatePetitionName();
   const [renameFolder] = useMutation(Petitions_renameFolderDocument);
   const showRenameDialog = useRenameDialog();
 
@@ -381,12 +381,7 @@ function Petitions() {
             type: petition.__typename,
             isDisabled: isPublic || petition.myEffectivePermission?.permissionType === "READ",
           });
-          await updatePetition({
-            variables: {
-              petitionId: petition.id,
-              data: { name: newName },
-            },
-          });
+          await updatePetitionName(petition.id, newName);
         }
       }
     } catch {}
@@ -798,14 +793,6 @@ const _queries = [
 ];
 
 const _mutations = [
-  gql`
-    mutation Petitions_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
-      updatePetition(petitionId: $petitionId, data: $data) {
-        id
-        name
-      }
-    }
-  `,
   gql`
     mutation Petitions_movePetitions(
       $ids: [GID!]

@@ -17835,16 +17835,6 @@
     "context": "Verification link sent"
   },
   {
-    "term": "public.sign-up-button",
-    "definition": "Regístrate",
-    "context": "Sign up"
-  },
-  {
-    "term": "public.sign-up-for-free-button",
-    "definition": "Regístrate gratis",
-    "context": "Sign up for free"
-  },
-  {
     "term": "public.signup.meta-description",
     "definition": "Regístrate en Parallel",
     "context": "Signup on Parallel"
@@ -17938,16 +17928,6 @@
     "term": "public.templates.meta-description",
     "definition": "Obtenga más información sobre las plantillas de Parallel",
     "context": "Learn more about Parallel templates"
-  },
-  {
-    "term": "public.templates.want-to-use-our-templates",
-    "definition": "¿Quieres utilizar nuestras plantillas?",
-    "context": "Do you want to use our templates?"
-  },
-  {
-    "term": "public.try-for-free-button",
-    "definition": "Pruébalo gratis",
-    "context": "Try for free"
   },
   {
     "term": "recipient-view.cant-find-email-help",

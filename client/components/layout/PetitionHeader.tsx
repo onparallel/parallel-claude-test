@@ -46,10 +46,10 @@ import {
   PetitionHeader_updatePetitionPermissionSubscriptionDocument,
   PetitionsHeader_associateProfileToPetitionDocument,
   PetitionsHeader_movePetitionDocument,
-  UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { assertTypename } from "@parallel/utils/apollo/typename";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
+import { useUpdatePetitionName } from "@parallel/utils/hooks/useUpdatePetitionName";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
@@ -82,7 +82,6 @@ import { PetitionSection } from "./PetitionLayout";
 
 export interface PetitionHeaderProps extends PetitionHeader_QueryFragment {
   petition: PetitionHeader_PetitionBaseFragment;
-  onUpdatePetition: (value: UpdatePetitionInput) => void;
   section: PetitionSection;
   actions?: ReactNode;
   onRefetch?: () => void;
@@ -94,7 +93,7 @@ export interface PetitionHeaderInstance {
 
 export const PetitionHeader = Object.assign(
   chakraForwardRef<"div", PetitionHeaderProps, PetitionHeaderInstance>(function PetitionHeader(
-    { petition, me, onUpdatePetition, section: current, actions, onRefetch, ...props },
+    { petition, me, section: current, actions, onRefetch, ...props },
     ref,
   ) {
     const intl = useIntl();
@@ -117,6 +116,8 @@ export const PetitionHeader = Object.assign(
     const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
     const moreOptionsRef = useRef<HTMLButtonElement>(null);
+
+    const updatePetitionName = useUpdatePetitionName();
 
     const deletePetitions = useDeletePetitions();
     const handleDeleteClick = async function () {
@@ -440,7 +441,7 @@ export const PetitionHeader = Object.assign(
               paddingEnd={4}
               petition={petition}
               state={state}
-              onNameChange={(name) => onUpdatePetition({ name: name || null })}
+              onNameChange={(name) => updatePetitionName(petition.id, name)}
             />
           </Flex>
           <HStack spacing={1}>
