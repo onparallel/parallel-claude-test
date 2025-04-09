@@ -112,6 +112,7 @@ export function usePetitionCanFinalize(petition: PetitionSelection, publicContex
 
     let lastCompletedFieldIndex = -1;
     let latestReplyDate = new Date(0);
+    let lastCompletedFieldPage = null as number | null;
 
     visibleFields.forEach((field, index) => {
       field.replies.forEach((reply) => {
@@ -119,20 +120,34 @@ export function usePetitionCanFinalize(petition: PetitionSelection, publicContex
         if (replyDate > latestReplyDate) {
           latestReplyDate = replyDate;
           lastCompletedFieldIndex = index;
+          lastCompletedFieldPage = field.page;
         }
       });
     });
 
-    const nextIncompleteField =
-      incompleteFields.find((field) => {
-        const fieldIndex = visibleFields.findIndex(
-          (visibleField) =>
-            visibleField.id === field.id ||
-            visibleField.children?.some((child) => child.id === field.id),
-        );
+    // First we look for required incomplete fields on the same page as the last completed field
+    const incompleteFieldsInSamePage = lastCompletedFieldPage
+      ? incompleteFields.filter((field) => field.page === lastCompletedFieldPage)
+      : [];
 
-        return fieldIndex > lastCompletedFieldIndex;
-      }) || incompleteFields[0];
+    let nextIncompleteField;
+
+    if (incompleteFieldsInSamePage.length > 0) {
+      // If there are required incomplete fields on the same page, we choose the first one
+      nextIncompleteField = incompleteFieldsInSamePage[0];
+    } else {
+      // If there are no fields on the same page, we continue with the original logic of the next incomplete field no matter the page
+      nextIncompleteField =
+        incompleteFields.find((field) => {
+          const fieldIndex = visibleFields.findIndex(
+            (visibleField) =>
+              visibleField.id === field.id ||
+              visibleField.children?.some((child) => child.id === field.id),
+          );
+
+          return fieldIndex > lastCompletedFieldIndex;
+        }) || incompleteFields[0];
+    }
 
     return {
       canFinalize: incompleteFields.length === 0,
