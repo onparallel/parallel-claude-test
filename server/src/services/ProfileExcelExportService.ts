@@ -71,7 +71,7 @@ export class ProfileExcelExportService extends ProfileExcelService {
       const pagination = this.profiles.getPaginatedProfileForOrg(
         profileType.org_id,
         {
-          limit: 100,
+          limit: 5000,
           offset,
           search,
           filter: {

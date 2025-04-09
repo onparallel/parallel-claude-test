@@ -73,6 +73,8 @@ createQueueWorker_OLD(
         return 5 * 60_000;
       } else if (taskName === "PROFILES_EXCEL_IMPORT") {
         return 5 * 60_000;
+      } else if (taskName === "PROFILES_EXCEL_EXPORT") {
+        return 5 * 60_000;
       } else {
         return 2 * 60_000;
       }
