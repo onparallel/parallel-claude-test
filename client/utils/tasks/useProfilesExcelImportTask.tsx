@@ -56,6 +56,23 @@ export function useProfilesExcelImportTask() {
     );
   }
 
+  async function showRowLimitReachedDialog(limit: number) {
+    return await withError(
+      showErrorDialog({
+        header: <FormattedMessage id="generic.import-error" defaultMessage="Import error" />,
+        message: (
+          <Text>
+            <FormattedMessage
+              id="component.import-profiles-from-excel-dialog.row-limit-reached"
+              defaultMessage="The file you are trying to import exceeds the maximum number of profiles ({limit}). Please, remove some rows until you reach that limit and try again."
+              values={{ limit: intl.formatNumber(limit) }}
+            />
+          </Text>
+        ),
+      }),
+    );
+  }
+
   return [
     async (
       variables: { profileTypeId: string; file: File },
@@ -72,6 +89,9 @@ export function useProfilesExcelImportTask() {
               if (code === "INVALID_CELL_ERROR") {
                 const cell = task.output.error.cell as ErrorCell;
                 await withError(showImportErrorDialog(cell));
+              }
+              if (code === "ROW_LIMIT_REACHED") {
+                await withError(showRowLimitReachedDialog(task.output.error.limit));
               }
             }
           },

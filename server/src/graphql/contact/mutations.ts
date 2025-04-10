@@ -11,11 +11,11 @@ import {
 import pMap from "p-map";
 import { chunk, countBy, isNonNullish, isNullish, uniqueBy } from "remeda";
 import { CreateContact } from "../../db/__types";
+import { importFromExcel } from "../../util/importFromExcel";
 import { withError } from "../../util/promises/withError";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { importFromExcel } from "../helpers/importDataFromExcel";
 import { parseContactList } from "../helpers/parseContactList";
 import { RESULT } from "../helpers/Result";
 import { uploadArg } from "../helpers/scalars/Upload";

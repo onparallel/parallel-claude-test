@@ -5,9 +5,14 @@ import { Stream } from "stream";
  * returns the contents of the first worksheet in the excel file
  * in a two-dimensional matrix of strings containing every cell with content.
  */
-export async function importFromExcel(file: Stream) {
+export async function importFromExcel(file: Stream, opts?: { maxRows: number }) {
   const wb = new Excel.Workbook();
   const workbook = await wb.xlsx.read(file);
+
+  if (opts?.maxRows && workbook.worksheets[0].rowCount > opts.maxRows) {
+    throw new Error("ROW_LIMIT_REACHED");
+  }
+
   const rows: string[][] = [];
   workbook.worksheets[0].eachRow({ includeEmpty: true }, (row) => {
     const cells: string[] = [];

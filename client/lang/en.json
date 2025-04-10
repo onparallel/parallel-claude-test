@@ -4180,6 +4180,11 @@
     "context": "We have detected an error in cell {col}{row}."
   },
   {
+    "term": "component.import-profiles-from-excel-dialog.row-limit-reached",
+    "definition": "The file you are trying to import exceeds the maximum number of profiles ({limit}). Please, remove some rows until you reach that limit and try again.",
+    "context": "The file you are trying to import exceeds the maximum number of profiles ({limit}). Please, remove some rows until you reach that limit and try again."
+  },
+  {
     "term": "component.import-replies-dialog.checkbox-overwrite-replies",
     "definition": "Overwrite existing replies",
     "context": "Overwrite existing replies"

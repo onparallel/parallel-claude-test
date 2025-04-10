@@ -59,6 +59,7 @@ import { buildAutomatedBackgroundCheckFieldQueries } from "../../../util/backgro
 import { applyFieldVisibility, mapFieldLogic } from "../../../util/fieldLogic";
 import { toBytes } from "../../../util/fileSize";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
+import { importFromExcel } from "../../../util/importFromExcel";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { isValueCompatible } from "../../../util/isValueCompatible";
 import { petitionIsCompleted } from "../../../util/petitionIsCompleted";
@@ -93,7 +94,6 @@ import {
   createPetitionFieldRepliesFromPrefillData,
 } from "../../helpers/buildFieldGroupRepliesFromPrefill";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { importFromExcel } from "../../helpers/importDataFromExcel";
 import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectValues";
 import { datetimeArg } from "../../helpers/scalars/DateTime";
 import { jsonArg, jsonObjectArg } from "../../helpers/scalars/JSON";

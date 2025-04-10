@@ -1,6 +1,6 @@
 import { assert } from "ts-essentials";
-import { importFromExcel } from "../../graphql/helpers/importDataFromExcel";
 import { CellError, InvalidDataError, UnknownIdError } from "../../services/ProfileExcelService";
+import { importFromExcel } from "../../util/importFromExcel";
 import { withError } from "../../util/promises/withError";
 import { TaskRunner } from "../helpers/TaskRunner";
 
@@ -23,12 +23,18 @@ export class ProfilesExcelImportRunner extends TaskRunner<"PROFILES_EXCEL_IMPORT
 
     const file = await this.ctx.storage.temporaryFiles.downloadFile(temporaryFile.path);
 
-    const [importError, importData] = await withError(importFromExcel(file));
+    const [importError, importData] = await withError(
+      importFromExcel(file, { maxRows: 2 + 10_000 }), // 2 header rows + 10k profiles
+    );
     if (importError) {
       return {
         success: false,
         error: {
-          code: "INVALID_FILE_ERROR",
+          code:
+            importError.message === "ROW_LIMIT_REACHED"
+              ? "ROW_LIMIT_REACHED"
+              : "INVALID_FILE_ERROR",
+          limit: 10_000,
         },
       };
     }
