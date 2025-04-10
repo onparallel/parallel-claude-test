@@ -4,7 +4,7 @@ import {
   usePetitionCanFinalize_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
-import { omit, pick, zip } from "remeda";
+import { isNonNullish, omit, pick, zip } from "remeda";
 import { completedFieldReplies } from "./completedFieldReplies";
 import { useFieldLogic } from "./fieldLogic/useFieldLogic";
 
@@ -36,10 +36,10 @@ export function usePetitionCanFinalize(petition: PetitionSelection, publicContex
             replies: field.replies.map((r, groupIndex) => ({
               ...omit(r, ["__typename"]),
               children: r.children
-                ?.filter(
-                  (_, childReplyIndex) =>
-                    groupChildrenLogic?.[groupIndex][childReplyIndex].isVisible ?? false,
-                )
+                ?.filter((_, childReplyIndex) => {
+                  //TODO: investigate why this is undefined when we delete children fields
+                  return groupChildrenLogic?.[groupIndex][childReplyIndex]?.isVisible ?? false;
+                })
                 .map((gr) => ({
                   ...omit(gr, ["__typename"]),
                   field: omit(gr.field, ["__typename"]),
@@ -125,28 +125,28 @@ export function usePetitionCanFinalize(petition: PetitionSelection, publicContex
       });
     });
 
-    // First we look for required incomplete fields on the same page as the last completed field
+    let nextIncompleteField =
+      incompleteFields.find((field) => {
+        const fieldIndex = visibleFields.findIndex(
+          (visibleField) =>
+            visibleField.id === field.id ||
+            visibleField.children?.some((child) => child.id === field.id),
+        );
+
+        return fieldIndex > lastCompletedFieldIndex;
+      }) || incompleteFields[0];
+
     const incompleteFieldsInSamePage = lastCompletedFieldPage
       ? incompleteFields.filter((field) => field.page === lastCompletedFieldPage)
       : [];
 
-    let nextIncompleteField;
-
-    if (incompleteFieldsInSamePage.length > 0) {
-      // If there are required incomplete fields on the same page, we choose the first one
+    // If we gonna switch page and there are required incomplete fields on the same page, we choose the first one
+    if (
+      isNonNullish(nextIncompleteField) &&
+      nextIncompleteField.page !== lastCompletedFieldPage &&
+      incompleteFieldsInSamePage.length > 0
+    ) {
       nextIncompleteField = incompleteFieldsInSamePage[0];
-    } else {
-      // If there are no fields on the same page, we continue with the original logic of the next incomplete field no matter the page
-      nextIncompleteField =
-        incompleteFields.find((field) => {
-          const fieldIndex = visibleFields.findIndex(
-            (visibleField) =>
-              visibleField.id === field.id ||
-              visibleField.children?.some((child) => child.id === field.id),
-          );
-
-          return fieldIndex > lastCompletedFieldIndex;
-        }) || incompleteFields[0];
     }
 
     return {
