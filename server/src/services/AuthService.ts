@@ -520,7 +520,13 @@ export class Auth implements IAuth {
 
   async forgotPassword(req: Request, res: Response, next: NextFunction) {
     const { email, locale } = req.body;
+    const [, cognitoUser] = await withError(this.getUser(email));
     try {
+      if (cognitoUser?.UserStatus === "FORCE_CHANGE_PASSWORD") {
+        // cognito user is in status FORCE_CHANGE_PASSWORD, can't reset the password
+        res.status(401).send({ error: "ForceChangePasswordException" });
+        return;
+      }
       const [user] = await this.users.loadUsersByEmail(email);
       const userData = user ? await this.users.loadUserData(user.user_data_id) : null;
       if (userData?.is_sso_user) {
@@ -536,16 +542,12 @@ export class Auth implements IAuth {
         );
         res.status(204).send();
       }
-    } catch (error: any) {
+    } catch (error) {
       if (error instanceof LimitExceededException) {
         res.status(429).send({ error: "LimitExceededException" });
         return;
       } else if (error instanceof NotAuthorizedException) {
-        const [, data] = await withError(this.getUser(email));
-        if (data?.UserStatus === "FORCE_CHANGE_PASSWORD") {
-          // cognito user is in status FORCE_CHANGE_PASSWORD, can't reset the password
-          res.status(401).send({ error: "ForceChangePasswordException" });
-        } else if (!data) {
+        if (!cognitoUser) {
           // if the user is SSO, adminGetUser will throw a UserNotFoundException
           res.status(401).send({ error: "ExternalUser" });
         }
