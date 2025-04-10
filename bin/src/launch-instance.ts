@@ -191,10 +191,10 @@ async function main() {
       await copyToRemoteServer(ipAddress, `${OPS_DIR}/bootstrap.sh`, `${HOME_DIR}/`);
       await executeRemoteCommand(ipAddress, `${HOME_DIR}/bootstrap.sh`);
       for (const alarm of [
-        // CPU over 40% for 5 consecutive minutes
-        { Period: 60, EvaluationPeriods: 5, DatapointsToAlarm: 5, Threshold: 50.0 },
-        // CPU over 85% for 2 minute
-        { Period: 60, EvaluationPeriods: 2, DatapointsToAlarm: 2, Threshold: 85.0 },
+        // CPU over 60% for 5 consecutive minutes
+        { Period: 60, EvaluationPeriods: 5, DatapointsToAlarm: 5, Threshold: 60.0 },
+        // CPU over 90% for 2 minutes
+        { Period: 60, EvaluationPeriods: 2, DatapointsToAlarm: 2, Threshold: 90.0 },
       ])
         await cw.send(
           new PutMetricAlarmCommand({
