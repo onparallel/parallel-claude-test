@@ -217,6 +217,11 @@ export function buildConfig() {
       endpoint: process.env.OPENAI_ASSISTANT_ENDPOINT!,
       apiVersion: process.env.OPENAI_ASSISTANT_API_VERSION!,
     },
+    aiCompletion: {
+      anthropic: {
+        apiKey: process.env.AI_COMPLETION_ANTHROPIC_API_KEY!,
+      },
+    },
     fileExport: {
       iManage: {
         signatureSecret: process.env.FILE_EXPORT_IMANAGE_SIGNATURE_SECRET!,

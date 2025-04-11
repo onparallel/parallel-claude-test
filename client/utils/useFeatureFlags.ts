@@ -204,6 +204,17 @@ export function useFeatureFlags() {
               defaultMessage: "Enables the Background check petition field on the organization.",
             }),
           },
+          {
+            name: "DOCUMENT_PROCESSING",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.document-processing-name",
+              defaultMessage: "AI document processing",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.document-processing-description",
+              defaultMessage: "Enables the AI document processing feature on file fields.",
+            }),
+          },
         ],
       },
       {

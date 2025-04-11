@@ -1,4 +1,4 @@
-import { HStack, IconProps, Text } from "@chakra-ui/react";
+import { HStack, IconProps, Stack, Text } from "@chakra-ui/react";
 import { AlertCircleFilledIcon, CircleCheckFilledIcon } from "@parallel/chakra/icons";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { FORMATS } from "@parallel/utils/dates";
@@ -17,18 +17,20 @@ export function PetitionRepliesMetadataDate({
 }) {
   const intl = useIntl();
   return (
-    <HStack alignItems="flex-end">
+    <Stack>
       <Text as="span" fontWeight={500} color="gray.600" fontSize="sm">
-        {label}:
+        {label}
       </Text>
-      <Text as="span">
-        {isNonNullish(date) ? <FormattedDate value={date} {...FORMATS.L} /> : "-"}
-      </Text>
-      {rightIcon}
-      {isNonNullish(date) ? (
-        <CopyToClipboardButton size="xs" fontSize="md" text={intl.formatDate(date, FORMATS.L)} />
-      ) : null}
-    </HStack>
+      <HStack>
+        {isNonNullish(date) ? (
+          <CopyToClipboardButton size="xs" fontSize="md" text={intl.formatDate(date, FORMATS.L)} />
+        ) : null}
+        <Text as="span">
+          {isNonNullish(date) ? <FormattedDate value={date} {...FORMATS.L} /> : "-"}
+        </Text>
+        {rightIcon}
+      </HStack>
+    </Stack>
   );
 }
 
@@ -40,15 +42,17 @@ export function PetitionRepliesMetadataText({
   content: string | null;
 }) {
   return (
-    <HStack alignItems="flex-end">
+    <Stack>
       <Text as="span" fontWeight={500} color="gray.600" fontSize="sm">
-        {label}:
+        {label}
       </Text>
-      <Text as="span">{isNonNullish(content) ? content : "-"}</Text>
-      {isNonNullish(content) ? (
-        <CopyToClipboardButton size="xs" fontSize="md" text={content} />
-      ) : null}
-    </HStack>
+      <HStack>
+        {isNonNullish(content) ? (
+          <CopyToClipboardButton size="xs" fontSize="md" text={content} />
+        ) : null}
+        <Text as="span">{isNonNullish(content) ? content : "-"}</Text>
+      </HStack>
+    </Stack>
   );
 }
 

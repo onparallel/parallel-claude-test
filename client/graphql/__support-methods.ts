@@ -104,6 +104,47 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "createAnthropicCompletionIntegration",
+      description: "Creates a new Anthropic AI Completion integration on the provided organization",
+      args: [
+        {
+          name: "model",
+          description:
+            "e.g. claude-3-5-haiku-20241022; claude-3-7-sonnet-20250219; claude-3-5-sonnet-20241022",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "orgId",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "createAzureOpenAiIntegration",
       description: "Creates a new Azure OpenAI integration on the provided organization",
       args: [

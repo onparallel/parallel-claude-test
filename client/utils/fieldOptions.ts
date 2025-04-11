@@ -18,6 +18,7 @@ export interface FieldOptions {
       integrationId: Maybe<string>;
       processDocumentAs: DocumentProcessingType;
     }>;
+    processDocument?: boolean;
   };
   SHORT_TEXT: {
     placeholder?: Maybe<string>;

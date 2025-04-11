@@ -720,6 +720,7 @@ export type FeatureFlag =
   | "CUSTOM_HOST_UI"
   | "CUSTOM_PROPERTIES"
   | "DASHBOARDS"
+  | "DOCUMENT_PROCESSING"
   | "DOCUSIGN_SANDBOX_PROVIDER"
   | "DOW_JONES_KYC"
   | "ES_TAX_DOCUMENTS_FIELD"
@@ -1065,6 +1066,8 @@ export type Mutation = {
    * Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
    */
   createAddPetitionPermissionMaybeTask: MaybeTask;
+  /** Creates a new Anthropic AI Completion integration on the provided organization */
+  createAnthropicCompletionIntegration: SupportMethodResponse;
   /** Creates a new Azure OpenAI integration on the provided organization */
   createAzureOpenAiIntegration: SupportMethodResponse;
   createBackgroundCheckProfilePdfTask: Task;
@@ -1706,6 +1709,10 @@ export type MutationcreateAddPetitionPermissionMaybeTaskArgs = {
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+};
+
+export type MutationcreateAnthropicCompletionIntegrationArgs = {
+  orgId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateAzureOpenAiIntegrationArgs = {
@@ -6629,6 +6636,7 @@ export type TaskName =
   | "BULK_PETITION_SEND"
   | "CLOSE_PETITIONS"
   | "DASHBOARD_REFRESH"
+  | "DOCUMENT_PROCESSING"
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"

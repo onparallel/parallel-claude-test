@@ -781,6 +781,7 @@ export type FeatureFlag =
   | "CUSTOM_HOST_UI"
   | "CUSTOM_PROPERTIES"
   | "DASHBOARDS"
+  | "DOCUMENT_PROCESSING"
   | "DOCUSIGN_SANDBOX_PROVIDER"
   | "DOW_JONES_KYC"
   | "ES_TAX_DOCUMENTS_FIELD"
@@ -1145,6 +1146,8 @@ export interface Mutation {
    * Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
    */
   createAddPetitionPermissionMaybeTask: MaybeTask;
+  /** Creates a new Anthropic AI Completion integration on the provided organization */
+  createAnthropicCompletionIntegration: SupportMethodResponse;
   /** Creates a new Azure OpenAI integration on the provided organization */
   createAzureOpenAiIntegration: SupportMethodResponse;
   createBackgroundCheckProfilePdfTask: Task;
@@ -1786,6 +1789,11 @@ export interface MutationcreateAddPetitionPermissionMaybeTaskArgs {
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+}
+
+export interface MutationcreateAnthropicCompletionIntegrationArgs {
+  model: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
 }
 
 export interface MutationcreateAzureOpenAiIntegrationArgs {
@@ -6886,6 +6894,7 @@ export type TaskName =
   | "BULK_PETITION_SEND"
   | "CLOSE_PETITIONS"
   | "DASHBOARD_REFRESH"
+  | "DOCUMENT_PROCESSING"
   | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
@@ -22807,11 +22816,16 @@ export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
 
 export type PetitionComposeFieldSettings_UserFragment = {
   __typename?: "User";
+  hasDocumentProcessingAccess: boolean;
   hasEsTaxDocumentsField: boolean;
   hasDowJonesField: boolean;
   hasBackgroundCheck: boolean;
   hasProfileSearchField: boolean;
-  organization: { __typename?: "Organization"; hasDocumentProcessingIntegration: boolean };
+  organization: {
+    __typename?: "Organization";
+    hasDocumentProcessingIntegration: boolean;
+    hasAnthropicCompletionIntegration: boolean;
+  };
 };
 
 export type PetitionComposeFieldSettings_PetitionBase_Petition_Fragment = {
@@ -22976,7 +22990,12 @@ export type PetitionComposeFieldGroupSettings_PetitionFieldFragment = {
 
 export type PetitionComposeFileUploadSettings_UserFragment = {
   __typename?: "User";
-  organization: { __typename?: "Organization"; hasDocumentProcessingIntegration: boolean };
+  hasDocumentProcessingAccess: boolean;
+  organization: {
+    __typename?: "Organization";
+    hasDocumentProcessingIntegration: boolean;
+    hasAnthropicCompletionIntegration: boolean;
+  };
 };
 
 export type PetitionComposeFileUploadSettings_PetitionFieldFragment = {
@@ -45503,6 +45522,7 @@ export type PetitionCompose_QueryFragment = {
     hasPetitionSignature: boolean;
     hasPrefillSecret: boolean;
     hasOnBehalfOf: boolean;
+    hasDocumentProcessingAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -45512,6 +45532,7 @@ export type PetitionCompose_QueryFragment = {
       hasIdVerification: boolean;
       iconUrl?: string | null;
       hasDocumentProcessingIntegration: boolean;
+      hasAnthropicCompletionIntegration: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       signatureIntegrations: {
         __typename?: "IOrgIntegrationPagination";
@@ -47740,6 +47761,7 @@ export type PetitionCompose_userQuery = {
     hasPetitionSignature: boolean;
     hasPrefillSecret: boolean;
     hasOnBehalfOf: boolean;
+    hasDocumentProcessingAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -47749,6 +47771,7 @@ export type PetitionCompose_userQuery = {
       hasIdVerification: boolean;
       iconUrl?: string | null;
       hasDocumentProcessingIntegration: boolean;
+      hasAnthropicCompletionIntegration: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       signatureIntegrations: {
         __typename?: "IOrgIntegrationPagination";
@@ -70783,8 +70806,13 @@ export const PetitionFieldTypeSelect_UserFragmentDoc = gql`
 ` as unknown as DocumentNode<PetitionFieldTypeSelect_UserFragment, unknown>;
 export const PetitionComposeFileUploadSettings_UserFragmentDoc = gql`
   fragment PetitionComposeFileUploadSettings_User on User {
+    hasDocumentProcessingAccess: hasFeatureFlag(featureFlag: DOCUMENT_PROCESSING)
     organization {
       hasDocumentProcessingIntegration: hasIntegration(integration: DOCUMENT_PROCESSING)
+      hasAnthropicCompletionIntegration: hasIntegration(
+        integration: AI_COMPLETION
+        provider: "ANTHROPIC"
+      )
     }
   }
 ` as unknown as DocumentNode<PetitionComposeFileUploadSettings_UserFragment, unknown>;

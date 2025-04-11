@@ -26,7 +26,6 @@ import {
 import { assert } from "ts-essentials";
 import { RESULT } from "../../graphql";
 import { validateReferencingFieldsPositions } from "../../graphql/helpers/validators/validFieldLogic";
-import { AiCompletionPrompt } from "../../integrations/ai-completion/AiCompletionClient";
 import { ILogger, LOGGER } from "../../services/Logger";
 import { QUEUES_SERVICE, QueuesService } from "../../services/QueuesService";
 import { average } from "../../util/arrays";
@@ -232,7 +231,7 @@ export interface PetitionSignatureConfig {
 
 export interface PetitionSummaryConfig {
   integration_id: number;
-  prompt: AiCompletionPrompt[];
+  prompt: { role: "system" | "user"; content: string }[];
   model: string;
   api_version: string;
 }

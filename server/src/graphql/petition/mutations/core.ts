@@ -1377,8 +1377,9 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       async (_, args, ctx) => {
         const field = await ctx.petitions.loadField(args.fieldId);
         if (
-          isNonNullish(field?.options.documentProcessing) &&
-          args.data.options?.documentProcessing !== null
+          (isNonNullish(field?.options.documentProcessing) &&
+            args.data.options?.documentProcessing !== null) ||
+          (field?.options.processDocument && args.data.options?.processDocument !== null)
         ) {
           throw new ForbiddenError(
             "Can't set accepts or maxFileSize on a document processing field",
@@ -1491,7 +1492,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           ...(field.type === "FILE_UPLOAD"
             ? omit(options, ["maxFileSize"]) // ignore maxFileSize so user can't change it
             : options),
-          ...(isNonNullish(options.documentProcessing) // hardcode maxFileSize and accepts options when setting documentProcessing
+          ...(isNonNullish(options.documentProcessing) || options.processDocument // hardcode maxFileSize and accepts options when setting documentProcessing
             ? {
                 maxFileSize: toBytes(10, "MB"), // 10MB is a limit for the Bankflip request. We should review this when implementing a second provider
                 accepts: ["PDF", "IMAGE"],

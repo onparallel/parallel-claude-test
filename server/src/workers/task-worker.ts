@@ -9,6 +9,7 @@ import { BankflipSessionCompletedRunner } from "./tasks/BankflipSessionCompleted
 import { BulkPetitionSendRunner } from "./tasks/BulkPetitionSendRunner";
 import { ClosePetitionsRunner } from "./tasks/ClosePetitionsRunner";
 import { DashboardRefreshRunner } from "./tasks/DashboardRefreshRunner";
+import { DocumentProcessingRunner } from "./tasks/DocumentProcessingRunner";
 import { DowJonesProfileDownloadRunner } from "./tasks/DowJonesProfileDownloadRunner";
 import { ExportExcelRunner } from "./tasks/ExportExcelRunner";
 import { ExportRepliesRunner } from "./tasks/ExportRepliesRunner";
@@ -46,6 +47,7 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   PROFILES_EXCEL_IMPORT: ProfilesExcelImportRunner,
   PROFILES_EXCEL_EXPORT: ProfilesExcelExportRunner,
   DASHBOARD_REFRESH: DashboardRefreshRunner,
+  DOCUMENT_PROCESSING: DocumentProcessingRunner,
 };
 
 export interface TaskWorkerPayload {

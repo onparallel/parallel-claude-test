@@ -51,6 +51,7 @@ import { DowJonesRiskLabel } from "../petition-common/DowJonesRiskLabel";
 import { EsTaxDocumentsContentErrorMessage } from "../petition-common/EsTaxDocumentsContentErrorMessage";
 import { CopyOrDownloadReplyButton } from "./CopyOrDownloadReplyButton";
 import { PetitionRepliesFieldFilePassword } from "./field-replies/PetitionRepliesFieldFilePassword";
+import { PetitionRepliesFieldFileSchema } from "./field-replies/PetitionRepliesFieldFileSchema";
 import { PetitionRepliesFieldFileUploadPayslipReply } from "./field-replies/PetitionRepliesFieldFileUploadPayslipReply";
 import { PetitionRepliesFieldIdVerificationReply } from "./field-replies/PetitionRepliesFieldIdVerificationReply";
 
@@ -473,6 +474,15 @@ export function PetitionRepliesFieldReply({
                         metadata={reply.metadata as any}
                       />
                     ) : null}
+
+                    {type === "FILE_UPLOAD" &&
+                    reply.metadata.inferred_data_schema &&
+                    reply.metadata.inferred_data ? (
+                      <PetitionRepliesFieldFileSchema
+                        data={reply.metadata.inferred_data}
+                        schema={reply.metadata.inferred_data_schema}
+                      />
+                    ) : null}
                   </Stack>
                 ) : (
                   <HStack>
@@ -496,7 +506,7 @@ export function PetitionRepliesFieldReply({
                       </Text>
                     ) : (
                       <BreakLines>{content}</BreakLines>
-                    )}
+                    )}{" "}
                     {reply.field?.type === "DATE_TIME" &&
                     currentTimezone !== reply.content.timezone ? (
                       <HelpPopover>

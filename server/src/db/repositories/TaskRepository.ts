@@ -120,6 +120,12 @@ export type TaskInput<TName extends TaskName> = {
   DASHBOARD_REFRESH: {
     dashboard_id: number;
   };
+  DOCUMENT_PROCESSING: {
+    petition_field_reply_id: number;
+    file_upload_id: number;
+    integration_id: number;
+    model: string;
+  };
 }[TName];
 
 export interface AddPetitionPermissionsInput {
@@ -279,6 +285,11 @@ export type TaskOutput<TName extends TaskName> = {
   DASHBOARD_REFRESH: {
     success: boolean;
     error?: any;
+  };
+  DOCUMENT_PROCESSING: {
+    success: boolean;
+    classification_ai_completion_log_id?: number;
+    extraction_ai_completion_log_id?: number;
   };
 }[TName];
 

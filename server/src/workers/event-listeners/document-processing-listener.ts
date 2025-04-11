@@ -4,6 +4,7 @@ import {
   InvalidCredentialsError,
   InvalidRequestError,
 } from "../../integrations/helpers/GenericIntegration";
+import { toBytes } from "../../util/fileSize";
 import { listener } from "../helpers/EventProcessor";
 
 export const documentProcessingListener = listener(
@@ -70,6 +71,62 @@ export const documentProcessingListener = listener(
           );
         }
       }
+    }
+
+    if (options.processDocument) {
+      const hasFeatureFlag = await ctx.featureFlags.orgHasFeatureFlag(
+        petition.org_id,
+        "DOCUMENT_PROCESSING",
+      );
+      if (!hasFeatureFlag) {
+        return;
+      }
+
+      const [anthropicIntegration] = await ctx.integrations.loadIntegrationsByOrgId(
+        petition.org_id,
+        "AI_COMPLETION",
+        "ANTHROPIC",
+      );
+
+      if (!anthropicIntegration) {
+        return;
+      }
+
+      const user = event.data.user_id ? await ctx.users.loadUser(event.data.user_id) : null;
+      const access = event.data.petition_access_id
+        ? await ctx.petitions.loadAccess(event.data.petition_access_id)
+        : null;
+
+      if (!user && !access) {
+        return;
+      }
+
+      const file = await ctx.files.loadFileUpload(reply.content.file_upload_id);
+
+      if (
+        !file ||
+        !["application/pdf", "image/jpeg", "image/png", "image/gif", "image/webp"].includes(
+          file.content_type,
+        ) ||
+        parseInt(file.size) > toBytes(10, "MB")
+      ) {
+        return;
+      }
+
+      await ctx.tasks.createTask(
+        {
+          name: "DOCUMENT_PROCESSING",
+          input: {
+            petition_field_reply_id: reply.id,
+            file_upload_id: reply.content.file_upload_id,
+            integration_id: anthropicIntegration.id,
+            model: anthropicIntegration.settings.MODEL,
+          },
+          user_id: user?.id ?? null,
+          petition_access_id: access?.id ?? null,
+        },
+        ctx.config.instanceName,
+      );
     }
   },
 );

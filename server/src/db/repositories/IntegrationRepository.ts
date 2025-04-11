@@ -19,7 +19,7 @@ import { KNEX } from "../knex";
 interface IntegrationProviders {
   SIGNATURE: "SIGNATURIT" | "DOCUSIGN";
   DOW_JONES_KYC: "DOW_JONES_KYC";
-  AI_COMPLETION: "AZURE_OPEN_AI";
+  AI_COMPLETION: "AZURE_OPEN_AI" | "ANTHROPIC";
   ID_VERIFICATION: "BANKFLIP";
   DOCUMENT_PROCESSING: "BANKFLIP";
   PROFILE_EXTERNAL_SOURCE: "EINFORMA" | "COMPANIES_HOUSE";
@@ -66,6 +66,14 @@ interface AzureAiCompletionSettings {
   ENDPOINT: string;
 }
 
+interface AnthropicCompletionSettings {
+  IS_PARALLEL_MANAGED: boolean;
+  MODEL: string;
+  CREDENTIALS: {
+    API_KEY: string;
+  };
+}
+
 interface EInformaProfileExternalSourceSettings {
   CREDENTIALS: {
     CLIENT_ID: string;
@@ -108,7 +116,10 @@ export type IntegrationSettings<
       }[TProvider]
     : never;
   AI_COMPLETION: TProvider extends IntegrationProviders["AI_COMPLETION"]
-    ? { AZURE_OPEN_AI: AzureAiCompletionSettings }[TProvider]
+    ? {
+        AZURE_OPEN_AI: AzureAiCompletionSettings;
+        ANTHROPIC: AnthropicCompletionSettings;
+      }[TProvider]
     : never;
   ID_VERIFICATION: TProvider extends IntegrationProviders["ID_VERIFICATION"]
     ? {

@@ -195,6 +195,186 @@
     "context": "This is an email sent via Parallel from the verified account {email}"
   },
   {
+    "term": "document-processing-runner.bank-certificate.account-number",
+    "definition": "Account number",
+    "context": "Account number"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.account-opened-at",
+    "definition": "Account opened at",
+    "context": "Account opened at"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.account-owner",
+    "definition": "Account owner",
+    "context": "Account owner"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.account-owner-id",
+    "definition": "Account owner ID",
+    "context": "Account owner ID"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.account-swift-number",
+    "definition": "SWIFT number",
+    "context": "SWIFT number"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.bank-address",
+    "definition": "Bank address",
+    "context": "Bank address"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.bank-name",
+    "definition": "Bank name",
+    "context": "Bank name"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.issued-at",
+    "definition": "Issued at",
+    "context": "Issued at"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.issued-for",
+    "definition": "Issued for",
+    "context": "Issued for"
+  },
+  {
+    "term": "document-processing-runner.id-card.birth-date",
+    "definition": "Birth date",
+    "context": "Birth date"
+  },
+  {
+    "term": "document-processing-runner.id-card.birth-place",
+    "definition": "Birth place",
+    "context": "Birth place"
+  },
+  {
+    "term": "document-processing-runner.id-card.expiration-date",
+    "definition": "Expiration date",
+    "context": "Expiration date"
+  },
+  {
+    "term": "document-processing-runner.id-card.first-name",
+    "definition": "First name",
+    "context": "First name"
+  },
+  {
+    "term": "document-processing-runner.id-card.issue-date",
+    "definition": "Issue date",
+    "context": "Issue date"
+  },
+  {
+    "term": "document-processing-runner.id-card.issuing-country",
+    "definition": "Issuing country",
+    "context": "Issuing country"
+  },
+  {
+    "term": "document-processing-runner.id-card.nationality",
+    "definition": "Nationality",
+    "context": "Nationality"
+  },
+  {
+    "term": "document-processing-runner.id-card.number",
+    "definition": "ID",
+    "context": "ID"
+  },
+  {
+    "term": "document-processing-runner.id-card.surname",
+    "definition": "Last name",
+    "context": "Last name"
+  },
+  {
+    "term": "document-processing-runner.passport.birth-date",
+    "definition": "Date of birth",
+    "context": "Date of birth"
+  },
+  {
+    "term": "document-processing-runner.passport.birth-place",
+    "definition": "Birth place",
+    "context": "Birth place"
+  },
+  {
+    "term": "document-processing-runner.passport.expiration-date",
+    "definition": "Expiry date",
+    "context": "Expiry date"
+  },
+  {
+    "term": "document-processing-runner.passport.first-name",
+    "definition": "First name",
+    "context": "First name"
+  },
+  {
+    "term": "document-processing-runner.passport.issue-date",
+    "definition": "Date of issue",
+    "context": "Date of issue"
+  },
+  {
+    "term": "document-processing-runner.passport.issuing-country",
+    "definition": "Issuing country",
+    "context": "Issuing country"
+  },
+  {
+    "term": "document-processing-runner.passport.nationality",
+    "definition": "Nationality",
+    "context": "Nationality"
+  },
+  {
+    "term": "document-processing-runner.passport.number",
+    "definition": "ID",
+    "context": "ID"
+  },
+  {
+    "term": "document-processing-runner.passport.surname",
+    "definition": "Last name",
+    "context": "Last name"
+  },
+  {
+    "term": "document-processing-runner.payslip.employee-id",
+    "definition": "Employee ID",
+    "context": "Employee ID"
+  },
+  {
+    "term": "document-processing-runner.payslip.employee-name",
+    "definition": "Employee name",
+    "context": "Employee name"
+  },
+  {
+    "term": "document-processing-runner.payslip.employer-id",
+    "definition": "Employer ID",
+    "context": "Employer ID"
+  },
+  {
+    "term": "document-processing-runner.payslip.employer-name",
+    "definition": "Employer name",
+    "context": "Employer name"
+  },
+  {
+    "term": "document-processing-runner.payslip.net-pay",
+    "definition": "Net salary",
+    "context": "Net salary"
+  },
+  {
+    "term": "document-processing-runner.payslip.period-end",
+    "definition": "To",
+    "context": "To"
+  },
+  {
+    "term": "document-processing-runner.payslip.period-start",
+    "definition": "From",
+    "context": "From"
+  },
+  {
+    "term": "document-processing-runner.payslip.total-accrued",
+    "definition": "Total accrued",
+    "context": "Total accrued"
+  },
+  {
+    "term": "document-processing-runner.payslip.total-deduction",
+    "definition": "Total deduction",
+    "context": "Total deduction"
+  },
+  {
     "term": "document.annex-cover-page.title",
     "definition": "Annex {n}",
     "context": "Annex {n}"

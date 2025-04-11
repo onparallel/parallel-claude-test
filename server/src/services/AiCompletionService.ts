@@ -1,5 +1,6 @@
+import Ajv from "ajv";
 import safeStringify from "fast-safe-stringify";
-import { Container, inject, injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { pick } from "remeda";
 import { AiCompletionLog, AiCompletionLogType } from "../db/__types";
 import {
@@ -8,9 +9,10 @@ import {
 } from "../db/repositories/IntegrationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import {
-  AI_COMPLETION_CLIENT,
-  AiCompletionPrompt,
-  IAiCompletionClient,
+  AI_COMPLETION_CLIENT_FACTORY,
+  AiCompletionClientFactory,
+  AiCompletionPromptItem,
+  AiCompletionResponse,
 } from "../integrations/ai-completion/AiCompletionClient";
 import {
   InvalidCredentialsError,
@@ -19,14 +21,13 @@ import {
 
 export const AI_COMPLETION_SERVICE = Symbol.for("AI_COMPLETION_SERVICE");
 
-type AiCompletionProvider = IntegrationProvider<"AI_COMPLETION">;
-
 interface AiCompletionConfig {
-  integration_id: number;
+  integrationId: number;
   type: AiCompletionLogType;
   model: string;
-  prompt: AiCompletionPrompt[];
-  apiVersion: string;
+  prompt: AiCompletionPromptItem[];
+  apiVersion?: string;
+  responseFormat: { type: "text" } | { type: "json"; schema: any };
 }
 
 export interface IAiCompletionService {
@@ -36,37 +37,49 @@ export interface IAiCompletionService {
 @injectable()
 export class AiCompletionService implements IAiCompletionService {
   constructor(
-    @inject(Container) private container: Container,
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(IntegrationRepository) private integrations: IntegrationRepository,
+    @inject(AI_COMPLETION_CLIENT_FACTORY)
+    private aiCompletionClientFactory: AiCompletionClientFactory,
   ) {}
 
-  private getClient(integration: { id: number; provider: AiCompletionProvider }) {
-    const client = this.container.get<IAiCompletionClient<any>>(AI_COMPLETION_CLIENT, {
-      name: integration.provider,
-    });
-    client.configure(integration.id);
-    return client;
-  }
-
   public async processAiCompletion(config: AiCompletionConfig, createdBy: string) {
-    const integration = (await this.integrations.loadIntegration(config.integration_id))!;
-    const provider = integration.provider as IntegrationProvider<"AI_COMPLETION">;
-    const client = this.getClient({ id: integration.id, provider });
-    const params = client.buildRequestParams(config.model, config.apiVersion, config.prompt);
+    const integration = (await this.integrations.loadIntegration(config.integrationId))!;
+    const client = this.aiCompletionClientFactory(
+      integration.provider as IntegrationProvider<"AI_COMPLETION">,
+      integration.id,
+    );
+    const params = await client.buildRequestParams(
+      config.model,
+      config.apiVersion ?? null,
+      config.prompt,
+      config.responseFormat,
+    );
 
     const aiCompletionLog = await this.petitions.createAiCompletionLog(
       {
-        integration_id: config.integration_id,
+        integration_id: config.integrationId,
         type: config.type,
         request_params: JSON.stringify(params),
       },
       createdBy,
     );
 
+    let response: AiCompletionResponse | undefined;
     try {
-      const response = await client.getCompletion(params);
-      await this.petitions.updateAiCompletionLog(
+      response = await client.getCompletion(params);
+
+      if (config.responseFormat.type === "json") {
+        // make sure response.completion is a valid JSON
+        const result = JSON.parse(response.completion);
+        const ajv = new Ajv({ strict: false });
+        ajv.addFormat("currency", true);
+        if (!ajv.validate(config.responseFormat.schema, result)) {
+          throw new Error("Invalid JSON object: " + ajv.errorsText());
+        }
+      }
+
+      return await this.petitions.updateAiCompletionLog(
         aiCompletionLog.id,
         {
           status: "COMPLETED",
@@ -81,10 +94,14 @@ export class AiCompletionService implements IAiCompletionService {
         createdBy,
       );
     } catch (error) {
-      await this.petitions.updateAiCompletionLog(
+      return await this.petitions.updateAiCompletionLog(
         aiCompletionLog.id,
         {
           status: "FAILED",
+          raw_response: response?.rawResponse,
+          request_tokens: response?.requestTokens,
+          response_tokens: response?.responseTokens,
+          cost: response?.totalCost,
           error:
             error instanceof InvalidCredentialsError || error instanceof InvalidRequestError
               ? pick(error, ["code", "message"])
@@ -100,7 +117,5 @@ export class AiCompletionService implements IAiCompletionService {
         createdBy,
       );
     }
-
-    return aiCompletionLog;
   }
 }

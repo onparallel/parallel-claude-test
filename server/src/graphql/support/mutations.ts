@@ -1473,3 +1473,71 @@ export const createProfileRelationshipsExcel = mutationField("createProfileRelat
     }
   },
 });
+
+export const createAnthropicCompletionIntegration = mutationField(
+  "createAnthropicCompletionIntegration",
+  {
+    description: "Creates a new Anthropic AI Completion integration on the provided organization",
+    type: "SupportMethodResponse",
+    authorize: superAdminAccess(),
+    args: {
+      orgId: nonNull(globalIdArg("Organization")),
+      model: nonNull(
+        stringArg({
+          description:
+            "e.g. claude-3-5-haiku-20241022; claude-3-7-sonnet-20250219; claude-3-5-sonnet-20241022",
+        }),
+      ),
+    },
+    resolve: async (_, args, ctx) => {
+      try {
+        const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
+          args.orgId,
+          "AI_COMPLETION",
+          "ANTHROPIC",
+        );
+
+        if (isNullish(integration)) {
+          await ctx.integrationsSetup.createAnthropicIntegration(
+            {
+              org_id: args.orgId,
+              name: "Anthropic AI",
+              is_default: true,
+              settings: {
+                IS_PARALLEL_MANAGED: true,
+                MODEL: args.model,
+                CREDENTIALS: {
+                  API_KEY: ctx.config.aiCompletion.anthropic.apiKey,
+                },
+              },
+            },
+            `User:${ctx.user!.id}`,
+          );
+          return {
+            result: RESULT.SUCCESS,
+            message: `Integration created successfully`,
+          };
+        } else {
+          await ctx.integrationsSetup.updateAnthropicIntegration(integration.id, {
+            settings: {
+              IS_PARALLEL_MANAGED: true,
+              MODEL: args.model,
+              CREDENTIALS: {
+                API_KEY: ctx.config.aiCompletion.anthropic.apiKey,
+              },
+            },
+          });
+          return {
+            result: RESULT.SUCCESS,
+            message: `Integration updated successfully`,
+          };
+        }
+      } catch (error) {
+        return {
+          result: RESULT.FAILURE,
+          message: error instanceof Error ? error.message : "Unknown error",
+        };
+      }
+    },
+  },
+);

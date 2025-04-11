@@ -3530,6 +3530,16 @@
     "context": "Developers solutions"
   },
   {
+    "term": "component.feature-flag-descriptions.document-processing-description",
+    "definition": "Enables the AI document processing feature on file fields.",
+    "context": "Enables the AI document processing feature on file fields."
+  },
+  {
+    "term": "component.feature-flag-descriptions.document-processing-name",
+    "definition": "AI document processing",
+    "context": "AI document processing"
+  },
+  {
     "term": "component.feature-flag-descriptions.docusign-sandbox-provider-description",
     "definition": "Enables the setting to create a DocuSign Sandbox integration on the organization.",
     "context": "Enables the setting to create a DocuSign Sandbox integration on the organization."
@@ -6033,6 +6043,16 @@
     "term": "component.petition-compose-field.visibility-title",
     "definition": "Visibility conditions",
     "context": "Visibility conditions"
+  },
+  {
+    "term": "component.petition-compose-file-upload-settings.ai-document-processing",
+    "definition": "AI document processing",
+    "context": "AI document processing"
+  },
+  {
+    "term": "component.petition-compose-file-upload-settings.ai-document-processing-description",
+    "definition": "Enable AI document processing to automatically extract information from uploaded documents.",
+    "context": "Enable AI document processing to automatically extract information from uploaded documents."
   },
   {
     "term": "component.petition-compose-file-upload-settings.allowed-formats",

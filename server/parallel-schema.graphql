@@ -820,6 +820,7 @@ enum FeatureFlag {
   CUSTOM_HOST_UI
   CUSTOM_PROPERTIES
   DASHBOARDS
+  DOCUMENT_PROCESSING
   DOCUSIGN_SANDBOX_PROVIDER
   DOW_JONES_KYC
   ES_TAX_DOCUMENTS_FIELD
@@ -1401,6 +1402,17 @@ type Mutation {
     userGroupIds: [GID!]
     userIds: [GID!]
   ): MaybeTask!
+
+  """
+  Creates a new Anthropic AI Completion integration on the provided organization
+  """
+  createAnthropicCompletionIntegration(
+    """
+    e.g. claude-3-5-haiku-20241022; claude-3-7-sonnet-20250219; claude-3-5-sonnet-20241022
+    """
+    model: String!
+    orgId: GID!
+  ): SupportMethodResponse!
 
   """
   Creates a new Azure OpenAI integration on the provided organization
@@ -8663,6 +8675,7 @@ enum TaskName {
   BULK_PETITION_SEND
   CLOSE_PETITIONS
   DASHBOARD_REFRESH
+  DOCUMENT_PROCESSING
   DOW_JONES_PROFILE_DOWNLOAD
   EXPORT_EXCEL
   EXPORT_REPLIES

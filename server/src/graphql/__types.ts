@@ -2410,6 +2410,7 @@ export interface NexusGenFieldTypes {
     copyBackgroundCheckReplyToProfileFieldValue: NexusGenRootTypes["ProfileFieldValue"]; // ProfileFieldValue!
     copyFileReplyToProfileFieldFile: NexusGenRootTypes["ProfileFieldFile"][]; // [ProfileFieldFile!]!
     createAddPetitionPermissionMaybeTask: NexusGenRootTypes["MaybeTask"]; // MaybeTask!
+    createAnthropicCompletionIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createAzureOpenAiIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createBackgroundCheckProfilePdfTask: NexusGenRootTypes["Task"]; // Task!
     createBankflipDocumentProcessingIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -5429,6 +5430,7 @@ export interface NexusGenFieldTypeNames {
     copyBackgroundCheckReplyToProfileFieldValue: "ProfileFieldValue";
     copyFileReplyToProfileFieldFile: "ProfileFieldFile";
     createAddPetitionPermissionMaybeTask: "MaybeTask";
+    createAnthropicCompletionIntegration: "SupportMethodResponse";
     createAzureOpenAiIntegration: "SupportMethodResponse";
     createBackgroundCheckProfilePdfTask: "Task";
     createBankflipDocumentProcessingIntegration: "SupportMethodResponse";
@@ -7993,6 +7995,11 @@ export interface NexusGenArgTypes {
       subscribe: boolean | null; // Boolean
       userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
       userIds?: NexusGenScalars["GID"][] | null; // [GID!]
+    };
+    createAnthropicCompletionIntegration: {
+      // args
+      model: string; // String!
+      orgId: NexusGenScalars["GID"]; // GID!
     };
     createAzureOpenAiIntegration: {
       // args

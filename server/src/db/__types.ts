@@ -17,9 +17,12 @@ export const AiCompletionLogStatusValues = [
   "FAILED",
 ] as AiCompletionLogStatus[];
 
-export type AiCompletionLogType = "PETITION_SUMMARY";
+export type AiCompletionLogType = "PETITION_SUMMARY" | "DOCUMENT_PROCESSING";
 
-export const AiCompletionLogTypeValues = ["PETITION_SUMMARY"] as AiCompletionLogType[];
+export const AiCompletionLogTypeValues = [
+  "PETITION_SUMMARY",
+  "DOCUMENT_PROCESSING",
+] as AiCompletionLogType[];
 
 export type ContactLocale = "en" | "es" | "ca" | "it" | "pt";
 
@@ -93,7 +96,8 @@ export type FeatureFlagName =
   | "DASHBOARDS"
   | "PETITION_APPROVAL_FLOW"
   | "PROFILE_SEARCH_FIELD"
-  | "REMOVE_PREVIEW_FILES";
+  | "REMOVE_PREVIEW_FILES"
+  | "DOCUMENT_PROCESSING";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -133,6 +137,7 @@ export const FeatureFlagNameValues = [
   "PETITION_APPROVAL_FLOW",
   "PROFILE_SEARCH_FIELD",
   "REMOVE_PREVIEW_FILES",
+  "DOCUMENT_PROCESSING",
 ] as FeatureFlagName[];
 
 export type IntegrationType =
@@ -596,7 +601,8 @@ export type TaskName =
   | "CLOSE_PETITIONS"
   | "PROFILES_EXCEL_IMPORT"
   | "DASHBOARD_REFRESH"
-  | "PROFILES_EXCEL_EXPORT";
+  | "PROFILES_EXCEL_EXPORT"
+  | "DOCUMENT_PROCESSING";
 
 export const TaskNameValues = [
   "PRINT_PDF",
@@ -619,6 +625,7 @@ export const TaskNameValues = [
   "PROFILES_EXCEL_IMPORT",
   "DASHBOARD_REFRESH",
   "PROFILES_EXCEL_EXPORT",
+  "DOCUMENT_PROCESSING",
 ] as TaskName[];
 
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";

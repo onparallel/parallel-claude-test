@@ -11,7 +11,7 @@ import {
   InvalidRequestError,
 } from "../helpers/GenericIntegration";
 
-export type AzureOpenAiModel = "gpt-4-turbo" | "gpt-35-turbo";
+export type AzureOpenAiModel = "gpt-4-turbo" | "gpt-35-turbo" | "gpt-4o-mini";
 
 interface AzureOpenAiIntegrationContext {
   endpoint: string;

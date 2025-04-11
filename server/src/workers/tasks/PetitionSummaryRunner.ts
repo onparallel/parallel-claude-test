@@ -67,13 +67,16 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
     const summary = await this.ctx.aiCompletion.processAiCompletion(
       {
         type: "PETITION_SUMMARY",
-        integration_id: summaryConfig.integration_id,
+        integrationId: summaryConfig.integration_id,
         apiVersion: summaryConfig.api_version,
         model: summaryConfig.model,
         prompt: summaryConfig.prompt.map((message) => ({
           role: message.role,
-          content: liquid.parseAndRenderSync(message.content, scope, { globals: { intl } }),
+          content: liquid.parseAndRenderSync(message.content, scope, {
+            globals: { intl },
+          }) as string,
         })),
+        responseFormat: { type: "text" },
       },
       `User:${user.id}`,
     );

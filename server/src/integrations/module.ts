@@ -1,5 +1,13 @@
 import { ContainerModule } from "inversify";
-import { AI_COMPLETION_CLIENT, IAiCompletionClient } from "./ai-completion/AiCompletionClient";
+import {
+  AI_COMPLETION_CLIENT,
+  AI_COMPLETION_CLIENT_FACTORY,
+  AiCompletionClientFactory,
+  getAiCompletionClientFactory,
+  IAiCompletionClient,
+} from "./ai-completion/AiCompletionClient";
+import { AnthropicClient } from "./ai-completion/AnthropicClient";
+import { AnthropicIntegration } from "./ai-completion/AnthropicIntegration";
 import { AzureOpenAiClient } from "./ai-completion/AzureOpenAIClient";
 import { AzureOpenAiIntegration } from "./ai-completion/AzureOpenAiIntegration";
 import { IDocumentProcessingIntegration } from "./document-processing/DocumentProcessingIntegration";
@@ -45,8 +53,15 @@ export const integrationsModule = new ContainerModule((options) => {
     .bind<IAiCompletionClient<any>>(AI_COMPLETION_CLIENT)
     .to(AzureOpenAiClient)
     .whenNamed("AZURE_OPEN_AI");
-
+  options
+    .bind<IAiCompletionClient<any>>(AI_COMPLETION_CLIENT)
+    .to(AnthropicClient)
+    .whenNamed("ANTHROPIC");
   options.bind<AzureOpenAiIntegration>(AzureOpenAiIntegration).toSelf();
+  options.bind<AnthropicIntegration>(AnthropicIntegration).toSelf();
+  options
+    .bind<AiCompletionClientFactory>(AI_COMPLETION_CLIENT_FACTORY)
+    .toFactory(getAiCompletionClientFactory);
 
   options.bind<SignaturitIntegration>(SignaturitIntegration).toSelf();
   options.bind<DocusignIntegration>(DocusignIntegration).toSelf();

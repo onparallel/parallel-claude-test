@@ -1,15 +1,15 @@
-import { Container, inject, injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { isNullish } from "remeda";
 import { Readable } from "stream";
 import { BackgroundCheckProfileProps } from "../pdf/documents/BackgroundCheckProfile";
 import { IPrinter, PRINTER } from "./Printer";
 import { IRedis, REDIS } from "./Redis";
 import {
-  BACKGROUND_CHECK_CLIENT,
+  BACKGROUND_CHECK_CLIENT_FACTORY,
+  BackgroundCheckClientFactory,
   EntityDetailsResponse,
   EntitySearchRequest,
   EntitySearchResponse,
-  IBackgroundCheckClient,
 } from "./background-check-clients/BackgroundCheckClient";
 
 interface EntityDetailsPdfResponse {
@@ -31,15 +31,14 @@ export const BACKGROUND_CHECK_SERVICE = Symbol.for("BACKGROUND_CHECK_SERVICE");
 @injectable()
 export class BackgroundCheckService implements IBackgroundCheckService {
   constructor(
-    @inject(Container) private container: Container,
     @inject(PRINTER) private printer: IPrinter,
     @inject(REDIS) private redis: IRedis,
+    @inject(BACKGROUND_CHECK_CLIENT_FACTORY)
+    private backgroundCheckClientFactory: BackgroundCheckClientFactory,
   ) {}
 
   private getClient() {
-    return this.container.get<IBackgroundCheckClient>(BACKGROUND_CHECK_CLIENT, {
-      name: "OPEN_SANCTIONS",
-    });
+    return this.backgroundCheckClientFactory("OPEN_SANCTIONS");
   }
 
   async entitySearch(query: EntitySearchRequest): Promise<EntitySearchResponse> {

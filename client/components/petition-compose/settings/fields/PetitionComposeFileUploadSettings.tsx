@@ -13,6 +13,7 @@ import { ValueContainerProps, components } from "react-select";
 import { difference, intersectionWith, isNonNullish } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRow } from "../rows/SettingsRow";
+import { SettingsRowSwitch } from "../rows/SettingsRowSwitch";
 
 export function PetitionComposeFileUploadSettings({
   field,
@@ -36,6 +37,9 @@ export function PetitionComposeFileUploadSettings({
     ],
     [],
   );
+
+  const isAiDocumentProcessingActive =
+    user.organization.hasAnthropicCompletionIntegration && user.hasDocumentProcessingAccess;
   return (
     <>
       {user.organization.hasDocumentProcessingIntegration ? (
@@ -81,7 +85,34 @@ export function PetitionComposeFileUploadSettings({
             />
           </Box>
         </SettingsRow>
-      ) : null}
+      ) : (
+        <SettingsRowSwitch
+          isChecked={isAiDocumentProcessingActive && !!field.options.processDocument}
+          onChange={(processDocument) =>
+            onFieldEdit(field.id, {
+              options: {
+                processDocument,
+              },
+            })
+          }
+          isDisabled={isReadOnly || !isAiDocumentProcessingActive}
+          label={
+            <FormattedMessage
+              id="component.petition-compose-file-upload-settings.ai-document-processing"
+              defaultMessage="AI document processing"
+            />
+          }
+          isReadOnly={isReadOnly}
+          description={
+            <FormattedMessage
+              id="component.petition-compose-file-upload-settings.ai-document-processing-description"
+              defaultMessage="Enable AI document processing to automatically extract information from uploaded documents."
+            />
+          }
+          controlId="ai-document-processing"
+        />
+      )}
+
       <SettingsRow
         controlId="allowed-format"
         textStyle={isReadOnly ? "muted" : undefined}
@@ -91,7 +122,11 @@ export function PetitionComposeFileUploadSettings({
             defaultMessage="Allowed formats"
           />
         }
-        isReadOnly={isReadOnly || isNonNullish(field.options.documentProcessing)}
+        isReadOnly={
+          isReadOnly ||
+          isNonNullish(field.options.documentProcessing) ||
+          (isAiDocumentProcessingActive && !!field.options.processDocument)
+        }
       >
         <Box flex={1}>
           <AllowedFormatsSelect
@@ -178,8 +213,13 @@ function ValueContainer({
 PetitionComposeFileUploadSettings.fragments = {
   User: gql`
     fragment PetitionComposeFileUploadSettings_User on User {
+      hasDocumentProcessingAccess: hasFeatureFlag(featureFlag: DOCUMENT_PROCESSING)
       organization {
         hasDocumentProcessingIntegration: hasIntegration(integration: DOCUMENT_PROCESSING)
+        hasAnthropicCompletionIntegration: hasIntegration(
+          integration: AI_COMPLETION
+          provider: "ANTHROPIC"
+        )
       }
     }
   `,

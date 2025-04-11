@@ -130,6 +130,10 @@ const SCHEMAS = {
           },
         },
       },
+      processDocument: {
+        description: "Whether to enable AI document processing for this field",
+        type: "boolean",
+      },
       attachToPdf: {
         type: "boolean",
       },

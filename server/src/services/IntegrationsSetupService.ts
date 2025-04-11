@@ -6,6 +6,7 @@ import {
   IntegrationCredentials,
   IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
+import { AnthropicIntegration } from "../integrations/ai-completion/AnthropicIntegration";
 import { AzureOpenAiIntegration } from "../integrations/ai-completion/AzureOpenAiIntegration";
 import {
   BANKFLIP_DOCUMENT_PROCESSING_INTEGRATION,
@@ -60,6 +61,21 @@ export interface IIntegrationsSetupService {
     createdBy: string,
     t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"AI_COMPLETION", "AZURE_OPEN_AI">>;
+  createAnthropicIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "is_default" | "name"> & {
+      settings: IntegrationSettings<"AI_COMPLETION", "ANTHROPIC">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<EnhancedOrgIntegration<"AI_COMPLETION", "ANTHROPIC">>;
+  updateAnthropicIntegration(
+    integrationId: number,
+    data: Replace<
+      Partial<OrgIntegration>,
+      { settings: IntegrationSettings<"AI_COMPLETION", "ANTHROPIC"> }
+    >,
+    t?: Knex.Transaction,
+  ): Promise<void>;
   createBankflipIdVerificationIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
       settings: IntegrationSettings<"ID_VERIFICATION", "BANKFLIP">;
@@ -119,6 +135,8 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     @inject(SignaturitIntegration) private signaturitIntegration: SignaturitIntegration,
     @inject(DowJonesIntegration) private dowJonesIntegration: DowJonesIntegration,
     @inject(AzureOpenAiIntegration) private azureOpenAiIntegration: AzureOpenAiIntegration,
+    @inject(AnthropicIntegration)
+    private anthropicIntegration: AnthropicIntegration,
     @inject(BANKFLIP_ID_VERIFICATION_INTEGRATION)
     private bankflipIdVerificationIntegration: BankflipIdVerificationIntegration,
     @inject(BANKFLIP_DOCUMENT_PROCESSING_INTEGRATION)
@@ -182,6 +200,27 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     t?: Knex.Transaction<any, any[]> | undefined,
   ): Promise<EnhancedOrgIntegration<"AI_COMPLETION", "AZURE_OPEN_AI">> {
     return await this.azureOpenAiIntegration.createOrgIntegration(data, createdBy, t);
+  }
+
+  async createAnthropicIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "is_default" | "name"> & {
+      settings: IntegrationSettings<"AI_COMPLETION", "ANTHROPIC">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction<any, any[]> | undefined,
+  ): Promise<EnhancedOrgIntegration<"AI_COMPLETION", "ANTHROPIC">> {
+    return await this.anthropicIntegration.createOrgIntegration(data, createdBy, t);
+  }
+
+  async updateAnthropicIntegration(
+    integrationId: number,
+    data: Replace<
+      Partial<OrgIntegration>,
+      { settings: IntegrationSettings<"AI_COMPLETION", "ANTHROPIC"> }
+    >,
+    t?: Knex.Transaction<any, any[]> | undefined,
+  ): Promise<void> {
+    await this.anthropicIntegration.updateOrgIntegration(integrationId, data, t);
   }
 
   async createBankflipIdVerificationIntegration(

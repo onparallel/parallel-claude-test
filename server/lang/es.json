@@ -195,6 +195,186 @@
     "context": "This is an email sent via Parallel from the verified account {email}"
   },
   {
+    "term": "document-processing-runner.bank-certificate.account-number",
+    "definition": "Número de cuenta",
+    "context": "Account number"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.account-opened-at",
+    "definition": "Cuenta abierta en",
+    "context": "Account opened at"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.account-owner",
+    "definition": "Titular de la cuenta",
+    "context": "Account owner"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.account-owner-id",
+    "definition": "ID del titular de la cuenta",
+    "context": "Account owner ID"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.account-swift-number",
+    "definition": "Número SWIFT de la cuenta",
+    "context": "SWIFT number"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.bank-address",
+    "definition": "Dirección del banco",
+    "context": "Bank address"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.bank-name",
+    "definition": "Nombre del banco",
+    "context": "Bank name"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.issued-at",
+    "definition": "Emitido el",
+    "context": "Issued at"
+  },
+  {
+    "term": "document-processing-runner.bank-certificate.issued-for",
+    "definition": "Emitido para",
+    "context": "Issued for"
+  },
+  {
+    "term": "document-processing-runner.id-card.birth-date",
+    "definition": "Fecha de nacimiento",
+    "context": "Birth date"
+  },
+  {
+    "term": "document-processing-runner.id-card.birth-place",
+    "definition": "Lugar de nacimiento",
+    "context": "Birth place"
+  },
+  {
+    "term": "document-processing-runner.id-card.expiration-date",
+    "definition": "Fecha de caducidad",
+    "context": "Expiration date"
+  },
+  {
+    "term": "document-processing-runner.id-card.first-name",
+    "definition": "Nombre",
+    "context": "First name"
+  },
+  {
+    "term": "document-processing-runner.id-card.issue-date",
+    "definition": "Fecha de emisión",
+    "context": "Issue date"
+  },
+  {
+    "term": "document-processing-runner.id-card.issuing-country",
+    "definition": "País emisor",
+    "context": "Issuing country"
+  },
+  {
+    "term": "document-processing-runner.id-card.nationality",
+    "definition": "Nacionalidad",
+    "context": "Nationality"
+  },
+  {
+    "term": "document-processing-runner.id-card.number",
+    "definition": "ID",
+    "context": "ID"
+  },
+  {
+    "term": "document-processing-runner.id-card.surname",
+    "definition": "Apellido",
+    "context": "Last name"
+  },
+  {
+    "term": "document-processing-runner.passport.birth-date",
+    "definition": "Fecha de nacimiento",
+    "context": "Date of birth"
+  },
+  {
+    "term": "document-processing-runner.passport.birth-place",
+    "definition": "Lugar de nacimiento",
+    "context": "Birth place"
+  },
+  {
+    "term": "document-processing-runner.passport.expiration-date",
+    "definition": "Fecha de caducidad",
+    "context": "Expiry date"
+  },
+  {
+    "term": "document-processing-runner.passport.first-name",
+    "definition": "Nombre",
+    "context": "First name"
+  },
+  {
+    "term": "document-processing-runner.passport.issue-date",
+    "definition": "Fecha de emisión",
+    "context": "Date of issue"
+  },
+  {
+    "term": "document-processing-runner.passport.issuing-country",
+    "definition": "País emisor",
+    "context": "Issuing country"
+  },
+  {
+    "term": "document-processing-runner.passport.nationality",
+    "definition": "Nacionalidad",
+    "context": "Nationality"
+  },
+  {
+    "term": "document-processing-runner.passport.number",
+    "definition": "ID",
+    "context": "ID"
+  },
+  {
+    "term": "document-processing-runner.passport.surname",
+    "definition": "Apellido",
+    "context": "Last name"
+  },
+  {
+    "term": "document-processing-runner.payslip.employee-id",
+    "definition": "ID del empleado",
+    "context": "Employee ID"
+  },
+  {
+    "term": "document-processing-runner.payslip.employee-name",
+    "definition": "Nombre del empleado",
+    "context": "Employee name"
+  },
+  {
+    "term": "document-processing-runner.payslip.employer-id",
+    "definition": "ID del empleador",
+    "context": "Employer ID"
+  },
+  {
+    "term": "document-processing-runner.payslip.employer-name",
+    "definition": "Nombre del empleador",
+    "context": "Employer name"
+  },
+  {
+    "term": "document-processing-runner.payslip.net-pay",
+    "definition": "Sueldo neto",
+    "context": "Net salary"
+  },
+  {
+    "term": "document-processing-runner.payslip.period-end",
+    "definition": "Hasta",
+    "context": "To"
+  },
+  {
+    "term": "document-processing-runner.payslip.period-start",
+    "definition": "Desde",
+    "context": "From"
+  },
+  {
+    "term": "document-processing-runner.payslip.total-accrued",
+    "definition": "Total devengado",
+    "context": "Total accrued"
+  },
+  {
+    "term": "document-processing-runner.payslip.total-deduction",
+    "definition": "Deducción total",
+    "context": "Total deduction"
+  },
+  {
     "term": "document.annex-cover-page.title",
     "definition": "Anexo {n}",
     "context": "Annex {n}"
