@@ -1,7 +1,9 @@
-import { HStack, IconProps, Stack, Text } from "@chakra-ui/react";
+import { HStack, IconProps, Image, Stack, Text } from "@chakra-ui/react";
 import { AlertCircleFilledIcon, CircleCheckFilledIcon } from "@parallel/chakra/icons";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { FORMATS } from "@parallel/utils/dates";
+import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
+import { isValid } from "date-fns";
 import { ReactNode, forwardRef } from "react";
 import { FormattedDate, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
@@ -16,6 +18,10 @@ export function PetitionRepliesMetadataDate({
   rightIcon?: ReactNode;
 }) {
   const intl = useIntl();
+
+  // Check if date is valid
+  const isValidDate = isNonNullish(date) && isValid(new Date(date));
+
   return (
     <Stack>
       <Text as="span" fontWeight={500} color="gray.600" fontSize="sm">
@@ -23,10 +29,20 @@ export function PetitionRepliesMetadataDate({
       </Text>
       <HStack>
         {isNonNullish(date) ? (
-          <CopyToClipboardButton size="xs" fontSize="md" text={intl.formatDate(date, FORMATS.L)} />
+          <CopyToClipboardButton
+            size="xs"
+            fontSize="md"
+            text={isValidDate ? intl.formatDate(date, FORMATS.L) : date}
+          />
         ) : null}
         <Text as="span">
-          {isNonNullish(date) ? <FormattedDate value={date} {...FORMATS.L} /> : "-"}
+          {isValidDate ? (
+            <FormattedDate value={date} {...FORMATS.L} />
+          ) : isNonNullish(date) ? (
+            date
+          ) : (
+            "-"
+          )}
         </Text>
         {rightIcon}
       </HStack>
@@ -51,6 +67,45 @@ export function PetitionRepliesMetadataText({
           <CopyToClipboardButton size="xs" fontSize="md" text={content} />
         ) : null}
         <Text as="span">{isNonNullish(content) ? content : "-"}</Text>
+      </HStack>
+    </Stack>
+  );
+}
+
+export function PetitionRepliesMetadataCountry({
+  label,
+  countryCode,
+}: {
+  label: string;
+  countryCode: string | null;
+}) {
+  const intl = useIntl();
+  const { countries } = useLoadCountryNames(intl.locale);
+  const countryName = isNonNullish(countryCode)
+    ? (countries?.[countryCode] ?? countries?.[countryCode.toUpperCase()])
+    : null;
+
+  return (
+    <Stack>
+      <Text as="span" fontWeight={500} color="gray.600" fontSize="sm">
+        {label}
+      </Text>
+      <HStack>
+        {isNonNullish(countryCode) ? (
+          <>
+            <CopyToClipboardButton size="xs" fontSize="md" text={countryName ?? countryCode} />
+            {isNonNullish(countryName) && (
+              <Image
+                alt={countryName}
+                boxSize={6}
+                src={`${
+                  process.env.NEXT_PUBLIC_ASSETS_URL ?? ""
+                }/static/countries/flags/${countryCode.toLowerCase()}.png`}
+              />
+            )}
+          </>
+        ) : null}
+        <Text as="span">{isNonNullish(countryName) ? countryName : (countryCode ?? "-")}</Text>
       </HStack>
     </Stack>
   );

@@ -8,6 +8,7 @@ import { Fragment } from "react";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import {
+  PetitionRepliesMetadataCountry,
   PetitionRepliesMetadataDate,
   PetitionRepliesMetadataText,
 } from "./PetitionRepliesMetadata";
@@ -16,7 +17,7 @@ interface Schema {
   type: "object" | "array" | "string" | "number";
   "@label"?: LocalizableUserText;
   "@render"?: string[];
-  format?: "currency" | "date";
+  format?: "currency" | "date" | "country";
   properties?: { [key: string]: Schema };
   items?: Schema;
 }
@@ -109,6 +110,10 @@ export function PetitionRepliesFieldFileSchema({
     // Render a value formatted as a date
     if (fieldSchema.format === "date") {
       return <PetitionRepliesMetadataDate key={key} label={title} date={value} />;
+    }
+
+    if (fieldSchema.format === "country") {
+      return <PetitionRepliesMetadataCountry key={key} label={title} countryCode={value} />;
     }
 
     // Render simple fields

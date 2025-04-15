@@ -73,7 +73,12 @@ export class AiCompletionService implements IAiCompletionService {
         // make sure response.completion is a valid JSON
         const result = JSON.parse(response.completion);
         const ajv = new Ajv({ strict: false });
-        ajv.addFormat("currency", true);
+        // add these format values to the schema, but do not validate them
+        // this is to avoid errors when the AI returns a value that is not in the expected format
+        // but is still valid (e.g. ILLEGIBLE)
+        for (const format of ["date", "currency", "country"]) {
+          ajv.addFormat(format, true);
+        }
         if (!ajv.validate(config.responseFormat.schema, result)) {
           throw new Error("Invalid JSON object: " + ajv.errorsText());
         }

@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import Anthropic, { APIError } from "@anthropic-ai/sdk";
 import stringify from "fast-safe-stringify";
 import { inject, injectable } from "inversify";
 import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
@@ -40,21 +40,11 @@ export class AnthropicIntegration extends GenericIntegration<
       try {
         return await handler(client, context);
       } catch (error) {
-        if (this.isAuthenticationError(error)) {
+        if (error instanceof APIError && error.status === 401) {
           throw new InvalidCredentialsError("INVALID_CREDENTIALS", stringify(error));
         }
         throw error;
       }
     });
-  }
-
-  private isAuthenticationError(e: unknown) {
-    return (
-      !!e &&
-      typeof e === "object" &&
-      "status" in e &&
-      typeof e.status === "number" &&
-      e.status === 401
-    );
   }
 }

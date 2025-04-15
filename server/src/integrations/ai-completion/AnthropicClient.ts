@@ -1,3 +1,4 @@
+import { APIError } from "@anthropic-ai/sdk";
 import { MessageParam, Model, TextBlockParam } from "@anthropic-ai/sdk/resources";
 import BigNumber from "bignumber.js";
 import stringify from "fast-safe-stringify";
@@ -173,14 +174,32 @@ export class AnthropicClient
 
             return { completion, model, time };
           } catch (error) {
-            if (this.isModelNotFoundError(error)) {
+            if (error instanceof APIError) {
+              if (error.status === 429) {
+                // too many requests, will be handled by retry to calculate delay based in response headers
+                throw error;
+              }
+
               throw new InvalidRequestError(error.status.toString(), stringify(error));
             } else {
               throw new StopRetryError(error);
             }
           }
         },
-        { maxRetries: 1 },
+        {
+          maxRetries: 1,
+          delay: (error) => {
+            if (error instanceof APIError && error.status === 429) {
+              // https://docs.anthropic.com/en/api/rate-limits#response-headers
+              const retryAfter = error.headers["retry-after"];
+              if (retryAfter) {
+                return parseInt(retryAfter) * 1000;
+              }
+            }
+
+            return undefined;
+          },
+        },
       );
 
       const requestTokens = response.completion.usage.input_tokens;
@@ -221,9 +240,5 @@ export class AnthropicClient
     } else {
       return await this.storage.fileUploads.downloadFileBase64(file.path);
     }
-  }
-
-  private isModelNotFoundError(e: unknown): e is { status: number } {
-    return !!e && typeof e === "object" && "status" in e && e.status === 404;
   }
 }

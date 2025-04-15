@@ -6,9 +6,25 @@ import { toBytes } from "../../util/fileSize";
 import { walkObject } from "../../util/walkObject";
 import { TaskRunner } from "../helpers/TaskRunner";
 
-const DOCUMENT_CLASSIFICATION_TYPES = [
-  { type: "ID_CARD" as const, description: "Official ID card document certifying identity" },
-  { type: "PASSPORT" as const, description: "Official passport document certifying identity" },
+const DOCUMENT_CLASSIFICATION_TYPES: {
+  type: string;
+  description: string;
+  additionalPrompt?: string;
+}[] = [
+  {
+    type: "ID_CARD" as const,
+    description: "Official ID card document certifying identity",
+    additionalPrompt: outdent`
+      Use your knowledge and think twice about IDs in the issuer country to determine the right ID number so you don't get confused by other numbers such as support numbers or similar which sometimes might be larger in size: in Spain, for example, the ID number should be a number labeled as NIE, NIF, DNI or similar.
+    `,
+  },
+  {
+    type: "PASSPORT" as const,
+    description: "Official passport document certifying identity",
+    additionalPrompt: outdent`
+      Use your knowledge and think twice about passport numbers in the issuer country to make sure the number matches the format of the document for that country.
+    `,
+  },
   {
     type: "PAYSLIP" as const,
     description: "Official payroll document certifying employment status",
@@ -178,6 +194,8 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
       throw new Error(`Document schema ${classification.type} not implemented`);
     }
 
+    const document = DOCUMENT_CLASSIFICATION_TYPES.find((t) => t.type === classification.type);
+
     walkObject(schema, (key, _, node) => {
       if (key.startsWith("@")) {
         delete node[key];
@@ -194,6 +212,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
             role: "system",
             content: outdent`
               You are a world-class information extraction model. Your task is to extract specific fields from a text document based on the provided schema. Please strictly adhere to the given instructions and output format.
+              Double check any text or number you extract to avoid confusion between similar characters.
                   
               Considerations for data formatting:
                 - Dates must be in "YYYY-MM-DD" format
@@ -211,9 +230,19 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
           {
             role: "user",
             content: outdent`
-              Below there is a document containing one or more ${classification.type} documents. Extract the information according to the specified schema. If you are unable to read any of the properties but it is present, pass the word ILLEGIBLE instead.
+              Below there is a document containing one or more ${classification.type} documents.
+              Extract the information according to the specified schema.
+              If you are unable to read any of the properties but it is present, pass the word ILLEGIBLE instead.
             `,
           },
+          ...(document?.additionalPrompt
+            ? [
+                {
+                  role: "user",
+                  content: document.additionalPrompt,
+                } as const,
+              ]
+            : []),
           {
             role: "user",
             content: { type: "file", file_upload_id: file.id },
@@ -256,6 +285,17 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         "expirationDate",
         "issuingCountry",
       ],
+      "@render": [
+        "number",
+        "firstName",
+        "surname",
+        "birthDate",
+        "birthPlace",
+        "nationality",
+        "issueDate",
+        "expirationDate",
+        "issuingCountry",
+      ],
       properties: {
         number: {
           type: "string",
@@ -280,6 +320,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         },
         birthDate: {
           type: "string",
+          format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.birth-date",
             defaultMessage: "Birth date",
@@ -294,6 +335,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         },
         nationality: {
           type: "string",
+          format: "country",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.nationality",
             defaultMessage: "Nationality",
@@ -301,6 +343,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         },
         issueDate: {
           type: "string",
+          format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.issue-date",
             defaultMessage: "Issue date",
@@ -308,6 +351,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         },
         expirationDate: {
           type: "string",
+          format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.expiration-date",
             defaultMessage: "Expiration date",
@@ -315,6 +359,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         },
         issuingCountry: {
           type: "string",
+          format: "country",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.issuing-country",
             defaultMessage: "Issuing country",
@@ -338,7 +383,17 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         "expirationDate",
         "issuingCountry",
       ],
-
+      "@render": [
+        "number",
+        "firstName",
+        "surname",
+        "birthDate",
+        "birthPlace",
+        "nationality",
+        "issueDate",
+        "expirationDate",
+        "issuingCountry",
+      ],
       properties: {
         number: {
           type: "string",
@@ -363,6 +418,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         },
         birthDate: {
           type: "string",
+          format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.passport.birth-date",
             defaultMessage: "Date of birth",
@@ -377,6 +433,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         },
         nationality: {
           type: "string",
+          format: "country",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.passport.nationality",
             defaultMessage: "Nationality",
@@ -384,6 +441,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         },
         issueDate: {
           type: "string",
+          format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.passport.issue-date",
             defaultMessage: "Date of issue",
@@ -391,6 +449,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         },
         expirationDate: {
           type: "string",
+          format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.passport.expiration-date",
             defaultMessage: "Expiry date",
@@ -398,6 +457,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         },
         issuingCountry: {
           type: "string",
+          format: "country",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.passport.issuing-country",
             defaultMessage: "Issuing country",
@@ -423,6 +483,17 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
     return {
       type: "object",
       required: [
+        "periodStart",
+        "periodEnd",
+        "employeeName",
+        "employeeId",
+        "employerName",
+        "employerId",
+        "netPay",
+        "totalAccrued",
+        "totalDeduction",
+      ],
+      "@render": [
         "periodStart",
         "periodEnd",
         "employeeName",
@@ -515,7 +586,17 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         "issuedFor",
         "issuedAt",
       ],
-
+      "@render": [
+        "bankName",
+        "bankAddress",
+        "accountOwner",
+        "accountOwnerId",
+        "accountNumber",
+        "accountSwiftNumber",
+        "accountOpenedAt",
+        "issuedFor",
+        "issuedAt",
+      ],
       properties: {
         bankName: {
           type: "string",
@@ -561,6 +642,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         },
         accountOpenedAt: {
           type: "string",
+          format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.bank-certificate.account-opened-at",
             defaultMessage: "Account opened at",
@@ -575,6 +657,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         },
         issuedAt: {
           type: "string",
+          format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.bank-certificate.issued-at",
             defaultMessage: "Issued at",
