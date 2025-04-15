@@ -71,7 +71,7 @@ export function PetitionProfilesTable({
       <CardHeader
         omitDivider={profiles.length > 0}
         rightAction={
-          <Stack direction="row">
+          <Stack direction="row" className="no-print">
             <Button
               leftIcon={<AddIcon fontSize="18px" />}
               onClick={onAddProfile}

@@ -446,12 +446,12 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       onRefetch={() => refetch()}
       section="activity"
       headerActions={
-        <Box display={{ base: "none", lg: "block" }}>
+        <Box display={{ base: "none", lg: "block" }} className="no-print">
           <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
         </Box>
       }
     >
-      <Box position="sticky" top={0} zIndex={2}>
+      <Box position="sticky" top={0} zIndex={2} className="no-print">
         {displayPetitionLimitReachedAlert ? (
           <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
         ) : null}
@@ -485,7 +485,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
             next={handleLoadMore}
             hasMore={events.items.length < events.totalCount}
             loader={
-              <Center height="100px" width="100%" zIndex="1">
+              <Center height="100px" width="100%" zIndex="1" className="no-print">
                 <Spinner
                   thickness="2px"
                   speed="0.65s"

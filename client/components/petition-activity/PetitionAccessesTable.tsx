@@ -103,7 +103,7 @@ export function PetitionAccessesTable({
       <CardHeader
         omitDivider={petition.accesses.length > 0}
         rightAction={
-          <Stack direction="row">
+          <Stack direction="row" className="no-print">
             {showActions ? (
               <Menu>
                 <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>

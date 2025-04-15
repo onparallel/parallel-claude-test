@@ -151,6 +151,7 @@ export const AppLayoutNavBar = Object.assign(
     return (
       <Box
         as="nav"
+        className="no-print"
         ref={navRef}
         id="nav-bar"
         zIndex={isOpenDesktop ? 41 : 2}

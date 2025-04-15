@@ -431,6 +431,11 @@ export const PetitionHeader = Object.assign(
         gridTemplateColumns={{ base: "1fr min-content", lg: "1fr min-content 1fr" }}
         gridTemplateRows={{ base: "4rem 2.5rem", lg: "4rem" }}
         gridTemplateAreas={{ base: '"a b" "c c"', lg: '"a c b"' }}
+        sx={{
+          "@media print": {
+            gridTemplateRows: "auto auto !important",
+          },
+        }}
         {...props}
       >
         <GridItem area="a" as={Flex} flexDirection="column" justifyContent="center" minWidth={0}>
@@ -595,7 +600,7 @@ export const PetitionHeader = Object.assign(
             );
           })}
         </GridItem>
-        <GridItem area="b" as={HStack} justifyContent="flex-end">
+        <GridItem area="b" as={HStack} justifyContent="flex-end" className="no-print">
           {!isPetition ? (
             <RestrictedFeaturePopover isRestricted={!userCanCreatePetition}>
               <Button

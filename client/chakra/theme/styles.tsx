@@ -17,5 +17,16 @@ export const styles: Styles = {
       borderColor: mode("gray.200", "whiteAlpha.300")(props),
       wordWrap: "break-word",
     },
+    "@media print": {
+      ".no-print, .no-print *": {
+        display: "none !important",
+      },
+      "html, body, #__next, main, div": {
+        height: "auto !important",
+        width: "auto !important",
+        overflow: "visible !important",
+        fontSize: "12px !important",
+      },
+    },
   }),
 };

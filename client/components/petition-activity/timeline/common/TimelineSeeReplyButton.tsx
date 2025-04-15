@@ -24,7 +24,14 @@ export function TimelineSeeReplyButton({ field, replyId, ...props }: TimelineSee
             : buildUrlToSection("replies", { field: field.id })
         }
       >
-        <Button as="a" size="sm" variant="outline" background="white" {...props}>
+        <Button
+          as="a"
+          className="no-print"
+          size="sm"
+          variant="outline"
+          background="white"
+          {...props}
+        >
           <FormattedMessage id="component.timeline-see-reply-button.see" defaultMessage="See" />
         </Button>
       </NakedLink>
