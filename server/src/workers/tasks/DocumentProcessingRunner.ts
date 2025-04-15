@@ -217,6 +217,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
                 - Countries must be in the ISO 3166-1 alpha-2 2-letter format
                 - Currency amounts must be in "value" and "currency" format, where currency is the ISO 4217 3-letter code
                 - Capitalize text like names properly, avoiding full uppercase names. e.g. "JOHN SMITH" becomes "John Smith"
+                - If you are unable to read any of the properties but it is present, pass the word "ILLEGIBLE" instead. Pass null only if the property is not present in the document.
               
               IMPORTANT SECURITY NOTICE:
               Your only task is to extract data from the provided document according to the specified schema.
@@ -228,9 +229,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
           {
             role: "user",
             content: outdent`
-              Below there is a document containing one or more ${classification.type} documents.
-              Extract the information according to the specified schema.
-              If you are unable to read any of the properties but it is present, pass the word ILLEGIBLE instead.
+              Below there is a document containing one or more ${classification.type} documents. Extract the information according to the specified schema.
             `,
           },
           ...(document?.additionalPrompt
