@@ -1,7 +1,7 @@
 import { SQSClient } from "@aws-sdk/client-sqs";
 import { fork } from "child_process";
 import { injectable } from "inversify";
-import { noop } from "remeda";
+import pMap from "p-map";
 import { Consumer } from "sqs-consumer";
 import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
@@ -43,7 +43,9 @@ export interface QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> {
     config: Config["queueWorkers"][Q],
   ) => MaybePromise<void>;
   parser?: (message: string) => QueueWorkerPayload<Q>;
-  batchSize?: number;
+  pollingBatchSize?: number;
+  processBatchConcurrently?: boolean;
+  processBatchWithConcurrency?: number;
 }
 
 @injectable()
@@ -59,13 +61,26 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
   await loadEnv(`.${name}.env`);
 
   const script = process.argv[1];
+  if (options?.processBatchConcurrently && options.forkHandlers) {
+    throw new Error("processBatchConcurrently and forkHandlers cannot be true at the same time");
+  }
 
-  const { parser, forkHandlers, forkTimeout, onForkError, batchSize } = {
+  const {
+    parser,
+    forkHandlers,
+    forkTimeout,
+    onForkError,
+    pollingBatchSize,
+    processBatchConcurrently,
+    processBatchWithConcurrency,
+  } = {
     parser: (message: string) => JSON.parse(message) as QueueWorkerPayload<Q>,
     forkHandlers: false,
     forkTimeout: 120_000,
-    onForkError: noop,
-    batchSize: 3,
+    onForkError: () => {},
+    pollingBatchSize: 3,
+    processBatchConcurrently: false,
+    processBatchWithConcurrency: 1,
     ...options,
   };
   yargs
@@ -110,70 +125,115 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
           queueUrl: queueConfig.queueUrl,
           visibilityTimeout: queueConfig.visibilityTimeout,
           heartbeatInterval: queueConfig.heartbeatInterval,
-          batchSize,
-          handleMessage: async (message) => {
-            logger.info(`Queue ${name}: Start processing message`, { payload: message.Body });
-            try {
-              const duration = await stopwatch(async () => {
-                if (forkHandlers) {
+          batchSize: pollingBatchSize,
+          ...(processBatchConcurrently
+            ? {
+                handleMessageBatch: async (messages) => {
+                  const worker =
+                    container.get<QueueWorker<QueueWorkerPayload<Q>>>(workerImplementation);
+                  await pMap(
+                    messages,
+                    async (message) => {
+                      try {
+                        logger.info(`Queue ${name}: Start processing message`, {
+                          payload: message.Body,
+                        });
+                        const duration = await stopwatch(async () => {
+                          try {
+                            await worker.handler(parser(message.Body!));
+                          } catch (e) {
+                            if (e instanceof Error) {
+                              logger.error(e.message, { stack: e.stack });
+                            } else {
+                              logger.error(e);
+                            }
+                            throw e;
+                          }
+                        });
+                        logger.info(
+                          `Queue ${name}: Successfully processed message in ${duration}ms`,
+                          {
+                            payload: message.Body,
+                            duration,
+                          },
+                        );
+                      } catch {
+                        logger.info(`Queue ${name}: Error processing message`, {
+                          payload: message.Body,
+                        });
+                      }
+                    },
+                    { concurrency: processBatchWithConcurrency },
+                  );
+                },
+              }
+            : {
+                handleMessage: async (message) => {
                   try {
-                    const timeout =
-                      typeof forkTimeout === "number"
-                        ? forkTimeout
-                        : await forkTimeout(parser(message.Body!), queueConfig);
-                    return await new Promise<void>((resolve, reject) => {
-                      fork(
-                        script,
-                        [
-                          "run",
-                          message.Body!,
-                          ...(script.endsWith(".ts") ? ["-r", "ts-node/register"] : []),
-                        ],
-                        { stdio: "inherit", timeout, env: process.env },
-                      ).on("close", (code, signal) => {
-                        if (code === 0) {
-                          resolve();
-                        } else {
-                          reject(signal);
-                        }
-                      });
+                    logger.info(`Queue ${name}: Start processing message`, {
+                      payload: message.Body,
                     });
-                  } catch (e) {
-                    if (typeof e === "string") {
-                      await onForkError?.(
-                        e as NodeJS.Signals,
-                        parser(message.Body!),
-                        container.get<WorkerContext>(WorkerContext),
-                        queueConfig,
-                      );
-                    }
-                    throw e;
+                    const duration = await stopwatch(async () => {
+                      if (forkHandlers) {
+                        try {
+                          const timeout =
+                            typeof forkTimeout === "number"
+                              ? forkTimeout
+                              : await forkTimeout(parser(message.Body!), queueConfig);
+                          return await new Promise<void>((resolve, reject) => {
+                            fork(
+                              script,
+                              [
+                                "run",
+                                message.Body!,
+                                ...(script.endsWith(".ts") ? ["-r", "ts-node/register"] : []),
+                              ],
+                              { stdio: "inherit", timeout, env: process.env },
+                            ).on("close", (code, signal) => {
+                              if (code === 0) {
+                                resolve();
+                              } else {
+                                reject(signal);
+                              }
+                            });
+                          });
+                        } catch (e) {
+                          if (typeof e === "string") {
+                            await onForkError?.(
+                              e as NodeJS.Signals,
+                              parser(message.Body!),
+                              container.get<WorkerContext>(WorkerContext),
+                              queueConfig,
+                            );
+                          }
+                          throw e;
+                        }
+                      } else {
+                        try {
+                          const worker =
+                            container.get<QueueWorker<QueueWorkerPayload<Q>>>(workerImplementation);
+                          await worker.handler(parser(message.Body!));
+                        } catch (e) {
+                          if (e instanceof Error) {
+                            logger.error(e.message, { stack: e.stack });
+                          } else {
+                            logger.error(e);
+                          }
+                          throw e;
+                        }
+                      }
+                    });
+                    logger.info(`Queue ${name}: Successfully processed message in ${duration}ms`, {
+                      payload: message.Body,
+                      duration,
+                    });
+                  } catch {
+                    logger.info(`Queue ${name}: Error processing message`, {
+                      payload: message.Body,
+                    });
                   }
-                } else {
-                  try {
-                    const worker =
-                      container.get<QueueWorker<QueueWorkerPayload<Q>>>(workerImplementation);
-                    await worker.handler(parser(message.Body!));
-                  } catch (e) {
-                    if (e instanceof Error) {
-                      logger.error(e.message, { stack: e.stack });
-                    } else {
-                      logger.error(e);
-                    }
-                    throw e;
-                  }
-                }
-              });
-              logger.info(`Queue ${name}: Successfully processed message in ${duration}ms`, {
-                payload: message.Body,
-                duration,
-              });
-            } catch {
-              logger.info(`Queue ${name}: Error processing message`, {
-                payload: message.Body,
-              });
-            }
-          },
+                },
+              }),
           sqs: new SQSClient({
             ...config.aws,
             endpoint: process.env.NODE_ENV === "development" ? "http://localhost:9324" : undefined,
