@@ -38,7 +38,7 @@ const SUBNET_ID = {
     },
 };
 const NUM_INSTANCES = {
-    production: 2,
+    production: 3,
     staging: 1,
 };
 const ec2 = new client_ec2_1.EC2Client({});
@@ -64,14 +64,12 @@ async function main() {
         ImageIds: [IMAGE_ID],
     }))
         .then((res) => res.Images[0]);
-    (0, p_map_1.default)((0, remeda_1.range)(0, NUM_INSTANCES[env]), async (i) => {
+    const azs = (0, remeda_1.range)(0, 3).flatMap(() => Object.keys(SUBNET_ID[env]));
+    await (0, p_map_1.default)((0, remeda_1.range)(0, NUM_INSTANCES[env]), async (i) => {
         const name = `parallel-${env}-${commit}-${i + 1}`;
         const result = await (async () => {
-            const azs = (0, remeda_1.range)(0, 3)
-                .flatMap(() => Object.keys(SUBNET_ID[env]))
-                .reverse();
             while (azs.length > 0) {
-                const az = azs.pop();
+                const az = azs.shift();
                 const subnet = SUBNET_ID[env][az];
                 try {
                     console.log((0, chalk_1.default) `Launching instance in ${az}...`);

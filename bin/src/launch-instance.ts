@@ -51,7 +51,7 @@ const SUBNET_ID = {
 } as const;
 
 const NUM_INSTANCES = {
-  production: 2,
+  production: 3,
   staging: 1,
 };
 
@@ -84,16 +84,14 @@ async function main() {
     )
     .then((res) => res.Images![0]);
 
-  pMap(
+  const azs = range(0, 3).flatMap(() => Object.keys(SUBNET_ID[env]));
+  await pMap(
     range(0, NUM_INSTANCES[env]),
     async (i) => {
       const name = `parallel-${env}-${commit}-${i + 1}`;
       const result = await (async () => {
-        const azs = range(0, 3)
-          .flatMap(() => Object.keys(SUBNET_ID[env]))
-          .reverse();
         while (azs.length > 0) {
-          const az = azs.pop()!;
+          const az = azs.shift()!;
           const subnet = (SUBNET_ID as any)[env][az];
           try {
             console.log(chalk`Launching instance in ${az}...`);
