@@ -2095,6 +2095,7 @@ export interface Profile {
   deletion_scheduled_at: Maybe<Date>; // timestamptz
   anonymized_at: Maybe<Date>; // timestamptz
   localizable_name: any; // jsonb
+  value_cache: any; // jsonb
 }
 
 export type CreateProfile = PartialProps<
@@ -2111,6 +2112,7 @@ export type CreateProfile = PartialProps<
   | "deletion_scheduled_at"
   | "anonymized_at"
   | "localizable_name"
+  | "value_cache"
 >;
 
 export interface ProfileEvent {

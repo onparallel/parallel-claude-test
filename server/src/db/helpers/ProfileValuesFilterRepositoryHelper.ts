@@ -45,17 +45,30 @@ export class ProfileValuesFilterRepositoryHelper {
     assert(profileTypeField, `Profile type field ${profileTypeFieldId} not found`);
     if (isNullish(joins[profileTypeFieldId])) {
       const alias = (joins[profileTypeFieldId] = `pfv${profileTypeField.id}`);
-      const table = profileTypeField.type === "FILE" ? "profile_field_file" : "profile_field_value";
-      q.joinRaw(
-        /* sql */ `
-          left join ${table} ${alias} 
-            on ${alias}.profile_id = p.id
-            and ${alias}.profile_type_field_id = ?
-            and ${alias}.deleted_at is null 
-            and ${alias}.removed_at is null
+      if (profileTypeField.type === "FILE") {
+        q.joinRaw(
+          /* sql */ `
+            left join profile_field_file ${alias} 
+              on ${alias}.profile_id = p.id
+              and ${alias}.profile_type_field_id = ?
+              and ${alias}.deleted_at is null 
+              and ${alias}.removed_at is null
+            `,
+          [profileTypeFieldId],
+        );
+      } else {
+        q.joinRaw(
+          /* sql */ `
+          left join profile_field_value ${alias}
+            on not jsonb_exists(p.value_cache, ?)
+              and ${alias}.profile_id = p.id
+              and ${alias}.profile_type_field_id = ?
+              and ${alias}.deleted_at is null 
+              and ${alias}.removed_at is null
           `,
-        [profileTypeFieldId],
-      );
+          [profileTypeFieldId, profileTypeFieldId],
+        );
+      }
     }
   }
 
@@ -92,11 +105,36 @@ export class ProfileValuesFilterRepositoryHelper {
           `Invalid operator ${filter.operator} for type ${profileTypeField.type}`,
         );
       };
-      const content =
-        profileTypeField.type === "FILE"
-          ? this.knex.raw(`??.id`, [joins[filter.profileTypeFieldId]])
-          : this.knex.raw(`??.content`, [joins[filter.profileTypeFieldId]]);
-      const expiryDate = this.knex.raw(`??.expiry_date`, [joins[filter.profileTypeFieldId]]);
+      let content: Knex.Raw;
+      if (profileTypeField.type === "FILE") {
+        content = this.knex.raw(`??.id`, [joins[filter.profileTypeFieldId]]);
+      } else {
+        if (
+          ["SHORT_TEXT", "SELECT", "CHECKBOX", "DATE", "PHONE", "NUMBER"].includes(
+            profileTypeField.type,
+          )
+        ) {
+          content = this.knex.raw(`coalesce(p.value_cache->?->'content', ??.content)`, [
+            filter.profileTypeFieldId,
+            joins[filter.profileTypeFieldId],
+          ]);
+        } else {
+          content = this.knex.raw(`??.content`, [joins[filter.profileTypeFieldId]]);
+        }
+      }
+      let expiryDate: Knex.Raw;
+      if (
+        ["SHORT_TEXT", "SELECT", "CHECKBOX", "DATE", "PHONE", "NUMBER"].includes(
+          profileTypeField.type,
+        )
+      ) {
+        expiryDate = this.knex.raw(
+          `coalesce((p.value_cache->?->>'expiry_date')::date, ??.expiry_date)`,
+          [filter.profileTypeFieldId, joins[filter.profileTypeFieldId]],
+        );
+      } else {
+        expiryDate = this.knex.raw(`??.expiry_date`, [joins[filter.profileTypeFieldId]]);
+      }
       const [negated, operator] = filter.operator.startsWith("NOT_")
         ? ([
             true,

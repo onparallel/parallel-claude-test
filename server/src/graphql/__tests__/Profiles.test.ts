@@ -1149,6 +1149,121 @@ describe("GraphQL/Profiles", () => {
         items: [{ id: contractId }, { id: expiredContractId }],
       });
     });
+
+    it("filters by HAS_EXPIRY on a cached value", async () => {
+      await updateProfileValue(harryPotterId, [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+          content: { value: "1990-01-01" },
+          expiryDate: "1990-01-01",
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileFilter) {
+            profiles(limit: 100, offset: 0, filter: $filter) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          filter: {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+            values: {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+              operator: "HAS_EXPIRY",
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 1,
+        items: [{ id: harryPotterId }],
+      });
+    });
+
+    it("filters by NOT_HAS_EXPIRY on a cached value", async () => {
+      await updateProfileValue(harryPotterId, [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+          content: { value: "1990-01-01" },
+          expiryDate: "1990-01-01",
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileFilter) {
+            profiles(limit: 100, offset: 0, filter: $filter) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          filter: {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+            values: {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+              operator: "NOT_HAS_EXPIRY",
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 2,
+        items: [{ id: harveySpecterId }, { id: unknownPersonId }],
+      });
+    });
+
+    it("filters by GREATER_THAN on a cached DATE value", async () => {
+      await updateProfileValue(harryPotterId, [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+          content: { value: "1990-01-02" },
+          expiryDate: "1990-01-02",
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileFilter) {
+            profiles(limit: 100, offset: 0, filter: $filter) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          filter: {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+            values: {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+              operator: "GREATER_THAN",
+              value: "1990-01-01",
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 1,
+        items: [{ id: harryPotterId }],
+      });
+    });
   });
 
   describe("profile", () => {
@@ -4150,6 +4265,55 @@ describe("GraphQL/Profiles", () => {
       });
     });
 
+    it("updates value_cache in profiles where DATE field is_expirable is updated", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+          content: { value: "1990-10-10" },
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+              force: true
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+          data: { isExpirable: false },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileTypeField).toEqual({
+        id: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+      });
+
+      const [dbProfile] = await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(profile.id).id)
+        .select("*");
+
+      expect(dbProfile?.value_cache).toEqual({
+        [profileType0Fields[2].id]: {
+          content: { value: "1990-10-10" },
+        },
+      });
+    });
+
     it("removes values expiry date when disabling caducity of profile field type", async () => {
       const profile = await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
         {
@@ -5398,6 +5562,255 @@ describe("GraphQL/Profiles", () => {
         },
       ]);
     });
+
+    it("updates value_cache in profiles where CHECKBOX field options are updated", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[3].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+          content: { value: ["A", "B"] },
+        },
+      ]);
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeFieldId: GID!
+            $profileTypeId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeFieldId: $profileTypeFieldId
+              profileTypeId: $profileTypeId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+          profileTypeId: toGlobalId("ProfileType", profileTypes[3].id),
+          data: {
+            options: {
+              values: [
+                { value: "AA", label: { es: "A", en: "A" } },
+                { value: "BB", label: { es: "B", en: "B" } },
+                { value: "C", label: { es: "C", en: "C" } },
+              ],
+            },
+            substitutions: [
+              { old: "A", new: "AA" },
+              { old: "B", new: "BB" },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileTypeField).toEqual({
+        id: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+      });
+
+      const [updatedProfile] = await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(profile.id).id)
+        .select("*");
+      expect(updatedProfile.value_cache).toEqual({
+        [profileType3Fields[4].id]: { content: { value: ["AA", "BB"] } },
+      });
+    });
+
+    it("updates value_cache in profiles where CHECKBOX field options are removed", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[3].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+          content: { value: ["A", "B"] },
+        },
+      ]);
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeFieldId: GID!
+            $profileTypeId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeFieldId: $profileTypeFieldId
+              profileTypeId: $profileTypeId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+          profileTypeId: toGlobalId("ProfileType", profileTypes[3].id),
+          data: {
+            options: {
+              values: [
+                { value: "AA", label: { es: "A", en: "A" } },
+                { value: "C", label: { es: "C", en: "C" } },
+              ],
+            },
+            substitutions: [
+              { old: "A", new: "AA" },
+              { old: "B", new: null },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileTypeField).toEqual({
+        id: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+      });
+
+      const [updatedProfile] = await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(profile.id).id)
+        .select("*");
+      expect(updatedProfile.value_cache).toEqual({
+        [profileType3Fields[4].id]: { content: { value: ["AA"] } },
+      });
+    });
+
+    it("updates value_cache in profiles where SELECT field options are updated", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          content: { value: "Harvey" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+          content: { value: "Specter" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+          content: { value: "high" },
+        },
+      ]);
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeFieldId: GID!
+            $profileTypeId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeFieldId: $profileTypeFieldId
+              profileTypeId: $profileTypeId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          data: {
+            options: {
+              values: [
+                { value: "low", label: { es: "Bajo", en: "Low" } },
+                { value: "medium", label: { es: "Medio", en: "Medium" } },
+                { value: "very-high", label: { es: "Muy alto", en: "Very high" } },
+              ],
+            },
+            substitutions: [{ old: "high", new: "very-high" }],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileTypeField).toEqual({
+        id: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+      });
+
+      const [updatedProfile] = await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(profile.id).id)
+        .select("*");
+      expect(updatedProfile.value_cache).toEqual({
+        [profileType0Fields[0].id]: {
+          content: { value: "Harvey" },
+        },
+        [profileType0Fields[1].id]: {
+          content: { value: "Specter" },
+        },
+        [profileType0Fields[6].id]: {
+          content: { value: "very-high" },
+        },
+      });
+    });
+
+    it("removes value_cache in profiles where SELECT field options are removed", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          content: { value: "Harvey" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+          content: { value: "Specter" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+          content: { value: "high" },
+        },
+      ]);
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeFieldId: GID!
+            $profileTypeId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeFieldId: $profileTypeFieldId
+              profileTypeId: $profileTypeId
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          data: {
+            options: {
+              values: [
+                { value: "low", label: { es: "Bajo", en: "Low" } },
+                { value: "medium", label: { es: "Medio", en: "Medium" } },
+              ],
+            },
+            substitutions: [{ old: "high", new: null }],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileTypeField).toEqual({
+        id: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+      });
+
+      const [updatedProfile] = await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(profile.id).id)
+        .select("*");
+      expect(updatedProfile.value_cache).toEqual({
+        [profileType0Fields[0].id]: {
+          content: { value: "Harvey" },
+        },
+        [profileType0Fields[1].id]: {
+          content: { value: "Specter" },
+        },
+      });
+    });
   });
 
   describe("updateProfileTypeFieldPositions", () => {
@@ -5652,6 +6065,65 @@ describe("GraphQL/Profiles", () => {
 
       expect(errors).toContainGraphQLError("FIELD_USED_IN_BACKGROUND_CHECK_MONITORING_RULE");
       expect(data).toBeNull();
+    });
+
+    it("updates cache in profile when deleting a profile type field", async () => {
+      await mocks.knex
+        .from("profile_type")
+        .where("id", profileTypes[0].id)
+        .update({
+          profile_name_pattern: json([profileType0Fields[0].id, " ", profileType0Fields[1].id]),
+        });
+
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          content: { value: "Harvey" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+          content: { value: "Specter" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+          content: { value: "high" },
+        },
+      ]);
+
+      const profileId = fromGlobalId(profile.id).id;
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $profileTypeFieldIds: [GID!]!) {
+            deleteProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldIds: $profileTypeFieldIds
+              force: true
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[6].id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deleteProfileTypeField).toEqual({
+        id: toGlobalId("ProfileType", profileTypes[0].id),
+      });
+
+      const [updatedProfile] = await mocks.knex.from("profile").where("id", profileId).select("*");
+      expect(updatedProfile.value_cache).toEqual({
+        [profileType0Fields[0].id]: {
+          content: { value: "Harvey" },
+        },
+        [profileType0Fields[1].id]: {
+          content: { value: "Specter" },
+        },
+      });
     });
   });
 
@@ -6651,6 +7123,84 @@ describe("GraphQL/Profiles", () => {
 
       expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
       expect(data).toBeNull();
+    });
+
+    it("updates cache in profile when updating values and expiry dates", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          content: { value: "Harvey" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+          content: { value: "2023-08-19" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+          content: { value: "medium" },
+        },
+      ]);
+
+      const { errors } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+              content: { value: "Mike" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+              content: { value: "Ross" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+              content: { value: "1990-10-10" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[3].id),
+              content: { value: "+34611611611" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+              content: { value: "high" },
+            },
+          ],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const [dbProfile] = await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(profile.id).id)
+        .select("*");
+
+      expect(dbProfile?.value_cache).toEqual({
+        [profileType0Fields[0].id]: {
+          content: { value: "Mike" },
+        },
+        [profileType0Fields[1].id]: {
+          content: { value: "Ross" },
+        },
+        [profileType0Fields[2].id]: {
+          content: { value: "1990-10-10" },
+          expiry_date: "1990-10-10",
+        },
+        [profileType0Fields[3].id]: {
+          content: { value: "+34611611611" },
+        },
+        [profileType0Fields[6].id]: {
+          content: { value: "high" },
+        },
+      });
     });
   });
 

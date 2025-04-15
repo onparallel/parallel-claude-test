@@ -31,6 +31,7 @@ import {
   FileUpload,
   Profile,
   ProfileFieldFile,
+  ProfileFieldValue,
   ProfileTypeField,
   ProfileTypeProcess,
 } from "../../db/__types";
@@ -546,51 +547,13 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
           }
         }
         if (isNonNullish(args.data.substitutions) && args.data.substitutions.length > 0) {
-          const { currentValues, previousValues } =
-            await ctx.profiles.updateProfileFieldValueContentByProfileTypeFieldId(
-              profileTypeField.id,
-              profileTypeField.type,
-              args.data.substitutions,
-              ctx.user!.id,
-            );
-
-          const previousByProfileId = groupBy(previousValues, (v) => v.profile_id);
-          for (const [_profileId, previous] of Object.entries(previousByProfileId)) {
-            const profileId = parseInt(_profileId);
-            await ctx.profiles.createProfileUpdatedEvents(
-              profileId,
-              previous.map((f) => {
-                const current = currentValues.find(
-                  (v) =>
-                    v.profile_id === profileId &&
-                    v.profile_type_field_id === f.profile_type_field_id,
-                );
-                const previous = previousValues.find(
-                  (v) =>
-                    v.profile_id === profileId &&
-                    v.profile_type_field_id === f.profile_type_field_id,
-                );
-
-                return {
-                  org_id: ctx.user!.org_id,
-                  profile_id: f.profile_id,
-                  type: "PROFILE_FIELD_VALUE_UPDATED",
-                  data: {
-                    user_id: ctx.user!.id,
-                    profile_type_field_id: f.profile_type_field_id,
-                    current_profile_field_value_id: current?.id ?? null,
-                    previous_profile_field_value_id: previous?.id ?? null,
-                    alias:
-                      updateData.alias !== undefined
-                        ? updateData.alias
-                        : (profileTypeField.alias ?? null),
-                  },
-                };
-              }),
-              ctx.user!.org_id,
-              ctx.user!.id,
-            );
-          }
+          await ctx.profiles.updateProfileFieldValueContentByProfileTypeFieldId(
+            profileTypeField.id,
+            profileTypeField.type,
+            args.data.substitutions,
+            ctx.user!.id,
+            ctx.user!.org_id,
+          );
         }
       }
 
@@ -632,16 +595,21 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
               );
             }
             // if removing caducity, remove expiry dates from all profile replies
-            const pfvs = await ctx.profiles.removeProfileFieldValuesExpiryDateByProfileTypeFieldId(
-              args.profileTypeFieldId,
-              t,
-            );
-            const pffs = await ctx.profiles.removeProfileFieldFilesExpiryDateByProfileTypeFieldId(
-              args.profileTypeFieldId,
-              t,
-            );
+            const pfvfs =
+              profileTypeField.type === "FILE"
+                ? await ctx.profiles.removeProfileFieldFilesExpiryDateByProfileTypeFieldId(
+                    args.profileTypeFieldId,
+                    t,
+                  )
+                : await ctx.profiles.removeProfileFieldValuesExpiryDateByProfileTypeFieldId(
+                    args.profileTypeFieldId,
+                    t,
+                  );
 
-            const byProfileId = groupBy([...pfvs, ...pffs], (v) => v.profile_id);
+            const byProfileId = groupBy(
+              pfvfs as (ProfileFieldValue | ProfileFieldFile)[],
+              (v) => v.profile_id,
+            );
             for (const [profileId, values] of Object.entries(byProfileId)) {
               await ctx.profiles.createProfileUpdatedEvents(
                 parseInt(profileId),

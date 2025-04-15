@@ -7,6 +7,7 @@ import {
   Organization,
   Profile,
   ProfileStatus,
+  ProfileType,
   ProfileTypeField,
   ProfileTypeFieldType,
   User,
@@ -306,6 +307,109 @@ describe("repositories/ProfileRepository", () => {
         ]),
         [user3.id]: [{ profileId: profiles[1].id, profileTypeFieldId: fieldDefaultRead.id }],
       });
+    });
+  });
+
+  describe("anonymizeProfile", () => {
+    let profileType: ProfileType;
+    let fields: ProfileTypeField[];
+
+    beforeAll(async () => {
+      [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+      fields = await mocks.createRandomProfileTypeFields(
+        organization.id,
+        profileType.id,
+        3,
+        (i) =>
+          [
+            {
+              type: "SHORT_TEXT" as const,
+            },
+            {
+              type: "DATE" as const,
+              is_expirable: true,
+              options: JSON.stringify({
+                useReplyAsExpiryDate: true,
+              }),
+            },
+            {
+              type: "SELECT" as const,
+              options: JSON.stringify({
+                values: [
+                  { value: "HIGH", label: { en: "high" } },
+                  { value: "MEDIUM", label: { en: "medium" } },
+                  { value: "LOW", label: { en: "low" } },
+                ],
+              }),
+            },
+          ][i],
+      );
+    });
+
+    it("anonymizes entire profile with its values and clears cache", async () => {
+      const [profile] = await repo.createProfiles(
+        {
+          org_id: organization.id,
+          profile_type_id: profileType.id,
+          status: "OPEN",
+        },
+        user.id,
+      );
+
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[0].id,
+            type: "SHORT_TEXT",
+            content: { value: "test" },
+          },
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[1].id,
+            type: "DATE",
+            content: { value: "2024-10-10" },
+            expiryDate: "2024-10-10",
+          },
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[2].id,
+            type: "SELECT",
+            content: { value: "HIGH" },
+          },
+        ],
+        user.id,
+        organization.id,
+      );
+
+      const [profileBefore] = await mocks.knex.from("profile").where("id", profile.id).select("*");
+      expect(profileBefore).toMatchObject({
+        anonymized_at: null,
+        value_cache: {
+          [fields[0].id]: { content: { value: "test" } },
+          [fields[1].id]: { content: { value: "2024-10-10" }, expiry_date: "2024-10-10" },
+          [fields[2].id]: { content: { value: "HIGH" } },
+        },
+      });
+
+      await repo.deleteProfile([profile.id], `User:${user.id}`);
+      await repo.anonymizeProfile([profile.id]);
+
+      const [profileAfter] = await mocks.knex.from("profile").where("id", profile.id).select("*");
+      expect(profileAfter).toMatchObject({
+        deleted_at: expect.any(Date),
+        anonymized_at: expect.any(Date),
+        value_cache: {},
+      });
+
+      const valuesAfter = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_id", profile.id)
+        .select("*");
+
+      expect(valuesAfter.every((v) => v.anonymized_at !== null && v.content.value === null)).toBe(
+        true,
+      );
     });
   });
 });

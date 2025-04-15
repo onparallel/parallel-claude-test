@@ -5,7 +5,6 @@ import {
   filter,
   groupBy,
   indexBy,
-  isNonNull,
   isNonNullish,
   isNullish,
   map,
@@ -27,6 +26,7 @@ import {
 } from "../../services/ProfileTypeFieldService";
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { keyBuilder } from "../../util/keyBuilder";
+import { never } from "../../util/never";
 import { ProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { LazyPromise } from "../../util/promises/LazyPromise";
@@ -482,39 +482,69 @@ export class ProfileRepository extends BaseRepository {
     if (Array.isArray(profileTypeFieldIds) && profileTypeFieldIds.length === 0) {
       return;
     }
-    await this.withTransaction(async (t) => {
-      await this.from("profile_type_field", t)
-        .whereIn("id", unMaybeArray(profileTypeFieldIds))
-        .whereNull("deleted_at")
-        .update({ deleted_at: this.now(), deleted_by: deletedBy });
-      await Promise.all([
-        this.raw(
-          /* sql */ `
-            with new_positions as (
-              select id, rank() over (order by position asc) - 1 as position
-              from profile_type_field
-              where profile_type_id = ? and deleted_at is null
-            )
-            update profile_type_field as ptf set
-              position = np.position,
-              updated_at = NOW(),
-              updated_by = ?
-            from new_positions np
-            where np.id = ptf.id and np.position != ptf.position
-          `,
-          [profileTypeId, deletedBy],
-          t,
+
+    await this.raw(
+      /* sql */ `
+      with deleted_profile_type_field_ids as (
+        select * from (?) as t(profile_type_field_id)
+      ),
+      deleted_profile_type_fields as (
+        update profile_type_field as ptf set
+          deleted_at = NOW(),
+          deleted_by = ?
+        from deleted_profile_type_field_ids dptfi
+        where ptf.id = dptfi.profile_type_field_id
+        and ptf.deleted_at is null
+        returning *
+      ),
+      new_positions as (
+        select id, rank() over (order by position asc) - 1 as position
+        from profile_type_field
+        where profile_type_id = ? and deleted_at is null and id not in (select id from deleted_profile_type_fields)
+      ),
+      update_positions as (
+        update profile_type_field ptf set
+          position = np.position,
+          updated_at = NOW(),
+          updated_by = ?
+        from new_positions np
+        where np.id = ptf.id and np.position != ptf.position
+      ),
+      deleted_profile_field_values as (
+        update profile_field_value pfv set
+          deleted_at = NOW(),
+          deleted_by = ?
+        from deleted_profile_type_fields dptf
+        where pfv.profile_type_field_id = dptf.id
+      ),
+      deleted_profile_field_files as (
+        update profile_field_file pff set
+          deleted_at = NOW(),
+          deleted_by = ?
+        from deleted_profile_type_fields dptf
+        where pff.profile_type_field_id = dptf.id
+      ),
+      update_profile_value_cache as (
+        update profile p set
+          value_cache = value_cache - (select array_agg(id::text) from deleted_profile_type_fields dptf)
+        where p.profile_type_id = ?
+        and p.deleted_at is null
+      )
+      select 1
+    `,
+      [
+        this.sqlValues(
+          unMaybeArray(profileTypeFieldIds).map((id) => [id]),
+          ["int"],
         ),
-        this.from("profile_field_value")
-          .whereNull("deleted_at")
-          .whereIn("profile_type_field_id", unMaybeArray(profileTypeFieldIds))
-          .update({ deleted_at: this.now(), deleted_by: deletedBy }),
-        this.from("profile_field_file")
-          .whereNull("deleted_at")
-          .whereIn("profile_type_field_id", unMaybeArray(profileTypeFieldIds))
-          .update({ deleted_at: this.now(), deleted_by: deletedBy }),
-      ]);
-    });
+        deletedBy,
+        profileTypeId,
+        deletedBy,
+        deletedBy,
+        deletedBy,
+        profileTypeId,
+      ],
+    );
     this.loadProfileTypeFieldsByProfileTypeId.dataloader.clear(profileTypeId);
   }
 
@@ -1040,6 +1070,7 @@ export class ProfileRepository extends BaseRepository {
     userId: number | null,
     orgId: number,
     externalSourceIntegrationId?: number,
+    t?: Knex.Transaction,
   ) {
     //ignore fields that have no content and no expiry date
     const _fields = fields.filter((f) => f.content !== undefined || f.expiryDate !== undefined);
@@ -1186,6 +1217,33 @@ export class ProfileRepository extends BaseRepository {
                 select distinct profile_id, removed_by_user_id as user_id from removed_previous_values
               ) t
             returning *
+          ),
+          update_value_cache as (
+            update profile p
+              set value_cache = (value_cache - t.removed_profile_type_field_ids) || t.values
+            from (
+              select 
+                nv.profile_id,
+                coalesce(
+                  jsonb_object_agg(
+                    nv.profile_type_field_id,
+                    case
+                    when wnpv.id is not null then
+                    jsonb_build_object('content', wnpv.content) || case when wnpv.expiry_date is not null then jsonb_build_object('expiry_date', wnpv.expiry_date) else '{}'::jsonb end
+                  when wpv.id is not null then
+                    jsonb_build_object('content', wpv.content) || case when wpv.expiry_date is not null then jsonb_build_object('expiry_date', wpv.expiry_date) else '{}'::jsonb end
+                  else
+                    'null'::jsonb
+                  end
+                ) filter (where nv.content is not null), '{}'::jsonb) as values,
+                coalesce(array_agg(nv.profile_type_field_id::text) filter (where nv.content is null), array[]::text[]) as removed_profile_type_field_ids
+              from new_values nv
+              left join with_no_previous_values wnpv on wnpv.profile_id = nv.profile_id and wnpv.profile_type_field_id = nv.profile_type_field_id
+              left join with_previous_values wpv on wpv.profile_id = nv.profile_id and wpv.profile_type_field_id = nv.profile_type_field_id
+              where nv.type in ('SHORT_TEXT', 'SELECT', 'CHECKBOX', 'DATE', 'PHONE', 'NUMBER')
+              group by nv.profile_id
+            ) t
+            where p.id = t.profile_id
           )
           select * from events
           union all
@@ -1257,7 +1315,7 @@ export class ProfileRepository extends BaseRepository {
       );
 
       await this.updateProfileNamesWithPattern(profileValues, `User:${userId}`, t);
-    });
+    }, t);
   }
 
   async profileFieldRepliesHaveExpiryDateSet(
@@ -1284,12 +1342,25 @@ export class ProfileRepository extends BaseRepository {
     profileTypeFieldId: number,
     t?: Knex.Transaction,
   ) {
-    return await this.from("profile_field_value", t)
-      .where("profile_type_field_id", profileTypeFieldId)
-      .whereNull("deleted_at")
-      .whereNull("removed_at")
-      .whereNotNull("expiry_date")
-      .update({ expiry_date: null }, "*");
+    return await this.raw<ProfileFieldValue>(
+      /* sql */ `
+        with updated_profile_field_values as (
+          update profile_field_value pfv set
+            expiry_date = null
+          where pfv.profile_type_field_id = ? and pfv.removed_at is null and pfv.deleted_at is null and pfv.expiry_date is not null
+          returning *
+        ),
+        update_profile_value_cache as (
+          update profile p set
+            value_cache = value_cache #- array[?, 'expiry_date']
+          where p.id in (select distinct profile_id from updated_profile_field_values)
+          and p.deleted_at is null
+        )
+        select * from updated_profile_field_values
+      `,
+      [profileTypeFieldId, profileTypeFieldId],
+      t,
+    );
   }
 
   async removeProfileFieldFilesExpiryDateByProfileTypeFieldId(
@@ -2049,7 +2120,10 @@ export class ProfileRepository extends BaseRepository {
       .whereIn("id", profileIds)
       .whereNotNull("deleted_at")
       .whereNull("anonymized_at")
-      .update({ anonymized_at: this.now() })
+      .update({
+        value_cache: this.json({}),
+        anonymized_at: this.now(),
+      })
       .returning(["id", "org_id"]);
 
     const [values, files] = await Promise.all([
@@ -2099,22 +2173,49 @@ export class ProfileRepository extends BaseRepository {
       await pMapChunk(
         ids,
         async (idsChunk) => {
-          await this.from("profile_field_value", t)
-            .whereIn("id", idsChunk)
-            .whereNull("anonymized_at")
-            .update({
-              anonymized_at: this.now(),
-              content: this.knex.raw(/* sql */ `
-                case "type"
+          await this.raw(
+            /* sql */ `
+              with profile_field_value_ids as (
+                select profile_field_value_id from (?) as t(profile_field_value_id)
+              ),
+              profiles_with_value_ids as (
+                select pfv.profile_id, array_agg(pfv.id::text) as profile_field_value_ids
+                from profile_field_value pfv
+                join profile_field_value_ids pfv_ids on pfv.id = pfv_ids.profile_field_value_id
+                where pfv.anonymized_at is null
+                group by pfv.profile_id
+              ),
+              updated_profile as (
+                update profile p
+                set 
+                  anonymized_at = now(),
+                  value_cache = value_cache - pfv_ids.profile_field_value_ids
+                from profiles_with_value_ids pfv_ids
+                where pfv_ids.profile_id = p.id
+                returning id
+              )
+              update profile_field_value pfv
+              set 
+                anonymized_at = now(),
+                content = case "type"
                   when 'BACKGROUND_CHECK' then 
                     content || jsonb_build_object('query', null, 'search', null, 'entity', null)
                   else 
                     content || jsonb_build_object('value', null)
                   end
-              `),
-            });
+              from profile_field_value_ids pfv_ids
+              where pfv.id = pfv_ids.profile_field_value_id and pfv.anonymized_at is null
+            `,
+            [
+              this.sqlValues(
+                idsChunk.map((id) => [id]),
+                ["int"],
+              ),
+            ],
+            t,
+          );
         },
-        { chunkSize: 200, concurrency: 5 },
+        { chunkSize: 1000 },
       );
     }, t);
   }
@@ -2143,7 +2244,7 @@ export class ProfileRepository extends BaseRepository {
             t,
           );
         },
-        { chunkSize: 200, concurrency: 5 },
+        { chunkSize: 1000 },
       );
     }, t);
 
@@ -2205,69 +2306,60 @@ export class ProfileRepository extends BaseRepository {
       new?: string | null;
     }[],
     userId: number,
+    orgId: number,
   ) {
     return await this.withTransaction(async (t) => {
-      const previousValues = await this.from("profile_field_value", t)
-        .whereNull("deleted_at")
-        .whereNull("removed_at")
-        .where("profile_type_field_id", profileTypeFieldId)
-        .mmodify((q) => {
-          if (type === "CHECKBOX") {
-            q.whereRaw(
-              /* sql */ `exists (
-              select 1
-              from jsonb_array_elements_text("content"->'value') as elem
-              where elem in ?
-            )`,
-              [this.sqlIn(data.map((d) => d.old))],
-            );
-          } else {
-            q.whereRaw(/* sql */ `content->>'value' in ?`, [this.sqlIn(data.map((d) => d.old))]);
+      const values = await this.raw<ProfileFieldValue>(
+        /* sql */ `
+        select * from profile_field_value
+        where profile_type_field_id = ?
+        and ?
+        and removed_at is null
+        and deleted_at is null
+      `,
+        [
+          profileTypeFieldId,
+          type === "SELECT"
+            ? this.knex.raw(/* sql */ `content->>'value' in ?`, [
+                this.sqlIn(data.map((d) => d.old)),
+              ])
+            : type === "CHECKBOX"
+              ? this.knex.raw(/* sql */ `jsonb_exists_any(content->'value', ?)`, [
+                  this.sqlArray(data.map((d) => d.old)),
+                ])
+              : never(),
+        ],
+        t,
+      );
+      const updates = values.map((v) => {
+        let value;
+        if (type === "SELECT") {
+          const substitution = data.find((d) => d.old === v.content.value);
+          value = substitution!.new ?? null;
+        } else if (type === "CHECKBOX") {
+          value = [];
+          for (const option of v.content.value) {
+            const substitution = data.find((d) => d.old === option);
+            if (isNonNullish(substitution)) {
+              if (isNonNullish(substitution.new)) {
+                value.push(substitution.new);
+              }
+            } else {
+              value.push(option);
+            }
           }
-        })
-
-        .update({ removed_at: this.now(), removed_by_user_id: userId })
-        .returning("*");
-
-      const fieldsWithContent =
-        type === "CHECKBOX"
-          ? previousValues
-              .map((f) => ({
-                ...f,
-                content: {
-                  value: (f.content.value as string[])
-                    .map((value) => {
-                      const found = data.find((d) => d.old === value);
-                      return found ? found.new : value;
-                    })
-                    .filter(isNonNull),
-                },
-              }))
-              .filter((f) => f.content.value.length > 0)
-          : previousValues
-              .filter((f) => data.find((d) => d.old === f.content.value && isNonNullish(d.new)))
-              .map((f) => ({
-                ...f,
-                content: { value: data.find((d) => d.old === f.content.value)!.new },
-              }));
-
-      let currentValues: ProfileFieldValue[] = [];
-      if (fieldsWithContent.length) {
-        currentValues = await this.insert(
-          "profile_field_value",
-          fieldsWithContent.map((f) => ({
-            profile_id: f.profile_id,
-            profile_type_field_id: f.profile_type_field_id,
-            type: f.type,
-            content: this.json(f.content),
-            created_by_user_id: userId,
-            expiry_date: f.expiry_date,
-          })),
-          t,
-        );
-      }
-
-      return { currentValues, previousValues };
+          if (value.length === 0) {
+            value = null;
+          }
+        }
+        return {
+          profileId: v.profile_id,
+          profileTypeFieldId,
+          type,
+          content: isNonNullish(value) ? { value } : null,
+        };
+      });
+      await this.updateProfileFieldValues(updates, userId, orgId, undefined, t);
     });
   }
 
