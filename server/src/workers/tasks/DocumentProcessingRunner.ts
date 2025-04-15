@@ -125,9 +125,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         metadata: {
           inferred_type: classification.type,
           inferred_data: JSON.parse(extractedDataLog.completion),
-          inferred_data_schema: inferredDataSchema
-            ? { type: "array", items: inferredDataSchema }
-            : null,
+          inferred_data_schema: inferredDataSchema,
         },
       },
       this.ctx.config.instanceName,
@@ -250,10 +248,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         ],
         responseFormat: {
           type: "json",
-          schema: {
-            type: "array",
-            items: schema,
-          },
+          schema,
         },
       },
       this.ctx.config.instanceName,
@@ -264,7 +259,10 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
     return {
       ID_CARD: await this.idCardSchema(),
       PASSPORT: await this.passportSchema(),
-      PAYSLIP: await this.payslipSchema(),
+      PAYSLIP: {
+        type: "array",
+        items: await this.payslipSchema(),
+      },
       BANK_CERTIFICATE: await this.bankCertificateSchema(),
       ILLEGIBLE: null,
       OTHER: null,
