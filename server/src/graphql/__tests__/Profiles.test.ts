@@ -451,24 +451,25 @@ describe("GraphQL/Profiles", () => {
           content: { value: "Potter" },
         },
       ]);
-      await mocks.knex.from("profile_field_value").insert({
-        created_by_user_id: sessionUser.id,
-        profile_id: fromGlobalId(harryPotter.id).id,
-        type: "BACKGROUND_CHECK",
-        profile_type_field_id: profileType0Fields[8].id,
-        content: JSON.stringify({
-          query: {
-            name: "Harry Potter",
-            date: null,
-            type: "PERSON",
-          },
-          search: {
-            totalCount: 1,
-            createdAt: new Date(),
-          },
-          entity: null,
-        }),
-      });
+      await mocks.createProfileFieldValues(fromGlobalId(harryPotter.id).id, [
+        {
+          created_by_user_id: sessionUser.id,
+          type: "BACKGROUND_CHECK",
+          profile_type_field_id: profileType0Fields[8].id,
+          content: JSON.stringify({
+            query: {
+              name: "Harry Potter",
+              date: null,
+              type: "PERSON",
+            },
+            search: {
+              totalCount: 1,
+              createdAt: new Date(),
+            },
+            entity: null,
+          }),
+        },
+      ]);
 
       const harveySpecter = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
         {
@@ -480,52 +481,55 @@ describe("GraphQL/Profiles", () => {
           content: { value: "Specter" },
         },
       ]);
-      await mocks.knex.from("profile_field_value").insert({
-        created_by_user_id: sessionUser.id,
-        profile_id: fromGlobalId(harveySpecter.id).id,
-        type: "BACKGROUND_CHECK",
-        profile_type_field_id: profileType0Fields[8].id,
-        content: JSON.stringify({
-          query: {
-            name: "Harvey Specter",
-            date: null,
-            type: "PERSON",
-          },
-          search: {
-            totalCount: 2,
-            createdAt: new Date(),
-          },
-          entity: {
-            id: "1",
-            type: "PERSON",
-            name: "Harvey Specter",
-            createdAt: new Date(),
-            properties: {
-              topics: ["role.lawyer", "poi"],
+
+      await mocks.createProfileFieldValues(fromGlobalId(harveySpecter.id).id, [
+        {
+          created_by_user_id: sessionUser.id,
+          type: "BACKGROUND_CHECK",
+          profile_type_field_id: profileType0Fields[8].id,
+          content: JSON.stringify({
+            query: {
+              name: "Harvey Specter",
+              date: null,
+              type: "PERSON",
             },
-          },
-        }),
-      });
+            search: {
+              totalCount: 2,
+              createdAt: new Date(),
+            },
+            entity: {
+              id: "1",
+              type: "PERSON",
+              name: "Harvey Specter",
+              createdAt: new Date(),
+              properties: {
+                topics: ["role.lawyer", "poi"],
+              },
+            },
+          }),
+        },
+      ]);
 
       const unknownPerson = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
-      await mocks.knex.from("profile_field_value").insert({
-        created_by_user_id: sessionUser.id,
-        profile_id: fromGlobalId(unknownPerson.id).id,
-        type: "BACKGROUND_CHECK",
-        profile_type_field_id: profileType0Fields[8].id,
-        content: JSON.stringify({
-          query: {
-            name: "N/A",
-            date: null,
-            type: "PERSON",
-          },
-          search: {
-            items: [],
-            totalCount: 0,
-          },
-          entity: null,
-        }),
-      });
+      await mocks.createProfileFieldValues(fromGlobalId(unknownPerson.id).id, [
+        {
+          created_by_user_id: sessionUser.id,
+          type: "BACKGROUND_CHECK",
+          profile_type_field_id: profileType0Fields[8].id,
+          content: JSON.stringify({
+            query: {
+              name: "N/A",
+              date: null,
+              type: "PERSON",
+            },
+            search: {
+              items: [],
+              totalCount: 0,
+            },
+            entity: null,
+          }),
+        },
+      ]);
 
       const profileA = await createProfile(toGlobalId("ProfileType", profileTypes[3].id), [
         {
@@ -4504,13 +4508,14 @@ describe("GraphQL/Profiles", () => {
 
     it("sends profile_field_value_updated event when updating select field options with null substitutions", async () => {
       const [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[1].id, 1);
-      await mocks.knex.from("profile_field_value").insert({
-        profile_id: profile.id,
-        profile_type_field_id: profileTypeField3.id,
-        content: { value: "ES" },
-        created_by_user_id: sessionUser.id,
-        type: "SELECT",
-      });
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeField3.id,
+          content: { value: "ES" },
+          created_by_user_id: sessionUser.id,
+          type: "SELECT",
+        },
+      ]);
 
       const { errors } = await testClient.execute(
         gql`
@@ -4573,13 +4578,14 @@ describe("GraphQL/Profiles", () => {
 
     it("sends profile_field_value_updated event when updating select field options with non-null substitutions", async () => {
       const [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[1].id, 1);
-      await mocks.knex.from("profile_field_value").insert({
-        profile_id: profile.id,
-        profile_type_field_id: profileTypeField3.id,
-        content: { value: "ES" },
-        created_by_user_id: sessionUser.id,
-        type: "SELECT",
-      });
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeField3.id,
+          content: { value: "ES" },
+          created_by_user_id: sessionUser.id,
+          type: "SELECT",
+        },
+      ]);
 
       const { errors } = await testClient.execute(
         gql`
@@ -5287,13 +5293,14 @@ describe("GraphQL/Profiles", () => {
 
       const profiles = await mocks.createRandomProfiles(organization.id, profileTypes[1].id, 2);
 
-      await mocks.knex.from("profile_field_value").insert({
-        content: { value: "high" },
-        created_by_user_id: sessionUser.id,
-        profile_id: profiles[1].id,
-        profile_type_field_id: selectProfileTypeField.id,
-        type: "SELECT",
-      });
+      await mocks.createProfileFieldValues(profiles[1].id, [
+        {
+          content: { value: "high" },
+          created_by_user_id: sessionUser.id,
+          profile_type_field_id: selectProfileTypeField.id,
+          type: "SELECT",
+        },
+      ]);
 
       const { errors, data } = await testClient.execute(
         gql`
@@ -5407,13 +5414,14 @@ describe("GraphQL/Profiles", () => {
 
       const profiles = await mocks.createRandomProfiles(organization.id, profileTypes[1].id, 2);
 
-      await mocks.knex.from("profile_field_value").insert({
-        content: { value: "medium" },
-        created_by_user_id: sessionUser.id,
-        profile_id: profiles[1].id,
-        profile_type_field_id: selectProfileTypeField.id,
-        type: "SELECT",
-      });
+      await mocks.createProfileFieldValues(profiles[1].id, [
+        {
+          content: { value: "medium" },
+          created_by_user_id: sessionUser.id,
+          profile_type_field_id: selectProfileTypeField.id,
+          type: "SELECT",
+        },
+      ]);
 
       const { errors, data } = await testClient.execute(
         gql`
@@ -5455,32 +5463,33 @@ describe("GraphQL/Profiles", () => {
 
     it("updates values in multiple profiles", async () => {
       const profiles = await mocks.createRandomProfiles(organization.id, profileTypes[1].id, 3);
-      const values = await mocks.knex.from("profile_field_value").insert(
-        [
-          {
-            profile_id: profiles[0].id,
-            content: { value: "ES" },
-            profile_type_field_id: profileTypeField3.id,
-            type: "SELECT",
-            created_by_user_id: sessionUser.id,
-          },
-          {
-            profile_id: profiles[1].id,
-            content: { value: "ES" },
-            profile_type_field_id: profileTypeField3.id,
-            type: "SELECT",
-            created_by_user_id: sessionUser.id,
-          },
-          {
-            profile_id: profiles[2].id,
-            content: { value: "AR" },
-            profile_type_field_id: profileTypeField3.id,
-            type: "SELECT",
-            created_by_user_id: sessionUser.id,
-          },
-        ],
-        "*",
-      );
+
+      const [p0Value] = await mocks.createProfileFieldValues(profiles[0].id, [
+        {
+          content: { value: "ES" },
+          profile_type_field_id: profileTypeField3.id,
+          type: "SELECT",
+          created_by_user_id: sessionUser.id,
+        },
+      ]);
+
+      const [p1Value] = await mocks.createProfileFieldValues(profiles[1].id, [
+        {
+          content: { value: "ES" },
+          profile_type_field_id: profileTypeField3.id,
+          type: "SELECT",
+          created_by_user_id: sessionUser.id,
+        },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[2].id, [
+        {
+          content: { value: "AR" },
+          profile_type_field_id: profileTypeField3.id,
+          type: "SELECT",
+          created_by_user_id: sessionUser.id,
+        },
+      ]);
 
       const { errors } = await testClient.execute(
         gql`
@@ -5538,7 +5547,7 @@ describe("GraphQL/Profiles", () => {
             user_id: sessionUser.id,
             profile_type_field_id: profileTypeField3.id,
             current_profile_field_value_id: expect.any(Number),
-            previous_profile_field_value_id: values[0].id,
+            previous_profile_field_value_id: p0Value.id,
             alias: null,
           },
         },
@@ -5556,7 +5565,7 @@ describe("GraphQL/Profiles", () => {
             user_id: sessionUser.id,
             profile_type_field_id: profileTypeField3.id,
             current_profile_field_value_id: expect.any(Number),
-            previous_profile_field_value_id: values[1].id,
+            previous_profile_field_value_id: p1Value.id,
             alias: null,
           },
         },
@@ -6260,13 +6269,14 @@ describe("GraphQL/Profiles", () => {
         }),
       );
 
-      await mocks.knex.from("profile_field_value").insert({
-        profile_id: profile.id,
-        type: profileType0Fields[0].type,
-        profile_type_field_id: profileType0Fields[0].id,
-        content: { value: "John" },
-        created_by_user_id: sessionUser.id,
-      });
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          type: profileType0Fields[0].type,
+          profile_type_field_id: profileType0Fields[0].id,
+          content: { value: "John" },
+          created_by_user_id: sessionUser.id,
+        },
+      ]);
 
       const { data, errors } = await testClient.execute(
         gql`
@@ -6347,14 +6357,15 @@ describe("GraphQL/Profiles", () => {
         }),
       );
 
-      await mocks.knex.from("profile_field_value").insert({
-        profile_id: profile.id,
-        type: profileType0Fields[5].type,
-        profile_type_field_id: profileType0Fields[5].id,
-        content: { value: "YB5340186" },
-        expiry_date: "2030-01-01",
-        created_by_user_id: sessionUser.id,
-      });
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          type: profileType0Fields[5].type,
+          profile_type_field_id: profileType0Fields[5].id,
+          content: { value: "YB5340186" },
+          expiry_date: "2030-01-01",
+          created_by_user_id: sessionUser.id,
+        },
+      ]);
 
       const { data, errors } = await testClient.execute(
         gql`
@@ -6438,13 +6449,14 @@ describe("GraphQL/Profiles", () => {
         }),
       );
 
-      await mocks.knex.from("profile_field_value").insert({
-        profile_id: profile.id,
-        type: profileType3Fields[4].type,
-        profile_type_field_id: profileType3Fields[4].id,
-        content: { value: ["A", "C"] },
-        created_by_user_id: sessionUser.id,
-      });
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          type: profileType3Fields[4].type,
+          profile_type_field_id: profileType3Fields[4].id,
+          content: { value: ["A", "C"] },
+          created_by_user_id: sessionUser.id,
+        },
+      ]);
 
       const { data, errors } = await testClient.execute(
         gql`

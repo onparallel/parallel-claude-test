@@ -304,128 +304,110 @@ describe("GraphQL/Profiles to Petitions", () => {
        * FILL HOMER SIMPSON PROFILE
        * ========================
        */
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(mainProfile.id, [
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_first_name"].id,
           type: "SHORT_TEXT",
           content: { value: "Homer" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_last_name"].id,
           type: "SHORT_TEXT",
           content: { value: "Simpson" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_email"].id,
           type: "SHORT_TEXT",
           content: { value: "homer@springfield.com" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_phone_number"].id,
           type: "PHONE",
           content: { value: "+34611611611" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_mobile_phone_number"].id,
           type: "PHONE",
           content: { value: "+34611611612" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_birth_date"].id,
           type: "DATE",
           content: { value: "1956-05-12" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_gender"].id,
           type: "SELECT",
           content: { value: "M" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_address"].id,
           type: "SHORT_TEXT",
           content: { value: "742 Evergreen Terrace" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_city"].id,
           type: "SHORT_TEXT",
           content: { value: "Springfield" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_zip"].id,
           type: "SHORT_TEXT",
           content: { value: "12345" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_country_of_residence"].id,
           type: "SHORT_TEXT",
           content: { value: "US" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_citizenship"].id,
           type: "SHORT_TEXT",
           content: { value: "US" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_tax_id"].id,
           type: "SHORT_TEXT",
           content: { value: "123456789" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_passport_number"].id,
           type: "SHORT_TEXT",
           content: { value: "P123456789" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_is_pep"].id,
           type: "SELECT",
           content: { value: "N" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_risk"].id,
           type: "SELECT",
           content: { value: "MEDIUM" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_source_of_funds"].id,
           type: "TEXT",
           content: { value: "Salary" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_background_check"].id,
           type: "BACKGROUND_CHECK",
           content: {
@@ -456,13 +438,13 @@ describe("GraphQL/Profiles to Petitions", () => {
           created_by_user_id: user.id,
         },
         {
-          profile_id: mainProfile.id,
           profile_type_field_id: individualIdx["p_occupation"].id,
           type: "SHORT_TEXT",
           content: { value: "Nuclear Safety Inspector" },
           created_by_user_id: user.id,
         },
       ]);
+
       const homerFiles = await mocks.createRandomFileUpload(4, (i) => ({
         filename: [
           "proof_of_address_document__homer_simpson",
@@ -511,128 +493,110 @@ describe("GraphQL/Profiles to Petitions", () => {
        * FILL MARGE BOUVIER PROFILE
        * ========================
        */
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(yourFamilyMemberProfiles[0].id, [
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_first_name"].id,
           type: "SHORT_TEXT",
           content: { value: "Marge" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_last_name"].id,
           type: "SHORT_TEXT",
           content: { value: "Bouvier" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_email"].id,
           type: "SHORT_TEXT",
           content: { value: "marge@springfield.com" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_phone_number"].id,
           type: "PHONE",
           content: { value: "+34611611613" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_mobile_phone_number"].id,
           type: "PHONE",
           content: { value: "+34611611614" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_birth_date"].id,
           type: "DATE",
           content: { value: "1956-10-12" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_gender"].id,
           type: "SELECT",
           content: { value: "F" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_address"].id,
           type: "SHORT_TEXT",
           content: { value: "742 Evergreen Terrace" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_city"].id,
           type: "SHORT_TEXT",
           content: { value: "Springfield" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_zip"].id,
           type: "SHORT_TEXT",
           content: { value: "12345" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_country_of_residence"].id,
           type: "SHORT_TEXT",
           content: { value: "US" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_citizenship"].id,
           type: "SHORT_TEXT",
           content: { value: "US" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_tax_id"].id,
           type: "SHORT_TEXT",
           content: { value: "123456780" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_passport_number"].id,
           type: "SHORT_TEXT",
           content: { value: "X123456789" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_is_pep"].id,
           type: "SELECT",
           content: { value: "N" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_risk"].id,
           type: "SELECT",
           content: { value: "LOW" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_source_of_funds"].id,
           type: "TEXT",
           content: { value: "Husband" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_background_check"].id,
           type: "BACKGROUND_CHECK",
           content: {
@@ -651,7 +615,6 @@ describe("GraphQL/Profiles to Petitions", () => {
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[0].id,
           profile_type_field_id: individualIdx["p_occupation"].id,
           type: "SHORT_TEXT",
           content: { value: "Housewife" },
@@ -708,72 +671,62 @@ describe("GraphQL/Profiles to Petitions", () => {
        * FILL BART SIMPSON PROFILE
        * ========================
        */
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(yourFamilyMemberProfiles[1].id, [
         {
-          profile_id: yourFamilyMemberProfiles[1].id,
           profile_type_field_id: individualIdx["p_first_name"].id,
           type: "SHORT_TEXT",
           content: { value: "Bart" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[1].id,
           profile_type_field_id: individualIdx["p_last_name"].id,
           type: "SHORT_TEXT",
           content: { value: "Simpson" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[1].id,
           profile_type_field_id: individualIdx["p_email"].id,
           type: "SHORT_TEXT",
           content: { value: "bart@springfield.com" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[1].id,
           profile_type_field_id: individualIdx["p_birth_date"].id,
           type: "DATE",
           content: { value: "1980-04-01" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[1].id,
           profile_type_field_id: individualIdx["p_gender"].id,
           type: "SELECT",
           content: { value: "M" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[1].id,
           profile_type_field_id: individualIdx["p_address"].id,
           type: "SHORT_TEXT",
           content: { value: "742 Evergreen Terrace" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[1].id,
           profile_type_field_id: individualIdx["p_city"].id,
           type: "SHORT_TEXT",
           content: { value: "Springfield" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[1].id,
           profile_type_field_id: individualIdx["p_zip"].id,
           type: "SHORT_TEXT",
           content: { value: "12345" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[1].id,
           profile_type_field_id: individualIdx["p_country_of_residence"].id,
           type: "SHORT_TEXT",
           content: { value: "US" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[1].id,
           profile_type_field_id: individualIdx["p_citizenship"].id,
           type: "SHORT_TEXT",
           content: { value: "US" },
@@ -798,51 +751,44 @@ describe("GraphQL/Profiles to Petitions", () => {
        * FILL LISA SIMPSON PROFILE
        * ========================
        */
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(yourFamilyMemberProfiles[2].id, [
         {
-          profile_id: yourFamilyMemberProfiles[2].id,
           profile_type_field_id: individualIdx["p_first_name"].id,
           type: "SHORT_TEXT",
           content: { value: "Lisa" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[2].id,
           profile_type_field_id: individualIdx["p_last_name"].id,
           type: "SHORT_TEXT",
           content: { value: "Simpson" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[2].id,
           profile_type_field_id: individualIdx["p_email"].id,
           type: "SHORT_TEXT",
           content: { value: "lisa@springfield.com" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[2].id,
           profile_type_field_id: individualIdx["p_birth_date"].id,
           type: "DATE",
           content: { value: "1984-05-12" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[2].id,
           profile_type_field_id: individualIdx["p_gender"].id,
           type: "SELECT",
           content: { value: "F" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[2].id,
           profile_type_field_id: individualIdx["p_address"].id,
           type: "SHORT_TEXT",
           content: { value: "742 Evergreen Terrace" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourFamilyMemberProfiles[2].id,
           profile_type_field_id: individualIdx["p_city"].id,
           type: "SHORT_TEXT",
           content: { value: "Springfield" },
@@ -867,100 +813,86 @@ describe("GraphQL/Profiles to Petitions", () => {
        * FILL MOE'S TAVERN PROFILE
        * ========================
        */
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(yourCompaniesProfiles[0].id, [
         {
-          profile_id: yourCompaniesProfiles[0].id,
           profile_type_field_id: legalEntityIdx["p_entity_name"].id,
           type: "SHORT_TEXT",
           content: { value: "Moe's Tavern" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[0].id,
           profile_type_field_id: legalEntityIdx["p_trade_name"].id,
           type: "SHORT_TEXT",
           content: { value: "Moe's Tavern INC" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[0].id,
           profile_type_field_id: legalEntityIdx["p_entity_type"].id,
           type: "SELECT",
           content: { value: "INCORPORATED" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[0].id,
           profile_type_field_id: legalEntityIdx["p_registration_number"].id,
           type: "SHORT_TEXT",
           content: { value: "12345" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[0].id,
           profile_type_field_id: legalEntityIdx["p_tax_id"].id,
           type: "SHORT_TEXT",
           content: { value: "123456789" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[0].id,
           profile_type_field_id: legalEntityIdx["p_registered_address"].id,
           type: "SHORT_TEXT",
           content: { value: "123 Main Street" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[0].id,
           profile_type_field_id: legalEntityIdx["p_phone_number"].id,
           type: "PHONE",
           content: { value: "+123456789" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[0].id,
           profile_type_field_id: legalEntityIdx["p_city"].id,
           type: "SHORT_TEXT",
           content: { value: "Springfield" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[0].id,
           profile_type_field_id: legalEntityIdx["p_zip"].id,
           type: "SHORT_TEXT",
           content: { value: "123" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[0].id,
           profile_type_field_id: legalEntityIdx["p_country"].id,
           type: "SELECT",
           content: { value: "US" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[0].id,
           profile_type_field_id: legalEntityIdx["p_country_of_incorporation"].id,
           type: "SELECT",
           content: { value: "US" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[0].id,
           profile_type_field_id: legalEntityIdx["p_date_of_incorporation"].id,
           type: "DATE",
           content: { value: "1980-01-01" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[0].id,
           profile_type_field_id: legalEntityIdx["p_main_business_activity"].id,
           type: "SHORT_TEXT",
           content: { value: "Bar" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[0].id,
           profile_type_field_id: legalEntityIdx["p_risk"].id,
           type: "SELECT",
           content: { value: "LOW" },
@@ -986,128 +918,110 @@ describe("GraphQL/Profiles to Petitions", () => {
        * FILL POWER PLANT PROFILE
        * ========================
        */
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(yourCompaniesProfiles[1].id, [
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_entity_name"].id,
           type: "SHORT_TEXT",
           content: { value: "Springfield Nuclear Power Plant" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_trade_name"].id,
           type: "SHORT_TEXT",
           content: { value: "Springfield Nuclear Power Plant LLC" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_entity_type"].id,
           type: "SELECT",
           content: { value: "LIMITED_LIABILITY_COMPANY" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_registration_number"].id,
           type: "SHORT_TEXT",
           content: { value: "123456789" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_tax_id"].id,
           type: "SHORT_TEXT",
           content: { value: "TAX123" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_registered_address"].id,
           type: "SHORT_TEXT",
           content: { value: "123 Industrial Av" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_phone_number"].id,
           type: "PHONE",
           content: { value: "+123456780" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_city"].id,
           type: "SHORT_TEXT",
           content: { value: "Springfield" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_zip"].id,
           type: "SHORT_TEXT",
           content: { value: "12345" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_country"].id,
           type: "SELECT",
           content: { value: "US" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_country_of_incorporation"].id,
           type: "SELECT",
           content: { value: "US" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_date_of_incorporation"].id,
           type: "DATE",
           content: { value: "1900-01-01" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_main_business_activity"].id,
           type: "SHORT_TEXT",
           content: { value: "Power Plant" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_risk"].id,
           type: "SELECT",
           content: { value: "HIGH" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_poa_types"].id,
           type: "SELECT",
           content: { value: "SPECIAL_POA" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_poa_scope"].id,
           type: "SHORT_TEXT",
           content: { value: "All" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_poa_effective_date"].id,
           type: "DATE",
           content: { value: "1900-01-01" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourCompaniesProfiles[1].id,
           profile_type_field_id: legalEntityIdx["p_poa_expiration_date"].id,
           type: "DATE",
           content: { value: "2000-01-01" },
@@ -1174,142 +1088,122 @@ describe("GraphQL/Profiles to Petitions", () => {
        * FILL CONTRACT PROFILE
        * ========================
        */
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(yourContractsProfiles[0].id, [
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_counterparty"].id,
           type: "SHORT_TEXT",
           content: { value: "Homer Simpson" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_contract_type"].id,
           type: "SELECT",
           content: { value: "EMPLOYMENT_CONTRACT" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_effective_date"].id,
           type: "DATE",
           content: { value: "1980-01-01" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_expiration_date"].id,
           type: "DATE",
           content: { value: "1990-01-01" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_jurisdiction"].id,
           type: "SELECT",
           content: { value: "US" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_contract_value"].id,
           type: "NUMBER",
           content: { value: 1500 },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_contract_currency"].id,
           type: "SELECT",
           content: { value: "USD" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_payment_terms"].id,
           type: "SHORT_TEXT",
           content: { value: "Monthly" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_renewal_terms"].id,
           type: "SHORT_TEXT",
           content: { value: "Based on performance" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_termination_clauses"].id,
           type: "SHORT_TEXT",
           content: { value: "None" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_confidentiality_agreement"].id,
           type: "SELECT",
           content: { value: "Y" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_performance_metrics"].id,
           type: "SHORT_TEXT",
           content: { value: "None" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_dispute_resolution_mechanism"].id,
           type: "SHORT_TEXT",
           content: { value: "None" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_compliance_obligations"].id,
           type: "SHORT_TEXT",
           content: { value: "None" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_security_provisions"].id,
           type: "SHORT_TEXT",
           content: { value: "None" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_notes"].id,
           type: "TEXT",
           content: { value: "None" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_billing_contact_full_name"].id,
           type: "SHORT_TEXT",
           content: { value: "Homer Simpson" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_billing_contact_email"].id,
           type: "SHORT_TEXT",
           content: { value: "homer@springfield.com" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_legal_contact_full_name"].id,
           type: "SHORT_TEXT",
           content: { value: "Montgomery Burns" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: yourContractsProfiles[0].id,
           profile_type_field_id: contractIdx["p_legal_contact_email"].id,
           type: "SHORT_TEXT",
           content: { value: "monty@springfield.com" },
@@ -5856,16 +5750,14 @@ describe("GraphQL/Profiles to Petitions", () => {
 
     it("creates a petition from a custom profile type", async () => {
       const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(profile.id, [
         {
-          profile_id: profile.id,
           profile_type_field_id: profileFields[0].id,
           type: "SHORT_TEXT",
           content: { value: "SHORT_TEXT reply" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: profile.id,
           profile_type_field_id: profileFields[1].id,
           type: "CHECKBOX",
           content: { value: ["B", "C"] },
@@ -5986,23 +5878,20 @@ describe("GraphQL/Profiles to Petitions", () => {
 
     it("sends error if profile value does not match format in child field", async () => {
       const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(profile.id, [
         {
-          profile_id: profile.id,
           profile_type_field_id: profileFields[0].id,
           type: "SHORT_TEXT",
           content: { value: "SHORT_TEXT reply" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: profile.id,
           profile_type_field_id: profileFields[1].id,
           type: "CHECKBOX",
           content: { value: ["B", "C"] },
           created_by_user_id: user.id,
         },
         {
-          profile_id: profile.id,
           profile_type_field_id: profileFields[2].id,
           type: "SHORT_TEXT",
           content: { value: "this is my EMAIL reply" },
@@ -6049,23 +5938,20 @@ describe("GraphQL/Profiles to Petitions", () => {
 
     it("skips field with format error when providing skipFormatErrors flag", async () => {
       const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(profile.id, [
         {
-          profile_id: profile.id,
           profile_type_field_id: profileFields[0].id,
           type: "SHORT_TEXT",
           content: { value: "SHORT_TEXT reply" },
           created_by_user_id: user.id,
         },
         {
-          profile_id: profile.id,
           profile_type_field_id: profileFields[1].id,
           type: "CHECKBOX",
           content: { value: ["B", "C"] },
           created_by_user_id: user.id,
         },
         {
-          profile_id: profile.id,
           profile_type_field_id: profileFields[2].id,
           type: "SHORT_TEXT",
           content: { value: "this is my EMAIL reply" },
@@ -6245,52 +6131,45 @@ describe("GraphQL/Profiles to Petitions", () => {
       );
 
       // INSERT VALUES FOR MIKE ROSS
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(mikeRoss.id, [
         {
           type: "TEXT",
-          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["TEXT"].id,
           content: { value: "Mike Ross" },
           created_by_user_id: user.id,
         },
         {
           type: "SHORT_TEXT",
-          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["SHORT_TEXT"].id,
           content: { value: "Lawyer" },
           created_by_user_id: user.id,
         },
         {
           type: "DATE",
-          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["DATE"].id,
           content: { value: "2020-10-09" },
           created_by_user_id: user.id,
         },
         {
           type: "PHONE",
-          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["PHONE"].id,
           content: { value: "+34611676433" },
           created_by_user_id: user.id,
         },
         {
           type: "NUMBER",
-          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["NUMBER"].id,
           content: { value: 1234 },
           created_by_user_id: user.id,
         },
         {
           type: "SELECT",
-          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["SELECT"].id,
           content: { value: "LOW" },
           created_by_user_id: user.id,
         },
         {
           type: "BACKGROUND_CHECK",
-          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["BACKGROUND_CHECK"].id,
           content: {
             query: {
@@ -6320,7 +6199,6 @@ describe("GraphQL/Profiles to Petitions", () => {
         },
         {
           type: "CHECKBOX",
-          profile_id: mikeRoss.id,
           profile_type_field_id: propertiesIdx["CHECKBOX"].id,
           content: { value: ["A", "C"] },
           created_by_user_id: user.id,
@@ -6340,52 +6218,45 @@ describe("GraphQL/Profiles to Petitions", () => {
       });
 
       // INSERT VALUES FOR HARVEY SPECTER
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(harveySpecter.id, [
         {
           type: "TEXT",
-          profile_id: harveySpecter.id,
           profile_type_field_id: propertiesIdx["TEXT"].id,
           content: { value: "Harvey Specter" },
           created_by_user_id: user.id,
         },
         {
           type: "SHORT_TEXT",
-          profile_id: harveySpecter.id,
           profile_type_field_id: propertiesIdx["SHORT_TEXT"].id,
           content: { value: "CEO" },
           created_by_user_id: user.id,
         },
         {
           type: "DATE",
-          profile_id: harveySpecter.id,
           profile_type_field_id: propertiesIdx["DATE"].id,
           content: { value: "2023-10-09" },
           created_by_user_id: user.id,
         },
         {
           type: "PHONE",
-          profile_id: harveySpecter.id,
           profile_type_field_id: propertiesIdx["PHONE"].id,
           content: { value: "+541165259666" },
           created_by_user_id: user.id,
         },
         {
           type: "NUMBER",
-          profile_id: harveySpecter.id,
           profile_type_field_id: propertiesIdx["NUMBER"].id,
           content: { value: 0.123456789 },
           created_by_user_id: user.id,
         },
         {
           type: "SELECT",
-          profile_id: harveySpecter.id,
           profile_type_field_id: propertiesIdx["SELECT"].id,
           content: { value: "MEDIUM" },
           created_by_user_id: user.id,
         },
         {
           type: "BACKGROUND_CHECK",
-          profile_id: harveySpecter.id,
           profile_type_field_id: propertiesIdx["BACKGROUND_CHECK"].id,
           content: {
             query: {
@@ -6415,7 +6286,6 @@ describe("GraphQL/Profiles to Petitions", () => {
         },
         {
           type: "CHECKBOX",
-          profile_id: harveySpecter.id,
           profile_type_field_id: propertiesIdx["CHECKBOX"].id,
           content: { value: ["B"] },
           created_by_user_id: user.id,
@@ -7868,13 +7738,14 @@ describe("GraphQL/Profiles to Petitions", () => {
         .update("permission", "HIDDEN");
 
       // only replied value is HIDDEN
-      await mocks.knex.from("profile_field_value").insert({
-        type: "TEXT",
-        profile_id: newProfile.id,
-        profile_type_field_id: propertiesIdx["TEXT"].id,
-        content: { value: "HOMER SIMPSON" },
-        created_by_user_id: user.id,
-      });
+      await mocks.createProfileFieldValues(newProfile.id, [
+        {
+          type: "TEXT",
+          profile_type_field_id: propertiesIdx["TEXT"].id,
+          content: { value: "HOMER SIMPSON" },
+          created_by_user_id: user.id,
+        },
+      ]);
 
       const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
         user_id: user.id,
@@ -7925,13 +7796,14 @@ describe("GraphQL/Profiles to Petitions", () => {
         .update("permission", "HIDDEN");
 
       // only replied value is HIDDEN
-      await mocks.knex.from("profile_field_value").insert({
-        type: "TEXT",
-        profile_id: newProfile.id,
-        profile_type_field_id: propertiesIdx["TEXT"].id,
-        content: { value: "Harvey" },
-        created_by_user_id: user.id,
-      });
+      await mocks.createProfileFieldValues(newProfile.id, [
+        {
+          type: "TEXT",
+          profile_type_field_id: propertiesIdx["TEXT"].id,
+          content: { value: "Harvey" },
+          created_by_user_id: user.id,
+        },
+      ]);
 
       const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
         user_id: user.id,

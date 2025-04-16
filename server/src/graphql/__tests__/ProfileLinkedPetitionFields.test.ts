@@ -2687,21 +2687,22 @@ describe("ProfileLinkedPetitionFields", () => {
     it("does not update value or create event if BACKGROUND_CHECK value is already present on profile and its the same", async () => {
       const [profile] = await mocks.createRandomProfiles(organization.id, individual.id, 1);
 
-      await mocks.knex.from("profile_field_value").insert({
-        profile_id: profile.id,
-        type: "BACKGROUND_CHECK",
-        created_by_user_id: user.id,
-        profile_type_field_id: individualProfileTypeFields["p_background_check"].id,
-        content: {
-          query: { name: "Mike Wazowski", date: null, type: "Person" },
-          search: {
-            totalCount: 0,
-            items: [],
-            createdAt: new Date(),
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          type: "BACKGROUND_CHECK",
+          created_by_user_id: user.id,
+          profile_type_field_id: individualProfileTypeFields["p_background_check"].id,
+          content: {
+            query: { name: "Mike Wazowski", date: null, type: "Person" },
+            search: {
+              totalCount: 0,
+              items: [],
+              createdAt: new Date(),
+            },
+            entity: { id: "1", type: "Person", name: "Mike Wazowski", properties: {} },
           },
-          entity: { id: "1", type: "Person", name: "Mike Wazowski", properties: {} },
         },
-      });
+      ]);
 
       const { errors, data } = await testClient.execute(
         gql`
@@ -4701,13 +4702,14 @@ describe("ProfileLinkedPetitionFields", () => {
         .update("permission", "READ");
 
       const [profile] = await mocks.createRandomProfiles(organization.id, individual.id, 1);
-      await mocks.knex.from("profile_field_value").insert({
-        created_by_user_id: user.id,
-        profile_id: profile.id,
-        profile_type_field_id: individualProfileTypeFields["p_first_name"].id,
-        type: "SHORT_TEXT",
-        content: { value: "Jane" },
-      });
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          created_by_user_id: user.id,
+          profile_type_field_id: individualProfileTypeFields["p_first_name"].id,
+          type: "SHORT_TEXT",
+          content: { value: "Jane" },
+        },
+      ]);
 
       const { errors, data } = await testClient.execute(
         gql`
@@ -7229,13 +7231,14 @@ describe("ProfileLinkedPetitionFields", () => {
       }));
 
       const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
-      await mocks.knex.from("profile_field_value").insert({
-        profile_id: profile.id,
-        profile_type_field_id: profileTypeFields.find((f) => f.type === "CHECKBOX")!.id,
-        type: "CHECKBOX",
-        content: { value: ["A"] },
-        created_by_user_id: user.id,
-      });
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeFields.find((f) => f.type === "CHECKBOX")!.id,
+          type: "CHECKBOX",
+          content: { value: ["A"] },
+          created_by_user_id: user.id,
+        },
+      ]);
 
       const { errors, data } = await testClient.execute(
         gql`
@@ -7297,13 +7300,14 @@ describe("ProfileLinkedPetitionFields", () => {
       }));
 
       const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
-      await mocks.knex.from("profile_field_value").insert({
-        profile_id: profile.id,
-        profile_type_field_id: profileTypeFields.find((f) => f.type === "CHECKBOX")!.id,
-        type: "CHECKBOX",
-        content: { value: ["C", "A"] },
-        created_by_user_id: user.id,
-      });
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeFields.find((f) => f.type === "CHECKBOX")!.id,
+          type: "CHECKBOX",
+          content: { value: ["C", "A"] },
+          created_by_user_id: user.id,
+        },
+      ]);
 
       const { errors, data } = await testClient.execute(
         gql`

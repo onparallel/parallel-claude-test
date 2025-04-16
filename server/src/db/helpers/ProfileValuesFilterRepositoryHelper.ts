@@ -31,20 +31,60 @@ export class ProfileValuesFilterRepositoryHelper {
         this.applyProfileValuesFilterJoins(q, condition, joins, profileTypeFieldsById);
       }
     } else {
-      this.applyProfileTypeFieldJoin(q, filter.profileTypeFieldId, joins, profileTypeFieldsById);
+      this.applyProfileTypeFieldJoin(q, joins, profileTypeFieldsById[filter.profileTypeFieldId]);
+    }
+  }
+
+  public getProfileTypeFieldContent(
+    joins: Record<number, string>,
+    profileTypeField: ProfileTypeField,
+  ) {
+    const alias = joins[profileTypeField.id];
+    if (profileTypeField.type === "FILE") {
+      return this.knex.raw(`??.id`, [alias]);
+    } else {
+      if (
+        ["SHORT_TEXT", "SELECT", "CHECKBOX", "DATE", "PHONE", "NUMBER"].includes(
+          profileTypeField.type,
+        )
+      ) {
+        return this.knex.raw(`coalesce(p.value_cache->?->'content', ??.content)`, [
+          profileTypeField.id,
+          alias,
+        ]);
+      } else {
+        return this.knex.raw(`??.content`, [alias]);
+      }
+    }
+  }
+
+  public getProfileTypeFieldExpiryDate(
+    joins: Record<number, string>,
+    profileTypeField: ProfileTypeField,
+  ) {
+    const alias = joins[profileTypeField.id];
+    if (
+      ["SHORT_TEXT", "SELECT", "CHECKBOX", "DATE", "PHONE", "NUMBER"].includes(
+        profileTypeField.type,
+      )
+    ) {
+      return this.knex.raw(`coalesce((p.value_cache->?->>'expiry_date')::date, ??.expiry_date)`, [
+        profileTypeField.id,
+        alias,
+      ]);
+    } else {
+      return this.knex.raw(`??.expiry_date`, [alias]);
     }
   }
 
   public applyProfileTypeFieldJoin(
     q: Knex.QueryBuilder,
-    profileTypeFieldId: number,
     joins: Record<number, string>,
-    profileTypeFieldsById: Record<number, ProfileTypeField>,
+    profileTypeField: ProfileTypeField,
   ) {
-    const profileTypeField = profileTypeFieldsById![profileTypeFieldId];
-    assert(profileTypeField, `Profile type field ${profileTypeFieldId} not found`);
-    if (isNullish(joins[profileTypeFieldId])) {
-      const alias = (joins[profileTypeFieldId] = `pfv${profileTypeField.id}`);
+    assert(profileTypeField, `Profile type field ${profileTypeField.id} not found`);
+    if (isNullish(joins[profileTypeField.id])) {
+      const alias = (joins[profileTypeField.id] = `pfv${profileTypeField.id}`);
       if (profileTypeField.type === "FILE") {
         q.joinRaw(
           /* sql */ `
@@ -54,7 +94,7 @@ export class ProfileValuesFilterRepositoryHelper {
               and ${alias}.deleted_at is null 
               and ${alias}.removed_at is null
             `,
-          [profileTypeFieldId],
+          [profileTypeField.id],
         );
       } else {
         q.joinRaw(
@@ -66,7 +106,7 @@ export class ProfileValuesFilterRepositoryHelper {
               and ${alias}.deleted_at is null 
               and ${alias}.removed_at is null
           `,
-          [profileTypeFieldId, profileTypeFieldId],
+          [profileTypeField.id, profileTypeField.id],
         );
       }
     }
@@ -105,36 +145,8 @@ export class ProfileValuesFilterRepositoryHelper {
           `Invalid operator ${filter.operator} for type ${profileTypeField.type}`,
         );
       };
-      let content: Knex.Raw;
-      if (profileTypeField.type === "FILE") {
-        content = this.knex.raw(`??.id`, [joins[filter.profileTypeFieldId]]);
-      } else {
-        if (
-          ["SHORT_TEXT", "SELECT", "CHECKBOX", "DATE", "PHONE", "NUMBER"].includes(
-            profileTypeField.type,
-          )
-        ) {
-          content = this.knex.raw(`coalesce(p.value_cache->?->'content', ??.content)`, [
-            filter.profileTypeFieldId,
-            joins[filter.profileTypeFieldId],
-          ]);
-        } else {
-          content = this.knex.raw(`??.content`, [joins[filter.profileTypeFieldId]]);
-        }
-      }
-      let expiryDate: Knex.Raw;
-      if (
-        ["SHORT_TEXT", "SELECT", "CHECKBOX", "DATE", "PHONE", "NUMBER"].includes(
-          profileTypeField.type,
-        )
-      ) {
-        expiryDate = this.knex.raw(
-          `coalesce((p.value_cache->?->>'expiry_date')::date, ??.expiry_date)`,
-          [filter.profileTypeFieldId, joins[filter.profileTypeFieldId]],
-        );
-      } else {
-        expiryDate = this.knex.raw(`??.expiry_date`, [joins[filter.profileTypeFieldId]]);
-      }
+      const content = this.getProfileTypeFieldContent(joins, profileTypeField);
+      const expiryDate = this.getProfileTypeFieldExpiryDate(joins, profileTypeField);
       const [negated, operator] = filter.operator.startsWith("NOT_")
         ? ([
             true,

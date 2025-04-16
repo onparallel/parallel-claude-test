@@ -32,6 +32,7 @@ import {
   CreatePetitionAttachment,
   CreatePetitionField,
   CreatePetitionFieldReply,
+  CreateProfileFieldValue,
   CreateTag,
   CreateTemporaryFile,
   CreateUser,
@@ -71,6 +72,7 @@ import {
   ProfileEvent,
   ProfileEventType,
   ProfileEventTypeValues,
+  ProfileFieldValue,
   ProfileType,
   ProfileTypeField,
   ProfileTypeFieldType,
@@ -1384,6 +1386,48 @@ export class Mocks {
       })),
       "*",
     );
+  }
+
+  async createProfileFieldValues(
+    profileId: number,
+    values: Omit<CreateProfileFieldValue, "profile_id">[],
+  ) {
+    const rows = await this.knex<ProfileFieldValue>("profile_field_value").insert(
+      values.map((v) => ({
+        ...v,
+        profile_id: profileId,
+      })),
+      "*",
+    );
+
+    const cacheableValues = rows.filter(
+      (r) =>
+        r.type === "SHORT_TEXT" ||
+        r.type === "SELECT" ||
+        r.type === "CHECKBOX" ||
+        r.type === "DATE" ||
+        r.type === "PHONE" ||
+        r.type === "NUMBER",
+    );
+
+    if (cacheableValues.length > 0) {
+      await this.knex("profile")
+        .where("id", profileId)
+        .update({
+          value_cache: this.knex.raw(
+            /* sql */ `value_cache || ?::jsonb`,
+            JSON.stringify(
+              Object.fromEntries(
+                cacheableValues.map((r) => [
+                  r.profile_type_field_id,
+                  removeNotDefined({ content: r.content, expiry_date: r.expiry_date }),
+                ]),
+              ),
+            ),
+          ),
+        });
+    }
+    return rows;
   }
 }
 

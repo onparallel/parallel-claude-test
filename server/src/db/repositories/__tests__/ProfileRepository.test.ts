@@ -118,9 +118,9 @@ describe("repositories/ProfileRepository", () => {
             },
           },
         });
-      await mocks.knex.from("profile_field_value").insert([
+
+      await mocks.createProfileFieldValues(profiles[0].id, [
         {
-          profile_id: profiles[0].id,
           profile_type_field_id: selectField.id,
           content: { value: "high" },
           created_by_user_id: user.id,
@@ -128,22 +128,28 @@ describe("repositories/ProfileRepository", () => {
           removed_by_user_id: user.id,
           type: "SELECT",
         },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[1].id, [
         {
-          profile_id: profiles[1].id,
           profile_type_field_id: selectField.id,
           content: { value: "medium" },
           created_by_user_id: user.id,
           type: "SELECT",
         },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[2].id, [
         {
-          profile_id: profiles[2].id,
           profile_type_field_id: selectField.id,
           content: { value: "low" },
           created_by_user_id: user.id,
           type: "SELECT",
         },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[3].id, [
         {
-          profile_id: profiles[3].id,
           profile_type_field_id: selectField.id,
           content: { value: "high" },
           created_by_user_id: user.id,
@@ -154,8 +160,10 @@ describe("repositories/ProfileRepository", () => {
           deleted_by: `User:${user.id}`,
           anonymized_at: new Date(),
         },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[4].id, [
         {
-          profile_id: profiles[4].id,
           profile_type_field_id: selectField.id,
           content: { value: "high" },
           created_by_user_id: user.id,
@@ -197,54 +205,55 @@ describe("repositories/ProfileRepository", () => {
     });
 
     it("returns all current values with defined monitoring rules", async () => {
-      const values = await mocks.knex
-        .from("profile_field_value")
-        .insert([
-          {
-            profile_id: profiles[0].id,
-            content: { query: "query", search: "search" }, // mocked, doesn't matter
-            profile_type_field_id: fieldWithMonitoring.id,
-            created_by_user_id: user.id,
-            type: "BACKGROUND_CHECK",
-          },
-          {
-            profile_id: profiles[0].id,
-            content: { query: "query", search: "search" },
-            profile_type_field_id: fieldNoMonitoring.id,
-            created_by_user_id: user.id,
-            type: "BACKGROUND_CHECK",
-          },
-          {
-            profile_id: profiles[1].id,
-            content: { query: "query", search: "search" },
-            profile_type_field_id: fieldWithMonitoring.id,
-            created_by_user_id: user.id,
-            type: "BACKGROUND_CHECK",
-          },
-          {
-            profile_id: profiles[2].id,
-            content: { query: "query", search: "search" },
-            profile_type_field_id: fieldWithMonitoring.id,
-            created_by_user_id: user.id,
-            type: "BACKGROUND_CHECK",
-            removed_at: new Date(),
-            removed_by_user_id: user.id,
-          },
-          {
-            profile_id: profiles[3].id,
-            content: { query: "query", search: "search" },
-            profile_type_field_id: fieldWithMonitoring.id,
-            created_by_user_id: user.id,
-            type: "BACKGROUND_CHECK",
-          },
-        ])
-        .returning("*");
+      const p0Values = await mocks.createProfileFieldValues(profiles[0].id, [
+        {
+          content: { query: "query", search: "search" }, // mocked, doesn't matter
+          profile_type_field_id: fieldWithMonitoring.id,
+          created_by_user_id: user.id,
+          type: "BACKGROUND_CHECK",
+        },
+        {
+          content: { query: "query", search: "search" },
+          profile_type_field_id: fieldNoMonitoring.id,
+          created_by_user_id: user.id,
+          type: "BACKGROUND_CHECK",
+        },
+      ]);
+
+      const p1Values = await mocks.createProfileFieldValues(profiles[1].id, [
+        {
+          content: { query: "query", search: "search" },
+          profile_type_field_id: fieldWithMonitoring.id,
+          created_by_user_id: user.id,
+          type: "BACKGROUND_CHECK",
+        },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[2].id, [
+        {
+          content: { query: "query", search: "search" },
+          profile_type_field_id: fieldWithMonitoring.id,
+          created_by_user_id: user.id,
+          type: "BACKGROUND_CHECK",
+          removed_at: new Date(),
+          removed_by_user_id: user.id,
+        },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[3].id, [
+        {
+          content: { query: "query", search: "search" },
+          profile_type_field_id: fieldWithMonitoring.id,
+          created_by_user_id: user.id,
+          type: "BACKGROUND_CHECK",
+        },
+      ]);
 
       const result = await repo.getBackgroundCheckProfileFieldValuesForRefreshByOrgId(
         organization.id,
         (_, monitoring) => isNonNullish(monitoring),
       );
-      expect(result.map((r) => r.id)).toIncludeSameMembers([values[0].id, values[2].id]);
+      expect(result.map((r) => r.id)).toIncludeSameMembers([p0Values[0].id, p1Values[0].id]);
     });
   });
 

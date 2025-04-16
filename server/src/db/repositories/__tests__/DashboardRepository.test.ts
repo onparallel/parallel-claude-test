@@ -343,16 +343,14 @@ describe("DashboardRepository", () => {
       // ########################
       // ALBUS DUMBLEDORE PROFILE
       // ########################
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(individuals[0].id, [
         {
-          profile_id: individuals[0].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: individualFields[0].id,
           type: "SHORT_TEXT",
           content: { value: "Albus Dumbledore" },
         },
         {
-          profile_id: individuals[0].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: individualFields[2].id,
           type: "BACKGROUND_CHECK",
@@ -386,20 +384,19 @@ describe("DashboardRepository", () => {
           },
         },
         {
-          profile_id: individuals[0].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: individualFields[3].id,
           type: "DATE",
           content: { value: "1881-08-01" },
         },
         {
-          profile_id: individuals[0].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: individualFields[4].id,
           type: "SELECT",
           content: { value: "HIGH" },
         },
       ]);
+
       const [dumbledoreId] = await mocks.createRandomFileUpload(1);
       await mocks.knex.from("profile_field_file").insert({
         profile_id: individuals[0].id,
@@ -412,16 +409,14 @@ describe("DashboardRepository", () => {
       // ########################
       // HARRY POTTER PROFILE
       // ########################
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(individuals[1].id, [
         {
-          profile_id: individuals[1].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: individualFields[0].id,
           type: "SHORT_TEXT",
           content: { value: "Harry Potter" },
         },
         {
-          profile_id: individuals[1].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: individualFields[2].id,
           type: "BACKGROUND_CHECK",
@@ -448,14 +443,12 @@ describe("DashboardRepository", () => {
           },
         },
         {
-          profile_id: individuals[1].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: individualFields[3].id,
           type: "DATE",
           content: { value: "1190-08-11" },
         },
         {
-          profile_id: individuals[1].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: individualFields[4].id,
           type: "SELECT",
@@ -466,16 +459,14 @@ describe("DashboardRepository", () => {
       // ########################
       // TOM RIDDLE PROFILE
       // ########################
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(individuals[2].id, [
         {
-          profile_id: individuals[2].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: individualFields[0].id,
           type: "SHORT_TEXT",
           content: { value: "Tom Riddle" },
         },
         {
-          profile_id: individuals[2].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: individualFields[2].id,
           type: "BACKGROUND_CHECK",
@@ -509,7 +500,6 @@ describe("DashboardRepository", () => {
           },
         },
         {
-          profile_id: individuals[2].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: individualFields[4].id,
           type: "SELECT",
@@ -520,16 +510,14 @@ describe("DashboardRepository", () => {
       // ########################
       // LILY POTTER PROFILE
       // ########################
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(individuals[3].id, [
         {
-          profile_id: individuals[3].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: individualFields[0].id,
           type: "SHORT_TEXT",
           content: { value: "Lily Potter" },
         },
         {
-          profile_id: individuals[3].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: individualFields[2].id,
           type: "BACKGROUND_CHECK",
@@ -547,7 +535,6 @@ describe("DashboardRepository", () => {
           },
         },
         {
-          profile_id: individuals[3].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: individualFields[4].id,
           type: "SELECT",
@@ -558,30 +545,26 @@ describe("DashboardRepository", () => {
       // ########################
       // DUMBLEDORE CONTRACT
       // ########################
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(contracts[0].id, [
         {
-          profile_id: contracts[0].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: contractFields[0].id,
           type: "TEXT",
           content: { value: "Work Contract" },
         },
         {
-          profile_id: contracts[0].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: contractFields[1].id,
           type: "PHONE",
           content: { value: "+123456789" },
         },
         {
-          profile_id: contracts[0].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: contractFields[2].id,
           type: "CHECKBOX",
           content: { value: ["A", "C"] },
         },
         {
-          profile_id: contracts[0].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: contractFields[3].id,
           type: "DATE",
@@ -589,7 +572,6 @@ describe("DashboardRepository", () => {
           expiry_date: new Date().toISOString().split("T")[0],
         },
         {
-          profile_id: contracts[0].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: contractFields[4].id,
           type: "NUMBER",
@@ -600,30 +582,26 @@ describe("DashboardRepository", () => {
       // ########################
       // SEVERUS SNAPE CONTRACT
       // ########################
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(contracts[1].id, [
         {
-          profile_id: contracts[1].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: contractFields[0].id,
           type: "TEXT",
           content: { value: "Work Contract" },
         },
         {
-          profile_id: contracts[1].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: contractFields[1].id,
           type: "PHONE",
           content: { value: "+123456789" },
         },
         {
-          profile_id: contracts[1].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: contractFields[2].id,
           type: "CHECKBOX",
           content: { value: ["A", "B"] },
         },
         {
-          profile_id: contracts[1].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: contractFields[3].id,
           type: "DATE",
@@ -631,7 +609,6 @@ describe("DashboardRepository", () => {
           expiry_date: subMonths(new Date(), 1).toISOString().split("T")[0],
         },
         {
-          profile_id: contracts[1].id,
           created_by_user_id: users[0].id,
           profile_type_field_id: contractFields[4].id,
           type: "NUMBER",
@@ -1208,164 +1185,165 @@ describe("DashboardRepository", () => {
         }),
       );
 
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(profiles[0].id, [
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[0].id,
           profile_type_field_id: riskSelectField.id,
           type: "SELECT",
           content: { value: "HIGH" },
         },
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[0].id,
           profile_type_field_id: numberField.id,
           type: "NUMBER",
           content: { value: 1000 },
         },
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[0].id,
           profile_type_field_id: countrySelectField.id,
           type: "SELECT",
           content: { value: "AR" },
         },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[1].id, [
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[1].id,
           profile_type_field_id: riskSelectField.id,
           type: "SELECT",
           content: { value: "HIGH" },
         },
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[1].id,
           profile_type_field_id: numberField.id,
           type: "NUMBER",
           content: { value: 500 },
         },
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[1].id,
           profile_type_field_id: countrySelectField.id,
           type: "SELECT",
           content: { value: "FR" },
         },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[2].id, [
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[2].id,
           profile_type_field_id: riskSelectField.id,
           type: "SELECT",
           content: { value: "HIGH" },
         },
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[2].id,
           profile_type_field_id: numberField.id,
           type: "NUMBER",
           content: { value: 200 },
         },
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[2].id,
           profile_type_field_id: countrySelectField.id,
           type: "SELECT",
           content: { value: "AR" },
         },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[3].id, [
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[3].id,
           profile_type_field_id: riskSelectField.id,
           type: "SELECT",
           content: { value: "MEDIUM" },
         },
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[3].id,
           profile_type_field_id: numberField.id,
           type: "NUMBER",
           content: { value: 0 },
         },
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[3].id,
           profile_type_field_id: countrySelectField.id,
           type: "SELECT",
           content: { value: "AR" },
         },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[4].id, [
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[4].id,
           profile_type_field_id: riskSelectField.id,
           type: "SELECT",
           content: { value: "MEDIUM" },
         },
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[4].id,
           profile_type_field_id: numberField.id,
           type: "NUMBER",
           content: { value: -100 },
         },
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[4].id,
           profile_type_field_id: countrySelectField.id,
           type: "SELECT",
           content: { value: "FR" },
         },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[5].id, [
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[5].id,
           profile_type_field_id: riskSelectField.id,
           type: "SELECT",
           content: { value: "MEDIUM" },
         },
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[5].id,
           profile_type_field_id: numberField.id,
           type: "NUMBER",
           content: { value: 800 },
         },
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[5].id,
           profile_type_field_id: countrySelectField.id,
           type: "SELECT",
           content: { value: "FR" },
         },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[6].id, [
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[6].id,
           profile_type_field_id: countrySelectField.id,
           type: "SELECT",
           content: { value: "GB" },
         },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[7].id, [
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[7].id,
           profile_type_field_id: numberField.id,
           type: "NUMBER",
           content: { value: 12345 },
         },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[8].id, [
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[8].id,
           profile_type_field_id: riskSelectField.id,
           type: "SELECT",
           content: { value: "LOW" },
         },
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[8].id,
           profile_type_field_id: numberField.id,
           type: "NUMBER",
           content: { value: 8000 },
         },
         {
           created_by_user_id: users[0].id,
-          profile_id: profiles[8].id,
           profile_type_field_id: countrySelectField.id,
           type: "SELECT",
           content: { value: "ES" },

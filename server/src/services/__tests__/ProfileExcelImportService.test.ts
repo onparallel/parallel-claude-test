@@ -241,23 +241,20 @@ describe("ProfileExcelImportService", () => {
     it("should update profiles with the provided data", async () => {
       const profiles = await mocks.createRandomProfiles(organization.id, profileType.id, 100);
       for (const profile of profiles) {
-        await mocks.knex.from("profile_field_value").insert([
+        await mocks.createProfileFieldValues(profile.id, [
           {
-            profile_id: profile.id,
             type: "SHORT_TEXT",
             created_by_user_id: user.id,
             profile_type_field_id: profileTypeFields[0].id,
             content: { value: faker.lorem.words(3) },
           },
           {
-            profile_id: profile.id,
             type: "SELECT",
             created_by_user_id: user.id,
             profile_type_field_id: profileTypeFields[1].id,
             content: { value: ["AR", "ES", "FR", "UY"][Math.floor(Math.random() * 4)] },
           },
           {
-            profile_id: profile.id,
             type: "DATE",
             created_by_user_id: user.id,
             profile_type_field_id: profileTypeFields[2].id,
@@ -265,7 +262,6 @@ describe("ProfileExcelImportService", () => {
             expiry_date: "2020-01-01",
           },
           {
-            profile_id: profile.id,
             type: "TEXT",
             created_by_user_id: user.id,
             profile_type_field_id: profileTypeFields[3].id,
@@ -273,14 +269,12 @@ describe("ProfileExcelImportService", () => {
             expiry_date: "2022-01-01",
           },
           {
-            profile_id: profile.id,
             type: "CHECKBOX",
             created_by_user_id: user.id,
             profile_type_field_id: profileTypeFields[4].id,
             content: { value: ["A", "B", "C"] },
           },
           {
-            profile_id: profile.id,
             type: "NUMBER",
             created_by_user_id: user.id,
             profile_type_field_id: profileTypeFields[5].id,
@@ -422,55 +416,46 @@ describe("ProfileExcelImportService", () => {
       const profiles = await mocks.createRandomProfiles(organization.id, profileType.id, 100);
       const valuesById: Record<number, ProfileFieldValue[]> = {};
       for (const profile of profiles) {
-        const values = await mocks.knex.from("profile_field_value").insert(
-          [
-            {
-              profile_id: profile.id,
-              type: "SHORT_TEXT",
-              created_by_user_id: user.id,
-              profile_type_field_id: profileTypeFields[0].id,
-              content: { value: "Harvey Specter" },
-            },
-            {
-              profile_id: profile.id,
-              type: "SELECT",
-              created_by_user_id: user.id,
-              profile_type_field_id: profileTypeFields[1].id,
-              content: { value: ["AR", "ES", "FR", "UY"][Math.floor(Math.random() * 4)] },
-            },
-            {
-              profile_id: profile.id,
-              type: "DATE",
-              created_by_user_id: user.id,
-              profile_type_field_id: profileTypeFields[2].id,
-              content: { value: "2020-01-01" },
-              expiry_date: "2020-01-01",
-            },
-            {
-              profile_id: profile.id,
-              type: "TEXT",
-              created_by_user_id: user.id,
-              profile_type_field_id: profileTypeFields[3].id,
-              content: { value: faker.lorem.words(3) },
-              expiry_date: "2022-01-01",
-            },
-            {
-              profile_id: profile.id,
-              type: "CHECKBOX",
-              created_by_user_id: user.id,
-              profile_type_field_id: profileTypeFields[4].id,
-              content: { value: ["A", "B", "C"] },
-            },
-            {
-              profile_id: profile.id,
-              type: "NUMBER",
-              created_by_user_id: user.id,
-              profile_type_field_id: profileTypeFields[5].id,
-              content: { value: 456 },
-            },
-          ],
-          "*",
-        );
+        const values = await mocks.createProfileFieldValues(profile.id, [
+          {
+            type: "SHORT_TEXT",
+            created_by_user_id: user.id,
+            profile_type_field_id: profileTypeFields[0].id,
+            content: { value: "Harvey Specter" },
+          },
+          {
+            type: "SELECT",
+            created_by_user_id: user.id,
+            profile_type_field_id: profileTypeFields[1].id,
+            content: { value: ["AR", "ES", "FR", "UY"][Math.floor(Math.random() * 4)] },
+          },
+          {
+            type: "DATE",
+            created_by_user_id: user.id,
+            profile_type_field_id: profileTypeFields[2].id,
+            content: { value: "2020-01-01" },
+            expiry_date: "2020-01-01",
+          },
+          {
+            type: "TEXT",
+            created_by_user_id: user.id,
+            profile_type_field_id: profileTypeFields[3].id,
+            content: { value: faker.lorem.words(3) },
+            expiry_date: "2022-01-01",
+          },
+          {
+            type: "CHECKBOX",
+            created_by_user_id: user.id,
+            profile_type_field_id: profileTypeFields[4].id,
+            content: { value: ["A", "B", "C"] },
+          },
+          {
+            type: "NUMBER",
+            created_by_user_id: user.id,
+            profile_type_field_id: profileTypeFields[5].id,
+            content: { value: 456 },
+          },
+        ]);
 
         valuesById[profile.id] = values;
       }

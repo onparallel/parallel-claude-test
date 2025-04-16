@@ -258,28 +258,24 @@ export class DashboardRepository extends BaseRepository {
         q.orderBy("p.id").select(this.knex.raw(/* sql */ `distinct on (p.id) p.id`));
 
         if (settings.type === "AGGREGATE") {
-          this.profileValuesFilter.applyProfileTypeFieldJoin(
-            q,
-            settings.profileTypeFieldId,
+          const profileTypeField = profileTypeFieldsById[settings.profileTypeFieldId];
+          this.profileValuesFilter.applyProfileTypeFieldJoin(q, joins, profileTypeField);
+          const content = this.profileValuesFilter.getProfileTypeFieldContent(
             joins,
-            profileTypeFieldsById,
+            profileTypeField,
           );
-          const alias = joins[settings.profileTypeFieldId];
-          const content = this.knex.raw(`??.content`, [alias]);
           q.whereRaw(`? is not null`, [content]).select(
             this.knex.raw(/* sql */ `(?->'value')::numeric as aggr`, [content]),
           );
         }
 
         if (settings.groupByProfileTypeFieldId) {
-          this.profileValuesFilter.applyProfileTypeFieldJoin(
-            q,
-            settings.groupByProfileTypeFieldId,
+          const profileTypeField = profileTypeFieldsById[settings.groupByProfileTypeFieldId];
+          this.profileValuesFilter.applyProfileTypeFieldJoin(q, joins, profileTypeField);
+          const content = this.profileValuesFilter.getProfileTypeFieldContent(
             joins,
-            profileTypeFieldsById,
+            profileTypeField,
           );
-          const alias = joins[settings.groupByProfileTypeFieldId];
-          const content = this.knex.raw(`??.content`, [alias]);
           q.select(
             this.knex.raw(/* sql */ `(coalesce(?, '{}'::jsonb)->>'value') as group_by_value`, [
               content,

@@ -722,37 +722,38 @@ describe("Background Check - Profiles", () => {
     });
 
     it("returns stored entity when requesting same entity", async () => {
-      await mocks.knex.from("profile_field_value").insert({
-        profile_id: profile.id,
-        profile_type_field_id: profileTypeField.id,
-        content: {
-          query: {
-            name: "Vladimir Putin",
-            date: null,
-            type: null,
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeField.id,
+          content: {
+            query: {
+              name: "Vladimir Putin",
+              date: null,
+              type: null,
+            },
+            search: {
+              totalCount: 1,
+              items: [
+                {
+                  id: "Q7747",
+                  type: "Person",
+                  name: "Vladimir Vladimirovich PUTIN",
+                  properties: {},
+                },
+              ],
+              createdAt: new Date().toISOString(),
+            },
+            entity: {
+              id: "Q7747",
+              type: "Person",
+              name: "Vladimir Vladimirovich PUTIN",
+              properties: {},
+            },
           },
-          search: {
-            totalCount: 1,
-            items: [
-              {
-                id: "Q7747",
-                type: "Person",
-                name: "Vladimir Vladimirovich PUTIN",
-                properties: {},
-              },
-            ],
-            createdAt: new Date().toISOString(),
-          },
-          entity: {
-            id: "Q7747",
-            type: "Person",
-            name: "Vladimir Vladimirovich PUTIN",
-            properties: {},
-          },
+          type: "BACKGROUND_CHECK",
+          created_by_user_id: user.id,
         },
-        type: "BACKGROUND_CHECK",
-        created_by_user_id: user.id,
-      });
+      ]);
 
       const { data, errors } = await testClient.execute(
         gql`
@@ -781,37 +782,38 @@ describe("Background Check - Profiles", () => {
     });
 
     it("makes a new search in openSanctions if entity is different", async () => {
-      await mocks.knex.from("profile_field_value").insert({
-        profile_id: profile.id,
-        profile_type_field_id: profileTypeField.id,
-        content: {
-          query: {
-            name: "Vladimir Putin",
-            date: null,
-            type: null,
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeField.id,
+          content: {
+            query: {
+              name: "Vladimir Putin",
+              date: null,
+              type: null,
+            },
+            search: {
+              totalCount: 1,
+              items: [
+                {
+                  id: "Q7747",
+                  type: "Person",
+                  name: "Vladimir Vladimirovich PUTIN",
+                  properties: {},
+                },
+              ],
+              createdAt: new Date().toISOString(),
+            },
+            entity: {
+              id: "ABCDEF",
+              type: "Person",
+              name: "ANOTHER ENTITY",
+              properties: {},
+            },
           },
-          search: {
-            totalCount: 1,
-            items: [
-              {
-                id: "Q7747",
-                type: "Person",
-                name: "Vladimir Vladimirovich PUTIN",
-                properties: {},
-              },
-            ],
-            createdAt: new Date().toISOString(),
-          },
-          entity: {
-            id: "ABCDEF",
-            type: "Person",
-            name: "ANOTHER ENTITY",
-            properties: {},
-          },
+          type: "BACKGROUND_CHECK",
+          created_by_user_id: user.id,
         },
-        type: "BACKGROUND_CHECK",
-        created_by_user_id: user.id,
-      });
+      ]);
 
       const { data, errors } = await testClient.execute(
         gql`
@@ -865,10 +867,8 @@ describe("Background Check - Profiles", () => {
       );
       [profile] = await mocks.createRandomProfiles(organization.id, profileType.id);
 
-      [profileFieldValue] = await mocks.knex
-        .from("profile_field_value")
-        .insert({
-          profile_id: profile.id,
+      [profileFieldValue] = await mocks.createProfileFieldValues(profile.id, [
+        {
           profile_type_field_id: profileTypeField.id,
           content: {
             query: {
@@ -892,8 +892,8 @@ describe("Background Check - Profiles", () => {
           },
           type: "BACKGROUND_CHECK",
           created_by_user_id: user.id,
-        })
-        .returning("*");
+        },
+      ]);
     });
 
     afterEach(async () => {

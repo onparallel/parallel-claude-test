@@ -1333,30 +1333,26 @@ describe("Profile External Sources", () => {
           1,
         );
         // insert some values on profile
-        await mocks.knex.from("profile_field_value").insert([
+        await mocks.createProfileFieldValues(legalEntity.id, [
           {
-            profile_id: legalEntity.id,
             profile_type_field_id: legalEntityPTFsByAlias["p_trade_name"].id,
             content: { value: "My Super Company" },
             created_by_user_id: user.id,
             type: "SHORT_TEXT",
           },
           {
-            profile_id: legalEntity.id,
             profile_type_field_id: legalEntityPTFsByAlias["p_tax_id"].id,
             content: { value: "B67505586" },
             created_by_user_id: user.id,
             type: "SHORT_TEXT",
           },
           {
-            profile_id: legalEntity.id,
             profile_type_field_id: legalEntityPTFsByAlias["p_city"].id,
             content: { value: "Tarragona" },
             created_by_user_id: user.id,
             type: "SHORT_TEXT",
           },
           {
-            profile_id: legalEntity.id,
             profile_type_field_id: legalEntityPTFsByAlias["p_date_of_incorporation"].id,
             content: { value: "2024-12-29" },
             created_by_user_id: user.id,
@@ -2046,13 +2042,14 @@ describe("Profile External Sources", () => {
           individualProfileType.id,
           1,
         );
-        await mocks.knex.from("profile_field_value").insert({
-          profile_id: individual.id,
-          profile_type_field_id: individualPTFsByAlias["p_tax_id"].id,
-          content: { value: "Y0000000J" },
-          created_by_user_id: user.id,
-          type: "SHORT_TEXT",
-        });
+        await mocks.createProfileFieldValues(individual.id, [
+          {
+            profile_type_field_id: individualPTFsByAlias["p_tax_id"].id,
+            content: { value: "Y0000000J" },
+            created_by_user_id: user.id,
+            type: "SHORT_TEXT",
+          },
+        ]);
 
         const { errors, data } = await testClient.execute(
           gql`
@@ -2140,16 +2137,15 @@ describe("Profile External Sources", () => {
           individualProfileType.id,
           1,
         );
-        await mocks.knex.from("profile_field_value").insert([
+
+        await mocks.createProfileFieldValues(individual.id, [
           {
-            profile_id: individual.id,
             profile_type_field_id: individualPTFsByAlias["p_first_name"].id,
             content: { value: "Mike" },
             type: "SHORT_TEXT",
             created_by_user_id: user.id,
           },
           {
-            profile_id: individual.id,
             profile_type_field_id: individualPTFsByAlias["p_last_name"].id,
             content: { value: "Ross" },
             type: "SHORT_TEXT",
@@ -2243,24 +2239,21 @@ describe("Profile External Sources", () => {
           legalEntityProfileType.id,
           1,
         );
-        await mocks.knex.from("profile_field_value").insert([
+        await mocks.createProfileFieldValues(legalEntity.id, [
           {
             // Should prioritize p_tax_id
-            profile_id: legalEntity.id,
             profile_type_field_id: legalEntityPTFsByAlias["p_tax_id"].id,
             content: { value: "B67505586" },
             type: "SHORT_TEXT",
             created_by_user_id: user.id,
           },
           {
-            profile_id: legalEntity.id,
             profile_type_field_id: legalEntityPTFsByAlias["p_trade_name"].id,
             content: { value: "Parallel" },
             type: "SHORT_TEXT",
             created_by_user_id: user.id,
           },
           {
-            profile_id: legalEntity.id,
             profile_type_field_id: legalEntityPTFsByAlias["p_entity_name"].id,
             content: { value: "Parallel Solutions S.L." },
             type: "SHORT_TEXT",
@@ -2411,9 +2404,8 @@ describe("Profile External Sources", () => {
           individualProfileType.id,
           1,
         );
-        await mocks.knex.from("profile_field_value").insert([
+        await mocks.createProfileFieldValues(individual.id, [
           {
-            profile_id: individual.id,
             profile_type_field_id: individualPTFsByAlias["p_tax_id"].id,
             content: { value: "Y0000000J" },
             created_by_user_id: user.id,
