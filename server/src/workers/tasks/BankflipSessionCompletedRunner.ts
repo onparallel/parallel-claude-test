@@ -1,6 +1,7 @@
 import stringify from "fast-safe-stringify";
 import pMap from "p-map";
 import { groupBy, isDeepEqual, isNonNullish, isNullish, pick, zip } from "remeda";
+import { assert } from "ts-essentials";
 import { CreatePetitionFieldReply, PetitionFieldReply } from "../../db/__types";
 import {
   ModelRequest,
@@ -320,7 +321,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     // a set of documents with the same request model will be all part of the same PetitionFieldReply
     // TODO cambiar la manera de agrupar documentos una vez Bankflip implemente una solución que lo permita de manera fácil (ya hablado con ellos)
     const groupedByRequestModel = groupBy(modelRequestOutcome.documents ?? [], (d) =>
-      Object.keys(d.model)
+      Object.keys(modelRequestOutcome.modelRequest.model)
         .sort()
         .map((key) => d.model[key as keyof ModelRequest])
         .join("_"),
@@ -414,12 +415,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
       return [];
     }
 
-    const idVerificationSummary = await this.ctx.bankflip.fetchIdVerificationSummary(
-      metadata.orgId,
-      idVerification.id,
-    );
-
-    if (idVerification.state === "ko" && (idVerificationSummary.documents ?? []).length === 0) {
+    if (idVerification.state === "ko") {
       return [
         {
           content: {
@@ -432,6 +428,13 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
         },
       ];
     }
+
+    assert(isNonNullish(idVerification.id), "idVerification.id expected to be non-null");
+
+    const idVerificationSummary = await this.ctx.bankflip.fetchIdVerificationSummary(
+      metadata.orgId,
+      idVerification.id,
+    );
 
     const replies: Pick<CreatePetitionFieldReply, "content" | "metadata">[] = [];
 

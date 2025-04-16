@@ -102,7 +102,7 @@ interface IdentityVerificationDocument {
 }
 
 interface IdentityVerification {
-  id: string;
+  id: string | null;
   createdAt: Maybe<string>;
   state: "ok" | "ko";
   koReason:
