@@ -11,6 +11,7 @@ import {
   stringArg,
 } from "nexus";
 import { isNonNullish, omit } from "remeda";
+import { FeatureFlagNameValues } from "../../db/__types";
 import { defaultBrandTheme } from "../../util/BrandTheme";
 import { addDuration, multiplyDuration } from "../../util/duration";
 import { and, or } from "../helpers/authorize";
@@ -343,7 +344,10 @@ export const Organization = objectType({
       authorize: isOwnOrgOrSuperAdmin(),
       type: "FeatureFlagNameValue",
       resolve: async (o, _, ctx) => {
-        return await ctx.featureFlags.getOrganizationFeatureFlags(o.id);
+        const ffs = await ctx.featureFlags.getOrganizationFeatureFlags(o.id);
+        // make sure to not include in the response values that are not in the enum
+        // this is to avoid errors when a new feature flag is added to the DB but is not yet in the enum (run migration before a release)
+        return ffs.filter((ff) => FeatureFlagNameValues.includes(ff.name));
       },
     });
   },
