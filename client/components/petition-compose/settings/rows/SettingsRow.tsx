@@ -8,7 +8,10 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { PaidBadge } from "@parallel/components/common/PaidBadge";
+import { PaidPopover } from "@parallel/components/common/PaidPopover";
 import { ReactNode } from "react";
+import { isNonNullish } from "remeda";
 
 export interface SettingsRowProps extends Omit<FormControlProps, "label"> {
   label: ReactNode;
@@ -18,6 +21,8 @@ export interface SettingsRowProps extends Omit<FormControlProps, "label"> {
   controlId: string;
   children: ReactNode;
   description?: ReactNode;
+  showPaidBadge?: boolean;
+  contactMessage?: string;
 }
 
 export function SettingsRow({
@@ -27,6 +32,8 @@ export function SettingsRow({
   isVertical,
   controlId,
   description,
+  showPaidBadge,
+  contactMessage,
   children,
   ...props
 }: SettingsRowProps) {
@@ -62,6 +69,13 @@ export function SettingsRow({
           {description ? <HelpPopover marginStart={0}>{description}</HelpPopover> : null}
         </HStack>
       </FormLabel>
+      {showPaidBadge ? (
+        isNonNullish(contactMessage) ? (
+          <PaidPopover contactMessage={contactMessage} />
+        ) : (
+          <PaidBadge />
+        )
+      ) : null}
       <Flex
         {...(isVertical
           ? { flexDirection: "column" }

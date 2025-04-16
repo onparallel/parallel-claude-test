@@ -11,6 +11,7 @@ import useMergedRef from "@react-hook/merged-ref";
 import { useRef } from "react";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { AIGeneratedPopover } from "../common/AIGeneratedPopover";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { FileExportAccessIconButton } from "../common/FileExportAccessIconButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -50,11 +51,18 @@ export function CopyOrDownloadReplyButton({
           }
         />
       ) : isFileTypeField(reply.field!.type) ? (
-        <ReplyDownloadButton
-          isDisabled={reply.isAnonymized || content.uploadComplete === false || content.error}
-          contentType={reply.isAnonymized ? "" : content.contentType}
-          onDownload={(preview) => onAction(preview ? "PREVIEW_FILE" : "DOWNLOAD_FILE")}
-        />
+        <>
+          <ReplyDownloadButton
+            isDisabled={reply.isAnonymized || content.uploadComplete === false || content.error}
+            contentType={reply.isAnonymized ? "" : content.contentType}
+            onDownload={(preview) => onAction(preview ? "PREVIEW_FILE" : "DOWNLOAD_FILE")}
+          />
+          {reply.field!.type === "FILE_UPLOAD" &&
+          reply.metadata.inferred_data_schema &&
+          reply.metadata.inferred_data ? (
+            <AIGeneratedPopover marginTop={2} />
+          ) : null}
+        </>
       ) : (
         <CopyToClipboardButton
           size="xs"

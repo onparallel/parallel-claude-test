@@ -280,6 +280,11 @@
     "context": "ID"
   },
   {
+    "term": "document-processing-runner.id-card.sex",
+    "definition": "Sexo",
+    "context": "Sex"
+  },
+  {
     "term": "document-processing-runner.id-card.surname",
     "definition": "Apellido",
     "context": "Last name"
@@ -323,6 +328,11 @@
     "term": "document-processing-runner.passport.number",
     "definition": "ID",
     "context": "ID"
+  },
+  {
+    "term": "document-processing-runner.passport.sex",
+    "definition": "Sexo",
+    "context": "Sex"
   },
   {
     "term": "document-processing-runner.passport.surname",

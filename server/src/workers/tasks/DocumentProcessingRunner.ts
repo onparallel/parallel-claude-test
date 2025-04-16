@@ -275,6 +275,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         "number",
         "firstName",
         "surname",
+        "sex",
         "birthDate",
         "birthPlace",
         "nationality",
@@ -286,6 +287,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         "number",
         "firstName",
         "surname",
+        "sex",
         "birthDate",
         "birthPlace",
         "nationality",
@@ -295,28 +297,37 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
       ],
       properties: {
         number: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.number",
             defaultMessage: "ID",
           }),
         },
         firstName: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.first-name",
             defaultMessage: "First name",
           }),
         },
         surname: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.surname",
             defaultMessage: "Last name",
           }),
         },
+        sex: {
+          type: ["string", "null"],
+          format: "sex",
+          enum: ["F", "M"],
+          "@label": await this.ctx.i18n.getLocalizableUserText({
+            id: "document-processing-runner.id-card.sex",
+            defaultMessage: "Sex",
+          }),
+        },
         birthDate: {
-          type: "string",
+          type: ["string", "null"],
           format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.birth-date",
@@ -324,14 +335,14 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
           }),
         },
         birthPlace: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.birth-place",
             defaultMessage: "Birth place",
           }),
         },
         nationality: {
-          type: "string",
+          type: ["string", "null"],
           format: "country",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.nationality",
@@ -339,7 +350,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
           }),
         },
         issueDate: {
-          type: "string",
+          type: ["string", "null"],
           format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.issue-date",
@@ -347,7 +358,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
           }),
         },
         expirationDate: {
-          type: "string",
+          type: ["string", "null"],
           format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.expiration-date",
@@ -355,7 +366,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
           }),
         },
         issuingCountry: {
-          type: "string",
+          type: ["string", "null"],
           format: "country",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.issuing-country",
@@ -373,6 +384,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         "number",
         "firstName",
         "surname",
+        "sex",
         "birthDate",
         "birthPlace",
         "nationality",
@@ -384,6 +396,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         "number",
         "firstName",
         "surname",
+        "sex",
         "birthDate",
         "birthPlace",
         "nationality",
@@ -393,28 +406,37 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
       ],
       properties: {
         number: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.passport.number",
             defaultMessage: "ID",
           }),
         },
         firstName: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.passport.first-name",
             defaultMessage: "First name",
           }),
         },
         surname: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.passport.surname",
             defaultMessage: "Last name",
           }),
         },
+        sex: {
+          type: ["string", "null"],
+          format: "sex",
+          enum: ["F", "M"],
+          "@label": await this.ctx.i18n.getLocalizableUserText({
+            id: "document-processing-runner.passport.sex",
+            defaultMessage: "Sex",
+          }),
+        },
         birthDate: {
-          type: "string",
+          type: ["string", "null"],
           format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.passport.birth-date",
@@ -422,14 +444,14 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
           }),
         },
         birthPlace: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.passport.birth-place",
             defaultMessage: "Birth place",
           }),
         },
         nationality: {
-          type: "string",
+          type: ["string", "null"],
           format: "country",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.passport.nationality",
@@ -437,7 +459,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
           }),
         },
         issueDate: {
-          type: "string",
+          type: ["string", "null"],
           format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.passport.issue-date",
@@ -445,7 +467,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
           }),
         },
         expirationDate: {
-          type: "string",
+          type: ["string", "null"],
           format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.passport.expiration-date",
@@ -453,7 +475,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
           }),
         },
         issuingCountry: {
-          type: "string",
+          type: ["string", "null"],
           format: "country",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.passport.issuing-country",
@@ -466,12 +488,12 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
 
   private moneySchema() {
     return {
-      type: "object",
+      type: ["object", "null"],
       format: "currency",
       required: ["value", "currency"],
       properties: {
-        value: { type: "number" },
-        currency: { type: "string" },
+        value: { type: ["number", "null"] },
+        currency: { type: ["string", "null"] },
       },
     } as const;
   }
@@ -503,42 +525,42 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
       ],
       properties: {
         periodStart: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.payslip.period-start",
             defaultMessage: "From",
           }),
         },
         periodEnd: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.payslip.period-end",
             defaultMessage: "To",
           }),
         },
         employeeName: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.payslip.employee-name",
             defaultMessage: "Employee name",
           }),
         },
         employeeId: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.payslip.employee-id",
             defaultMessage: "Employee ID",
           }),
         },
         employerName: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.payslip.employer-name",
             defaultMessage: "Employer name",
           }),
         },
         employerId: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.payslip.employer-id",
             defaultMessage: "Employer ID",
@@ -596,49 +618,49 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
       ],
       properties: {
         bankName: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.bank-certificate.bank-name",
             defaultMessage: "Bank name",
           }),
         },
         bankAddress: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.bank-certificate.bank-address",
             defaultMessage: "Bank address",
           }),
         },
         accountOwner: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.bank-certificate.account-owner",
             defaultMessage: "Account owner",
           }),
         },
         accountOwnerId: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.bank-certificate.account-owner-id",
             defaultMessage: "Account owner ID",
           }),
         },
         accountNumber: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.bank-certificate.account-number",
             defaultMessage: "Account number",
           }),
         },
         accountSwiftNumber: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.bank-certificate.account-swift-number",
             defaultMessage: "SWIFT number",
           }),
         },
         accountOpenedAt: {
-          type: "string",
+          type: ["string", "null"],
           format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.bank-certificate.account-opened-at",
@@ -646,14 +668,14 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
           }),
         },
         issuedFor: {
-          type: "string",
+          type: ["string", "null"],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.bank-certificate.issued-for",
             defaultMessage: "Issued for",
           }),
         },
         issuedAt: {
-          type: "string",
+          type: ["string", "null"],
           format: "date",
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.bank-certificate.issued-at",

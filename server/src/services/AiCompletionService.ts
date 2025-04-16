@@ -76,7 +76,7 @@ export class AiCompletionService implements IAiCompletionService {
         // add these format values to the schema, but do not validate them
         // this is to avoid errors when the AI returns a value that is not in the expected format
         // but is still valid (e.g. ILLEGIBLE)
-        for (const format of ["date", "currency", "country"]) {
+        for (const format of ["date", "currency", "country", "sex"]) {
           ajv.addFormat(format, true);
         }
         if (!ajv.validate(config.responseFormat.schema, result)) {

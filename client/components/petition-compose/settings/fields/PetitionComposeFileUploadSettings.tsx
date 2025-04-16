@@ -109,6 +109,19 @@ export function PetitionComposeFileUploadSettings({
               defaultMessage="Enable AI document processing to automatically extract information from uploaded documents."
             />
           }
+          showPaidBadge={!isAiDocumentProcessingActive}
+          contactMessage={intl.formatMessage(
+            {
+              id: "generic.more-information-about",
+              defaultMessage: "Hi, I would like more information about {name}.",
+            },
+            {
+              name: intl.formatMessage({
+                id: "component.petition-compose-file-upload-settings.ai-document-processing",
+                defaultMessage: "AI document processing",
+              }),
+            },
+          )}
           controlId="ai-document-processing"
         />
       )}

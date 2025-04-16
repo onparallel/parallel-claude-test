@@ -111,6 +111,44 @@ export function PetitionRepliesMetadataCountry({
   );
 }
 
+export function PetitionRepliesMetadataGender({
+  label,
+  gender,
+}: {
+  label: string;
+  gender: string | null;
+}) {
+  const intl = useIntl();
+
+  const genderText = isNonNullish(gender)
+    ? gender === "M"
+      ? intl.formatMessage({
+          id: "component.petition-replies-metadata.gender-male",
+          defaultMessage: "Male",
+        })
+      : gender === "F"
+        ? intl.formatMessage({
+            id: "component.petition-replies-metadata.gender-female",
+            defaultMessage: "Female",
+          })
+        : gender
+    : "-";
+
+  return (
+    <Stack>
+      <Text as="span" fontWeight={500} color="gray.600" fontSize="sm">
+        {label}
+      </Text>
+      <HStack>
+        {isNonNullish(gender) ? (
+          <CopyToClipboardButton size="xs" fontSize="md" text={genderText} />
+        ) : null}
+        <Text as="span">{genderText}</Text>
+      </HStack>
+    </Stack>
+  );
+}
+
 export const InvalidIcon = forwardRef<SVGSVGElement, IconProps>(function InvalidIcon(
   { ...props },
   ref,

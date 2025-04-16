@@ -6,10 +6,11 @@ import {
 } from "@parallel/components/common/LocalizableUserTextRender";
 import { Fragment } from "react";
 import { useIntl } from "react-intl";
-import { isNonNullish } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import {
   PetitionRepliesMetadataCountry,
   PetitionRepliesMetadataDate,
+  PetitionRepliesMetadataGender,
   PetitionRepliesMetadataText,
 } from "./PetitionRepliesMetadata";
 
@@ -17,7 +18,7 @@ interface Schema {
   type: "object" | "array" | "string" | "number";
   "@label"?: LocalizableUserText;
   "@render"?: string[];
-  format?: "currency" | "date" | "country";
+  format?: "currency" | "date" | "country" | "sex";
   properties?: { [key: string]: Schema };
   items?: Schema;
 }
@@ -41,10 +42,21 @@ export function PetitionRepliesFieldFileSchema({
   const intl = useIntl();
 
   function formatCurrencyAmount(value: CurrencyAmount | null) {
-    return isNonNullish(value)
-      ? intl.formatNumber(value.value, { style: "currency", currency: value.currency })
-      : null;
+    if (isNullish(value)) return null;
+
+    if (isNonNullish(value.value)) {
+      if (isNonNullish(value.currency)) {
+        return intl.formatNumber(value.value, { style: "currency", currency: value.currency });
+      } else {
+        return intl.formatNumber(value.value, {
+          maximumFractionDigits: 2,
+          minimumFractionDigits: 2,
+        });
+      }
+    }
+    return null;
   }
+
   const title = localizableUserTextRender({
     intl,
     value: schema["@label"] ?? {},
@@ -57,6 +69,11 @@ export function PetitionRepliesFieldFileSchema({
       value: fieldSchema["@label"] ?? {},
       default: key,
     });
+
+    if (isNullish(value)) {
+      // Handle null values for any field type
+      return <PetitionRepliesMetadataText key={key} label={title} content={"-"} />;
+    }
 
     if (fieldSchema.type === "array" && Array.isArray(value)) {
       // Render array of elements
@@ -71,7 +88,7 @@ export function PetitionRepliesFieldFileSchema({
             {title}
           </Text>
           <Stack paddingX={3} spacing={3} divider={<Divider />}>
-            {value.map((item: any, index: number) => (
+            {(value as any[]).map((item: any, index: number) => (
               <Fragment key={`${key}-${index}`}>{renderContent(fieldSchema.items!, item)}</Fragment>
             ))}
           </Stack>
@@ -116,12 +133,20 @@ export function PetitionRepliesFieldFileSchema({
       return <PetitionRepliesMetadataCountry key={key} label={title} countryCode={value} />;
     }
 
+    if (fieldSchema.format === "sex") {
+      return <PetitionRepliesMetadataGender key={key} label={title} gender={value} />;
+    }
+
     // Render simple fields
-    return <PetitionRepliesMetadataText key={key} label={title} content={value ?? "-"} />;
+    return <PetitionRepliesMetadataText key={key} label={title} content={value} />;
   };
 
   // Render content of the main schema or sub-schemas
   const renderContent = (currentSchema: Schema, currentData: any) => {
+    if (isNullish(currentData)) {
+      return null;
+    }
+
     if (currentSchema.type === "object" && currentSchema.properties) {
       // Determine keys to display and ensure they follow schema order
       const keysToRender = currentSchema["@render"] ?? Object.keys(currentSchema.properties);

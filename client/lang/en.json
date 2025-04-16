@@ -220,6 +220,11 @@
     "context": "Users"
   },
   {
+    "term": "component.ai-generated-popover.default-message",
+    "definition": "AI-processed information may contain inaccuracies. Make sure to review it before making any decisions.",
+    "context": "AI-processed information may contain inaccuracies. Make sure to review it before making any decisions."
+  },
+  {
     "term": "component.alerts-contact-us-dialog.body-1",
     "definition": "Program alerts on your profiles for deadline reviews.",
     "context": "Program alerts on your profiles for deadline reviews."
@@ -5220,6 +5225,11 @@
     "context": "Paid"
   },
   {
+    "term": "component.paid-popover.content",
+    "definition": "<a>Contact sales</a> for more information about this feature and pricing.",
+    "context": "<a>Contact sales</a> for more information about this feature and pricing."
+  },
+  {
     "term": "component.password-restrict-petition.body",
     "definition": "This parallel is protected. Enter the password to unlock it.",
     "context": "This parallel is protected. Enter the password to unlock it."
@@ -7343,6 +7353,16 @@
     "term": "component.petition-replies-filtered-fields.hidden-fields-explanation",
     "definition": "Fields not shown to the recipient because the visibility conditions are not met.",
     "context": "Fields not shown to the recipient because the visibility conditions are not met."
+  },
+  {
+    "term": "component.petition-replies-metadata.gender-female",
+    "definition": "Female",
+    "context": "Female"
+  },
+  {
+    "term": "component.petition-replies-metadata.gender-male",
+    "definition": "Male",
+    "context": "Male"
   },
   {
     "term": "component.petition-replies-summary.activate-petition-summary-support-message",
@@ -13588,6 +13608,11 @@
     "term": "generic.months",
     "definition": "months",
     "context": "months"
+  },
+  {
+    "term": "generic.more-information-about",
+    "definition": "Hi, I would like more information about {name}.",
+    "context": "Hi, I would like more information about {name}."
   },
   {
     "term": "generic.more-options",
