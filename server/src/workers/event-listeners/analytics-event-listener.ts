@@ -70,10 +70,10 @@ async function loadUserDataByUserId(userId: number, ctx: WorkerContext) {
   return userData;
 }
 
-async function loadUserStats(userId: number, ctx: WorkerContext) {
+async function getUserStats(userId: number, ctx: WorkerContext) {
   const [loginEvents, stats] = await Promise.all([
-    ctx.system.loadUserLoggedInEvents(userId),
-    ctx.petitions.loadPetitionStatsForUser(userId),
+    ctx.system.getUserLoggedInEvents(userId),
+    ctx.petitions.getPetitionStatsForUser(userId),
   ]);
   return {
     logins: loginEvents.length,
@@ -248,7 +248,7 @@ async function trackUserLoggedInEvent(event: UserLoggedInEvent, ctx: WorkerConte
   const [user, userData, stats, permissions] = await Promise.all([
     loadUser(event.data.user_id, ctx),
     loadUserDataByUserId(event.data.user_id, ctx),
-    loadUserStats(event.data.user_id, ctx),
+    getUserStats(event.data.user_id, ctx),
     ctx.users.loadUserPermissions(event.data.user_id),
   ]);
 

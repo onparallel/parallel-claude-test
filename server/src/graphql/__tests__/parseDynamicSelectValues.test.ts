@@ -136,7 +136,7 @@ describe("parseDynamicSelectValues", () => {
         ["Castilla y León", "Soria", "Soria"],
         ["Castilla y León", "Soria", "El Burgo de Osma"],
       ]),
-    ).toThrowError("Missing value at (4, 1)");
+    ).toThrow("Missing value at (4, 1)");
   });
 
   it("throws on incomplete row", () => {
@@ -149,7 +149,7 @@ describe("parseDynamicSelectValues", () => {
         ["Cataluña", "Barcelona", "Terrassa"],
         ["Cataluña", "Tarragona"],
       ]),
-    ).toThrowError("Not enough data at row 5");
+    ).toThrow("Not enough data at row 5");
   });
 
   it("throws when not enough columns", () => {
@@ -169,6 +169,6 @@ describe("parseDynamicSelectValues", () => {
         ["Soria"],
         ["El Burgo de Osma"],
       ]),
-    ).toThrowError("Not enough columns");
+    ).toThrow("Not enough columns");
   });
 });

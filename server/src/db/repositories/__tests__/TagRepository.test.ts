@@ -62,16 +62,14 @@ describe("repositories/TagRepository", () => {
   it("should allow to create tags with same name in different organizations", async () => {
     await expect(
       repo.createTag({ color: "#FF00FF", name: tags[1].name }, otherUser),
-    ).resolves.not.toThrowError();
+    ).resolves.not.toThrow();
   });
 
   it("should not allow to create a tag with a taken name in the same organization", async () => {
-    await expect(
-      repo.createTag({ color: "#FFFFFF", name: tags[3].name }, user),
-    ).rejects.toThrowError();
+    await expect(repo.createTag({ color: "#FFFFFF", name: tags[3].name }, user)).rejects.toThrow();
   });
 
   it("should not allow to use a taken name to update the tag", async () => {
-    await expect(repo.updateTag(tags[2].id, { name: tags[3].name }, user)).rejects.toThrowError();
+    await expect(repo.updateTag(tags[2].id, { name: tags[3].name }, user)).rejects.toThrow();
   });
 });

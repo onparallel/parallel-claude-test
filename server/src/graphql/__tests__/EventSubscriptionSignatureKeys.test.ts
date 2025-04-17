@@ -96,7 +96,7 @@ describe("GraphQL/EventSubscriptionSignatureKeys", () => {
           const publicKeyBuffer = Buffer.from(key.public_key, "base64");
           assert(publicKeyBuffer instanceof Buffer);
         }
-      }).not.toThrowError();
+      }).not.toThrow();
     });
   });
 

@@ -18,15 +18,12 @@ export async function signatureCancelledRequestError(
   const petition = await context.petitions.loadPetition(signatureRequest.petition_id);
   if (!petition) return;
 
-  const users = await context.petitions.getUsersOnPetition(petition.id);
+  const users = (await context.petitions.loadUsersOnPetition(petition.id)).filter(
+    (u) => u.is_subscribed,
+  );
 
   const emails = [];
   for (const user of users) {
-    const isSubscribed = await context.petitions.isUserSubscribedToPetition(user.id, petition.id);
-    if (!isSubscribed) {
-      continue;
-    }
-
     const userData = await context.users.loadUserData(user.user_data_id);
     if (!userData) {
       throw new Error(`UserData:${user.user_data_id} not found for User:${user.id}`);

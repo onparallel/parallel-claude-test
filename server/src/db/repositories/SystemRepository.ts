@@ -25,7 +25,7 @@ export class SystemRepository extends BaseRepository {
     return systemEvents;
   }
 
-  async loadUserLoggedInEvents(userId: number) {
+  async getUserLoggedInEvents(userId: number) {
     return await this.from("system_event")
       .where({ type: "USER_LOGGED_IN" })
       .whereRaw(/* sql */ `(("data" ->> 'user_id')::int) = ?`, [userId])

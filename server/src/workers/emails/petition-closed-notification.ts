@@ -15,6 +15,7 @@ import {
   renderSlateWithPlaceholdersToText,
 } from "../../util/slate/placeholders";
 import { random } from "../../util/token";
+import { withTempDir } from "../../util/withTempDir";
 
 export async function petitionClosedNotification(
   payload: {
@@ -129,11 +130,13 @@ export async function petitionClosedNotification(
         filename = fileUpload.filename;
       } else {
         const owner = await context.petitions.loadPetitionOwner(petition.id);
+        await using tempDir = await withTempDir();
         const binderPath = await context.petitionBinder.createBinder(owner!.id, {
           petitionId: petition.id,
           documentTitle: payload.pdf_export_title ?? "",
           maxOutputSize: 18 * 1024 * 1024,
           outputFileName: filename,
+          outputFilePath: tempDir.path,
         });
 
         res = await context.storage.temporaryFiles.uploadFile(

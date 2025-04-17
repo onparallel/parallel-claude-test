@@ -1,6 +1,6 @@
 import "reflect-metadata";
 // keep this space to prevent import sorting, removing init from top
-import { readFile, unlink } from "fs/promises";
+import { readFile } from "fs/promises";
 import { inject, injectable } from "inversify";
 import pMap from "p-map";
 import { isNonNullish } from "remeda";
@@ -34,6 +34,7 @@ import { removeKeys } from "../util/remedaExtensions";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { random } from "../util/token";
 import { Maybe, Replace } from "../util/types";
+import { withTempDir } from "../util/withTempDir";
 import { createQueueWorker, QueueWorker } from "./helpers/createQueueWorker";
 
 type SignatureOrgIntegration = Replace<
@@ -118,7 +119,6 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
       customDocumentTemporaryFileId,
     } = signature.signature_config;
 
-    let documentTmpPath: string | null = null;
     const integration = await this.fetchOrgSignatureIntegration(orgIntegrationId);
     try {
       const owner = await this.petitions.loadPetitionOwner(petition.id);
@@ -130,7 +130,8 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
       const outputFileName =
         title || (await this.getDefaultFileName(petition.id, petition.recipient_locale));
 
-      documentTmpPath = await this.petitionBinder.createBinder(owner!.id, {
+      await using tempDir = await withTempDir();
+      const documentTmpPath = await this.petitionBinder.createBinder(owner!.id, {
         petitionId: petition.id,
         documentTitle: title,
         showSignatureBoxes: true,
@@ -138,6 +139,7 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
         outputFileName,
         includeAnnexedDocuments: true,
         customDocumentTemporaryFileId,
+        outputFilePath: tempDir.path,
       });
 
       const documentTmpFile = await this.storeTemporaryDocument(documentTmpPath, outputFileName);
@@ -246,12 +248,6 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
       if (errorCode === "UNKNOWN_ERROR") {
         throw error;
       }
-    } finally {
-      try {
-        if (isNonNullish(documentTmpPath)) {
-          await unlink(documentTmpPath);
-        }
-      } catch {}
     }
   }
 

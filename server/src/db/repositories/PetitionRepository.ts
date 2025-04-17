@@ -6492,26 +6492,24 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async getUsersOnPetition(
-    petitionId: number,
-    opts?: { onlySubscribed?: boolean; excludeUserIds?: number[] },
-  ) {
-    return await this.from("user")
-      .join("petition_permission", "user.id", "petition_permission.user_id")
-      .where("petition_permission.petition_id", petitionId)
-      .whereNull("petition_permission.deleted_at")
-      .where("user.status", "ACTIVE")
-      .whereNull("user.deleted_at")
-      .mmodify((q) => {
-        if (opts?.onlySubscribed) {
-          q.where("petition_permission.is_subscribed", true);
-        }
-        if (opts?.excludeUserIds && opts.excludeUserIds.length > 0) {
-          q.whereNotIn("user.id", opts.excludeUserIds);
-        }
-      })
-      .distinct<User[]>("user.*");
-  }
+  readonly loadUsersOnPetition = this.buildLoader<number, (User & { is_subscribed: boolean })[]>(
+    async (petitionIds) => {
+      const rows = await this.from("user")
+        .join("petition_permission", "user.id", "petition_permission.user_id")
+        .whereIn("petition_permission.petition_id", petitionIds)
+        .whereNotNull("petition_permission.user_id")
+        .whereNull("petition_permission.deleted_at")
+        .where("user.status", "ACTIVE")
+        .whereNull("user.deleted_at")
+        .distinctOn("user.id", "petition_permission.petition_id")
+        .select<
+          (User & { is_subscribed: boolean; petition_id: number })[]
+        >("user.*", "petition_permission.is_subscribed", "petition_permission.petition_id");
+
+      const byPetitionId = groupBy(rows, (r) => r.petition_id);
+      return petitionIds.map((petitionId) => byPetitionId[petitionId] ?? []);
+    },
+  );
 
   async isUserSubscribedToPetition(userId: number, petitionId: number) {
     return await this.exists(
@@ -6870,7 +6868,7 @@ export class PetitionRepository extends BaseRepository {
     return access;
   }
 
-  async loadPetitionStatsForUser(userId: number) {
+  async getPetitionStatsForUser(userId: number) {
     const petitions = await this.raw<{ status: PetitionStatus; sent_at: Date }>(
       /* sql */ `
       select p.status, pa.created_at sent_at from petition p 

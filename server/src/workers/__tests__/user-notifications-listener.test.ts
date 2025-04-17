@@ -30,7 +30,9 @@ describe("Worker - User Notifications Listener", () => {
     ctx = container.get<WorkerContext>(WorkerContext);
     knex = container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
+  });
 
+  beforeEach(async () => {
     [organization] = await mocks.createRandomOrganizations(1);
     users = await mocks.createRandomUsers(organization.id, 2);
     [petition] = await mocks.createRandomPetitions(organization.id, users[0].id, 1);
@@ -48,51 +50,6 @@ describe("Worker - User Notifications Listener", () => {
       [contact.id],
       users[0].id,
     );
-  });
-
-  afterEach(async () => {
-    await mocks.clearUserNotifications();
-    const extraUsers = await mocks.knex
-      .from("user")
-      .whereNotIn(
-        "id",
-        users.map((u) => u.id),
-      )
-      .select("*");
-
-    if (extraUsers.length > 0) {
-      await mocks.knex
-        .from("petition_permission")
-        .whereIn(
-          "user_id",
-          extraUsers.map((u) => u.id),
-        )
-        .delete();
-
-      await mocks.knex
-        .from("user_group_member")
-        .whereIn(
-          "user_id",
-          extraUsers.map((u) => u.id),
-        )
-        .delete();
-
-      await mocks.knex
-        .from("user")
-        .whereIn(
-          "id",
-          extraUsers.map((u) => u.id),
-        )
-        .delete();
-
-      await mocks.knex
-        .from("user_data")
-        .whereIn(
-          "id",
-          extraUsers.map((u) => u.user_data_id),
-        )
-        .delete();
-    }
   });
 
   afterAll(async () => {

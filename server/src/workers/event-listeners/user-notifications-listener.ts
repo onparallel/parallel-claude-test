@@ -23,11 +23,12 @@ async function createPetitionCompletedUserNotifications(
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
 
-  const users = await ctx.petitions.getUsersOnPetition(event.petition_id, {
-    onlySubscribed: true,
-    // if a user completed it, avoid creating a notification for that user
-    excludeUserIds: isNonNullish(event.data.user_id) ? [event.data.user_id] : undefined,
-  });
+  const users = (await ctx.petitions.loadUsersOnPetition(event.petition_id)).filter(
+    (u) =>
+      u.is_subscribed &&
+      // if a user completed it, avoid creating a notification for that user
+      u.id !== event.data.user_id,
+  );
 
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({
@@ -63,18 +64,12 @@ async function createCommentPublishedUserNotifications(
     ...groupMembers.flatMap((members) => members.map((m) => m.user_id)),
   ]);
 
-  const [users, subscribedUsers] = await Promise.all([
-    ctx.petitions.getUsersOnPetition(event.petition_id, {
-      excludeUserIds: comment!.user_id ? [comment!.user_id] : undefined,
-    }),
-    ctx.petitions.getUsersOnPetition(event.petition_id, {
-      onlySubscribed: true,
-      excludeUserIds: comment!.user_id ? [comment!.user_id] : undefined,
-    }),
-  ]);
+  const users = (await ctx.petitions.loadUsersOnPetition(event.petition_id)).filter(
+    (u) => u.id !== comment!.user_id,
+  );
 
   const userIds = users.map((u) => u.id);
-  const subscribedUserIds = subscribedUsers.map((u) => u.id);
+  const subscribedUserIds = users.filter((u) => u.is_subscribed).map((u) => u.id);
 
   const userIdsToNotify = userIds.filter(
     (userId) => subscribedUserIds.includes(userId) || mentionedUserIds.includes(userId),
@@ -240,7 +235,9 @@ async function createSignatureCompletedUserNotifications(
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
 
-  const users = await ctx.petitions.getUsersOnPetition(event.petition_id, { onlySubscribed: true });
+  const users = (await ctx.petitions.loadUsersOnPetition(event.petition_id)).filter(
+    (u) => u.is_subscribed,
+  );
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({
       type: "SIGNATURE_COMPLETED",
@@ -260,14 +257,12 @@ async function createSignatureCancelledUserNotifications(
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
 
-  const users = await ctx.petitions.getUsersOnPetition(petition.id, {
-    onlySubscribed: true,
-    // if a user cancelled the signature, avoid creating a notification for that user
-    excludeUserIds:
-      event.data.cancel_reason === "CANCELLED_BY_USER"
-        ? [event.data.cancel_data.user_id!]
-        : undefined,
-  });
+  const users = (await ctx.petitions.loadUsersOnPetition(petition.id)).filter(
+    (u) =>
+      u.is_subscribed &&
+      // if a user cancelled the signature, avoid creating a notification for that user
+      (event.data.cancel_reason !== "CANCELLED_BY_USER" || u.id !== event.data.cancel_data.user_id),
+  );
 
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({
@@ -315,10 +310,11 @@ async function createPetitionSharedUserNotifications(
   } else if (event.type === "GROUP_PERMISSION_ADDED") {
     const groupMembers = await ctx.userGroups.loadUserGroupMembers(event.data.user_group_id);
     const groupMemberUserIds = groupMembers.map((m) => m.user_id);
-    const subscribedUsers = await ctx.petitions.getUsersOnPetition(
-      event.petition_id,
-      // avoid sending notification to the user that shared the petition if he is a member of the group
-      { onlySubscribed: true, excludeUserIds: [event.data.user_id] },
+    const subscribedUsers = (await ctx.petitions.loadUsersOnPetition(event.petition_id)).filter(
+      (u) =>
+        u.is_subscribed &&
+        // avoid sending notification to the user that shared the petition if he is a member of the group
+        u.id !== event.data.user_id,
     );
 
     await ctx.petitions.createPetitionUserNotification(
@@ -343,7 +339,9 @@ async function createRemindersOptOutNotifications(event: RemindersOptOutEvent, c
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
 
-  const users = await ctx.petitions.getUsersOnPetition(event.petition_id, { onlySubscribed: true });
+  const users = (await ctx.petitions.loadUsersOnPetition(event.petition_id)).filter(
+    (u) => u.is_subscribed,
+  );
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({
       type: "REMINDERS_OPT_OUT",
@@ -365,7 +363,9 @@ async function createAccessActivatedFromPublicPetitionLinkUserNotifications(
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
 
-  const users = await ctx.petitions.getUsersOnPetition(event.petition_id, { onlySubscribed: true });
+  const users = (await ctx.petitions.loadUsersOnPetition(event.petition_id)).filter(
+    (u) => u.is_subscribed,
+  );
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({
       type: "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
