@@ -109,6 +109,11 @@ export function buildConfig() {
         visibilityTimeout: parseInt(process.env.WORKERS_DELAY_QUEUE_VISIBILITY_TIMEOUT!),
         heartbeatInterval: parseInt(process.env.WORKERS_DELAY_QUEUE_HEARTBEAT_INTERVAL!),
       },
+      "webhooks-worker": {
+        queueUrl: process.env.WORKERS_WEBHOOKS_ENDPOINT!,
+        visibilityTimeout: parseInt(process.env.WORKERS_WEBHOOKS_VISIBILITY_TIMEOUT!),
+        heartbeatInterval: parseInt(process.env.WORKERS_WEBHOOKS_HEARTBEAT_INTERVAL!),
+      },
     },
     cronWorkers: {
       "scheduled-trigger": {

@@ -16,6 +16,7 @@ import { MaybePromise } from "../../util/types";
 import { DelayQueuePayload } from "../delay-queue";
 import { EmailEventsWorkerPayload } from "../email-events";
 import { EmailSenderWorkerPayload } from "../email-sender";
+import { WebhooksWorkerPayload } from "../queues/WebhooksWorkerQueue";
 import { SignatureWorkerPayload } from "../signature-worker";
 import { TaskWorkerPayload } from "../task-worker";
 import { EventProcessorPayload } from "./EventProcessor";
@@ -27,6 +28,7 @@ export type QueueWorkerPayload_OLD<Q extends keyof Config["queueWorkers"]> = {
   "signature-worker": SignatureWorkerPayload;
   "task-worker": TaskWorkerPayload;
   "delay-queue": DelayQueuePayload;
+  "webhooks-worker": WebhooksWorkerPayload;
 }[Q];
 
 export interface QueueWorkerOptions_OLD<Q extends keyof Config["queueWorkers"]> {

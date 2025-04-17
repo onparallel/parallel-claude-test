@@ -76,7 +76,6 @@ import {
   IPetitionMessageContextService,
   PETITION_MESSAGE_CONTEXT_SERVICE,
 } from "./services/PetitionMessageContextService";
-import { IPrinter, PRINTER } from "./services/Printer";
 import {
   PROFILE_EXCEL_EXPORT_SERVICE,
   ProfileExcelExportService,
@@ -124,7 +123,6 @@ export class ApiContext {
     @inject(AUTH) public readonly auth: IAuth,
     @inject(EMAILS) public readonly emails: IEmailsService,
     @inject(SIGNATURE) public readonly signature: ISignatureService,
-    @inject(PRINTER) public readonly printer: IPrinter,
     @inject(FETCH_SERVICE) public readonly fetch: IFetchService,
     @inject(IMAGE_SERVICE) public readonly images: IImageService,
     @inject(ORG_LIMITS_SERVICE) public readonly orgLimits: IOrgLimitsService,
@@ -139,7 +137,6 @@ export class ApiContext {
     public readonly petitionImportExport: IPetitionImportExportService,
     @inject(PETITION_MESSAGE_CONTEXT_SERVICE)
     public readonly petitionMessageContext: IPetitionMessageContextService,
-    @inject(AI_COMPLETION_SERVICE) public readonly aiCompletion: IAiCompletionService,
     @inject(BACKGROUND_CHECK_SERVICE) public readonly backgroundCheck: IBackgroundCheckService,
     @inject(EVENT_SUBSCRIPTION_SERVICE)
     public readonly eventSubscription: IEventSubscriptionService,
@@ -193,10 +190,7 @@ export class WorkerContext {
     @inject(SMTP) public readonly smtp: ISmtp,
     @inject(EMAILS) public readonly emails: IEmailsService,
     @inject(ANALYTICS) public readonly analytics: IAnalyticsService,
-    @inject(PRINTER) public readonly printer: IPrinter,
-    @inject(SIGNATURE) public readonly signature: ISignatureService,
     @inject(PETITION_BINDER) public readonly petitionBinder: IPetitionBinder,
-    @inject(IMAGE_SERVICE) public readonly images: IImageService,
     @inject(I18N_SERVICE) public readonly i18n: II18nService,
     @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
     @inject(QUEUES_SERVICE) public readonly queues: IQueuesService,
@@ -205,15 +199,12 @@ export class WorkerContext {
     @inject(ORGANIZATION_LAYOUT_SERVICE)
     public readonly layouts: IOrganizationLayoutService,
     @inject(FETCH_SERVICE) public readonly fetch: IFetchService,
-    @inject(ENCRYPTION_SERVICE) public readonly encryption: IEncryptionService,
     @inject(PETITION_MESSAGE_CONTEXT_SERVICE)
     public readonly petitionMessageContext: IPetitionMessageContextService,
     @inject(BANKFLIP_SERVICE) public readonly bankflip: IBankflipService,
     @inject(ORGANIZATION_CREDITS_SERVICE) public readonly orgCredits: IOrganizationCreditsService,
     @inject(AI_COMPLETION_SERVICE) public readonly aiCompletion: IAiCompletionService,
     @inject(BACKGROUND_CHECK_SERVICE) public readonly backgroundCheck: IBackgroundCheckService,
-    @inject(EVENT_SUBSCRIPTION_SERVICE)
-    public readonly eventSubscription: IEventSubscriptionService,
     @inject(REDIS) public readonly redis: IRedis,
     @inject(ID_VERIFICATION_SERVICE) public readonly idVerification: IdVerificationService,
     @inject(DOCUMENT_PROCESSING_SERVICE)
@@ -224,6 +215,8 @@ export class WorkerContext {
     @inject(PROFILE_EXCEL_EXPORT_SERVICE)
     public readonly profileExcelExport: ProfileExcelExportService,
     @inject(IMANAGE_FILE_EXPORT_INTEGRATION) public readonly iManageExport: IFileExportIntegration,
+    @inject(EVENT_SUBSCRIPTION_SERVICE)
+    public readonly eventSubscription: IEventSubscriptionService,
 
     // Repositories
     public readonly contacts: ContactRepository,

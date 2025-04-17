@@ -15,6 +15,7 @@ import { ILogger, LOGGER } from "../src/services/Logger";
 import { IQueuesService, QUEUES_SERVICE } from "../src/services/QueuesService";
 import { IRedis, REDIS } from "../src/services/Redis";
 import { IStorageService, STORAGE_SERVICE } from "../src/services/StorageService";
+import { WebhooksWorker } from "../src/workers/queues/WebhooksWorkerQueue";
 import {
   MockAiAssistantService,
   MockAnalyticsService,
@@ -75,6 +76,8 @@ export async function createTestContainer() {
   container
     .bind<IProfileExternalSourceIntegration>(EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION)
     .to(MockEInformaProfileExternalSourceIntegration);
+
+  container.bind(WebhooksWorker).toSelf();
 
   return container;
 }

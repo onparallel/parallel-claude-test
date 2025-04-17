@@ -6,20 +6,11 @@ import { WorkerContext } from "../../context";
 import { EventSubscription, Organization, Petition, User } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { ENCRYPTION_SERVICE, IEncryptionService } from "../../services/EncryptionService";
-import { FETCH_SERVICE, IFetchService } from "../../services/FetchService";
+import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
-import { unMaybeFunction } from "../../util/types";
 import { petitionEventSubscriptionsListener } from "../event-listeners/petition-event-subscriptions-listener";
-
-function expectRequestInit(index: number, value: any) {
-  return expect.toSatisfy((init: Parameters<IFetchService["fetch"]>[1]) => {
-    expect(unMaybeFunction(init, index)).toMatchObject(value);
-    return true;
-  });
-}
 
 describe("Worker - Petition Event Subscriptions Listener", () => {
   let ctx: WorkerContext;
@@ -33,11 +24,10 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
   let petition: Petition;
   let subscriptions: EventSubscription[];
 
-  let fetchSpy: jest.SpyInstance<
-    ReturnType<IFetchService["fetch"]>,
-    Parameters<IFetchService["fetch"]>
+  let queueSpy: jest.SpyInstance<
+    ReturnType<IQueuesService["enqueueMessages"]>,
+    Parameters<IQueuesService["enqueueMessages"]>
   >;
-  let emailSpy: jest.SpyInstance;
 
   let encryptionService: IEncryptionService;
 
@@ -50,8 +40,7 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
     [organization] = await mocks.createRandomOrganizations(1);
     users = await mocks.createRandomUsers(organization.id, 6);
 
-    emailSpy = jest.spyOn(container.get<IEmailsService>(EMAILS), "sendDeveloperWebhookFailedEmail");
-    fetchSpy = jest.spyOn(container.get<IFetchService>(FETCH_SERVICE), "fetch");
+    queueSpy = jest.spyOn(container.get<IQueuesService>(QUEUES_SERVICE), "enqueueMessages");
 
     encryptionService = container.get<IEncryptionService>(ENCRYPTION_SERVICE);
   });
@@ -126,8 +115,7 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
   });
 
   afterEach(async () => {
-    fetchSpy.mockClear();
-    emailSpy.mockClear();
+    queueSpy.mockClear();
     ctx.subscriptions.loadEventSubscriptionSignatureKeysBySubscriptionId.dataloader.clearAll();
     ctx.subscriptions.loadPetitionEventSubscriptionsByUserId.dataloader.clearAll();
     await mocks.knex.from("event_subscription_signature_key").delete();
@@ -160,64 +148,30 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
       ctx,
     );
 
-    const body = JSON.stringify({
-      id: toGlobalId("PetitionEvent", event.id),
-      petitionId: toGlobalId("Petition", event.petition_id),
-      type: event.type,
-      data: {
-        userId: toGlobalId("User", users[0].id),
-      },
-      createdAt: event.created_at,
-    });
-
-    expect(fetchSpy).toHaveBeenCalledTimes(4);
-    expect(fetchSpy.mock.calls[0]).toMatchObject([
-      "https://users.0.com/events",
-      expectRequestInit(0, {
-        method: "POST",
-        body,
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+    expect(queueSpy).toHaveBeenCalledTimes(1);
+    expect(queueSpy.mock.calls[0]).toEqual([
+      "webhooks-worker",
+      [0, 1, 2, 4].map((index) => ({
+        id: `webhook-${toGlobalId("EventSubscription", subscriptions[index].id)}`,
+        body: {
+          subscriptionId: subscriptions[index].id,
+          endpoint: subscriptions[index].endpoint,
+          body: {
+            id: toGlobalId("PetitionEvent", event.id),
+            petitionId: toGlobalId("Petition", event.petition_id),
+            type: "PETITION_CREATED",
+            data: {
+              userId: toGlobalId("User", users[0].id),
+            },
+            createdAt: event.created_at,
+          },
+          headers: {
+            "Content-Type": "application/json",
+            "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+            "X-Parallel-Signature-Timestamp": expect.any(String),
+          },
         },
-      }),
-      { timeout: 15_000, maxRetries: 3 },
-    ]);
-    expect(fetchSpy.mock.calls[1]).toMatchObject([
-      "https://users.1.com/events",
-      expectRequestInit(0, {
-        method: "POST",
-        body,
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-        },
-      }),
-      { timeout: 15_000, maxRetries: 3 },
-    ]);
-    expect(fetchSpy.mock.calls[2]).toMatchObject([
-      "https://users.2.com/events",
-      expectRequestInit(0, {
-        method: "POST",
-        body,
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-        },
-      }),
-      { timeout: 15_000, maxRetries: 3 },
-    ]);
-    expect(fetchSpy.mock.calls[3]).toMatchObject([
-      "https://users.5.com/events",
-      expectRequestInit(0, {
-        method: "POST",
-        body,
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-        },
-      }),
-      { timeout: 15_000, maxRetries: 3 },
+      })),
     ]);
   });
 
@@ -238,28 +192,32 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
       ctx,
     );
 
-    const body = JSON.stringify({
-      id: toGlobalId("PetitionEvent", event.id),
-      petitionId: toGlobalId("Petition", event.petition_id),
-      type: event.type,
-      data: {
-        userId: toGlobalId("User", users[1].id),
-      },
-      createdAt: event.created_at,
-    });
-
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
-    expect(fetchSpy.mock.calls[0]).toMatchObject([
-      "https://users.0.com/events",
-      expectRequestInit(0, {
-        method: "POST",
-        body,
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+    expect(queueSpy).toHaveBeenCalledTimes(1);
+    expect(queueSpy.mock.calls[0]).toEqual([
+      "webhooks-worker",
+      [
+        {
+          id: `webhook-${toGlobalId("EventSubscription", subscriptions[0].id)}`,
+          body: {
+            subscriptionId: subscriptions[0].id,
+            endpoint: "https://users.0.com/events",
+            body: {
+              id: toGlobalId("PetitionEvent", event.id),
+              petitionId: toGlobalId("Petition", event.petition_id),
+              type: "PETITION_COMPLETED",
+              data: {
+                userId: toGlobalId("User", users[1].id),
+              },
+              createdAt: event.created_at,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+              "X-Parallel-Signature-Timestamp": expect.any(String),
+            },
+          },
         },
-      }),
-      { timeout: 15_000, maxRetries: 3 },
+      ],
     ]);
   });
 
@@ -299,137 +257,118 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
       createdAt: event.created_at,
     });
 
-    expect(fetchSpy).toHaveBeenCalledTimes(3);
-    expect(fetchSpy.mock.calls[0]).toMatchObject([
-      "https://users.0.com/events",
-      expectRequestInit(0, {
-        method: "POST",
-        body,
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+    expect(queueSpy).toHaveBeenCalledTimes(1);
+    expect(queueSpy.mock.calls[0]).toEqual([
+      "webhooks-worker",
+      [
+        {
+          id: `webhook-${toGlobalId("EventSubscription", subscriptions[0].id)}`,
+          body: {
+            subscriptionId: subscriptions[0].id,
+            endpoint: "https://users.0.com/events",
+            body: {
+              id: toGlobalId("PetitionEvent", event.id),
+              petitionId: toGlobalId("Petition", event.petition_id),
+              type: "PETITION_CREATED",
+              data: {
+                userId: toGlobalId("User", users[1].id),
+              },
+              createdAt: event.created_at,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+              "X-Parallel-Signature-Timestamp": expect.any(String),
+            },
+          },
         },
-      }),
-      { timeout: 15_000, maxRetries: 3 },
-    ]);
-
-    expect(fetchSpy.mock.calls[1]).toMatchObject([
-      "https://users.1.com/events",
-      expectRequestInit(0, {
-        method: "POST",
-        body,
-        headers: expect.toSatisfy((headers: Record<string, string>) => {
-          expect(headers).toMatchObject({
-            "Content-Type": "application/json",
-            "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-            "X-Parallel-Signature-Timestamp": expect.any(String),
-            ...fromEntries(
-              [0, 1].map((i) => [
-                `X-Parallel-Signature-${i + 1}`,
-                expect.toSatisfy((signature: string) =>
-                  verify(
-                    null,
-                    Buffer.from(body),
-                    {
-                      key: Buffer.from(keys[i].public_key, "base64"),
-                      format: "der",
-                      type: "spki",
-                    },
-                    Buffer.from(signature, "base64"),
-                  ),
-                ),
-              ]),
-            ),
-            ...fromEntries(
-              [0, 1].map((i) => [
-                `X-Parallel-Signature-V2-${i + 1}`,
-                expect.toSatisfy((signature: string) =>
-                  verify(
-                    null,
-                    Buffer.from(
-                      "https://users.1.com/events" +
-                        headers["X-Parallel-Signature-Timestamp"] +
-                        body,
+        {
+          id: `webhook-${toGlobalId("EventSubscription", subscriptions[1].id)}`,
+          body: {
+            subscriptionId: subscriptions[1].id,
+            endpoint: "https://users.1.com/events",
+            body: {
+              id: toGlobalId("PetitionEvent", event.id),
+              petitionId: toGlobalId("Petition", event.petition_id),
+              type: "PETITION_CREATED",
+              data: {
+                userId: toGlobalId("User", users[1].id),
+              },
+              createdAt: event.created_at,
+            },
+            headers: expect.toSatisfy((headers: Record<string, string>) => {
+              expect(headers).toMatchObject({
+                "Content-Type": "application/json",
+                "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+                "X-Parallel-Signature-Timestamp": expect.any(String),
+                ...fromEntries(
+                  [0, 1].map((i) => [
+                    `X-Parallel-Signature-${i + 1}`,
+                    expect.toSatisfy((signature: string) =>
+                      verify(
+                        null,
+                        new Uint8Array(Buffer.from(body)),
+                        {
+                          key: Buffer.from(keys[i].public_key, "base64"),
+                          format: "der",
+                          type: "spki",
+                        },
+                        new Uint8Array(Buffer.from(signature, "base64")),
+                      ),
                     ),
-                    {
-                      key: Buffer.from(keys[i].public_key, "base64"),
-                      format: "der",
-                      type: "spki",
-                    },
-                    Buffer.from(signature, "base64"),
-                  ),
+                  ]),
                 ),
-              ]),
-            ),
-          });
-          return true;
-        }),
-      }),
-      { timeout: 15_000, maxRetries: 3 },
-    ]);
-    expect(fetchSpy.mock.calls[2]).toMatchObject([
-      "https://users.5.com/events",
-      expectRequestInit(0, {
-        method: "POST",
-        body,
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+                ...fromEntries(
+                  [0, 1].map((i) => [
+                    `X-Parallel-Signature-V2-${i + 1}`,
+                    expect.toSatisfy((signature: string) =>
+                      verify(
+                        null,
+                        new Uint8Array(
+                          Buffer.from(
+                            "https://users.1.com/events" +
+                              headers["X-Parallel-Signature-Timestamp"] +
+                              body,
+                          ),
+                        ),
+                        {
+                          key: Buffer.from(keys[i].public_key, "base64"),
+                          format: "der",
+                          type: "spki",
+                        },
+                        new Uint8Array(Buffer.from(signature, "base64")),
+                      ),
+                    ),
+                  ]),
+                ),
+              });
+              return true;
+            }),
+          },
         },
-      }),
-      { timeout: 15_000, maxRetries: 3 },
-    ]);
-  });
-
-  it("sends email and sets subscription as failing when event can not be delivered", async () => {
-    fetchSpy.mockImplementation(async (url) => {
-      if (url === "https://users.0.com/events") {
-        return new Response(null, { status: 418, statusText: "I'm a teapot" });
-      } else {
-        return new Response(null, { status: 200, statusText: "OK" });
-      }
-    });
-
-    const [event] = await mocks.createRandomPetitionEvents(users[0].id, petition.id, 1, [
-      "PETITION_CREATED",
-    ]);
-    await petitionEventSubscriptionsListener.handle(
-      {
-        id: event.id,
-        petition_id: event.petition_id,
-        type: "PETITION_CREATED",
-        data: { user_id: users[0].id },
-        created_at: event.created_at,
-        processed_at: event.processed_at,
-        processed_by: event.processed_by,
-      },
-      ctx,
-    );
-
-    expect(fetchSpy).toHaveBeenCalledTimes(3);
-    expect(emailSpy).toHaveBeenCalledTimes(1);
-
-    const user0Subscription = subscriptions.find((s) => s.user_id === users[0].id)!;
-    expect(emailSpy).toHaveBeenLastCalledWith(
-      user0Subscription.id,
-      "Error 418: I'm a teapot for POST https://users.0.com/events",
-      {
-        id: toGlobalId("PetitionEvent", event.id),
-        petitionId: toGlobalId("Petition", event.petition_id),
-        type: event.type,
-        data: {
-          userId: toGlobalId("User", users[0].id),
+        {
+          id: `webhook-${toGlobalId("EventSubscription", subscriptions[4].id)}`,
+          body: {
+            subscriptionId: subscriptions[4].id,
+            endpoint: "https://users.5.com/events",
+            body: {
+              id: toGlobalId("PetitionEvent", event.id),
+              petitionId: toGlobalId("Petition", event.petition_id),
+              type: "PETITION_CREATED",
+              data: {
+                userId: toGlobalId("User", users[1].id),
+              },
+              createdAt: event.created_at,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+              "X-Parallel-Signature-Timestamp": expect.any(String),
+            },
+          },
         },
-        createdAt: event.created_at,
-      },
-    );
-
-    const [failingSubscription] = await mocks.knex
-      .from("event_subscription")
-      .where("id", user0Subscription.id)
-      .select("*");
-
-    expect(failingSubscription.is_failing).toEqual(true);
+      ],
+    ]);
   });
 
   it("does not send webhook event for user who ignores their own events", async () => {
@@ -452,52 +391,74 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
       ctx,
     );
 
-    const body = JSON.stringify({
-      id: toGlobalId("PetitionEvent", event.id),
-      petitionId: toGlobalId("Petition", event.petition_id),
-      type: event.type,
-      data: {
-        userId: toGlobalId("User", users[5].id),
-      },
-      createdAt: event.created_at,
-    });
-
-    expect(fetchSpy).toHaveBeenCalledTimes(3);
-    expect(fetchSpy.mock.calls[0]).toMatchObject([
-      "https://users.0.com/events",
-      expectRequestInit(0, {
-        method: "POST",
-        body,
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+    expect(queueSpy).toHaveBeenCalledTimes(1);
+    expect(queueSpy.mock.calls[0]).toEqual([
+      "webhooks-worker",
+      [
+        {
+          id: `webhook-${toGlobalId("EventSubscription", subscriptions[0].id)}`,
+          body: {
+            subscriptionId: subscriptions[0].id,
+            endpoint: "https://users.0.com/events",
+            body: {
+              id: toGlobalId("PetitionEvent", event.id),
+              petitionId: toGlobalId("Petition", event.petition_id),
+              type: "PETITION_CREATED",
+              data: {
+                userId: toGlobalId("User", users[5].id),
+              },
+              createdAt: event.created_at,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+              "X-Parallel-Signature-Timestamp": expect.any(String),
+            },
+          },
         },
-      }),
-      { timeout: 15_000, maxRetries: 3 },
-    ]);
-    expect(fetchSpy.mock.calls[1]).toMatchObject([
-      "https://users.1.com/events",
-      expectRequestInit(0, {
-        method: "POST",
-        body,
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+        {
+          id: `webhook-${toGlobalId("EventSubscription", subscriptions[1].id)}`,
+          body: {
+            subscriptionId: subscriptions[1].id,
+            endpoint: "https://users.1.com/events",
+            body: {
+              id: toGlobalId("PetitionEvent", event.id),
+              petitionId: toGlobalId("Petition", event.petition_id),
+              type: "PETITION_CREATED",
+              data: {
+                userId: toGlobalId("User", users[5].id),
+              },
+              createdAt: event.created_at,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+              "X-Parallel-Signature-Timestamp": expect.any(String),
+            },
+          },
         },
-      }),
-      { timeout: 15_000, maxRetries: 3 },
-    ]);
-    expect(fetchSpy.mock.calls[2]).toMatchObject([
-      "https://users.2.com/events",
-      expectRequestInit(0, {
-        method: "POST",
-        body,
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+        {
+          id: `webhook-${toGlobalId("EventSubscription", subscriptions[2].id)}`,
+          body: {
+            subscriptionId: subscriptions[2].id,
+            endpoint: "https://users.2.com/events",
+            body: {
+              id: toGlobalId("PetitionEvent", event.id),
+              petitionId: toGlobalId("Petition", event.petition_id),
+              type: "PETITION_CREATED",
+              data: {
+                userId: toGlobalId("User", users[5].id),
+              },
+              createdAt: event.created_at,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+              "X-Parallel-Signature-Timestamp": expect.any(String),
+            },
+          },
         },
-      }),
-      { timeout: 15_000, maxRetries: 3 },
+      ],
     ]);
   });
 });

@@ -371,11 +371,37 @@ export function publicApi(container: Container) {
         description: outdent`
         Subscribe to our events to get real time updates on your parallels and profiles.
 
-        Here's a list of all possible events:
+        ## Retry Mechanism
+
+        To ensure reliable delivery of webhook events, Parallel implements a retry strategy for failed webhook calls. If your endpoint responds with a non-2xx HTTP status code, times out, or fails to respond within 15 seconds, we will consider the delivery attempt unsuccessful and initiate a retry.
+
+        We retry failed webhook deliveries up to five times using an exponential backoff strategy with the following intervals:
+
+        -	1st retry: 10 seconds after the initial attempt
+        -	2nd retry: 20 seconds after the previous attempt
+        -	3rd retry: 40 seconds after the previous attempt
+        -	4th retry: 80 seconds after the previous attempt
+        -	5th retry: 160 seconds after the previous attempt
+
+        After the fifth failed attempt, the event is marked as undeliverable, and no further retries are made.
+
+        **Important: Webhook endpoints must respond within 15 seconds to be considered successful. If the response exceeds this duration, it is treated as a failure and will trigger a retry.**
+
+        ## Best Practices
+
+        -	**Idempotency**: Ensure that your webhook handler can process duplicate events without adverse effects.
+        -	**Acknowledgement**: Aim to acknowledge events quickly and handle any heavy processing asynchronously to stay within the 15-second limit.
+        -	**Logging**: Log incoming webhook events and your responses to aid in debugging and operational awareness.
+        -	**Security**: Validate the authenticity of incoming webhooks via [signature headers](https://help.onparallel.com/en/articles/7035199-manage-event-subscriptions-and-signature-keys).
+
         ## Parallel Events
+        Here's a list of all possible parallel events:
+
         ${PetitionEvent.description}
 
         ## Profile Events
+        Here's a list of all possible profile events:
+
         ${ProfileEvent.description}
       `,
       },
