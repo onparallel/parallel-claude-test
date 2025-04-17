@@ -63,7 +63,6 @@ export const DashboardModuleCard = Object.assign(
         gridRow={props.gridRow ?? "span 1"}
         opacity={isDragging ? 0.4 : 1}
         cursor={isDragging ? "grabbing" : "default"}
-        boxShadow={isDragging ? "lg" : props.boxShadow}
         position="relative"
         overflow="hidden"
         zIndex={isDragging ? 10 : 1}
@@ -154,7 +153,8 @@ export const DashboardModuleCard = Object.assign(
         <Flex
           flexDirection="column"
           minWidth={0}
-          height="100%"
+          flex="1"
+          overflow="hidden"
           pointerEvents={isEditing ? "none" : "auto"}
           opacity={isEditing ? 0.4 : 1}
           filter={isEditing ? "blur(2px)" : "none"}

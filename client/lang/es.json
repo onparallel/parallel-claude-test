@@ -2761,7 +2761,7 @@
   },
   {
     "term": "component.dashboard-module-form.module-result-type-count",
-    "definition": "Cuenta",
+    "definition": "Contar",
     "context": "Count"
   },
   {
@@ -2776,7 +2776,7 @@
   },
   {
     "term": "component.dashboard-module-form.module-result-type-sum",
-    "definition": "Suma",
+    "definition": "Sumar",
     "context": "Sum"
   },
   {
