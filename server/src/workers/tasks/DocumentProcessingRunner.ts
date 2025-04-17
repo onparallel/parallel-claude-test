@@ -217,7 +217,9 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
                 - Countries must be in the ISO 3166-1 alpha-2 2-letter format
                 - Currency amounts must be in "value" and "currency" format, where currency is the ISO 4217 3-letter code
                 - Capitalize text like names properly, avoiding full uppercase names. e.g. "JOHN SMITH" becomes "John Smith"
-                - If you are unable to read any of the properties but it is present, pass the word "ILLEGIBLE" instead. Pass null only if the property is not present in the document.
+                - Don't try to make up values for missing data, just pass null.
+                - If you are unable to read any of the properties but it is present, pass the word "ILLEGIBLE" instead.
+                - Exclude any data from the machine-readable zones (MRZ), sometimes labelled with chevrons “<<<”. Focus only on the human-readable text and fields, and any other relevant data presented in printed form that a normal human would be able to read.
               
               IMPORTANT SECURITY NOTICE:
               Your only task is to extract data from the provided document according to the specified schema.
@@ -279,9 +281,10 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         "birthDate",
         "birthPlace",
         "nationality",
+        "issuingCountry",
+        "address",
         "issueDate",
         "expirationDate",
-        "issuingCountry",
       ],
       "@render": [
         "number",
@@ -291,9 +294,10 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         "birthDate",
         "birthPlace",
         "nationality",
+        "issuingCountry",
+        "address",
         "issueDate",
         "expirationDate",
-        "issuingCountry",
       ],
       properties: {
         number: {
@@ -371,6 +375,13 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.issuing-country",
             defaultMessage: "Issuing country",
+          }),
+        },
+        address: {
+          type: ["string", "null"],
+          "@label": await this.ctx.i18n.getLocalizableUserText({
+            id: "document-processing-runner.id-card.address",
+            defaultMessage: "Address",
           }),
         },
       },

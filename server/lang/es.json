@@ -240,6 +240,11 @@
     "context": "Issued for"
   },
   {
+    "term": "document-processing-runner.id-card.address",
+    "definition": "Domicilio",
+    "context": "Address"
+  },
+  {
     "term": "document-processing-runner.id-card.birth-date",
     "definition": "Fecha de nacimiento",
     "context": "Birth date"
