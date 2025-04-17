@@ -1,21 +1,33 @@
 import { inputObjectType, list, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
+import { DashboardModule } from "../../db/__types";
+import { ModuleSettings } from "../../db/repositories/DashboardRepository";
 import { PetitionFilter } from "../../db/repositories/PetitionRepository";
 import { ProfileFilter } from "../../db/repositories/ProfileRepository";
 import { ProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
-import { authenticateAnd, ifArgDefined, realUserIsSuperAdmin } from "../helpers/authorize";
+import { and, authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { mapPetitionFilterInput } from "../helpers/mapPetitionFilterInput";
+import { SUCCESS } from "../helpers/Success";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
-import { petitionsAreOfTypeTemplate } from "../petition/authorizers";
-import { profileTypeFieldBelongsToProfileType } from "../profile/authorizers";
 import {
-  dashboardExists,
+  petitionsAreOfTypeTemplate,
+  userHasAccessToPetitions,
+  userHasFeatureFlag,
+} from "../petition/authorizers";
+import {
+  profileTypeFieldBelongsToProfileType,
+  userHasAccessToProfileType,
+} from "../profile/authorizers";
+import { contextUserHasPermission } from "../users/authorizers";
+import {
+  dashboardCanCreateModule,
   moduleBelongsToDashboard,
-  profileTypeBelongsToDashboardOrganization,
-  templateBelongsToDashboardOrganization,
+  moduleHasType,
+  userHasAccessToDashboard,
 } from "./authorizers";
 import {
   validatePetitionsNumberDashboardModuleSettingsInput,
@@ -26,16 +38,74 @@ import {
   validateProfilesRatioDashboardModuleSettingsInput,
 } from "./validations";
 
-export const adminCreateDashboard = mutationField("adminCreateDashboard", {
+export const createDashboard = mutationField("createDashboard", {
   type: "Dashboard",
-  description: "Creates a new dashboard in the organization",
-  authorize: authenticateAnd(realUserIsSuperAdmin()),
+  description: "Creates a new empty dashboard in the organization",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("DASHBOARDS"),
+    contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+  ),
   args: {
-    orgId: nonNull(globalIdArg("Organization")),
     name: nonNull(stringArg()),
   },
-  resolve: async (_, { orgId, name }, ctx) => {
-    return await ctx.dashboards.createDashboard({ org_id: orgId, name }, `User:${ctx.user!.id}`);
+  validateArgs: maxLength("name", 255),
+  resolve: async (_, { name }, ctx) => {
+    return await ctx.dashboards.createDashboard(
+      { org_id: ctx.user!.org_id, name },
+      `User:${ctx.user!.id}`,
+    );
+  },
+});
+
+export const updateDashboard = mutationField("updateDashboard", {
+  type: "Dashboard",
+  description: "Updates a dashboard",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("DASHBOARDS"),
+    contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+    userHasAccessToDashboard("id"),
+  ),
+  args: {
+    id: nonNull(globalIdArg("Dashboard")),
+    name: nonNull(stringArg()),
+  },
+  validateArgs: validateAnd(maxLength("name", 255)),
+  resolve: async (_, { id, name }, ctx) => {
+    return await ctx.dashboards.updateDashboard(id, { name }, `User:${ctx.user!.id}`);
+  },
+});
+
+export const cloneDashboard = mutationField("cloneDashboard", {
+  type: "Dashboard",
+  description: "Clones a dashboard",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("DASHBOARDS"),
+    contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+    userHasAccessToDashboard("id"),
+  ),
+  args: {
+    id: nonNull(globalIdArg("Dashboard")),
+    name: nonNull(stringArg()),
+  },
+  resolve: async (_, { id, name }, ctx) => {
+    return await ctx.dashboards.cloneDashboard(id, name, ctx.user!);
+  },
+});
+
+export const deleteDashboard = mutationField("deleteDashboard", {
+  type: "Success",
+  description: "Deletes a dashboard",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("DASHBOARDS"),
+    contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+    userHasAccessToDashboard("id"),
+  ),
+  args: {
+    id: nonNull(globalIdArg("Dashboard")),
+  },
+  resolve: async (_, { id }, ctx) => {
+    await ctx.dashboards.deleteDashboard(id, `User:${ctx.user!.id}`);
+    return SUCCESS;
   },
 });
 
@@ -44,9 +114,11 @@ export const createCreatePetitionButtonDashboardModule = mutationField(
   {
     type: "Dashboard",
     authorize: authenticateAnd(
-      realUserIsSuperAdmin(),
-      dashboardExists("dashboardId"),
-      templateBelongsToDashboardOrganization("settings.templateId", "dashboardId"),
+      userHasFeatureFlag("DASHBOARDS"),
+      contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+      userHasAccessToDashboard("dashboardId"),
+      dashboardCanCreateModule("dashboardId"),
+      userHasAccessToPetitions("settings.templateId"),
       petitionsAreOfTypeTemplate("settings.templateId"),
     ),
     args: {
@@ -90,7 +162,12 @@ export const createPetitionsNumberDashboardModule = mutationField(
   "createPetitionsNumberDashboardModule",
   {
     type: "Dashboard",
-    authorize: authenticateAnd(realUserIsSuperAdmin(), dashboardExists("dashboardId")),
+    authorize: authenticateAnd(
+      userHasFeatureFlag("DASHBOARDS"),
+      contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+      userHasAccessToDashboard("dashboardId"),
+      dashboardCanCreateModule("dashboardId"),
+    ),
     args: {
       dashboardId: nonNull(globalIdArg("Dashboard")),
       title: nullable(stringArg()),
@@ -106,7 +183,7 @@ export const createPetitionsNumberDashboardModule = mutationField(
     },
     validateArgs: validateAnd(
       maxLength("title", 255),
-      validatePetitionsNumberDashboardModuleSettingsInput("dashboardId", "settings"),
+      validatePetitionsNumberDashboardModuleSettingsInput("settings"),
     ),
     resolve: async (_, { dashboardId, title, size, settings }, ctx) => {
       await ctx.dashboards.createDashboardModule(
@@ -133,7 +210,12 @@ export const createPetitionsRatioDashboardModule = mutationField(
   "createPetitionsRatioDashboardModule",
   {
     type: "Dashboard",
-    authorize: authenticateAnd(realUserIsSuperAdmin(), dashboardExists("dashboardId")),
+    authorize: authenticateAnd(
+      userHasFeatureFlag("DASHBOARDS"),
+      contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+      userHasAccessToDashboard("dashboardId"),
+      dashboardCanCreateModule("dashboardId"),
+    ),
     args: {
       dashboardId: nonNull(globalIdArg("Dashboard")),
       title: nullable(stringArg()),
@@ -150,7 +232,7 @@ export const createPetitionsRatioDashboardModule = mutationField(
     },
     validateArgs: validateAnd(
       maxLength("title", 255),
-      validatePetitionsRatioDashboardModuleSettingsInput("dashboardId", "settings"),
+      validatePetitionsRatioDashboardModuleSettingsInput("settings"),
     ),
     resolve: async (_, { dashboardId, title, size, settings }, ctx) => {
       await ctx.dashboards.createDashboardModule(
@@ -181,7 +263,12 @@ export const createPetitionsPieChartDashboardModule = mutationField(
   "createPetitionsPieChartDashboardModule",
   {
     type: "Dashboard",
-    authorize: authenticateAnd(realUserIsSuperAdmin(), dashboardExists("dashboardId")),
+    authorize: authenticateAnd(
+      userHasFeatureFlag("DASHBOARDS"),
+      contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+      userHasAccessToDashboard("dashboardId"),
+      dashboardCanCreateModule("dashboardId"),
+    ),
     args: {
       dashboardId: nonNull(globalIdArg("Dashboard")),
       title: nullable(stringArg()),
@@ -207,7 +294,7 @@ export const createPetitionsPieChartDashboardModule = mutationField(
     },
     validateArgs: validateAnd(
       maxLength("title", 255),
-      validatePetitionsPieChartDashboardModuleSettingsInput("dashboardId", "settings"),
+      validatePetitionsPieChartDashboardModuleSettingsInput("settings"),
     ),
     resolve: async (_, { dashboardId, title, size, settings }, ctx) => {
       await ctx.dashboards.createDashboardModule(
@@ -239,8 +326,11 @@ export const createProfilesNumberDashboardModule = mutationField(
   {
     type: "Dashboard",
     authorize: authenticateAnd(
-      realUserIsSuperAdmin(),
-      dashboardExists("dashboardId"),
+      userHasFeatureFlag("DASHBOARDS"),
+      contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+      userHasAccessToDashboard("dashboardId"),
+      dashboardCanCreateModule("dashboardId"),
+      userHasAccessToProfileType("settings.profileTypeId"),
       ifArgDefined(
         "settings.profileTypeFieldId",
         profileTypeFieldBelongsToProfileType(
@@ -248,7 +338,6 @@ export const createProfilesNumberDashboardModule = mutationField(
           "settings.profileTypeId",
         ),
       ),
-      profileTypeBelongsToDashboardOrganization("settings.profileTypeId", "dashboardId"),
     ),
     args: {
       dashboardId: nonNull(globalIdArg("Dashboard")),
@@ -314,8 +403,11 @@ export const createProfilesRatioDashboardModule = mutationField(
   {
     type: "Dashboard",
     authorize: authenticateAnd(
-      realUserIsSuperAdmin(),
-      dashboardExists("dashboardId"),
+      userHasFeatureFlag("DASHBOARDS"),
+      contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+      userHasAccessToDashboard("dashboardId"),
+      dashboardCanCreateModule("dashboardId"),
+      userHasAccessToProfileType("settings.profileTypeId"),
       ifArgDefined(
         "settings.profileTypeFieldId",
         profileTypeFieldBelongsToProfileType(
@@ -323,7 +415,6 @@ export const createProfilesRatioDashboardModule = mutationField(
           "settings.profileTypeId",
         ),
       ),
-      profileTypeBelongsToDashboardOrganization("settings.profileTypeId", "dashboardId"),
     ),
     args: {
       dashboardId: nonNull(globalIdArg("Dashboard")),
@@ -388,8 +479,11 @@ export const createProfilesPieChartDashboardModule = mutationField(
   {
     type: "Dashboard",
     authorize: authenticateAnd(
-      realUserIsSuperAdmin(),
-      dashboardExists("dashboardId"),
+      userHasFeatureFlag("DASHBOARDS"),
+      contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+      userHasAccessToDashboard("dashboardId"),
+      dashboardCanCreateModule("dashboardId"),
+      userHasAccessToProfileType("settings.profileTypeId"),
       ifArgDefined(
         "settings.profileTypeFieldId",
         profileTypeFieldBelongsToProfileType(
@@ -397,7 +491,6 @@ export const createProfilesPieChartDashboardModule = mutationField(
           "settings.profileTypeId",
         ),
       ),
-      profileTypeBelongsToDashboardOrganization("settings.profileTypeId", "dashboardId"),
     ),
     args: {
       dashboardId: nonNull(globalIdArg("Dashboard")),
@@ -488,11 +581,479 @@ export const createProfilesPieChartDashboardModule = mutationField(
   },
 );
 
+export const updateCreatePetitionButtonDashboardModule = mutationField(
+  "updateCreatePetitionButtonDashboardModule",
+  {
+    type: "DashboardModule",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("DASHBOARDS"),
+      contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+      userHasAccessToDashboard("dashboardId"),
+      moduleBelongsToDashboard("moduleId", "dashboardId"),
+      moduleHasType("moduleId", "CREATE_PETITION_BUTTON"),
+      ifArgDefined(
+        "data.settings.templateId",
+        and(
+          userHasAccessToPetitions("data.settings.templateId"),
+          petitionsAreOfTypeTemplate("data.settings.templateId"),
+        ),
+      ),
+    ),
+    args: {
+      dashboardId: nonNull(globalIdArg("Dashboard")),
+      moduleId: nonNull(globalIdArg("DashboardModule")),
+      data: nonNull(
+        inputObjectType({
+          name: "UpdateCreatePetitionButtonDashboardModuleInput",
+          definition(t) {
+            t.nullable.string("title");
+            t.nullable.field("size", { type: "DashboardModuleSize" });
+            t.nullable.field("settings", {
+              type: "CreatePetitionButtonDashboardModuleSettingsInput",
+            });
+          },
+        }),
+      ),
+    },
+    validateArgs: validateAnd(
+      maxLength("data.title", 255),
+      maxLength("data.settings.buttonLabel", 255),
+    ),
+    resolve: async (_, { moduleId, data }, ctx) => {
+      const updateData: Partial<DashboardModule> = {};
+      if (data.title !== undefined) {
+        updateData.title = data.title;
+      }
+      if (isNonNullish(data.size)) {
+        updateData.size = data.size;
+      }
+      if (isNonNullish(data.settings)) {
+        updateData.settings = {
+          label: data.settings.buttonLabel,
+          template_id: data.settings.templateId,
+        } as ModuleSettings<"CREATE_PETITION_BUTTON">;
+      }
+
+      return await ctx.dashboards.updateDashboardModule(
+        moduleId,
+        updateData,
+        `User:${ctx.user!.id}`,
+      );
+    },
+  },
+);
+
+export const updatePetitionsNumberDashboardModule = mutationField(
+  "updatePetitionsNumberDashboardModule",
+  {
+    type: "DashboardModule",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("DASHBOARDS"),
+      contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+      userHasAccessToDashboard("dashboardId"),
+      moduleBelongsToDashboard("moduleId", "dashboardId"),
+      moduleHasType("moduleId", "PETITIONS_NUMBER"),
+    ),
+    args: {
+      dashboardId: nonNull(globalIdArg("Dashboard")),
+      moduleId: nonNull(globalIdArg("DashboardModule")),
+      data: nonNull(
+        inputObjectType({
+          name: "UpdatePetitionsNumberDashboardModuleInput",
+          definition(t) {
+            t.nullable.string("title");
+            t.nullable.field("size", { type: "DashboardModuleSize" });
+            t.nullable.field("settings", {
+              type: "PetitionsNumberDashboardModuleSettingsInput",
+            });
+          },
+        }),
+      ),
+    },
+    validateArgs: validateAnd(
+      maxLength("data.title", 255),
+      validatePetitionsNumberDashboardModuleSettingsInput("data.settings"),
+    ),
+    resolve: async (_, { moduleId, data }, ctx) => {
+      const updateData: Partial<DashboardModule> = {};
+      if (data.title !== undefined) {
+        updateData.title = data.title;
+      }
+      if (isNonNullish(data.size)) {
+        updateData.size = data.size;
+      }
+      if (isNonNullish(data.settings)) {
+        updateData.settings = {
+          filters: mapPetitionFilterInput(data.settings.filters),
+        } as ModuleSettings<"PETITIONS_NUMBER">;
+        updateData.result = null;
+      }
+
+      return await ctx.dashboards.updateDashboardModule(
+        moduleId,
+        updateData,
+        `User:${ctx.user!.id}`,
+      );
+    },
+  },
+);
+
+export const updatePetitionsRatioDashboardModule = mutationField(
+  "updatePetitionsRatioDashboardModule",
+  {
+    type: "DashboardModule",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("DASHBOARDS"),
+      contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+      userHasAccessToDashboard("dashboardId"),
+      moduleBelongsToDashboard("moduleId", "dashboardId"),
+      moduleHasType("moduleId", "PETITIONS_RATIO"),
+    ),
+    args: {
+      dashboardId: nonNull(globalIdArg("Dashboard")),
+      moduleId: nonNull(globalIdArg("DashboardModule")),
+      data: nonNull(
+        inputObjectType({
+          name: "UpdatePetitionsRatioDashboardModuleInput",
+          definition(t) {
+            t.nullable.string("title");
+            t.nullable.field("size", { type: "DashboardModuleSize" });
+            t.nullable.field("settings", {
+              type: "PetitionsRatioDashboardModuleSettingsInput",
+            });
+          },
+        }),
+      ),
+    },
+    validateArgs: validateAnd(
+      maxLength("data.title", 255),
+      validatePetitionsRatioDashboardModuleSettingsInput("data.settings"),
+    ),
+    resolve: async (_, { moduleId, data }, ctx) => {
+      const updateData: Partial<DashboardModule> = {};
+      if (data.title !== undefined) {
+        updateData.title = data.title;
+      }
+      if (isNonNullish(data.size)) {
+        updateData.size = data.size;
+      }
+      if (isNonNullish(data.settings)) {
+        updateData.settings = {
+          graphicType: data.settings.graphicType,
+          filters: data.settings.filters.map(mapPetitionFilterInput) as [
+            PetitionFilter,
+            PetitionFilter,
+          ],
+        } as ModuleSettings<"PETITIONS_RATIO">;
+        updateData.result = null;
+      }
+
+      return await ctx.dashboards.updateDashboardModule(
+        moduleId,
+        updateData,
+        `User:${ctx.user!.id}`,
+      );
+    },
+  },
+);
+
+export const updatePetitionsPieChartDashboardModule = mutationField(
+  "updatePetitionsPieChartDashboardModule",
+  {
+    type: "DashboardModule",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("DASHBOARDS"),
+      contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+      userHasAccessToDashboard("dashboardId"),
+      moduleBelongsToDashboard("moduleId", "dashboardId"),
+      moduleHasType("moduleId", "PETITIONS_PIE_CHART"),
+    ),
+    args: {
+      dashboardId: nonNull(globalIdArg("Dashboard")),
+      moduleId: nonNull(globalIdArg("DashboardModule")),
+      data: nonNull(
+        inputObjectType({
+          name: "UpdatePetitionsPieChartDashboardModuleInput",
+          definition(t) {
+            t.nullable.string("title");
+            t.nullable.field("size", { type: "DashboardModuleSize" });
+            t.nullable.field("settings", {
+              type: "PetitionsPieChartDashboardModuleSettingsInput",
+            });
+          },
+        }),
+      ),
+    },
+    validateArgs: validateAnd(
+      maxLength("data.title", 255),
+      validatePetitionsPieChartDashboardModuleSettingsInput("data.settings"),
+    ),
+    resolve: async (_, { moduleId, data }, ctx) => {
+      const updateData: Partial<DashboardModule> = {};
+      if (data.title !== undefined) {
+        updateData.title = data.title;
+      }
+      if (isNonNullish(data.size)) {
+        updateData.size = data.size;
+      }
+      if (isNonNullish(data.settings)) {
+        updateData.settings = {
+          graphicType: data.settings.graphicType,
+          items: data.settings.items.map((i) => ({
+            ...i,
+            filter: mapPetitionFilterInput(i.filter),
+          })),
+        } as ModuleSettings<"PETITIONS_PIE_CHART">;
+        updateData.result = null;
+      }
+
+      return await ctx.dashboards.updateDashboardModule(
+        moduleId,
+        updateData,
+        `User:${ctx.user!.id}`,
+      );
+    },
+  },
+);
+
+export const updateProfilesNumberDashboardModule = mutationField(
+  "updateProfilesNumberDashboardModule",
+  {
+    type: "DashboardModule",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("DASHBOARDS"),
+      contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+      userHasAccessToDashboard("dashboardId"),
+      moduleBelongsToDashboard("moduleId", "dashboardId"),
+      moduleHasType("moduleId", "PROFILES_NUMBER"),
+      userHasAccessToProfileType("data.settings.profileTypeId"),
+      ifArgDefined(
+        "data.settings.profileTypeFieldId",
+        profileTypeFieldBelongsToProfileType(
+          "data.settings.profileTypeFieldId" as never,
+          "data.settings.profileTypeId",
+        ),
+      ),
+    ),
+    args: {
+      dashboardId: nonNull(globalIdArg("Dashboard")),
+      moduleId: nonNull(globalIdArg("DashboardModule")),
+      data: nonNull(
+        inputObjectType({
+          name: "UpdateProfilesNumberDashboardModuleInput",
+          definition(t) {
+            t.nullable.string("title");
+            t.nullable.field("size", { type: "DashboardModuleSize" });
+            t.nullable.field("settings", {
+              type: "ProfilesNumberDashboardModuleSettingsInput",
+            });
+          },
+        }),
+      ),
+    },
+    validateArgs: validateAnd(
+      maxLength("data.title", 255),
+      validateProfilesNumberDashboardModuleSettingsInput("data.settings"),
+    ),
+    resolve: async (_, { moduleId, data }, ctx) => {
+      const updateData: Partial<DashboardModule> = {};
+      if (data.title !== undefined) {
+        updateData.title = data.title;
+      }
+      if (isNonNullish(data.size)) {
+        updateData.size = data.size;
+      }
+      if (isNonNullish(data.settings)) {
+        updateData.settings = {
+          ...(data.settings.type === "COUNT"
+            ? { type: "COUNT" }
+            : {
+                type: "AGGREGATE",
+                aggregate: data.settings.aggregate!,
+                profileTypeFieldId: data.settings.profileTypeFieldId!,
+              }),
+          profileTypeId: data.settings.profileTypeId,
+          filters: {
+            status: data.settings.filter.status,
+            values: data.settings.filter.values as ProfileFieldValuesFilter,
+          },
+        } as ModuleSettings<"PROFILES_NUMBER">;
+        updateData.result = null;
+      }
+
+      return await ctx.dashboards.updateDashboardModule(
+        moduleId,
+        updateData,
+        `User:${ctx.user!.id}`,
+      );
+    },
+  },
+);
+
+export const updateProfilesRatioDashboardModule = mutationField(
+  "updateProfilesRatioDashboardModule",
+  {
+    type: "DashboardModule",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("DASHBOARDS"),
+      contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+      userHasAccessToDashboard("dashboardId"),
+      moduleBelongsToDashboard("moduleId", "dashboardId"),
+      moduleHasType("moduleId", "PROFILES_RATIO"),
+      userHasAccessToProfileType("data.settings.profileTypeId"),
+      ifArgDefined(
+        "data.settings.profileTypeFieldId",
+        profileTypeFieldBelongsToProfileType(
+          "data.settings.profileTypeFieldId" as never,
+          "data.settings.profileTypeId",
+        ),
+      ),
+    ),
+    args: {
+      dashboardId: nonNull(globalIdArg("Dashboard")),
+      moduleId: nonNull(globalIdArg("DashboardModule")),
+      data: nonNull(
+        inputObjectType({
+          name: "UpdateProfilesRatioDashboardModuleInput",
+          definition(t) {
+            t.nullable.string("title");
+            t.nullable.field("size", { type: "DashboardModuleSize" });
+            t.nullable.field("settings", {
+              type: "ProfilesRatioDashboardModuleSettingsInput",
+            });
+          },
+        }),
+      ),
+    },
+    validateArgs: validateAnd(
+      maxLength("data.title", 255),
+      validateProfilesRatioDashboardModuleSettingsInput("data.settings"),
+    ),
+    resolve: async (_, { moduleId, data }, ctx) => {
+      const updateData: Partial<DashboardModule> = {};
+      if (data.title !== undefined) {
+        updateData.title = data.title;
+      }
+      if (isNonNullish(data.size)) {
+        updateData.size = data.size;
+      }
+      if (isNonNullish(data.settings)) {
+        updateData.settings = {
+          ...(data.settings.type === "COUNT"
+            ? { type: "COUNT" }
+            : {
+                type: "AGGREGATE",
+                aggregate: data.settings.aggregate!,
+                profileTypeFieldId: data.settings.profileTypeFieldId!,
+              }),
+          profileTypeId: data.settings.profileTypeId,
+          graphicType: data.settings.graphicType,
+          filters: data.settings.filters as [ProfileFilter, ProfileFilter],
+        } as ModuleSettings<"PROFILES_RATIO">;
+        updateData.result = null;
+      }
+
+      return await ctx.dashboards.updateDashboardModule(
+        moduleId,
+        updateData,
+        `User:${ctx.user!.id}`,
+      );
+    },
+  },
+);
+
+export const updateProfilesPieChartDashboardModule = mutationField(
+  "updateProfilesPieChartDashboardModule",
+  {
+    type: "DashboardModule",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("DASHBOARDS"),
+      contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+      userHasAccessToDashboard("dashboardId"),
+      moduleBelongsToDashboard("moduleId", "dashboardId"),
+      moduleHasType("moduleId", "PROFILES_PIE_CHART"),
+      userHasAccessToProfileType("data.settings.profileTypeId"),
+      ifArgDefined(
+        "data.settings.profileTypeFieldId",
+        profileTypeFieldBelongsToProfileType(
+          "data.settings.profileTypeFieldId" as never,
+          "data.settings.profileTypeId",
+        ),
+      ),
+    ),
+    args: {
+      dashboardId: nonNull(globalIdArg("Dashboard")),
+      moduleId: nonNull(globalIdArg("DashboardModule")),
+      data: nonNull(
+        inputObjectType({
+          name: "UpdateProfilesPieChartDashboardModuleInput",
+          definition(t) {
+            t.nullable.string("title");
+            t.nullable.field("size", { type: "DashboardModuleSize" });
+            t.nullable.field("settings", {
+              type: "ProfilesPieChartDashboardModuleSettingsInput",
+            });
+          },
+        }),
+      ),
+    },
+    validateArgs: validateAnd(
+      maxLength("data.title", 255),
+      validateProfilesPieChartDashboardModuleSettingsInput("data.settings"),
+    ),
+    resolve: async (_, { moduleId, data }, ctx) => {
+      const updateData: Partial<DashboardModule> = {};
+      if (data.title !== undefined) {
+        updateData.title = data.title;
+      }
+      if (isNonNullish(data.size)) {
+        updateData.size = data.size;
+      }
+      if (isNonNullish(data.settings)) {
+        updateData.settings = {
+          ...(data.settings.type === "COUNT"
+            ? { type: "COUNT" }
+            : {
+                type: "AGGREGATE",
+                aggregate: data.settings.aggregate!,
+                profileTypeFieldId: data.settings.profileTypeFieldId!,
+              }),
+          profileTypeId: data.settings.profileTypeId,
+          groupByProfileTypeFieldId: data.settings.groupByProfileTypeFieldId ?? undefined,
+          groupByFilter: data.settings.groupByFilter
+            ? {
+                status: data.settings.groupByFilter.status,
+                values: data.settings.groupByFilter.values as ProfileFieldValuesFilter,
+              }
+            : undefined,
+          graphicType: data.settings.graphicType,
+          items: data.settings.items.map((item) => ({
+            color: item.color,
+            label: item.label,
+            filter: {
+              status: item.filter.status,
+              values: item.filter.values as ProfileFieldValuesFilter,
+            },
+          })),
+        } as ModuleSettings<"PROFILES_PIE_CHART">;
+        updateData.result = null;
+      }
+
+      return await ctx.dashboards.updateDashboardModule(
+        moduleId,
+        updateData,
+        `User:${ctx.user!.id}`,
+      );
+    },
+  },
+);
+
 export const deleteDashboardModule = mutationField("deleteDashboardModule", {
   type: "Dashboard",
   authorize: authenticateAnd(
-    realUserIsSuperAdmin(),
-    dashboardExists("dashboardId"),
+    userHasFeatureFlag("DASHBOARDS"),
+    contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+    userHasAccessToDashboard("dashboardId"),
     moduleBelongsToDashboard("moduleId", "dashboardId"),
   ),
   args: {
@@ -511,8 +1072,9 @@ export const deleteDashboardModule = mutationField("deleteDashboardModule", {
 export const updateDashboardModulePositions = mutationField("updateDashboardModulePositions", {
   type: "Dashboard",
   authorize: authenticateAnd(
-    realUserIsSuperAdmin(),
-    dashboardExists("dashboardId"),
+    userHasFeatureFlag("DASHBOARDS"),
+    contextUserHasPermission("DASHBOARDS:CRUD_DASHBOARDS"),
+    userHasAccessToDashboard("dashboardId"),
     moduleBelongsToDashboard("moduleIds", "dashboardId"),
   ),
   args: {

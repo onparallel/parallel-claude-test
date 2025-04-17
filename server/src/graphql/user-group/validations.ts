@@ -67,6 +67,16 @@ export function validUserGroupPermissionsInput<TypeName extends string, FieldNam
       }
     }
 
+    if (permissions.some((p) => p.name === "DASHBOARDS:CRUD_DASHBOARDS")) {
+      const hasDashboardsAccess = await ctx.featureFlags.userHasFeatureFlag(
+        ctx.user!.id,
+        "DASHBOARDS",
+      );
+      if (!hasDashboardsAccess) {
+        unknownNames.push("DASHBOARDS:CRUD_DASHBOARDS");
+      }
+    }
+
     if (unknownNames.length > 0) {
       throw new ArgValidationError(
         info,

@@ -1,5 +1,6 @@
 import { enumType, interfaceType, objectType } from "nexus";
 import { DashboardModuleSizeValues } from "../../db/__types";
+import { toGlobalId } from "../../util/globalId";
 
 export const Dashboard = objectType({
   name: "Dashboard",
@@ -73,6 +74,140 @@ export const DashboardModule = interfaceType({
   },
 });
 
+export const DashboardModuleProfileFieldValuesFilter = objectType({
+  name: "DashboardModuleProfileFieldValuesFilter",
+  definition(t) {
+    t.nullable.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
+    t.nullable.field("operator", {
+      type: enumType({
+        name: "DashboardModuleProfileFieldValuesFilterOperator",
+        members: [
+          "HAS_VALUE",
+          "NOT_HAS_VALUE",
+          "EQUAL",
+          "NOT_EQUAL",
+          "START_WITH",
+          "END_WITH",
+          "CONTAIN",
+          "NOT_CONTAIN",
+          "IS_ONE_OF",
+          "NOT_IS_ONE_OF",
+          "LESS_THAN",
+          "LESS_THAN_OR_EQUAL",
+          "GREATER_THAN",
+          "GREATER_THAN_OR_EQUAL",
+          "HAS_BG_CHECK_RESULTS",
+          "NOT_HAS_BG_CHECK_RESULTS",
+          "HAS_BG_CHECK_MATCH",
+          "NOT_HAS_BG_CHECK_MATCH",
+          "HAS_BG_CHECK_TOPICS",
+          "NOT_HAS_BG_CHECK_TOPICS",
+          "HAS_ANY_BG_CHECK_TOPICS",
+          "NOT_HAS_ANY_BG_CHECK_TOPICS",
+          "IS_EXPIRED",
+          "EXPIRES_IN",
+          "HAS_EXPIRY",
+          "NOT_HAS_EXPIRY",
+        ],
+      }),
+    });
+    t.nullable.json("value");
+    t.nullable.field("logicalOperator", {
+      type: enumType({
+        name: "DashboardModuleProfileFieldValuesFilterGroupLogicalOperator",
+        members: ["AND", "OR"],
+      }),
+    });
+    t.nullable.list.nonNull.field("conditions", {
+      type: "DashboardModuleProfileFieldValuesFilter",
+    });
+  },
+});
+
+export const DashboardModuleProfileFilter = objectType({
+  name: "DashboardModuleProfileFilter",
+  definition(t) {
+    t.nullable.list.nonNull.field("status", { type: "ProfileStatus" });
+    t.nullable.field("values", { type: "DashboardModuleProfileFieldValuesFilter" });
+  },
+});
+
+export const DashboardModulePetitionFilter = objectType({
+  name: "DashboardModulePetitionFilter",
+  definition(t) {
+    t.nullable.list.nonNull.field("status", { type: "PetitionStatus" });
+    t.nullable.field("sharedWith", {
+      type: objectType({
+        name: "DashboardModulePetitionFilterSharedWith",
+        definition(t) {
+          t.nonNull.field("operator", {
+            type: "FilterSharedWithLogicalOperator",
+          });
+          t.nonNull.list.nonNull.field("filters", {
+            type: objectType({
+              name: "DashboardModulePetitionFilterSharedWithFilters",
+              definition(t) {
+                t.nonNull.id("value");
+                t.nonNull.field("operator", {
+                  type: "FilterSharedWithOperator",
+                });
+              },
+            }),
+          });
+        },
+      }),
+    });
+    t.nullable.field("approvals", {
+      type: objectType({
+        name: "DashboardModulePetitionFilterApprovals",
+        definition(t) {
+          t.nonNull.field("operator", {
+            type: "PetitionApprovalsFilterLogicalOperator",
+          });
+          t.nonNull.list.nonNull.field("filters", {
+            type: objectType({
+              name: "DashboardModulePetitionFilterApprovalsFilters",
+              definition(t) {
+                t.nonNull.string("value");
+                t.nonNull.field("operator", {
+                  type: "PetitionApprovalsFilterOperator",
+                });
+              },
+            }),
+            resolve: (o) =>
+              o.filters.map((f: any) =>
+                f.operator === "ASSIGNED_TO" ? { ...f, value: toGlobalId("User", f.value) } : f,
+              ),
+          });
+        },
+      }),
+    });
+    t.nullable.field("tags", {
+      type: objectType({
+        name: "DashboardModulePetitionFilterTags",
+        definition(t) {
+          t.nonNull.field("operator", {
+            type: "PetitionTagFilterLogicalOperator",
+          });
+          t.nonNull.list.nonNull.field("filters", {
+            type: objectType({
+              name: "DashboardModulePetitionFilterTagsFilters",
+              definition(t) {
+                t.nonNull.list.nonNull.globalId("value", { prefixName: "Tag" });
+                t.nonNull.field("operator", {
+                  type: "PetitionTagFilterLineOperator",
+                });
+              },
+            }),
+          });
+        },
+      }),
+    });
+    t.nullable.list.nonNull.field("signature", { type: "PetitionSignatureStatusFilter" });
+    t.nullable.list.nonNull.globalId("fromTemplateId", { prefixName: "Petition" });
+  },
+});
+
 export const DashboardModuleResultItem = objectType({
   name: "DashboardModuleResultItem",
   definition(t) {
@@ -98,6 +233,14 @@ export const DashboardPetitionsNumberModule = objectType({
   definition(t) {
     t.implements("DashboardModule");
     t.nullable.field("result", { type: "DashboardModuleResultItem" });
+    t.nonNull.field("settings", {
+      type: objectType({
+        name: "DashboardPetitionsNumberModuleSettings",
+        definition(t) {
+          t.nonNull.field("filters", { type: "DashboardModulePetitionFilter" });
+        },
+      }),
+    });
   },
 });
 
@@ -110,6 +253,10 @@ export const DashboardProfilesNumberModule = objectType({
         name: "DashboardProfilesNumberModuleSettings",
         definition(t) {
           t.nonNull.field("type", { type: "ModuleResultType" });
+          t.nonNull.field("filters", { type: "DashboardModuleProfileFilter" });
+          t.nullable.globalId("profileTypeId", { prefixName: "ProfileType" });
+          t.nullable.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
+          t.nullable.field("aggregate", { type: "ModuleResultAggregateType" });
         },
       }),
     });
@@ -126,6 +273,7 @@ export const DashboardPetitionsRatioModule = objectType({
         name: "DashboardPetitionsRatioModuleSettings",
         definition(t) {
           t.nonNull.field("graphicType", { type: "DashboardRatioModuleSettingsType" });
+          t.nonNull.list.field("filters", { type: "DashboardModulePetitionFilter" });
         },
       }),
     });
@@ -143,6 +291,10 @@ export const DashboardProfilesRatioModule = objectType({
         definition(t) {
           t.nonNull.field("graphicType", { type: "DashboardRatioModuleSettingsType" });
           t.nonNull.field("type", { type: "ModuleResultType" });
+          t.nonNull.list.field("filters", { type: "DashboardModuleProfileFilter" });
+          t.nullable.globalId("profileTypeId", { prefixName: "ProfileType" });
+          t.nullable.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
+          t.nullable.field("aggregate", { type: "ModuleResultAggregateType" });
         },
       }),
     });
@@ -159,6 +311,16 @@ export const DashboardPetitionsPieChartModule = objectType({
         name: "DashboardPetitionsPieChartModuleSettings",
         definition(t) {
           t.nonNull.field("graphicType", { type: "DashboardPieChartModuleSettingsType" });
+          t.nonNull.list.field("items", {
+            type: objectType({
+              name: "DashboardPetitionsPieChartModuleItems",
+              definition(t) {
+                t.nonNull.string("label");
+                t.nonNull.string("color");
+                t.nonNull.field("filter", { type: "DashboardModulePetitionFilter" });
+              },
+            }),
+          });
         },
       }),
     });
@@ -176,6 +338,24 @@ export const DashboardProfilesPieChartModule = objectType({
         definition(t) {
           t.nonNull.field("graphicType", { type: "DashboardPieChartModuleSettingsType" });
           t.nonNull.field("type", { type: "ModuleResultType" });
+          t.nullable.globalId("profileTypeId", { prefixName: "ProfileType" });
+          t.nullable.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
+          t.nullable.field("aggregate", { type: "ModuleResultAggregateType" });
+          t.nullable.globalId("groupByProfileTypeFieldId", {
+            prefixName: "ProfileTypeField",
+            description: "Optional SELECT field to group by its values instead of items array",
+          });
+          t.nonNull.list.field("items", {
+            type: objectType({
+              name: "DashboardProfilesPieChartModuleItems",
+              definition(t) {
+                t.nonNull.string("label");
+                t.nonNull.string("color");
+                t.nonNull.field("filter", { type: "DashboardModuleProfileFilter" });
+              },
+            }),
+          });
+          t.nullable.field("groupByFilter", { type: "DashboardModuleProfileFilter" });
         },
       }),
     });

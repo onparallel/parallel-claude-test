@@ -482,6 +482,88 @@ export type DashboardModule = {
   title: Maybe<Scalars["String"]["output"]>;
 };
 
+export type DashboardModulePetitionFilter = {
+  approvals: Maybe<DashboardModulePetitionFilterApprovals>;
+  fromTemplateId: Maybe<Array<Scalars["GID"]["output"]>>;
+  sharedWith: Maybe<DashboardModulePetitionFilterSharedWith>;
+  signature: Maybe<Array<PetitionSignatureStatusFilter>>;
+  status: Maybe<Array<PetitionStatus>>;
+  tags: Maybe<DashboardModulePetitionFilterTags>;
+};
+
+export type DashboardModulePetitionFilterApprovals = {
+  filters: Array<DashboardModulePetitionFilterApprovalsFilters>;
+  operator: PetitionApprovalsFilterLogicalOperator;
+};
+
+export type DashboardModulePetitionFilterApprovalsFilters = {
+  operator: PetitionApprovalsFilterOperator;
+  value: Scalars["String"]["output"];
+};
+
+export type DashboardModulePetitionFilterSharedWith = {
+  filters: Array<DashboardModulePetitionFilterSharedWithFilters>;
+  operator: FilterSharedWithLogicalOperator;
+};
+
+export type DashboardModulePetitionFilterSharedWithFilters = {
+  operator: FilterSharedWithOperator;
+  value: Scalars["ID"]["output"];
+};
+
+export type DashboardModulePetitionFilterTags = {
+  filters: Array<DashboardModulePetitionFilterTagsFilters>;
+  operator: PetitionTagFilterLogicalOperator;
+};
+
+export type DashboardModulePetitionFilterTagsFilters = {
+  operator: PetitionTagFilterLineOperator;
+  value: Array<Scalars["GID"]["output"]>;
+};
+
+export type DashboardModuleProfileFieldValuesFilter = {
+  conditions: Maybe<Array<DashboardModuleProfileFieldValuesFilter>>;
+  logicalOperator: Maybe<DashboardModuleProfileFieldValuesFilterGroupLogicalOperator>;
+  operator: Maybe<DashboardModuleProfileFieldValuesFilterOperator>;
+  profileTypeFieldId: Maybe<Scalars["GID"]["output"]>;
+  value: Maybe<Scalars["JSON"]["output"]>;
+};
+
+export type DashboardModuleProfileFieldValuesFilterGroupLogicalOperator = "AND" | "OR";
+
+export type DashboardModuleProfileFieldValuesFilterOperator =
+  | "CONTAIN"
+  | "END_WITH"
+  | "EQUAL"
+  | "EXPIRES_IN"
+  | "GREATER_THAN"
+  | "GREATER_THAN_OR_EQUAL"
+  | "HAS_ANY_BG_CHECK_TOPICS"
+  | "HAS_BG_CHECK_MATCH"
+  | "HAS_BG_CHECK_RESULTS"
+  | "HAS_BG_CHECK_TOPICS"
+  | "HAS_EXPIRY"
+  | "HAS_VALUE"
+  | "IS_EXPIRED"
+  | "IS_ONE_OF"
+  | "LESS_THAN"
+  | "LESS_THAN_OR_EQUAL"
+  | "NOT_CONTAIN"
+  | "NOT_EQUAL"
+  | "NOT_HAS_ANY_BG_CHECK_TOPICS"
+  | "NOT_HAS_BG_CHECK_MATCH"
+  | "NOT_HAS_BG_CHECK_RESULTS"
+  | "NOT_HAS_BG_CHECK_TOPICS"
+  | "NOT_HAS_EXPIRY"
+  | "NOT_HAS_VALUE"
+  | "NOT_IS_ONE_OF"
+  | "START_WITH";
+
+export type DashboardModuleProfileFilter = {
+  status: Maybe<Array<ProfileStatus>>;
+  values: Maybe<DashboardModuleProfileFieldValuesFilter>;
+};
+
 export type DashboardModuleResultItem = {
   aggr: Maybe<Scalars["Float"]["output"]>;
   color: Maybe<Scalars["String"]["output"]>;
@@ -500,8 +582,13 @@ export type DashboardModuleSize = "LARGE" | "MEDIUM" | "SMALL";
 export type DashboardPetitionsNumberModule = DashboardModule & {
   id: Scalars["GID"]["output"];
   result: Maybe<DashboardModuleResultItem>;
+  settings: DashboardPetitionsNumberModuleSettings;
   size: DashboardModuleSize;
   title: Maybe<Scalars["String"]["output"]>;
+};
+
+export type DashboardPetitionsNumberModuleSettings = {
+  filters: DashboardModulePetitionFilter;
 };
 
 export type DashboardPetitionsPieChartModule = DashboardModule & {
@@ -512,8 +599,15 @@ export type DashboardPetitionsPieChartModule = DashboardModule & {
   title: Maybe<Scalars["String"]["output"]>;
 };
 
+export type DashboardPetitionsPieChartModuleItems = {
+  color: Scalars["String"]["output"];
+  filter: DashboardModulePetitionFilter;
+  label: Scalars["String"]["output"];
+};
+
 export type DashboardPetitionsPieChartModuleSettings = {
   graphicType: DashboardPieChartModuleSettingsType;
+  items: Array<DashboardPetitionsPieChartModuleItems>;
 };
 
 export type DashboardPetitionsRatioModule = DashboardModule & {
@@ -525,6 +619,7 @@ export type DashboardPetitionsRatioModule = DashboardModule & {
 };
 
 export type DashboardPetitionsRatioModuleSettings = {
+  filters: Array<DashboardModulePetitionFilter>;
   graphicType: DashboardRatioModuleSettingsType;
 };
 
@@ -539,6 +634,10 @@ export type DashboardProfilesNumberModule = DashboardModule & {
 };
 
 export type DashboardProfilesNumberModuleSettings = {
+  aggregate: Maybe<ModuleResultAggregateType>;
+  filters: DashboardModuleProfileFilter;
+  profileTypeFieldId: Maybe<Scalars["GID"]["output"]>;
+  profileTypeId: Maybe<Scalars["GID"]["output"]>;
   type: ModuleResultType;
 };
 
@@ -550,8 +649,20 @@ export type DashboardProfilesPieChartModule = DashboardModule & {
   title: Maybe<Scalars["String"]["output"]>;
 };
 
+export type DashboardProfilesPieChartModuleItems = {
+  color: Scalars["String"]["output"];
+  filter: DashboardModuleProfileFilter;
+  label: Scalars["String"]["output"];
+};
+
 export type DashboardProfilesPieChartModuleSettings = {
+  aggregate: Maybe<ModuleResultAggregateType>;
   graphicType: DashboardPieChartModuleSettingsType;
+  /** Optional SELECT field to group by its values instead of items array */
+  groupByProfileTypeFieldId: Maybe<Scalars["GID"]["output"]>;
+  items: Array<DashboardProfilesPieChartModuleItems>;
+  profileTypeFieldId: Maybe<Scalars["GID"]["output"]>;
+  profileTypeId: Maybe<Scalars["GID"]["output"]>;
   type: ModuleResultType;
 };
 
@@ -564,7 +675,11 @@ export type DashboardProfilesRatioModule = DashboardModule & {
 };
 
 export type DashboardProfilesRatioModuleSettings = {
+  aggregate: Maybe<ModuleResultAggregateType>;
+  filters: Array<DashboardModuleProfileFilter>;
   graphicType: DashboardRatioModuleSettingsType;
+  profileTypeFieldId: Maybe<Scalars["GID"]["output"]>;
+  profileTypeId: Maybe<Scalars["GID"]["output"]>;
   type: ModuleResultType;
 };
 
@@ -1004,8 +1119,6 @@ export type Mutation = {
   activateUser: Array<User>;
   /** Add users to a user group */
   addUsersToUserGroup: UserGroup;
-  /** Creates a new dashboard in the organization */
-  adminCreateDashboard: Dashboard;
   /** Anonymizes a petition */
   anonymizePetition: SupportMethodResponse;
   /** Updates the status of a PENDING petition field replies to APPROVED or REJECTED */
@@ -1035,6 +1148,8 @@ export type Mutation = {
   changePassword: ChangePasswordResult;
   /** Changes the type of a petition Field */
   changePetitionFieldType: PetitionField;
+  /** Clones a dashboard */
+  cloneDashboard: Dashboard;
   /** Clones a petition field */
   clonePetitionField: PetitionField;
   /** Clone petition. */
@@ -1085,6 +1200,8 @@ export type Mutation = {
   createContactlessPetitionAccess: PetitionAccess;
   createCreatePetitionButtonDashboardModule: Dashboard;
   createCustomSignatureDocumentUploadLink: Scalars["JSONObject"]["output"];
+  /** Creates a new empty dashboard in the organization */
+  createDashboard: Dashboard;
   /** Creates a new Dow Jones KYC integration on the user's organization */
   createDowJonesKycIntegration: OrgIntegration;
   /** Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document */
@@ -1207,6 +1324,8 @@ export type Mutation = {
   deleteAzureOpenAiIntegration: SupportMethodResponse;
   /** Delete contacts. */
   deleteContacts: Result;
+  /** Deletes a dashboard */
+  deleteDashboard: Success;
   deleteDashboardModule: Dashboard;
   /** Removes the DOW JONES integration of the user's organization */
   deleteDowJonesKycIntegration: Organization;
@@ -1434,6 +1553,9 @@ export type Mutation = {
   updateCompaniesHouseCustomProperties: SupportMethodResponse;
   /** Updates a contact. */
   updateContact: Contact;
+  updateCreatePetitionButtonDashboardModule: DashboardModule;
+  /** Updates a dashboard */
+  updateDashboard: Dashboard;
   updateDashboardModulePositions: Dashboard;
   updateEinformaCustomProperties: SupportMethodResponse;
   /** Activate or deactivate a list of organization feature flag */
@@ -1499,6 +1621,9 @@ export type Mutation = {
   updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
   /** Updates a variable on the petition. */
   updatePetitionVariable: Petition;
+  updatePetitionsNumberDashboardModule: DashboardModule;
+  updatePetitionsPieChartDashboardModule: DashboardModule;
+  updatePetitionsRatioDashboardModule: DashboardModule;
   /** Updates an existing event subscription for the user's profiles */
   updateProfileEventSubscription: ProfileEventSubscription;
   updateProfileFieldValue: Profile;
@@ -1510,6 +1635,9 @@ export type Mutation = {
   updateProfileTypeFieldPermissions: ProfileType;
   updateProfileTypeFieldPositions: ProfileType;
   updateProfileTypeProcessPositions: ProfileType;
+  updateProfilesNumberDashboardModule: DashboardModule;
+  updateProfilesPieChartDashboardModule: DashboardModule;
+  updateProfilesRatioDashboardModule: DashboardModule;
   /** Updates the info and permissions of a public link */
   updatePublicPetitionLink: PublicPetitionLink;
   /** Updates template_public from template */
@@ -1547,11 +1675,6 @@ export type MutationactivateUserArgs = {
 export type MutationaddUsersToUserGroupArgs = {
   userGroupId: Scalars["GID"]["input"];
   userIds: Array<Scalars["GID"]["input"]>;
-};
-
-export type MutationadminCreateDashboardArgs = {
-  name: Scalars["String"]["input"];
-  orgId: Scalars["GID"]["input"];
 };
 
 export type MutationanonymizePetitionArgs = {
@@ -1635,6 +1758,11 @@ export type MutationchangePetitionFieldTypeArgs = {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionId: Scalars["GID"]["input"];
   type: PetitionFieldType;
+};
+
+export type MutationcloneDashboardArgs = {
+  id: Scalars["GID"]["input"];
+  name: Scalars["String"]["input"];
 };
 
 export type MutationclonePetitionFieldArgs = {
@@ -1770,6 +1898,10 @@ export type MutationcreateCreatePetitionButtonDashboardModuleArgs = {
 export type MutationcreateCustomSignatureDocumentUploadLinkArgs = {
   file: FileUploadInput;
   petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateDashboardArgs = {
+  name: Scalars["String"]["input"];
 };
 
 export type MutationcreateDowJonesKycIntegrationArgs = {
@@ -2156,6 +2288,10 @@ export type MutationdeleteAzureOpenAiIntegrationArgs = {
 export type MutationdeleteContactsArgs = {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   ids: Array<Scalars["GID"]["input"]>;
+};
+
+export type MutationdeleteDashboardArgs = {
+  id: Scalars["GID"]["input"];
 };
 
 export type MutationdeleteDashboardModuleArgs = {
@@ -2833,6 +2969,17 @@ export type MutationupdateContactArgs = {
   id: Scalars["GID"]["input"];
 };
 
+export type MutationupdateCreatePetitionButtonDashboardModuleArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  data: UpdateCreatePetitionButtonDashboardModuleInput;
+  moduleId: Scalars["GID"]["input"];
+};
+
+export type MutationupdateDashboardArgs = {
+  id: Scalars["GID"]["input"];
+  name: Scalars["String"]["input"];
+};
+
 export type MutationupdateDashboardModulePositionsArgs = {
   dashboardId: Scalars["GID"]["input"];
   moduleIds: Array<Scalars["GID"]["input"]>;
@@ -3023,6 +3170,24 @@ export type MutationupdatePetitionVariableArgs = {
   petitionId: Scalars["GID"]["input"];
 };
 
+export type MutationupdatePetitionsNumberDashboardModuleArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  data: UpdatePetitionsNumberDashboardModuleInput;
+  moduleId: Scalars["GID"]["input"];
+};
+
+export type MutationupdatePetitionsPieChartDashboardModuleArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  data: UpdatePetitionsPieChartDashboardModuleInput;
+  moduleId: Scalars["GID"]["input"];
+};
+
+export type MutationupdatePetitionsRatioDashboardModuleArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  data: UpdatePetitionsRatioDashboardModuleInput;
+  moduleId: Scalars["GID"]["input"];
+};
+
 export type MutationupdateProfileEventSubscriptionArgs = {
   eventTypes?: InputMaybe<Array<ProfileEventType>>;
   eventsUrl?: InputMaybe<Scalars["String"]["input"]>;
@@ -3076,6 +3241,24 @@ export type MutationupdateProfileTypeFieldPositionsArgs = {
 export type MutationupdateProfileTypeProcessPositionsArgs = {
   profileTypeId: Scalars["GID"]["input"];
   profileTypeProcessIds: Array<Scalars["GID"]["input"]>;
+};
+
+export type MutationupdateProfilesNumberDashboardModuleArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  data: UpdateProfilesNumberDashboardModuleInput;
+  moduleId: Scalars["GID"]["input"];
+};
+
+export type MutationupdateProfilesPieChartDashboardModuleArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  data: UpdateProfilesPieChartDashboardModuleInput;
+  moduleId: Scalars["GID"]["input"];
+};
+
+export type MutationupdateProfilesRatioDashboardModuleArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  data: UpdateProfilesRatioDashboardModuleInput;
+  moduleId: Scalars["GID"]["input"];
 };
 
 export type MutationupdatePublicPetitionLinkArgs = {
@@ -6727,6 +6910,12 @@ export type UpdateContactInput = {
   lastName?: InputMaybe<Scalars["String"]["input"]>;
 };
 
+export type UpdateCreatePetitionButtonDashboardModuleInput = {
+  settings?: InputMaybe<CreatePetitionButtonDashboardModuleSettingsInput>;
+  size?: InputMaybe<DashboardModuleSize>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type UpdatePetitionFieldAutoSearchConfigInput = {
   country?: InputMaybe<Scalars["GID"]["input"]>;
   date?: InputMaybe<Scalars["GID"]["input"]>;
@@ -6794,6 +6983,24 @@ export type UpdatePetitionVariableInput = {
   defaultValue: Scalars["Float"]["input"];
 };
 
+export type UpdatePetitionsNumberDashboardModuleInput = {
+  settings?: InputMaybe<PetitionsNumberDashboardModuleSettingsInput>;
+  size?: InputMaybe<DashboardModuleSize>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type UpdatePetitionsPieChartDashboardModuleInput = {
+  settings?: InputMaybe<PetitionsPieChartDashboardModuleSettingsInput>;
+  size?: InputMaybe<DashboardModuleSize>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type UpdatePetitionsRatioDashboardModuleInput = {
+  settings?: InputMaybe<PetitionsRatioDashboardModuleSettingsInput>;
+  size?: InputMaybe<DashboardModuleSize>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type UpdateProfileFieldValueInput = {
   content?: InputMaybe<Scalars["JSONObject"]["input"]>;
   expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
@@ -6818,6 +7025,24 @@ export type UpdateProfileTypeFieldPermissionsInput = {
 export type UpdateProfileTypeFieldSelectOptionsSubstitution = {
   new?: InputMaybe<Scalars["String"]["input"]>;
   old: Scalars["String"]["input"];
+};
+
+export type UpdateProfilesNumberDashboardModuleInput = {
+  settings?: InputMaybe<ProfilesNumberDashboardModuleSettingsInput>;
+  size?: InputMaybe<DashboardModuleSize>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type UpdateProfilesPieChartDashboardModuleInput = {
+  settings?: InputMaybe<ProfilesPieChartDashboardModuleSettingsInput>;
+  size?: InputMaybe<DashboardModuleSize>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type UpdateProfilesRatioDashboardModuleInput = {
+  settings?: InputMaybe<ProfilesRatioDashboardModuleSettingsInput>;
+  size?: InputMaybe<DashboardModuleSize>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type UpdateTagInput = {

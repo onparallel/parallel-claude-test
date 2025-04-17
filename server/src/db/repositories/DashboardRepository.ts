@@ -15,6 +15,7 @@ import {
   DashboardModule,
   DashboardModuleType,
   ProfileTypeField,
+  User,
 } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import {
@@ -137,6 +138,72 @@ export class DashboardRepository extends BaseRepository {
     );
 
     return dashboard;
+  }
+
+  async updateDashboard(dashboardId: number, data: Partial<Dashboard>, updatedBy: string) {
+    const [dashboard] = await this.from("dashboard")
+      .where("id", dashboardId)
+      .whereNull("deleted_at")
+      .update(
+        {
+          ...data,
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*",
+      );
+
+    return dashboard;
+  }
+
+  async deleteDashboard(dashboardId: number, deletedBy: string) {
+    await this.from("dashboard_module")
+      .where({
+        dashboard_id: dashboardId,
+        deleted_at: null,
+      })
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
+      });
+
+    await this.from("dashboard")
+      .where({
+        id: dashboardId,
+        deleted_at: null,
+      })
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
+      });
+  }
+
+  async cloneDashboard(dashboardId: number, name: string, user: User) {
+    const newDashboard = await this.createDashboard(
+      {
+        org_id: user.org_id,
+        name,
+      },
+      `User:${user.id}`,
+    );
+
+    const modules = await this.loadModulesByDashboardId.raw(dashboardId);
+    if (modules.length > 0) {
+      await this.from("dashboard_module").insert(
+        modules.map((module) => ({
+          dashboard_id: newDashboard.id,
+          position: module.position,
+          settings: module.settings,
+          type: module.type,
+          size: module.size,
+          title: module.title,
+          created_at: this.now(),
+          created_by: `User:${user.id}`,
+        })),
+      );
+    }
+
+    return newDashboard;
   }
 
   async getRefreshedDashboard(dashboardId: number, updatedBy: string) {

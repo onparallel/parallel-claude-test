@@ -22,38 +22,20 @@ import {
   PetitionTagFilterLogicalOperator,
 } from "@parallel/graphql/__types";
 import { object } from "@parallel/utils/queryState";
+import { useLogicalOperators } from "@parallel/utils/useLogicalOperators";
 import { useMemo } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 
 export function PetitionListTagFilter() {
-  const intl = useIntl();
-
   const { control, setValue, watch } = useFormContext<{
     filter: PetitionTagFilter | undefined;
   }>();
 
   const { fields: filters, append, remove } = useFieldArray({ control, name: "filter.filters" });
 
-  const logicalOperators = useMemo<SimpleOption<PetitionTagFilterLogicalOperator>[]>(() => {
-    return [
-      {
-        label: intl.formatMessage({
-          id: "component.petition-list-shared-with-filter.or",
-          defaultMessage: "or",
-        }),
-        value: "OR",
-      },
-      {
-        label: intl.formatMessage({
-          id: "component.petition-list-shared-with-filter.and",
-          defaultMessage: "and",
-        }),
-        value: "AND",
-      },
-    ];
-  }, [intl.locale]);
+  const logicalOperators = useLogicalOperators();
 
   const handleAddFilter = () => {
     const value = watch();
@@ -142,17 +124,22 @@ PetitionListTagFilter.fragments = {
   `,
 };
 
-export interface PetitionListTagFilterLineProps {
+interface PetitionListTagFilterLineProps {
   index: number;
   onRemove: () => void;
+  rootPath?: string;
 }
 
-export function PetitionListTagFilterLine({ index, onRemove }: PetitionListTagFilterLineProps) {
-  const path = `filter.filters.${index}` as const;
+export function PetitionListTagFilterLine({
+  index,
+  onRemove,
+  rootPath = "filter",
+}: PetitionListTagFilterLineProps) {
+  const path = `${rootPath}.filters.${index}` as const;
   const intl = useIntl();
 
-  const { setValue, setFocus, control, watch, formState } = useFormContext<{
-    filter: PetitionTagFilter | undefined;
+  const { setValue, setFocus, control, watch } = useFormContext<{
+    [key: string]: PetitionTagFilter | undefined;
   }>();
   const operator = watch(`${path}.operator`);
   const operators = useMemo<SimpleOption<PetitionTagFilterLineOperator>[]>(() => {
@@ -181,7 +168,6 @@ export function PetitionListTagFilterLine({ index, onRemove }: PetitionListTagFi
     ];
   }, [intl.locale]);
 
-  const error = formState.errors.filter?.filters?.[index]?.value;
   return (
     <>
       <IconButton
@@ -214,12 +200,12 @@ export function PetitionListTagFilterLine({ index, onRemove }: PetitionListTagFi
         )}
       />
       {operator !== "IS_EMPTY" ? (
-        <FormControl gridColumn="2" isInvalid={isNonNullish(error)}>
-          <Controller
-            control={control}
-            name={`${path}.value`}
-            rules={{ required: true }}
-            render={({ field: { onChange, ...field } }) => (
+        <Controller
+          control={control}
+          name={`${path}.value`}
+          rules={{ required: true }}
+          render={({ field: { onChange, ...field }, fieldState: { error } }) => (
+            <FormControl gridColumn="2" isInvalid={isNonNullish(error)}>
               <TagSelect
                 size="sm"
                 isMulti
@@ -227,17 +213,17 @@ export function PetitionListTagFilterLine({ index, onRemove }: PetitionListTagFi
                 maxItems={10}
                 onChange={(tags) => onChange(tags.map((tag) => tag.id))}
               />
-            )}
-          />
-          <FormErrorMessage>
-            {error?.type === "required" ? (
-              <FormattedMessage
-                id="generic.required-field-error"
-                defaultMessage="The field is required"
-              />
-            ) : null}
-          </FormErrorMessage>
-        </FormControl>
+              <FormErrorMessage>
+                {error?.type === "required" ? (
+                  <FormattedMessage
+                    id="generic.required-field-error"
+                    defaultMessage="The field is required"
+                  />
+                ) : null}
+              </FormErrorMessage>
+            </FormControl>
+          )}
+        />
       ) : null}
     </>
   );

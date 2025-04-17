@@ -19,6 +19,7 @@ import {
   PetitionApprovalsFilterOperator,
 } from "@parallel/graphql/__types";
 import { object } from "@parallel/utils/queryState";
+import { useLogicalOperators } from "@parallel/utils/useLogicalOperators";
 import { useCallback, useMemo } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -27,33 +28,19 @@ import { useSearchUsers } from "../../../utils/useSearchUsers";
 import { UserSelect } from "../../common/UserSelect";
 
 export function PetitionListApprovalsFilter() {
-  const intl = useIntl();
-
   const { control, setValue, watch } = useFormContext<{
     filter: PetitionApprovalsFilterInput | undefined;
   }>();
+  const logicalOperators = useLogicalOperators();
 
-  const logicalOperators = useMemo<SimpleOption<PetitionApprovalsFilterLogicalOperator>[]>(() => {
-    return [
-      {
-        label: intl.formatMessage({
-          id: "generic.condition-logical-join-or",
-          defaultMessage: "or",
-        }),
-        value: "OR",
-      },
-      {
-        label: intl.formatMessage({
-          id: "generic.condition-logical-join-and",
-          defaultMessage: "and",
-        }),
-        value: "AND",
-      },
-    ];
-  }, [intl.locale]);
-
-  const { fields: filters, append, remove } = useFieldArray({ control, name: "filter.filters" });
-
+  const {
+    fields: filters,
+    append,
+    remove,
+  } = useFieldArray({
+    control,
+    name: "filter.filters",
+  });
   const handleAddFilter = () => {
     const value = watch();
     if (isNullish(value.filter?.operator)) {
@@ -135,17 +122,22 @@ export function PetitionListApprovalsFilter() {
   );
 }
 
-interface PetitionListApprovalsFilterProps {
+interface PetitionListApprovalsFilterLineProps {
   index: number;
   onRemove: () => void;
+  rootPath?: string;
 }
 
-function PetitionListApprovalsFilterLine({ index, onRemove }: PetitionListApprovalsFilterProps) {
-  const path = `filter.filters.${index}` as const;
+export function PetitionListApprovalsFilterLine({
+  index,
+  onRemove,
+  rootPath = "filter",
+}: PetitionListApprovalsFilterLineProps) {
+  const path = `${rootPath}.filters.${index}` as const;
   const intl = useIntl();
 
-  const { setValue, setFocus, control, watch, formState } = useFormContext<{
-    filter: PetitionApprovalsFilterInput | undefined;
+  const { setValue, setFocus, control, watch } = useFormContext<{
+    [key: string]: PetitionApprovalsFilterInput | undefined;
   }>();
   const operator = watch(`${path}.operator`);
 
@@ -187,40 +179,39 @@ function PetitionListApprovalsFilterLine({ index, onRemove }: PetitionListApprov
           id: "component.petition-list-approvals-filter.without-approval",
           defaultMessage: "Without approval",
         }),
-        value: "WITHOUT_APPROVAL", // Sin aprobación
+        value: "WITHOUT_APPROVAL",
       },
       {
         label: intl.formatMessage({
           id: "component.petition-list-approvals-filter.approval-not-started",
           defaultMessage: "Approval not started",
         }),
-        value: "NOT_STARTED", // Aprobación sin iniciar
+        value: "NOT_STARTED",
       },
       {
         label: intl.formatMessage({
           id: "component.petition-list-approvals-filter.pending",
           defaultMessage: "Pending",
         }),
-        value: "PENDING", // Pendiente
+        value: "PENDING",
       },
       {
         label: intl.formatMessage({
           id: "component.petition-list-approvals-filter.approved",
           defaultMessage: "Approved",
         }),
-        value: "APPROVED", // Aprobada
+        value: "APPROVED",
       },
       {
         label: intl.formatMessage({
           id: "component.petition-list-approvals-filter.rejected",
           defaultMessage: "Rejected",
         }),
-        value: "REJECTED", // Rechazada
+        value: "REJECTED",
       },
     ];
   }, [intl.locale]);
 
-  const error = formState.errors.filter?.filters?.[index]?.value;
   return (
     <>
       <IconButton
@@ -250,13 +241,15 @@ function PetitionListApprovalsFilterLine({ index, onRemove }: PetitionListApprov
           />
         )}
       />
-      <FormControl gridColumn="2" isInvalid={isNonNullish(error)}>
-        {operator === "STATUS" ? (
-          <Controller
-            control={control}
-            name={`${path}.value`}
-            rules={{ required: true }}
-            render={({ field }) => (
+
+      {operator === "STATUS" ? (
+        <Controller
+          key="status"
+          control={control}
+          name={`${path}.value`}
+          rules={{ required: true }}
+          render={({ field, fieldState: { error } }) => (
+            <FormControl gridColumn="2" isInvalid={isNonNullish(error)}>
               <SimpleSelect
                 {...field}
                 size="sm"
@@ -266,14 +259,25 @@ function PetitionListApprovalsFilterLine({ index, onRemove }: PetitionListApprov
                   defaultMessage: "Select a status",
                 })}
               />
-            )}
-          />
-        ) : (
-          <Controller
-            control={control}
-            name={`${path}.value`}
-            rules={{ required: true }}
-            render={({ field: { onChange, value, ...field } }) => (
+              <FormErrorMessage>
+                {error?.type === "required" ? (
+                  <FormattedMessage
+                    id="generic.required-field-error"
+                    defaultMessage="The field is required"
+                  />
+                ) : null}
+              </FormErrorMessage>
+            </FormControl>
+          )}
+        />
+      ) : (
+        <Controller
+          key="assigned-to"
+          control={control}
+          name={`${path}.value`}
+          rules={{ required: true }}
+          render={({ field: { onChange, value, ...field }, fieldState: { error } }) => (
+            <FormControl gridColumn="2" isInvalid={isNonNullish(error)}>
               <UserSelect
                 size="sm"
                 {...field}
@@ -281,19 +285,18 @@ function PetitionListApprovalsFilterLine({ index, onRemove }: PetitionListApprov
                 onChange={(user) => onChange(user?.id ?? (null as any))}
                 onSearch={handleSearchUsers}
               />
-            )}
-          />
-        )}
-
-        <FormErrorMessage>
-          {error?.type === "required" ? (
-            <FormattedMessage
-              id="generic.required-field-error"
-              defaultMessage="The field is required"
-            />
-          ) : null}
-        </FormErrorMessage>
-      </FormControl>
+              <FormErrorMessage>
+                {error?.type === "required" ? (
+                  <FormattedMessage
+                    id="generic.required-field-error"
+                    defaultMessage="The field is required"
+                  />
+                ) : null}
+              </FormErrorMessage>
+            </FormControl>
+          )}
+        />
+      )}
     </>
   );
 }

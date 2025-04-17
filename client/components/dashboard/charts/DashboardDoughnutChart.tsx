@@ -30,6 +30,10 @@ export function DashboardDoughnutChart({ data }: { data: ChartData<"doughnut"> }
       data={total === 0 ? placeholderData : (data as any)}
       options={{
         responsive: true,
+        maintainAspectRatio: true,
+        layout: {
+          padding: 16,
+        },
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -58,7 +62,6 @@ export function DashboardDoughnutChart({ data }: { data: ChartData<"doughnut"> }
             },
           },
         },
-        animation: false,
       }}
     />
   );

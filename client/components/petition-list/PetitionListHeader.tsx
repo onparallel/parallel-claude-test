@@ -27,7 +27,7 @@ import { useColumnVisibilityDialog } from "../common/dialogs/ColumnVisibilityDia
 import { isDialogError } from "../common/dialogs/DialogProvider";
 import { SaveViewTabsMenu } from "../common/view-tabs/SaveViewMenuButton";
 import { useConfirmChangeViewAllDialog } from "../petition-compose/dialogs/ConfirmChangeViewAllDialog";
-import { useAskViewNameDialog } from "./AskViewNameDialog";
+import { useAskNameDialog } from "./AskNameDialog";
 
 export interface PetitionListHeaderProps {
   shape: QueryStateOf<PetitionsQueryState>;
@@ -125,12 +125,12 @@ export function PetitionListHeader({
     );
   }, [state, views]);
 
-  const showAskViewNameDialog = useAskViewNameDialog();
+  const showAskNameDialog = useAskNameDialog();
   const [createPetitionListView] = useMutation(PetitionListHeader_createPetitionListViewDocument);
   const handleSaveAsNewViewClick = async () => {
     try {
       const currentView = state.view !== "ALL" ? views.find((v) => v.id === state.view) : null;
-      const name = await showAskViewNameDialog({
+      const name = await showAskNameDialog({
         name: currentView?.name,
         header: (
           <FormattedMessage

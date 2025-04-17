@@ -867,9 +867,7 @@ function usePetitionListActions({
       onClick: onRenameClick,
       isDisabled: selectedCount !== 1 || minimumPermission === "READ",
       leftIcon: <EditSimpleIcon />,
-      children: (
-        <FormattedMessage id="page.petitions-list.actions-rename" defaultMessage="Rename" />
-      ),
+      children: <FormattedMessage id="generic.rename" defaultMessage="Rename" />,
     },
     {
       key: "share",

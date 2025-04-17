@@ -29,6 +29,11 @@ export function DashboardPieChart({ data }: { data: ChartData<"pie"> }) {
     <Pie
       data={total === 0 ? placeholderData : (data as any)}
       options={{
+        responsive: true,
+        maintainAspectRatio: true,
+        layout: {
+          padding: 16,
+        },
         plugins: {
           legend: {
             display: false,
@@ -59,7 +64,6 @@ export function DashboardPieChart({ data }: { data: ChartData<"pie"> }) {
             },
           },
         },
-        animation: false,
       }}
     />
   );

@@ -557,6 +557,26 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
           },
         ],
       },
+      {
+        category: intl.formatMessage({
+          id: "page.permissions-group.category-dashboards",
+          defaultMessage: "Dashboards",
+        }),
+        permissions: [
+          {
+            name: "DASHBOARDS:CRUD_DASHBOARDS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.dashboards-crud",
+              defaultMessage: "Create and manage dashboards",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.dashboards-crud-description",
+              defaultMessage:
+                "Grants users in this team permissions to create and manage dashboards.",
+            }),
+          },
+        ],
+      },
     ],
     [intl.locale],
   );

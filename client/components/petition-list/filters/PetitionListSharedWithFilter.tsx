@@ -20,6 +20,7 @@ import {
   UserSelect_UserGroupFragment,
 } from "@parallel/graphql/__types";
 import { object } from "@parallel/utils/queryState";
+import { useLogicalOperators } from "@parallel/utils/useLogicalOperators";
 import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 import { useCallback, useMemo } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
@@ -29,30 +30,11 @@ import { useSearchUsers } from "../../../utils/useSearchUsers";
 import { UserSelect } from "../../common/UserSelect";
 
 export function PetitionListSharedWithFilter() {
-  const intl = useIntl();
-
   const { control, setValue, watch } = useFormContext<{
     filter: PetitionSharedWithFilter | undefined;
   }>();
 
-  const logicalOperators = useMemo<SimpleOption<FilterSharedWithLogicalOperator>[]>(() => {
-    return [
-      {
-        label: intl.formatMessage({
-          id: "generic.condition-logical-join-or",
-          defaultMessage: "or",
-        }),
-        value: "OR",
-      },
-      {
-        label: intl.formatMessage({
-          id: "generic.condition-logical-join-and",
-          defaultMessage: "and",
-        }),
-        value: "AND",
-      },
-    ];
-  }, [intl.locale]);
+  const logicalOperators = useLogicalOperators();
 
   const { fields: filters, append, remove } = useFieldArray({ control, name: "filter.filters" });
 
@@ -140,14 +122,19 @@ export function PetitionListSharedWithFilter() {
 interface PetitionListSharedWithFilterProps {
   index: number;
   onRemove: () => void;
+  rootPath?: string;
 }
 
-function PetitionListSharedWithFilterLine({ index, onRemove }: PetitionListSharedWithFilterProps) {
-  const path = `filter.filters.${index}` as const;
+export function PetitionListSharedWithFilterLine({
+  index,
+  onRemove,
+  rootPath = "filter",
+}: PetitionListSharedWithFilterProps) {
+  const path = `${rootPath}.filters.${index}` as const;
   const intl = useIntl();
 
-  const { setValue, setFocus, control, watch, formState } = useFormContext<{
-    filter: PetitionSharedWithFilter | undefined;
+  const { setValue, setFocus, control, watch } = useFormContext<{
+    [key: string]: PetitionSharedWithFilter | undefined;
   }>();
   const operator = watch(`${path}.operator`);
 
@@ -195,7 +182,6 @@ function PetitionListSharedWithFilterLine({ index, onRemove }: PetitionListShare
     ];
   }, [intl.locale]);
 
-  const error = formState.errors.filter?.filters?.[index]?.value;
   return (
     <>
       <IconButton
@@ -225,12 +211,13 @@ function PetitionListSharedWithFilterLine({ index, onRemove }: PetitionListShare
           />
         )}
       />
-      <FormControl gridColumn="2" isInvalid={isNonNullish(error)}>
-        <Controller
-          control={control}
-          name={`${path}.value`}
-          rules={{ required: true }}
-          render={({ field: { onChange, value, ...field } }) => (
+
+      <Controller
+        control={control}
+        name={`${path}.value`}
+        rules={{ required: true }}
+        render={({ field: { onChange, value, ...field }, fieldState: { error } }) => (
+          <FormControl gridColumn="2" isInvalid={isNonNullish(error)}>
             <UserSelect
               size="sm"
               includeGroups={operator !== "IS_OWNER"}
@@ -239,17 +226,17 @@ function PetitionListSharedWithFilterLine({ index, onRemove }: PetitionListShare
               onChange={(userOrGroup) => onChange(userOrGroup?.id ?? (null as any))}
               onSearch={handleSearchUsersAndGroups}
             />
-          )}
-        />
-        <FormErrorMessage>
-          {error?.type === "required" ? (
-            <FormattedMessage
-              id="generic.required-field-error"
-              defaultMessage="The field is required"
-            />
-          ) : null}
-        </FormErrorMessage>
-      </FormControl>
+            <FormErrorMessage>
+              {error?.type === "required" ? (
+                <FormattedMessage
+                  id="generic.required-field-error"
+                  defaultMessage="The field is required"
+                />
+              ) : null}
+            </FormErrorMessage>
+          </FormControl>
+        )}
+      />
     </>
   );
 }

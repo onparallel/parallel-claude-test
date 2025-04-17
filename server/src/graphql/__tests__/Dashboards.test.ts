@@ -2,6 +2,7 @@ import { subMinutes } from "date-fns";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
 import {
+  CreateDashboardModule,
   Dashboard,
   DashboardModule,
   Organization,
@@ -16,16 +17,93 @@ import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
+function modulesBuilder(dashboards: Dashboard[], templateId: number): CreateDashboardModule[] {
+  return [
+    {
+      dashboard_id: dashboards[0].id,
+      position: 0,
+      type: "CREATE_PETITION_BUTTON",
+      size: "SMALL",
+      title: "Create petition",
+      settings: JSON.stringify({
+        template_id: templateId,
+        label: "KYC",
+      }),
+    },
+    {
+      dashboard_id: dashboards[0].id,
+      position: 1,
+      type: "PETITIONS_NUMBER",
+      size: "LARGE",
+      title: "Total closed petitions",
+      settings: JSON.stringify({}),
+    },
+    {
+      dashboard_id: dashboards[1].id,
+      position: 0,
+      type: "PROFILES_RATIO",
+      size: "MEDIUM",
+      title: "Open profiles percentage",
+      settings: JSON.stringify({}),
+    },
+    {
+      dashboard_id: dashboards[1].id,
+      position: 1,
+      type: "PROFILES_PIE_CHART",
+      size: "LARGE",
+      title: "Profiles by status",
+      settings: JSON.stringify({}),
+    },
+    {
+      dashboard_id: dashboards[1].id,
+      position: 2,
+      type: "PETITIONS_NUMBER",
+      size: "LARGE",
+      title: "Petitions",
+      settings: JSON.stringify({}),
+    },
+    {
+      dashboard_id: dashboards[1].id,
+      position: 3,
+      type: "PROFILES_PIE_CHART",
+      size: "LARGE",
+      title: "Profiles by status",
+      settings: JSON.stringify({}),
+    },
+    {
+      dashboard_id: dashboards[2].id,
+      position: 0,
+      type: "PETITIONS_RATIO",
+      size: "SMALL",
+      title: "Petitions ratio",
+      settings: JSON.stringify({}),
+    },
+    {
+      dashboard_id: dashboards[2].id,
+      position: 1,
+      type: "PETITIONS_PIE_CHART",
+      size: "SMALL",
+      title: "Petitions pie chart",
+      settings: JSON.stringify({}),
+    },
+    {
+      dashboard_id: dashboards[2].id,
+      position: 2,
+      type: "PROFILES_NUMBER",
+      size: "SMALL",
+      title: "Profiles number",
+      settings: JSON.stringify({}),
+    },
+  ];
+}
+
 describe("GraphQL / Dashboards", () => {
   let testClient: TestClient;
   let user: User;
   let organization: Organization;
 
-  let superadmin: User;
-  let rootOrg: Organization;
+  let noPermissionsApiKey: string;
   let mocks: Mocks;
-
-  let superadminApiKey: string;
 
   let dashboards: Dashboard[];
   let modules: DashboardModule[];
@@ -36,11 +114,14 @@ describe("GraphQL / Dashboards", () => {
   let riskSelectProfileTypeField: ProfileTypeField;
   let countrySelectProfileTypeField: ProfileTypeField;
 
-  let rootOrgProfileType: ProfileType;
-  let rootOrgProfileTypeField: ProfileTypeField;
-
   let userTemplate: Petition;
-  let rootOrgTemplate: Petition;
+
+  let otherOrg: Organization;
+  let otherUser: User;
+  let otherTemplate: Petition;
+
+  let otherProfileType: ProfileType;
+  let otherProfileTypeField: ProfileTypeField;
 
   beforeAll(async () => {
     testClient = await initServer();
@@ -51,80 +132,35 @@ describe("GraphQL / Dashboards", () => {
 
     await mocks.createFeatureFlags([{ name: "DASHBOARDS", default_value: true }]);
 
-    [rootOrg] = await mocks.createRandomOrganizations(1, () => ({ status: "ROOT" }));
-    [superadmin] = await mocks.createRandomUsers(rootOrg.id, 1);
-    const [userGroup] = await mocks.createUserGroups(1, rootOrg.id, [
-      { name: "SUPERADMIN", effect: "GRANT" },
+    const [userGroup] = await mocks.createUserGroups(1, organization.id, [
+      { name: "DASHBOARDS:CRUD_DASHBOARDS", effect: "GRANT" },
     ]);
-    await mocks.insertUserGroupMembers(userGroup.id, [superadmin.id]);
-    ({ apiKey: superadminApiKey } = await mocks.createUserAuthToken("token", superadmin.id));
+    await mocks.insertUserGroupMembers(userGroup.id, [user.id]);
+
+    const [userNoPermission] = await mocks.createRandomUsers(organization.id, 1);
+    ({ apiKey: noPermissionsApiKey } = await mocks.createUserAuthToken(
+      "no-permission",
+      userNoPermission.id,
+    ));
 
     [userTemplate] = await mocks.createRandomTemplates(organization.id, user.id, 1);
-    [rootOrgTemplate] = await mocks.createRandomTemplates(rootOrg.id, superadmin.id, 1);
+
+    [otherOrg] = await mocks.createRandomOrganizations(1);
+    [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
+    [otherTemplate] = await mocks.createRandomTemplates(otherOrg.id, otherUser.id, 1);
 
     dashboards = await mocks.knex
       .from("dashboard")
       .insert([
         { org_id: organization.id, name: "Dashboard 1", position: 0 },
         { org_id: organization.id, name: "Dashboard 2", position: 1 },
+        { org_id: organization.id, name: "Dashboard 3", position: 2 },
       ])
       .returning("*");
 
     modules = await mocks.knex
       .from("dashboard_module")
-      .insert([
-        {
-          dashboard_id: dashboards[0].id,
-          position: 0,
-          type: "CREATE_PETITION_BUTTON",
-          size: "SMALL",
-          title: "Create petition",
-          settings: JSON.stringify({
-            template_id: userTemplate.id,
-            label: "KYC",
-          }),
-        },
-        {
-          dashboard_id: dashboards[0].id,
-          position: 1,
-          type: "PETITIONS_NUMBER",
-          size: "LARGE",
-          title: "Total closed petitions",
-          settings: JSON.stringify({}),
-        },
-        {
-          dashboard_id: dashboards[1].id,
-          position: 0,
-          type: "PROFILES_RATIO",
-          size: "MEDIUM",
-          title: "Open profiles percentage",
-          settings: JSON.stringify({}),
-        },
-        {
-          dashboard_id: dashboards[1].id,
-          position: 1,
-          type: "PROFILES_PIE_CHART",
-          size: "LARGE",
-          title: "Profiles by status",
-          settings: JSON.stringify({}),
-        },
-        {
-          dashboard_id: dashboards[1].id,
-          position: 2,
-          type: "PETITIONS_NUMBER",
-          size: "LARGE",
-          title: "Petitions",
-          settings: JSON.stringify({}),
-        },
-        {
-          dashboard_id: dashboards[1].id,
-          position: 3,
-          type: "PROFILES_PIE_CHART",
-          size: "LARGE",
-          title: "Profiles by status",
-          settings: JSON.stringify({}),
-        },
-      ])
+      .insert(modulesBuilder(dashboards, userTemplate.id))
       .returning("*");
 
     [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
@@ -150,12 +186,11 @@ describe("GraphQL / Dashboards", () => {
             : {},
     }));
 
-    [rootOrgProfileType] = await mocks.createRandomProfileTypes(rootOrg.id, 1);
-    [rootOrgProfileTypeField] = await mocks.createRandomProfileTypeFields(
-      rootOrg.id,
-      rootOrgProfileType.id,
+    [otherProfileType] = await mocks.createRandomProfileTypes(otherOrg.id, 1);
+    [otherProfileTypeField] = await mocks.createRandomProfileTypeFields(
+      otherOrg.id,
+      otherProfileType.id,
       1,
-      () => ({ type: "SHORT_TEXT" }),
     );
   });
 
@@ -173,63 +208,11 @@ describe("GraphQL / Dashboards", () => {
     await mocks.knex.from("dashboard_module").delete();
     modules = await mocks.knex
       .from("dashboard_module")
-      .insert([
-        {
-          dashboard_id: dashboards[0].id,
-          position: 0,
-          type: "CREATE_PETITION_BUTTON",
-          size: "SMALL",
-          title: "Create petition",
-          settings: JSON.stringify({
-            template_id: userTemplate.id,
-            label: "KYC",
-          }),
-        },
-        {
-          dashboard_id: dashboards[0].id,
-          position: 1,
-          type: "PETITIONS_NUMBER",
-          size: "LARGE",
-          title: "Total closed petitions",
-          settings: JSON.stringify({}),
-        },
-        {
-          dashboard_id: dashboards[1].id,
-          position: 0,
-          type: "PROFILES_RATIO",
-          size: "MEDIUM",
-          title: "Open profiles percentage",
-          settings: JSON.stringify({}),
-        },
-        {
-          dashboard_id: dashboards[1].id,
-          position: 1,
-          type: "PROFILES_PIE_CHART",
-          size: "LARGE",
-          title: "Profiles by status",
-          settings: JSON.stringify({}),
-        },
-        {
-          dashboard_id: dashboards[1].id,
-          position: 2,
-          type: "PETITIONS_NUMBER",
-          size: "LARGE",
-          title: "Petitions",
-          settings: JSON.stringify({}),
-        },
-        {
-          dashboard_id: dashboards[1].id,
-          position: 3,
-          type: "PROFILES_PIE_CHART",
-          size: "LARGE",
-          title: "Profiles by status",
-          settings: JSON.stringify({}),
-        },
-      ])
+      .insert(modulesBuilder(dashboards, userTemplate.id))
       .returning("*");
   });
 
-  describe("me.dashboards", () => {
+  describe("dashboards", () => {
     it("queries every available dashboard for the user, without triggering refreshes", async () => {
       const { errors, data } = await testClient.execute(gql`
         query {
@@ -302,6 +285,32 @@ describe("GraphQL / Dashboards", () => {
                 id: toGlobalId("DashboardModule", modules[5].id),
                 size: "LARGE",
                 title: "Profiles by status",
+              },
+            ],
+          },
+          {
+            id: toGlobalId("Dashboard", dashboards[2].id),
+            isDefault: false,
+            isRefreshing: false,
+            lastRefreshAt: null,
+            modules: [
+              {
+                __typename: "DashboardPetitionsRatioModule",
+                id: toGlobalId("DashboardModule", modules[6].id),
+                size: "SMALL",
+                title: "Petitions ratio",
+              },
+              {
+                __typename: "DashboardPetitionsPieChartModule",
+                id: toGlobalId("DashboardModule", modules[7].id),
+                size: "SMALL",
+                title: "Petitions pie chart",
+              },
+              {
+                __typename: "DashboardProfilesNumberModule",
+                id: toGlobalId("DashboardModule", modules[8].id),
+                size: "SMALL",
+                title: "Profiles number",
               },
             ],
           },
@@ -466,27 +475,26 @@ describe("GraphQL / Dashboards", () => {
     });
   });
 
-  describe("adminCreateDashboard", () => {
+  describe("createDashboard", () => {
     it("creates an empty dashboard in last position", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
-          mutation ($orgId: GID!, $name: String!) {
-            adminCreateDashboard(orgId: $orgId, name: $name) {
+          mutation ($name: String!) {
+            createDashboard(name: $name) {
               id
               name
             }
           }
         `,
         {
-          orgId: toGlobalId("Organization", organization.id),
-          name: "Dashboard 3",
+          name: "Dashboard 4",
         },
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.adminCreateDashboard).toEqual({
+      expect(data?.createDashboard).toEqual({
         id: expect.any(String),
-        name: "Dashboard 3",
+        name: "Dashboard 4",
       });
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(gql`
@@ -503,22 +511,22 @@ describe("GraphQL / Dashboards", () => {
       expect(queryData?.me.dashboards).toEqual([
         { id: toGlobalId("Dashboard", dashboards[0].id) },
         { id: toGlobalId("Dashboard", dashboards[1].id) },
-        { id: data?.adminCreateDashboard.id },
+        { id: toGlobalId("Dashboard", dashboards[2].id) },
+        { id: data?.createDashboard.id },
       ]);
     });
 
-    it("sends error if normal user tries to create a dashboard", async () => {
-      const { errors, data } = await testClient.execute(
+    it("sends error if user without permission tries to create a dashboard", async () => {
+      const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
         gql`
-          mutation ($orgId: GID!, $name: String!) {
-            adminCreateDashboard(orgId: $orgId, name: $name) {
+          mutation ($name: String!) {
+            createDashboard(name: $name) {
               id
               name
             }
           }
         `,
         {
-          orgId: toGlobalId("Organization", organization.id),
           name: "Dashboard X",
         },
       );
@@ -531,7 +539,7 @@ describe("GraphQL / Dashboards", () => {
   describe("createCreatePetitionButtonDashboardModule", () => {
     it("creates a CREATE_PETITION_BUTTON module", async () => {
       const [template] = await mocks.createRandomTemplates(organization.id, user.id, 1);
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -604,9 +612,43 @@ describe("GraphQL / Dashboards", () => {
       });
     });
 
+    it("sends error if user does not have permission", async () => {
+      const [template] = await mocks.createRandomTemplates(organization.id, user.id, 1);
+      const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: CreatePetitionButtonDashboardModuleSettingsInput!
+          ) {
+            createCreatePetitionButtonDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "KYC",
+          size: "SMALL",
+          settings: {
+            templateId: toGlobalId("Petition", template.id),
+            buttonLabel: "Start KYC...",
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
     it("sends error if templateId does not belong to same org as dashboard", async () => {
-      const [template] = await mocks.createRandomTemplates(rootOrg.id, superadmin.id, 1);
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -633,7 +675,7 @@ describe("GraphQL / Dashboards", () => {
           title: "KYC",
           size: "SMALL",
           settings: {
-            templateId: toGlobalId("Petition", template.id),
+            templateId: toGlobalId("Petition", otherTemplate.id),
             buttonLabel: "Start KYC...",
           },
         },
@@ -650,7 +692,7 @@ describe("GraphQL / Dashboards", () => {
       const [tag] = await mocks.createRandomTags(organization.id, 1);
       const [userGroup] = await mocks.createUserGroups(1, organization.id);
 
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -693,6 +735,13 @@ describe("GraphQL / Dashboards", () => {
                   { operator: "IS_OWNER", value: toGlobalId("User", user.id) },
                 ],
               },
+              approvals: {
+                operator: "AND",
+                filters: [
+                  { operator: "STATUS", value: "APPROVED" },
+                  { operator: "ASSIGNED_TO", value: toGlobalId("User", user.id) },
+                ],
+              },
             },
           },
         },
@@ -716,8 +765,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if fromTemplateId in filters does not belong to same org as dashboard", async () => {
-      const [template] = await mocks.createRandomTemplates(rootOrg.id, superadmin.id);
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -744,7 +792,7 @@ describe("GraphQL / Dashboards", () => {
           size: "SMALL",
           settings: {
             filters: {
-              fromTemplateId: toGlobalId("Petition", template.id),
+              fromTemplateId: toGlobalId("Petition", otherTemplate.id),
             },
           },
         },
@@ -758,9 +806,9 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if tags in filters does not belong to same org as dashboard", async () => {
-      const [tag] = await mocks.createRandomTags(rootOrg.id, 1);
+      const [tag] = await mocks.createRandomTags(otherOrg.id, 1);
 
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -804,8 +852,8 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if tags filter operator is IS_EMPTY but values are passed", async () => {
-      const [tag] = await mocks.createRandomTags(rootOrg.id, 1);
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const [tag] = await mocks.createRandomTags(otherOrg.id, 1);
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -849,7 +897,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if tags filter operator is CONTAINS but no values are passed", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -893,9 +941,9 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if passing more than 5 tags filter", async () => {
-      const [tag] = await mocks.createRandomTags(rootOrg.id, 1);
+      const [tag] = await mocks.createRandomTags(otherOrg.id, 1);
 
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -946,9 +994,9 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if sharedWith users in filters does not belong to same org as dashboard", async () => {
-      const [userGroup] = await mocks.createUserGroups(1, rootOrg.id);
+      const [userGroup] = await mocks.createUserGroups(1, otherOrg.id);
 
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -995,7 +1043,7 @@ describe("GraphQL / Dashboards", () => {
 
     it("sends error if passing more than 5 sharedWith filters", async () => {
       const [userGroup] = await mocks.createUserGroups(1, organization.id);
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1046,7 +1094,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if one of the sharedWith filters is not a User or UserGroup", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1093,7 +1141,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if one of the sharedWith filters user does not belong to the same organization as the dashboard", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1122,7 +1170,7 @@ describe("GraphQL / Dashboards", () => {
             filters: {
               sharedWith: {
                 operator: "AND",
-                filters: [{ operator: "SHARED_WITH", value: toGlobalId("User", superadmin.id) }],
+                filters: [{ operator: "SHARED_WITH", value: toGlobalId("User", otherUser.id) }],
               },
             },
           },
@@ -1135,11 +1183,52 @@ describe("GraphQL / Dashboards", () => {
       });
       expect(data).toBeNull();
     });
+
+    it("sends error if user does not have permissions", async () => {
+      const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: PetitionsNumberDashboardModuleSettingsInput!
+          ) {
+            createPetitionsNumberDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Number of petitions",
+          size: "SMALL",
+          settings: {
+            filters: {
+              locale: "es",
+              path: "/",
+              status: ["DRAFT", "COMPLETED"],
+              signature: ["NO_SIGNATURE"],
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("createPetitionsRatioDashboardModule", () => {
     it("creates a PETITIONS_RATIO module", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1191,8 +1280,48 @@ describe("GraphQL / Dashboards", () => {
       });
     });
 
+    it("sends error if user does not have permissions", async () => {
+      const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: PetitionsRatioDashboardModuleSettingsInput!
+          ) {
+            createPetitionsRatioDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Ratio of petitions",
+          size: "SMALL",
+          settings: {
+            graphicType: "RATIO",
+            filters: [
+              { status: ["DRAFT", "PENDING"] },
+              { status: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"] },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
     it("sends error if fromTemplateId does not belong to same org as dashboard", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1222,7 +1351,7 @@ describe("GraphQL / Dashboards", () => {
             filters: [
               {
                 status: ["DRAFT", "PENDING"],
-                fromTemplateId: toGlobalId("Petition", rootOrgTemplate.id),
+                fromTemplateId: toGlobalId("Petition", otherTemplate.id),
               },
               { status: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"] },
             ],
@@ -1240,7 +1369,7 @@ describe("GraphQL / Dashboards", () => {
 
   describe("createPetitionsPieChartDashboardModule", () => {
     it("creates a PETITIONS_PIE_CHART module", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1293,8 +1422,49 @@ describe("GraphQL / Dashboards", () => {
       });
     });
 
+    it("sends error if user does not have permissions", async () => {
+      const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: PetitionsPieChartDashboardModuleSettingsInput!
+          ) {
+            createPetitionsPieChartDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Pie chart of petitions",
+          size: "LARGE",
+          settings: {
+            graphicType: "DOUGHNUT",
+            items: [
+              { label: "Draft", color: "#00FF00", filter: { status: ["DRAFT"] } },
+              { label: "Completed", color: "#FF0000", filter: { status: ["COMPLETED"] } },
+              { label: "Closed", color: "#0000FF", filter: { status: ["CLOSED"] } },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
     it("sends error if passing no filters", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1334,7 +1504,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if passing invalid color value", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1380,7 +1550,7 @@ describe("GraphQL / Dashboards", () => {
 
   describe("createProfilesNumberDashboardModule", () => {
     it("creates a PROFILES_NUMBER COUNT module", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1445,8 +1615,8 @@ describe("GraphQL / Dashboards", () => {
       });
     });
 
-    it("sends error if profileTypeFieldId in filter.values does not correspond to profileType", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+    it("sends error if user does not have permissions", async () => {
+      const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1480,7 +1650,60 @@ describe("GraphQL / Dashboards", () => {
                 logicalOperator: "AND",
                 conditions: [
                   {
-                    profileTypeFieldId: toGlobalId("ProfileTypeField", rootOrgProfileTypeField.id),
+                    profileTypeFieldId: toGlobalId(
+                      "ProfileTypeField",
+                      shortTextProfileTypeField.id,
+                    ),
+                    operator: "EQUAL",
+                    value: "Mike",
+                  },
+                ],
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if profileTypeFieldId in filter.values does not correspond to profileType", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: ProfilesNumberDashboardModuleSettingsInput!
+          ) {
+            createProfilesNumberDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Number of open profiles",
+          size: "SMALL",
+          settings: {
+            type: "COUNT",
+            profileTypeId: toGlobalId("ProfileType", profileType.id),
+            filter: {
+              status: ["OPEN"],
+              values: {
+                logicalOperator: "AND",
+                conditions: [
+                  {
+                    profileTypeFieldId: toGlobalId("ProfileTypeField", otherProfileTypeField.id),
                     operator: "EQUAL",
                     value: "Mike",
                   },
@@ -1499,7 +1722,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("creates a PROFILES_NUMBER AGGREGATE module", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1554,7 +1777,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if profileTypeId does not belong to same org as dashboard", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1581,7 +1804,7 @@ describe("GraphQL / Dashboards", () => {
           size: "SMALL",
           settings: {
             type: "COUNT",
-            profileTypeId: toGlobalId("ProfileType", rootOrgProfileType.id),
+            profileTypeId: toGlobalId("ProfileType", otherProfileType.id),
             filter: {
               status: ["OPEN"],
             },
@@ -1594,7 +1817,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if passing type COUNT and aggregate or profileTypeFieldId values", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1639,7 +1862,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if passing type AGGREGATE and not passing aggregate or profileTypeFieldId values", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1683,7 +1906,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if profileTypeFieldId is not a NUMBER when type is AGGREGATE", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1728,7 +1951,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if profileTypeFieldId does not belong to profileType", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1757,7 +1980,7 @@ describe("GraphQL / Dashboards", () => {
             type: "AGGREGATE",
             aggregate: "MIN",
             profileTypeId: toGlobalId("ProfileType", profileType.id),
-            profileTypeFieldId: toGlobalId("ProfileTypeField", rootOrgProfileTypeField.id),
+            profileTypeFieldId: toGlobalId("ProfileTypeField", otherProfileTypeField.id),
             filter: {
               status: ["OPEN"],
             },
@@ -1770,7 +1993,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if passing profileId or profileTypeId in filters", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1816,7 +2039,7 @@ describe("GraphQL / Dashboards", () => {
 
   describe("createProfilesRatioDashboardModule", () => {
     it("creates a PROFILES_RATIO COUNT module", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1853,8 +2076,44 @@ describe("GraphQL / Dashboards", () => {
       });
     });
 
+    it("sends error if user does not have permissions", async () => {
+      const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: ProfilesRatioDashboardModuleSettingsInput!
+          ) {
+            createProfilesRatioDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Ratio of profiles",
+          size: "SMALL",
+          settings: {
+            graphicType: "RATIO",
+            type: "COUNT",
+            profileTypeId: toGlobalId("ProfileType", profileType.id),
+            filters: [{ status: ["OPEN"] }, { status: ["OPEN", "CLOSED"] }],
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
     it("creates a PROFILES_RATIO AGGREGATE(SUM) module", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1895,7 +2154,7 @@ describe("GraphQL / Dashboards", () => {
 
     it("sends error when creating a PROFILES_RATIO AGGREGATE(AVG/MIN/MAX) module", async () => {
       for (const aggregate of ["AVG", "MIN", "MAX"]) {
-        const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+        const { errors, data } = await testClient.execute(
           gql`
             mutation (
               $dashboardId: GID!
@@ -1937,7 +2196,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if passing more or less than 2 filters", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -1976,7 +2235,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if profileTypeId does not belong to same org as dashboard", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -2001,7 +2260,7 @@ describe("GraphQL / Dashboards", () => {
           settings: {
             graphicType: "RATIO",
             type: "COUNT",
-            profileTypeId: toGlobalId("ProfileType", rootOrgProfileType.id),
+            profileTypeId: toGlobalId("ProfileType", otherProfileType.id),
             filters: [{ status: ["OPEN"] }, { status: ["OPEN", "CLOSED"] }],
           },
         },
@@ -2012,7 +2271,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if passing type COUNT and aggregate or profileTypeFieldId values", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -2053,7 +2312,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if passing type AGGREGATE and not passing aggregate or profileTypeFieldId values", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -2092,7 +2351,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if profileTypeFieldId does not belong to profileType", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -2119,7 +2378,7 @@ describe("GraphQL / Dashboards", () => {
             type: "AGGREGATE",
             aggregate: "SUM",
             profileTypeId: toGlobalId("ProfileType", profileType.id),
-            profileTypeFieldId: toGlobalId("ProfileTypeField", rootOrgProfileTypeField.id),
+            profileTypeFieldId: toGlobalId("ProfileTypeField", otherProfileTypeField.id),
             filters: [{ status: ["OPEN"] }, { status: ["OPEN", "CLOSED"] }],
           },
         },
@@ -2131,7 +2390,7 @@ describe("GraphQL / Dashboards", () => {
 
     it("sends error if passing profileId or profileTypeId in filters", async () => {
       const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -2175,7 +2434,7 @@ describe("GraphQL / Dashboards", () => {
 
   describe("createProfilesPieChartDashboardModule", () => {
     it("creates a PROFILES_PIE_CHART COUNT module", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -2216,8 +2475,48 @@ describe("GraphQL / Dashboards", () => {
       });
     });
 
+    it("sends error if user does not have permissions", async () => {
+      const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: ProfilesPieChartDashboardModuleSettingsInput!
+          ) {
+            createProfilesPieChartDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Profiles pie chart",
+          size: "SMALL",
+          settings: {
+            graphicType: "PIE",
+            type: "COUNT",
+            profileTypeId: toGlobalId("ProfileType", profileType.id),
+            items: [
+              { label: "Open", color: "#00ff00", filter: { status: ["OPEN"] } },
+              { label: "Closed", color: "#ff0000", filter: { status: ["CLOSED"] } },
+              { label: "Deleted", color: "#0000ff", filter: { status: ["DELETION_SCHEDULED"] } },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
     it("creates a PROFILES_PIE_CHART AGGREGATE module", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -2261,7 +2560,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if passing no items", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -2300,7 +2599,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if passing invalid color value", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -2345,7 +2644,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if profileTypeId does not belong to same org as dashboard", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -2370,7 +2669,7 @@ describe("GraphQL / Dashboards", () => {
           settings: {
             graphicType: "PIE",
             type: "COUNT",
-            profileTypeId: toGlobalId("ProfileType", rootOrgProfileType.id),
+            profileTypeId: toGlobalId("ProfileType", otherProfileType.id),
             items: [
               { label: "Open", color: "#00ff00", filter: { status: ["OPEN"] } },
               { label: "Closed", color: "#ff0000", filter: { status: ["CLOSED"] } },
@@ -2385,7 +2684,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if passing profileId or profileTypeId in filters", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -2435,7 +2734,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("creates a pie chart based on the values of a SELECT property with custom options", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -2485,7 +2784,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("creates a pie chart aggregating values of NUMBER field on OPEN profiles and grouping by a SELECT property with standardList COUNTRIES", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -2540,7 +2839,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if trying to group by but property is not SELECT", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -2585,7 +2884,7 @@ describe("GraphQL / Dashboards", () => {
     });
 
     it("sends error if trying to group by and passing settings.items array", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $dashboardId: GID!
@@ -2647,9 +2946,540 @@ describe("GraphQL / Dashboards", () => {
     });
   });
 
+  describe("updateCreatePetitionButtonDashboardModule", () => {
+    it("should update create petition button module settings", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $moduleId: GID!
+            $data: UpdateCreatePetitionButtonDashboardModuleInput!
+          ) {
+            updateCreatePetitionButtonDashboardModule(
+              dashboardId: $dashboardId
+              moduleId: $moduleId
+              data: $data
+            ) {
+              id
+              title
+              size
+              ... on DashboardCreatePetitionButtonModule {
+                settings {
+                  label
+                  template {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          moduleId: toGlobalId("DashboardModule", modules[0].id),
+          data: {
+            title: "Updated Button",
+            size: "MEDIUM",
+            settings: {
+              buttonLabel: "Create New KYC",
+              templateId: toGlobalId("Petition", userTemplate.id),
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateCreatePetitionButtonDashboardModule).toEqual({
+        id: toGlobalId("DashboardModule", modules[0].id),
+        title: "Updated Button",
+        size: "MEDIUM",
+        settings: {
+          label: "Create New KYC",
+          template: {
+            id: toGlobalId("Petition", userTemplate.id),
+          },
+        },
+      });
+    });
+  });
+
+  describe("updatePetitionsNumberDashboardModule", () => {
+    it("should update petitions number module settings", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation UpdatePetitionsNumberDashboardModule(
+            $dashboardId: GID!
+            $moduleId: GID!
+            $data: UpdatePetitionsNumberDashboardModuleInput!
+          ) {
+            updatePetitionsNumberDashboardModule(
+              dashboardId: $dashboardId
+              moduleId: $moduleId
+              data: $data
+            ) {
+              id
+              title
+              size
+              ... on DashboardPetitionsNumberModule {
+                settings {
+                  filters {
+                    status
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          moduleId: toGlobalId("DashboardModule", modules[1].id),
+          data: {
+            title: "Updated Title",
+            size: "MEDIUM",
+            settings: {
+              filters: {
+                status: ["DRAFT", "PENDING"],
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetitionsNumberDashboardModule).toEqual({
+        id: toGlobalId("DashboardModule", modules[1].id),
+        title: "Updated Title",
+        size: "MEDIUM",
+        settings: {
+          filters: {
+            status: ["DRAFT", "PENDING"],
+          },
+        },
+      });
+    });
+
+    it("sets approvals filter", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation UpdatePetitionsNumberDashboardModule(
+            $dashboardId: GID!
+            $moduleId: GID!
+            $data: UpdatePetitionsNumberDashboardModuleInput!
+          ) {
+            updatePetitionsNumberDashboardModule(
+              dashboardId: $dashboardId
+              moduleId: $moduleId
+              data: $data
+            ) {
+              id
+              title
+              size
+              ... on DashboardPetitionsNumberModule {
+                settings {
+                  filters {
+                    approvals {
+                      operator
+                      filters {
+                        operator
+                        value
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          moduleId: toGlobalId("DashboardModule", modules[1].id),
+          data: {
+            title: "Updated Title",
+            size: "MEDIUM",
+            settings: {
+              filters: {
+                approvals: {
+                  operator: "OR",
+                  filters: [
+                    { operator: "STATUS", value: "REJECTED" },
+                    { operator: "ASSIGNED_TO", value: toGlobalId("User", user.id) },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetitionsNumberDashboardModule).toEqual({
+        id: toGlobalId("DashboardModule", modules[1].id),
+        title: "Updated Title",
+        size: "MEDIUM",
+        settings: {
+          filters: {
+            approvals: {
+              operator: "OR",
+              filters: [
+                { operator: "STATUS", value: "REJECTED" },
+                { operator: "ASSIGNED_TO", value: toGlobalId("User", user.id) },
+              ],
+            },
+          },
+        },
+      });
+    });
+  });
+
+  describe("updatePetitionsRatioDashboardModule", () => {
+    it("should update petitions ratio module settings", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation UpdatePetitionsRatioDashboardModule(
+            $dashboardId: GID!
+            $moduleId: GID!
+            $data: UpdatePetitionsRatioDashboardModuleInput!
+          ) {
+            updatePetitionsRatioDashboardModule(
+              dashboardId: $dashboardId
+              moduleId: $moduleId
+              data: $data
+            ) {
+              id
+              title
+              size
+              ... on DashboardPetitionsRatioModule {
+                settings {
+                  graphicType
+                  filters {
+                    status
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[2].id),
+          moduleId: toGlobalId("DashboardModule", modules[6].id),
+          data: {
+            title: "Updated Ratio",
+            size: "MEDIUM",
+            settings: {
+              graphicType: "PERCENTAGE",
+              filters: [{ status: ["COMPLETED"] }, { status: ["CLOSED"] }],
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetitionsRatioDashboardModule).toEqual({
+        id: toGlobalId("DashboardModule", modules[6].id),
+        title: "Updated Ratio",
+        size: "MEDIUM",
+        settings: {
+          graphicType: "PERCENTAGE",
+          filters: [{ status: ["COMPLETED"] }, { status: ["CLOSED"] }],
+        },
+      });
+    });
+  });
+
+  describe("updatePetitionsPieChartDashboardModule", () => {
+    it("should update petitions pie chart module settings", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation UpdatePetitionsPieChartDashboardModule(
+            $dashboardId: GID!
+            $moduleId: GID!
+            $data: UpdatePetitionsPieChartDashboardModuleInput!
+          ) {
+            updatePetitionsPieChartDashboardModule(
+              dashboardId: $dashboardId
+              moduleId: $moduleId
+              data: $data
+            ) {
+              id
+              title
+              size
+              ... on DashboardPetitionsPieChartModule {
+                settings {
+                  graphicType
+                  items {
+                    label
+                    color
+                    filter {
+                      status
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[2].id),
+          moduleId: toGlobalId("DashboardModule", modules[7].id),
+          data: {
+            title: "Updated Pie Chart",
+            size: "MEDIUM",
+            settings: {
+              graphicType: "DOUGHNUT",
+              items: [
+                {
+                  label: "Open",
+                  color: "#00ff00",
+                  filter: { status: ["PENDING"] },
+                },
+                {
+                  label: "Closed",
+                  color: "#ff0000",
+                  filter: { status: ["CLOSED"] },
+                },
+              ],
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetitionsPieChartDashboardModule).toEqual({
+        id: toGlobalId("DashboardModule", modules[7].id),
+        title: "Updated Pie Chart",
+        size: "MEDIUM",
+        settings: {
+          graphicType: "DOUGHNUT",
+          items: [
+            {
+              label: "Open",
+              color: "#00ff00",
+              filter: { status: ["PENDING"] },
+            },
+            {
+              label: "Closed",
+              color: "#ff0000",
+              filter: { status: ["CLOSED"] },
+            },
+          ],
+        },
+      });
+    });
+  });
+
+  describe("updateProfilesNumberDashboardModule", () => {
+    it("should update profiles number module settings", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation UpdateProfilesNumberDashboardModule(
+            $dashboardId: GID!
+            $moduleId: GID!
+            $data: UpdateProfilesNumberDashboardModuleInput!
+          ) {
+            updateProfilesNumberDashboardModule(
+              dashboardId: $dashboardId
+              moduleId: $moduleId
+              data: $data
+            ) {
+              id
+              title
+              size
+              ... on DashboardProfilesNumberModule {
+                settings {
+                  type
+                  profileTypeId
+                  filters {
+                    status
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[2].id),
+          moduleId: toGlobalId("DashboardModule", modules[8].id),
+          data: {
+            title: "Updated Number",
+            size: "MEDIUM",
+            settings: {
+              type: "COUNT",
+              profileTypeId: toGlobalId("ProfileType", profileType.id),
+              filter: {
+                status: ["OPEN", "CLOSED"],
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfilesNumberDashboardModule).toEqual({
+        id: toGlobalId("DashboardModule", modules[8].id),
+        title: "Updated Number",
+        size: "MEDIUM",
+        settings: {
+          type: "COUNT",
+          profileTypeId: toGlobalId("ProfileType", profileType.id),
+          filters: {
+            status: ["OPEN", "CLOSED"],
+          },
+        },
+      });
+    });
+  });
+
+  describe("updateProfilesRatioDashboardModule", () => {
+    it("should update profiles ratio module settings", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation UpdateProfilesRatioDashboardModule(
+            $dashboardId: GID!
+            $moduleId: GID!
+            $data: UpdateProfilesRatioDashboardModuleInput!
+          ) {
+            updateProfilesRatioDashboardModule(
+              dashboardId: $dashboardId
+              moduleId: $moduleId
+              data: $data
+            ) {
+              id
+              title
+              size
+              ... on DashboardProfilesRatioModule {
+                settings {
+                  type
+                  graphicType
+                  profileTypeId
+                  filters {
+                    status
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[1].id),
+          moduleId: toGlobalId("DashboardModule", modules[2].id),
+          data: {
+            title: "Updated Ratio",
+            size: "MEDIUM",
+            settings: {
+              type: "COUNT",
+              graphicType: "PERCENTAGE",
+              profileTypeId: toGlobalId("ProfileType", profileType.id),
+              filters: [{ status: ["OPEN"] }, { status: ["CLOSED"] }],
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfilesRatioDashboardModule).toEqual({
+        id: toGlobalId("DashboardModule", modules[2].id),
+        title: "Updated Ratio",
+        size: "MEDIUM",
+        settings: {
+          type: "COUNT",
+          graphicType: "PERCENTAGE",
+          profileTypeId: toGlobalId("ProfileType", profileType.id),
+          filters: [{ status: ["OPEN"] }, { status: ["CLOSED"] }],
+        },
+      });
+    });
+  });
+
+  describe("updateProfilesPieChartDashboardModule", () => {
+    it("should update profiles pie chart module settings", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation UpdateProfilesPieChartDashboardModule(
+            $dashboardId: GID!
+            $moduleId: GID!
+            $data: UpdateProfilesPieChartDashboardModuleInput!
+          ) {
+            updateProfilesPieChartDashboardModule(
+              dashboardId: $dashboardId
+              moduleId: $moduleId
+              data: $data
+            ) {
+              id
+              title
+              size
+              ... on DashboardProfilesPieChartModule {
+                settings {
+                  type
+                  graphicType
+                  profileTypeId
+                  items {
+                    label
+                    color
+                    filter {
+                      status
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[1].id),
+          moduleId: toGlobalId("DashboardModule", modules[3].id),
+          data: {
+            title: "Updated Pie Chart",
+            size: "MEDIUM",
+            settings: {
+              type: "COUNT",
+              graphicType: "PIE",
+              profileTypeId: toGlobalId("ProfileType", profileType.id),
+              items: [
+                {
+                  label: "Open",
+                  color: "#00ff00",
+                  filter: { status: ["OPEN"] },
+                },
+                {
+                  label: "Closed",
+                  color: "#ff0000",
+                  filter: { status: ["CLOSED"] },
+                },
+              ],
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfilesPieChartDashboardModule).toEqual({
+        id: toGlobalId("DashboardModule", modules[3].id),
+        title: "Updated Pie Chart",
+        size: "MEDIUM",
+        settings: {
+          type: "COUNT",
+          graphicType: "PIE",
+          profileTypeId: toGlobalId("ProfileType", profileType.id),
+          items: [
+            {
+              label: "Open",
+              color: "#00ff00",
+              filter: { status: ["OPEN"] },
+            },
+            {
+              label: "Closed",
+              color: "#ff0000",
+              filter: { status: ["CLOSED"] },
+            },
+          ],
+        },
+      });
+    });
+  });
+
   describe("deleteDashboardModule", () => {
     it("deletes a module from a dashboard and updates positions of other modules", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation ($dashboardId: GID!, $moduleId: GID!) {
             deleteDashboardModule(dashboardId: $dashboardId, moduleId: $moduleId) {
@@ -2698,18 +3528,18 @@ describe("GraphQL / Dashboards", () => {
         {
           id: modules[4].id,
           position: 1,
-          updated_by: `User:${superadmin.id}`,
+          updated_by: `User:${user.id}`,
         },
         {
           id: modules[5].id,
           position: 2,
-          updated_by: `User:${superadmin.id}`,
+          updated_by: `User:${user.id}`,
         },
       ]);
     });
 
-    it("sends error if non-superadmin tries to delete a module", async () => {
-      const { errors, data } = await testClient.execute(
+    it("sends error if user does not have permission", async () => {
+      const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
         gql`
           mutation ($dashboardId: GID!, $moduleId: GID!) {
             deleteDashboardModule(dashboardId: $dashboardId, moduleId: $moduleId) {
@@ -2733,7 +3563,7 @@ describe("GraphQL / Dashboards", () => {
 
   describe("updateDashboardModulePositions", () => {
     it("reorders modules in dashboard, updating only modules that changed position", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation ($dashboardId: GID!, $moduleIds: [GID!]!) {
             updateDashboardModulePositions(dashboardId: $dashboardId, moduleIds: $moduleIds) {
@@ -2790,12 +3620,12 @@ describe("GraphQL / Dashboards", () => {
         {
           id: modules[4].id,
           position: 1,
-          updated_by: `User:${superadmin.id}`,
+          updated_by: `User:${user.id}`,
         },
         {
           id: modules[3].id,
           position: 2,
-          updated_by: `User:${superadmin.id}`,
+          updated_by: `User:${user.id}`,
         },
         {
           id: modules[5].id,
@@ -2805,8 +3635,35 @@ describe("GraphQL / Dashboards", () => {
       ]);
     });
 
+    it("sends error if user does not have permissions", async () => {
+      const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
+        gql`
+          mutation ($dashboardId: GID!, $moduleIds: [GID!]!) {
+            updateDashboardModulePositions(dashboardId: $dashboardId, moduleIds: $moduleIds) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[1].id),
+          moduleIds: [
+            toGlobalId("DashboardModule", modules[2].id),
+            toGlobalId("DashboardModule", modules[4].id),
+            toGlobalId("DashboardModule", modules[3].id),
+            toGlobalId("DashboardModule", modules[5].id),
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
     it("sends error if passing invalid or incomplete moduleIds", async () => {
-      const { errors, data } = await testClient.withApiKey(superadminApiKey).execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation ($dashboardId: GID!, $moduleIds: [GID!]!) {
             updateDashboardModulePositions(dashboardId: $dashboardId, moduleIds: $moduleIds) {
@@ -2823,6 +3680,165 @@ describe("GraphQL / Dashboards", () => {
             toGlobalId("DashboardModule", modules[2].id),
             toGlobalId("DashboardModule", modules[4].id),
           ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("updateDashboard", () => {
+    it("updates dashboard name", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($id: GID!, $name: String!) {
+            updateDashboard(id: $id, name: $name) {
+              id
+              name
+            }
+          }
+        `,
+        {
+          id: toGlobalId("Dashboard", dashboards[0].id),
+          name: "Updated dashboard name",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateDashboard).toEqual({
+        id: toGlobalId("Dashboard", dashboards[0].id),
+        name: "Updated dashboard name",
+      });
+    });
+
+    it("sends error if user does not have permissions on dashboard", async () => {
+      const [otherDashboard] = await mocks.knex
+        .from("dashboard")
+        .insert({ org_id: otherOrg.id, name: "Other dashboard", position: 0 })
+        .returning("*");
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($id: GID!, $name: String!) {
+            updateDashboard(id: $id, name: $name) {
+              id
+              name
+            }
+          }
+        `,
+        {
+          id: toGlobalId("Dashboard", otherDashboard.id),
+          name: "Updated dashboard name",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("cloneDashboard", () => {
+    it("clones dashboard and every module inside it", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($id: GID!, $name: String!) {
+            cloneDashboard(id: $id, name: $name) {
+              id
+              name
+              isRefreshing
+              isDefault
+              lastRefreshAt
+              modules {
+                __typename
+                size
+                title
+              }
+            }
+          }
+        `,
+        {
+          id: toGlobalId("Dashboard", dashboards[1].id),
+          name: "Cloned dashboard",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.cloneDashboard).toEqual({
+        id: expect.any(String),
+        name: "Cloned dashboard",
+        isRefreshing: false,
+        isDefault: false,
+        lastRefreshAt: null,
+        modules: [
+          {
+            __typename: "DashboardProfilesRatioModule",
+            size: "MEDIUM",
+            title: "Open profiles percentage",
+          },
+          {
+            __typename: "DashboardProfilesPieChartModule",
+            size: "LARGE",
+            title: "Profiles by status",
+          },
+          {
+            __typename: "DashboardPetitionsNumberModule",
+            size: "LARGE",
+            title: "Petitions",
+          },
+          {
+            __typename: "DashboardProfilesPieChartModule",
+            size: "LARGE",
+            title: "Profiles by status",
+          },
+        ],
+      });
+    });
+  });
+
+  describe("deleteDashboard", () => {
+    it("deletes a dashboard and all modules inside it", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($id: GID!) {
+            deleteDashboard(id: $id)
+          }
+        `,
+        {
+          id: toGlobalId("Dashboard", dashboards[1].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deleteDashboard).toEqual("SUCCESS");
+
+      const dbDashboard = await mocks.knex
+        .from("dashboard")
+        .where("id", dashboards[1].id)
+        .select("deleted_at");
+
+      expect(dbDashboard[0].deleted_at).not.toBeNull();
+
+      const dbModules = await mocks.knex
+        .from("dashboard_module")
+        .where("dashboard_id", dashboards[1].id)
+        .select("deleted_at");
+
+      expect(dbModules).toHaveLength(4);
+      dbModules.forEach((module) => {
+        expect(module.deleted_at).not.toBeNull();
+      });
+    });
+
+    it("sends error if user does not have permission", async () => {
+      const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
+        gql`
+          mutation ($id: GID!) {
+            deleteDashboard(id: $id)
+          }
+        `,
+        {
+          id: toGlobalId("Dashboard", dashboards[1].id),
         },
       );
 

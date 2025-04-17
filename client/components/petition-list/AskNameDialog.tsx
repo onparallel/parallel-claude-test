@@ -7,12 +7,16 @@ import { FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
 
-export function AskViewNameDialog({
+export function AskNameDialog({
   name,
   header,
   confirm,
+  label,
   ...props
-}: DialogProps<{ name?: string; header: ReactNode; confirm: ReactNode }, string>) {
+}: DialogProps<
+  { name?: string; header: ReactNode; confirm: ReactNode; label?: ReactNode },
+  string
+>) {
   const {
     handleSubmit,
     register,
@@ -44,10 +48,12 @@ export function AskViewNameDialog({
         <Stack>
           <FormControl isInvalid={!!errors.name}>
             <FormLabel fontWeight="normal">
-              <FormattedMessage
-                id="component.ask-view-name-dialog.name-label"
-                defaultMessage="Enter a meaningful name for the view"
-              />
+              {label ?? (
+                <FormattedMessage
+                  id="component.ask-view-name-dialog.name-label"
+                  defaultMessage="Enter a meaningful name for the view"
+                />
+              )}
             </FormLabel>
             <Input {...nameProps} />
             <FormErrorMessage>
@@ -71,6 +77,6 @@ export function AskViewNameDialog({
   );
 }
 
-export function useAskViewNameDialog() {
-  return useDialog(AskViewNameDialog);
+export function useAskNameDialog() {
+  return useDialog(AskNameDialog);
 }

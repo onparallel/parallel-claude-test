@@ -275,24 +275,6 @@ export function userIsSuperAdmin<
   };
 }
 
-export function realUserIsSuperAdmin<
-  TypeName extends string,
-  FieldName extends string,
->(): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const user = ctx.realUser ?? ctx.user!;
-      const [org, permissions] = await Promise.all([
-        ctx.organizations.loadOrg(user.org_id),
-        ctx.users.loadUserPermissions(user.id),
-      ]);
-
-      return org?.status === "ROOT" && permissions.includes("SUPERADMIN");
-    } catch {}
-    return false;
-  };
-}
-
 export function verifyCaptcha<
   TypeName extends string,
   FieldName extends string,

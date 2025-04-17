@@ -1,4 +1,5 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
+import { DashboardModuleType } from "../../db/__types";
 import { MaybeArray, unMaybeArray } from "../../util/types";
 import { Arg, getArg } from "../helpers/authorize";
 import { ForbiddenError } from "../helpers/errors";
@@ -13,23 +14,6 @@ export function userHasAccessToDashboard<
     const dashboard = await ctx.dashboards.loadDashboard(id);
 
     if (!dashboard || dashboard.org_id !== ctx.user!.org_id) {
-      throw new ForbiddenError("Dashboard not found");
-    }
-
-    return true;
-  };
-}
-
-export function dashboardExists<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>,
->(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    const id = getArg(args, argName);
-    const dashboard = await ctx.dashboards.loadDashboard(id);
-
-    if (!dashboard) {
       throw new ForbiddenError("Dashboard not found");
     }
 
@@ -60,48 +44,38 @@ export function moduleBelongsToDashboard<
   };
 }
 
-export function templateBelongsToDashboardOrganization<
+export function moduleHasType<
   TypeName extends string,
   FieldName extends string,
-  TTemplateIdArg extends Arg<TypeName, FieldName, number>,
-  TDashboardIdArg extends Arg<TypeName, FieldName, number>,
+  TModuleIdArg extends Arg<TypeName, FieldName, number>,
 >(
-  templateIdArg: TTemplateIdArg,
-  dashboardIdArg: TDashboardIdArg,
+  moduleIdArg: TModuleIdArg,
+  type: DashboardModuleType,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const templateId = getArg(args, templateIdArg);
-    const dashboardId = getArg(args, dashboardIdArg);
+    const moduleId = getArg(args, moduleIdArg);
+    const module = await ctx.dashboards.loadDashboardModule(moduleId);
 
-    const template = await ctx.petitions.loadPetition(templateId);
-    const dashboard = await ctx.dashboards.loadDashboard(dashboardId);
-
-    if (!template || !dashboard || template.org_id !== dashboard.org_id) {
-      throw new ForbiddenError("Template not found");
+    if (!module || module.type !== type) {
+      throw new ForbiddenError(`Expected module of type ${type}`);
     }
 
     return true;
   };
 }
 
-export function profileTypeBelongsToDashboardOrganization<
+export function dashboardCanCreateModule<
   TypeName extends string,
   FieldName extends string,
-  TProfileTypeIdArg extends Arg<TypeName, FieldName, number>,
   TDashboardIdArg extends Arg<TypeName, FieldName, number>,
->(
-  profileTypeIdArg: TProfileTypeIdArg,
-  dashboardIdArg: TDashboardIdArg,
-): FieldAuthorizeResolver<TypeName, FieldName> {
+>(dashboardIdArg: TDashboardIdArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const profileTypeId = getArg(args, profileTypeIdArg);
     const dashboardId = getArg(args, dashboardIdArg);
+    // do not cache as same loader may be called in gql response after creating the module
+    const modules = await ctx.dashboards.loadModulesByDashboardId.raw(dashboardId);
 
-    const profileType = await ctx.profiles.loadProfileType(profileTypeId);
-    const dashboard = await ctx.dashboards.loadDashboard(dashboardId);
-
-    if (!profileType || !dashboard || profileType.org_id !== dashboard.org_id) {
-      throw new ForbiddenError("Profile Type not found");
+    if (modules.length >= 20) {
+      throw new ForbiddenError(`Dashboard cannot have more than 20 modules`);
     }
 
     return true;

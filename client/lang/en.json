@@ -1390,6 +1390,16 @@
     "context": "Transfer parallels"
   },
   {
+    "term": "component.confirm-delete-dashboard-dialog.body",
+    "definition": "If continue, the dashboard will be permanently deleted.",
+    "context": "If continue, the dashboard will be permanently deleted."
+  },
+  {
+    "term": "component.confirm-delete-dashboard-dialog.header",
+    "definition": "Delete dashboard",
+    "context": "Delete dashboard"
+  },
+  {
     "term": "component.confirm-delete-petitions-dialog.body",
     "definition": "Are you sure you want to delete {list}?",
     "context": "Are you sure you want to delete {list}?"
@@ -2680,6 +2690,16 @@
     "context": "Total {count}"
   },
   {
+    "term": "component.dashboard-module-card.confirm-delete",
+    "definition": "Do you want to delete this module?",
+    "context": "Do you want to delete this module?"
+  },
+  {
+    "term": "component.dashboard-module-card.drag-to-sort-label",
+    "definition": "Drag to sort this dashboard module",
+    "context": "Drag to sort this dashboard module"
+  },
+  {
     "term": "component.dashboard-module-card.inconsistent-filters-popover",
     "definition": "The selected filters produce inconsistent results. Please review them.",
     "context": "The selected filters produce inconsistent results. Please review them."
@@ -2690,9 +2710,154 @@
     "context": "Untitled module"
   },
   {
+    "term": "component.dashboard-module-form.chart-filters",
+    "definition": "Chart filters",
+    "context": "Chart filters"
+  },
+  {
+    "term": "component.dashboard-module-form.error-chart-items-required",
+    "definition": "Chart items are required",
+    "context": "Chart items are required"
+  },
+  {
+    "term": "component.dashboard-module-form.filters",
+    "definition": "Filters",
+    "context": "Filters"
+  },
+  {
+    "term": "component.dashboard-module-form.filters-of",
+    "definition": "Filters of {name}:",
+    "context": "Filters of {name}:"
+  },
+  {
+    "term": "component.dashboard-module-form.module-field-to-aggregate",
+    "definition": "Field to aggregate",
+    "context": "Field to aggregate"
+  },
+  {
+    "term": "component.dashboard-module-form.module-name",
+    "definition": "Name",
+    "context": "Name"
+  },
+  {
+    "term": "component.dashboard-module-form.module-name-placeholder",
+    "definition": "Module name",
+    "context": "Module name"
+  },
+  {
+    "term": "component.dashboard-module-form.module-profile-type",
+    "definition": "Profile type",
+    "context": "Profile type"
+  },
+  {
+    "term": "component.dashboard-module-form.module-result-type",
+    "definition": "Result type",
+    "context": "Result type"
+  },
+  {
+    "term": "component.dashboard-module-form.module-result-type-average",
+    "definition": "Average",
+    "context": "Average"
+  },
+  {
+    "term": "component.dashboard-module-form.module-result-type-count",
+    "definition": "Count",
+    "context": "Count"
+  },
+  {
+    "term": "component.dashboard-module-form.module-result-type-max",
+    "definition": "Maximum",
+    "context": "Maximum"
+  },
+  {
+    "term": "component.dashboard-module-form.module-result-type-min",
+    "definition": "Minimum",
+    "context": "Minimum"
+  },
+  {
+    "term": "component.dashboard-module-form.module-result-type-sum",
+    "definition": "Sum",
+    "context": "Sum"
+  },
+  {
+    "term": "component.dashboard-module-form.module-size",
+    "definition": "Size",
+    "context": "Size"
+  },
+  {
+    "term": "component.dashboard-module-form.ratio-type-label",
+    "definition": "Type",
+    "context": "Type"
+  },
+  {
     "term": "component.dashboard-pie-chart-module.not-replied",
     "definition": "Not replied",
     "context": "Not replied"
+  },
+  {
+    "term": "component.dashboard-tabs.clone-dashboard-header",
+    "definition": "Clone dashboard",
+    "context": "Clone dashboard"
+  },
+  {
+    "term": "component.dashboard-tabs.dashboard-x",
+    "definition": "Dashboard {count}",
+    "context": "Dashboard {count}"
+  },
+  {
+    "term": "component.dashboard-tabs.new-dashboard",
+    "definition": "New dashboard",
+    "context": "New dashboard"
+  },
+  {
+    "term": "component.dashboard-tabs.new-dashboard-header",
+    "definition": "New dashboard",
+    "context": "New dashboard"
+  },
+  {
+    "term": "component.dashboard-tabs.rename-dashboard-header",
+    "definition": "Rename dashboard",
+    "context": "Rename dashboard"
+  },
+  {
+    "term": "component.dashboard-tabs.rename-dashboard-label",
+    "definition": "Enter a meaningful name for the dashboard",
+    "context": "Enter a meaningful name for the dashboard"
+  },
+  {
+    "term": "component.dashborad-module-chart-type.doughnut",
+    "definition": "Doughnut",
+    "context": "Doughnut"
+  },
+  {
+    "term": "component.dashborad-module-chart-type.pie",
+    "definition": "Pie",
+    "context": "Pie"
+  },
+  {
+    "term": "component.dashboard-module-form.ratio-type-percentage",
+    "definition": "Percentage",
+    "context": "Percentage"
+  },
+  {
+    "term": "component.dashboard-module-form.ratio-type-ratio",
+    "definition": "Ratio",
+    "context": "Ratio"
+  },
+  {
+    "term": "component.dashboard-module-form.sizes-large",
+    "definition": "Large",
+    "context": "Large"
+  },
+  {
+    "term": "component.dashboard-module-form.sizes-medium",
+    "definition": "Medium",
+    "context": "Medium"
+  },
+  {
+    "term": "component.dashboard-module-form.sizes-small",
+    "definition": "Small",
+    "context": "Small"
   },
   {
     "term": "component.date-range-picker-button.clear-range",
@@ -4465,11 +4630,6 @@
     "context": "Manage tags"
   },
   {
-    "term": "component.manage-tags-dialog.rename",
-    "definition": "Rename",
-    "context": "Rename"
-  },
-  {
     "term": "component.manage-tags-dialog.tag-label",
     "definition": "Tag",
     "context": "Tag"
@@ -4583,6 +4743,26 @@
     "term": "component.message-events-indicator.opened-explanation",
     "definition": "The email was opened on {date}",
     "context": "The email was opened on {date}"
+  },
+  {
+    "term": "component.module-tabs.button-module",
+    "definition": "Action button",
+    "context": "Action button"
+  },
+  {
+    "term": "component.module-tabs.numeric-module",
+    "definition": "Numeric",
+    "context": "Numeric"
+  },
+  {
+    "term": "component.module-tabs.pie-chart-module",
+    "definition": "Pie chart",
+    "context": "Pie chart"
+  },
+  {
+    "term": "component.module-tabs.ratio-module",
+    "definition": "Percentage / ratio",
+    "context": "Percentage / ratio"
   },
   {
     "term": "component.more-liquid-references-button.and",
@@ -5443,6 +5623,16 @@
     "term": "component.petition-approvals-step-status.rejected",
     "definition": "Rejected",
     "context": "Rejected"
+  },
+  {
+    "term": "component.petition-button-module-settings.button-text-label",
+    "definition": "Button text",
+    "context": "Button text"
+  },
+  {
+    "term": "component.petition-button-module-settings.button-text-placeholder",
+    "definition": "New KYC",
+    "context": "New KYC"
   },
   {
     "term": "component.petition-closed-alert.description",
@@ -6705,6 +6895,36 @@
     "context": "Show when"
   },
   {
+    "term": "component.petition-filters-module-settings.approvals-label",
+    "definition": "Approvals",
+    "context": "Approvals"
+  },
+  {
+    "term": "component.petition-filters-module-settings.petition-status-label",
+    "definition": "Status",
+    "context": "Status"
+  },
+  {
+    "term": "component.petition-filters-module-settings.shared-with-label",
+    "definition": "Shared",
+    "context": "Shared"
+  },
+  {
+    "term": "component.petition-filters-module-settings.signature-status-label",
+    "definition": "eSignature status",
+    "context": "eSignature status"
+  },
+  {
+    "term": "component.petition-filters-module-settings.tags-label",
+    "definition": "Tags",
+    "context": "Tags"
+  },
+  {
+    "term": "component.petition-filters-module-settings.template-label",
+    "definition": "Template",
+    "context": "Template"
+  },
+  {
     "term": "component.petition-from-template-dialog.body",
     "definition": "This parallel has been created from a template. Changes to fields or settings will <b>only affect this parallel</b>.",
     "context": "This parallel has been created from a template. Changes to fields or settings will <b>only affect this parallel</b>."
@@ -6950,11 +7170,6 @@
     "context": "Search in:"
   },
   {
-    "term": "component.petition-list-shared-with-filter.and",
-    "definition": "and",
-    "context": "and"
-  },
-  {
     "term": "component.petition-list-shared-with-filter.is-owner",
     "definition": "owner is",
     "context": "owner is"
@@ -6963,11 +7178,6 @@
     "term": "component.petition-list-shared-with-filter.not-shared-with",
     "definition": "is not shared with",
     "context": "is not shared with"
-  },
-  {
-    "term": "component.petition-list-shared-with-filter.or",
-    "definition": "or",
-    "context": "or"
   },
   {
     "term": "component.petition-list-shared-with-filter.shared-with",
@@ -7948,6 +8158,76 @@
     "term": "component.petition-variables-card.header",
     "definition": "Calculation results",
     "context": "Calculation results"
+  },
+  {
+    "term": "component.petitions-chart-module-settings.add-item-button",
+    "definition": "Add item",
+    "context": "Add item"
+  },
+  {
+    "term": "component.petitions-chart-module-settings.chart-items-label",
+    "definition": "Chart items",
+    "context": "Chart items"
+  },
+  {
+    "term": "component.petitions-chart-module-settings.chart-type-label",
+    "definition": "Chart type",
+    "context": "Chart type"
+  },
+  {
+    "term": "component.petitions-chart-module-settings.custom-chart-items",
+    "definition": "Custom chart items",
+    "context": "Custom chart items"
+  },
+  {
+    "term": "component.petitions-chart-module-settings.from-profile-type-field-chart-items",
+    "definition": "From profile type field",
+    "context": "From profile type field"
+  },
+  {
+    "term": "component.petitions-chart-module-settings.item-color",
+    "definition": "Color",
+    "context": "Color"
+  },
+  {
+    "term": "component.petitions-chart-module-settings.item-default-label",
+    "definition": "Item {index}",
+    "context": "Item {index}"
+  },
+  {
+    "term": "component.petitions-chart-module-settings.item-label",
+    "definition": "Label",
+    "context": "Label"
+  },
+  {
+    "term": "component.petitions-chart-module-settings.no-chart-items-added",
+    "definition": "No chart items added",
+    "context": "No chart items added"
+  },
+  {
+    "term": "component.petitions-chart-module-settings.remove-item-button",
+    "definition": "Remove item",
+    "context": "Remove item"
+  },
+  {
+    "term": "component.petitions-chart-module-settings.source-chart-items-label",
+    "definition": "Source of chart items",
+    "context": "Source of chart items"
+  },
+  {
+    "term": "component.petitions-fitlers-module-settings.all-petition-status-placeholder",
+    "definition": "All statuses",
+    "context": "All statuses"
+  },
+  {
+    "term": "component.petitions-fitlers-module-settings.any-signature-status-placeholder",
+    "definition": "Any signature status",
+    "context": "Any signature status"
+  },
+  {
+    "term": "component.petitions-fitlers-module-settings.any-template-placeholder",
+    "definition": "Any template",
+    "context": "Any template"
   },
   {
     "term": "component.petitions-table-columns.header-approvals",
@@ -8993,6 +9273,26 @@
     "term": "component.profiles-excel-import.header",
     "definition": "Importing profiles...",
     "context": "Importing profiles..."
+  },
+  {
+    "term": "component.profiles-filters-module-settings.add-condition",
+    "definition": "Add condition",
+    "context": "Add condition"
+  },
+  {
+    "term": "component.profiles-filters-module-settings.add-group",
+    "definition": "Add group",
+    "context": "Add group"
+  },
+  {
+    "term": "component.profiles-filters-module-settings.all-profile-status-placeholder",
+    "definition": "Select a status...",
+    "context": "Select a status..."
+  },
+  {
+    "term": "component.profiles-filters-module-settings.properties",
+    "definition": "Properties",
+    "context": "Properties"
   },
   {
     "term": "component.property-referenced-alert.referenced-in",
@@ -12540,11 +12840,6 @@
     "context": "It will be the first one you will see when you enter."
   },
   {
-    "term": "component.view-tabs.rename-view-confirm",
-    "definition": "Rename",
-    "context": "Rename"
-  },
-  {
     "term": "component.view-tabs.rename-view-header",
     "definition": "Rename view",
     "context": "Rename view"
@@ -12798,6 +13093,11 @@
     "term": "generic.clear",
     "definition": "Clear",
     "context": "Clear"
+  },
+  {
+    "term": "generic.clone",
+    "definition": "Clone",
+    "context": "Clone"
   },
   {
     "term": "generic.close",
@@ -13325,6 +13625,11 @@
     "context": "Last name"
   },
   {
+    "term": "generic.forms-name-label",
+    "definition": "Name",
+    "context": "Name"
+  },
+  {
     "term": "generic.forms.company-email-placeholder",
     "definition": "example@company.com",
     "context": "example@company.com"
@@ -13353,11 +13658,6 @@
     "term": "generic.forms.invalid-verification-code",
     "definition": "The verification code is invalid",
     "context": "The verification code is invalid"
-  },
-  {
-    "term": "generic.forms.name-label",
-    "definition": "Name",
-    "context": "Name"
   },
   {
     "term": "generic.forms.password-label",
@@ -14185,6 +14485,11 @@
     "context": "Long text"
   },
   {
+    "term": "generic.profiles",
+    "definition": "Profiles",
+    "context": "Profiles"
+  },
+  {
     "term": "generic.recipient-view-export-to-pdf",
     "definition": "Export to PDF",
     "context": "Export to PDF"
@@ -14213,6 +14518,11 @@
     "term": "generic.remove-condition",
     "definition": "Remove condition",
     "context": "Remove condition"
+  },
+  {
+    "term": "generic.rename",
+    "definition": "Rename",
+    "context": "Rename"
   },
   {
     "term": "generic.reply-not-available",
@@ -15445,6 +15755,26 @@
     "context": "Teams"
   },
   {
+    "term": "page.home.add-module",
+    "definition": "Add module",
+    "context": "Add module"
+  },
+  {
+    "term": "page.home.dashboard-empty-state-description",
+    "definition": "Add modules to see the metrics you need",
+    "context": "Add modules to see the metrics you need"
+  },
+  {
+    "term": "page.home.editing",
+    "definition": "Editing",
+    "context": "Editing"
+  },
+  {
+    "term": "page.home.exit-editing",
+    "definition": "Exit editing",
+    "context": "Exit editing"
+  },
+  {
     "term": "page.home.last-refreshed",
     "definition": "Updated {timeAgo}",
     "context": "Updated {timeAgo}"
@@ -15770,6 +16100,11 @@
     "context": "Contacts"
   },
   {
+    "term": "page.permissions-group.category-dashboards",
+    "definition": "Dashboards",
+    "context": "Dashboards"
+  },
+  {
     "term": "page.permissions-group.category-integrations",
     "definition": "Integrations",
     "context": "Integrations"
@@ -15823,6 +16158,16 @@
     "term": "page.permissions-group.contacts-list-description",
     "definition": "Grants users in this team permissions to view the list of contacts on the organization.",
     "context": "Grants users in this team permissions to view the list of contacts on the organization."
+  },
+  {
+    "term": "page.permissions-group.dashboards-crud",
+    "definition": "Create and manage dashboards",
+    "context": "Create and manage dashboards"
+  },
+  {
+    "term": "page.permissions-group.dashboards-crud-description",
+    "definition": "Grants users in this team permissions to create and manage dashboards.",
+    "context": "Grants users in this team permissions to create and manage dashboards."
   },
   {
     "term": "page.permissions-group.delete-contacts",
@@ -16198,11 +16543,6 @@
     "term": "page.petition-replies.export-pdf",
     "definition": "Export to PDF",
     "context": "Export to PDF"
-  },
-  {
-    "term": "page.petitions-list.actions-rename",
-    "definition": "Rename",
-    "context": "Rename"
   },
   {
     "term": "page.petitions-list.actions-save-as-template",
@@ -18633,6 +18973,21 @@
     "term": "util.use-petition-table-colums.approval-status-rejected",
     "definition": "Rejected",
     "context": "Rejected"
+  },
+  {
+    "term": "util.use-profile-status-labels.closed",
+    "definition": "Closed",
+    "context": "Closed"
+  },
+  {
+    "term": "util.use-profile-status-labels.deletion-scheduled",
+    "definition": "Deletion scheduled",
+    "context": "Deletion scheduled"
+  },
+  {
+    "term": "util.use-profile-status-labels.open",
+    "definition": "Open",
+    "context": "Open"
   },
   {
     "term": "util.use-short-text-formats.email",

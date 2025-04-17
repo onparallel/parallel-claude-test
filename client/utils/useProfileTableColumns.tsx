@@ -37,6 +37,7 @@ import { ProfileFormFieldCheckboxInner } from "@parallel/components/profiles/for
 import { ProfileFormFieldSelectInner } from "@parallel/components/profiles/form-fields/ProfileFormFieldSelect";
 import {
   FilterSharedWithLogicalOperator,
+  ProfileValueFilterLine_ProfileTypeFieldFragment,
   useProfileTableColumns_ProfileTypeFragment,
   useProfileTableColumns_ProfileWithPropertiesFragment,
 } from "@parallel/graphql/__types";
@@ -58,7 +59,6 @@ import {
   ProfileFieldValuesFilterGroup,
 } from "./ProfileFieldValuesFilter";
 import { UseReactSelectProps, useReactSelectProps } from "./react-select/hooks";
-import { UnwrapArray } from "./types";
 import { useProfileFieldValueFilterOperators } from "./useProfileFieldValueFilterOperators";
 import { isValidDateString } from "./validation";
 import { ValueProps } from "./ValueProps";
@@ -348,44 +348,50 @@ function ProfileValueFilter({
 }
 
 export interface ProfileValueFilterLineProps {
-  index: number;
-  profileTypeField: UnwrapArray<useProfileTableColumns_ProfileTypeFragment["fields"]>;
-  onRemove: () => void;
+  index?: number;
+  path?: string;
+  profileTypeField: ProfileValueFilterLine_ProfileTypeFieldFragment;
+  onRemove?: () => void;
 }
 
 export function ProfileValueFilterLine({
-  index,
+  index = 0,
+  path,
   onRemove,
   profileTypeField,
 }: ProfileValueFilterLineProps) {
-  const path = `filter.conditions.${index}` as const;
+  const basePath = path ?? `filter.conditions.${index}`;
   const intl = useIntl();
 
-  const { setValue, setFocus, control, watch, formState } =
-    useFormContext<ProfileValueFilterFormData>();
-  const { operator, value } = watch(path);
+  const { setValue, setFocus, control, watch } = useFormContext();
+  const { operator, value } = watch(basePath);
 
   const operators = useProfileFieldValueFilterOperators(profileTypeField);
-  const error = formState.errors.filter?.conditions?.[index]?.value;
+
   // workaround phone input validation
   const [validPhone, setValidPhone] = useState(true);
 
   return (
     <>
-      <IconButton
-        variant="ghost"
-        icon={<CloseIcon boxSize={3} />}
-        gridRow={{ base: "span 2", sm: "auto" }}
-        aria-label={intl.formatMessage({
-          id: "generic.remove",
-          defaultMessage: "Remove",
-        })}
-        size="sm"
-        onClick={onRemove}
-      />
+      {isNonNullish(onRemove) ? (
+        <IconButton
+          variant="ghost"
+          icon={<CloseIcon boxSize={3} />}
+          gridRow={{ base: "span 2", sm: "auto" }}
+          aria-label={intl.formatMessage({
+            id: "generic.remove",
+            defaultMessage: "Remove",
+          })}
+          size="sm"
+          onClick={onRemove}
+        />
+      ) : (
+        <Box gridRow={{ base: "span 2", sm: "auto" }}></Box>
+      )}
+
       <Controller
         control={control}
-        name={`${path}.operator`}
+        name={`${basePath}.operator`}
         render={({ field: { onChange: _, ...field } }) => (
           <SimpleSelect
             size="sm"
@@ -434,11 +440,11 @@ export function ProfileValueFilterLine({
               } else {
                 never();
               }
-              setValue(`${path}.operator`, op!);
-              setValue(`${path}.value`, _value);
+              setValue(`${basePath}.operator`, op!);
+              setValue(`${basePath}.value`, _value);
 
               if (!["HAS_VALUE", "NOT_HAS_VALUE"].includes(op!)) {
-                setTimeout(() => setFocus(`${path}.value`));
+                setTimeout(() => setFocus(`${basePath}.value`));
               }
             }}
           />
@@ -454,28 +460,28 @@ export function ProfileValueFilterLine({
       ].includes(operator.startsWith("NOT_") ? operator.slice("NOT_".length) : operator) ? (
         <></>
       ) : (
-        <FormControl gridColumn="2" isInvalid={isNonNullish(error)}>
-          <Controller<ProfileValueFilterFormData>
-            control={control}
-            name={`${path}.value`}
-            rules={{
-              required: true,
-              validate: {
-                ...(operator === "EXPIRES_IN"
-                  ? { validInterval: (value) => /^P\d+[YMWD]$/.test(value as string) }
-                  : ["TEXT", "SHORT_TEXT"].includes(profileTypeField.type)
-                    ? ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator)
-                      ? { minLength: (value) => (value as string[]).length > 0 }
-                      : { minLength: (value) => (value as string).trim().length > 0 }
-                    : profileTypeField.type === "DATE"
-                      ? { validDate: isValidDateString as any }
-                      : profileTypeField.type === "PHONE"
-                        ? { validPhone: () => validPhone }
-                        : {}),
-              },
-            }}
-            render={({ field: { value, onChange, ...rest } }) =>
-              operator === "EXPIRES_IN" ? (
+        <Controller
+          control={control}
+          name={`${basePath}.value`}
+          rules={{
+            required: true,
+            validate: {
+              ...(operator === "EXPIRES_IN"
+                ? { validInterval: (value) => /^P\d+[YMWD]$/.test(value as string) }
+                : ["TEXT", "SHORT_TEXT"].includes(profileTypeField.type)
+                  ? ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator)
+                    ? { minLength: (value) => (value as string[]).length > 0 }
+                    : { minLength: (value) => (value as string).trim().length > 0 }
+                  : profileTypeField.type === "DATE"
+                    ? { validDate: isValidDateString as any }
+                    : profileTypeField.type === "PHONE"
+                      ? { validPhone: () => validPhone }
+                      : {}),
+            },
+          }}
+          render={({ field: { value, onChange, ...rest }, fieldState: { error } }) => (
+            <FormControl gridColumn="2" isInvalid={!!error}>
+              {operator === "EXPIRES_IN" ? (
                 <SimpleDurationInput
                   size="sm"
                   value={value as string}
@@ -551,42 +557,57 @@ export function ProfileValueFilterLine({
                 </>
               ) : (
                 never()
-              )
-            }
-          />
-          <FormErrorMessage>
-            {error?.type === "required" ? (
-              <FormattedMessage
-                id="generic.required-field-error"
-                defaultMessage="The field is required"
-              />
-            ) : error?.type === "minLength" ? (
-              <FormattedMessage
-                id="generic.required-field-error"
-                defaultMessage="The field is required"
-              />
-            ) : error?.type === "validPhone" ? (
-              <FormattedMessage
-                id="generic.invalid-phone-error"
-                defaultMessage="A valid phone is required"
-              />
-            ) : error?.type === "validDate" ? (
-              <FormattedMessage
-                id="generic.invalid-date-error"
-                defaultMessage="A valid date is required"
-              />
-            ) : error?.type === "validInterval" ? (
-              <FormattedMessage
-                id="generic.invalid-interval-error"
-                defaultMessage="A valid interval is required"
-              />
-            ) : null}
-          </FormErrorMessage>
-        </FormControl>
+              )}
+              <FormErrorMessage>
+                {error?.type === "required" ? (
+                  <FormattedMessage
+                    id="generic.required-field-error"
+                    defaultMessage="The field is required"
+                  />
+                ) : error?.type === "minLength" ? (
+                  <FormattedMessage
+                    id="generic.required-field-error"
+                    defaultMessage="The field is required"
+                  />
+                ) : error?.type === "validPhone" ? (
+                  <FormattedMessage
+                    id="generic.invalid-phone-error"
+                    defaultMessage="A valid phone is required"
+                  />
+                ) : error?.type === "validDate" ? (
+                  <FormattedMessage
+                    id="generic.invalid-date-error"
+                    defaultMessage="A valid date is required"
+                  />
+                ) : error?.type === "validInterval" ? (
+                  <FormattedMessage
+                    id="generic.invalid-interval-error"
+                    defaultMessage="A valid interval is required"
+                  />
+                ) : null}
+              </FormErrorMessage>
+            </FormControl>
+          )}
+        />
       )}
     </>
   );
 }
+
+ProfileValueFilterLine.fragments = {
+  get ProfileTypeField() {
+    return gql`
+      fragment ProfileValueFilterLine_ProfileTypeField on ProfileTypeField {
+        id
+        type
+        name
+        options
+        ...useProfileFieldValueFilterOperators_ProfileTypeField
+      }
+      ${useProfileFieldValueFilterOperators.fragments.ProfileTypeField}
+    `;
+  },
+};
 
 const SimpleDurationInput = chakraForwardRef<"input", ValueProps<string> & ThemingProps<"Input">>(
   function SimpleDurationInput({ value, onChange, ...props }, ref) {
@@ -750,50 +771,65 @@ const BackgroundCheckTopicSelect = forwardRef<
 });
 
 useProfileTableColumns.fragments = {
-  ProfileType: gql`
-    fragment useProfileTableColumns_ProfileType on ProfileType {
-      id
-      fields {
+  get ProfileTypeField() {
+    return gql`
+      fragment useProfileTableColumns_ProfileTypeField on ProfileTypeField {
         id
         type
         name
         options
-        isExpirable
+        ...ProfileValueFilterLine_ProfileTypeField
       }
-    }
-  `,
-  Profile: gql`
-    fragment useProfileTableColumns_Profile on Profile {
-      id
-      createdAt
-      subscribers {
+      ${ProfileValueFilterLine.fragments.ProfileTypeField}
+    `;
+  },
+  get ProfileType() {
+    return gql`
+      fragment useProfileTableColumns_ProfileType on ProfileType {
         id
-        user {
-          id
-          ...UserAvatarList_User
+        fields {
+          ...useProfileTableColumns_ProfileTypeField
         }
       }
-      ...ProfileReference_Profile
-    }
-    ${ProfileReference.fragments.Profile}
-    ${UserAvatarList.fragments.User}
-  `,
-  ProfileFieldProperty: gql`
-    fragment useProfileTableColumns_ProfileFieldProperty on ProfileFieldProperty {
-      field {
-        ...ProfilePropertyContent_ProfileTypeField
+      ${this.ProfileTypeField}
+    `;
+  },
+  get Profile() {
+    return gql`
+      fragment useProfileTableColumns_Profile on Profile {
+        id
+        createdAt
+        subscribers {
+          id
+          user {
+            id
+            ...UserAvatarList_User
+          }
+        }
+        ...ProfileReference_Profile
       }
-      files {
-        ...ProfilePropertyContent_ProfileFieldFile
+      ${ProfileReference.fragments.Profile}
+      ${UserAvatarList.fragments.User}
+    `;
+  },
+  get ProfileFieldProperty() {
+    return gql`
+      fragment useProfileTableColumns_ProfileFieldProperty on ProfileFieldProperty {
+        field {
+          ...ProfilePropertyContent_ProfileTypeField
+        }
+        files {
+          ...ProfilePropertyContent_ProfileFieldFile
+        }
+        value {
+          ...ProfilePropertyContent_ProfileFieldValue
+        }
       }
-      value {
-        ...ProfilePropertyContent_ProfileFieldValue
-      }
-    }
-    ${ProfilePropertyContent.fragments.ProfileTypeField}
-    ${ProfilePropertyContent.fragments.ProfileFieldFile}
-    ${ProfilePropertyContent.fragments.ProfileFieldValue}
-  `,
+      ${ProfilePropertyContent.fragments.ProfileTypeField}
+      ${ProfilePropertyContent.fragments.ProfileFieldFile}
+      ${ProfilePropertyContent.fragments.ProfileFieldValue}
+    `;
+  },
   get _Profile() {
     return gql`
       fragment useProfileTableColumns_ProfileWithProperties on Profile {

@@ -1,10 +1,14 @@
+import { gql } from "@apollo/client";
 import { SimpleOption } from "@parallel/components/common/SimpleSelect";
-import { ProfileFieldValuesFilterOperator, ProfileTypeField } from "@parallel/graphql/__types";
+import {
+  ProfileFieldValuesFilterOperator,
+  useProfileFieldValueFilterOperators_ProfileTypeFieldFragment,
+} from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
 export function useProfileFieldValueFilterOperators(
-  field: Pick<ProfileTypeField, "type" | "options" | "isExpirable">,
+  field: useProfileFieldValueFilterOperators_ProfileTypeFieldFragment,
 ) {
   const intl = useIntl();
   return useMemo<SimpleOption<ProfileFieldValuesFilterOperator>[]>(() => {
@@ -249,3 +253,14 @@ export function useProfileFieldValueFilterOperators(
     return operators;
   }, [intl.locale, field.type]);
 }
+
+useProfileFieldValueFilterOperators.fragments = {
+  ProfileTypeField: gql`
+    fragment useProfileFieldValueFilterOperators_ProfileTypeField on ProfileTypeField {
+      id
+      type
+      options
+      isExpirable
+    }
+  `,
+};

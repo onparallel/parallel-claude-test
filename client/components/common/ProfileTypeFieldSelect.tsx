@@ -6,7 +6,7 @@ import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
 import { memo, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import {
+import Select, {
   ActionMeta,
   CSSObjectWithLabel,
   MultiValueProps,
@@ -137,7 +137,7 @@ export function ProfileTypeFieldSelect<
     );
   };
 
-  return (
+  return isNonNullish(onCreateProperty) ? (
     <CreatableSelect
       options={options}
       isMulti={isMulti}
@@ -155,6 +155,27 @@ export function ProfileTypeFieldSelect<
       onCreateOption={handleCreate}
       formatCreateLabel={formatCreateLabel}
       suggestedPropertyName={suggestedPropertyName}
+      placeholder={
+        props.placeholder ??
+        intl.formatMessage({
+          id: "component.profile-type-field-select.placeholder",
+          defaultMessage: "Select a property",
+        })
+      }
+      {...(props as any)}
+      {...rsProps}
+    />
+  ) : (
+    <Select<OptionType, IsMulti, never>
+      options={options}
+      isMulti={isMulti}
+      isSearchable={true}
+      value={_value as any}
+      onChange={(value, meta) => {
+        handleChange(value as any, meta as ActionMeta<ProfileTypeFieldSelectOption<OptionType>>);
+      }}
+      getOptionValue={getOptionValue}
+      getOptionLabel={getOptionLabel}
       placeholder={
         props.placeholder ??
         intl.formatMessage({

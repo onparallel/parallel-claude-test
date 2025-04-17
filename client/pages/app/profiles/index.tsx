@@ -51,7 +51,7 @@ import { withPermission } from "@parallel/components/common/withPermission";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { getProfileTypeFieldIcon } from "@parallel/components/organization/profiles/getProfileTypeFieldIcon";
 import { useConfirmChangeViewAllDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeViewAllDialog";
-import { useAskViewNameDialog } from "@parallel/components/petition-list/AskViewNameDialog";
+import { useAskNameDialog } from "@parallel/components/petition-list/AskNameDialog";
 import { useCreateProfileFromProfileTypeDialog } from "@parallel/components/profiles/dialogs/CreateProfileFromProfileTypeDialog";
 import { useImportProfilesFromExcelDialog } from "@parallel/components/profiles/dialogs/ImportProfilesFromExcelDialog";
 import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
@@ -922,12 +922,12 @@ function ProfilesListHeader({
     } catch {}
   };
 
-  const showAskViewNameDialog = useAskViewNameDialog();
+  const showAskNameDialog = useAskNameDialog();
   const [createProfileListView] = useMutation(Profiles_createProfileListViewDocument);
   const handleSaveViewAsNew = async () => {
     const currentView = state.view !== "ALL" ? views.find((v) => v.id === state.view) : null;
     try {
-      const name = await showAskViewNameDialog({
+      const name = await showAskNameDialog({
         name: currentView?.name,
         header: (
           <FormattedMessage

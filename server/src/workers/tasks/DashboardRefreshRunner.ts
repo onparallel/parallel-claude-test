@@ -10,7 +10,9 @@ export class DashboardRefreshRunner extends TaskRunner<"DASHBOARD_REFRESH"> {
     const updatedBy = `User:${this.task.user_id}`;
 
     const dashboard = await this.ctx.dashboards.loadDashboard(dashboardId);
-    assert(dashboard, `Dashboard not found: ${dashboardId}`);
+    if (!dashboard) {
+      return { success: false };
+    }
 
     const modules = await this.ctx.dashboards.loadModulesByDashboardId(dashboardId);
 

@@ -540,6 +540,92 @@ interface DashboardModule {
   title: String
 }
 
+type DashboardModulePetitionFilter {
+  approvals: DashboardModulePetitionFilterApprovals
+  fromTemplateId: [GID!]
+  sharedWith: DashboardModulePetitionFilterSharedWith
+  signature: [PetitionSignatureStatusFilter!]
+  status: [PetitionStatus!]
+  tags: DashboardModulePetitionFilterTags
+}
+
+type DashboardModulePetitionFilterApprovals {
+  filters: [DashboardModulePetitionFilterApprovalsFilters!]!
+  operator: PetitionApprovalsFilterLogicalOperator!
+}
+
+type DashboardModulePetitionFilterApprovalsFilters {
+  operator: PetitionApprovalsFilterOperator!
+  value: String!
+}
+
+type DashboardModulePetitionFilterSharedWith {
+  filters: [DashboardModulePetitionFilterSharedWithFilters!]!
+  operator: FilterSharedWithLogicalOperator!
+}
+
+type DashboardModulePetitionFilterSharedWithFilters {
+  operator: FilterSharedWithOperator!
+  value: ID!
+}
+
+type DashboardModulePetitionFilterTags {
+  filters: [DashboardModulePetitionFilterTagsFilters!]!
+  operator: PetitionTagFilterLogicalOperator!
+}
+
+type DashboardModulePetitionFilterTagsFilters {
+  operator: PetitionTagFilterLineOperator!
+  value: [GID!]!
+}
+
+type DashboardModuleProfileFieldValuesFilter {
+  conditions: [DashboardModuleProfileFieldValuesFilter!]
+  logicalOperator: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator
+  operator: DashboardModuleProfileFieldValuesFilterOperator
+  profileTypeFieldId: GID
+  value: JSON
+}
+
+enum DashboardModuleProfileFieldValuesFilterGroupLogicalOperator {
+  AND
+  OR
+}
+
+enum DashboardModuleProfileFieldValuesFilterOperator {
+  CONTAIN
+  END_WITH
+  EQUAL
+  EXPIRES_IN
+  GREATER_THAN
+  GREATER_THAN_OR_EQUAL
+  HAS_ANY_BG_CHECK_TOPICS
+  HAS_BG_CHECK_MATCH
+  HAS_BG_CHECK_RESULTS
+  HAS_BG_CHECK_TOPICS
+  HAS_EXPIRY
+  HAS_VALUE
+  IS_EXPIRED
+  IS_ONE_OF
+  LESS_THAN
+  LESS_THAN_OR_EQUAL
+  NOT_CONTAIN
+  NOT_EQUAL
+  NOT_HAS_ANY_BG_CHECK_TOPICS
+  NOT_HAS_BG_CHECK_MATCH
+  NOT_HAS_BG_CHECK_RESULTS
+  NOT_HAS_BG_CHECK_TOPICS
+  NOT_HAS_EXPIRY
+  NOT_HAS_VALUE
+  NOT_IS_ONE_OF
+  START_WITH
+}
+
+type DashboardModuleProfileFilter {
+  status: [ProfileStatus!]
+  values: DashboardModuleProfileFieldValuesFilter
+}
+
 type DashboardModuleResultItem {
   aggr: Float
   color: String
@@ -565,8 +651,13 @@ enum DashboardModuleSize {
 type DashboardPetitionsNumberModule implements DashboardModule {
   id: GID!
   result: DashboardModuleResultItem
+  settings: DashboardPetitionsNumberModuleSettings!
   size: DashboardModuleSize!
   title: String
+}
+
+type DashboardPetitionsNumberModuleSettings {
+  filters: DashboardModulePetitionFilter!
 }
 
 type DashboardPetitionsPieChartModule implements DashboardModule {
@@ -577,8 +668,15 @@ type DashboardPetitionsPieChartModule implements DashboardModule {
   title: String
 }
 
+type DashboardPetitionsPieChartModuleItems {
+  color: String!
+  filter: DashboardModulePetitionFilter!
+  label: String!
+}
+
 type DashboardPetitionsPieChartModuleSettings {
   graphicType: DashboardPieChartModuleSettingsType!
+  items: [DashboardPetitionsPieChartModuleItems!]!
 }
 
 type DashboardPetitionsRatioModule implements DashboardModule {
@@ -590,6 +688,7 @@ type DashboardPetitionsRatioModule implements DashboardModule {
 }
 
 type DashboardPetitionsRatioModuleSettings {
+  filters: [DashboardModulePetitionFilter!]!
   graphicType: DashboardRatioModuleSettingsType!
 }
 
@@ -607,6 +706,10 @@ type DashboardProfilesNumberModule implements DashboardModule {
 }
 
 type DashboardProfilesNumberModuleSettings {
+  aggregate: ModuleResultAggregateType
+  filters: DashboardModuleProfileFilter!
+  profileTypeFieldId: GID
+  profileTypeId: GID
   type: ModuleResultType!
 }
 
@@ -618,8 +721,24 @@ type DashboardProfilesPieChartModule implements DashboardModule {
   title: String
 }
 
+type DashboardProfilesPieChartModuleItems {
+  color: String!
+  filter: DashboardModuleProfileFilter!
+  label: String!
+}
+
 type DashboardProfilesPieChartModuleSettings {
+  aggregate: ModuleResultAggregateType
   graphicType: DashboardPieChartModuleSettingsType!
+  groupByFilter: DashboardModuleProfileFilter
+
+  """
+  Optional SELECT field to group by its values instead of items array
+  """
+  groupByProfileTypeFieldId: GID
+  items: [DashboardProfilesPieChartModuleItems!]!
+  profileTypeFieldId: GID
+  profileTypeId: GID
   type: ModuleResultType!
 }
 
@@ -632,7 +751,11 @@ type DashboardProfilesRatioModule implements DashboardModule {
 }
 
 type DashboardProfilesRatioModuleSettings {
+  aggregate: ModuleResultAggregateType
+  filters: [DashboardModuleProfileFilter!]!
   graphicType: DashboardRatioModuleSettingsType!
+  profileTypeFieldId: GID
+  profileTypeId: GID
   type: ModuleResultType!
 }
 
@@ -1188,11 +1311,6 @@ type Mutation {
   addUsersToUserGroup(userGroupId: GID!, userIds: [GID!]!): UserGroup!
 
   """
-  Creates a new dashboard in the organization
-  """
-  adminCreateDashboard(name: String!, orgId: GID!): Dashboard!
-
-  """
   Anonymizes a petition
   """
   anonymizePetition(petitionId: GID!): SupportMethodResponse!
@@ -1304,6 +1422,11 @@ type Mutation {
     petitionId: GID!
     type: PetitionFieldType!
   ): PetitionField!
+
+  """
+  Clones a dashboard
+  """
+  cloneDashboard(id: GID!, name: String!): Dashboard!
 
   """
   Clones a petition field
@@ -1521,6 +1644,11 @@ type Mutation {
     title: String
   ): Dashboard!
   createCustomSignatureDocumentUploadLink(file: FileUploadInput!, petitionId: GID!): JSONObject!
+
+  """
+  Creates a new empty dashboard in the organization
+  """
+  createDashboard(name: String!): Dashboard!
 
   """
   Creates a new Dow Jones KYC integration on the user's organization
@@ -2124,6 +2252,11 @@ type Mutation {
     force: Boolean
     ids: [GID!]!
   ): Result!
+
+  """
+  Deletes a dashboard
+  """
+  deleteDashboard(id: GID!): Success!
   deleteDashboardModule(dashboardId: GID!, moduleId: GID!): Dashboard!
 
   """
@@ -3046,6 +3179,16 @@ type Mutation {
   Updates a contact.
   """
   updateContact(data: UpdateContactInput!, id: GID!): Contact!
+  updateCreatePetitionButtonDashboardModule(
+    dashboardId: GID!
+    data: UpdateCreatePetitionButtonDashboardModuleInput!
+    moduleId: GID!
+  ): DashboardModule!
+
+  """
+  Updates a dashboard
+  """
+  updateDashboard(id: GID!, name: String!): Dashboard!
   updateDashboardModulePositions(dashboardId: GID!, moduleIds: [GID!]!): Dashboard!
   updateEinformaCustomProperties(
     """
@@ -3357,6 +3500,21 @@ type Mutation {
     name: String!
     petitionId: GID!
   ): Petition!
+  updatePetitionsNumberDashboardModule(
+    dashboardId: GID!
+    data: UpdatePetitionsNumberDashboardModuleInput!
+    moduleId: GID!
+  ): DashboardModule!
+  updatePetitionsPieChartDashboardModule(
+    dashboardId: GID!
+    data: UpdatePetitionsPieChartDashboardModuleInput!
+    moduleId: GID!
+  ): DashboardModule!
+  updatePetitionsRatioDashboardModule(
+    dashboardId: GID!
+    data: UpdatePetitionsRatioDashboardModuleInput!
+    moduleId: GID!
+  ): DashboardModule!
 
   """
   Updates an existing event subscription for the user's profiles
@@ -3414,6 +3572,21 @@ type Mutation {
     profileTypeId: GID!
     profileTypeProcessIds: [GID!]!
   ): ProfileType!
+  updateProfilesNumberDashboardModule(
+    dashboardId: GID!
+    data: UpdateProfilesNumberDashboardModuleInput!
+    moduleId: GID!
+  ): DashboardModule!
+  updateProfilesPieChartDashboardModule(
+    dashboardId: GID!
+    data: UpdateProfilesPieChartDashboardModuleInput!
+    moduleId: GID!
+  ): DashboardModule!
+  updateProfilesRatioDashboardModule(
+    dashboardId: GID!
+    data: UpdateProfilesRatioDashboardModuleInput!
+    moduleId: GID!
+  ): DashboardModule!
 
   """
   Updates the info and permissions of a public link
@@ -8823,6 +8996,12 @@ input UpdateContactInput {
   lastName: String
 }
 
+input UpdateCreatePetitionButtonDashboardModuleInput {
+  settings: CreatePetitionButtonDashboardModuleSettingsInput
+  size: DashboardModuleSize
+  title: String
+}
+
 input UpdatePetitionFieldAutoSearchConfigInput {
   country: GID
   date: GID
@@ -8890,6 +9069,24 @@ input UpdatePetitionVariableInput {
   defaultValue: Float!
 }
 
+input UpdatePetitionsNumberDashboardModuleInput {
+  settings: PetitionsNumberDashboardModuleSettingsInput
+  size: DashboardModuleSize
+  title: String
+}
+
+input UpdatePetitionsPieChartDashboardModuleInput {
+  settings: PetitionsPieChartDashboardModuleSettingsInput
+  size: DashboardModuleSize
+  title: String
+}
+
+input UpdatePetitionsRatioDashboardModuleInput {
+  settings: PetitionsRatioDashboardModuleSettingsInput
+  size: DashboardModuleSize
+  title: String
+}
+
 input UpdateProfileFieldValueInput {
   content: JSONObject
   expiryDate: Date
@@ -8914,6 +9111,24 @@ input UpdateProfileTypeFieldPermissionsInput {
 input UpdateProfileTypeFieldSelectOptionsSubstitution {
   new: String
   old: String!
+}
+
+input UpdateProfilesNumberDashboardModuleInput {
+  settings: ProfilesNumberDashboardModuleSettingsInput
+  size: DashboardModuleSize
+  title: String
+}
+
+input UpdateProfilesPieChartDashboardModuleInput {
+  settings: ProfilesPieChartDashboardModuleSettingsInput
+  size: DashboardModuleSize
+  title: String
+}
+
+input UpdateProfilesRatioDashboardModuleInput {
+  settings: ProfilesRatioDashboardModuleSettingsInput
+  size: DashboardModuleSize
+  title: String
 }
 
 input UpdateTagInput {

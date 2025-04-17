@@ -3,7 +3,7 @@ import { Box, Button, Flex, MenuDivider, MenuItem, MenuList, Square, Text } from
 import { CopyIcon, DeleteIcon, EditIcon, StarEmptyIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
-import { useAskViewNameDialog } from "@parallel/components/petition-list/AskViewNameDialog";
+import { useAskNameDialog } from "@parallel/components/petition-list/AskNameDialog";
 import { ViewTabs_ListViewFragment } from "@parallel/graphql/__types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { Reorder } from "framer-motion";
@@ -182,11 +182,11 @@ export function ViewTab({
   onDragEnd,
 }: ViewTabProps) {
   const intl = useIntl();
-  const showAskViewNameDialog = useAskViewNameDialog();
+  const showAskNameDialog = useAskNameDialog();
   const moreOptionsButtonRef = useRef<HTMLButtonElement>(null);
   const handleRenameViewClick = async function () {
     try {
-      const name = await showAskViewNameDialog({
+      const name = await showAskNameDialog({
         name: view.name,
         header: (
           <FormattedMessage
@@ -194,9 +194,7 @@ export function ViewTab({
             defaultMessage="Rename view"
           />
         ),
-        confirm: (
-          <FormattedMessage id="component.view-tabs.rename-view-confirm" defaultMessage="Rename" />
-        ),
+        confirm: <FormattedMessage id="generic.rename" defaultMessage="Rename" />,
         modalProps: { finalFocusRef: moreOptionsButtonRef },
       });
       onRenameView(view.id, name);
@@ -204,7 +202,7 @@ export function ViewTab({
   };
   const handleCloneViewClick = async function () {
     try {
-      const name = await showAskViewNameDialog({
+      const name = await showAskNameDialog({
         name:
           view.type === "ALL"
             ? intl.formatMessage({ id: "generic.all-view", defaultMessage: "All" })

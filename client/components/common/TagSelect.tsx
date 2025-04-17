@@ -598,10 +598,7 @@ export function ManageTagsDialog({ ...props }: ManageTagsDialogProps) {
           <Grid gridTemplateColumns="auto 1fr" alignItems="center" gridRowGap={2} marginTop={4}>
             <FormControl as={NoElement} isDisabled={isNullish(tagId)} isInvalid={!!errors.name}>
               <FormLabel marginBottom="0">
-                <FormattedMessage
-                  id="component.manage-tags-dialog.rename"
-                  defaultMessage="Rename"
-                />
+                <FormattedMessage id="generic.rename" defaultMessage="Rename" />
               </FormLabel>
               <Input {...register("name", { required: true, validate: { isNotEmptyText } })} />
 

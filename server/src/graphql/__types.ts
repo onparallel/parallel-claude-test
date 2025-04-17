@@ -449,6 +449,12 @@ export interface NexusGenInputs {
     firstName?: string | null; // String
     lastName?: string | null; // String
   };
+  UpdateCreatePetitionButtonDashboardModuleInput: {
+    // input type
+    settings?: NexusGenInputs["CreatePetitionButtonDashboardModuleSettingsInput"] | null; // CreatePetitionButtonDashboardModuleSettingsInput
+    size?: NexusGenEnums["DashboardModuleSize"] | null; // DashboardModuleSize
+    title?: string | null; // String
+  };
   UpdatePetitionFieldAutoSearchConfigInput: {
     // input type
     country?: NexusGenScalars["GID"] | null; // GID
@@ -516,6 +522,24 @@ export interface NexusGenInputs {
     // input type
     defaultValue: number; // Float!
   };
+  UpdatePetitionsNumberDashboardModuleInput: {
+    // input type
+    settings?: NexusGenInputs["PetitionsNumberDashboardModuleSettingsInput"] | null; // PetitionsNumberDashboardModuleSettingsInput
+    size?: NexusGenEnums["DashboardModuleSize"] | null; // DashboardModuleSize
+    title?: string | null; // String
+  };
+  UpdatePetitionsPieChartDashboardModuleInput: {
+    // input type
+    settings?: NexusGenInputs["PetitionsPieChartDashboardModuleSettingsInput"] | null; // PetitionsPieChartDashboardModuleSettingsInput
+    size?: NexusGenEnums["DashboardModuleSize"] | null; // DashboardModuleSize
+    title?: string | null; // String
+  };
+  UpdatePetitionsRatioDashboardModuleInput: {
+    // input type
+    settings?: NexusGenInputs["PetitionsRatioDashboardModuleSettingsInput"] | null; // PetitionsRatioDashboardModuleSettingsInput
+    size?: NexusGenEnums["DashboardModuleSize"] | null; // DashboardModuleSize
+    title?: string | null; // String
+  };
   UpdateProfileFieldValueInput: {
     // input type
     content?: NexusGenScalars["JSONObject"] | null; // JSONObject
@@ -541,6 +565,24 @@ export interface NexusGenInputs {
     // input type
     new?: string | null; // String
     old: string; // String!
+  };
+  UpdateProfilesNumberDashboardModuleInput: {
+    // input type
+    settings?: NexusGenInputs["ProfilesNumberDashboardModuleSettingsInput"] | null; // ProfilesNumberDashboardModuleSettingsInput
+    size?: NexusGenEnums["DashboardModuleSize"] | null; // DashboardModuleSize
+    title?: string | null; // String
+  };
+  UpdateProfilesPieChartDashboardModuleInput: {
+    // input type
+    settings?: NexusGenInputs["ProfilesPieChartDashboardModuleSettingsInput"] | null; // ProfilesPieChartDashboardModuleSettingsInput
+    size?: NexusGenEnums["DashboardModuleSize"] | null; // DashboardModuleSize
+    title?: string | null; // String
+  };
+  UpdateProfilesRatioDashboardModuleInput: {
+    // input type
+    settings?: NexusGenInputs["ProfilesRatioDashboardModuleSettingsInput"] | null; // ProfilesRatioDashboardModuleSettingsInput
+    size?: NexusGenEnums["DashboardModuleSize"] | null; // DashboardModuleSize
+    title?: string | null; // String
   };
   UpdateTagInput: {
     // input type
@@ -581,6 +623,34 @@ export interface NexusGenEnums {
     | "INVALID_NEW_PASSWORD"
     | "LIMIT_EXCEEDED"
     | "SUCCESS";
+  DashboardModuleProfileFieldValuesFilterGroupLogicalOperator: "AND" | "OR";
+  DashboardModuleProfileFieldValuesFilterOperator:
+    | "CONTAIN"
+    | "END_WITH"
+    | "EQUAL"
+    | "EXPIRES_IN"
+    | "GREATER_THAN"
+    | "GREATER_THAN_OR_EQUAL"
+    | "HAS_ANY_BG_CHECK_TOPICS"
+    | "HAS_BG_CHECK_MATCH"
+    | "HAS_BG_CHECK_RESULTS"
+    | "HAS_BG_CHECK_TOPICS"
+    | "HAS_EXPIRY"
+    | "HAS_VALUE"
+    | "IS_EXPIRED"
+    | "IS_ONE_OF"
+    | "LESS_THAN"
+    | "LESS_THAN_OR_EQUAL"
+    | "NOT_CONTAIN"
+    | "NOT_EQUAL"
+    | "NOT_HAS_ANY_BG_CHECK_TOPICS"
+    | "NOT_HAS_BG_CHECK_MATCH"
+    | "NOT_HAS_BG_CHECK_RESULTS"
+    | "NOT_HAS_BG_CHECK_TOPICS"
+    | "NOT_HAS_EXPIRY"
+    | "NOT_HAS_VALUE"
+    | "NOT_IS_ONE_OF"
+    | "START_WITH";
   DashboardModuleSize: db.DashboardModuleSize;
   DashboardPieChartModuleSettingsType: "DOUGHNUT" | "PIE";
   DashboardRatioModuleSettingsType: "PERCENTAGE" | "RATIO";
@@ -964,6 +1034,59 @@ export interface NexusGenObjects {
     label: string;
     template_id: number;
   };
+  DashboardModulePetitionFilter: {
+    // root type
+    approvals?: NexusGenRootTypes["DashboardModulePetitionFilterApprovals"] | null; // DashboardModulePetitionFilterApprovals
+    fromTemplateId?: NexusGenScalars["GID"][] | null; // [GID!]
+    sharedWith?: NexusGenRootTypes["DashboardModulePetitionFilterSharedWith"] | null; // DashboardModulePetitionFilterSharedWith
+    signature?: NexusGenEnums["PetitionSignatureStatusFilter"][] | null; // [PetitionSignatureStatusFilter!]
+    status?: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
+    tags?: NexusGenRootTypes["DashboardModulePetitionFilterTags"] | null; // DashboardModulePetitionFilterTags
+  };
+  DashboardModulePetitionFilterApprovals: {
+    // root type
+    operator: NexusGenEnums["PetitionApprovalsFilterLogicalOperator"]; // PetitionApprovalsFilterLogicalOperator!
+  };
+  DashboardModulePetitionFilterApprovalsFilters: {
+    // root type
+    operator: NexusGenEnums["PetitionApprovalsFilterOperator"]; // PetitionApprovalsFilterOperator!
+    value: string; // String!
+  };
+  DashboardModulePetitionFilterSharedWith: {
+    // root type
+    filters: NexusGenRootTypes["DashboardModulePetitionFilterSharedWithFilters"][]; // [DashboardModulePetitionFilterSharedWithFilters!]!
+    operator: NexusGenEnums["FilterSharedWithLogicalOperator"]; // FilterSharedWithLogicalOperator!
+  };
+  DashboardModulePetitionFilterSharedWithFilters: {
+    // root type
+    operator: NexusGenEnums["FilterSharedWithOperator"]; // FilterSharedWithOperator!
+    value: string; // ID!
+  };
+  DashboardModulePetitionFilterTags: {
+    // root type
+    filters: NexusGenRootTypes["DashboardModulePetitionFilterTagsFilters"][]; // [DashboardModulePetitionFilterTagsFilters!]!
+    operator: NexusGenEnums["PetitionTagFilterLogicalOperator"]; // PetitionTagFilterLogicalOperator!
+  };
+  DashboardModulePetitionFilterTagsFilters: {
+    // root type
+    operator: NexusGenEnums["PetitionTagFilterLineOperator"]; // PetitionTagFilterLineOperator!
+    value: NexusGenScalars["GID"][]; // [GID!]!
+  };
+  DashboardModuleProfileFieldValuesFilter: {
+    // root type
+    conditions?: NexusGenRootTypes["DashboardModuleProfileFieldValuesFilter"][] | null; // [DashboardModuleProfileFieldValuesFilter!]
+    logicalOperator?:
+      | NexusGenEnums["DashboardModuleProfileFieldValuesFilterGroupLogicalOperator"]
+      | null; // DashboardModuleProfileFieldValuesFilterGroupLogicalOperator
+    operator?: NexusGenEnums["DashboardModuleProfileFieldValuesFilterOperator"] | null; // DashboardModuleProfileFieldValuesFilterOperator
+    profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
+    value?: NexusGenScalars["JSON"] | null; // JSON
+  };
+  DashboardModuleProfileFilter: {
+    // root type
+    status?: NexusGenEnums["ProfileStatus"][] | null; // [ProfileStatus!]
+    values?: NexusGenRootTypes["DashboardModuleProfileFieldValuesFilter"] | null; // DashboardModuleProfileFieldValuesFilter
+  };
   DashboardModuleResultItem: {
     // root type
     aggr?: number | null; // Float
@@ -980,7 +1103,12 @@ export interface NexusGenObjects {
     // root type
     id: NexusGenScalars["GID"]; // GID!
     result?: NexusGenRootTypes["DashboardModuleResultItem"] | null; // DashboardModuleResultItem
+    settings: NexusGenRootTypes["DashboardPetitionsNumberModuleSettings"]; // DashboardPetitionsNumberModuleSettings!
     title?: string | null; // String
+  };
+  DashboardPetitionsNumberModuleSettings: {
+    // root type
+    filters: NexusGenRootTypes["DashboardModulePetitionFilter"]; // DashboardModulePetitionFilter!
   };
   DashboardPetitionsPieChartModule: {
     // root type
@@ -989,9 +1117,16 @@ export interface NexusGenObjects {
     settings: NexusGenRootTypes["DashboardPetitionsPieChartModuleSettings"]; // DashboardPetitionsPieChartModuleSettings!
     title?: string | null; // String
   };
+  DashboardPetitionsPieChartModuleItems: {
+    // root type
+    color: string; // String!
+    filter: NexusGenRootTypes["DashboardModulePetitionFilter"]; // DashboardModulePetitionFilter!
+    label: string; // String!
+  };
   DashboardPetitionsPieChartModuleSettings: {
     // root type
     graphicType: NexusGenEnums["DashboardPieChartModuleSettingsType"]; // DashboardPieChartModuleSettingsType!
+    items: NexusGenRootTypes["DashboardPetitionsPieChartModuleItems"][]; // [DashboardPetitionsPieChartModuleItems!]!
   };
   DashboardPetitionsRatioModule: {
     // root type
@@ -1002,6 +1137,7 @@ export interface NexusGenObjects {
   };
   DashboardPetitionsRatioModuleSettings: {
     // root type
+    filters: NexusGenRootTypes["DashboardModulePetitionFilter"][]; // [DashboardModulePetitionFilter!]!
     graphicType: NexusGenEnums["DashboardRatioModuleSettingsType"]; // DashboardRatioModuleSettingsType!
   };
   DashboardProfilesNumberModule: {
@@ -1013,6 +1149,10 @@ export interface NexusGenObjects {
   };
   DashboardProfilesNumberModuleSettings: {
     // root type
+    aggregate?: NexusGenEnums["ModuleResultAggregateType"] | null; // ModuleResultAggregateType
+    filters: NexusGenRootTypes["DashboardModuleProfileFilter"]; // DashboardModuleProfileFilter!
+    profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
+    profileTypeId?: NexusGenScalars["GID"] | null; // GID
     type: NexusGenEnums["ModuleResultType"]; // ModuleResultType!
   };
   DashboardProfilesPieChartModule: {
@@ -1022,9 +1162,21 @@ export interface NexusGenObjects {
     settings: NexusGenRootTypes["DashboardProfilesPieChartModuleSettings"]; // DashboardProfilesPieChartModuleSettings!
     title?: string | null; // String
   };
+  DashboardProfilesPieChartModuleItems: {
+    // root type
+    color: string; // String!
+    filter: NexusGenRootTypes["DashboardModuleProfileFilter"]; // DashboardModuleProfileFilter!
+    label: string; // String!
+  };
   DashboardProfilesPieChartModuleSettings: {
     // root type
+    aggregate?: NexusGenEnums["ModuleResultAggregateType"] | null; // ModuleResultAggregateType
     graphicType: NexusGenEnums["DashboardPieChartModuleSettingsType"]; // DashboardPieChartModuleSettingsType!
+    groupByFilter?: NexusGenRootTypes["DashboardModuleProfileFilter"] | null; // DashboardModuleProfileFilter
+    groupByProfileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
+    items: NexusGenRootTypes["DashboardProfilesPieChartModuleItems"][]; // [DashboardProfilesPieChartModuleItems!]!
+    profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
+    profileTypeId?: NexusGenScalars["GID"] | null; // GID
     type: NexusGenEnums["ModuleResultType"]; // ModuleResultType!
   };
   DashboardProfilesRatioModule: {
@@ -1036,7 +1188,11 @@ export interface NexusGenObjects {
   };
   DashboardProfilesRatioModuleSettings: {
     // root type
+    aggregate?: NexusGenEnums["ModuleResultAggregateType"] | null; // ModuleResultAggregateType
+    filters: NexusGenRootTypes["DashboardModuleProfileFilter"][]; // [DashboardModuleProfileFilter!]!
     graphicType: NexusGenEnums["DashboardRatioModuleSettingsType"]; // DashboardRatioModuleSettingsType!
+    profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
+    profileTypeId?: NexusGenScalars["GID"] | null; // GID
     type: NexusGenEnums["ModuleResultType"]; // ModuleResultType!
   };
   DowJonesKycEntityDate: {
@@ -2057,6 +2213,60 @@ export interface NexusGenFieldTypes {
     label: string; // String!
     template: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
   };
+  DashboardModulePetitionFilter: {
+    // field return type
+    approvals: NexusGenRootTypes["DashboardModulePetitionFilterApprovals"] | null; // DashboardModulePetitionFilterApprovals
+    fromTemplateId: NexusGenScalars["GID"][] | null; // [GID!]
+    sharedWith: NexusGenRootTypes["DashboardModulePetitionFilterSharedWith"] | null; // DashboardModulePetitionFilterSharedWith
+    signature: NexusGenEnums["PetitionSignatureStatusFilter"][] | null; // [PetitionSignatureStatusFilter!]
+    status: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
+    tags: NexusGenRootTypes["DashboardModulePetitionFilterTags"] | null; // DashboardModulePetitionFilterTags
+  };
+  DashboardModulePetitionFilterApprovals: {
+    // field return type
+    filters: NexusGenRootTypes["DashboardModulePetitionFilterApprovalsFilters"][]; // [DashboardModulePetitionFilterApprovalsFilters!]!
+    operator: NexusGenEnums["PetitionApprovalsFilterLogicalOperator"]; // PetitionApprovalsFilterLogicalOperator!
+  };
+  DashboardModulePetitionFilterApprovalsFilters: {
+    // field return type
+    operator: NexusGenEnums["PetitionApprovalsFilterOperator"]; // PetitionApprovalsFilterOperator!
+    value: string; // String!
+  };
+  DashboardModulePetitionFilterSharedWith: {
+    // field return type
+    filters: NexusGenRootTypes["DashboardModulePetitionFilterSharedWithFilters"][]; // [DashboardModulePetitionFilterSharedWithFilters!]!
+    operator: NexusGenEnums["FilterSharedWithLogicalOperator"]; // FilterSharedWithLogicalOperator!
+  };
+  DashboardModulePetitionFilterSharedWithFilters: {
+    // field return type
+    operator: NexusGenEnums["FilterSharedWithOperator"]; // FilterSharedWithOperator!
+    value: string; // ID!
+  };
+  DashboardModulePetitionFilterTags: {
+    // field return type
+    filters: NexusGenRootTypes["DashboardModulePetitionFilterTagsFilters"][]; // [DashboardModulePetitionFilterTagsFilters!]!
+    operator: NexusGenEnums["PetitionTagFilterLogicalOperator"]; // PetitionTagFilterLogicalOperator!
+  };
+  DashboardModulePetitionFilterTagsFilters: {
+    // field return type
+    operator: NexusGenEnums["PetitionTagFilterLineOperator"]; // PetitionTagFilterLineOperator!
+    value: NexusGenScalars["GID"][]; // [GID!]!
+  };
+  DashboardModuleProfileFieldValuesFilter: {
+    // field return type
+    conditions: NexusGenRootTypes["DashboardModuleProfileFieldValuesFilter"][] | null; // [DashboardModuleProfileFieldValuesFilter!]
+    logicalOperator:
+      | NexusGenEnums["DashboardModuleProfileFieldValuesFilterGroupLogicalOperator"]
+      | null; // DashboardModuleProfileFieldValuesFilterGroupLogicalOperator
+    operator: NexusGenEnums["DashboardModuleProfileFieldValuesFilterOperator"] | null; // DashboardModuleProfileFieldValuesFilterOperator
+    profileTypeFieldId: NexusGenScalars["GID"] | null; // GID
+    value: NexusGenScalars["JSON"] | null; // JSON
+  };
+  DashboardModuleProfileFilter: {
+    // field return type
+    status: NexusGenEnums["ProfileStatus"][] | null; // [ProfileStatus!]
+    values: NexusGenRootTypes["DashboardModuleProfileFieldValuesFilter"] | null; // DashboardModuleProfileFieldValuesFilter
+  };
   DashboardModuleResultItem: {
     // field return type
     aggr: number | null; // Float
@@ -2073,8 +2283,13 @@ export interface NexusGenFieldTypes {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
     result: NexusGenRootTypes["DashboardModuleResultItem"] | null; // DashboardModuleResultItem
+    settings: NexusGenRootTypes["DashboardPetitionsNumberModuleSettings"]; // DashboardPetitionsNumberModuleSettings!
     size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
     title: string | null; // String
+  };
+  DashboardPetitionsNumberModuleSettings: {
+    // field return type
+    filters: NexusGenRootTypes["DashboardModulePetitionFilter"]; // DashboardModulePetitionFilter!
   };
   DashboardPetitionsPieChartModule: {
     // field return type
@@ -2084,9 +2299,16 @@ export interface NexusGenFieldTypes {
     size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
     title: string | null; // String
   };
+  DashboardPetitionsPieChartModuleItems: {
+    // field return type
+    color: string; // String!
+    filter: NexusGenRootTypes["DashboardModulePetitionFilter"]; // DashboardModulePetitionFilter!
+    label: string; // String!
+  };
   DashboardPetitionsPieChartModuleSettings: {
     // field return type
     graphicType: NexusGenEnums["DashboardPieChartModuleSettingsType"]; // DashboardPieChartModuleSettingsType!
+    items: NexusGenRootTypes["DashboardPetitionsPieChartModuleItems"][]; // [DashboardPetitionsPieChartModuleItems!]!
   };
   DashboardPetitionsRatioModule: {
     // field return type
@@ -2098,6 +2320,7 @@ export interface NexusGenFieldTypes {
   };
   DashboardPetitionsRatioModuleSettings: {
     // field return type
+    filters: NexusGenRootTypes["DashboardModulePetitionFilter"][]; // [DashboardModulePetitionFilter!]!
     graphicType: NexusGenEnums["DashboardRatioModuleSettingsType"]; // DashboardRatioModuleSettingsType!
   };
   DashboardProfilesNumberModule: {
@@ -2110,6 +2333,10 @@ export interface NexusGenFieldTypes {
   };
   DashboardProfilesNumberModuleSettings: {
     // field return type
+    aggregate: NexusGenEnums["ModuleResultAggregateType"] | null; // ModuleResultAggregateType
+    filters: NexusGenRootTypes["DashboardModuleProfileFilter"]; // DashboardModuleProfileFilter!
+    profileTypeFieldId: NexusGenScalars["GID"] | null; // GID
+    profileTypeId: NexusGenScalars["GID"] | null; // GID
     type: NexusGenEnums["ModuleResultType"]; // ModuleResultType!
   };
   DashboardProfilesPieChartModule: {
@@ -2120,9 +2347,21 @@ export interface NexusGenFieldTypes {
     size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
     title: string | null; // String
   };
+  DashboardProfilesPieChartModuleItems: {
+    // field return type
+    color: string; // String!
+    filter: NexusGenRootTypes["DashboardModuleProfileFilter"]; // DashboardModuleProfileFilter!
+    label: string; // String!
+  };
   DashboardProfilesPieChartModuleSettings: {
     // field return type
+    aggregate: NexusGenEnums["ModuleResultAggregateType"] | null; // ModuleResultAggregateType
     graphicType: NexusGenEnums["DashboardPieChartModuleSettingsType"]; // DashboardPieChartModuleSettingsType!
+    groupByFilter: NexusGenRootTypes["DashboardModuleProfileFilter"] | null; // DashboardModuleProfileFilter
+    groupByProfileTypeFieldId: NexusGenScalars["GID"] | null; // GID
+    items: NexusGenRootTypes["DashboardProfilesPieChartModuleItems"][]; // [DashboardProfilesPieChartModuleItems!]!
+    profileTypeFieldId: NexusGenScalars["GID"] | null; // GID
+    profileTypeId: NexusGenScalars["GID"] | null; // GID
     type: NexusGenEnums["ModuleResultType"]; // ModuleResultType!
   };
   DashboardProfilesRatioModule: {
@@ -2135,7 +2374,11 @@ export interface NexusGenFieldTypes {
   };
   DashboardProfilesRatioModuleSettings: {
     // field return type
+    aggregate: NexusGenEnums["ModuleResultAggregateType"] | null; // ModuleResultAggregateType
+    filters: NexusGenRootTypes["DashboardModuleProfileFilter"][]; // [DashboardModuleProfileFilter!]!
     graphicType: NexusGenEnums["DashboardRatioModuleSettingsType"]; // DashboardRatioModuleSettingsType!
+    profileTypeFieldId: NexusGenScalars["GID"] | null; // GID
+    profileTypeId: NexusGenScalars["GID"] | null; // GID
     type: NexusGenEnums["ModuleResultType"]; // ModuleResultType!
   };
   DowJonesKycEntityDate: {
@@ -2381,7 +2624,6 @@ export interface NexusGenFieldTypes {
     // field return type
     activateUser: NexusGenRootTypes["User"][]; // [User!]!
     addUsersToUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
-    adminCreateDashboard: NexusGenRootTypes["Dashboard"]; // Dashboard!
     anonymizePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     approveOrRejectPetitionFieldReplies: NexusGenRootTypes["Petition"]; // Petition!
     approvePetitionApprovalRequestStep: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
@@ -2398,6 +2640,7 @@ export interface NexusGenFieldTypes {
     changeOrganization: NexusGenEnums["Result"]; // Result!
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
     changePetitionFieldType: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    cloneDashboard: NexusGenRootTypes["Dashboard"]; // Dashboard!
     clonePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     clonePetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     cloneProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
@@ -2421,6 +2664,7 @@ export interface NexusGenFieldTypes {
     createContactlessPetitionAccess: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createCreatePetitionButtonDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
     createCustomSignatureDocumentUploadLink: NexusGenScalars["JSONObject"]; // JSONObject!
+    createDashboard: NexusGenRootTypes["Dashboard"]; // Dashboard!
     createDowJonesKycIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     createDowJonesKycReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createDowJonesProfileDownloadTask: NexusGenRootTypes["Task"]; // Task!
@@ -2481,6 +2725,7 @@ export interface NexusGenFieldTypes {
     deactivateUser: NexusGenRootTypes["User"][]; // [User!]!
     deleteAzureOpenAiIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     deleteContacts: NexusGenEnums["Result"]; // Result!
+    deleteDashboard: NexusGenEnums["Success"]; // Success!
     deleteDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
     deleteDowJonesKycIntegration: NexusGenRootTypes["Organization"]; // Organization!
     deleteEventSubscriptionSignatureKeys: NexusGenEnums["Result"]; // Result!
@@ -2604,6 +2849,8 @@ export interface NexusGenFieldTypes {
     updateBackgroundCheckEntity: NexusGenEnums["Success"]; // Success!
     updateCompaniesHouseCustomProperties: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
+    updateCreatePetitionButtonDashboardModule: NexusGenRootTypes["DashboardModule"]; // DashboardModule!
+    updateDashboard: NexusGenRootTypes["Dashboard"]; // Dashboard!
     updateDashboardModulePositions: NexusGenRootTypes["Dashboard"]; // Dashboard!
     updateEinformaCustomProperties: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateFeatureFlags: NexusGenRootTypes["Organization"]; // Organization!
@@ -2635,6 +2882,9 @@ export interface NexusGenFieldTypes {
     updatePetitionRestriction: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionUserNotificationReadStatus: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
     updatePetitionVariable: NexusGenRootTypes["Petition"]; // Petition!
+    updatePetitionsNumberDashboardModule: NexusGenRootTypes["DashboardModule"]; // DashboardModule!
+    updatePetitionsPieChartDashboardModule: NexusGenRootTypes["DashboardModule"]; // DashboardModule!
+    updatePetitionsRatioDashboardModule: NexusGenRootTypes["DashboardModule"]; // DashboardModule!
     updateProfileEventSubscription: NexusGenRootTypes["ProfileEventSubscription"]; // ProfileEventSubscription!
     updateProfileFieldValue: NexusGenRootTypes["Profile"]; // Profile!
     updateProfileListView: NexusGenRootTypes["ProfileListView"]; // ProfileListView!
@@ -2643,6 +2893,9 @@ export interface NexusGenFieldTypes {
     updateProfileTypeFieldPermissions: NexusGenRootTypes["ProfileType"]; // ProfileType!
     updateProfileTypeFieldPositions: NexusGenRootTypes["ProfileType"]; // ProfileType!
     updateProfileTypeProcessPositions: NexusGenRootTypes["ProfileType"]; // ProfileType!
+    updateProfilesNumberDashboardModule: NexusGenRootTypes["DashboardModule"]; // DashboardModule!
+    updateProfilesPieChartDashboardModule: NexusGenRootTypes["DashboardModule"]; // DashboardModule!
+    updateProfilesRatioDashboardModule: NexusGenRootTypes["DashboardModule"]; // DashboardModule!
     updatePublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     updatePublicTemplateVisibility: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateSignatureRequestMetadata: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
@@ -5077,6 +5330,58 @@ export interface NexusGenFieldTypeNames {
     label: "String";
     template: "PetitionBaseMini";
   };
+  DashboardModulePetitionFilter: {
+    // field return type name
+    approvals: "DashboardModulePetitionFilterApprovals";
+    fromTemplateId: "GID";
+    sharedWith: "DashboardModulePetitionFilterSharedWith";
+    signature: "PetitionSignatureStatusFilter";
+    status: "PetitionStatus";
+    tags: "DashboardModulePetitionFilterTags";
+  };
+  DashboardModulePetitionFilterApprovals: {
+    // field return type name
+    filters: "DashboardModulePetitionFilterApprovalsFilters";
+    operator: "PetitionApprovalsFilterLogicalOperator";
+  };
+  DashboardModulePetitionFilterApprovalsFilters: {
+    // field return type name
+    operator: "PetitionApprovalsFilterOperator";
+    value: "String";
+  };
+  DashboardModulePetitionFilterSharedWith: {
+    // field return type name
+    filters: "DashboardModulePetitionFilterSharedWithFilters";
+    operator: "FilterSharedWithLogicalOperator";
+  };
+  DashboardModulePetitionFilterSharedWithFilters: {
+    // field return type name
+    operator: "FilterSharedWithOperator";
+    value: "ID";
+  };
+  DashboardModulePetitionFilterTags: {
+    // field return type name
+    filters: "DashboardModulePetitionFilterTagsFilters";
+    operator: "PetitionTagFilterLogicalOperator";
+  };
+  DashboardModulePetitionFilterTagsFilters: {
+    // field return type name
+    operator: "PetitionTagFilterLineOperator";
+    value: "GID";
+  };
+  DashboardModuleProfileFieldValuesFilter: {
+    // field return type name
+    conditions: "DashboardModuleProfileFieldValuesFilter";
+    logicalOperator: "DashboardModuleProfileFieldValuesFilterGroupLogicalOperator";
+    operator: "DashboardModuleProfileFieldValuesFilterOperator";
+    profileTypeFieldId: "GID";
+    value: "JSON";
+  };
+  DashboardModuleProfileFilter: {
+    // field return type name
+    status: "ProfileStatus";
+    values: "DashboardModuleProfileFieldValuesFilter";
+  };
   DashboardModuleResultItem: {
     // field return type name
     aggr: "Float";
@@ -5093,8 +5398,13 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     id: "GID";
     result: "DashboardModuleResultItem";
+    settings: "DashboardPetitionsNumberModuleSettings";
     size: "DashboardModuleSize";
     title: "String";
+  };
+  DashboardPetitionsNumberModuleSettings: {
+    // field return type name
+    filters: "DashboardModulePetitionFilter";
   };
   DashboardPetitionsPieChartModule: {
     // field return type name
@@ -5104,9 +5414,16 @@ export interface NexusGenFieldTypeNames {
     size: "DashboardModuleSize";
     title: "String";
   };
+  DashboardPetitionsPieChartModuleItems: {
+    // field return type name
+    color: "String";
+    filter: "DashboardModulePetitionFilter";
+    label: "String";
+  };
   DashboardPetitionsPieChartModuleSettings: {
     // field return type name
     graphicType: "DashboardPieChartModuleSettingsType";
+    items: "DashboardPetitionsPieChartModuleItems";
   };
   DashboardPetitionsRatioModule: {
     // field return type name
@@ -5118,6 +5435,7 @@ export interface NexusGenFieldTypeNames {
   };
   DashboardPetitionsRatioModuleSettings: {
     // field return type name
+    filters: "DashboardModulePetitionFilter";
     graphicType: "DashboardRatioModuleSettingsType";
   };
   DashboardProfilesNumberModule: {
@@ -5130,6 +5448,10 @@ export interface NexusGenFieldTypeNames {
   };
   DashboardProfilesNumberModuleSettings: {
     // field return type name
+    aggregate: "ModuleResultAggregateType";
+    filters: "DashboardModuleProfileFilter";
+    profileTypeFieldId: "GID";
+    profileTypeId: "GID";
     type: "ModuleResultType";
   };
   DashboardProfilesPieChartModule: {
@@ -5140,9 +5462,21 @@ export interface NexusGenFieldTypeNames {
     size: "DashboardModuleSize";
     title: "String";
   };
+  DashboardProfilesPieChartModuleItems: {
+    // field return type name
+    color: "String";
+    filter: "DashboardModuleProfileFilter";
+    label: "String";
+  };
   DashboardProfilesPieChartModuleSettings: {
     // field return type name
+    aggregate: "ModuleResultAggregateType";
     graphicType: "DashboardPieChartModuleSettingsType";
+    groupByFilter: "DashboardModuleProfileFilter";
+    groupByProfileTypeFieldId: "GID";
+    items: "DashboardProfilesPieChartModuleItems";
+    profileTypeFieldId: "GID";
+    profileTypeId: "GID";
     type: "ModuleResultType";
   };
   DashboardProfilesRatioModule: {
@@ -5155,7 +5489,11 @@ export interface NexusGenFieldTypeNames {
   };
   DashboardProfilesRatioModuleSettings: {
     // field return type name
+    aggregate: "ModuleResultAggregateType";
+    filters: "DashboardModuleProfileFilter";
     graphicType: "DashboardRatioModuleSettingsType";
+    profileTypeFieldId: "GID";
+    profileTypeId: "GID";
     type: "ModuleResultType";
   };
   DowJonesKycEntityDate: {
@@ -5401,7 +5739,6 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     activateUser: "User";
     addUsersToUserGroup: "UserGroup";
-    adminCreateDashboard: "Dashboard";
     anonymizePetition: "SupportMethodResponse";
     approveOrRejectPetitionFieldReplies: "Petition";
     approvePetitionApprovalRequestStep: "PetitionApprovalRequestStep";
@@ -5418,6 +5755,7 @@ export interface NexusGenFieldTypeNames {
     changeOrganization: "Result";
     changePassword: "ChangePasswordResult";
     changePetitionFieldType: "PetitionField";
+    cloneDashboard: "Dashboard";
     clonePetitionField: "PetitionField";
     clonePetitions: "PetitionBase";
     cloneProfileType: "ProfileType";
@@ -5441,6 +5779,7 @@ export interface NexusGenFieldTypeNames {
     createContactlessPetitionAccess: "PetitionAccess";
     createCreatePetitionButtonDashboardModule: "Dashboard";
     createCustomSignatureDocumentUploadLink: "JSONObject";
+    createDashboard: "Dashboard";
     createDowJonesKycIntegration: "OrgIntegration";
     createDowJonesKycReply: "PetitionFieldReply";
     createDowJonesProfileDownloadTask: "Task";
@@ -5501,6 +5840,7 @@ export interface NexusGenFieldTypeNames {
     deactivateUser: "User";
     deleteAzureOpenAiIntegration: "SupportMethodResponse";
     deleteContacts: "Result";
+    deleteDashboard: "Success";
     deleteDashboardModule: "Dashboard";
     deleteDowJonesKycIntegration: "Organization";
     deleteEventSubscriptionSignatureKeys: "Result";
@@ -5624,6 +5964,8 @@ export interface NexusGenFieldTypeNames {
     updateBackgroundCheckEntity: "Success";
     updateCompaniesHouseCustomProperties: "SupportMethodResponse";
     updateContact: "Contact";
+    updateCreatePetitionButtonDashboardModule: "DashboardModule";
+    updateDashboard: "Dashboard";
     updateDashboardModulePositions: "Dashboard";
     updateEinformaCustomProperties: "SupportMethodResponse";
     updateFeatureFlags: "Organization";
@@ -5655,6 +5997,9 @@ export interface NexusGenFieldTypeNames {
     updatePetitionRestriction: "PetitionBase";
     updatePetitionUserNotificationReadStatus: "PetitionUserNotification";
     updatePetitionVariable: "Petition";
+    updatePetitionsNumberDashboardModule: "DashboardModule";
+    updatePetitionsPieChartDashboardModule: "DashboardModule";
+    updatePetitionsRatioDashboardModule: "DashboardModule";
     updateProfileEventSubscription: "ProfileEventSubscription";
     updateProfileFieldValue: "Profile";
     updateProfileListView: "ProfileListView";
@@ -5663,6 +6008,9 @@ export interface NexusGenFieldTypeNames {
     updateProfileTypeFieldPermissions: "ProfileType";
     updateProfileTypeFieldPositions: "ProfileType";
     updateProfileTypeProcessPositions: "ProfileType";
+    updateProfilesNumberDashboardModule: "DashboardModule";
+    updateProfilesPieChartDashboardModule: "DashboardModule";
+    updateProfilesRatioDashboardModule: "DashboardModule";
     updatePublicPetitionLink: "PublicPetitionLink";
     updatePublicTemplateVisibility: "SupportMethodResponse";
     updateSignatureRequestMetadata: "PetitionSignatureRequest";
@@ -7834,11 +8182,6 @@ export interface NexusGenArgTypes {
       userGroupId: NexusGenScalars["GID"]; // GID!
       userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
-    adminCreateDashboard: {
-      // args
-      name: string; // String!
-      orgId: NexusGenScalars["GID"]; // GID!
-    };
     anonymizePetition: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
@@ -7921,6 +8264,11 @@ export interface NexusGenArgTypes {
       force?: boolean | null; // Boolean
       petitionId: NexusGenScalars["GID"]; // GID!
       type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
+    };
+    cloneDashboard: {
+      // args
+      id: NexusGenScalars["GID"]; // GID!
+      name: string; // String!
     };
     clonePetitionField: {
       // args
@@ -8057,6 +8405,10 @@ export interface NexusGenArgTypes {
       // args
       file: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    createDashboard: {
+      // args
+      name: string; // String!
     };
     createDowJonesKycIntegration: {
       // args
@@ -8443,6 +8795,10 @@ export interface NexusGenArgTypes {
       // args
       force?: boolean | null; // Boolean
       ids: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    deleteDashboard: {
+      // args
+      id: NexusGenScalars["GID"]; // GID!
     };
     deleteDashboardModule: {
       // args
@@ -9119,6 +9475,17 @@ export interface NexusGenArgTypes {
       data: NexusGenInputs["UpdateContactInput"]; // UpdateContactInput!
       id: NexusGenScalars["GID"]; // GID!
     };
+    updateCreatePetitionButtonDashboardModule: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      data: NexusGenInputs["UpdateCreatePetitionButtonDashboardModuleInput"]; // UpdateCreatePetitionButtonDashboardModuleInput!
+      moduleId: NexusGenScalars["GID"]; // GID!
+    };
+    updateDashboard: {
+      // args
+      id: NexusGenScalars["GID"]; // GID!
+      name: string; // String!
+    };
     updateDashboardModulePositions: {
       // args
       dashboardId: NexusGenScalars["GID"]; // GID!
@@ -9309,6 +9676,24 @@ export interface NexusGenArgTypes {
       name: string; // String!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
+    updatePetitionsNumberDashboardModule: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      data: NexusGenInputs["UpdatePetitionsNumberDashboardModuleInput"]; // UpdatePetitionsNumberDashboardModuleInput!
+      moduleId: NexusGenScalars["GID"]; // GID!
+    };
+    updatePetitionsPieChartDashboardModule: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      data: NexusGenInputs["UpdatePetitionsPieChartDashboardModuleInput"]; // UpdatePetitionsPieChartDashboardModuleInput!
+      moduleId: NexusGenScalars["GID"]; // GID!
+    };
+    updatePetitionsRatioDashboardModule: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      data: NexusGenInputs["UpdatePetitionsRatioDashboardModuleInput"]; // UpdatePetitionsRatioDashboardModuleInput!
+      moduleId: NexusGenScalars["GID"]; // GID!
+    };
     updateProfileEventSubscription: {
       // args
       eventTypes?: NexusGenEnums["ProfileEventType"][] | null; // [ProfileEventType!]
@@ -9363,6 +9748,24 @@ export interface NexusGenArgTypes {
       // args
       profileTypeId: NexusGenScalars["GID"]; // GID!
       profileTypeProcessIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    updateProfilesNumberDashboardModule: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      data: NexusGenInputs["UpdateProfilesNumberDashboardModuleInput"]; // UpdateProfilesNumberDashboardModuleInput!
+      moduleId: NexusGenScalars["GID"]; // GID!
+    };
+    updateProfilesPieChartDashboardModule: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      data: NexusGenInputs["UpdateProfilesPieChartDashboardModuleInput"]; // UpdateProfilesPieChartDashboardModuleInput!
+      moduleId: NexusGenScalars["GID"]; // GID!
+    };
+    updateProfilesRatioDashboardModule: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      data: NexusGenInputs["UpdateProfilesRatioDashboardModuleInput"]; // UpdateProfilesRatioDashboardModuleInput!
+      moduleId: NexusGenScalars["GID"]; // GID!
     };
     updatePublicPetitionLink: {
       // args

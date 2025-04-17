@@ -77,7 +77,7 @@ export function CreateOrUpdateDocumentThemeDialog({
         <Stack>
           <FormControl isInvalid={!!errors.name}>
             <FormLabel>
-              <FormattedMessage id="generic.forms.name-label" defaultMessage="Name" />
+              <FormattedMessage id="generic.forms-name-label" defaultMessage="Name" />
             </FormLabel>
             <Input {...nameRegisterProps} maxLength={50} />
             <FormErrorMessage>

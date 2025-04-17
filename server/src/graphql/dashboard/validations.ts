@@ -1,7 +1,6 @@
 import fastSafeStringify from "fast-safe-stringify";
 import { GraphQLResolveInfo } from "graphql";
 import { indexBy, isNonNullish, isNullish, partition } from "remeda";
-import { assert } from "ts-essentials";
 import { ApiContext } from "../../context";
 import { fromGlobalId, isGlobalId } from "../../util/globalId";
 import { validateProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
@@ -199,22 +198,21 @@ export function validatePetitionsNumberDashboardModuleSettingsInput<
   TypeName extends string,
   FieldName extends string,
 >(
-  dashboardIdArg: ArgWithPath<TypeName, FieldName, number>,
   prop: ArgWithPath<
     TypeName,
     FieldName,
-    NexusGenInputs["PetitionsNumberDashboardModuleSettingsInput"]
+    NexusGenInputs["PetitionsNumberDashboardModuleSettingsInput"] | null | undefined
   >,
 ) {
   return (async (_, args, ctx, info) => {
-    const [dashboardId] = getArgWithPath(args, dashboardIdArg);
-    const dashboard = await ctx.dashboards.loadDashboard(dashboardId);
-    assert(dashboard, "Dashboard not found");
     const [settings, argName] = getArgWithPath(args, prop);
+    if (!settings) {
+      return;
+    }
 
     await validatePetitionFilter(
       settings.filters,
-      dashboard.org_id,
+      ctx.user!.org_id,
       info,
       `${argName}.filters`,
       ctx,
@@ -226,18 +224,17 @@ export function validatePetitionsRatioDashboardModuleSettingsInput<
   TypeName extends string,
   FieldName extends string,
 >(
-  dashboardIdArg: ArgWithPath<TypeName, FieldName, number>,
   prop: ArgWithPath<
     TypeName,
     FieldName,
-    NexusGenInputs["PetitionsRatioDashboardModuleSettingsInput"]
+    NexusGenInputs["PetitionsRatioDashboardModuleSettingsInput"] | null | undefined
   >,
 ) {
   return (async (_, args, ctx, info) => {
-    const [dashboardId] = getArgWithPath(args, dashboardIdArg);
-    const dashboard = await ctx.dashboards.loadDashboard(dashboardId);
-    assert(dashboard, "Dashboard not found");
     const [settings, argName] = getArgWithPath(args, prop);
+    if (!settings) {
+      return;
+    }
 
     if (settings.filters.length !== 2) {
       throw new ArgValidationError(info, `${argName}.filters`, "Exactly 2 filters are required");
@@ -247,7 +244,7 @@ export function validatePetitionsRatioDashboardModuleSettingsInput<
       const filterIndex = settings.filters.indexOf(filter);
       await validatePetitionFilter(
         filter,
-        dashboard.org_id,
+        ctx.user!.org_id,
         info,
         `${argName}.filters[${filterIndex}]`,
         ctx,
@@ -260,18 +257,17 @@ export function validatePetitionsPieChartDashboardModuleSettingsInput<
   TypeName extends string,
   FieldName extends string,
 >(
-  dashboardIdArg: ArgWithPath<TypeName, FieldName, number>,
   prop: ArgWithPath<
     TypeName,
     FieldName,
-    NexusGenInputs["PetitionsPieChartDashboardModuleSettingsInput"]
+    NexusGenInputs["PetitionsPieChartDashboardModuleSettingsInput"] | null | undefined
   >,
 ) {
   return (async (_, args, ctx, info) => {
-    const [dashboardId] = getArgWithPath(args, dashboardIdArg);
-    const dashboard = await ctx.dashboards.loadDashboard(dashboardId);
-    assert(dashboard, "Dashboard not found");
     const [settings, argName] = getArgWithPath(args, prop);
+    if (!settings) {
+      return;
+    }
 
     if (settings.items.length < 1) {
       throw new ArgValidationError(info, `${argName}.items`, "At least 1 filter is required");
@@ -290,7 +286,7 @@ export function validatePetitionsPieChartDashboardModuleSettingsInput<
 
       await validatePetitionFilter(
         item.filter,
-        dashboard.org_id,
+        ctx.user!.org_id,
         info,
         `${argName}.items[${itemIndex}]`,
         ctx,
@@ -306,11 +302,14 @@ export function validateProfilesNumberDashboardModuleSettingsInput<
   prop: ArgWithPath<
     TypeName,
     FieldName,
-    NexusGenInputs["ProfilesNumberDashboardModuleSettingsInput"]
+    NexusGenInputs["ProfilesNumberDashboardModuleSettingsInput"] | null | undefined
   >,
 ) {
   return (async (_, args, ctx, info) => {
     const [settings, argName] = getArgWithPath(args, prop);
+    if (!settings) {
+      return;
+    }
 
     await validateProfileFilter(
       settings.filter,
@@ -339,11 +338,14 @@ export function validateProfilesRatioDashboardModuleSettingsInput<
   prop: ArgWithPath<
     TypeName,
     FieldName,
-    NexusGenInputs["ProfilesRatioDashboardModuleSettingsInput"]
+    NexusGenInputs["ProfilesRatioDashboardModuleSettingsInput"] | null | undefined
   >,
 ) {
   return (async (_, args, ctx, info) => {
     const [settings, argName] = getArgWithPath(args, prop);
+    if (!settings) {
+      return;
+    }
 
     if (settings.filters.length !== 2) {
       throw new ArgValidationError(info, `${argName}.filters`, "Exactly 2 filters are required");
@@ -387,11 +389,14 @@ export function validateProfilesPieChartDashboardModuleSettingsInput<
   prop: ArgWithPath<
     TypeName,
     FieldName,
-    NexusGenInputs["ProfilesPieChartDashboardModuleSettingsInput"]
+    NexusGenInputs["ProfilesPieChartDashboardModuleSettingsInput"] | null | undefined
   >,
 ) {
   return (async (_, args, ctx, info) => {
     const [settings, argName] = getArgWithPath(args, prop);
+    if (!settings) {
+      return;
+    }
 
     if (isNullish(settings.groupByProfileTypeFieldId) && settings.items.length < 1) {
       throw new ArgValidationError(info, `${argName}.items`, "At least 1 item is required");
