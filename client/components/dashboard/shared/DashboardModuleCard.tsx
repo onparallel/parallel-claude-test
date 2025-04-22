@@ -156,8 +156,8 @@ export const DashboardModuleCard = Object.assign(
           flex="1"
           overflow="hidden"
           pointerEvents={isEditing ? "none" : "auto"}
-          opacity={isEditing ? 0.4 : 1}
-          filter={isEditing ? "blur(2px)" : "none"}
+          opacity={isEditing ? 0.7 : 1}
+          filter={isEditing ? "blur(1px)" : "none"}
         >
           {children}
         </Flex>

@@ -31,7 +31,7 @@ export function DashboardChartLegend({ data }: { data: DashboardChartLegendChart
           values={{
             count: (
               <Text as="span" fontWeight={600}>
-                {total}
+                <FormattedNumber value={total} />
               </Text>
             ),
           }}

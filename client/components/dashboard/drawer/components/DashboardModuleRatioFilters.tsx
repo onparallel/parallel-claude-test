@@ -1,18 +1,13 @@
 import { HStack, Text, useRadioGroup } from "@chakra-ui/react";
-import { untranslated } from "@parallel/utils/untranslated";
+import { FormattedMessage } from "react-intl";
 import { ModuleSettingsRadioButton } from "./ModuleSettingsRadioButton";
 
 interface DashboardModuleRatioFiltersProps {
   value: number;
   onChange: (value: number) => void;
-  filtersCount: [number, number];
 }
 
-export function DashboardModuleRatioFilters({
-  value,
-  onChange,
-  filtersCount,
-}: DashboardModuleRatioFiltersProps) {
+export function DashboardModuleRatioFilters({ value, onChange }: DashboardModuleRatioFiltersProps) {
   const { getRootProps, getRadioProps } = useRadioGroup({
     name: "filters",
     value: value.toString(),
@@ -23,10 +18,23 @@ export function DashboardModuleRatioFilters({
   return (
     <HStack {...getRootProps()}>
       <ModuleSettingsRadioButton {...getRadioProps({ value: "0" })}>
-        <Text>{untranslated(`A (${filtersCount[0]})`)}</Text>
+        <Text>
+          <FormattedMessage
+            id="component.dashboard-module-ratio-filters.numerator"
+            defaultMessage="Numerator"
+          />
+        </Text>
       </ModuleSettingsRadioButton>
+      <Text as="span" fontSize="2xl" color="gray.400">
+        /
+      </Text>
       <ModuleSettingsRadioButton {...getRadioProps({ value: "1" })}>
-        <Text>{untranslated(`B (${filtersCount[1]})`)}</Text>
+        <Text>
+          <FormattedMessage
+            id="component.dashboard-module-ratio-filters.denominator"
+            defaultMessage="Denominator"
+          />
+        </Text>
       </ModuleSettingsRadioButton>
     </HStack>
   );

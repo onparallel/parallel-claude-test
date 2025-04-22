@@ -2790,6 +2790,41 @@
     "context": "Type"
   },
   {
+    "term": "component.dashboard-module-form.ratio-type-percentage",
+    "definition": "Percentage",
+    "context": "Percentage"
+  },
+  {
+    "term": "component.dashboard-module-form.ratio-type-ratio",
+    "definition": "Ratio",
+    "context": "Ratio"
+  },
+  {
+    "term": "component.dashboard-module-form.sizes-large",
+    "definition": "Large",
+    "context": "Large"
+  },
+  {
+    "term": "component.dashboard-module-form.sizes-medium",
+    "definition": "Medium",
+    "context": "Medium"
+  },
+  {
+    "term": "component.dashboard-module-form.sizes-small",
+    "definition": "Small",
+    "context": "Small"
+  },
+  {
+    "term": "component.dashboard-module-ratio-filters.denominator",
+    "definition": "Denominator",
+    "context": "Denominator"
+  },
+  {
+    "term": "component.dashboard-module-ratio-filters.numerator",
+    "definition": "Numerator",
+    "context": "Numerator"
+  },
+  {
     "term": "component.dashboard-pie-chart-module.not-replied",
     "definition": "Not replied",
     "context": "Not replied"
@@ -2833,31 +2868,6 @@
     "term": "component.dashborad-module-chart-type.pie",
     "definition": "Pie",
     "context": "Pie"
-  },
-  {
-    "term": "component.dashboard-module-form.ratio-type-percentage",
-    "definition": "Percentage",
-    "context": "Percentage"
-  },
-  {
-    "term": "component.dashboard-module-form.ratio-type-ratio",
-    "definition": "Ratio",
-    "context": "Ratio"
-  },
-  {
-    "term": "component.dashboard-module-form.sizes-large",
-    "definition": "Large",
-    "context": "Large"
-  },
-  {
-    "term": "component.dashboard-module-form.sizes-medium",
-    "definition": "Medium",
-    "context": "Medium"
-  },
-  {
-    "term": "component.dashboard-module-form.sizes-small",
-    "definition": "Small",
-    "context": "Small"
   },
   {
     "term": "component.date-range-picker-button.clear-range",
