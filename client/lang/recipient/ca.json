@@ -40,9 +40,14 @@
     "context": "You have {count, plural, =1{# pending process} other{# pending processes}}"
   },
   {
-    "term": "component.confirm-signer-info-dialog.header",
-    "definition": "Ja has afegit aquest correu per a {signersList}. Pots modificar el nom i afegir-lo de nou.",
-    "context": "You already added this email for {signersList}. You can modify the name and add it again."
+    "term": "component.confirm-signer-info-dialog.body",
+    "definition": "Ja has afegit aquest correu per a <b>{signersList}</b>. Pots modificar el nom i afegir-lo de nou.",
+    "context": "You already added this email for <b>{signersList}</b>. You can modify the name and add it again."
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.body-extended",
+    "definition": "Cada signant rebrà un correu electrònic separat per signar. Si diversos signants comparteixen la mateixa adreça de correu electrònic, rebran un correu electrònic per a cada signant i cadascun ha de ser signat individualment.",
+    "context": "Each signer gets a separate email. If they share the same address, they will receive one email per signer, and all must be signed."
   },
   {
     "term": "component.confirm-signer-info-dialog.is-preset",

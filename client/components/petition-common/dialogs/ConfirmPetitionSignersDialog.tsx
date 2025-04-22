@@ -137,6 +137,7 @@ export function ConfirmPetitionSignersDialog(
     (onChange: (...events: any[]) => void) => async (contact: ContactSelectSelection | null) => {
       try {
         const repeatedSigners = allSigners.filter((s) => s.email === contact!.email);
+
         onChange([
           ...signers,
           repeatedSigners.length > 0

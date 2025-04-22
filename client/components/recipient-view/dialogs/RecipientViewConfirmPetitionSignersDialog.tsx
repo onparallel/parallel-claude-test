@@ -116,7 +116,8 @@ function RecipientViewConfirmPetitionSignersDialog({
   const handleAddNewSigner = (onChange: (...events: any[]) => void) => async () => {
     try {
       const newSigner = await showAddNewSignerDialog({ tone });
-      const repeatedSigners = additionalSigners.filter((s) => s.email === newSigner.email);
+      const repeatedSigners = allSigners.filter((s) => s.email === newSigner.email);
+
       onChange([
         ...additionalSigners,
         repeatedSigners.length > 0

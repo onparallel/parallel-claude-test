@@ -1880,9 +1880,14 @@
     "context": "Send reminder"
   },
   {
-    "term": "component.confirm-signer-info-dialog.header",
-    "definition": "You already added this email for {signersList}. You can modify the name and add it again.",
-    "context": "You already added this email for {signersList}. You can modify the name and add it again."
+    "term": "component.confirm-signer-info-dialog.body",
+    "definition": "You already added this email for <b>{signersList}</b>. You can modify the name and add it again.",
+    "context": "You already added this email for <b>{signersList}</b>. You can modify the name and add it again."
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.body-extended",
+    "definition": "Each signer gets a separate email. If they share the same address, they will receive one email per signer, and all must be signed.",
+    "context": "Each signer gets a separate email. If they share the same address, they will receive one email per signer, and all must be signed."
   },
   {
     "term": "component.confirm-signer-info-dialog.is-preset",

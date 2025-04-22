@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertIcon,
   Button,
   Flex,
   FormControl,
@@ -71,17 +73,28 @@ function ConfirmSignerInfoDialog({
       body={
         <Stack>
           {repeatedSigners.length > 0 ? (
-            <Text fontSize="14px">
-              <FormattedMessage
-                id="component.confirm-signer-info-dialog.header"
-                defaultMessage="You already added this email for {signersList}. You can modify the name and add it again."
-                values={{
-                  signersList: intl.formatList(
-                    repeatedSigners.map((s) => fullName(s.firstName, s.lastName)),
-                  ),
-                }}
-              />
-            </Text>
+            <>
+              <Text fontSize="14px">
+                <FormattedMessage
+                  id="component.confirm-signer-info-dialog.body"
+                  defaultMessage="You already added this email for <b>{signersList}</b>. You can modify the name and add it again."
+                  values={{
+                    signersList: intl.formatList(
+                      repeatedSigners.map((s) => fullName(s.firstName, s.lastName)),
+                    ),
+                  }}
+                />
+              </Text>
+              <Alert status="warning">
+                <AlertIcon />
+                <Text fontSize="14px">
+                  <FormattedMessage
+                    id="component.confirm-signer-info-dialog.body-extended"
+                    defaultMessage="Each signer gets a separate email. If they share the same address, they will receive one email per signer, and all must be signed."
+                  />
+                </Text>
+              </Alert>
+            </>
           ) : null}
           <FormControl id="email" isInvalid={!!errors.email}>
             <FormLabel fontWeight={400}>
