@@ -83,7 +83,7 @@ export function RecipientViewPetitionFieldCheckbox({
   const tone = useTone();
 
   const options = field.options as FieldOptions["CHECKBOX"];
-  const hasStandardList = isNonNullish(field.options.standardList);
+  const showMultiSelect = isNonNullish(field.options.standardList) || options.values.length > 15;
   const { type = "UNLIMITED", max = 1 } = options.limit ?? {};
   const reply = field.replies.length > 0 ? field.replies[0] : undefined;
   const isRejected = reply?.status === "REJECTED" || false;
@@ -238,7 +238,7 @@ export function RecipientViewPetitionFieldCheckbox({
             showSavedIcon={false}
           />
         </HStack>
-        {hasStandardList ? (
+        {showMultiSelect ? (
           <HStack align="start">
             <Box flex="1">
               <PetitionFieldCheckboxStandardList
@@ -291,9 +291,6 @@ export function RecipientViewPetitionFieldCheckbox({
                         display: "none",
                       },
                     },
-                    ":hover, :focus-within": {
-                      "[data-rs='value-container']": { paddingInlineEnd: 0 },
-                    },
                   }),
                   valueContainer: (baseStyles) => ({
                     ...baseStyles,
@@ -302,7 +299,7 @@ export function RecipientViewPetitionFieldCheckbox({
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "flex-start",
-                    justifyContent: "center",
+                    justifyContent: "flex-start",
                   }),
                   multiValue: (baseStyles) => ({
                     ...baseStyles,

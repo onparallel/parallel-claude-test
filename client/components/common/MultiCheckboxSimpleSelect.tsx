@@ -50,6 +50,14 @@ export const MultiCheckboxSimpleSelect = forwardRef(function MultiCheckboxSimple
           display: "flex",
         };
       },
+      input: (base: CSSObjectWithLabel) => ({
+        ...base,
+        height: "0px",
+        position: "absolute" as const,
+        "> input": {
+          height: "0px",
+        },
+      }),
     };
     return isNonNullish(_styles) ? mergeStyles(styles, _styles) : styles;
   }, [_styles]);
