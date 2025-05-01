@@ -59735,6 +59735,7 @@ export type Profiles_ProfileTypeFragment = {
   icon: ProfileTypeIcon;
   isPinned: boolean;
   canCreate: boolean;
+  archivedAt?: string | null;
   pluralName: { [locale in UserLocale]?: string };
   fields: Array<{
     __typename?: "ProfileTypeField";
@@ -59898,6 +59899,7 @@ export type Profiles_profileTypeQuery = {
     icon: ProfileTypeIcon;
     isPinned: boolean;
     canCreate: boolean;
+    archivedAt?: string | null;
     pluralName: { [locale in UserLocale]?: string };
     fields: Array<{
       __typename?: "ProfileTypeField";
@@ -76630,6 +76632,7 @@ export const Profiles_ProfileTypeFragmentDoc = gql`
     icon
     isPinned
     canCreate
+    archivedAt
     ...ProfileTypeReference_ProfileType
     ...useProfileTableColumns_ProfileType
   }

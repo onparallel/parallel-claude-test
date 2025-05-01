@@ -478,7 +478,10 @@ function Profiles() {
                 colorScheme="primary"
                 onClick={handleCreateProfile}
                 isDisabled={
-                  !userCanCreateProfiles || isNullish(profileType) || !profileType.canCreate
+                  !userCanCreateProfiles ||
+                  isNullish(profileType) ||
+                  !profileType.canCreate ||
+                  isNonNullish(profileType.archivedAt)
                 }
                 options={
                   <MenuList minWidth={0}>
@@ -531,7 +534,10 @@ function Profiles() {
                 colorScheme="primary"
                 onClick={handleCreateProfile}
                 isDisabled={
-                  !userCanCreateProfiles || isNullish(profileType) || !profileType.canCreate
+                  !userCanCreateProfiles ||
+                  isNullish(profileType) ||
+                  !profileType.canCreate ||
+                  isNonNullish(profileType.archivedAt)
                 }
               >
                 <FormattedMessage
@@ -1066,6 +1072,7 @@ const _fragments = {
         icon
         isPinned
         canCreate
+        archivedAt
         ...ProfileTypeReference_ProfileType
         ...useProfileTableColumns_ProfileType
       }
