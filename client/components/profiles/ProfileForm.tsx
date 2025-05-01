@@ -143,6 +143,7 @@ export const ProfileForm = Object.assign(
       clearErrors,
       handleSubmit,
       setValue,
+      getValues,
     } = useForm<ProfileFormData>({
       defaultValues: buildFormDefaultValue(properties),
     });
@@ -408,8 +409,12 @@ export const ProfileForm = Object.assign(
               },
             );
 
+            const currentValues = getValues();
+            reset(currentValues, {
+              keepDirty: false,
+              keepDirtyValues: false,
+            });
             await onRefetch();
-            reset();
           } catch (e) {
             if (isApolloError(e, "MAX_FILES_EXCEEDED")) {
               await withError(
