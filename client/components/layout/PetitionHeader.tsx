@@ -712,7 +712,7 @@ export const PetitionHeader = Object.assign(
                     <MenuItem
                       onClick={handleSaveAsTemplate}
                       icon={<CopyIcon display="block" boxSize={4} />}
-                      isDisabled={!userCanCreateTemplate}
+                      isDisabled={!userCanCreateTemplate || isAnonymized}
                     >
                       <FormattedMessage
                         id="component.petition-header.save-as-template-button"

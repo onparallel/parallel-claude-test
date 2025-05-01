@@ -444,9 +444,13 @@ function Petitions() {
     )!;
   }, [selectedRows]);
 
+  const selectedPetitionIsAnonymized = selectedRows.some(
+    (r) => r.__typename === "Petition" && r.isAnonymized,
+  );
+
   const actions = usePetitionListActions({
     userCanChangePath,
-    userCanCreateTemplate,
+    userCanCreateTemplate: userCanCreateTemplate && !selectedPetitionIsAnonymized,
     userCanCreatePetition,
     type: state.type,
     selectedCount: selectedRows.length,
@@ -727,6 +731,7 @@ Petitions.fragments = {
         }
         ... on Petition {
           status
+          isAnonymized
         }
         ... on PetitionTemplate {
           isPublic

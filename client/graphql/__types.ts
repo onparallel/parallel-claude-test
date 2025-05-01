@@ -58433,6 +58433,7 @@ export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
   __typename?: "Petition";
   name?: string | null;
   status: PetitionStatus;
+  isAnonymized: boolean;
   sentAt?: string | null;
   lastActivityAt?: string | null;
   lastRecipientActivityAt?: string | null;
@@ -58778,6 +58779,7 @@ export type Petitions_petitionsQuery = {
           __typename?: "Petition";
           name?: string | null;
           status: PetitionStatus;
+          isAnonymized: boolean;
           sentAt?: string | null;
           lastActivityAt?: string | null;
           lastRecipientActivityAt?: string | null;
@@ -76481,6 +76483,7 @@ export const Petitions_PetitionBaseOrFolderFragmentDoc = gql`
     }
     ... on Petition {
       status
+      isAnonymized
     }
     ... on PetitionTemplate {
       isPublic
