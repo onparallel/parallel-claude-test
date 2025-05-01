@@ -324,7 +324,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         sex: {
           type: ["string", "null"],
           format: "sex",
-          enum: ["F", "M"],
+          enum: ["F", "M", null],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.id-card.sex",
             defaultMessage: "Sex",
@@ -440,7 +440,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         sex: {
           type: ["string", "null"],
           format: "sex",
-          enum: ["F", "M"],
+          enum: ["F", "M", null],
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.passport.sex",
             defaultMessage: "Sex",
