@@ -3705,6 +3705,16 @@
     "context": "Custom solutions"
   },
   {
+    "term": "component.feature-flag-descriptions.dashboards-description",
+    "definition": "Grants access to dashboards",
+    "context": "Grants access to dashboards"
+  },
+  {
+    "term": "component.feature-flag-descriptions.dashboards-name",
+    "definition": "Dashboards",
+    "context": "Dashboards"
+  },
+  {
     "term": "component.feature-flag-descriptions.delegate-access-description",
     "definition": "Allows turning off \"Invite collaborator\" on the recipient view",
     "context": "Allows turning off \"Invite collaborator\" on the recipient view"

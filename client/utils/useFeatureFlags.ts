@@ -415,6 +415,17 @@ export function useFeatureFlags() {
             }),
           },
           {
+            name: "DASHBOARDS",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.dashboards-name",
+              defaultMessage: "Dashboards",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.dashboards-description",
+              defaultMessage: "Grants access to dashboards",
+            }),
+          },
+          {
             name: "SHOW_CONTACTS_BUTTON",
             title: intl.formatMessage({
               id: "component.feature-flag-descriptions.show-contacts-button-name",
