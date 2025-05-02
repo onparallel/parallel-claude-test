@@ -2296,6 +2296,11 @@ export function publicApi(container: Container) {
             throw new BadRequestError(
               "The field is already replied and does not accept any more replies.",
             );
+          } else if (containsGraphQLError(error, "REPLY_ONLY_FROM_PROFILE_ERROR")) {
+            throw new BadRequestError(
+              "The field can only be replied to from a profile",
+              "REPLY_ONLY_FROM_PROFILE_ERROR",
+            );
           } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
             throw new ForbiddenError("You don't have enough credits to submit a reply");
           } else if (
@@ -2425,6 +2430,11 @@ export function publicApi(container: Container) {
             throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR", {
               subcode,
             });
+          } else if (containsGraphQLError(error, "REPLY_ONLY_FROM_PROFILE_ERROR")) {
+            throw new BadRequestError(
+              "The reply can only be updated from a profile",
+              "REPLY_ONLY_FROM_PROFILE_ERROR",
+            );
           } else if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
             throw new BadRequestError("The reply is already approved and cannot be modified.");
           } else if (
@@ -2465,6 +2475,11 @@ export function publicApi(container: Container) {
         } catch (error) {
           if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
             throw new ConflictError("The reply is already approved and cannot be deleted.");
+          } else if (containsGraphQLError(error, "REPLY_ONLY_FROM_PROFILE_ERROR")) {
+            throw new BadRequestError(
+              "The reply can't be deleted",
+              "REPLY_ONLY_FROM_PROFILE_ERROR",
+            );
           } else if (containsGraphQLError(error, "DELETE_FIELD_GROUP_REPLY_ERROR")) {
             throw new ConflictError(
               "You can't delete the last reply of a required FIELD_GROUP field",

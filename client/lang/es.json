@@ -4670,6 +4670,11 @@
     "context": "and {count} more"
   },
   {
+    "term": "component.map-fields-table.disabled-because-settings",
+    "definition": "No se pueden importar respuestas a este campo porque tiene el ajuste <b>\"{settingName}\"</b> habilitado.",
+    "context": "New answers cannot be imported into this field because it has the <b>\"{settingName}\"</b> setting enabled."
+  },
+  {
     "term": "component.map-fields-table.field-visibility-alert",
     "definition": "Este campo puede no ser visible ya que está sujeto a condiciones de visibilidad.",
     "context": "This field may not be visible as it is subject to visibility conditions."
@@ -6070,6 +6075,21 @@
     "context": "Show reply activity"
   },
   {
+    "term": "component.petition-compose-field-settings.reply-only-from-profile-description",
+    "definition": "Cuando esta opción está activada, el campo no puede ser completado por los destinatarios y sólo se pre-rellenará con los datos disponibles en un perfil. Si está activada, el campo será opcional.",
+    "context": "When this option is enabled, the field cannot be completed by users or recipients and will only be pre-filled with the data available in a profile. If enabled, the field will be optional."
+  },
+  {
+    "term": "component.petition-compose-field-settings.reply-only-from-profile-disabled-readonly",
+    "definition": "Esta opción no puede ser cambiada porque el campo es el primer hijo de un grupo.",
+    "context": "This option cannot be changed because the field is the first child of a group."
+  },
+  {
+    "term": "component.petition-compose-field-settings.reply-only-from-profile-label",
+    "definition": "Solo rellenable desde perfil",
+    "context": "Only pre-filled from profile"
+  },
+  {
     "term": "component.petition-compose-field-settings.review-flow",
     "definition": "Flujo de revisión",
     "context": "Review flow"
@@ -6228,6 +6248,11 @@
     "term": "component.petition-compose-field.remove-calculations",
     "definition": "Quitar cálculos",
     "context": "Remove calculations"
+  },
+  {
+    "term": "component.petition-compose-field.required-disabled-reply-only-from-profile",
+    "definition": "Este campo es opcional porque se rellena solo con datos de perfil y no puede ser completado por los destinatarios. Para hacerlo obligatorio, necesitas desactivar la opción <b>\"{settingName}\"</b> en los ajustes del campo.",
+    "context": "This field is optional because it is only pre-filled from profile and cannot be completed by recipients. To make it required, you need to disable the <b>\"{settingName}\"</b> option in the field settings."
   },
   {
     "term": "component.petition-compose-field.required-label",
@@ -16568,6 +16593,11 @@
     "term": "page.petition-compose.first-child-is-internal-error",
     "definition": "El primer campo de un grupo no puede ser interno si el grupo no lo es.",
     "context": "The first field of a group cannot be internal if the group is not."
+  },
+  {
+    "term": "page.petition-compose.first-child-is-reply-only-from-profile-error",
+    "definition": "El primer campo de un grupo no puede ser opcional. El campo tiene <b>{settingName}</b> habilitado, por lo que no puede ser opcional. Deshabilita esta configuración para poder reordenar.",
+    "context": "The first field of a group cannot be optional. The field has <b>{settingName}</b> enabled, so it cannot be optional. Disable this setting to be able to reorder."
   },
   {
     "term": "page.petition-replies.export-pdf",

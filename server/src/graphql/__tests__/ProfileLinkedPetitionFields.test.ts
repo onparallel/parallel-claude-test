@@ -528,6 +528,10 @@ describe("ProfileLinkedPetitionFields", () => {
         expect(errors).toBeUndefined();
         expect(data?.createProfileLinkedPetitionField).toEqual({
           ...property,
+          options: {
+            ...property.options,
+            replyOnlyFromProfile: false,
+          },
           alias: null,
         });
       }

@@ -19,15 +19,18 @@ export interface FieldOptions {
       processDocumentAs: DocumentProcessingType;
     }>;
     processDocument?: boolean;
+    replyOnlyFromProfile?: boolean;
   };
   SHORT_TEXT: {
     placeholder?: Maybe<string>;
     format: Maybe<string>;
     maxLength: Maybe<number>;
+    replyOnlyFromProfile?: boolean;
   };
   TEXT: {
     placeholder?: Maybe<string>;
     maxLength: Maybe<number>;
+    replyOnlyFromProfile?: boolean;
   };
   NUMBER: {
     placeholder?: Maybe<string>;
@@ -38,15 +41,18 @@ export interface FieldOptions {
     decimals: number;
     prefix: Maybe<string>;
     suffix: Maybe<string>;
+    replyOnlyFromProfile?: boolean;
   };
   PHONE: {
     placeholder?: Maybe<string>;
+    replyOnlyFromProfile?: boolean;
   };
   SELECT: {
     values: string[];
     labels?: Maybe<string[]>;
     placeholder?: Maybe<string>;
     standardList?: Maybe<string>;
+    replyOnlyFromProfile?: boolean;
   };
   DYNAMIC_SELECT: {
     values: DynamicSelectOption[];
@@ -67,8 +73,11 @@ export interface FieldOptions {
       max: number;
     };
     standardList?: Maybe<string>;
+    replyOnlyFromProfile?: boolean;
   };
-  DATE: {};
+  DATE: {
+    replyOnlyFromProfile?: boolean;
+  };
   DOW_JONES_KYC: {};
   BACKGROUND_CHECK: {
     integrationId?: string | null;
@@ -79,6 +88,7 @@ export interface FieldOptions {
       type: BackgroundCheckEntitySearchType | null;
       country: string | null;
     } | null;
+    replyOnlyFromProfile?: boolean;
   };
   FIELD_GROUP: {
     groupName?: Maybe<string>;

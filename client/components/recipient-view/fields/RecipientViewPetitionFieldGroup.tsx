@@ -135,7 +135,7 @@ export function RecipientViewPetitionFieldGroup({
                   <RecipientViewPetitionFieldGroupField
                     parentReplyId={group.id}
                     field={{ ...field, replies }}
-                    isDisabled={isDisabled}
+                    isDisabled={isDisabled || field.options.replyOnlyFromProfile === true}
                     onDownloadAttachment={onDownloadAttachment(field.id)}
                     onDeleteReply={onDeleteReply}
                     onUpdateReply={onUpdateReply}

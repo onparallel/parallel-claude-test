@@ -1768,6 +1768,11 @@ export class PetitionRepository extends BaseRepository {
       if (!parent.is_internal && firstChild?.is_internal) {
         throw new Error("FIRST_CHILD_IS_INTERNAL_ERROR");
       }
+      if (firstChild?.profile_type_field_id && firstChild?.options.replyOnlyFromProfile) {
+        // fields with replyOnlyFromProfile enabled are always optional.
+        // This reorder would make it required, so we need to prevent it
+        throw new Error("FIRST_CHILD_IS_REPLY_ONLY_FROM_PROFILE_ERROR");
+      }
     }
 
     try {
@@ -7726,6 +7731,7 @@ export class PetitionRepository extends BaseRepository {
    * based on the field type the value could be an array for creating multiple replies.
    * If no field is found for a given key/alias, that entry is ignored.
    * If the reply is invalid given the field options, it will be ignored.
+   * If the field is configured to be replied only from profile, the reply will be ignored.
    */
   async prefillPetition(petitionId: number, prefill: Record<string, any>, owner: User) {
     const fields = await this.loadAllFieldsByPetitionId(petitionId);
@@ -7839,7 +7845,13 @@ export class PetitionRepository extends BaseRepository {
     prefill: Record<string, any>,
     fields: Pick<
       PetitionField,
-      "id" | "type" | "alias" | "options" | "parent_petition_field_id" | "multiple"
+      | "id"
+      | "type"
+      | "alias"
+      | "options"
+      | "parent_petition_field_id"
+      | "multiple"
+      | "profile_type_field_id"
     >[],
     parentFieldId: number | null = null,
   ) {
@@ -7864,6 +7876,10 @@ export class PetitionRepository extends BaseRepository {
         isFileTypeField(field.type) ||
         ["HEADING", "BACKGROUND_CHECK", "PROFILE_SEARCH"].includes(field.type)
       ) {
+        continue;
+      }
+
+      if (field.options.replyOnlyFromProfile) {
         continue;
       }
 
@@ -8523,7 +8539,11 @@ export class PetitionRepository extends BaseRepository {
       ...zip(fieldsWithParent, fieldsChildReplies),
     ]) {
       if (!field || (!field.multiple && replies.length > 0 && !overwrite)) {
-        return false;
+        return "FIELD_ALREADY_REPLIED";
+      }
+
+      if (field.options.replyOnlyFromProfile === true) {
+        return "REPLY_ONLY_FROM_PROFILE";
       }
     }
 
@@ -8558,6 +8578,18 @@ export class PetitionRepository extends BaseRepository {
       return "REPLY_NOT_FOUND";
     }
 
+    const fields = await this.loadFieldForReply(replyIds);
+    if (
+      fields.some(
+        (f) =>
+          f?.parent_petition_field_id &&
+          f?.profile_type_field_id &&
+          f?.options.replyOnlyFromProfile === true,
+      )
+    ) {
+      return "REPLY_ONLY_FROM_PROFILE";
+    }
+
     const fieldGroupReplies = replies.filter(isNonNullish).filter((r) => r.type === "FIELD_GROUP");
 
     const allReplies = replies;
@@ -8566,6 +8598,7 @@ export class PetitionRepository extends BaseRepository {
       const childFields = await this.loadPetitionFieldChildren(
         fieldGroupReplies.map((r) => r.petition_field_id),
       );
+
       if (childFields.length > 0) {
         const fieldGroupChildReplies = (
           await this.loadPetitionFieldGroupChildReplies.raw(

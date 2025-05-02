@@ -90,6 +90,7 @@ import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
 import usePrevious from "@react-hook/previous";
 import { NativeTypes } from "react-dnd-html5-backend";
+import { AlertPopover } from "../common/AlertPopover";
 import { HelpCenterLink } from "../common/HelpCenterLink";
 import { HelpPopover } from "../common/HelpPopover";
 import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
@@ -906,14 +907,31 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             alignItems="center"
             width="auto"
             height="24px"
-            isDisabled={isReadOnly}
+            isDisabled={isReadOnly || field.options.replyOnlyFromProfile}
           >
+            {field.options.replyOnlyFromProfile ? (
+              <AlertPopover marginEnd={2} marginStart={0}>
+                <Text>
+                  <FormattedMessage
+                    id="component.petition-compose-field.required-disabled-reply-only-from-profile"
+                    defaultMessage='This field is optional because it is only pre-filled from profile and cannot be completed by recipients. To make it required, you need to disable the <b>"{settingName}"</b> option in the field settings.'
+                    values={{
+                      settingName: intl.formatMessage({
+                        id: "component.petition-compose-field-settings.reply-only-from-profile-label",
+                        defaultMessage: "Only pre-filled from profile",
+                      }),
+                    }}
+                  />
+                </Text>
+              </AlertPopover>
+            ) : null}
             <FormLabel htmlFor={`field-required-${field.id}`} fontWeight="normal" marginBottom="0">
               <FormattedMessage
                 id="component.petition-compose-field.required-label"
                 defaultMessage="Required"
               />
             </FormLabel>
+
             <Switch
               data-testid="compose-field-required"
               id={`field-required-${field.id}`}
@@ -942,7 +960,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                   onFieldEdit({ optional: !event.target.checked });
                 }
               }}
-              isDisabled={isReadOnly || index === 0}
+              isDisabled={isReadOnly || index === 0 || field.options.replyOnlyFromProfile}
             />
           </FormControl>
         )}

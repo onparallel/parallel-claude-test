@@ -4618,6 +4618,86 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
       expect(data).toBeNull();
     });
+
+    it("omits replies for fields with replyOnlyFromProfile enabled", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        multiple: true,
+        type: "FIELD_GROUP",
+        alias: "field_group",
+      }));
+      await mocks.createRandomPetitionFields(petition.id, 2, (i) => ({
+        parent_petition_field_id: fieldGroup.id,
+        type: "SHORT_TEXT",
+        alias: `child_${i}`,
+        options: { replyOnlyFromProfile: i === 1 },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $replies: JSONObject!) {
+            bulkCreatePetitionReplies(petitionId: $petitionId, replies: $replies) {
+              id
+              fields {
+                alias
+                replies {
+                  id
+                  children {
+                    field {
+                      alias
+                    }
+                    replies {
+                      content
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replies: {
+            field_group: [
+              {
+                child_0: "Hello",
+                child_1: "World",
+              },
+              {
+                child_0: "Goodbye",
+                child_1: "World",
+              },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.bulkCreatePetitionReplies).toEqual({
+        id: toGlobalId("Petition", petition.id),
+        fields: [
+          {
+            alias: "field_group",
+            replies: [
+              {
+                id: expect.any(String),
+                children: [
+                  { field: { alias: "child_0" }, replies: [{ content: { value: "Hello" } }] },
+                  { field: { alias: "child_1" }, replies: [] },
+                ],
+              },
+              {
+                id: expect.any(String),
+                children: [
+                  { field: { alias: "child_0" }, replies: [{ content: { value: "Goodbye" } }] },
+                  { field: { alias: "child_1" }, replies: [] },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+    });
   });
 
   describe("createPetitionFieldReplies", () => {
@@ -6523,6 +6603,49 @@ describe("GraphQL/Petition Field Replies", () => {
       );
 
       expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to submit a reply on a field with replyOnlyFromProfile enabled", async () => {
+      await mocks.knex
+        .from("petition_field")
+        .where("id", fieldGroupChildren[0].id)
+        .update({
+          options: { replyOnlyFromProfile: true },
+        });
+
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", fieldGroupChildren[0].id),
+              parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+              content: { value: "My reply" },
+            },
+          ],
+        },
+      );
+
+      await mocks.knex
+        .from("petition_field")
+        .where("id", fieldGroupChildren[0].id)
+        .update({
+          options: { replyOnlyFromProfile: false },
+        });
+
+      expect(errors).toContainGraphQLError("REPLY_ONLY_FROM_PROFILE_ERROR");
       expect(data).toBeNull();
     });
   });

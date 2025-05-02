@@ -111,7 +111,7 @@ export function PetitionComposeNumberSettings({
 
   return (
     <>
-      <FormControl as={HStack} flex={1} isDisabled={isReadOnly}>
+      <FormControl as={HStack} flex={1} isDisabled={isReadOnly || field.isLinkedToProfileTypeField}>
         <FormLabel margin={0} fontWeight="normal">
           <FormattedMessage
             id="component.field-settings-number.decimals"
@@ -140,7 +140,10 @@ export function PetitionComposeNumberSettings({
           </NumberInput>
         </Box>
       </FormControl>
-      <FormControl isInvalid={isRangeInvalid} isDisabled={isReadOnly}>
+      <FormControl
+        isInvalid={isRangeInvalid}
+        isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
+      >
         <FormLabel display="flex" alignItems="center" fontWeight="normal" marginBottom={2}>
           <FormattedMessage
             id="component.field-settings-number.limit-range"

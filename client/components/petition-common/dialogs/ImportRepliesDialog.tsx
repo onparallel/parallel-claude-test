@@ -114,7 +114,10 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
       }));
 
     const filteredFields = allFields.filter(
-      (f) => !excludedFieldsTarget.includes(f.type) && mapping[f.id] === undefined,
+      (f) =>
+        !excludedFieldsTarget.includes(f.type) &&
+        mapping[f.id] === undefined &&
+        !f.options.replyOnlyFromProfile,
     );
     const filteredSourceFields = sourcePetitionFields.filter(
       (f) => !excludedFieldsOrigin.includes(f.type),

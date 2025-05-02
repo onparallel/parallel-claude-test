@@ -242,10 +242,16 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
         true,
       );
 
-      if (!canBeReplied) {
+      if (canBeReplied === "FIELD_ALREADY_REPLIED") {
         throw new ApolloError(
           "The field is already replied and does not accept multiple replies",
           "FIELD_ALREADY_REPLIED_ERROR",
+        );
+      }
+      if (canBeReplied === "REPLY_ONLY_FROM_PROFILE") {
+        throw new ApolloError(
+          "The field can only be replied to from a profile",
+          "REPLY_ONLY_FROM_PROFILE_ERROR",
         );
       }
 

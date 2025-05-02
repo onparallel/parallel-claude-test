@@ -220,6 +220,9 @@ export const MapFieldsTable = Object.assign(
             isReadOnly
             alias
             fromPetitionFieldId
+            profileTypeField {
+              id
+            }
             replies {
               ...MapFieldsTable_PetitionFieldReply
             }
@@ -311,6 +314,10 @@ function TableRow({
       const originFieldIsChild = f.parent?.id !== undefined;
       const isChildSelectedParent = f.parent?.id === parentFieldMatchedFieldId;
 
+      if (field.options.replyOnlyFromProfile) {
+        return field.profileTypeField?.id === f.profileTypeField?.id;
+      }
+
       return (
         !excludedFieldsOrigin.includes(f.type) &&
         isReplyContentCompatible(field, f) &&
@@ -340,7 +347,8 @@ function TableRow({
   const isFieldDisabled =
     (fieldHasReplies && !allowOverwrite && !field.multiple && !targetFieldIsChild) ||
     replyIsApproved ||
-    !hasFields;
+    !hasFields ||
+    field.options.replyOnlyFromProfile;
 
   const alertOrArrow =
     allowOverwrite && fieldHasReplies && !field.multiple ? (
@@ -405,6 +413,17 @@ function TableRow({
                     <FormattedMessage
                       id="component.map-fields-table.no-compatible-fields-alert"
                       defaultMessage="You cannot import replies to this field because no compatible fields have been found."
+                    />
+                  ) : field.options.replyOnlyFromProfile ? (
+                    <FormattedMessage
+                      id="component.map-fields-table.disabled-because-settings"
+                      defaultMessage='New answers cannot be imported into this field because it has the <b>"{settingName}"</b> setting enabled.'
+                      values={{
+                        settingName: intl.formatMessage({
+                          id: "component.petition-compose-field-settings.reply-only-from-profile-label",
+                          defaultMessage: "Only pre-filled from profile",
+                        }),
+                      }}
                     />
                   ) : (
                     <FormattedMessage

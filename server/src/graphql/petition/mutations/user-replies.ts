@@ -825,6 +825,11 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
           `The reply has been approved and cannot be updated.`,
           "REPLY_ALREADY_APPROVED_ERROR",
         );
+      } else if (updateCheck === "REPLY_ONLY_FROM_PROFILE") {
+        throw new ApolloError(
+          `The reply can only be updated from a profile`,
+          "REPLY_ONLY_FROM_PROFILE_ERROR",
+        );
       } else if (updateCheck === "REPLY_NOT_FOUND") {
         throw new ForbiddenError("FORBIDDEN");
       }

@@ -30,10 +30,11 @@ export function PetitionComposeShortTextSettings({
               defaultMessage="Format"
             />
           }
+          isDisabled={isNonNullish(field.profileTypeField?.options?.format) || isReadOnly}
         >
           <Box flex={1}>
             <ShortTextFormatSelect
-              isDisabled={isNonNullish(field.profileTypeField?.options?.format)}
+              isDisabled={isNonNullish(field.profileTypeField?.options?.format) || isReadOnly}
               size="sm"
               data-testid="petition-compose-short-text-format-select"
               value={options.format}

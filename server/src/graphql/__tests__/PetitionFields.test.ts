@@ -4541,7 +4541,7 @@ describe("GraphQL/Petition Fields", () => {
         type: "SHORT_TEXT",
         parent_petition_field_id: fields[5].id,
         profile_type_field_id: emailProfileTypeField.id,
-        options: { maxLength: 10000 },
+        options: { maxLength: 10000, replyOnlyFromProfile: false },
       }));
 
       const { errors, data } = await testClient.execute(
@@ -4568,6 +4568,7 @@ describe("GraphQL/Petition Fields", () => {
         options: {
           format: "IBAN",
           maxLength: 10000,
+          replyOnlyFromProfile: false,
         },
       });
     });

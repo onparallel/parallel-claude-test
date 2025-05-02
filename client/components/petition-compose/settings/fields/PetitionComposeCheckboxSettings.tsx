@@ -173,6 +173,7 @@ export function PetitionComposeCheckboxSettings({
           </Stack>
         }
         controlId="list-of-options"
+        isDisabled={field.isLinkedToProfileTypeField || isReadOnly}
       >
         <Box flex={1}>
           <StandardListSelect

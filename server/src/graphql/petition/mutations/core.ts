@@ -586,6 +586,11 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
             "First child of an external field cannot be internal",
             "FIRST_CHILD_IS_INTERNAL_ERROR",
           );
+        } else if (e.message === "FIRST_CHILD_IS_REPLY_ONLY_FROM_PROFILE_ERROR") {
+          throw new ApolloError(
+            "First child of a field group cannot be optional",
+            "FIRST_CHILD_IS_REPLY_ONLY_FROM_PROFILE_ERROR",
+          );
         }
       }
       throw e;
@@ -1296,6 +1301,16 @@ export const deletePetitionField = mutationField("deletePetitionField", {
           "FIRST_CHILD_IS_INTERNAL_ERROR",
         );
       }
+      if (
+        secondChild?.profile_type_field_id &&
+        secondChild?.options.replyOnlyFromProfile &&
+        secondChild?.optional
+      ) {
+        throw new ApolloError(
+          "First child of a field group cannot be optional",
+          "FIRST_CHILD_IS_REPLY_ONLY_FROM_PROFILE_ERROR",
+        );
+      }
     }
 
     if (!args.force) {
@@ -1361,6 +1376,26 @@ export const updatePetitionField = mutationField("updatePetitionField", {
         args.data.options?.values ??
         args.data.options?.labels,
       not(fieldIsLinkedToProfileTypeField("fieldId")),
+    ),
+    ifArgDefined(
+      (args) => args.data.options?.replyOnlyFromProfile,
+      and(
+        fieldHasType("fieldId", [
+          // support only field types that can be linked to a profile type field
+          // these fields have an equivalent ProfileTypeFieldType
+          "SHORT_TEXT",
+          "TEXT",
+          "NUMBER",
+          "DATE",
+          "PHONE",
+          "FILE_UPLOAD",
+          "SELECT",
+          "CHECKBOX",
+          "BACKGROUND_CHECK",
+        ]),
+        fieldIsLinkedToProfileTypeField("fieldId"),
+        fieldIsNotFirstChild("fieldId"),
+      ),
     ),
     ifArgNotUndefined(
       (args) => args.data.options?.format,
@@ -3272,6 +3307,11 @@ export const unlinkPetitionFieldChildren = mutationField("unlinkPetitionFieldChi
           throw new ApolloError(
             "First child of an external field cannot be internal",
             "FIRST_CHILD_IS_INTERNAL_ERROR",
+          );
+        } else if (error.message === "FIRST_CHILD_IS_REPLY_ONLY_FROM_PROFILE_ERROR") {
+          throw new ApolloError(
+            "First child of a field group cannot be optional",
+            "FIRST_CHILD_IS_REPLY_ONLY_FROM_PROFILE_ERROR",
           );
         }
       }

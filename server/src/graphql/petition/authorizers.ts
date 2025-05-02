@@ -209,10 +209,18 @@ export function fieldCanBeReplied<
         : (getArg(args, overWriteArg) ?? false)
       : false;
 
-    if (!(await ctx.petitions.fieldsCanBeReplied(_fields, overwriteExisting))) {
+    const canBeReplied = await ctx.petitions.fieldsCanBeReplied(_fields, overwriteExisting);
+
+    if (canBeReplied === "FIELD_ALREADY_REPLIED") {
       throw new ApolloError(
         "The field is already replied and does not accept multiple replies",
         "FIELD_ALREADY_REPLIED_ERROR",
+      );
+    }
+    if (canBeReplied === "REPLY_ONLY_FROM_PROFILE") {
+      throw new ApolloError(
+        "The field can only be replied to from a profile",
+        "REPLY_ONLY_FROM_PROFILE_ERROR",
       );
     }
 
@@ -610,6 +618,13 @@ export function replyCanBeUpdated<
       throw new ApolloError(
         `The reply has been approved and cannot be updated.`,
         "REPLY_ALREADY_APPROVED_ERROR",
+      );
+    }
+
+    if (result === "REPLY_ONLY_FROM_PROFILE") {
+      throw new ApolloError(
+        `The reply can only be updated from a profile`,
+        "REPLY_ONLY_FROM_PROFILE_ERROR",
       );
     }
 

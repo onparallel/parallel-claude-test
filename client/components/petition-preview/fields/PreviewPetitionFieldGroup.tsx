@@ -346,7 +346,7 @@ export function PreviewPetitionFieldGroup({
                       parentReplyId={group.id}
                       field={{ ...field, replies }}
                       petition={petition}
-                      isDisabled={isDisabled}
+                      isDisabled={isDisabled || field.options.replyOnlyFromProfile === true}
                       isCacheOnly={isCacheOnly}
                       onDownloadAttachment={onDownloadAttachment(field.id)}
                       onDeleteReply={onDeleteReply}

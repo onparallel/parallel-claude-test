@@ -7757,6 +7757,7 @@ export type MapFieldsTable_PetitionFieldFragment = {
     alias?: string | null;
     fromPetitionFieldId?: string | null;
     isChild: boolean;
+    profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -7773,6 +7774,7 @@ export type MapFieldsTable_PetitionFieldFragment = {
     parent?: { __typename?: "PetitionField"; id: string } | null;
     children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
   }> | null;
+  profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -7802,6 +7804,7 @@ export type MapFieldsTable_PetitionFieldDataFragment = {
   alias?: string | null;
   fromPetitionFieldId?: string | null;
   isChild: boolean;
+  profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -7848,6 +7851,7 @@ export type MapFieldsTable_PetitionBase_Petition_Fragment = {
       alias?: string | null;
       fromPetitionFieldId?: string | null;
       isChild: boolean;
+      profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
       replies: Array<{
         __typename?: "PetitionFieldReply";
         id: string;
@@ -7865,6 +7869,7 @@ export type MapFieldsTable_PetitionBase_Petition_Fragment = {
       children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
+    profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -7910,6 +7915,7 @@ export type MapFieldsTable_PetitionBase_PetitionTemplate_Fragment = {
       alias?: string | null;
       fromPetitionFieldId?: string | null;
       isChild: boolean;
+      profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
       replies: Array<{
         __typename?: "PetitionFieldReply";
         id: string;
@@ -7927,6 +7933,7 @@ export type MapFieldsTable_PetitionBase_PetitionTemplate_Fragment = {
       children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
+    profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -20117,6 +20124,7 @@ export type ImportRepliesDialog_petitionQuery = {
               }> | null;
               field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
             }>;
+            profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
           }> | null;
           replies: Array<{
@@ -20138,6 +20146,7 @@ export type ImportRepliesDialog_petitionQuery = {
             id: string;
             replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
           } | null;
+          profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
         }>;
       }
     | {
@@ -20188,6 +20197,7 @@ export type ImportRepliesDialog_petitionQuery = {
               }> | null;
               field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
             }>;
+            profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
             children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
           }> | null;
           replies: Array<{
@@ -20209,6 +20219,7 @@ export type ImportRepliesDialog_petitionQuery = {
             id: string;
             replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
           } | null;
+          profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
         }>;
       }
     | null;
@@ -25444,6 +25455,7 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   title?: string | null;
   multiple: boolean;
   options: { [key: string]: any };
+  optional: boolean;
   isInternal: boolean;
   isReadOnly: boolean;
   showInPdf: boolean;
@@ -25456,7 +25468,6 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   isLinkedToProfileType: boolean;
   isLinkedToProfileTypeField: boolean;
   visibility?: { [key: string]: any } | null;
-  optional: boolean;
   isChild: boolean;
   parent?: {
     __typename?: "PetitionField";
@@ -47884,11 +47895,11 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     isInternal: boolean;
     multiple: boolean;
     isChild: boolean;
+    optional: boolean;
     showInPdf: boolean;
     showActivityInPdf: boolean;
     position: number;
     hasCommentsEnabled: boolean;
-    optional: boolean;
     description?: string | null;
     children?: Array<{
       __typename?: "PetitionField";
@@ -47903,6 +47914,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       isInternal: boolean;
       isReadOnly: boolean;
       isChild: boolean;
+      optional: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
       isFixed: boolean;
@@ -47911,7 +47923,6 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       requireApproval: boolean;
       isLinkedToProfileType: boolean;
       math?: Array<{ [key: string]: any }> | null;
-      optional: boolean;
       description?: string | null;
       parent?: {
         __typename?: "PetitionField";
@@ -48210,13 +48221,13 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     isChild: boolean;
     isInternal: boolean;
     isLinkedToProfileTypeField: boolean;
+    optional: boolean;
     showInPdf: boolean;
     showActivityInPdf: boolean;
     position: number;
     hasCommentsEnabled: boolean;
     requireApproval: boolean;
     isLinkedToProfileType: boolean;
-    optional: boolean;
     description?: string | null;
     children?: Array<{
       __typename?: "PetitionField";
@@ -48231,6 +48242,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       isInternal: boolean;
       isReadOnly: boolean;
       isChild: boolean;
+      optional: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
       isFixed: boolean;
@@ -48239,7 +48251,6 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       requireApproval: boolean;
       isLinkedToProfileType: boolean;
       math?: Array<{ [key: string]: any }> | null;
-      optional: boolean;
       description?: string | null;
       parent?: {
         __typename?: "PetitionField";
@@ -48536,13 +48547,13 @@ export type PetitionCompose_PetitionFieldFragment = {
   isChild: boolean;
   isLinkedToProfileTypeField: boolean;
   multiple: boolean;
+  optional: boolean;
   showInPdf: boolean;
   showActivityInPdf: boolean;
   position: number;
   hasCommentsEnabled: boolean;
   requireApproval: boolean;
   isLinkedToProfileType: boolean;
-  optional: boolean;
   description?: string | null;
   parent?: {
     __typename?: "PetitionField";
@@ -48564,6 +48575,7 @@ export type PetitionCompose_PetitionFieldFragment = {
     isInternal: boolean;
     isChild: boolean;
     isLinkedToProfileTypeField: boolean;
+    optional: boolean;
     isReadOnly: boolean;
     showInPdf: boolean;
     showActivityInPdf: boolean;
@@ -48573,7 +48585,6 @@ export type PetitionCompose_PetitionFieldFragment = {
     requireApproval: boolean;
     isLinkedToProfileType: boolean;
     visibility?: { [key: string]: any } | null;
-    optional: boolean;
     description?: string | null;
     math?: Array<{ [key: string]: any }> | null;
     parent?: {
@@ -48663,13 +48674,13 @@ export type PetitionCompose_updatePetitionFieldFragment = {
   isChild: boolean;
   isLinkedToProfileTypeField: boolean;
   multiple: boolean;
+  optional: boolean;
   showInPdf: boolean;
   showActivityInPdf: boolean;
   position: number;
   hasCommentsEnabled: boolean;
   requireApproval: boolean;
   isLinkedToProfileType: boolean;
-  optional: boolean;
   description?: string | null;
   petition:
     | { __typename?: "Petition"; status: PetitionStatus; id: string; lastChangeAt: string }
@@ -48694,6 +48705,7 @@ export type PetitionCompose_updatePetitionFieldFragment = {
     isInternal: boolean;
     isChild: boolean;
     isLinkedToProfileTypeField: boolean;
+    optional: boolean;
     isReadOnly: boolean;
     showInPdf: boolean;
     showActivityInPdf: boolean;
@@ -48703,7 +48715,6 @@ export type PetitionCompose_updatePetitionFieldFragment = {
     requireApproval: boolean;
     isLinkedToProfileType: boolean;
     visibility?: { [key: string]: any } | null;
-    optional: boolean;
     description?: string | null;
     math?: Array<{ [key: string]: any }> | null;
     parent?: {
@@ -49445,13 +49456,13 @@ export type PetitionCompose_createPetitionFieldMutation = {
     isChild: boolean;
     isLinkedToProfileTypeField: boolean;
     multiple: boolean;
+    optional: boolean;
     showInPdf: boolean;
     showActivityInPdf: boolean;
     position: number;
     hasCommentsEnabled: boolean;
     requireApproval: boolean;
     isLinkedToProfileType: boolean;
-    optional: boolean;
     description?: string | null;
     petition:
       | {
@@ -49602,6 +49613,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
       isInternal: boolean;
       isChild: boolean;
       isLinkedToProfileTypeField: boolean;
+      optional: boolean;
       isReadOnly: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
@@ -49611,7 +49623,6 @@ export type PetitionCompose_createPetitionFieldMutation = {
       requireApproval: boolean;
       isLinkedToProfileType: boolean;
       visibility?: { [key: string]: any } | null;
-      optional: boolean;
       description?: string | null;
       math?: Array<{ [key: string]: any }> | null;
       parent?: {
@@ -49746,13 +49757,13 @@ export type PetitionCompose_clonePetitionFieldMutation = {
     isChild: boolean;
     isLinkedToProfileTypeField: boolean;
     multiple: boolean;
+    optional: boolean;
     showInPdf: boolean;
     showActivityInPdf: boolean;
     position: number;
     hasCommentsEnabled: boolean;
     requireApproval: boolean;
     isLinkedToProfileType: boolean;
-    optional: boolean;
     description?: string | null;
     petition:
       | {
@@ -49903,6 +49914,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
       isInternal: boolean;
       isChild: boolean;
       isLinkedToProfileTypeField: boolean;
+      optional: boolean;
       isReadOnly: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
@@ -49912,7 +49924,6 @@ export type PetitionCompose_clonePetitionFieldMutation = {
       requireApproval: boolean;
       isLinkedToProfileType: boolean;
       visibility?: { [key: string]: any } | null;
-      optional: boolean;
       description?: string | null;
       math?: Array<{ [key: string]: any }> | null;
       parent?: {
@@ -50109,13 +50120,13 @@ export type PetitionCompose_updatePetitionFieldMutation = {
     isChild: boolean;
     isLinkedToProfileTypeField: boolean;
     multiple: boolean;
+    optional: boolean;
     showInPdf: boolean;
     showActivityInPdf: boolean;
     position: number;
     hasCommentsEnabled: boolean;
     requireApproval: boolean;
     isLinkedToProfileType: boolean;
-    optional: boolean;
     description?: string | null;
     petition:
       | { __typename?: "Petition"; status: PetitionStatus; id: string; lastChangeAt: string }
@@ -50144,6 +50155,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
       isInternal: boolean;
       isChild: boolean;
       isLinkedToProfileTypeField: boolean;
+      optional: boolean;
       isReadOnly: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
@@ -50153,7 +50165,6 @@ export type PetitionCompose_updatePetitionFieldMutation = {
       requireApproval: boolean;
       isLinkedToProfileType: boolean;
       visibility?: { [key: string]: any } | null;
-      optional: boolean;
       description?: string | null;
       math?: Array<{ [key: string]: any }> | null;
       parent?: {
@@ -50252,13 +50263,13 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
     isChild: boolean;
     isLinkedToProfileTypeField: boolean;
     multiple: boolean;
+    optional: boolean;
     showInPdf: boolean;
     showActivityInPdf: boolean;
     position: number;
     hasCommentsEnabled: boolean;
     requireApproval: boolean;
     isLinkedToProfileType: boolean;
-    optional: boolean;
     description?: string | null;
     petition:
       | { __typename?: "Petition"; status: PetitionStatus; id: string; lastChangeAt: string }
@@ -50287,6 +50298,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
       isInternal: boolean;
       isChild: boolean;
       isLinkedToProfileTypeField: boolean;
+      optional: boolean;
       isReadOnly: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
@@ -50296,7 +50308,6 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
       requireApproval: boolean;
       isLinkedToProfileType: boolean;
       visibility?: { [key: string]: any } | null;
-      optional: boolean;
       description?: string | null;
       math?: Array<{ [key: string]: any }> | null;
       parent?: {
@@ -50395,13 +50406,13 @@ export type PetitionCompose_linkPetitionFieldChildrenMutation = {
     isChild: boolean;
     isLinkedToProfileTypeField: boolean;
     multiple: boolean;
+    optional: boolean;
     showInPdf: boolean;
     showActivityInPdf: boolean;
     position: number;
     hasCommentsEnabled: boolean;
     requireApproval: boolean;
     isLinkedToProfileType: boolean;
-    optional: boolean;
     description?: string | null;
     petition:
       | {
@@ -50440,6 +50451,7 @@ export type PetitionCompose_linkPetitionFieldChildrenMutation = {
       isInternal: boolean;
       isChild: boolean;
       isLinkedToProfileTypeField: boolean;
+      optional: boolean;
       isReadOnly: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
@@ -50449,7 +50461,6 @@ export type PetitionCompose_linkPetitionFieldChildrenMutation = {
       requireApproval: boolean;
       isLinkedToProfileType: boolean;
       visibility?: { [key: string]: any } | null;
-      optional: boolean;
       description?: string | null;
       math?: Array<{ [key: string]: any }> | null;
       parent?: {
@@ -50548,13 +50559,13 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
     isChild: boolean;
     isLinkedToProfileTypeField: boolean;
     multiple: boolean;
+    optional: boolean;
     showInPdf: boolean;
     showActivityInPdf: boolean;
     position: number;
     hasCommentsEnabled: boolean;
     requireApproval: boolean;
     isLinkedToProfileType: boolean;
-    optional: boolean;
     description?: string | null;
     petition:
       | {
@@ -50603,6 +50614,7 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
       isInternal: boolean;
       isChild: boolean;
       isLinkedToProfileTypeField: boolean;
+      optional: boolean;
       isReadOnly: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
@@ -50612,7 +50624,6 @@ export type PetitionCompose_unlinkPetitionFieldChildrenMutation = {
       requireApproval: boolean;
       isLinkedToProfileType: boolean;
       visibility?: { [key: string]: any } | null;
-      optional: boolean;
       description?: string | null;
       math?: Array<{ [key: string]: any }> | null;
       parent?: {
@@ -50711,6 +50722,7 @@ export type PetitionCompose_createProfileLinkedPetitionFieldMutation = {
     alias?: string | null;
     isChild: boolean;
     multiple: boolean;
+    optional: boolean;
     showInPdf: boolean;
     showActivityInPdf: boolean;
     position: number;
@@ -50718,7 +50730,6 @@ export type PetitionCompose_createProfileLinkedPetitionFieldMutation = {
     requireApproval: boolean;
     isLinkedToProfileType: boolean;
     description?: string | null;
-    optional: boolean;
     petition:
       | {
           __typename?: "Petition";
@@ -50868,6 +50879,7 @@ export type PetitionCompose_createProfileLinkedPetitionFieldMutation = {
       isInternal: boolean;
       isChild: boolean;
       isLinkedToProfileTypeField: boolean;
+      optional: boolean;
       isReadOnly: boolean;
       showInPdf: boolean;
       showActivityInPdf: boolean;
@@ -50877,7 +50889,6 @@ export type PetitionCompose_createProfileLinkedPetitionFieldMutation = {
       requireApproval: boolean;
       isLinkedToProfileType: boolean;
       visibility?: { [key: string]: any } | null;
-      optional: boolean;
       description?: string | null;
       math?: Array<{ [key: string]: any }> | null;
       parent?: {
@@ -51236,11 +51247,11 @@ export type PetitionCompose_petitionQuery = {
           isInternal: boolean;
           multiple: boolean;
           isChild: boolean;
+          optional: boolean;
           showInPdf: boolean;
           showActivityInPdf: boolean;
           position: number;
           hasCommentsEnabled: boolean;
-          optional: boolean;
           description?: string | null;
           children?: Array<{
             __typename?: "PetitionField";
@@ -51255,6 +51266,7 @@ export type PetitionCompose_petitionQuery = {
             isInternal: boolean;
             isReadOnly: boolean;
             isChild: boolean;
+            optional: boolean;
             showInPdf: boolean;
             showActivityInPdf: boolean;
             isFixed: boolean;
@@ -51263,7 +51275,6 @@ export type PetitionCompose_petitionQuery = {
             requireApproval: boolean;
             isLinkedToProfileType: boolean;
             math?: Array<{ [key: string]: any }> | null;
-            optional: boolean;
             description?: string | null;
             parent?: {
               __typename?: "PetitionField";
@@ -51589,13 +51600,13 @@ export type PetitionCompose_petitionQuery = {
           isChild: boolean;
           isInternal: boolean;
           isLinkedToProfileTypeField: boolean;
+          optional: boolean;
           showInPdf: boolean;
           showActivityInPdf: boolean;
           position: number;
           hasCommentsEnabled: boolean;
           requireApproval: boolean;
           isLinkedToProfileType: boolean;
-          optional: boolean;
           description?: string | null;
           children?: Array<{
             __typename?: "PetitionField";
@@ -51610,6 +51621,7 @@ export type PetitionCompose_petitionQuery = {
             isInternal: boolean;
             isReadOnly: boolean;
             isChild: boolean;
+            optional: boolean;
             showInPdf: boolean;
             showActivityInPdf: boolean;
             isFixed: boolean;
@@ -51618,7 +51630,6 @@ export type PetitionCompose_petitionQuery = {
             requireApproval: boolean;
             isLinkedToProfileType: boolean;
             math?: Array<{ [key: string]: any }> | null;
-            optional: boolean;
             description?: string | null;
             parent?: {
               __typename?: "PetitionField";
@@ -67528,6 +67539,9 @@ export const MapFieldsTable_PetitionFieldDataFragmentDoc = gql`
     isReadOnly
     alias
     fromPetitionFieldId
+    profileTypeField {
+      id
+    }
     replies {
       ...MapFieldsTable_PetitionFieldReply
     }
@@ -73665,6 +73679,7 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
     title
     multiple
     options
+    optional
     isInternal
     isReadOnly
     showInPdf

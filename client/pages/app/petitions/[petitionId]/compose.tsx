@@ -510,27 +510,38 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               ),
             });
           } else if (isApolloError(e, "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR")) {
-            await withError(
-              showErrorDialog({
-                message: (
-                  <FormattedMessage
-                    id="generic.first-child-visibility-conditions-error"
-                    defaultMessage="You cannot set conditions for the first field in a group."
-                  />
-                ),
-              }),
-            );
+            await showErrorDialog.ignoringDialogErrors({
+              message: (
+                <FormattedMessage
+                  id="generic.first-child-visibility-conditions-error"
+                  defaultMessage="You cannot set conditions for the first field in a group."
+                />
+              ),
+            });
           } else if (isApolloError(e, "FIRST_CHILD_IS_INTERNAL_ERROR")) {
-            await withError(
-              showErrorDialog({
-                message: (
-                  <FormattedMessage
-                    id="generic.first-child-is-internal-error"
-                    defaultMessage="The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
-                  />
-                ),
-              }),
-            );
+            await showErrorDialog.ignoringDialogErrors({
+              message: (
+                <FormattedMessage
+                  id="generic.first-child-is-internal-error"
+                  defaultMessage="The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
+                />
+              ),
+            });
+          } else if (isApolloError(e, "FIRST_CHILD_IS_REPLY_ONLY_FROM_PROFILE_ERROR")) {
+            await showErrorDialog.ignoringDialogErrors({
+              message: (
+                <FormattedMessage
+                  id="page.petition-compose.first-child-is-reply-only-from-profile-error"
+                  defaultMessage="The first field of a group cannot be optional. The field has <b>{settingName}</b> enabled, so it cannot be optional. Disable this setting to be able to reorder."
+                  values={{
+                    settingName: intl.formatMessage({
+                      id: "component.petition-compose-field-settings.reply-only-from-profile-label",
+                      defaultMessage: "Only pre-filled from profile",
+                    }),
+                  }}
+                />
+              ),
+            });
           } else {
             // throw error to show compose generic error dialog
             throw e;
@@ -579,16 +590,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         (field.children![0].type === "DOW_JONES_KYC" ||
           field.children![0].type === "BACKGROUND_CHECK")
       ) {
-        await withError(
-          showErrorDialog({
-            message: (
-              <FormattedMessage
-                id="generic.dow-jones-kyc-external-error"
-                defaultMessage="A Dow Jones field can't be set as external. Remove if from the group or move it to another position and try again."
-              />
-            ),
-          }),
-        );
+        await showErrorDialog.ignoringDialogErrors({
+          message: (
+            <FormattedMessage
+              id="generic.dow-jones-kyc-external-error"
+              defaultMessage="A Dow Jones field can't be set as external. Remove if from the group or move it to another position and try again."
+            />
+          ),
+        });
         return;
       }
       if (data.multiple === false) {
@@ -1140,38 +1149,32 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             await linkField(true);
           } catch {}
         } else if (isApolloError(error, "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR")) {
-          await withError(
-            showErrorDialog({
-              message: (
-                <FormattedMessage
-                  id="generic.first-child-visibility-conditions-error"
-                  defaultMessage="You cannot set conditions for the first field in a group."
-                />
-              ),
-            }),
-          );
+          await showErrorDialog.ignoringDialogErrors({
+            message: (
+              <FormattedMessage
+                id="generic.first-child-visibility-conditions-error"
+                defaultMessage="You cannot set conditions for the first field in a group."
+              />
+            ),
+          });
         } else if (isApolloError(error, "FIRST_CHILD_IS_INTERNAL_ERROR")) {
-          await withError(
-            showErrorDialog({
-              message: (
-                <FormattedMessage
-                  id="generic.first-child-is-internal-error"
-                  defaultMessage="The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
-                />
-              ),
-            }),
-          );
+          await showErrorDialog.ignoringDialogErrors({
+            message: (
+              <FormattedMessage
+                id="generic.first-child-is-internal-error"
+                defaultMessage="The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
+              />
+            ),
+          });
         } else if (isApolloError(error, "INVALID_FIELD_CONDITIONS_ORDER")) {
-          await withError(
-            showErrorDialog({
-              message: (
-                <FormattedMessage
-                  id="generic.invalid-field-conditions-error"
-                  defaultMessage="You can only move fields so that visibility and calculations conditions refer only to previous fields."
-                />
-              ),
-            }),
-          );
+          await showErrorDialog.ignoringDialogErrors({
+            message: (
+              <FormattedMessage
+                id="generic.invalid-field-conditions-error"
+                defaultMessage="You can only move fields so that visibility and calculations conditions refer only to previous fields."
+              />
+            ),
+          });
         } else {
           throw error;
         }
@@ -1224,22 +1227,35 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             await unlinkChild(true);
           } catch {}
         } else if (isApolloError(error, "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR")) {
-          await withError(
-            showErrorDialog({
-              message: (
-                <FormattedMessage
-                  id="generic.first-child-visibility-conditions-error"
-                  defaultMessage="You cannot set conditions for the first field in a group."
-                />
-              ),
-            }),
-          );
+          await showErrorDialog.ignoringDialogErrors({
+            message: (
+              <FormattedMessage
+                id="generic.first-child-visibility-conditions-error"
+                defaultMessage="You cannot set conditions for the first field in a group."
+              />
+            ),
+          });
         } else if (isApolloError(error, "FIRST_CHILD_IS_INTERNAL_ERROR")) {
           await showErrorDialog.ignoringDialogErrors({
             message: (
               <FormattedMessage
                 id="generic.first-child-is-internal-error"
                 defaultMessage="The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
+              />
+            ),
+          });
+        } else if (isApolloError(error, "FIRST_CHILD_IS_REPLY_ONLY_FROM_PROFILE_ERROR")) {
+          await showErrorDialog.ignoringDialogErrors({
+            message: (
+              <FormattedMessage
+                id="page.petition-compose.first-child-is-reply-only-from-profile-error"
+                defaultMessage="The first field of a group cannot be optional. The field has <b>{settingName}</b> enabled, so it cannot be optional. Disable this setting to be able to reorder."
+                values={{
+                  settingName: intl.formatMessage({
+                    id: "component.petition-compose-field-settings.reply-only-from-profile-label",
+                    defaultMessage: "Only pre-filled from profile",
+                  }),
+                }}
               />
             ),
           });

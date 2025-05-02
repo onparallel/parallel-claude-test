@@ -84,6 +84,7 @@ export function ImportOptionsSettingsRow({
         />
       }
       controlId="import-options-excel"
+      isDisabled={isDisabled}
     >
       <Box>
         <Button

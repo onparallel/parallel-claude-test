@@ -39,12 +39,19 @@ const SCHEMAS = {
       suffix: {
         type: ["string", "null"],
       },
+      replyOnlyFromProfile: {
+        type: "boolean",
+      },
     },
   },
   DATE: {
     type: "object",
     additionalProperties: false,
-    properties: {},
+    properties: {
+      replyOnlyFromProfile: {
+        type: "boolean",
+      },
+    },
   },
   DATE_TIME: {
     type: "object",
@@ -59,6 +66,9 @@ const SCHEMAS = {
       placeholder: {
         type: ["string", "null"],
       },
+      replyOnlyFromProfile: {
+        type: "boolean",
+      },
     },
   },
   TEXT: {
@@ -71,6 +81,9 @@ const SCHEMAS = {
       },
       maxLength: {
         type: ["integer", "null"],
+      },
+      replyOnlyFromProfile: {
+        type: "boolean",
       },
     },
   },
@@ -98,6 +111,9 @@ const SCHEMAS = {
           "US_POSTALCODE",
           null,
         ],
+      },
+      replyOnlyFromProfile: {
+        type: "boolean",
       },
     },
   },
@@ -135,6 +151,9 @@ const SCHEMAS = {
         type: "boolean",
       },
       attachToPdf: {
+        type: "boolean",
+      },
+      replyOnlyFromProfile: {
         type: "boolean",
       },
     },
@@ -188,6 +207,9 @@ const SCHEMAS = {
           "SIC",
           null,
         ],
+      },
+      replyOnlyFromProfile: {
+        type: "boolean",
       },
     },
   },
@@ -284,6 +306,9 @@ const SCHEMAS = {
           null,
         ],
       },
+      replyOnlyFromProfile: {
+        type: "boolean",
+      },
     },
   },
   ES_TAX_DOCUMENTS: {
@@ -364,6 +389,9 @@ const SCHEMAS = {
           date: { type: ["number", "null"] },
           country: { type: ["number", "null"] },
         },
+      },
+      replyOnlyFromProfile: {
+        type: "boolean",
       },
     },
   },
@@ -476,6 +504,10 @@ export function defaultFieldProperties(
 
   const alias = type === "HEADING" ? null : (field?.alias ?? null);
 
+  const replyOnlyFromProfile = isNonNullish(field?.profile_type_field_id)
+    ? !!field.options.replyOnlyFromProfile
+    : undefined;
+
   const options = ((): any => {
     switch (type) {
       case "HEADING": {
@@ -486,6 +518,7 @@ export function defaultFieldProperties(
       }
       case "TEXT": {
         return {
+          replyOnlyFromProfile,
           placeholder:
             isNonNullish(field) && hasPlaceholder(field.type)
               ? (field.options.placeholder ?? null)
@@ -500,6 +533,7 @@ export function defaultFieldProperties(
       }
       case "SHORT_TEXT": {
         return {
+          replyOnlyFromProfile,
           placeholder:
             isNonNullish(field) && hasPlaceholder(field.type)
               ? (field.options.placeholder ?? null)
@@ -515,17 +549,22 @@ export function defaultFieldProperties(
       }
       case "BACKGROUND_CHECK": {
         return {
+          replyOnlyFromProfile,
           integrationId: null,
           autoSearchConfig: null,
         };
       }
       case "DOW_JONES_KYC":
       case "DATE_TIME":
-      case "DATE": {
         return {};
+      case "DATE": {
+        return {
+          replyOnlyFromProfile,
+        };
       }
       case "NUMBER": {
         return {
+          replyOnlyFromProfile,
           placeholder:
             isNonNullish(field) && hasPlaceholder(field.type)
               ? (field.options.placeholder ?? null)
@@ -540,6 +579,7 @@ export function defaultFieldProperties(
       }
       case "PHONE": {
         return {
+          replyOnlyFromProfile,
           placeholder:
             isNonNullish(field) && hasPlaceholder(field.type)
               ? (field.options.placeholder ?? null)
@@ -548,6 +588,7 @@ export function defaultFieldProperties(
       }
       case "SELECT": {
         return {
+          replyOnlyFromProfile,
           values:
             isNonNullish(field) && ["SELECT", "CHECKBOX"].includes(field.type)
               ? field.options.values
@@ -560,6 +601,7 @@ export function defaultFieldProperties(
       }
       case "FILE_UPLOAD":
         return {
+          replyOnlyFromProfile,
           accepts: null,
           attachToPdf: false,
         };
@@ -583,6 +625,7 @@ export function defaultFieldProperties(
       }
       case "CHECKBOX": {
         return {
+          replyOnlyFromProfile,
           values:
             isNonNullish(field) && ["SELECT", "CHECKBOX"].includes(field.type)
               ? field.options.values
@@ -725,46 +768,68 @@ export async function selectOptionsValuesAndLabels(
 }
 
 export async function mapFieldOptions(
-  type: PetitionFieldType,
-  options: any,
+  field: Pick<PetitionField, "type" | "options" | "profile_type_field_id">,
   locale?: ContactLocale,
 ) {
-  if (type === "BACKGROUND_CHECK") {
-    return {
-      ...options,
-      ...(options.autoSearchConfig
-        ? {
-            autoSearchConfig: {
-              type: options.autoSearchConfig.type,
-              name: options.autoSearchConfig.name.map((id: number) =>
-                toGlobalId("PetitionField", id),
-              ),
-              date: isNonNullish(options.autoSearchConfig.date)
-                ? toGlobalId("PetitionField", options.autoSearchConfig.date)
-                : null,
-              country: isNonNullish(options.autoSearchConfig.country)
-                ? toGlobalId("PetitionField", options.autoSearchConfig.country)
-                : null,
-            },
-          }
-        : {}),
-    };
-  } else if (type === "SELECT" || type === "CHECKBOX") {
-    return {
-      ...options,
-      ...(await selectOptionsValuesAndLabels(options, locale)),
-    };
-  } else if (type === "ID_VERIFICATION") {
-    // don't expose integrationId until we allow to configure it on frontend
-    return pick(options, ["config", "attachToPdf"]);
-  } else if (type === "PROFILE_SEARCH") {
-    return {
-      searchIn: (options as PetitionFieldOptions["PROFILE_SEARCH"]).searchIn.map((s) => ({
-        profileTypeId: toGlobalId("ProfileType", s.profileTypeId),
-        profileTypeFieldIds: s.profileTypeFieldIds.map((id) => toGlobalId("ProfileTypeField", id)),
-      })),
-    };
-  }
+  const replyOnlyFromProfile = isNonNullish(field.profile_type_field_id)
+    ? !!field.options.replyOnlyFromProfile
+    : undefined;
 
-  return options;
+  switch (field.type) {
+    case "SHORT_TEXT":
+    case "TEXT":
+    case "NUMBER":
+    case "DATE":
+    case "PHONE":
+    case "FILE_UPLOAD":
+      return {
+        ...field.options,
+        replyOnlyFromProfile,
+      };
+    case "SELECT":
+    case "CHECKBOX":
+      return {
+        ...field.options,
+        replyOnlyFromProfile,
+        ...(await selectOptionsValuesAndLabels(field.options, locale)),
+      };
+    case "BACKGROUND_CHECK":
+      return {
+        ...field.options,
+        replyOnlyFromProfile,
+        ...(field.options.autoSearchConfig
+          ? {
+              autoSearchConfig: {
+                type: field.options.autoSearchConfig.type,
+                name: field.options.autoSearchConfig.name.map((id: number) =>
+                  toGlobalId("PetitionField", id),
+                ),
+                date: isNonNullish(field.options.autoSearchConfig.date)
+                  ? toGlobalId("PetitionField", field.options.autoSearchConfig.date)
+                  : null,
+                country: isNonNullish(field.options.autoSearchConfig.country)
+                  ? toGlobalId("PetitionField", field.options.autoSearchConfig.country)
+                  : null,
+              },
+            }
+          : {}),
+      };
+    case "ID_VERIFICATION":
+      return {
+        config: field.options.config,
+        attachToPdf: field.options.attachToPdf,
+      };
+    case "PROFILE_SEARCH":
+      return {
+        searchIn: (field.options as PetitionFieldOptions["PROFILE_SEARCH"]).searchIn.map((s) => ({
+          profileTypeId: toGlobalId("ProfileType", s.profileTypeId),
+          profileTypeFieldIds: s.profileTypeFieldIds.map((id) =>
+            toGlobalId("ProfileTypeField", id),
+          ),
+        })),
+      };
+
+    default:
+      return field.options;
+  }
 }

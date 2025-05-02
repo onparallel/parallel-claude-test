@@ -229,6 +229,47 @@ export const PetitionComposeFieldSettings = Object.assign(
               {hasAlias ? (
                 <SettingsRowAlias field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
               ) : null}
+
+              {field.isLinkedToProfileTypeField ? (
+                <SettingsRowSwitch
+                  isDisabled={isReadOnly || field.position === 0}
+                  isChecked={field.options.replyOnlyFromProfile ?? false}
+                  onChange={(value) =>
+                    onFieldEdit(field.id, {
+                      options: {
+                        replyOnlyFromProfile: value,
+                      },
+                      ...(!field.optional && value ? { optional: true } : {}),
+                      ...(!field.isInternal && value ? { isInternal: true } : {}),
+                    })
+                  }
+                  label={
+                    <FormattedMessage
+                      id="component.petition-compose-field-settings.reply-only-from-profile-label"
+                      defaultMessage="Only pre-filled from profile"
+                    />
+                  }
+                  description={
+                    <Text fontSize="sm">
+                      <FormattedMessage
+                        id="component.petition-compose-field-settings.reply-only-from-profile-description"
+                        defaultMessage="When this option is enabled, the field cannot be completed by users or recipients and will only be pre-filled with the data available in a profile. If enabled, the field will be optional."
+                      />
+                    </Text>
+                  }
+                  disabledReadon={
+                    field.position === 0 ? (
+                      <Text fontSize="sm">
+                        <FormattedMessage
+                          id="component.petition-compose-field-settings.reply-only-from-profile-disabled-readonly"
+                          defaultMessage="This option cannot be changed because the field is the first child of a group."
+                        />
+                      </Text>
+                    ) : undefined
+                  }
+                  controlId="reply-only-from-profile"
+                />
+              ) : null}
             </Stack>
 
             {petition.isInteractionWithRecipientsEnabled ? (
@@ -394,6 +435,7 @@ export const PetitionComposeFieldSettings = Object.assign(
           title
           multiple
           options
+          optional
           isInternal
           isReadOnly
           showInPdf

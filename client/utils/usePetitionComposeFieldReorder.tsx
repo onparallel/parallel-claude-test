@@ -1,7 +1,7 @@
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { PetitionComposeFieldSelection } from "@parallel/components/petition-compose/PetitionComposeField";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy, isNonNullish } from "remeda";
 import { PetitionFieldMath, PetitionFieldVisibility } from "./fieldLogic/types";
 import { Maybe } from "./types";
@@ -18,6 +18,7 @@ export function usePetitionComposeFieldReorder<T extends PetitionComposeFieldSel
   isFieldGroup?: boolean;
 }) {
   const [fieldIds, setFieldIds] = useState(fields.map((f) => f.id));
+  const intl = useIntl();
   useEffectSkipFirst(
     () => setFieldIds(fields.map((f) => f.id)),
     [fields.map((f) => f.id).join(",")],
@@ -132,7 +133,15 @@ export function usePetitionComposeFieldReorder<T extends PetitionComposeFieldSel
           const hasFirstChildVisibilityError =
             isFieldGroup && position === 0 && isNonNullish(field.visibility);
 
-          if (hasFirstChildVisibilityError || hasFirstChildInternalError) {
+          // The first field in a group cannot be optional
+          const hasFirstChildOptionalError =
+            isFieldGroup && position === 0 && field.optional && field.options.replyOnlyFromProfile;
+
+          if (
+            hasFirstChildVisibilityError ||
+            hasFirstChildInternalError ||
+            hasFirstChildOptionalError
+          ) {
             try {
               setFieldIds(fields.map((f) => f.id));
               await showError({
@@ -141,12 +150,23 @@ export function usePetitionComposeFieldReorder<T extends PetitionComposeFieldSel
                     id="generic.first-child-is-internal-error"
                     defaultMessage="The first field of a group cannot be internal if the group is not. Disable this setting to be able to reorder."
                   />
-                ) : (
+                ) : hasFirstChildVisibilityError ? (
                   <FormattedMessage
                     id="generic.first-child-visibility-conditions-error"
                     defaultMessage="You cannot set conditions for the first field in a group."
                   />
-                ),
+                ) : hasFirstChildOptionalError ? (
+                  <FormattedMessage
+                    id="page.petition-compose.first-child-is-reply-only-from-profile-error"
+                    defaultMessage="The first field of a group cannot be optional. The field has <b>{settingName}</b> enabled, so it cannot be optional. Disable this setting to be able to reorder."
+                    values={{
+                      settingName: intl.formatMessage({
+                        id: "component.petition-compose-field-settings.reply-only-from-profile-label",
+                        defaultMessage: "Only pre-filled from profile",
+                      }),
+                    }}
+                  />
+                ) : undefined,
               });
             } catch {}
             return;
