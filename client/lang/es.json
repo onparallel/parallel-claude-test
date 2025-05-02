@@ -1396,7 +1396,7 @@
   },
   {
     "term": "component.confirm-delete-dashboard-dialog.header",
-    "definition": "Eliminar panel",
+    "definition": "Eliminar dashboard",
     "context": "Delete dashboard"
   },
   {
@@ -2841,32 +2841,32 @@
   },
   {
     "term": "component.dashboard-tabs.clone-dashboard-header",
-    "definition": "Clonar panel",
+    "definition": "Clonar dashboard",
     "context": "Clone dashboard"
   },
   {
     "term": "component.dashboard-tabs.dashboard-x",
-    "definition": "Panel {count}",
+    "definition": "Dashboard {count}",
     "context": "Dashboard {count}"
   },
   {
     "term": "component.dashboard-tabs.new-dashboard",
-    "definition": "Nuevo panel",
+    "definition": "Nuevo dashboard",
     "context": "New dashboard"
   },
   {
     "term": "component.dashboard-tabs.new-dashboard-header",
-    "definition": "Nuevo panel",
+    "definition": "Nuevo dashboard",
     "context": "New dashboard"
   },
   {
     "term": "component.dashboard-tabs.rename-dashboard-header",
-    "definition": "Renombrar panel",
+    "definition": "Renombrar dashboard",
     "context": "Rename dashboard"
   },
   {
     "term": "component.dashboard-tabs.rename-dashboard-label",
-    "definition": "Introduzca un nombre significativo para el panel",
+    "definition": "Introduzca un nombre significativo para el dashboard",
     "context": "Enter a meaningful name for the dashboard"
   },
   {
@@ -16131,7 +16131,7 @@
   },
   {
     "term": "page.permissions-group.category-dashboards",
-    "definition": "Paneles",
+    "definition": "Dashboards",
     "context": "Dashboards"
   },
   {
@@ -16191,12 +16191,12 @@
   },
   {
     "term": "page.permissions-group.dashboards-crud",
-    "definition": "Crear y gestionar paneles",
+    "definition": "Crear y gestionar dashboards",
     "context": "Create and manage dashboards"
   },
   {
     "term": "page.permissions-group.dashboards-crud-description",
-    "definition": "Concede a los usuarios en este equipo permisos para crear y gestionar paneles.",
+    "definition": "Concede a los usuarios en este equipo permisos para crear y gestionar dashboards.",
     "context": "Grants users in this team permissions to create and manage dashboards."
   },
   {
