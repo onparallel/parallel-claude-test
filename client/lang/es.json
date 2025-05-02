@@ -1880,14 +1880,19 @@
     "context": "Send reminder"
   },
   {
+    "term": "component.confirm-signer-info-dialog.alert-description",
+    "definition": "Al añadir varios firmantes con la misma dirección de correo, recibirán tantos correos como firmantes {tone, select, INFORMAL{hayas} other{haya}} indicado con ese mismo correo.",
+    "context": "If you add multiple signers with the same email address, they'll receive as many separate emails as the number of signers you've assigned to that address."
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.alert-title",
+    "definition": "Cada correo de firma incluye un enlace único y personalizado.",
+    "context": "Each signature email includes a unique and personalized link."
+  },
+  {
     "term": "component.confirm-signer-info-dialog.body",
     "definition": "Ya has añadido este correo para <b>{signersList}</b>. Puedes modificar el nombre y añadirlo de nuevo.",
     "context": "You already added this email for <b>{signersList}</b>. You can modify the name and add it again."
-  },
-  {
-    "term": "component.confirm-signer-info-dialog.body-extended",
-    "definition": "Cada firmante recibe un correo electrónico separado. Si comparten la misma dirección de correo electrónico, recibirán un correo electrónico para cada firmante, y todos deben ser firmados.",
-    "context": "Each signer gets a separate email. If they share the same address, they will receive one email per signer, and all must be signed."
   },
   {
     "term": "component.confirm-signer-info-dialog.is-preset",

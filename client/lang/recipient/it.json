@@ -40,14 +40,19 @@
     "context": "You have {count, plural, =1{# pending process} other{# pending processes}}"
   },
   {
+    "term": "component.confirm-signer-info-dialog.alert-description",
+    "definition": "Aggiungendo più firmatari con lo stesso indirizzo email, riceveranno tanti messaggi quanti firmatari {tone, select, INFORMAL{hai} other{ha}} indicato con lo stesso indirizzo.",
+    "context": "If you add multiple signers with the same email address, they'll receive as many separate emails as the number of signers you've assigned to that address."
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.alert-title",
+    "definition": "Ogni email di firma include un link unico e personalizzato.",
+    "context": "Each signature email includes a unique and personalized link."
+  },
+  {
     "term": "component.confirm-signer-info-dialog.body",
     "definition": "Hai già aggiunto questa email per <b>{signersList}</b>. Puoi modificare il nome e aggiungerlo di nuovo.",
     "context": "You already added this email for <b>{signersList}</b>. You can modify the name and add it again."
-  },
-  {
-    "term": "component.confirm-signer-info-dialog.body-extended",
-    "definition": "Ogni signore riceverà un email separato per firmare. Se più signori condividono la stessa email, riceveranno un email per ogni signore e ognuno deve essere firmato individualmente.",
-    "context": "Each signer gets a separate email. If they share the same address, they will receive one email per signer, and all must be signed."
   },
   {
     "term": "component.confirm-signer-info-dialog.is-preset",

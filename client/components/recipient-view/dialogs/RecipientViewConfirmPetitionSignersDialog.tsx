@@ -106,6 +106,7 @@ function RecipientViewConfirmPetitionSignersDialog({
           await showConfirmSignerInfo({
             selection: signer,
             repeatedSigners: [],
+            tone,
           }),
           ...additionalSigners.slice(index + 1),
         ]);

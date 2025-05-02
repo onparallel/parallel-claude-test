@@ -1,6 +1,8 @@
 import {
   Alert,
+  AlertDescription,
   AlertIcon,
+  AlertTitle,
   Button,
   Flex,
   FormControl,
@@ -15,6 +17,7 @@ import {
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { Tone } from "@parallel/graphql/__types";
 import { fullName } from "@parallel/utils/fullName";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
@@ -27,12 +30,14 @@ interface ConfirmSignerInfoDialogProps {
   selection: SignerSelectSelection;
   repeatedSigners: { firstName: string; lastName?: string | null }[];
   allowUpdateFixedSigner?: boolean;
+  tone?: Tone;
 }
 
 function ConfirmSignerInfoDialog({
   selection,
   repeatedSigners,
   allowUpdateFixedSigner,
+  tone = "INFORMAL",
   ...props
 }: DialogProps<ConfirmSignerInfoDialogProps, SignerSelectSelection>) {
   const intl = useIntl();
@@ -85,14 +90,25 @@ function ConfirmSignerInfoDialog({
                   }}
                 />
               </Text>
-              <Alert status="warning">
+              <Alert status="warning" rounded="md">
                 <AlertIcon />
-                <Text fontSize="14px">
-                  <FormattedMessage
-                    id="component.confirm-signer-info-dialog.body-extended"
-                    defaultMessage="Each signer gets a separate email. If they share the same address, they will receive one email per signer, and all must be signed."
-                  />
-                </Text>
+                <Stack spacing={1}>
+                  <AlertTitle fontSize="14px">
+                    <FormattedMessage
+                      id="component.confirm-signer-info-dialog.alert-title"
+                      defaultMessage="Each signature email includes a unique and personalized link."
+                    />
+                  </AlertTitle>
+                  <AlertDescription fontSize="14px">
+                    <FormattedMessage
+                      id="component.confirm-signer-info-dialog.alert-description"
+                      defaultMessage="If you add multiple signers with the same email address, they'll receive as many separate emails as the number of signers you've assigned to that address."
+                      values={{
+                        tone,
+                      }}
+                    />
+                  </AlertDescription>
+                </Stack>
               </Alert>
             </>
           ) : null}
