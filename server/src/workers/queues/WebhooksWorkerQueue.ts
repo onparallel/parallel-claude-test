@@ -5,6 +5,7 @@ import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { FETCH_SERVICE, IFetchService } from "../../services/FetchService";
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { toGlobalId } from "../../util/globalId";
+import { withError } from "../../util/promises/withError";
 import { QueueWorker } from "../helpers/createQueueWorker";
 
 export type WebhooksWorkerPayload = {
@@ -33,17 +34,19 @@ export class WebhooksWorker extends QueueWorker<WebhooksWorkerPayload> {
       return;
     }
 
-    const response = await this.fetch.fetch(
-      payload.endpoint,
-      {
-        method: "POST",
-        body: JSON.stringify(payload.body),
-        headers: payload.headers,
-      },
-      { timeout: 15_000 },
+    const [error, response] = await withError(
+      this.fetch.fetch(
+        payload.endpoint,
+        {
+          method: "POST",
+          body: JSON.stringify(payload.body),
+          headers: payload.headers,
+        },
+        { timeout: 15_000 },
+      ),
     );
 
-    if (response.ok) {
+    if (!error && response.ok) {
       if (subscription.is_failing) {
         await this.subscriptions.updateEventSubscription(
           payload.subscriptionId,
@@ -58,7 +61,9 @@ export class WebhooksWorker extends QueueWorker<WebhooksWorkerPayload> {
     const retryCount = payload.retryCount ?? 0;
     // failed on 5th retry: send email and set as failing
     if (retryCount >= 5) {
-      const errorMessage = `Error ${response.status}: ${response.statusText} for POST ${payload.endpoint}`;
+      const errorMessage = error
+        ? error.message
+        : `Error ${response.status}: ${response.statusText} for POST ${payload.endpoint}`;
       if (!subscription.is_failing) {
         await this.emails.sendDeveloperWebhookFailedEmail(
           payload.subscriptionId,

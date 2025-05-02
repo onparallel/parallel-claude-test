@@ -25,6 +25,10 @@ export function validApprovalFlowConfigInput<TypeName extends string, FieldName 
       return;
     }
 
+    if (approvalConfig.length === 0) {
+      throw new ArgValidationError(info, argName, "approvalConfig must not be empty");
+    }
+
     for (const config of approvalConfig) {
       const index = approvalConfig.indexOf(config);
 

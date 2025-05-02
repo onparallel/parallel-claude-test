@@ -463,7 +463,7 @@ function _PetitionSettings({
         });
 
         await onUpdatePetition({
-          approvalFlowConfig,
+          approvalFlowConfig: approvalFlowConfig.length > 0 ? approvalFlowConfig : null,
         });
       } catch {}
     } else {
