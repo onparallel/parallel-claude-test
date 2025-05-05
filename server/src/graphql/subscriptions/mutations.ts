@@ -30,17 +30,13 @@ async function challengeWebhookUrl(url: string, fetch: IFetchService, headers?: 
       url,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-          ...headers,
-        } as any,
+        headers: headers as any,
         body: JSON.stringify({}),
       },
       { timeout: 5_000 },
     ),
   );
-  return response?.status === 200 ?? false;
+  return response?.status === 200;
 }
 
 export const createEventSubscriptionSignatureKey = mutationField(

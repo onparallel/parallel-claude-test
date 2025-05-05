@@ -1,6 +1,4 @@
-import { verify } from "crypto";
 import { Knex } from "knex";
-import { fromEntries } from "remeda";
 import { createTestContainer } from "../../../test/testContainer";
 import { WorkerContext } from "../../context";
 import {
@@ -14,7 +12,6 @@ import {
 } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { ENCRYPTION_SERVICE, IEncryptionService } from "../../services/EncryptionService";
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
@@ -34,8 +31,6 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
     Parameters<IQueuesService["enqueueMessages"]>
   >;
 
-  let encryptionService: IEncryptionService;
-
   let profileTypes: ProfileType[];
   let profileTypeFields: ProfileTypeField[];
 
@@ -51,8 +46,6 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
     users = await mocks.createRandomUsers(organization.id, 6);
 
     queueSpy = jest.spyOn(container.get<IQueuesService>(QUEUES_SERVICE), "enqueueMessages");
-
-    encryptionService = container.get<IEncryptionService>(ENCRYPTION_SERVICE);
   });
 
   beforeEach(async () => {
@@ -249,7 +242,6 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
         id: `webhook-${toGlobalId("EventSubscription", subscriptions[index].id)}`,
         body: {
           subscriptionId: subscriptions[index].id,
-          endpoint: subscriptions[index].endpoint,
           body: {
             id: toGlobalId("ProfileEvent", event.id),
             profileId: toGlobalId("Profile", event.profile_id),
@@ -258,11 +250,6 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
               userId: toGlobalId("User", users[0].id),
             },
             createdAt: event.created_at,
-          },
-          headers: {
-            "Content-Type": "application/json",
-            "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-            "X-Parallel-Signature-Timestamp": expect.any(String),
           },
         },
       })),
@@ -301,7 +288,6 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
           id: `webhook-${toGlobalId("EventSubscription", subscriptions[3].id)}`,
           body: {
             subscriptionId: subscriptions[3].id,
-            endpoint: subscriptions[3].endpoint,
             body: {
               id: toGlobalId("ProfileEvent", event.id),
               profileId: toGlobalId("Profile", event.profile_id),
@@ -312,11 +298,6 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
                 alias: null,
               },
               createdAt: event.created_at,
-            },
-            headers: {
-              "Content-Type": "application/json",
-              "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-              "X-Parallel-Signature-Timestamp": expect.any(String),
             },
           },
         },
@@ -342,18 +323,12 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
         id: `webhook-${toGlobalId("EventSubscription", subscriptions[index].id)}`,
         body: {
           subscriptionId: subscriptions[index].id,
-          endpoint: subscriptions[index].endpoint,
           body: {
             id: toGlobalId("ProfileEvent", event.id),
             profileId: toGlobalId("Profile", event.profile_id),
             type: "PROFILE_ANONYMIZED",
             data: {},
             createdAt: event.created_at,
-          },
-          headers: {
-            "Content-Type": "application/json",
-            "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-            "X-Parallel-Signature-Timestamp": expect.any(String),
           },
         },
       })),
@@ -391,7 +366,6 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
           id: `webhook-${toGlobalId("EventSubscription", subscriptions[3].id)}`,
           body: {
             subscriptionId: subscriptions[3].id,
-            endpoint: subscriptions[3].endpoint,
             body: {
               id: toGlobalId("ProfileEvent", event.id),
               profileId: toGlobalId("Profile", event.profile_id),
@@ -403,198 +377,6 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
                 alias: null,
               },
               createdAt: event.created_at,
-            },
-            headers: {
-              "Content-Type": "application/json",
-              "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-              "X-Parallel-Signature-Timestamp": expect.any(String),
-            },
-          },
-        },
-      ],
-    ]);
-  });
-
-  it("adds signature on request headers only for users with configured signature keys", async () => {
-    const subscription = subscriptions.find((s) => s.user_id === users[1].id)!;
-
-    const keys = await mocks.createEventSubscriptionSignatureKey(
-      subscription.id,
-      encryptionService,
-      2,
-    );
-
-    const [event] = await mocks.createRandomProfileEvents(
-      organization.id,
-      users[1].id,
-      profiles[0].id,
-      1,
-      ["PROFILE_CREATED"],
-    );
-
-    await profileEventSubscriptionsListener.handle(
-      {
-        id: event.id,
-        org_id: organization.id,
-        profile_id: event.profile_id,
-        type: "PROFILE_CREATED",
-        data: { user_id: users[1].id },
-        created_at: event.created_at,
-        processed_at: event.processed_at,
-        processed_by: event.processed_by,
-      },
-      ctx,
-    );
-
-    const body = JSON.stringify({
-      id: toGlobalId("ProfileEvent", event.id),
-      profileId: toGlobalId("Profile", event.profile_id),
-      type: event.type,
-      data: {
-        userId: toGlobalId("User", users[1].id),
-      },
-      createdAt: event.created_at,
-    });
-
-    expect(queueSpy).toHaveBeenCalledTimes(1);
-    expect(queueSpy.mock.calls[0]).toEqual([
-      "webhooks-worker",
-      [
-        {
-          id: `webhook-${toGlobalId("EventSubscription", subscriptions[0].id)}`,
-          body: {
-            subscriptionId: subscriptions[0].id,
-            endpoint: "https://users.0.com/events",
-            body: {
-              id: toGlobalId("ProfileEvent", event.id),
-              profileId: toGlobalId("Profile", event.profile_id),
-              type: "PROFILE_CREATED",
-              data: { userId: toGlobalId("User", users[1].id) },
-              createdAt: event.created_at,
-            },
-            headers: {
-              "Content-Type": "application/json",
-              "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-              "X-Parallel-Signature-Timestamp": expect.any(String),
-            },
-          },
-        },
-        {
-          id: `webhook-${toGlobalId("EventSubscription", subscriptions[2].id)}`,
-          body: {
-            subscriptionId: subscriptions[2].id,
-            endpoint: "https://users.1.com/events",
-            body: {
-              id: toGlobalId("ProfileEvent", event.id),
-              profileId: toGlobalId("Profile", event.profile_id),
-              type: "PROFILE_CREATED",
-              data: { userId: toGlobalId("User", users[1].id) },
-              createdAt: event.created_at,
-            },
-            headers: expect.toSatisfy((headers: Record<string, string>) => {
-              expect(headers).toMatchObject({
-                "Content-Type": "application/json",
-                "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-                "X-Parallel-Signature-Timestamp": expect.any(String),
-                ...fromEntries(
-                  [0, 1].map((i) => [
-                    `X-Parallel-Signature-${i + 1}`,
-                    expect.toSatisfy((signature: string) =>
-                      verify(
-                        null,
-                        new Uint8Array(Buffer.from(body)),
-                        {
-                          key: Buffer.from(keys[i].public_key, "base64"),
-                          format: "der",
-                          type: "spki",
-                        },
-                        new Uint8Array(Buffer.from(signature, "base64")),
-                      ),
-                    ),
-                  ]),
-                ),
-                ...fromEntries(
-                  [0, 1].map((i) => [
-                    `X-Parallel-Signature-V2-${i + 1}`,
-                    expect.toSatisfy((signature: string) =>
-                      verify(
-                        null,
-                        new Uint8Array(
-                          Buffer.from(
-                            "https://users.1.com/events" +
-                              headers["X-Parallel-Signature-Timestamp"] +
-                              body,
-                          ),
-                        ),
-                        {
-                          key: Buffer.from(keys[i].public_key, "base64"),
-                          format: "der",
-                          type: "spki",
-                        },
-                        new Uint8Array(Buffer.from(signature, "base64")),
-                      ),
-                    ),
-                  ]),
-                ),
-              });
-              return true;
-            }),
-          },
-        },
-        {
-          id: `webhook-${toGlobalId("EventSubscription", subscriptions[3].id)}`,
-          body: {
-            subscriptionId: subscriptions[3].id,
-            endpoint: "https://users.2.com/events",
-            body: {
-              id: toGlobalId("ProfileEvent", event.id),
-              profileId: toGlobalId("Profile", event.profile_id),
-              type: "PROFILE_CREATED",
-              data: { userId: toGlobalId("User", users[1].id) },
-              createdAt: event.created_at,
-            },
-            headers: {
-              "Content-Type": "application/json",
-              "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-              "X-Parallel-Signature-Timestamp": expect.any(String),
-            },
-          },
-        },
-        {
-          id: `webhook-${toGlobalId("EventSubscription", subscriptions[5].id)}`,
-          body: {
-            subscriptionId: subscriptions[5].id,
-            endpoint: "https://users.3.com/events",
-            body: {
-              id: toGlobalId("ProfileEvent", event.id),
-              profileId: toGlobalId("Profile", event.profile_id),
-              type: "PROFILE_CREATED",
-              data: { userId: toGlobalId("User", users[1].id) },
-              createdAt: event.created_at,
-            },
-            headers: {
-              "Content-Type": "application/json",
-              "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-              "X-Parallel-Signature-Timestamp": expect.any(String),
-            },
-          },
-        },
-        {
-          id: `webhook-${toGlobalId("EventSubscription", subscriptions[8].id)}`,
-          body: {
-            subscriptionId: subscriptions[8].id,
-            endpoint: "https://users.5.com/events",
-            body: {
-              id: toGlobalId("ProfileEvent", event.id),
-              profileId: toGlobalId("Profile", event.profile_id),
-              type: "PROFILE_CREATED",
-              data: { userId: toGlobalId("User", users[1].id) },
-              createdAt: event.created_at,
-            },
-            headers: {
-              "Content-Type": "application/json",
-              "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-              "X-Parallel-Signature-Timestamp": expect.any(String),
             },
           },
         },
@@ -624,18 +406,12 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
           id: `webhook-${toGlobalId("EventSubscription", subscriptions[0].id)}`,
           body: {
             subscriptionId: subscriptions[0].id,
-            endpoint: "https://users.0.com/events",
             body: {
               id: toGlobalId("ProfileEvent", event.id),
               profileId: toGlobalId("Profile", event.profile_id),
               type: "PROFILE_CLOSED",
               data: { userId: toGlobalId("User", users[5].id) },
               createdAt: event.created_at,
-            },
-            headers: {
-              "Content-Type": "application/json",
-              "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-              "X-Parallel-Signature-Timestamp": expect.any(String),
             },
           },
         },
@@ -643,18 +419,12 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
           id: `webhook-${toGlobalId("EventSubscription", subscriptions[4].id)}`,
           body: {
             subscriptionId: subscriptions[4].id,
-            endpoint: "https://users.2.com/events-unsubscribed-profile",
             body: {
               id: toGlobalId("ProfileEvent", event.id),
               profileId: toGlobalId("Profile", event.profile_id),
               type: "PROFILE_CLOSED",
               data: { userId: toGlobalId("User", users[5].id) },
               createdAt: event.created_at,
-            },
-            headers: {
-              "Content-Type": "application/json",
-              "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-              "X-Parallel-Signature-Timestamp": expect.any(String),
             },
           },
         },
@@ -662,18 +432,12 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
           id: `webhook-${toGlobalId("EventSubscription", subscriptions[5].id)}`,
           body: {
             subscriptionId: subscriptions[5].id,
-            endpoint: "https://users.3.com/events",
             body: {
               id: toGlobalId("ProfileEvent", event.id),
               profileId: toGlobalId("Profile", event.profile_id),
               type: "PROFILE_CLOSED",
               data: { userId: toGlobalId("User", users[5].id) },
               createdAt: event.created_at,
-            },
-            headers: {
-              "Content-Type": "application/json",
-              "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-              "X-Parallel-Signature-Timestamp": expect.any(String),
             },
           },
         },

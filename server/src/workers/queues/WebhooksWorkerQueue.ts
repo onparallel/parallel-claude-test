@@ -2,6 +2,10 @@ import { inject, injectable } from "inversify";
 import { CONFIG, Config } from "../../config";
 import { SubscriptionRepository } from "../../db/repositories/SubscriptionRepository";
 import { EMAILS, IEmailsService } from "../../services/EmailsService";
+import {
+  EVENT_SUBSCRIPTION_SERVICE,
+  IEventSubscriptionService,
+} from "../../services/EventSubscriptionService";
 import { FETCH_SERVICE, IFetchService } from "../../services/FetchService";
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { toGlobalId } from "../../util/globalId";
@@ -10,9 +14,7 @@ import { QueueWorker } from "../helpers/createQueueWorker";
 
 export type WebhooksWorkerPayload = {
   subscriptionId: number;
-  endpoint: string;
   body: any;
-  headers: any;
   retryCount?: number;
 };
 
@@ -24,23 +26,33 @@ export class WebhooksWorker extends QueueWorker<WebhooksWorkerPayload> {
     @inject(QUEUES_SERVICE) private queues: IQueuesService,
     @inject(EMAILS) private emails: IEmailsService,
     @inject(SubscriptionRepository) private subscriptions: SubscriptionRepository,
+    @inject(EVENT_SUBSCRIPTION_SERVICE) private subscriptionsService: IEventSubscriptionService,
   ) {
     super();
   }
 
   override async handler(payload: WebhooksWorkerPayload) {
     const subscription = await this.subscriptions.loadEventSubscription(payload.subscriptionId);
+    const subscriptionKeys =
+      await this.subscriptions.loadEventSubscriptionSignatureKeysBySubscriptionId(
+        payload.subscriptionId,
+      );
+
     if (!subscription || !subscription.is_enabled) {
       return;
     }
 
     const [error, response] = await withError(
       this.fetch.fetch(
-        payload.endpoint,
+        subscription.endpoint,
         {
           method: "POST",
           body: JSON.stringify(payload.body),
-          headers: payload.headers,
+          headers: this.subscriptionsService.buildSubscriptionSignatureHeaders(
+            subscriptionKeys,
+            subscription.endpoint,
+            JSON.stringify(payload.body),
+          ),
         },
         { timeout: 15_000 },
       ),
@@ -63,7 +75,7 @@ export class WebhooksWorker extends QueueWorker<WebhooksWorkerPayload> {
     if (retryCount >= 5) {
       const errorMessage = error
         ? error.message
-        : `Error ${response.status}: ${response.statusText} for POST ${payload.endpoint}`;
+        : `Error ${response.status}: ${response.statusText} for POST ${subscription.endpoint}`;
       if (!subscription.is_failing) {
         await this.emails.sendDeveloperWebhookFailedEmail(
           payload.subscriptionId,

@@ -1,9 +1,11 @@
+import { verify } from "crypto";
 import { Knex } from "knex";
 import { createTestContainer } from "../../../test/testContainer";
 import { User } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { EMAILS, IEmailsService } from "../../services/EmailsService";
+import { ENCRYPTION_SERVICE, IEncryptionService } from "../../services/EncryptionService";
 import { FETCH_SERVICE, IFetchService } from "../../services/FetchService";
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { toGlobalId } from "../../util/globalId";
@@ -28,6 +30,8 @@ describe("Webhooks Worker", () => {
 
   let webhooksWorker: WebhooksWorker;
 
+  let encryptionService: IEncryptionService;
+
   beforeAll(async () => {
     const container = await createTestContainer();
     knex = container.get<Knex>(KNEX);
@@ -40,6 +44,7 @@ describe("Webhooks Worker", () => {
     queueSpy = jest.spyOn(container.get<IQueuesService>(QUEUES_SERVICE), "enqueueMessages");
 
     webhooksWorker = container.get<WebhooksWorker>(WebhooksWorker);
+    encryptionService = container.get<IEncryptionService>(ENCRYPTION_SERVICE);
   });
 
   afterEach(async () => {
@@ -80,11 +85,6 @@ describe("Webhooks Worker", () => {
           userId: toGlobalId("User", user.id),
         },
       },
-      endpoint: subscription.endpoint,
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-      },
     });
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
@@ -101,11 +101,6 @@ describe("Webhooks Worker", () => {
             data: {
               userId: toGlobalId("User", user.id),
             },
-          },
-          endpoint: subscription.endpoint,
-          headers: {
-            "Content-Type": "application/json",
-            "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
           },
           retryCount: 1,
         },
@@ -140,11 +135,6 @@ describe("Webhooks Worker", () => {
         data: {
           userId: toGlobalId("User", user.id),
         },
-      },
-      endpoint: subscription.endpoint,
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
       },
       retryCount: 5,
     });
@@ -192,11 +182,6 @@ describe("Webhooks Worker", () => {
           userId: toGlobalId("User", user.id),
         },
       },
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-      },
-      endpoint: failingSubscription.endpoint,
     });
 
     expect(fetchSpy.mock.calls.at(-1)).toMatchObject([
@@ -211,5 +196,118 @@ describe("Webhooks Worker", () => {
       .select("*");
 
     expect(updatedSubscription.is_failing).toEqual(false);
+  });
+
+  it("adds signature on request headers only for subscriptions with configured signature keys", async () => {
+    const subscriptions = await mocks.createEventSubscription([
+      {
+        type: "PETITION",
+        user_id: user.id,
+        event_types: ["PETITION_CREATED"],
+        endpoint: "https://users.0.com/events",
+        is_enabled: true,
+      },
+      {
+        type: "PETITION",
+        user_id: user.id,
+        event_types: ["PETITION_CREATED"],
+        endpoint: "https://users.1.com/events",
+        is_enabled: true,
+      },
+    ]);
+
+    const [key] = await mocks.createEventSubscriptionSignatureKey(
+      subscriptions[1].id,
+      encryptionService,
+      1,
+    );
+
+    const body = {
+      id: toGlobalId("PetitionEvent", 1),
+      type: "PETITION_CREATED",
+      data: {
+        userId: toGlobalId("User", user.id),
+      },
+    };
+
+    await webhooksWorker.handler({
+      subscriptionId: subscriptions[0].id,
+      body,
+    });
+
+    await webhooksWorker.handler({
+      subscriptionId: subscriptions[1].id,
+      body,
+    });
+
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+    expect(fetchSpy).toHaveBeenNthCalledWith(
+      1,
+      "https://users.0.com/events",
+      expect.objectContaining({
+        body: JSON.stringify(body),
+        method: "POST",
+        headers: expect.toSatisfy((headers: Record<string, string>) => {
+          expect(headers).toEqual({
+            "Content-Type": "application/json",
+            "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+            "X-Parallel-Signature-Timestamp": expect.any(String),
+          });
+
+          return true;
+        }),
+      }),
+      { timeout: 15_000 },
+    );
+
+    expect(fetchSpy).toHaveBeenNthCalledWith(
+      2,
+      "https://users.1.com/events",
+      expect.objectContaining({
+        body: JSON.stringify(body),
+        method: "POST",
+        headers: expect.toSatisfy((headers: Record<string, string>) => {
+          expect(headers).toEqual({
+            "Content-Type": "application/json",
+            "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
+            "X-Parallel-Signature-Timestamp": expect.any(String),
+            "X-Parallel-Signature-1": expect.toSatisfy((signature: string) =>
+              verify(
+                null,
+                new Uint8Array(Buffer.from(JSON.stringify(body))),
+                {
+                  key: Buffer.from(key.public_key, "base64"),
+                  format: "der",
+                  type: "spki",
+                },
+                new Uint8Array(Buffer.from(signature, "base64")),
+              ),
+            ),
+            "X-Parallel-Signature-V2-1": expect.toSatisfy((signature: string) =>
+              verify(
+                null,
+                new Uint8Array(
+                  Buffer.from(
+                    "https://users.1.com/events" +
+                      headers["X-Parallel-Signature-Timestamp"] +
+                      JSON.stringify(body),
+                  ),
+                ),
+                {
+                  key: Buffer.from(key.public_key, "base64"),
+                  format: "der",
+                  type: "spki",
+                },
+                new Uint8Array(Buffer.from(signature, "base64")),
+              ),
+            ),
+          });
+
+          return true;
+        }),
+      }),
+      { timeout: 15_000 },
+    );
   });
 });
