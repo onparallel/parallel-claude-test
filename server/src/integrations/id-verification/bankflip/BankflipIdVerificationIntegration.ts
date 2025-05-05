@@ -423,10 +423,7 @@ export class BankflipIdVerificationIntegration
     if (isNaN(diff) || diff > 5 * 60 * 1_000) {
       // if received timestamp is older than 5 minutes, reject the request as it could be a replay attack
       // any error response in the webhook will cause Bankflip to retry the request after an exponential backoff, up to 60 times, or ~6 days
-      // 5 minutes check should allow Bankflip to retry the request a few times before timestamp is too old
-      // Bankflip hace exponential backoff usando el timestamp original, lo que hace que esto falle luego de 5 minutos
-      // hasta que no lo arreglen de su lado dejamos este check comentado
-      // throw new Error("HMAC verification error: Invalid timestamp");
+      throw new Error("HMAC verification error: Invalid timestamp");
     }
 
     const hash = createHmac("sha256", Buffer.from((req as any).webhookSecret, "base64"))
