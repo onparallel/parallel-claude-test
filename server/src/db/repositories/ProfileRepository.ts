@@ -2188,7 +2188,6 @@ export class ProfileRepository extends BaseRepository {
               updated_profile as (
                 update profile p
                 set 
-                  anonymized_at = now(),
                   value_cache = value_cache - pfv_ids.profile_field_value_ids
                 from profiles_with_value_ids pfv_ids
                 where pfv_ids.profile_id = p.id
