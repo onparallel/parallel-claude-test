@@ -262,7 +262,7 @@ export function RecipientViewPetitionFieldCheckbox({
                     ) {
                       await handleUpdate(checkedItems);
                     }
-                  } else {
+                  } else if (checkedItems.length > 0) {
                     await handleCreate(checkedItems);
                   }
                 }}
@@ -299,7 +299,7 @@ export function RecipientViewPetitionFieldCheckbox({
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "flex-start",
-                    justifyContent: "flex-start",
+                    justifyContent: checkedItems.length > 0 ? "flex-start" : "center",
                   }),
                   multiValue: (baseStyles) => ({
                     ...baseStyles,
@@ -320,14 +320,14 @@ export function RecipientViewPetitionFieldCheckbox({
                     ":focus-within": {
                       display: "none",
                     },
+                    overflow: "hidden",
                   }),
                   input: (baseStyles) => ({
                     ...baseStyles,
-                    height: "0px",
+                    height: "auto",
                     position: "absolute",
-
                     "> input": {
-                      height: "0px",
+                      height: "auto",
                     },
                   }),
                 }}

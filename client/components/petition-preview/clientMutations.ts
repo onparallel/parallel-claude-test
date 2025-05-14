@@ -319,7 +319,6 @@ export function useCreatePetitionFieldReply() {
                   : {
                       ...child,
                       replies: [
-                        ...child.replies,
                         {
                           id,
                           __typename: "PetitionFieldReply",
@@ -442,6 +441,7 @@ export function useCreateFileUploadReply() {
       uploads,
       parentReplyId,
       isCacheOnly,
+      omitOldChildReplies,
     }: {
       petitionId: string;
       fieldId: string;
@@ -449,6 +449,7 @@ export function useCreateFileUploadReply() {
       uploads: MutableRefObject<Record<string, AbortController>>;
       parentReplyId?: string;
       isCacheOnly?: boolean;
+      omitOldChildReplies?: boolean;
     }) {
       if (isCacheOnly) {
         for (const { file } of content) {
@@ -482,7 +483,7 @@ export function useCreateFileUploadReply() {
                     : {
                         ...child,
                         replies: [
-                          ...child.replies,
+                          ...(omitOldChildReplies ? [] : child.replies),
                           {
                             id,
                             __typename: "PetitionFieldReply",
@@ -865,7 +866,11 @@ export function useCreateFieldGroupRepliesFromProfiles() {
             });
             if (!property) continue;
 
-            if (isFileTypeField(linkedField.type) && property.files) {
+            if (
+              isFileTypeField(linkedField.type) &&
+              isNonNullish(property.files) &&
+              property.files.length > 0
+            ) {
               await createFileUploadReply({
                 petitionId,
                 fieldId: linkedField.id,
@@ -876,8 +881,9 @@ export function useCreateFieldGroupRepliesFromProfiles() {
                 uploads: { current: {} },
                 parentReplyId: groupId,
                 isCacheOnly,
+                omitOldChildReplies: true,
               });
-            } else {
+            } else if (isNonNullish(property.value)) {
               await createFieldReply({
                 petitionId,
                 fieldId: linkedField.id,

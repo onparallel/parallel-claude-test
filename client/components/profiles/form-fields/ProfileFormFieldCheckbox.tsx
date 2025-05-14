@@ -63,7 +63,9 @@ export function ProfileFormFieldCheckbox({
               isDisabled={isDisabled}
               field={field}
               value={value}
-              onChange={(value) => onChange(value)}
+              onChange={(value) => {
+                onChange(value.length > 0 ? value : null);
+              }}
               onBlur={() => {
                 if (isNonNullish(value)) {
                   return showExpiryDateDialog({});
@@ -101,6 +103,7 @@ export function ProfileFormFieldCheckbox({
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "flex-start",
+                  justifyContent: isNonNullish(value) && value.length > 0 ? "flex-start" : "center",
                 }),
                 multiValue: (baseStyles) => ({
                   ...baseStyles,
@@ -125,9 +128,10 @@ export function ProfileFormFieldCheckbox({
                 }),
                 input: (baseStyles) => ({
                   ...baseStyles,
-                  height: "0px",
+                  height: "auto",
+                  position: "absolute",
                   "> input": {
-                    height: "0px",
+                    height: "auto",
                   },
                 }),
               }}
