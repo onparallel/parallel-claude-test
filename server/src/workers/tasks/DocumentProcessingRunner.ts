@@ -613,6 +613,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         "accountNumber",
         "accountSwiftNumber",
         "accountOpenedAt",
+        "endingBalance",
         "issuedFor",
         "issuedAt",
       ],
@@ -624,6 +625,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
         "accountNumber",
         "accountSwiftNumber",
         "accountOpenedAt",
+        "endingBalance",
         "issuedFor",
         "issuedAt",
       ],
@@ -668,6 +670,13 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
           "@label": await this.ctx.i18n.getLocalizableUserText({
             id: "document-processing-runner.bank-certificate.account-swift-number",
             defaultMessage: "SWIFT number",
+          }),
+        },
+        endingBalance: {
+          ...this.moneySchema(),
+          "@label": await this.ctx.i18n.getLocalizableUserText({
+            id: "document-processing-runner.bank-certificate.ending-balance",
+            defaultMessage: "Ending balance",
           }),
         },
         accountOpenedAt: {

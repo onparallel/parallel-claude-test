@@ -230,6 +230,11 @@
     "context": "Bank name"
   },
   {
+    "term": "document-processing-runner.bank-certificate.ending-balance",
+    "definition": "Saldo final",
+    "context": "Ending balance"
+  },
+  {
     "term": "document-processing-runner.bank-certificate.issued-at",
     "definition": "Emitido el",
     "context": "Issued at"
