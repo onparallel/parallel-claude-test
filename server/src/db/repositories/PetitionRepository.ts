@@ -3188,8 +3188,8 @@ export class PetitionRepository extends BaseRepository {
         );
       }
 
+      // clone tags if source petition is from same org
       if (sourcePetition.org_id === owner.org_id) {
-        // clone tags if source petition is from same org
         await this.raw(
           /* sql */ `
             insert into petition_tag (petition_id, tag_id, created_by)
@@ -3200,13 +3200,13 @@ export class PetitionRepository extends BaseRepository {
         );
       }
 
+      // clone default permissions if source petition is from same org
+      // and we are creating a template from another template
       if (
         sourcePetition.org_id === owner.org_id &&
         sourcePetition.is_template &&
         (data.is_template === undefined || data.is_template === true)
       ) {
-        // clone default permissions if source petition is from same org
-        // and we are creating a template from another template
         await this.raw(
           /* sql */ `
             insert into template_default_permission (
@@ -3223,39 +3223,45 @@ export class PetitionRepository extends BaseRepository {
       const newFieldIds = Object.fromEntries(clonedFields.map((f) => [f.from_id, f.id]));
 
       // on RTE texts, replace globalId placeholders with the field ids of the cloned petition
-      // also on approvalFlowConfig, replace field ids with the new field ids
       const petitionUpdateData: Partial<Petition> = {};
-      if (isNonNullish(cloned.email_subject)) {
-        petitionUpdateData.email_subject = replacePlaceholdersInText(
-          cloned.email_subject,
-          (placeholder) => {
-            if (isGlobalId(placeholder, "PetitionField")) {
-              return toGlobalId("PetitionField", newFieldIds[fromGlobalId(placeholder).id]);
-            }
-            return placeholder;
-          },
-        );
-      }
-
-      for (const key of ["email_body", "closing_email_body", "completing_message_body"] as const) {
+      for (const [key, type] of [
+        ["email_subject", "text"],
+        ["email_body", "slate"],
+        ["closing_email_body", "slate"],
+        ["completing_message_body", "slate"],
+      ] as [keyof Petition, "text" | "slate"][]) {
         if (isNonNullish(cloned[key])) {
-          petitionUpdateData[key] = JSON.stringify(
-            replacePlaceholdersInSlate(safeJsonParse(cloned[key]) as SlateNode[], (placeholder) => {
-              if (isGlobalId(placeholder, "PetitionField")) {
-                return toGlobalId("PetitionField", newFieldIds[fromGlobalId(placeholder).id]);
-              }
-              return placeholder;
-            }),
-          );
+          petitionUpdateData[key] =
+            type === "text"
+              ? replacePlaceholdersInText(cloned[key], (placeholder) => {
+                  if (isGlobalId(placeholder, "PetitionField")) {
+                    return toGlobalId("PetitionField", newFieldIds[fromGlobalId(placeholder).id]);
+                  }
+                  return placeholder;
+                })
+              : JSON.stringify(
+                  replacePlaceholdersInSlate(
+                    safeJsonParse(cloned[key]) as SlateNode[],
+                    (placeholder) => {
+                      if (isGlobalId(placeholder, "PetitionField")) {
+                        return toGlobalId(
+                          "PetitionField",
+                          newFieldIds[fromGlobalId(placeholder).id],
+                        );
+                      }
+                      return placeholder;
+                    },
+                  ),
+                );
         }
       }
 
       const allReferencedLists: string[] = [];
+      // in approval flow config logic, update referenced field IDS with new fields
       if (
         isNonNullish(cloned.approval_flow_config) &&
         cloned.approval_flow_config.some((c) => isNonNullish(c.visibility))
       ) {
-        // in approval flow config, update referenced field IDS with new fields
         petitionUpdateData.approval_flow_config = JSON.stringify(
           cloned.approval_flow_config.map((c) => {
             const fieldLogic = c.visibility
@@ -3265,6 +3271,7 @@ export class PetitionRepository extends BaseRepository {
                 )
               : null;
 
+            // accumulate list references on logic to later update standard list definitions override
             allReferencedLists.push(...(fieldLogic?.referencedLists ?? []));
             return {
               ...c,
@@ -3274,6 +3281,7 @@ export class PetitionRepository extends BaseRepository {
         );
       }
 
+      // update petition if there are any changes
       if (Object.keys(petitionUpdateData).length > 0) {
         [cloned] = await this.updatePetition(cloned.id, petitionUpdateData, createdBy, t);
       }
@@ -3285,84 +3293,233 @@ export class PetitionRepository extends BaseRepository {
         await this.clonePetitionReplyEvents(petitionId, cloned.id, newFieldIds, newReplyIds, t);
       }
 
-      const fieldLogicUpdate = clonedFields.filter(
-        (f) => isNonNullish(f.visibility) || isNonNullish(f.math),
+      const fieldIdUpdates = clonedFields.filter(
+        (f) =>
+          // update field visibility and math on cloned fields
+          isNonNullish(f.visibility) ||
+          isNonNullish(f.math) ||
+          // update field references in autoSearchConfig to point to cloned fields
+          (f.type === "BACKGROUND_CHECK" && isNonNullish(f.options.autoSearchConfig)),
       );
-      if (fieldLogicUpdate.length > 0) {
-        // update visibility conditions and math on cloned fields
+
+      const profileTypesUpdates =
+        // updates are only required if coming from another organization
+        sourcePetition.org_id !== owner.org_id
+          ? clonedFields.filter(
+              (f) =>
+                // update standard profile types and fields references in searchIn to ids on the user's organization
+                (f.type === "PROFILE_SEARCH" && isNonNullish(f.options.searchIn)) ||
+                // update linked profile types on FIELD_GROUP
+                (f.type === "FIELD_GROUP" && isNonNullish(f.profile_type_id)) ||
+                // update linked profile type fields in FIELD_GROUP children
+                (isNonNullish(f.parent_petition_field_id) && isNonNullish(f.profile_type_field_id)),
+            )
+          : [];
+
+      const allFieldUpdates = [...fieldIdUpdates, ...profileTypesUpdates];
+
+      if (allFieldUpdates.length > 0) {
+        const profileTypes =
+          profileTypesUpdates.length > 0
+            ? await this.from("profile_type", t)
+                .whereNull("deleted_at")
+                .whereNotNull("standard_type")
+                .whereIn("org_id", [sourcePetition.org_id, owner.org_id])
+                .select("*")
+            : null;
+        // map profile type ids from source org to user org
+        const profileTypeIdMap =
+          profileTypes?.reduce(
+            (acc, type) => {
+              if (type.org_id === sourcePetition.org_id) {
+                const matchingType = profileTypes.find(
+                  (t) => t.org_id === owner.org_id && t.standard_type === type.standard_type,
+                );
+                acc[type.id] = matchingType?.id ?? null;
+              }
+              return acc;
+            },
+            {} as Record<number, number | null>,
+          ) ?? {};
+
+        const profileTypeFields = profileTypes
+          ? await this.from("profile_type_field", t)
+              .whereNull("deleted_at")
+              .whereIn(
+                "profile_type_id",
+                profileTypes.map((pt) => pt.id),
+              )
+              .select("*")
+          : null;
+        // map profile type field ids from source org to user org
+        const profileTypeFieldIdMap =
+          profileTypeFields?.reduce(
+            (acc, field) => {
+              const profileType = profileTypes?.find((pt) => pt.id === field.profile_type_id);
+              assert(profileType, `Profile type ${field.profile_type_id} not found`);
+              if (profileType.org_id === sourcePetition.org_id) {
+                const matchingProfileType = profileTypes?.find(
+                  (pt) =>
+                    pt.org_id === owner.org_id && pt.standard_type === profileType.standard_type,
+                );
+                const matchingField = profileTypeFields?.find(
+                  (ft) =>
+                    ft.profile_type_id === matchingProfileType?.id && ft.alias === field.alias,
+                );
+                acc[field.id] = matchingField?.id ?? null;
+              }
+              return acc;
+            },
+            {} as Record<number, number | null>,
+          ) ?? {};
+
         await this.raw<PetitionField>(
           /* sql */ `
           update petition_field as pf set
             visibility = t.visibility,
-            math = t.math
-          from (?) as t (id, visibility, math)
+            math = t.math,
+            options = t.options,
+            profile_type_id = t.profile_type_id,
+            profile_type_field_id = t.profile_type_field_id
+          from (?) as t (id, visibility, math, options, profile_type_id, profile_type_field_id)
           where t.id = pf.id
           returning *;
         `,
           [
             this.sqlValues(
-              fieldLogicUpdate.map((field) => {
+              allFieldUpdates.map((field) => {
                 const {
-                  field: { visibility, math },
+                  field: { visibility: mappedVisibility, math: mappedMath },
                   referencedLists,
                   // map field visibility and math field IDs into new IDs
                 } = mapFieldLogic<number, number>(field, (id) => newFieldIds[id]);
 
+                // TODO repasar luego de mergear ADVERSE_MEDIA_SEARCH
+                const mappedOptions = {
+                  ...field.options,
+                  ...("autoSearchConfig" in field.options &&
+                  isNonNullish(field.options.autoSearchConfig)
+                    ? {
+                        autoSearchConfig: {
+                          type: field.options.autoSearchConfig.type,
+                          name: field.options.autoSearchConfig.name.map(
+                            (id: number) => newFieldIds[id],
+                          ),
+                          date: isNonNullish(field.options.autoSearchConfig.date)
+                            ? newFieldIds[field.options.autoSearchConfig.date]
+                            : null,
+                          country: isNonNullish(field.options.autoSearchConfig.country)
+                            ? newFieldIds[field.options.autoSearchConfig.country]
+                            : null,
+                        },
+                      }
+                    : {}),
+                  ...("searchIn" in field.options &&
+                  isNonNullish(field.options.searchIn) &&
+                  Array.isArray(field.options.searchIn) &&
+                  sourcePetition.org_id !== owner.org_id
+                    ? {
+                        searchIn: field.options.searchIn.map(
+                          (item: { profileTypeId: number; profileTypeFieldIds: number[] }) => {
+                            const profileTypeId = profileTypeIdMap[item.profileTypeId];
+                            assert(profileTypeId, `Profile type ${item.profileTypeId} not found`);
+                            return {
+                              profileTypeId,
+                              profileTypeFieldIds: item.profileTypeFieldIds.map(
+                                (id) => profileTypeFieldIdMap[id],
+                              ),
+                            };
+                          },
+                        ),
+                      }
+                    : {}),
+                };
+
+                const mappedProfileTypeId =
+                  sourcePetition.org_id !== owner.org_id
+                    ? isNonNullish(field.profile_type_id)
+                      ? (profileTypeIdMap[field.profile_type_id] ?? null)
+                      : null
+                    : field.profile_type_id;
+
+                const mappedProfileTypeFieldId =
+                  sourcePetition.org_id !== owner.org_id
+                    ? isNonNullish(field.profile_type_field_id)
+                      ? (profileTypeFieldIdMap[field.profile_type_field_id] ?? null)
+                      : null
+                    : field.profile_type_field_id;
+
                 allReferencedLists.push(...referencedLists);
-                return [field.id, this.json(visibility), this.json(math)];
+                return [
+                  field.id,
+                  this.json(mappedVisibility),
+                  this.json(mappedMath),
+                  this.json(mappedOptions),
+                  mappedProfileTypeId,
+                  mappedProfileTypeFieldId,
+                ];
               }),
-              ["int", "jsonb", "jsonb"],
+              ["int", "jsonb", "jsonb", "jsonb", "int", "int"],
             ),
           ],
           t,
         );
       }
 
+      // after searching every place where a standard list could be referenced, update the standard list definitions override
       if (!cloned.is_template && allReferencedLists.length > 0) {
         await this.updateStandardListDefinitionOverride(cloned.id, unique(allReferencedLists), t);
       }
 
-      const backgroundCheckFieldsUpdate = clonedFields.filter(
-        (f) => f.type === "BACKGROUND_CHECK" && isNonNullish(f.options.autoSearchConfig),
-      );
-
-      // update field references in autoSearchConfig to point to cloned fields
-      if (backgroundCheckFieldsUpdate.length > 0) {
-        await this.raw(
-          /* sql */ `
-          update petition_field as pf set
-            options = t.options
-          from (?) as t (id, options)
-          where t.id = pf.id
-          returning *;
-        `,
-          [
-            this.sqlValues(
-              backgroundCheckFieldsUpdate.map((field) => {
-                return [
-                  field.id,
-                  JSON.stringify({
-                    ...field.options,
-                    autoSearchConfig: {
-                      type: field.options.autoSearchConfig.type,
-                      name: field.options.autoSearchConfig.name.map(
-                        (id: number) => newFieldIds[id],
-                      ),
-                      date: isNonNullish(field.options.autoSearchConfig.date)
-                        ? newFieldIds[field.options.autoSearchConfig.date]
-                        : null,
-                      country: isNonNullish(field.options.autoSearchConfig.country)
-                        ? newFieldIds[field.options.autoSearchConfig.country]
-                        : null,
-                    },
-                  }),
-                ];
-              }),
-              ["int", "jsonb"],
-            ),
-          ],
+      if (sourcePetition.org_id !== owner.org_id) {
+        const clonedFieldGroupRelationships = await this.from(
+          "petition_field_group_relationship",
           t,
-        );
+        )
+          .where({ petition_id: cloned.id, deleted_at: null })
+          .select("id", "profile_relationship_type_id");
+
+        if (clonedFieldGroupRelationships.length > 0) {
+          const relationshipTypes = await this.from("profile_relationship_type", t)
+            .whereIn("org_id", [sourcePetition.org_id, owner.org_id])
+            .whereNull("deleted_at")
+            .select("id", "org_id", "alias");
+
+          const relationshipTypesMap = relationshipTypes.reduce(
+            (acc, type) => {
+              if (type.org_id === sourcePetition.org_id) {
+                const matchingType = relationshipTypes.find(
+                  (t) => t.org_id === owner.org_id && t.alias === type.alias,
+                );
+
+                acc[type.id] = matchingType?.id ?? null;
+              }
+
+              return acc;
+            },
+            {} as Record<number, number | null>,
+          );
+
+          await this.raw(
+            /* sql */ `
+            update petition_field_group_relationship as pfr set
+              profile_relationship_type_id = t.profile_relationship_type_id
+            from (?) as t (id, profile_relationship_type_id)
+            where t.id = pfr.id
+            returning *;
+          `,
+            [
+              this.sqlValues(
+                clonedFieldGroupRelationships.map((r) => [
+                  r.id,
+                  relationshipTypesMap[r.profile_relationship_type_id] ?? null,
+                ]),
+                ["int", "int"],
+              ),
+            ],
+            t,
+          );
+        }
       }
 
       if (clonedFields.length > 0) {

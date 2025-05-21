@@ -21,6 +21,9 @@ import {
   PetitionFieldType,
   PetitionFieldTypeValues,
   PetitionUserNotification,
+  ProfileRelationshipType,
+  ProfileType,
+  ProfileTypeField,
   User,
 } from "../../__types";
 import { KNEX } from "../../knex";
@@ -2948,9 +2951,29 @@ describe("repositories/PetitionRepository", () => {
   });
 
   describe("clonePetition", () => {
+    let profileTypes: ProfileType[];
+    let individualPtfs: ProfileTypeField[];
+    let profileRelationshipTypes: ProfileRelationshipType[];
+
     beforeAll(async () => {
       await profilesSetup.createDefaultProfileTypes(organization.id, `User:${user.id}`);
       await profilesSetup.createDefaultProfileRelationshipTypes(organization.id, `User:${user.id}`);
+
+      profileTypes = await mocks.knex
+        .from("profile_type")
+        .where({ org_id: organization.id, deleted_at: null })
+        .select("*");
+      profileRelationshipTypes = await mocks.knex
+        .from("profile_relationship_type")
+        .where({ org_id: organization.id, deleted_at: null })
+        .select("*");
+
+      const individualPt = profileTypes.find((pt) => pt.standard_type === "INDIVIDUAL")!;
+
+      individualPtfs = await mocks.knex
+        .from("profile_type_field")
+        .where({ profile_type_id: individualPt.id, deleted_at: null })
+        .select("*");
     });
 
     it("copies petition field group relationships when cloning a petition or template", async () => {
@@ -3063,6 +3086,333 @@ describe("repositories/PetitionRepository", () => {
       await expect(
         petitions.clonePetition(template.id, user, { is_template: false, status: "DRAFT" }),
       ).resolves.not.toThrow();
+    });
+
+    it("correctly updates referenced profile types and field ids on a PROFILE_SEARCH field when cloning a public template from another org", async () => {
+      const [otherOrg] = await mocks.createRandomOrganizations(1);
+      const [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
+
+      await profilesSetup.createDefaultProfileTypes(otherOrg.id, `User:${otherUser.id}`);
+
+      const [individualPt] = await mocks.knex
+        .from("profile_type")
+        .where({
+          org_id: otherOrg.id,
+          standard_type: "INDIVIDUAL",
+        })
+        .select("*");
+
+      const [individualPtField] = await mocks.knex
+        .from("profile_type_field")
+        .where({
+          profile_type_id: individualPt.id,
+          alias: "p_last_name",
+        })
+        .select("*");
+
+      const [template] = await mocks.createRandomTemplates(otherOrg.id, otherUser.id, 1, () => ({
+        template_public: true,
+      }));
+
+      await mocks.createRandomPetitionFields(template.id, 1, () => ({
+        type: "PROFILE_SEARCH",
+        options: JSON.stringify({
+          searchIn: [
+            {
+              profileTypeId: individualPt.id,
+              profileTypeFieldIds: [individualPtField.id],
+            },
+          ],
+        }),
+      }));
+
+      const cloned = await petitions.clonePetition(template.id, user, {
+        is_template: false,
+        status: "DRAFT",
+      });
+
+      const clonedFields = await mocks.knex
+        .from("petition_field")
+        .where({ petition_id: cloned.id, deleted_at: null })
+        .select("id", "type", "options");
+
+      expect(clonedFields).toIncludeSameMembers([
+        {
+          id: expect.any(Number),
+          type: "PROFILE_SEARCH",
+          options: {
+            searchIn: [
+              {
+                profileTypeId: profileTypes.find((pt) => pt.standard_type === "INDIVIDUAL")!.id,
+                profileTypeFieldIds: [
+                  individualPtfs.find((ptf) => ptf.alias === "p_last_name")!.id,
+                ],
+              },
+            ],
+          },
+        },
+      ]);
+    });
+
+    it("correctly updates referenced field ids on a BACKGROUND_CHECK field with autoSearchConfig", async () => {
+      const [template] = await mocks.createRandomTemplates(organization.id, user.id, 1, () => ({
+        template_public: true,
+      }));
+
+      const [shortText, date, select] = await mocks.createRandomPetitionFields(
+        template.id,
+        3,
+        (i) => ({
+          type: ["SHORT_TEXT", "DATE", "SELECT"][i] as PetitionFieldType,
+          options: i === 2 ? { standardList: "COUNTRIES" } : {},
+        }),
+      );
+
+      await mocks.createRandomPetitionFields(template.id, 1, () => ({
+        type: "BACKGROUND_CHECK",
+        options: JSON.stringify({
+          autoSearchConfig: {
+            type: "PERSON",
+            name: [shortText.id],
+            date: date.id,
+            country: select.id,
+          },
+        }),
+      }));
+
+      const cloned = await petitions.clonePetition(template.id, user, {
+        is_template: false,
+        status: "DRAFT",
+      });
+      const clonedFields = await mocks.knex
+        .from("petition_field")
+        .where({ petition_id: cloned.id, deleted_at: null })
+        .select("id", "type", "options");
+
+      expect(clonedFields).toIncludeSameMembers([
+        {
+          id: expect.any(Number),
+          type: "SHORT_TEXT",
+          options: {},
+        },
+        {
+          id: expect.any(Number),
+          type: "DATE",
+          options: {},
+        },
+        {
+          id: expect.any(Number),
+          type: "SELECT",
+          options: {
+            standardList: "COUNTRIES",
+          },
+        },
+        {
+          id: expect.any(Number),
+          type: "BACKGROUND_CHECK",
+          options: {
+            autoSearchConfig: {
+              type: "PERSON",
+              name: [clonedFields.find((f) => f.type === "SHORT_TEXT")!.id],
+              date: clonedFields.find((f) => f.type === "DATE")!.id,
+              country: clonedFields.find((f) => f.type === "SELECT")!.id,
+            },
+          },
+        },
+      ]);
+    });
+
+    it("correctly updates field groups linked to standard profile types when cloning a public template from another org", async () => {
+      const [otherOrg] = await mocks.createRandomOrganizations(1);
+      const [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
+
+      await profilesSetup.createDefaultProfileTypes(otherOrg.id, `User:${otherUser.id}`);
+      await profilesSetup.createDefaultProfileRelationshipTypes(
+        otherOrg.id,
+        `User:${otherUser.id}`,
+      );
+
+      const otherOrgPts = await mocks.knex
+        .from("profile_type")
+        .where({ org_id: otherOrg.id, deleted_at: null })
+        .select("*");
+
+      const otherOrgPrts = await mocks.knex
+        .from("profile_relationship_type")
+        .where({ org_id: otherOrg.id, deleted_at: null })
+        .select("*");
+
+      const [publicTemplate] = await mocks.createRandomTemplates(
+        otherOrg.id,
+        otherUser.id,
+        1,
+        () => ({ template_public: true }),
+      );
+
+      const ptIndividual = otherOrgPts.find((pt) => pt.standard_type === "INDIVIDUAL")!;
+      const ptCompany = otherOrgPts.find((pt) => pt.standard_type === "LEGAL_ENTITY")!;
+      const ptContract = otherOrgPts.find((pt) => pt.standard_type === "CONTRACT")!;
+
+      const [individuals, companies, contracts] = await mocks.createRandomPetitionFields(
+        publicTemplate.id,
+        3,
+        (i) => ({
+          type: "FIELD_GROUP",
+          multiple: true,
+          profile_type_id: [ptIndividual.id, ptCompany.id, ptContract.id][i],
+        }),
+      );
+
+      const otherOrgFamilyMember = otherOrgPrts.find((prt) => prt.alias === "p_family_member")!;
+      const otherOrgDirector = otherOrgPrts.find((prt) => prt.alias === "p_director__managed_by")!;
+      const otherOrgMainContract = otherOrgPrts.find(
+        (prt) => prt.alias === "p_main_contract__annex",
+      )!;
+
+      await mocks.knex.from("petition_field_group_relationship").insert([
+        {
+          petition_id: publicTemplate.id,
+          left_side_petition_field_id: individuals.id,
+          right_side_petition_field_id: individuals.id,
+          profile_relationship_type_id: otherOrgFamilyMember.id,
+          direction: "LEFT_RIGHT",
+        },
+        {
+          petition_id: publicTemplate.id,
+          left_side_petition_field_id: individuals.id,
+          right_side_petition_field_id: companies.id,
+          profile_relationship_type_id: otherOrgDirector.id,
+          direction: "LEFT_RIGHT",
+        },
+        {
+          petition_id: publicTemplate.id,
+          left_side_petition_field_id: contracts.id,
+          right_side_petition_field_id: contracts.id,
+          profile_relationship_type_id: otherOrgMainContract.id,
+          direction: "LEFT_RIGHT",
+        },
+      ]);
+
+      const cloned = await petitions.clonePetition(publicTemplate.id, user, {
+        is_template: false,
+        status: "DRAFT",
+      });
+
+      const clonedFields: Pick<PetitionField, "id" | "type" | "profile_type_id">[] =
+        await mocks.knex
+          .from("petition_field")
+          .where({ petition_id: cloned.id, deleted_at: null })
+          .select("id", "type", "profile_type_id");
+
+      expect(clonedFields).toIncludeSameMembers([
+        {
+          id: expect.any(Number),
+          type: "FIELD_GROUP",
+          profile_type_id: profileTypes.find((pt) => pt.standard_type === "INDIVIDUAL")!.id,
+        },
+        {
+          id: expect.any(Number),
+          type: "FIELD_GROUP",
+          profile_type_id: profileTypes.find((pt) => pt.standard_type === "LEGAL_ENTITY")!.id,
+        },
+        {
+          id: expect.any(Number),
+          type: "FIELD_GROUP",
+          profile_type_id: profileTypes.find((pt) => pt.standard_type === "CONTRACT")!.id,
+        },
+      ]);
+
+      const clonedIndividuals = clonedFields.find(
+        (f) =>
+          f.profile_type_id === profileTypes.find((pt) => pt.standard_type === "INDIVIDUAL")!.id,
+      )!;
+
+      const clonedCompanies = clonedFields.find(
+        (f) =>
+          f.profile_type_id === profileTypes.find((pt) => pt.standard_type === "LEGAL_ENTITY")!.id,
+      )!;
+
+      const clonedContracts = clonedFields.find(
+        (f) => f.profile_type_id === profileTypes.find((pt) => pt.standard_type === "CONTRACT")!.id,
+      )!;
+
+      const familyMember = profileRelationshipTypes.find((prt) => prt.alias === "p_family_member")!;
+      const director = profileRelationshipTypes.find(
+        (prt) => prt.alias === "p_director__managed_by",
+      )!;
+      const mainContract = profileRelationshipTypes.find(
+        (prt) => prt.alias === "p_main_contract__annex",
+      )!;
+
+      const clonedFieldGroupRelationships = await mocks.knex
+        .from("petition_field_group_relationship")
+        .where({ petition_id: cloned.id, deleted_at: null })
+        .select(
+          "petition_id",
+          "left_side_petition_field_id",
+          "right_side_petition_field_id",
+          "profile_relationship_type_id",
+        );
+
+      expect(clonedFieldGroupRelationships).toIncludeSameMembers([
+        {
+          petition_id: cloned.id,
+          left_side_petition_field_id: clonedIndividuals.id,
+          right_side_petition_field_id: clonedIndividuals.id,
+          profile_relationship_type_id: familyMember.id,
+        },
+        {
+          petition_id: cloned.id,
+          left_side_petition_field_id: clonedIndividuals.id,
+          right_side_petition_field_id: clonedCompanies.id,
+          profile_relationship_type_id: director.id,
+        },
+        {
+          petition_id: cloned.id,
+          left_side_petition_field_id: clonedContracts.id,
+          right_side_petition_field_id: clonedContracts.id,
+          profile_relationship_type_id: mainContract.id,
+        },
+      ]);
+    });
+
+    it("unlinks field groups linked to non-standard profile types when cloning a public template from another org", async () => {
+      const [otherOrg] = await mocks.createRandomOrganizations(1);
+      const [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
+
+      const [nonStandardPt] = await mocks.createRandomProfileTypes(otherOrg.id, 1);
+
+      const [publicTemplate] = await mocks.createRandomTemplates(
+        otherOrg.id,
+        otherUser.id,
+        1,
+        () => ({ template_public: true }),
+      );
+
+      await mocks.createRandomPetitionFields(publicTemplate.id, 1, (i) => ({
+        type: "FIELD_GROUP",
+        multiple: true,
+        profile_type_id: nonStandardPt.id,
+      }));
+
+      const cloned = await petitions.clonePetition(publicTemplate.id, user, {
+        is_template: false,
+        status: "DRAFT",
+      });
+
+      const clonedFields: Pick<PetitionField, "id" | "type" | "profile_type_id">[] =
+        await mocks.knex
+          .from("petition_field")
+          .where({ petition_id: cloned.id, deleted_at: null })
+          .select("id", "type", "profile_type_id");
+
+      expect(clonedFields).toIncludeSameMembers([
+        {
+          id: expect.any(Number),
+          type: "FIELD_GROUP",
+          profile_type_id: null,
+        },
+      ]);
     });
   });
 });
