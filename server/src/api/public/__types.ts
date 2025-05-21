@@ -2969,6 +2969,7 @@ export type MutationstartPetitionApprovalRequestStepArgs = {
 };
 
 export type MutationstartSignatureRequestArgs = {
+  additionalSigners?: InputMaybe<Array<PublicPetitionSignerDataInput>>;
   customDocumentTemporaryFileId?: InputMaybe<Scalars["GID"]["input"]>;
   message?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
@@ -10101,6 +10102,9 @@ export type StartSignature_startSignatureRequestMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   message?: InputMaybe<Scalars["String"]["input"]>;
   customDocumentTemporaryFileId?: InputMaybe<Scalars["GID"]["input"]>;
+  additionalSigners?: InputMaybe<
+    Array<PublicPetitionSignerDataInput> | PublicPetitionSignerDataInput
+  >;
 }>;
 
 export type StartSignature_startSignatureRequestMutation = {
@@ -13848,11 +13852,13 @@ export const StartSignature_startSignatureRequestDocument = gql`
     $petitionId: GID!
     $message: String
     $customDocumentTemporaryFileId: GID
+    $additionalSigners: [PublicPetitionSignerDataInput!]
   ) {
     startSignatureRequest(
       petitionId: $petitionId
       message: $message
       customDocumentTemporaryFileId: $customDocumentTemporaryFileId
+      additionalSigners: $additionalSigners
     ) {
       ...PetitionSignatureRequest
     }

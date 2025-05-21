@@ -1,4 +1,4 @@
-import { booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { booleanArg, list, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { isNonNullish, isNullish } from "remeda";
 import { toBytes } from "../../../util/fileSize";
 import { toGlobalId } from "../../../util/globalId";
@@ -9,6 +9,7 @@ import { ApolloError, ForbiddenError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonObjectArg } from "../../helpers/scalars/JSON";
 import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
+import { validPetitionSignerData } from "../../helpers/validators/validSignatureConfig";
 import {
   petitionCanUploadCustomSignatureDocument,
   petitionIsNotAnonymized,
@@ -24,8 +25,10 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     message: nullable(stringArg()),
-    customDocumentTemporaryFileId: globalIdArg("FileUpload"),
+    customDocumentTemporaryFileId: nullable(globalIdArg("FileUpload")),
+    additionalSigners: nullable(list(nonNull("PublicPetitionSignerDataInput"))),
   },
+  validateArgs: validPetitionSignerData("additionalSigners"),
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
@@ -37,6 +40,16 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
         throw new ApolloError(
           `Petition:${petition.id} was expected to have signature_config set`,
           "MISSING_SIGNATURE_CONFIG_ERROR",
+        );
+      }
+
+      if (
+        !petition.signature_config.allowAdditionalSigners &&
+        isNonNullish(args.additionalSigners)
+      ) {
+        throw new ApolloError(
+          `Petition does not allow additional signers`,
+          "ADDITIONAL_SIGNERS_NOT_ALLOWED_ERROR",
         );
       }
 
@@ -90,19 +103,19 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
     },
   ),
 
-  resolve: async (_, { petitionId, message, customDocumentTemporaryFileId }, ctx) => {
+  resolve: async (_, args, ctx) => {
     try {
-      const petition = (await ctx.petitions.loadPetition(petitionId))!;
+      const petition = (await ctx.petitions.loadPetition(args.petitionId))!;
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(petition.id, `User:${ctx.user!.id}`);
 
       await ctx.petitions.updatePetition(
-        petitionId,
+        args.petitionId,
         { status: "COMPLETED" },
         `User:${ctx.user!.id}`,
       );
 
       await ctx.petitions.createEvent({
-        petition_id: petitionId,
+        petition_id: args.petitionId,
         type: "PETITION_COMPLETED",
         data: { user_id: ctx.user!.id },
       });
@@ -111,8 +124,9 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
         petition.id,
         {
           ...petition.signature_config!,
-          message: message ?? undefined,
-          customDocumentTemporaryFileId: customDocumentTemporaryFileId ?? undefined,
+          message: args.message ?? undefined,
+          customDocumentTemporaryFileId: args.customDocumentTemporaryFileId ?? undefined,
+          additionalSignersInfo: args.additionalSigners ?? undefined,
         },
         ctx.user!,
       );

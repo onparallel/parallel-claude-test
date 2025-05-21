@@ -3302,11 +3302,13 @@ export function publicApi(container: Container) {
             $petitionId: GID!
             $message: String
             $customDocumentTemporaryFileId: GID
+            $additionalSigners: [PublicPetitionSignerDataInput!]
           ) {
             startSignatureRequest(
               petitionId: $petitionId
               message: $message
               customDocumentTemporaryFileId: $customDocumentTemporaryFileId
+              additionalSigners: $additionalSigners
             ) {
               ...PetitionSignatureRequest
             }
@@ -3339,6 +3341,7 @@ export function publicApi(container: Container) {
             petitionId: params.petitionId,
             message: body.message,
             customDocumentTemporaryFileId,
+            additionalSigners: body.additionalSigners,
           });
 
           assert("id" in response.startSignatureRequest);
@@ -3356,15 +3359,22 @@ export function publicApi(container: Container) {
             throw new ForbiddenError("You don't have enough credits to complete this parallel");
           } else if (containsGraphQLError(error, "APPROVAL_REQUEST_STEP_NOT_COMPLETED")) {
             throw new ForbiddenError(error.message);
+          } else if (containsGraphQLError(error, "ADDITIONAL_SIGNERS_NOT_ALLOWED_ERROR")) {
+            throw new BadRequestError(error.message);
           } else if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
-            const { error_code: errorCode } = error.response.errors![0].extensions.extra as {
-              error_code: string;
-            };
-            if (errorCode === "INVALID_CONTENT_TYPE_ERROR") {
+            const extra = error.response.errors![0].extensions.extra as
+              | {
+                  error_code: string;
+                }
+              | undefined;
+            if (extra?.error_code === "INVALID_CONTENT_TYPE_ERROR") {
               throw new BadRequestError(`File must be a PDF document`);
             }
-            if (errorCode === "FILE_SIZE_EXCEEDED_ERROR") {
+            if (extra?.error_code === "FILE_SIZE_EXCEEDED_ERROR") {
               throw new BadRequestError(`File size exceeded`);
+            }
+            if (extra?.error_code === "INVALID_EMAIL_ERROR") {
+              throw new BadRequestError(error.message);
             }
           }
 

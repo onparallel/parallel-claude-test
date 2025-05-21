@@ -97,3 +97,25 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
+
+export function validPetitionSignerData<TypeName extends string, FieldName extends string>(
+  signersInfoProp: ArgWithPath<
+    TypeName,
+    FieldName,
+    NexusGenInputs["PublicPetitionSignerDataInput"][] | null | undefined
+  >,
+) {
+  return (async (_, args, ctx, info) => {
+    const [signersInfo] = getArgWithPath(args, signersInfoProp);
+    if (!signersInfo) {
+      return;
+    }
+    for (const [index, signer] of signersInfo.entries()) {
+      if (!EMAIL_REGEX.test(signer.email)) {
+        throw new ArgValidationError(info, `${signersInfoProp}[${index}].email`, `Invalid email.`, {
+          error_code: "INVALID_EMAIL_ERROR",
+        });
+      }
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}

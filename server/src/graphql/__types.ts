@@ -9556,6 +9556,7 @@ export interface NexusGenArgTypes {
     };
     startSignatureRequest: {
       // args
+      additionalSigners?: NexusGenInputs["PublicPetitionSignerDataInput"][] | null; // [PublicPetitionSignerDataInput!]
       customDocumentTemporaryFileId?: NexusGenScalars["GID"] | null; // GID
       message?: string | null; // String
       petitionId: NexusGenScalars["GID"]; // GID!

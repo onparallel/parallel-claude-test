@@ -35,6 +35,7 @@ import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validEmail } from "../helpers/validators/validEmail";
+import { validPetitionSignerData } from "../helpers/validators/validSignatureConfig";
 import {
   fieldAttachmentBelongsToField,
   fieldHasParent,
@@ -390,6 +391,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
     authenticatePublicAccess("keycode"),
     publicPetitionDoesNotHaveOngoingProcess("keycode"),
   ),
+  validateArgs: validPetitionSignerData("additionalSigners"),
   resolve: async (_, args, ctx) => {
     try {
       const petitionId = ctx.access!.petition_id;

@@ -2969,6 +2969,7 @@ export type MutationstartPetitionApprovalRequestStepArgs = {
 };
 
 export type MutationstartSignatureRequestArgs = {
+  additionalSigners?: InputMaybe<Array<PublicPetitionSignerDataInput>>;
   customDocumentTemporaryFileId?: InputMaybe<Scalars["GID"]["input"]>;
   message?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];

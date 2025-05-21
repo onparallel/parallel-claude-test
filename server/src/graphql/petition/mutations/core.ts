@@ -104,7 +104,10 @@ import { validIsNonNullish } from "../../helpers/validators/validIsDefined";
 import { validPath } from "../../helpers/validators/validPath";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
-import { validSignatureConfig } from "../../helpers/validators/validSignatureConfig";
+import {
+  validPetitionSignerData,
+  validSignatureConfig,
+} from "../../helpers/validators/validSignatureConfig";
 import {
   validPetitionSubject,
   validPublicPetitionLinkPetitionNamePattern,
@@ -2788,6 +2791,7 @@ export const completePetition = mutationField("completePetition", {
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionIsNotAnonymized("petitionId"),
   ),
+  validateArgs: validPetitionSignerData("additionalSigners"),
   resolve: async (_, args, ctx) => {
     try {
       const [composedPetition] = await ctx.petitions.getComposedPetitionFieldsAndVariables([

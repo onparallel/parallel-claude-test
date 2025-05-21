@@ -3180,6 +3180,7 @@ type Mutation {
     petitionId: GID!
   ): PetitionApprovalRequestStep!
   startSignatureRequest(
+    additionalSigners: [PublicPetitionSignerDataInput!]
     customDocumentTemporaryFileId: GID
     message: String
     petitionId: GID!

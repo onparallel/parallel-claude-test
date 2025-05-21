@@ -1838,6 +1838,26 @@ export const SignatureRequestInput = schema({
       type: "object",
       isFile: true,
     },
+    additionalSigners: {
+      description: "An optional list of additional signers",
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["email", "firstName", "lastName"],
+        properties: {
+          email: {
+            type: "string",
+          },
+          firstName: {
+            type: "string",
+          },
+          lastName: {
+            type: "string",
+          },
+        },
+      },
+    },
   },
 });
 
