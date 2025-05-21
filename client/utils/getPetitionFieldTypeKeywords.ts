@@ -305,6 +305,8 @@ export function getPetitionFieldTypeKeywords(type: PetitionFieldType) {
         "people",
         "conflict",
       ];
+    case "ADVERSE_MEDIA_SEARCH":
+      return ["adverse", "media", "search", "búsqueda", "medio", "adverso", "noticia", "news"];
     default:
       throw new Error(`Missing keywords PetitionFieldType  "${type}"`);
   }

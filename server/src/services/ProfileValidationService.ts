@@ -111,13 +111,13 @@ export class ProfileValidationService {
       throw new Error(ajv.errorsText());
     }
 
-    if (type === "BACKGROUND_CHECK") {
-      await this.validateBackgroundCheckOptions(options, profileTypeId);
+    if (type === "BACKGROUND_CHECK" || type === "ADVERSE_MEDIA_SEARCH") {
+      await this.validateMonitoringOptions(options, profileTypeId);
     }
   }
 
-  private async validateBackgroundCheckOptions(
-    options: ProfileTypeFieldOptions["BACKGROUND_CHECK"],
+  private async validateMonitoringOptions(
+    options: ProfileTypeFieldOptions["BACKGROUND_CHECK" | "ADVERSE_MEDIA_SEARCH"],
     profileTypeId: number,
   ) {
     if (isNonNullish(options.monitoring?.activationCondition?.profileTypeFieldId)) {

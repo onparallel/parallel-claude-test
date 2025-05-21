@@ -5217,7 +5217,9 @@ describe("GraphQL/Profiles", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("FIELD_USED_IN_BACKGROUND_CHECK_MONITORING_RULE");
+      expect(errors).toContainGraphQLError("FIELD_USED_IN_MONITORING_RULE", {
+        profileTypeFieldIds: [toGlobalId("ProfileTypeField", backgroundCheckProfileTypeField.id)],
+      });
       expect(data).toBeNull();
     });
 
@@ -6043,17 +6045,22 @@ describe("GraphQL/Profiles", () => {
     });
 
     it("fails if trying to delete a profile type field that is being used in monitoring rules", async () => {
-      await mocks.createRandomProfileTypeFields(organization.id, profileTypes[0].id, 1, () => ({
-        type: "BACKGROUND_CHECK",
-        options: {
-          monitoring: {
-            activationCondition: {
-              profileTypeFieldId: profileType0Fields[7].id,
-              values: ["M"],
+      const [bgCheck] = await mocks.createRandomProfileTypeFields(
+        organization.id,
+        profileTypes[0].id,
+        1,
+        () => ({
+          type: "BACKGROUND_CHECK",
+          options: {
+            monitoring: {
+              activationCondition: {
+                profileTypeFieldId: profileType0Fields[7].id,
+                values: ["M"],
+              },
             },
           },
-        },
-      }));
+        }),
+      );
 
       const { errors, data } = await testClient.execute(
         gql`
@@ -6072,7 +6079,9 @@ describe("GraphQL/Profiles", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("FIELD_USED_IN_BACKGROUND_CHECK_MONITORING_RULE");
+      expect(errors).toContainGraphQLError("FIELD_USED_IN_MONITORING_RULE", {
+        profileTypeFieldIds: [toGlobalId("ProfileTypeField", bgCheck.id)],
+      });
       expect(data).toBeNull();
     });
 

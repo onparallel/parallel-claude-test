@@ -70,6 +70,7 @@ import {
   petitionsAreOfTypeTemplate,
   repliesBelongsToPetition,
   replyIsForFieldOfType,
+  replyTypeSwitch,
   userHasAccessToPetitions,
   userHasFeatureFlag,
 } from "../petition/authorizers";
@@ -557,7 +558,10 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
         }
       }
 
-      if (profileTypeField.type === "BACKGROUND_CHECK" && options.monitoring === null) {
+      if (
+        ["BACKGROUND_CHECK", "ADVERSE_MEDIA_SEARCH"].includes(profileTypeField.type) &&
+        options.monitoring === null
+      ) {
         // check if there is any profile with active monitoring rules for this field, to warn the user that it will stop monitoring
         const profileIds = await ctx.profiles.getProfileIdsWithActiveMonitoringByProfileTypeFieldId(
           profileTypeField.id,
@@ -871,7 +875,7 @@ export const createProfile = mutationField("createProfile", {
           (ptf) => ptf!.id === field.profileTypeFieldId,
         )!;
 
-        if (profileTypeField.type === "FILE" || profileTypeField.type === "BACKGROUND_CHECK") {
+        if (["FILE", "BACKGROUND_CHECK", "ADVERSE_MEDIA_SEARCH"].includes(profileTypeField.type)) {
           throw new ApolloError(
             `Cannot create a profile with a field of type ${profileTypeField.type}`,
           );
@@ -1088,18 +1092,17 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
 
     assert(profileTypeFields.every(isNonNullish), "ProfileTypeField not found");
 
-    if (
-      fields.some((field) => {
-        const property = profileTypeFields.find((ptf) => ptf.id === field.profileTypeFieldId)!;
-        return (
-          (property.type === "BACKGROUND_CHECK" || property.type === "FILE") &&
-          isNonNullish(field.content)
-        );
-      })
-    ) {
-      throw new ForbiddenError(
-        "Cannot update BACKGROUND_CHECK and FILE contents with this mutation",
+    const invalidField = fields.find((field) => {
+      const property = profileTypeFields.find((ptf) => ptf.id === field.profileTypeFieldId)!;
+      return (
+        ["FILE", "BACKGROUND_CHECK", "ADVERSE_MEDIA_SEARCH"].includes(property.type) &&
+        isNonNullish(field.content)
       );
+    });
+
+    if (invalidField) {
+      const property = profileTypeFields.find((ptf) => ptf.id === invalidField.profileTypeFieldId)!;
+      throw new ForbiddenError(`Cannot update ${property.type} contents with this mutation`);
     }
 
     const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
@@ -1544,6 +1547,7 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
 export const copyBackgroundCheckReplyToProfileFieldValue = mutationField(
   "copyBackgroundCheckReplyToProfileFieldValue",
   {
+    deprecation: "use copyReplyContentToProfileFieldValue",
     type: "ProfileFieldValue",
     authorize: authenticateAnd(
       userHasFeatureFlag("PROFILES"),
@@ -1574,6 +1578,58 @@ export const copyBackgroundCheckReplyToProfileFieldValue = mutationField(
             profileId,
             profileTypeFieldId,
             type: "BACKGROUND_CHECK",
+            content: reply!.content,
+            expiryDate,
+          },
+        ],
+        ctx.user!.id,
+        ctx.user!.org_id,
+      );
+
+      return (await ctx.profiles.loadProfileFieldValue({ profileId, profileTypeFieldId }))!;
+    },
+  },
+);
+
+export const copyReplyContentToProfileFieldValue = mutationField(
+  "copyReplyContentToProfileFieldValue",
+  {
+    type: "ProfileFieldValue",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PROFILES"),
+      contextUserHasPermission("PROFILES:CREATE_PROFILES"),
+      userHasAccessToProfile("profileId"),
+      profileHasStatus("profileId", "OPEN"),
+      profileIsNotAnonymized("profileId"),
+      profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
+      userHasPermissionOnProfileTypeField("profileTypeFieldId", "WRITE"),
+      userHasAccessToPetitions("petitionId"),
+      petitionIsNotAnonymized("petitionId"),
+      repliesBelongsToPetition("petitionId", "replyId"),
+      replyIsForFieldOfType("replyId", ["BACKGROUND_CHECK", "ADVERSE_MEDIA_SEARCH"]),
+      replyTypeSwitch("replyId", {
+        BACKGROUND_CHECK: profileTypeFieldIsOfType("profileTypeFieldId", ["BACKGROUND_CHECK"]),
+        ADVERSE_MEDIA_SEARCH: profileTypeFieldIsOfType("profileTypeFieldId", [
+          "ADVERSE_MEDIA_SEARCH",
+        ]),
+      }),
+    ),
+    args: {
+      profileId: nonNull(globalIdArg("Profile")),
+      profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
+      petitionId: nonNull(globalIdArg("Petition")),
+      replyId: nonNull(globalIdArg("PetitionFieldReply")),
+      expiryDate: dateArg(),
+    },
+    resolve: async (_, { profileId, profileTypeFieldId, expiryDate, replyId }, ctx) => {
+      const reply = await ctx.petitions.loadFieldReply(replyId);
+
+      await ctx.profiles.updateProfileFieldValues(
+        [
+          {
+            profileId,
+            profileTypeFieldId,
+            type: reply!.type as "BACKGROUND_CHECK" | "ADVERSE_MEDIA_SEARCH",
             content: reply!.content,
             expiryDate,
           },
@@ -2545,6 +2601,36 @@ export const profileImportExcelModelDownloadLink = mutationField(
         filename,
         "attachment",
       );
+    },
+  },
+);
+
+export const updateProfileFieldValueMonitoringStatus = mutationField(
+  "updateProfileFieldValueMonitoringStatus",
+  {
+    type: "Profile",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PROFILES"),
+      userHasAccessToProfile("profileId"),
+      profileHasStatus("profileId", "OPEN"),
+      profileIsNotAnonymized("profileId"),
+      profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
+      userHasPermissionOnProfileTypeField("profileTypeFieldId", "WRITE"),
+      profileTypeFieldIsOfType("profileTypeFieldId", ["ADVERSE_MEDIA_SEARCH"]),
+    ),
+    args: {
+      profileId: nonNull(globalIdArg("Profile")),
+      profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
+      enabled: nonNull(booleanArg()),
+    },
+    resolve: async (_, args, ctx) => {
+      await ctx.profiles.updateProfileFieldValueOptionsByProfileId(
+        args.profileId,
+        args.profileTypeFieldId,
+        { active_monitoring: args.enabled },
+      );
+
+      return (await ctx.profiles.loadProfile(args.profileId))!;
     },
   },
 );

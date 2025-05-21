@@ -12,12 +12,13 @@ import {
   PetitionFieldAttachment,
   PetitionFieldReply,
   PetitionFieldType,
+  PetitionFieldTypeValues,
   User,
   UserGroup,
 } from "../../db/__types";
-import { defaultFieldProperties } from "../../db/helpers/fieldOptions";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
+import { PETITION_FIELD_SERVICE, PetitionFieldService } from "../../services/PetitionFieldService";
 import { toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
@@ -35,10 +36,14 @@ describe("GraphQL/Petition Fields", () => {
 
   let userGroup: UserGroup;
 
+  let petitionFields: PetitionFieldService;
+
   beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
+
+    petitionFields = testClient.container.get<PetitionFieldService>(PETITION_FIELD_SERVICE);
 
     ({ organization, user } = await mocks.createSessionUserAndOrganization());
 
@@ -2502,6 +2507,60 @@ describe("GraphQL/Petition Fields", () => {
         ],
       });
     });
+
+    it("sends error when trying to delete a field used in ADVERSE_MEDIA_SEARCH autoSearchConfig", async () => {
+      const [bgCheck, shortText] = await mocks.createRandomPetitionFields(
+        userPetition.id,
+        2,
+        (i) => ({
+          type: ["BACKGROUND_CHECK", "SHORT_TEXT"][i] as PetitionFieldType,
+        }),
+      );
+
+      await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "ADVERSE_MEDIA_SEARCH",
+        options: {
+          autoSearchConfig: {
+            name: [shortText.id],
+            backgroundCheck: bgCheck.id,
+          },
+        },
+      }));
+
+      const { errors: errors1, data: data1 } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", bgCheck.id),
+        },
+      );
+
+      expect(errors1).toContainGraphQLError("FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG");
+      expect(data1).toBeNull();
+
+      const { errors: errors2, data: data2 } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", shortText.id),
+        },
+      );
+
+      expect(errors2).toContainGraphQLError("FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG");
+      expect(data2).toBeNull();
+    });
   });
 
   describe("updateFieldPositions", () => {
@@ -3021,7 +3080,7 @@ describe("GraphQL/Petition Fields", () => {
         return {
           type,
           is_fixed: index === 0,
-          options: defaultFieldProperties(type).options,
+          options: petitionFields.defaultFieldProperties(type).options,
         };
       });
 
@@ -4571,6 +4630,401 @@ describe("GraphQL/Petition Fields", () => {
           replyOnlyFromProfile: false,
         },
       });
+    });
+
+    it("updates autoSearchConfig on a BACKGROUND_CHECK field", async () => {
+      const [backgroundCheck, name, date, country] = await mocks.createRandomPetitionFields(
+        userPetition.id,
+        4,
+        (i) => ({
+          type: ["BACKGROUND_CHECK", "SHORT_TEXT", "DATE", "SELECT"][i] as PetitionFieldType,
+          options: i === 3 ? { standardList: "COUNTRIES" } : {},
+          multiple: false,
+        }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+              options
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", backgroundCheck.id),
+          data: {
+            options: {
+              autoSearchConfig: {
+                type: "PERSON",
+                name: [toGlobalId("PetitionField", name.id)],
+                date: toGlobalId("PetitionField", date.id),
+                country: toGlobalId("PetitionField", country.id),
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetitionField).toEqual({
+        id: toGlobalId("PetitionField", backgroundCheck.id),
+        options: {
+          autoSearchConfig: {
+            type: "PERSON",
+            name: [toGlobalId("PetitionField", name.id)],
+            date: toGlobalId("PetitionField", date.id),
+            country: toGlobalId("PetitionField", country.id),
+          },
+        },
+      });
+    });
+
+    it("sends error if passing invalid fieldIds when updating autoSearchConfig on BACKGROUND_CHECK", async () => {
+      const [backgroundCheck, name, _date, country] = await mocks.createRandomPetitionFields(
+        userPetition.id,
+        4,
+        (i) => ({
+          type: ["BACKGROUND_CHECK", "SHORT_TEXT", "DATE", "SELECT"][i] as PetitionFieldType,
+          options: i === 3 ? { standardList: "COUNTRIES" } : {},
+          multiple: false,
+        }),
+      );
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+              options
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", backgroundCheck.id),
+          data: {
+            options: {
+              autoSearchConfig: {
+                type: "PERSON",
+                name: [toGlobalId("PetitionField", country.id)],
+                date: toGlobalId("PetitionField", name.id),
+                country: null,
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        argName: "data.options",
+        message: "Error: Invalid autoSearchConfig",
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error when passing fields that are children of another groups when updating autoSearchConfig on BACKGROUND_CHECK", async () => {
+      const [group1, group2] = await mocks.createRandomPetitionFields(userPetition.id, 2, () => ({
+        type: "FIELD_GROUP",
+      }));
+
+      const [backgroundCheck] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "BACKGROUND_CHECK",
+        multiple: false,
+        parent_petition_field_id: group1.id,
+      }));
+
+      const [name] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "SHORT_TEXT",
+        multiple: false,
+        parent_petition_field_id: group2.id,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+              options
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", backgroundCheck.id),
+          data: {
+            options: {
+              autoSearchConfig: {
+                type: "PERSON",
+                name: [toGlobalId("PetitionField", name.id)],
+                date: null,
+                country: null,
+              },
+            },
+          },
+        },
+      );
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        argName: "data.options",
+        message: "Error: Invalid autoSearchConfig",
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error when passing invalid json when updating authSearchConfig on BACKGROUND_CHECK", async () => {
+      const [backgroundCheck, name, date, country] = await mocks.createRandomPetitionFields(
+        userPetition.id,
+        4,
+        (i) => ({
+          type: ["BACKGROUND_CHECK", "SHORT_TEXT", "DATE", "SELECT"][i] as PetitionFieldType,
+          options: i === 3 ? { standardList: "COUNTRIES" } : {},
+          multiple: false,
+        }),
+      );
+
+      for (const autoSearchConfig of [
+        {
+          type: "PERSON",
+          name: [], // name must have at least 1 field
+          date: null,
+          country: null,
+        },
+        {
+          type: "PERSON",
+          name: null, // name must have at least 1 field
+          date: toGlobalId("PetitionField", date.id),
+          country: null,
+        },
+        {
+          type: "CONTRACT", // invalid type
+          name: [toGlobalId("PetitionField", name.id)],
+          date: null,
+          country: null,
+        },
+        {
+          type: "PERSON",
+          name: [toGlobalId("PetitionField", name.id)],
+          date: [toGlobalId("PetitionField", date.id)], // date must be a single field
+          country: null,
+        },
+        {
+          type: "PERSON",
+          name: [toGlobalId("PetitionField", name.id)],
+          date: null,
+          country: toGlobalId("PetitionField", country.id),
+          unknown: "unknown", // unknown property
+        },
+      ]) {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+                id
+                options
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", userPetition.id),
+            fieldId: toGlobalId("PetitionField", backgroundCheck.id),
+            data: { options: { autoSearchConfig } },
+          },
+        );
+        expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+        expect(data).toBeNull();
+      }
+    });
+
+    it("updates autoSearchConfig on a ADVERSE_MEDIA_SEARCH field", async () => {
+      const [adverseMedia, name, bgCheck] = await mocks.createRandomPetitionFields(
+        userPetition.id,
+        3,
+        (i) => ({
+          type: ["ADVERSE_MEDIA_SEARCH", "SHORT_TEXT", "BACKGROUND_CHECK"][i] as PetitionFieldType,
+          multiple: false,
+        }),
+      );
+
+      for (const autoSearchConfig of [
+        {
+          name: [toGlobalId("PetitionField", name.id)],
+          backgroundCheck: toGlobalId("PetitionField", bgCheck.id),
+        },
+        {
+          name: null,
+          backgroundCheck: toGlobalId("PetitionField", bgCheck.id),
+        },
+        {
+          name: [],
+          backgroundCheck: toGlobalId("PetitionField", bgCheck.id),
+        },
+        {
+          name: [toGlobalId("PetitionField", name.id)],
+          backgroundCheck: null,
+        },
+      ]) {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+                id
+                options
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", userPetition.id),
+            fieldId: toGlobalId("PetitionField", adverseMedia.id),
+            data: { options: { autoSearchConfig } },
+          },
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.updatePetitionField).toEqual({
+          id: toGlobalId("PetitionField", adverseMedia.id),
+          options: { autoSearchConfig },
+        });
+      }
+    });
+
+    it("sends error if passing invalid fieldIds when updating autoSearchConfig on ADVERSE_MEDIA_SEARCH", async () => {
+      const [adverseMedia, name, bgCheck] = await mocks.createRandomPetitionFields(
+        userPetition.id,
+        3,
+        (i) => ({
+          type: ["ADVERSE_MEDIA_SEARCH", "SHORT_TEXT", "BACKGROUND_CHECK"][i] as PetitionFieldType,
+          multiple: false,
+        }),
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+              options
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", adverseMedia.id),
+          data: {
+            options: {
+              autoSearchConfig: {
+                name: [toGlobalId("PetitionField", bgCheck.id)],
+                backgroundCheck: toGlobalId("PetitionField", name.id),
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        argName: "data.options",
+        message: "Error: Invalid autoSearchConfig",
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error when passing invalid json when updating authSearchConfig on ADVERSE_MEDIA_SEARCH", async () => {
+      const [adverseMedia, name, bgCheck] = await mocks.createRandomPetitionFields(
+        userPetition.id,
+        3,
+        (i) => ({
+          type: ["ADVERSE_MEDIA_SEARCH", "SHORT_TEXT", "BACKGROUND_CHECK"][i] as PetitionFieldType,
+          multiple: false,
+        }),
+      );
+
+      for (const autoSearchConfig of [
+        {
+          name: [],
+          backgroundCheck: null,
+        },
+        {
+          name: null,
+          backgroundCheck: null,
+        },
+        {
+          type: "PERSON", // BACKGROUND_CHECK config
+          name: [toGlobalId("PetitionField", name.id)],
+          date: null,
+          country: null,
+        },
+        {
+          name: toGlobalId("PetitionField", name.id), // name must be an array
+          backgroundCheck: toGlobalId("PetitionField", bgCheck.id),
+        },
+        {
+          name: [toGlobalId("PetitionField", name.id)],
+          backgroundCheck: [toGlobalId("PetitionField", bgCheck.id)], // backgroundCheck must be a single field
+        },
+        {
+          name: [toGlobalId("PetitionField", name.id)],
+          // missing property backgroundCheck
+        },
+      ]) {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+                id
+                options
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", userPetition.id),
+            fieldId: toGlobalId("PetitionField", adverseMedia.id),
+            data: { options: { autoSearchConfig } },
+          },
+        );
+        expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+        expect(data).toBeNull();
+      }
+    });
+
+    it("sends error when updating autoSearchConfig on a field other than ADVERSE_MEDIA_SEARCH or BACKGROUND_CHECK", async () => {
+      const invalidTypes = PetitionFieldTypeValues.filter(
+        (t) => t !== "ADVERSE_MEDIA_SEARCH" && t !== "BACKGROUND_CHECK",
+      );
+
+      const [field] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: invalidTypes[Math.floor(Math.random() * invalidTypes.length)] as PetitionFieldType,
+        multiple: false,
+      }));
+
+      const [name] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "SHORT_TEXT",
+        multiple: false,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", field.id),
+          data: {
+            options: {
+              autoSearchConfig: {
+                name: [toGlobalId("PetitionField", name.id)],
+                backgroundCheck: null,
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
     });
   });
 

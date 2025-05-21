@@ -35,7 +35,8 @@ import { PetitionComposeVariables } from "@parallel/components/petition-compose/
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
-import { useConfigureAutomateSearchDialog } from "@parallel/components/petition-compose/dialogs/ConfigureAutomateSearchDialog";
+import { useConfigureAdverseMediaAutomateSearchDialog } from "@parallel/components/petition-compose/dialogs/ConfigureAdverseMediaAutomateSearchDialog";
+import { useConfigureBackgroundCheckAutomateSearchDialog } from "@parallel/components/petition-compose/dialogs/ConfigureBackgroundCheckAutomateSearchDialog";
 import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeFieldTypeDialog";
 import { useConfirmChangeShortTextFormatDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeShortTextFormatDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmDeleteFieldDialog";
@@ -49,7 +50,10 @@ import {
   ReferencedFieldDialog,
   useReferencedFieldDialog,
 } from "@parallel/components/petition-compose/dialogs/ReferencedFieldDialog";
-import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
+import {
+  ONLY_INTERNAL_FIELD_TYPES,
+  PetitionComposeFieldSettings,
+} from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
 import {
   cleanPreviewFieldReplies,
   updatePreviewFieldReplies,
@@ -68,7 +72,6 @@ import {
   PetitionCompose_unlinkPetitionFieldChildrenDocument,
   PetitionCompose_updateFieldPositionsDocument,
   PetitionCompose_updatePetitionDocument,
-  PetitionCompose_updatePetitionFieldAutoSearchConfigDocument,
   PetitionCompose_updatePetitionFieldDocument,
   PetitionCompose_updatePetitionFieldFragmentDoc,
   PetitionCompose_userDocument,
@@ -368,11 +371,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     }
   };
 
-  const [updatePetitionFieldAutoSearchConfig] = useMutation(
-    PetitionCompose_updatePetitionFieldAutoSearchConfigDocument,
-  );
-
-  const checkReferencedFieldInBackgroundCheck = async (fieldId: string) => {
+  const checkReferencedFieldInAutoSearchConfig = async (fieldId: string) => {
     const { allFieldsWithIndices } = fieldsRef.current;
     const referencedInBackgroundCheck = allFieldsWithIndices.filter(([f]) => {
       const options = f.options as FieldOptions["BACKGROUND_CHECK"];
@@ -384,39 +383,72 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           options.autoSearchConfig.country === fieldId)
       );
     });
+    const referencedInAdverseMedia = allFieldsWithIndices.filter(([f]) => {
+      const options = f.options as FieldOptions["ADVERSE_MEDIA_SEARCH"];
+      return (
+        f.type === "ADVERSE_MEDIA_SEARCH" &&
+        options.autoSearchConfig &&
+        (options.autoSearchConfig.name?.includes(fieldId) ||
+          options.autoSearchConfig.backgroundCheck === fieldId)
+      );
+    });
 
     if (referencedInBackgroundCheck.length) {
       const [backgroundCheckField] = referencedInBackgroundCheck[0];
       try {
-        await showFieldUsedForSearchesDialog();
+        await showFieldUsedForSearchesDialog({ fieldTitle: backgroundCheckField.title });
         const config = await showAutomateSearchDialog({
           petitionId,
           field: backgroundCheckField,
         });
 
-        await updatePetitionFieldAutoSearchConfig({
-          variables: {
-            fieldId: backgroundCheckField.id,
-            petitionId,
-            config,
+        await _handleFieldEdit(backgroundCheckField.id, {
+          options: {
+            autoSearchConfig: config,
           },
         });
-
-        return true;
       } catch (e) {
         if (isDialogError(e) && e.reason === "DELETE_AUTO_SEARCH_CONFIG") {
           try {
             await _handleFieldEdit(backgroundCheckField.id, {
               options: {
-                ...backgroundCheckField.options,
                 autoSearchConfig: null,
               },
             });
           } catch {}
         }
+      } finally {
+        return true;
       }
-      return true;
     }
+
+    if (referencedInAdverseMedia.length) {
+      const [adverseMediaField] = referencedInAdverseMedia[0];
+      try {
+        await showFieldUsedForSearchesDialog({ fieldTitle: adverseMediaField.title });
+        const config = await showConfigureAdverseMediaAutomateSearchDialog({
+          petitionId,
+          field: adverseMediaField,
+        });
+
+        await _handleFieldEdit(adverseMediaField.id, {
+          options: { autoSearchConfig: config },
+        });
+      } catch (e) {
+        if (isDialogError(e) && e.reason === "DELETE_AUTO_SEARCH_CONFIG") {
+          try {
+            await _handleFieldEdit(adverseMediaField.id, {
+              options: {
+                autoSearchConfig: null,
+              },
+            });
+          } catch {}
+        }
+      } finally {
+        return true;
+      }
+    }
+
     return false;
   };
 
@@ -424,9 +456,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     wrapper(async function (fieldId: string) {
       setActiveFieldId((activeFieldId) => (activeFieldId === fieldId ? null : activeFieldId));
 
-      if (await checkReferencedFieldInBackgroundCheck(fieldId)) {
-        return;
-      }
       await deleteField(false);
 
       async function deleteField(force: boolean) {
@@ -470,7 +499,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             setAddFieldAfterId([_afterFieldId, _inParentFieldId]);
           }
         } catch (e) {
-          if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
+          if (isApolloError(e, "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
+            if (await checkReferencedFieldInAutoSearchConfig(fieldId)) {
+              return;
+            }
+          } else if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
             try {
               await confirmDelete();
             } catch {
@@ -587,14 +620,13 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         isNonNullish(field) &&
         field.type === "FIELD_GROUP" &&
         (field.children ?? []).length > 0 &&
-        (field.children![0].type === "DOW_JONES_KYC" ||
-          field.children![0].type === "BACKGROUND_CHECK")
+        ONLY_INTERNAL_FIELD_TYPES.includes(field.children![0].type)
       ) {
         await showErrorDialog.ignoringDialogErrors({
           message: (
             <FormattedMessage
-              id="generic.dow-jones-kyc-external-error"
-              defaultMessage="A Dow Jones field can't be set as external. Remove if from the group or move it to another position and try again."
+              id="page.petition-compose.field-group-with-internal-field-error"
+              defaultMessage="A group can't be set as external if it contains an only internal field as first field. Remove if from the group or move it to another position and try again."
             />
           ),
         });
@@ -711,7 +743,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         });
       } catch (e) {
         if (isApolloError(e, "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
-          await checkReferencedFieldInBackgroundCheck(fieldId);
+          await checkReferencedFieldInAutoSearchConfig(fieldId);
         }
         if (isApolloError(e, "ALIAS_ALREADY_EXISTS")) {
           throw e;
@@ -730,7 +762,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   );
   const handleFieldEdit = useCallback(wrapper(_handleFieldEdit), [petitionId, _handleFieldEdit]);
 
-  const showAutomateSearchDialog = useConfigureAutomateSearchDialog();
+  const showConfigureAdverseMediaAutomateSearchDialog =
+    useConfigureAdverseMediaAutomateSearchDialog();
+  const showAutomateSearchDialog = useConfigureBackgroundCheckAutomateSearchDialog();
   const showFieldUsedForSearchesDialog = useFieldUsedForSearchesDialog();
   const showReferencedFieldDialog = useReferencedFieldDialog();
   const confirmChangeFieldType = useConfirmChangeFieldTypeDialog();
@@ -738,10 +772,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const handleFieldTypeChange = useCallback(
     wrapper(async function (fieldId: string, type: PetitionFieldType) {
       const { allFieldsWithIndices } = fieldsRef.current!;
-
-      if (await checkReferencedFieldInBackgroundCheck(fieldId)) {
-        return;
-      }
 
       const field = allFieldsWithIndices.find(([f]) => f.id === fieldId)![0];
       const referencingVisibility = allFieldsWithIndices.filter(([f]) =>
@@ -828,7 +858,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         cleanPreviewFieldReplies(apollo, fieldId);
         return;
       } catch (e) {
-        if (isApolloError(e, "FIELD_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG")) {
+        if (isApolloError(e, "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
+          if (await checkReferencedFieldInAutoSearchConfig(fieldId)) {
+            return;
+          }
+        } else if (isApolloError(e, "FIELD_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG")) {
           await showErrorDialog.ignoringDialogErrors({
             header: (
               <Stack direction="row" spacing={2} align="center">
@@ -1140,7 +1174,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         await linkField();
       } catch (error) {
         if (isApolloError(error, "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
-          await checkReferencedFieldInBackgroundCheck(
+          await checkReferencedFieldInAutoSearchConfig(
             (error.graphQLErrors[0]!.extensions?.fieldId ?? "") as string,
           );
         } else if (isApolloError(error, "FIELD_HAS_REPLIES_ERROR")) {
@@ -1744,22 +1778,6 @@ const _fragments = {
 };
 
 const _mutations = [
-  gql`
-    mutation PetitionCompose_updatePetitionFieldAutoSearchConfig(
-      $petitionId: GID!
-      $fieldId: GID!
-      $config: UpdatePetitionFieldAutoSearchConfigInput
-    ) {
-      updatePetitionFieldAutoSearchConfig(
-        petitionId: $petitionId
-        fieldId: $fieldId
-        config: $config
-      ) {
-        id
-        options
-      }
-    }
-  `,
   gql`
     mutation PetitionCompose_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
       updatePetition(petitionId: $petitionId, data: $data) {

@@ -1,13 +1,22 @@
 import DataLoader from "dataloader";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { FromSchema } from "json-schema-to-ts";
 import pMap from "p-map";
 import { join } from "path";
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
-import { ProfileTypeFieldType, UserLocale, UserLocaleValues } from "../db/__types";
+import {
+  ContactLocale,
+  CreatePetitionField,
+  PetitionFieldType,
+  ProfileTypeField,
+  ProfileTypeFieldType,
+  UserLocale,
+  UserLocaleValues,
+} from "../db/__types";
 import { LOCALIZABLE_USER_TEXT_SCHEMA } from "../graphql";
 import { walkObject } from "../util/walkObject";
+import { PETITION_FIELD_SERVICE, PetitionFieldService } from "./PetitionFieldService";
 
 const EU_COUNTRIES =
   "AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE".split(",");
@@ -33,6 +42,67 @@ const STANDARD_LIST_NAMES = [
   "NACE",
   "SIC",
 ] as const;
+
+const FIELD_MONITORING_SCHEMA = {
+  type: ["object", "null"],
+  required: ["searchFrequency"],
+  additionalProperties: false,
+  properties: {
+    activationCondition: {
+      type: ["object", "null"],
+      required: ["profileTypeFieldId", "values"],
+      properties: {
+        profileTypeFieldId: { type: "number" },
+        values: {
+          type: "array",
+          minItems: 1,
+          items: {
+            type: "string",
+          },
+        },
+      },
+    },
+    searchFrequency: {
+      type: "object",
+      oneOf: [
+        {
+          type: "object",
+          required: ["type", "frequency"],
+          additionalProperties: false,
+          properties: {
+            type: { type: "string", const: "FIXED" },
+            frequency: {
+              type: "string",
+              enum: SEARCH_FREQUENCY,
+            },
+          },
+        },
+        {
+          type: "object",
+          required: ["type", "profileTypeFieldId", "options"],
+          additionalProperties: false,
+          properties: {
+            type: { type: "string", const: "VARIABLE" },
+            profileTypeFieldId: { type: "number" },
+            options: {
+              type: "array",
+              minItems: 1,
+              items: {
+                type: "object",
+                required: ["frequency", "value"],
+                additionalProperties: false,
+                properties: {
+                  frequency: { type: "string", enum: SEARCH_FREQUENCY },
+                  value: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+      ],
+    },
+  },
+} as const;
 
 export const SCHEMAS = {
   TEXT: {
@@ -143,66 +213,15 @@ export const SCHEMAS = {
     additionalProperties: false,
     required: [],
     properties: {
-      monitoring: {
-        type: ["object", "null"],
-        required: ["searchFrequency"],
-        additionalProperties: false,
-        properties: {
-          activationCondition: {
-            type: ["object", "null"],
-            required: ["profileTypeFieldId", "values"],
-            properties: {
-              profileTypeFieldId: { type: "number" },
-              values: {
-                type: "array",
-                minItems: 1,
-                items: {
-                  type: "string",
-                },
-              },
-            },
-          },
-          searchFrequency: {
-            type: "object",
-            oneOf: [
-              {
-                type: "object",
-                required: ["type", "frequency"],
-                additionalProperties: false,
-                properties: {
-                  type: { type: "string", const: "FIXED" },
-                  frequency: {
-                    type: "string",
-                    enum: SEARCH_FREQUENCY,
-                  },
-                },
-              },
-              {
-                type: "object",
-                required: ["type", "profileTypeFieldId", "options"],
-                additionalProperties: false,
-                properties: {
-                  type: { type: "string", const: "VARIABLE" },
-                  profileTypeFieldId: { type: "number" },
-                  options: {
-                    type: "array",
-                    minItems: 1,
-                    items: {
-                      type: "object",
-                      required: ["frequency", "value"],
-                      additionalProperties: false,
-                      properties: {
-                        frequency: { type: "string", enum: SEARCH_FREQUENCY },
-                        value: { type: "string" },
-                      },
-                    },
-                  },
-                },
-              },
-            ],
-          },
-        },
-      },
+      monitoring: FIELD_MONITORING_SCHEMA,
+    },
+  },
+  ADVERSE_MEDIA_SEARCH: {
+    type: "object",
+    additionalProperties: false,
+    required: [],
+    properties: {
+      monitoring: FIELD_MONITORING_SCHEMA,
     },
   },
 } as const;
@@ -211,10 +230,14 @@ export type ProfileTypeFieldOptions = {
   [K in keyof typeof SCHEMAS]: FromSchema<(typeof SCHEMAS)[K]>;
 };
 
+export type ProfileTypeFieldMonitoring = NonNullable<FromSchema<typeof FIELD_MONITORING_SCHEMA>>;
+
 export const PROFILE_TYPE_FIELD_SERVICE = Symbol.for("PROFILE_TYPE_FIELD_SERVICE");
 
 @injectable()
 export class ProfileTypeFieldService {
+  constructor(@inject(PETITION_FIELD_SERVICE) private petitionFields: PetitionFieldService) {}
+
   defaultProfileTypeFieldOptions(type: ProfileTypeFieldType): any {
     if (type === "DATE") {
       return { useReplyAsExpiryDate: false };
@@ -263,7 +286,7 @@ export class ProfileTypeFieldService {
     }
   }
 
-  sanitizeProfileFieldValueContent(type: ProfileTypeFieldType, content: any) {
+  mapValueContentToDatabase(type: ProfileTypeFieldType, content: any) {
     switch (type) {
       case "PHONE":
         assert(typeof content.value === "string", "Expected value to be a string");
@@ -275,6 +298,78 @@ export class ProfileTypeFieldService {
       default:
         return content;
     }
+  }
+
+  mapToPetitionField(
+    profileTypeField: ProfileTypeField,
+    defaultLocale: ContactLocale,
+  ): Omit<CreatePetitionField, "petition_id" | "position" | "parent_petition_field_id"> {
+    const FIELD_TYPE_MAP: Record<ProfileTypeFieldType, PetitionFieldType> = {
+      TEXT: "TEXT",
+      SHORT_TEXT: "SHORT_TEXT",
+      SELECT: "SELECT",
+      PHONE: "PHONE",
+      NUMBER: "NUMBER",
+      FILE: "FILE_UPLOAD",
+      DATE: "DATE",
+      BACKGROUND_CHECK: "BACKGROUND_CHECK",
+      CHECKBOX: "CHECKBOX",
+      ADVERSE_MEDIA_SEARCH: "ADVERSE_MEDIA_SEARCH",
+    };
+    const type = FIELD_TYPE_MAP[profileTypeField.type];
+
+    const defaultProperties = this.petitionFields.defaultFieldProperties(type);
+
+    switch (profileTypeField.type) {
+      case "SHORT_TEXT": {
+        defaultProperties.options.format = profileTypeField.options.format ?? null;
+        break;
+      }
+      case "SELECT": {
+        const options = profileTypeField.options as ProfileTypeFieldOptions["SELECT"];
+        defaultProperties.options.standardList = options.standardList ?? null;
+        defaultProperties.options.values = isNonNullish(options.standardList)
+          ? []
+          : options.values.map((v) => v.value);
+        defaultProperties.options.labels = isNonNullish(options.standardList)
+          ? []
+          : options.values.map(
+              (v) => (v.label as any)[defaultLocale] ?? v.label["en"] ?? v.label["es"] ?? null,
+            );
+        break;
+      }
+      case "CHECKBOX": {
+        const options = profileTypeField.options as ProfileTypeFieldOptions["CHECKBOX"];
+        defaultProperties.options.standardList = options.standardList ?? null;
+        defaultProperties.options.values = isNonNullish(options.standardList)
+          ? []
+          : options.values.map((v) => v.value);
+        defaultProperties.options.labels = isNonNullish(options.standardList)
+          ? []
+          : options.values.map(
+              (v) => (v.label as any)[defaultLocale] ?? v.label["en"] ?? v.label["es"] ?? null,
+            );
+        defaultProperties.options.limit = {
+          min: 1,
+          max: 1,
+          type: "UNLIMITED",
+        };
+        break;
+      }
+      default:
+        break;
+    }
+
+    return {
+      profile_type_field_id: profileTypeField.id,
+      type,
+      title:
+        profileTypeField.name[defaultLocale] ??
+        profileTypeField.name["en"] ??
+        profileTypeField.name["es"] ??
+        null,
+      ...defaultProperties,
+    };
   }
 
   private readonly standardListsLoader = new DataLoader<

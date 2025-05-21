@@ -1,6 +1,5 @@
-import { extension } from "mime-types";
 import { arg, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
-import { findLast, isNonNullish, isNullish, minBy, pick, unique, zip } from "remeda";
+import { findLast, isNonNullish, isNullish, minBy } from "remeda";
 import { assert } from "ts-essentials";
 import {
   ContactLocaleValues,
@@ -10,7 +9,6 @@ import {
   StandardListDefinitionListTypeValues,
 } from "../../../db/__types";
 import { ReplyStatusChangedEvent } from "../../../db/events/PetitionEvent";
-import { mapFieldOptions, PetitionFieldOptions } from "../../../db/helpers/fieldOptions";
 import { defaultBrandTheme } from "../../../util/BrandTheme";
 import {
   mapFieldLogic,
@@ -19,7 +17,6 @@ import {
 } from "../../../util/fieldLogic";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
-import { isFileTypeField } from "../../../util/isFileTypeField";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { renderSlateToHtml } from "../../../util/slate/render";
 import { getPetitionApprovalRequestStatus } from "../../helpers/getPetitionApprovalRequestStatus";
@@ -512,10 +509,10 @@ export const PetitionFieldMini = objectType({
       resolve: async (o, _, ctx) => {
         if (o.type === "SELECT" || o.type === "CHECKBOX") {
           const petition = (await ctx.petitions.loadPetition(o.petition_id))!;
-          return await mapFieldOptions(o, petition.recipient_locale);
+          return await ctx.petitionFields.mapFieldOptions(o, petition.recipient_locale);
         }
 
-        return await mapFieldOptions(o);
+        return await ctx.petitionFields.mapFieldOptions(o);
       },
     });
   },
@@ -785,6 +782,10 @@ export const PetitionFieldType = enumType({
       name: "PROFILE_SEARCH",
       description: "A field for performing searches in the profiles database",
     },
+    {
+      name: "ADVERSE_MEDIA_SEARCH",
+      description: "A field for performing searches in the adverse media database",
+    },
   ],
 });
 
@@ -811,10 +812,10 @@ export const PetitionField = objectType({
       resolve: async (o, _, ctx) => {
         if (o.type === "SELECT" || o.type === "CHECKBOX") {
           const petition = (await ctx.petitions.loadPetition(o.petition_id))!;
-          return await mapFieldOptions(o, petition.recipient_locale);
+          return await ctx.petitionFields.mapFieldOptions(o, petition.recipient_locale);
         }
 
-        return await mapFieldOptions(o);
+        return await ctx.petitionFields.mapFieldOptions(o);
       },
     });
     t.boolean("optional", {
@@ -1288,107 +1289,7 @@ export const PetitionFieldReply = objectType({
     });
     t.jsonObject("content", {
       description: "The content of the reply.",
-      resolve: async (root, _, ctx) => {
-        if (isFileTypeField(root.type)) {
-          const file = isNonNullish(root.content.file_upload_id)
-            ? await ctx.files.loadFileUpload(root.content.file_upload_id)
-            : null;
-          const decrypted = isNonNullish(file?.password)
-            ? await ctx.encryption.decrypt(Buffer.from(file.password, "hex"), "utf8")
-            : null;
-          return file
-            ? {
-                id: toGlobalId("FileUpload", file.id),
-                filename: file.filename,
-                size: file.size,
-                contentType: file.content_type,
-                extension: extension(file.content_type) || null,
-                uploadComplete: file.upload_complete,
-                ...(root.type === "FILE_UPLOAD" && isNonNullish(decrypted)
-                  ? { password: decrypted }
-                  : {}),
-                ...(root.type === "DOW_JONES_KYC" ? { entity: root.content.entity } : {}),
-                ...(["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(root.type)
-                  ? pick(root.content, ["warning", "type"])
-                  : {}),
-              }
-            : root.anonymized_at
-              ? {}
-              : {
-                  ...(["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(root.type)
-                    ? // file_upload_id is null but reply is not anonymized: there was an error when requesting documents
-                      pick(root.content, ["type", "request", "error"])
-                    : {}),
-                };
-        } else if (root.type === "BACKGROUND_CHECK") {
-          return {
-            query: isNonNullish(root.content.query)
-              ? pick(root.content.query, ["name", "date", "type", "country"])
-              : null,
-            search: isNonNullish(root.content.search)
-              ? pick(root.content.search, ["totalCount"])
-              : null,
-            entity: isNonNullish(root.content.entity)
-              ? {
-                  ...pick(root.content.entity, ["id", "type", "name"]),
-                  properties: pick(root.content.entity.properties, ["topics"]),
-                }
-              : null,
-          };
-        } else if (root.type === "PROFILE_SEARCH") {
-          const field = await ctx.petitions.loadFieldForReply(root.id);
-          assert(field?.type === "PROFILE_SEARCH", "Field not found for reply");
-          const { searchIn } = field.options as PetitionFieldOptions["PROFILE_SEARCH"];
-
-          const profileTypeIds = unique(searchIn.map((s) => s.profileTypeId));
-          const profileTypeFieldIds = unique(searchIn.flatMap((s) => s.profileTypeFieldIds));
-          const profileIds = unique(root.content.value as number[]);
-
-          const profileTypes = (await ctx.profiles.loadProfileType(profileTypeIds)).filter(
-            isNonNullish,
-          );
-          const profiles = await ctx.profiles.loadProfile(profileIds);
-
-          const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
-          const profileValues = await ctx.profiles.loadProfileFieldValuesByProfileId(profileIds);
-
-          return {
-            search: root.content.search,
-            totalResults: root.content.totalResults,
-            profileTypes: profileTypes.map((pt) => ({
-              id: toGlobalId("ProfileType", pt.id),
-              name: pt.name,
-            })),
-            value: zip(profiles, profileValues).map(([p, values]) => {
-              if (!p) {
-                return null;
-              }
-              const fieldIds =
-                searchIn.find((s) => s.profileTypeId === p.profile_type_id)?.profileTypeFieldIds ??
-                [];
-
-              const profileType = profileTypes.find((pt) => pt.id === p.profile_type_id)!;
-
-              return {
-                id: toGlobalId("Profile", p.id),
-                name: p.localizable_name,
-                profileType: {
-                  id: toGlobalId("ProfileType", profileType.id),
-                  standardType: profileType.standard_type,
-                },
-                fields: fieldIds.map((ptfId) => ({
-                  id: toGlobalId("ProfileTypeField", ptfId),
-                  name: profileTypeFields.find((ptf) => ptf?.id === ptfId)!.name,
-                  value:
-                    values.find((v) => v.profile_type_field_id === ptfId)?.content?.value ?? null,
-                })),
-              };
-            }),
-          };
-        } else {
-          return root.content ?? {};
-        }
-      },
+      resolve: async (root, _, ctx) => await ctx.petitionsHelper.mapReplyContentFromDatabase(root),
     });
     t.nullable.field("field", {
       type: "PetitionField",

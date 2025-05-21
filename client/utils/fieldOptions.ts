@@ -104,4 +104,11 @@ export interface FieldOptions {
     };
   };
   PROFILE_SEARCH: {};
+  ADVERSE_MEDIA_SEARCH: {
+    autoSearchConfig?: {
+      // name and profile are globalIds pointing to SHORT_TEXT and BACKGROUND_CHECK fields on the petition
+      name: string[] | null;
+      backgroundCheck: string | null;
+    } | null;
+  };
 }

@@ -1,9 +1,11 @@
 import Excel from "exceljs";
 import { isNonNullish, partition, sortBy } from "remeda";
 import { Readable } from "stream";
-import { PetitionField, PetitionFieldReply, PetitionFieldType } from "../../db/__types";
-import { backgroundCheckFieldReplyUrl } from "../../util/backgroundCheck";
+import { PetitionField, PetitionFieldReply } from "../../db/__types";
+
 import { applyFieldVisibility } from "../../util/fieldLogic";
+
+import { fieldReplyUrl } from "../../util/fieldReplyUrl";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { pMapChunk } from "../../util/promises/pMapChunk";
@@ -83,18 +85,19 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
         };
 
         function replyContent(
-          r: { content: any; type: PetitionFieldType; escapeCommas: boolean },
-          field: Pick<AliasedPetitionField, "id" | "petition_id">,
+          r: Pick<PetitionFieldReply, "content" | "parent_petition_field_reply_id">,
+          field: Pick<AliasedPetitionField, "id" | "type" | "petition_id">,
+          opts?: { escapeCommas: boolean },
         ) {
           function valueMap(value: any) {
             // escape commas on every reply to distinguish between multiple replies
-            if (r.escapeCommas && typeof value === "string") {
+            if (opts?.escapeCommas && typeof value === "string") {
               return value.replaceAll(",", "\\,");
             }
             return value;
           }
 
-          switch (r.type) {
+          switch (field.type) {
             case "CHECKBOX":
               return (r.content.value as string[]).map(valueMap).join(",");
             case "DYNAMIC_SELECT":
@@ -104,8 +107,9 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
                 .map(valueMap)
                 .join(",");
             case "BACKGROUND_CHECK":
+            case "ADVERSE_MEDIA_SEARCH":
               // no need for "valueMap", as URL will never include commas
-              return backgroundCheckFieldReplyUrl(parallelUrl, "en", field, r);
+              return fieldReplyUrl(parallelUrl, "en", field, r);
             default:
               return valueMap(r.content.value);
           }
@@ -126,7 +130,7 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
             reply_group_index?: number;
           },
           parent: Pick<AliasedPetitionField, "options" | "from_petition_field_id" | "alias"> | null,
-          replies: Pick<PetitionFieldReply, "content" | "type">[],
+          replies: Pick<PetitionFieldReply, "content" | "parent_petition_field_reply_id">[],
         ) {
           if (field.type === "PROFILE_SEARCH") {
             return;
@@ -162,17 +166,12 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
           row[columnId] = !isFileTypeField(field.type)
             ? replies
                 .map((r) =>
-                  replyContent(
-                    {
-                      content: r.content,
-                      type: field.type,
-                      escapeCommas:
-                        field.multiple ||
-                        field.type === "CHECKBOX" ||
-                        field.type === "DYNAMIC_SELECT",
-                    },
-                    field,
-                  ),
+                  replyContent(r, field, {
+                    escapeCommas:
+                      field.multiple ||
+                      field.type === "CHECKBOX" ||
+                      field.type === "DYNAMIC_SELECT",
+                  }),
                 )
                 .join(",")
             : replies.length > 0

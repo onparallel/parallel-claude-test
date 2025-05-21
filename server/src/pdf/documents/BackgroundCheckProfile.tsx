@@ -6,7 +6,7 @@ import {
   EntityDetailsResponse,
   EntitySearchRequest,
   EntitySearchResponse,
-} from "../../services/background-check-clients/BackgroundCheckClient";
+} from "../../services/BackgroundCheckService";
 import { FORMATS } from "../../util/dates";
 import { Header } from "../components/background-check/Header";
 import { RiskLabel } from "../components/background-check/RiskLabel";

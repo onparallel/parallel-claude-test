@@ -25,6 +25,23 @@ import { isFileTypeField } from "../../util/isFileTypeField";
 import { createLiquid } from "../../util/liquid";
 import { TaskRunner } from "../helpers/TaskRunner";
 
+const SUMMARY_FIELD_TYPES = [
+  "TEXT",
+  "FILE_UPLOAD",
+  "HEADING",
+  "SELECT",
+  "DYNAMIC_SELECT",
+  "SHORT_TEXT",
+  "CHECKBOX",
+  "NUMBER",
+  "PHONE",
+  "DATE",
+  "ES_TAX_DOCUMENTS",
+  "DATE_TIME",
+  "FIELD_GROUP",
+  "ID_VERIFICATION",
+] as const;
+
 export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
   async run() {
     const { petition_id: petitionId } = this.task.input;
@@ -197,7 +214,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
       .filter(
         ([[field], { isVisible }]) =>
           // don't include this type fields in summary scope
-          isVisible && !["BACKGROUND_CHECK", "PROFILE_SEARCH"].includes(field.type),
+          isVisible && SUMMARY_FIELD_TYPES.includes(field.type),
       )
       .map(([[field, index, childrenFieldIndexes], logic]) => ({
         title: field.title,
@@ -220,8 +237,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
                 children: zipX(reply.children!, childLogic, childrenFieldIndexes!)
                   .filter(
                     ([{ field }, logic]) =>
-                      logic.isVisible &&
-                      !["BACKGROUND_CHECK", "PROFILE_SEARCH"].includes(field.type),
+                      logic.isVisible && SUMMARY_FIELD_TYPES.includes(field.type),
                   )
                   .map(([{ field, replies }, logic, childIndex]) => ({
                     field: {

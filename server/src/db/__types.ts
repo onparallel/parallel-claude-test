@@ -97,7 +97,8 @@ export type FeatureFlagName =
   | "PETITION_APPROVAL_FLOW"
   | "PROFILE_SEARCH_FIELD"
   | "REMOVE_PREVIEW_FILES"
-  | "DOCUMENT_PROCESSING";
+  | "DOCUMENT_PROCESSING"
+  | "ADVERSE_MEDIA_SEARCH";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -138,6 +139,7 @@ export const FeatureFlagNameValues = [
   "PROFILE_SEARCH_FIELD",
   "REMOVE_PREVIEW_FILES",
   "DOCUMENT_PROCESSING",
+  "ADVERSE_MEDIA_SEARCH",
 ] as FeatureFlagName[];
 
 export type IntegrationType =
@@ -369,7 +371,8 @@ export type PetitionFieldType =
   | "FIELD_GROUP"
   | "BACKGROUND_CHECK"
   | "ID_VERIFICATION"
-  | "PROFILE_SEARCH";
+  | "PROFILE_SEARCH"
+  | "ADVERSE_MEDIA_SEARCH";
 
 export const PetitionFieldTypeValues = [
   "TEXT",
@@ -389,6 +392,7 @@ export const PetitionFieldTypeValues = [
   "BACKGROUND_CHECK",
   "ID_VERIFICATION",
   "PROFILE_SEARCH",
+  "ADVERSE_MEDIA_SEARCH",
 ] as PetitionFieldType[];
 
 export type PetitionMessageStatus = "SCHEDULED" | "CANCELLED" | "PROCESSING" | "PROCESSED";
@@ -536,7 +540,8 @@ export type ProfileTypeFieldType =
   | "NUMBER"
   | "SELECT"
   | "BACKGROUND_CHECK"
-  | "CHECKBOX";
+  | "CHECKBOX"
+  | "ADVERSE_MEDIA_SEARCH";
 
 export const ProfileTypeFieldTypeValues = [
   "TEXT",
@@ -548,6 +553,7 @@ export const ProfileTypeFieldTypeValues = [
   "SELECT",
   "BACKGROUND_CHECK",
   "CHECKBOX",
+  "ADVERSE_MEDIA_SEARCH",
 ] as ProfileTypeFieldType[];
 
 export type ProfileTypeStandardType = "INDIVIDUAL" | "LEGAL_ENTITY" | "CONTRACT";
@@ -2192,6 +2198,9 @@ export interface ProfileFieldValue {
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
   external_source_integration_id: Maybe<number>; // int4
+  is_draft: boolean; // bool
+  pending_review: boolean; // bool
+  active_monitoring: boolean; // bool
 }
 
 export type CreateProfileFieldValue = PartialProps<
@@ -2206,6 +2215,9 @@ export type CreateProfileFieldValue = PartialProps<
   | "deleted_at"
   | "deleted_by"
   | "external_source_integration_id"
+  | "is_draft"
+  | "pending_review"
+  | "active_monitoring"
 >;
 
 export interface ProfileListView {

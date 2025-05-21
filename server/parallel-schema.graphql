@@ -66,6 +66,73 @@ type AccessOpenedEvent implements PetitionEvent {
   type: PetitionEventType!
 }
 
+type AdverseMediaArticle {
+  author: String
+  body: String
+  classification: AdverseMediaArticleRelevance
+  classifiedAt: DateTime
+  header: String
+  id: String!
+  images: [String!]
+  quotes: [String!]
+  source: String
+  summary: String
+  timestamp: Int
+  url: String
+}
+
+enum AdverseMediaArticleRelevance {
+  DISMISSED
+  IRRELEVANT
+  RELEVANT
+}
+
+type AdverseMediaArticleSearchResult {
+  articles: AdverseMediaArticleSearchResultArticles!
+  isDraft: Boolean
+  search: [AdverseMediaSearchTerm!]!
+}
+
+type AdverseMediaArticleSearchResultArticles {
+  createdAt: DateTime!
+  items: [AdverseMediaArticle!]!
+  totalCount: Int!
+}
+
+type AdverseMediaEntitySuggestItem {
+  id: String!
+  name: String!
+}
+
+type AdverseMediaSearchTerm {
+  entityId: String
+  label: String
+  term: String
+  wikiDataId: String
+}
+
+input AdverseMediaSearchTermInput {
+  """
+  Search by an internal entity ID on the specific provider
+  """
+  entityId: String
+
+  """
+  If searching by entityId or wikiDataId, the name of the entity as returned by the provider
+  """
+  label: String
+
+  """
+  Search by a free text
+  """
+  term: String
+
+  """
+  Search by a wikiData ID
+  """
+  wikiDataId: String
+}
+
 type AiCompletionLog implements Timestamps {
   completion: String
 
@@ -935,6 +1002,7 @@ type EventSubscriptionSignatureKey {
 }
 
 enum FeatureFlag {
+  ADVERSE_MEDIA_SEARCH
   AUTO_ANONYMIZE
   BACKGROUND_CHECK
   BULK_PETITION_SEND_TASK
@@ -1422,6 +1490,11 @@ type Mutation {
     petitionId: GID!
     type: PetitionFieldType!
   ): PetitionField!
+  classifyAdverseMediaArticle(
+    classification: AdverseMediaArticleRelevance
+    id: String!
+    token: String!
+  ): AdverseMediaArticle!
 
   """
   Clones a dashboard
@@ -1490,7 +1563,7 @@ type Mutation {
     profileId: GID!
     profileTypeFieldId: GID!
     replyId: GID!
-  ): ProfileFieldValue!
+  ): ProfileFieldValue! @deprecated(reason: "use copyReplyContentToProfileFieldValue")
   copyFileReplyToProfileFieldFile(
     expiryDate: Date
     fileReplyIds: [GID!]!
@@ -1498,6 +1571,13 @@ type Mutation {
     profileId: GID!
     profileTypeFieldId: GID!
   ): [ProfileFieldFile!]!
+  copyReplyContentToProfileFieldValue(
+    expiryDate: Date
+    petitionId: GID!
+    profileId: GID!
+    profileTypeFieldId: GID!
+    replyId: GID!
+  ): ProfileFieldValue!
 
   """
   Adds permissions to users and groups on given petitions and folders.
@@ -2950,6 +3030,7 @@ type Mutation {
   Soft-deletes a given auth token, making it permanently unusable.
   """
   revokeUserAuthToken(authTokenIds: [GID!]!): Result!
+  saveAdverseMediaChanges(token: String!): AdverseMediaArticleSearchResult!
 
   """
   Moves a profile to DELETION_SCHEDULED status
@@ -3408,15 +3489,6 @@ type Mutation {
     force: Boolean = false
     petitionId: GID!
   ): PetitionField!
-
-  """
-  Updates the auto search config of a BACKGROUND_CHECK petition field.
-  """
-  updatePetitionFieldAutoSearchConfig(
-    config: UpdatePetitionFieldAutoSearchConfigInput
-    fieldId: GID!
-    petitionId: GID!
-  ): PetitionField!
   updatePetitionFieldGroupRelationships(
     petitionId: GID!
     relationships: [UpdatePetitionFieldGroupRelationshipInput!]!
@@ -3530,6 +3602,11 @@ type Mutation {
     name: String
   ): ProfileEventSubscription!
   updateProfileFieldValue(fields: [UpdateProfileFieldValueInput!]!, profileId: GID!): Profile!
+  updateProfileFieldValueMonitoringStatus(
+    enabled: Boolean!
+    profileId: GID!
+    profileTypeFieldId: GID!
+  ): Profile!
 
   """
   Updates a profile list view
@@ -5372,6 +5449,11 @@ Type of a petition field
 """
 enum PetitionFieldType {
   """
+  A field for performing searches in the adverse media database
+  """
+  ADVERSE_MEDIA_SEARCH
+
+  """
   Run a background check of entities
   """
   BACKGROUND_CHECK
@@ -6796,6 +6878,13 @@ type ProfileFieldValue implements ProfileFieldResponse {
   expiresAt: DateTime
   expiryDate: String
   field: ProfileTypeField!
+  hasActiveMonitoring: Boolean!
+
+  """
+  Whether this value has an unsaved draft.
+  """
+  hasDraft: Boolean!
+  hasPendingReview: Boolean!
   id: GID!
   profile: Profile!
 
@@ -7071,6 +7160,7 @@ enum ProfileTypeFieldPermissionType {
 }
 
 enum ProfileTypeFieldType {
+  ADVERSE_MEDIA_SEARCH
   BACKGROUND_CHECK
   CHECKBOX
   DATE
@@ -7838,6 +7928,28 @@ type Query {
     search: String
     status: [PetitionStatus!]
   ): PublicPetitionAccessPagination!
+
+  """
+  Suggest alternative search terms based on the current search
+  """
+  adverseMediaAlternativeSearchSuggestions(
+    search: String!
+    token: String!
+  ): [AdverseMediaSearchTerm!]!
+  adverseMediaArticleDetails(
+    id: String!
+    search: [AdverseMediaSearchTermInput!]
+    token: String!
+  ): AdverseMediaArticle!
+  adverseMediaArticleSearch(
+    search: [AdverseMediaSearchTermInput!]
+    token: String!
+  ): AdverseMediaArticleSearchResult
+
+  """
+  Suggest entity names based on a search term
+  """
+  adverseMediaEntitySuggest(searchTerm: String!): [AdverseMediaEntitySuggestItem!]!
   backgroundCheckEntityDetails(entityId: String!, token: String!): BackgroundCheckEntityDetails!
   backgroundCheckEntitySearch(
     """
@@ -9000,13 +9112,6 @@ input UpdateCreatePetitionButtonDashboardModuleInput {
   settings: CreatePetitionButtonDashboardModuleSettingsInput
   size: DashboardModuleSize
   title: String
-}
-
-input UpdatePetitionFieldAutoSearchConfigInput {
-  country: GID
-  date: GID
-  name: [GID!]!
-  type: BackgroundCheckEntitySearchType
 }
 
 input UpdatePetitionFieldGroupRelationshipInput {

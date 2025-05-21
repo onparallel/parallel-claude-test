@@ -27,15 +27,20 @@ import { assert } from "ts-essentials";
 import { RESULT } from "../../graphql";
 import { validateReferencingFieldsPositions } from "../../graphql/helpers/validators/validFieldLogic";
 import { ILogger, LOGGER } from "../../services/Logger";
+import { PETITION_FIELD_SERVICE, PetitionFieldService } from "../../services/PetitionFieldService";
+import {
+  PETITION_VALIDATION_SERVICE,
+  PetitionValidationService,
+} from "../../services/PetitionValidationService";
 import { QUEUES_SERVICE, QueuesService } from "../../services/QueuesService";
 import { average } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import { applyFieldVisibility, evaluateFieldLogic, mapFieldLogic } from "../../util/fieldLogic";
-import { fieldReplyContent } from "../../util/fieldReplyContent";
 import { fromGlobalId, fromGlobalIds, isGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { isValueCompatible } from "../../util/isValueCompatible";
 import { keyBuilder } from "../../util/keyBuilder";
+import { never } from "../../util/never";
 import { paginationLoader } from "../../util/paginationLoader";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
@@ -52,7 +57,6 @@ import {
 import { SlateNode } from "../../util/slate/render";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray, Replace, UnwrapArray, unMaybeArray } from "../../util/types";
-import { validateReplyContent } from "../../util/validateReplyContent";
 import { TemplateStatsReportInput } from "../../workers/tasks/TemplateStatsReportRunner";
 import {
   AiCompletionLog,
@@ -116,7 +120,6 @@ import {
   TableCreateTypes,
   TableTypes,
 } from "../helpers/BaseRepository";
-import { defaultFieldProperties, validateFieldOptions } from "../helpers/fieldOptions";
 import {
   PETITION_FILTER_REPOSITORY_HELPER,
   PetitionFilterRepositoryHelper,
@@ -267,6 +270,8 @@ export class PetitionRepository extends BaseRepository {
     private petitionFilter: PetitionFilterRepositoryHelper,
     @inject(QUEUES_SERVICE) private queues: QueuesService,
     @inject(FileRepository) private files: FileRepository,
+    @inject(PETITION_VALIDATION_SERVICE) private petitionValidation: PetitionValidationService,
+    @inject(PETITION_FIELD_SERVICE) private petitionFields: PetitionFieldService,
   ) {
     super(knex);
   }
@@ -1548,7 +1553,7 @@ export class PetitionRepository extends BaseRepository {
         await this.insert(
           "petition_field",
           (["HEADING", "SHORT_TEXT"] as PetitionFieldType[]).map((type, index) => ({
-            ...defaultFieldProperties(type),
+            ...this.petitionFields.defaultFieldProperties(type),
             petition_id: petition.id,
             type,
             is_fixed: type === "HEADING",
@@ -2289,15 +2294,6 @@ export class PetitionRepository extends BaseRepository {
     }, t);
   }
 
-  async validateFieldData(fieldId: number, data: { options: Maybe<Record<string, any>> }) {
-    const field = await this.loadField(fieldId);
-    if (!field) {
-      throw new Error("Petition field not found");
-    }
-    validateFieldOptions(field.type, { ...field.options, ...data.options });
-    return field;
-  }
-
   readonly loadRepliesForField = this.buildLoadMultipleBy(
     "petition_field_reply",
     "petition_field_id",
@@ -2373,11 +2369,7 @@ export class PetitionRepository extends BaseRepository {
     );
     const petition = (await this.loadPetition(petitionId))!;
 
-    if (
-      (!petition.enable_interaction_with_recipients &&
-        fields.some((f) => isNonNullish(f) && f.type !== "BACKGROUND_CHECK")) ||
-      fields.some((f) => isNonNullish(f) && !f.is_internal)
-    ) {
+    if (fields.some((f) => !f!.is_internal) || !petition.enable_interaction_with_recipients) {
       await this.updatePetition(
         petitionId,
         {
@@ -2445,11 +2437,7 @@ export class PetitionRepository extends BaseRepository {
 
     const petition = (await this.loadPetition(petitionId))!;
 
-    if (
-      (!petition.enable_interaction_with_recipients &&
-        fields.some((f) => isNonNullish(f) && f.type !== "BACKGROUND_CHECK")) ||
-      fields.some((f) => isNonNullish(f) && !f.is_internal)
-    ) {
+    if (fields.some((f) => !f!.is_internal) || !petition.enable_interaction_with_recipients) {
       await this.updatePetition(
         petitionId,
         {
@@ -2543,10 +2531,7 @@ export class PetitionRepository extends BaseRepository {
 
     const petition = (await this.loadPetition(field.petition_id))!;
 
-    if (
-      (!petition.enable_interaction_with_recipients && field.type !== "BACKGROUND_CHECK") ||
-      !field.is_internal
-    ) {
+    if (!petition.enable_interaction_with_recipients || !field.is_internal) {
       await this.updatePetition(
         field.petition_id,
         {
@@ -3299,7 +3284,8 @@ export class PetitionRepository extends BaseRepository {
           isNonNullish(f.visibility) ||
           isNonNullish(f.math) ||
           // update field references in autoSearchConfig to point to cloned fields
-          (f.type === "BACKGROUND_CHECK" && isNonNullish(f.options.autoSearchConfig)),
+          (f.type === "BACKGROUND_CHECK" && isNonNullish(f.options.autoSearchConfig)) ||
+          (f.type === "ADVERSE_MEDIA_SEARCH" && isNonNullish(f.options.autoSearchConfig)),
       );
 
       const profileTypesUpdates =
@@ -3394,24 +3380,36 @@ export class PetitionRepository extends BaseRepository {
                   // map field visibility and math field IDs into new IDs
                 } = mapFieldLogic<number, number>(field, (id) => newFieldIds[id]);
 
-                // TODO repasar luego de mergear ADVERSE_MEDIA_SEARCH
                 const mappedOptions = {
                   ...field.options,
                   ...("autoSearchConfig" in field.options &&
                   isNonNullish(field.options.autoSearchConfig)
                     ? {
-                        autoSearchConfig: {
-                          type: field.options.autoSearchConfig.type,
-                          name: field.options.autoSearchConfig.name.map(
-                            (id: number) => newFieldIds[id],
-                          ),
-                          date: isNonNullish(field.options.autoSearchConfig.date)
-                            ? newFieldIds[field.options.autoSearchConfig.date]
-                            : null,
-                          country: isNonNullish(field.options.autoSearchConfig.country)
-                            ? newFieldIds[field.options.autoSearchConfig.country]
-                            : null,
-                        },
+                        autoSearchConfig:
+                          field.type === "BACKGROUND_CHECK"
+                            ? {
+                                type: field.options.autoSearchConfig.type,
+                                name: field.options.autoSearchConfig.name.map(
+                                  (id: number) => newFieldIds[id],
+                                ),
+                                date: isNonNullish(field.options.autoSearchConfig.date)
+                                  ? newFieldIds[field.options.autoSearchConfig.date]
+                                  : null,
+                                country: isNonNullish(field.options.autoSearchConfig.country)
+                                  ? newFieldIds[field.options.autoSearchConfig.country]
+                                  : null,
+                              }
+                            : field.type === "ADVERSE_MEDIA_SEARCH"
+                              ? {
+                                  name:
+                                    field.options.autoSearchConfig.name?.map(
+                                      (id: number) => newFieldIds[id],
+                                    ) ?? null,
+                                  backgroundCheck: field.options.autoSearchConfig.backgroundCheck
+                                    ? newFieldIds[field.options.autoSearchConfig.backgroundCheck]
+                                    : null,
+                                }
+                              : never(),
                       }
                     : {}),
                   ...("searchIn" in field.options &&
@@ -3474,6 +3472,7 @@ export class PetitionRepository extends BaseRepository {
       if (sourcePetition.org_id !== owner.org_id) {
         const clonedFieldGroupRelationships = await this.from(
           "petition_field_group_relationship",
+
           t,
         )
           .where({ petition_id: cloned.id, deleted_at: null })
@@ -5232,7 +5231,7 @@ export class PetitionRepository extends BaseRepository {
       const [petition] = await this.from("petition", t)
         .where({ id: petitionId, deleted_at: null })
         .select("automatic_numbering_config");
-      const props = defaultFieldProperties(type, field, petition);
+      const props = this.petitionFields.defaultFieldProperties(type, field, petition);
       if (type === "ID_VERIFICATION") {
         const integrations = await this.from("org_integration", t)
           .where("org_id", user.org_id)
@@ -7906,7 +7905,7 @@ export class PetitionRepository extends BaseRepository {
         otherReplies.map((reply) => ({
           user_id: owner.id,
           petition_field_id: reply.fieldId,
-          content: fieldReplyContent(reply.fieldType, reply.content),
+          content: this.petitionFields.mapReplyContentToDatabase(reply.fieldType, reply.content),
           type: reply.fieldType,
         })),
         `User:${owner.id}`,
@@ -7966,7 +7965,10 @@ export class PetitionRepository extends BaseRepository {
             childrenReplies.map((reply) => ({
               user_id: owner.id,
               petition_field_id: reply.fieldId,
-              content: fieldReplyContent(reply.fieldType, reply.content),
+              content: this.petitionFields.mapReplyContentToDatabase(
+                reply.fieldType,
+                reply.content,
+              ),
               type: reply.fieldType,
               parent_petition_field_reply_id: parentReply.id,
             })),
@@ -8028,10 +8030,21 @@ export class PetitionRepository extends BaseRepository {
 
     for (const [alias, value] of entries) {
       const field = rootFields.find((f) => f.alias === alias);
+
       if (
         !field ||
-        isFileTypeField(field.type) ||
-        ["HEADING", "BACKGROUND_CHECK", "PROFILE_SEARCH"].includes(field.type)
+        ![
+          "TEXT",
+          "SELECT",
+          "DYNAMIC_SELECT",
+          "SHORT_TEXT",
+          "CHECKBOX",
+          "NUMBER",
+          "PHONE",
+          "DATE",
+          "DATE_TIME",
+          "FIELD_GROUP",
+        ].includes(field.type)
       ) {
         continue;
       }
@@ -8098,7 +8111,7 @@ export class PetitionRepository extends BaseRepository {
 
       for (const { content, childrenReplies } of singleReplies) {
         try {
-          await validateReplyContent(field, content);
+          await this.petitionValidation.validateFieldReplyContent(field, content);
           result.push({ fieldId: field.id, fieldType: field.type, content, childrenReplies });
         } catch {}
       }
@@ -9251,7 +9264,9 @@ export class ReadOnlyPetitionRepository extends PetitionRepository {
     petitionFilter: PetitionFilterRepositoryHelper,
     @inject(QUEUES_SERVICE) queues: QueuesService,
     @inject(ReadOnlyFileRepository) files: ReadOnlyFileRepository,
+    @inject(PETITION_VALIDATION_SERVICE) petitionValidation: PetitionValidationService,
+    @inject(PETITION_FIELD_SERVICE) petitionFields: PetitionFieldService,
   ) {
-    super(knex, logger, petitionFilter, queues, files);
+    super(knex, logger, petitionFilter, queues, files, petitionValidation, petitionFields);
   }
 }

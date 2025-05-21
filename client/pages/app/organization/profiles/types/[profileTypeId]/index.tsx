@@ -73,7 +73,7 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { getReferencedInBackgroundCheck } from "@parallel/utils/getFieldsReferencedInBackgroundCheck";
+import { getFieldsReferencedInMonitoring } from "@parallel/utils/getFieldsReferencedInMonitoring";
 import { KeyProp, getKey } from "@parallel/utils/keyProp";
 import { useArchiveProfileType } from "@parallel/utils/mutations/useArchiveProfileType";
 import { useDeleteProfileType } from "@parallel/utils/mutations/useDeleteProfileType";
@@ -293,9 +293,9 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
             },
           });
         } catch {}
-      } else if (isApolloError(e, "FIELD_USED_IN_BACKGROUND_CHECK_MONITORING_RULE")) {
+      } else if (isApolloError(e, "FIELD_USED_IN_MONITORING_RULE")) {
         try {
-          const properties = getReferencedInBackgroundCheck({
+          const properties = getFieldsReferencedInMonitoring({
             profileTypeFields: profileType.fields,
             profileTypeFieldId: profileTypeFieldIds[0],
           });
@@ -370,7 +370,11 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
           profileTypeField: fields[0],
         });
       }
-      if (fields.length === 1 && fields[0].type === "BACKGROUND_CHECK") {
+      if (
+        fields.length === 1 &&
+        (fields[0].type === "BACKGROUND_CHECK" || fields[0].type === "ADVERSE_MEDIA_SEARCH")
+      ) {
+        // Refetch to get the latest monitoring settings and new possible monitoring profile type fields
         refetch();
       }
     } catch {}
@@ -964,14 +968,14 @@ const _fragments = {
         ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
         ...ProfileTypeSettings_ProfileTypeField
         ...useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeField
-        ...getReferencedInBackgroundCheck_ProfileTypeField
+        ...getFieldsReferencedInMonitoring_ProfileTypeField
       }
       ${useProfileTypeFieldPermissionDialog.fragments.ProfileTypeField}
       ${useUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
       ${useCreateOrUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
       ${ProfileTypeSettings.fragments.ProfileTypeField}
       ${useProfileTypeFieldReferencedMonitoringDialog.fragments.ProfileTypeField}
-      ${getReferencedInBackgroundCheck.fragments.ProfileTypeField}
+      ${getFieldsReferencedInMonitoring.fragments.ProfileTypeField}
     `;
   },
   get ProfileType() {

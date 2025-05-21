@@ -35,7 +35,15 @@
     }
   },
   "metrics": {
-    "aggregation_dimensions": [["InstanceId"], ["Environment", "Release"]],
+    "aggregation_dimensions": [
+      [
+        "InstanceId"
+      ],
+      [
+        "Environment",
+        "Release"
+      ]
+    ],
     "append_dimensions": {
       "AutoScalingGroupName": "${aws:AutoScalingGroupName}",
       "ImageId": "${aws:ImageId}",
@@ -50,17 +58,25 @@
         "metrics_aggregation_interval": 60
       },
       "cpu": {
-        "measurement": ["cpu_usage_nice"],
+        "measurement": [
+          "cpu_usage_nice"
+        ],
         "metrics_collection_interval": 60,
         "totalcpu": false
       },
       "disk": {
-        "measurement": ["used_percent"],
+        "measurement": [
+          "used_percent"
+        ],
         "metrics_collection_interval": 60,
-        "resources": ["/"]
+        "resources": [
+          "/"
+        ]
       },
       "mem": {
-        "measurement": ["mem_used_percent"],
+        "measurement": [
+          "mem_used_percent"
+        ],
         "metrics_collection_interval": 60
       },
       "statsd": {
@@ -71,7 +87,10 @@
       "procstat": [
         {
           "pid_file": "/var/run/nginx.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "nginx"
@@ -79,7 +98,10 @@
         },
         {
           "pid_file": "/var/run/parallel-server.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-server"
@@ -87,7 +109,10 @@
         },
         {
           "pid_file": "/var/run/parallel-client.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-client"
@@ -95,7 +120,10 @@
         },
         {
           "pid_file": "/var/run/parallel-email-events-queue.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-email-events-queue"
@@ -103,7 +131,10 @@
         },
         {
           "pid_file": "/var/run/parallel-email-sender-queue.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-email-sender-queue"
@@ -111,7 +142,10 @@
         },
         {
           "pid_file": "/var/run/parallel-event-processor-queue.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-event-processor-queue"
@@ -119,7 +153,10 @@
         },
         {
           "pid_file": "/var/run/parallel-signature-worker-queue.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-signature-worker-queue"
@@ -127,7 +164,10 @@
         },
         {
           "pid_file": "/var/run/parallel-task-worker-queue1.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-task-worker-queue1"
@@ -135,16 +175,21 @@
         },
         {
           "pid_file": "/var/run/parallel-task-worker-queue2.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-task-worker-queue2"
           }
         },
-
         {
           "pid_file": "/var/run/parallel-task-worker-queue3.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-task-worker-queue3"
@@ -152,7 +197,10 @@
         },
         {
           "pid_file": "/var/run/parallel-delay-queue-queue.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-delay-queue-queue"
@@ -160,7 +208,10 @@
         },
         {
           "pid_file": "/var/run/parallel-reminder-trigger-cron.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-reminder-trigger-cron"
@@ -168,7 +219,10 @@
         },
         {
           "pid_file": "/var/run/parallel-scheduled-trigger-cron.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-scheduled-trigger-cron"
@@ -176,7 +230,10 @@
         },
         {
           "pid_file": "/var/run/parallel-petition-notifications-cron.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-petition-notifications-cron"
@@ -184,7 +241,10 @@
         },
         {
           "pid_file": "/var/run/parallel-organization-limits-cron.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-organization-limits-cron"
@@ -192,7 +252,10 @@
         },
         {
           "pid_file": "/var/run/parallel-anonymizer-cron.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-anonymizer-cron"
@@ -200,7 +263,10 @@
         },
         {
           "pid_file": "/var/run/parallel-old-notifications-cron.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-old-notifications-cron"
@@ -208,7 +274,10 @@
         },
         {
           "pid_file": "/var/run/parallel-expiring-properties-cron.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-expiring-properties-cron"
@@ -216,10 +285,24 @@
         },
         {
           "pid_file": "/var/run/parallel-background-check-monitor-cron.pid",
-          "measurement": ["cpu_usage", "memory_rss"],
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
           "metrics_collection_interval": 10,
           "append_dimensions": {
             "Process": "parallel-background-check-monitor-cron"
+          }
+        },
+        {
+          "pid_file": "/var/run/parallel-adverse-media-monitor-cron.pid",
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
+          "metrics_collection_interval": 10,
+          "append_dimensions": {
+            "Process": "parallel-adverse-media-monitor-cron"
           }
         }
       ]

@@ -8,10 +8,11 @@ import {
   FieldSelectIcon,
   FieldShortTextIcon,
   FieldTextIcon,
+  MediaIcon,
   ShortSearchIcon,
 } from "@parallel/chakra/icons";
 import { LocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
-import { ProfileFieldBackgroundCheckSettings } from "@parallel/components/organization/profiles/settings/ProfileFieldBackgroundCheckSettings";
+import type { IProfileFieldMonitoringSettings } from "@parallel/components/organization/profiles/settings/ProfileFieldMonitoringSettings";
 import { ProfileTypeFieldType } from "@parallel/graphql/__types";
 import { IntlShape } from "react-intl";
 import { Maybe } from "./types";
@@ -35,7 +36,6 @@ export type ProfileTypeFieldOptions<TType extends ProfileTypeFieldType> = {
     showOptionsWithColors?: Maybe<boolean>;
     standardList?: Maybe<string>;
   };
-  BACKGROUND_CHECK: ProfileFieldBackgroundCheckSettings;
   CHECKBOX: {
     values: {
       label: LocalizableUserText;
@@ -43,6 +43,8 @@ export type ProfileTypeFieldOptions<TType extends ProfileTypeFieldType> = {
     }[];
     standardList?: Maybe<string>;
   };
+  BACKGROUND_CHECK: IProfileFieldMonitoringSettings;
+  ADVERSE_MEDIA_SEARCH: IProfileFieldMonitoringSettings;
 }[TType];
 
 export const PROFILE_TYPE_FIELD_CONFIG = Object.freeze({
@@ -109,6 +111,16 @@ export const PROFILE_TYPE_FIELD_CONFIG = Object.freeze({
     icon: FieldSelectIcon,
     color: "pink.400",
   },
+
+  CHECKBOX: {
+    label: (intl) =>
+      intl.formatMessage({
+        id: "generic.profile-type-field-type-checkbox",
+        defaultMessage: "Multiple choice",
+      }),
+    icon: FieldCheckboxIcon,
+    color: "#805AD5",
+  },
   BACKGROUND_CHECK: {
     label: (intl) =>
       intl.formatMessage({
@@ -118,14 +130,14 @@ export const PROFILE_TYPE_FIELD_CONFIG = Object.freeze({
     icon: ShortSearchIcon,
     color: "green.700",
   },
-  CHECKBOX: {
+  ADVERSE_MEDIA_SEARCH: {
     label: (intl) =>
       intl.formatMessage({
-        id: "generic.profile-type-field-type-checkbox",
-        defaultMessage: "Multiple choice",
+        id: "generic.profile-type-field-type-adverse-media-search",
+        defaultMessage: "Adverse media search",
       }),
-    icon: FieldCheckboxIcon,
-    color: "#805AD5",
+    icon: MediaIcon,
+    color: "green.700",
   },
 } as Record<
   ProfileTypeFieldType,

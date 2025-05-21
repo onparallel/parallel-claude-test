@@ -10,7 +10,6 @@ import {
   PetitionFieldTypeValues,
   User,
 } from "../db/__types";
-import { validateFieldOptions } from "../db/helpers/fieldOptions";
 import { PetitionRepository, PetitionVariable } from "../db/repositories/PetitionRepository";
 import { FIELD_REFERENCE_REGEX } from "../graphql";
 import { validateFieldLogic } from "../graphql/helpers/validators/validFieldLogic";
@@ -18,6 +17,11 @@ import { validateRichTextContent } from "../graphql/helpers/validators/validRich
 import { PetitionFieldMath, PetitionFieldVisibility } from "../util/fieldLogic";
 import { safeJsonParse } from "../util/safeJsonParse";
 import { Maybe } from "../util/types";
+import { PETITION_FIELD_SERVICE, PetitionFieldService } from "./PetitionFieldService";
+import {
+  PETITION_VALIDATION_SERVICE,
+  PetitionValidationService,
+} from "./PetitionValidationService";
 
 export const PETITION_IMPORT_EXPORT_SERVICE = Symbol.for("PETITION_IMPORT_EXPORT_SERVICE");
 
@@ -149,7 +153,11 @@ export interface IPetitionImportExportService {
 
 @injectable()
 export class PetitionImportExportService implements IPetitionImportExportService {
-  constructor(@inject(PetitionRepository) private petitions: PetitionRepository) {}
+  constructor(
+    @inject(PetitionRepository) private petitions: PetitionRepository,
+    @inject(PETITION_VALIDATION_SERVICE) private petitionValidation: PetitionValidationService,
+    @inject(PETITION_FIELD_SERVICE) private petitionFields: PetitionFieldService,
+  ) {}
 
   async toJson(petitionId: number) {
     const [petition, fields] = await Promise.all([
@@ -301,11 +309,13 @@ export class PetitionImportExportService implements IPetitionImportExportService
     this.validateJsonVariablesAndAliases(variables, fieldAliases);
 
     for (const field of allJsonFields) {
-      validateFieldOptions(field.type, field.options);
+      this.petitionValidation.validateFieldOptionsSchema(field.type, field.options);
       await validateFieldLogic(field, allJsonFields, {
         variables,
         customLists: json.customLists,
         standardListDefinitions,
+        loadSelectOptionsValuesAndLabels: (options) =>
+          this.petitionFields.loadSelectOptionsValuesAndLabels(options),
       });
     }
 

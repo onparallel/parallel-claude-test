@@ -1,13 +1,16 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, HStack, List, ListItem, Text } from "@chakra-ui/react";
-import { BusinessIcon, SearchIcon, UserIcon } from "@parallel/chakra/icons";
+import { Box, Button, Flex, HStack, List, ListItem, Stack, Text } from "@chakra-ui/react";
+import { BusinessIcon, SearchIcon, ShortSearchIcon, UserIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Link } from "@parallel/components/common/Link";
 import {
+  AdverseMediaArticle,
+  AdverseMediaSearchTermInput,
   ProfilePropertyContent_ProfileFieldFileFragment,
   ProfilePropertyContent_ProfileFieldValueFragment,
   ProfilePropertyContent_ProfileTypeFieldFragment,
 } from "@parallel/graphql/__types";
+import { FORMATS } from "@parallel/utils/dates";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { never } from "@parallel/utils/never";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
@@ -322,6 +325,16 @@ const ProfileFieldValue = chakraForwardRef<"p" | "span" | "div", ProfileProperty
             {...rest}
           />
         );
+      } else if (field.type === "ADVERSE_MEDIA_SEARCH") {
+        const { noOfLines: _, ...rest } = props;
+        return (
+          <ProfileFieldAdverseMediaSearchValue
+            value={value}
+            field={field}
+            profileId={profileId}
+            {...rest}
+          />
+        );
       } else {
         never(`ProfileTypeFieldType ${field.type} not implemented`);
       }
@@ -365,6 +378,7 @@ const ProfileFieldBackgroundCheckValue = chakraForwardRef<"div", ProfileProperty
           paddingX={2}
           paddingY={1}
           onClick={handleClick}
+          fontWeight={500}
         >
           {isNonNullish(content.entity) ? (
             <>
@@ -435,6 +449,96 @@ const ProfileFieldBackgroundCheckValue = chakraForwardRef<"div", ProfileProperty
               </HStack>
             </>
           )}
+        </Button>
+      </Flex>
+    );
+  },
+);
+
+const ProfileFieldAdverseMediaSearchValue = chakraForwardRef<"div", ProfilePropertyContentProps>(
+  function ProfileFieldAdverseMediaSearchValue({ value, field, profileId, ...props }, ref) {
+    const intl = useIntl();
+    const savedArticles = value?.content?.articles?.items.filter(
+      (article: AdverseMediaArticle) => article.classification === "RELEVANT",
+    );
+
+    const dismissedArticles = value?.content?.articles?.items.filter(
+      (article: AdverseMediaArticle) =>
+        article.classification === "DISMISSED" || article.classification === "IRRELEVANT",
+    );
+
+    const handleClick = async () => {
+      try {
+        const url = `/${intl.locale}/app/adverse-media?${new URLSearchParams({
+          token: btoa(
+            JSON.stringify({
+              profileTypeFieldId: field.id,
+              profileId,
+            }),
+          ),
+          readonly: "true",
+        })}`;
+        await openNewWindow(url);
+      } catch {}
+    };
+
+    return (
+      <Flex ref={ref} {...props}>
+        <Button
+          variant="outline"
+          size="sm"
+          backgroundColor="white"
+          height="auto"
+          paddingX={2}
+          paddingY={1}
+          onClick={handleClick}
+          fontWeight={500}
+        >
+          <Stack spacing={1} maxWidth="100%" width="100%">
+            <HStack spacing={1.5} minWidth={0} width="100%">
+              <ShortSearchIcon />
+              <OverflownText textAlign="start" width="100%">
+                {intl.formatList(
+                  value?.content?.search
+                    ?.map((search: AdverseMediaSearchTermInput) => search.label || search.term)
+                    .filter(isNonNullish),
+                  { type: "disjunction" },
+                )}
+              </OverflownText>
+            </HStack>
+            {savedArticles?.length > 0 ? (
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="generic.saved-articles"
+                  defaultMessage="{count, plural, =1 {# saved article} other {# saved articles}}"
+                  values={{ count: savedArticles.length }}
+                />
+              </Text>
+            ) : null}
+            {dismissedArticles?.length > 0 ? (
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="generic.dismissed-articles"
+                  defaultMessage="{count, plural, =1 {# dismissed article} other {# dismissed articles}}"
+                  values={{ count: dismissedArticles.length }}
+                />
+              </Text>
+            ) : null}
+            {isNonNullish(value?.content?.articles?.createdAt) ? (
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="generic.results-for"
+                  defaultMessage="Results for {date}"
+                  values={{
+                    date: intl.formatDate(
+                      new Date(value?.content?.articles?.createdAt),
+                      FORMATS["L+LT"],
+                    ),
+                  }}
+                />
+              </Text>
+            ) : null}
+          </Stack>
         </Button>
       </Flex>
     );

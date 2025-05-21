@@ -3,7 +3,7 @@ import { IntegrationType } from "../../db/__types";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { MaybeArray, unMaybeArray } from "../../util/types";
 import { Arg, getArg } from "../helpers/authorize";
-import { parseBackgroundCheckToken } from "./utils";
+import { parseReplyToken } from "./utils";
 
 export function userHasAccessToIntegrations<
   TypeName extends string,
@@ -27,15 +27,18 @@ export function userHasAccessToIntegrations<
   };
 }
 
-export function authenticateBackgroundCheckToken<
+export function authenticatePetitionOrProfileReplyToken<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, string>,
->(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+>(
+  argName: TArg,
+  fieldType: "BACKGROUND_CHECK" | "ADVERSE_MEDIA_SEARCH",
+): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       const token = getArg(args, argName);
-      const params = parseBackgroundCheckToken(token);
+      const params = parseReplyToken(token);
 
       if ("petitionId" in params) {
         const petition = await ctx.petitions.loadPetition(params.petitionId);
@@ -44,7 +47,7 @@ export function authenticateBackgroundCheckToken<
           petition?.anonymized_at === null,
           ctx.petitions.userHasAccessToPetitions(ctx.user!.id, [params.petitionId]),
           ctx.petitions.fieldsBelongToPetition(params.petitionId, [params.fieldId]),
-          ctx.petitions.fieldHasType([params.fieldId], ["BACKGROUND_CHECK"]),
+          ctx.petitions.fieldHasType([params.fieldId], [fieldType]),
           ...(params.parentReplyId
             ? [
                 ctx.petitions.replyIsForFieldOfType([params.parentReplyId], ["FIELD_GROUP"]),
@@ -57,9 +60,10 @@ export function authenticateBackgroundCheckToken<
       } else if ("profileId" in params) {
         const profile = await ctx.profiles.loadProfile(params.profileId);
         const profileTypeField = await ctx.profiles.loadProfileTypeField(params.profileTypeFieldId);
-        const userPermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission([
-          { profileTypeFieldId: params.profileTypeFieldId, userId: ctx.user!.id },
-        ]);
+        const userPermission = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission({
+          profileTypeFieldId: params.profileTypeFieldId,
+          userId: ctx.user!.id,
+        });
         const userHasFeatureFlag = await ctx.featureFlags.userHasFeatureFlag(
           ctx.user!.id,
           "PROFILES",
@@ -70,8 +74,8 @@ export function authenticateBackgroundCheckToken<
           profile?.anonymized_at === null, // profile is not anonymized
           profile?.org_id === ctx.user!.org_id, // user has access to profile
           profile?.profile_type_id === profileTypeField?.profile_type_id, // profile has profileTypeField
-          profileTypeField?.type === "BACKGROUND_CHECK", // profileTypeField is BACKGROUND_CHECK
-          userPermissions.every((p) => isAtLeast(p, "READ")), // user has READ or WRITE permission on profileTypeField
+          profileTypeField?.type === fieldType, // profileTypeField is of type fieldType
+          isAtLeast(userPermission, "READ"), // user has READ or WRITE permission on profileTypeField
         ];
 
         return results.every((r) => r);

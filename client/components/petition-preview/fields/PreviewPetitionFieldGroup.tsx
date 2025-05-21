@@ -50,6 +50,7 @@ import { usePreviewImportFromProfileDialog } from "../dialogs/PreviewImportFromP
 import { usePreviewImportFromProfileFormatErrorDialog } from "../dialogs/PreviewImportFromProfileFormatErrorDialog";
 import { PreviewPetitionFieldKyc } from "./PreviewPetitionFieldKyc";
 import { PreviewPetitionFieldProfileSearch } from "./PreviewPetitionFieldProfileSearch";
+import { PreviewPetitionFieldAdverseMediaSearch } from "./adverse-media-search/PreviewPetitionFieldAdverseMediaSearch";
 import { PreviewPetitionFieldBackgroundCheck } from "./background-check/PreviewPetitionFieldBackgroundCheck";
 
 export interface PreviewPetitionFieldGroupProps
@@ -535,6 +536,13 @@ function PreviewPetitionFieldGroupField(props: {
         <PreviewPetitionFieldBackgroundCheck
           {...commonProps}
           user={user}
+          petition={petition}
+          onRefreshField={onRefreshField}
+          isCacheOnly={isCacheOnly}
+        />
+      ) : field.type === "ADVERSE_MEDIA_SEARCH" ? (
+        <PreviewPetitionFieldAdverseMediaSearch
+          {...commonProps}
           petition={petition}
           onRefreshField={onRefreshField}
           isCacheOnly={isCacheOnly}

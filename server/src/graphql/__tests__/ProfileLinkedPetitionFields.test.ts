@@ -7221,6 +7221,13 @@ describe("ProfileLinkedPetitionFields", () => {
                 content: { value: ["A", "C"] },
               },
             },
+            {
+              field: {
+                id: toGlobalId("ProfileTypeField", profileTypeFields[9].id),
+                type: "ADVERSE_MEDIA_SEARCH",
+              },
+              value: null,
+            },
           ],
         },
       });
@@ -7424,6 +7431,13 @@ describe("ProfileLinkedPetitionFields", () => {
               value: {
                 content: { value: ["C", "A"] }, // keep the value in the profile
               },
+            },
+            {
+              field: {
+                id: toGlobalId("ProfileTypeField", profileTypeFields[9].id),
+                type: "ADVERSE_MEDIA_SEARCH",
+              },
+              value: null,
             },
           ],
         },

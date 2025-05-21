@@ -2,7 +2,16 @@ import { execSync } from "child_process";
 import "reflect-metadata";
 import { GenericContainer, Wait } from "testcontainers";
 
+const SETUP_POSTGRES_TIME = "postgres ok";
+const SETUP_MIGRATIONS_TIME = "migrations ok";
+const SETUP_SEEDS_TIME = "seeds ok";
+const SETUP_TOTAL_TIME = "Setup done!";
+
 export default async function () {
+  console.time(SETUP_TOTAL_TIME);
+
+  console.log("starting postgres...");
+  console.time(SETUP_POSTGRES_TIME);
   await new GenericContainer("postgres:16.8")
     .withExposedPorts({ container: 5432, host: 5433 })
     .withWaitStrategy(Wait.forLogMessage("database system is ready to accept connections"))
@@ -12,6 +21,17 @@ export default async function () {
       POSTGRES_DB: "parallel_test",
     })
     .start();
+  console.timeEnd(SETUP_POSTGRES_TIME);
+
+  console.log("running migrations...");
+  console.time(SETUP_MIGRATIONS_TIME);
   execSync("cross-env NODE_ENV=test MIGRATION_ENV=local knex migrate:latest");
+  console.timeEnd(SETUP_MIGRATIONS_TIME);
+
+  console.log("running seeds...");
+  console.time(SETUP_SEEDS_TIME);
   execSync("cross-env knex seed:run --specific=test.ts");
+  console.timeEnd(SETUP_SEEDS_TIME);
+
+  console.timeEnd(SETUP_TOTAL_TIME);
 }

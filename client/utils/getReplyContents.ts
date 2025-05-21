@@ -23,7 +23,12 @@ export function getReplyContents({
   const { type, options } = petitionField;
   if (reply.isAnonymized) {
     return [null];
-  } else if (isFileTypeField(type) || type === "BACKGROUND_CHECK" || type === "PROFILE_SEARCH") {
+  } else if (
+    isFileTypeField(type) ||
+    type === "BACKGROUND_CHECK" ||
+    type === "PROFILE_SEARCH" ||
+    type === "ADVERSE_MEDIA_SEARCH"
+  ) {
     return [reply.content];
   } else if (type === "NUMBER") {
     return [formatNumberWithPrefix(intl, reply.content.value, options as FieldOptions["NUMBER"])];

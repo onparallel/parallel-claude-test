@@ -24,13 +24,11 @@ import { FORMATS } from "@parallel/utils/dates";
 import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
-import { openNewWindow } from "@parallel/utils/openNewWindow";
-import { useInterval } from "@parallel/utils/useInterval";
+import { useManagedWindow } from "@parallel/utils/hooks/useManagedWindow";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { AnimatePresence, motion } from "framer-motion";
-import { useRouter } from "next/router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, zip } from "remeda";
 import {
@@ -68,8 +66,11 @@ export function PreviewPetitionFieldBackgroundCheck({
   parentReplyId,
 }: PreviewPetitionFieldBackgroundCheckProps) {
   const intl = useIntl();
-  const router = useRouter();
-  const [state, setState] = useState<"IDLE" | "FETCHING">("IDLE");
+
+  const { state, setState, browserTabRef, openWindow, closeWindow } = useManagedWindow({
+    onRefreshField,
+  });
+
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
   const fieldLogic = useFieldLogic(petition, isCacheOnly);
@@ -106,40 +107,11 @@ export function PreviewPetitionFieldBackgroundCheck({
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
       await onDeleteReply(replyId);
 
-      if (browserTabRef.current) {
-        browserTabRef.current.close();
-        setState("IDLE");
-      }
+      closeWindow();
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
     },
     [onDeleteReply],
   );
-
-  const browserTabRef = useRef<Window>();
-  useInterval(
-    async (done) => {
-      if (isNonNullish(browserTabRef.current) && browserTabRef.current.closed) {
-        setState("IDLE");
-        done();
-      } else if (state === "FETCHING") {
-        onRefreshField();
-      }
-    },
-    5000,
-    [onRefreshField, state, field.replies.length],
-  );
-
-  useEffect(() => {
-    const handleRouteChange = () => {
-      if (isNonNullish(browserTabRef.current)) {
-        browserTabRef.current.close();
-      }
-    };
-
-    router.events.on("routeChangeStart", handleRouteChange);
-
-    return () => router.events.off("routeChangeStart", handleRouteChange);
-  }, []);
 
   useWindowEvent(
     "message",
@@ -192,9 +164,7 @@ export function PreviewPetitionFieldBackgroundCheck({
         url += `/results?${urlParams}`;
       }
 
-      try {
-        browserTabRef.current = await openNewWindow(url);
-      } catch {}
+      await openWindow(url);
     },
     [intl.locale, isDisabled],
   );
@@ -273,11 +243,7 @@ export function PreviewPetitionFieldBackgroundCheck({
       }
     }
 
-    url += `?${searchParams.toString()}`;
-
-    try {
-      browserTabRef.current = await openNewWindow(url);
-    } catch {}
+    await openWindow(`${url}?${searchParams.toString()}`);
 
     if (isCacheOnly) {
       setState("IDLE");
@@ -285,8 +251,7 @@ export function PreviewPetitionFieldBackgroundCheck({
   };
 
   const handleCancelClick = () => {
-    setState("IDLE");
-    browserTabRef.current?.close();
+    closeWindow();
   };
 
   const fieldReplies = completedFieldReplies(field);

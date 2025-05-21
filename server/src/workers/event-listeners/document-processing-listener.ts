@@ -1,9 +1,9 @@
 import { isNonNullish, isNullish } from "remeda";
-import { PetitionFieldOptions } from "../../db/helpers/fieldOptions";
 import {
   InvalidCredentialsError,
   InvalidRequestError,
 } from "../../integrations/helpers/GenericIntegration";
+import { PetitionFieldOptions } from "../../services/PetitionFieldService";
 import { toBytes } from "../../util/fileSize";
 import { listener } from "../helpers/EventProcessor";
 

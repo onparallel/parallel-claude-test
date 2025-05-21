@@ -17,7 +17,7 @@ import { getClientIp } from "request-ip";
 import { PetitionAccess, User } from "../../db/__types";
 import { Task } from "../../db/repositories/TaskRepository";
 import { evaluateApprovalStepsVisibility } from "../../util/approvalStepsLogic";
-import { buildAutomatedBackgroundCheckFieldQueries } from "../../util/backgroundCheck";
+import { buildAutomatedBackgroundCheckFieldQueries } from "../../util/buildAutomatedBackgroundCheckFieldQueries";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { petitionIsCompleted } from "../../util/petitionIsCompleted";

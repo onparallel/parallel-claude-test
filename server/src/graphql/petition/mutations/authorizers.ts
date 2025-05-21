@@ -2,8 +2,10 @@ import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin"
 import { isNonNullish, isNullish, partition } from "remeda";
 import { ApiContext } from "../../../context";
 import { PetitionPermissionType, UserStatus } from "../../../db/__types";
+import { PetitionFieldOptions } from "../../../services/PetitionFieldService";
 import { PetitionFieldVisibility } from "../../../util/fieldLogic";
 import { toGlobalId } from "../../../util/globalId";
+import { never } from "../../../util/never";
 import { Maybe, MaybeArray, unMaybeArray } from "../../../util/types";
 import { NexusGenInputs } from "../../__types";
 import { Arg, getArg } from "../../helpers/authorize";
@@ -305,6 +307,11 @@ export function fieldIsNotBeingUsedInAutoSearchConfig<
     const fieldIds = unMaybeArray(getArg(args, fieldIdArg));
 
     const petitionFields = await ctx.petitions.loadAllFieldsByPetitionId(petitionId);
+    const fieldsWithAutoSearchConfig = petitionFields.filter(
+      (f) =>
+        isNonNullish(f.options.autoSearchConfig) &&
+        (f.type === "BACKGROUND_CHECK" || f.type === "ADVERSE_MEDIA_SEARCH"),
+    );
 
     for (const fieldId of fieldIds) {
       const field = petitionFields.find((f) => f.id === fieldId);
@@ -312,29 +319,41 @@ export function fieldIsNotBeingUsedInAutoSearchConfig<
         continue;
       }
 
-      if (field.type === "SHORT_TEXT" || field.type === "DATE") {
-        if (
-          petitionFields.some(
-            (f) =>
-              f.type === "BACKGROUND_CHECK" &&
-              isNonNullish(f.options.autoSearchConfig) &&
-              ((f.options.autoSearchConfig.name as number[]).includes(field.id) ||
-                (f.options.autoSearchConfig.date as number | null) === field.id ||
-                (f.options.autoSearchConfig.country as number | null) === field.id),
-          )
-        ) {
-          throw new ApolloError(
-            `PetitionField ${toGlobalId(
-              "PetitionField",
-              fieldId,
-            )} is being referenced on an autoSearchConfig`,
-            "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG",
-            { fieldId: toGlobalId("PetitionField", fieldId) },
-          );
+      // these types can be referenced in autoSearchConfig
+      if (["SHORT_TEXT", "DATE", "SELECT", "BACKGROUND_CHECK"].includes(field.type)) {
+        for (const f of fieldsWithAutoSearchConfig) {
+          if (f.type === "BACKGROUND_CHECK") {
+            const config = f.options.autoSearchConfig as NonNullable<
+              PetitionFieldOptions["BACKGROUND_CHECK"]["autoSearchConfig"]
+            >;
+
+            if (
+              config.name.includes(field.id) ||
+              config.date === field.id ||
+              config.country === field.id
+            ) {
+              throw new ApolloError(
+                `PetitionField ${toGlobalId("PetitionField", fieldId)} is being referenced on an autoSearchConfig`,
+                "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG",
+              );
+            }
+          } else if (f.type === "ADVERSE_MEDIA_SEARCH") {
+            const config = f.options.autoSearchConfig as NonNullable<
+              PetitionFieldOptions["ADVERSE_MEDIA_SEARCH"]["autoSearchConfig"]
+            >;
+
+            if ((config.name ?? []).includes(field.id) || config.backgroundCheck === field.id) {
+              throw new ApolloError(
+                `PetitionField ${toGlobalId("PetitionField", fieldId)} is being referenced on an autoSearchConfig`,
+                "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG",
+              );
+            }
+          } else {
+            never(`${field.type} cannot have autoSearchConfig`);
+          }
         }
       }
     }
-
     return true;
   };
 }

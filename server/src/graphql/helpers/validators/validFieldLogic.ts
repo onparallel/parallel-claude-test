@@ -6,8 +6,8 @@ import {
   StandardListDefinition,
   StandardListDefinitionListType,
 } from "../../../db/__types";
-import { selectOptionsValuesAndLabels } from "../../../db/helpers/fieldOptions";
 import { PetitionCustomList, PetitionVariable } from "../../../db/repositories/PetitionRepository";
+import { PetitionFieldOptions } from "../../../services/PetitionFieldService";
 import {
   PetitionFieldLogic,
   PetitionFieldLogicCondition,
@@ -18,6 +18,7 @@ import {
 } from "../../../util/fieldLogic";
 import { fromGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
+import { Maybe } from "../../../util/types";
 import { NexusGenInputs } from "../../__types";
 import { Arg, ArgWithPath, getArg, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
@@ -262,6 +263,9 @@ export async function validateFieldLogic<
     variables: PetitionVariable[];
     standardListDefinitions: Pick<StandardListDefinition, "list_name" | "list_type">[];
     customLists: Pick<PetitionCustomList, "name">[];
+    loadSelectOptionsValuesAndLabels: (
+      options: PetitionFieldOptions["SELECT"],
+    ) => Promise<{ values: string[]; labels?: Maybe<string[]> }>;
   },
   skipJsonSchemaValidation?: boolean,
 ) {
@@ -295,10 +299,19 @@ export async function validateFieldLogic<
         `Field with id ${referencedField.id} is not linked to petition with id ${field.petition_id}`,
       );
 
-      assert(
-        referencedField.type === "FIELD_GROUP" ? c.modifier === "NUMBER_OF_REPLIES" : true,
-        "FIELD_GROUP can only be referenced with NUMBER_OF_REPLIES",
-      );
+      const isOnlyHasReplies =
+        isFileTypeField(referencedField.type) ||
+        (referencedField.type === "DYNAMIC_SELECT" && c.column === undefined) ||
+        referencedField.type === "FIELD_GROUP" ||
+        referencedField.type === "BACKGROUND_CHECK" ||
+        referencedField.type === "ADVERSE_MEDIA_SEARCH";
+
+      if (isOnlyHasReplies) {
+        assert(
+          c.modifier === "NUMBER_OF_REPLIES",
+          `${referencedField.type} can only be referenced with NUMBER_OF_REPLIES modifier`,
+        );
+      }
 
       // check operator/modifier compatibility
       if (c.modifier === "NUMBER_OF_REPLIES") {
@@ -344,7 +357,7 @@ export async function validateFieldLogic<
         ) {
           const options =
             referencedField.type === "SELECT"
-              ? (await selectOptionsValuesAndLabels(referencedField.options)).values
+              ? (await props.loadSelectOptionsValuesAndLabels(referencedField.options)).values
               : getDynamicSelectValues(referencedField.options.values, c.column!);
           assertOneOf(
             c.operator,
@@ -553,6 +566,8 @@ export function validateFieldLogicInput<
           standardListDefinitions:
             await ctx.petitions.loadResolvedStandardListDefinitionsByPetitionId(petitionId),
           customLists: petition!.custom_lists ?? [],
+          loadSelectOptionsValuesAndLabels: (options) =>
+            ctx.petitionFields.loadSelectOptionsValuesAndLabels(options),
         },
         true, // JSON SCHEMA is already validated, no need to do it again
       );

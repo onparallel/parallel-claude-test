@@ -11,6 +11,7 @@ import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { isValidDate } from "../util/time";
 import { Maybe, UnwrapArray } from "../util/types";
 import { I18N_SERVICE, II18nService } from "./I18nService";
+import { EXPORTABLE_FIELD_TYPES } from "./ProfileExcelExportService";
 import {
   CellData,
   CellError,
@@ -130,6 +131,20 @@ export class ProfileExcelImportService extends ProfileExcelService {
     );
   }
 
+  private cellToValueContent(cell: CellData, type: ProfileTypeFieldType) {
+    return cell.value && cell.value.trim() !== ""
+      ? {
+          value:
+            type === "NUMBER"
+              ? parseFloat(cell.value)
+              : type === "CHECKBOX"
+                ? // split the checkbox value by commas (ignoring escaped commas) and trim whitespace from each item
+                  cell.value.split(/(?<!\\),/).map((x) => x.trim())
+                : cell.value,
+        }
+      : null;
+  }
+
   async parseExcelData(
     profileTypeId: number,
     excelData: string[][],
@@ -207,18 +222,7 @@ export class ProfileExcelImportService extends ProfileExcelService {
           throw new CellError(cell, "You do not have write permission for this field");
         }
 
-        const content =
-          cell.value && cell.value.trim() !== ""
-            ? {
-                value:
-                  field.type === "NUMBER"
-                    ? parseFloat(cell.value)
-                    : field.type === "CHECKBOX"
-                      ? // split the checkbox value by commas (ignoring escaped commas) and trim whitespace from each item
-                        cell.value.split(/(?<!\\),/).map((x) => x.trim())
-                      : cell.value,
-              }
-            : null;
+        const content = this.cellToValueContent(cell, field.type);
 
         try {
           await this.profileValidation.validateProfileFieldValueContent(field, content);
@@ -342,7 +346,7 @@ export class ProfileExcelImportService extends ProfileExcelService {
     );
 
     return zip(fields, permissions)
-      .filter(([f]) => f.type !== "FILE" && f.type !== "BACKGROUND_CHECK")
+      .filter(([field]) => EXPORTABLE_FIELD_TYPES.includes(field.type))
       .map(([field, permission]) => ({
         isRequired: requiredFieldIds.includes(field.id),
         permission,

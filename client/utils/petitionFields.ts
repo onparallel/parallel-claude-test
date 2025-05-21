@@ -105,6 +105,11 @@ export function getPetitionFieldTypeLabel(intl: IntlShape, type: PetitionFieldTy
         id: "generic.petition-field-type-profile-search",
         defaultMessage: "Profile search",
       });
+    case "ADVERSE_MEDIA_SEARCH":
+      return intl.formatMessage({
+        id: "generic.petition-field-type-adverse-media-search",
+        defaultMessage: "Adverse media search",
+      });
     default:
       throw new Error(`Missing PetitionFieldType "${type}"`);
   }
@@ -131,6 +136,7 @@ export function usePetitionFieldTypeColor(type: PetitionFieldType) {
       FIELD_GROUP: theme.colors.blue[600],
       ID_VERIFICATION: theme.colors.green[500],
       PROFILE_SEARCH: theme.colors.green[500],
+      ADVERSE_MEDIA_SEARCH: theme.colors.green[700],
     } as Record<PetitionFieldType, string>
   )[type];
 }

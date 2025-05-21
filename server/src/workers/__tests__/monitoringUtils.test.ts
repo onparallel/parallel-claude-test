@@ -1,7 +1,4 @@
-import {
-  EntityDetailsResponse,
-  EntitySearchResponse,
-} from "../../services/background-check-clients/BackgroundCheckClient";
+import { EntityDetailsResponse, EntitySearchResponse } from "../../services/BackgroundCheckService";
 import {
   isNotifiableEntityDifference,
   isNotifiableSearchDifference,

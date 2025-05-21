@@ -12,7 +12,7 @@ import {
 } from "nexus";
 import { countBy, isNonNullish, sort, unique, zip } from "remeda";
 import { assert } from "ts-essentials";
-import { PetitionFieldOptions, selectOptionsValuesAndLabels } from "../../db/helpers/fieldOptions";
+import { PetitionFieldOptions } from "../../services/PetitionFieldService";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import {
@@ -478,7 +478,7 @@ export const standardListDefinition = queryField("standardListDefinition", {
       throw new ForbiddenError("Not found");
     }
 
-    const { values, labels } = await selectOptionsValuesAndLabels(
+    const { values, labels } = await ctx.petitionFields.loadSelectOptionsValuesAndLabels(
       { standardList: standardListDefinition.list_type, values: [] },
       locale,
     );

@@ -1,14 +1,11 @@
-import { extension } from "mime-types";
 import { arg, core, enumType, inputObjectType, objectType, unionType } from "nexus";
-import { isNonNullish, isNullish, pick } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
-import { mapFieldOptions } from "../../db/helpers/fieldOptions";
 import { defaultBrandTheme } from "../../util/BrandTheme";
 import { mapFieldLogic, PetitionFieldMath, PetitionFieldVisibility } from "../../util/fieldLogic";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { getInitials } from "../../util/initials";
-import { isFileTypeField } from "../../util/isFileTypeField";
 import { safeJsonParse } from "../../util/safeJsonParse";
 import { renderSlateWithMentionsToHtml } from "../../util/slate/mentions";
 import { renderSlateWithPlaceholdersToHtml } from "../../util/slate/placeholders";
@@ -436,10 +433,10 @@ export const PublicPetitionField = objectType({
       resolve: async (o, _, ctx) => {
         if (o.type === "SELECT" || o.type === "CHECKBOX") {
           const petition = (await ctx.petitions.loadPetition(o.petition_id))!;
-          return await mapFieldOptions(o, petition.recipient_locale);
+          return await ctx.petitionFields.mapFieldOptions(o, petition.recipient_locale);
         }
 
-        return await mapFieldOptions(o);
+        return await ctx.petitionFields.mapFieldOptions(o);
       },
     });
     t.boolean("optional", {
@@ -727,44 +724,8 @@ export const PublicPetitionFieldReply = objectType({
     });
     t.jsonObject("content", {
       description: "The public content of the reply",
-      resolve: async (root, _, ctx) => {
-        if (isFileTypeField(root.type)) {
-          const file = isNonNullish(root.content.file_upload_id)
-            ? await ctx.files.loadFileUpload(root.content.file_upload_id)
-            : null;
-          return file
-            ? {
-                filename: file.filename,
-                size: file.size,
-                contentType: file.content_type,
-                extension: extension(file.content_type) || null,
-                uploadComplete: file.upload_complete,
-                ...(["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(root.type)
-                  ? pick(root.content, ["warning", "type"])
-                  : {}),
-              }
-            : root.anonymized_at
-              ? {}
-              : {
-                  ...(["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(root.type)
-                    ? // file_upload_id is null but reply is not anonymized: there was an error when requesting documents
-                      pick(root.content, ["type", "request", "error"])
-                    : {}),
-                };
-        } else if (root.type === "BACKGROUND_CHECK") {
-          // make sure to not expose this field in public context
-          return {};
-        } else if (root.type === "PROFILE_SEARCH") {
-          return {
-            // evaluateFieldLogic on PROFILE_SEARCH fields looks for value.length
-            // se we need to expose an array with the same length, values are not important
-            // so, we just expose this for the field logic to be calculated correctly
-            value: root.content.value.map((v: unknown) => "x"),
-          };
-        } else {
-          return root.content ?? {};
-        }
-      },
+      resolve: async (root, _, ctx) =>
+        await ctx.petitionsHelper.mapPublicReplyContentFromDatabase(root),
     });
     t.field("field", {
       type: "PublicPetitionField",

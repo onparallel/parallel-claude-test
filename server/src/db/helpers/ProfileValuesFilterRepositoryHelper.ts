@@ -105,6 +105,7 @@ export class ProfileValuesFilterRepositoryHelper {
               and ${alias}.profile_type_field_id = ?
               and ${alias}.deleted_at is null 
               and ${alias}.removed_at is null
+              and ${alias}.is_draft = false
           `,
           [profileTypeField.id, profileTypeField.id],
         );

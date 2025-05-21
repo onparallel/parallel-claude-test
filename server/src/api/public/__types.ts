@@ -100,6 +100,58 @@ export type AccessOpenedEvent = PetitionEvent & {
   type: PetitionEventType;
 };
 
+export type AdverseMediaArticle = {
+  author: Maybe<Scalars["String"]["output"]>;
+  body: Maybe<Scalars["String"]["output"]>;
+  classification: Maybe<AdverseMediaArticleRelevance>;
+  classifiedAt: Maybe<Scalars["DateTime"]["output"]>;
+  header: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["String"]["output"];
+  images: Maybe<Array<Scalars["String"]["output"]>>;
+  quotes: Maybe<Array<Scalars["String"]["output"]>>;
+  source: Maybe<Scalars["String"]["output"]>;
+  summary: Maybe<Scalars["String"]["output"]>;
+  timestamp: Maybe<Scalars["Int"]["output"]>;
+  url: Maybe<Scalars["String"]["output"]>;
+};
+
+export type AdverseMediaArticleRelevance = "DISMISSED" | "IRRELEVANT" | "RELEVANT";
+
+export type AdverseMediaArticleSearchResult = {
+  articles: AdverseMediaArticleSearchResultArticles;
+  isDraft: Maybe<Scalars["Boolean"]["output"]>;
+  search: Array<AdverseMediaSearchTerm>;
+};
+
+export type AdverseMediaArticleSearchResultArticles = {
+  createdAt: Scalars["DateTime"]["output"];
+  items: Array<AdverseMediaArticle>;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type AdverseMediaEntitySuggestItem = {
+  id: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
+};
+
+export type AdverseMediaSearchTerm = {
+  entityId: Maybe<Scalars["String"]["output"]>;
+  label: Maybe<Scalars["String"]["output"]>;
+  term: Maybe<Scalars["String"]["output"]>;
+  wikiDataId: Maybe<Scalars["String"]["output"]>;
+};
+
+export type AdverseMediaSearchTermInput = {
+  /** Search by an internal entity ID on the specific provider */
+  entityId?: InputMaybe<Scalars["String"]["input"]>;
+  /** If searching by entityId or wikiDataId, the name of the entity as returned by the provider */
+  label?: InputMaybe<Scalars["String"]["input"]>;
+  /** Search by a free text */
+  term?: InputMaybe<Scalars["String"]["input"]>;
+  /** Search by a wikiData ID */
+  wikiDataId?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type AiCompletionLog = Timestamps & {
   completion: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was created. */
@@ -658,6 +710,7 @@ export type DashboardProfilesPieChartModuleItems = {
 export type DashboardProfilesPieChartModuleSettings = {
   aggregate: Maybe<ModuleResultAggregateType>;
   graphicType: DashboardPieChartModuleSettingsType;
+  groupByFilter: Maybe<DashboardModuleProfileFilter>;
   /** Optional SELECT field to group by its values instead of items array */
   groupByProfileTypeFieldId: Maybe<Scalars["GID"]["output"]>;
   items: Array<DashboardProfilesPieChartModuleItems>;
@@ -827,6 +880,7 @@ export type EventSubscriptionSignatureKey = {
 };
 
 export type FeatureFlag =
+  | "ADVERSE_MEDIA_SEARCH"
   | "AUTO_ANONYMIZE"
   | "BACKGROUND_CHECK"
   | "BULK_PETITION_SEND_TASK"
@@ -1148,6 +1202,7 @@ export type Mutation = {
   changePassword: ChangePasswordResult;
   /** Changes the type of a petition Field */
   changePetitionFieldType: PetitionField;
+  classifyAdverseMediaArticle: AdverseMediaArticle;
   /** Clones a dashboard */
   cloneDashboard: Dashboard;
   /** Clones a petition field */
@@ -1170,8 +1225,10 @@ export type Mutation = {
    */
   completePetition: Petition;
   completeProfileFromExternalSource: Profile;
+  /** @deprecated use copyReplyContentToProfileFieldValue */
   copyBackgroundCheckReplyToProfileFieldValue: ProfileFieldValue;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
+  copyReplyContentToProfileFieldValue: ProfileFieldValue;
   /**
    * Adds permissions to users and groups on given petitions and folders.
    * If the total amount of permission to add exceeds 200, a task will be created for async completion.
@@ -1502,6 +1559,7 @@ export type Mutation = {
   retryAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
+  saveAdverseMediaChanges: AdverseMediaArticleSearchResult;
   /** Moves a profile to DELETION_SCHEDULED status */
   scheduleProfileForDeletion: Array<Profile>;
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
@@ -1594,8 +1652,6 @@ export type Mutation = {
   updatePetitionEventSubscription: PetitionEventSubscription;
   /** Updates a petition field. */
   updatePetitionField: PetitionField;
-  /** Updates the auto search config of a BACKGROUND_CHECK petition field. */
-  updatePetitionFieldAutoSearchConfig: PetitionField;
   updatePetitionFieldGroupRelationships: PetitionBase;
   /** Updates multiple replies for a petition at once */
   updatePetitionFieldReplies: Array<PetitionFieldReply>;
@@ -1627,6 +1683,7 @@ export type Mutation = {
   /** Updates an existing event subscription for the user's profiles */
   updateProfileEventSubscription: ProfileEventSubscription;
   updateProfileFieldValue: Profile;
+  updateProfileFieldValueMonitoringStatus: Profile;
   /** Updates a profile list view */
   updateProfileListView: ProfileListView;
   updateProfileType: ProfileType;
@@ -1760,6 +1817,12 @@ export type MutationchangePetitionFieldTypeArgs = {
   type: PetitionFieldType;
 };
 
+export type MutationclassifyAdverseMediaArticleArgs = {
+  classification?: InputMaybe<AdverseMediaArticleRelevance>;
+  id: Scalars["String"]["input"];
+  token: Scalars["String"]["input"];
+};
+
 export type MutationcloneDashboardArgs = {
   id: Scalars["GID"]["input"];
   name: Scalars["String"]["input"];
@@ -1828,6 +1891,14 @@ export type MutationcopyFileReplyToProfileFieldFileArgs = {
   profileTypeFieldId: Scalars["GID"]["input"];
 };
 
+export type MutationcopyReplyContentToProfileFieldValueArgs = {
+  expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+  replyId: Scalars["GID"]["input"];
+};
+
 export type MutationcreateAddPetitionPermissionMaybeTaskArgs = {
   folders?: InputMaybe<FoldersInput>;
   message?: InputMaybe<Scalars["String"]["input"]>;
@@ -1840,6 +1911,7 @@ export type MutationcreateAddPetitionPermissionMaybeTaskArgs = {
 };
 
 export type MutationcreateAnthropicCompletionIntegrationArgs = {
+  model: Scalars["String"]["input"];
   orgId: Scalars["GID"]["input"];
 };
 
@@ -2798,6 +2870,10 @@ export type MutationrevokeUserAuthTokenArgs = {
   authTokenIds: Array<Scalars["GID"]["input"]>;
 };
 
+export type MutationsaveAdverseMediaChangesArgs = {
+  token: Scalars["String"]["input"];
+};
+
 export type MutationscheduleProfileForDeletionArgs = {
   profileIds: Array<Scalars["GID"]["input"]>;
 };
@@ -3105,12 +3181,6 @@ export type MutationupdatePetitionFieldArgs = {
   petitionId: Scalars["GID"]["input"];
 };
 
-export type MutationupdatePetitionFieldAutoSearchConfigArgs = {
-  config?: InputMaybe<UpdatePetitionFieldAutoSearchConfigInput>;
-  fieldId: Scalars["GID"]["input"];
-  petitionId: Scalars["GID"]["input"];
-};
-
 export type MutationupdatePetitionFieldGroupRelationshipsArgs = {
   petitionId: Scalars["GID"]["input"];
   relationships: Array<UpdatePetitionFieldGroupRelationshipInput>;
@@ -3202,6 +3272,12 @@ export type MutationupdateProfileEventSubscriptionArgs = {
 export type MutationupdateProfileFieldValueArgs = {
   fields: Array<UpdateProfileFieldValueInput>;
   profileId: Scalars["GID"]["input"];
+};
+
+export type MutationupdateProfileFieldValueMonitoringStatusArgs = {
+  enabled: Scalars["Boolean"]["input"];
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateProfileListViewArgs = {
@@ -4403,6 +4479,8 @@ export type PetitionFieldReplyStatus =
 
 /** Type of a petition field */
 export type PetitionFieldType =
+  /** A field for performing searches in the adverse media database */
+  | "ADVERSE_MEDIA_SEARCH"
   /** Run a background check of entities */
   | "BACKGROUND_CHECK"
   /** A options list. */
@@ -5360,6 +5438,10 @@ export type ProfileFieldValue = ProfileFieldResponse & {
   expiresAt: Maybe<Scalars["DateTime"]["output"]>;
   expiryDate: Maybe<Scalars["String"]["output"]>;
   field: ProfileTypeField;
+  hasActiveMonitoring: Scalars["Boolean"]["output"];
+  /** Whether this value has an unsaved draft. */
+  hasDraft: Scalars["Boolean"]["output"];
+  hasPendingReview: Scalars["Boolean"]["output"];
   id: Scalars["GID"]["output"];
   profile: Profile;
   /** Time when the response was removed. */
@@ -5596,6 +5678,7 @@ export type ProfileTypeFieldPermission = {
 export type ProfileTypeFieldPermissionType = "HIDDEN" | "READ" | "WRITE";
 
 export type ProfileTypeFieldType =
+  | "ADVERSE_MEDIA_SEARCH"
   | "BACKGROUND_CHECK"
   | "CHECKBOX"
   | "DATE"
@@ -6047,6 +6130,12 @@ export type PublicUserOrContact = PublicContact | PublicUser;
 export type Query = {
   access: PublicPetitionAccess;
   accesses: PublicPetitionAccessPagination;
+  /** Suggest alternative search terms based on the current search */
+  adverseMediaAlternativeSearchSuggestions: Array<AdverseMediaSearchTerm>;
+  adverseMediaArticleDetails: AdverseMediaArticle;
+  adverseMediaArticleSearch: Maybe<AdverseMediaArticleSearchResult>;
+  /** Suggest entity names based on a search term */
+  adverseMediaEntitySuggest: Array<AdverseMediaEntitySuggestItem>;
   backgroundCheckEntityDetails: BackgroundCheckEntityDetails;
   backgroundCheckEntitySearch: BackgroundCheckEntitySearch;
   /** Run a search on PROFILE_SEARCH petition field */
@@ -6135,6 +6224,26 @@ export type QueryaccessesArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   status?: InputMaybe<Array<PetitionStatus>>;
+};
+
+export type QueryadverseMediaAlternativeSearchSuggestionsArgs = {
+  search: Scalars["String"]["input"];
+  token: Scalars["String"]["input"];
+};
+
+export type QueryadverseMediaArticleDetailsArgs = {
+  id: Scalars["String"]["input"];
+  search?: InputMaybe<Array<AdverseMediaSearchTermInput>>;
+  token: Scalars["String"]["input"];
+};
+
+export type QueryadverseMediaArticleSearchArgs = {
+  search?: InputMaybe<Array<AdverseMediaSearchTermInput>>;
+  token: Scalars["String"]["input"];
+};
+
+export type QueryadverseMediaEntitySuggestArgs = {
+  searchTerm: Scalars["String"]["input"];
 };
 
 export type QuerybackgroundCheckEntityDetailsArgs = {
@@ -6914,13 +7023,6 @@ export type UpdateCreatePetitionButtonDashboardModuleInput = {
   settings?: InputMaybe<CreatePetitionButtonDashboardModuleSettingsInput>;
   size?: InputMaybe<DashboardModuleSize>;
   title?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type UpdatePetitionFieldAutoSearchConfigInput = {
-  country?: InputMaybe<Scalars["GID"]["input"]>;
-  date?: InputMaybe<Scalars["GID"]["input"]>;
-  name: Array<Scalars["GID"]["input"]>;
-  type?: InputMaybe<BackgroundCheckEntitySearchType>;
 };
 
 export type UpdatePetitionFieldGroupRelationshipInput = {

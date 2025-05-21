@@ -11,6 +11,7 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { removeDiacriticsAndLowercase } from "@parallel/utils/strings";
+import { useHasAdverseMediaSearch } from "@parallel/utils/useHasAdverseMediaSearch";
 import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -255,6 +256,7 @@ function NewFieldProfileTypeFieldItem({
   onAddField: () => Promise<void>;
 }) {
   const hasBackgroundCheck = useHasBackgroundCheck();
+  const hasAdverseMediaSearch = useHasAdverseMediaSearch();
   return (
     <Button
       isDisabled={isDisabled}
@@ -278,7 +280,10 @@ function NewFieldProfileTypeFieldItem({
           minWidth={0}
           _icon={{ height: "28px", minWidth: "28px", rounded: "md", svg: { boxSize: "20px" } }}
         />
-        {!hasBackgroundCheck && field.type === "BACKGROUND_CHECK" ? <PaidBadge /> : null}
+        {(!hasAdverseMediaSearch && field.type === "ADVERSE_MEDIA_SEARCH") ||
+        (!hasBackgroundCheck && field.type === "BACKGROUND_CHECK") ? (
+          <PaidBadge />
+        ) : null}
       </HStack>
     </Button>
   );

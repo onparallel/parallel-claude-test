@@ -21,6 +21,7 @@ import { assert } from "ts-essentials";
 import { LocalizableUserText } from "../../graphql";
 import {
   PROFILE_TYPE_FIELD_SERVICE,
+  ProfileTypeFieldMonitoring,
   ProfileTypeFieldOptions,
   ProfileTypeFieldService,
 } from "../../services/ProfileTypeFieldService";
@@ -615,7 +616,23 @@ export class ProfileRepository extends BaseRepository {
   readonly loadProfileFieldValuesByProfileId = this.buildLoadMultipleBy(
     "profile_field_value",
     "profile_id",
-    (q) => q.whereNull("removed_at").whereNull("deleted_at"),
+    (q) =>
+      q.where({
+        removed_at: null,
+        deleted_at: null,
+        is_draft: false,
+      }),
+  );
+
+  readonly loadDraftProfileFieldValuesByProfileId = this.buildLoadMultipleBy(
+    "profile_field_value",
+    "profile_id",
+    (q) =>
+      q.where({
+        removed_at: null,
+        deleted_at: null,
+        is_draft: true,
+      }),
   );
 
   readonly loadProfileFieldValue = this.buildLoader<
@@ -630,8 +647,12 @@ export class ProfileRepository extends BaseRepository {
       const values = await this.from("profile_field_value", t)
         .whereIn("profile_id", unique(keys.map((k) => k.profileId)))
         .whereIn("profile_type_field_id", unique(keys.map((k) => k.profileTypeFieldId)))
-        .whereNull("removed_at")
-        .whereNull("deleted_at");
+        .where({
+          removed_at: null,
+          deleted_at: null,
+          is_draft: false,
+        });
+
       const byKey = indexBy(values, keyBuilder(["profile_id", "profile_type_field_id"]));
       return keys.map(keyBuilder(["profileId", "profileTypeFieldId"])).map((k) => byKey[k] ?? null);
     },
@@ -853,7 +874,10 @@ export class ProfileRepository extends BaseRepository {
       /* sql */ `
         with from_values as (
             select distinct profile_id from profile_field_value
-            where profile_type_field_id in ? and deleted_at is null and removed_at is null
+            where profile_type_field_id in ? 
+              and deleted_at is null 
+              and removed_at is null 
+              and is_draft = false
           ), from_files as (
             select distinct profile_id from profile_field_file
             where profile_type_field_id in ? and deleted_at is null and removed_at is null
@@ -974,12 +998,15 @@ export class ProfileRepository extends BaseRepository {
           ) as values
         from "profile" p
         left join profile_field_value pfv
-          on pfv.profile_id = p.id and pfv.profile_type_field_id in ?
-          and pfv.deleted_at is null and pfv.removed_at is null
+          on pfv.profile_id = p.id
+          and pfv.profile_type_field_id in ?
+          and pfv.deleted_at is null
+          and pfv.removed_at is null
+          and pfv.is_draft = false
         where
           p.profile_type_id = ?
           and p.deleted_at is null 
-          group by p.id;
+        group by p.id;
       `,
         [this.sqlIn(pattern.filter((p) => typeof p === "number")), profileTypeId],
         t,
@@ -1066,6 +1093,7 @@ export class ProfileRepository extends BaseRepository {
       type: ProfileTypeFieldType;
       content?: Record<string, any> | null;
       expiryDate?: string | null;
+      pendingReview?: boolean;
     }[],
     userId: number | null,
     orgId: number,
@@ -1077,15 +1105,16 @@ export class ProfileRepository extends BaseRepository {
     if (_fields.length === 0) {
       return;
     }
+
     await this.withTransaction(async (t) => {
       const events = await this.raw<ProfileEvent>(
         /* sql */ `
           with new_values as (
-            select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date)
+            select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date, pending_review)
           ),
           with_no_previous_values as (
             -- insert values where a profile_field_value does not exist yet
-            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id)
+            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review)
             select 
               nv.profile_id, 
               nv.profile_type_field_id, 
@@ -1093,9 +1122,16 @@ export class ProfileRepository extends BaseRepository {
               nv.content,
               case(nv.expiry_date) when '-infinity'::date then null else nv.expiry_date end,
               ?,
-              ?
+              ?,
+              case when nv.type in ('BACKGROUND_CHECK', 'ADVERSE_MEDIA_SEARCH') then true else false end, -- this fields are monitored by default
+              nv.pending_review
             from new_values nv
-            left join profile_field_value pfv2 on pfv2.profile_id = nv.profile_id and pfv2.profile_type_field_id = nv.profile_type_field_id and pfv2.removed_at is null
+            left join profile_field_value pfv2 
+              on pfv2.profile_id = nv.profile_id
+              and pfv2.profile_type_field_id = nv.profile_type_field_id
+              and pfv2.deleted_at is null
+              and pfv2.removed_at is null
+              and pfv2.is_draft = false
             where pfv2.id is null and nv.content is not null
             returning *
           ),
@@ -1121,7 +1157,7 @@ export class ProfileRepository extends BaseRepository {
           ),
           with_previous_values as (
             -- insert values where a profile_field_value existed already
-            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id)
+            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review)
             select 
               nv.profile_id,
               nv.profile_type_field_id, 
@@ -1129,7 +1165,9 @@ export class ProfileRepository extends BaseRepository {
               case(nv.content) when 'null'::jsonb then rpv.content else nv.content end,
               case(nv.expiry_date) when '-infinity'::date then rpv.expiry_date else nv.expiry_date end,
               ?,
-              ?
+              ?,
+              rpv.active_monitoring, -- active_monitoring is always inherited from previous values
+              nv.pending_review -- pending_review is always set explicitly, not inherited
             from removed_previous_values rpv
             join new_values nv on nv.profile_id = rpv.profile_id and rpv.profile_type_field_id = nv.profile_type_field_id
             where nv.content is not null
@@ -1261,13 +1299,14 @@ export class ProfileRepository extends BaseRepository {
                 ? "null"
                 : f.content
                   ? JSON.stringify(
-                      this.profileTypeFields.sanitizeProfileFieldValueContent(f.type, f.content),
+                      this.profileTypeFields.mapValueContentToDatabase(f.type, f.content),
                     )
                   : null,
               // undefined ('-infinity'::date) uses previous value, null removes
               f.expiryDate === undefined ? "-infinity" : (f.expiryDate ?? null),
+              f.pendingReview ?? false,
             ]),
-            ["int", "int", "profile_type_field_type", "jsonb", "date"],
+            ["int", "int", "profile_type_field_type", "jsonb", "date", "boolean"],
           ),
           // with_no_previous_values
           ...[userId, externalSourceIntegrationId ?? null],
@@ -1306,7 +1345,12 @@ export class ProfileRepository extends BaseRepository {
               where pt.id = p.profile_type_id
             ) t where jsonb_typeof(t.part) = 'number'
           ) t on true
-          left join profile_field_value pfv on p.id = pfv.profile_id and pfv.profile_type_field_id = t.profile_type_field_id and pfv.removed_at is null and pfv.deleted_at is null
+          left join profile_field_value pfv
+            on p.id = pfv.profile_id 
+            and pfv.profile_type_field_id = t.profile_type_field_id 
+            and pfv.removed_at is null 
+            and pfv.deleted_at is null
+            and pfv.is_draft = false
           where p.id in ?
           group by p.id, t.profile_name_pattern
         `,
@@ -1316,6 +1360,72 @@ export class ProfileRepository extends BaseRepository {
 
       await this.updateProfileNamesWithPattern(profileValues, `User:${userId}`, t);
     }, t);
+  }
+
+  async upsertDraftProfileFieldValues(
+    fields: {
+      profileId: number;
+      profileTypeFieldId: number;
+      type: ProfileTypeFieldType;
+      content?: Record<string, any> | null;
+      expiryDate?: string | null;
+    }[],
+    userId: number | null,
+  ) {
+    //ignore fields that have no content and no expiry date
+    const _fields = fields.filter((f) => f.content !== undefined || f.expiryDate !== undefined);
+    if (_fields.length === 0) {
+      return;
+    }
+
+    await this.raw(
+      /* sql */ `
+        with new_values as (
+          select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date)
+        )
+        insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, is_draft)
+        select
+          nv.profile_id,
+          nv.profile_type_field_id,
+          nv.type,
+          nv.content,
+          nv.expiry_date,
+          ?,
+          true
+        from new_values nv
+        on conflict ("profile_id", "profile_type_field_id") where ((removed_at is null) and (deleted_at is null) and (is_draft = true))
+        do update
+        set
+          content = EXCLUDED.content
+        returning *;
+      `,
+      [
+        this.sqlValues(
+          _fields.map((f) => [
+            f.profileId,
+            f.profileTypeFieldId,
+            f.type,
+            f.content
+              ? JSON.stringify(this.profileTypeFields.mapValueContentToDatabase(f.type, f.content))
+              : null,
+            f.expiryDate ?? null,
+          ]),
+          ["int", "int", "profile_type_field_type", "jsonb", "date"],
+        ),
+        userId,
+      ],
+    );
+  }
+
+  async deleteDraftProfileFieldValue(id: number, t?: Knex.Transaction) {
+    await this.from("profile_field_value", t)
+      .where({
+        id,
+        deleted_at: null,
+        removed_at: null,
+        is_draft: true,
+      })
+      .delete();
   }
 
   async profileFieldRepliesHaveExpiryDateSet(
@@ -1332,6 +1442,11 @@ export class ProfileRepository extends BaseRepository {
         removed_at: null,
         deleted_at: null,
       })
+      .mmodify((q) => {
+        if (type !== "FILE") {
+          q.where("is_draft", false);
+        }
+      })
       .whereNotNull("expiry_date")
       .select<{ count: number }[]>(this.count());
 
@@ -1347,7 +1462,11 @@ export class ProfileRepository extends BaseRepository {
         with updated_profile_field_values as (
           update profile_field_value pfv set
             expiry_date = null
-          where pfv.profile_type_field_id = ? and pfv.removed_at is null and pfv.deleted_at is null and pfv.expiry_date is not null
+          where pfv.profile_type_field_id = ?
+            and pfv.expiry_date is not null
+            and pfv.removed_at is null
+            and pfv.deleted_at is null
+            and pfv.is_draft = false
           returning *
         ),
         update_profile_value_cache as (
@@ -1548,6 +1667,7 @@ export class ProfileRepository extends BaseRepository {
       .whereNotNull("pfx.expiry_date")
       .whereNull("pfx.removed_at")
       .whereNull("pfx.deleted_at")
+      .where("pfx.is_draft", false)
       .whereNotNull("ptf.expiry_alert_ahead_time")
       .modify(filter);
     const filesQuery = this.knex
@@ -2265,13 +2385,14 @@ export class ProfileRepository extends BaseRepository {
 
   async getProfileFieldValueCountWithContent(
     profileTypeFieldId: number,
-    type: ProfileTypeFieldType,
+    type: "SELECT" | "CHECKBOX",
     content: string[],
   ) {
     const rows = await this.from("profile_field_value")
       .where("profile_type_field_id", profileTypeFieldId)
       .whereNull("deleted_at")
       .whereNull("removed_at")
+      .where("is_draft", false)
       .mmodify((q) => {
         if (type === "CHECKBOX") {
           q.whereRaw(
@@ -2299,7 +2420,7 @@ export class ProfileRepository extends BaseRepository {
 
   async updateProfileFieldValueContentByProfileTypeFieldId(
     profileTypeFieldId: number,
-    type: ProfileTypeFieldType,
+    type: "SELECT" | "CHECKBOX",
     data: {
       old: string;
       new?: string | null;
@@ -2402,9 +2523,9 @@ export class ProfileRepository extends BaseRepository {
     const [profileTypeField] = await this.from("profile_type_field")
       .where({
         id: profileTypeFieldId,
-        type: "BACKGROUND_CHECK",
         deleted_at: null,
       })
+      .whereIn("type", ["BACKGROUND_CHECK", "ADVERSE_MEDIA_SEARCH"])
       .whereRaw(/*sql*/ `options->>'monitoring' is not null`)
       .select("*");
 
@@ -2412,7 +2533,9 @@ export class ProfileRepository extends BaseRepository {
       return [];
     }
 
-    const { monitoring } = profileTypeField.options as ProfileTypeFieldOptions["BACKGROUND_CHECK"];
+    const { monitoring } = profileTypeField.options as ProfileTypeFieldOptions[
+      | "BACKGROUND_CHECK"
+      | "ADVERSE_MEDIA_SEARCH"];
 
     const profiles = await this.from("profile")
       .where({
@@ -2438,6 +2561,7 @@ export class ProfileRepository extends BaseRepository {
       .where({
         removed_at: null,
         deleted_at: null,
+        is_draft: false,
         profile_type_field_id: monitoring.activationCondition.profileTypeFieldId,
         type: "SELECT",
       })
@@ -2454,69 +2578,80 @@ export class ProfileRepository extends BaseRepository {
   }
 
   /**
-   * @returns every OPEN profile with at least 1 replied BACKGROUND_CHECK field with monitoring rules
+   * profile field values for monitoring refresh must meet the following criteria:
+   *  - profile must be OPEN
+   *  - active_monitoring must be true
+   *  - value must not have an unsaved draft
+   *  - value's property must have monitoring config set
+   *  - if monitoring config has activation conditions, those must pass
    */
-  private async getProfilesWithBackgroundCheckMonitoringRules(orgId: number) {
-    return await this.raw<Profile>(
-      /* sql */ `
-      select distinct on (p.id) p.*
-      from profile p
-      join profile_field_value pfv 
-        on pfv.profile_id = p.id
-        and pfv.type = 'BACKGROUND_CHECK'
-        and pfv.removed_at is null
-        and pfv.deleted_at is null
-      join profile_type_field ptf 
-        on ptf.id = pfv.profile_type_field_id 
-        and ptf.type = 'BACKGROUND_CHECK' 
-        and ptf."options"->>'monitoring' is not null
-        and ptf.deleted_at is null
-      where
-        p.status = 'OPEN'
-        and p.org_id = ?
-        and p.deleted_at is null;
-    `,
-      [orgId],
-    );
-  }
-
-  async getBackgroundCheckProfileFieldValuesForRefreshByOrgId(
+  async getProfileFieldValuesForRefreshByOrgId(
     orgId: number,
+    type: ProfileTypeFieldType,
     requiresRefresh: (
-      pfv: ProfileFieldValue,
-      monitoring: ProfileTypeFieldOptions["BACKGROUND_CHECK"]["monitoring"],
-      selectPfvs: ProfileFieldValue[],
+      pfv: Pick<ProfileFieldValue, "created_at">,
+      monitoring: ProfileTypeFieldMonitoring,
+      selectPfvs: Pick<ProfileFieldValue, "profile_type_field_id" | "content">[],
     ) => boolean,
-  ) {
-    const profiles = await this.getProfilesWithBackgroundCheckMonitoringRules(orgId);
-
-    const result: ProfileFieldValue[] = [];
-
-    for (const profile of profiles) {
-      const profileFieldValues = await this.from("profile_field_value")
-        .where({ profile_id: profile.id, removed_at: null, deleted_at: null })
-        .whereIn("type", ["BACKGROUND_CHECK", "SELECT"])
-        .select("*");
-
-      const [backgroundCheckPfvs, selectPfvs] = partition(
-        profileFieldValues,
-        (pfv) => pfv.type === "BACKGROUND_CHECK",
-      );
-
-      const backgroundCheckPtfs = await this.loadProfileTypeField(
-        backgroundCheckPfvs.map((pfv) => pfv.profile_type_field_id),
-      );
-
-      for (const [pfv, ptf] of zip(backgroundCheckPfvs, backgroundCheckPtfs)) {
-        const options = ptf?.options as ProfileTypeFieldOptions["BACKGROUND_CHECK"];
-
-        if (requiresRefresh(pfv, options.monitoring, selectPfvs)) {
-          result.push(pfv);
-        }
+  ): Promise<ProfileFieldValue[]> {
+    const profileFieldValues = await this.raw<
+      ProfileFieldValue & {
+        monitoring: ProfileTypeFieldMonitoring;
+        select_values: Pick<ProfileFieldValue, "profile_type_field_id" | "content">[];
       }
-    }
+    >(
+      /* sql */ `
+        select 
+          pfv.*,
+          ptf.options->'monitoring' as monitoring,
+          coalesce(
+	          jsonb_agg(
+	            jsonb_build_object(
+	              'profile_type_field_id', select_pfv.profile_type_field_id::int,
+	              'content', select_pfv.content
+	            )
+	          ) filter (where select_pfv.profile_type_field_id is not null),
+	          '[]'::jsonb
+          ) as select_values
+        from profile p
+        join profile_field_value pfv
+          on pfv.profile_id = p.id
+          and pfv.type = :type
+          and pfv.removed_at is null
+          and pfv.deleted_at is null
+          and pfv.is_draft = false
+          and pfv.active_monitoring = true
+        left join profile_field_value draft_pfv
+          on draft_pfv.profile_id = pfv.profile_id
+          and draft_pfv.profile_type_field_id = pfv.profile_type_field_id
+          and draft_pfv.type = pfv.type
+          and draft_pfv.removed_at is null
+          and draft_pfv.deleted_at is null
+          and draft_pfv.is_draft = true
+        left join profile_field_value select_pfv
+          on select_pfv.profile_id = p.id
+          and select_pfv.type = 'SELECT' 
+          and select_pfv.removed_at is null
+          and select_pfv.deleted_at is null
+          and select_pfv.is_draft = false
+        join profile_type_field ptf 
+          on ptf.id = pfv.profile_type_field_id 
+          and ptf.type = :type
+          and ptf."options"->>'monitoring' is not null
+          and ptf.deleted_at is null
+        where
+          p.status = 'OPEN'
+          and p.org_id = :orgId
+          and p.deleted_at is null
+          and draft_pfv.id is null
+        group by pfv.id, ptf.options;
+      `,
+      { orgId, type },
+    );
 
-    return result;
+    return profileFieldValues.filter(({ monitoring, select_values: selectValues, ...value }) =>
+      requiresRefresh(value, monitoring, selectValues),
+    );
   }
 
   async getSubscribedUsersWithReadPermissions(
@@ -3157,12 +3292,20 @@ export class ProfileRepository extends BaseRepository {
       where (
         p.id in (
           select distinct(profile_id) from profile_field_value pfv 
-          join profile_type_field ptf on ptf.id = pfv.profile_type_field_id and ptf.id in :ptfs and ptf.deleted_at is null
-          join profile_type pt on pt.id = ptf.profile_type_id and pt.id in :pts and pt.deleted_at is null and pt.org_id = :orgId
+          join profile_type_field ptf 
+            on ptf.id = pfv.profile_type_field_id 
+            and ptf.id in :ptfs 
+            and ptf.deleted_at is null
+          join profile_type pt 
+          on pt.id = ptf.profile_type_id 
+            and pt.id in :pts 
+            and pt.deleted_at is null 
+            and pt.org_id = :orgId
           where pfv.deleted_at is null 
-          and pfv.removed_at is null
-          and pfv.type in ('TEXT', 'SHORT_TEXT')
-          and strict_word_similarity(:search, coalesce(pfv."content"->>'value', '')) > :threshold
+            and pfv.removed_at is null
+            and pfv.is_draft = false
+            and pfv.type in ('TEXT', 'SHORT_TEXT')
+            and strict_word_similarity(:search, coalesce(pfv."content"->>'value', '')) > :threshold
         )
         or strict_word_similarity(:search, coalesce(p.localizable_name->>'es', '')) > :threshold
         or strict_word_similarity(:search, coalesce(p.localizable_name->>'en', '')) > :threshold
@@ -3244,5 +3387,21 @@ export class ProfileRepository extends BaseRepository {
 
       return allowed.length !== 2;
     });
+  }
+
+  async updateProfileFieldValueOptionsByProfileId(
+    profileId: number,
+    profileTypeFieldId: number,
+    data: Pick<ProfileFieldValue, "active_monitoring">,
+  ) {
+    await this.from("profile_field_value")
+      .where({
+        profile_id: profileId,
+        profile_type_field_id: profileTypeFieldId,
+        deleted_at: null,
+        removed_at: null,
+        is_draft: false,
+      })
+      .update({ ...data });
   }
 }

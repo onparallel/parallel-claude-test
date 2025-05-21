@@ -492,6 +492,7 @@ function ConditionPredicate({
           !isFileTypeField(referencedField.type) &&
           referencedField.type !== "DYNAMIC_SELECT" &&
           referencedField.type !== "BACKGROUND_CHECK" &&
+          referencedField.type !== "ADVERSE_MEDIA_SEARCH" &&
           referencedField.type !== "FIELD_GROUP"
         ) {
           options.push(

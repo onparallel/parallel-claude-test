@@ -19,6 +19,8 @@ import {
 } from "@parallel/components/common/dialogs/DialogProvider";
 import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/CreateProfileDialog";
 import {
+  AdverseMediaArticle,
+  AdverseMediaSearchTermInput,
   ArchiveFieldGroupReplyIntoProfileConflictResolutionInput,
   ArchiveFieldGroupReplyIntoProfileExpirationInput,
   useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment,
@@ -400,6 +402,44 @@ function ArchiveFieldGroupReplyIntoProfileRow({
           );
         }
 
+        if (f.type === "ADVERSE_MEDIA_SEARCH") {
+          const fieldContent = replies?.[0]?.content;
+          const profileFieldContent = profileField.value?.content;
+
+          const fieldSearch =
+            fieldContent?.search
+              ?.map(
+                (search: AdverseMediaSearchTermInput) =>
+                  search.term || search.entityId || search.wikiDataId,
+              )
+              .filter(isNonNullish) ?? [];
+
+          const profileSearch =
+            profileFieldContent?.search
+              ?.map(
+                (search: AdverseMediaSearchTermInput) =>
+                  search.term || search.entityId || search.wikiDataId,
+              )
+              .filter(isNonNullish) ?? [];
+
+          const fieldIdsWithClassification =
+            fieldContent?.articles?.items?.map(
+              ({ id, classification }: AdverseMediaArticle) => `${id}-${classification}`,
+            ) || [];
+
+          const profileIdsWithClassification =
+            profileFieldContent?.articles?.items?.map(
+              ({ id, classification }: AdverseMediaArticle) => `${id}-${classification}`,
+            ) || [];
+
+          return (
+            fieldSearch.length !== profileSearch.length ||
+            fieldIdsWithClassification.length !== profileIdsWithClassification.length ||
+            difference.multiset(fieldSearch, profileSearch).length > 0 ||
+            difference.multiset(fieldIdsWithClassification, profileIdsWithClassification).length > 0
+          );
+        }
+
         if (f.type === "FILE_UPLOAD") {
           const petitionFilesToString = replies.map((reply) => {
             const { filename, size, contentType } = reply.content;
@@ -416,7 +456,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
 
           return (
             petitionFilesToString.length !== profileFilesToString.length ||
-            difference(petitionFilesToString, profileFilesToString).length > 0
+            difference.multiset(petitionFilesToString, profileFilesToString).length > 0
           );
         }
 

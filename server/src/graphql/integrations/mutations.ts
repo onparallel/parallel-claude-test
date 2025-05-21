@@ -7,6 +7,9 @@ import { userHasFeatureFlag } from "../petition/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
 import { userHasAccessToIntegrations } from "./authorizers";
 
+//////////////////////
+// SIGNATURE
+//////////////////////
 export const markSignatureIntegrationAsDefault = mutationField(
   "markSignatureIntegrationAsDefault",
   {
@@ -131,6 +134,9 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
   },
 });
 
+//////////////////////
+// DOW JONES KYC
+//////////////////////
 export const createDowJonesKycIntegration = mutationField("createDowJonesKycIntegration", {
   description: "Creates a new Dow Jones KYC integration on the user's organization",
   type: nonNull("OrgIntegration"),

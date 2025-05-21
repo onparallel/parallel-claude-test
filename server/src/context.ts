@@ -30,6 +30,11 @@ import { DOW_JONES_CLIENT, IDowJonesClient } from "./integrations/dow-jones/DowJ
 import { IFileExportIntegration } from "./integrations/file-export/FileExportIntegration";
 import { IMANAGE_FILE_EXPORT_INTEGRATION } from "./integrations/file-export/imanage/IManageFileExportIntegration";
 import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./services/AccountSetupService";
+import {
+  ADVERSE_MEDIA_SEARCH_SERVICE,
+  IAdverseMediaSearchService,
+} from "./services/AdverseMediaSearchService";
+import { AI_ASSISTANT_SERVICE, IAiAssistantService } from "./services/AiAssistantService";
 import { AI_COMPLETION_SERVICE, IAiCompletionService } from "./services/AiCompletionService";
 import { ANALYTICS, IAnalyticsService } from "./services/AnalyticsService";
 import { AUTH, IAuth } from "./services/AuthService";
@@ -67,6 +72,7 @@ import {
   ORGANIZATION_LAYOUT_SERVICE,
 } from "./services/OrganizationLayoutService";
 import { IPetitionBinder, PETITION_BINDER } from "./services/PetitionBinder";
+import { PETITION_FIELD_SERVICE, PetitionFieldService } from "./services/PetitionFieldService";
 import { PETITION_FILES_SERVICE, PetitionFilesService } from "./services/PetitionFilesService";
 import {
   IPetitionImportExportService,
@@ -76,6 +82,14 @@ import {
   IPetitionMessageContextService,
   PETITION_MESSAGE_CONTEXT_SERVICE,
 } from "./services/PetitionMessageContextService";
+import {
+  PETITION_VALIDATION_SERVICE,
+  PetitionValidationService,
+} from "./services/PetitionValidationService";
+import {
+  PETITIONS_HELPER_SERVICE,
+  PetitionsHelperService,
+} from "./services/PetitionsHelperService";
 import {
   PROFILE_EXCEL_EXPORT_SERVICE,
   ProfileExcelExportService,
@@ -96,6 +110,7 @@ import {
   PROFILE_VALIDATION_SERVICE,
   ProfileValidationService,
 } from "./services/ProfileValidationService";
+import { PROFILES_HELPER_SERVICE, ProfilesHelperService } from "./services/ProfilesHelperService";
 import { IProfilesSetupService, PROFILES_SETUP_SERVICE } from "./services/ProfilesSetupService";
 import { IQueuesService, QUEUES_SERVICE } from "./services/QueuesService";
 import { IRedis, REDIS } from "./services/Redis";
@@ -145,6 +160,18 @@ export class ApiContext {
     public readonly profileExternalSources: IProfileExternalSourcesService,
     @inject(PROFILE_EXCEL_IMPORT_SERVICE)
     public readonly profileExcelImport: ProfileExcelImportService,
+    @inject(ADVERSE_MEDIA_SEARCH_SERVICE) public readonly adverseMedia: IAdverseMediaSearchService,
+    @inject(AI_ASSISTANT_SERVICE) public readonly aiAssistant: IAiAssistantService,
+
+    // Petition helper services
+    @inject(PETITIONS_HELPER_SERVICE) public readonly petitionsHelper: PetitionsHelperService,
+    @inject(PETITION_VALIDATION_SERVICE)
+    public readonly petitionValidation: PetitionValidationService,
+    @inject(PETITION_FIELD_SERVICE)
+    public readonly petitionFields: PetitionFieldService,
+
+    // Profile helper services
+    @inject(PROFILES_HELPER_SERVICE) public readonly profilesHelper: ProfilesHelperService,
     @inject(PROFILE_VALIDATION_SERVICE)
     public readonly profileValidation: ProfileValidationService,
     @inject(PROFILE_TYPE_FIELD_SERVICE)
@@ -217,6 +244,7 @@ export class WorkerContext {
     @inject(IMANAGE_FILE_EXPORT_INTEGRATION) public readonly iManageExport: IFileExportIntegration,
     @inject(EVENT_SUBSCRIPTION_SERVICE)
     public readonly eventSubscription: IEventSubscriptionService,
+    @inject(ADVERSE_MEDIA_SEARCH_SERVICE) public readonly adverseMedia: IAdverseMediaSearchService,
 
     // Repositories
     public readonly contacts: ContactRepository,

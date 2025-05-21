@@ -148,6 +148,9 @@ export function buildConfig() {
       "background-check-monitor": {
         rule: process.env.WORKERS_BACKGROUND_CHECK_MONITOR_RULE!,
       },
+      "adverse-media-monitor": {
+        rule: process.env.WORKERS_ADVERSE_MEDIA_MONITOR_RULE!,
+      },
     },
     imageProxy: {
       secret: process.env.IMAGE_PROXY_SIGNATURE_SECRET!,
@@ -230,6 +233,11 @@ export function buildConfig() {
     fileExport: {
       iManage: {
         signatureSecret: process.env.FILE_EXPORT_IMANAGE_SIGNATURE_SECRET!,
+      },
+    },
+    adverseMedia: {
+      oPoint: {
+        token: process.env.ADVERSE_MEDIA_OPOINT_TOKEN!,
       },
     },
   });

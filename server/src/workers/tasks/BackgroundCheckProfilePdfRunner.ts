@@ -1,5 +1,5 @@
 import { isNonNullish } from "remeda";
-import { parseBackgroundCheckToken } from "../../graphql/integrations/utils";
+import { parseReplyToken } from "../../graphql/integrations/utils";
 import { TaskRunner } from "../helpers/TaskRunner";
 
 export class BackgroundCheckProfilePdfRunner extends TaskRunner<"BACKGROUND_CHECK_PROFILE_PDF"> {
@@ -11,7 +11,7 @@ export class BackgroundCheckProfilePdfRunner extends TaskRunner<"BACKGROUND_CHEC
 
     const { token, entity_id: entityId } = this.task.input;
 
-    const params = parseBackgroundCheckToken(token);
+    const params = parseReplyToken(token);
 
     let replyContent: any = null;
     if ("petitionId" in params) {

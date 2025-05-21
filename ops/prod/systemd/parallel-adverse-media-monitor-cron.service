@@ -1,0 +1,20 @@
+[Unit]
+Description=parallel adverse media monitor cron
+After=network.target
+
+[Service]
+Environment=PORT=4000
+Environment=NODE_ENV=production
+Environment=ENV=#ENV#
+Environment=BUILD_ID=#BUILD_ID#
+Environment=INSTANCE_NUMBER=#INSTANCE_NUMBER#
+Environment=INSTANCE_NAME=#INSTANCE_NAME#
+WorkingDirectory=/home/ec2-user/main/server
+Type=simple
+User=ec2-user
+ExecStart=/usr/bin/node /home/ec2-user/main/server/dist/workers/adverse-media-monitor.js start
+ExecStartPost=/bin/sh -c 'pgrep -xf "/usr/bin/node /home/ec2-user/main/server/dist/workers/adverse-media-monitor.js start" | sudo tee /var/run/parallel-adverse-media-monitor-cron.pid > /dev/null'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

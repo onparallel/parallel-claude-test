@@ -1,6 +1,6 @@
 import { Container } from "inversify";
 import { Knex } from "knex";
-import { isNonNullish } from "remeda";
+import { isNonNullish, pick } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
 import {
@@ -178,29 +178,36 @@ describe("repositories/ProfileRepository", () => {
     });
   });
 
-  describe("getBackgroundCheckProfileFieldValuesForRefreshByOrgId", () => {
-    let fieldWithMonitoring: ProfileTypeField;
-    let fieldNoMonitoring: ProfileTypeField;
+  describe("getProfileFieldValuesForRefreshByOrgId", () => {
+    let bgCheckWithMonitoring: ProfileTypeField;
+    let bgCheckNoMonitoring: ProfileTypeField;
+    let adverseMediaWithMonitoring: ProfileTypeField;
+    let adverseMediaNoMonitoring: ProfileTypeField;
     let profiles: Profile[];
 
     beforeEach(async () => {
       const [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
-      [fieldWithMonitoring, fieldNoMonitoring] = await mocks.createRandomProfileTypeFields(
-        organization.id,
-        profileType.id,
-        2,
-        (i) => ({
-          type: "BACKGROUND_CHECK",
-          options:
-            i === 0
-              ? { monitoring: { searchFrequency: { type: "FIXED", frequency: "3_MONTHS" } } }
-              : { monitoring: null },
-        }),
-      );
+      [
+        bgCheckWithMonitoring,
+        bgCheckNoMonitoring,
+        adverseMediaWithMonitoring,
+        adverseMediaNoMonitoring,
+      ] = await mocks.createRandomProfileTypeFields(organization.id, profileType.id, 4, (i) => ({
+        type: [
+          "BACKGROUND_CHECK",
+          "BACKGROUND_CHECK",
+          "ADVERSE_MEDIA_SEARCH",
+          "ADVERSE_MEDIA_SEARCH",
+        ][i] as ProfileTypeFieldType,
+        options:
+          i === 0 || i === 2
+            ? { monitoring: { searchFrequency: { type: "FIXED", frequency: "3_MONTHS" } } }
+            : { monitoring: null },
+      }));
 
-      profiles = await mocks.createRandomProfiles(organization.id, profileType.id, 4, (i) => ({
-        status: i === 3 ? "CLOSED" : "OPEN",
-        closed_at: i === 3 ? new Date() : null,
+      profiles = await mocks.createRandomProfiles(organization.id, profileType.id, 5, (i) => ({
+        status: i === 4 ? "CLOSED" : "OPEN",
+        closed_at: i === 4 ? new Date() : null,
       }));
     });
 
@@ -208,52 +215,142 @@ describe("repositories/ProfileRepository", () => {
       const p0Values = await mocks.createProfileFieldValues(profiles[0].id, [
         {
           content: { query: "query", search: "search" }, // mocked, doesn't matter
-          profile_type_field_id: fieldWithMonitoring.id,
+          profile_type_field_id: bgCheckWithMonitoring.id,
           created_by_user_id: user.id,
           type: "BACKGROUND_CHECK",
+          active_monitoring: true,
         },
         {
           content: { query: "query", search: "search" },
-          profile_type_field_id: fieldNoMonitoring.id,
+          profile_type_field_id: bgCheckNoMonitoring.id,
           created_by_user_id: user.id,
           type: "BACKGROUND_CHECK",
+          active_monitoring: true,
         },
       ]);
 
       const p1Values = await mocks.createProfileFieldValues(profiles[1].id, [
         {
           content: { query: "query", search: "search" },
-          profile_type_field_id: fieldWithMonitoring.id,
+          profile_type_field_id: bgCheckWithMonitoring.id,
           created_by_user_id: user.id,
           type: "BACKGROUND_CHECK",
+          active_monitoring: true,
         },
       ]);
 
+      // value is removed
       await mocks.createProfileFieldValues(profiles[2].id, [
         {
           content: { query: "query", search: "search" },
-          profile_type_field_id: fieldWithMonitoring.id,
+          profile_type_field_id: bgCheckWithMonitoring.id,
           created_by_user_id: user.id,
           type: "BACKGROUND_CHECK",
           removed_at: new Date(),
           removed_by_user_id: user.id,
+          active_monitoring: true,
         },
       ]);
 
+      // monitoring disabled on this value
       await mocks.createProfileFieldValues(profiles[3].id, [
         {
           content: { query: "query", search: "search" },
-          profile_type_field_id: fieldWithMonitoring.id,
+          profile_type_field_id: bgCheckWithMonitoring.id,
           created_by_user_id: user.id,
           type: "BACKGROUND_CHECK",
+          active_monitoring: false,
         },
       ]);
 
-      const result = await repo.getBackgroundCheckProfileFieldValuesForRefreshByOrgId(
+      // profile is closed
+      await mocks.createProfileFieldValues(profiles[4].id, [
+        {
+          content: { query: "query", search: "search" },
+          profile_type_field_id: bgCheckWithMonitoring.id,
+          created_by_user_id: user.id,
+          type: "BACKGROUND_CHECK",
+          active_monitoring: true,
+        },
+      ]);
+
+      const result = await repo.getProfileFieldValuesForRefreshByOrgId(
         organization.id,
+        "BACKGROUND_CHECK",
         (_, monitoring) => isNonNullish(monitoring),
       );
       expect(result.map((r) => r.id)).toIncludeSameMembers([p0Values[0].id, p1Values[0].id]);
+    });
+
+    it("does not return values with ongoing drafts", async () => {
+      const p0Values = await mocks.createProfileFieldValues(profiles[0].id, [
+        {
+          content: {
+            search: [],
+            articles: { totalCount: 0, items: [], createdAt: new Date() },
+            relevant_articles: [],
+            dismissed_articles: [],
+            irrelevant_articles: [],
+          },
+          profile_type_field_id: adverseMediaWithMonitoring.id,
+          created_by_user_id: user.id,
+          type: "ADVERSE_MEDIA_SEARCH",
+          active_monitoring: true,
+          is_draft: false,
+        },
+        {
+          content: {
+            search: [],
+            articles: { totalCount: 0, items: [], createdAt: new Date() },
+            relevant_articles: [],
+            dismissed_articles: [],
+            irrelevant_articles: [],
+          },
+          profile_type_field_id: adverseMediaNoMonitoring.id,
+          created_by_user_id: user.id,
+          type: "ADVERSE_MEDIA_SEARCH",
+          active_monitoring: true,
+        },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[1].id, [
+        {
+          content: {
+            search: [],
+            articles: { totalCount: 0, items: [], createdAt: new Date() },
+            relevant_articles: [],
+            dismissed_articles: [],
+            irrelevant_articles: [],
+          },
+          profile_type_field_id: adverseMediaWithMonitoring.id,
+          created_by_user_id: user.id,
+          type: "ADVERSE_MEDIA_SEARCH",
+          active_monitoring: true,
+          is_draft: false,
+        },
+        {
+          content: {
+            search: [],
+            articles: { totalCount: 0, items: [], createdAt: new Date() },
+            relevant_articles: [],
+            dismissed_articles: [],
+            irrelevant_articles: [],
+          },
+          profile_type_field_id: adverseMediaWithMonitoring.id,
+          created_by_user_id: user.id,
+          type: "ADVERSE_MEDIA_SEARCH",
+          active_monitoring: true,
+          is_draft: true,
+        },
+      ]);
+
+      const result = await repo.getProfileFieldValuesForRefreshByOrgId(
+        organization.id,
+        "ADVERSE_MEDIA_SEARCH",
+        (_, monitoring) => isNonNullish(monitoring),
+      );
+
+      expect(result.map((r) => r.id)).toIncludeSameMembers([p0Values[0].id]);
     });
   });
 
@@ -419,6 +516,728 @@ describe("repositories/ProfileRepository", () => {
       expect(valuesAfter.every((v) => v.anonymized_at !== null && v.content.value === null)).toBe(
         true,
       );
+    });
+  });
+
+  describe("updateProfileFieldValues", () => {
+    let profileType: ProfileType;
+    let fields: ProfileTypeField[];
+    beforeAll(async () => {
+      [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+      fields = await mocks.createRandomProfileTypeFields(
+        organization.id,
+        profileType.id,
+        4,
+        (i) => ({
+          type: ["SHORT_TEXT", "CHECKBOX", "BACKGROUND_CHECK", "ADVERSE_MEDIA_SEARCH"][
+            i
+          ] as ProfileTypeFieldType,
+          options:
+            i === 1
+              ? JSON.stringify({
+                  values: [
+                    { label: { en: "A" }, value: "A" },
+                    { label: { en: "B" }, value: "B" },
+                    { label: { en: "C" }, value: "C" },
+                  ],
+                })
+              : {},
+        }),
+      );
+    });
+
+    it("does nothing if updating SHORT_TEXT field with exactly same content", async () => {
+      const [profile] = await repo.createProfiles(
+        { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
+        user.id,
+      );
+
+      const dbEvents1 = await mocks.knex
+        .from("profile_event")
+        .where("profile_id", profile.id)
+        .orderBy("id", "asc")
+        .select("type");
+
+      expect(dbEvents1).toEqual([{ type: "PROFILE_CREATED" }]);
+
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[0].id,
+            type: "SHORT_TEXT",
+            content: { value: "test" },
+          },
+        ],
+        user.id,
+        organization.id,
+      );
+
+      const dbEvents2 = await mocks.knex
+        .from("profile_event")
+        .where("profile_id", profile.id)
+        .orderBy("id", "asc")
+        .select("type");
+
+      expect(dbEvents2).toEqual([
+        { type: "PROFILE_CREATED" },
+        { type: "PROFILE_FIELD_VALUE_UPDATED" },
+        { type: "PROFILE_UPDATED" },
+      ]);
+
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[0].id,
+            type: "SHORT_TEXT",
+            content: { value: "test" },
+          },
+        ],
+        user.id,
+        organization.id,
+      );
+
+      const dbEvents3 = await mocks.knex
+        .from("profile_event")
+        .where("profile_id", profile.id)
+        .orderBy("id", "asc")
+        .select("type");
+
+      expect(dbEvents3).toEqual([
+        { type: "PROFILE_CREATED" },
+        { type: "PROFILE_FIELD_VALUE_UPDATED" },
+        { type: "PROFILE_UPDATED" },
+      ]);
+
+      const pfvs = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_id", profile.id)
+        .select("*");
+
+      expect(pfvs).toHaveLength(1);
+    });
+
+    it("does nothing if updating CHECKBOX field with exactly same content", async () => {
+      const [profile] = await repo.createProfiles(
+        { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
+        user.id,
+      );
+
+      const dbEvents1 = await mocks.knex
+        .from("profile_event")
+        .where("profile_id", profile.id)
+        .orderBy("id", "asc")
+        .select("type");
+
+      expect(dbEvents1).toEqual([{ type: "PROFILE_CREATED" }]);
+
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[1].id,
+            type: "CHECKBOX",
+            content: { value: ["A", "C"] },
+          },
+        ],
+        user.id,
+        organization.id,
+      );
+
+      const dbEvents2 = await mocks.knex
+        .from("profile_event")
+        .where("profile_id", profile.id)
+        .orderBy("id", "asc")
+        .select("type");
+
+      expect(dbEvents2).toEqual([
+        { type: "PROFILE_CREATED" },
+        { type: "PROFILE_FIELD_VALUE_UPDATED" },
+        { type: "PROFILE_UPDATED" },
+      ]);
+
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[1].id,
+            type: "CHECKBOX",
+            content: { value: ["C", "A"] }, // order doesn't matter
+          },
+        ],
+        user.id,
+        organization.id,
+      );
+
+      const dbEvents3 = await mocks.knex
+        .from("profile_event")
+        .where("profile_id", profile.id)
+        .orderBy("id", "asc")
+        .select("type");
+
+      expect(dbEvents3).toEqual([
+        { type: "PROFILE_CREATED" },
+        { type: "PROFILE_FIELD_VALUE_UPDATED" },
+        { type: "PROFILE_UPDATED" },
+      ]);
+
+      const pfvs = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_id", profile.id)
+        .select("*");
+
+      expect(pfvs).toHaveLength(1);
+    });
+
+    it("does nothing if updating BACKGROUND_CHECK field with exactly same content", async () => {
+      const [profile] = await repo.createProfiles(
+        { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
+        user.id,
+      );
+
+      const dbEvents1 = await mocks.knex
+        .from("profile_event")
+        .where("profile_id", profile.id)
+        .orderBy("id", "asc")
+        .select("type");
+
+      expect(dbEvents1).toEqual([{ type: "PROFILE_CREATED" }]);
+
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[2].id,
+            type: "BACKGROUND_CHECK",
+            content: {
+              query: {
+                name: "John Doe",
+                date: "2024-10-10",
+                type: "PERSON",
+                country: "FR",
+              },
+              entity: {
+                id: "123",
+                type: "PERSON",
+                name: "John Doe",
+                properties: {},
+              },
+              search: {
+                totalCount: 1,
+                items: [
+                  {
+                    id: "123",
+                    type: "PERSON",
+                    name: "John Doe",
+                    properties: {},
+                  },
+                ],
+                createdAt: new Date(),
+              },
+            },
+          },
+        ],
+        user.id,
+        organization.id,
+      );
+
+      const dbEvents2 = await mocks.knex
+        .from("profile_event")
+        .where("profile_id", profile.id)
+        .orderBy("id", "asc")
+        .select("type");
+
+      expect(dbEvents2).toEqual([
+        { type: "PROFILE_CREATED" },
+        { type: "PROFILE_FIELD_VALUE_UPDATED" },
+        { type: "PROFILE_UPDATED" },
+      ]);
+
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[2].id,
+            type: "BACKGROUND_CHECK",
+            content: {
+              query: {
+                name: "John Doe",
+                date: "2024-10-10",
+                type: "PERSON",
+                country: "FR",
+              },
+              entity: {
+                id: "123",
+                type: "PERSON",
+                name: "John Doe",
+                properties: {},
+              },
+              search: {
+                totalCount: 1,
+                items: [
+                  {
+                    id: "123",
+                    type: "PERSON",
+                    name: "John Doe",
+                    properties: {},
+                  },
+                ],
+                createdAt: new Date(),
+              },
+            },
+          },
+        ],
+        user.id,
+        organization.id,
+      );
+
+      const dbEvents3 = await mocks.knex
+        .from("profile_event")
+        .where("profile_id", profile.id)
+        .orderBy("id", "asc")
+        .select("type");
+
+      expect(dbEvents3).toEqual([
+        { type: "PROFILE_CREATED" },
+        { type: "PROFILE_FIELD_VALUE_UPDATED" },
+        { type: "PROFILE_UPDATED" },
+      ]);
+
+      const pfvs = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_id", profile.id)
+        .select("*");
+
+      expect(pfvs).toHaveLength(1);
+    });
+
+    it("does nothing if updating ADVERSE_MEDIA_SEARCH field with exactly same content", async () => {
+      const [profile] = await repo.createProfiles(
+        { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
+        user.id,
+      );
+
+      const dbEvents1 = await mocks.knex
+        .from("profile_event")
+        .where("profile_id", profile.id)
+        .orderBy("id", "asc")
+        .select("type");
+
+      expect(dbEvents1).toEqual([{ type: "PROFILE_CREATED" }]);
+
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[3].id,
+            type: "ADVERSE_MEDIA_SEARCH",
+            content: {
+              search: [{ term: "John Doe" }, { wikiDataId: "Q7747", label: "Vladimir Putin" }],
+              articles: {
+                totalCount: 4,
+                items: [
+                  {
+                    id: "1",
+                    header: "John Doe is a good person",
+                    timestamp: 1712345678,
+                    source: "Google",
+                  },
+                  {
+                    id: "2",
+                    header: "Putin's speech",
+                    timestamp: 1712345678,
+                    source: "Google",
+                  },
+                  {
+                    id: "3",
+                    header: "Vladimir Putin in talks with Trump",
+                    timestamp: 1712345678,
+                    source: "Google",
+                  },
+                  {
+                    id: "4",
+                    header: "Jane Smith wins prestigious award",
+                    timestamp: 1712345678,
+                    source: "Google",
+                  },
+                ],
+                createdAt: new Date(),
+              },
+              relevant_articles: [{ id: "1" }],
+              irrelevant_articles: [{ id: "2" }, { id: "4" }],
+              dismissed_articles: [{ id: "3" }],
+            },
+          },
+        ],
+        user.id,
+        organization.id,
+      );
+
+      const dbEvents2 = await mocks.knex
+        .from("profile_event")
+        .where("profile_id", profile.id)
+        .orderBy("id", "asc")
+        .select("type");
+
+      expect(dbEvents2).toEqual([
+        { type: "PROFILE_CREATED" },
+        { type: "PROFILE_FIELD_VALUE_UPDATED" },
+        { type: "PROFILE_UPDATED" },
+      ]);
+
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[3].id,
+            type: "ADVERSE_MEDIA_SEARCH",
+            content: {
+              search: [{ term: "John Doe" }, { wikiDataId: "Q7747", label: "Vladimir Putin" }],
+              articles: {
+                totalCount: 4,
+                items: [
+                  {
+                    id: "1",
+                    header: "John Doe is a good person",
+                    timestamp: 1712345678,
+                    source: "Google",
+                  },
+                  {
+                    id: "2",
+                    header: "Putin's speech",
+                    timestamp: 1712345678,
+                    source: "Google",
+                  },
+                  {
+                    id: "3",
+                    header: "Vladimir Putin in talks with Trump",
+                    timestamp: 1712345678,
+                    source: "Google",
+                  },
+                  {
+                    id: "4",
+                    header: "Jane Smith wins prestigious award",
+                    timestamp: 1712345678,
+                    source: "Google",
+                  },
+                ],
+                createdAt: new Date(),
+              },
+              relevant_articles: [{ id: "1" }],
+              irrelevant_articles: [{ id: "2" }, { id: "4" }],
+              dismissed_articles: [{ id: "3" }],
+            },
+          },
+        ],
+        user.id,
+        organization.id,
+      );
+
+      const dbEvents3 = await mocks.knex
+        .from("profile_event")
+        .where("profile_id", profile.id)
+        .orderBy("id", "asc")
+        .select("type");
+
+      expect(dbEvents3).toEqual([
+        { type: "PROFILE_CREATED" },
+        { type: "PROFILE_FIELD_VALUE_UPDATED" },
+        { type: "PROFILE_UPDATED" },
+      ]);
+
+      const pfvs = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_id", profile.id)
+        .select("*");
+
+      expect(pfvs).toHaveLength(1);
+    });
+
+    it("removes draft when removing value", async () => {
+      const [profile] = await repo.createProfiles(
+        { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
+        user.id,
+      );
+
+      await mocks.knex.from("profile_field_value").insert([
+        {
+          profile_id: profile.id,
+          profile_type_field_id: fields[0].id,
+          type: "SHORT_TEXT",
+          content: { value: "Original Content" },
+          is_draft: false,
+          created_by_user_id: user.id,
+        },
+        {
+          profile_id: profile.id,
+          profile_type_field_id: fields[0].id,
+          type: "SHORT_TEXT",
+          content: { value: "my edited content" },
+          is_draft: true,
+          created_by_user_id: user.id,
+        },
+      ]);
+
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[0].id,
+            type: "SHORT_TEXT",
+            content: null,
+          },
+        ],
+        user.id,
+        organization.id,
+      );
+
+      const pfvs = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_id", profile.id)
+        .select("*");
+
+      expect(pfvs).toHaveLength(2);
+      expect(pfvs.map(pick(["content", "is_draft", "removed_at"]))).toIncludeSameMembers([
+        {
+          content: { value: "Original Content" },
+          is_draft: false,
+          removed_at: expect.any(Date),
+        },
+        {
+          content: { value: "my edited content" },
+          is_draft: true,
+          removed_at: expect.any(Date),
+        },
+      ]);
+    });
+
+    it("sets active_monitoring when creating BACKGROUND_CHECK and ADVERSE_MEDIA_SEARCH values", async () => {
+      const [profile] = await repo.createProfiles(
+        { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
+        user.id,
+      );
+
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[0].id,
+            type: "SHORT_TEXT",
+            content: {
+              value: "Original Content",
+            },
+          },
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[2].id,
+            type: "BACKGROUND_CHECK",
+            content: {
+              query: {
+                name: "John Doe",
+                date: "2024-10-10",
+                type: "PERSON",
+                country: "FR",
+              },
+              search: {
+                totalCount: 1,
+                items: [
+                  {
+                    id: "123",
+                    type: "PERSON",
+                    name: "John Doe",
+                    properties: {},
+                  },
+                ],
+                createdAt: new Date(),
+              },
+              entity: {
+                id: "123",
+                type: "PERSON",
+                name: "John Doe",
+                properties: {},
+              },
+            },
+          },
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[3].id,
+            type: "ADVERSE_MEDIA_SEARCH",
+            content: {
+              search: [{ term: "John Doe" }],
+              articles: {
+                totalCount: 0,
+                items: [],
+                createdAt: new Date(),
+              },
+              relevant_articles: [],
+              irrelevant_articles: [],
+              dismissed_articles: [],
+            },
+          },
+        ],
+        user.id,
+        organization.id,
+      );
+
+      const pfvs = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_id", profile.id)
+        .select("*");
+
+      expect(pfvs).toHaveLength(3);
+      expect(pfvs.map(pick(["type", "active_monitoring"]))).toIncludeSameMembers([
+        {
+          type: "SHORT_TEXT",
+          active_monitoring: false,
+        },
+        {
+          type: "BACKGROUND_CHECK",
+          active_monitoring: true,
+        },
+        {
+          type: "ADVERSE_MEDIA_SEARCH",
+          active_monitoring: true,
+        },
+      ]);
+    });
+
+    it("maintains active_monitoring value when updating", async () => {
+      const [profile] = await repo.createProfiles(
+        { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
+        user.id,
+      );
+
+      await mocks.knex.from("profile_field_value").insert([
+        {
+          profile_id: profile.id,
+          profile_type_field_id: fields[0].id,
+          type: "SHORT_TEXT",
+          content: { value: "Original Content" },
+          is_draft: false,
+          created_by_user_id: user.id,
+          active_monitoring: true,
+        },
+      ]);
+
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[0].id,
+            type: "SHORT_TEXT",
+            content: { value: "my edited content" },
+          },
+        ],
+        user.id,
+        organization.id,
+      );
+
+      const pfvs = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_id", profile.id)
+        .select("*");
+
+      expect(pfvs).toHaveLength(2);
+      expect(pfvs.map(pick(["content", "removed_at", "active_monitoring"]))).toIncludeSameMembers([
+        {
+          content: { value: "Original Content" },
+          removed_at: expect.any(Date),
+          active_monitoring: true,
+        },
+        {
+          content: { value: "my edited content" },
+          removed_at: null,
+          active_monitoring: true,
+        },
+      ]);
+    });
+
+    it("sets pending_review value when updating", async () => {
+      const [profile] = await repo.createProfiles(
+        { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
+        user.id,
+      );
+
+      await mocks.knex.from("profile_field_value").insert([
+        {
+          profile_id: profile.id,
+          profile_type_field_id: fields[0].id,
+          type: "SHORT_TEXT",
+          content: { value: "Original Content" },
+          is_draft: false,
+          created_by_user_id: user.id,
+          active_monitoring: true,
+        },
+      ]);
+
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[0].id,
+            type: "SHORT_TEXT",
+            content: { value: "my edited content" },
+            pendingReview: true,
+          },
+        ],
+        user.id,
+        organization.id,
+      );
+
+      const pfvs = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_id", profile.id)
+        .select("*");
+
+      expect(pfvs).toHaveLength(2);
+      expect(pfvs.map(pick(["content", "removed_at", "pending_review"]))).toIncludeSameMembers([
+        {
+          content: { value: "Original Content" },
+          removed_at: expect.any(Date),
+          pending_review: false,
+        },
+        {
+          content: { value: "my edited content" },
+          removed_at: null,
+          pending_review: true,
+        },
+      ]);
+    });
+
+    it("sets pending_review value when creating", async () => {
+      const [profile] = await repo.createProfiles(
+        { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
+        user.id,
+      );
+
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[0].id,
+            type: "SHORT_TEXT",
+            content: { value: "My Original Content" },
+            pendingReview: true,
+          },
+        ],
+        user.id,
+        organization.id,
+      );
+
+      const pfvs = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_id", profile.id)
+        .select("*");
+
+      expect(pfvs).toHaveLength(1);
+      expect(pfvs.map(pick(["content", "removed_at", "pending_review"]))).toIncludeSameMembers([
+        {
+          content: { value: "My Original Content" },
+          removed_at: null,
+          pending_review: true,
+        },
+      ]);
     });
   });
 });

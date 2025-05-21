@@ -16,6 +16,7 @@ import { ComponentType, PropsWithChildren, ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
 import { PetitionFieldTypeSelect } from "../PetitionFieldTypeSelect";
+import { PetitionComposeAdverseMediaSearchSettings } from "./fields/PetitionComposeAdverseMediaSearchSettings";
 import { PetitionComposeBackgroundCheckSettings } from "./fields/PetitionComposeBackgroundCheckSettings";
 import { PetitionComposeCheckboxSettings } from "./fields/PetitionComposeCheckboxSettings";
 import { PetitionComposeDynamicSelectFieldSettings } from "./fields/PetitionComposeDynamicSelectFieldSettings";
@@ -70,8 +71,26 @@ const COMPONENTS: Partial<
   SHORT_TEXT: PetitionComposeShortTextSettings,
   FILE_UPLOAD: PetitionComposeFileUploadSettings,
   BACKGROUND_CHECK: PetitionComposeBackgroundCheckSettings,
+  ADVERSE_MEDIA_SEARCH: PetitionComposeAdverseMediaSearchSettings,
   ID_VERIFICATION: PetitionComposeIdVerificationSettings,
 };
+
+export const ONLY_INTERNAL_FIELD_TYPES = [
+  "BACKGROUND_CHECK",
+  "ADVERSE_MEDIA_SEARCH",
+  "PROFILE_SEARCH",
+  "DOW_JONES_KYC",
+] as PetitionFieldType[];
+
+const ONLY_ONE_REPLY_FIELD_TYPES = [
+  "CHECKBOX",
+  "ES_TAX_DOCUMENTS",
+  "DOW_JONES_KYC",
+  "BACKGROUND_CHECK",
+  "ID_VERIFICATION",
+  "PROFILE_SEARCH",
+  "ADVERSE_MEDIA_SEARCH",
+] as PetitionFieldType[];
 
 export const PetitionComposeFieldSettings = Object.assign(
   chakraForwardRef<"section", PetitionComposeFieldSettingsProps>(
@@ -97,9 +116,7 @@ export const PetitionComposeFieldSettings = Object.assign(
 
       const parentIsInternal = isFieldGroupChild ? field.parent!.isInternal : false;
 
-      const canOnlyBeInternal = ["DOW_JONES_KYC", "BACKGROUND_CHECK", "PROFILE_SEARCH"].includes(
-        field.type,
-      );
+      const canOnlyBeInternal = ONLY_INTERNAL_FIELD_TYPES.includes(field.type);
 
       const isInternalFieldDisabled =
         isReadOnly ||
@@ -110,15 +127,7 @@ export const PetitionComposeFieldSettings = Object.assign(
 
       const canChangeFieldType = !["FIELD_GROUP"].includes(field.type);
 
-      const canChangeMultiple = ![
-        "HEADING",
-        "CHECKBOX",
-        "ES_TAX_DOCUMENTS",
-        "DOW_JONES_KYC",
-        "BACKGROUND_CHECK",
-        "ID_VERIFICATION",
-        "PROFILE_SEARCH",
-      ].includes(field.type);
+      const canChangeMultiple = !["HEADING", ...ONLY_ONE_REPLY_FIELD_TYPES].includes(field.type);
 
       const isReplyable = !["HEADING", "FIELD_GROUP"].includes(field.type);
 
@@ -167,9 +176,7 @@ export const PetitionComposeFieldSettings = Object.assign(
                       if (type !== field.type) {
                         const isTypeChangeNotAllowed =
                           isFieldGroupChild &&
-                          (type === "DOW_JONES_KYC" ||
-                            type === "BACKGROUND_CHECK" ||
-                            type === "PROFILE_SEARCH") &&
+                          ONLY_INTERNAL_FIELD_TYPES.includes(type) &&
                           field.position === 0 &&
                           !field.parent!.isInternal;
 
@@ -317,9 +324,7 @@ export const PetitionComposeFieldSettings = Object.assign(
             ) : null}
 
             {(isFieldGroupChild && !isFileTypeField(field.type)) ||
-            field.type === "DOW_JONES_KYC" ||
-            field.type === "BACKGROUND_CHECK" ||
-            field.type === "PROFILE_SEARCH" ||
+            canOnlyBeInternal ||
             !petition.isDocumentGenerationEnabled ? null : (
               <SettingsRowGroup
                 label={

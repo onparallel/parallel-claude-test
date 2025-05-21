@@ -12,16 +12,19 @@ import {
   pipe,
 } from "remeda";
 import { UserLocale } from "../db/__types";
-import { PetitionFieldOptions, selectOptionsValuesAndLabels } from "../db/helpers/fieldOptions";
 import { ContactRepository } from "../db/repositories/ContactRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { FORMATS } from "../util/dates";
 import { fullName } from "../util/fullName";
 import { fromGlobalId, isGlobalId } from "../util/globalId";
-import { isFileTypeField } from "../util/isFileTypeField";
 import { Maybe } from "../util/types";
 import { I18N_SERVICE, II18nService } from "./I18nService";
+import {
+  PETITION_FIELD_SERVICE,
+  PetitionFieldOptions,
+  PetitionFieldService,
+} from "./PetitionFieldService";
 
 export interface IPetitionMessageContextService {
   fetchPlaceholderValues(
@@ -44,6 +47,7 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
     @inject(ContactRepository) private contacts: ContactRepository,
     @inject(UserRepository) private users: UserRepository,
     @inject(I18N_SERVICE) private i18n: II18nService,
+    @inject(PETITION_FIELD_SERVICE) private petitionFields: PetitionFieldService,
   ) {}
 
   async fetchPlaceholderValues(
@@ -66,7 +70,17 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
       fields!,
       filter(
         (f) =>
-          !["HEADING", "FIELD_GROUP"].includes(f.type) && !isFileTypeField(f.type) && f.is_internal,
+          [
+            "NUMBER",
+            "CHECKBOX",
+            "SELECT",
+            "PHONE",
+            "DATE",
+            "DATE_TIME",
+            "DYNAMIC_SELECT",
+            "TEXT",
+            "SHORT_TEXT",
+          ].includes(f.type) && f.is_internal,
       ),
       indexBy((f) => f.id),
     );
@@ -78,7 +92,7 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
         async (f) =>
           [
             f.id,
-            await selectOptionsValuesAndLabels(
+            await this.petitionFields.loadSelectOptionsValuesAndLabels(
               f.options as PetitionFieldOptions["SELECT"],
               intl.locale as UserLocale,
             ),

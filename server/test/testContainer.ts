@@ -2,6 +2,10 @@ import { createContainer } from "../src/container";
 import { DOW_JONES_CLIENT, IDowJonesClient } from "../src/integrations/dow-jones/DowJonesClient";
 import { EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION } from "../src/integrations/profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
 import { IProfileExternalSourceIntegration } from "../src/integrations/profile-external-source/ProfileExternalSourceIntegration";
+import {
+  ADVERSE_MEDIA_SEARCH_SERVICE,
+  IAdverseMediaSearchService,
+} from "../src/services/AdverseMediaSearchService";
 import { AI_ASSISTANT_SERVICE, IAiAssistantService } from "../src/services/AiAssistantService";
 import { ANALYTICS, IAnalyticsService } from "../src/services/AnalyticsService";
 import { AUTH, IAuth } from "../src/services/AuthService";
@@ -17,6 +21,7 @@ import { IRedis, REDIS } from "../src/services/Redis";
 import { IStorageService, STORAGE_SERVICE } from "../src/services/StorageService";
 import { WebhooksWorker } from "../src/workers/queues/WebhooksWorkerQueue";
 import {
+  MockAdverseMediaSearchService,
   MockAiAssistantService,
   MockAnalyticsService,
   MockAuth,
@@ -64,6 +69,12 @@ export async function createTestContainer() {
   container
     .bind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE)
     .to(MockBackgroundCheckService)
+    .inSingletonScope();
+
+  await container.unbind(ADVERSE_MEDIA_SEARCH_SERVICE);
+  container
+    .bind<IAdverseMediaSearchService>(ADVERSE_MEDIA_SEARCH_SERVICE)
+    .to(MockAdverseMediaSearchService)
     .inSingletonScope();
 
   await container.unbind(AUTH);

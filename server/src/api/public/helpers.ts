@@ -839,7 +839,11 @@ export function parseProfileTypeFieldInput<
       throw new Error(`Unknown alias '${alias}' in values object`);
     }
 
-    if (field.type === "BACKGROUND_CHECK") {
+    if (
+      !["TEXT", "SELECT", "SHORT_TEXT", "CHECKBOX", "NUMBER", "PHONE", "DATE", "FILE"].includes(
+        field.type,
+      )
+    ) {
       throw new Error(
         `Field '${alias}' cannot be submitted via API. Please, remove it from the values and try again.`,
       );

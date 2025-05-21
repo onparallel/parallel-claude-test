@@ -1,23 +1,23 @@
 import { fromGlobalId, isGlobalId } from "../../util/globalId";
 
-export interface BackgroundCheckPetitionParams {
+export interface PetitionReplyParams {
   petitionId: string;
   fieldId: string;
   parentReplyId?: string;
 }
 
-export interface BackgroundCheckProfileParams {
+export interface ProfileReplyParams {
   profileId: string;
   profileTypeFieldId: string;
 }
 
-type BackgroundCheckParams = BackgroundCheckPetitionParams | BackgroundCheckProfileParams;
+type PetitionOrProfileReplyParams = PetitionReplyParams | ProfileReplyParams;
 
 export type NumericParams<T> = {
   [K in keyof T]: number;
 };
 
-export function parseBackgroundCheckToken(token: string): NumericParams<BackgroundCheckParams> {
+export function parseReplyToken(token: string): NumericParams<PetitionOrProfileReplyParams> {
   const parsed = JSON.parse(Buffer.from(token, "base64").toString());
   if (isPetitionToken(parsed) || isProfileToken(parsed)) {
     return toNumericIds(parsed);
@@ -26,25 +26,25 @@ export function parseBackgroundCheckToken(token: string): NumericParams<Backgrou
   }
 }
 
-function toNumericIds<T extends BackgroundCheckParams>(token: T): NumericParams<T> {
+function toNumericIds<T extends PetitionOrProfileReplyParams>(token: T): NumericParams<T> {
   return Object.fromEntries(
-    Object.entries(token).map(([k, v]) => [k, fromGlobalId(v).id]),
+    Object.entries(token).map(([k, v]) => [k, v ? fromGlobalId(v).id : null]),
   ) as NumericParams<T>;
 }
 
-function isPetitionToken(token: any): token is BackgroundCheckPetitionParams {
+function isPetitionToken(token: any): token is PetitionReplyParams {
   return (
     typeof token.petitionId === "string" &&
     isGlobalId(token.petitionId, "Petition") &&
     typeof token.fieldId === "string" &&
     isGlobalId(token.fieldId, "PetitionField") &&
-    (typeof token.parentReplyId === "undefined" ||
+    (!token.parentReplyId ||
       (typeof token.parentReplyId === "string" &&
         isGlobalId(token.parentReplyId, "PetitionFieldReply")))
   );
 }
 
-function isProfileToken(token: any): token is BackgroundCheckProfileParams {
+function isProfileToken(token: any): token is ProfileReplyParams {
   return (
     typeof token.profileId === "string" &&
     isGlobalId(token.profileId, "Profile") &&

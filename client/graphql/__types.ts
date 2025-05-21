@@ -108,6 +108,63 @@ export interface AccessOpenedEvent extends PetitionEvent {
   type: PetitionEventType;
 }
 
+export interface AdverseMediaArticle {
+  __typename?: "AdverseMediaArticle";
+  author?: Maybe<Scalars["String"]["output"]>;
+  body?: Maybe<Scalars["String"]["output"]>;
+  classification?: Maybe<AdverseMediaArticleRelevance>;
+  classifiedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  header?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["String"]["output"];
+  images?: Maybe<Array<Scalars["String"]["output"]>>;
+  quotes?: Maybe<Array<Scalars["String"]["output"]>>;
+  source?: Maybe<Scalars["String"]["output"]>;
+  summary?: Maybe<Scalars["String"]["output"]>;
+  timestamp?: Maybe<Scalars["Int"]["output"]>;
+  url?: Maybe<Scalars["String"]["output"]>;
+}
+
+export type AdverseMediaArticleRelevance = "DISMISSED" | "IRRELEVANT" | "RELEVANT";
+
+export interface AdverseMediaArticleSearchResult {
+  __typename?: "AdverseMediaArticleSearchResult";
+  articles: AdverseMediaArticleSearchResultArticles;
+  isDraft?: Maybe<Scalars["Boolean"]["output"]>;
+  search: Array<AdverseMediaSearchTerm>;
+}
+
+export interface AdverseMediaArticleSearchResultArticles {
+  __typename?: "AdverseMediaArticleSearchResultArticles";
+  createdAt: Scalars["DateTime"]["output"];
+  items: Array<AdverseMediaArticle>;
+  totalCount: Scalars["Int"]["output"];
+}
+
+export interface AdverseMediaEntitySuggestItem {
+  __typename?: "AdverseMediaEntitySuggestItem";
+  id: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
+}
+
+export interface AdverseMediaSearchTerm {
+  __typename?: "AdverseMediaSearchTerm";
+  entityId?: Maybe<Scalars["String"]["output"]>;
+  label?: Maybe<Scalars["String"]["output"]>;
+  term?: Maybe<Scalars["String"]["output"]>;
+  wikiDataId?: Maybe<Scalars["String"]["output"]>;
+}
+
+export interface AdverseMediaSearchTermInput {
+  /** Search by an internal entity ID on the specific provider */
+  entityId?: InputMaybe<Scalars["String"]["input"]>;
+  /** If searching by entityId or wikiDataId, the name of the entity as returned by the provider */
+  label?: InputMaybe<Scalars["String"]["input"]>;
+  /** Search by a free text */
+  term?: InputMaybe<Scalars["String"]["input"]>;
+  /** Search by a wikiData ID */
+  wikiDataId?: InputMaybe<Scalars["String"]["input"]>;
+}
+
 export interface AiCompletionLog extends Timestamps {
   __typename?: "AiCompletionLog";
   completion?: Maybe<Scalars["String"]["output"]>;
@@ -901,6 +958,7 @@ export interface EventSubscriptionSignatureKey {
 }
 
 export type FeatureFlag =
+  | "ADVERSE_MEDIA_SEARCH"
   | "AUTO_ANONYMIZE"
   | "BACKGROUND_CHECK"
   | "BULK_PETITION_SEND_TASK"
@@ -1241,6 +1299,7 @@ export interface Mutation {
   changePassword: ChangePasswordResult;
   /** Changes the type of a petition Field */
   changePetitionFieldType: PetitionField;
+  classifyAdverseMediaArticle: AdverseMediaArticle;
   /** Clones a dashboard */
   cloneDashboard: Dashboard;
   /** Clones a petition field */
@@ -1263,8 +1322,10 @@ export interface Mutation {
    */
   completePetition: Petition;
   completeProfileFromExternalSource: Profile;
+  /** @deprecated use copyReplyContentToProfileFieldValue */
   copyBackgroundCheckReplyToProfileFieldValue: ProfileFieldValue;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
+  copyReplyContentToProfileFieldValue: ProfileFieldValue;
   /**
    * Adds permissions to users and groups on given petitions and folders.
    * If the total amount of permission to add exceeds 200, a task will be created for async completion.
@@ -1595,6 +1656,7 @@ export interface Mutation {
   retryAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
+  saveAdverseMediaChanges: AdverseMediaArticleSearchResult;
   /** Moves a profile to DELETION_SCHEDULED status */
   scheduleProfileForDeletion: Array<Profile>;
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
@@ -1687,8 +1749,6 @@ export interface Mutation {
   updatePetitionEventSubscription: PetitionEventSubscription;
   /** Updates a petition field. */
   updatePetitionField: PetitionField;
-  /** Updates the auto search config of a BACKGROUND_CHECK petition field. */
-  updatePetitionFieldAutoSearchConfig: PetitionField;
   updatePetitionFieldGroupRelationships: PetitionBase;
   /** Updates multiple replies for a petition at once */
   updatePetitionFieldReplies: Array<PetitionFieldReply>;
@@ -1720,6 +1780,7 @@ export interface Mutation {
   /** Updates an existing event subscription for the user's profiles */
   updateProfileEventSubscription: ProfileEventSubscription;
   updateProfileFieldValue: Profile;
+  updateProfileFieldValueMonitoringStatus: Profile;
   /** Updates a profile list view */
   updateProfileListView: ProfileListView;
   updateProfileType: ProfileType;
@@ -1853,6 +1914,12 @@ export interface MutationchangePetitionFieldTypeArgs {
   type: PetitionFieldType;
 }
 
+export interface MutationclassifyAdverseMediaArticleArgs {
+  classification?: InputMaybe<AdverseMediaArticleRelevance>;
+  id: Scalars["String"]["input"];
+  token: Scalars["String"]["input"];
+}
+
 export interface MutationcloneDashboardArgs {
   id: Scalars["GID"]["input"];
   name: Scalars["String"]["input"];
@@ -1919,6 +1986,14 @@ export interface MutationcopyFileReplyToProfileFieldFileArgs {
   petitionId: Scalars["GID"]["input"];
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
+}
+
+export interface MutationcopyReplyContentToProfileFieldValueArgs {
+  expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+  replyId: Scalars["GID"]["input"];
 }
 
 export interface MutationcreateAddPetitionPermissionMaybeTaskArgs {
@@ -2892,6 +2967,10 @@ export interface MutationrevokeUserAuthTokenArgs {
   authTokenIds: Array<Scalars["GID"]["input"]>;
 }
 
+export interface MutationsaveAdverseMediaChangesArgs {
+  token: Scalars["String"]["input"];
+}
+
 export interface MutationscheduleProfileForDeletionArgs {
   profileIds: Array<Scalars["GID"]["input"]>;
 }
@@ -3199,12 +3278,6 @@ export interface MutationupdatePetitionFieldArgs {
   petitionId: Scalars["GID"]["input"];
 }
 
-export interface MutationupdatePetitionFieldAutoSearchConfigArgs {
-  config?: InputMaybe<UpdatePetitionFieldAutoSearchConfigInput>;
-  fieldId: Scalars["GID"]["input"];
-  petitionId: Scalars["GID"]["input"];
-}
-
 export interface MutationupdatePetitionFieldGroupRelationshipsArgs {
   petitionId: Scalars["GID"]["input"];
   relationships: Array<UpdatePetitionFieldGroupRelationshipInput>;
@@ -3296,6 +3369,12 @@ export interface MutationupdateProfileEventSubscriptionArgs {
 export interface MutationupdateProfileFieldValueArgs {
   fields: Array<UpdateProfileFieldValueInput>;
   profileId: Scalars["GID"]["input"];
+}
+
+export interface MutationupdateProfileFieldValueMonitoringStatusArgs {
+  enabled: Scalars["Boolean"]["input"];
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
 }
 
 export interface MutationupdateProfileListViewArgs {
@@ -4551,6 +4630,8 @@ export type PetitionFieldReplyStatus =
 
 /** Type of a petition field */
 export type PetitionFieldType =
+  /** A field for performing searches in the adverse media database */
+  | "ADVERSE_MEDIA_SEARCH"
   /** Run a background check of entities */
   | "BACKGROUND_CHECK"
   /** A options list. */
@@ -5562,6 +5643,10 @@ export interface ProfileFieldValue extends ProfileFieldResponse {
   expiresAt?: Maybe<Scalars["DateTime"]["output"]>;
   expiryDate?: Maybe<Scalars["String"]["output"]>;
   field: ProfileTypeField;
+  hasActiveMonitoring: Scalars["Boolean"]["output"];
+  /** Whether this value has an unsaved draft. */
+  hasDraft: Scalars["Boolean"]["output"];
+  hasPendingReview: Scalars["Boolean"]["output"];
   id: Scalars["GID"]["output"];
   profile: Profile;
   /** Time when the response was removed. */
@@ -5814,6 +5899,7 @@ export interface ProfileTypeFieldPermission {
 export type ProfileTypeFieldPermissionType = "HIDDEN" | "READ" | "WRITE";
 
 export type ProfileTypeFieldType =
+  | "ADVERSE_MEDIA_SEARCH"
   | "BACKGROUND_CHECK"
   | "CHECKBOX"
   | "DATE"
@@ -6291,6 +6377,12 @@ export interface Query {
   __typename?: "Query";
   access: PublicPetitionAccess;
   accesses: PublicPetitionAccessPagination;
+  /** Suggest alternative search terms based on the current search */
+  adverseMediaAlternativeSearchSuggestions: Array<AdverseMediaSearchTerm>;
+  adverseMediaArticleDetails: AdverseMediaArticle;
+  adverseMediaArticleSearch?: Maybe<AdverseMediaArticleSearchResult>;
+  /** Suggest entity names based on a search term */
+  adverseMediaEntitySuggest: Array<AdverseMediaEntitySuggestItem>;
   backgroundCheckEntityDetails: BackgroundCheckEntityDetails;
   backgroundCheckEntitySearch: BackgroundCheckEntitySearch;
   /** Run a search on PROFILE_SEARCH petition field */
@@ -6379,6 +6471,26 @@ export interface QueryaccessesArgs {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   status?: InputMaybe<Array<PetitionStatus>>;
+}
+
+export interface QueryadverseMediaAlternativeSearchSuggestionsArgs {
+  search: Scalars["String"]["input"];
+  token: Scalars["String"]["input"];
+}
+
+export interface QueryadverseMediaArticleDetailsArgs {
+  id: Scalars["String"]["input"];
+  search?: InputMaybe<Array<AdverseMediaSearchTermInput>>;
+  token: Scalars["String"]["input"];
+}
+
+export interface QueryadverseMediaArticleSearchArgs {
+  search?: InputMaybe<Array<AdverseMediaSearchTermInput>>;
+  token: Scalars["String"]["input"];
+}
+
+export interface QueryadverseMediaEntitySuggestArgs {
+  searchTerm: Scalars["String"]["input"];
 }
 
 export interface QuerybackgroundCheckEntityDetailsArgs {
@@ -7189,13 +7301,6 @@ export interface UpdateCreatePetitionButtonDashboardModuleInput {
   title?: InputMaybe<Scalars["String"]["input"]>;
 }
 
-export interface UpdatePetitionFieldAutoSearchConfigInput {
-  country?: InputMaybe<Scalars["GID"]["input"]>;
-  date?: InputMaybe<Scalars["GID"]["input"]>;
-  name: Array<Scalars["GID"]["input"]>;
-  type?: InputMaybe<BackgroundCheckEntitySearchType>;
-}
-
 export interface UpdatePetitionFieldGroupRelationshipInput {
   direction: ProfileRelationshipDirection;
   id?: InputMaybe<Scalars["GID"]["input"]>;
@@ -7572,6 +7677,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -13099,6 +13205,7 @@ export type AdminSettingsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -13167,6 +13274,7 @@ export type AppLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -13332,6 +13440,7 @@ export type DevelopersLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -13429,6 +13538,7 @@ export type OrganizationSettingsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -13677,6 +13787,7 @@ export type PetitionLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -13745,6 +13856,7 @@ export type ProfileLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -13868,6 +13980,9 @@ export type ProfileLayout_ProfileFragment = {
       content?: { [key: string]: any } | null;
       createdAt: string;
       expiryDate?: string | null;
+      hasDraft: boolean;
+      hasPendingReview: boolean;
+      hasActiveMonitoring: boolean;
     } | null;
   }>;
   petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
@@ -13937,6 +14052,9 @@ export type ProfileLayout_subscribeToProfileMutation = {
         content?: { [key: string]: any } | null;
         createdAt: string;
         expiryDate?: string | null;
+        hasDraft: boolean;
+        hasPendingReview: boolean;
+        hasActiveMonitoring: boolean;
       } | null;
     }>;
     petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
@@ -14007,6 +14125,9 @@ export type ProfileLayout_unsubscribeFromProfileMutation = {
         content?: { [key: string]: any } | null;
         createdAt: string;
         expiryDate?: string | null;
+        hasDraft: boolean;
+        hasPendingReview: boolean;
+        hasActiveMonitoring: boolean;
       } | null;
     }>;
     petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
@@ -14030,6 +14151,7 @@ export type ReportsSidebarLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -14098,6 +14220,7 @@ export type SidebarLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -14167,6 +14290,7 @@ export type UserGroupLayout_QueryFragment = {
     initials?: string | null;
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -14298,6 +14422,7 @@ export type UserSettingsLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -15491,6 +15616,7 @@ export type OrganizationProfilesLayout_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -15834,7 +15960,7 @@ export type useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment = {
   expiryAlertAheadTime?: Duration | null;
 };
 
-export type ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragment = {
+export type ProfileFieldMonitoringSettings_ProfileTypeFieldFragment = {
   __typename?: "ProfileTypeField";
   id: string;
   name: { [locale in UserLocale]?: string };
@@ -15843,7 +15969,7 @@ export type ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragment = {
   alias?: string | null;
 };
 
-export type ProfileFieldBackgroundCheckSettings_ProfileTypeFragment = {
+export type ProfileFieldMonitoringSettings_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
   fields: Array<{
@@ -22421,11 +22547,11 @@ export type PetitionComposeNewFieldDrawer_ProfileTypeFragment = {
 
 export type PetitionComposeNewFieldDrawer_UserFragment = {
   __typename?: "User";
+  id: string;
+  hasProfilesAccess: boolean;
   hasEsTaxDocumentsField: boolean;
   hasDowJonesField: boolean;
   hasProfileSearchField: boolean;
-  hasBackgroundCheck: boolean;
-  hasProfilesAccess: boolean;
 };
 
 export type PetitionComposeNewFieldDrawer_PetitionBase_Petition_Fragment = {
@@ -22533,6 +22659,14 @@ export type PetitionComposeNewFieldDrawerPetitionFields_ProfileTypeFragment = {
   icon: ProfileTypeIcon;
   pluralName: { [locale in UserLocale]?: string };
   standardType?: ProfileTypeStandardType | null;
+};
+
+export type PetitionComposeNewFieldDrawerPetitionFields_UserFragment = {
+  __typename?: "User";
+  id: string;
+  hasEsTaxDocumentsField: boolean;
+  hasDowJonesField: boolean;
+  hasProfileSearchField: boolean;
 };
 
 export type PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeFieldFragment = {
@@ -22840,6 +22974,7 @@ export type PetitionFieldTypeSelect_UserFragment = {
   hasDowJonesField: boolean;
   hasBackgroundCheck: boolean;
   hasProfileSearchField: boolean;
+  hasAdverseMediaSearch: boolean;
 };
 
 export type PetitionFieldTypeSelectDropdown_UserFragment = {
@@ -22848,6 +22983,7 @@ export type PetitionFieldTypeSelectDropdown_UserFragment = {
   hasDowJonesField: boolean;
   hasBackgroundCheck: boolean;
   hasProfileSearchField: boolean;
+  hasAdverseMediaSearch: boolean;
 };
 
 export type PetitionRemindersConfig_RemindersConfigFragment = {
@@ -23496,6 +23632,122 @@ export type CompliancePeriodDialog_PetitionBaseFragment =
   | CompliancePeriodDialog_PetitionBase_Petition_Fragment
   | CompliancePeriodDialog_PetitionBase_PetitionTemplate_Fragment;
 
+export type ConfigureAdverseMediaAutomateSearchDialog_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+    multiple: boolean;
+    title?: string | null;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      multiple: boolean;
+      title?: string | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+    }> | null;
+    parent?: { __typename?: "PetitionField"; id: string } | null;
+  }>;
+};
+
+export type ConfigureAdverseMediaAutomateSearchDialog_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+    multiple: boolean;
+    title?: string | null;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      multiple: boolean;
+      title?: string | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+    }> | null;
+    parent?: { __typename?: "PetitionField"; id: string } | null;
+  }>;
+};
+
+export type ConfigureAdverseMediaAutomateSearchDialog_PetitionBaseFragment =
+  | ConfigureAdverseMediaAutomateSearchDialog_PetitionBase_Petition_Fragment
+  | ConfigureAdverseMediaAutomateSearchDialog_PetitionBase_PetitionTemplate_Fragment;
+
+export type ConfigureAdverseMediaAutomateSearchDialog_InnerPetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+  multiple: boolean;
+  parent?: { __typename?: "PetitionField"; id: string } | null;
+};
+
+export type ConfigureAdverseMediaAutomateSearchDialog_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  options: { [key: string]: any };
+  parent?: { __typename?: "PetitionField"; id: string } | null;
+};
+
+export type ConfigureAdverseMediaAutomateSearchDialog_petitionQueryVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type ConfigureAdverseMediaAutomateSearchDialog_petitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          multiple: boolean;
+          title?: string | null;
+          children?: Array<{
+            __typename?: "PetitionField";
+            id: string;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+            multiple: boolean;
+            title?: string | null;
+            parent?: { __typename?: "PetitionField"; id: string } | null;
+          }> | null;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        }>;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          multiple: boolean;
+          title?: string | null;
+          children?: Array<{
+            __typename?: "PetitionField";
+            id: string;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+            multiple: boolean;
+            title?: string | null;
+            parent?: { __typename?: "PetitionField"; id: string } | null;
+          }> | null;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        }>;
+      }
+    | null;
+};
+
 export type ConfigureApprovalStepsDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
@@ -23703,7 +23955,7 @@ export type ConfigureApprovalStepsDialog_petitionQuery = {
     | null;
 };
 
-export type ConfigureAutomateSearchDialog_PetitionBase_Petition_Fragment = {
+export type ConfigureBackgroundCheckAutomateSearchDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   fields: Array<{
     __typename?: "PetitionField";
@@ -23725,7 +23977,7 @@ export type ConfigureAutomateSearchDialog_PetitionBase_Petition_Fragment = {
   }>;
 };
 
-export type ConfigureAutomateSearchDialog_PetitionBase_PetitionTemplate_Fragment = {
+export type ConfigureBackgroundCheckAutomateSearchDialog_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   fields: Array<{
     __typename?: "PetitionField";
@@ -23747,11 +23999,11 @@ export type ConfigureAutomateSearchDialog_PetitionBase_PetitionTemplate_Fragment
   }>;
 };
 
-export type ConfigureAutomateSearchDialog_PetitionBaseFragment =
-  | ConfigureAutomateSearchDialog_PetitionBase_Petition_Fragment
-  | ConfigureAutomateSearchDialog_PetitionBase_PetitionTemplate_Fragment;
+export type ConfigureBackgroundCheckAutomateSearchDialog_PetitionBaseFragment =
+  | ConfigureBackgroundCheckAutomateSearchDialog_PetitionBase_Petition_Fragment
+  | ConfigureBackgroundCheckAutomateSearchDialog_PetitionBase_PetitionTemplate_Fragment;
 
-export type ConfigureAutomateSearchDialog_InnerPetitionFieldFragment = {
+export type ConfigureBackgroundCheckAutomateSearchDialog_InnerPetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
@@ -23760,17 +24012,17 @@ export type ConfigureAutomateSearchDialog_InnerPetitionFieldFragment = {
   parent?: { __typename?: "PetitionField"; id: string } | null;
 };
 
-export type ConfigureAutomateSearchDialog_PetitionFieldFragment = {
+export type ConfigureBackgroundCheckAutomateSearchDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
   options: { [key: string]: any };
   parent?: { __typename?: "PetitionField"; id: string } | null;
 };
 
-export type ConfigureAutomateSearchDialog_petitionQueryVariables = Exact<{
+export type ConfigureBackgroundCheckAutomateSearchDialog_petitionQueryVariables = Exact<{
   id: Scalars["GID"]["input"];
 }>;
 
-export type ConfigureAutomateSearchDialog_petitionQuery = {
+export type ConfigureBackgroundCheckAutomateSearchDialog_petitionQuery = {
   petition?:
     | {
         __typename?: "Petition";
@@ -25401,6 +25653,7 @@ export type PetitionComposeFieldSettings_UserFragment = {
   hasDowJonesField: boolean;
   hasBackgroundCheck: boolean;
   hasProfileSearchField: boolean;
+  hasAdverseMediaSearch: boolean;
   organization: {
     __typename?: "Organization";
     hasDocumentProcessingIntegration: boolean;
@@ -25494,25 +25747,16 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   }> | null;
 };
 
-export type PetitionComposeBackgroundCheckSettings_PetitionFieldFragment = {
+export type PetitionComposeAdverseMediaSearchSettings_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   options: { [key: string]: any };
 };
 
-export type PetitionComposeBackgroundCheckSettings_updatePetitionFieldAutoSearchConfigMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"]["input"];
-    fieldId: Scalars["GID"]["input"];
-    config?: InputMaybe<UpdatePetitionFieldAutoSearchConfigInput>;
-  }>;
-
-export type PetitionComposeBackgroundCheckSettings_updatePetitionFieldAutoSearchConfigMutation = {
-  updatePetitionFieldAutoSearchConfig: {
-    __typename?: "PetitionField";
-    id: string;
-    options: { [key: string]: any };
-  };
+export type PetitionComposeBackgroundCheckSettings_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  options: { [key: string]: any };
 };
 
 export type PetitionComposeCheckboxSettings_PetitionFieldFragment = {
@@ -28729,6 +28973,283 @@ export type PreviewPetitionFieldProfileSearch_PetitionBase_PetitionTemplate_Frag
 export type PreviewPetitionFieldProfileSearch_PetitionBaseFragment =
   | PreviewPetitionFieldProfileSearch_PetitionBase_Petition_Fragment
   | PreviewPetitionFieldProfileSearch_PetitionBase_PetitionTemplate_Fragment;
+
+export type AdverseMediaArticleCard_AdverseMediaArticleListItemFragment = {
+  __typename?: "AdverseMediaArticle";
+  id: string;
+  header?: string | null;
+  source?: string | null;
+  timestamp?: number | null;
+  classification?: AdverseMediaArticleRelevance | null;
+};
+
+export type AdverseMediaArticleCard_AdverseMediaArticleFragment = {
+  __typename?: "AdverseMediaArticle";
+  id: string;
+  header?: string | null;
+  source?: string | null;
+  timestamp?: number | null;
+  classification?: AdverseMediaArticleRelevance | null;
+  url?: string | null;
+  author?: string | null;
+  body?: string | null;
+  summary?: string | null;
+  images?: Array<string> | null;
+  quotes?: Array<string> | null;
+};
+
+export type AdverseMediaArticleCard_adverseMediaArticleDetailsQueryVariables = Exact<{
+  articleId: Scalars["String"]["input"];
+  token: Scalars["String"]["input"];
+  search?: InputMaybe<Array<AdverseMediaSearchTermInput> | AdverseMediaSearchTermInput>;
+  includeQuotes: Scalars["Boolean"]["input"];
+}>;
+
+export type AdverseMediaArticleCard_adverseMediaArticleDetailsQuery = {
+  adverseMediaArticleDetails: {
+    __typename?: "AdverseMediaArticle";
+    id: string;
+    header?: string | null;
+    source?: string | null;
+    timestamp?: number | null;
+    classification?: AdverseMediaArticleRelevance | null;
+    url?: string | null;
+    author?: string | null;
+    body?: string | null;
+    summary?: string | null;
+    images?: Array<string> | null;
+    quotes?: Array<string> | null;
+  };
+};
+
+export type AdverseMediaArticleDetails_AdverseMediaArticleFragment = {
+  __typename?: "AdverseMediaArticle";
+  id: string;
+  url?: string | null;
+  author?: string | null;
+  body?: string | null;
+  header?: string | null;
+  source?: string | null;
+  summary?: string | null;
+  timestamp?: number | null;
+  images?: Array<string> | null;
+  quotes?: Array<string> | null;
+};
+
+export type AdverseMediaArticleHeader_AdverseMediaArticleFragment = {
+  __typename?: "AdverseMediaArticle";
+  id: string;
+  header?: string | null;
+  classification?: AdverseMediaArticleRelevance | null;
+};
+
+export type AdverseMediaSearchInput_adverseMediaEntitySuggestQueryVariables = Exact<{
+  searchTerm: Scalars["String"]["input"];
+}>;
+
+export type AdverseMediaSearchInput_adverseMediaEntitySuggestQuery = {
+  adverseMediaEntitySuggest: Array<{
+    __typename?: "AdverseMediaEntitySuggestItem";
+    id: string;
+    name: string;
+  }>;
+};
+
+export type PreviewPetitionFieldAdverseMediaSearch_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  parent?: { __typename?: "PetitionField"; id: string } | null;
+  previewReplies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+  }>;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+  }>;
+};
+
+export type PreviewPetitionFieldAdverseMediaSearch_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        isAnonymized: boolean;
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        isAnonymized: boolean;
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      }>;
+    }> | null;
+    parent?: { __typename?: "PetitionField"; id: string } | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: { __typename?: "PetitionField"; id: string };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+  }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
+  standardListDefinitions: Array<{
+    __typename?: "StandardListDefinition";
+    id: string;
+    listName: string;
+    values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
+  }>;
+};
+
+export type PreviewPetitionFieldAdverseMediaSearch_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        isAnonymized: boolean;
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        isAnonymized: boolean;
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      }>;
+    }> | null;
+    parent?: { __typename?: "PetitionField"; id: string } | null;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: { __typename?: "PetitionField"; id: string };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+  }>;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
+  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
+  standardListDefinitions: Array<{
+    __typename?: "StandardListDefinition";
+    id: string;
+    listName: string;
+    values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
+  }>;
+};
+
+export type PreviewPetitionFieldAdverseMediaSearch_PetitionBaseFragment =
+  | PreviewPetitionFieldAdverseMediaSearch_PetitionBase_Petition_Fragment
+  | PreviewPetitionFieldAdverseMediaSearch_PetitionBase_PetitionTemplate_Fragment;
 
 export type BackgroundCheckEntityDetailsCompanyBasic_BackgroundCheckEntityDetailsCompanyFragment = {
   __typename?: "BackgroundCheckEntityDetailsCompany";
@@ -33753,6 +34274,9 @@ export type ProfileDrawer_profileQuery = {
         content?: { [key: string]: any } | null;
         createdAt: string;
         expiryDate?: string | null;
+        hasDraft: boolean;
+        hasPendingReview: boolean;
+        hasActiveMonitoring: boolean;
       } | null;
     }>;
     petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
@@ -35415,6 +35939,9 @@ export type ProfileForm_ProfileFieldValueFragment = {
   content?: { [key: string]: any } | null;
   createdAt: string;
   expiryDate?: string | null;
+  hasDraft: boolean;
+  hasPendingReview: boolean;
+  hasActiveMonitoring: boolean;
 };
 
 export type ProfileForm_ProfileFieldPropertyFragment = {
@@ -35449,6 +35976,9 @@ export type ProfileForm_ProfileFieldPropertyFragment = {
     content?: { [key: string]: any } | null;
     createdAt: string;
     expiryDate?: string | null;
+    hasDraft: boolean;
+    hasPendingReview: boolean;
+    hasActiveMonitoring: boolean;
   } | null;
 };
 
@@ -35496,6 +36026,9 @@ export type ProfileForm_ProfileFragment = {
       content?: { [key: string]: any } | null;
       createdAt: string;
       expiryDate?: string | null;
+      hasDraft: boolean;
+      hasPendingReview: boolean;
+      hasActiveMonitoring: boolean;
     } | null;
   }>;
   petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
@@ -35643,6 +36176,9 @@ export type ProfileForm_updateProfileFieldValueMutation = {
         content?: { [key: string]: any } | null;
         createdAt: string;
         expiryDate?: string | null;
+        hasDraft: boolean;
+        hasPendingReview: boolean;
+        hasActiveMonitoring: boolean;
       } | null;
     }>;
     petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
@@ -35712,6 +36248,9 @@ export type ProfileForm_createProfileFieldFileUploadLinkMutation = {
         content?: { [key: string]: any } | null;
         createdAt: string;
         expiryDate?: string | null;
+        hasDraft: boolean;
+        hasPendingReview: boolean;
+        hasActiveMonitoring: boolean;
       } | null;
     };
   };
@@ -37537,6 +38076,9 @@ export type ProfileFormField_ProfileFieldPropertyFragment = {
     __typename?: "ProfileFieldValue";
     id: string;
     content?: { [key: string]: any } | null;
+    hasDraft: boolean;
+    hasPendingReview: boolean;
+    hasActiveMonitoring: boolean;
   } | null;
 };
 
@@ -37554,6 +38096,9 @@ export type ProfileFormField_ProfileFieldValueFragment = {
   __typename?: "ProfileFieldValue";
   id: string;
   content?: { [key: string]: any } | null;
+  hasDraft: boolean;
+  hasPendingReview: boolean;
+  hasActiveMonitoring: boolean;
 };
 
 export type ProfileFormField_ProfileFieldFileFragment = {
@@ -37583,6 +38128,47 @@ export type ProfileFormField_PetitionFieldFragment = {
   }>;
 };
 
+export type ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  fields: Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput;
+}>;
+
+export type ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMutation = {
+  updateProfileFieldValue: { __typename?: "Profile"; id: string };
+};
+
+export type ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMonitoringStatusMutationVariables =
+  Exact<{
+    profileId: Scalars["GID"]["input"];
+    profileTypeFieldId: Scalars["GID"]["input"];
+    enabled: Scalars["Boolean"]["input"];
+  }>;
+
+export type ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMonitoringStatusMutation = {
+  updateProfileFieldValueMonitoringStatus: {
+    __typename?: "Profile";
+    id: string;
+    properties: Array<{
+      __typename?: "ProfileFieldProperty";
+      value?: { __typename?: "ProfileFieldValue"; id: string; hasActiveMonitoring: boolean } | null;
+      field: { __typename?: "ProfileTypeField"; id: string };
+    }>;
+  };
+};
+
+export type ProfileFormFieldAdverseMediaSearch_copyReplyContentToProfileFieldValueMutationVariables =
+  Exact<{
+    profileId: Scalars["GID"]["input"];
+    profileTypeFieldId: Scalars["GID"]["input"];
+    petitionId: Scalars["GID"]["input"];
+    replyId: Scalars["GID"]["input"];
+    expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
+  }>;
+
+export type ProfileFormFieldAdverseMediaSearch_copyReplyContentToProfileFieldValueMutation = {
+  copyReplyContentToProfileFieldValue: { __typename?: "ProfileFieldValue"; id: string };
+};
+
 export type ProfileFormFieldBackgroundCheck_updateProfileFieldValueMutationVariables = Exact<{
   profileId: Scalars["GID"]["input"];
   fields: Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput;
@@ -37592,7 +38178,7 @@ export type ProfileFormFieldBackgroundCheck_updateProfileFieldValueMutation = {
   updateProfileFieldValue: { __typename?: "Profile"; id: string };
 };
 
-export type ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutationVariables =
+export type ProfileFormFieldBackgroundCheck_copyReplyContentToProfileFieldValueMutationVariables =
   Exact<{
     profileId: Scalars["GID"]["input"];
     profileTypeFieldId: Scalars["GID"]["input"];
@@ -37601,8 +38187,8 @@ export type ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFie
     expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
   }>;
 
-export type ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutation = {
-  copyBackgroundCheckReplyToProfileFieldValue: { __typename?: "ProfileFieldValue"; id: string };
+export type ProfileFormFieldBackgroundCheck_copyReplyContentToProfileFieldValueMutation = {
+  copyReplyContentToProfileFieldValue: { __typename?: "ProfileFieldValue"; id: string };
 };
 
 export type ProfileFieldFileUpload_ProfileFieldFileFragment = {
@@ -40414,6 +41000,7 @@ export type Admin_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -40501,6 +41088,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -40662,6 +41250,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -40950,6 +41539,7 @@ export type AdminOrganizationsMembers_queryQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -41152,6 +41742,7 @@ export type AdminOrganizations_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -41249,6 +41840,7 @@ export type AdminSupportMethods_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -41299,6 +41891,111 @@ export type AdminSupportMethods_userQuery = {
     }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
+};
+
+export type AdverseMediaSearch_AdverseMediaArticleFragment = {
+  __typename?: "AdverseMediaArticle";
+  id: string;
+  classification?: AdverseMediaArticleRelevance | null;
+  classifiedAt?: string | null;
+  header?: string | null;
+  source?: string | null;
+  timestamp?: number | null;
+};
+
+export type AdverseMediaSearch_adverseMediaArticleSearchQueryVariables = Exact<{
+  search?: InputMaybe<Array<AdverseMediaSearchTermInput> | AdverseMediaSearchTermInput>;
+  token: Scalars["String"]["input"];
+}>;
+
+export type AdverseMediaSearch_adverseMediaArticleSearchQuery = {
+  adverseMediaArticleSearch?: {
+    __typename?: "AdverseMediaArticleSearchResult";
+    isDraft?: boolean | null;
+    articles: {
+      __typename?: "AdverseMediaArticleSearchResultArticles";
+      totalCount: number;
+      createdAt: string;
+      items: Array<{
+        __typename?: "AdverseMediaArticle";
+        id: string;
+        classification?: AdverseMediaArticleRelevance | null;
+        classifiedAt?: string | null;
+        header?: string | null;
+        source?: string | null;
+        timestamp?: number | null;
+      }>;
+    };
+    search: Array<{
+      __typename?: "AdverseMediaSearchTerm";
+      entityId?: string | null;
+      label?: string | null;
+      term?: string | null;
+      wikiDataId?: string | null;
+    }>;
+  } | null;
+};
+
+export type AdverseMediaSearch_adverseMediaAlternativeSearchSuggestionsQueryVariables = Exact<{
+  token: Scalars["String"]["input"];
+  search: Scalars["String"]["input"];
+}>;
+
+export type AdverseMediaSearch_adverseMediaAlternativeSearchSuggestionsQuery = {
+  adverseMediaAlternativeSearchSuggestions: Array<{
+    __typename?: "AdverseMediaSearchTerm";
+    term?: string | null;
+    wikiDataId?: string | null;
+    entityId?: string | null;
+    label?: string | null;
+  }>;
+};
+
+export type AdverseMediaSearch_classifyAdverseMediaArticleMutationVariables = Exact<{
+  id: Scalars["String"]["input"];
+  token: Scalars["String"]["input"];
+  classification?: InputMaybe<AdverseMediaArticleRelevance>;
+}>;
+
+export type AdverseMediaSearch_classifyAdverseMediaArticleMutation = {
+  classifyAdverseMediaArticle: {
+    __typename?: "AdverseMediaArticle";
+    id: string;
+    classification?: AdverseMediaArticleRelevance | null;
+    classifiedAt?: string | null;
+  };
+};
+
+export type AdverseMediaSearch_saveAdverseMediaChangesMutationVariables = Exact<{
+  token: Scalars["String"]["input"];
+}>;
+
+export type AdverseMediaSearch_saveAdverseMediaChangesMutation = {
+  saveAdverseMediaChanges: {
+    __typename?: "AdverseMediaArticleSearchResult";
+    isDraft?: boolean | null;
+    articles: {
+      __typename?: "AdverseMediaArticleSearchResultArticles";
+      totalCount: number;
+      createdAt: string;
+      items: Array<{
+        __typename?: "AdverseMediaArticle";
+        id: string;
+        classification?: AdverseMediaArticleRelevance | null;
+        classifiedAt?: string | null;
+        header?: string | null;
+        source?: string | null;
+        timestamp?: number | null;
+      }>;
+    };
+    search: Array<{
+      __typename?: "AdverseMediaSearchTerm";
+      entityId?: string | null;
+      label?: string | null;
+      term?: string | null;
+      wikiDataId?: string | null;
+    }>;
+  };
 };
 
 export type Alerts_ProfileFieldPropertyFragment = {
@@ -41364,6 +42061,7 @@ export type Alerts_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -42204,6 +42902,7 @@ export type Contact_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -42399,6 +43098,7 @@ export type Contacts_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -42871,6 +43571,7 @@ export type Home_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -43456,6 +44157,7 @@ export type OrganizationBranding_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasRemovedParallelBranding: boolean;
     hasPdfExportV2: boolean;
@@ -43564,6 +44266,7 @@ export type OrganizationCompliance_userQuery = {
     initials?: string | null;
     hasAutoAnonymize: boolean;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -43650,6 +44353,7 @@ export type OrganizationGeneral_userQuery = {
     initials?: string | null;
     hasCustomHost: boolean;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -43845,6 +44549,7 @@ export type OrganizationGroup_userQuery = {
     initials?: string | null;
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -43953,6 +44658,7 @@ export type PermissionsGroup_userQuery = {
     hasLoginAsAccess: boolean;
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -44182,6 +44888,7 @@ export type OrganizationGroups_userQuery = {
     initials?: string | null;
     hasPermissionManagement: boolean;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -44252,6 +44959,7 @@ export type OrganizationSettings_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -44324,6 +45032,7 @@ export type OrganizationIntegrations_userQuery = {
     hasPetitionSignature: boolean;
     hasDowJonesFeature: boolean;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -44472,6 +45181,7 @@ export type IntegrationsSignature_userQuery = {
     initials?: string | null;
     hasPetitionSignature: boolean;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDocusignSandbox: boolean;
     hasProfilesAccess: boolean;
@@ -44719,6 +45429,7 @@ export type OrganizationProfileType_userQuery = {
     initials?: string | null;
     hasKeyProcessesFeature: boolean;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -45194,6 +45905,7 @@ export type OrganizationProfileTypes_userQuery = {
     initials?: string | null;
     hasCreateProfileType: boolean;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -45347,6 +46059,7 @@ export type OrganizationUsage_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -45553,6 +46266,7 @@ export type OrganizationUsers_userQuery = {
     initials?: string | null;
     hasGhostLogin: boolean;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -45929,6 +46643,7 @@ export type PetitionActivity_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -47743,6 +48458,7 @@ export type PetitionActivity_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -48807,6 +49523,7 @@ export type PetitionCompose_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasPetitionApprovalFlow: boolean;
@@ -48814,9 +49531,6 @@ export type PetitionCompose_QueryFragment = {
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasAutoAnonymize: boolean;
-    hasEsTaxDocumentsField: boolean;
-    hasDowJonesField: boolean;
-    hasProfileSearchField: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     hasRecipientLangCA: boolean;
@@ -48826,6 +49540,9 @@ export type PetitionCompose_QueryFragment = {
     hasPrefillSecret: boolean;
     hasOnBehalfOf: boolean;
     hasDocumentProcessingAccess: boolean;
+    hasEsTaxDocumentsField: boolean;
+    hasDowJonesField: boolean;
+    hasProfileSearchField: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -48899,20 +49616,6 @@ export type PetitionCompose_QueryFragment = {
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
-};
-
-export type PetitionCompose_updatePetitionFieldAutoSearchConfigMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  fieldId: Scalars["GID"]["input"];
-  config?: InputMaybe<UpdatePetitionFieldAutoSearchConfigInput>;
-}>;
-
-export type PetitionCompose_updatePetitionFieldAutoSearchConfigMutation = {
-  updatePetitionFieldAutoSearchConfig: {
-    __typename?: "PetitionField";
-    id: string;
-    options: { [key: string]: any };
-  };
 };
 
 export type PetitionCompose_updatePetitionMutationVariables = Exact<{
@@ -51046,6 +51749,7 @@ export type PetitionCompose_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasPetitionApprovalFlow: boolean;
@@ -51053,9 +51757,6 @@ export type PetitionCompose_userQuery = {
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasAutoAnonymize: boolean;
-    hasEsTaxDocumentsField: boolean;
-    hasDowJonesField: boolean;
-    hasProfileSearchField: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
     hasRecipientLangCA: boolean;
@@ -51065,6 +51766,9 @@ export type PetitionCompose_userQuery = {
     hasPrefillSecret: boolean;
     hasOnBehalfOf: boolean;
     hasDocumentProcessingAccess: boolean;
+    hasEsTaxDocumentsField: boolean;
+    hasDowJonesField: boolean;
+    hasProfileSearchField: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -52032,6 +52736,7 @@ export type PetitionMessages_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
@@ -52103,6 +52808,7 @@ export type PetitionMessages_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
@@ -53718,6 +54424,7 @@ export type PetitionPreview_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -56271,6 +56978,7 @@ export type PetitionPreview_userQuery = {
     initials?: string | null;
     hasPublicLinkPrefill: boolean;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -57470,6 +58178,7 @@ export type PetitionReplies_userQuery = {
     hasPetitionApprovalFlow: boolean;
     hasProfilesAccess: boolean;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasExportCuatrecasas: boolean;
     hasSummaryAccess: boolean;
@@ -58659,6 +59368,7 @@ export type Petitions_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasPetitionApprovalFlow: boolean;
     hasDashboardsAccess: boolean;
@@ -59234,6 +59944,7 @@ export type NewPetition_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -59551,6 +60262,7 @@ export type ProfileDetail_userQuery = {
     initials?: string | null;
     hasKeyProcessesFeature: boolean;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
@@ -59710,6 +60422,9 @@ export type ProfileDetail_profileQuery = {
         content?: { [key: string]: any } | null;
         createdAt: string;
         expiryDate?: string | null;
+        hasDraft: boolean;
+        hasPendingReview: boolean;
+        hasActiveMonitoring: boolean;
       } | null;
     }>;
     petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
@@ -59822,6 +60537,7 @@ export type Profiles_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -60060,6 +60776,7 @@ export type Reports_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -60136,6 +60853,7 @@ export type Overview_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -60212,6 +60930,7 @@ export type ReportsReplies_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -60288,6 +61007,7 @@ export type ReportsTemplates_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -60358,6 +61078,7 @@ export type Account_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasOnBehalfOf: boolean;
     hasDashboardsAccess: boolean;
@@ -60469,6 +61190,7 @@ export type Account_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasOnBehalfOf: boolean;
     hasDashboardsAccess: boolean;
@@ -60827,6 +61549,7 @@ export type Subscriptions_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -60929,6 +61652,7 @@ export type Tokens_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -60999,6 +61723,7 @@ export type Settings_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -61077,6 +61802,7 @@ export type Security_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
+    hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasDashboardsAccess: boolean;
     hasProfilesAccess: boolean;
@@ -63264,7 +63990,7 @@ export type focusPetitionField_PublicPetitionFieldFragment = {
   }>;
 };
 
-export type getReferencedInBackgroundCheck_ProfileTypeFieldFragment = {
+export type getFieldsReferencedInMonitoring_ProfileTypeFieldFragment = {
   __typename?: "ProfileTypeField";
   id: string;
   type: ProfileTypeFieldType;
@@ -65785,6 +66511,12 @@ export type useGetPetitionPages_PetitionBaseFragment =
   | useGetPetitionPages_PetitionBase_Petition_Fragment
   | useGetPetitionPages_PetitionBase_PetitionTemplate_Fragment;
 
+export type useHasAdverseMediaSearch_MeQueryVariables = Exact<{ [key: string]: never }>;
+
+export type useHasAdverseMediaSearch_MeQuery = {
+  me: { __typename?: "User"; id: string; hasAdverseMediaSearch: boolean };
+};
+
 export type useHasBackgroundCheck_MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type useHasBackgroundCheck_MeQuery = {
@@ -67391,6 +68123,7 @@ export const AppLayout_QueryFragmentDoc = gql`
         hasIdVerification: hasIntegration(integration: ID_VERIFICATION)
       }
       hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
+      hasAdverseMediaSearch: hasFeatureFlag(featureFlag: ADVERSE_MEDIA_SEARCH)
       hasRemovePreviewFiles: hasFeatureFlag(featureFlag: REMOVE_PREVIEW_FILES)
     }
     realMe {
@@ -67895,6 +68628,9 @@ export const ProfileFormField_ProfileFieldValueFragmentDoc = gql`
   fragment ProfileFormField_ProfileFieldValue on ProfileFieldValue {
     id
     content
+    hasDraft
+    hasPendingReview
+    hasActiveMonitoring
   }
 ` as unknown as DocumentNode<ProfileFormField_ProfileFieldValueFragment, unknown>;
 export const ProfileForm_ProfileFieldValueFragmentDoc = gql`
@@ -68398,14 +69134,14 @@ export const OrganizationProfilesLayout_QueryFragmentDoc = gql`
   }
   ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<OrganizationProfilesLayout_QueryFragment, unknown>;
-export const getReferencedInBackgroundCheck_ProfileTypeFieldFragmentDoc = gql`
-  fragment getReferencedInBackgroundCheck_ProfileTypeField on ProfileTypeField {
+export const getFieldsReferencedInMonitoring_ProfileTypeFieldFragmentDoc = gql`
+  fragment getFieldsReferencedInMonitoring_ProfileTypeField on ProfileTypeField {
     id
     type
     options
     name
   }
-` as unknown as DocumentNode<getReferencedInBackgroundCheck_ProfileTypeFieldFragment, unknown>;
+` as unknown as DocumentNode<getFieldsReferencedInMonitoring_ProfileTypeFieldFragment, unknown>;
 export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc = gql`
   fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
     id
@@ -68417,15 +69153,15 @@ export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc
     expiryAlertAheadTime
     options
     isStandard
-    ...getReferencedInBackgroundCheck_ProfileTypeField
+    ...getFieldsReferencedInMonitoring_ProfileTypeField
   }
-  ${getReferencedInBackgroundCheck_ProfileTypeFieldFragmentDoc}
+  ${getFieldsReferencedInMonitoring_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<
   useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment,
   unknown
 >;
-export const ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragmentDoc = gql`
-  fragment ProfileFieldBackgroundCheckSettings_ProfileTypeField on ProfileTypeField {
+export const ProfileFieldMonitoringSettings_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileFieldMonitoringSettings_ProfileTypeField on ProfileTypeField {
     id
     name
     type
@@ -68434,17 +69170,17 @@ export const ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragmentDoc = g
     ...ProfileTypeFieldSelect_ProfileTypeField
   }
   ${ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc}
-` as unknown as DocumentNode<ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragment, unknown>;
-export const ProfileFieldBackgroundCheckSettings_ProfileTypeFragmentDoc = gql`
-  fragment ProfileFieldBackgroundCheckSettings_ProfileType on ProfileType {
+` as unknown as DocumentNode<ProfileFieldMonitoringSettings_ProfileTypeFieldFragment, unknown>;
+export const ProfileFieldMonitoringSettings_ProfileTypeFragmentDoc = gql`
+  fragment ProfileFieldMonitoringSettings_ProfileType on ProfileType {
     id
     fields {
       id
-      ...ProfileFieldBackgroundCheckSettings_ProfileTypeField
+      ...ProfileFieldMonitoringSettings_ProfileTypeField
     }
   }
-  ${ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragmentDoc}
-` as unknown as DocumentNode<ProfileFieldBackgroundCheckSettings_ProfileTypeFragment, unknown>;
+  ${ProfileFieldMonitoringSettings_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<ProfileFieldMonitoringSettings_ProfileTypeFragment, unknown>;
 export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragmentDoc = gql`
   fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileType on ProfileType {
     id
@@ -68452,10 +69188,10 @@ export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragmentDoc = gq
       id
       ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
     }
-    ...ProfileFieldBackgroundCheckSettings_ProfileType
+    ...ProfileFieldMonitoringSettings_ProfileType
   }
   ${useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc}
-  ${ProfileFieldBackgroundCheckSettings_ProfileTypeFragmentDoc}
+  ${ProfileFieldMonitoringSettings_ProfileTypeFragmentDoc}
 ` as unknown as DocumentNode<useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment, unknown>;
 export const TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc = gql`
   fragment TimelinePetitionCreatedEvent_PetitionCreatedEvent on PetitionCreatedEvent {
@@ -70224,6 +70960,49 @@ export const PetitionComposeVariables_PetitionFieldFragmentDoc = gql`
   }
   ${ReferencedCalculationsDialog_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeVariables_PetitionFieldFragment, unknown>;
+export const ConfigureAdverseMediaAutomateSearchDialog_InnerPetitionFieldFragmentDoc = gql`
+  fragment ConfigureAdverseMediaAutomateSearchDialog_InnerPetitionField on PetitionField {
+    id
+    type
+    options
+    multiple
+    parent {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  ConfigureAdverseMediaAutomateSearchDialog_InnerPetitionFieldFragment,
+  unknown
+>;
+export const ConfigureAdverseMediaAutomateSearchDialog_PetitionBaseFragmentDoc = gql`
+  fragment ConfigureAdverseMediaAutomateSearchDialog_PetitionBase on PetitionBase {
+    fields {
+      id
+      ...ConfigureAdverseMediaAutomateSearchDialog_InnerPetitionField
+      children {
+        id
+        ...ConfigureAdverseMediaAutomateSearchDialog_InnerPetitionField
+      }
+    }
+    ...PetitionFieldSelect_PetitionBase
+  }
+  ${ConfigureAdverseMediaAutomateSearchDialog_InnerPetitionFieldFragmentDoc}
+  ${PetitionFieldSelect_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  ConfigureAdverseMediaAutomateSearchDialog_PetitionBaseFragment,
+  unknown
+>;
+export const ConfigureAdverseMediaAutomateSearchDialog_PetitionFieldFragmentDoc = gql`
+  fragment ConfigureAdverseMediaAutomateSearchDialog_PetitionField on PetitionField {
+    options
+    parent {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  ConfigureAdverseMediaAutomateSearchDialog_PetitionFieldFragment,
+  unknown
+>;
 export const PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc = gql`
   fragment PetitionFieldVisibilityEditor_PetitionField on PetitionField {
     id
@@ -70318,8 +71097,8 @@ export const ConfigureApprovalStepsDialog_PetitionBaseFragmentDoc = gql`
   ${Fragments_FullApprovalFlowConfigFragmentDoc}
   ${PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<ConfigureApprovalStepsDialog_PetitionBaseFragment, unknown>;
-export const ConfigureAutomateSearchDialog_InnerPetitionFieldFragmentDoc = gql`
-  fragment ConfigureAutomateSearchDialog_InnerPetitionField on PetitionField {
+export const ConfigureBackgroundCheckAutomateSearchDialog_InnerPetitionFieldFragmentDoc = gql`
+  fragment ConfigureBackgroundCheckAutomateSearchDialog_InnerPetitionField on PetitionField {
     id
     type
     options
@@ -70328,30 +71107,39 @@ export const ConfigureAutomateSearchDialog_InnerPetitionFieldFragmentDoc = gql`
       id
     }
   }
-` as unknown as DocumentNode<ConfigureAutomateSearchDialog_InnerPetitionFieldFragment, unknown>;
-export const ConfigureAutomateSearchDialog_PetitionBaseFragmentDoc = gql`
-  fragment ConfigureAutomateSearchDialog_PetitionBase on PetitionBase {
+` as unknown as DocumentNode<
+  ConfigureBackgroundCheckAutomateSearchDialog_InnerPetitionFieldFragment,
+  unknown
+>;
+export const ConfigureBackgroundCheckAutomateSearchDialog_PetitionBaseFragmentDoc = gql`
+  fragment ConfigureBackgroundCheckAutomateSearchDialog_PetitionBase on PetitionBase {
     fields {
       id
-      ...ConfigureAutomateSearchDialog_InnerPetitionField
+      ...ConfigureBackgroundCheckAutomateSearchDialog_InnerPetitionField
       children {
         id
-        ...ConfigureAutomateSearchDialog_InnerPetitionField
+        ...ConfigureBackgroundCheckAutomateSearchDialog_InnerPetitionField
       }
     }
     ...PetitionFieldSelect_PetitionBase
   }
-  ${ConfigureAutomateSearchDialog_InnerPetitionFieldFragmentDoc}
+  ${ConfigureBackgroundCheckAutomateSearchDialog_InnerPetitionFieldFragmentDoc}
   ${PetitionFieldSelect_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<ConfigureAutomateSearchDialog_PetitionBaseFragment, unknown>;
-export const ConfigureAutomateSearchDialog_PetitionFieldFragmentDoc = gql`
-  fragment ConfigureAutomateSearchDialog_PetitionField on PetitionField {
+` as unknown as DocumentNode<
+  ConfigureBackgroundCheckAutomateSearchDialog_PetitionBaseFragment,
+  unknown
+>;
+export const ConfigureBackgroundCheckAutomateSearchDialog_PetitionFieldFragmentDoc = gql`
+  fragment ConfigureBackgroundCheckAutomateSearchDialog_PetitionField on PetitionField {
     options
     parent {
       id
     }
   }
-` as unknown as DocumentNode<ConfigureAutomateSearchDialog_PetitionFieldFragment, unknown>;
+` as unknown as DocumentNode<
+  ConfigureBackgroundCheckAutomateSearchDialog_PetitionFieldFragment,
+  unknown
+>;
 export const useCreateOrUpdateFieldGroupRelationshipsDialog_PetitionFieldFragmentDoc = gql`
   fragment useCreateOrUpdateFieldGroupRelationshipsDialog_PetitionField on PetitionField {
     id
@@ -70581,6 +71369,15 @@ export const PetitionApprovalStepsVisibilityEditor_PetitionBaseFragmentDoc = gql
   ${PetitionApprovalStepsVisibilityEditor_PetitionFieldFragmentDoc}
   ${PetitionFieldLogicContext_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionApprovalStepsVisibilityEditor_PetitionBaseFragment, unknown>;
+export const PetitionComposeAdverseMediaSearchSettings_PetitionFieldFragmentDoc = gql`
+  fragment PetitionComposeAdverseMediaSearchSettings_PetitionField on PetitionField {
+    id
+    options
+  }
+` as unknown as DocumentNode<
+  PetitionComposeAdverseMediaSearchSettings_PetitionFieldFragment,
+  unknown
+>;
 export const PetitionComposeBackgroundCheckSettings_PetitionFieldFragmentDoc = gql`
   fragment PetitionComposeBackgroundCheckSettings_PetitionField on PetitionField {
     id
@@ -70831,6 +71628,78 @@ export const PreviewPetitionFieldProfileSearch_PetitionBaseFragmentDoc = gql`
     id
   }
 ` as unknown as DocumentNode<PreviewPetitionFieldProfileSearch_PetitionBaseFragment, unknown>;
+export const AdverseMediaArticleDetails_AdverseMediaArticleFragmentDoc = gql`
+  fragment AdverseMediaArticleDetails_AdverseMediaArticle on AdverseMediaArticle {
+    id
+    url
+    author
+    body
+    header
+    source
+    summary
+    timestamp
+    images
+    quotes @include(if: $includeQuotes)
+  }
+` as unknown as DocumentNode<AdverseMediaArticleDetails_AdverseMediaArticleFragment, unknown>;
+export const AdverseMediaArticleHeader_AdverseMediaArticleFragmentDoc = gql`
+  fragment AdverseMediaArticleHeader_AdverseMediaArticle on AdverseMediaArticle {
+    id
+    header
+    classification
+  }
+` as unknown as DocumentNode<AdverseMediaArticleHeader_AdverseMediaArticleFragment, unknown>;
+export const AdverseMediaArticleCard_AdverseMediaArticleFragmentDoc = gql`
+  fragment AdverseMediaArticleCard_AdverseMediaArticle on AdverseMediaArticle {
+    id
+    header
+    source
+    timestamp
+    classification
+    ...AdverseMediaArticleDetails_AdverseMediaArticle
+    ...AdverseMediaArticleHeader_AdverseMediaArticle
+  }
+  ${AdverseMediaArticleDetails_AdverseMediaArticleFragmentDoc}
+  ${AdverseMediaArticleHeader_AdverseMediaArticleFragmentDoc}
+` as unknown as DocumentNode<AdverseMediaArticleCard_AdverseMediaArticleFragment, unknown>;
+export const PreviewPetitionFieldAdverseMediaSearch_PetitionFieldFragmentDoc = gql`
+  fragment PreviewPetitionFieldAdverseMediaSearch_PetitionField on PetitionField {
+    id
+    parent {
+      id
+    }
+    previewReplies @client {
+      id
+      content
+      parent {
+        id
+      }
+    }
+    replies {
+      id
+      content
+      parent {
+        id
+      }
+    }
+  }
+` as unknown as DocumentNode<PreviewPetitionFieldAdverseMediaSearch_PetitionFieldFragment, unknown>;
+export const PreviewPetitionFieldAdverseMediaSearch_PetitionBaseFragmentDoc = gql`
+  fragment PreviewPetitionFieldAdverseMediaSearch_PetitionBase on PetitionBase {
+    id
+    fields {
+      id
+      ...PreviewPetitionFieldAdverseMediaSearch_PetitionField
+      children {
+        id
+        ...PreviewPetitionFieldAdverseMediaSearch_PetitionField
+      }
+    }
+    ...useFieldLogic_PetitionBase
+  }
+  ${PreviewPetitionFieldAdverseMediaSearch_PetitionFieldFragmentDoc}
+  ${useFieldLogic_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<PreviewPetitionFieldAdverseMediaSearch_PetitionBaseFragment, unknown>;
 export const TestModeSignatureBadge_UserFragmentDoc = gql`
   fragment TestModeSignatureBadge_User on User {
     hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
@@ -71852,6 +72721,24 @@ export const AdminOrganizations_OrganizationFragmentDoc = gql`
     usageDetails
   }
 ` as unknown as DocumentNode<AdminOrganizations_OrganizationFragment, unknown>;
+export const AdverseMediaArticleCard_AdverseMediaArticleListItemFragmentDoc = gql`
+  fragment AdverseMediaArticleCard_AdverseMediaArticleListItem on AdverseMediaArticle {
+    id
+    header
+    source
+    timestamp
+    classification
+  }
+` as unknown as DocumentNode<AdverseMediaArticleCard_AdverseMediaArticleListItemFragment, unknown>;
+export const AdverseMediaSearch_AdverseMediaArticleFragmentDoc = gql`
+  fragment AdverseMediaSearch_AdverseMediaArticle on AdverseMediaArticle {
+    id
+    classification
+    classifiedAt
+    ...AdverseMediaArticleCard_AdverseMediaArticleListItem
+  }
+  ${AdverseMediaArticleCard_AdverseMediaArticleListItemFragmentDoc}
+` as unknown as DocumentNode<AdverseMediaSearch_AdverseMediaArticleFragment, unknown>;
 export const Alerts_ProfileFieldPropertyFragmentDoc = gql`
   fragment Alerts_ProfileFieldProperty on ProfileFieldProperty {
     field {
@@ -72715,14 +73602,14 @@ export const OrganizationProfileType_ProfileTypeFieldFragmentDoc = gql`
     ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
     ...ProfileTypeSettings_ProfileTypeField
     ...useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeField
-    ...getReferencedInBackgroundCheck_ProfileTypeField
+    ...getFieldsReferencedInMonitoring_ProfileTypeField
   }
   ${useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragmentDoc}
   ${useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc}
   ${useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc}
   ${ProfileTypeSettings_ProfileTypeFieldFragmentDoc}
   ${useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeFieldFragmentDoc}
-  ${getReferencedInBackgroundCheck_ProfileTypeFieldFragmentDoc}
+  ${getFieldsReferencedInMonitoring_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<OrganizationProfileType_ProfileTypeFieldFragment, unknown>;
 export const ProfileTypeSettings_ProfileTypeProcessFragmentDoc = gql`
   fragment ProfileTypeSettings_ProfileTypeProcess on ProfileTypeProcess {
@@ -74350,6 +75237,7 @@ export const PetitionFieldTypeSelectDropdown_UserFragmentDoc = gql`
     hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
     hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
     hasProfileSearchField: hasFeatureFlag(featureFlag: PROFILE_SEARCH_FIELD)
+    hasAdverseMediaSearch: hasFeatureFlag(featureFlag: ADVERSE_MEDIA_SEARCH)
   }
 ` as unknown as DocumentNode<PetitionFieldTypeSelectDropdown_UserFragment, unknown>;
 export const PetitionFieldTypeSelect_UserFragmentDoc = gql`
@@ -74378,14 +75266,21 @@ export const PetitionComposeFieldSettings_UserFragmentDoc = gql`
   ${PetitionFieldTypeSelect_UserFragmentDoc}
   ${PetitionComposeFileUploadSettings_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeFieldSettings_UserFragment, unknown>;
-export const PetitionComposeNewFieldDrawer_UserFragmentDoc = gql`
-  fragment PetitionComposeNewFieldDrawer_User on User {
+export const PetitionComposeNewFieldDrawerPetitionFields_UserFragmentDoc = gql`
+  fragment PetitionComposeNewFieldDrawerPetitionFields_User on User {
+    id
     hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
     hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
     hasProfileSearchField: hasFeatureFlag(featureFlag: PROFILE_SEARCH_FIELD)
-    hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
-    hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
   }
+` as unknown as DocumentNode<PetitionComposeNewFieldDrawerPetitionFields_UserFragment, unknown>;
+export const PetitionComposeNewFieldDrawer_UserFragmentDoc = gql`
+  fragment PetitionComposeNewFieldDrawer_User on User {
+    id
+    hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+    ...PetitionComposeNewFieldDrawerPetitionFields_User
+  }
+  ${PetitionComposeNewFieldDrawerPetitionFields_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeNewFieldDrawer_UserFragment, unknown>;
 export const PetitionComposeNewFieldDrawerPetitionFields_ProfileTypeFragmentDoc = gql`
   fragment PetitionComposeNewFieldDrawerPetitionFields_ProfileType on ProfileType {
@@ -80132,6 +81027,18 @@ export const PetitionSettings_enableAutomaticNumberingOnPetitionFieldsDocument =
   PetitionSettings_enableAutomaticNumberingOnPetitionFieldsMutation,
   PetitionSettings_enableAutomaticNumberingOnPetitionFieldsMutationVariables
 >;
+export const ConfigureAdverseMediaAutomateSearchDialog_petitionDocument = gql`
+  query ConfigureAdverseMediaAutomateSearchDialog_petition($id: GID!) {
+    petition(id: $id) {
+      id
+      ...ConfigureAdverseMediaAutomateSearchDialog_PetitionBase
+    }
+  }
+  ${ConfigureAdverseMediaAutomateSearchDialog_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  ConfigureAdverseMediaAutomateSearchDialog_petitionQuery,
+  ConfigureAdverseMediaAutomateSearchDialog_petitionQueryVariables
+>;
 export const ConfigureApprovalStepsDialog_petitionDocument = gql`
   query ConfigureApprovalStepsDialog_petition($petitionId: GID!) {
     petition(id: $petitionId) {
@@ -80144,17 +81051,17 @@ export const ConfigureApprovalStepsDialog_petitionDocument = gql`
   ConfigureApprovalStepsDialog_petitionQuery,
   ConfigureApprovalStepsDialog_petitionQueryVariables
 >;
-export const ConfigureAutomateSearchDialog_petitionDocument = gql`
-  query ConfigureAutomateSearchDialog_petition($id: GID!) {
+export const ConfigureBackgroundCheckAutomateSearchDialog_petitionDocument = gql`
+  query ConfigureBackgroundCheckAutomateSearchDialog_petition($id: GID!) {
     petition(id: $id) {
       id
-      ...ConfigureAutomateSearchDialog_PetitionBase
+      ...ConfigureBackgroundCheckAutomateSearchDialog_PetitionBase
     }
   }
-  ${ConfigureAutomateSearchDialog_PetitionBaseFragmentDoc}
+  ${ConfigureBackgroundCheckAutomateSearchDialog_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<
-  ConfigureAutomateSearchDialog_petitionQuery,
-  ConfigureAutomateSearchDialog_petitionQueryVariables
+  ConfigureBackgroundCheckAutomateSearchDialog_petitionQuery,
+  ConfigureBackgroundCheckAutomateSearchDialog_petitionQueryVariables
 >;
 export const useCreateOrUpdateFieldGroupRelationshipsDialog_petitionDocument = gql`
   query useCreateOrUpdateFieldGroupRelationshipsDialog_petition($id: GID!) {
@@ -80260,26 +81167,6 @@ export const StandardListDetailsDialog_standardListDefinitionDocument = gql`
   StandardListDetailsDialog_standardListDefinitionQuery,
   StandardListDetailsDialog_standardListDefinitionQueryVariables
 >;
-export const PetitionComposeBackgroundCheckSettings_updatePetitionFieldAutoSearchConfigDocument =
-  gql`
-    mutation PetitionComposeBackgroundCheckSettings_updatePetitionFieldAutoSearchConfig(
-      $petitionId: GID!
-      $fieldId: GID!
-      $config: UpdatePetitionFieldAutoSearchConfigInput
-    ) {
-      updatePetitionFieldAutoSearchConfig(
-        petitionId: $petitionId
-        fieldId: $fieldId
-        config: $config
-      ) {
-        id
-        options
-      }
-    }
-  ` as unknown as DocumentNode<
-    PetitionComposeBackgroundCheckSettings_updatePetitionFieldAutoSearchConfigMutation,
-    PetitionComposeBackgroundCheckSettings_updatePetitionFieldAutoSearchConfigMutationVariables
-  >;
 export const DynamicSelectSettings_uploadDynamicSelectFieldFileDocument = gql`
   mutation DynamicSelectSettings_uploadDynamicSelectFieldFile(
     $petitionId: GID!
@@ -80715,6 +81602,34 @@ export const PreviewImportFromProfileFormatErrorDialog_profilesDocument = gql`
 ` as unknown as DocumentNode<
   PreviewImportFromProfileFormatErrorDialog_profilesQuery,
   PreviewImportFromProfileFormatErrorDialog_profilesQueryVariables
+>;
+export const AdverseMediaArticleCard_adverseMediaArticleDetailsDocument = gql`
+  query AdverseMediaArticleCard_adverseMediaArticleDetails(
+    $articleId: String!
+    $token: String!
+    $search: [AdverseMediaSearchTermInput!]
+    $includeQuotes: Boolean!
+  ) {
+    adverseMediaArticleDetails(id: $articleId, search: $search, token: $token) {
+      id
+      ...AdverseMediaArticleCard_AdverseMediaArticle
+    }
+  }
+  ${AdverseMediaArticleCard_AdverseMediaArticleFragmentDoc}
+` as unknown as DocumentNode<
+  AdverseMediaArticleCard_adverseMediaArticleDetailsQuery,
+  AdverseMediaArticleCard_adverseMediaArticleDetailsQueryVariables
+>;
+export const AdverseMediaSearchInput_adverseMediaEntitySuggestDocument = gql`
+  query AdverseMediaSearchInput_adverseMediaEntitySuggest($searchTerm: String!) {
+    adverseMediaEntitySuggest(searchTerm: $searchTerm) {
+      id
+      name
+    }
+  }
+` as unknown as DocumentNode<
+  AdverseMediaSearchInput_adverseMediaEntitySuggestQuery,
+  AdverseMediaSearchInput_adverseMediaEntitySuggestQueryVariables
 >;
 export const PetitionApprovalsCard_cancelPetitionApprovalRequestStepDocument = gql`
   mutation PetitionApprovalsCard_cancelPetitionApprovalRequestStep(
@@ -81559,6 +82474,69 @@ export const useProfileSubscribersDialog_unsubscribeFromProfileDocument = gql`
   useProfileSubscribersDialog_unsubscribeFromProfileMutation,
   useProfileSubscribersDialog_unsubscribeFromProfileMutationVariables
 >;
+export const ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueDocument = gql`
+  mutation ProfileFormFieldAdverseMediaSearch_updateProfileFieldValue(
+    $profileId: GID!
+    $fields: [UpdateProfileFieldValueInput!]!
+  ) {
+    updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMutation,
+  ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMutationVariables
+>;
+export const ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMonitoringStatusDocument =
+  gql`
+    mutation ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMonitoringStatus(
+      $profileId: GID!
+      $profileTypeFieldId: GID!
+      $enabled: Boolean!
+    ) {
+      updateProfileFieldValueMonitoringStatus(
+        profileId: $profileId
+        profileTypeFieldId: $profileTypeFieldId
+        enabled: $enabled
+      ) {
+        id
+        properties {
+          value {
+            id
+            hasActiveMonitoring
+          }
+          field {
+            id
+          }
+        }
+      }
+    }
+  ` as unknown as DocumentNode<
+    ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMonitoringStatusMutation,
+    ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMonitoringStatusMutationVariables
+  >;
+export const ProfileFormFieldAdverseMediaSearch_copyReplyContentToProfileFieldValueDocument = gql`
+  mutation ProfileFormFieldAdverseMediaSearch_copyReplyContentToProfileFieldValue(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $petitionId: GID!
+    $replyId: GID!
+    $expiryDate: Date
+  ) {
+    copyReplyContentToProfileFieldValue(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      petitionId: $petitionId
+      replyId: $replyId
+      expiryDate: $expiryDate
+    ) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  ProfileFormFieldAdverseMediaSearch_copyReplyContentToProfileFieldValueMutation,
+  ProfileFormFieldAdverseMediaSearch_copyReplyContentToProfileFieldValueMutationVariables
+>;
 export const ProfileFormFieldBackgroundCheck_updateProfileFieldValueDocument = gql`
   mutation ProfileFormFieldBackgroundCheck_updateProfileFieldValue(
     $profileId: GID!
@@ -81572,29 +82550,28 @@ export const ProfileFormFieldBackgroundCheck_updateProfileFieldValueDocument = g
   ProfileFormFieldBackgroundCheck_updateProfileFieldValueMutation,
   ProfileFormFieldBackgroundCheck_updateProfileFieldValueMutationVariables
 >;
-export const ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueDocument =
-  gql`
-    mutation ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValue(
-      $profileId: GID!
-      $profileTypeFieldId: GID!
-      $petitionId: GID!
-      $replyId: GID!
-      $expiryDate: Date
+export const ProfileFormFieldBackgroundCheck_copyReplyContentToProfileFieldValueDocument = gql`
+  mutation ProfileFormFieldBackgroundCheck_copyReplyContentToProfileFieldValue(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $petitionId: GID!
+    $replyId: GID!
+    $expiryDate: Date
+  ) {
+    copyReplyContentToProfileFieldValue(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      petitionId: $petitionId
+      replyId: $replyId
+      expiryDate: $expiryDate
     ) {
-      copyBackgroundCheckReplyToProfileFieldValue(
-        profileId: $profileId
-        profileTypeFieldId: $profileTypeFieldId
-        petitionId: $petitionId
-        replyId: $replyId
-        expiryDate: $expiryDate
-      ) {
-        id
-      }
+      id
     }
-  ` as unknown as DocumentNode<
-    ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutation,
-    ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueMutationVariables
-  >;
+  }
+` as unknown as DocumentNode<
+  ProfileFormFieldBackgroundCheck_copyReplyContentToProfileFieldValueMutation,
+  ProfileFormFieldBackgroundCheck_copyReplyContentToProfileFieldValueMutationVariables
+>;
 export const PublicSignupForm_emailIsAvailableDocument = gql`
   query PublicSignupForm_emailIsAvailable($email: String!) {
     emailIsAvailable(email: $email)
@@ -82492,6 +83469,91 @@ export const AdminSupportMethods_userDocument = gql`
   }
   ${AdminSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<AdminSupportMethods_userQuery, AdminSupportMethods_userQueryVariables>;
+export const AdverseMediaSearch_adverseMediaArticleSearchDocument = gql`
+  query AdverseMediaSearch_adverseMediaArticleSearch(
+    $search: [AdverseMediaSearchTermInput!]
+    $token: String!
+  ) {
+    adverseMediaArticleSearch(search: $search, token: $token) {
+      isDraft
+      articles {
+        totalCount
+        createdAt
+        items {
+          id
+          ...AdverseMediaSearch_AdverseMediaArticle
+        }
+      }
+      search {
+        entityId
+        label
+        term
+        wikiDataId
+      }
+    }
+  }
+  ${AdverseMediaSearch_AdverseMediaArticleFragmentDoc}
+` as unknown as DocumentNode<
+  AdverseMediaSearch_adverseMediaArticleSearchQuery,
+  AdverseMediaSearch_adverseMediaArticleSearchQueryVariables
+>;
+export const AdverseMediaSearch_adverseMediaAlternativeSearchSuggestionsDocument = gql`
+  query AdverseMediaSearch_adverseMediaAlternativeSearchSuggestions(
+    $token: String!
+    $search: String!
+  ) {
+    adverseMediaAlternativeSearchSuggestions(token: $token, search: $search) {
+      term
+      wikiDataId
+      entityId
+      label
+    }
+  }
+` as unknown as DocumentNode<
+  AdverseMediaSearch_adverseMediaAlternativeSearchSuggestionsQuery,
+  AdverseMediaSearch_adverseMediaAlternativeSearchSuggestionsQueryVariables
+>;
+export const AdverseMediaSearch_classifyAdverseMediaArticleDocument = gql`
+  mutation AdverseMediaSearch_classifyAdverseMediaArticle(
+    $id: String!
+    $token: String!
+    $classification: AdverseMediaArticleRelevance
+  ) {
+    classifyAdverseMediaArticle(id: $id, token: $token, classification: $classification) {
+      id
+      classification
+      classifiedAt
+    }
+  }
+` as unknown as DocumentNode<
+  AdverseMediaSearch_classifyAdverseMediaArticleMutation,
+  AdverseMediaSearch_classifyAdverseMediaArticleMutationVariables
+>;
+export const AdverseMediaSearch_saveAdverseMediaChangesDocument = gql`
+  mutation AdverseMediaSearch_saveAdverseMediaChanges($token: String!) {
+    saveAdverseMediaChanges(token: $token) {
+      isDraft
+      articles {
+        totalCount
+        createdAt
+        items {
+          id
+          ...AdverseMediaSearch_AdverseMediaArticle
+        }
+      }
+      search {
+        entityId
+        label
+        term
+        wikiDataId
+      }
+    }
+  }
+  ${AdverseMediaSearch_AdverseMediaArticleFragmentDoc}
+` as unknown as DocumentNode<
+  AdverseMediaSearch_saveAdverseMediaChangesMutation,
+  AdverseMediaSearch_saveAdverseMediaChangesMutationVariables
+>;
 export const Alerts_userDocument = gql`
   query Alerts_user {
     ...AppLayout_Query
@@ -83598,25 +84660,6 @@ export const PetitionActivity_userDocument = gql`
   }
   ${PetitionActivity_QueryFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivity_userQuery, PetitionActivity_userQueryVariables>;
-export const PetitionCompose_updatePetitionFieldAutoSearchConfigDocument = gql`
-  mutation PetitionCompose_updatePetitionFieldAutoSearchConfig(
-    $petitionId: GID!
-    $fieldId: GID!
-    $config: UpdatePetitionFieldAutoSearchConfigInput
-  ) {
-    updatePetitionFieldAutoSearchConfig(
-      petitionId: $petitionId
-      fieldId: $fieldId
-      config: $config
-    ) {
-      id
-      options
-    }
-  }
-` as unknown as DocumentNode<
-  PetitionCompose_updatePetitionFieldAutoSearchConfigMutation,
-  PetitionCompose_updatePetitionFieldAutoSearchConfigMutationVariables
->;
 export const PetitionCompose_updatePetitionDocument = gql`
   mutation PetitionCompose_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
     updatePetition(petitionId: $petitionId, data: $data) {
@@ -86210,6 +87253,17 @@ export const useGetDefaultMentionables_permissionsQueryDocument = gql`
 ` as unknown as DocumentNode<
   useGetDefaultMentionables_permissionsQueryQuery,
   useGetDefaultMentionables_permissionsQueryQueryVariables
+>;
+export const useHasAdverseMediaSearch_MeDocument = gql`
+  query useHasAdverseMediaSearch_Me {
+    me {
+      id
+      hasAdverseMediaSearch: hasFeatureFlag(featureFlag: ADVERSE_MEDIA_SEARCH)
+    }
+  }
+` as unknown as DocumentNode<
+  useHasAdverseMediaSearch_MeQuery,
+  useHasAdverseMediaSearch_MeQueryVariables
 >;
 export const useHasBackgroundCheck_MeDocument = gql`
   query useHasBackgroundCheck_Me {

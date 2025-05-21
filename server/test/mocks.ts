@@ -2,6 +2,7 @@ import { faker } from "@faker-js/faker/locale/af_ZA";
 import { RedisCommandRawReply } from "@redis/client/dist/lib/commands";
 import { IncomingMessage } from "http";
 import { inject, injectable } from "inversify";
+import { isNonNullish, pick } from "remeda";
 import { Readable } from "stream";
 import { ProfileTypeStandardType, User, UserLocale } from "../src/db/__types";
 import {
@@ -26,13 +27,22 @@ import {
 } from "../src/integrations/profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
 import { BackgroundCheckProfileProps } from "../src/pdf/documents/BackgroundCheckProfile";
 import {
+  AdverseMediaSearchService,
+  IAdverseMediaSearchService,
+} from "../src/services/AdverseMediaSearchService";
+import {
   AI_ASSISTANT_SERVICE,
   AiAssistantService,
   IAiAssistantService,
 } from "../src/services/AiAssistantService";
 import { IAnalyticsService } from "../src/services/AnalyticsService";
 import { IAuth } from "../src/services/AuthService";
-import { IBackgroundCheckService } from "../src/services/BackgroundCheckService";
+import {
+  EntityDetailsResponse,
+  EntitySearchRequest,
+  EntitySearchResponse,
+  IBackgroundCheckService,
+} from "../src/services/BackgroundCheckService";
 import { IEmailsService } from "../src/services/EmailsService";
 import { ENCRYPTION_SERVICE, EncryptionService } from "../src/services/EncryptionService";
 import { FETCH_SERVICE, IFetchService } from "../src/services/FetchService";
@@ -42,10 +52,10 @@ import { IQueuesService } from "../src/services/QueuesService";
 import { IRedis, REDIS } from "../src/services/Redis";
 import { IStorageImpl, IStorageService } from "../src/services/StorageService";
 import {
-  EntityDetailsResponse,
-  EntitySearchRequest,
-  EntitySearchResponse,
-} from "../src/services/background-check-clients/BackgroundCheckClient";
+  AdverseMediaArticle,
+  ArticleSearchResponse,
+  SearchTerm,
+} from "../src/services/adverse-media-search-clients/AdverseMediaSearchClient";
 import { random } from "../src/util/token";
 
 export const USER_COGNITO_ID = "test-cognito-id";
@@ -463,5 +473,118 @@ export class MockEInformaProfileExternalSourceIntegration
   protected override async parseFullName(value: string) {
     const [firstName, lastName] = value.split(" ");
     return { firstName, lastName };
+  }
+}
+
+@injectable()
+export class MockAdverseMediaSearchService
+  extends AdverseMediaSearchService
+  implements IAdverseMediaSearchService
+{
+  private ITEMS: AdverseMediaArticle[] = [
+    {
+      id: "JOHN_DOE",
+      url: "https://www.google.com",
+      author: "John Doe",
+      source: "Google",
+      header: "John Doe is a good person",
+      body: "John Doe is a good person",
+      summary: "John Doe is a good person",
+      timestamp: 1,
+      images: ["https://www.google.com/image.jpg"],
+    },
+    {
+      id: "JANE_SMITH",
+      url: "https://www.example.com",
+      author: "Reporter Name",
+      source: "News Daily",
+      header: "Jane Smith wins prestigious award",
+      body: "Jane Smith, a renowned researcher, has been recognized for her groundbreaking work in artificial intelligence.",
+      summary: "Jane Smith receives award for contributions to AI research",
+      timestamp: 2,
+      images: ["https://www.example.com/jane_smith.jpg"],
+      quotes: ["I'm honored to receive this recognition", "This award belongs to my entire team"],
+    },
+    {
+      id: "VLADIMIR_PUTIN",
+      url: "https://www.newssite.com/politics",
+      author: "Political Correspondent",
+      source: "International News",
+      header: "Vladimir Putin makes controversial statement",
+      body: "Russian President Vladimir Putin has made a series of controversial statements regarding international relations during a press conference on Monday.",
+      summary: "Putin's remarks spark international debate",
+      timestamp: 3,
+      images: ["https://www.newssite.com/putin_conference.jpg"],
+      quotes: [
+        "We must protect our national interests",
+        "Cooperation is possible only on equal terms",
+      ],
+    },
+    {
+      id: "ELON_MUSK",
+      url: "https://www.techjournal.com/business",
+      author: "Tech Reporter",
+      source: "Tech Journal",
+      header: "Elon Musk announces new AI venture",
+      body: "Tesla and SpaceX CEO Elon Musk has announced a new artificial intelligence company that aims to develop safe and beneficial AI systems. The announcement comes amid growing concerns about AI regulation.",
+      summary: "Musk launches new company focused on ethical AI development",
+      timestamp: 4,
+      images: ["https://www.techjournal.com/musk_announcement.jpg"],
+      quotes: [
+        "We need to ensure AI remains aligned with human values",
+        "This venture will prioritize safety above all else",
+      ],
+    },
+    {
+      id: "FINANCIAL_SCANDAL",
+      url: "https://www.financenews.com/investigations",
+      author: "Investigative Journalist",
+      source: "Finance News Network",
+      header: "Major bank implicated in money laundering scheme",
+      body: "A major international bank has been implicated in a sophisticated money laundering operation involving billions of dollars. Regulatory authorities from multiple countries are coordinating their investigation into the allegations.",
+      summary: "Banking giant faces scrutiny over alleged money laundering activities",
+      timestamp: 5,
+      images: [
+        "https://www.financenews.com/bank_headquarters.jpg",
+        "https://www.financenews.com/evidence_documents.jpg",
+      ],
+      quotes: [
+        "This appears to be one of the largest financial scandals of the decade",
+        "The investigation has uncovered systematic failures in compliance procedures",
+      ],
+    },
+  ];
+
+  override async searchEntities() {
+    return [];
+  }
+
+  override async searchArticles(searchTerms: SearchTerm[]): Promise<ArticleSearchResponse> {
+    if (searchTerms.some((t: any) => isNonNullish(t.term))) {
+      return {
+        totalCount: this.ITEMS.length,
+        items: this.ITEMS.map(pick(["id", "header", "timestamp", "source"])),
+        createdAt: new Date(),
+      };
+    }
+
+    const filteredItems = this.ITEMS.filter((i) =>
+      searchTerms.some((t: any) => t.entityId === i.id),
+    );
+
+    return {
+      totalCount: filteredItems.length,
+      items: filteredItems.map(pick(["id", "header", "timestamp", "source"])),
+      createdAt: new Date(),
+    };
+  }
+
+  override async fetchArticle(id: string) {
+    const article = this.ITEMS.find((i) => i.id === id);
+    if (!article) {
+      throw new Error("ARTICLE_NOT_FOUND");
+    }
+
+    return article;
   }
 }

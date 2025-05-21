@@ -4,12 +4,12 @@ import { groupBy, indexBy, isNonNullish, isNullish, mapValues, pipe, unique } fr
 import { assert } from "ts-essentials";
 import { ApiContext } from "../../context";
 import { PetitionField } from "../../db/__types";
-import { PetitionFieldOptions } from "../../db/helpers/fieldOptions";
+import { PetitionFieldOptions } from "../../services/PetitionFieldService";
+import { ValidateReplyContentError } from "../../services/PetitionValidationService";
 import { toBytes } from "../../util/fileSize";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { keyBuilder } from "../../util/keyBuilder";
-import { ValidateReplyContentError, validateReplyContent } from "../../util/validateReplyContent";
 import { NexusGenInputs } from "../__types";
 import { ArgWithPath, getArgWithPath } from "../helpers/authorize";
 import { ArgValidationError, InvalidReplyError } from "../helpers/errors";
@@ -82,7 +82,7 @@ export function validateCreatePetitionFieldReplyInput<
     for (const [index, reply] of fieldReplies.entries()) {
       const field = fieldsById[reply.id];
       try {
-        await validateReplyContent(field, reply.content);
+        await ctx.petitionValidation.validateFieldReplyContent(field, reply.content);
       } catch (e) {
         if (e instanceof ValidateReplyContentError) {
           throw new InvalidReplyError(
@@ -175,7 +175,7 @@ export function validateUpdatePetitionFieldReplyInput<
       }
 
       try {
-        await validateReplyContent(field, content);
+        await ctx.petitionValidation.validateFieldReplyContent(field, content);
       } catch (e) {
         if (e instanceof ValidateReplyContentError) {
           throw new InvalidReplyError(

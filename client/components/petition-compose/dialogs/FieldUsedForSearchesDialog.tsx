@@ -2,8 +2,12 @@ import { Box, Button, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FormattedMessage } from "react-intl";
+import { isNonNullish } from "remeda";
 
-function FieldUsedForSearchesDialog({ ...props }: DialogProps<{}>) {
+function FieldUsedForSearchesDialog({
+  fieldTitle,
+  ...props
+}: DialogProps<{ fieldTitle?: string | null }>) {
   return (
     <ConfirmDialog
       {...props}
@@ -18,14 +22,15 @@ function FieldUsedForSearchesDialog({ ...props }: DialogProps<{}>) {
         <Text>
           <FormattedMessage
             id="component.field-used-for-searches.body"
-            defaultMessage="This field is used to automate the search in a {fieldName} field. To continue, please first update the field configuration."
+            defaultMessage="This field is used to automate the search in {fieldTitle}. To continue, please first update the field configuration."
             values={{
-              fieldName: (
-                <Box as="em">
-                  <FormattedMessage
-                    id="generic.petition-field-type-background-check"
-                    defaultMessage="Background check"
-                  />
+              fieldTitle: (
+                <Box as="em" fontWeight={500}>
+                  {isNonNullish(fieldTitle) ? (
+                    fieldTitle
+                  ) : (
+                    <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+                  )}
                 </Box>
               ),
             }}

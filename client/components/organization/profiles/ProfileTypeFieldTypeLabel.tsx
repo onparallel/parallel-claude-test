@@ -3,6 +3,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PaidBadge } from "@parallel/components/common/PaidBadge";
 import { ProfileTypeFieldType } from "@parallel/graphql/__types";
 import { PROFILE_TYPE_FIELD_CONFIG } from "@parallel/utils/profileFields";
+import { useHasAdverseMediaSearch } from "@parallel/utils/useHasAdverseMediaSearch";
 import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
 import { useIntl } from "react-intl";
 
@@ -16,6 +17,7 @@ export const ProfileTypeFieldTypeLabel = chakraForwardRef<"div", ProfileTypeFiel
     const { label, color, icon } = PROFILE_TYPE_FIELD_CONFIG[type];
 
     const hasBackgroundCheck = useHasBackgroundCheck();
+    const hasAdverseMediaSearch = useHasAdverseMediaSearch();
 
     return (
       <Box ref={ref} display="inline-flex" alignItems="center" {...props}>
@@ -32,7 +34,10 @@ export const ProfileTypeFieldTypeLabel = chakraForwardRef<"div", ProfileTypeFiel
         <Text whiteSpace="nowrap" as="div" flex="1" marginStart={2}>
           {label(intl)}
         </Text>
-        {!hasBackgroundCheck && type === "BACKGROUND_CHECK" ? <PaidBadge marginStart={2} /> : null}
+        {(!hasAdverseMediaSearch && type === "ADVERSE_MEDIA_SEARCH") ||
+        (!hasBackgroundCheck && type === "BACKGROUND_CHECK") ? (
+          <PaidBadge marginStart={2} />
+        ) : null}
       </Box>
     );
   },

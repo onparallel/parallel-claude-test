@@ -15,6 +15,19 @@ import { PROFILE_TYPE_FIELD_SERVICE, ProfileTypeFieldService } from "./ProfileTy
 
 export const PROFILE_EXCEL_EXPORT_SERVICE = Symbol.for("PROFILE_EXCEL_EXPORT_SERVICE");
 
+/**
+ * this are the fieldTypes that can be exported into plain text
+ */
+export const EXPORTABLE_FIELD_TYPES = [
+  "TEXT",
+  "SHORT_TEXT",
+  "DATE",
+  "PHONE",
+  "NUMBER",
+  "SELECT",
+  "CHECKBOX",
+] as const;
+
 @injectable()
 export class ProfileExcelExportService extends ProfileExcelService {
   constructor(
@@ -40,10 +53,9 @@ export class ProfileExcelExportService extends ProfileExcelService {
     const profileType = await this.profiles.loadProfileType(profileTypeId);
     assert(profileType, `Profile type with id ${profileTypeId} not found`);
 
-    // FILE and BACKGROUND_CHECK fields are not included as those cannot be exported into plain text
     const profileTypeFields = (
       await this.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId)
-    ).filter((ptf) => ptf && ptf.type !== "FILE" && ptf.type !== "BACKGROUND_CHECK");
+    ).filter((ptf) => ptf && EXPORTABLE_FIELD_TYPES.includes(ptf.type));
 
     const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
 
@@ -149,18 +161,12 @@ export class ProfileExcelExportService extends ProfileExcelService {
   }
 
   private stringifyProfileFieldValue(field: ProfileTypeField, value?: ProfileFieldValue) {
-    switch (field.type) {
-      case "SHORT_TEXT":
-      case "TEXT":
-      case "PHONE":
-      case "NUMBER":
-      case "SELECT":
-      case "DATE":
-        return value?.content?.value;
-      case "CHECKBOX":
-        return value?.content?.value.join(",");
-      default:
-        throw new Error(`Cannot stringify ${field.type} field`);
+    assert(EXPORTABLE_FIELD_TYPES.includes(field.type), `Cannot stringify ${field.type} field`);
+
+    if (field.type === "CHECKBOX") {
+      return value?.content?.value.join(",");
     }
+
+    return value?.content?.value;
   }
 }

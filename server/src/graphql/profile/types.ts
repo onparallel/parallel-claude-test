@@ -1,8 +1,7 @@
 import { addDays } from "date-fns";
 import { fromZonedTime } from "date-fns-tz";
-import { format as formatPhoneNumber } from "libphonenumber-js";
 import { enumType, inputObjectType, interfaceType, list, nonNull, objectType } from "nexus";
-import { isNonNullish, isNullish, pick, sortBy, unique } from "remeda";
+import { isNonNullish, isNullish, sortBy, unique } from "remeda";
 import { assert } from "ts-essentials";
 import {
   ProfileRelationshipTypeDirectionValues,
@@ -485,31 +484,27 @@ export const ProfileFieldValue = objectType({
     t.globalId("id");
     t.implements("ProfileFieldResponse");
     t.nullable.jsonObject("content", {
-      resolve: (root, _, ctx) => {
-        if (root.type === "BACKGROUND_CHECK") {
-          return {
-            query: isNonNullish(root.content.query)
-              ? pick(root.content.query, ["name", "date", "type", "country"])
-              : null,
-            search: isNonNullish(root.content.search)
-              ? pick(root.content.search, ["totalCount", "createdAt"])
-              : null,
-            entity: isNonNullish(root.content.entity)
-              ? {
-                  ...pick(root.content.entity, ["id", "type", "name", "createdAt"]),
-                  properties: pick(root.content.entity.properties, ["topics"]),
-                }
-              : null,
-          };
-        } else if (root.type === "PHONE") {
-          return {
-            ...root.content,
-            pretty: formatPhoneNumber(root.content.value as string, "INTERNATIONAL"),
-          };
-        } else {
-          return root.content;
+      resolve: (root, _, ctx) => ctx.profilesHelper.mapValueContentFromDatabase(root),
+    });
+    t.nonNull.boolean("hasDraft", {
+      description: "Whether this value has an unsaved draft.",
+      resolve: async (root, _, ctx) => {
+        // only this field type applies
+        if (root.type === "ADVERSE_MEDIA_SEARCH") {
+          const draftValues = await ctx.profiles.loadDraftProfileFieldValuesByProfileId(
+            root.profile_id,
+          );
+          return draftValues.some((v) => v.type === "ADVERSE_MEDIA_SEARCH");
         }
+
+        return false;
       },
+    });
+    t.nonNull.boolean("hasActiveMonitoring", {
+      resolve: (o) => o.active_monitoring,
+    });
+    t.nonNull.boolean("hasPendingReview", {
+      resolve: (o) => o.pending_review,
     });
   },
 });

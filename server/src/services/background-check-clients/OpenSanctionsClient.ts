@@ -1,7 +1,6 @@
 import { inject, injectable } from "inversify";
 import { isNonNullish } from "remeda";
 import { CONFIG, Config } from "../../config";
-import { FETCH_SERVICE, FetchService } from "../FetchService";
 import {
   EntityDetailsCompany,
   EntityDetailsPerson,
@@ -12,8 +11,9 @@ import {
   EntitySearchPerson,
   EntitySearchRequest,
   EntitySearchResponse,
-  IBackgroundCheckClient,
-} from "./BackgroundCheckClient";
+} from "../BackgroundCheckService";
+import { FETCH_SERVICE, FetchService } from "../FetchService";
+import { IBackgroundCheckClient } from "./BackgroundCheckClient";
 
 interface OpenSanctionsPersonSchema {
   id: string;

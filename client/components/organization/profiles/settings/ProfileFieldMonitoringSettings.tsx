@@ -25,8 +25,9 @@ import {
 } from "@parallel/components/common/SimpleSelect";
 import {
   CreateProfileTypeFieldInput,
-  ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragment,
-  ProfileFieldBackgroundCheckSettings_ProfileTypeFragment,
+  ProfileFieldMonitoringSettings_ProfileTypeFieldFragment,
+  ProfileFieldMonitoringSettings_ProfileTypeFragment,
+  ProfileTypeFieldType,
 } from "@parallel/graphql/__types";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { Maybe } from "@parallel/utils/types";
@@ -50,7 +51,7 @@ type FrequencyFixedOption =
   | "1_MONTHS"
   | "1_DAYS";
 
-export interface ProfileFieldBackgroundCheckSettings {
+export interface IProfileFieldMonitoringSettings {
   hasMonitoring?: boolean;
   monitoring?: Maybe<{
     activationCondition?: Maybe<{
@@ -139,11 +140,13 @@ const SUGGESTED_RISK_LEVEL = {
   },
 } as CreateProfileTypeFieldInput;
 
-export function ProfileFieldBackgroundCheckSettings({
+export function ProfileFieldMonitoringSettings({
+  profileFieldType,
   profileType,
   isDisabled,
 }: {
-  profileType: ProfileFieldBackgroundCheckSettings_ProfileTypeFragment;
+  profileFieldType: ProfileTypeFieldType;
+  profileType: ProfileFieldMonitoringSettings_ProfileTypeFragment;
   isDisabled?: boolean;
 }) {
   const intl = useIntl();
@@ -220,14 +223,14 @@ export function ProfileFieldBackgroundCheckSettings({
     (intl) => [
       {
         label: intl.formatMessage({
-          id: "component.profile-field-background-check-settings.fixed-search-frequency",
+          id: "component.profile-field-monitoring-settings.fixed-search-frequency",
           defaultMessage: "Fixed",
         }),
         value: "FIXED",
       },
       {
         label: intl.formatMessage({
-          id: "component.profile-field-background-check-settings.variable-search-frequency",
+          id: "component.profile-field-monitoring-settings.variable-search-frequency",
           defaultMessage: "Based on options",
         }),
         value: "VARIABLE",
@@ -292,13 +295,13 @@ export function ProfileFieldBackgroundCheckSettings({
         <Stack flex={1} spacing={1}>
           <FormLabel margin={0}>
             <FormattedMessage
-              id="component.profile-field-background-check-settings.monitoring-label"
+              id="component.profile-field-monitoring-settings.monitoring-label"
               defaultMessage="Ongoing Monitoring"
             />
           </FormLabel>
           <FormHelperText margin={0}>
             <FormattedMessage
-              id="component.profile-field-background-check-settings.monitoring-description"
+              id="component.profile-field-monitoring-settings.monitoring-description"
               defaultMessage="Monitor search results to detect relevant changes."
             />
           </FormHelperText>
@@ -317,12 +320,12 @@ export function ProfileFieldBackgroundCheckSettings({
               >
                 <HStack alignItems="center" spacing={0}>
                   <FormattedMessage
-                    id="component.profile-field-background-check-settings.activation-conditions-label"
+                    id="component.profile-field-monitoring-settings.activation-conditions-label"
                     defaultMessage="Add activation conditions"
                   />
                   <HelpPopover>
                     <FormattedMessage
-                      id="component.profile-field-background-check-settings.activation-conditions-help"
+                      id="component.profile-field-monitoring-settings.activation-conditions-help"
                       defaultMessage="Add conditionts to enable or disable monitoring based on replies in another property. For instance, depending on the type of relationship with the customer."
                     />
                   </HelpPopover>
@@ -334,7 +337,7 @@ export function ProfileFieldBackgroundCheckSettings({
                 <HStack>
                   <Text as="span" whiteSpace="nowrap">
                     <FormattedMessage
-                      id="component.profile-field-background-check-settings.activate-when"
+                      id="component.profile-field-monitoring-settings.activate-when"
                       defaultMessage="Activate when"
                     />
                   </Text>
@@ -372,7 +375,7 @@ export function ProfileFieldBackgroundCheckSettings({
                             hasBusinessRelationshipProperty
                               ? undefined
                               : intl.formatMessage({
-                                  id: "component.profile-field-background-check-settings.business-relationship",
+                                  id: "component.profile-field-monitoring-settings.business-relationship",
                                   defaultMessage: "Business relationship",
                                 })
                           }
@@ -389,7 +392,7 @@ export function ProfileFieldBackgroundCheckSettings({
                 <HStack>
                   <Text as="span" whiteSpace="nowrap">
                     <FormattedMessage
-                      id="component.profile-field-background-check-settings.is-one-of"
+                      id="component.profile-field-monitoring-settings.is-one-of"
                       defaultMessage="is one of"
                     />
                   </Text>
@@ -432,15 +435,22 @@ export function ProfileFieldBackgroundCheckSettings({
                 <Flex alignItems="center" marginBottom={2}>
                   <FormLabel fontWeight={400} margin={0}>
                     <FormattedMessage
-                      id="component.profile-field-background-check-settings.search-frequency-label"
+                      id="component.profile-field-monitoring-settings.search-frequency-label"
                       defaultMessage="Search frequency"
                     />
                   </FormLabel>
                   <HelpPopover>
-                    <FormattedMessage
-                      id="component.profile-field-background-check-settings.search-frequency-help"
-                      defaultMessage="Indicate how often you want each profile to be monitored. You can choose a fixed frequency or a variable frequency based on the option selected in another property. For instance, adjusting the frequency based on the client's risk."
-                    />
+                    {profileFieldType === "ADVERSE_MEDIA_SEARCH" ? (
+                      <FormattedMessage
+                        id="component.profile-field-monitoring-settings.search-frequency-help-adverse-media-search"
+                        defaultMessage="Indicate how often you want the news to be monitored. You can choose a fixed frequency or a variable frequency based on the option selected in another property. For instance, adjusting the frequency based on the client's risk."
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="component.profile-field-monitoring-settings.search-frequency-help"
+                        defaultMessage="Indicate how often you want each profile to be monitored. You can choose a fixed frequency or a variable frequency based on the option selected in another property. For instance, adjusting the frequency based on the client's risk."
+                      />
+                    )}
                   </HelpPopover>
                 </Flex>
                 <Controller
@@ -510,7 +520,7 @@ export function ProfileFieldBackgroundCheckSettings({
                           hasRiskProperty
                             ? undefined
                             : intl.formatMessage({
-                                id: "component.profile-field-background-check-settings.risk-level",
+                                id: "component.profile-field-monitoring-settings.risk-level",
                                 defaultMessage: "Risk level",
                               })
                         }
@@ -544,7 +554,7 @@ function SearchFrequencyOptions({
   searchFrequencyFixedOptions,
   isDisabled,
 }: {
-  searchFrequencyProfileField: ProfileFieldBackgroundCheckSettings_ProfileTypeFieldFragment;
+  searchFrequencyProfileField: ProfileFieldMonitoringSettings_ProfileTypeFieldFragment;
   searchFrequencyFixedOptions: SimpleOption<FrequencyFixedOption>[];
   isDisabled?: boolean;
 }) {
@@ -614,7 +624,7 @@ function SearchFrequencyOptions({
                     <SimpleSelect
                       options={searchFrequencyFixedOptions}
                       placeholder={intl.formatMessage({
-                        id: "component.profile-field-background-check-settings.select-frequency",
+                        id: "component.profile-field-monitoring-settings.select-frequency",
                         defaultMessage: "Choose a frequency",
                       })}
                       {...field}
@@ -630,10 +640,10 @@ function SearchFrequencyOptions({
   );
 }
 
-ProfileFieldBackgroundCheckSettings.fragments = {
+ProfileFieldMonitoringSettings.fragments = {
   get ProfileTypeField() {
     return gql`
-      fragment ProfileFieldBackgroundCheckSettings_ProfileTypeField on ProfileTypeField {
+      fragment ProfileFieldMonitoringSettings_ProfileTypeField on ProfileTypeField {
         id
         name
         type
@@ -646,11 +656,11 @@ ProfileFieldBackgroundCheckSettings.fragments = {
   },
   get ProfileType() {
     return gql`
-      fragment ProfileFieldBackgroundCheckSettings_ProfileType on ProfileType {
+      fragment ProfileFieldMonitoringSettings_ProfileType on ProfileType {
         id
         fields {
           id
-          ...ProfileFieldBackgroundCheckSettings_ProfileTypeField
+          ...ProfileFieldMonitoringSettings_ProfileTypeField
         }
       }
       ${this.ProfileTypeField}

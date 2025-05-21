@@ -1,13 +1,7 @@
 import { isNonNullish, isNullish } from "remeda";
-import {
-  PetitionField,
-  PetitionFieldReply,
-  PetitionFieldReplyStatus,
-  PetitionFieldType,
-} from "../db/__types";
-import { EntitySearchRequest } from "../services/background-check-clients/BackgroundCheckClient";
+import { PetitionFieldReply, PetitionFieldReplyStatus, PetitionFieldType } from "../db/__types";
+import { EntitySearchRequest } from "../services/BackgroundCheckService";
 import { applyFieldVisibility, PetitionFieldMath, PetitionFieldVisibility } from "./fieldLogic";
-import { toGlobalId } from "./globalId";
 
 interface FieldLogicPetitionFieldReplyInner {
   id: number;
@@ -39,31 +33,6 @@ interface FieldLogicPetitionInput {
   automaticNumberingConfig: { numberingType: "NUMBERS" | "LETTERS" | "ROMAN_NUMERALS" } | null;
   standardListDefinitions: { listName: string; values: { key: string }[] }[];
   fields: FieldLogicPetitionFieldInput[];
-}
-
-export function backgroundCheckFieldReplyUrl(
-  parallelUrl: string,
-  locale: string,
-  field: Pick<PetitionField, "id" | "petition_id">,
-  reply: Pick<PetitionFieldReply, "content">,
-) {
-  const token = Buffer.from(
-    JSON.stringify({
-      petitionId: toGlobalId("Petition", field.petition_id),
-      fieldId: toGlobalId("PetitionField", field.id),
-    }),
-  ).toString("base64");
-
-  return `${parallelUrl}/${locale}/app/background-check/${
-    reply.content.entity?.id ? reply.content.entity.id : "results"
-  }?${new URLSearchParams({
-    token,
-    ...(reply.content.query?.name ? { name: reply.content.query.name } : {}),
-    ...(reply.content.query?.date ? { date: reply.content.query.date } : {}),
-    ...(reply.content.query?.type ? { type: reply.content.query.type } : {}),
-    ...(reply.content.query?.country ? { country: reply.content.query.country } : {}),
-    readonly: "true",
-  })}`;
 }
 
 /**

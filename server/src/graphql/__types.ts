@@ -117,6 +117,13 @@ declare global {
 }
 
 export interface NexusGenInputs {
+  AdverseMediaSearchTermInput: {
+    // input type
+    entityId?: string | null; // String
+    label?: string | null; // String
+    term?: string | null; // String
+    wikiDataId?: string | null; // String
+  };
   ApprovalFlowConfigInput: {
     // input type
     name: string; // String!
@@ -455,13 +462,6 @@ export interface NexusGenInputs {
     size?: NexusGenEnums["DashboardModuleSize"] | null; // DashboardModuleSize
     title?: string | null; // String
   };
-  UpdatePetitionFieldAutoSearchConfigInput: {
-    // input type
-    country?: NexusGenScalars["GID"] | null; // GID
-    date?: NexusGenScalars["GID"] | null; // GID
-    name: NexusGenScalars["GID"][]; // [GID!]!
-    type?: NexusGenEnums["BackgroundCheckEntitySearchType"] | null; // BackgroundCheckEntitySearchType
-  };
   UpdatePetitionFieldGroupRelationshipInput: {
     // input type
     direction: NexusGenEnums["ProfileRelationshipDirection"]; // ProfileRelationshipDirection!
@@ -612,6 +612,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
+  AdverseMediaArticleRelevance: "DISMISSED" | "IRRELEVANT" | "RELEVANT";
   AiCompletionLogStatus: db.AiCompletionLogStatus;
   ApprovalFlowType: "ALL" | "ANY";
   ArchiveFieldGroupReplyIntoProfileConflictResolutionAction: "APPEND" | "IGNORE" | "OVERWRITE";
@@ -873,6 +874,45 @@ export interface NexusGenObjects {
   AccessDeactivatedEvent: petitionEvents.AccessDeactivatedEvent;
   AccessDelegatedEvent: petitionEvents.AccessDelegatedEvent;
   AccessOpenedEvent: petitionEvents.AccessOpenedEvent;
+  AdverseMediaArticle: {
+    // root type
+    author?: string | null; // String
+    body?: string | null; // String
+    classification?: NexusGenEnums["AdverseMediaArticleRelevance"] | null; // AdverseMediaArticleRelevance
+    classifiedAt?: NexusGenScalars["DateTime"] | null; // DateTime
+    header?: string | null; // String
+    id: string; // String!
+    images?: string[] | null; // [String!]
+    quotes?: string[] | null; // [String!]
+    source?: string | null; // String
+    summary?: string | null; // String
+    timestamp?: number | null; // Int
+    url?: string | null; // String
+  };
+  AdverseMediaArticleSearchResult: {
+    // root type
+    articles: NexusGenRootTypes["AdverseMediaArticleSearchResultArticles"]; // AdverseMediaArticleSearchResultArticles!
+    isDraft?: boolean | null; // Boolean
+    search: NexusGenRootTypes["AdverseMediaSearchTerm"][]; // [AdverseMediaSearchTerm!]!
+  };
+  AdverseMediaArticleSearchResultArticles: {
+    // root type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    items: NexusGenRootTypes["AdverseMediaArticle"][]; // [AdverseMediaArticle!]!
+    totalCount: number; // Int!
+  };
+  AdverseMediaEntitySuggestItem: {
+    // root type
+    id: string; // String!
+    name: string; // String!
+  };
+  AdverseMediaSearchTerm: {
+    // root type
+    entityId?: string | null; // String
+    label?: string | null; // String
+    term?: string | null; // String
+    wikiDataId?: string | null; // String
+  };
   AiCompletionLog: db.AiCompletionLog;
   ApprovalFlowConfig: {
     name: string;
@@ -1981,6 +2021,45 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
+  AdverseMediaArticle: {
+    // field return type
+    author: string | null; // String
+    body: string | null; // String
+    classification: NexusGenEnums["AdverseMediaArticleRelevance"] | null; // AdverseMediaArticleRelevance
+    classifiedAt: NexusGenScalars["DateTime"] | null; // DateTime
+    header: string | null; // String
+    id: string; // String!
+    images: string[] | null; // [String!]
+    quotes: string[] | null; // [String!]
+    source: string | null; // String
+    summary: string | null; // String
+    timestamp: number | null; // Int
+    url: string | null; // String
+  };
+  AdverseMediaArticleSearchResult: {
+    // field return type
+    articles: NexusGenRootTypes["AdverseMediaArticleSearchResultArticles"]; // AdverseMediaArticleSearchResultArticles!
+    isDraft: boolean | null; // Boolean
+    search: NexusGenRootTypes["AdverseMediaSearchTerm"][]; // [AdverseMediaSearchTerm!]!
+  };
+  AdverseMediaArticleSearchResultArticles: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    items: NexusGenRootTypes["AdverseMediaArticle"][]; // [AdverseMediaArticle!]!
+    totalCount: number; // Int!
+  };
+  AdverseMediaEntitySuggestItem: {
+    // field return type
+    id: string; // String!
+    name: string; // String!
+  };
+  AdverseMediaSearchTerm: {
+    // field return type
+    entityId: string | null; // String
+    label: string | null; // String
+    term: string | null; // String
+    wikiDataId: string | null; // String
+  };
   AiCompletionLog: {
     // field return type
     completion: string | null; // String
@@ -2640,6 +2719,7 @@ export interface NexusGenFieldTypes {
     changeOrganization: NexusGenEnums["Result"]; // Result!
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
     changePetitionFieldType: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    classifyAdverseMediaArticle: NexusGenRootTypes["AdverseMediaArticle"]; // AdverseMediaArticle!
     cloneDashboard: NexusGenRootTypes["Dashboard"]; // Dashboard!
     clonePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     clonePetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
@@ -2652,6 +2732,7 @@ export interface NexusGenFieldTypes {
     completeProfileFromExternalSource: NexusGenRootTypes["Profile"]; // Profile!
     copyBackgroundCheckReplyToProfileFieldValue: NexusGenRootTypes["ProfileFieldValue"]; // ProfileFieldValue!
     copyFileReplyToProfileFieldFile: NexusGenRootTypes["ProfileFieldFile"][]; // [ProfileFieldFile!]!
+    copyReplyContentToProfileFieldValue: NexusGenRootTypes["ProfileFieldValue"]; // ProfileFieldValue!
     createAddPetitionPermissionMaybeTask: NexusGenRootTypes["MaybeTask"]; // MaybeTask!
     createAnthropicCompletionIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createAzureOpenAiIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -2820,6 +2901,7 @@ export interface NexusGenFieldTypes {
     restoreLogin: NexusGenEnums["Result"]; // Result!
     retryAsyncFieldCompletion: NexusGenRootTypes["AsyncFieldCompletionResponse"]; // AsyncFieldCompletionResponse!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
+    saveAdverseMediaChanges: NexusGenRootTypes["AdverseMediaArticleSearchResult"]; // AdverseMediaArticleSearchResult!
     scheduleProfileForDeletion: NexusGenRootTypes["Profile"][]; // [Profile!]!
     sendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
     sendPetitionApprovalRequestStepReminder: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
@@ -2871,7 +2953,6 @@ export interface NexusGenFieldTypes {
     updatePetitionComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     updatePetitionEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     updatePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    updatePetitionFieldAutoSearchConfig: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldGroupRelationships: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionFieldReplies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -2887,6 +2968,7 @@ export interface NexusGenFieldTypes {
     updatePetitionsRatioDashboardModule: NexusGenRootTypes["DashboardModule"]; // DashboardModule!
     updateProfileEventSubscription: NexusGenRootTypes["ProfileEventSubscription"]; // ProfileEventSubscription!
     updateProfileFieldValue: NexusGenRootTypes["Profile"]; // Profile!
+    updateProfileFieldValueMonitoringStatus: NexusGenRootTypes["Profile"]; // Profile!
     updateProfileListView: NexusGenRootTypes["ProfileListView"]; // ProfileListView!
     updateProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     updateProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
@@ -3981,6 +4063,9 @@ export interface NexusGenFieldTypes {
     expiresAt: NexusGenScalars["DateTime"] | null; // DateTime
     expiryDate: string | null; // String
     field: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
+    hasActiveMonitoring: boolean; // Boolean!
+    hasDraft: boolean; // Boolean!
+    hasPendingReview: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"]; // Profile!
     removedAt: NexusGenScalars["DateTime"] | null; // DateTime
@@ -4379,6 +4464,10 @@ export interface NexusGenFieldTypes {
     // field return type
     access: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     accesses: NexusGenRootTypes["PublicPetitionAccessPagination"]; // PublicPetitionAccessPagination!
+    adverseMediaAlternativeSearchSuggestions: NexusGenRootTypes["AdverseMediaSearchTerm"][]; // [AdverseMediaSearchTerm!]!
+    adverseMediaArticleDetails: NexusGenRootTypes["AdverseMediaArticle"]; // AdverseMediaArticle!
+    adverseMediaArticleSearch: NexusGenRootTypes["AdverseMediaArticleSearchResult"] | null; // AdverseMediaArticleSearchResult
+    adverseMediaEntitySuggest: NexusGenRootTypes["AdverseMediaEntitySuggestItem"][]; // [AdverseMediaEntitySuggestItem!]!
     backgroundCheckEntityDetails: NexusGenRootTypes["BackgroundCheckEntityDetails"]; // BackgroundCheckEntityDetails!
     backgroundCheckEntitySearch: NexusGenRootTypes["BackgroundCheckEntitySearch"]; // BackgroundCheckEntitySearch!
     conflictCheckProfileSearch: NexusGenRootTypes["Profile"][]; // [Profile!]!
@@ -5098,6 +5187,45 @@ export interface NexusGenFieldTypeNames {
     petition: "PetitionBaseMini";
     type: "PetitionEventType";
   };
+  AdverseMediaArticle: {
+    // field return type name
+    author: "String";
+    body: "String";
+    classification: "AdverseMediaArticleRelevance";
+    classifiedAt: "DateTime";
+    header: "String";
+    id: "String";
+    images: "String";
+    quotes: "String";
+    source: "String";
+    summary: "String";
+    timestamp: "Int";
+    url: "String";
+  };
+  AdverseMediaArticleSearchResult: {
+    // field return type name
+    articles: "AdverseMediaArticleSearchResultArticles";
+    isDraft: "Boolean";
+    search: "AdverseMediaSearchTerm";
+  };
+  AdverseMediaArticleSearchResultArticles: {
+    // field return type name
+    createdAt: "DateTime";
+    items: "AdverseMediaArticle";
+    totalCount: "Int";
+  };
+  AdverseMediaEntitySuggestItem: {
+    // field return type name
+    id: "String";
+    name: "String";
+  };
+  AdverseMediaSearchTerm: {
+    // field return type name
+    entityId: "String";
+    label: "String";
+    term: "String";
+    wikiDataId: "String";
+  };
   AiCompletionLog: {
     // field return type name
     completion: "String";
@@ -5755,6 +5883,7 @@ export interface NexusGenFieldTypeNames {
     changeOrganization: "Result";
     changePassword: "ChangePasswordResult";
     changePetitionFieldType: "PetitionField";
+    classifyAdverseMediaArticle: "AdverseMediaArticle";
     cloneDashboard: "Dashboard";
     clonePetitionField: "PetitionField";
     clonePetitions: "PetitionBase";
@@ -5767,6 +5896,7 @@ export interface NexusGenFieldTypeNames {
     completeProfileFromExternalSource: "Profile";
     copyBackgroundCheckReplyToProfileFieldValue: "ProfileFieldValue";
     copyFileReplyToProfileFieldFile: "ProfileFieldFile";
+    copyReplyContentToProfileFieldValue: "ProfileFieldValue";
     createAddPetitionPermissionMaybeTask: "MaybeTask";
     createAnthropicCompletionIntegration: "SupportMethodResponse";
     createAzureOpenAiIntegration: "SupportMethodResponse";
@@ -5935,6 +6065,7 @@ export interface NexusGenFieldTypeNames {
     restoreLogin: "Result";
     retryAsyncFieldCompletion: "AsyncFieldCompletionResponse";
     revokeUserAuthToken: "Result";
+    saveAdverseMediaChanges: "AdverseMediaArticleSearchResult";
     scheduleProfileForDeletion: "Profile";
     sendPetition: "SendPetitionResult";
     sendPetitionApprovalRequestStepReminder: "PetitionApprovalRequestStep";
@@ -5986,7 +6117,6 @@ export interface NexusGenFieldTypeNames {
     updatePetitionComment: "PetitionFieldComment";
     updatePetitionEventSubscription: "PetitionEventSubscription";
     updatePetitionField: "PetitionField";
-    updatePetitionFieldAutoSearchConfig: "PetitionField";
     updatePetitionFieldGroupRelationships: "PetitionBase";
     updatePetitionFieldReplies: "PetitionFieldReply";
     updatePetitionFieldRepliesStatus: "PetitionField";
@@ -6002,6 +6132,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionsRatioDashboardModule: "DashboardModule";
     updateProfileEventSubscription: "ProfileEventSubscription";
     updateProfileFieldValue: "Profile";
+    updateProfileFieldValueMonitoringStatus: "Profile";
     updateProfileListView: "ProfileListView";
     updateProfileType: "ProfileType";
     updateProfileTypeField: "ProfileTypeField";
@@ -7096,6 +7227,9 @@ export interface NexusGenFieldTypeNames {
     expiresAt: "DateTime";
     expiryDate: "String";
     field: "ProfileTypeField";
+    hasActiveMonitoring: "Boolean";
+    hasDraft: "Boolean";
+    hasPendingReview: "Boolean";
     id: "GID";
     profile: "Profile";
     removedAt: "DateTime";
@@ -7494,6 +7628,10 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     access: "PublicPetitionAccess";
     accesses: "PublicPetitionAccessPagination";
+    adverseMediaAlternativeSearchSuggestions: "AdverseMediaSearchTerm";
+    adverseMediaArticleDetails: "AdverseMediaArticle";
+    adverseMediaArticleSearch: "AdverseMediaArticleSearchResult";
+    adverseMediaEntitySuggest: "AdverseMediaEntitySuggestItem";
     backgroundCheckEntityDetails: "BackgroundCheckEntityDetails";
     backgroundCheckEntitySearch: "BackgroundCheckEntitySearch";
     conflictCheckProfileSearch: "Profile";
@@ -8265,6 +8403,12 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     };
+    classifyAdverseMediaArticle: {
+      // args
+      classification?: NexusGenEnums["AdverseMediaArticleRelevance"] | null; // AdverseMediaArticleRelevance
+      id: string; // String!
+      token: string; // String!
+    };
     cloneDashboard: {
       // args
       id: NexusGenScalars["GID"]; // GID!
@@ -8332,6 +8476,14 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       profileId: NexusGenScalars["GID"]; // GID!
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+    };
+    copyReplyContentToProfileFieldValue: {
+      // args
+      expiryDate?: NexusGenScalars["Date"] | null; // Date
+      petitionId: NexusGenScalars["GID"]; // GID!
+      profileId: NexusGenScalars["GID"]; // GID!
+      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+      replyId: NexusGenScalars["GID"]; // GID!
     };
     createAddPetitionPermissionMaybeTask: {
       // args
@@ -9304,6 +9456,10 @@ export interface NexusGenArgTypes {
       // args
       authTokenIds: NexusGenScalars["GID"][]; // [GID!]!
     };
+    saveAdverseMediaChanges: {
+      // args
+      token: string; // String!
+    };
     scheduleProfileForDeletion: {
       // args
       profileIds: NexusGenScalars["GID"][]; // [GID!]!
@@ -9611,12 +9767,6 @@ export interface NexusGenArgTypes {
       force?: boolean | null; // Boolean
       petitionId: NexusGenScalars["GID"]; // GID!
     };
-    updatePetitionFieldAutoSearchConfig: {
-      // args
-      config?: NexusGenInputs["UpdatePetitionFieldAutoSearchConfigInput"] | null; // UpdatePetitionFieldAutoSearchConfigInput
-      fieldId: NexusGenScalars["GID"]; // GID!
-      petitionId: NexusGenScalars["GID"]; // GID!
-    };
     updatePetitionFieldGroupRelationships: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
@@ -9709,6 +9859,12 @@ export interface NexusGenArgTypes {
       // args
       fields: NexusGenInputs["UpdateProfileFieldValueInput"][]; // [UpdateProfileFieldValueInput!]!
       profileId: NexusGenScalars["GID"]; // GID!
+    };
+    updateProfileFieldValueMonitoringStatus: {
+      // args
+      enabled: boolean; // Boolean!
+      profileId: NexusGenScalars["GID"]; // GID!
+      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
     };
     updateProfileListView: {
       // args
@@ -9985,6 +10141,26 @@ export interface NexusGenArgTypes {
       offset?: number | null; // Int
       search?: string | null; // String
       status?: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
+    };
+    adverseMediaAlternativeSearchSuggestions: {
+      // args
+      search: string; // String!
+      token: string; // String!
+    };
+    adverseMediaArticleDetails: {
+      // args
+      id: string; // String!
+      search?: NexusGenInputs["AdverseMediaSearchTermInput"][] | null; // [AdverseMediaSearchTermInput!]
+      token: string; // String!
+    };
+    adverseMediaArticleSearch: {
+      // args
+      search?: NexusGenInputs["AdverseMediaSearchTermInput"][] | null; // [AdverseMediaSearchTermInput!]
+      token: string; // String!
+    };
+    adverseMediaEntitySuggest: {
+      // args
+      searchTerm: string; // String!
     };
     backgroundCheckEntityDetails: {
       // args

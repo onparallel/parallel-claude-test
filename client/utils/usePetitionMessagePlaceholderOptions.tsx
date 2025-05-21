@@ -1,11 +1,25 @@
 import { gql } from "@apollo/client";
-import { usePetitionMessagePlaceholderOptions_PetitionBaseFragment } from "@parallel/graphql/__types";
+import {
+  PetitionFieldType,
+  usePetitionMessagePlaceholderOptions_PetitionBaseFragment,
+} from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { useAllFieldsWithIndices } from "./fieldIndices";
-import { isFileTypeField } from "./isFileTypeField";
 import { PlaceholderOption, createPlaceholderPlugin } from "./slate/PlaceholderPlugin";
+
+const ACCEPTED_FIELD_TYPES = [
+  "NUMBER",
+  "CHECKBOX",
+  "SELECT",
+  "PHONE",
+  "DATE",
+  "DATE_TIME",
+  "DYNAMIC_SELECT",
+  "TEXT",
+  "SHORT_TEXT",
+] as PetitionFieldType[];
 
 export function usePetitionMessagePlaceholderOptions({
   petition,
@@ -87,10 +101,7 @@ export function usePetitionMessagePlaceholderOptions({
         .filter(
           ([field]) =>
             field.isInternal &&
-            !field.isReadOnly &&
-            !isFileTypeField(field.type) &&
-            field.type !== "FIELD_GROUP" &&
-            field.type !== "BACKGROUND_CHECK" && // don't include BACKGROUND_CHECK, FIELD_GROUP
+            ACCEPTED_FIELD_TYPES.includes(field.type) &&
             (isNonNullish(field.parent) ? !field.parent.multiple : true),
         )
         .map(([field, fieldIndex]) => ({

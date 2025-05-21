@@ -85,6 +85,7 @@ import { Tooltip } from "@parallel/chakra/components";
 import { ChevronFilledIcon } from "@parallel/chakra/icons";
 import { Assert, UnwrapArray } from "@parallel/utils/types";
 import { useConstant } from "@parallel/utils/useConstant";
+import { useHasAdverseMediaSearch } from "@parallel/utils/useHasAdverseMediaSearch";
 import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
 import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
@@ -768,9 +769,11 @@ const _PetitionComposeFieldInner = chakraForwardRef<
   const previousVisibility = usePrevious(field.visibility);
   const hasBackgroundCheck = useHasBackgroundCheck();
   const hasIdVerification = useHasIdVerification();
+  const hasAdverseMediaSearch = useHasAdverseMediaSearch();
   const showRestrictedPetitionFieldAlert =
     (field.type === "BACKGROUND_CHECK" && !hasBackgroundCheck) ||
-    (field.type === "ID_VERIFICATION" && !hasIdVerification);
+    (field.type === "ID_VERIFICATION" && !hasIdVerification) ||
+    (field.type === "ADVERSE_MEDIA_SEARCH" && !hasAdverseMediaSearch);
 
   return (
     <Stack spacing={1} ref={elementRef} {...props}>

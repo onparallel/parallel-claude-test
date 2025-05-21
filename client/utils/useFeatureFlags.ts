@@ -215,6 +215,18 @@ export function useFeatureFlags() {
               defaultMessage: "Enables the AI document processing feature on file fields.",
             }),
           },
+          {
+            name: "ADVERSE_MEDIA_SEARCH",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.adverse-media-search-name",
+              defaultMessage: "Adverse media search",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.adverse-media-search-description",
+              defaultMessage:
+                "Enables the Adverse media search petition field on the organization.",
+            }),
+          },
         ],
       },
       {

@@ -50,6 +50,7 @@ import { BackgroundCheckRiskLabel } from "../petition-common/BackgroundCheckRisk
 import { DowJonesRiskLabel } from "../petition-common/DowJonesRiskLabel";
 import { EsTaxDocumentsContentErrorMessage } from "../petition-common/EsTaxDocumentsContentErrorMessage";
 import { CopyOrDownloadReplyButton } from "./CopyOrDownloadReplyButton";
+import { PetitionRepliesFieldAdverseMediaSearch } from "./field-replies/PetitionRepliesFieldAdverseMediaSearch";
 import { PetitionRepliesFieldFilePassword } from "./field-replies/PetitionRepliesFieldFilePassword";
 import { PetitionRepliesFieldFileSchema } from "./field-replies/PetitionRepliesFieldFileSchema";
 import { PetitionRepliesFieldFileUploadPayslipReply } from "./field-replies/PetitionRepliesFieldFileUploadPayslipReply";
@@ -67,7 +68,8 @@ export type PetitionRepliesFieldAction =
   | "DOWNLOAD_FILE"
   | "PREVIEW_FILE"
   | "VIEW_DETAILS"
-  | "VIEW_RESULTS";
+  | "VIEW_RESULTS"
+  | "VIEW_ARTICLES";
 
 export function PetitionRepliesFieldReply({
   petition,
@@ -144,14 +146,13 @@ export function PetitionRepliesFieldReply({
   );
 
   const handleAction = async (action: PetitionRepliesFieldAction) => {
+    const petitionStatus = petition.__typename === "Petition" && petition.status;
+    const isReadOnly = isDisabled || reply.status === "APPROVED" || petitionStatus === "CLOSED";
+
     if (action === "VIEW_DETAILS" || action === "VIEW_RESULTS") {
       const { name, date, type, country } = reply.content?.query ?? {};
 
       let url = `/${intl.locale}/app/background-check/`;
-
-      const petitionStatus = petition.__typename === "Petition" && petition.status;
-
-      const isReadOnly = isDisabled || reply.status === "APPROVED" || petitionStatus === "CLOSED";
 
       if (action === "VIEW_RESULTS") {
         url += `/results`;
@@ -164,6 +165,17 @@ export function PetitionRepliesFieldReply({
         ...(date ? { date } : {}),
         ...(type ? { type } : {}),
         ...(country ? { country } : {}),
+        ...(isReadOnly ? { readonly: "true" } : {}),
+      });
+      try {
+        browserTabRef.current = await openNewWindow(`${url}?${urlParams.toString()}`);
+      } catch {}
+    } else if (action === "VIEW_ARTICLES") {
+      const url = `/${intl.locale}/app/adverse-media`;
+
+      const urlParams = new URLSearchParams({
+        token: tokenBase64,
+        defaultTabIndex: "1",
         ...(isReadOnly ? { readonly: "true" } : {}),
       });
       try {
@@ -435,6 +447,8 @@ export function PetitionRepliesFieldReply({
                       )
                     )}
                   </Stack>
+                ) : type === "ADVERSE_MEDIA_SEARCH" ? (
+                  <PetitionRepliesFieldAdverseMediaSearch reply={reply} />
                 ) : isFileTypeField(type) ? (
                   <Stack flex="1">
                     <Flex flexWrap="wrap" gap={1.5} alignItems="center" minHeight={6}>

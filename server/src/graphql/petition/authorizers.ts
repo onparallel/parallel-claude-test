@@ -271,6 +271,25 @@ export function fieldTypeSwitch<
   };
 }
 
+export function replyTypeSwitch<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>,
+>(
+  argReplyId: TArg,
+  map: Partial<Record<PetitionFieldType, FieldAuthorizeResolver<TypeName, FieldName>>>,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (root, args, ctx, info) => {
+    const replyId = getArg(args, argReplyId);
+    const reply = (await ctx.petitions.loadFieldReply(replyId))!;
+    const resolver = map[reply.type];
+    if (!resolver) {
+      return true;
+    }
+
+    return await resolver(root, args, ctx, info);
+  };
+}
 export function replyIsForFieldOfType<
   TypeName extends string,
   FieldName extends string,

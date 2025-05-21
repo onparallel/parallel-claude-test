@@ -95,6 +95,11 @@ export function getPetitionFieldTypeDescription(intl: IntlShape, type: PetitionF
         defaultMessage:
           "Search for matches in selected profile fields to detect potential conflicts or risks that require review.",
       });
+    case "ADVERSE_MEDIA_SEARCH":
+      return intl.formatMessage({
+        id: "util.get-petition-field-type-description.adverse-media-search-description",
+        defaultMessage: "Integrate an internal search field for adverse media.",
+      });
     default:
       throw new Error(`Missing description PetitionFieldType  "${type}"`);
   }

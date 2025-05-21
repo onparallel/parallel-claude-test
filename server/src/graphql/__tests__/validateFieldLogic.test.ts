@@ -6,6 +6,7 @@ import { ApiContext } from "../../context";
 import { Organization, Petition, PetitionField, PetitionFieldType, User } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
+import { PETITION_FIELD_SERVICE, PetitionFieldService } from "../../services/PetitionFieldService";
 import { deleteAllData } from "../../util/knexUtils";
 import { validateFieldLogic } from "../helpers/validators/validFieldLogic";
 
@@ -29,11 +30,15 @@ describe("validateFieldLogic", () => {
 
   let allFields: PetitionField[];
 
+  let petitionFields: PetitionFieldService;
+
   beforeAll(async () => {
     container = await createTestContainer();
     ctx = container.get<ApiContext>(ApiContext);
     knex = container.get(KNEX);
     mocks = new Mocks(knex);
+
+    petitionFields = container.get<PetitionFieldService>(PETITION_FIELD_SERVICE);
 
     ({ user, organization } = await mocks.createSessionUserAndOrganization());
 
@@ -86,7 +91,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).resolves.not.toThrow();
       });
@@ -110,7 +121,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).resolves.not.toThrow();
       });
@@ -134,7 +151,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).resolves.not.toThrow();
       });
@@ -158,7 +181,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).resolves.not.toThrow();
       });
@@ -194,7 +223,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).resolves.not.toThrow();
       });
@@ -211,7 +246,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow();
       });
@@ -235,7 +276,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).resolves.not.toThrow();
       });
@@ -259,7 +306,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow();
       });
@@ -283,7 +336,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow("Conditions can't reference HEADING fields");
       });
@@ -307,7 +366,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow("Invalid value type string for modifier NUMBER_OF_REPLIES");
       });
@@ -331,7 +396,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow("Invalid value type number for field of type TEXT");
       });
@@ -355,7 +426,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow("Invalid operator START_WITH for modifier NUMBER_OF_REPLIES");
       });
@@ -379,7 +456,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow("Invalid operator LESS_THAN for field of type TEXT");
       });
@@ -403,7 +486,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow("Invalid operator START_WITH for field of type SELECT");
       });
@@ -427,7 +516,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow(
           "Invalid value Unknown option for field of type SELECT. Should be one of: Option 1, Option 2, Option 3",
@@ -453,9 +548,17 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
-        ).rejects.toThrow("Invalid modifier NONE for field of type FILE_UPLOAD");
+        ).rejects.toThrow(
+          "Assertion Error: FILE_UPLOAD can only be referenced with NUMBER_OF_REPLIES modifier",
+        );
       });
 
       it("fieldId value for conditions should be a PetitionField GID", async () => {
@@ -477,7 +580,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow();
       });
@@ -501,7 +610,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow(`Can't find PetitionField:1101010 referenced in condition 0`);
       });
@@ -531,7 +646,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow(`Can't find PetitionField:${deletedField.id} referenced in condition 1`);
       });
@@ -567,7 +688,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow(
           `Can't find PetitionField:${fieldOnAnotherPetition.id} referenced in condition 2`,
@@ -593,7 +720,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow("Can't add a reference to field itself");
       });
@@ -617,7 +750,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow("Can't reference fields that come next");
       });
@@ -639,7 +778,13 @@ describe("validateFieldLogic", () => {
               },
             },
             allFields,
-            { variables: [], customLists: [], standardListDefinitions: [] },
+            {
+              variables: [],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
           ),
         ).rejects.toThrow();
       });
@@ -666,6 +811,8 @@ describe("validateFieldLogic", () => {
               variables: [{ name: "PETITION_VARIABLE", default_value: 0 }],
               customLists: [],
               standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
           ),
         ).resolves.not.toThrow();
@@ -693,6 +840,8 @@ describe("validateFieldLogic", () => {
               variables: [{ name: "PETITION_VARIABLE", default_value: 0 }],
               customLists: [],
               standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
           ),
         ).rejects.toThrow("Invalid value type string for variable condition 0");
@@ -731,6 +880,8 @@ describe("validateFieldLogic", () => {
                 variables: [{ name: "PETITION_VARIABLE", default_value: 0 }],
                 customLists: [],
                 standardListDefinitions: [],
+                loadSelectOptionsValuesAndLabels: (options) =>
+                  petitionFields.loadSelectOptionsValuesAndLabels(options),
               },
             ),
           ).rejects.toThrow(`Invalid operator ${operator} for variable condition 0`);
@@ -759,6 +910,8 @@ describe("validateFieldLogic", () => {
               variables: [],
               customLists: [],
               standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
           ),
         ).rejects.toThrow(`Can't find variable PETITION_VARIABLE referenced in condition 0`);
@@ -827,6 +980,8 @@ describe("validateFieldLogic", () => {
               variables: [],
               customLists: [],
               standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
           ),
         ).resolves.not.toThrow();
@@ -855,6 +1010,8 @@ describe("validateFieldLogic", () => {
               variables: [],
               customLists: [],
               standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
           ),
         ).resolves.not.toThrow();
@@ -883,6 +1040,8 @@ describe("validateFieldLogic", () => {
               variables: [],
               customLists: [],
               standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
           ),
         ).resolves.not.toThrow();
@@ -911,6 +1070,8 @@ describe("validateFieldLogic", () => {
               variables: [],
               customLists: [],
               standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
           ),
         ).rejects.toThrow("Can't reference fields that come next");
@@ -939,6 +1100,8 @@ describe("validateFieldLogic", () => {
               variables: [],
               customLists: [],
               standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
           ),
         ).resolves.not.toThrow();
@@ -967,6 +1130,8 @@ describe("validateFieldLogic", () => {
               variables: [],
               customLists: [],
               standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
           ),
         ).rejects.toThrow("Can't reference fields that come next");
@@ -995,6 +1160,8 @@ describe("validateFieldLogic", () => {
               variables: [],
               customLists: [],
               standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
           ),
         ).resolves.not.toThrow();
@@ -1023,6 +1190,8 @@ describe("validateFieldLogic", () => {
               variables: [],
               customLists: [],
               standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
           ),
         ).rejects.toThrow("Can't reference fields that come next");
@@ -1051,6 +1220,8 @@ describe("validateFieldLogic", () => {
               variables: [],
               customLists: [],
               standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
           ),
         ).resolves.not.toThrow();
@@ -1093,6 +1264,8 @@ describe("validateFieldLogic", () => {
             variables: [{ name: "score", default_value: 0 }],
             customLists: [],
             standardListDefinitions: [],
+            loadSelectOptionsValuesAndLabels: (options) =>
+              petitionFields.loadSelectOptionsValuesAndLabels(options),
           },
         ),
       ).resolves.not.toThrow();
@@ -1132,6 +1305,8 @@ describe("validateFieldLogic", () => {
             variables: [{ name: "score", default_value: 0 }],
             customLists: [],
             standardListDefinitions: [],
+            loadSelectOptionsValuesAndLabels: (options) =>
+              petitionFields.loadSelectOptionsValuesAndLabels(options),
           },
         ),
       ).resolves.not.toThrow();
@@ -1174,6 +1349,8 @@ describe("validateFieldLogic", () => {
             ],
             customLists: [],
             standardListDefinitions: [],
+            loadSelectOptionsValuesAndLabels: (options) =>
+              petitionFields.loadSelectOptionsValuesAndLabels(options),
           },
         ),
       ).resolves.not.toThrow();
@@ -1213,6 +1390,8 @@ describe("validateFieldLogic", () => {
             variables: [{ name: "score", default_value: 0 }],
             customLists: [],
             standardListDefinitions: [],
+            loadSelectOptionsValuesAndLabels: (options) =>
+              petitionFields.loadSelectOptionsValuesAndLabels(options),
           },
         ),
       ).rejects.toThrow();
@@ -1252,6 +1431,8 @@ describe("validateFieldLogic", () => {
             variables: [{ name: "score", default_value: 0 }],
             customLists: [],
             standardListDefinitions: [],
+            loadSelectOptionsValuesAndLabels: (options) =>
+              petitionFields.loadSelectOptionsValuesAndLabels(options),
           },
         ),
       ).rejects.toThrow();
@@ -1294,6 +1475,8 @@ describe("validateFieldLogic", () => {
             ],
             customLists: [],
             standardListDefinitions: [],
+            loadSelectOptionsValuesAndLabels: (options) =>
+              petitionFields.loadSelectOptionsValuesAndLabels(options),
           },
         ),
       ).rejects.toThrow();
@@ -1336,6 +1519,8 @@ describe("validateFieldLogic", () => {
             ],
             customLists: [],
             standardListDefinitions: [],
+            loadSelectOptionsValuesAndLabels: (options) =>
+              petitionFields.loadSelectOptionsValuesAndLabels(options),
           },
         ),
       ).rejects.toThrow();
@@ -1382,6 +1567,8 @@ describe("validateFieldLogic", () => {
               ],
               customLists: [],
               standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
           ),
         ).rejects.toThrow();
@@ -1429,6 +1616,8 @@ describe("validateFieldLogic", () => {
               ],
               customLists: [],
               standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
           ),
         ).rejects.toThrow();
@@ -1476,6 +1665,8 @@ describe("validateFieldLogic", () => {
               ],
               customLists: [],
               standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
           ),
         ).rejects.toThrow();
@@ -1516,6 +1707,8 @@ describe("validateFieldLogic", () => {
             variables: [{ name: "score", default_value: 0 }],
             customLists: [],
             standardListDefinitions: [],
+            loadSelectOptionsValuesAndLabels: (options) =>
+              petitionFields.loadSelectOptionsValuesAndLabels(options),
           },
         ),
       ).resolves.not.toThrow();
@@ -1580,6 +1773,8 @@ describe("validateFieldLogic", () => {
             ],
             customLists: [],
             standardListDefinitions: [],
+            loadSelectOptionsValuesAndLabels: (options) =>
+              petitionFields.loadSelectOptionsValuesAndLabels(options),
           },
         ),
       ).resolves.not.toThrow();

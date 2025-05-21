@@ -38,7 +38,7 @@ import {
   useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { getReferencedInBackgroundCheck } from "@parallel/utils/getFieldsReferencedInBackgroundCheck";
+import { getFieldsReferencedInMonitoring } from "@parallel/utils/getFieldsReferencedInMonitoring";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useSetFocusRef } from "@parallel/utils/react-form-hook/useSetFocusRef";
 import { assertType } from "@parallel/utils/types";
@@ -48,6 +48,7 @@ import {
   expirationToDuration,
   useExpirationOptions,
 } from "@parallel/utils/useExpirationOptions";
+import { useHasAdverseMediaSearch } from "@parallel/utils/useHasAdverseMediaSearch";
 import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
 import { REFERENCE_REGEX } from "@parallel/utils/validation";
 import { nanoid } from "nanoid";
@@ -56,7 +57,10 @@ import { Controller, FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { isNonNullish, omit, pick } from "remeda";
 import { ProfileTypeFieldTypeSelect } from "../ProfileTypeFieldTypeSelect";
-import { ProfileFieldBackgroundCheckSettings } from "../settings/ProfileFieldBackgroundCheckSettings";
+import {
+  IProfileFieldMonitoringSettings,
+  ProfileFieldMonitoringSettings,
+} from "../settings/ProfileFieldMonitoringSettings";
 import {
   ProfileFieldSelectSettings,
   SelectOptionValue,
@@ -92,7 +96,7 @@ export interface CreateOrUpdateProfileTypeFieldDialogData {
     }[];
     showOptionsWithColors?: boolean;
     standardList?: string | null;
-  } & ProfileFieldBackgroundCheckSettings;
+  } & IProfileFieldMonitoringSettings;
 }
 
 function defaultOptions(
@@ -137,6 +141,14 @@ function defaultOptions(
         searchFrequency: { type: "FIXED", frequency: "3_YEARS" },
       },
     };
+  } else if (type === "ADVERSE_MEDIA_SEARCH") {
+    assertType<ProfileTypeFieldOptions<"ADVERSE_MEDIA_SEARCH">>(options);
+    return {
+      hasMonitoring: isNonNullish(options.monitoring),
+      monitoring: options.monitoring ?? {
+        searchFrequency: { type: "FIXED", frequency: "3_YEARS" },
+      },
+    };
   } else {
     return options;
   }
@@ -155,11 +167,12 @@ function CreateOrUpdateProfileTypeFieldDialog({
 
   const isUpdating = isNonNullish(profileTypeField) && "id" in profileTypeField;
   const hasBackgroundCheck = useHasBackgroundCheck();
+  const hasAdverseMediaSearch = useHasAdverseMediaSearch();
   const isStandard = isUpdating ? profileTypeField!.isStandard : false;
 
   const referencedIn =
     isUpdating && profileTypeField.type === "SELECT"
-      ? getReferencedInBackgroundCheck({
+      ? getFieldsReferencedInMonitoring({
           profileTypeFields: profileType.fields,
           profileTypeFieldId: profileTypeField.id,
         })
@@ -400,7 +413,8 @@ function CreateOrUpdateProfileTypeFieldDialog({
                           options:
                             formData.type === "DATE"
                               ? pick(formData.options, ["useReplyAsExpiryDate"])
-                              : formData.type === "BACKGROUND_CHECK"
+                              : formData.type === "BACKGROUND_CHECK" ||
+                                  formData.type === "ADVERSE_MEDIA_SEARCH"
                                 ? formData.options.hasMonitoring
                                   ? pick(formData.options, ["monitoring"])
                                   : { monitoring: null }
@@ -429,7 +443,8 @@ function CreateOrUpdateProfileTypeFieldDialog({
                               options:
                                 formData.type === "DATE"
                                   ? pick(formData.options, ["useReplyAsExpiryDate"])
-                                  : formData.type === "BACKGROUND_CHECK"
+                                  : formData.type === "BACKGROUND_CHECK" ||
+                                      formData.type === "ADVERSE_MEDIA_SEARCH"
                                     ? formData.options.hasMonitoring
                                       ? pick(formData.options, ["monitoring"])
                                       : { monitoring: null }
@@ -473,6 +488,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                     options = pick(formData.options, ["useReplyAsExpiryDate"]);
                     break;
                   case "BACKGROUND_CHECK":
+                  case "ADVERSE_MEDIA_SEARCH":
                     options = formData.options.hasMonitoring
                       ? pick(formData.options, ["monitoring"])
                       : { monitoring: null };
@@ -542,9 +558,11 @@ function CreateOrUpdateProfileTypeFieldDialog({
               </AlertDescription>
             </Alert>
           ) : null}
-          {!hasBackgroundCheck && selectedType === "BACKGROUND_CHECK" ? (
-            <RestrictedPetitionFieldAlert fieldType="BACKGROUND_CHECK" />
+          {(!hasBackgroundCheck && selectedType === "BACKGROUND_CHECK") ||
+          (!hasAdverseMediaSearch && selectedType === "ADVERSE_MEDIA_SEARCH") ? (
+            <RestrictedPetitionFieldAlert fieldType={selectedType} />
           ) : null}
+
           {referencedIn.length ? (
             <PropertyReferencedAlert propertyNames={referencedPropertiesNames} />
           ) : null}
@@ -677,9 +695,9 @@ function CreateOrUpdateProfileTypeFieldDialog({
                 hideColor={selectedType === "CHECKBOX"}
               />
             ) : null}
-
-            {selectedType === "BACKGROUND_CHECK" ? (
-              <ProfileFieldBackgroundCheckSettings
+            {selectedType === "BACKGROUND_CHECK" || selectedType === "ADVERSE_MEDIA_SEARCH" ? (
+              <ProfileFieldMonitoringSettings
+                profileFieldType={selectedType}
                 profileType={profileType}
                 isDisabled={isDisabled}
               />
@@ -772,9 +790,9 @@ useCreateOrUpdateProfileTypeFieldDialog.fragments = {
         expiryAlertAheadTime
         options
         isStandard
-        ...getReferencedInBackgroundCheck_ProfileTypeField
+        ...getFieldsReferencedInMonitoring_ProfileTypeField
       }
-      ${getReferencedInBackgroundCheck.fragments.ProfileTypeField}
+      ${getFieldsReferencedInMonitoring.fragments.ProfileTypeField}
     `;
   },
   get ProfileType() {
@@ -785,9 +803,9 @@ useCreateOrUpdateProfileTypeFieldDialog.fragments = {
           id
           ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
         }
-        ...ProfileFieldBackgroundCheckSettings_ProfileType
+        ...ProfileFieldMonitoringSettings_ProfileType
       }
-      ${ProfileFieldBackgroundCheckSettings.fragments.ProfileType}
+      ${ProfileFieldMonitoringSettings.fragments.ProfileType}
       ${this.ProfileTypeField}
     `;
   },

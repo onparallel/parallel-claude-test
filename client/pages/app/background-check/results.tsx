@@ -262,8 +262,8 @@ function BackgroundCheckFieldSearchResults({
 
               <Text as="span">
                 <FormattedMessage
-                  id="component.background-check-search-result.results-obtained-on"
-                  defaultMessage="Results from {date}"
+                  id="generic.results-for"
+                  defaultMessage="Results for {date}"
                   values={{
                     date: intl.formatDate(result.createdAt, FORMATS.FULL),
                   }}

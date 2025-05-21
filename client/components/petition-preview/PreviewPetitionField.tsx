@@ -44,6 +44,7 @@ import {
   useStartAsyncFieldCompletion,
   useUpdatePetitionFieldReply,
 } from "./clientMutations";
+import { PreviewPetitionFieldAdverseMediaSearch } from "./fields/adverse-media-search/PreviewPetitionFieldAdverseMediaSearch";
 import { PreviewPetitionFieldBackgroundCheck } from "./fields/background-check/PreviewPetitionFieldBackgroundCheck";
 import { PreviewPetitionFieldGroup } from "./fields/PreviewPetitionFieldGroup";
 import { PreviewPetitionFieldKyc } from "./fields/PreviewPetitionFieldKyc";
@@ -343,6 +344,14 @@ export function PreviewPetitionField({
           {...props}
           {...commonProps}
           user={user}
+          petition={petition}
+          onRefreshField={handleRefreshAsyncField}
+          isCacheOnly={isCacheOnly}
+        />
+      ) : field.type === "ADVERSE_MEDIA_SEARCH" ? (
+        <PreviewPetitionFieldAdverseMediaSearch
+          {...props}
+          {...commonProps}
           petition={petition}
           onRefreshField={handleRefreshAsyncField}
           isCacheOnly={isCacheOnly}

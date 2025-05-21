@@ -40,6 +40,7 @@ export const excludedFieldsTarget = [
   "DOW_JONES_KYC",
   "BACKGROUND_CHECK",
   "PROFILE_SEARCH",
+  "ADVERSE_MEDIA_SEARCH",
 ] as PetitionFieldType[];
 
 export const excludedFieldsOrigin = [

@@ -47,18 +47,11 @@ import {
   ProfileFieldFileAddedEvent,
   ProfileFieldFileRemovedEvent,
 } from "../../../db/events/ProfileEvent";
-import { defaultFieldProperties } from "../../../db/helpers/fieldOptions";
-import {
-  contentsAreEqual,
-  mapPetitionFieldReplyToProfileFieldValue,
-  mapProfileTypeFieldToPetitionField,
-} from "../../../db/helpers/petitionProfileMapper";
 import { evaluateApprovalStepsVisibility } from "../../../util/approvalStepsLogic";
 import { chunkWhile } from "../../../util/arrays";
-import { buildAutomatedBackgroundCheckFieldQueries } from "../../../util/backgroundCheck";
+import { buildAutomatedBackgroundCheckFieldQueries } from "../../../util/buildAutomatedBackgroundCheckFieldQueries";
 import { applyFieldVisibility, mapFieldLogic } from "../../../util/fieldLogic";
-import { toBytes } from "../../../util/fileSize";
-import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
+import { fromGlobalId, fromGlobalIds, isGlobalId, toGlobalId } from "../../../util/globalId";
 import { importFromExcel } from "../../../util/importFromExcel";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { isValueCompatible } from "../../../util/isValueCompatible";
@@ -73,6 +66,7 @@ import {
 } from "../../../util/slate/placeholders";
 import { hash, random } from "../../../util/token";
 import { unMaybeArray } from "../../../util/types";
+import { walkObject } from "../../../util/walkObject";
 import { userHasAccessToContactGroups } from "../../contact/authorizers";
 import { RESULT } from "../../helpers/Result";
 import { SUCCESS } from "../../helpers/Success";
@@ -89,10 +83,6 @@ import {
   not,
   or,
 } from "../../helpers/authorize";
-import {
-  buildFieldGroupRepliesFromPrefillInput,
-  createPetitionFieldRepliesFromPrefillData,
-} from "../../helpers/buildFieldGroupRepliesFromPrefill";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectValues";
 import { datetimeArg } from "../../helpers/scalars/DateTime";
@@ -1183,7 +1173,7 @@ export const createPetitionField = mutationField("createPetitionField", {
     ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
 
     async function defaultProperties(type: PetitionFieldType, petition: Petition) {
-      const props = defaultFieldProperties(type, undefined, petition);
+      const props = ctx.petitionFields.defaultFieldProperties(type, undefined, petition);
       if (type === "ID_VERIFICATION") {
         const integrations = await ctx.integrations.loadIntegrationsByOrgId(
           ctx.user!.org_id,
@@ -1348,7 +1338,12 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       not(
         chain(
           fieldHasType("fieldId", ["FIELD_GROUP"]),
-          firstChildHasType("fieldId", ["DOW_JONES_KYC", "BACKGROUND_CHECK", "PROFILE_SEARCH"]),
+          firstChildHasType("fieldId", [
+            "DOW_JONES_KYC",
+            "BACKGROUND_CHECK",
+            "PROFILE_SEARCH",
+            "ADVERSE_MEDIA_SEARCH",
+          ]),
         ),
       ),
     ),
@@ -1363,7 +1358,14 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     ),
     ifArgDefined(
       (args) => args.data.isInternal ?? args.data.showInPdf,
-      not(fieldHasType("fieldId", ["DOW_JONES_KYC", "BACKGROUND_CHECK", "PROFILE_SEARCH"])),
+      not(
+        fieldHasType("fieldId", [
+          "DOW_JONES_KYC",
+          "BACKGROUND_CHECK",
+          "PROFILE_SEARCH",
+          "ADVERSE_MEDIA_SEARCH",
+        ]),
+      ),
     ),
     ifArgDefined(
       (args) => args.data.alias,
@@ -1392,6 +1394,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           "SELECT",
           "CHECKBOX",
           "BACKGROUND_CHECK",
+          "ADVERSE_MEDIA_SEARCH",
         ]),
         fieldIsLinkedToProfileTypeField("fieldId"),
         fieldIsNotFirstChild("fieldId"),
@@ -1403,7 +1406,14 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     ),
     ifArgDefined(
       (args) => args.data.multiple,
-      not(fieldHasType("fieldId", ["ES_TAX_DOCUMENTS", "ID_VERIFICATION", "PROFILE_SEARCH"])),
+      not(
+        fieldHasType("fieldId", [
+          "ES_TAX_DOCUMENTS",
+          "ID_VERIFICATION",
+          "PROFILE_SEARCH",
+          "ADVERSE_MEDIA_SEARCH",
+        ]),
+      ),
     ),
     ifArgDefined(
       (args) =>
@@ -1513,47 +1523,26 @@ export const updatePetitionField = mutationField("updatePetitionField", {
 
     if (isNonNullish(options)) {
       try {
-        if ("autoSearchConfig" in options && options.autoSearchConfig !== null) {
-          throw new ApolloError(
-            "use updatePetitionFieldAutoSearchConfig mutation to update autoSearchConfig",
-            "FORBIDDEN",
-          );
-        }
-        const field = await ctx.petitions.validateFieldData(args.fieldId, {
-          options,
+        // convert every globalId defined in options to numeric
+        const dbOptions = structuredClone(options);
+        walkObject(dbOptions, (key, value, node) => {
+          if (Array.isArray(value) && value.every((v) => typeof v === "string" && isGlobalId(v))) {
+            node[key] = value.map((v) => fromGlobalId(v).id);
+          }
+          if (isGlobalId(value)) {
+            node[key] = fromGlobalId(value).id;
+          }
         });
-        data.options = {
-          ...field.options,
-          ...(field.type === "FILE_UPLOAD"
-            ? omit(options, ["maxFileSize"]) // ignore maxFileSize so user can't change it
-            : options),
-          ...(isNonNullish(options.documentProcessing) || options.processDocument // hardcode maxFileSize and accepts options when setting documentProcessing
-            ? {
-                maxFileSize: toBytes(10, "MB"), // 10MB is a limit for the Bankflip request. We should review this when implementing a second provider
-                accepts: ["PDF", "IMAGE"],
-              }
-            : {}),
-        };
 
-        if (["SELECT", "CHECKBOX"].includes(field.type)) {
-          const { values, labels } = data.options as {
-            labels?: string[] | null;
-            values?: string[] | null;
-          };
-          if (isNullish(values) && isNonNullish(labels)) {
-            throw new Error("Values are required when labels are defined");
-          }
-          // make sure every or none of the values have a label
-          if (isNonNullish(values) && isNonNullish(labels) && values.length !== labels.length) {
-            throw new Error("The number of values and labels should match");
-          }
-          if (isNonNullish(labels) && labels.some((l) => l.trim() === "")) {
-            throw new Error("Labels cannot be empty");
-          }
-          if (isNonNullish(options.values) && isNullish(options.labels)) {
-            data.options.labels = null;
-          }
-        }
+        const field = await ctx.petitionValidation.validatePetitionFieldOptions(
+          args.fieldId,
+          {
+            options: dbOptions,
+          },
+          ctx.petitions.loadField,
+        );
+
+        data.options = field.options;
 
         if (
           field.type === "SHORT_TEXT" &&
@@ -1692,94 +1681,6 @@ export const updatePetitionField = mutationField("updatePetitionField", {
   },
 });
 
-export const updatePetitionFieldAutoSearchConfig = mutationField(
-  "updatePetitionFieldAutoSearchConfig",
-  {
-    description: "Updates the auto search config of a BACKGROUND_CHECK petition field.",
-    type: "PetitionField",
-    authorize: authenticateAnd(
-      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
-      fieldsBelongsToPetition("petitionId", "fieldId"),
-      petitionsAreEditable("petitionId"),
-      petitionDoesNotHaveStartedProcess("petitionId"),
-      petitionsAreNotPublicTemplates("petitionId"),
-      petitionIsNotAnonymized("petitionId"),
-      fieldHasType("fieldId", "BACKGROUND_CHECK"),
-      ifArgDefined("config", async (_, args, ctx) => {
-        const field = await ctx.petitions.loadField(args.fieldId);
-        const nameFields = await ctx.petitions.loadField(args.config!.name);
-        const dateField = isNonNullish(args.config!.date)
-          ? await ctx.petitions.loadField(args.config!.date)
-          : null;
-        const countryField = isNonNullish(args.config!.country)
-          ? await ctx.petitions.loadField(args.config!.country)
-          : null;
-        return (
-          nameFields.length > 0 &&
-          nameFields.every(
-            (f) =>
-              isNonNullish(f) &&
-              f.petition_id === args.petitionId && // fields must belong all to the same petition
-              f.type === "SHORT_TEXT" && // must be of type SHORT_TEXT
-              !f.multiple && // must be "single reply"
-              (isNullish(f.parent_petition_field_id) || // must not be a child of another field (children are multiple by default)
-                f.parent_petition_field_id === field!.parent_petition_field_id), // can be a sibling of the BACKGROUND_CHECK field
-          ) &&
-          (isNullish(dateField) ||
-            (dateField.petition_id === args.petitionId &&
-              dateField.type === "DATE" &&
-              !dateField.multiple &&
-              (isNullish(dateField.parent_petition_field_id) ||
-                dateField.parent_petition_field_id === field!.parent_petition_field_id))) &&
-          (isNullish(countryField) ||
-            (countryField.petition_id === args.petitionId &&
-              countryField.type === "SELECT" &&
-              countryField.options?.standardList === "COUNTRIES" &&
-              !countryField.multiple &&
-              (isNullish(countryField.parent_petition_field_id) ||
-                countryField.parent_petition_field_id === field!.parent_petition_field_id)))
-        );
-      }),
-    ),
-    args: {
-      petitionId: nonNull(globalIdArg("Petition")),
-      fieldId: nonNull(globalIdArg("PetitionField")),
-      config: inputObjectType({
-        name: "UpdatePetitionFieldAutoSearchConfigInput",
-        definition(t) {
-          t.nullable.field("type", { type: "BackgroundCheckEntitySearchType" });
-          t.nonNull.list.nonNull.globalId("name", { prefixName: "PetitionField" });
-          t.nullable.globalId("date", { prefixName: "PetitionField" });
-          t.nullable.globalId("country", { prefixName: "PetitionField" });
-        },
-      }),
-    },
-    resolve: async (_, args, ctx) => {
-      const autoSearchConfig = args.config
-        ? {
-            name: args.config.name,
-            date: args.config.date ?? null,
-            type: args.config.type ?? null,
-            country: args.config.country ?? null,
-          }
-        : null;
-
-      const field = await ctx.petitions.validateFieldData(args.fieldId, {
-        options: { autoSearchConfig },
-      });
-
-      const [updated] = await ctx.petitions.updatePetitionField(
-        args.petitionId,
-        args.fieldId,
-        { options: { ...field.options, autoSearchConfig } },
-        `User:${ctx.user!.id}`,
-      );
-
-      return updated;
-    },
-  },
-);
-
 export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFile", {
   description:
     "Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options",
@@ -1843,7 +1744,11 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
         updatedAt: fileUpload.updated_at.toISOString(),
       },
     };
-    await ctx.petitions.validateFieldData(args.fieldId, { options });
+    await ctx.petitionValidation.validatePetitionFieldOptions(
+      args.fieldId,
+      { options },
+      ctx.petitions.loadField,
+    );
     const [field] = await ctx.petitions.updatePetitionField(
       args.petitionId,
       args.fieldId,
@@ -3388,7 +3293,7 @@ export const createProfileLinkedPetitionField = mutationField("createProfileLink
     const profileTypeField = (await ctx.profiles.loadProfileTypeField(args.profileTypeFieldId))!;
     const petition = await ctx.petitions.loadPetition(args.petitionId);
 
-    const mappedField = mapProfileTypeFieldToPetitionField(
+    const mappedField = ctx.profileTypeFields.mapToPetitionField(
       profileTypeField,
       petition!.recipient_locale,
     );
@@ -3598,8 +3503,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
 
         // if already exists a value on the profile, there could be a conflict with reply so we need to check
         if (isNonNullish(profileFieldValue)) {
-          // we need to do something only if the reply value is different than current value (or no reply on the field)
-          if (isNullish(reply) || !contentsAreEqual(profileFieldValue, reply)) {
+          if (isNullish(reply) || !ctx.petitionsHelper.contentsAreEqual(reply, profileFieldValue)) {
             // expiration is required if the field is expirable and the reply is defined (meaning profile value will be modified)
             if (
               isNonNullish(reply) &&
@@ -3621,7 +3525,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                */
               updateProfileFieldValues.push({
                 profileId: profile!.id,
-                ...mapPetitionFieldReplyToProfileFieldValue(
+                ...ctx.petitionsHelper.mapPetitionFieldReplyToProfileFieldValue(
                   reply ?? { type: field.type, content: null },
                 ),
                 profileTypeFieldId: field.profile_type_field_id!,
@@ -3646,7 +3550,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
 
           updateProfileFieldValues.push({
             profileId: profile!.id,
-            ...mapPetitionFieldReplyToProfileFieldValue(reply),
+            ...ctx.petitionsHelper.mapPetitionFieldReplyToProfileFieldValue(reply),
             profileTypeFieldId: field.profile_type_field_id!,
             expiryDate:
               reply && profileTypeField.options.useReplyAsExpiryDate
@@ -4154,11 +4058,12 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
         (pf) => pf.from_petition_field_id === input.petitionFieldId,
       )!.id,
     }));
-    const { replies, propertiesWithInvalidFormat } = await buildFieldGroupRepliesFromPrefillInput(
-      petition.id,
-      prefill,
-      ctx,
-    );
+    const { replies, propertiesWithInvalidFormat } =
+      await ctx.petitionsHelper.buildFieldGroupRepliesFromProfiles(
+        petition.id,
+        prefill,
+        ctx.user!.id,
+      );
 
     if (propertiesWithInvalidFormat.length > 0 && !args.skipFormatErrors) {
       throw new ApolloError(
@@ -4174,7 +4079,11 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
 
     if (replies.length > 0) {
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(petition.id, `User:${ctx.user!.id}`);
-      await createPetitionFieldRepliesFromPrefillData(petition.id, replies, ctx);
+      await ctx.petitionsHelper.createPetitionFieldRepliesFromPrefillData(
+        petition.id,
+        replies,
+        ctx.user!,
+      );
     }
 
     return petition;
@@ -4217,14 +4126,15 @@ export const prefillPetitionFromProfiles = mutationField("prefillPetitionFromPro
   },
   validateArgs: notEmptyArray("prefill"),
   resolve: async (_, args, ctx) => {
-    const { replies, propertiesWithInvalidFormat } = await buildFieldGroupRepliesFromPrefillInput(
-      args.petitionId,
-      args.prefill.map((p, index) => ({
-        ...p,
-        parentReplyId: index === 0 ? (args.parentReplyId ?? null) : null,
-      })),
-      ctx,
-    );
+    const { replies, propertiesWithInvalidFormat } =
+      await ctx.petitionsHelper.buildFieldGroupRepliesFromProfiles(
+        args.petitionId,
+        args.prefill.map((p, index) => ({
+          ...p,
+          parentReplyId: index === 0 ? (args.parentReplyId ?? null) : null,
+        })),
+        ctx.user!.id,
+      );
 
     const emptyProfileIds = replies
       .filter((d) => d.childReplies.length === 0)
@@ -4255,7 +4165,11 @@ export const prefillPetitionFromProfiles = mutationField("prefillPetitionFromPro
 
       // insert data in DB only after the two error checks have passed (NOTHING_TO_IMPORT_ERROR and PETITION_SEND_LIMIT_REACHED).
       // this will ensure nothing will be modified in DB if an error is thrown
-      await createPetitionFieldRepliesFromPrefillData(args.petitionId, replies, ctx);
+      await ctx.petitionsHelper.createPetitionFieldRepliesFromPrefillData(
+        args.petitionId,
+        replies,
+        ctx.user!,
+      );
     }
 
     const profileIds = unique(args.prefill.flatMap((p) => p.profileIds));
@@ -4463,17 +4377,18 @@ export const createFieldGroupRepliesFromProfiles = mutationField(
     },
     validateArgs: validateAnd(notEmptyArray("profileIds"), uniqueValues("profileIds")),
     resolve: async (_, args, ctx) => {
-      const { replies, propertiesWithInvalidFormat } = await buildFieldGroupRepliesFromPrefillInput(
-        args.petitionId,
-        [
-          {
-            petitionFieldId: args.petitionFieldId,
-            parentReplyId: args.parentReplyId ?? null,
-            profileIds: args.profileIds,
-          },
-        ],
-        ctx,
-      );
+      const { replies, propertiesWithInvalidFormat } =
+        await ctx.petitionsHelper.buildFieldGroupRepliesFromProfiles(
+          args.petitionId,
+          [
+            {
+              petitionFieldId: args.petitionFieldId,
+              parentReplyId: args.parentReplyId ?? null,
+              profileIds: args.profileIds,
+            },
+          ],
+          ctx.user!.id,
+        );
 
       const emptyProfileIds = replies
         .filter((d) => d.childReplies.length === 0)
@@ -4506,7 +4421,11 @@ export const createFieldGroupRepliesFromProfiles = mutationField(
         );
         // insert data in DB only after the two error checks have passed (NOTHING_TO_IMPORT_ERROR and PETITION_SEND_LIMIT_REACHED).
         // this will ensure nothing will be modified in DB if an error is thrown
-        await createPetitionFieldRepliesFromPrefillData(args.petitionId, replies, ctx);
+        await ctx.petitionsHelper.createPetitionFieldRepliesFromPrefillData(
+          args.petitionId,
+          replies,
+          ctx.user!,
+        );
       }
 
       await ctx.profiles.associateProfilesToPetition(

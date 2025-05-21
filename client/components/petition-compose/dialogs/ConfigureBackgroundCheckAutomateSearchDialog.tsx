@@ -5,9 +5,8 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { BackgroundCheckEntityTypeSelect } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityTypeSelect";
 import {
-  ConfigureAutomateSearchDialog_petitionDocument,
+  ConfigureBackgroundCheckAutomateSearchDialog_petitionDocument,
   PetitionComposeFieldSettings_PetitionFieldFragment,
-  UpdatePetitionFieldAutoSearchConfigInput,
 } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { useMemo } from "react";
@@ -15,19 +14,32 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
 
-interface ConfigureAutomateSearchDialogInput {
+interface ConfigureBackgroundCheckAutomateSearchDialogInput {
   petitionId: string;
   field: PetitionComposeFieldSettings_PetitionFieldFragment;
 }
 
-export function ConfigureAutomateSearchDialog({
+interface ConfigureBackgroundCheckAutomateSearchDialogOutput {
+  name: string[];
+  date: string | null;
+  type: string | null;
+  country: string | null;
+}
+
+export function ConfigureBackgroundCheckAutomateSearchDialog({
   petitionId,
   field,
   ...props
-}: DialogProps<ConfigureAutomateSearchDialogInput, UpdatePetitionFieldAutoSearchConfigInput>) {
-  const { data, loading } = useQuery(ConfigureAutomateSearchDialog_petitionDocument, {
-    variables: { id: petitionId },
-  });
+}: DialogProps<
+  ConfigureBackgroundCheckAutomateSearchDialogInput,
+  ConfigureBackgroundCheckAutomateSearchDialogOutput
+>) {
+  const { data, loading } = useQuery(
+    ConfigureBackgroundCheckAutomateSearchDialog_petitionDocument,
+    {
+      variables: { id: petitionId },
+    },
+  );
 
   const petition = data?.petition ?? { fields: [] };
 
@@ -255,26 +267,26 @@ export function ConfigureAutomateSearchDialog({
   );
 }
 
-export function useConfigureAutomateSearchDialog() {
-  return useDialog(ConfigureAutomateSearchDialog);
+export function useConfigureBackgroundCheckAutomateSearchDialog() {
+  return useDialog(ConfigureBackgroundCheckAutomateSearchDialog);
 }
 
-ConfigureAutomateSearchDialog.fragments = {
+ConfigureBackgroundCheckAutomateSearchDialog.fragments = {
   PetitionBase: gql`
-    fragment ConfigureAutomateSearchDialog_PetitionBase on PetitionBase {
+    fragment ConfigureBackgroundCheckAutomateSearchDialog_PetitionBase on PetitionBase {
       fields {
         id
-        ...ConfigureAutomateSearchDialog_InnerPetitionField
+        ...ConfigureBackgroundCheckAutomateSearchDialog_InnerPetitionField
         children {
           id
-          ...ConfigureAutomateSearchDialog_InnerPetitionField
+          ...ConfigureBackgroundCheckAutomateSearchDialog_InnerPetitionField
         }
       }
       ...PetitionFieldSelect_PetitionBase
     }
     ${PetitionFieldSelect.fragments.PetitionBase}
 
-    fragment ConfigureAutomateSearchDialog_InnerPetitionField on PetitionField {
+    fragment ConfigureBackgroundCheckAutomateSearchDialog_InnerPetitionField on PetitionField {
       id
       type
       options
@@ -285,7 +297,7 @@ ConfigureAutomateSearchDialog.fragments = {
     }
   `,
   PetitionField: gql`
-    fragment ConfigureAutomateSearchDialog_PetitionField on PetitionField {
+    fragment ConfigureBackgroundCheckAutomateSearchDialog_PetitionField on PetitionField {
       options
       parent {
         id
@@ -296,12 +308,12 @@ ConfigureAutomateSearchDialog.fragments = {
 
 const _queries = [
   gql`
-    query ConfigureAutomateSearchDialog_petition($id: GID!) {
+    query ConfigureBackgroundCheckAutomateSearchDialog_petition($id: GID!) {
       petition(id: $id) {
         id
-        ...ConfigureAutomateSearchDialog_PetitionBase
+        ...ConfigureBackgroundCheckAutomateSearchDialog_PetitionBase
       }
     }
-    ${ConfigureAutomateSearchDialog.fragments.PetitionBase}
+    ${ConfigureBackgroundCheckAutomateSearchDialog.fragments.PetitionBase}
   `,
 ];

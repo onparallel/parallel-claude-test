@@ -24,6 +24,7 @@ import {
   usePetitionFieldTypeColor,
 } from "@parallel/utils/petitionFields";
 import { removeDiacriticsAndLowercase } from "@parallel/utils/strings";
+import { useHasAdverseMediaSearch } from "@parallel/utils/useHasAdverseMediaSearch";
 import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
 import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -98,6 +99,7 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
         fields: [
           "FILE_UPLOAD",
           "BACKGROUND_CHECK",
+          "ADVERSE_MEDIA_SEARCH",
           ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
           "ID_VERIFICATION",
           ...(user.hasProfileSearchField ? ["PROFILE_SEARCH"] : []),
@@ -204,6 +206,7 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
   } as const;
 
   const hasBackgroundCheck = useHasBackgroundCheck();
+  const hasAdverseMediaSearch = useHasAdverseMediaSearch();
   const hasIdVerification = useHasIdVerification();
 
   return (
@@ -249,7 +252,8 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
                               description={description}
                               showPaidBadge={
                                 (type === "BACKGROUND_CHECK" && !hasBackgroundCheck) ||
-                                (type === "ID_VERIFICATION" && !hasIdVerification)
+                                (type === "ID_VERIFICATION" && !hasIdVerification) ||
+                                (type === "ADVERSE_MEDIA_SEARCH" && !hasAdverseMediaSearch)
                               }
                               onAddField={onAddField}
                             />
@@ -310,6 +314,16 @@ PetitionComposeNewFieldDrawerPetitionFields.fragments = {
         ...ProfileTypeReference_ProfileType
       }
       ${ProfileTypeReference.fragments.ProfileType}
+    `;
+  },
+  get User() {
+    return gql`
+      fragment PetitionComposeNewFieldDrawerPetitionFields_User on User {
+        id
+        hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
+        hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
+        hasProfileSearchField: hasFeatureFlag(featureFlag: PROFILE_SEARCH_FIELD)
+      }
     `;
   },
 };
@@ -398,7 +412,10 @@ function PetitionComposeNewFieldDrawerField({
         data-action="add-petition-field"
         data-petition-field-type={type}
       >
-        <PetitionFieldTypeLabel type={type} />
+        <PetitionFieldTypeLabel
+          type={type}
+          labelProps={{ whiteSpace: "normal", textAlign: "left" }}
+        />
       </Button>
     </SmallPopover>
   );

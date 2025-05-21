@@ -15,6 +15,7 @@ import {
   FieldTaxDocumentsIcon,
   FieldTextIcon,
   IdVerificationIcon,
+  MediaIcon,
   ProfileSearchIcon,
   ShortSearchIcon,
 } from "@parallel/chakra/icons";
@@ -47,6 +48,7 @@ export const PetitionFieldTypeIcon = chakraForwardRef<"svg", PetitionFieldTypeIc
         FIELD_GROUP: FieldGroupIcon,
         ID_VERIFICATION: IdVerificationIcon,
         PROFILE_SEARCH: ProfileSearchIcon,
+        ADVERSE_MEDIA_SEARCH: MediaIcon,
       } as Record<PetitionFieldType, ElementType>
     )[type];
     return <Icon as={icon} {...(props as any)} ref={ref} />;

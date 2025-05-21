@@ -72,7 +72,9 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
   const showAliasButtons =
     field.type === "DYNAMIC_SELECT" ||
     isFileTypeField(field.type) ||
-    field.type === "BACKGROUND_CHECK"
+    field.type === "BACKGROUND_CHECK" ||
+    field.type === "ADVERSE_MEDIA_SEARCH" ||
+    field.type === "PROFILE_SEARCH"
       ? false
       : true;
 

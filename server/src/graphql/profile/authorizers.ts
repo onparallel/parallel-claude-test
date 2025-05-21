@@ -8,9 +8,10 @@ import {
   ProfileTypeFieldPermissionType,
   ProfileTypeFieldType,
 } from "../../db/__types";
+import { ProfileTypeFieldOptions } from "../../services/ProfileTypeFieldService";
+import { toGlobalId } from "../../util/globalId";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { MaybeArray, unMaybeArray } from "../../util/types";
-import { walkObject } from "../../util/walkObject";
 import { NexusGenInputs } from "../__types";
 import { Arg, ArgAuthorizer, getArg } from "../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../helpers/errors";
@@ -324,30 +325,42 @@ export function profileTypeFieldIsNotUsedInMonitoringRules<
   profileTypeIdArg: TProfileTypeId,
   profileTypeFieldIdArg: TProfileTypeFieldId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
-  function optionsIncludeProfileTypeFieldId(options: any, ids: number[]) {
-    try {
-      walkObject(options, (key, value) => {
-        if (key === "profileTypeFieldId" && typeof value === "number" && ids.includes(value)) {
-          throw new Error();
-        }
-      });
-      return false;
-    } catch {
-      return true;
-    }
-  }
-
   return async (_, args, ctx) => {
     const profileTypeId = getArg(args, profileTypeIdArg);
     const profileTypeFieldIds = unMaybeArray(getArg(args, profileTypeFieldIdArg));
     const usedInProfileTypeFields = (
       await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId)
-    ).filter((ptf) => optionsIncludeProfileTypeFieldId(ptf.options, profileTypeFieldIds));
+    ).filter((ptf) => {
+      // check if the profile type has other properties of this types that are referencing profileTypeFieldIds in monitoring options
+      if (ptf.type === "BACKGROUND_CHECK" || ptf.type === "ADVERSE_MEDIA_SEARCH") {
+        const options = ptf.options as ProfileTypeFieldOptions[
+          | "BACKGROUND_CHECK"
+          | "ADVERSE_MEDIA_SEARCH"];
 
-    if (usedInProfileTypeFields.filter((ptf) => ptf.type === "BACKGROUND_CHECK").length > 0) {
+        if (
+          (isNonNullish(options.monitoring?.activationCondition?.profileTypeFieldId) &&
+            profileTypeFieldIds.includes(
+              options.monitoring.activationCondition.profileTypeFieldId,
+            )) ||
+          (options.monitoring?.searchFrequency.type === "VARIABLE" &&
+            profileTypeFieldIds.includes(options.monitoring.searchFrequency.profileTypeFieldId))
+        ) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+
+    if (usedInProfileTypeFields.length > 0) {
       throw new ApolloError(
-        "This field is being used in a BACKGROUND_CHECK monitoring rule.",
-        "FIELD_USED_IN_BACKGROUND_CHECK_MONITORING_RULE",
+        "This field is being used in a monitoring rule.",
+        "FIELD_USED_IN_MONITORING_RULE",
+        {
+          profileTypeFieldIds: usedInProfileTypeFields.map((ptf) =>
+            toGlobalId("ProfileTypeField", ptf.id),
+          ),
+        },
       );
     }
 

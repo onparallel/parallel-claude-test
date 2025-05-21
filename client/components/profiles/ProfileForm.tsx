@@ -102,6 +102,7 @@ const SUGGESTIONS_TYPE_MAPPING: Record<ProfileTypeFieldType, PetitionFieldType[]
   SELECT: ["SELECT", "CHECKBOX"],
   BACKGROUND_CHECK: ["BACKGROUND_CHECK"],
   CHECKBOX: ["SELECT", "CHECKBOX"],
+  ADVERSE_MEDIA_SEARCH: ["ADVERSE_MEDIA_SEARCH"],
 };
 
 function normalize(alias: string) {
@@ -193,21 +194,28 @@ export const ProfileForm = Object.assign(
 
     const fieldsWithIndices = useAllFieldsWithIndices(petition ?? { fields: [] });
 
-    // with property.field.type === "BACKGROUND_CHECK" we don't need to check for alias
+    // with property.field.type === "BACKGROUND_CHECK" or "ADVERSE_MEDIA_SEARCH" we don't need to check for alias
     const propertiesWithSuggestedFields = useMemo(
       () =>
         properties.map(
           (property) =>
             [
               property,
-              isNonNullish(property.field.alias) || property.field.type === "BACKGROUND_CHECK"
+              isNonNullish(property.field.alias) ||
+              property.field.type === "BACKGROUND_CHECK" ||
+              property.field.type === "ADVERSE_MEDIA_SEARCH"
                 ? fieldsWithIndices.filter(
-                    ([pf]) =>
-                      SUGGESTIONS_TYPE_MAPPING[property.field.type].includes(pf.type) &&
+                    ([petitionField]) =>
+                      SUGGESTIONS_TYPE_MAPPING[property.field.type].includes(petitionField.type) &&
                       (property.field.type === "BACKGROUND_CHECK" ||
-                        (isNonNullish(pf.alias) &&
-                          (normalize(pf.alias).includes(normalize(property.field.alias!)) ||
-                            normalize(property.field.alias!).includes(normalize(pf.alias))))),
+                        property.field.type === "ADVERSE_MEDIA_SEARCH" ||
+                        (isNonNullish(petitionField.alias) &&
+                          (normalize(petitionField.alias).includes(
+                            normalize(property.field.alias!),
+                          ) ||
+                            normalize(property.field.alias!).includes(
+                              normalize(petitionField.alias),
+                            )))),
                   )
                 : [],
             ] as const,

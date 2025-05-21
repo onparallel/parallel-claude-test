@@ -21,9 +21,9 @@ import {
   UserGroupPermissionName,
 } from "../../db/__types";
 import { PetitionEvent } from "../../db/events/PetitionEvent";
-import { defaultFieldProperties } from "../../db/helpers/fieldOptions";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
+import { PETITION_FIELD_SERVICE, PetitionFieldService } from "../../services/PetitionFieldService";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
@@ -97,10 +97,14 @@ describe("GraphQL/Petitions", () => {
 
   let collaboratorApiKey: string;
 
+  let petitionFields: PetitionFieldService;
+
   beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
+
+    petitionFields = testClient.container.get<PetitionFieldService>(PETITION_FIELD_SERVICE);
 
     ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization());
     sessionUserData = await mocks.loadUserData(sessionUser.user_data_id);
@@ -3131,6 +3135,61 @@ describe("GraphQL/Petitions", () => {
       expect(newTemplate.publicLink.slug).toStartWith(publicLink.slug);
       expect(newTemplate.publicLink.slug.length).toBeGreaterThan(publicLink.slug.length); // new slug will be the same as before with some added suffix
     });
+
+    it("updates referenced fields in autoSearchConfig when cloning a petition with ADVERSE_MEDIA_SEARCH fields", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+      const [shortText, bgCheck] = await mocks.createRandomPetitionFields(petition.id, 2, (i) => ({
+        type: ["SHORT_TEXT", "BACKGROUND_CHECK"][i] as PetitionFieldType,
+      }));
+
+      await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "ADVERSE_MEDIA_SEARCH",
+        options: JSON.stringify({
+          replyOnlyFromProfile: false,
+          autoSearchConfig: {
+            name: [shortText.id],
+            backgroundCheck: bgCheck.id,
+          },
+        }),
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionIds: [GID!]!) {
+            clonePetitions(petitionIds: $petitionIds) {
+              id
+              fields {
+                id
+                type
+                options
+              }
+            }
+          }
+        `,
+        { petitionIds: [toGlobalId("Petition", petition.id)] },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.clonePetitions).toEqual([
+        {
+          id: expect.any(String),
+          fields: [
+            { id: expect.any(String), type: "SHORT_TEXT", options: expect.any(Object) },
+            { id: expect.any(String), type: "BACKGROUND_CHECK", options: expect.any(Object) },
+            {
+              id: expect.any(String),
+              type: "ADVERSE_MEDIA_SEARCH",
+              options: expect.objectContaining({
+                autoSearchConfig: {
+                  name: [data!.clonePetitions[0].fields[0].id],
+                  backgroundCheck: data!.clonePetitions[0].fields[1].id,
+                },
+              }),
+            },
+          ],
+        },
+      ]);
+    });
   });
 
   describe("deletePetitions", () => {
@@ -3611,7 +3670,7 @@ describe("GraphQL/Petitions", () => {
 
       const headings = await mocks.createRandomPetitionFields(petition.id, 3, () => ({
         type: "HEADING",
-        ...defaultFieldProperties("HEADING", undefined, {
+        ...petitionFields.defaultFieldProperties("HEADING", undefined, {
           automatic_numbering_config: { numbering_type: "LETTERS" },
         }),
       }));

@@ -15,10 +15,13 @@ import {
   ProfileTypeProcess,
   User,
 } from "../../db/__types";
-import { mapProfileTypeFieldToPetitionField } from "../../db/helpers/petitionProfileMapper";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { PROFILES_SETUP_SERVICE, ProfilesSetupService } from "../../services/ProfilesSetupService";
+import {
+  PROFILE_TYPE_FIELD_SERVICE,
+  ProfileTypeFieldService,
+} from "../../services/ProfileTypeFieldService";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
@@ -28,10 +31,16 @@ describe("GraphQL/Profiles to Petitions", () => {
   let user: User;
   let organization: Organization;
 
+  let profileTypeFields: ProfileTypeFieldService;
+
   beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
+
+    profileTypeFields = testClient.container.get<ProfileTypeFieldService>(
+      PROFILE_TYPE_FIELD_SERVICE,
+    );
 
     ({ organization, user } = await mocks.createSessionUserAndOrganization());
 
@@ -157,13 +166,13 @@ describe("GraphQL/Profiles to Petitions", () => {
       );
 
       const individualFields = individualProperties
-        .map((p) => mapProfileTypeFieldToPetitionField(p, "en"))
+        .map((p) => profileTypeFields.mapToPetitionField(p, "en"))
         .slice(0, 23);
       const legalEntityFields = legalEntityProperties
-        .map((p) => mapProfileTypeFieldToPetitionField(p, "en"))
+        .map((p) => profileTypeFields.mapToPetitionField(p, "en"))
         .slice(0, 25);
       const contractFields = contractProperties
-        .map((p) => mapProfileTypeFieldToPetitionField(p, "en"))
+        .map((p) => profileTypeFields.mapToPetitionField(p, "en"))
         .slice(0, 22);
 
       youChildren = await mocks.createRandomPetitionFields(
@@ -6203,6 +6212,39 @@ describe("GraphQL/Profiles to Petitions", () => {
           content: { value: ["A", "C"] },
           created_by_user_id: user.id,
         },
+        {
+          type: "ADVERSE_MEDIA_SEARCH",
+          profile_type_field_id: propertiesIdx["ADVERSE_MEDIA_SEARCH"].id,
+          content: {
+            search: [{ wikiDataId: "Q7747", name: "Vladimir Putin" }, { term: "economic war" }],
+            articles: {
+              totalCount: 3,
+              items: [
+                {
+                  id: "OPOINT/1-1",
+                  header: "Article 1 Header",
+                  timestamp: 0,
+                  source: "Times",
+                },
+                {
+                  id: "OPOINT/1-2",
+                  header: "Article 2 Header",
+                  timestamp: 1,
+                  source: "Times",
+                },
+                {
+                  id: "OPOINT/1-3",
+                  header: "Article 3 Header",
+                  timestamp: 0,
+                  source: "Times",
+                },
+              ],
+            },
+            relevant_articles: [{ id: "OPOINT/1-1", added_at: new Date() }],
+            irrelevant_articles: [{ id: "OPOINT/1-2", added_at: new Date() }],
+            dismissed_articles: [{ id: "OPOINT/1-3", added_at: new Date() }],
+          },
+        },
       ]);
       const [mikeRossDocument] = await mocks.createRandomFileUpload(1, () => ({
         filename: "id_document__mike_ross",
@@ -6362,6 +6404,11 @@ describe("GraphQL/Profiles to Petitions", () => {
               profile_type_field_id: propertiesIdx["CHECKBOX"].id,
             },
             {
+              type: "ADVERSE_MEDIA_SEARCH" as PetitionFieldType,
+              parent_petition_field_id: fieldGroup.id,
+              profile_type_field_id: propertiesIdx["ADVERSE_MEDIA_SEARCH"].id,
+            },
+            {
               type: "SHORT_TEXT" as PetitionFieldType,
               parent_petition_field_id: fieldGroup.id,
               profile_type_field_id: null,
@@ -6441,10 +6488,10 @@ describe("GraphQL/Profiles to Petitions", () => {
         id: toGlobalId("PetitionField", fieldGroup.id),
         petition: {
           events: {
-            totalCount: 10,
+            totalCount: 11,
             items: [
               { type: "PROFILE_ASSOCIATED" },
-              ...range(0, 9).map(() => ({ type: "REPLY_CREATED" })),
+              ...range(0, 10).map(() => ({ type: "REPLY_CREATED" })),
             ],
           },
           profiles: [
@@ -6589,6 +6636,55 @@ describe("GraphQL/Profiles to Petitions", () => {
                   {
                     id: expect.any(String),
                     content: { value: ["A", "C"] },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "ADVERSE_MEDIA_SEARCH",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["ADVERSE_MEDIA_SEARCH"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {
+                      search: [
+                        { wikiDataId: "Q7747", name: "Vladimir Putin" },
+                        { term: "economic war" },
+                      ],
+                      articles: {
+                        totalCount: 3,
+                        items: [
+                          {
+                            id: "OPOINT/1-1",
+                            header: "Article 1 Header",
+                            timestamp: 0,
+                            source: "Times",
+                            classification: "RELEVANT",
+                            classifiedAt: expect.any(String),
+                          },
+                          {
+                            id: "OPOINT/1-2",
+                            header: "Article 2 Header",
+                            timestamp: 1,
+                            source: "Times",
+                            classification: "IRRELEVANT",
+                            classifiedAt: expect.any(String),
+                          },
+                          {
+                            id: "OPOINT/1-3",
+                            header: "Article 3 Header",
+                            timestamp: 0,
+                            source: "Times",
+                            classification: "DISMISSED",
+                            classifiedAt: expect.any(String),
+                          },
+                        ],
+                      },
+                    },
                   },
                 ],
               },
@@ -6787,6 +6883,55 @@ describe("GraphQL/Profiles to Petitions", () => {
               {
                 field: {
                   id: expect.any(String),
+                  type: "ADVERSE_MEDIA_SEARCH",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["ADVERSE_MEDIA_SEARCH"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {
+                      search: [
+                        { wikiDataId: "Q7747", name: "Vladimir Putin" },
+                        { term: "economic war" },
+                      ],
+                      articles: {
+                        totalCount: 3,
+                        items: [
+                          {
+                            id: "OPOINT/1-1",
+                            header: "Article 1 Header",
+                            timestamp: 0,
+                            source: "Times",
+                            classification: "RELEVANT",
+                            classifiedAt: expect.any(String),
+                          },
+                          {
+                            id: "OPOINT/1-2",
+                            header: "Article 2 Header",
+                            timestamp: 1,
+                            source: "Times",
+                            classification: "IRRELEVANT",
+                            classifiedAt: expect.any(String),
+                          },
+                          {
+                            id: "OPOINT/1-3",
+                            header: "Article 3 Header",
+                            timestamp: 0,
+                            source: "Times",
+                            classification: "DISMISSED",
+                            classifiedAt: expect.any(String),
+                          },
+                        ],
+                      },
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
                   type: "SHORT_TEXT",
                   profileTypeField: null,
                 },
@@ -6926,6 +7071,16 @@ describe("GraphQL/Profiles to Petitions", () => {
                     content: { value: ["B"] },
                   },
                 ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "ADVERSE_MEDIA_SEARCH",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["ADVERSE_MEDIA_SEARCH"].id),
+                  },
+                },
+                replies: [],
               },
               {
                 field: {
@@ -7169,6 +7324,55 @@ describe("GraphQL/Profiles to Petitions", () => {
               {
                 field: {
                   id: expect.any(String),
+                  type: "ADVERSE_MEDIA_SEARCH",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["ADVERSE_MEDIA_SEARCH"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: {
+                      search: [
+                        { wikiDataId: "Q7747", name: "Vladimir Putin" },
+                        { term: "economic war" },
+                      ],
+                      articles: {
+                        totalCount: 3,
+                        items: [
+                          {
+                            id: "OPOINT/1-1",
+                            header: "Article 1 Header",
+                            timestamp: 0,
+                            source: "Times",
+                            classification: "RELEVANT",
+                            classifiedAt: expect.any(String),
+                          },
+                          {
+                            id: "OPOINT/1-2",
+                            header: "Article 2 Header",
+                            timestamp: 1,
+                            source: "Times",
+                            classification: "IRRELEVANT",
+                            classifiedAt: expect.any(String),
+                          },
+                          {
+                            id: "OPOINT/1-3",
+                            header: "Article 3 Header",
+                            timestamp: 0,
+                            source: "Times",
+                            classification: "DISMISSED",
+                            classifiedAt: expect.any(String),
+                          },
+                        ],
+                      },
+                    },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
                   type: "SHORT_TEXT",
                   profileTypeField: null,
                 },
@@ -7268,6 +7472,16 @@ describe("GraphQL/Profiles to Petitions", () => {
                   type: "CHECKBOX",
                   profileTypeField: {
                     id: toGlobalId("ProfileTypeField", propertiesIdx["CHECKBOX"].id),
+                  },
+                },
+                replies: [],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "ADVERSE_MEDIA_SEARCH",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["ADVERSE_MEDIA_SEARCH"].id),
                   },
                 },
                 replies: [],
@@ -7623,6 +7837,16 @@ describe("GraphQL/Profiles to Petitions", () => {
                     content: { value: ["B"] },
                   },
                 ],
+              },
+              {
+                field: {
+                  id: expect.any(String),
+                  type: "ADVERSE_MEDIA_SEARCH",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["ADVERSE_MEDIA_SEARCH"].id),
+                  },
+                },
+                replies: [],
               },
               {
                 field: {

@@ -1,11 +1,8 @@
 import { subDays, subMonths, subYears } from "date-fns";
-import { isNonNullish, isNullish } from "remeda";
+import { isNonNullish } from "remeda";
 import { ProfileFieldValue } from "../../db/__types";
-import {
-  EntityDetailsResponse,
-  EntitySearchResponse,
-} from "../../services/background-check-clients/BackgroundCheckClient";
-import { ProfileTypeFieldOptions } from "../../services/ProfileTypeFieldService";
+import { EntityDetailsResponse, EntitySearchResponse } from "../../services/BackgroundCheckService";
+import { ProfileTypeFieldMonitoring } from "../../services/ProfileTypeFieldService";
 
 /**
  * Determines if a date is within a specified frequency period before another date.
@@ -33,9 +30,7 @@ function isWithinFrequencyPeriod(
 }
 
 function passesActivationCondition(
-  activationCondition: NonNullable<
-    ProfileTypeFieldOptions["BACKGROUND_CHECK"]["monitoring"]
-  >["activationCondition"],
+  activationCondition: ProfileTypeFieldMonitoring["activationCondition"],
   selectValues: Pick<ProfileFieldValue, "profile_type_field_id" | "content">[],
 ) {
   if (isNonNullish(activationCondition)) {
@@ -52,12 +47,9 @@ function passesActivationCondition(
 export function requiresRefresh(currentDate: Date) {
   return (
     pfv: Pick<ProfileFieldValue, "created_at">,
-    monitoring: ProfileTypeFieldOptions["BACKGROUND_CHECK"]["monitoring"],
+    monitoring: ProfileTypeFieldMonitoring,
     selectValues: Pick<ProfileFieldValue, "profile_type_field_id" | "content">[],
   ) => {
-    if (isNullish(monitoring)) {
-      return false;
-    }
     if (!passesActivationCondition(monitoring.activationCondition, selectValues)) {
       return false;
     }

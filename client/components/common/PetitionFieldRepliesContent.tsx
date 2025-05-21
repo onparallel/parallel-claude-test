@@ -1,8 +1,10 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Flex, HStack, List, ListItem, Stack, Text } from "@chakra-ui/react";
-import { BusinessIcon, SearchIcon, UserIcon } from "@parallel/chakra/icons";
+import { BusinessIcon, SearchIcon, ShortSearchIcon, UserIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
+  AdverseMediaArticle,
+  AdverseMediaSearchTermInput,
   PetitionFieldRepliesContent_PetitionFieldFragment,
   PetitionFieldRepliesContent_PetitionFieldReplyFragment,
   PetitionFieldType,
@@ -191,6 +193,15 @@ const PetitionFieldRepliesContentNonFile = chakraForwardRef<
             reply={reply}
           />
         );
+      } else if (field.type === "ADVERSE_MEDIA_SEARCH") {
+        return (
+          <PetitionFieldAdverseMediaSearch
+            key={undefined}
+            petitionId={petitionId}
+            field={field}
+            reply={reply}
+          />
+        );
       } else {
         never(`PetitionFieldType ${field.type} not implemented`);
       }
@@ -277,6 +288,7 @@ function PetitionFieldBackgroundCheck({
       paddingX={2}
       paddingY={1}
       onClick={handleClick}
+      fontWeight={500}
     >
       {isNonNullish(content.entity) ? (
         <HStack display="inline-flex" minWidth={0}>
@@ -302,6 +314,105 @@ function PetitionFieldBackgroundCheck({
           </HStack>
         </HStack>
       )}
+    </Button>
+  );
+}
+
+interface PetitionFieldAdverseMediaSearchProps {
+  petitionId: string;
+  field: PetitionFieldRepliesContent_PetitionFieldFragment;
+  reply: PetitionFieldRepliesContent_PetitionFieldReplyFragment;
+}
+
+function PetitionFieldAdverseMediaSearch({
+  petitionId,
+  field,
+  reply,
+}: PetitionFieldAdverseMediaSearchProps) {
+  const intl = useIntl();
+  const savedArticles = reply.content?.articles?.items.filter(
+    (article: AdverseMediaArticle) => article.classification === "RELEVANT",
+  );
+
+  const dismissedArticles = reply.content?.articles?.items.filter(
+    (article: AdverseMediaArticle) =>
+      article.classification === "DISMISSED" || article.classification === "IRRELEVANT",
+  );
+
+  const parentReplyId = reply.parent?.id;
+  const handleClick = async () => {
+    try {
+      const url = `/${intl.locale}/app/adverse-media?${new URLSearchParams({
+        token: btoa(
+          JSON.stringify({
+            fieldId: field.id,
+            petitionId,
+            ...(parentReplyId ? { parentReplyId } : {}),
+          }),
+        ),
+        readonly: "true",
+      })}`;
+      await openNewWindow(url);
+    } catch {}
+  };
+
+  return (
+    <Button
+      key={undefined}
+      variant="outline"
+      size="sm"
+      backgroundColor="white"
+      height="auto"
+      paddingX={2}
+      paddingY={1}
+      onClick={handleClick}
+      fontWeight={500}
+    >
+      <Stack spacing={1} maxWidth="100%" width="100%">
+        <HStack spacing={1.5} minWidth={0} width="100%">
+          <ShortSearchIcon />
+          <OverflownText textAlign="start" width="100%">
+            {intl.formatList(
+              reply.content?.search
+                ?.map((search: AdverseMediaSearchTermInput) => search.label || search.term)
+                .filter(isNonNullish),
+              { type: "disjunction" },
+            )}
+          </OverflownText>
+        </HStack>
+        {savedArticles?.length > 0 ? (
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="generic.saved-articles"
+              defaultMessage="{count, plural, =1 {# saved article} other {# saved articles}}"
+              values={{ count: savedArticles.length }}
+            />
+          </Text>
+        ) : null}
+        {dismissedArticles?.length > 0 ? (
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="generic.dismissed-articles"
+              defaultMessage="{count, plural, =1 {# dismissed article} other {# dismissed articles}}"
+              values={{ count: dismissedArticles.length }}
+            />
+          </Text>
+        ) : null}
+        {isNonNullish(reply.content?.articles?.createdAt) ? (
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="generic.results-for"
+              defaultMessage="Results for {date}"
+              values={{
+                date: intl.formatDate(
+                  new Date(reply.content?.articles?.createdAt),
+                  FORMATS["L+LT"],
+                ),
+              }}
+            />
+          </Text>
+        ) : null}
+      </Stack>
     </Button>
   );
 }

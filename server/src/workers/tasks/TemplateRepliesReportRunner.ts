@@ -11,9 +11,9 @@ import {
   PetitionStatus,
 } from "../../db/__types";
 import { PetitionSignatureConfig } from "../../db/repositories/PetitionRepository";
-import { backgroundCheckFieldReplyUrl } from "../../util/backgroundCheck";
 import { FORMATS } from "../../util/dates";
 import { applyFieldVisibility, evaluateFieldLogic } from "../../util/fieldLogic";
+import { fieldReplyUrl } from "../../util/fieldReplyUrl";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
@@ -302,10 +302,10 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         }
 
         function replyContent(
-          r: Pick<PetitionFieldReply, "content" | "type">,
-          field: Pick<PetitionField, "id" | "petition_id">,
+          r: Pick<PetitionFieldReply, "content" | "parent_petition_field_reply_id">,
+          field: Pick<PetitionField, "id" | "type" | "petition_id">,
         ) {
-          switch (r.type) {
+          switch (field.type) {
             case "CHECKBOX":
               return (r.content.value as string[]).join(", ");
             case "DYNAMIC_SELECT":
@@ -319,7 +319,8 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
                 timeZone: "Etc/UTC",
               });
             case "BACKGROUND_CHECK":
-              return backgroundCheckFieldReplyUrl(parallelUrl, intl.locale, field, r);
+            case "ADVERSE_MEDIA_SEARCH":
+              return fieldReplyUrl(parallelUrl, intl.locale, field, r);
             default:
               return r.content.value as string;
           }
@@ -338,7 +339,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
             reply_group_index?: number;
           },
           parent: Pick<PetitionField, "options" | "from_petition_field_id"> | null,
-          replies: Pick<PetitionFieldReply, "content" | "type">[],
+          replies: Pick<PetitionFieldReply, "content" | "parent_petition_field_reply_id">[],
         ) {
           if (field.type === "PROFILE_SEARCH") {
             return;
@@ -388,7 +389,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           }
 
           row[columnId] = !isFileTypeField(field.type)
-            ? replies.map((r) => replyContent({ ...r, type: field.type }, field)).join("; ")
+            ? replies.map((r) => replyContent(r, field)).join("; ")
             : replies.length > 0
               ? intl.formatMessage(
                   {

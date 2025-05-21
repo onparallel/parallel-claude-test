@@ -220,6 +220,56 @@
     "context": "Users"
   },
   {
+    "term": "component.adverse-media-article-details.no-article-body",
+    "definition": "No article body available",
+    "context": "No article body available"
+  },
+  {
+    "term": "component.adverse-media-article-header.back-to-article-list",
+    "definition": "Back to article list",
+    "context": "Back to article list"
+  },
+  {
+    "term": "component.adverse-media-article-header.not-relevant",
+    "definition": "Not relevant",
+    "context": "Not relevant"
+  },
+  {
+    "term": "component.adverse-media-article-header.not-the-person",
+    "definition": "Not the person",
+    "context": "Not the person"
+  },
+  {
+    "term": "component.adverse-media-article-header.relevant",
+    "definition": "Relevant",
+    "context": "Relevant"
+  },
+  {
+    "term": "component.adverse-media-article-header.save-as-relevant",
+    "definition": "Save as relevant",
+    "context": "Save as relevant"
+  },
+  {
+    "term": "component.adverse-media-article-header.saved-as-not-relevant",
+    "definition": "Non-relevant article",
+    "context": "Non-relevant article"
+  },
+  {
+    "term": "component.adverse-media-article-header.saved-as-not-the-person",
+    "definition": "Not the person",
+    "context": "Not the person"
+  },
+  {
+    "term": "component.adverse-media-article-header.saved-as-relevant",
+    "definition": "Saved as relevant",
+    "context": "Saved as relevant"
+  },
+  {
+    "term": "component.adverse-media-search-input.create-term",
+    "definition": "Search by text: <b>{label}</b>",
+    "context": "Search by text: <b>{label}</b>"
+  },
+  {
     "term": "component.ai-generated-popover.default-message",
     "definition": "AI-processed information may contain inaccuracies. Make sure to review it before making any decisions.",
     "context": "AI-processed information may contain inaccuracies. Make sure to review it before making any decisions."
@@ -760,11 +810,6 @@
     "context": "Results found: {amount}"
   },
   {
-    "term": "component.background-check-search-result.results-obtained-on",
-    "definition": "Results from {date}",
-    "context": "Results from {date}"
-  },
-  {
     "term": "component.background-check-search-result.risk-labels",
     "definition": "Risk labels",
     "context": "Risk labels"
@@ -1038,6 +1083,46 @@
     "term": "component.completing-message-dialog.pending-processes-count",
     "definition": "You have {count, plural, =1{# pending process} other{# pending processes}}",
     "context": "You have {count, plural, =1{# pending process} other{# pending processes}}"
+  },
+  {
+    "term": "component.configure-adverse-media-automate-search-dialog.body",
+    "definition": "Select the fields to be used to autocomplete the adverse media search.",
+    "context": "Select the fields to be used to autocomplete the adverse media search."
+  },
+  {
+    "term": "component.configure-adverse-media-automate-search-dialog.header",
+    "definition": "Autocomplete search",
+    "context": "Autocomplete search"
+  },
+  {
+    "term": "component.configure-adverse-media-automate-search-dialog.name-helper-text",
+    "definition": "There are no short replies fields in the form.",
+    "context": "There are no short replies fields in the form."
+  },
+  {
+    "term": "component.configure-adverse-media-automate-search-dialog.name-label",
+    "definition": "Name of person/entity",
+    "context": "Name of person/entity"
+  },
+  {
+    "term": "component.configure-adverse-media-automate-search-dialog.or-by",
+    "definition": "Or by",
+    "context": "Or by"
+  },
+  {
+    "term": "component.configure-adverse-media-automate-search-dialog.profile-helper-text",
+    "definition": "There are no background check fields in the form.",
+    "context": "There are no background check fields in the form."
+  },
+  {
+    "term": "component.configure-adverse-media-automate-search-dialog.profile-label",
+    "definition": "Profile",
+    "context": "Profile"
+  },
+  {
+    "term": "component.configure-adverse-media-automate-search-dialog.remove-setting",
+    "definition": "Remove setting",
+    "context": "Remove setting"
   },
   {
     "term": "component.configure-approval-steps-dialog.add-approval-button",
@@ -1388,6 +1473,16 @@
     "term": "component.confirm-deactivate-user-dialog.transfer-parallels",
     "definition": "Transfer parallels",
     "context": "Transfer parallels"
+  },
+  {
+    "term": "component.confirm-delete-adverse-media-search-dialog.body",
+    "definition": "All saved articles will be deleted. Are you sure you want to delete this adverse media search?",
+    "context": "All saved articles will be deleted. Are you sure you want to delete this adverse media search?"
+  },
+  {
+    "term": "component.confirm-delete-adverse-media-search-dialog.header",
+    "definition": "Delete adverse media search",
+    "context": "Delete adverse media search"
   },
   {
     "term": "component.confirm-delete-dashboard-dialog.body",
@@ -1965,6 +2060,26 @@
     "context": "Remove field from group"
   },
   {
+    "term": "component.confirm-update-adverse-media-dialog.body",
+    "definition": "This property supports only one response. If you add a new search, the previous one will be deleted. Are you sure you want to modify this answer?",
+    "context": "This property supports only one response. If you add a new search, the previous one will be deleted. Are you sure you want to modify this answer?"
+  },
+  {
+    "term": "component.confirm-update-adverse-media-dialog.body-with-monitoring",
+    "definition": "If you continue, the saved search and its articles will be discarded, deleting both the monitoring and the stored version history, if any. Are you sure you want to discard this search?",
+    "context": "If you continue, the saved search and its articles will be discarded, deleting both the monitoring and the stored version history, if any. Are you sure you want to discard this search?"
+  },
+  {
+    "term": "component.confirm-update-adverse-media-dialog.header",
+    "definition": "Modify reply",
+    "context": "Modify reply"
+  },
+  {
+    "term": "component.confirm-update-adverse-media-dialog.yes-modify",
+    "definition": "Yes, modify",
+    "context": "Yes, modify"
+  },
+  {
     "term": "component.confirm-update-entity-dialog.body",
     "definition": "This property supports only one response. If you add a new entity, the previous one will be deleted. Are you sure you want to modify this answer?",
     "context": "This property supports only one response. If you add a new entity, the previous one will be deleted. Are you sure you want to modify this answer?"
@@ -2063,6 +2178,11 @@
     "term": "component.copy-liquid-reference-button.reference-copied",
     "definition": "Copied to clipboard!",
     "context": "Copied to clipboard!"
+  },
+  {
+    "term": "component.copy-or-download-reply-button.view-articles",
+    "definition": "View articles",
+    "context": "View articles"
   },
   {
     "term": "component.copy-or-download-reply-button.view-details",
@@ -3635,6 +3755,16 @@
     "context": "Generating report..."
   },
   {
+    "term": "component.feature-flag-descriptions.adverse-media-search-description",
+    "definition": "Enables the Adverse media search petition field on the organization.",
+    "context": "Enables the Adverse media search petition field on the organization."
+  },
+  {
+    "term": "component.feature-flag-descriptions.adverse-media-search-name",
+    "definition": "Adverse media search",
+    "context": "Adverse media search"
+  },
+  {
     "term": "component.feature-flag-descriptions.auto-anonymize-description",
     "definition": "Allows setting up a period of time for the parallels to be automatically anonymized after x days of their closing.",
     "context": "Allows setting up a period of time for the parallels to be automatically anonymized after x days of their closing."
@@ -4046,8 +4176,8 @@
   },
   {
     "term": "component.field-used-for-searches.body",
-    "definition": "This field is used to automate the search in a {fieldName} field. To continue, please first update the field configuration.",
-    "context": "This field is used to automate the search in a {fieldName} field. To continue, please first update the field configuration."
+    "definition": "This field is used to automate the search in {fieldTitle}. To continue, please first update the field configuration.",
+    "context": "This field is used to automate the search in {fieldTitle}. To continue, please first update the field configuration."
   },
   {
     "term": "component.field-used-for-searches.header",
@@ -5753,6 +5883,16 @@
     "term": "component.petition-compliance-period-dialog.purpose-of-treatment.placeholder",
     "definition": "Briefly describe the purpose of the data processing.",
     "context": "Briefly describe the purpose of the data processing."
+  },
+  {
+    "term": "component.petition-compose-adverse-media-search-settings.autocomplete-search",
+    "definition": "Autocomplete the search",
+    "context": "Autocomplete the search"
+  },
+  {
+    "term": "component.petition-compose-adverse-media-search-settings.autocomplete-search-help",
+    "definition": "Add this option to autocomplete the search using replies from the fields.",
+    "context": "Add this option to autocomplete the search using replies from the fields."
   },
   {
     "term": "component.petition-compose-and-preview-alerts.restart-approvals",
@@ -8425,6 +8565,26 @@
     "context": "Incompatible fields"
   },
   {
+    "term": "component.preview-petition-adverse-media-search.articles-saved",
+    "definition": "{count, plural, =0 {Search criteria saved} other {Search criteria and {count} {count, plural, =1 {article} other {articles}} saved}}",
+    "context": "{count, plural, =0 {Search criteria saved} other {Search criteria and {count} {count, plural, =1 {article} other {articles}} saved}}"
+  },
+  {
+    "term": "component.preview-petition-adverse-media-search.do-another-search",
+    "definition": "Modify search",
+    "context": "Modify search"
+  },
+  {
+    "term": "component.preview-petition-adverse-media-search.run-adverse-media-search",
+    "definition": "Search in media",
+    "context": "Search in media"
+  },
+  {
+    "term": "component.preview-petition-adverse-media-search.wait-perform-search",
+    "definition": "Please wait while we run the adverse media search...",
+    "context": "Please wait while we run the adverse media search..."
+  },
+  {
     "term": "component.preview-petition-background-check.check-lists",
     "definition": "Run background check",
     "context": "Run background check"
@@ -8438,6 +8598,31 @@
     "term": "component.preview-petition-background-check.wait-perform-search",
     "definition": "Please wait while we run the background check...",
     "context": "Please wait while we run the background check..."
+  },
+  {
+    "term": "component.preview-petition-field-adverse-media-search.approved",
+    "definition": "This search has been approved",
+    "context": "This search has been approved"
+  },
+  {
+    "term": "component.preview-petition-field-adverse-media-search.rejected",
+    "definition": "This search has been rejected",
+    "context": "This search has been rejected"
+  },
+  {
+    "term": "component.preview-petition-field-adverse-media-search.remove-reply-label",
+    "definition": "Remove reply",
+    "context": "Remove reply"
+  },
+  {
+    "term": "component.preview-petition-field-adverse-media-search.view-article",
+    "definition": "View article",
+    "context": "View article"
+  },
+  {
+    "term": "component.preview-petition-field-adverse-media-search.view-details",
+    "definition": "View details",
+    "context": "View details"
   },
   {
     "term": "component.preview-petition-field-background-check-replace-reply-dialog.body",
@@ -8560,84 +8745,24 @@
     "context": "Generating PDF file..."
   },
   {
-    "term": "component.profile-field-background-check-settings.activate-when",
-    "definition": "Activate when",
-    "context": "Activate when"
-  },
-  {
-    "term": "component.profile-field-background-check-settings.activation-conditions-help",
-    "definition": "Add conditionts to enable or disable monitoring based on replies in another property. For instance, depending on the type of relationship with the customer.",
-    "context": "Add conditionts to enable or disable monitoring based on replies in another property. For instance, depending on the type of relationship with the customer."
-  },
-  {
-    "term": "component.profile-field-background-check-settings.activation-conditions-label",
-    "definition": "Add activation conditions",
-    "context": "Add activation conditions"
-  },
-  {
-    "term": "component.profile-field-background-check-settings.business-relationship",
-    "definition": "Business relationship",
-    "context": "Business relationship"
-  },
-  {
-    "term": "component.profile-field-background-check-settings.fixed-search-frequency",
-    "definition": "Fixed",
-    "context": "Fixed"
-  },
-  {
-    "term": "component.profile-field-background-check-settings.is-one-of",
-    "definition": "is one of",
-    "context": "is one of"
-  },
-  {
-    "term": "component.profile-field-background-check-settings.monitoring-description",
-    "definition": "Monitor search results to detect relevant changes.",
-    "context": "Monitor search results to detect relevant changes."
-  },
-  {
-    "term": "component.profile-field-background-check-settings.monitoring-label",
-    "definition": "Ongoing Monitoring",
-    "context": "Ongoing Monitoring"
-  },
-  {
-    "term": "component.profile-field-background-check-settings.risk-level",
-    "definition": "Risk level",
-    "context": "Risk level"
-  },
-  {
-    "term": "component.profile-field-background-check-settings.search-frequency-help",
-    "definition": "Indicate how often you want each profile to be monitored. You can choose a fixed frequency or a variable frequency based on the option selected in another property. For instance, adjusting the frequency based on the client's risk.",
-    "context": "Indicate how often you want each profile to be monitored. You can choose a fixed frequency or a variable frequency based on the option selected in another property. For instance, adjusting the frequency based on the client's risk."
-  },
-  {
-    "term": "component.profile-field-background-check-settings.search-frequency-label",
-    "definition": "Search frequency",
-    "context": "Search frequency"
-  },
-  {
-    "term": "component.profile-field-background-check-settings.select-frequency",
-    "definition": "Choose a frequency",
-    "context": "Choose a frequency"
-  },
-  {
-    "term": "component.profile-field-background-check-settings.variable-search-frequency",
-    "definition": "Based on options",
-    "context": "Based on options"
-  },
-  {
     "term": "component.profile-field-background-check.active-monitoring",
     "definition": "Active monitoring",
     "context": "Active monitoring"
   },
   {
-    "term": "component.profile-field-background-check.last-updated-on",
-    "definition": "Last updated on {date}",
-    "context": "Last updated on {date}"
+    "term": "component.profile-field-background-check.deactivated-monitoring",
+    "definition": "Monitoring is deactivated.",
+    "context": "Monitoring is deactivated."
   },
   {
     "term": "component.profile-field-background-check.modify-search",
     "definition": "Modify search",
     "context": "Modify search"
+  },
+  {
+    "term": "component.profile-field-background-check.paused-monitoring-draft",
+    "definition": "Monitoring is paused because there are changes not saved.",
+    "context": "Monitoring is paused because there are changes not saved."
   },
   {
     "term": "component.profile-field-background-check.preview-pdf",
@@ -8675,11 +8800,6 @@
     "context": "Run background check"
   },
   {
-    "term": "component.profile-field-background-check.saved-on",
-    "definition": "Saved on {date}",
-    "context": "Saved on {date}"
-  },
-  {
     "term": "component.profile-field-background-check.wait-perform-search",
     "definition": "Please wait while we run the background check...",
     "context": "Please wait while we run the background check..."
@@ -8715,6 +8835,76 @@
     "context": "Show suggestions"
   },
   {
+    "term": "component.profile-field-monitoring-settings.activate-when",
+    "definition": "Activate when",
+    "context": "Activate when"
+  },
+  {
+    "term": "component.profile-field-monitoring-settings.activation-conditions-help",
+    "definition": "Add conditionts to enable or disable monitoring based on replies in another property. For instance, depending on the type of relationship with the customer.",
+    "context": "Add conditionts to enable or disable monitoring based on replies in another property. For instance, depending on the type of relationship with the customer."
+  },
+  {
+    "term": "component.profile-field-monitoring-settings.activation-conditions-label",
+    "definition": "Add activation conditions",
+    "context": "Add activation conditions"
+  },
+  {
+    "term": "component.profile-field-monitoring-settings.business-relationship",
+    "definition": "Business relationship",
+    "context": "Business relationship"
+  },
+  {
+    "term": "component.profile-field-monitoring-settings.fixed-search-frequency",
+    "definition": "Fixed",
+    "context": "Fixed"
+  },
+  {
+    "term": "component.profile-field-monitoring-settings.is-one-of",
+    "definition": "is one of",
+    "context": "is one of"
+  },
+  {
+    "term": "component.profile-field-monitoring-settings.monitoring-description",
+    "definition": "Monitor search results to detect relevant changes.",
+    "context": "Monitor search results to detect relevant changes."
+  },
+  {
+    "term": "component.profile-field-monitoring-settings.monitoring-label",
+    "definition": "Ongoing Monitoring",
+    "context": "Ongoing Monitoring"
+  },
+  {
+    "term": "component.profile-field-monitoring-settings.risk-level",
+    "definition": "Risk level",
+    "context": "Risk level"
+  },
+  {
+    "term": "component.profile-field-monitoring-settings.search-frequency-help",
+    "definition": "Indicate how often you want each profile to be monitored. You can choose a fixed frequency or a variable frequency based on the option selected in another property. For instance, adjusting the frequency based on the client's risk.",
+    "context": "Indicate how often you want each profile to be monitored. You can choose a fixed frequency or a variable frequency based on the option selected in another property. For instance, adjusting the frequency based on the client's risk."
+  },
+  {
+    "term": "component.profile-field-monitoring-settings.search-frequency-help-adverse-media-search",
+    "definition": "Indicate how often you want the news to be monitored. You can choose a fixed frequency or a variable frequency based on the option selected in another property. For instance, adjusting the frequency based on the client's risk.",
+    "context": "Indicate how often you want the news to be monitored. You can choose a fixed frequency or a variable frequency based on the option selected in another property. For instance, adjusting the frequency based on the client's risk."
+  },
+  {
+    "term": "component.profile-field-monitoring-settings.search-frequency-label",
+    "definition": "Search frequency",
+    "context": "Search frequency"
+  },
+  {
+    "term": "component.profile-field-monitoring-settings.select-frequency",
+    "definition": "Choose a frequency",
+    "context": "Choose a frequency"
+  },
+  {
+    "term": "component.profile-field-monitoring-settings.variable-search-frequency",
+    "definition": "Based on options",
+    "context": "Based on options"
+  },
+  {
     "term": "component.profile-field-select.placeholder",
     "definition": "Select an option",
     "context": "Select an option"
@@ -8738,6 +8928,41 @@
     "term": "component.profile-field.set-expiration-button-label",
     "definition": "Set expiration",
     "context": "Set expiration"
+  },
+  {
+    "term": "component.profile-form-field-adverse-media-search.draft",
+    "definition": "There are changes not saved",
+    "context": "There are changes not saved"
+  },
+  {
+    "term": "component.profile-form-field-adverse-media-search.monitoring-active",
+    "definition": "There is news not reviewed",
+    "context": "There is news not reviewed"
+  },
+  {
+    "term": "component.profile-form-field-adverse-media-search.remove-adverse-media-search",
+    "definition": "Discard search and articles",
+    "context": "Discard search and articles"
+  },
+  {
+    "term": "component.profile-form-field-adverse-media-search.run-adverse-media-search",
+    "definition": "Run adverse media search",
+    "context": "Run adverse media search"
+  },
+  {
+    "term": "component.profile-form-field-adverse-media-search.start-monitoring",
+    "definition": "Enable monitoring",
+    "context": "Enable monitoring"
+  },
+  {
+    "term": "component.profile-form-field-adverse-media-search.stop-monitoring",
+    "definition": "Stop monitoring",
+    "context": "Stop monitoring"
+  },
+  {
+    "term": "component.profile-form-field-adverse-media-search.wait-perform-search",
+    "definition": "Please wait while we run the adverse media search...",
+    "context": "Please wait while we run the adverse media search..."
   },
   {
     "term": "component.profile-form.associated-profiles-count",
@@ -13395,6 +13620,11 @@
     "context": "Deleted team"
   },
   {
+    "term": "generic.dismissed-articles",
+    "definition": "{count, plural, =1 {# dismissed article} other {# dismissed articles}}",
+    "context": "{count, plural, =1 {# dismissed article} other {# dismissed articles}}"
+  },
+  {
     "term": "generic.document-not-available",
     "definition": "Document not available",
     "context": "Document not available"
@@ -13413,11 +13643,6 @@
     "term": "generic.dont-show-message-again",
     "definition": "Do not show this message again",
     "context": "Do not show this message again"
-  },
-  {
-    "term": "generic.dow-jones-kyc-external-error",
-    "definition": "A Dow Jones field can't be set as external. Remove if from the group or move it to another position and try again.",
-    "context": "A Dow Jones field can't be set as external. Remove if from the group or move it to another position and try again."
   },
   {
     "term": "generic.download",
@@ -13925,6 +14150,11 @@
     "context": "Last quarter"
   },
   {
+    "term": "generic.last-updated-on",
+    "definition": "Last updated on {date}",
+    "context": "Last updated on {date}"
+  },
+  {
     "term": "generic.last-used-at",
     "definition": "Last used at",
     "context": "Last used at"
@@ -13993,6 +14223,11 @@
     "term": "generic.n-days-before",
     "definition": "{count, plural, =1 {1 day} other {# days}} before",
     "context": "{count, plural, =1 {1 day} other {# days}} before"
+  },
+  {
+    "term": "generic.n-dismissed",
+    "definition": "{count} dismissed",
+    "context": "{count} dismissed"
   },
   {
     "term": "generic.n-group-members",
@@ -14213,6 +14448,11 @@
     "term": "generic.petition-count",
     "definition": "{count, plural, =1 {# parallel} other {# parallels}}",
     "context": "{count, plural, =1 {# parallel} other {# parallels}}"
+  },
+  {
+    "term": "generic.petition-field-type-adverse-media-search",
+    "definition": "Adverse media search",
+    "context": "Adverse media search"
   },
   {
     "term": "generic.petition-field-type-background-check",
@@ -14495,6 +14735,11 @@
     "context": "Property"
   },
   {
+    "term": "generic.profile-type-field-type-adverse-media-search",
+    "definition": "Adverse media search",
+    "context": "Adverse media search"
+  },
+  {
     "term": "generic.profile-type-field-type-background-check",
     "definition": "Background check",
     "context": "Background check"
@@ -14600,6 +14845,11 @@
     "context": "The field is required"
   },
   {
+    "term": "generic.results-for",
+    "definition": "Results for {date}",
+    "context": "Results for {date}"
+  },
+  {
     "term": "generic.retry",
     "definition": "Retry",
     "context": "Retry"
@@ -14628,6 +14878,16 @@
     "term": "generic.saved",
     "definition": "Saved",
     "context": "Saved"
+  },
+  {
+    "term": "generic.saved-articles",
+    "definition": "{count, plural, =1 {# saved article} other {# saved articles}}",
+    "context": "{count, plural, =1 {# saved article} other {# saved articles}}"
+  },
+  {
+    "term": "generic.saved-on",
+    "definition": "Saved on {date}",
+    "context": "Saved on {date}"
   },
   {
     "term": "generic.saving-changes",
@@ -15435,6 +15695,86 @@
     "context": "User limit"
   },
   {
+    "term": "page.adverse-media-search.article",
+    "definition": "Article",
+    "context": "Article"
+  },
+  {
+    "term": "page.adverse-media-search.article-not-found",
+    "definition": "Article not found",
+    "context": "Article not found"
+  },
+  {
+    "term": "page.adverse-media-search.dismissed-articles",
+    "definition": "Dismissed articles",
+    "context": "Dismissed articles"
+  },
+  {
+    "term": "page.adverse-media-search.link",
+    "definition": "Link",
+    "context": "Link"
+  },
+  {
+    "term": "page.adverse-media-search.mentions",
+    "definition": "Mentions",
+    "context": "Mentions"
+  },
+  {
+    "term": "page.adverse-media-search.no-article-selected",
+    "definition": "No article selected",
+    "context": "No article selected"
+  },
+  {
+    "term": "page.adverse-media-search.no-articles-found",
+    "definition": "No articles found",
+    "context": "No articles found"
+  },
+  {
+    "term": "page.adverse-media-search.non-relevant-articles",
+    "definition": "Non-relevant articles",
+    "context": "Non-relevant articles"
+  },
+  {
+    "term": "page.adverse-media-search.other-images",
+    "definition": "Other images",
+    "context": "Other images"
+  },
+  {
+    "term": "page.adverse-media-search.placeholder",
+    "definition": "Type something and press enter...",
+    "context": "Type something and press enter..."
+  },
+  {
+    "term": "page.adverse-media-search.refresh-search",
+    "definition": "Refresh search",
+    "context": "Refresh search"
+  },
+  {
+    "term": "page.adverse-media-search.relevant-articles",
+    "definition": "Relevant articles",
+    "context": "Relevant articles"
+  },
+  {
+    "term": "page.adverse-media-search.save-search",
+    "definition": "Save to profile",
+    "context": "Save to profile"
+  },
+  {
+    "term": "page.adverse-media-search.search",
+    "definition": "Search",
+    "context": "Search"
+  },
+  {
+    "term": "page.adverse-media-search.search-saved",
+    "definition": "Search saved",
+    "context": "Search saved"
+  },
+  {
+    "term": "page.adverse-media-search.search-saved-description",
+    "definition": "Your search has been saved to your profile",
+    "context": "Your search has been saved to your profile"
+  },
+  {
     "term": "page.alerts.no-alerts",
     "definition": "You have no alerts set up",
     "context": "You have no alerts set up"
@@ -15493,11 +15833,6 @@
     "term": "page.background-check-profile-details.relation",
     "definition": "Relation",
     "context": "Relation"
-  },
-  {
-    "term": "page.background-check-profile-details.results-obtained-on",
-    "definition": "Results from {date}",
-    "context": "Results from {date}"
   },
   {
     "term": "page.background-check-profile-details.sanction-lists",
@@ -16578,6 +16913,11 @@
     "term": "page.permissions-group.users-list-description",
     "definition": "Grants users in this team permissions to view the list of users on the organization",
     "context": "Grants users in this team permissions to view the list of users on the organization"
+  },
+  {
+    "term": "page.petition-compose.field-group-with-internal-field-error",
+    "definition": "A group can't be set as external if it contains an only internal field as first field. Remove if from the group or move it to another position and try again.",
+    "context": "A group can't be set as external if it contains an only internal field as first field. Remove if from the group or move it to another position and try again."
   },
   {
     "term": "page.petition-compose.field-referenced-in-header",
@@ -18733,6 +19073,11 @@
     "term": "util.get-open-sanctions-relationship.wife-father",
     "definition": "Wife's father",
     "context": "Wife's father"
+  },
+  {
+    "term": "util.get-petition-field-type-description.adverse-media-search-description",
+    "definition": "Integrate an internal search field for adverse media.",
+    "context": "Integrate an internal search field for adverse media."
   },
   {
     "term": "util.get-petition-field-type-description.background-check-description",

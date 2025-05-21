@@ -7,31 +7,26 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
-  Progress,
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { BusinessIcon, RepeatIcon, SearchIcon, UserIcon } from "@parallel/chakra/icons";
+import { BusinessIcon, SearchIcon, ShortSearchIcon, UserIcon } from "@parallel/chakra/icons";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
-import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
 import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
 import {
-  ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueDocument,
+  ProfileFormFieldBackgroundCheck_copyReplyContentToProfileFieldValueDocument,
   ProfileFormFieldBackgroundCheck_updateProfileFieldValueDocument,
   ProfileFormField_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
-import { FORMATS } from "@parallel/utils/dates";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
-import { openNewWindow } from "@parallel/utils/openNewWindow";
+import { useManagedWindow } from "@parallel/utils/hooks/useManagedWindow";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useBackgroundCheckProfileDownloadTask } from "@parallel/utils/tasks/useBackgroundCheckProfileDownloadTask";
 import { unMaybeArray } from "@parallel/utils/types";
 import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
-import { useInterval } from "@parallel/utils/useInterval";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
-import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -40,6 +35,12 @@ import { ProfileFieldSuggestion } from "../ProfileFieldSuggestion";
 import { useConfirmRemoveEntityDialog } from "../dialogs/ConfirmRemoveEntityDialog";
 import { useConfirmUpdateEntityDialog } from "../dialogs/ConfirmUpdateEntityDialog";
 import { ProfileFormFieldProps } from "./ProfileFormField";
+import {
+  MonitoringInfo,
+  SearchProgressComponent,
+  checkIfMonitoringIsActive,
+  getSearchFrequency,
+} from "./ProfileFormFieldCommon";
 import {
   ProfileFormFieldInputGroup,
   ProfileFormFieldInputGroupProps,
@@ -71,11 +72,7 @@ export function ProfileFormFieldBackgroundCheck({
 }: ProfileFormFieldBackgroundCheckProps) {
   const intl = useIntl();
   const router = useRouter();
-  const [state, setState] = useState<"IDLE" | "FETCHING">("IDLE");
-
-  const hasReply = isNonNullish(props.value?.content);
-  const [showSuggestions, setShowSuggestions] = useState(!hasReply);
-  const browserTabRef = useRef<Window>();
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const entityButtonRef = useRef<HTMLButtonElement>(null);
 
   const tokenBase64 = btoa(
@@ -85,11 +82,11 @@ export function ProfileFormFieldBackgroundCheck({
     }),
   );
 
-  useEffect(() => {
-    if (router.query.profileTypeField === field.id) {
-      entityButtonRef.current?.focus();
-    }
-  }, [router.query.profileTypeField]);
+  const { state, browserTabRef, openWindow, closeWindow } = useManagedWindow({
+    onRefreshField,
+  });
+
+  const hasReply = isNonNullish(props.value?.content);
 
   useEffect(() => {
     if (showSuggestions && hasReply) {
@@ -120,41 +117,19 @@ export function ProfileFormFieldBackgroundCheck({
     entity?.name ??
     [entityTypeLabel, query?.name, query?.date, countryName].filter(isNonNullish).join(" | ");
 
-  useInterval(
-    async (done) => {
-      if (isNonNullish(browserTabRef.current) && browserTabRef.current.closed) {
-        setState("IDLE");
-        done();
-      } else if (state === "FETCHING") {
-        onRefreshField();
-      }
-    },
-    5000,
-    [onRefreshField, state],
-  );
+  useEffect(() => {
+    if (router.query.profileTypeField === field.id) {
+      entityButtonRef.current?.focus();
+    }
+  }, [router.query.profileTypeField]);
 
   useEffect(() => {
-    const handleRouteChange = () => {
-      if (isNonNullish(browserTabRef.current)) {
-        browserTabRef.current.close();
-      }
-    };
-
-    router.events.on("routeChangeStart", handleRouteChange);
-
-    return () => router.events.off("routeChangeStart", handleRouteChange);
-  }, []);
-
-  useWindowEvent(
-    "message",
-    async (e) => {
+    const handleMessage = (e: MessageEvent) => {
       const browserTab = browserTabRef.current;
       if (isNullish(browserTab) || e.source !== browserTab) {
         return;
       }
-      if (e.data === "refresh") {
-        onRefreshField();
-      } else if (e.data.event === "update-info") {
+      if (e.data.event === "update-info") {
         const token = e.data.token;
         if (token !== tokenBase64) {
           return;
@@ -168,43 +143,28 @@ export function ProfileFormFieldBackgroundCheck({
           browserTab.origin,
         );
       }
-    },
-    [onRefreshField, tokenBase64],
-  );
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [entity?.id, tokenBase64]);
 
   const { monitoring } = field.options as ProfileTypeFieldOptions<"BACKGROUND_CHECK">;
 
   const hasActivationCondition = isNonNullish(monitoring?.activationCondition);
   const hasMonitoring = isNonNullish(monitoring);
 
-  const checkIfMonitoringIsActive = () => {
-    const conditions = monitoring!.activationCondition;
-    const property = properties?.find(({ field }) => field.id === conditions?.profileTypeFieldId);
-    return conditions?.values?.includes(property?.value?.content?.value) ?? false;
-  };
+  const isMonitoringActive = hasActivationCondition
+    ? checkIfMonitoringIsActive(monitoring, properties)
+    : hasMonitoring;
 
-  const getSearchFrequency = () => {
-    if (monitoring?.searchFrequency?.type === "FIXED") {
-      return monitoring.searchFrequency.frequency.split("_");
-    } else {
-      const searchFrequency = monitoring!.searchFrequency;
-      const property = properties?.find(
-        ({ field }) => field.id === searchFrequency?.profileTypeFieldId,
-      );
-      const frequency = searchFrequency.options.find(
-        ({ value }) => value === property?.value?.content?.value,
-      )?.frequency;
-      return frequency?.split("_") ?? ["3", "YEARS"];
-    }
-  };
-
-  const isMonitoringActive = hasActivationCondition ? checkIfMonitoringIsActive() : hasMonitoring;
-  const monitoringFrequency = hasMonitoring ? getSearchFrequency() : null;
+  const monitoringFrequency = hasMonitoring ? getSearchFrequency(monitoring, properties) : null;
 
   const showConfirmRemoveEntityDialog = useConfirmRemoveEntityDialog();
   const [updateProfileFieldValue] = useMutation(
     ProfileFormFieldBackgroundCheck_updateProfileFieldValueDocument,
   );
+
   const handleRemove = async () => {
     try {
       await showConfirmRemoveEntityDialog({ hasMonitoring });
@@ -221,10 +181,7 @@ export function ProfileFormFieldBackgroundCheck({
         },
       });
 
-      if (browserTabRef.current) {
-        browserTabRef.current.close();
-        setState("IDLE");
-      }
+      closeWindow();
 
       onRefreshField();
     } catch {}
@@ -232,7 +189,6 @@ export function ProfileFormFieldBackgroundCheck({
 
   const handleModifySearch = async () => {
     try {
-      setState("FETCHING");
       let url = `/${intl.locale}/app/background-check`;
 
       const { date, name, type, country } = query ?? {};
@@ -247,7 +203,7 @@ export function ProfileFormFieldBackgroundCheck({
 
       url += `?${searchParams.toString()}`;
 
-      browserTabRef.current = await openNewWindow(url);
+      await openWindow(url);
     } catch {}
   };
 
@@ -273,7 +229,7 @@ export function ProfileFormFieldBackgroundCheck({
         url += `/results?${urlParams}`;
       }
 
-      browserTabRef.current = await openNewWindow(url);
+      await openWindow(url);
     } catch {}
   };
 
@@ -287,30 +243,21 @@ export function ProfileFormFieldBackgroundCheck({
     } catch {}
   };
 
-  const handleStart = async () => {
-    setState("FETCHING");
-    let url = `/${intl.locale}/app/background-check`;
+  const handleStart = () =>
+    openWindow(
+      `/${intl.locale}/app/background-check?${new URLSearchParams({
+        token: tokenBase64,
+      }).toString()}`,
+    );
 
-    const searchParams = new URLSearchParams({
-      token: tokenBase64,
-    });
+  const handleCancelClick = () => closeWindow();
 
-    url += `?${searchParams.toString()}`;
-
-    try {
-      browserTabRef.current = await openNewWindow(url);
-    } catch {}
-  };
-
-  const handleCancelClick = () => {
-    setState("IDLE");
-    browserTabRef.current?.close();
-  };
-
-  const [copyBackgroundCheckReplyToProfileFieldValue] = useMutation(
-    ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValueDocument,
+  const [copyReplyContentToProfileFieldValue] = useMutation(
+    ProfileFormFieldBackgroundCheck_copyReplyContentToProfileFieldValueDocument,
   );
+
   const showConfirmUpdateEntityDialog = useConfirmUpdateEntityDialog();
+
   const handleSuggestionClick = async (replyId: string) => {
     try {
       if (!petitionId) return;
@@ -320,7 +267,7 @@ export function ProfileFormFieldBackgroundCheck({
           hasMonitoring,
         });
       }
-      await copyBackgroundCheckReplyToProfileFieldValue({
+      await copyReplyContentToProfileFieldValue({
         variables: {
           profileId,
           profileTypeFieldId: field.id,
@@ -437,6 +384,7 @@ export function ProfileFormFieldBackgroundCheck({
                   whiteSpace="pre-wrap"
                   textAlign="left"
                   onClick={handleOpenSearchOrEntity}
+                  isDisabled={!hasBackgroundCheck}
                 >
                   {entityOrSearchName}
                 </Button>
@@ -453,7 +401,7 @@ export function ProfileFormFieldBackgroundCheck({
                     )
                   </Text>
                 ) : (
-                  <HStack>
+                  <HStack wrap="wrap">
                     {(entity?.properties?.topics as string[] | undefined)?.map((topic, i) => (
                       <BackgroundCheckRiskLabel key={i} risk={topic} />
                     ))}
@@ -505,62 +453,11 @@ export function ProfileFormFieldBackgroundCheck({
               ) : null}
             </HStack>
 
-            {hasMonitoring && isMonitoringActive ? (
-              <HStack>
-                <SmallPopover
-                  content={
-                    <Text fontSize="sm">
-                      <FormattedMessage
-                        id="component.profile-field-background-check.active-monitoring"
-                        defaultMessage="Active monitoring"
-                      />{" "}
-                      {monitoringFrequency![1] === "DAYS" ? (
-                        <FormattedMessage
-                          id="component.profile-field-background-check.results-monitored-x-days"
-                          defaultMessage="The results are monitored every {count, plural, =1 {day} other {# days}}."
-                          values={{ count: parseInt(monitoringFrequency![0]) }}
-                        />
-                      ) : monitoringFrequency![1] === "MONTHS" ? (
-                        <FormattedMessage
-                          id="component.profile-field-background-check.results-monitored-x-months"
-                          defaultMessage="The results are monitored every {count, plural, =1 {month} other {# months}}."
-                          values={{ count: parseInt(monitoringFrequency![0]) }}
-                        />
-                      ) : monitoringFrequency![1] === "YEARS" ? (
-                        <FormattedMessage
-                          id="component.profile-field-background-check.results-monitored-x-years"
-                          defaultMessage="The results are monitored every {count, plural, =1 {year} other {# years}}."
-                          values={{ count: parseInt(monitoringFrequency![0]) }}
-                        />
-                      ) : null}
-                    </Text>
-                  }
-                  placement="bottom"
-                  width="250px"
-                >
-                  <RepeatIcon color="yellow.500" marginBottom={0.5} />
-                </SmallPopover>
-                <Text fontSize="sm">
-                  <FormattedMessage
-                    id="component.profile-field-background-check.last-updated-on"
-                    defaultMessage="Last updated on {date}"
-                    values={{
-                      date: intl.formatDate(new Date(savedOn), FORMATS.LL),
-                    }}
-                  />
-                </Text>
-              </HStack>
-            ) : (
-              <Text fontSize="sm">
-                <FormattedMessage
-                  id="component.profile-field-background-check.saved-on"
-                  defaultMessage="Saved on {date}"
-                  values={{
-                    date: intl.formatDate(new Date(savedOn), FORMATS.LL),
-                  }}
-                />
-              </Text>
-            )}
+            <MonitoringInfo
+              isMonitoringActive={isMonitoringActive}
+              monitoringFrequency={monitoringFrequency}
+              createdAt={savedOn}
+            />
           </Stack>
         ) : (
           <Stack width="100%" spacing={3}>
@@ -570,6 +467,8 @@ export function ProfileFormFieldBackgroundCheck({
                 fontSize="md"
                 isDisabled={isDisabled || !hasBackgroundCheck || state === "FETCHING"}
                 onClick={handleStart}
+                leftIcon={<ShortSearchIcon />}
+                fontWeight={500}
               >
                 <FormattedMessage
                   id="component.profile-field-background-check.run-background-check"
@@ -578,26 +477,13 @@ export function ProfileFormFieldBackgroundCheck({
               </Button>
             </Box>
             {state === "FETCHING" ? (
-              <Stack>
-                <Text fontSize="sm">
-                  <FormattedMessage
-                    id="component.profile-field-background-check.wait-perform-search"
-                    defaultMessage="Please wait while we run the background check..."
-                  />
-                </Text>
-                <HStack>
-                  <Progress
-                    size="md"
-                    isIndeterminate
-                    colorScheme="green"
-                    borderRadius="full"
-                    width="100%"
-                  />
-                  <Button size="sm" fontWeight="normal" onClick={handleCancelClick}>
-                    <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-                  </Button>
-                </HStack>
-              </Stack>
+              <SearchProgressComponent
+                onCancelClick={handleCancelClick}
+                loadingMessage={intl.formatMessage({
+                  id: "component.profile-field-background-check.wait-perform-search",
+                  defaultMessage: "Please wait while we run the background check...",
+                })}
+              />
             ) : null}
             {!hasBackgroundCheck ? (
               <RestrictedPetitionFieldAlert fieldType="BACKGROUND_CHECK" />
@@ -626,14 +512,14 @@ const _mutations = [
     }
   `,
   gql`
-    mutation ProfileFormFieldBackgroundCheck_copyBackgroundCheckReplyToProfileFieldValue(
+    mutation ProfileFormFieldBackgroundCheck_copyReplyContentToProfileFieldValue(
       $profileId: GID!
       $profileTypeFieldId: GID!
       $petitionId: GID!
       $replyId: GID!
       $expiryDate: Date
     ) {
-      copyBackgroundCheckReplyToProfileFieldValue(
+      copyReplyContentToProfileFieldValue(
         profileId: $profileId
         profileTypeFieldId: $profileTypeFieldId
         petitionId: $petitionId

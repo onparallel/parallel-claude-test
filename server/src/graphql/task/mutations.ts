@@ -44,7 +44,7 @@ import { validSortByInput } from "../helpers/validators/validSortByField";
 import { validExportFileRenamePattern } from "../helpers/validators/validTextWithPlaceholders";
 import { validUrl } from "../helpers/validators/validUrl";
 import {
-  authenticateBackgroundCheckToken,
+  authenticatePetitionOrProfileReplyToken,
   userHasAccessToIntegrations,
 } from "../integrations/authorizers";
 import {
@@ -474,7 +474,7 @@ export const createBackgroundCheckProfilePdfTask = mutationField(
     type: "Task",
     authorize: authenticateAnd(
       userHasFeatureFlag("BACKGROUND_CHECK"),
-      authenticateBackgroundCheckToken("token"),
+      authenticatePetitionOrProfileReplyToken("token", "BACKGROUND_CHECK"),
     ),
     args: {
       token: nonNull(stringArg()),

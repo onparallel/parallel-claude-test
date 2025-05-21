@@ -12,11 +12,11 @@ createCronWorker("background-check-monitor", async (ctx) => {
   const organizations = await ctx.organizations.getOrganizationsWithFeatureFlag("BACKGROUND_CHECK");
 
   for (const org of organizations) {
-    const valuesForRefresh =
-      await ctx.profiles.getBackgroundCheckProfileFieldValuesForRefreshByOrgId(
-        org.id,
-        requiresRefresh(now),
-      );
+    const valuesForRefresh = await ctx.profiles.getProfileFieldValuesForRefreshByOrgId(
+      org.id,
+      "BACKGROUND_CHECK",
+      requiresRefresh(now),
+    );
 
     const profileFieldValuesForNotification: Pick<
       ProfileFieldValue,

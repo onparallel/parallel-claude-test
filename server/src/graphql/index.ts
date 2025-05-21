@@ -75,3 +75,7 @@ export * from "./dashboard/types";
 
 export * from "./petition-approval-request/mutations";
 export * from "./petition-approval-request/types";
+
+export * from "./adverse-media/mutations";
+export * from "./adverse-media/queries";
+export * from "./adverse-media/types";

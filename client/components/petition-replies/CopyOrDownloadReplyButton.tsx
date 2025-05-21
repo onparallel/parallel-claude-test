@@ -50,6 +50,17 @@ export function CopyOrDownloadReplyButton({
                 })
           }
         />
+      ) : reply.field!.type === "ADVERSE_MEDIA_SEARCH" ? (
+        <IconButtonWithTooltip
+          isDisabled={reply.isAnonymized}
+          onClick={() => onAction("VIEW_ARTICLES")}
+          icon={<EyeIcon />}
+          size="xs"
+          label={intl.formatMessage({
+            id: "component.copy-or-download-reply-button.view-articles",
+            defaultMessage: "View articles",
+          })}
+        />
       ) : isFileTypeField(reply.field!.type) ? (
         <>
           <ReplyDownloadButton

@@ -39,6 +39,7 @@ import { isNonNullish, isNullish, noop } from "remeda";
 import { ProfileFieldSuggestion } from "../ProfileFieldSuggestion";
 import { ProfileFormData } from "../ProfileForm";
 import { useUpdateProfileFieldExpirationDialog } from "../dialogs/UpdateProfileFieldExpirationDialog";
+import { ProfileFormFieldAdverseMediaSearch } from "./ProfileFormFieldAdverseMediaSearch";
 import { ProfileFormFieldBackgroundCheck } from "./ProfileFormFieldBackgroundCheck";
 import { ProfileFormFieldCheckbox } from "./ProfileFormFieldCheckbox";
 import { ProfileFormFieldDate } from "./ProfileFormFieldDate";
@@ -140,6 +141,9 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
 
   const bgCheckSuggestions = fieldsWithIndices.filter(([petitionField]) => {
     return petitionField.type === "BACKGROUND_CHECK";
+  });
+  const adverseMediaSuggestions = fieldsWithIndices.filter(([petitionField]) => {
+    return petitionField.type === "ADVERSE_MEDIA_SEARCH";
   });
   const suggestions = fieldsWithIndices.flatMap(([petitionField, fieldIndex]) => {
     return petitionField.replies
@@ -392,6 +396,14 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
             fieldsWithIndices={bgCheckSuggestions}
             petitionId={props.petitionId}
           />
+        ) : field.type === "ADVERSE_MEDIA_SEARCH" ? (
+          <ProfileFormFieldAdverseMediaSearch
+            {...commonProps}
+            profileId={props.profileId}
+            onRefreshField={props.onRefetch}
+            fieldsWithIndices={adverseMediaSuggestions}
+            petitionId={props.petitionId}
+          />
         ) : field.type === "CHECKBOX" ? (
           <ProfileFormFieldCheckbox {...commonProps} />
         ) : null}
@@ -461,6 +473,9 @@ ProfileFormField.fragments = {
       fragment ProfileFormField_ProfileFieldValue on ProfileFieldValue {
         id
         content
+        hasDraft
+        hasPendingReview
+        hasActiveMonitoring
       }
     `;
   },

@@ -5,8 +5,8 @@ import { PetitionField, PetitionFieldReply } from "../../db/__types";
 import { ContactRepository } from "../../db/repositories/ContactRepository";
 import { PetitionRepository } from "../../db/repositories/PetitionRepository";
 import { UserRepository } from "../../db/repositories/UserRepository";
-import { backgroundCheckFieldReplyUrl } from "../../util/backgroundCheck";
 import { FORMATS } from "../../util/dates";
+import { fieldReplyUrl } from "../../util/fieldReplyUrl";
 import { Maybe, UnwrapArray } from "../../util/types";
 import { FieldCommentsExcelWorksheet } from "./FieldCommentsExcelWorksheet";
 import { TextRepliesExcelWorksheet } from "./TextRepliesExcelWorksheet";
@@ -15,7 +15,7 @@ type ComposedPetitionField = Pick<
   PetitionField,
   "id" | "petition_id" | "type" | "title" | "parent_petition_field_id"
 > & {
-  replies: Pick<PetitionFieldReply, "content">[];
+  replies: Pick<PetitionFieldReply, "content" | "parent_petition_field_reply_id">[];
   group_name?: Maybe<string>;
   group_number?: number;
 };
@@ -90,9 +90,9 @@ export class PetitionExcelExport {
     );
   }
 
-  private extractBackgroundCheckReply(field: ComposedPetitionField) {
+  private extractReplyUrl(field: ComposedPetitionField) {
     return this.extractReplies(field, (r) =>
-      backgroundCheckFieldReplyUrl(this.parallelUrl, this.intl.locale, field, r),
+      fieldReplyUrl(this.parallelUrl, this.intl.locale, field, r),
     );
   }
 
@@ -146,8 +146,8 @@ export class PetitionExcelExport {
       return this.extractDateReply(field, FORMATS["L"]);
     } else if (field.type === "DATE_TIME") {
       return this.extractDateReply(field, FORMATS["L+LTS"]);
-    } else if (field.type === "BACKGROUND_CHECK") {
-      return this.extractBackgroundCheckReply(field);
+    } else if (field.type === "BACKGROUND_CHECK" || field.type === "ADVERSE_MEDIA_SEARCH") {
+      return this.extractReplyUrl(field);
     } else {
       throw new Error(`Can't extract replies on field type ${field.type}`);
     }

@@ -9,6 +9,7 @@
     "download-flag-emojis": "node dist/download-flag-emojis.js",
     "download-fonts": "node dist/download-fonts.js",
     "download-timezone-list": "node dist/download-timezone-list.js",
+    "download-mediatopics": "node dist/download-mediatopics.js",
     "extract-i18n-terms": "node dist/extract-i18n-terms.js",
     "generate-i18n-files": "node dist/generate-i18n-files.js",
     "build-release": "node dist/build-release.js",

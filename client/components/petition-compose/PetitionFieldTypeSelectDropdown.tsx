@@ -101,6 +101,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
             }),
             fields: [
               "BACKGROUND_CHECK",
+              "ADVERSE_MEDIA_SEARCH",
               "DYNAMIC_SELECT",
               ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
               ...(user.hasDowJonesField ? ["DOW_JONES_KYC"] : []),
@@ -121,7 +122,9 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
 
       const { locale } = useIntl();
 
-      const showPaidBadge = activeType === "BACKGROUND_CHECK" && !user.hasBackgroundCheck;
+      const showPaidBadge =
+        (activeType === "BACKGROUND_CHECK" && !user.hasBackgroundCheck) ||
+        (activeType === "ADVERSE_MEDIA_SEARCH" && !user.hasAdverseMediaSearch);
 
       const itemRole = (
         {
@@ -348,6 +351,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
           hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
           hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
           hasProfileSearchField: hasFeatureFlag(featureFlag: PROFILE_SEARCH_FIELD)
+          hasAdverseMediaSearch: hasFeatureFlag(featureFlag: ADVERSE_MEDIA_SEARCH)
         }
       `,
     },

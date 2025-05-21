@@ -13,9 +13,8 @@ import pMap from "p-map";
 import { isNonNullish, isNullish, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { CreatePetitionFieldReply } from "../../../db/__types";
-import { PetitionFieldOptions } from "../../../db/helpers/fieldOptions";
 import { InvalidCredentialsError } from "../../../integrations/helpers/GenericIntegration";
-import { fieldReplyContent } from "../../../util/fieldReplyContent";
+import { PetitionFieldOptions } from "../../../services/PetitionFieldService";
 import { fromGlobalId, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { never } from "../../../util/never";
@@ -28,12 +27,12 @@ import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonObjectArg } from "../../helpers/scalars/JSON";
 import { validateAnd } from "../../helpers/validateArgs";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
-import { authenticateBackgroundCheckToken } from "../../integrations/authorizers";
+import { authenticatePetitionOrProfileReplyToken } from "../../integrations/authorizers";
 import {
-  BackgroundCheckPetitionParams,
-  BackgroundCheckProfileParams,
   NumericParams,
-  parseBackgroundCheckToken,
+  PetitionReplyParams,
+  ProfileReplyParams,
+  parseReplyToken,
 } from "../../integrations/utils";
 import {
   fieldCanBeReplied,
@@ -688,7 +687,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
             };
           } else {
             return {
-              content: fieldReplyContent(field.type, fieldReply.content),
+              content: ctx.petitionFields.mapReplyContentToDatabase(field.type, fieldReply.content),
               petition_field_id: field.id,
               parent_petition_field_reply_id: fieldReply.parentReplyId ?? null,
               type: field.type,
@@ -780,7 +779,7 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
       args.petitionId,
       replyInput.map((replyData) => ({
         id: replyData.id,
-        content: fieldReplyContent(replyData.type, replyData.content),
+        content: ctx.petitionFields.mapReplyContentToDatabase(replyData.type, replyData.content),
       })),
       ctx.user!,
     );
@@ -791,7 +790,7 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
   type: "Success",
   authorize: authenticateAnd(
     userHasFeatureFlag("BACKGROUND_CHECK"),
-    authenticateBackgroundCheckToken("token"),
+    authenticatePetitionOrProfileReplyToken("token", "BACKGROUND_CHECK"),
   ),
   args: {
     token: nonNull(stringArg()),
@@ -800,7 +799,7 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
   resolve: async (_, args, ctx) => {
     async function petitionParamsResolver(
       entityId: string | null,
-      params: NumericParams<BackgroundCheckPetitionParams>,
+      params: NumericParams<PetitionReplyParams>,
     ) {
       const petition = await ctx.petitions.loadPetition(params.petitionId);
       if (petition?.status === "CLOSED") {
@@ -860,7 +859,7 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
 
     async function profileParamsResolver(
       entityId: string | null,
-      params: NumericParams<BackgroundCheckProfileParams>,
+      params: NumericParams<ProfileReplyParams>,
     ) {
       const profile = await ctx.profiles.loadProfile(params.profileId);
 
@@ -917,7 +916,7 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
     }
 
     try {
-      const params = parseBackgroundCheckToken(args.token);
+      const params = parseReplyToken(args.token);
 
       if ("petitionId" in params) {
         await petitionParamsResolver(args.entityId ?? null, params);

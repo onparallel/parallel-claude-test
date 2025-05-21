@@ -5,6 +5,11 @@ import {
   IAccountSetupService,
 } from "./AccountSetupService";
 import {
+  ADVERSE_MEDIA_SEARCH_SERVICE,
+  AdverseMediaSearchService,
+  IAdverseMediaSearchService,
+} from "./AdverseMediaSearchService";
+import {
   AI_ASSISTANT_SERVICE,
   AiAssistantService,
   IAiAssistantService,
@@ -61,6 +66,7 @@ import {
   OrganizationLayoutService,
 } from "./OrganizationLayoutService";
 import { IPetitionBinder, PETITION_BINDER, PetitionBinder } from "./PetitionBinder";
+import { PETITION_FIELD_SERVICE, PetitionFieldService } from "./PetitionFieldService";
 import { PETITION_FILES_SERVICE, PetitionFilesService } from "./PetitionFilesService";
 import {
   IPetitionImportExportService,
@@ -72,6 +78,11 @@ import {
   PETITION_MESSAGE_CONTEXT_SERVICE,
   PetitionMessageContextService,
 } from "./PetitionMessageContextService";
+import {
+  PETITION_VALIDATION_SERVICE,
+  PetitionValidationService,
+} from "./PetitionValidationService";
+import { PETITIONS_HELPER_SERVICE, PetitionsHelperService } from "./PetitionsHelperService";
 import { IPrinter, PRINTER, Printer } from "./Printer";
 import {
   PROFILE_EXCEL_EXPORT_SERVICE,
@@ -88,6 +99,7 @@ import {
 } from "./ProfileExternalSourcesService";
 import { PROFILE_TYPE_FIELD_SERVICE, ProfileTypeFieldService } from "./ProfileTypeFieldService";
 import { PROFILE_VALIDATION_SERVICE, ProfileValidationService } from "./ProfileValidationService";
+import { PROFILES_HELPER_SERVICE, ProfilesHelperService } from "./ProfilesHelperService";
 import {
   IProfilesSetupService,
   PROFILES_SETUP_SERVICE,
@@ -119,6 +131,10 @@ export const servicesModule = new ContainerModule((options) => {
     .inSingletonScope();
   options.bind<IAiAssistantService>(AI_ASSISTANT_SERVICE).to(AiAssistantService).inSingletonScope();
   options.bind<ICorsService>(CORS_SERVICE).to(CorsService).inSingletonScope();
+  options
+    .bind<IAdverseMediaSearchService>(ADVERSE_MEDIA_SEARCH_SERVICE)
+    .to(AdverseMediaSearchService)
+    .inSingletonScope();
 
   // Request Scope
   options
@@ -154,6 +170,13 @@ export const servicesModule = new ContainerModule((options) => {
   options.bind(PROFILE_EXCEL_IMPORT_SERVICE).to(ProfileExcelImportService);
   options.bind(PROFILE_EXCEL_EXPORT_SERVICE).to(ProfileExcelExportService);
 
+  // Petition helper services
+  options.bind(PETITIONS_HELPER_SERVICE).to(PetitionsHelperService);
+  options.bind(PETITION_VALIDATION_SERVICE).to(PetitionValidationService);
+  options.bind(PETITION_FIELD_SERVICE).to(PetitionFieldService);
+
+  // Profile helper services
+  options.bind(PROFILES_HELPER_SERVICE).to(ProfilesHelperService);
   options.bind(PROFILE_VALIDATION_SERVICE).to(ProfileValidationService);
   options.bind(PROFILE_TYPE_FIELD_SERVICE).to(ProfileTypeFieldService);
 });

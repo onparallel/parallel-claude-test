@@ -107,6 +107,8 @@ export function validApprovalFlowConfigInput<TypeName extends string, FieldName 
               standardListDefinitions:
                 await ctx.petitions.loadResolvedStandardListDefinitionsByPetitionId(petitionId),
               customLists: petition.custom_lists ?? [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                ctx.petitionFields.loadSelectOptionsValuesAndLabels(options),
             },
             true,
           );

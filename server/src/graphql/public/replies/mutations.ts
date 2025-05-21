@@ -11,8 +11,7 @@ import {
 import { isNonNullish, isNullish, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { CreatePetitionFieldReply } from "../../../db/__types";
-import { PetitionFieldOptions } from "../../../db/helpers/fieldOptions";
-import { fieldReplyContent } from "../../../util/fieldReplyContent";
+import { PetitionFieldOptions } from "../../../services/PetitionFieldService";
 import { toGlobalId } from "../../../util/globalId";
 import { random } from "../../../util/token";
 import { RESULT } from "../../helpers/Result";
@@ -92,7 +91,7 @@ export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetit
     const data: CreatePetitionFieldReply[] = args.fields.map((fieldReply) => {
       const field = fields.find((f) => f!.id === fieldReply.id)!;
       return {
-        content: fieldReplyContent(field.type, fieldReply.content),
+        content: ctx.petitionFields.mapReplyContentToDatabase(field.type, fieldReply.content),
         petition_field_id: fieldReply.id,
         parent_petition_field_reply_id: fieldReply.parentReplyId ?? null,
         type: field.type,
@@ -159,7 +158,7 @@ export const publicUpdatePetitionFieldReplies = mutationField("publicUpdatePetit
       ctx.access!.petition_id,
       repliesInput.map((replyData) => ({
         id: replyData.id,
-        content: fieldReplyContent(replyData.type, replyData.content),
+        content: ctx.petitionFields.mapReplyContentToDatabase(replyData.type, replyData.content),
       })),
       ctx.access!,
     );

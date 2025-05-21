@@ -18,7 +18,8 @@ export function defaultFieldCondition<T extends Pick<PetitionField, "id" | "type
     isFileTypeField(field.type) ||
     (field.type === "DYNAMIC_SELECT" && column === undefined) ||
     field.type === "FIELD_GROUP" ||
-    field.type === "BACKGROUND_CHECK";
+    field.type === "BACKGROUND_CHECK" ||
+    field.type === "ADVERSE_MEDIA_SEARCH";
 
   return {
     fieldId: field.id,
@@ -46,8 +47,9 @@ export function defaultFieldConditionValue<
   if (
     isFileTypeField(field.type) ||
     (field.type === "DYNAMIC_SELECT" && column === undefined) ||
+    field.type === "FIELD_GROUP" ||
     field.type === "BACKGROUND_CHECK" ||
-    field.type === "FIELD_GROUP"
+    field.type === "ADVERSE_MEDIA_SEARCH"
   ) {
     return 0;
   } else if (field.type === "SELECT") {
