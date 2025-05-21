@@ -2308,6 +2308,8 @@ export function publicApi(container: Container) {
             containsGraphQLError(error, "ONGOING_APPROVAL_REQUEST_ERROR")
           ) {
             throw new ForbiddenError(error.message);
+          } else if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+            throw new BadRequestError(error.message);
           }
           throw error;
         }
@@ -2442,6 +2444,8 @@ export function publicApi(container: Container) {
             containsGraphQLError(error, "ONGOING_APPROVAL_REQUEST_ERROR")
           ) {
             throw new ForbiddenError(error.message);
+          } else if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+            throw new BadRequestError(error.message);
           }
 
           throw error;
