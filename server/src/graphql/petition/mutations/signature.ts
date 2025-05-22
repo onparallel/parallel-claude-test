@@ -44,16 +44,6 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
       }
 
       if (
-        !petition.signature_config.allowAdditionalSigners &&
-        isNonNullish(args.additionalSigners)
-      ) {
-        throw new ApolloError(
-          `Petition does not allow additional signers`,
-          "ADDITIONAL_SIGNERS_NOT_ALLOWED_ERROR",
-        );
-      }
-
-      if (
         petition.approval_flow_config &&
         petition.signature_config.review &&
         petition.signature_config.reviewAfterApproval

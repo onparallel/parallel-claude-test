@@ -3359,8 +3359,6 @@ export function publicApi(container: Container) {
             throw new ForbiddenError("You don't have enough credits to complete this parallel");
           } else if (containsGraphQLError(error, "APPROVAL_REQUEST_STEP_NOT_COMPLETED")) {
             throw new ForbiddenError(error.message);
-          } else if (containsGraphQLError(error, "ADDITIONAL_SIGNERS_NOT_ALLOWED_ERROR")) {
-            throw new BadRequestError(error.message);
           } else if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
             const extra = error.response.errors![0].extensions.extra as
               | {
