@@ -501,7 +501,7 @@ interface OPointDocument {
 interface OPointSearchResponse {
   searchresult: {
     documents: number;
-    document: OPointDocument[];
+    document?: OPointDocument[];
     generated_timestamp: number;
   };
 }
@@ -586,7 +586,7 @@ export class OPointClient implements IAdverseMediaSearchClient {
 
     return {
       totalCount: response.searchresult.documents,
-      items: response.searchresult.document.map(this.mapArticle),
+      items: response.searchresult.document?.map(this.mapArticle) ?? [],
       createdAt: new Date(response.searchresult.generated_timestamp * 1_000),
     };
   }
@@ -620,7 +620,7 @@ export class OPointClient implements IAdverseMediaSearchClient {
       },
     });
 
-    if (response.searchresult.document.length === 0) {
+    if (!response.searchresult.document || response.searchresult.document.length === 0) {
       throw new Error("ARTICLE_NOT_FOUND");
     }
 
