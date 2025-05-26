@@ -96,7 +96,7 @@ export function PetitionRepliesFieldFileSchema({
       );
     }
 
-    if (fieldSchema.type === "object" && fieldSchema.format === "currency") {
+    if (fieldSchema.format === "currency") {
       // Render currency amount with value and currency format
       return (
         <PetitionRepliesMetadataText
