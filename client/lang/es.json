@@ -1116,8 +1116,8 @@
   },
   {
     "term": "component.configure-adverse-media-automate-search-dialog.profile-label",
-    "definition": "Perfil",
-    "context": "Profile"
+    "definition": "Perfil de búsqueda en listados",
+    "context": "Background check profile"
   },
   {
     "term": "component.configure-adverse-media-automate-search-dialog.remove-setting",

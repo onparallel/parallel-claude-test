@@ -7950,7 +7950,10 @@ type Query {
   """
   Suggest entity names based on a search term
   """
-  adverseMediaEntitySuggest(searchTerm: String!): [AdverseMediaEntitySuggestItem!]!
+  adverseMediaEntitySuggest(
+    excludeIds: [String!]
+    searchTerm: String!
+  ): [AdverseMediaEntitySuggestItem!]!
   backgroundCheckEntityDetails(entityId: String!, token: String!): BackgroundCheckEntityDetails!
   backgroundCheckEntitySearch(
     """

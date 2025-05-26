@@ -30,11 +30,13 @@ export const adverseMediaEntitySuggest = queryField("adverseMediaEntitySuggest",
       ),
     ),
   ),
-  args: { searchTerm: nonNull(stringArg()) },
+  args: { searchTerm: nonNull(stringArg()), excludeIds: list(nonNull(stringArg())) },
   authorize: authenticateAnd(userHasFeatureFlag("ADVERSE_MEDIA_SEARCH")),
   validateArgs: maxLength("searchTerm", 100),
   resolve: async (_, args, ctx) => {
-    return await ctx.adverseMedia.searchEntities(args.searchTerm);
+    return await ctx.adverseMedia.searchEntities(args.searchTerm, {
+      excludeIds: args.excludeIds ?? [],
+    });
   },
 });
 

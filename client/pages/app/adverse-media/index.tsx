@@ -131,7 +131,7 @@ function AdverseMediaSearch({
       if (isNonNullish(searchData) && searchData.length > 0) {
         const searchId = Date.now().toString();
         lastSearchRef.current = searchId;
-
+        startTimestamp.current = Date.now();
         setIsSearching(true);
         try {
           const { data: refetchData } = await refetch({
@@ -460,12 +460,7 @@ function SearchInputWithSuggestions({
                     },
                   }))}
                   onChange={(newValue) => {
-                    const newValues = newValue.map((v) => ({
-                      term: v._search.term,
-                      entityId: v._search.entityId,
-                      wikiDataId: v._search.wikiDataId,
-                      label: v._search.label,
-                    }));
+                    const newValues = newValue.map((v) => v._search);
                     onChange(newValues);
                     if (newValues.length !== value.length) {
                       onSubmit();

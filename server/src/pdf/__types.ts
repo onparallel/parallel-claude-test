@@ -6244,6 +6244,7 @@ export type QueryadverseMediaArticleSearchArgs = {
 };
 
 export type QueryadverseMediaEntitySuggestArgs = {
+  excludeIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
   searchTerm: Scalars["String"]["input"];
 };
 

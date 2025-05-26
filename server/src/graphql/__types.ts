@@ -10161,6 +10161,7 @@ export interface NexusGenArgTypes {
     };
     adverseMediaEntitySuggest: {
       // args
+      excludeIds?: string[] | null; // [String!]
       searchTerm: string; // String!
     };
     backgroundCheckEntityDetails: {

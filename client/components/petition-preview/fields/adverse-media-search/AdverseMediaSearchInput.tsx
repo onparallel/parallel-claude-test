@@ -89,12 +89,12 @@ export const AdverseMediaSearchInput = forwardRef(function AdverseMediaSearchInp
   const [inputValue, setInputValue] = useState("");
 
   const loadOptions = useDebouncedAsync(
-    async (search: string): Promise<Option[]> => {
+    async (search: string, entityIdsToOmit?: string[]): Promise<Option[]> => {
       if (search.length < 3) return [];
 
       const { data } = await apollo.query({
         query: AdverseMediaSearchInput_adverseMediaEntitySuggestDocument,
-        variables: { searchTerm: search },
+        variables: { searchTerm: search, excludeIds: entityIdsToOmit },
         fetchPolicy: "network-only",
       });
 
@@ -153,7 +153,8 @@ export const AdverseMediaSearchInput = forwardRef(function AdverseMediaSearchInp
   });
 
   const loadOptionsForSelect = async (inputText: string): Promise<readonly Option[]> => {
-    return await loadOptions(inputText);
+    const entityIdsToOmit = value?.map((v) => v._search.entityId).filter(isNonNullish);
+    return await loadOptions(inputText, entityIdsToOmit);
   };
 
   const formatCreateLabel = (label: string) => {
@@ -201,8 +202,11 @@ export const AdverseMediaSearchInput = forwardRef(function AdverseMediaSearchInp
 
 const _mutations = [
   gql`
-    query AdverseMediaSearchInput_adverseMediaEntitySuggest($searchTerm: String!) {
-      adverseMediaEntitySuggest(searchTerm: $searchTerm) {
+    query AdverseMediaSearchInput_adverseMediaEntitySuggest(
+      $searchTerm: String!
+      $excludeIds: [String!]
+    ) {
+      adverseMediaEntitySuggest(searchTerm: $searchTerm, excludeIds: $excludeIds) {
         id
         name
       }

@@ -3066,6 +3066,7 @@ export interface MutationstartPetitionApprovalRequestStepArgs {
 }
 
 export interface MutationstartSignatureRequestArgs {
+  additionalSigners?: InputMaybe<Array<PublicPetitionSignerDataInput>>;
   customDocumentTemporaryFileId?: InputMaybe<Scalars["GID"]["input"]>;
   message?: InputMaybe<Scalars["String"]["input"]>;
   petitionId: Scalars["GID"]["input"];
@@ -6490,6 +6491,7 @@ export interface QueryadverseMediaArticleSearchArgs {
 }
 
 export interface QueryadverseMediaEntitySuggestArgs {
+  excludeIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
   searchTerm: Scalars["String"]["input"];
 }
 
@@ -29045,6 +29047,7 @@ export type AdverseMediaArticleHeader_AdverseMediaArticleFragment = {
 
 export type AdverseMediaSearchInput_adverseMediaEntitySuggestQueryVariables = Exact<{
   searchTerm: Scalars["String"]["input"];
+  excludeIds?: InputMaybe<Array<Scalars["String"]["input"]> | Scalars["String"]["input"]>;
 }>;
 
 export type AdverseMediaSearchInput_adverseMediaEntitySuggestQuery = {
@@ -81621,8 +81624,11 @@ export const AdverseMediaArticleCard_adverseMediaArticleDetailsDocument = gql`
   AdverseMediaArticleCard_adverseMediaArticleDetailsQueryVariables
 >;
 export const AdverseMediaSearchInput_adverseMediaEntitySuggestDocument = gql`
-  query AdverseMediaSearchInput_adverseMediaEntitySuggest($searchTerm: String!) {
-    adverseMediaEntitySuggest(searchTerm: $searchTerm) {
+  query AdverseMediaSearchInput_adverseMediaEntitySuggest(
+    $searchTerm: String!
+    $excludeIds: [String!]
+  ) {
+    adverseMediaEntitySuggest(searchTerm: $searchTerm, excludeIds: $excludeIds) {
       id
       name
     }

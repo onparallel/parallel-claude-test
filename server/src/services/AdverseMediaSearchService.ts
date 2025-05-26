@@ -29,7 +29,10 @@ export interface AdverseMediaSearchContent {
 }
 
 export interface IAdverseMediaSearchService {
-  searchEntities(searchTerm: string): Promise<EntitySuggestionResponseItem[]>;
+  searchEntities(
+    searchTerm: string,
+    opts?: { excludeIds?: string[] },
+  ): Promise<EntitySuggestionResponseItem[]>;
   searchArticles(
     searchTerms: SearchTerm[],
     opts?: { excludeArticles?: string[] },
@@ -58,8 +61,8 @@ export class AdverseMediaSearchService implements IAdverseMediaSearchService {
     @inject(ADVERSE_MEDIA_SEARCH_CLIENT) private opointAdverseMedia: IAdverseMediaSearchClient,
   ) {}
 
-  async searchEntities(searchTerm: string) {
-    return await this.opointAdverseMedia.searchEntities(searchTerm);
+  async searchEntities(searchTerm: string, opts?: { excludeIds?: string[] }) {
+    return await this.opointAdverseMedia.searchEntities(searchTerm, opts);
   }
 
   async searchArticles(search: SearchTerm[], opts?: { excludeArticles?: string[] }) {

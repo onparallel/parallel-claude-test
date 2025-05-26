@@ -36,7 +36,10 @@ export interface AdverseMediaArticle {
 }
 
 export interface IAdverseMediaSearchClient {
-  searchEntities(searchTerm: string): Promise<EntitySuggestionResponseItem[]>;
+  searchEntities(
+    searchTerm: string,
+    opts?: { excludeIds?: string[] },
+  ): Promise<EntitySuggestionResponseItem[]>;
   searchArticles(
     searchTerms: SearchTerm[],
     opts?: { excludeArticles?: string[] },

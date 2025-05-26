@@ -101,7 +101,7 @@ export function ConfigureAdverseMediaAutomateSearchDialog({
             <FormLabel fontWeight={400}>
               <FormattedMessage
                 id="component.configure-adverse-media-automate-search-dialog.profile-label"
-                defaultMessage="Profile"
+                defaultMessage="Background check profile"
               />
             </FormLabel>
             <Controller
