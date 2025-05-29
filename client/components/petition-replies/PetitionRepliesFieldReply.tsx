@@ -32,12 +32,10 @@ import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { getReplyContents } from "@parallel/utils/getReplyContents";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
-import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
-import { useWindowEvent } from "@parallel/utils/useWindowEvent";
-import { Fragment, useRef } from "react";
+import { Fragment } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, isNullish } from "remeda";
+import { isNonNullish } from "remeda";
 import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
@@ -60,7 +58,10 @@ export interface PetitionRepliesFieldReplyProps {
   petition: PetitionRepliesFieldReply_PetitionFragment;
   reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment;
   onUpdateStatus: (status: PetitionFieldReplyStatus) => void;
-  onAction: (action: PetitionRepliesFieldAction) => void;
+  onAction: (
+    action: PetitionRepliesFieldAction,
+    reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment,
+  ) => void;
   isDisabled?: boolean;
 }
 
@@ -80,19 +81,9 @@ export function PetitionRepliesFieldReply({
 }: PetitionRepliesFieldReplyProps) {
   const intl = useIntl();
   const type = reply.field!.type;
-  const parentReplyId = reply.parent?.id;
 
-  const browserTabRef = useRef<Window>();
   const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const countryNames = useLoadCountryNames(intl.locale);
-
-  const tokenBase64 = btoa(
-    JSON.stringify({
-      fieldId: reply.field!.id,
-      petitionId: petition.id,
-      ...(parentReplyId ? { parentReplyId } : {}),
-    }),
-  );
 
   const buildUrlToSection = useBuildUrlToPetitionSection();
   const editReplyIconButton = (idSuffix = "") => {
@@ -120,70 +111,8 @@ export function PetitionRepliesFieldReply({
     );
   };
 
-  useWindowEvent(
-    "message",
-    async (e) => {
-      const browserTab = browserTabRef.current;
-      if (isNullish(browserTab) || e.source !== browserTab) {
-        return;
-      }
-      if (e.data.event === "update-info") {
-        const token = e.data.token;
-        if (token !== tokenBase64) {
-          return;
-        }
-
-        browserTab.postMessage(
-          {
-            event: "info-updated",
-            entityIds: [reply.content?.entity?.id].filter(isNonNullish),
-          },
-          browserTab.origin,
-        );
-      }
-    },
-    [tokenBase64],
-  );
-
   const handleAction = async (action: PetitionRepliesFieldAction) => {
-    const petitionStatus = petition.__typename === "Petition" && petition.status;
-    const isReadOnly = isDisabled || reply.status === "APPROVED" || petitionStatus === "CLOSED";
-
-    if (action === "VIEW_DETAILS" || action === "VIEW_RESULTS") {
-      const { name, date, type, country } = reply.content?.query ?? {};
-
-      let url = `/${intl.locale}/app/background-check/`;
-
-      if (action === "VIEW_RESULTS") {
-        url += `/results`;
-      } else {
-        url += `/${reply.content?.entity?.id}`;
-      }
-      const urlParams = new URLSearchParams({
-        token: tokenBase64,
-        ...(name ? { name } : {}),
-        ...(date ? { date } : {}),
-        ...(type ? { type } : {}),
-        ...(country ? { country } : {}),
-        ...(isReadOnly ? { readonly: "true" } : {}),
-      });
-      try {
-        browserTabRef.current = await openNewWindow(`${url}?${urlParams.toString()}`);
-      } catch {}
-    } else if (action === "VIEW_ARTICLES") {
-      const url = `/${intl.locale}/app/adverse-media`;
-
-      const urlParams = new URLSearchParams({
-        token: tokenBase64,
-        defaultTabIndex: "1",
-        ...(isReadOnly ? { readonly: "true" } : {}),
-      });
-      try {
-        browserTabRef.current = await openNewWindow(`${url}?${urlParams.toString()}`);
-      } catch {}
-    } else {
-      onAction(action);
-    }
+    onAction(action, reply);
   };
 
   const entityTypeLabel = getEntityTypeLabel(intl, reply.content?.query?.type);

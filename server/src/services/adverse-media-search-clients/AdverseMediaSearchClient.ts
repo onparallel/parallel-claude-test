@@ -35,14 +35,26 @@ export interface AdverseMediaArticle {
   images?: string[];
 }
 
+export interface SuggestEntitiesOptions {
+  excludeEntityIds?: string[];
+}
+
+export interface BuildSearchTermOptions {
+  excludeArticles?: string[] | null;
+}
+
+export interface FetchArticleOptions {
+  searchTerms?: SearchTerm[] | null;
+}
+
 export interface IAdverseMediaSearchClient {
-  searchEntities(
+  suggestEntities(
     searchTerm: string,
-    opts?: { excludeIds?: string[] },
+    opts?: SuggestEntitiesOptions,
   ): Promise<EntitySuggestionResponseItem[]>;
   searchArticles(
     searchTerms: SearchTerm[],
-    opts?: { excludeArticles?: string[] },
+    opts?: BuildSearchTermOptions,
   ): Promise<ArticleSearchResponse>;
-  fetchArticle(id: string, searchTerms?: SearchTerm[] | null): Promise<AdverseMediaArticle>;
+  fetchArticle(id: string, opts?: FetchArticleOptions): Promise<AdverseMediaArticle>;
 }

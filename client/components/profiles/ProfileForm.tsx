@@ -282,9 +282,12 @@ export const ProfileForm = Object.assign(
                       const useValueAsExpiryDate =
                         prop?.field.type === "DATE" && prop?.field.options?.useReplyAsExpiryDate;
 
-                      if (type === "BACKGROUND_CHECK") {
-                        if ((content?.search || content?.entity) && prop?.field.isExpirable) {
-                          // BACKGROUND_CHECK can only update expiryDate through this mutation
+                      if (type === "BACKGROUND_CHECK" || type === "ADVERSE_MEDIA_SEARCH") {
+                        if (
+                          (content?.search || content?.entity || content?.articles) &&
+                          prop?.field.isExpirable
+                        ) {
+                          // BACKGROUND_CHECK and ADVERSE_MEDIA_SEARCH can only update expiryDate through this mutation
                           return {
                             profileTypeFieldId,
                             expiryDate: expiryDate || null,

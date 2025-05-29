@@ -555,7 +555,7 @@ export class MockAdverseMediaSearchService
     },
   ];
 
-  override async searchEntities() {
+  override async suggestEntities() {
     return [];
   }
 

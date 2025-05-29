@@ -31,7 +31,6 @@ import {
   AdverseMediaSearch_saveAdverseMediaChangesDocument,
   AdverseMediaSearchTermInput,
 } from "@parallel/graphql/__types";
-import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { UnwrapPromise } from "@parallel/utils/types";
@@ -43,7 +42,7 @@ import Head from "next/head";
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, isNullish, omit, omitBy, uniqueBy } from "remeda";
+import { isNonNullish, isNullish, omitBy, uniqueBy } from "remeda";
 
 type AdverseMediaSearchProps = UnwrapPromise<ReturnType<typeof AdverseMediaSearch.getInitialProps>>;
 
@@ -57,7 +56,6 @@ function AdverseMediaSearch({
   token,
   articleId,
   defaultTabIndex,
-  savedSearch,
   autoCompleteSearch,
   isReadOnly,
   isTemplate,
@@ -76,7 +74,7 @@ function AdverseMediaSearch({
     data: _data,
     loading: queryLoading,
     refetch,
-  } = useAssertQuery(AdverseMediaSearch_adverseMediaArticleSearchDocument, {
+  } = useQuery(AdverseMediaSearch_adverseMediaArticleSearchDocument, {
     variables: {
       token,
       search: !hasReply && autoCompleteSearch.length ? autoCompleteSearch : null,
@@ -121,10 +119,18 @@ function AdverseMediaSearch({
 
   const form = useForm<AdverseMediaSearchData>({
     defaultValues: {
-      search: savedSearch?.length ? savedSearch : search,
+      search: !hasReply && autoCompleteSearch.length ? autoCompleteSearch : search,
     },
     mode: "onChange",
   });
+
+  useEffect(() => {
+    if (!queryLoading) {
+      form.reset({
+        search,
+      });
+    }
+  }, [queryLoading]);
 
   const performSearch = useCallback(
     async (searchData: AdverseMediaSearchTermInput[]) => {
@@ -632,19 +638,10 @@ AdverseMediaSearch.getInitialProps = async ({ query, fetchQuery }: WithApolloDat
       : null,
   ].filter(isNonNullish);
 
-  const { data } = await fetchQuery(AdverseMediaSearch_adverseMediaArticleSearchDocument, {
-    variables: {
-      token,
-      search: isNullish(query.hasReply) && autoCompleteSearch.length ? autoCompleteSearch : null,
-    },
-  });
-  const search = data?.adverseMediaArticleSearch?.search ?? [];
-
   return {
     token,
     articleId: query.articleId as string,
     defaultTabIndex: query.defaultTabIndex ? parseInt(query.defaultTabIndex as string) : undefined,
-    savedSearch: search.map((item) => omit(item, ["__typename"])),
     autoCompleteSearch,
     hasReply: query.hasReply === "true",
     isReadOnly: query.readonly === "true",

@@ -494,7 +494,7 @@ const ProfileFieldAdverseMediaSearchValue = chakraForwardRef<"div", ProfilePrope
           onClick={handleClick}
           fontWeight={500}
         >
-          <Stack spacing={1} maxWidth="100%" width="100%">
+          <Stack spacing={1} maxWidth="100%" width="100%" textAlign="start">
             <HStack spacing={1.5} minWidth={0} width="100%">
               <ShortSearchIcon />
               <OverflownText textAlign="start" width="100%">

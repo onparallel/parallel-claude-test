@@ -5,9 +5,12 @@ import {
   ADVERSE_MEDIA_SEARCH_CLIENT,
   AdverseMediaArticle,
   ArticleSearchResponse,
+  BuildSearchTermOptions,
   EntitySuggestionResponseItem,
+  FetchArticleOptions,
   IAdverseMediaSearchClient,
   SearchTerm,
+  SuggestEntitiesOptions,
 } from "./adverse-media-search-clients/AdverseMediaSearchClient";
 
 export const ADVERSE_MEDIA_SEARCH_SERVICE = Symbol.for("ADVERSE_MEDIA_SEARCH_SERVICE");
@@ -29,15 +32,15 @@ export interface AdverseMediaSearchContent {
 }
 
 export interface IAdverseMediaSearchService {
-  searchEntities(
+  suggestEntities(
     searchTerm: string,
-    opts?: { excludeIds?: string[] },
+    opts?: SuggestEntitiesOptions,
   ): Promise<EntitySuggestionResponseItem[]>;
   searchArticles(
     searchTerms: SearchTerm[],
-    opts?: { excludeArticles?: string[] },
+    opts?: BuildSearchTermOptions,
   ): Promise<ArticleSearchResponse>;
-  fetchArticle(id: string, searchTerms?: SearchTerm[] | null): Promise<AdverseMediaArticle>;
+  fetchArticle(id: string, opts?: FetchArticleOptions): Promise<AdverseMediaArticle>;
   addRelevanceToArticle(
     article: AdverseMediaArticle,
     content: Pick<
@@ -61,16 +64,16 @@ export class AdverseMediaSearchService implements IAdverseMediaSearchService {
     @inject(ADVERSE_MEDIA_SEARCH_CLIENT) private opointAdverseMedia: IAdverseMediaSearchClient,
   ) {}
 
-  async searchEntities(searchTerm: string, opts?: { excludeIds?: string[] }) {
-    return await this.opointAdverseMedia.searchEntities(searchTerm, opts);
+  async suggestEntities(searchTerm: string, opts?: SuggestEntitiesOptions) {
+    return await this.opointAdverseMedia.suggestEntities(searchTerm, opts);
   }
 
-  async searchArticles(search: SearchTerm[], opts?: { excludeArticles?: string[] }) {
+  async searchArticles(search: SearchTerm[], opts?: BuildSearchTermOptions) {
     return await this.opointAdverseMedia.searchArticles(search, opts);
   }
 
-  async fetchArticle(id: string, searchTerms?: SearchTerm[] | null) {
-    return await this.opointAdverseMedia.fetchArticle(id, searchTerms);
+  async fetchArticle(id: string, opts?: FetchArticleOptions) {
+    return await this.opointAdverseMedia.fetchArticle(id, opts);
   }
 
   addRelevanceToArticle(

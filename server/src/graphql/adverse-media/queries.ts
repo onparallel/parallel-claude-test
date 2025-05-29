@@ -34,8 +34,8 @@ export const adverseMediaEntitySuggest = queryField("adverseMediaEntitySuggest",
   authorize: authenticateAnd(userHasFeatureFlag("ADVERSE_MEDIA_SEARCH")),
   validateArgs: maxLength("searchTerm", 100),
   resolve: async (_, args, ctx) => {
-    return await ctx.adverseMedia.searchEntities(args.searchTerm, {
-      excludeIds: args.excludeIds ?? [],
+    return await ctx.adverseMedia.suggestEntities(args.searchTerm, {
+      excludeEntityIds: args.excludeIds ?? [],
     });
   },
 });
@@ -55,7 +55,7 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
     async function petitionParamsResolver(params: NumericParams<PetitionReplyParams>) {
       const fieldReplies = await ctx.petitions.loadRepliesForField(params.fieldId);
 
-      // look for a reply in the field that matches the search criteria
+      // look for a reply in the field with any search criteria
       const reply = fieldReplies.find(
         (r) =>
           r.type === "ADVERSE_MEDIA_SEARCH" &&
@@ -84,6 +84,7 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
         ...(reply?.content?.dismissed_articles ?? []),
       ].map((a) => a.id);
 
+      // if search terms are provided, run a search excluding articles already classified
       const articlesSearch = await ctx.adverseMedia.searchArticles(args.search, {
         excludeArticles: classifiedArticleIds,
       });
@@ -95,7 +96,7 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
       );
 
       if (isNonNullish(reply)) {
-        // reply is defined but search criteria doesn't match, update it
+        // reply is defined: update it
         await ctx.petitions.updatePetitionFieldRepliesContent(
           params.petitionId,
           [
@@ -261,7 +262,7 @@ export const adverseMediaArticleDetails = queryField("adverseMediaArticleDetails
   validateArgs: validateAdverseMediaSearchTermInput("search"),
   resolve: async (_, args, ctx) => {
     async function petitionParamsResolver(params: NumericParams<PetitionReplyParams>) {
-      const article = await ctx.adverseMedia.fetchArticle(args.id, args.search);
+      const article = await ctx.adverseMedia.fetchArticle(args.id, { searchTerms: args.search });
 
       const fieldReplies = await ctx.petitions.loadRepliesForField(params.fieldId);
       const reply = fieldReplies.find(
@@ -279,7 +280,7 @@ export const adverseMediaArticleDetails = queryField("adverseMediaArticleDetails
         ctx.profiles.loadProfileFieldValuesByProfileId(params.profileId),
       ]);
 
-      const article = await ctx.adverseMedia.fetchArticle(args.id, args.search);
+      const article = await ctx.adverseMedia.fetchArticle(args.id, { searchTerms: args.search });
 
       const draftValue = draftValues.find(
         (v) =>
@@ -308,8 +309,10 @@ export const adverseMediaArticleDetails = queryField("adverseMediaArticleDetails
         return null as never;
       }
     } catch (error) {
-      if (error instanceof Error && error.message === "ARTICLE_NOT_FOUND") {
-        throw new ApolloError("Article not found", "ARTICLE_NOT_FOUND");
+      if (error instanceof Error) {
+        if (error.message === "ARTICLE_NOT_FOUND") {
+          throw new ApolloError("Article not found", "ARTICLE_NOT_FOUND");
+        }
       }
 
       throw error;
@@ -364,7 +367,7 @@ export const adverseMediaAlternativeSearchSuggestions = queryField(
 
               Example:
               input: Emilio Cuatrecasas Figueras
-              output: ["Emilio Cuatrecasas", "Emilio Cuatrecasas Figueras", "Emilio C. Figueras"]
+              output: ["Emilio Cuatrecasas", "Emilio C. Figueras"]
             `,
           },
           {

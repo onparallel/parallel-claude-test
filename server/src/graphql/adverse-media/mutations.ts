@@ -1,6 +1,5 @@
 import { mutationField, nonNull, nullable, stringArg } from "nexus";
 import { uniqueBy } from "remeda";
-import { assert } from "ts-essentials";
 import { authenticateAnd } from "../helpers/authorize";
 import { ForbiddenError } from "../helpers/errors";
 import { authenticatePetitionOrProfileReplyToken } from "../integrations/authorizers";
@@ -82,7 +81,11 @@ export const classifyAdverseMediaArticle = mutationField("classifyAdverseMediaAr
           r.type === "ADVERSE_MEDIA_SEARCH" &&
           r.parent_petition_field_reply_id === (params.parentReplyId ?? null),
       );
-      assert(replies.length === 1, "Expected exactly one reply for the field");
+      if (replies.length !== 1) {
+        throw new ForbiddenError(
+          `Expected exactly one reply for the field, but got ${replies.length}`,
+        );
+      }
       const reply = replies[0];
 
       if (!reply.content.articles.items.some((a: any) => a.id === args.id)) {

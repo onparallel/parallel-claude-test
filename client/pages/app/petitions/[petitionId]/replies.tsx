@@ -63,6 +63,7 @@ import {
 } from "@parallel/components/petition-replies/dialogs/ExportRepliesDialog";
 import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesProgressDialog";
 import {
+  AdverseMediaArticle,
   PetitionFieldReplyStatus,
   PetitionReplies_PetitionFragment,
   PetitionReplies_associateProfileToPetitionDocument,
@@ -77,6 +78,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { FieldOptions } from "@parallel/utils/fieldOptions";
 import {
   PetitionFieldFilter,
   defaultFieldsFilter,
@@ -85,6 +87,7 @@ import {
 import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
 import { useClosePetition } from "@parallel/utils/hooks/useClosePetition";
+import { useManagedWindow } from "@parallel/utils/hooks/useManagedWindow";
 import { LiquidPetitionScopeProvider } from "@parallel/utils/liquid/LiquidPetitionScopeProvider";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import {
@@ -103,6 +106,7 @@ import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFil
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
+import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -135,6 +139,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }, [petitionId]);
 
   const petition = data!.petition as PetitionReplies_PetitionFragment;
+
+  const allFields = useMemo(
+    () => petition.fields.flatMap((f) => [f, ...(f.children ?? [])]),
+    [petition.fields],
+  );
+
   const allFieldsUnreadCommentCount =
     sumBy(petition.fields, (f) => f.unreadCommentCount) + petition.unreadGeneralCommentCount;
   const myEffectivePermission = petition.myEffectivePermission!.permissionType;
@@ -232,7 +242,49 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     [petitionId],
   );
 
+  const { openWindow } = useManagedWindow({
+    onRefreshField: refetch,
+  });
+
+  // Handle communication with opened windows for background checks and adverse media
+  useWindowEvent(
+    "message",
+    async (e: MessageEvent) => {
+      if (e.data.event === "update-info") {
+        const token = e.data.token;
+
+        // Parse token to get field and petition info
+        try {
+          const tokenData = JSON.parse(atob(token));
+          if (tokenData.petitionId === petition.id) {
+            // Find the reply
+            const field = allFields.find((field) => field.id === tokenData.fieldId);
+
+            const reply = field?.replies.find((r) => r.parent?.id === tokenData.parentReplyId);
+
+            if (reply && e.source) {
+              (e.source as Window).postMessage(
+                {
+                  event: "info-updated",
+                  entityIds: [reply?.content?.entity?.id].filter(isNonNullish),
+                },
+                (e.source as Window).origin,
+              );
+            }
+          }
+        } catch {
+          // Invalid token, ignore
+        }
+      }
+    },
+    [petition.id, allFields],
+  );
+
   const handleAction: PetitionRepliesFieldProps["onAction"] = async function (action, reply) {
+    const petitionStatus = petition.__typename === "Petition" && petition.status;
+    const isReadOnly =
+      petition.isAnonymized || reply.status === "APPROVED" || petitionStatus === "CLOSED";
+
     switch (action) {
       case "DOWNLOAD_FILE":
       case "PREVIEW_FILE":
@@ -244,6 +296,122 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           );
         } catch {}
         break;
+      case "VIEW_DETAILS":
+      case "VIEW_RESULTS":
+        const parentReplyId = reply.parent?.id;
+        const { name, date, type, country } = reply.content?.query ?? {};
+        const tokenBase64 = btoa(
+          JSON.stringify({
+            fieldId: reply.field!.id,
+            petitionId: petition.id,
+            ...(parentReplyId ? { parentReplyId } : {}),
+          }),
+        );
+
+        let url = `/${intl.locale}/app/background-check/`;
+
+        if (action === "VIEW_RESULTS") {
+          url += `/results`;
+        } else {
+          url += `/${reply.content?.entity?.id}`;
+        }
+        const urlParams = new URLSearchParams({
+          token: tokenBase64,
+          ...(name ? { name } : {}),
+          ...(date ? { date } : {}),
+          ...(type ? { type } : {}),
+          ...(country ? { country } : {}),
+          ...(isReadOnly ? { readonly: "true" } : {}),
+        });
+        try {
+          await openWindow(`${url}?${urlParams.toString()}`);
+        } catch {}
+        break;
+      case "VIEW_ARTICLES": {
+        let name: string | undefined = undefined;
+        let encodedEntity: string | undefined = undefined;
+        const parentReplyId = reply.parent?.id;
+
+        const options = reply.field!.options as FieldOptions["ADVERSE_MEDIA_SEARCH"];
+        const visibleFields = zip(petition.fields, fieldLogic)
+          .filter(([_, { isVisible }]) => isVisible)
+          .map(([field, { groupChildrenLogic }]) => {
+            if (field.type === "FIELD_GROUP") {
+              return {
+                ...field,
+                replies: field.replies.map((r, groupIndex) => ({
+                  ...r,
+                  children: r.children?.filter(
+                    (_, childReplyIndex) =>
+                      groupChildrenLogic?.[groupIndex][childReplyIndex].isVisible ?? false,
+                  ),
+                })),
+              };
+            } else {
+              return field;
+            }
+          });
+
+        if (isNonNullish(options.autoSearchConfig)) {
+          const fields = parentReplyId
+            ? visibleFields.flatMap((f) => [f, ...(f.children ?? [])])
+            : visibleFields;
+
+          name = options
+            .autoSearchConfig!.name?.map((id) => {
+              const field = fields.find((f) => f.id === id);
+              if (field) {
+                const replies = field.replies;
+                return field.parent && parentReplyId
+                  ? replies.find((r) => r?.parent?.id === parentReplyId)?.content.value
+                  : replies[0]?.content.value;
+              }
+              return null;
+            })
+            .filter(isNonNullish)
+            .join(" ")
+            .trim();
+
+          const entity = fields.find((f) => f.id === options.autoSearchConfig!.backgroundCheck)
+            ?.replies[0]?.content.entity;
+
+          if (entity) {
+            encodedEntity = btoa(
+              JSON.stringify({
+                id: entity.id,
+                name: entity.name,
+              }),
+            );
+          }
+        }
+
+        const adverseMediaTokenBase64 = btoa(
+          JSON.stringify({
+            fieldId: reply.field!.id,
+            petitionId: petition.id,
+            ...(parentReplyId ? { parentReplyId } : {}),
+          }),
+        );
+        const adverseMediaUrl = `/${intl.locale}/app/adverse-media`;
+
+        const adverseMediaUrlParams = new URLSearchParams({
+          token: adverseMediaTokenBase64,
+          defaultTabIndex:
+            reply.content?.articles?.items.filter(
+              (article: AdverseMediaArticle) => article.classification === "RELEVANT",
+            ).length > 0
+              ? "1"
+              : "0",
+          hasReply: "true",
+          ...(name ? { name } : {}),
+          ...(encodedEntity ? { entity: encodedEntity } : {}),
+          ...(isReadOnly ? { readonly: "true" } : {}),
+        });
+        try {
+          await openWindow(`${adverseMediaUrl}?${adverseMediaUrlParams.toString()}`);
+        } catch {}
+        break;
+      }
     }
   };
   const showExportRepliesDialog = useExportRepliesDialog();
@@ -335,10 +503,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }, []);
 
   const fieldsWithIndices = useFieldsWithIndices(petition);
-  const allFields = useMemo(
-    () => petition.fields.flatMap((f) => [f, ...(f.children ?? [])]),
-    [petition.fields],
-  );
+
   const hasLinkedToProfileTypeFields = allFields.some((f) => f.isLinkedToProfileTypeField);
 
   const repliesFieldGroupsWithProfileTypes = zip(petition.fields, fieldLogic)

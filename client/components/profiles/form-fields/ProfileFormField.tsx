@@ -133,6 +133,12 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
     (isNonNullish(content?.search) || isNonNullish(content?.entity))
   ) {
     fieldIsEmpty = false;
+  } else if (
+    field.type === "ADVERSE_MEDIA_SEARCH" &&
+    isNonNullish(content?.articles) &&
+    isNonNullish(content?.search)
+  ) {
+    fieldIsEmpty = false;
   }
   const locales = useSupportedUserLocales();
 
