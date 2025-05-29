@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, Stack, Text, useToast } from "@chakra-ui/react";
+import { Box, Button, Flex, Stack, Text, useToast } from "@chakra-ui/react";
 import { ChevronRightIcon, ImportIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NakedLink } from "@parallel/components/common/Link";
@@ -365,9 +365,10 @@ export function PreviewPetitionFieldGroup({
               })}
 
               {petition.__typename === "PetitionTemplate" && !isLinkedToProfileType ? null : (
-                <Center
+                <Flex
                   display={{ base: "none", xl: "flex" }}
                   position="absolute"
+                  alignItems="flex-start"
                   top="0px"
                   insetEnd="-48px"
                   height="100%"
@@ -375,15 +376,18 @@ export function PreviewPetitionFieldGroup({
                   minWidth="48px"
                   padding={2}
                 >
-                  <Stack className={"edit-preview-field-buttons"} display="none">
+                  <Stack
+                    className={"edit-preview-field-buttons"}
+                    display="none"
+                    position="sticky"
+                    top={2}
+                  >
                     {isLinkedToProfileType ? (
                       <IconButtonWithTooltip
                         icon={<ImportIcon boxSize={4} />}
                         size="sm"
-                        variant="outline"
-                        backgroundColor="white"
+                        colorScheme="purple"
                         placement="bottom"
-                        color="gray.600"
                         onClick={() => handleImportFromProfile(group.id)}
                         label={intl.formatMessage({
                           id: "component.preview-petition-field-group.import-from-profile",
@@ -400,7 +404,7 @@ export function PreviewPetitionFieldGroup({
                       iconButtonReviewReply
                     )}
                   </Stack>
-                </Center>
+                </Flex>
               )}
             </RecipientViewPetitionFieldGroupCard>
           );

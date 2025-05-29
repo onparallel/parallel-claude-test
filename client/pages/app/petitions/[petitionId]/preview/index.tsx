@@ -900,9 +900,10 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                                 onCommentsButtonClick={() => setActiveFieldId(field.id)}
                               />
                               {field.type !== "FIELD_GROUP" ? (
-                                <Center
+                                <Flex
                                   display={{ base: "none", xl: "flex" }}
                                   position="absolute"
+                                  alignItems="flex-start"
                                   top="0px"
                                   insetEnd="-48px"
                                   height="100%"
@@ -910,7 +911,12 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                                   minWidth="48px"
                                   padding={2}
                                 >
-                                  <Stack className={"edit-preview-field-buttons"} display="none">
+                                  <Stack
+                                    className={"edit-preview-field-buttons"}
+                                    display="none"
+                                    position="sticky"
+                                    top={2}
+                                  >
                                     <NakedLink
                                       href={buildUrlToSection("compose", { field: field.id })}
                                     >
@@ -939,7 +945,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                                       iconButtonReviewReply
                                     )}
                                   </Stack>
-                                </Center>
+                                </Flex>
                               ) : null}
                             </Box>
                           </LiquidPetitionVariableProvider>
