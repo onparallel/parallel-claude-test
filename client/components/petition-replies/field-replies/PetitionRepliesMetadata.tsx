@@ -3,6 +3,7 @@ import { AlertCircleFilledIcon, CircleCheckFilledIcon } from "@parallel/chakra/i
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { FORMATS } from "@parallel/utils/dates";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
+import * as Sentry from "@sentry/nextjs";
 import { isValid } from "date-fns";
 import { ReactNode, forwardRef } from "react";
 import { FormattedDate, useIntl } from "react-intl";
@@ -57,16 +58,25 @@ export function PetitionRepliesMetadataText({
   label: string;
   content: string | null;
 }) {
+  if (isNonNullish(content) && typeof content !== "string") {
+    Sentry.captureException(
+      new Error(
+        `PetitionRepliesMetadataText content is not a string: ${typeof content} - ${typeof content === "object" ? JSON.stringify(content) : content}`,
+      ),
+    );
+  }
   return (
     <Stack>
       <Text as="span" fontWeight={500} color="gray.600" fontSize="sm">
         {label}
       </Text>
       <HStack>
-        {isNonNullish(content) ? (
+        {isNonNullish(content) && typeof content === "string" ? (
           <CopyToClipboardButton size="xs" fontSize="md" text={content} />
         ) : null}
-        <Text as="span">{isNonNullish(content) ? content : "-"}</Text>
+        <Text as="span">
+          {isNonNullish(content) && typeof content === "string" ? content : "-"}
+        </Text>
       </HStack>
     </Stack>
   );
