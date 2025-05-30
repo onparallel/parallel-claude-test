@@ -1,7 +1,6 @@
 import { inject, injectable } from "inversify";
 import { isNonNullish, isNullish, pick } from "remeda";
 import { CONFIG, Config } from "../../config";
-import { RateLimitGuard } from "../../workers/helpers/RateLimitGuard";
 import { FETCH_SERVICE, FetchService } from "../FetchService";
 import {
   AdverseMediaArticle,
@@ -70,14 +69,10 @@ const OPOINT_PROFILE_ID = "558966";
 
 @injectable()
 export class OPointClient implements IAdverseMediaSearchClient {
-  private rateLimit: RateLimitGuard;
-
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(FETCH_SERVICE) private fetch: FetchService,
-  ) {
-    this.rateLimit = new RateLimitGuard(200); // 200 requests per second
-  }
+  ) {}
 
   private async apiCall<TResult>(method: string, uri: string, body?: any): Promise<TResult> {
     const response = await this.fetch.fetch(`https://api.opoint.com/${uri}`, {
@@ -124,11 +119,10 @@ export class OPointClient implements IAdverseMediaSearchClient {
   }
 
   async searchArticles(searchTerms: SearchTerm[], opts?: BuildSearchTermOptions) {
-    await this.rateLimit.waitUntilAllowed();
     const response = await this.apiCall<OPointSearchResponse>("POST", "search/", {
       searchterm: this.buildSearchTerm(searchTerms, opts),
       params: {
-        requestedarticles: 100,
+        requestedarticles: 25,
         main: {
           header: 1,
         },
@@ -160,7 +154,6 @@ export class OPointClient implements IAdverseMediaSearchClient {
     }
     const [, idSite, idArticle] = idMatch;
 
-    await this.rateLimit.waitUntilAllowed();
     const response = await this.apiCall<OPointSearchResponse>("POST", "search/", {
       ...(opts?.searchTerms
         ? {

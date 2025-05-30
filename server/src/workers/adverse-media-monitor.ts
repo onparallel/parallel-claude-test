@@ -2,8 +2,12 @@ import pMap from "p-map";
 import { AdverseMediaSearchContent } from "../services/AdverseMediaSearchService";
 import { createCronWorker } from "./helpers/createCronWorker";
 import { requiresRefresh } from "./helpers/monitoringUtils";
+import { RateLimitGuard } from "./helpers/RateLimitGuard";
 
 createCronWorker("adverse-media-monitor", async (ctx) => {
+  // we have to be super careful to not overload the API with automatic search requests
+  const guard = new RateLimitGuard(2);
+
   const now = new Date();
   const organizations =
     await ctx.organizations.getOrganizationsWithFeatureFlag("ADVERSE_MEDIA_SEARCH");
@@ -18,6 +22,7 @@ createCronWorker("adverse-media-monitor", async (ctx) => {
     await pMap(
       valuesForRefresh,
       async (value) => {
+        await guard.waitUntilAllowed();
         const content = value.content as AdverseMediaSearchContent;
         const searchResponse = await ctx.adverseMedia.searchArticles(content.search, {
           excludeArticles: [
@@ -53,8 +58,7 @@ createCronWorker("adverse-media-monitor", async (ctx) => {
           org.id,
         );
       },
-      // we have a RateLimitGuard on the search endpoint with 200 req/second, and assume each search request will take approx 2 seconds
-      { concurrency: 200 },
+      { concurrency: 10 },
     );
   }
 });
