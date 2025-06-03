@@ -1062,11 +1062,15 @@ function NotificationsSection({ onHelpCenterClick, ...rest }: NotificationsSecti
           </NavBarButton>
         </ListItem>
         <ListItem>
-          <NakedLink href={`https://help.onparallel.com/${intl.locale}`}>
-            <NavBarButton onClick={onHelpCenterClick} icon={<HelpOutlineIcon boxSize={5} />}>
-              <FormattedMessage id="component.new-layout.help-button" defaultMessage="Help" />
-            </NavBarButton>
-          </NakedLink>
+          <NavBarButton
+            icon={<HelpOutlineIcon boxSize={5} />}
+            as="a"
+            target="_blank"
+            rel="noopener"
+            href={`https://help.onparallel.com/${intl.locale}`}
+          >
+            <FormattedMessage id="generic.help" defaultMessage="Help" />
+          </NavBarButton>
         </ListItem>
       </List>
     </Stack>

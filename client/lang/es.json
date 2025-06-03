@@ -5180,11 +5180,6 @@
     "context": "New folder"
   },
   {
-    "term": "component.new-layout.help-button",
-    "definition": "Ayuda",
-    "context": "Help"
-  },
-  {
     "term": "component.new-layout.hide-navigation",
     "definition": "Esconder menú",
     "context": "Hide navigation"
