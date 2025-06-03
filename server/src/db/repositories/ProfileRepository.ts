@@ -1135,8 +1135,9 @@ export class ProfileRepository extends BaseRepository {
             where pfv2.id is null and nv.content is not null
             returning *
           ),
-          removed_previous_values as (
+          removed_previous_values_and_drafts as (
             -- remove previous values that are being updated or removed
+            -- when removing or updating values, make sure to also remove its possible drafts
             update profile_field_value pfv
               set removed_at = now(),
               removed_by_user_id = ?
@@ -1154,6 +1155,9 @@ export class ProfileRepository extends BaseRepository {
             )
             and pfv.removed_at is null
             returning pfv.*
+          ),
+          removed_previous_values as (
+            select * from removed_previous_values_and_drafts where is_draft = false
           ),
           with_previous_values as (
             -- insert values where a profile_field_value existed already
