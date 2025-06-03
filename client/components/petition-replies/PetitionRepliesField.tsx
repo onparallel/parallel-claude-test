@@ -312,6 +312,22 @@ export const PetitionRepliesField = Object.assign(
         <Stack paddingStart={10} spacing={3}>
           {field.replies.length > 0 ? (
             field.replies.map((reply, index) => {
+              const filteredFields = filterPetitionFields(
+                zip(
+                  reply.children!.map(({ field, replies }) => ({
+                    ...field,
+                    replies,
+                  })),
+                  childrenFieldIndices!,
+                ),
+                fieldLogic.groupChildrenLogic![index],
+                filter,
+              );
+
+              if (filteredFields.length === 0) {
+                return null;
+              }
+
               return (
                 <Card
                   id={`reply-${reply.id}`}
@@ -333,16 +349,7 @@ export const PetitionRepliesField = Object.assign(
                     </Text>
                   ) : null}
                   <Stack spacing={3}>
-                    {filterPetitionFields(
-                      zip(
-                        reply.children!.map(({ field, replies }) => ({
-                          ...field,
-                          childReplies: replies,
-                        })),
-                        childrenFieldIndices!,
-                      ),
-                      fieldLogic.groupChildrenLogic![index],
-                    ).map((x) => {
+                    {filteredFields.map((x) => {
                       return x.type === "FIELD" ? (
                         <LiquidPetitionVariableProvider key={x.field.id} logic={x.fieldLogic}>
                           <Stack key={x.field.id}>
@@ -422,8 +429,8 @@ export const PetitionRepliesField = Object.assign(
                             </Box>
                             {x.field.type === "HEADING" ? null : (
                               <Stack spacing={4}>
-                                {x.field.childReplies.length ? (
-                                  x.field.childReplies.map((reply) => (
+                                {x.field.replies.length ? (
+                                  x.field.replies.map((reply) => (
                                     <PetitionRepliesFieldReply
                                       petition={petition}
                                       key={reply.id}

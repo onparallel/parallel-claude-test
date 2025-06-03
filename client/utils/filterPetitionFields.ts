@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { filterPetitionFields_PetitionFieldFragment } from "@parallel/graphql/__types";
-import { zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
 import { PetitionFieldIndex } from "./fieldIndices";
 import { FieldLogic } from "./fieldLogic/types";
 import { isFileTypeField } from "./isFileTypeField";
@@ -54,30 +54,51 @@ export function filterPetitionFields<T extends filterPetitionFields_PetitionFiel
     } else {
       const conditions: boolean[] = [];
       if (filter.SHOW_REPLIED && !filter.SHOW_NOT_REPLIED) {
-        conditions.push(field.replies.length > 0);
+        conditions.push(
+          field.replies.length > 0 ||
+            (isNonNullish(field.children) && field.children.some((c) => c.replies.length > 0)),
+        );
       }
 
       if (!filter.SHOW_REPLIED && filter.SHOW_NOT_REPLIED) {
-        conditions.push(field.replies.length === 0);
+        conditions.push(
+          field.replies.length === 0 ||
+            (isNonNullish(field.children) && field.children.some((c) => c.replies.length === 0)),
+        );
       }
 
       if (filter.SHOW_ONLY_FILE_UPLOAD) {
-        conditions.push(isFileTypeField(field.type));
+        conditions.push(
+          isFileTypeField(field.type) ||
+            (isNonNullish(field.children) && field.children.some((c) => isFileTypeField(c.type))),
+        );
       }
 
       if (filter.SHOW_REVIEWED && !filter.SHOW_NOT_REVIEWED) {
         conditions.push(
-          field.replies.length > 0 && field.replies.every((r) => r.status === "APPROVED"),
+          (field.replies.length > 0 && field.replies.every((r) => r.status === "APPROVED")) ||
+            (isNonNullish(field.children) &&
+              field.children.some(
+                (c) => c.replies.length > 0 && c.replies.every((r) => r.status === "APPROVED"),
+              )),
         );
       }
       if (!filter.SHOW_REVIEWED && filter.SHOW_NOT_REVIEWED) {
         conditions.push(
           field.replies.length === 0 ||
-            field.replies.some((r) => r.status === "REJECTED" || r.status === "PENDING"),
+            field.replies.some((r) => r.status === "REJECTED" || r.status === "PENDING") ||
+            (isNonNullish(field.children) &&
+              field.children.some(
+                (c) =>
+                  c.replies.length === 0 ||
+                  c.replies.some((r) => r.status === "REJECTED" || r.status === "PENDING"),
+              )),
         );
       }
       if (filter.SHOW_WITH_COMMENTS) {
-        conditions.push(field.commentCount > 0);
+        conditions.push(
+          field.commentCount > 0 || (isNonNullish(field.parent) && field.parent.commentCount > 0),
+        );
       }
       if (conditions.every((x) => x)) {
         filtered.push({
@@ -103,6 +124,19 @@ filterPetitionFields.fragments = {
       replies {
         id
         status
+      }
+      parent {
+        id
+        commentCount
+      }
+      children {
+        id
+        type
+        isReadOnly
+        replies {
+          id
+          status
+        }
       }
     }
   `,

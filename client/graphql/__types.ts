@@ -32686,12 +32686,23 @@ export type PetitionRepliesContents_PetitionFieldFragment = {
   commentCount: number;
   unreadCommentCount: number;
   isReadOnly: boolean;
-  parent?: { __typename?: "PetitionField"; id: string } | null;
+  parent?: { __typename?: "PetitionField"; id: string; commentCount: number } | null;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
     status: PetitionFieldReplyStatus;
   }>;
+  children?: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    isReadOnly: boolean;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      status: PetitionFieldReplyStatus;
+    }>;
+  }> | null;
 };
 
 export type PetitionRepliesField_PetitionFragment = {
@@ -32752,6 +32763,18 @@ export type PetitionRepliesField_PetitionFieldFragment = {
           id: string;
           status: PetitionFieldReplyStatus;
         }>;
+        parent?: { __typename?: "PetitionField"; id: string; commentCount: number } | null;
+        children?: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          isReadOnly: boolean;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            status: PetitionFieldReplyStatus;
+          }>;
+        }> | null;
       };
       replies: Array<{
         __typename?: "PetitionFieldReply";
@@ -32878,6 +32901,18 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
         id: string;
         status: PetitionFieldReplyStatus;
       }>;
+      parent?: { __typename?: "PetitionField"; id: string; commentCount: number } | null;
+      children?: Array<{
+        __typename?: "PetitionField";
+        id: string;
+        type: PetitionFieldType;
+        isReadOnly: boolean;
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          status: PetitionFieldReplyStatus;
+        }>;
+      }> | null;
     };
     replies: Array<{
       __typename?: "PetitionFieldReply";
@@ -57106,10 +57141,10 @@ export type PetitionReplies_PetitionFragment = {
       isLinkedToProfileTypeField: boolean;
       alias?: string | null;
       type: PetitionFieldType;
+      isReadOnly: boolean;
       options: { [key: string]: any };
       title?: string | null;
       isInternal: boolean;
-      isReadOnly: boolean;
       visibility?: { [key: string]: any } | null;
       math?: Array<{ [key: string]: any }> | null;
       multiple: boolean;
@@ -57356,6 +57391,18 @@ export type PetitionReplies_PetitionFragment = {
               }>;
             }> | null;
           }>;
+          parent?: { __typename?: "PetitionField"; id: string; commentCount: number } | null;
+          children?: Array<{
+            __typename?: "PetitionField";
+            id: string;
+            type: PetitionFieldType;
+            isReadOnly: boolean;
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              status: PetitionFieldReplyStatus;
+            }>;
+          }> | null;
           profileType?: {
             __typename?: "ProfileType";
             id: string;
@@ -57531,7 +57578,12 @@ export type PetitionReplies_PetitionFragment = {
         isComplete: boolean;
       };
     }>;
-    parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+    parent?: {
+      __typename?: "PetitionField";
+      id: string;
+      multiple: boolean;
+      commentCount: number;
+    } | null;
     lastComment?: {
       __typename?: "PetitionFieldComment";
       id: string;
@@ -57905,6 +57957,18 @@ export type PetitionReplies_PetitionFieldFragment = {
           id: string;
           status: PetitionFieldReplyStatus;
         }>;
+        parent?: { __typename?: "PetitionField"; id: string; commentCount: number } | null;
+        children?: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          isReadOnly: boolean;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            status: PetitionFieldReplyStatus;
+          }>;
+        }> | null;
       };
       replies: Array<{
         __typename?: "PetitionFieldReply";
@@ -57990,11 +58054,12 @@ export type PetitionReplies_PetitionFieldFragment = {
       isComplete: boolean;
     };
   }>;
-  parent?: { __typename?: "PetitionField"; id: string } | null;
+  parent?: { __typename?: "PetitionField"; id: string; commentCount: number } | null;
   children?: Array<{
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
+    isReadOnly: boolean;
     options: { [key: string]: any };
     visibility?: { [key: string]: any } | null;
     math?: Array<{ [key: string]: any }> | null;
@@ -58004,6 +58069,7 @@ export type PetitionReplies_PetitionFieldFragment = {
       id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
+      status: PetitionFieldReplyStatus;
     }>;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
@@ -58339,10 +58405,10 @@ export type PetitionReplies_petitionQuery = {
             isLinkedToProfileTypeField: boolean;
             alias?: string | null;
             type: PetitionFieldType;
+            isReadOnly: boolean;
             options: { [key: string]: any };
             title?: string | null;
             isInternal: boolean;
-            isReadOnly: boolean;
             visibility?: { [key: string]: any } | null;
             math?: Array<{ [key: string]: any }> | null;
             multiple: boolean;
@@ -58593,6 +58659,18 @@ export type PetitionReplies_petitionQuery = {
                     }>;
                   }> | null;
                 }>;
+                parent?: { __typename?: "PetitionField"; id: string; commentCount: number } | null;
+                children?: Array<{
+                  __typename?: "PetitionField";
+                  id: string;
+                  type: PetitionFieldType;
+                  isReadOnly: boolean;
+                  replies: Array<{
+                    __typename?: "PetitionFieldReply";
+                    id: string;
+                    status: PetitionFieldReplyStatus;
+                  }>;
+                }> | null;
                 profileType?: {
                   __typename?: "ProfileType";
                   id: string;
@@ -58768,7 +58846,12 @@ export type PetitionReplies_petitionQuery = {
               isComplete: boolean;
             };
           }>;
-          parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+          parent?: {
+            __typename?: "PetitionField";
+            id: string;
+            multiple: boolean;
+            commentCount: number;
+          } | null;
           lastComment?: {
             __typename?: "PetitionFieldComment";
             id: string;
@@ -63964,6 +64047,18 @@ export type filterPetitionFields_PetitionFieldFragment = {
     id: string;
     status: PetitionFieldReplyStatus;
   }>;
+  parent?: { __typename?: "PetitionField"; id: string; commentCount: number } | null;
+  children?: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    isReadOnly: boolean;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      status: PetitionFieldReplyStatus;
+    }>;
+  }> | null;
 };
 
 export type focusPetitionField_PetitionFieldFragment = {
@@ -76383,6 +76478,19 @@ export const filterPetitionFields_PetitionFieldFragmentDoc = gql`
     replies {
       id
       status
+    }
+    parent {
+      id
+      commentCount
+    }
+    children {
+      id
+      type
+      isReadOnly
+      replies {
+        id
+        status
+      }
     }
   }
 ` as unknown as DocumentNode<filterPetitionFields_PetitionFieldFragment, unknown>;
