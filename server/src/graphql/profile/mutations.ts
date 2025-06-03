@@ -1980,7 +1980,8 @@ export const createProfileRelationship = mutationField("createProfileRelationshi
           right_side_profile_id: rightId,
         };
       }),
-      ctx.user!,
+      ctx.user!.id,
+      ctx.user!.org_id,
     );
 
     return (await ctx.profiles.loadProfile(args.profileId))!;

@@ -1453,7 +1453,8 @@ export const createProfileRelationshipsExcel = mutationField("createProfileRelat
             (r) => r.alias === d.relationship_alias,
           )!.id,
         })),
-        ctx.user!,
+        ctx.user!.id,
+        args.orgId,
       );
 
       return {

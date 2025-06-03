@@ -3882,7 +3882,8 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                   }
                 }),
             ),
-            ctx.user!,
+            ctx.user!.id,
+            ctx.user!.org_id,
           );
         }
       }

@@ -2803,7 +2803,8 @@ export class ProfileRepository extends BaseRepository {
 
   async createProfileRelationship(
     data: MaybeArray<Omit<CreateProfileRelationship, "org_id" | "created_by_user_id">>,
-    user: User,
+    userId: number,
+    orgId: number,
     t?: Knex.Transaction,
   ) {
     const dataArr = unMaybeArray(data);
@@ -2851,8 +2852,8 @@ export class ProfileRepository extends BaseRepository {
           returning *
         `,
           [
-            user.org_id,
-            user.id,
+            orgId,
+            userId,
             this.sqlValues(
               dataChunk.map((c) => [
                 c.left_side_profile_id,
@@ -2861,10 +2862,10 @@ export class ProfileRepository extends BaseRepository {
               ]),
               ["int", "int", "int"],
             ),
-            user.org_id,
-            user.id,
-            user.org_id,
-            user.id,
+            orgId,
+            userId,
+            orgId,
+            userId,
           ],
           t,
         );
