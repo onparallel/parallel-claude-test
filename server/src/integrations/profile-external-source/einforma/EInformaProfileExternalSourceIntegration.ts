@@ -92,7 +92,7 @@ export class EInformaProfileExternalSourceIntegration
     >
   > = {
     INDIVIDUAL: [
-      { key: "cnae", property: { type: "SELECT", options: { standardList: "CNAE" } } },
+      { key: "cnae", property: { type: "SELECT", options: { standardList: "CNAE_2009" } } },
       { key: "fechaUltimoBalance", property: { type: "DATE", options: {} } },
       { key: "situacion", property: { type: "SHORT_TEXT", options: {} } },
       { key: "web", property: { type: "SHORT_TEXT", options: {} } },
@@ -103,7 +103,7 @@ export class EInformaProfileExternalSourceIntegration
     ],
     LEGAL_ENTITY: [
       { key: "nombreComercial", property: { type: "SHORT_TEXT", options: {} } },
-      { key: "cnae", property: { type: "SELECT", options: { standardList: "CNAE" } } },
+      { key: "cnae", property: { type: "SELECT", options: { standardList: "CNAE_2009" } } },
       { key: "fechaUltimoBalance", property: { type: "DATE", options: {} } },
       { key: "situacion", property: { type: "SHORT_TEXT", options: {} } },
       { key: "web", property: { type: "SHORT_TEXT", options: {} } },
@@ -564,7 +564,7 @@ export class EInformaProfileExternalSourceIntegration
   protected override mapExtraProperty(entity: EInformaEntityByIdResponse, key: string) {
     switch (key) {
       case "cnae":
-        // "cnae" is mapped to a SELECT field of standardList:CNAE
+        // "cnae" is mapped to a SELECT field of standardList:CNAE_2009
         return { value: entity["cnae"]?.slice(0, 4) };
       case "web":
       case "nombreComercial":

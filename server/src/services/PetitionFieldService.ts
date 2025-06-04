@@ -25,7 +25,9 @@ const STANDARD_LIST_NAMES = [
   "NON_EU_COUNTRIES",
   "CURRENCIES",
   "NACE",
-  "CNAE",
+  "CNAE", // deprecated
+  "CNAE_2009",
+  "CNAE_2025",
   "SIC",
 ] as const;
 
@@ -871,10 +873,23 @@ export class PetitionFieldService {
                 labels: keys.map((code) => `${code} - ${codes[code]}`),
               };
             }
-            case "CNAE": {
+            case "CNAE":
+            case "CNAE_2009": {
               const codes = (
                 await import(
-                  join(__dirname, `../../data/cnae/cnae_${locale === "en" ? "en" : "es"}.json`)
+                  join(__dirname, `../../data/cnae/cnae_2009_${locale === "en" ? "en" : "es"}.json`)
+                )
+              ).default;
+              const keys = Object.keys(codes).sort((a, b) => a.localeCompare(b));
+              return {
+                values: keys,
+                labels: keys.map((code) => `${code} - ${codes[code]}`),
+              };
+            }
+            case "CNAE_2025": {
+              const codes = (
+                await import(
+                  join(__dirname, `../../data/cnae/cnae_2025_${locale === "en" ? "en" : "es"}.json`)
                 )
               ).default;
               const keys = Object.keys(codes).sort((a, b) => a.localeCompare(b));

@@ -12,6 +12,8 @@ export function isCompatibleListType(
     CURRENCIES: null,
     NACE: null,
     CNAE: null,
+    CNAE_2009: null,
+    CNAE_2025: null,
   };
 
   return isNonNullish(standardList) && type === typesMap[standardList];

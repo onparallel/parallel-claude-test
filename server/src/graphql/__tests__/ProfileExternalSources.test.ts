@@ -2569,7 +2569,7 @@ describe("Profile External Sources", () => {
           {
             type: "SELECT",
             options: {
-              standardList: "CNAE",
+              standardList: "CNAE_2025",
             },
             profile_type_id: individualProfileType.id,
             position: Object.entries(individualPTFsByAlias).length + 1,

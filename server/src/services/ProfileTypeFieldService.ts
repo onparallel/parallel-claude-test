@@ -38,7 +38,9 @@ const STANDARD_LIST_NAMES = [
   "EU_COUNTRIES",
   "NON_EU_COUNTRIES",
   "CURRENCIES",
-  "CNAE",
+  "CNAE", // deprecated
+  "CNAE_2009",
+  "CNAE_2025",
   "NACE",
   "SIC",
 ] as const;
@@ -468,12 +470,34 @@ export class ProfileTypeFieldService {
                 isStandard: true,
               }));
             }
-            case "CNAE": {
+            case "CNAE":
+            case "CNAE_2009": {
               const locales = ["es", "en"] as const;
               const cnaeByLocale = Object.fromEntries(
                 await pMap(locales, async (locale) => [
                   locale,
-                  (await import(join(__dirname, `../../data/cnae/cnae_${locale}.json`))).default,
+                  (await import(join(__dirname, `../../data/cnae/cnae_2009_${locale}.json`)))
+                    .default,
+                ]),
+              );
+
+              const codes = Object.keys(cnaeByLocale["en"]).sort((a, b) => a.localeCompare(b));
+
+              return codes.map((code) => ({
+                value: code,
+                label: Object.fromEntries(
+                  locales.map((locale) => [locale, `${code} - ${cnaeByLocale[locale][code]}`]),
+                ) as Record<UserLocale, string>,
+                isStandard: true,
+              }));
+            }
+            case "CNAE_2025": {
+              const locales = ["es", "en"] as const;
+              const cnaeByLocale = Object.fromEntries(
+                await pMap(locales, async (locale) => [
+                  locale,
+                  (await import(join(__dirname, `../../data/cnae/cnae_2025_${locale}.json`)))
+                    .default,
                 ]),
               );
 

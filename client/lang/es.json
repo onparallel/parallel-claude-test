@@ -11735,6 +11735,16 @@
     "context": "CNAE codes"
   },
   {
+    "term": "component.standard-list-select.cnae-2009",
+    "definition": "Códigos CNAE (2009)",
+    "context": "CNAE codes (2009)"
+  },
+  {
+    "term": "component.standard-list-select.cnae-2025",
+    "definition": "Códigos CNAE (2025)",
+    "context": "CNAE codes (2025)"
+  },
+  {
     "term": "component.standard-list-select.countries-iso",
     "definition": "Listado de países",
     "context": "List of countries"

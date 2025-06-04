@@ -41,6 +41,16 @@ const STANDARD_LISTS = {
       id: "component.standard-list-select.cnae",
       defaultMessage: "CNAE codes",
     }),
+  CNAE_2009: (intl) =>
+    intl.formatMessage({
+      id: "component.standard-list-select.cnae-2009",
+      defaultMessage: "CNAE codes (2009)",
+    }),
+  CNAE_2025: (intl) =>
+    intl.formatMessage({
+      id: "component.standard-list-select.cnae-2025",
+      defaultMessage: "CNAE codes (2025)",
+    }),
   SIC: (intl) =>
     intl.formatMessage({
       id: "component.standard-list-select.sic",
@@ -76,6 +86,8 @@ export const StandardListSelect = forwardRef<
     <SimpleSelect
       ref={ref}
       options={options}
+      // this is a temporary solution to disable the deprecated CNAE option so users cannot set it until we remove it from the backend
+      isOptionDisabled={(option) => option.value === "CNAE"}
       placeholder={intl.formatMessage({
         id: "component.standard-list-select.no-list",
         defaultMessage: "No list",

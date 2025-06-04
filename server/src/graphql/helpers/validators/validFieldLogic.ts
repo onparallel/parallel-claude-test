@@ -427,6 +427,8 @@ export async function validateFieldLogic<
             CURRENCIES: null,
             NACE: null,
             CNAE: null,
+            CNAE_2009: null,
+            CNAE_2025: null,
           };
           assert(
             isNonNullish(referencedField.options.standardList) &&
