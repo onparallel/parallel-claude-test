@@ -305,7 +305,6 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
         show_welcome_page: 0,
         show_csv: context.showCsv ? 1 : 0,
         layout_color: templateData.theme.color ?? "#6059F7",
-        text_color: "#F6F6F6",
         logo: templateData.logoUrl ? await downloadImageBase64(templateData.logoUrl) : undefined,
         application_texts: {
           open_sign_button: intl.formatMessage({
