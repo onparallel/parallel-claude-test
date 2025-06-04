@@ -1270,14 +1270,16 @@ export class ProfileRepository extends BaseRepository {
                   jsonb_object_agg(
                     nv.profile_type_field_id,
                     case
-                    when wnpv.id is not null then
-                    jsonb_build_object('content', wnpv.content) || case when wnpv.expiry_date is not null then jsonb_build_object('expiry_date', wnpv.expiry_date) else '{}'::jsonb end
-                  when wpv.id is not null then
-                    jsonb_build_object('content', wpv.content) || case when wpv.expiry_date is not null then jsonb_build_object('expiry_date', wpv.expiry_date) else '{}'::jsonb end
-                  else
-                    'null'::jsonb
-                  end
-                ) filter (where nv.content is not null), '{}'::jsonb) as values,
+                      when wnpv.id is not null then
+                        jsonb_build_object('content', wnpv.content) || case when wnpv.expiry_date is not null then jsonb_build_object('expiry_date', wnpv.expiry_date) else '{}'::jsonb end
+                      when wpv.id is not null then
+                        jsonb_build_object('content', wpv.content) || case when wpv.expiry_date is not null then jsonb_build_object('expiry_date', wpv.expiry_date) else '{}'::jsonb end
+                      else
+                        'null'::jsonb -- should not happen
+                    end
+                  ) filter (where nv.content is not null and (wnpv.id is not null or wpv.id is not null)),
+                  '{}'::jsonb
+                ) as values,
                 coalesce(array_agg(nv.profile_type_field_id::text) filter (where nv.content is null), array[]::text[]) as removed_profile_type_field_ids
               from new_values nv
               left join with_no_previous_values wnpv on wnpv.profile_id = nv.profile_id and wnpv.profile_type_field_id = nv.profile_type_field_id

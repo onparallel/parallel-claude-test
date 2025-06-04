@@ -7223,6 +7223,73 @@ describe("GraphQL/Profiles", () => {
         },
       });
     });
+
+    it("updating values twice with same content should maintain cache as expected", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          content: { value: "Harvey" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+          content: { value: "2023-08-19" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+          content: { value: "medium" },
+        },
+      ]);
+
+      const { errors } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+              content: { value: "Harvey" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+              content: { value: "Dent" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+              content: { value: "medium" },
+            },
+          ],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const [dbProfile] = await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(profile.id).id)
+        .select("*");
+
+      expect(dbProfile?.value_cache).toEqual({
+        [profileType0Fields[0].id]: {
+          content: { value: "Harvey" },
+        },
+        [profileType0Fields[1].id]: {
+          content: { value: "Dent" },
+        },
+        [profileType0Fields[2].id]: {
+          content: { value: "2023-08-19" },
+          expiry_date: "2023-08-19",
+        },
+        [profileType0Fields[6].id]: {
+          content: { value: "medium" },
+        },
+      });
+    });
   });
 
   describe("deleteProfile", () => {
