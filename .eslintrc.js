@@ -62,6 +62,12 @@ module.exports = {
               'Please use instead useMergedRef from "@react-hook/merged-ref", CloseButton from "@parallel/common/CloseButton", Menu, Popover, Select and Tooltip from "@parallel/chakra/components"',
           },
           {
+            name: "@chakra-ui/react",
+            importNames: ["Collapse"],
+            message:
+              'Please use the Chakra V3 compatible components from "@parallel/components/ui" instead of "@chakra-ui/react"',
+          },
+          {
             name: "assert",
             message: 'Please use assert from "ts-essentials" instead.',
           },

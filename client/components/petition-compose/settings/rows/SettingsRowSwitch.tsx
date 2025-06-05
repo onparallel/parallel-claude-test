@@ -35,7 +35,7 @@ export function SettingsRowSwitch({
         </SmallPopover>
       </SettingsRow>
       {children ? (
-        <PaddedCollapse in={isChecked}>
+        <PaddedCollapse open={isChecked}>
           <Box marginTop={2}>{children}</Box>
         </PaddedCollapse>
       ) : null}

@@ -131,7 +131,7 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
                 defaultMessage="This message will be shown when the recipient <b>completes</b> the parallel. Use it to thank them or to include further instructions."
               />
             </Text>
-            <PaddedCollapse in={isEnabled}>
+            <PaddedCollapse open={isEnabled}>
               {petition.signatureConfig?.isEnabled ? (
                 <CloseableAlert status="info" rounded="md" marginBottom={2}>
                   <AlertIcon />

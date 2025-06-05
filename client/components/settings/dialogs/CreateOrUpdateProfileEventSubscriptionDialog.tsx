@@ -356,7 +356,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
                 )}
               />
             </FormControl>
-            <PaddedCollapse in={eventsMode === "SPECIFIC"}>
+            <PaddedCollapse open={eventsMode === "SPECIFIC"}>
               <Stack paddingStart={6}>
                 <Text fontSize="sm">
                   <FormattedMessage
@@ -407,7 +407,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
               </Stack>
             </PaddedCollapse>
             <PaddedCollapse
-              in={
+              open={
                 eventsMode === "SPECIFIC" &&
                 eventTypes.length > 0 &&
                 eventTypes.every((e) => FIELD_EVENTS.includes(e))

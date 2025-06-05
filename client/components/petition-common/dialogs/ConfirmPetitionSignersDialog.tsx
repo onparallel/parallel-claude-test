@@ -589,7 +589,7 @@ export function ConfirmPetitionSignersDialog(
                   defaultMessage="Include message"
                 />
               </Checkbox>
-              <PaddedCollapse in={showMessage}>
+              <PaddedCollapse open={showMessage}>
                 <GrowingTextarea
                   {...register("message", { required: showMessage })}
                   maxHeight="30vh"

@@ -116,7 +116,7 @@ export function ConfirmSendReminderDialog({
                 defaultMessage="Add a message"
               />
             </Checkbox>
-            <PaddedCollapse in={hasMessage}>
+            <PaddedCollapse open={hasMessage}>
               <RichTextEditor
                 id="confirm-send-reminder-message"
                 isInvalid={isInvalid && isEmptyRTEValue(message)}

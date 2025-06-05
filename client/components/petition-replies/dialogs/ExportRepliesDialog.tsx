@@ -275,7 +275,7 @@ export function ExportRepliesDialog({
                   defaultMessage="Rename downloaded files automatically"
                 />
               </Checkbox>
-              <PaddedCollapse in={rename}>
+              <PaddedCollapse open={rename}>
                 <Box marginStart={7}>
                   <PlaceholderInput
                     ref={inputRef}

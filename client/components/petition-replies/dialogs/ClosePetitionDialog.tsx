@@ -35,7 +35,7 @@ export function ClosePetitionDialog({
   ...props
 }: DialogProps<ClosePetitionDialogInput, ClosePetitionDialogNotification>) {
   const intl = useIntl();
-  const hasSignedDocument = petition.currentSignatureRequest?.status === "COMPLETED" ?? false;
+  const hasSignedDocument = petition.currentSignatureRequest?.status === "COMPLETED";
 
   const placeholders = usePetitionMessagePlaceholderOptions({ petition });
   const [message, setMessage] = useState(
@@ -111,7 +111,7 @@ export function ClosePetitionDialog({
                   />
                 </Checkbox>
               )}
-              <PaddedCollapse in={requiredMessage || sendMessage}>
+              <PaddedCollapse open={requiredMessage || sendMessage}>
                 <Stack>
                   <RichTextEditor
                     id={`close-petition-message-${petition.id}`}
@@ -149,7 +149,7 @@ export function ClosePetitionDialog({
                     )}
                   </Checkbox>
                   {hasSignedDocument ? null : (
-                    <PaddedCollapse in={attachPdfExport}>
+                    <PaddedCollapse open={attachPdfExport}>
                       <FormControl>
                         <FormLabel display="flex" alignItems="center">
                           <FormattedMessage

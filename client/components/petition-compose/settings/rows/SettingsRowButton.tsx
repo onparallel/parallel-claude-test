@@ -67,7 +67,7 @@ export function SettingsRowButton({
         )}
       </SettingsRow>
       {children ? (
-        <PaddedCollapse in={isActive}>
+        <PaddedCollapse open={isActive}>
           <Box marginTop={2}>{children}</Box>
         </PaddedCollapse>
       ) : null}

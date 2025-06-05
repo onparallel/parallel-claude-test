@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Collapse,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -22,6 +21,7 @@ import {
 import { QuestionOutlineIcon } from "@parallel/chakra/icons";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
+import { Collapsible } from "@parallel/components/ui";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useResizeObserver from "@react-hook/resize-observer";
 import { useRef, useState } from "react";
@@ -109,11 +109,13 @@ export function PublicPetitionInitialForm({
           </Text>
         </Stack>
         <Box maxWidth={{ base: "auto", md: "25rem" }} width="100%" position="relative">
-          <Collapse startingHeight={200} in={showMore}>
-            <Box ref={descriptionRef} whiteSpace="pre-wrap">
-              {description}
-            </Box>
-          </Collapse>
+          <Collapsible.Root startingHeight={200} open={showMore}>
+            <Collapsible.Content>
+              <Box ref={descriptionRef} whiteSpace="pre-wrap">
+                {description}
+              </Box>
+            </Collapsible.Content>
+          </Collapsible.Root>
           {canExpand ? (
             <>
               <Box

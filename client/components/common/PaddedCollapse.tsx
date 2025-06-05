@@ -1,12 +1,15 @@
-import { Box, Collapse, CollapseProps } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
+import { Collapsible, CollapsibleRootProps } from "../ui";
 
-export function PaddedCollapse({ children, ...props }: CollapseProps) {
+export function PaddedCollapse({ children, ...props }: CollapsibleRootProps) {
   return (
     <Box>
       <Box margin={-1}>
-        <Collapse {...props}>
-          <Box padding={1}>{children as any}</Box>
-        </Collapse>
+        <Collapsible.Root {...props}>
+          <Collapsible.Content>
+            <Box padding={1}>{children as any}</Box>
+          </Collapsible.Content>
+        </Collapsible.Root>
       </Box>
     </Box>
   );

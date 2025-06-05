@@ -378,7 +378,7 @@ export function PetitionSharingDialog({
                   defaultMessage="Notify users"
                 />
               </Checkbox>
-              <PaddedCollapse in={notify}>
+              <PaddedCollapse open={notify}>
                 <GrowingTextarea
                   data-testid="notify-users-message"
                   {...messageRegisterProps}

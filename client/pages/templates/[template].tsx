@@ -277,7 +277,10 @@ function LandingTemplateDetails({
                   defaultMessage="Information list"
                 />
               </Heading>
-              <PaddedCollapse startingHeight={"300px"} in={fields.length <= 10 ? true : showFields}>
+              <PaddedCollapse
+                startingHeight={"300px"}
+                open={fields.length <= 10 ? true : showFields}
+              >
                 <OrderedList>
                   {fieldsWithIndices.map(([field, fieldIndex, childrenFieldIndices]) => {
                     if (field.type === "HEADING") {

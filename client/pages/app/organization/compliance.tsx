@@ -182,7 +182,7 @@ function OrganizationCompliance() {
                 defaultMessage="Enable data erasure"
               />
             </Checkbox>
-            <PaddedCollapse in={isActive && me.hasAutoAnonymize}>
+            <PaddedCollapse open={isActive && me.hasAutoAnonymize}>
               <FormControl marginBottom={4} isInvalid={!!errors.period}>
                 <HStack>
                   <Controller

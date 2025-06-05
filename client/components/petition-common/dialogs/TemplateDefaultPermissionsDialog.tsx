@@ -267,7 +267,7 @@ export function TemplateDefaultPermissionsDialog({
                 />
               </FormControl>
             </Flex>
-            <PaddedCollapse in={editors.length > 0}>
+            <PaddedCollapse open={editors.length > 0}>
               <FormControl id="is-subscribed">
                 <Checkbox {...register("isSubscribed")}>
                   <Flex alignItems="center">

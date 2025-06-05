@@ -6,7 +6,6 @@ import {
   Center,
   Table as ChakraTable,
   Checkbox,
-  Collapse,
   FocusLock,
   HStack,
   HTMLChakraProps,
@@ -56,6 +55,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { identity, isNonNullish, noop, pick } from "remeda";
 import { assert } from "ts-essentials";
+import { Collapsible } from "../ui";
 import { HelpPopover } from "./HelpPopover";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
 import { Wrap } from "./Wrap";
@@ -467,9 +467,11 @@ function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
       {isExpandable ? (
         <Tr>
           <Td padding={0} colSpan={columns.length}>
-            <Collapse in={isExpanded}>
-              <FormattedMessage id="generic.expand" defaultMessage="Expand" />
-            </Collapse>
+            <Collapsible.Root open={isExpanded}>
+              <Collapsible.Content>
+                <FormattedMessage id="generic.expand" defaultMessage="Expand" />
+              </Collapsible.Content>
+            </Collapsible.Root>
           </Td>
         </Tr>
       ) : null}
