@@ -25,8 +25,10 @@ import {
   PetitionFieldType,
   PetitionRepliesFieldReply_PetitionFieldReplyFragment,
   PetitionRepliesFieldReply_PetitionFragment,
+  PetitionRepliesFieldReply_UserFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS, prettifyTimezone } from "@parallel/utils/dates";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { getReplyContents } from "@parallel/utils/getReplyContents";
@@ -53,10 +55,13 @@ import { PetitionRepliesFieldFilePassword } from "./field-replies/PetitionReplie
 import { PetitionRepliesFieldFileSchema } from "./field-replies/PetitionRepliesFieldFileSchema";
 import { PetitionRepliesFieldFileUploadPayslipReply } from "./field-replies/PetitionRepliesFieldFileUploadPayslipReply";
 import { PetitionRepliesFieldIdVerificationReply } from "./field-replies/PetitionRepliesFieldIdVerificationReply";
+import { PetitionRepliesPopoverField } from "./PetitionRepliesPopoverField";
 
 export interface PetitionRepliesFieldReplyProps {
   petition: PetitionRepliesFieldReply_PetitionFragment;
   reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment;
+  user: PetitionRepliesFieldReply_UserFragment;
+  fieldLogic: FieldLogicResult;
   onUpdateStatus: (status: PetitionFieldReplyStatus) => void;
   onAction: (
     action: PetitionRepliesFieldAction,
@@ -75,6 +80,8 @@ export type PetitionRepliesFieldAction =
 export function PetitionRepliesFieldReply({
   petition,
   reply,
+  user,
+  fieldLogic,
   onUpdateStatus,
   onAction,
   isDisabled,
@@ -88,26 +95,51 @@ export function PetitionRepliesFieldReply({
   const buildUrlToSection = useBuildUrlToPetitionSection();
   const editReplyIconButton = (idSuffix = "") => {
     return (
-      <NakedLink
-        href={buildUrlToSection("preview", {
-          field: reply.field!.id,
-          ...(reply.parent ? { parentReply: reply.parent.id } : {}),
-          ...(idSuffix ? { sufix: idSuffix } : {}),
-        })}
-      >
-        <IconButtonWithTooltip
-          as="a"
-          opacity={0}
-          className="edit-field-reply-button"
-          variant="ghost"
-          size="xs"
-          icon={<EditSimpleIcon />}
-          label={intl.formatMessage({
-            id: "component.petition-replies-field.edit-field-reply",
-            defaultMessage: "Edit reply",
-          })}
-        />
-      </NakedLink>
+      <HStack>
+        <Box display={{ base: "block", lg: "none" }}>
+          <NakedLink
+            href={buildUrlToSection("preview", {
+              field: reply.field!.id,
+              ...(reply.parent ? { parentReply: reply.parent.id } : {}),
+              ...(idSuffix ? { sufix: idSuffix } : {}),
+            })}
+          >
+            <IconButtonWithTooltip
+              as="a"
+              opacity={0}
+              className="edit-field-reply-button"
+              variant="ghost"
+              size="xs"
+              icon={<EditSimpleIcon />}
+              label={intl.formatMessage({
+                id: "component.petition-replies-field.edit-field-reply",
+                defaultMessage: "Edit reply",
+              })}
+            />
+          </NakedLink>
+        </Box>
+        <Box display={{ base: "none", lg: "block" }}>
+          <PetitionRepliesPopoverField
+            field={reply.field!}
+            petition={petition}
+            user={user}
+            parentReplyId={reply.parent ? reply.parent.id : undefined}
+            fieldLogic={fieldLogic}
+          >
+            <IconButtonWithTooltip
+              opacity={0}
+              className="edit-field-reply-button"
+              variant="ghost"
+              size="xs"
+              icon={<EditSimpleIcon />}
+              label={intl.formatMessage({
+                id: "component.petition-replies-field.edit-field-reply",
+                defaultMessage: "Edit reply",
+              })}
+            />
+          </PetitionRepliesPopoverField>
+        </Box>
+      </HStack>
     );
   };
 
@@ -268,7 +300,7 @@ export function PetitionRepliesFieldReply({
                           defaultMessage: "Search",
                         })}
                       </VisuallyHidden>
-                      <ShortSearchIcon />
+                      <ShortSearchIcon alignSelf="center" />
                       <Text as="span">{content?.search}</Text>
                       <Text as="span" color="gray.500" fontSize="sm">
                         {`(${intl.formatMessage(
@@ -282,6 +314,9 @@ export function PetitionRepliesFieldReply({
                           },
                         )})`}
                       </Text>
+                      <Box display="inline-block" marginStart={1}>
+                        {editReplyIconButton()}
+                      </Box>
                     </Flex>
                     {content?.value.length === 0 ? (
                       <Box>
@@ -584,6 +619,13 @@ export function PetitionRepliesFieldReply({
 }
 
 PetitionRepliesFieldReply.fragments = {
+  User: gql`
+    fragment PetitionRepliesFieldReply_User on User {
+      id
+      ...PetitionRepliesPopoverField_User
+    }
+    ${PetitionRepliesPopoverField.fragments.User}
+  `,
   Petition: gql`
     fragment PetitionRepliesFieldReply_Petition on Petition {
       id
@@ -591,7 +633,9 @@ PetitionRepliesFieldReply.fragments = {
         status
       }
       isReviewFlowEnabled
+      ...PetitionRepliesPopoverField_Petition
     }
+    ${PetitionRepliesPopoverField.fragments.Petition}
   `,
   PetitionFieldReply: gql`
     fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {
@@ -603,6 +647,7 @@ PetitionRepliesFieldReply.fragments = {
         type
         requireApproval
         ...getReplyContents_PetitionField
+        ...PetitionRepliesPopoverField_PetitionField
       }
       parent {
         id
@@ -623,6 +668,7 @@ PetitionRepliesFieldReply.fragments = {
     ${CopyOrDownloadReplyButton.fragments.PetitionFieldReply}
     ${getReplyContents.fragments.PetitionFieldReply}
     ${getReplyContents.fragments.PetitionField}
+    ${PetitionRepliesPopoverField.fragments.PetitionField}
   `,
 };
 

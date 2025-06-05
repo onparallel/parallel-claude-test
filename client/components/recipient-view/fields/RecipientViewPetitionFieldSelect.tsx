@@ -51,7 +51,19 @@ export function RecipientViewPetitionFieldSelect({
 }: RecipientViewPetitionFieldSelectProps) {
   const intl = useIntl();
 
-  const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
+  const fieldReplies = completedFieldReplies(field);
+
+  const filteredCompletedFieldReplies = parentReplyId
+    ? field.replies.filter(
+        (r) => r.parent?.id === parentReplyId && fieldReplies.some((fr) => fr.id === r.id),
+      )
+    : fieldReplies;
+
+  const filteredReplies = parentReplyId
+    ? field.replies.filter((r) => r.parent?.id === parentReplyId)
+    : field.replies;
+
+  const [showNewReply, setShowNewReply] = useState(filteredReplies.length === 0);
   const [value, setValue] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);
@@ -70,14 +82,14 @@ export function RecipientViewPetitionFieldSelect({
   );
 
   useEffect(() => {
-    if (field.multiple && field.replies.length > 0 && showNewReply) {
+    if (field.multiple && filteredReplies.length > 0 && showNewReply) {
       setShowNewReply(false);
     }
     if (hasAlreadyRepliedError) {
       setHasAlreadyRepliedError(false);
       setValue(null);
     }
-  }, [field.replies]);
+  }, [filteredReplies]);
 
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: string) => {
@@ -91,11 +103,11 @@ export function RecipientViewPetitionFieldSelect({
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
       await onDeleteReply(replyId);
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
-      if (field.replies.length === 1) {
+      if (filteredReplies.length === 1) {
         setShowNewReply(true);
       }
     },
-    [field.replies, onDeleteReply],
+    [filteredReplies, onDeleteReply],
   );
 
   function handleAddNewReply() {
@@ -104,8 +116,6 @@ export function RecipientViewPetitionFieldSelect({
   }
 
   const id = `reply-${field.id}-${parentReplyId ? `${parentReplyId}-new` : "new"}`;
-
-  const fieldReplies = completedFieldReplies(field);
 
   return (
     <RecipientViewPetitionFieldLayout
@@ -116,12 +126,12 @@ export function RecipientViewPetitionFieldSelect({
       onAddNewReply={handleAddNewReply}
       onDownloadAttachment={onDownloadAttachment}
     >
-      {fieldReplies.length ? (
+      {filteredCompletedFieldReplies.length ? (
         <Text fontSize="sm" color="gray.600">
           <FormattedMessage
             id="component.recipient-view-petition-field-card.replies-submitted"
             defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
-            values={{ count: fieldReplies.length }}
+            values={{ count: filteredCompletedFieldReplies.length }}
           />
         </Text>
       ) : hasAlreadyRepliedError ? (
@@ -129,10 +139,10 @@ export function RecipientViewPetitionFieldSelect({
           <FormattedMessage id="generic.reply-not-submitted" defaultMessage="Reply not sent" />
         </Text>
       ) : null}
-      {field.replies.length ? (
+      {filteredReplies.length ? (
         <List as={Stack} marginTop={1}>
           <AnimatePresence initial={false}>
-            {field.replies.map((reply) => (
+            {filteredReplies.map((reply) => (
               <motion.li
                 key={reply.id}
                 animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
@@ -151,7 +161,7 @@ export function RecipientViewPetitionFieldSelect({
           </AnimatePresence>
         </List>
       ) : null}
-      {(field.multiple && showNewReply) || field.replies.length === 0 ? (
+      {(field.multiple && showNewReply) || filteredReplies.length === 0 ? (
         <FormControl id={id} isDisabled={isDisabled}>
           <Box flex="1" position="relative" marginTop={2} minWidth="0">
             <SimpleSelect

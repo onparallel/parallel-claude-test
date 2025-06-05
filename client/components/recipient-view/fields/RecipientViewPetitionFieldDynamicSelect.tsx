@@ -50,7 +50,19 @@ export function RecipientViewPetitionFieldDynamicSelect({
   isInvalid,
   parentReplyId,
 }: RecipientViewPetitionFieldDynamicSelectProps) {
-  const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
+  const fieldReplies = completedFieldReplies(field);
+
+  const filteredCompletedFieldReplies = parentReplyId
+    ? field.replies.filter(
+        (r) => r.parent?.id === parentReplyId && fieldReplies.some((fr) => fr.id === r.id),
+      )
+    : fieldReplies;
+
+  const filteredReplies = parentReplyId
+    ? field.replies.filter((r) => r.parent?.id === parentReplyId)
+    : field.replies;
+
+  const [showNewReply, setShowNewReply] = useState(filteredReplies.length === 0);
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
   const replyRefs = useMultipleRefs<RecipientViewPetitionFieldReplyDynamicSelectInstance>();
   const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);
@@ -61,7 +73,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
     if (hasAlreadyRepliedError) {
       setHasAlreadyRepliedError(false);
     }
-  }, [field.replies]);
+  }, [filteredReplies]);
 
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: DynamicSelectValue) => {
@@ -75,11 +87,11 @@ export function RecipientViewPetitionFieldDynamicSelect({
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
       await onDeleteReply(replyId);
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
-      if (field.replies.length === 1) {
+      if (filteredReplies.length === 1) {
         setShowNewReply(true);
       }
     },
-    [field.replies, onDeleteReply],
+    [filteredReplies, onDeleteReply],
   );
 
   async function handleCreateReply(value: string) {
@@ -109,23 +121,23 @@ export function RecipientViewPetitionFieldDynamicSelect({
 
   const showAddNewReply = !isDisabled && field.multiple;
 
-  const fieldReplies = completedFieldReplies(field);
-
   return (
     <RecipientViewPetitionFieldLayout
       field={field}
       onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={showAddNewReply}
-      addNewReplyIsDisabled={showNewReply || fieldReplies.length !== field.replies.length}
+      addNewReplyIsDisabled={
+        showNewReply || filteredCompletedFieldReplies.length !== filteredReplies.length
+      }
       onAddNewReply={handleAddNewReply}
       onDownloadAttachment={onDownloadAttachment}
     >
-      {fieldReplies.length ? (
+      {filteredCompletedFieldReplies.length ? (
         <Text fontSize="sm" color="gray.600">
           <FormattedMessage
             id="component.recipient-view-petition-field-card.replies-submitted"
             defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
-            values={{ count: fieldReplies.length }}
+            values={{ count: filteredCompletedFieldReplies.length }}
           />
         </Text>
       ) : hasAlreadyRepliedError ? (
@@ -133,10 +145,10 @@ export function RecipientViewPetitionFieldDynamicSelect({
           <FormattedMessage id="generic.reply-not-submitted" defaultMessage="Reply not sent" />
         </Text>
       ) : null}
-      {field.replies.length ? (
+      {filteredReplies.length ? (
         <List as={Stack} marginTop={1} spacing={8}>
           <AnimatePresence initial={false}>
-            {field.replies.map((reply) => (
+            {filteredReplies.map((reply) => (
               <motion.li
                 key={reply.id}
                 animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
@@ -155,8 +167,8 @@ export function RecipientViewPetitionFieldDynamicSelect({
           </AnimatePresence>
         </List>
       ) : null}
-      {(showNewReply && field.multiple) || field.replies.length === 0 ? (
-        <Box marginTop={field.replies.length ? 8 : 1}>
+      {(showNewReply && field.multiple) || filteredReplies.length === 0 ? (
+        <Box marginTop={filteredReplies.length ? 8 : 1}>
           <RecipientViewPetitionFieldReplyDynamicSelectLevel
             label={fieldOptions.labels[0]}
             field={field}

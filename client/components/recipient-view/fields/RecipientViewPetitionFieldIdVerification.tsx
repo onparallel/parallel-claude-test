@@ -57,6 +57,10 @@ export function RecipientViewPetitionFieldIdVerification({
 }: RecipientViewPetitionFieldIdVerificationProps) {
   const tone = useTone();
 
+  const filteredReplies = parentReplyId
+    ? field.replies.filter((r) => r.parent?.id === parentReplyId)
+    : field.replies;
+
   const [state, setState] = useState<"IDLE" | "ERROR" | "FETCHING">("IDLE");
   const [requestType, setRequestType] = useState<"START" | "RETRY" | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
@@ -64,7 +68,7 @@ export function RecipientViewPetitionFieldIdVerification({
   useInterval(
     async (done) => {
       if (
-        (requestType === "START" && field.replies.length > 0 && sessionReady) ||
+        (requestType === "START" && filteredReplies.length > 0 && sessionReady) ||
         (requestType === "RETRY" && sessionReady)
       ) {
         setState("IDLE");
@@ -84,7 +88,7 @@ export function RecipientViewPetitionFieldIdVerification({
     [
       onRefreshField,
       state,
-      field.replies.map((r) => r.id + "-" + r.updatedAt).join(","),
+      filteredReplies.map((r) => r.id + "-" + r.updatedAt).join(","),
       requestType,
       sessionReady,
     ],
@@ -116,7 +120,7 @@ export function RecipientViewPetitionFieldIdVerification({
   const handleStart = async () => {
     try {
       setSessionReady(false);
-      setRequestType(field.replies.length ? "RETRY" : "START");
+      setRequestType(filteredReplies.length ? "RETRY" : "START");
       setState("FETCHING");
       popupRef.current = await openNewWindow(
         async () => {
@@ -145,7 +149,7 @@ export function RecipientViewPetitionFieldIdVerification({
   };
 
   const showStartAgainDialog = useRecipientViewIdVerificationStartAgainDialog();
-  const hasError = field.replies.some(
+  const hasError = filteredReplies.some(
     (r) => isNonNullish(r.content.error) && r.content.error.length > 0,
   );
 
@@ -158,7 +162,7 @@ export function RecipientViewPetitionFieldIdVerification({
     } catch {}
   };
 
-  const allRepliesApproved = field.replies.every((r) => r.status === "APPROVED");
+  const allRepliesApproved = filteredReplies.every((r) => r.status === "APPROVED");
 
   return (
     <RecipientViewPetitionFieldLayout
@@ -193,7 +197,7 @@ export function RecipientViewPetitionFieldIdVerification({
           </Stack>
         ) : (
           <>
-            {field.replies.length === 0 ? (
+            {filteredReplies.length === 0 ? (
               <Button
                 variant="outline"
                 onClick={handleStart}
@@ -205,7 +209,7 @@ export function RecipientViewPetitionFieldIdVerification({
               </Button>
             ) : (
               <Stack spacing={2}>
-                {field.replies.map((reply) => (
+                {filteredReplies.map((reply) => (
                   <RecipientViewIdVerificationReplyContent
                     key={reply.id}
                     fieldId={field.id}
@@ -229,7 +233,7 @@ export function RecipientViewPetitionFieldIdVerification({
                 </Text>
               </HStack>
             ) : null}
-            {field.replies.length > 0 ? (
+            {filteredReplies.length > 0 ? (
               <Flex marginTop={2} justify="flex-end">
                 <Button
                   variant="link"

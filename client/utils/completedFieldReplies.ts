@@ -59,7 +59,7 @@ export function completedFieldReplies(
 
 function _completedFieldReplies(
   field: Pick<PetitionField | PublicPetitionField, "type" | "options">,
-  replies: Pick<PetitionFieldReply | PublicPetitionFieldReply, "content" | "isAnonymized">[],
+  replies: Pick<PetitionFieldReply | PublicPetitionFieldReply, "id" | "content" | "isAnonymized">[],
 ) {
   switch (field.type) {
     case "DYNAMIC_SELECT":

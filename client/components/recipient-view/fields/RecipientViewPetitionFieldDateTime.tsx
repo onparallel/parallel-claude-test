@@ -4,7 +4,6 @@ import { DateInput } from "@parallel/components/common/DateInput";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { TimezoneSelect } from "@parallel/components/common/TimezoneSelect";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { prettifyTimezone } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { waitFor } from "@parallel/utils/promises/waitFor";
@@ -63,7 +62,11 @@ export function RecipientViewPetitionFieldDateTime({
   isInvalid,
   parentReplyId,
 }: RecipientViewPetitionFieldDateTimeProps) {
-  const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
+  const filteredReplies = parentReplyId
+    ? field.replies.filter((r) => r.parent?.id === parentReplyId)
+    : field.replies;
+
+  const [showNewReply, setShowNewReply] = useState(filteredReplies.length === 0);
   const [value, setValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
@@ -76,14 +79,14 @@ export function RecipientViewPetitionFieldDateTime({
   const { browserName } = useMetadata();
 
   useEffect(() => {
-    if (field.multiple && field.replies.length > 0 && showNewReply) {
+    if (field.multiple && filteredReplies.length > 0 && showNewReply) {
       setShowNewReply(false);
     }
     if (hasAlreadyRepliedError) {
       setHasAlreadyRepliedError(false);
       setValue("");
     }
-  }, [field.replies]);
+  }, [filteredReplies]);
 
   function handleAddNewReply() {
     setShowNewReply(true);
@@ -112,9 +115,9 @@ export function RecipientViewPetitionFieldDateTime({
       isDeletingReplyRef.current[replyId] = true;
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
       if (focusPrev) {
-        const index = field.replies.findIndex((r) => r.id === replyId);
+        const index = filteredReplies.findIndex((r) => r.id === replyId);
         if (index > 0) {
-          const prevId = field.replies[index - 1].id;
+          const prevId = filteredReplies[index - 1].id;
           replyRefs[prevId].current!.focus();
         }
       }
@@ -122,11 +125,11 @@ export function RecipientViewPetitionFieldDateTime({
 
       delete isDeletingReplyRef.current[replyId];
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
-      if (field.replies.length === 1) {
+      if (filteredReplies.length === 1) {
         handleAddNewReply();
       }
     },
-    [field.replies, onDeleteReply],
+    [filteredReplies, onDeleteReply],
   );
 
   const handleCreate = useDebouncedCallback(
@@ -176,10 +179,10 @@ export function RecipientViewPetitionFieldDateTime({
       if (isMetaReturn(event) && field.multiple) {
         await handleCreate.immediate(value, false);
       } else if (event.key === "Backspace" && value === "") {
-        if (field.replies.length > 0) {
+        if (filteredReplies.length > 0) {
           event.preventDefault();
           setShowNewReply(false);
-          const lastReplyId = field.replies[field.replies.length - 1].id;
+          const lastReplyId = filteredReplies[filteredReplies.length - 1].id;
           replyRefs[lastReplyId].current!.focus();
         }
       }
@@ -188,7 +191,7 @@ export function RecipientViewPetitionFieldDateTime({
       if (value) {
         await handleCreate.immediate(value, false);
         setShowNewReply(false);
-      } else if (!value && field.replies.length > 0) {
+      } else if (!value && filteredReplies.length > 0) {
         setShowNewReply(false);
       }
     },
@@ -201,8 +204,6 @@ export function RecipientViewPetitionFieldDateTime({
     },
   };
 
-  const fieldReplies = completedFieldReplies(field);
-
   return (
     <RecipientViewPetitionFieldLayout
       field={field}
@@ -213,12 +214,12 @@ export function RecipientViewPetitionFieldDateTime({
       onDownloadAttachment={onDownloadAttachment}
       onMouseDownNewReply={handleMouseDownNewReply}
     >
-      {fieldReplies.length ? (
+      {filteredReplies.length ? (
         <Text fontSize="sm" color="gray.600">
           <FormattedMessage
             id="component.recipient-view-petition-field-card.replies-submitted"
             defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
-            values={{ count: fieldReplies.length }}
+            values={{ count: filteredReplies.length }}
           />
         </Text>
       ) : hasAlreadyRepliedError ? (
@@ -226,10 +227,10 @@ export function RecipientViewPetitionFieldDateTime({
           <FormattedMessage id="generic.reply-not-submitted" defaultMessage="Reply not sent" />
         </Text>
       ) : null}
-      {field.replies.length ? (
+      {filteredReplies.length ? (
         <List as={Stack} marginTop={2}>
           <AnimatePresence initial={false}>
-            {field.replies.map((reply) => (
+            {filteredReplies.map((reply) => (
               <motion.li
                 key={reply.id}
                 animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
@@ -249,7 +250,7 @@ export function RecipientViewPetitionFieldDateTime({
           </AnimatePresence>
         </List>
       ) : null}
-      {(field.multiple && showNewReply) || field.replies.length === 0 ? (
+      {(field.multiple && showNewReply) || filteredReplies.length === 0 ? (
         <Stack>
           <Flex flex="1" position="relative" marginTop={2}>
             <DateInput {...inputProps} type="datetime-local" />

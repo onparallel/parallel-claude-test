@@ -3,7 +3,6 @@ import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { FormatFormErrorMessage, ShortTextInput } from "@parallel/components/common/ShortTextInput";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { waitFor } from "@parallel/utils/promises/waitFor";
@@ -61,7 +60,11 @@ export function RecipientViewPetitionFieldShortText({
 }: RecipientViewPetitionFieldShortTextProps) {
   const intl = useIntl();
 
-  const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
+  const filteredReplies = parentReplyId
+    ? field.replies.filter((r) => r.parent?.id === parentReplyId)
+    : field.replies;
+
+  const [showNewReply, setShowNewReply] = useState(filteredReplies.length === 0);
   const [value, setValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
@@ -78,7 +81,7 @@ export function RecipientViewPetitionFieldShortText({
       setHasAlreadyRepliedError(false);
       setValue("");
     }
-  }, [field.replies]);
+  }, [filteredReplies]);
 
   function handleAddNewReply() {
     setShowNewReply(true);
@@ -111,9 +114,9 @@ export function RecipientViewPetitionFieldShortText({
         isDeletingReplyRef.current[replyId] = true;
         setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
         if (focusPrev) {
-          const index = field.replies.findIndex((r) => r.id === replyId);
+          const index = filteredReplies.findIndex((r) => r.id === replyId);
           if (index > 0) {
-            const prevId = field.replies[index - 1].id;
+            const prevId = filteredReplies[index - 1].id;
             const element = replyRefs[prevId].current!;
             if (element.type === "text") {
               // setSelectionRange does not work on inputs that are not type="text" (e.g. email)
@@ -127,7 +130,7 @@ export function RecipientViewPetitionFieldShortText({
         delete isDeletingReplyRef.current[replyId];
         setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
         handleInvalidReply(replyId, false);
-        if (field.replies.length === 1) {
+        if (filteredReplies.length === 1) {
           handleAddNewReply();
         }
       },
@@ -139,7 +142,7 @@ export function RecipientViewPetitionFieldShortText({
         }
       },
     }),
-    [onUpdateReply, field.replies, onDeleteReply],
+    [onUpdateReply, filteredReplies, onDeleteReply],
   );
 
   const handleCreate = useDebouncedCallback(
@@ -223,10 +226,10 @@ export function RecipientViewPetitionFieldShortText({
       if (isMetaReturn(event) && field.multiple) {
         await handleCreate.immediate(value, false);
       } else if (event.key === "Backspace" && value === "") {
-        if (field.replies.length > 0) {
+        if (filteredReplies.length > 0) {
           event.preventDefault();
           setShowNewReply(false);
-          const lastReplyId = field.replies[field.replies.length - 1].id;
+          const lastReplyId = filteredReplies[filteredReplies.length - 1].id;
           replyRefs[lastReplyId].current!.focus();
         }
       }
@@ -242,7 +245,7 @@ export function RecipientViewPetitionFieldShortText({
         }
       }
 
-      if (!value && field.replies.length > 0) {
+      if (!value && filteredReplies.length > 0) {
         setShowNewReply(false);
       }
     },
@@ -275,7 +278,6 @@ export function RecipientViewPetitionFieldShortText({
   };
 
   const isInvalidValue = value.length === 0 || (format?.validate ? !format.validate(value) : false);
-  const fieldReplies = completedFieldReplies(field);
 
   return (
     <RecipientViewPetitionFieldLayout
@@ -287,12 +289,12 @@ export function RecipientViewPetitionFieldShortText({
       onDownloadAttachment={onDownloadAttachment}
       onMouseDownNewReply={handleMouseDownNewReply}
     >
-      {fieldReplies.length ? (
+      {filteredReplies.length ? (
         <Text fontSize="sm" color="gray.600">
           <FormattedMessage
             id="component.recipient-view-petition-field-card.replies-submitted"
             defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
-            values={{ count: fieldReplies.length }}
+            values={{ count: filteredReplies.length }}
           />
         </Text>
       ) : hasAlreadyRepliedError ? (
@@ -300,10 +302,10 @@ export function RecipientViewPetitionFieldShortText({
           <FormattedMessage id="generic.reply-not-submitted" defaultMessage="Reply not sent" />
         </Text>
       ) : null}
-      {field.replies.length ? (
+      {filteredReplies.length ? (
         <List as={Stack} marginTop={2}>
           <AnimatePresence initial={false}>
-            {field.replies.map((reply) => (
+            {filteredReplies.map((reply) => (
               <motion.li
                 key={reply.id}
                 animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
@@ -324,7 +326,7 @@ export function RecipientViewPetitionFieldShortText({
         </List>
       ) : null}
       <FormControl isInvalid={isInvalidReply[field.id] || hasAlreadyRepliedError}>
-        {(field.multiple && showNewReply) || field.replies.length === 0 ? (
+        {(field.multiple && showNewReply) || filteredReplies.length === 0 ? (
           <Flex flex="1" position="relative" marginTop={2}>
             <ShortTextInput
               data-testid="recipient-view-field-short-text-new-reply-input"

@@ -15,7 +15,6 @@ import {
   Heading,
   IconButton,
   Stack,
-  StackProps,
   Text,
   ThemingProps,
 } from "@chakra-ui/react";
@@ -34,6 +33,7 @@ import {
   PetitionRepliesField_PetitionFieldFragment,
   PetitionRepliesField_PetitionFieldReplyFragment,
   PetitionRepliesField_PetitionFragment,
+  PetitionRepliesField_UserFragment,
   PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
@@ -52,11 +52,14 @@ import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { NakedLink } from "../common/Link";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
+import { NoRepliesHintWithButton } from "./NoRepliesHintWithButton";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
 import { PetitionRepliesFilteredFields } from "./PetitionRepliesFilteredFields";
+import { PetitionRepliesPopoverField } from "./PetitionRepliesPopoverField";
 
 export interface PetitionRepliesFieldProps extends Omit<BoxProps, "filter"> {
   petition: PetitionRepliesField_PetitionFragment;
+  user: PetitionRepliesField_UserFragment;
   field: PetitionRepliesField_PetitionFieldFragment;
   fieldIndex: PetitionFieldIndex;
   childrenFieldIndices: string[] | undefined;
@@ -76,6 +79,7 @@ export const PetitionRepliesField = Object.assign(
   forwardRef<HTMLElement, PetitionRepliesFieldProps>(function PetitionRepliesField(
     {
       petition,
+      user,
       field,
       fieldIndex,
       childrenFieldIndices,
@@ -433,8 +437,10 @@ export const PetitionRepliesField = Object.assign(
                                   x.field.replies.map((reply) => (
                                     <PetitionRepliesFieldReply
                                       petition={petition}
+                                      user={user}
                                       key={reply.id}
                                       reply={reply}
+                                      fieldLogic={x.fieldLogic}
                                       onAction={(action) => onAction(action, reply)}
                                       onUpdateStatus={(status) =>
                                         onUpdateReplyStatus(x.field.id, reply.id, status)
@@ -450,6 +456,11 @@ export const PetitionRepliesField = Object.assign(
                                       field: x.field.id,
                                       parentReply: reply.id,
                                     })}
+                                    petition={petition}
+                                    user={user}
+                                    field={x.field}
+                                    fieldLogic={x.fieldLogic}
+                                    parentReplyId={reply.id}
                                   />
                                 )}
                               </Stack>
@@ -470,6 +481,10 @@ export const PetitionRepliesField = Object.assign(
               href={buildUrlToSection("preview", {
                 field: field.id,
               })}
+              petition={petition}
+              user={user}
+              field={field}
+              fieldLogic={fieldLogic}
             />
           )}
         </Stack>
@@ -608,8 +623,10 @@ export const PetitionRepliesField = Object.assign(
               {field.replies.map((reply) => (
                 <PetitionRepliesFieldReply
                   key={reply.id}
+                  user={user}
                   petition={petition}
                   reply={reply}
+                  fieldLogic={fieldLogic}
                   onAction={(action) => onAction(action, reply)}
                   onUpdateStatus={(status) => onUpdateReplyStatus(field.id, reply.id, status)}
                   isDisabled={isDisabled}
@@ -623,6 +640,10 @@ export const PetitionRepliesField = Object.assign(
             href={buildUrlToSection("preview", {
               field: field.id,
             })}
+            petition={petition}
+            user={user}
+            field={field}
+            fieldLogic={fieldLogic}
           />
         )}
       </Card>
@@ -630,12 +651,27 @@ export const PetitionRepliesField = Object.assign(
   }),
   {
     fragments: {
+      User: gql`
+        fragment PetitionRepliesField_User on User {
+          id
+          ...PetitionRepliesFieldReply_User
+          ...PetitionRepliesPopoverField_User
+          ...NoRepliesHintWithButton_User
+        }
+        ${PetitionRepliesFieldReply.fragments.User}
+        ${PetitionRepliesPopoverField.fragments.User}
+        ${NoRepliesHintWithButton.fragments.User}
+      `,
       Petition: gql`
         fragment PetitionRepliesField_Petition on Petition {
           id
           ...PetitionRepliesFieldReply_Petition
+          ...PetitionRepliesPopoverField_Petition
+          ...NoRepliesHintWithButton_Petition
         }
         ${PetitionRepliesFieldReply.fragments.Petition}
+        ${PetitionRepliesPopoverField.fragments.Petition}
+        ${NoRepliesHintWithButton.fragments.Petition}
       `,
       PetitionField: gql`
         fragment PetitionRepliesField_PetitionField on PetitionField {
@@ -658,6 +694,8 @@ export const PetitionRepliesField = Object.assign(
               ...FileAttachmentButton_FileUpload
             }
           }
+          ...PetitionRepliesPopoverField_PetitionField
+          ...NoRepliesHintWithButton_PetitionField
         }
         fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
           id
@@ -680,6 +718,7 @@ export const PetitionRepliesField = Object.assign(
                 }
               }
               ...filterPetitionFields_PetitionField
+              ...NoRepliesHintWithButton_PetitionField
             }
             replies {
               ...PetitionRepliesFieldReply_PetitionFieldReply
@@ -689,6 +728,8 @@ export const PetitionRepliesField = Object.assign(
         ${FileAttachmentButton.fragments.FileUpload}
         ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
         ${filterPetitionFields.fragments.PetitionField}
+        ${PetitionRepliesPopoverField.fragments.PetitionField}
+        ${NoRepliesHintWithButton.fragments.PetitionField}
       `,
     },
   },
@@ -821,46 +862,6 @@ export const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
         )}
         ref={ref}
       />
-    );
-  },
-);
-
-const NoRepliesHintWithButton = chakraForwardRef<"div", StackProps & { href: string }>(
-  function NoRepliesHintWithButton({ href, ...rest }, ref) {
-    const intl = useIntl();
-    return (
-      <HStack
-        ref={ref}
-        {...rest}
-        sx={{
-          "&:focus-within, &:hover": {
-            ".edit-field-reply-button": {
-              opacity: 1,
-            },
-          },
-        }}
-      >
-        <Text textStyle="hint">
-          <FormattedMessage
-            id="component.petition-replies-field.no-replies"
-            defaultMessage="There are no replies to this field yet"
-          />
-        </Text>
-        <NakedLink href={href}>
-          <IconButtonWithTooltip
-            as="a"
-            opacity={0}
-            className="edit-field-reply-button"
-            variant="ghost"
-            size="xs"
-            icon={<EditSimpleIcon />}
-            label={intl.formatMessage({
-              id: "component.petition-replies-field.add-field-reply",
-              defaultMessage: "Add reply",
-            })}
-          />
-        </NakedLink>
-      </HStack>
     );
   },
 );

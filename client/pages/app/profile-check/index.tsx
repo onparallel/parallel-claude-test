@@ -255,7 +255,7 @@ function ProfileSearchTabs({
 
   const profileTypeId = profileTypesData.profileTypes.items[tabIndex].id;
   const profileTypeFieldIds =
-    options?.searchIn?.find((s: any) => s.profileTypeId === profileTypeId).profileTypeFieldIds ??
+    options?.searchIn?.find((s: any) => s.profileTypeId === profileTypeId)?.profileTypeFieldIds ??
     [];
 
   const columns = useProfileSearchTableColumns({

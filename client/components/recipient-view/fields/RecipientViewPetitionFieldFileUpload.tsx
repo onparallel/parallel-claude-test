@@ -81,11 +81,21 @@ export function RecipientViewPetitionFieldFileUpload({
   const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);
   const fieldReplies = completedFieldReplies(field);
 
+  const filteredCompletedFieldReplies = parentReplyId
+    ? field.replies.filter(
+        (r) => r.parent?.id === parentReplyId && fieldReplies.some((fr) => fr.id === r.id),
+      )
+    : fieldReplies;
+
+  const filteredReplies = parentReplyId
+    ? field.replies.filter((r) => r.parent?.id === parentReplyId)
+    : field.replies;
+
   useEffect(() => {
     if (hasAlreadyRepliedError) {
       setHasAlreadyRepliedError(false);
     }
-  }, [field.replies]);
+  }, [filteredReplies]);
 
   const handleError = useCallback((e: any) => {
     if (isApolloError(e, "FIELD_ALREADY_REPLIED_ERROR")) {
@@ -109,15 +119,15 @@ export function RecipientViewPetitionFieldFileUpload({
           <FormattedMessage
             id="component.recipient-view-petition-field-card.files-uploaded"
             defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
-            values={{ count: fieldReplies.length }}
+            values={{ count: filteredCompletedFieldReplies.length }}
           />
         </Text>
       )}
 
-      {field.replies.length ? (
+      {filteredReplies.length ? (
         <List as={Stack} marginTop={1}>
           <AnimatePresence initial={false}>
-            {field.replies.map((reply) => (
+            {filteredReplies.map((reply) => (
               <motion.li
                 key={reply.id}
                 layout
@@ -364,7 +374,11 @@ function PetitionFieldFileUploadDropzone({
 
   const { accepts, maxFileSize }: FieldOptions["FILE_UPLOAD"] = field.options as any;
 
-  const _isDisabled = isDisabled || (!field.multiple && field.replies.length > 0);
+  const filteredReplies = parentReplyId
+    ? field.replies.filter((r) => r.parent?.id === parentReplyId)
+    : field.replies;
+
+  const _isDisabled = isDisabled || (!field.multiple && filteredReplies.length > 0);
 
   const fileUploadFormats = useFileUploadFormats();
 

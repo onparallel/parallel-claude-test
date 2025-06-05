@@ -31,6 +31,7 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { ProfileSelectInstance } from "@parallel/components/common/ProfileSelect";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { ShareButton } from "@parallel/components/common/ShareButton";
+import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import {
@@ -894,40 +895,45 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             />
           ) : null}
           <Stack flex="2" spacing={4} data-section="replies-fields">
-            <LiquidPetitionScopeProvider petition={petition}>
-              {filterPetitionFields(fieldsWithIndices, fieldLogic, filter).map((x, index) =>
-                x.type === "FIELD" ? (
-                  <LiquidPetitionVariableProvider key={x.field.id} logic={x.fieldLogic}>
-                    <PetitionRepliesField
-                      ref={fieldRefs[x.field.id]}
-                      id={`field-${x.field.id}`}
-                      data-section="replies-field"
-                      data-field-type={x.field.type}
-                      petition={petition}
-                      field={x.field}
-                      childrenFieldIndices={x.childrenFieldIndices}
-                      fieldIndex={x.fieldIndex}
-                      onAction={handleAction}
-                      isActive={activeFieldId === x.field.id}
-                      onToggleComments={() => {
-                        setQueryState({
-                          comments: activeFieldId === x.field.id ? null : x.field.id,
-                          profile: null,
-                        });
-                      }}
-                      onUpdateReplyStatus={(fieldId, replyId, status) =>
-                        handleUpdateRepliesStatus(fieldId, [replyId], status, x.field.id)
-                      }
-                      isDisabled={myEffectivePermission === "READ" || petition.status === "CLOSED"}
-                      filter={filter}
-                      fieldLogic={x.fieldLogic!}
-                    />
-                  </LiquidPetitionVariableProvider>
-                ) : (
-                  <PetitionRepliesFilteredFields key={index} count={x.count} />
-                ),
-              )}
-            </LiquidPetitionScopeProvider>
+            <ToneProvider value={petition.organization.brandTheme.preferredTone}>
+              <LiquidPetitionScopeProvider petition={petition}>
+                {filterPetitionFields(fieldsWithIndices, fieldLogic, filter).map((x, index) =>
+                  x.type === "FIELD" ? (
+                    <LiquidPetitionVariableProvider key={x.field.id} logic={x.fieldLogic}>
+                      <PetitionRepliesField
+                        ref={fieldRefs[x.field.id]}
+                        id={`field-${x.field.id}`}
+                        data-section="replies-field"
+                        data-field-type={x.field.type}
+                        petition={petition}
+                        user={me}
+                        field={x.field}
+                        childrenFieldIndices={x.childrenFieldIndices}
+                        fieldIndex={x.fieldIndex}
+                        onAction={handleAction}
+                        isActive={activeFieldId === x.field.id}
+                        onToggleComments={() => {
+                          setQueryState({
+                            comments: activeFieldId === x.field.id ? null : x.field.id,
+                            profile: null,
+                          });
+                        }}
+                        onUpdateReplyStatus={(fieldId, replyId, status) =>
+                          handleUpdateRepliesStatus(fieldId, [replyId], status, x.field.id)
+                        }
+                        isDisabled={
+                          myEffectivePermission === "READ" || petition.status === "CLOSED"
+                        }
+                        filter={filter}
+                        fieldLogic={x.fieldLogic!}
+                      />
+                    </LiquidPetitionVariableProvider>
+                  ) : (
+                    <PetitionRepliesFilteredFields key={index} count={x.count} />
+                  ),
+                )}
+              </LiquidPetitionScopeProvider>
+            </ToneProvider>
           </Stack>
         </Box>
       </Box>
@@ -946,6 +952,12 @@ PetitionReplies.fragments = {
         accesses {
           id
           status
+        }
+        organization {
+          id
+          brandTheme {
+            preferredTone
+          }
         }
         ...PetitionLayout_PetitionBase
         fields {
@@ -1130,6 +1142,7 @@ PetitionReplies.queries = [
         ...useUpdateIsReadNotification_User
         ...PetitionRepliesSummary_User
         ...PetitionApprovalsCard_User
+        ...PetitionRepliesField_User
       }
       metadata {
         country
@@ -1142,6 +1155,7 @@ PetitionReplies.queries = [
     ${useUpdateIsReadNotification.fragments.User}
     ${PetitionRepliesSummary.fragments.User}
     ${PetitionApprovalsCard.fragments.User}
+    ${PetitionRepliesField.fragments.User}
   `,
   gql`
     query PetitionReplies_petition($id: GID!) {

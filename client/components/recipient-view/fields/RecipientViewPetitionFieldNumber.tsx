@@ -48,7 +48,11 @@ export function RecipientViewPetitionFieldNumber({
 }: RecipientViewPetitionFieldNumberProps) {
   const intl = useIntl();
 
-  const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
+  const filteredReplies = parentReplyId
+    ? field.replies.filter((r) => r.parent?.id === parentReplyId)
+    : field.replies;
+
+  const [showNewReply, setShowNewReply] = useState(filteredReplies.length === 0);
   const [value, setValue] = useState<number | undefined>(undefined);
   const [isSaving, setIsSaving] = useState(false);
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
@@ -72,14 +76,14 @@ export function RecipientViewPetitionFieldNumber({
       });
 
   useEffect(() => {
-    if (field.multiple && field.replies.length > 0 && showNewReply) {
+    if (field.multiple && filteredReplies.length > 0 && showNewReply) {
       setShowNewReply(false);
     }
     if (hasAlreadyRepliedError) {
       setHasAlreadyRepliedError(false);
       setValue(undefined);
     }
-  }, [field.replies]);
+  }, [filteredReplies]);
 
   function handleAddNewReply() {
     setShowNewReply(true);
@@ -112,9 +116,9 @@ export function RecipientViewPetitionFieldNumber({
       isDeletingReplyRef.current[replyId] = true;
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
       if (focusPrev) {
-        const index = field.replies.findIndex((r) => r.id === replyId);
+        const index = filteredReplies.findIndex((r) => r.id === replyId);
         if (index > 0) {
-          const prevId = field.replies[index - 1].id;
+          const prevId = filteredReplies[index - 1].id;
           try {
             replyRefs[prevId].current!.selectionStart = replyRefs[prevId].current!.value.length;
           } catch {}
@@ -125,11 +129,11 @@ export function RecipientViewPetitionFieldNumber({
       delete isDeletingReplyRef.current[replyId];
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
       handleInvalidReply(replyId, false);
-      if (field.replies.length === 1) {
+      if (filteredReplies.length === 1) {
         handleAddNewReply();
       }
     },
-    [field.replies, onDeleteReply],
+    [filteredReplies, onDeleteReply],
   );
 
   const handleCreate = useDebouncedCallback(
@@ -193,10 +197,10 @@ export function RecipientViewPetitionFieldNumber({
         await handleCreate.immediate(value, true);
         handleAddNewReply();
       } else if (event.key === "Backspace" && value === undefined) {
-        if (field.replies.length > 0) {
+        if (filteredReplies.length > 0) {
           event.preventDefault();
           setShowNewReply(false);
-          const lastReplyId = field.replies[field.replies.length - 1].id;
+          const lastReplyId = filteredReplies[filteredReplies.length - 1].id;
           replyRefs[lastReplyId].current!.focus();
         }
       }
@@ -212,7 +216,7 @@ export function RecipientViewPetitionFieldNumber({
         setShowNewReply(false);
       }
       if (
-        (field.replies.length > 0 && isNullish(value)) ||
+        (filteredReplies.length > 0 && isNullish(value)) ||
         (isNonNullish(value) && isBetweenLimits(range, value))
       ) {
         setShowNewReply(false);
@@ -288,13 +292,13 @@ export function RecipientViewPetitionFieldNumber({
             />
           )}
         </Text>
-        {field.replies.length ? (
+        {filteredReplies.length ? (
           <Text fontSize="sm" color="gray.500">
             {"("}
             <FormattedMessage
               id="component.recipient-view-petition-field-card.replies-submitted"
               defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
-              values={{ count: field.replies.length }}
+              values={{ count: filteredReplies.length }}
             />
             {")"}
           </Text>
@@ -306,10 +310,10 @@ export function RecipientViewPetitionFieldNumber({
           </Text>
         ) : null}
       </Flex>
-      {field.replies.length ? (
+      {filteredReplies.length ? (
         <List as={Stack} marginTop={2}>
           <AnimatePresence initial={false}>
-            {field.replies.map((reply) => (
+            {filteredReplies.map((reply) => (
               <motion.li
                 key={reply.id}
                 animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
@@ -330,7 +334,7 @@ export function RecipientViewPetitionFieldNumber({
           </AnimatePresence>
         </List>
       ) : null}
-      {(field.multiple && showNewReply) || field.replies.length === 0 ? (
+      {(field.multiple && showNewReply) || filteredReplies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
           <NumeralInput data-testid="recipient-view-field-number-new-reply-input" {...inputProps} />
           <Center boxSize={10} position="absolute" insetEnd={0} bottom={0}>

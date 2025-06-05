@@ -46,6 +46,7 @@ export interface RecipientViewPetitionFieldCheckboxProps
   onUpdateReply: (replyId: string, content: { value: string[] }) => Promise<void>;
   onCreateReply: (content: { value: string[] }) => Promise<string | undefined>;
   onError: (error: any) => void;
+  parentReplyId?: string;
 }
 
 const haveChanges = ({
@@ -78,14 +79,20 @@ export function RecipientViewPetitionFieldCheckbox({
   onCreateReply,
   onCommentsButtonClick,
   onError,
+  parentReplyId,
 }: RecipientViewPetitionFieldCheckboxProps) {
   const intl = useIntl();
   const tone = useTone();
 
+  const filteredReplies = parentReplyId
+    ? field.replies.filter((r) => r.parent?.id === parentReplyId)
+    : field.replies;
+
   const options = field.options as FieldOptions["CHECKBOX"];
-  const showMultiSelect = isNonNullish(field.options.standardList) || options.values.length > 15;
+  const showMultiSelect =
+    isNonNullish(field.options.standardList) || (options.values.length > 15 && field.multiple);
   const { type = "UNLIMITED", max = 1 } = options.limit ?? {};
-  const reply = field.replies.length > 0 ? field.replies[0] : undefined;
+  const reply = filteredReplies.length > 0 ? filteredReplies[0] : undefined;
   const isRejected = reply?.status === "REJECTED" || false;
   const showRadio = max === 1 && type !== "UNLIMITED";
   const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);

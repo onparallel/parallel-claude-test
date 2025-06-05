@@ -53,6 +53,18 @@ export function RecipientViewPetitionFieldTaxDocuments({
   hideDeleteReplyButton,
   parentReplyId,
 }: RecipientViewPetitionFieldTaxDocumentsProps) {
+  const fieldReplies = completedFieldReplies(field);
+
+  const filteredCompletedFieldReplies = parentReplyId
+    ? field.replies.filter(
+        (r) => r.parent?.id === parentReplyId && fieldReplies.some((fr) => fr.id === r.id),
+      )
+    : fieldReplies;
+
+  const filteredReplies = parentReplyId
+    ? field.replies.filter((r) => r.parent?.id === parentReplyId)
+    : field.replies;
+
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
   const handleDeletePetitionReply = useCallback(
@@ -73,29 +85,29 @@ export function RecipientViewPetitionFieldTaxDocuments({
     if (state === "FIELD_ALREADY_REPLIED_ERROR") {
       setState("IDLE");
     }
-  }, [field.replies]);
+  }, [filteredReplies]);
 
   // ready means bankflip exported all requested docs and sent event to our webhook to start uploading replies
   const [bankflipSessionReady, setBankflipSessionReady] = useState(false);
 
   const [repliesBefore, setRepliesBefore] = useState(
-    field.replies.map((r) => ({ id: r.id, updatedAt: r.updatedAt })),
+    filteredReplies.map((r) => ({ id: r.id, updatedAt: r.updatedAt })),
   );
 
   const popupRef = useRef<Window>();
   useInterval(
     async (done) => {
       const someChange =
-        field.replies.length !== repliesBefore.length ||
+        filteredReplies.length !== repliesBefore.length ||
         zip(
           repliesBefore,
-          field.replies.map((r) => pick(r, ["id", "updatedAt"])),
+          filteredReplies.map((r) => pick(r, ["id", "updatedAt"])),
         ).some(([before, after]) => {
           return before.updatedAt !== after.updatedAt;
         });
 
       if (
-        (requestType === "START" && field.replies.length > 0 && bankflipSessionReady) ||
+        (requestType === "START" && filteredReplies.length > 0 && bankflipSessionReady) ||
         (requestType === "RETRY" && someChange && bankflipSessionReady)
       ) {
         setState("IDLE");
@@ -105,7 +117,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
           setState("IDLE");
           done();
         } else {
-          setRepliesBefore(field.replies.map((r) => pick(r, ["id", "updatedAt"])));
+          setRepliesBefore(filteredReplies.map((r) => pick(r, ["id", "updatedAt"])));
           onRefreshField();
         }
       } else {
@@ -116,7 +128,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
     [
       onRefreshField,
       state,
-      field.replies.map((r) => r.id + "-" + r.updatedAt).join(","),
+      filteredReplies.map((r) => r.id + "-" + r.updatedAt).join(","),
       bankflipSessionReady,
     ],
   );
@@ -145,7 +157,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
   const handleStart = async () => {
     try {
       // just to make sure there is always only 1 reply
-      for (const reply of field.replies) {
+      for (const reply of filteredReplies) {
         await handleDeletePetitionReply({ replyId: reply.id });
       }
       setBankflipSessionReady(false);
@@ -203,7 +215,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
     } catch {}
   };
 
-  const hasErrorDocuments = field.replies.some(
+  const hasErrorDocuments = filteredReplies.some(
     (r) =>
       ((isNonNullish(r.content.error) &&
         Array.isArray(r.content.error) &&
@@ -224,7 +236,6 @@ export function RecipientViewPetitionFieldTaxDocuments({
     setState("IDLE");
     popupRef.current?.close();
   };
-  const fieldReplies = completedFieldReplies(field);
 
   return (
     <RecipientViewPetitionFieldLayout
@@ -239,13 +250,13 @@ export function RecipientViewPetitionFieldTaxDocuments({
             defaultMessage="Follow the steps to upload the documentation you need."
             values={{ tone }}
           />
-          {fieldReplies.length ? (
+          {filteredCompletedFieldReplies.length ? (
             <>
               {" ("}
               <FormattedMessage
                 id="component.recipient-view-petition-field-card.files-uploaded"
                 defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
-                values={{ count: fieldReplies.length }}
+                values={{ count: filteredCompletedFieldReplies.length }}
               />
               {")"}
             </>
@@ -253,10 +264,10 @@ export function RecipientViewPetitionFieldTaxDocuments({
         </>
       </Text>
 
-      {field.replies.length ? (
+      {filteredReplies.length ? (
         <List as={Stack} paddingY={1}>
           <AnimatePresence initial={false}>
-            {field.replies.map((reply) => (
+            {filteredReplies.map((reply) => (
               <motion.li
                 key={reply.id}
                 layout
@@ -300,7 +311,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
               defaultMessage="Retry"
             />
           </Button>
-        ) : field.replies.length === 0 ? (
+        ) : filteredReplies.length === 0 ? (
           <Button
             variant="outline"
             width="min-content"
@@ -317,7 +328,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
         ) : (
           <Box />
         )}
-        {field.replies.length > 0 && state === "IDLE" ? (
+        {filteredReplies.length > 0 && state === "IDLE" ? (
           <Button variant="link" onClick={handleChangePerson}>
             <FormattedMessage
               id="component.recipient-view-petition-field-tax-documents.change-person-button"

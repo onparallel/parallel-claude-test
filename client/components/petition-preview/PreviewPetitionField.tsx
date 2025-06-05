@@ -64,6 +64,7 @@ export interface PreviewPetitionFieldProps
   showErrors: boolean;
   fieldLogic: FieldLogicResult;
   onError: (error: any) => void;
+  parentReplyId?: string;
 }
 
 export function PreviewPetitionField({
@@ -76,11 +77,14 @@ export function PreviewPetitionField({
   showErrors,
   fieldLogic,
   onCommentsButtonClick,
+  parentReplyId,
   ...props
 }: PreviewPetitionFieldProps) {
   const petitionId = petition.id;
   const uploads = useRef<Record<string, AbortController>>({});
   const fieldId = field.id;
+
+  const _parentReplyId = parentReplyId;
 
   const hasIdVerificationFeature = useHasIdVerification();
 
@@ -129,7 +133,7 @@ export function PreviewPetitionField({
           petitionId,
           fieldId: _fieldId ?? fieldId,
           replyId,
-          parentReplyId,
+          parentReplyId: parentReplyId ?? _parentReplyId,
           isCacheOnly,
         });
       } catch (e) {
@@ -160,7 +164,7 @@ export function PreviewPetitionField({
         petitionId,
         fieldId: _fieldId ?? fieldId,
         content,
-        parentReplyId,
+        parentReplyId: parentReplyId ?? _parentReplyId,
         isCacheOnly,
       });
       return res?.id;
@@ -180,7 +184,7 @@ export function PreviewPetitionField({
         fieldId: _fieldId ?? fieldId,
         content,
         uploads,
-        parentReplyId,
+        parentReplyId: parentReplyId ?? _parentReplyId,
         isCacheOnly,
       });
     },
@@ -225,7 +229,7 @@ export function PreviewPetitionField({
     return await startAsyncFieldCompletion({
       fieldId: _fieldId ?? fieldId,
       petitionId,
-      parentReplyId,
+      parentReplyId: parentReplyId ?? _parentReplyId,
       isCacheOnly,
     });
   };
@@ -238,7 +242,7 @@ export function PreviewPetitionField({
       variables: {
         petitionId,
         fieldId: _fieldId ?? fieldId,
-        parentReplyId,
+        parentReplyId: parentReplyId ?? _parentReplyId,
       },
     });
     return pick(data!.retryAsyncFieldCompletion, ["type", "url"]);
@@ -261,6 +265,7 @@ export function PreviewPetitionField({
     onUpdateReply: handleUpdatePetitionFieldReply,
     onCreateReply: handleCreatePetitionFieldReply,
     isDisabled: fieldIsDisabled,
+    parentReplyId,
   };
 
   if (field.type === "HEADING") {
