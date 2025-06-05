@@ -3214,6 +3214,7 @@ describe("repositories/PetitionRepository", () => {
           id: expect.any(Number),
           type: "BACKGROUND_CHECK",
           options: {
+            replyOnlyFromProfile: false,
             autoSearchConfig: {
               type: "PERSON",
               name: [clonedFields.find((f) => f.type === "SHORT_TEXT")!.id],

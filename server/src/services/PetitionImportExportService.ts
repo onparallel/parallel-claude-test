@@ -2,21 +2,27 @@ import Ajv from "ajv";
 import { inject, injectable } from "inversify";
 import pMap from "p-map";
 import { difference, isNonNullish, omit, unique } from "remeda";
+import { assert } from "ts-essentials";
 import {
   ContactLocale,
   ContactLocaleValues,
   PetitionField,
   PetitionFieldType,
   PetitionFieldTypeValues,
+  ProfileType,
+  ProfileTypeField,
+  ProfileTypeStandardType,
+  ProfileTypeStandardTypeValues,
   User,
 } from "../db/__types";
 import { PetitionRepository, PetitionVariable } from "../db/repositories/PetitionRepository";
+import { ProfileRepository } from "../db/repositories/ProfileRepository";
 import { FIELD_REFERENCE_REGEX } from "../graphql";
 import { validateFieldLogic } from "../graphql/helpers/validators/validFieldLogic";
 import { validateRichTextContent } from "../graphql/helpers/validators/validRichTextContent";
-import { PetitionFieldMath, PetitionFieldVisibility } from "../util/fieldLogic";
+import { mapFieldLogic, PetitionFieldMath, PetitionFieldVisibility } from "../util/fieldLogic";
+import { pFlatMap } from "../util/promises/pFlatMap";
 import { safeJsonParse } from "../util/safeJsonParse";
-import { Maybe } from "../util/types";
 import { PETITION_FIELD_SERVICE, PetitionFieldService } from "./PetitionFieldService";
 import {
   PETITION_VALIDATION_SERVICE,
@@ -44,6 +50,8 @@ const PETITION_JSON_SCHEMA = {
         "showInPdf",
         "showActivityInPdf",
         "hasCommentsEnabled",
+        "profileType",
+        "profileTypeField",
       ],
       additionalProperties: false,
       properties: {
@@ -61,8 +69,13 @@ const PETITION_JSON_SCHEMA = {
         showInPdf: { type: "boolean" },
         showActivityInPdf: { type: "boolean" },
         hasCommentsEnabled: { type: "boolean" },
+        profileType: {
+          type: ["string", "null"],
+          enum: [...ProfileTypeStandardTypeValues, null],
+        },
+        profileTypeField: { type: ["string", "null"] },
         children: {
-          type: "array",
+          type: ["array", "null"],
           items: {
             $ref: "#/definitions/petition-field",
           },
@@ -71,7 +84,7 @@ const PETITION_JSON_SCHEMA = {
     },
     petition: {
       type: "object",
-      required: ["name", "locale", "isTemplate", "fields", "variables"],
+      required: ["name", "locale", "isTemplate", "fields"],
       additionalProperties: false,
       properties: {
         name: { type: ["string", "null"] },
@@ -89,7 +102,7 @@ const PETITION_JSON_SCHEMA = {
           },
         },
         variables: {
-          type: "array",
+          type: ["array", "null"],
           items: {
             type: "object",
             required: ["name", "defaultValue"],
@@ -100,7 +113,7 @@ const PETITION_JSON_SCHEMA = {
           },
         },
         customLists: {
-          type: "array",
+          type: ["array", "null"],
           items: {
             type: "object",
             required: ["name", "values"],
@@ -108,6 +121,13 @@ const PETITION_JSON_SCHEMA = {
               name: { type: "string" },
               values: { type: "array", items: { type: "string" } },
             },
+          },
+        },
+        standardListOverrides: {
+          type: ["array", "null"],
+          items: {
+            type: "object",
+            required: ["name", "values"],
           },
         },
       },
@@ -119,29 +139,32 @@ const PETITION_JSON_SCHEMA = {
 interface PetitionFieldJson {
   id: number;
   type: PetitionFieldType;
-  title: Maybe<string>;
-  description: Maybe<string>;
+  title: string | null;
+  description: string | null;
   optional: boolean;
   multiple: boolean;
   options: any;
   visibility: PetitionFieldVisibility | null;
   math: PetitionFieldMath[] | null;
-  alias: Maybe<string>;
+  alias: string | null;
   isInternal: boolean;
   showInPdf: boolean;
   showActivityInPdf: boolean;
   hasCommentsEnabled: boolean;
+  profileType: ProfileTypeStandardType | null;
+  profileTypeField: string | null;
   children?: PetitionFieldJson[];
 }
 
 interface PetitionJson {
-  name: Maybe<string>;
+  name: string | null;
   locale: ContactLocale;
   isTemplate: boolean;
-  templateDescription: Maybe<string>;
+  templateDescription: string | null;
   fields: PetitionFieldJson[];
-  variables: { name: string; defaultValue: number }[];
-  customLists: { name: string; values: string[] }[];
+  variables?: { name: string; defaultValue: number }[] | null;
+  customLists?: { name: string; values: string[] }[] | null;
+  standardListOverrides?: { listName: string; listVersion: string }[] | null;
 }
 
 export interface IPetitionImportExportService {
@@ -155,6 +178,7 @@ export interface IPetitionImportExportService {
 export class PetitionImportExportService implements IPetitionImportExportService {
   constructor(
     @inject(PetitionRepository) private petitions: PetitionRepository,
+    @inject(ProfileRepository) private profiles: ProfileRepository,
     @inject(PETITION_VALIDATION_SERVICE) private petitionValidation: PetitionValidationService,
     @inject(PETITION_FIELD_SERVICE) private petitionFields: PetitionFieldService,
   ) {}
@@ -167,6 +191,18 @@ export class PetitionImportExportService implements IPetitionImportExportService
 
     if (!petition) throw new Error(`Petition:${petitionId} not found`);
 
+    const standardProfileTypes = await this.profiles.loadStandardProfileTypesByOrgId(
+      petition.org_id,
+    );
+
+    const standardProfileTypeFields = (
+      await this.profiles.loadProfileTypeFieldsByProfileTypeId(
+        standardProfileTypes.map((pt) => pt.id),
+      )
+    )
+      .flat()
+      .filter((f) => f.alias?.startsWith("p_"));
+
     const fieldGroupIds = fields.filter((f) => f.type === "FIELD_GROUP").map((f) => f.id);
 
     const children = await this.petitions.loadPetitionFieldChildren(fieldGroupIds);
@@ -175,68 +211,17 @@ export class PetitionImportExportService implements IPetitionImportExportService
       fieldGroupIds.map((id, index) => [id, children[index]]),
     );
 
-    // add a random number to every field id, so its easier to merge fields of many petitions
-    const randomNumber = Math.floor(Math.random() * 1_000_000_000);
     /**
      * [key] = original field id from DB
      * [value] = random incremental integer
      */
-    const customFieldIds: Record<number, number> = {};
-
-    function mapField(field: PetitionField, customFieldIds: Record<number, number>) {
-      return {
-        // replace the DB id with incremental integers to not expose database info.
-        // This is required to reconstruct visibility conditions
-        id: customFieldIds[field.id],
-        type: field.type,
-        title: field.title,
-        description: field.description,
-        optional: field.optional,
-        multiple: field.multiple,
-        options: omit(field.options, ["file", "autoSearchConfig"]),
-        visibility: isNonNullish(field.visibility)
-          ? {
-              ...field.visibility,
-              conditions: (field.visibility as PetitionFieldVisibility).conditions.map((c) => {
-                if ("fieldId" in c) {
-                  return {
-                    ...c,
-                    fieldId: customFieldIds[c.fieldId],
-                  };
-                } else {
-                  return c;
-                }
-              }),
-            }
-          : null,
-        alias: field.alias,
-        math: isNonNullish(field.math)
-          ? (field.math as PetitionFieldMath[]).map((math) => ({
-              ...math,
-              conditions: math.conditions.map((c) => {
-                if ("fieldId" in c) {
-                  return {
-                    ...c,
-                    fieldId: customFieldIds[c.fieldId],
-                  };
-                } else {
-                  return c;
-                }
-              }),
-              operations: math.operations.map((op) => ({
-                ...op,
-                operand:
-                  op.operand.type === "FIELD"
-                    ? { ...op.operand, fieldId: customFieldIds[op.operand.fieldId] }
-                    : op.operand,
-              })),
-            }))
-          : null,
-        isInternal: field.is_internal,
-        showInPdf: field.show_in_pdf,
-        showActivityInPdf: field.show_activity_in_pdf,
-        hasCommentsEnabled: field.has_comments_enabled,
-      };
+    const fieldIdsMap: Record<number, number> = {};
+    const seed = Math.floor(Math.random() * 1_000_000_000);
+    for (const field of fields) {
+      fieldIdsMap[field.id] = seed + field.id;
+      for (const child of childrenByFieldId[field.id] ?? []) {
+        fieldIdsMap[child.id] = seed + child.id;
+      }
     }
 
     return {
@@ -244,24 +229,109 @@ export class PetitionImportExportService implements IPetitionImportExportService
       locale: petition.recipient_locale,
       isTemplate: petition.is_template,
       templateDescription: safeJsonParse(petition.template_description),
-      fields: fields.map((field) => {
-        customFieldIds[field.id] = field.id + randomNumber;
-        return {
-          ...mapField(field, customFieldIds),
+      fields: await pMap(
+        fields,
+        async (field) => ({
+          ...(await this.mapField(
+            field,
+            fieldIdsMap,
+            standardProfileTypes,
+            standardProfileTypeFields,
+          )),
           children:
             field.type === "FIELD_GROUP"
-              ? childrenByFieldId[field.id].map((child) => {
-                  customFieldIds[child.id] = child.id + randomNumber;
-                  return mapField(child, customFieldIds);
-                })
+              ? await pMap(
+                  childrenByFieldId[field.id] ?? [],
+                  async (child) =>
+                    await this.mapField(
+                      child,
+                      fieldIdsMap,
+                      standardProfileTypes,
+                      standardProfileTypeFields,
+                    ),
+                )
               : undefined,
-        };
-      }),
-      variables: (petition.variables ?? []).map((v) => ({
+        }),
+        { concurrency: 1 },
+      ),
+      variables: petition.variables?.map((v) => ({
         name: v.name,
         defaultValue: v.default_value,
       })),
-      customLists: petition.custom_lists ?? [],
+      customLists:
+        petition.custom_lists && petition.custom_lists.length > 0
+          ? petition.custom_lists
+          : undefined,
+      standardListOverrides:
+        petition.standard_list_definition_override &&
+        petition.standard_list_definition_override.length > 0
+          ? petition.standard_list_definition_override.map((s) => ({
+              listName: s.list_name,
+              listVersion: s.list_version,
+            }))
+          : undefined,
+    };
+  }
+
+  private async mapField(
+    field: PetitionField,
+    fieldIdsMap: Record<number, number>,
+    standardProfileTypes: ProfileType[],
+    standardProfileTypeFields: ProfileTypeField[],
+  ): Promise<PetitionFieldJson> {
+    const {
+      field: { visibility, math },
+    } = mapFieldLogic<number, number>(field, (id) => fieldIdsMap[id]);
+
+    const options = await this.petitionFields.mapFieldOptions(field, (type, id) => {
+      if (type === "PetitionField") {
+        const mappedId = fieldIdsMap[id];
+        assert(isNonNullish(mappedId), `Expected id to be defined`);
+        return mappedId;
+      } else if (type === "ProfileType") {
+        const pt = standardProfileTypes.find((t) => t.id === id);
+        if (!pt) {
+          throw new Error(`Profile type not found or is not standard`);
+        }
+        return pt.standard_type!;
+      } else if (type === "ProfileTypeField") {
+        const ptf = standardProfileTypeFields.find((t) => t.id === id);
+        if (!ptf || !ptf.alias) {
+          throw new Error(`Profile type field not found or is not standard`);
+        }
+        return ptf.alias;
+      }
+
+      throw new Error(`Unknown type: ${type}`);
+    });
+
+    if (isNonNullish((options as any).standardList)) {
+      options.labels = [];
+      options.values = [];
+    }
+
+    return {
+      // replace the DB id with incremental integers to not expose database info.
+      // This is required to reconstruct visibility conditions
+      id: fieldIdsMap[field.id],
+      type: field.type,
+      title: field.title,
+      description: field.description,
+      optional: field.optional,
+      multiple: field.multiple,
+      options,
+      visibility,
+      math,
+      alias: field.alias,
+      isInternal: field.is_internal,
+      showInPdf: field.show_in_pdf,
+      showActivityInPdf: field.show_activity_in_pdf,
+      hasCommentsEnabled: field.has_comments_enabled,
+      profileType:
+        standardProfileTypes.find((pt) => pt.id === field.profile_type_id)?.standard_type ?? null,
+      profileTypeField:
+        standardProfileTypeFields.find((ptf) => ptf.id === field.profile_type_field_id)?.alias ??
+        null,
     };
   }
 
@@ -280,39 +350,76 @@ export class PetitionImportExportService implements IPetitionImportExportService
       throw new Error(`First field should be a HEADING`);
     }
 
-    // restore "position" property on fields based on array index
-    const allJsonFields = json.fields.flatMap((f, position) => [
-      {
-        ...omit(f, ["children"]),
-        position,
-        // petition_id is needed for part of the verification
-        // in this service fields are not present in DB so hardcode any number
-        petition_id: 0,
-        parent_petition_field_id: null,
-      },
-      ...(f.children?.map((child, childPosition) => ({
-        ...omit(child, ["children"]),
-        position: childPosition,
-        petition_id: 0,
-        parent_petition_field_id: f.id,
-      })) ?? []),
-    ]);
+    const standardProfileTypes = await this.profiles.loadStandardProfileTypesByOrgId(user.org_id);
+    const standardProfileTypeFields = (
+      await this.profiles.loadProfileTypeFieldsByProfileTypeId(
+        standardProfileTypes.map((pt) => pt.id),
+      )
+    )
+      .flat()
+      .filter((f) => f.alias?.startsWith("p_"));
+
+    function mapStandardProfileTypes(type: string, id: number): number {
+      if (type === "ProfileType") {
+        const standardType = id as unknown as string;
+        const profileType = standardProfileTypes.find((pt) => pt.standard_type === standardType);
+        if (!profileType) {
+          throw new Error(`Could not find ${standardType} ProfileType on user's organization`);
+        }
+        return profileType.id;
+      } else if (type === "ProfileTypeField") {
+        const alias = id as unknown as string;
+        const profileTypeField = standardProfileTypeFields.find((ptf) => ptf.alias === alias);
+        if (!profileTypeField) {
+          throw new Error(`Could not find ${alias} ProfileTypeField on user's organization`);
+        }
+        return profileTypeField.id;
+      }
+
+      return id;
+    }
+
+    const allJsonFields = await pFlatMap(
+      json.fields,
+      // restore "position" property on fields based on array index
+      async (f, position) => [
+        {
+          ...omit(f, ["children", "options"]),
+          position,
+          // petition_id is needed for part of the verification
+          // in this service fields are not present in DB so hardcode any number
+          petition_id: 0,
+          parent_petition_field_id: null,
+          options: await this.petitionFields.mapFieldOptions(f, mapStandardProfileTypes),
+        },
+        // children
+        ...((await pMap(f.children ?? [], async (child, childPosition) => ({
+          ...omit(child, ["children", "options"]),
+          position: childPosition,
+          petition_id: 0,
+          parent_petition_field_id: f.id,
+          options: await this.petitionFields.mapFieldOptions(child, mapStandardProfileTypes),
+        }))) ?? []),
+      ],
+      { concurrency: 1 },
+    );
 
     const fieldAliases = allJsonFields.map((f) => f.alias).filter(isNonNullish);
-    const variables = json.variables.map((v) => ({
-      name: v.name,
-      default_value: v.defaultValue,
-    }));
-
-    const standardListDefinitions = await this.petitions.getAllStandardListDefinitions();
+    const variables =
+      json.variables?.map((v) => ({
+        name: v.name,
+        default_value: v.defaultValue,
+      })) ?? [];
 
     this.validateJsonVariablesAndAliases(variables, fieldAliases);
+
+    const standardListDefinitions = await this.petitions.getAllStandardListDefinitions();
 
     for (const field of allJsonFields) {
       this.petitionValidation.validateFieldOptionsSchema(field.type, field.options);
       await validateFieldLogic(field, allJsonFields, {
         variables,
-        customLists: json.customLists,
+        customLists: json.customLists ?? [],
         standardListDefinitions,
         loadSelectOptionsValuesAndLabels: (options) =>
           this.petitionFields.loadSelectOptionsValuesAndLabels(options),
@@ -328,10 +435,11 @@ export class PetitionImportExportService implements IPetitionImportExportService
           template_description: isNonNullish(json.templateDescription)
             ? JSON.stringify(json.templateDescription)
             : null,
-          variables: json.variables.map((v) => ({
-            name: v.name,
-            default_value: v.defaultValue,
-          })),
+          variables:
+            json.variables?.map((v) => ({
+              name: v.name,
+              default_value: v.defaultValue,
+            })) ?? [],
           custom_lists: json.customLists ?? [],
         },
         user,
@@ -344,9 +452,16 @@ export class PetitionImportExportService implements IPetitionImportExportService
        * [value] = new field id from DB
        */
       const newFieldIds: Record<number, number> = {};
-      await pMap(
+      const createdFields = await pMap(
         allJsonFields,
         async (jsonField) => {
+          const profileType = standardProfileTypes.find(
+            (pt) => pt.standard_type === jsonField.profileType,
+          );
+          const profileTypeField = standardProfileTypeFields.find(
+            (ptf) => ptf.alias === jsonField.profileTypeField,
+          );
+
           const [field] = await this.petitions.createPetitionFieldsAtPosition(
             petition.id,
             {
@@ -356,33 +471,18 @@ export class PetitionImportExportService implements IPetitionImportExportService
               description: jsonField.description,
               optional: jsonField.optional,
               multiple: jsonField.multiple,
-              options: jsonField.options,
-              visibility: isNonNullish(jsonField.visibility)
-                ? {
-                    ...jsonField.visibility,
-                    conditions: jsonField.visibility.conditions.map((c) => {
-                      if ("fieldId" in c) {
-                        // the field.id should always be set on the map, as visibility conditions can only be applied on previous fields
-                        const fieldId = newFieldIds[c.fieldId];
-                        if (!fieldId) {
-                          throw new Error(
-                            `Expected PetitionField ${c.fieldId} to be present on map`,
-                          );
-                        }
-                        return { ...c, fieldId };
-                      } else {
-                        return c;
-                      }
-                    }),
-                  }
-                : null,
-              // math conditions may reference fields that are not yet created, so the ids mapping will be done later
+              // The next 3 properties could reference fields that are not yet created, so the ids mapping will be done later
+              visibility: jsonField.visibility,
               math: jsonField.math,
+              options: jsonField.options,
+              // ------
               alias: jsonField.alias,
               is_internal: jsonField.isInternal,
               show_in_pdf: jsonField.showInPdf,
               show_activity_in_pdf: jsonField.showActivityInPdf,
               has_comments_enabled: jsonField.hasCommentsEnabled,
+              profile_type_id: profileType?.id ?? null,
+              profile_type_field_id: profileTypeField?.id ?? null,
             },
             isNonNullish(jsonField.parent_petition_field_id)
               ? newFieldIds[jsonField.parent_petition_field_id]
@@ -394,41 +494,47 @@ export class PetitionImportExportService implements IPetitionImportExportService
 
           newFieldIds[jsonField.id] = field.id;
 
-          // update math conditions after creating the field in DB, as they may reference themselves
-          if (isNonNullish(field.math)) {
-            const updatedMath = field.math.map((math) => ({
-              ...math,
-              conditions: math.conditions.map((c) => {
-                if ("fieldId" in c) {
-                  const fieldId = newFieldIds[c.fieldId];
-                  if (!fieldId) {
-                    throw new Error(`Expected PetitionField ${c.fieldId} to be present on map`);
-                  }
-                  return { ...c, fieldId };
-                } else {
-                  return c;
-                }
-              }),
-              operations: math.operations.map((op) => ({
-                ...op,
-                operand:
-                  op.operand.type === "FIELD"
-                    ? { ...op.operand, fieldId: newFieldIds[op.operand.fieldId] }
-                    : op.operand,
-              })),
-            }));
-
-            await this.petitions.updatePetitionField(
-              petition.id,
-              field.id,
-              { math: updatedMath },
-              `User:${user.id}`,
-              t,
-            );
-          }
+          return field;
         },
         { concurrency: 1 },
       );
+
+      // after all fields are created, update field options, math and visibility to make sure those referencing fields will be mapped to the correct ids
+      await pMap(
+        createdFields,
+        async (field) => {
+          const {
+            field: { math, visibility },
+          } = mapFieldLogic<number, number>(field, (id) => newFieldIds[id]);
+
+          const options = await this.petitionFields.mapFieldOptions(field, (type, id) => {
+            if (type === "PetitionField") {
+              return newFieldIds[id];
+            }
+            // ProfileType and ProfileTypeField are already correctly mapped at this point
+            if (type === "ProfileType" || type === "ProfileTypeField") {
+              return id;
+            }
+
+            throw new Error(`Unknown type: ${type}`);
+          });
+
+          if ((options as any).standardList) {
+            options.labels = [];
+            options.values = [];
+          }
+
+          await this.petitions.updatePetitionField(
+            petition.id,
+            field.id,
+            { options, math, visibility },
+            `User:${user.id}`,
+            t,
+          );
+        },
+        { concurrency: 1 },
+      );
+
       return petition.id;
     });
   }

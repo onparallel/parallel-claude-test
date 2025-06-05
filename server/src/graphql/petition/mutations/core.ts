@@ -1177,15 +1177,7 @@ export const createPetitionField = mutationField("createPetitionField", {
 
     async function defaultProperties(type: PetitionFieldType, petition: Petition) {
       const props = ctx.petitionFields.defaultFieldProperties(type, undefined, petition);
-      if (type === "ID_VERIFICATION") {
-        const integrations = await ctx.integrations.loadIntegrationsByOrgId(
-          ctx.user!.org_id,
-          "ID_VERIFICATION",
-        );
-
-        props.options.integrationId =
-          integrations.find((i) => i.is_default)?.id ?? integrations[0]?.id ?? null;
-      } else if (type === "PROFILE_SEARCH") {
+      if (type === "PROFILE_SEARCH") {
         props.options = await ctx.petitions.buildDefaultProfileSearchOptions(ctx.user!.org_id);
       }
 
@@ -1382,8 +1374,9 @@ export const updatePetitionField = mutationField("updatePetitionField", {
         args.data.options?.labels,
       not(fieldIsLinkedToProfileTypeField("fieldId")),
     ),
-    ifArgDefined(
+    ifArgEquals(
       (args) => args.data.options?.replyOnlyFromProfile,
+      true,
       and(
         fieldHasType("fieldId", [
           // support only field types that can be linked to a profile type field

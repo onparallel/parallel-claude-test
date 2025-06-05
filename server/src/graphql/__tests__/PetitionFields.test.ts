@@ -164,6 +164,7 @@ describe("GraphQL/Petition Fields", () => {
               options: {
                 placeholder: null,
                 maxLength: null,
+                replyOnlyFromProfile: false,
               },
               isReadOnly: false,
               requireApproval: true,
@@ -293,6 +294,9 @@ describe("GraphQL/Petition Fields", () => {
               options: {
                 accepts: null,
                 attachToPdf: false,
+                replyOnlyFromProfile: false,
+                documentProcessing: null,
+                processDocument: false,
               },
               isReadOnly: false,
               replies: [],
@@ -1227,6 +1231,7 @@ describe("GraphQL/Petition Fields", () => {
                 date: data.clonePetitionField.children[1].id,
                 country: data.clonePetitionField.children[2].id,
               },
+              replyOnlyFromProfile: false,
             },
           },
         ],
@@ -3327,6 +3332,7 @@ describe("GraphQL/Petition Fields", () => {
         options: {
           placeholder: "enter text here...",
           maxLength: 100,
+          replyOnlyFromProfile: false,
         },
         optional: true,
         multiple: true,
@@ -4627,6 +4633,7 @@ describe("GraphQL/Petition Fields", () => {
         options: {
           format: "IBAN",
           maxLength: 10000,
+          placeholder: null,
           replyOnlyFromProfile: false,
         },
       });
@@ -4672,6 +4679,7 @@ describe("GraphQL/Petition Fields", () => {
       expect(data?.updatePetitionField).toEqual({
         id: toGlobalId("PetitionField", backgroundCheck.id),
         options: {
+          replyOnlyFromProfile: false,
           autoSearchConfig: {
             type: "PERSON",
             name: [toGlobalId("PetitionField", name.id)],
@@ -4883,7 +4891,10 @@ describe("GraphQL/Petition Fields", () => {
         expect(errors).toBeUndefined();
         expect(data?.updatePetitionField).toEqual({
           id: toGlobalId("PetitionField", adverseMedia.id),
-          options: { autoSearchConfig },
+          options: {
+            autoSearchConfig,
+            replyOnlyFromProfile: false,
+          },
         });
       }
     });
@@ -5116,6 +5127,7 @@ describe("GraphQL/Petition Fields", () => {
           format: null,
           maxLength: null,
           placeholder: field.options.placeholder,
+          replyOnlyFromProfile: false,
         },
       });
     });
@@ -5184,8 +5196,11 @@ describe("GraphQL/Petition Fields", () => {
         multiple: true,
         hasCommentsEnabled: true,
         options: {
+          replyOnlyFromProfile: false,
           accepts: null,
           attachToPdf: false,
+          documentProcessing: null,
+          processDocument: false,
         },
       });
     });

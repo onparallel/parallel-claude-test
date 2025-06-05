@@ -475,6 +475,8 @@ describe("ProfileLinkedPetitionFields", () => {
           options: {
             accepts: null,
             attachToPdf: false,
+            documentProcessing: null,
+            processDocument: false,
           },
         },
         {
@@ -493,7 +495,6 @@ describe("ProfileLinkedPetitionFields", () => {
           multiple: false,
           isInternal: true,
           options: {
-            integrationId: null,
             autoSearchConfig: null,
           },
         },

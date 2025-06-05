@@ -27,7 +27,11 @@ import { assert } from "ts-essentials";
 import { RESULT } from "../../graphql";
 import { validateReferencingFieldsPositions } from "../../graphql/helpers/validators/validFieldLogic";
 import { ILogger, LOGGER } from "../../services/Logger";
-import { PETITION_FIELD_SERVICE, PetitionFieldService } from "../../services/PetitionFieldService";
+import {
+  PETITION_FIELD_SERVICE,
+  PetitionFieldOptions,
+  PetitionFieldService,
+} from "../../services/PetitionFieldService";
 import {
   PETITION_VALIDATION_SERVICE,
   PetitionValidationService,
@@ -1948,48 +1952,46 @@ export class PetitionRepository extends BaseRepository {
           })),
         );
 
-        // if inside the cloned FIELD_GROUP exists a BACKGROUND_CHECK with autoSearchConfig
-        // and fields configured in autoSearch are also children of the FIELD_GROUP
+        // if inside the cloned FIELD_GROUP exists a field with autoSearchConfig
+        // and fields referenced in autoSearch are also children of the FIELD_GROUP
         // we need to update the ids of the autoSearchConfig to reference to the cloned children
         const originalChildrenIds = children.map((c) => c.id);
-        const backgroundCheckChildrenForAutoSearchUpdate = clonedChildren
-          .filter(
-            (f) =>
-              f.type === "BACKGROUND_CHECK" &&
-              isNonNullish(f.options.autoSearchConfig) &&
-              (f.options.autoSearchConfig.name.some((id: number) =>
-                originalChildrenIds.includes(id),
-              ) ||
-                (isNonNullish(f.options.autoSearchConfig.date) &&
-                  originalChildrenIds.includes(f.options.autoSearchConfig.date)) ||
-                (isNonNullish(f.options.autoSearchConfig.country) &&
-                  originalChildrenIds.includes(f.options.autoSearchConfig.country))),
-          )
-          .map((field) => ({
+        const childrenForAutoSearchUpdate = await pMap(
+          clonedChildren
+            .filter((f) => ["BACKGROUND_CHECK", "ADVERSE_MEDIA_SEARCH"].includes(f.type))
+            .filter((f) => {
+              if (f.type === "BACKGROUND_CHECK") {
+                const o = f.options as PetitionFieldOptions["BACKGROUND_CHECK"];
+                return (
+                  isNonNullish(o.autoSearchConfig) &&
+                  (o.autoSearchConfig.name.some((id) => originalChildrenIds.includes(id)) ||
+                    (isNonNullish(o.autoSearchConfig.date) &&
+                      originalChildrenIds.includes(o.autoSearchConfig.date)) ||
+                    (isNonNullish(o.autoSearchConfig.country) &&
+                      originalChildrenIds.includes(o.autoSearchConfig.country)))
+                );
+              } else if (f.type === "ADVERSE_MEDIA_SEARCH") {
+                const o = f.options as PetitionFieldOptions["ADVERSE_MEDIA_SEARCH"];
+                return (
+                  isNonNullish(o.autoSearchConfig) &&
+                  (o.autoSearchConfig.name?.some((id) => originalChildrenIds.includes(id)) ||
+                    (isNonNullish(o.autoSearchConfig.backgroundCheck) &&
+                      originalChildrenIds.includes(o.autoSearchConfig.backgroundCheck)))
+                );
+              } else {
+                never();
+              }
+            }),
+          async (field) => ({
             id: field.id,
-            options: {
-              ...field.options,
-              autoSearchConfig: {
-                ...field.options.autoSearchConfig,
-                name: field.options.autoSearchConfig.name.map(
-                  (id: number) =>
-                    clonedFields.find((f) => f.originalFieldId === id)?.cloned.id ?? id,
-                ),
-                date: isNonNullish(field.options.autoSearchConfig.date)
-                  ? (clonedFields.find(
-                      (f) => f.originalFieldId === field.options.autoSearchConfig.date,
-                    )?.cloned.id ?? field.options.autoSearchConfig.date)
-                  : null,
-                country: isNonNullish(field.options.autoSearchConfig.country)
-                  ? (clonedFields.find(
-                      (f) => f.originalFieldId === field.options.autoSearchConfig.country,
-                    )?.cloned.id ?? field.options.autoSearchConfig.country)
-                  : null,
-              },
-            },
-          }));
+            options: await this.petitionFields.mapFieldOptions(field, (type, id) => {
+              assert(type === "PetitionField", "type must be PetitionField");
+              return clonedFields.find((f) => f.originalFieldId === id)?.cloned.id ?? id;
+            }),
+          }),
+        );
 
-        if (backgroundCheckChildrenForAutoSearchUpdate.length > 0) {
+        if (childrenForAutoSearchUpdate.length > 0) {
           await this.raw(
             /* sql */ `
             update petition_field as pf set
@@ -1999,10 +2001,7 @@ export class PetitionRepository extends BaseRepository {
           `,
             [
               this.sqlValues(
-                backgroundCheckChildrenForAutoSearchUpdate.map((field) => [
-                  field.id,
-                  this.json(field.options),
-                ]),
+                childrenForAutoSearchUpdate.map((field) => [field.id, this.json(field.options)]),
                 ["int", "jsonb"],
               ),
             ],
@@ -3373,90 +3372,60 @@ export class PetitionRepository extends BaseRepository {
         `,
           [
             this.sqlValues(
-              allFieldUpdates.map((field) => {
-                const {
-                  field: { visibility: mappedVisibility, math: mappedMath },
-                  referencedLists,
-                  // map field visibility and math field IDs into new IDs
-                } = mapFieldLogic<number, number>(field, (id) => newFieldIds[id]);
+              await pMap(
+                allFieldUpdates,
+                async (field) => {
+                  const {
+                    field: { visibility: mappedVisibility, math: mappedMath },
+                    referencedLists,
+                    // map field visibility and math field IDs into new IDs
+                  } = mapFieldLogic<number, number>(field, (id) => newFieldIds[id]);
 
-                const mappedOptions = {
-                  ...field.options,
-                  ...("autoSearchConfig" in field.options &&
-                  isNonNullish(field.options.autoSearchConfig)
-                    ? {
-                        autoSearchConfig:
-                          field.type === "BACKGROUND_CHECK"
-                            ? {
-                                type: field.options.autoSearchConfig.type,
-                                name: field.options.autoSearchConfig.name.map(
-                                  (id: number) => newFieldIds[id],
-                                ),
-                                date: isNonNullish(field.options.autoSearchConfig.date)
-                                  ? newFieldIds[field.options.autoSearchConfig.date]
-                                  : null,
-                                country: isNonNullish(field.options.autoSearchConfig.country)
-                                  ? newFieldIds[field.options.autoSearchConfig.country]
-                                  : null,
-                              }
-                            : field.type === "ADVERSE_MEDIA_SEARCH"
-                              ? {
-                                  name:
-                                    field.options.autoSearchConfig.name?.map(
-                                      (id: number) => newFieldIds[id],
-                                    ) ?? null,
-                                  backgroundCheck: field.options.autoSearchConfig.backgroundCheck
-                                    ? newFieldIds[field.options.autoSearchConfig.backgroundCheck]
-                                    : null,
-                                }
-                              : never(),
+                  const mappedOptions = await this.petitionFields.mapFieldOptions(
+                    field,
+                    (type, id) => {
+                      if (type === "PetitionField") {
+                        return newFieldIds[id];
+                      } else if (type === "ProfileType") {
+                        return sourcePetition.org_id !== owner.org_id
+                          ? (profileTypeIdMap[id] ?? id)
+                          : id;
+                      } else if (type === "ProfileTypeField") {
+                        return sourcePetition.org_id !== owner.org_id
+                          ? (profileTypeFieldIdMap[id] ?? id)
+                          : id;
                       }
-                    : {}),
-                  ...("searchIn" in field.options &&
-                  isNonNullish(field.options.searchIn) &&
-                  Array.isArray(field.options.searchIn) &&
-                  sourcePetition.org_id !== owner.org_id
-                    ? {
-                        searchIn: field.options.searchIn.map(
-                          (item: { profileTypeId: number; profileTypeFieldIds: number[] }) => {
-                            const profileTypeId = profileTypeIdMap[item.profileTypeId];
-                            assert(profileTypeId, `Profile type ${item.profileTypeId} not found`);
-                            return {
-                              profileTypeId,
-                              profileTypeFieldIds: item.profileTypeFieldIds.map(
-                                (id) => profileTypeFieldIdMap[id],
-                              ),
-                            };
-                          },
-                        ),
-                      }
-                    : {}),
-                };
 
-                const mappedProfileTypeId =
-                  sourcePetition.org_id !== owner.org_id
-                    ? isNonNullish(field.profile_type_id)
-                      ? (profileTypeIdMap[field.profile_type_id] ?? null)
-                      : null
-                    : field.profile_type_id;
+                      return id;
+                    },
+                  );
 
-                const mappedProfileTypeFieldId =
-                  sourcePetition.org_id !== owner.org_id
-                    ? isNonNullish(field.profile_type_field_id)
-                      ? (profileTypeFieldIdMap[field.profile_type_field_id] ?? null)
-                      : null
-                    : field.profile_type_field_id;
+                  const mappedProfileTypeId =
+                    sourcePetition.org_id !== owner.org_id
+                      ? isNonNullish(field.profile_type_id)
+                        ? (profileTypeIdMap[field.profile_type_id] ?? null)
+                        : null
+                      : field.profile_type_id;
 
-                allReferencedLists.push(...referencedLists);
-                return [
-                  field.id,
-                  this.json(mappedVisibility),
-                  this.json(mappedMath),
-                  this.json(mappedOptions),
-                  mappedProfileTypeId,
-                  mappedProfileTypeFieldId,
-                ];
-              }),
+                  const mappedProfileTypeFieldId =
+                    sourcePetition.org_id !== owner.org_id
+                      ? isNonNullish(field.profile_type_field_id)
+                        ? (profileTypeFieldIdMap[field.profile_type_field_id] ?? null)
+                        : null
+                      : field.profile_type_field_id;
+
+                  allReferencedLists.push(...referencedLists);
+                  return [
+                    field.id,
+                    this.json(mappedVisibility),
+                    this.json(mappedMath),
+                    this.json(mappedOptions),
+                    mappedProfileTypeId,
+                    mappedProfileTypeFieldId,
+                  ];
+                },
+                { concurrency: 10 },
+              ),
               ["int", "jsonb", "jsonb", "jsonb", "int", "int"],
             ),
           ],
@@ -5232,18 +5201,7 @@ export class PetitionRepository extends BaseRepository {
         .where({ id: petitionId, deleted_at: null })
         .select("automatic_numbering_config");
       const props = this.petitionFields.defaultFieldProperties(type, field, petition);
-      if (type === "ID_VERIFICATION") {
-        const integrations = await this.from("org_integration", t)
-          .where("org_id", user.org_id)
-          .where("type", "ID_VERIFICATION")
-          .whereNull("deleted_at")
-          .where("is_enabled", true)
-          .orderBy("created_at", "desc")
-          .select("*");
-
-        props.options.integrationId =
-          integrations.find((i) => i.is_default)?.id ?? integrations[0]?.id ?? null;
-      } else if (type === "PROFILE_SEARCH") {
+      if (type === "PROFILE_SEARCH") {
         props.options = await this.buildDefaultProfileSearchOptions(user.org_id, t);
       }
 

@@ -17,6 +17,7 @@ import {
   DateTimeLiquidValue,
   WithLabelLiquidValue,
 } from "../../pdf/utils/liquid/LiquidValue";
+import { PetitionFieldOptions } from "../../services/PetitionFieldService";
 import { zipX } from "../../util/arrays";
 import { getFieldsWithIndices } from "../../util/fieldIndices";
 import { evaluateFieldLogic, FieldLogicResult } from "../../util/fieldLogic";
@@ -321,7 +322,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
         return new DateTimeLiquidValue(intl, content);
       case "SELECT":
         // in case of standard SELECT lists, this options will already have it correctly filled, as it comes from a graphql query
-        const options = field.options as { labels?: string[]; values: string[] };
+        const options = field.options as PetitionFieldOptions["SELECT"];
         if (isNonNullish(options.labels)) {
           const label =
             zip(options.labels!, options.values).find(([, v]) => v === content.value)?.[0] ?? "";
@@ -330,7 +331,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
           return content.value;
         }
       case "CHECKBOX": {
-        const options = field.options as { labels?: string[]; values: string[] };
+        const options = field.options as PetitionFieldOptions["CHECKBOX"];
         if (isNonNullish(options.labels)) {
           return (content.value ?? []).map((value: string) => {
             const label =

@@ -3,6 +3,7 @@ import { PropsWithChildren } from "react";
 import { IntlShape, useIntl } from "react-intl";
 import { isNonNullish, zip } from "remeda";
 import { PetitionFieldType } from "../../../db/__types";
+import { PetitionFieldOptions } from "../../../services/PetitionFieldService";
 import { getFieldsWithIndices } from "../../../util/fieldIndices";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { LiquidPetitionScopeProvider_PetitionBaseFragment } from "../../__types";
@@ -90,7 +91,7 @@ function getReplyValue(
       return new DateTimeLiquidValue(intl, content);
     case "SELECT":
       // in case of standard SELECT lists, this options will already have it correctly filled, as it comes from a graphql query
-      const options = field.options as { labels?: string[]; values: string[] };
+      const options = field.options as PetitionFieldOptions["SELECT"];
       if (isNonNullish(options.labels)) {
         const label =
           zip(options.labels!, options.values).find(([, v]) => v === content.value)?.[0] ?? "";
@@ -99,7 +100,7 @@ function getReplyValue(
         return content.value;
       }
     case "CHECKBOX": {
-      const options = field.options as { labels?: string[]; values: string[] };
+      const options = field.options as PetitionFieldOptions["CHECKBOX"];
       if (isNonNullish(options.labels)) {
         return (content.value ?? []).map((value: string) => {
           const label =

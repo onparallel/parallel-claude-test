@@ -4,7 +4,7 @@ import { injectable } from "inversify";
 import { FromSchema } from "json-schema-to-ts";
 import pMap from "p-map";
 import { join } from "path";
-import { isNonNullish, omit, pick } from "remeda";
+import { isNonNullish, omit } from "remeda";
 import {
   ContactLocale,
   CreatePetitionField,
@@ -13,8 +13,8 @@ import {
   PetitionFieldType,
   TableTypes,
 } from "../db/__types";
-import { fromGlobalId, toGlobalId } from "../util/globalId";
-import { Maybe } from "../util/types";
+import { fromGlobalId } from "../util/globalId";
+import { never } from "../util/never";
 
 const EU_COUNTRIES =
   "AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE".split(",");
@@ -34,40 +34,28 @@ const STANDARD_LIST_NAMES = [
 export const SCHEMAS = {
   NUMBER: {
     type: "object",
-    required: ["range", "decimals"],
     additionalProperties: false,
     properties: {
-      placeholder: {
-        type: ["string", "null"],
-      },
+      placeholder: { type: ["string", "null"] },
       range: {
         type: ["object", "null"],
+        additionalProperties: false,
         properties: {
-          min: { type: "number" },
-          max: { type: "number" },
+          min: { type: ["number", "null"] },
+          max: { type: ["number", "null"] },
         },
       },
-      decimals: {
-        type: "number",
-      },
-      prefix: {
-        type: ["string", "null"],
-      },
-      suffix: {
-        type: ["string", "null"],
-      },
-      replyOnlyFromProfile: {
-        type: "boolean",
-      },
+      decimals: { type: ["number", "null"] },
+      prefix: { type: ["string", "null"] },
+      suffix: { type: ["string", "null"] },
+      replyOnlyFromProfile: { type: ["boolean", "null"] },
     },
   },
   DATE: {
     type: "object",
     additionalProperties: false,
     properties: {
-      replyOnlyFromProfile: {
-        type: "boolean",
-      },
+      replyOnlyFromProfile: { type: ["boolean", "null"] },
     },
   },
   DATE_TIME: {
@@ -77,44 +65,27 @@ export const SCHEMAS = {
   },
   PHONE: {
     type: "object",
-    required: [],
     additionalProperties: false,
     properties: {
-      placeholder: {
-        type: ["string", "null"],
-      },
-      replyOnlyFromProfile: {
-        type: "boolean",
-      },
+      placeholder: { type: ["string", "null"] },
+      replyOnlyFromProfile: { type: ["boolean", "null"] },
     },
   },
   TEXT: {
     type: "object",
-    required: ["maxLength"],
     additionalProperties: false,
     properties: {
-      placeholder: {
-        type: ["string", "null"],
-      },
-      maxLength: {
-        type: ["integer", "null"],
-      },
-      replyOnlyFromProfile: {
-        type: "boolean",
-      },
+      placeholder: { type: ["string", "null"] },
+      maxLength: { type: ["integer", "null"] },
+      replyOnlyFromProfile: { type: ["boolean", "null"] },
     },
   },
   SHORT_TEXT: {
     type: "object",
-    required: ["maxLength", "format"],
     additionalProperties: false,
     properties: {
-      placeholder: {
-        type: ["string", "null"],
-      },
-      maxLength: {
-        type: ["integer", "null"],
-      },
+      placeholder: { type: ["string", "null"] },
+      maxLength: { type: ["integer", "null"] },
       format: {
         type: ["string", "null"],
         enum: [
@@ -129,19 +100,14 @@ export const SCHEMAS = {
           null,
         ],
       },
-      replyOnlyFromProfile: {
-        type: "boolean",
-      },
+      replyOnlyFromProfile: { type: ["boolean", "null"] },
     },
   },
   FILE_UPLOAD: {
     type: "object",
-    required: ["accepts", "attachToPdf"],
     additionalProperties: false,
     properties: {
-      maxFileSize: {
-        type: ["number", "null"],
-      },
+      maxFileSize: { type: ["number", "null"] },
       accepts: {
         type: ["array", "null"],
         items: {
@@ -151,12 +117,9 @@ export const SCHEMAS = {
       },
       documentProcessing: {
         type: ["object", "null"],
-        required: ["integrationId", "processDocumentAs"],
         additionalProperties: false,
+        required: ["processDocumentAs"],
         properties: {
-          integrationId: {
-            type: ["number", "null"],
-          },
           processDocumentAs: {
             type: "string",
             enum: DocumentProcessingTypeValues,
@@ -165,27 +128,20 @@ export const SCHEMAS = {
       },
       processDocument: {
         description: "Whether to enable AI document processing for this field",
-        type: "boolean",
+        type: ["boolean", "null"],
       },
       attachToPdf: {
-        type: "boolean",
+        type: ["boolean", "null"],
       },
-      replyOnlyFromProfile: {
-        type: "boolean",
-      },
+      replyOnlyFromProfile: { type: ["boolean", "null"] },
     },
   },
   HEADING: {
     type: "object",
-    required: ["hasPageBreak"],
     additionalProperties: false,
     properties: {
-      hasPageBreak: {
-        type: "boolean",
-      },
-      showNumbering: {
-        type: "boolean",
-      },
+      hasPageBreak: { type: ["boolean", "null"] },
+      showNumbering: { type: ["boolean", "null"] },
     },
   },
   SELECT: {
@@ -209,16 +165,12 @@ export const SCHEMAS = {
           maxLength: 2000,
         },
       },
-      placeholder: {
-        type: ["string", "null"],
-      },
+      placeholder: { type: ["string", "null"] },
       standardList: {
         type: ["string", "null"],
         enum: [...STANDARD_LIST_NAMES, null],
       },
-      replyOnlyFromProfile: {
-        type: "boolean",
-      },
+      replyOnlyFromProfile: { type: ["boolean", "null"] },
     },
   },
   DYNAMIC_SELECT: {
@@ -248,12 +200,11 @@ export const SCHEMAS = {
           },
           labels: {
             type: "array",
-            items: {
-              type: "string",
-            },
+            items: { type: "string" },
           },
           file: {
             type: ["object", "null"],
+            additionalProperties: false,
             required: ["id", "name", "size", "updatedAt"],
             properties: {
               id: { type: "string" },
@@ -269,7 +220,7 @@ export const SCHEMAS = {
   },
   CHECKBOX: {
     type: "object",
-    required: ["values", "limit"],
+    required: ["values"],
     additionalProperties: false,
     properties: {
       labels: {
@@ -289,8 +240,9 @@ export const SCHEMAS = {
         },
       },
       limit: {
-        type: "object",
-        required: ["min", "max", "type"],
+        type: ["object", "null"],
+        additionalProperties: false,
+        required: ["type", "min", "max"],
         properties: {
           type: {
             type: "string",
@@ -305,19 +257,15 @@ export const SCHEMAS = {
         type: ["string", "null"],
         enum: [...STANDARD_LIST_NAMES, null],
       },
-      replyOnlyFromProfile: {
-        type: "boolean",
-      },
+      replyOnlyFromProfile: { type: ["boolean", "null"] },
     },
   },
   ES_TAX_DOCUMENTS: {
     type: "object",
-    required: ["attachToPdf", "requests"],
     additionalProperties: false,
+    required: ["requests"],
     properties: {
-      attachToPdf: {
-        type: "boolean",
-      },
+      attachToPdf: { type: ["boolean", "null"] },
       requests: {
         type: "array",
         items: {
@@ -344,9 +292,9 @@ export const SCHEMAS = {
         },
       },
       identityVerification: {
-        type: "object",
-        required: ["type"],
+        type: ["object", "null"],
         additionalProperties: false,
+        required: ["type"],
         properties: {
           type: {
             type: "string",
@@ -364,11 +312,7 @@ export const SCHEMAS = {
   BACKGROUND_CHECK: {
     type: "object",
     additionalProperties: false,
-    required: [],
     properties: {
-      integrationId: {
-        type: ["number", "null"],
-      },
       autoSearchConfig: {
         type: ["object", "null"],
         additionalProperties: false,
@@ -379,7 +323,7 @@ export const SCHEMAS = {
             enum: ["PERSON", "COMPANY", null],
           },
           name: {
-            type: ["array"],
+            type: "array",
             items: {
               type: "number",
             },
@@ -389,15 +333,13 @@ export const SCHEMAS = {
           country: { type: ["number", "null"] },
         },
       },
-      replyOnlyFromProfile: {
-        type: "boolean",
-      },
+      replyOnlyFromProfile: { type: ["boolean", "null"] },
+      integrationId: { type: ["number", "null"] },
     },
   },
   FIELD_GROUP: {
     type: "object",
     additionalProperties: false,
-    required: ["groupName"],
     properties: {
       groupName: {
         type: ["string", "null"],
@@ -406,19 +348,14 @@ export const SCHEMAS = {
   },
   ID_VERIFICATION: {
     type: "object",
-    required: ["attachToPdf", "integrationId", "config"],
     additionalProperties: false,
+    required: ["config"],
     properties: {
-      attachToPdf: {
-        type: "boolean",
-      },
-      integrationId: {
-        type: ["number", "null"],
-      },
+      attachToPdf: { type: ["boolean", "null"] },
       config: {
         type: "object",
-        required: ["type", "allowedDocuments"],
         additionalProperties: false,
+        required: ["type", "allowedDocuments"],
         properties: {
           type: {
             type: "string",
@@ -465,7 +402,6 @@ export const SCHEMAS = {
   ADVERSE_MEDIA_SEARCH: {
     type: "object",
     additionalProperties: false,
-    required: [],
     properties: {
       autoSearchConfig: {
         type: ["object", "null"],
@@ -479,9 +415,8 @@ export const SCHEMAS = {
           backgroundCheck: { type: ["number", "null"] },
         },
       },
-      replyOnlyFromProfile: {
-        type: "boolean",
-      },
+      replyOnlyFromProfile: { type: ["boolean", "null"] },
+      integrationId: { type: ["number", "null"] },
     },
   },
 } as const;
@@ -529,39 +464,23 @@ export class PetitionFieldService {
         case "TEXT": {
           return {
             replyOnlyFromProfile,
-            placeholder:
-              isNonNullish(field) && this.hasPlaceholder(field.type)
-                ? (field.options.placeholder ?? null)
-                : null,
-            maxLength:
-              isNonNullish(field) &&
-              ["TEXT", "SHORT_TEXT"].includes(field.type) &&
-              isNonNullish(field.options.maxLength)
-                ? field.options.maxLength
-                : null,
+            placeholder: field?.options.placeholder ?? null,
+            maxLength: field?.options.maxLength ?? null,
           };
         }
         case "SHORT_TEXT": {
           return {
             replyOnlyFromProfile,
-            placeholder:
-              isNonNullish(field) && this.hasPlaceholder(field.type)
-                ? (field.options.placeholder ?? null)
-                : null,
-            maxLength:
-              isNonNullish(field) &&
-              ["TEXT", "SHORT_TEXT"].includes(field.type) &&
-              isNonNullish(field.options.maxLength)
-                ? field.options.maxLength
-                : null,
-            format: null,
+            placeholder: field?.options.placeholder ?? null,
+            maxLength: field?.options.maxLength ?? null,
+            format: field?.options.format ?? null,
           };
         }
-        case "BACKGROUND_CHECK": {
+        case "BACKGROUND_CHECK":
+        case "ADVERSE_MEDIA_SEARCH": {
           return {
             replyOnlyFromProfile,
-            integrationId: null,
-            autoSearchConfig: null,
+            autoSearchConfig: field?.options.autoSearchConfig ?? null,
           };
         }
         case "DOW_JONES_KYC":
@@ -575,50 +494,42 @@ export class PetitionFieldService {
         case "NUMBER": {
           return {
             replyOnlyFromProfile,
-            placeholder:
-              isNonNullish(field) && this.hasPlaceholder(field.type)
-                ? (field.options.placeholder ?? null)
-                : null,
-            range: {
+            placeholder: field?.options.placeholder ?? null,
+            range: field?.options.range ?? {
               min: 0,
             },
-            decimals: 2,
-            prefix: null,
-            suffix: null,
+            decimals: field?.options.decimals ?? 2,
+            prefix: field?.options.prefix ?? null,
+            suffix: field?.options.suffix ?? null,
           };
         }
         case "PHONE": {
           return {
             replyOnlyFromProfile,
-            placeholder:
-              isNonNullish(field) && this.hasPlaceholder(field.type)
-                ? (field.options.placeholder ?? null)
-                : null,
+            placeholder: field?.options.placeholder ?? null,
           };
         }
         case "SELECT": {
           return {
             replyOnlyFromProfile,
-            values:
-              isNonNullish(field) && ["SELECT", "CHECKBOX"].includes(field.type)
-                ? field.options.values
-                : [],
-            placeholder:
-              isNonNullish(field) && this.hasPlaceholder(field.type)
-                ? (field.options.placeholder ?? null)
-                : null,
+            values: field?.options.values ?? [],
+            placeholder: field?.options.placeholder ?? null,
+            standardList: field?.options.standardList ?? null,
           };
         }
         case "FILE_UPLOAD":
           return {
             replyOnlyFromProfile,
-            accepts: null,
-            attachToPdf: false,
+            accepts: field?.options.accepts ?? null,
+            attachToPdf: field?.options.attachToPdf ?? false,
+            processDocument: field?.options.processDocument ?? false,
+            /** @deprecated use processDocument */
+            documentProcessing: field?.options.documentProcessing ?? null,
           };
         case "ES_TAX_DOCUMENTS":
           return {
-            attachToPdf: false,
-            requests: [
+            attachToPdf: field?.options.attachToPdf ?? false,
+            requests: field?.options.requests ?? [
               {
                 model: {
                   type: "AEAT_IRPF_DATOS_FISCALES",
@@ -636,10 +547,7 @@ export class PetitionFieldService {
         case "CHECKBOX": {
           return {
             replyOnlyFromProfile,
-            values:
-              isNonNullish(field) && ["SELECT", "CHECKBOX"].includes(field.type)
-                ? field.options.values
-                : [],
+            values: field?.options.values ?? [],
             limit: {
               type: "RADIO",
               min: (optional ?? false) ? 0 : 1,
@@ -649,16 +557,20 @@ export class PetitionFieldService {
         }
         case "FIELD_GROUP": {
           return {
-            groupName: null,
+            groupName: field?.options.groupName ?? null,
           };
         }
         case "ID_VERIFICATION": {
           return {
-            attachToPdf: false,
-            integrationId: null,
+            attachToPdf: field?.options.attachToPdf ?? false,
             config: {
-              type: "SIMPLE",
-              allowedDocuments: ["ID_CARD", "PASSPORT", "RESIDENCE_PERMIT", "DRIVER_LICENSE"],
+              type: field?.options.config.type ?? "SIMPLE",
+              allowedDocuments: field?.options.config.allowedDocuments ?? [
+                "ID_CARD",
+                "PASSPORT",
+                "RESIDENCE_PERMIT",
+                "DRIVER_LICENSE",
+              ],
             },
           };
         }
@@ -666,11 +578,6 @@ export class PetitionFieldService {
           return {
             // will be filled later
             searchIn: [],
-          };
-        }
-        case "ADVERSE_MEDIA_SEARCH": {
-          return {
-            autoSearchConfig: null,
           };
         }
         default:
@@ -707,65 +614,131 @@ export class PetitionFieldService {
     };
   }
 
+  /**
+   * Maps a field's options to a complete options object based on its type.
+   * This method handles both complete and incomplete options values, ensuring
+   * all required properties are present in the returned object.
+   *
+   * @param field - The field containing type and options to map
+   * @param idMapFn - Optional function to map IDs to global IDs or other formats
+   * @param locale - Optional locale for localized options
+   * @returns A complete options object matching the field's type
+   */
   async mapFieldOptions(
-    field: Pick<PetitionField, "type" | "options" | "profile_type_field_id">,
+    field: Pick<PetitionField, "type" | "options">,
+    idMapFn: (type: string, id: number) => string | number,
     locale?: ContactLocale,
   ) {
-    const replyOnlyFromProfile = isNonNullish(field.profile_type_field_id)
-      ? !!field.options.replyOnlyFromProfile
-      : undefined;
-
     switch (field.type) {
-      case "SHORT_TEXT":
-      case "TEXT":
-      case "NUMBER":
-      case "DATE":
-      case "PHONE":
-      case "FILE_UPLOAD":
+      case "HEADING": {
         return {
-          ...field.options,
-          replyOnlyFromProfile,
+          hasPageBreak: field.options.hasPageBreak ?? false,
+          showNumbering: field.options.showNumbering ?? false,
+        };
+      }
+      case "TEXT":
+        return {
+          placeholder: field.options.placeholder ?? null,
+          maxLength: field.options.maxLength ?? null,
+          replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,
+        };
+      case "SHORT_TEXT":
+        return {
+          placeholder: field.options.placeholder ?? null,
+          maxLength: field.options.maxLength ?? null,
+          format: field.options.format ?? null,
+          replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,
+        };
+      case "NUMBER":
+        return {
+          placeholder: field.options.placeholder ?? null,
+          range: field.options.range ?? null,
+          decimals: field.options.decimals ?? null,
+          prefix: field.options.prefix ?? null,
+          suffix: field.options.suffix ?? null,
+          replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,
+        };
+      case "DATE":
+        return {
+          replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,
+        };
+      case "DATE_TIME":
+        return {};
+      case "PHONE":
+        return {
+          placeholder: field.options.placeholder ?? null,
+          replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,
         };
       case "SELECT":
+        const options = field.options as PetitionFieldOptions["SELECT"];
+        return {
+          ...(await this.loadSelectOptionsValuesAndLabels(options, locale)),
+          placeholder: field.options.placeholder ?? null,
+          standardList: field.options.standardList ?? null,
+          replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,
+        };
       case "CHECKBOX":
         return {
-          ...field.options,
-          replyOnlyFromProfile,
           ...(await this.loadSelectOptionsValuesAndLabels(field.options, locale)),
+          limit: field.options.limit ?? null,
+          standardList: field.options.standardList ?? null,
+          replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,
+        };
+      case "FILE_UPLOAD":
+        return {
+          accepts: field.options.accepts ?? null,
+          attachToPdf: field.options.attachToPdf ?? false,
+          replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,
+          processDocument: field.options.processDocument ?? false,
+          /** @deprecated use processDocument */
+          documentProcessing: field.options.documentProcessing ?? null,
+        };
+      case "DYNAMIC_SELECT":
+        return {
+          file: field.options.file ?? null,
+          values: field.options.values ?? [],
+          labels: field.options.labels ?? [],
+        };
+      case "FIELD_GROUP":
+        return {
+          groupName: field.options.groupName ?? null,
+        };
+      case "DOW_JONES_KYC":
+        return {};
+      case "ES_TAX_DOCUMENTS":
+        return {
+          attachToPdf: field.options.attachToPdf ?? false,
+          requests: field.options.requests,
         };
       case "BACKGROUND_CHECK":
         return {
-          ...field.options,
-          replyOnlyFromProfile,
-          ...(field.options.autoSearchConfig
+          autoSearchConfig: field.options.autoSearchConfig
             ? {
-                autoSearchConfig: {
-                  type: field.options.autoSearchConfig.type,
-                  name: field.options.autoSearchConfig.name.map((id: number) =>
-                    toGlobalId("PetitionField", id),
-                  ),
-                  date: isNonNullish(field.options.autoSearchConfig.date)
-                    ? toGlobalId("PetitionField", field.options.autoSearchConfig.date)
-                    : null,
-                  country: isNonNullish(field.options.autoSearchConfig.country)
-                    ? toGlobalId("PetitionField", field.options.autoSearchConfig.country)
-                    : null,
-                },
+                type: field.options.autoSearchConfig.type ?? null,
+                name:
+                  field.options.autoSearchConfig.name?.map((id: number) =>
+                    idMapFn("PetitionField", id),
+                  ) ?? [],
+                date: isNonNullish(field.options.autoSearchConfig.date)
+                  ? idMapFn("PetitionField", field.options.autoSearchConfig.date)
+                  : null,
+                country: isNonNullish(field.options.autoSearchConfig.country)
+                  ? idMapFn("PetitionField", field.options.autoSearchConfig.country)
+                  : null,
               }
-            : {}),
+            : null,
+          replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,
         };
       case "ID_VERIFICATION":
         return {
           config: field.options.config,
-          attachToPdf: field.options.attachToPdf,
+          attachToPdf: field.options.attachToPdf ?? false,
         };
       case "PROFILE_SEARCH":
         return {
           searchIn: (field.options as PetitionFieldOptions["PROFILE_SEARCH"]).searchIn.map((s) => ({
-            profileTypeId: toGlobalId("ProfileType", s.profileTypeId),
-            profileTypeFieldIds: s.profileTypeFieldIds.map((id) =>
-              toGlobalId("ProfileTypeField", id),
-            ),
+            profileTypeId: idMapFn("ProfileType", s.profileTypeId),
+            profileTypeFieldIds: s.profileTypeFieldIds.map((id) => idMapFn("ProfileTypeField", id)),
           })),
         };
       case "ADVERSE_MEDIA_SEARCH":
@@ -774,18 +747,17 @@ export class PetitionFieldService {
             ? {
                 name:
                   field.options.autoSearchConfig.name?.map((id: number) =>
-                    toGlobalId("PetitionField", id),
+                    idMapFn("PetitionField", id),
                   ) ?? null,
                 backgroundCheck: isNonNullish(field.options.autoSearchConfig.backgroundCheck)
-                  ? toGlobalId("PetitionField", field.options.autoSearchConfig.backgroundCheck)
+                  ? idMapFn("PetitionField", field.options.autoSearchConfig.backgroundCheck)
                   : null,
               }
             : null,
-          replyOnlyFromProfile,
+          replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,
         };
-
       default:
-        return field.options;
+        never(`Unknown field type: ${field.type}`);
     }
   }
 
@@ -797,7 +769,10 @@ export class PetitionFieldService {
       return this.standardListsLoader.load({ name: options.standardList, locale });
     }
 
-    return pick(options, ["values", "labels"]);
+    return {
+      values: options.values ?? [],
+      labels: options.labels ?? null,
+    };
   }
 
   mapReplyContentToDatabase(type: PetitionFieldType, content: any) {
@@ -816,7 +791,7 @@ export class PetitionFieldService {
 
   private readonly standardListsLoader = new DataLoader<
     { name: (typeof STANDARD_LIST_NAMES)[number]; locale: ContactLocale },
-    { values: string[]; labels?: Maybe<string[]> }
+    { values: string[]; labels: string[] }
   >(
     async (keys) =>
       await pMap(
@@ -913,8 +888,4 @@ export class PetitionFieldService {
         { concurrency: 1 },
       ),
   );
-
-  private hasPlaceholder(type: PetitionFieldType) {
-    return ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER", "PHONE"].includes(type);
-  }
 }

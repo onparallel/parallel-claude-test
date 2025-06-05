@@ -34,23 +34,20 @@ export const documentProcessingListener = listener(
         "DOCUMENT_PROCESSING",
       );
 
-      const integration =
-        integrations.find((i) => i.id === options.documentProcessing!.integrationId) ??
-        integrations.find((i) => i.is_default) ??
-        integrations[0] ??
-        null;
+      const integrationId =
+        integrations.find((i) => i.is_default)?.id ?? integrations[0]?.id ?? null;
 
       const updatedBy = event.data.user_id
         ? `User:${event.data.user_id}`
         : `PetitionAccess:${event.data.petition_access_id}`;
 
       try {
-        if (isNullish(integration)) {
+        if (isNullish(integrationId)) {
           throw new InvalidRequestError("INTEGRATION_NOT_FOUND");
         }
 
         await ctx.documentProcessing.startDocumentProcessing(
-          integration.id,
+          integrationId,
           reply.content.file_upload_id,
           options.documentProcessing.processDocumentAs,
           { petition_field_reply_id: reply.id },

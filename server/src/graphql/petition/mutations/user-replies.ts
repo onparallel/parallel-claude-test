@@ -374,22 +374,18 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
       };
     } else if (field.type === "ID_VERIFICATION") {
       const options = field.options as PetitionFieldOptions["ID_VERIFICATION"];
-      let integrationId = options.integrationId;
+      const integrations = await ctx.integrations.loadIntegrationsByOrgId(
+        ctx.user!.org_id,
+        "ID_VERIFICATION",
+      );
+      const integrationId =
+        integrations.find((i) => i.is_default)?.id ?? integrations[0]?.id ?? null;
 
       if (isNullish(integrationId)) {
-        const integrations = await ctx.integrations.loadIntegrationsByOrgId(
-          ctx.user!.org_id,
-          "ID_VERIFICATION",
+        throw new ApolloError(
+          "An enabled integration is required for ID_VERIFICATION field",
+          "MISSING_ID_VERIFICATION_INTEGRATION",
         );
-
-        integrationId = integrations.find((i) => i.is_default)?.id ?? integrations[0]?.id ?? null;
-
-        if (isNullish(integrationId)) {
-          throw new ApolloError(
-            "An enabled integration is required for ID_VERIFICATION field",
-            "MISSING_ID_VERIFICATION_INTEGRATION",
-          );
-        }
       }
 
       try {

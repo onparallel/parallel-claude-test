@@ -524,8 +524,8 @@ export const conflictCheckProfileSearch = queryField("conflictCheckProfileSearch
     return await ctx.profiles.conflictCheckSearch(
       search,
       ctx.user!.org_id,
-      profileTypeIds,
-      profileTypeFieldIds,
+      profileTypeIds.filter(isNonNullish),
+      profileTypeFieldIds.filter(isNonNullish),
     );
   },
 });

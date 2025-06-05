@@ -108,6 +108,11 @@ export class ProfileRepository extends BaseRepository {
   readonly loadProfileTypesByOrgId = this.buildLoadMultipleBy("profile_type", "org_id", (q) =>
     q.whereNull("deleted_at"),
   );
+  readonly loadStandardProfileTypesByOrgId = this.buildLoadMultipleBy(
+    "profile_type",
+    "org_id",
+    (q) => q.whereNull("deleted_at").whereNull("archived_at").whereNotNull("standard_type"),
+  );
 
   readonly loadProfileTypeField = this.buildLoadBy("profile_type_field", "id", (q) =>
     q.whereNull("deleted_at"),

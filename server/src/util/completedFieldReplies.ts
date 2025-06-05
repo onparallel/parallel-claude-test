@@ -1,4 +1,5 @@
 import { PetitionFieldType } from "../db/__types";
+import { PetitionFieldOptions } from "../services/PetitionFieldService";
 
 interface PartialField {
   type: PetitionFieldType;
@@ -18,11 +19,12 @@ export function completedFieldReplies(field: PartialField) {
         reply.content.value.every(([, value]: [string, string | null]) => !!value),
       );
     case "CHECKBOX":
+      const options = field.options as PetitionFieldOptions["CHECKBOX"];
       return field.replies.filter((reply) => {
-        if (field.options.limit.type === "EXACT") {
-          return reply.content.value.length === field.options.limit.max;
+        if (options.limit?.type === "EXACT") {
+          return reply.content.value.length === options.limit.max;
         } else {
-          return reply.content.value.length >= field.options.limit.min;
+          return !options.limit?.min || reply.content.value.length >= options.limit.min;
         }
       });
     case "FIELD_GROUP":

@@ -47,9 +47,9 @@ export class PetitionValidationService {
             "Reply must be of type number.",
           );
         }
-        const options = field.options;
-        const min = (options.range?.min as number) ?? -Infinity;
-        const max = (options.range?.max as number) ?? Infinity;
+        const options = field.options as PetitionFieldOptions["NUMBER"];
+        const min = options.range?.min ?? -Infinity;
+        const max = options.range?.max ?? Infinity;
         if (content.value > max || content.value < min) {
           throw new ValidateReplyContentError(
             "value",

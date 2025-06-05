@@ -433,10 +433,10 @@ export const PublicPetitionField = objectType({
       resolve: async (o, _, ctx) => {
         if (o.type === "SELECT" || o.type === "CHECKBOX") {
           const petition = (await ctx.petitions.loadPetition(o.petition_id))!;
-          return await ctx.petitionFields.mapFieldOptions(o, petition.recipient_locale);
+          return await ctx.petitionFields.mapFieldOptions(o, toGlobalId, petition.recipient_locale);
         }
 
-        return await ctx.petitionFields.mapFieldOptions(o);
+        return await ctx.petitionFields.mapFieldOptions(o, toGlobalId);
       },
     });
     t.boolean("optional", {
