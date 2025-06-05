@@ -1,6 +1,7 @@
 import { list, nonNull, nullable, objectType, queryField, stringArg } from "nexus";
 import { outdent } from "outdent";
 import { isNonNullish, isNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { schema } from "../../util/jsonSchema";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
@@ -54,20 +55,16 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
   resolve: async (_, args, ctx) => {
     async function petitionParamsResolver(params: NumericParams<PetitionReplyParams>) {
       const fieldReplies = await ctx.petitions.loadRepliesForField(params.fieldId);
-
       // look for a reply in the field with any search criteria
-      const reply = fieldReplies.find(
+      let reply = fieldReplies.find(
         (r) =>
           r.type === "ADVERSE_MEDIA_SEARCH" &&
           r.parent_petition_field_reply_id === (params.parentReplyId ?? null),
       );
 
       if (isNullish(args.search)) {
-        // if no search terms provided, return reply from DB
-        if (isNullish(reply)) {
-          return null;
-        }
-        return await ctx.petitionsHelper.mapReplyContentFromDatabase(reply);
+        // no search terms are provided, meaning we are doing a read-only query, return reply from DB
+        return reply ? await ctx.petitionsHelper.mapReplyContentFromDatabase(reply) : null;
       }
 
       await ctx.petitionsHelper.userCanWriteOnPetitionField(
@@ -77,6 +74,55 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
         reply?.id ?? null,
         ctx.user!.id,
       );
+
+      // if a search is provided, after checking permissions we will create an empty reply with the generated searchId, or update the existing one if it already exists
+      const searchId = crypto.randomUUID();
+
+      const petition = await ctx.petitions.loadPetition(params.petitionId);
+      assert(petition, "Petition not found");
+      if (!petition.is_template) {
+        if (isNonNullish(reply)) {
+          // if reply already exists, just set the new search_id into its content
+          [reply] = await ctx.petitions.updatePetitionFieldRepliesContent(
+            params.petitionId,
+            [
+              {
+                id: reply.id,
+                content: {
+                  ...reply.content,
+                  search_id: searchId,
+                  search: args.search,
+                },
+              },
+            ],
+            ctx.user!,
+            true, // skip event creation
+          );
+        } else {
+          [reply] = await ctx.petitions.createPetitionFieldReply(
+            params.petitionId,
+            {
+              petition_field_id: params.fieldId,
+              type: "ADVERSE_MEDIA_SEARCH",
+              content: {
+                search_id: searchId,
+                search: args.search,
+                articles: {
+                  totalCount: 0,
+                  items: [],
+                  createdAt: new Date(),
+                },
+                relevant_articles: [],
+                irrelevant_articles: [],
+                dismissed_articles: [],
+              },
+              user_id: ctx.user!.id,
+              parent_petition_field_reply_id: params.parentReplyId ?? null,
+            },
+            `User:${ctx.user!.id}`,
+          );
+        }
+      }
 
       const classifiedArticleIds = [
         ...(reply?.content?.relevant_articles ?? []),
@@ -95,35 +141,18 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
         reply?.content ?? null,
       );
 
-      if (isNonNullish(reply)) {
-        // reply is defined: update it
-        await ctx.petitions.updatePetitionFieldRepliesContent(
+      // after search is resolved, we will update the reply making sure the generated searchId is still matching the value in the stored reply.
+      // this way we can be sure to only update the latest search.
+      // reply could be nullish if petition is a template
+      if (!petition.is_template && isNonNullish(reply)) {
+        // update petition_field_reply where content->search_id = searchId
+        await ctx.petitions.updateAdverseMediaFieldReplyContentBySearchId(
           params.petitionId,
-          [
-            {
-              id: reply.id,
-              content,
-            },
-          ],
-          ctx.user!,
+          reply.id,
+          searchId,
+          content,
+          ctx.user!.id,
         );
-      } else {
-        const petition = await ctx.petitions.loadPetition(params.petitionId);
-        if (petition?.is_template === false) {
-          // create a new reply with the correct search criteria
-          await ctx.petitions.createPetitionFieldReply(
-            params.petitionId,
-            {
-              type: "ADVERSE_MEDIA_SEARCH",
-              content,
-              user_id: ctx.user!.id,
-              petition_field_id: params.fieldId,
-              parent_petition_field_reply_id: params.parentReplyId ?? null,
-              status: "PENDING",
-            },
-            `User:${ctx.user!.id}`,
-          );
-        }
       }
 
       return await ctx.petitionsHelper.mapReplyContentFromDatabase({

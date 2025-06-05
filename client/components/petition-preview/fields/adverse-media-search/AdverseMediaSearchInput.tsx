@@ -88,26 +88,22 @@ export const AdverseMediaSearchInput = forwardRef(function AdverseMediaSearchInp
   const apollo = useApolloClient();
   const [inputValue, setInputValue] = useState("");
 
-  const loadOptions = useDebouncedAsync(
-    async (search: string, entityIdsToOmit?: string[]): Promise<Option[]> => {
-      if (search.length < 3) return [];
+  const loadOptions = async (search: string, entityIdsToOmit?: string[]): Promise<Option[]> => {
+    if (search.length < 3) return [];
 
-      const { data } = await apollo.query({
-        query: AdverseMediaSearchInput_adverseMediaEntitySuggestDocument,
-        variables: { searchTerm: search, excludeIds: entityIdsToOmit },
-        fetchPolicy: "network-only",
-      });
+    const { data } = await apollo.query({
+      query: AdverseMediaSearchInput_adverseMediaEntitySuggestDocument,
+      variables: { searchTerm: search, excludeIds: entityIdsToOmit },
+      fetchPolicy: "network-only",
+    });
 
-      return data!.adverseMediaEntitySuggest.map((item) =>
-        createOption({
-          label: item.name,
-          entityId: item.id,
-        }),
-      );
-    },
-    150,
-    [],
-  );
+    return data!.adverseMediaEntitySuggest.map((item) =>
+      createOption({
+        label: item.name,
+        entityId: item.id,
+      }),
+    );
+  };
 
   const handleKeyDown: KeyboardEventHandler = (event) => {
     if (!inputValue || inputValue.length < 2) return;
@@ -152,10 +148,14 @@ export const AdverseMediaSearchInput = forwardRef(function AdverseMediaSearchInp
     },
   });
 
-  const loadOptionsForSelect = async (inputText: string): Promise<readonly Option[]> => {
-    const entityIdsToOmit = value?.map((v) => v._search.entityId).filter(isNonNullish);
-    return await loadOptions(inputText, entityIdsToOmit);
-  };
+  const loadOptionsForSelect = useDebouncedAsync(
+    async (inputText: string): Promise<readonly Option[]> => {
+      const entityIdsToOmit = value?.map((v) => v._search.entityId).filter(isNonNullish);
+      return await loadOptions(inputText, entityIdsToOmit);
+    },
+    500,
+    [],
+  );
 
   const formatCreateLabel = (label: string) => {
     return (

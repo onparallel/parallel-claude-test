@@ -106,16 +106,19 @@ export class OPointClient implements IAdverseMediaSearchClient {
     // as filters are not working, we need to add the number of excluded entities to the results count
     // and then filter out the excluded entities after the results are returned
     const resultsCount = 5 + (opts?.excludeEntityIds?.length ?? 0);
+    try {
+      const response = await this.apiCall<OPointSuggestResponse>(
+        "GET",
+        `suggest/en_GB_1/single/${resultsCount}/0/0/2147483647:65536/${selectedFilters}/${encodeURIComponent(searchTerm)}`,
+      );
 
-    const response = await this.apiCall<OPointSuggestResponse>(
-      "GET",
-      `suggest/en_GB_1/single/${resultsCount}/0/0/2147483647:65536/${selectedFilters}/${searchTerm}`,
-    );
-
-    return response.results
-      .map(pick(["id", "name"]))
-      .filter((r) => !opts?.excludeEntityIds?.includes(r.id))
-      .slice(0, 5);
+      return response.results
+        .map(pick(["id", "name"]))
+        .filter((r) => !opts?.excludeEntityIds?.includes(r.id))
+        .slice(0, 5);
+    } catch (error) {
+      return [];
+    }
   }
 
   async searchArticles(searchTerms: SearchTerm[], opts?: BuildSearchTermOptions) {

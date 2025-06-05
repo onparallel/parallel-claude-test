@@ -2482,6 +2482,74 @@ export class PetitionRepository extends BaseRepository {
     return replies;
   }
 
+  async updateAdverseMediaFieldReplyContentBySearchId(
+    petitionId: number,
+    replyId: number,
+    searchId: string,
+    content: any,
+    userId: number,
+    t?: Knex.Transaction,
+  ) {
+    const oldReply = await this.loadFieldReply(replyId);
+    const [reply] = await this.raw<PetitionFieldReply | undefined>(
+      /* sql */ `
+      with input_data as (
+        select * from (?) as t(reply_id, content)
+      )
+      update petition_field_reply pfr
+      set
+        content = id.content,
+        status = 'PENDING',
+        updated_at = NOW(),
+        updated_by = ?
+      from input_data id
+      where pfr.id = id.reply_id
+      and pfr.content->>'search_id' = ?
+      and pfr.deleted_at is null
+      returning pfr.*;
+  `,
+      [
+        this.sqlValues([[replyId, JSON.stringify(content)]], ["int", "jsonb"]),
+        `User:${userId}`,
+        searchId,
+      ],
+      t,
+    );
+
+    if (!reply) {
+      return null;
+    }
+
+    await this.updatePetition(
+      petitionId,
+      {
+        status: "PENDING",
+        closed_at: null,
+      },
+      `User:${userId}`,
+      t,
+    );
+
+    await this.createOrUpdateReplyEvents(petitionId, [reply], { user_id: userId }, t);
+    if (oldReply && oldReply.status !== "PENDING") {
+      await this.createEvent(
+        {
+          type: "REPLY_STATUS_CHANGED",
+          petition_id: petitionId,
+          data: {
+            status: "PENDING",
+            petition_field_id: reply.petition_field_id,
+            petition_field_reply_id: reply.id,
+            user_id: userId,
+          },
+        },
+        t,
+      );
+    }
+
+    return reply;
+  }
+
   async updatePetitionMetadata(petitionId: number, metadata: any) {
     const [petition] = await this.from("petition")
       .where("id", petitionId)

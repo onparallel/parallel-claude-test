@@ -15720,6 +15720,21 @@
     "context": "Link"
   },
   {
+    "term": "page.adverse-media-search.loading-articles",
+    "definition": "Buscando coincidencias relevantes entre más de 235.000 fuentes de noticias y listas de medios adversos para: <b>{search}</b>...",
+    "context": "Searching for matches across more than 235,000 news sources for: <b>{search}</b>..."
+  },
+  {
+    "term": "page.adverse-media-search.loading-articles-take-a-seat",
+    "definition": "Esto puede tardar unos segundos.",
+    "context": "This may take a few seconds."
+  },
+  {
+    "term": "page.adverse-media-search.loading-articles-take-a-seat-please-do-not-close-or-reload-the-page",
+    "definition": "Por favor, no cierres o recargues la página.",
+    "context": "Please do not close or reload the page."
+  },
+  {
     "term": "page.adverse-media-search.mentions",
     "definition": "Menciones",
     "context": "Mentions"
@@ -15750,11 +15765,6 @@
     "context": "Type something and press enter..."
   },
   {
-    "term": "page.adverse-media-search.refresh-search",
-    "definition": "Actualizar búsqueda",
-    "context": "Refresh search"
-  },
-  {
     "term": "page.adverse-media-search.relevant-articles",
     "definition": "Artículos relevantes",
     "context": "Relevant articles"
@@ -15766,6 +15776,11 @@
   },
   {
     "term": "page.adverse-media-search.search",
+    "definition": "Búsqueda",
+    "context": "Search"
+  },
+  {
+    "term": "page.adverse-media-search.search-button",
     "definition": "Buscar",
     "context": "Search"
   },

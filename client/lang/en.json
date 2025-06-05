@@ -15720,6 +15720,21 @@
     "context": "Link"
   },
   {
+    "term": "page.adverse-media-search.loading-articles",
+    "definition": "Searching for matches across more than 235,000 news sources for: <b>{search}</b>...",
+    "context": "Searching for matches across more than 235,000 news sources for: <b>{search}</b>..."
+  },
+  {
+    "term": "page.adverse-media-search.loading-articles-take-a-seat",
+    "definition": "This may take a few seconds.",
+    "context": "This may take a few seconds."
+  },
+  {
+    "term": "page.adverse-media-search.loading-articles-take-a-seat-please-do-not-close-or-reload-the-page",
+    "definition": "Please do not close or reload the page.",
+    "context": "Please do not close or reload the page."
+  },
+  {
     "term": "page.adverse-media-search.mentions",
     "definition": "Mentions",
     "context": "Mentions"
@@ -15750,11 +15765,6 @@
     "context": "Type something and press enter..."
   },
   {
-    "term": "page.adverse-media-search.refresh-search",
-    "definition": "Refresh search",
-    "context": "Refresh search"
-  },
-  {
     "term": "page.adverse-media-search.relevant-articles",
     "definition": "Relevant articles",
     "context": "Relevant articles"
@@ -15766,6 +15776,11 @@
   },
   {
     "term": "page.adverse-media-search.search",
+    "definition": "Search",
+    "context": "Search"
+  },
+  {
+    "term": "page.adverse-media-search.search-button",
     "definition": "Search",
     "context": "Search"
   },

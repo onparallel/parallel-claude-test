@@ -1,9 +1,10 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { Center, Grid, Spinner, Stack, Text, useBreakpointValue } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   BookOpenIcon,
   ForbiddenIcon,
+  SearchIcon,
   ShortSearchIcon,
   StarIcon,
   UserXIcon,
@@ -18,6 +19,7 @@ import {
   AdverseMediaArticleRelevance,
   AdverseMediaSearchTermInput,
 } from "@parallel/graphql/__types";
+import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { FORMATS } from "@parallel/utils/dates";
 import React, { useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -65,7 +67,7 @@ export function AdverseMediaArticleCard({
 
   const [showArticleDetail, setShowArticleDetail] = useState(true);
 
-  const { data, loading: loadingDetails } = useQuery(
+  const { data, loading: loadingDetails } = useQueryOrPreviousData(
     AdverseMediaArticleCard_adverseMediaArticleDetailsDocument,
     {
       variables: {
@@ -74,7 +76,7 @@ export function AdverseMediaArticleCard({
         search: includeQuotes && search.length > 0 ? search : null,
         includeQuotes: includeQuotes && search.length > 0 ? true : false,
       },
-      skip: isNullish(selectedArticleId) || !isSelected,
+      skip: isNullish(selectedArticleId) || !isSelected || isLoadingList,
     },
   );
 
@@ -204,14 +206,39 @@ export function AdverseMediaArticleCard({
               );
             })
           ) : isLoadingList ? (
-            <Center flex="1">
+            <Center flex="1" flexDirection="column" alignItems="center" gap={1} padding={6}>
               <Spinner
                 thickness="4px"
                 speed="0.65s"
                 emptyColor="gray.200"
                 color="primary.500"
                 size="xl"
+                marginBottom={4}
               />
+              {isNonNullish(search) && search.length > 0 ? (
+                <Text textStyle="hint" textAlign="center" as="span" verticalAlign="middle">
+                  <SearchIcon boxSize={4} color="gray.400" marginEnd={2} marginBottom={1} />
+                  <FormattedMessage
+                    id="page.adverse-media-search.loading-articles"
+                    defaultMessage="Searching for matches across more than 235,000 news sources for: <b>{search}</b>..."
+                    values={{
+                      search: search.map((s) => s.label || s.term).join(", "),
+                    }}
+                  />
+                </Text>
+              ) : null}
+              <Text textStyle="hint" textAlign="center">
+                <FormattedMessage
+                  id="page.adverse-media-search.loading-articles-take-a-seat"
+                  defaultMessage="This may take a few seconds."
+                />
+              </Text>
+              <Text textStyle="hint" textAlign="center" fontWeight="bold">
+                <FormattedMessage
+                  id="page.adverse-media-search.loading-articles-take-a-seat-please-do-not-close-or-reload-the-page"
+                  defaultMessage="Please do not close or reload the page."
+                />
+              </Text>
             </Center>
           ) : (
             <Center flex="1">

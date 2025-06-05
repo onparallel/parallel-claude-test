@@ -15,9 +15,8 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { RepeatIcon, SaveIcon, SparklesIcon, UserIcon } from "@parallel/chakra/icons";
+import { SaveIcon, SparklesIcon, UserIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
@@ -65,7 +64,6 @@ function AdverseMediaSearch({
 
   const startTimestamp = useRef(Date.now());
   const [isSearching, setIsSearching] = useState(false);
-  const lastSearchRef = useRef<string | null>(null);
 
   const showGenericError = useGenericErrorToast();
   const toast = useToast();
@@ -87,9 +85,18 @@ function AdverseMediaSearch({
 
   const [isDraft, setIsDraft] = useState(_data?.adverseMediaArticleSearch?.isDraft);
 
+  useEffect(() => {
+    if (!queryLoading) {
+      setIsDraft(_data?.adverseMediaArticleSearch?.isDraft);
+    }
+  }, [queryLoading]);
+
   const articles = _data?.adverseMediaArticleSearch?.articles.items ?? [];
   const search = (_data?.adverseMediaArticleSearch?.search ?? []).map((item) =>
     omitBy(item, (value, key) => isNullish(value) || key === "__typename"),
+  );
+  const currentSearch = useRef<AdverseMediaSearchTermInput[]>(
+    !hasReply && autoCompleteSearch?.length ? autoCompleteSearch : search,
   );
   const createdAt = _data?.adverseMediaArticleSearch?.articles.createdAt ?? null;
 
@@ -135,23 +142,19 @@ function AdverseMediaSearch({
   const performSearch = useCallback(
     async (searchData: AdverseMediaSearchTermInput[]) => {
       if (isNonNullish(searchData) && searchData.length > 0) {
-        const searchId = Date.now().toString();
-        lastSearchRef.current = searchId;
         startTimestamp.current = Date.now();
+        currentSearch.current = searchData;
         setIsSearching(true);
         try {
           const { data: refetchData } = await refetch({
             search: searchData,
           } as any);
-          if (lastSearchRef.current === searchId) {
-            setIsDraft(refetchData?.adverseMediaArticleSearch?.isDraft);
-          }
+
+          setIsDraft(refetchData?.adverseMediaArticleSearch?.isDraft);
         } catch (error: unknown) {
           await showGenericError(error);
         } finally {
-          if (lastSearchRef.current === searchId) {
-            setIsSearching(false);
-          }
+          setIsSearching(false);
         }
       }
     },
@@ -319,7 +322,7 @@ function AdverseMediaSearch({
               onSubmit={onSubmit}
               isReadOnly={isReadOnly}
               defaultSuggestions={autoCompleteSearch}
-              isLoading={isSearching}
+              isLoading={loading}
               token={token}
             />
 
@@ -334,9 +337,9 @@ function AdverseMediaSearch({
                         isAfter(article.classifiedAt, startTimestamp.current)),
                   )}
                   onClassifyArticle={handleClassifyArticle}
-                  search={search}
+                  search={currentSearch.current}
                   isLoadingList={loading}
-                  includeQuotes={true}
+                  includeQuotes={!loading}
                   isReadOnly={isReadOnly || isTemplate}
                   isSelected={activeTab === 0}
                 />
@@ -346,7 +349,7 @@ function AdverseMediaSearch({
                   token={token}
                   articles={savedArticles}
                   onClassifyArticle={handleClassifyArticle}
-                  search={search}
+                  search={currentSearch.current}
                   isLoadingList={loading}
                   defaultArticleId={articleId}
                   isReadOnly={isReadOnly || isTemplate}
@@ -358,7 +361,7 @@ function AdverseMediaSearch({
                   token={token}
                   articles={nonRelevantArticles}
                   onClassifyArticle={handleClassifyArticle}
-                  search={search}
+                  search={currentSearch.current}
                   isLoadingList={loading}
                   isReadOnly={isReadOnly || isTemplate}
                   isSelected={activeTab === 2}
@@ -369,7 +372,7 @@ function AdverseMediaSearch({
                   token={token}
                   articles={dismissedArticles}
                   onClassifyArticle={handleClassifyArticle}
-                  search={search}
+                  search={currentSearch.current}
                   isLoadingList={loading}
                   isReadOnly={isReadOnly || isTemplate}
                   isSelected={activeTab === 3}
@@ -403,7 +406,6 @@ function SearchInputWithSuggestions({
   defaultSuggestions: AdverseMediaSearchTermInput[];
   token: string;
 }) {
-  const intl = useIntl();
   const { control } = useFormContext<AdverseMediaSearchData>();
 
   const [suggestions, setSuggestions] = useState<AdverseMediaSearchTermInput[]>(defaultSuggestions);
@@ -468,24 +470,20 @@ function SearchInputWithSuggestions({
                   onChange={(newValue) => {
                     const newValues = newValue.map((v) => v._search);
                     onChange(newValues);
-                    if (newValues.length !== value.length) {
-                      onSubmit();
-                    }
                   }}
-                  isDisabled={isReadOnly}
+                  isDisabled={isReadOnly || isLoading}
                 />
               </Box>
-              <IconButtonWithTooltip
-                variant="outline"
-                backgroundColor="white"
-                icon={<RepeatIcon />}
-                label={intl.formatMessage({
-                  id: "page.adverse-media-search.refresh-search",
-                  defaultMessage: "Refresh search",
-                })}
+              <Button
+                colorScheme="purple"
                 onClick={onSubmit}
-                isDisabled={isReadOnly || isLoading}
-              />
+                isDisabled={isReadOnly || isLoading || isNullish(value) || value.length === 0}
+              >
+                <FormattedMessage
+                  id="page.adverse-media-search.search-button"
+                  defaultMessage="Search"
+                />
+              </Button>
             </HStack>
             {filteredSuggestions.length > 0 ? (
               <HStack flexWrap="wrap" gap={2} spacing={0}>
@@ -510,9 +508,8 @@ function SearchInputWithSuggestions({
                           wikiDataId: suggestion.wikiDataId,
                         },
                       ]);
-                      onSubmit();
                     }}
-                    isDisabled={isReadOnly}
+                    isDisabled={isReadOnly || isLoading}
                   >
                     {suggestion.label}
                   </Button>
