@@ -27588,7 +27588,7 @@ export type PreviewPetitionFieldMutations_updatePetitionFieldRepliesMutation = {
   }>;
 };
 
-export type useCreatePetitionFieldReply_PetitionFieldFragment = {
+export type useUpdatePetitionFieldReply_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
@@ -27639,6 +27639,18 @@ export type PreviewPetitionFieldMutations_createPetitionFieldRepliesMutation = {
     } | null;
     parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
   }>;
+};
+
+export type useCreatePetitionFieldReply_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  children?: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    multiple: boolean;
+    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+  }> | null;
 };
 
 export type PreviewPetitionFieldMutations_createFileUploadReplyMutationVariables = Exact<{
@@ -27731,6 +27743,7 @@ export type PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFiel
     field: {
       __typename?: "PetitionField";
       id: string;
+      multiple: boolean;
       replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
     };
     replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
@@ -27753,6 +27766,7 @@ export type PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFiel
       field: {
         __typename?: "PetitionField";
         id: string;
+        multiple: boolean;
         replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
       };
       replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
@@ -27772,6 +27786,7 @@ export type PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFiel
       field: {
         __typename?: "PetitionField";
         id: string;
+        multiple: boolean;
         replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
       };
       replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
@@ -53710,6 +53725,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
         field: {
           __typename?: "PetitionField";
           id: string;
+          multiple: boolean;
           replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
         };
         replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
@@ -53729,6 +53745,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
         field: {
           __typename?: "PetitionField";
           id: string;
+          multiple: boolean;
           replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
         };
         replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
@@ -54011,6 +54028,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
         field: {
           __typename?: "PetitionField";
           id: string;
+          multiple: boolean;
           replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
         };
         replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
@@ -54030,6 +54048,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
         field: {
           __typename?: "PetitionField";
           id: string;
+          multiple: boolean;
           replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
         };
         replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
@@ -54987,6 +55006,7 @@ export type PetitionCompose_createProfileLinkedPetitionFieldMutation = {
         field: {
           __typename?: "PetitionField";
           id: string;
+          multiple: boolean;
           replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
         };
         replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
@@ -55006,6 +55026,7 @@ export type PetitionCompose_createProfileLinkedPetitionFieldMutation = {
         field: {
           __typename?: "PetitionField";
           id: string;
+          multiple: boolean;
           replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
         };
         replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
@@ -77793,12 +77814,25 @@ export const PreviewPetitionField_PetitionFieldReplyFragmentDoc = gql`
     content
   }
 ` as unknown as DocumentNode<PreviewPetitionField_PetitionFieldReplyFragment, unknown>;
+export const useUpdatePetitionFieldReply_PetitionFieldFragmentDoc = gql`
+  fragment useUpdatePetitionFieldReply_PetitionField on PetitionField {
+    id
+    type
+    children {
+      id
+      replies {
+        id
+      }
+    }
+  }
+` as unknown as DocumentNode<useUpdatePetitionFieldReply_PetitionFieldFragment, unknown>;
 export const useCreatePetitionFieldReply_PetitionFieldFragmentDoc = gql`
   fragment useCreatePetitionFieldReply_PetitionField on PetitionField {
     id
     type
     children {
       id
+      multiple
       replies {
         id
       }
@@ -77820,6 +77854,7 @@ export const PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFie
       children {
         field {
           id
+          multiple
           replies {
             id
           }

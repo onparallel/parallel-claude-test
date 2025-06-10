@@ -82,14 +82,17 @@ export function RecipientViewPetitionFieldSelect({
   );
 
   useEffect(() => {
-    if (field.multiple && filteredReplies.length > 0 && showNewReply) {
-      setShowNewReply(false);
-    }
     if (hasAlreadyRepliedError) {
       setHasAlreadyRepliedError(false);
       setValue(null);
     }
   }, [filteredReplies]);
+
+  useEffect(() => {
+    if (field.multiple && filteredReplies.length > 0 && showNewReply) {
+      setShowNewReply(false);
+    }
+  }, [filteredReplies.length]);
 
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: string) => {

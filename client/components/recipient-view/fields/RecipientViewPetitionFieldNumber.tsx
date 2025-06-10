@@ -76,14 +76,17 @@ export function RecipientViewPetitionFieldNumber({
       });
 
   useEffect(() => {
-    if (field.multiple && filteredReplies.length > 0 && showNewReply) {
-      setShowNewReply(false);
-    }
     if (hasAlreadyRepliedError) {
       setHasAlreadyRepliedError(false);
       setValue(undefined);
     }
   }, [filteredReplies]);
+
+  useEffect(() => {
+    if (field.multiple && filteredReplies.length > 0 && showNewReply) {
+      setShowNewReply(false);
+    }
+  }, [filteredReplies.length]);
 
   function handleAddNewReply() {
     setShowNewReply(true);

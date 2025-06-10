@@ -1142,6 +1142,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           update: (cache, { data }) => {
             if (isTemplate && isNonNullish(data)) {
               for (const fieldId of childrenFieldIds) {
+                const field = allFieldsWithIndices.find(([f]) => f.id === fieldId)?.[0];
                 updatePreviewFieldReplies(cache, parentFieldId, (replies) => {
                   return replies.map((r) => {
                     return {
@@ -1152,6 +1153,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                           field: {
                             __typename: "PetitionField",
                             id: fieldId,
+                            multiple: field?.multiple ?? false,
                             replies: [],
                           },
                           replies: [],

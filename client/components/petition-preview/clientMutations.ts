@@ -18,6 +18,7 @@ import {
   useCreateFieldGroupRepliesFromProfiles_PetitionFieldFragment,
   useCreateFieldGroupRepliesFromProfiles_PetitionFieldFragmentDoc,
   useCreatePetitionFieldReply_PetitionFieldFragment,
+  useUpdatePetitionFieldReply_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
@@ -155,9 +156,9 @@ export function useUpdatePetitionFieldReply() {
       content: any;
       isCacheOnly?: boolean;
     }) {
-      const field = client.readFragment<useCreatePetitionFieldReply_PetitionFieldFragment>({
+      const field = client.readFragment<useUpdatePetitionFieldReply_PetitionFieldFragment>({
         fragment: gql`
-          fragment useCreatePetitionFieldReply_PetitionField on PetitionField {
+          fragment useUpdatePetitionFieldReply_PetitionField on PetitionField {
             id
             type
             children {
@@ -267,6 +268,7 @@ export function useCreatePetitionFieldReply() {
             type
             children {
               id
+              multiple
               replies {
                 id
               }
@@ -319,6 +321,7 @@ export function useCreatePetitionFieldReply() {
                   : {
                       ...child,
                       replies: [
+                        ...(child.field?.multiple ? child.replies : []),
                         {
                           id,
                           __typename: "PetitionFieldReply",
@@ -734,6 +737,7 @@ updatePreviewFieldReplies.fragments = {
         children {
           field {
             id
+            multiple
             replies {
               id
             }
