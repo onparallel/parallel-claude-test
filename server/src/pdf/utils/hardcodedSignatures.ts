@@ -18,7 +18,14 @@ export function getHardcodedSignatures(templateId: string) {
       fullName: "TIKO",
       signatureImageUrl: "https://static.onparallel.com/static/images/signatures/sello-tiko.png",
     });
-  } else if (["zas25KHxAByKWUgG8U2", "zas25KHxAByKWUhxeC6"].includes(templateId)) {
+  } else if (
+    [
+      "zas25KHxAByKWUgG8U2",
+      "zas25KHxAByKWUhxeC6",
+      "6Y8DSH92uxPaJ4CQ6UV8h",
+      "6Y8DSH92uxPaJ4CQ8C2Rs",
+    ].includes(templateId)
+  ) {
     signers.push({
       fullName: "Marta Blanco Maseda",
       signatureImageUrl:
