@@ -2040,7 +2040,10 @@ export class PetitionRepository extends BaseRepository {
       `,
         [
           this.sqlValues(
-            clonedFieldsForMathUpdate.map((child) => [child.id, this.json(child.math)]),
+            clonedFieldsForMathUpdate.map((child) => [
+              child.id,
+              child.math ? this.json(child.math) : null,
+            ]),
             ["int", "jsonb"],
           ),
         ],
@@ -2278,7 +2281,8 @@ export class PetitionRepository extends BaseRepository {
         .update(
           {
             ...data,
-            ...("math" in data ? { math: this.json(data.math) } : {}),
+            // math is required to be explicitly casted into jsonb as it is an array object
+            ...("math" in data ? { math: data.math ? this.json(data.math) : null } : {}),
             updated_at: this.now(),
             updated_by: updatedBy,
           },
@@ -3485,8 +3489,8 @@ export class PetitionRepository extends BaseRepository {
                   allReferencedLists.push(...referencedLists);
                   return [
                     field.id,
-                    this.json(mappedVisibility),
-                    this.json(mappedMath),
+                    mappedVisibility ? this.json(mappedVisibility) : null,
+                    mappedMath ? this.json(mappedMath) : null,
                     this.json(mappedOptions),
                     mappedProfileTypeId,
                     mappedProfileTypeFieldId,
