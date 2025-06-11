@@ -4,15 +4,15 @@
 # versions
 nodejs_version="22" # https://nodejs.org/en/download
 typst_version="0.11.1" # https://github.com/typst/typst/releases
-nginx_version="1.26.3" # http://nginx.org/en/download.html
+nginx_version="1.28.0" # http://nginx.org/en/download.html
 fail2ban_version="1.1.0" # https://github.com/fail2ban/fail2ban/releases
 modsecurity_version="3.0.14" # https://github.com/SpiderLabs/ModSecurity/releases
-modsecurity_nginx_version="1.0.3" # https://github.com/SpiderLabs/ModSecurity-nginx/releases
-coreruleset_version="4.12.0" # https://github.com/coreruleset/coreruleset/releases
+modsecurity_nginx_version="1.0.4" # https://github.com/SpiderLabs/ModSecurity-nginx/releases
+coreruleset_version="4.15.0" # https://github.com/coreruleset/coreruleset/releases
 ngx_devel_kit_version="0.3.4" # https://github.com/vision5/ngx_devel_kit/releases
 set_misc_nginx_module_version="0.33" # https://github.com/openresty/set-misc-nginx-module/tags
 headers_more_nginx_module_version="0.38" # https://github.com/openresty/headers-more-nginx-module/tags
-image_exiftool_version="13.25" # https://exiftool.org/
+image_exiftool_version="13.30" # https://exiftool.org/
 
 # Add public keys
 cat authorized_keys >> .ssh/authorized_keys
