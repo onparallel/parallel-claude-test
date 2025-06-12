@@ -358,7 +358,6 @@ export class DashboardRepository extends BaseRepository {
             isNonNullish(profileTypeFieldsById),
             "if filter.values is defined, profileTypeFieldsById is required",
           );
-          const joins: Record<number, string> = {};
           this.profileValuesFilter.applyProfileValuesFilterJoins(
             q,
             filters.values,

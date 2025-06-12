@@ -1458,6 +1458,38 @@ describe("DashboardRepository", () => {
       });
     });
 
+    it("aggregates numeric values by profile risk, grouping by SELECT property and removing null values", async () => {
+      expect(
+        await dashboards.getProfilesPieChartValues(organization.id, {
+          type: "AGGREGATE",
+          aggregate: "SUM",
+          items: [],
+          graphicType: "PIE",
+          profileTypeId: profileType.id,
+          profileTypeFieldId: numberField.id,
+          groupByProfileTypeFieldId: riskSelectField.id,
+          groupByFilter: {
+            status: ["OPEN", "CLOSED"],
+            values: {
+              conditions: [
+                {
+                  operator: "HAS_VALUE",
+                  profileTypeFieldId: riskSelectField.id,
+                },
+              ],
+              logicalOperator: "AND",
+            },
+          },
+        }),
+      ).toEqual({
+        items: expect.toIncludeSameMembers([
+          { label: { en: "High Risk" }, color: "#aa0000", count: 3, aggr: 1700 },
+          { label: { en: "Medium Risk" }, color: "#bb0000", count: 3, aggr: 700 },
+        ]),
+        isIncongruent: false,
+      });
+    });
+
     it("sends error when grouping by a property of type other than SELECT", async () => {
       await expect(
         dashboards.getProfilesPieChartValues(organization.id, {
