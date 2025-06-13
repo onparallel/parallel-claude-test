@@ -125,6 +125,7 @@ export function getHardcodedSignatures(templateId: string) {
       "6Y8DSH92uxPaJ4Byp9Ezm",
       "6Y8DSH92uxPaJ4CQ6WMDA",
       "6Y8DSH92uxPaJ4CQ6VbQh",
+      "6Y8DSH92uxPaJ4CQ8DWMG",
     ].includes(templateId)
   ) {
     signers.push({
