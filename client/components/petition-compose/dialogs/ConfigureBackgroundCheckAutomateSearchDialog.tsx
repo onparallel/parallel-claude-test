@@ -125,7 +125,7 @@ export function ConfigureBackgroundCheckAutomateSearchDialog({
             <FormLabel fontWeight={400}>
               <FormattedMessage
                 id="component.configure-automate-search-dialog.name-label"
-                defaultMessage="Name of person/entity"
+                defaultMessage="Name of person / entity"
               />
               <Text as="span" marginStart={1}>
                 *
@@ -207,7 +207,7 @@ export function ConfigureBackgroundCheckAutomateSearchDialog({
             <FormLabel fontWeight={400}>
               <FormattedMessage
                 id="component.configure-automate-search-dialog.country-label"
-                defaultMessage="Country"
+                defaultMessage="Country (nationality / jurisdiction)"
               />
             </FormLabel>
             <Controller

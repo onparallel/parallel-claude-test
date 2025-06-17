@@ -76,13 +76,18 @@ export function PetitionRepliesPopoverField({
           <PopoverContent width="500px">
             <FocusLock restoreFocus={false}>
               <PopoverArrow />
-              <PopoverBody>
+              <PopoverBody minHeight="60px">
                 <PopoverCloseButton top={4} insetEnd={5} />
                 <PreviewPetitionField
                   field={field}
                   petition={petition}
                   user={user}
-                  isDisabled={false}
+                  isDisabled={
+                    petition.status === "CLOSED" ||
+                    petition.isAnonymized ||
+                    user.organization.isPetitionUsageLimitReached ||
+                    petition.hasStartedProcess
+                  }
                   isCacheOnly={false}
                   myEffectivePermission={myEffectivePermission}
                   showErrors={false}
@@ -103,6 +108,9 @@ PetitionRepliesPopoverField.fragments = {
   Petition: gql`
     fragment PetitionRepliesPopoverField_Petition on Petition {
       id
+      status
+      hasStartedProcess
+      isAnonymized
       myEffectivePermission {
         permissionType
       }
@@ -113,6 +121,10 @@ PetitionRepliesPopoverField.fragments = {
   User: gql`
     fragment PetitionRepliesPopoverField_User on User {
       id
+      organization {
+        id
+        isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+      }
       ...PreviewPetitionField_User
     }
     ${PreviewPetitionField.fragments.User}

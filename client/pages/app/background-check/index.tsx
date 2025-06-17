@@ -186,7 +186,7 @@ function BackgroundCheckFieldSearch({
                   <FormLabel fontWeight="400">
                     <FormattedMessage
                       id="page.background-check.name-person-entity"
-                      defaultMessage="Name of the person/entity *"
+                      defaultMessage="Name of the person / entity *"
                     />
                   </FormLabel>
                   <Input {...register("name", { required: true })} />
@@ -228,7 +228,7 @@ function BackgroundCheckFieldSearch({
                   <FormLabel fontWeight={400}>
                     <FormattedMessage
                       id="page.background-check.country-label"
-                      defaultMessage="Country"
+                      defaultMessage="Country (nationality / jurisdiction)"
                     />
                   </FormLabel>
                   <Controller

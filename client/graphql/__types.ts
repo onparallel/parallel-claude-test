@@ -29809,6 +29809,8 @@ export type NoRepliesHintWithButton_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   status: PetitionStatus;
+  hasStartedProcess: boolean;
+  isAnonymized: boolean;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -30251,6 +30253,7 @@ export type NoRepliesHintWithButton_UserFragment = {
   id: string;
   hasBackgroundCheck: boolean;
   hasProfileSearchField: boolean;
+  organization: { __typename?: "Organization"; id: string; isPetitionUsageLimitReached: boolean };
 };
 
 export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
@@ -33173,6 +33176,7 @@ export type PetitionRepliesField_UserFragment = {
   id: string;
   hasBackgroundCheck: boolean;
   hasProfileSearchField: boolean;
+  organization: { __typename?: "Organization"; id: string; isPetitionUsageLimitReached: boolean };
 };
 
 export type PetitionRepliesField_PetitionFragment = {
@@ -33180,6 +33184,8 @@ export type PetitionRepliesField_PetitionFragment = {
   id: string;
   status: PetitionStatus;
   isReviewFlowEnabled: boolean;
+  hasStartedProcess: boolean;
+  isAnonymized: boolean;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -35617,6 +35623,7 @@ export type PetitionRepliesFieldReply_UserFragment = {
   id: string;
   hasBackgroundCheck: boolean;
   hasProfileSearchField: boolean;
+  organization: { __typename?: "Organization"; id: string; isPetitionUsageLimitReached: boolean };
 };
 
 export type PetitionRepliesFieldReply_PetitionFragment = {
@@ -35624,6 +35631,8 @@ export type PetitionRepliesFieldReply_PetitionFragment = {
   status: PetitionStatus;
   id: string;
   isReviewFlowEnabled: boolean;
+  hasStartedProcess: boolean;
+  isAnonymized: boolean;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -36097,6 +36106,8 @@ export type PetitionRepliesPopoverField_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   status: PetitionStatus;
+  hasStartedProcess: boolean;
+  isAnonymized: boolean;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -36251,6 +36262,7 @@ export type PetitionRepliesPopoverField_UserFragment = {
   id: string;
   hasBackgroundCheck: boolean;
   hasProfileSearchField: boolean;
+  organization: { __typename?: "Organization"; id: string; isPetitionUsageLimitReached: boolean };
 };
 
 export type PetitionRepliesPopoverField_PetitionFieldFragment = {
@@ -78228,6 +78240,10 @@ export const PreviewPetitionField_UserFragmentDoc = gql`
 export const PetitionRepliesPopoverField_UserFragmentDoc = gql`
   fragment PetitionRepliesPopoverField_User on User {
     id
+    organization {
+      id
+      isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+    }
     ...PreviewPetitionField_User
   }
   ${PreviewPetitionField_UserFragmentDoc}
@@ -82947,6 +82963,9 @@ export const ProfileDrawer_ProfileFragmentDoc = gql`
 export const PetitionRepliesPopoverField_PetitionFragmentDoc = gql`
   fragment PetitionRepliesPopoverField_Petition on Petition {
     id
+    status
+    hasStartedProcess
+    isAnonymized
     myEffectivePermission {
       permissionType
     }

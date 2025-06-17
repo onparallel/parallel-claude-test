@@ -132,7 +132,7 @@ function DowJonesFieldSearch() {
                   <FormLabel fontWeight="400">
                     <FormattedMessage
                       id="component.internal-field-kyc-research.name-person-entity"
-                      defaultMessage="Name of the person/entity *"
+                      defaultMessage="Name of the person / entity *"
                     />
                   </FormLabel>
                   <Input {...register("name", { required: true })} />

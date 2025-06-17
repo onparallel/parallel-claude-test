@@ -465,7 +465,7 @@ export default function BackgroundCheckProfile(props: BackgroundCheckProfileProp
                     ? "Person"
                     : props.query?.type === "COMPANY"
                       ? "Entity"
-                      : "Person/Entity"}
+                      : "person / entity"}
                 </Text>
               </View>
               <View style={styles.row}>

@@ -147,7 +147,7 @@ export function ConfigureAdverseMediaAutomateSearchDialog({
             <FormLabel fontWeight={400}>
               <FormattedMessage
                 id="component.configure-adverse-media-automate-search-dialog.name-label"
-                defaultMessage="Name of person/entity"
+                defaultMessage="Name of person / entity"
               />
             </FormLabel>
             <Controller

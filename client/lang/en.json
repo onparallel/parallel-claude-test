@@ -1101,8 +1101,8 @@
   },
   {
     "term": "component.configure-adverse-media-automate-search-dialog.name-label",
-    "definition": "Name of person/entity",
-    "context": "Name of person/entity"
+    "definition": "Name of person / entity",
+    "context": "Name of person / entity"
   },
   {
     "term": "component.configure-adverse-media-automate-search-dialog.or-by",
@@ -1186,8 +1186,8 @@
   },
   {
     "term": "component.configure-automate-search-dialog.country-label",
-    "definition": "Country",
-    "context": "Country"
+    "definition": "Country (nationality / jurisdiction)",
+    "context": "Country (nationality / jurisdiction)"
   },
   {
     "term": "component.configure-automate-search-dialog.date-of-birth-helper-text",
@@ -1216,8 +1216,8 @@
   },
   {
     "term": "component.configure-automate-search-dialog.name-label",
-    "definition": "Name of person/entity",
-    "context": "Name of person/entity"
+    "definition": "Name of person / entity",
+    "context": "Name of person / entity"
   },
   {
     "term": "component.configure-automate-search-dialog.remove-setting",
@@ -4646,8 +4646,8 @@
   },
   {
     "term": "component.internal-field-kyc-research.name-person-entity",
-    "definition": "Name of the person/entity *",
-    "context": "Name of the person/entity *"
+    "definition": "Name of the person / entity *",
+    "context": "Name of the person / entity *"
   },
   {
     "term": "component.internal-field-kyc-research.search",
@@ -15881,8 +15881,8 @@
   },
   {
     "term": "page.background-check.country-label",
-    "definition": "Country",
-    "context": "Country"
+    "definition": "Country (nationality / jurisdiction)",
+    "context": "Country (nationality / jurisdiction)"
   },
   {
     "term": "page.background-check.date-of-birth",
@@ -15916,8 +15916,8 @@
   },
   {
     "term": "page.background-check.name-person-entity",
-    "definition": "Name of the person/entity *",
-    "context": "Name of the person/entity *"
+    "definition": "Name of the person / entity *",
+    "context": "Name of the person / entity *"
   },
   {
     "term": "page.background-check.search",
