@@ -45,7 +45,7 @@ export function encode(buffer: Buffer) {
 
 export function decode(value: string) {
   if (value.length === 0) {
-    return new Buffer(0);
+    return Buffer.alloc(0);
   }
   const bytes = [0];
   let i = 0;
