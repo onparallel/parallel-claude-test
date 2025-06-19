@@ -19,6 +19,7 @@ import { ILogger, LOGGER } from "../src/services/Logger";
 import { IQueuesService, QUEUES_SERVICE } from "../src/services/QueuesService";
 import { IRedis, REDIS } from "../src/services/Redis";
 import { IStorageService, STORAGE_SERVICE } from "../src/services/StorageService";
+import { eventListenersModule } from "../src/workers/queues/event-listeners/module";
 import { WebhooksWorker } from "../src/workers/queues/WebhooksWorkerQueue";
 import {
   MockAdverseMediaSearchService,
@@ -89,6 +90,7 @@ export async function createTestContainer() {
     .to(MockEInformaProfileExternalSourceIntegration);
 
   container.bind(WebhooksWorker).toSelf();
+  container.load(eventListenersModule);
 
   return container;
 }

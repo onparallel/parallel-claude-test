@@ -1,6 +1,6 @@
 import { SQSClient } from "@aws-sdk/client-sqs";
 import { fork } from "child_process";
-import { injectable } from "inversify";
+import { ContainerModule, injectable } from "inversify";
 import pMap from "p-map";
 import { Consumer } from "sqs-consumer";
 import yargs from "yargs";
@@ -15,10 +15,10 @@ import { MaybePromise } from "../../util/types";
 import { DelayQueuePayload } from "../delay-queue";
 import { EmailEventsWorkerPayload } from "../email-events";
 import { EmailSenderWorkerPayload } from "../email-sender";
+import { EventProcessorPayload } from "../queues/EventProcessorQueue";
 import { WebhooksWorkerPayload } from "../queues/WebhooksWorkerQueue";
 import { SignatureWorkerPayload } from "../signature-worker";
 import { TaskWorkerPayload } from "../task-worker";
-import { EventProcessorPayload } from "./EventProcessor";
 
 export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
   "email-events": EmailEventsWorkerPayload;
@@ -31,6 +31,7 @@ export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
 }[Q];
 
 export interface QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> {
+  additionalModules?: ContainerModule[];
   forkHandlers?: boolean;
   /**
    * Time in ms after which the process is killed with SIGTERM
@@ -68,6 +69,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
   }
 
   const {
+    additionalModules,
     parser,
     forkHandlers,
     forkTimeout,
@@ -76,6 +78,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
     processBatchConcurrently,
     processBatchWithConcurrency,
   } = {
+    additionalModules: [],
     parser: (message: string) => JSON.parse(message) as QueueWorkerPayload<Q>,
     forkHandlers: false,
     forkTimeout: 120_000,
@@ -98,6 +101,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
       async ({ payload }: { payload: string }) => {
         const container = createContainer();
         const logger = container.get<ILogger>(LOGGER);
+        additionalModules.forEach((module) => container.load(module));
         container.bind(workerImplementation).toSelf();
         const worker = container.get<QueueWorker<QueueWorkerPayload<Q>>>(workerImplementation);
         try {
@@ -119,6 +123,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
       () => {},
       async () => {
         const container = createContainer();
+        additionalModules.forEach((module) => container.load(module));
         container.bind(workerImplementation).toSelf();
         const logger = container.get<ILogger>(LOGGER);
         const config = container.get<Config>(CONFIG);

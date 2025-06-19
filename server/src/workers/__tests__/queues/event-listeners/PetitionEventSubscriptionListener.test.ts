@@ -1,16 +1,18 @@
+import { Container } from "inversify";
 import { Knex } from "knex";
-import { createTestContainer } from "../../../test/testContainer";
-import { WorkerContext } from "../../context";
-import { EventSubscription, Organization, Petition, User } from "../../db/__types";
-import { KNEX } from "../../db/knex";
-import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
-import { toGlobalId } from "../../util/globalId";
-import { deleteAllData } from "../../util/knexUtils";
-import { petitionEventSubscriptionsListener } from "../event-listeners/petition-event-subscriptions-listener";
+import { createTestContainer } from "../../../../../test/testContainer";
+import { EventSubscription, Organization, Petition, User } from "../../../../db/__types";
+import { KNEX } from "../../../../db/knex";
+import { Mocks } from "../../../../db/repositories/__tests__/mocks";
+import { IQueuesService, QUEUES_SERVICE } from "../../../../services/QueuesService";
+import { toGlobalId } from "../../../../util/globalId";
+import { deleteAllData } from "../../../../util/knexUtils";
+import {
+  PETITION_EVENT_SUBSCRIPTIONS_LISTENER,
+  PetitionEventSubscriptionsListener,
+} from "../../../queues/event-listeners/PetitionEventSubscriptionsListener";
 
 describe("Worker - Petition Event Subscriptions Listener", () => {
-  let ctx: WorkerContext;
   let knex: Knex;
   let mocks: Mocks;
 
@@ -26,9 +28,12 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
     Parameters<IQueuesService["enqueueMessages"]>
   >;
 
+  let container: Container;
+  let petitionEventSubscriptionsListener: PetitionEventSubscriptionsListener;
+
   beforeAll(async () => {
-    const container = await createTestContainer();
-    ctx = container.get<WorkerContext>(WorkerContext);
+    container = await createTestContainer();
+
     knex = container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
@@ -39,6 +44,10 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
   });
 
   beforeEach(async () => {
+    petitionEventSubscriptionsListener = container.get<PetitionEventSubscriptionsListener>(
+      PETITION_EVENT_SUBSCRIPTIONS_LISTENER,
+    );
+
     [template] = await mocks.createRandomTemplates(organization.id, users[0].id, 1);
     [petitionFromTemplate, petition] = await mocks.createRandomPetitions(
       organization.id,
@@ -109,8 +118,6 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
 
   afterEach(async () => {
     queueSpy.mockClear();
-    ctx.subscriptions.loadEventSubscriptionSignatureKeysBySubscriptionId.dataloader.clearAll();
-    ctx.subscriptions.loadPetitionEventSubscriptionsByUserId.dataloader.clearAll();
     await mocks.knex.from("event_subscription_signature_key").delete();
     await mocks.knex.from("event_subscription").delete();
     await mocks.knex.from("petition_permission").delete();
@@ -128,18 +135,15 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
       1,
       ["PETITION_CREATED"],
     );
-    await petitionEventSubscriptionsListener.handle(
-      {
-        id: event.id,
-        petition_id: event.petition_id,
-        type: "PETITION_CREATED",
-        data: { user_id: users[0].id },
-        created_at: event.created_at,
-        processed_at: event.processed_at,
-        processed_by: event.processed_by,
-      },
-      ctx,
-    );
+    await petitionEventSubscriptionsListener.handle({
+      id: event.id,
+      petition_id: event.petition_id,
+      type: "PETITION_CREATED",
+      data: { user_id: users[0].id },
+      created_at: event.created_at,
+      processed_at: event.processed_at,
+      processed_by: event.processed_by,
+    });
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
     expect(queueSpy.mock.calls[0]).toEqual([
@@ -166,18 +170,15 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
     const [event] = await mocks.createRandomPetitionEvents(users[0].id, petition.id, 1, [
       "PETITION_COMPLETED",
     ]);
-    await petitionEventSubscriptionsListener.handle(
-      {
-        id: event.id,
-        petition_id: event.petition_id,
-        type: "PETITION_COMPLETED",
-        data: { user_id: users[1].id },
-        created_at: event.created_at,
-        processed_at: event.processed_at,
-        processed_by: event.processed_by,
-      },
-      ctx,
-    );
+    await petitionEventSubscriptionsListener.handle({
+      id: event.id,
+      petition_id: event.petition_id,
+      type: "PETITION_COMPLETED",
+      data: { user_id: users[1].id },
+      created_at: event.created_at,
+      processed_at: event.processed_at,
+      processed_by: event.processed_by,
+    });
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
     expect(queueSpy.mock.calls[0]).toEqual([
@@ -209,18 +210,15 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
       1,
       ["PETITION_CREATED"],
     );
-    await petitionEventSubscriptionsListener.handle(
-      {
-        id: event.id,
-        petition_id: event.petition_id,
-        type: "PETITION_CREATED",
-        data: { user_id: users[5].id },
-        created_at: event.created_at,
-        processed_at: event.processed_at,
-        processed_by: event.processed_by,
-      },
-      ctx,
-    );
+    await petitionEventSubscriptionsListener.handle({
+      id: event.id,
+      petition_id: event.petition_id,
+      type: "PETITION_CREATED",
+      data: { user_id: users[5].id },
+      created_at: event.created_at,
+      processed_at: event.processed_at,
+      processed_by: event.processed_by,
+    });
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
     expect(queueSpy.mock.calls[0]).toEqual([

@@ -1,18 +1,18 @@
 import { verify } from "crypto";
 import { Knex } from "knex";
-import { createTestContainer } from "../../../test/testContainer";
-import { User } from "../../db/__types";
-import { KNEX } from "../../db/knex";
-import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { EMAILS, IEmailsService } from "../../services/EmailsService";
-import { ENCRYPTION_SERVICE, IEncryptionService } from "../../services/EncryptionService";
-import { FETCH_SERVICE, IFetchService } from "../../services/FetchService";
-import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
-import { toGlobalId } from "../../util/globalId";
-import { deleteAllData } from "../../util/knexUtils";
-import { WebhooksWorker } from "../queues/WebhooksWorkerQueue";
+import { createTestContainer } from "../../../../test/testContainer";
+import { User } from "../../../db/__types";
+import { KNEX } from "../../../db/knex";
+import { Mocks } from "../../../db/repositories/__tests__/mocks";
+import { EMAILS, IEmailsService } from "../../../services/EmailsService";
+import { ENCRYPTION_SERVICE, IEncryptionService } from "../../../services/EncryptionService";
+import { FETCH_SERVICE, IFetchService } from "../../../services/FetchService";
+import { IQueuesService, QUEUES_SERVICE } from "../../../services/QueuesService";
+import { toGlobalId } from "../../../util/globalId";
+import { deleteAllData } from "../../../util/knexUtils";
+import { WebhooksWorker } from "../../queues/WebhooksWorkerQueue";
 
-describe("Webhooks Worker", () => {
+describe("WebhooksWorker", () => {
   let knex: Knex;
   let mocks: Mocks;
 

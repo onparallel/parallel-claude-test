@@ -1,6 +1,6 @@
+import { Container } from "inversify";
 import { Knex } from "knex";
-import { createTestContainer } from "../../../test/testContainer";
-import { WorkerContext } from "../../context";
+import { createTestContainer } from "../../../../../test/testContainer";
 import {
   Organization,
   Petition,
@@ -8,14 +8,15 @@ import {
   PetitionField,
   PetitionUserNotification,
   User,
-} from "../../db/__types";
-import { KNEX } from "../../db/knex";
-import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { deleteAllData } from "../../util/knexUtils";
-import { userNotificationsListener } from "../event-listeners/user-notifications-listener";
-
+} from "../../../../db/__types";
+import { KNEX } from "../../../../db/knex";
+import { Mocks } from "../../../../db/repositories/__tests__/mocks";
+import { deleteAllData } from "../../../../util/knexUtils";
+import {
+  USER_NOTIFICATIONS_LISTENER,
+  UserNotificationsListener,
+} from "../../../queues/event-listeners/UserNotificationsListener";
 describe("Worker - User Notifications Listener", () => {
-  let ctx: WorkerContext;
   let knex: Knex;
   let mocks: Mocks;
 
@@ -25,14 +26,19 @@ describe("Worker - User Notifications Listener", () => {
   let field: PetitionField;
   let access: PetitionAccess;
 
+  let container: Container;
+  let userNotificationsListener: UserNotificationsListener;
+
   beforeAll(async () => {
-    const container = await createTestContainer();
-    ctx = container.get<WorkerContext>(WorkerContext);
+    container = await createTestContainer();
     knex = container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
   });
 
   beforeEach(async () => {
+    userNotificationsListener = container.get<UserNotificationsListener>(
+      USER_NOTIFICATIONS_LISTENER,
+    );
     [organization] = await mocks.createRandomOrganizations(1);
     users = await mocks.createRandomUsers(organization.id, 2);
     [petition] = await mocks.createRandomPetitions(organization.id, users[0].id, 1);
@@ -58,20 +64,17 @@ describe("Worker - User Notifications Listener", () => {
   });
 
   it("users should receive a notification when a recipient completes the petition", async () => {
-    await userNotificationsListener.handle(
-      {
-        id: 1,
-        created_at: new Date(),
-        type: "PETITION_COMPLETED",
-        petition_id: petition.id,
-        data: {
-          petition_access_id: access.id,
-        },
-        processed_at: null,
-        processed_by: null,
+    await userNotificationsListener.handle({
+      id: 1,
+      created_at: new Date(),
+      type: "PETITION_COMPLETED",
+      petition_id: petition.id,
+      data: {
+        petition_access_id: access.id,
       },
-      ctx,
-    );
+      processed_at: null,
+      processed_by: null,
+    });
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
@@ -93,21 +96,18 @@ describe("Worker - User Notifications Listener", () => {
 
   it("users should receive a notification when a recipient comments a field", async () => {
     const [comment] = await mocks.createRandomCommentsFromAccess(access.id, field.id, petition.id);
-    await userNotificationsListener.handle(
-      {
-        id: 1,
-        created_at: new Date(),
-        type: "COMMENT_PUBLISHED",
-        petition_id: petition.id,
-        data: {
-          petition_field_comment_id: comment.id,
-          petition_field_id: field.id,
-        },
-        processed_at: null,
-        processed_by: null,
+    await userNotificationsListener.handle({
+      id: 1,
+      created_at: new Date(),
+      type: "COMMENT_PUBLISHED",
+      petition_id: petition.id,
+      data: {
+        petition_field_comment_id: comment.id,
+        petition_field_id: field.id,
       },
-      ctx,
-    );
+      processed_at: null,
+      processed_by: null,
+    });
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
@@ -131,21 +131,18 @@ describe("Worker - User Notifications Listener", () => {
 
   it("users should receive a notification when another user comments a field", async () => {
     const [comment] = await mocks.createRandomCommentsFromUser(users[1].id, field.id, petition.id);
-    await userNotificationsListener.handle(
-      {
-        id: 1,
-        created_at: new Date(),
-        type: "COMMENT_PUBLISHED",
-        petition_id: petition.id,
-        data: {
-          petition_field_comment_id: comment.id,
-          petition_field_id: field.id,
-        },
-        processed_at: null,
-        processed_by: null,
+    await userNotificationsListener.handle({
+      id: 1,
+      created_at: new Date(),
+      type: "COMMENT_PUBLISHED",
+      petition_id: petition.id,
+      data: {
+        petition_field_comment_id: comment.id,
+        petition_field_id: field.id,
       },
-      ctx,
-    );
+      processed_at: null,
+      processed_by: null,
+    });
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
@@ -170,21 +167,18 @@ describe("Worker - User Notifications Listener", () => {
   it("users should receive a notification when another user mentions them on a comment", async () => {
     const [comment] = await mocks.createRandomCommentsFromUser(users[1].id, field.id, petition.id);
     await mocks.mentionUserInComment(users[0].id, comment.id);
-    await userNotificationsListener.handle(
-      {
-        id: 1,
-        created_at: new Date(),
-        type: "COMMENT_PUBLISHED",
-        petition_id: petition.id,
-        data: {
-          petition_field_comment_id: comment.id,
-          petition_field_id: field.id,
-        },
-        processed_at: null,
-        processed_by: null,
+    await userNotificationsListener.handle({
+      id: 1,
+      created_at: new Date(),
+      type: "COMMENT_PUBLISHED",
+      petition_id: petition.id,
+      data: {
+        petition_field_comment_id: comment.id,
+        petition_field_id: field.id,
       },
-      ctx,
-    );
+      processed_at: null,
+      processed_by: null,
+    });
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
@@ -211,21 +205,18 @@ describe("Worker - User Notifications Listener", () => {
     const [newUser] = await mocks.createRandomUsers(organization.id, 1);
     await mocks.sharePetitions([petition.id], newUser.id, "READ", () => ({ is_subscribed: false }));
     await mocks.mentionUserInComment(newUser.id, comment.id);
-    await userNotificationsListener.handle(
-      {
-        id: 1,
-        created_at: new Date(),
-        type: "COMMENT_PUBLISHED",
-        petition_id: petition.id,
-        data: {
-          petition_field_comment_id: comment.id,
-          petition_field_id: field.id,
-        },
-        processed_at: null,
-        processed_by: null,
+    await userNotificationsListener.handle({
+      id: 1,
+      created_at: new Date(),
+      type: "COMMENT_PUBLISHED",
+      petition_id: petition.id,
+      data: {
+        petition_field_comment_id: comment.id,
+        petition_field_id: field.id,
       },
-      ctx,
-    );
+      processed_at: null,
+      processed_by: null,
+    });
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
@@ -266,21 +257,18 @@ describe("Worker - User Notifications Listener", () => {
     await mocks.insertUserGroupMembers(group.id, [users[0].id]);
     await mocks.mentionUserGroupInComment(group.id, comment.id);
 
-    await userNotificationsListener.handle(
-      {
-        id: 1,
-        created_at: new Date(),
-        type: "COMMENT_PUBLISHED",
-        petition_id: petition.id,
-        data: {
-          petition_field_comment_id: comment.id,
-          petition_field_id: field.id,
-        },
-        processed_at: null,
-        processed_by: null,
+    await userNotificationsListener.handle({
+      id: 1,
+      created_at: new Date(),
+      type: "COMMENT_PUBLISHED",
+      petition_id: petition.id,
+      data: {
+        petition_field_comment_id: comment.id,
+        petition_field_id: field.id,
       },
-      ctx,
-    );
+      processed_at: null,
+      processed_by: null,
+    });
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
@@ -305,22 +293,19 @@ describe("Worker - User Notifications Listener", () => {
   it("users should receive a notification when a petition is shared to them", async () => {
     const [newUser] = await mocks.createRandomUsers(organization.id, 1);
     await mocks.sharePetitions([petition.id], newUser.id, "READ", () => ({ is_subscribed: true }));
-    await userNotificationsListener.handle(
-      {
-        id: 1,
-        created_at: new Date(),
-        type: "USER_PERMISSION_ADDED",
-        petition_id: petition.id,
-        data: {
-          permission_type: "READ",
-          permission_user_id: newUser.id,
-          user_id: users[0].id,
-        },
-        processed_at: null,
-        processed_by: null,
+    await userNotificationsListener.handle({
+      id: 1,
+      created_at: new Date(),
+      type: "USER_PERMISSION_ADDED",
+      petition_id: petition.id,
+      data: {
+        permission_type: "READ",
+        permission_user_id: newUser.id,
+        user_id: users[0].id,
       },
-      ctx,
-    );
+      processed_at: null,
+      processed_by: null,
+    });
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
@@ -345,22 +330,19 @@ describe("Worker - User Notifications Listener", () => {
   it("users should not receive a notification when a petition is shared to them but they are not subscribed", async () => {
     const [newUser] = await mocks.createRandomUsers(organization.id, 1);
     await mocks.sharePetitions([petition.id], newUser.id, "READ", () => ({ is_subscribed: false }));
-    await userNotificationsListener.handle(
-      {
-        id: 1,
-        created_at: new Date(),
-        type: "USER_PERMISSION_ADDED",
-        petition_id: petition.id,
-        data: {
-          permission_type: "READ",
-          permission_user_id: newUser.id,
-          user_id: users[0].id,
-        },
-        processed_at: null,
-        processed_by: null,
+    await userNotificationsListener.handle({
+      id: 1,
+      created_at: new Date(),
+      type: "USER_PERMISSION_ADDED",
+      petition_id: petition.id,
+      data: {
+        permission_type: "READ",
+        permission_user_id: newUser.id,
+        user_id: users[0].id,
       },
-      ctx,
-    );
+      processed_at: null,
+      processed_by: null,
+    });
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
@@ -399,22 +381,19 @@ describe("Worker - User Notifications Listener", () => {
       },
     ]);
 
-    await userNotificationsListener.handle(
-      {
-        id: 1,
-        created_at: new Date(),
-        type: "GROUP_PERMISSION_ADDED",
-        petition_id: petition.id,
-        data: {
-          permission_type: "WRITE",
-          user_group_id: userGroup.id,
-          user_id: users[0].id,
-        },
-        processed_at: null,
-        processed_by: null,
+    await userNotificationsListener.handle({
+      id: 1,
+      created_at: new Date(),
+      type: "GROUP_PERMISSION_ADDED",
+      petition_id: petition.id,
+      data: {
+        permission_type: "WRITE",
+        user_group_id: userGroup.id,
+        user_id: users[0].id,
       },
-      ctx,
-    );
+      processed_at: null,
+      processed_by: null,
+    });
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
@@ -437,21 +416,18 @@ describe("Worker - User Notifications Listener", () => {
   });
 
   it("users should receive a notification when a signature is completed", async () => {
-    await userNotificationsListener.handle(
-      {
-        id: 1,
-        created_at: new Date(),
-        type: "SIGNATURE_COMPLETED",
-        petition_id: petition.id,
-        data: {
-          file_upload_id: 1,
-          petition_signature_request_id: 1,
-        },
-        processed_at: null,
-        processed_by: null,
+    await userNotificationsListener.handle({
+      id: 1,
+      created_at: new Date(),
+      type: "SIGNATURE_COMPLETED",
+      petition_id: petition.id,
+      data: {
+        file_upload_id: 1,
+        petition_signature_request_id: 1,
       },
-      ctx,
-    );
+      processed_at: null,
+      processed_by: null,
+    });
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
@@ -472,24 +448,21 @@ describe("Worker - User Notifications Listener", () => {
   });
 
   it("users should receive a notification when a signature is cancelled", async () => {
-    await userNotificationsListener.handle(
-      {
-        id: 1,
-        created_at: new Date(),
-        type: "SIGNATURE_CANCELLED",
-        petition_id: petition.id,
-        data: {
-          petition_signature_request_id: 1,
-          cancel_reason: "CANCELLED_BY_USER",
-          cancel_data: {
-            user_id: users[1].id,
-          },
+    await userNotificationsListener.handle({
+      id: 1,
+      created_at: new Date(),
+      type: "SIGNATURE_CANCELLED",
+      petition_id: petition.id,
+      data: {
+        petition_signature_request_id: 1,
+        cancel_reason: "CANCELLED_BY_USER",
+        cancel_data: {
+          user_id: users[1].id,
         },
-        processed_at: null,
-        processed_by: null,
       },
-      ctx,
-    );
+      processed_at: null,
+      processed_by: null,
+    });
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
@@ -523,20 +496,17 @@ describe("Worker - User Notifications Listener", () => {
       users[0].id,
       () => ({ email_log_id: emailLog.id }),
     );
-    await userNotificationsListener.handle(
-      {
-        id: 1,
-        created_at: new Date(),
-        type: "PETITION_MESSAGE_BOUNCED",
-        petition_id: message.petition_id,
-        data: {
-          petition_message_id: message.id,
-        },
-        processed_at: null,
-        processed_by: null,
+    await userNotificationsListener.handle({
+      id: 1,
+      created_at: new Date(),
+      type: "PETITION_MESSAGE_BOUNCED",
+      petition_id: message.petition_id,
+      data: {
+        petition_message_id: message.id,
       },
-      ctx,
-    );
+      processed_at: null,
+      processed_by: null,
+    });
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })

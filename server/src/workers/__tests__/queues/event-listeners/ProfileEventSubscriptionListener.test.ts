@@ -1,6 +1,6 @@
+import { Container } from "inversify";
 import { Knex } from "knex";
-import { createTestContainer } from "../../../test/testContainer";
-import { WorkerContext } from "../../context";
+import { createTestContainer } from "../../../../../test/testContainer";
 import {
   EventSubscription,
   Organization,
@@ -9,16 +9,18 @@ import {
   ProfileTypeField,
   ProfileTypeFieldPermissionType,
   User,
-} from "../../db/__types";
-import { KNEX } from "../../db/knex";
-import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
-import { toGlobalId } from "../../util/globalId";
-import { deleteAllData } from "../../util/knexUtils";
-import { profileEventSubscriptionsListener } from "../event-listeners/profile-event-subscriptions-listener";
+} from "../../../../db/__types";
+import { KNEX } from "../../../../db/knex";
+import { Mocks } from "../../../../db/repositories/__tests__/mocks";
+import { IQueuesService, QUEUES_SERVICE } from "../../../../services/QueuesService";
+import { toGlobalId } from "../../../../util/globalId";
+import { deleteAllData } from "../../../../util/knexUtils";
+import {
+  PROFILE_EVENT_SUBSCRIPTIONS_LISTENER,
+  ProfileEventSubscriptionsListener,
+} from "../../../queues/event-listeners/ProfileEventSubscriptionsListener";
 
 describe("Worker - Profile Event Subscriptions Listener", () => {
-  let ctx: WorkerContext;
   let knex: Knex;
   let mocks: Mocks;
 
@@ -31,14 +33,16 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
     Parameters<IQueuesService["enqueueMessages"]>
   >;
 
+  let profileEventSubscriptionsListener: ProfileEventSubscriptionsListener;
+
   let profileTypes: ProfileType[];
   let profileTypeFields: ProfileTypeField[];
 
   let profiles: Profile[];
+  let container: Container;
 
   beforeAll(async () => {
-    const container = await createTestContainer();
-    ctx = container.get<WorkerContext>(WorkerContext);
+    container = await createTestContainer();
     knex = container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
@@ -49,6 +53,10 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
   });
 
   beforeEach(async () => {
+    profileEventSubscriptionsListener = container.get<ProfileEventSubscriptionsListener>(
+      PROFILE_EVENT_SUBSCRIPTIONS_LISTENER,
+    );
+
     profileTypes = await mocks.createRandomProfileTypes(organization.id, 2);
 
     profileTypeFields = await mocks.createRandomProfileTypeFields(
@@ -205,8 +213,6 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
 
   afterEach(async () => {
     queueSpy.mockClear();
-    ctx.subscriptions.loadEventSubscriptionSignatureKeysBySubscriptionId.dataloader.clearAll();
-    ctx.subscriptions.loadProfileEventSubscriptionsByOrgId.dataloader.clearAll();
     await mocks.knex.from("event_subscription_signature_key").delete();
     await mocks.knex.from("event_subscription").delete();
     await mocks.knex.from("profile_subscription").delete();
@@ -226,14 +232,11 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
       1,
       ["PROFILE_CREATED"],
     );
-    await profileEventSubscriptionsListener.handle(
-      {
-        ...event,
-        type: "PROFILE_CREATED",
-        data: { user_id: users[0].id },
-      },
-      ctx,
-    );
+    await profileEventSubscriptionsListener.handle({
+      ...event,
+      type: "PROFILE_CREATED",
+      data: { user_id: users[0].id },
+    });
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
     expect(queueSpy.mock.calls[0]).toEqual([
@@ -265,20 +268,17 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
       ["PROFILE_FIELD_VALUE_UPDATED"],
     );
 
-    await profileEventSubscriptionsListener.handle(
-      {
-        ...event,
-        type: "PROFILE_FIELD_VALUE_UPDATED",
-        data: {
-          user_id: users[0].id,
-          profile_type_field_id: profileTypeFields[1].id,
-          current_profile_field_value_id: null,
-          previous_profile_field_value_id: null,
-          alias: null,
-        },
+    await profileEventSubscriptionsListener.handle({
+      ...event,
+      type: "PROFILE_FIELD_VALUE_UPDATED",
+      data: {
+        user_id: users[0].id,
+        profile_type_field_id: profileTypeFields[1].id,
+        current_profile_field_value_id: null,
+        previous_profile_field_value_id: null,
+        alias: null,
       },
-      ctx,
-    );
+    });
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
     expect(queueSpy.mock.calls[0]).toEqual([
@@ -314,7 +314,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
       ["PROFILE_ANONYMIZED"],
     );
 
-    await profileEventSubscriptionsListener.handle(event, ctx);
+    await profileEventSubscriptionsListener.handle(event);
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
     expect(queueSpy.mock.calls[0]).toEqual([
@@ -344,19 +344,16 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
       ["PROFILE_FIELD_FILE_ADDED"],
     );
 
-    await profileEventSubscriptionsListener.handle(
-      {
-        ...event,
-        type: "PROFILE_FIELD_FILE_ADDED",
-        data: {
-          user_id: users[4].id,
-          profile_type_field_id: profileTypeFields[1].id,
-          profile_field_file_id: 0,
-          alias: null,
-        },
+    await profileEventSubscriptionsListener.handle({
+      ...event,
+      type: "PROFILE_FIELD_FILE_ADDED",
+      data: {
+        user_id: users[4].id,
+        profile_type_field_id: profileTypeFields[1].id,
+        profile_field_file_id: 0,
+        alias: null,
       },
-      ctx,
-    );
+    });
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
     expect(queueSpy.mock.calls[0]).toEqual([
@@ -396,7 +393,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
       }),
     );
 
-    await profileEventSubscriptionsListener.handle(event, ctx);
+    await profileEventSubscriptionsListener.handle(event);
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
     expect(queueSpy.mock.calls[0]).toEqual([

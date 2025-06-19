@@ -1,10 +1,18 @@
+import { inject, injectable } from "inversify";
 import { isNonNullish } from "remeda";
-import { PetitionEvent } from "../../db/__types";
-import { removeNotDefined } from "../../util/remedaExtensions";
-import { listener } from "../helpers/EventProcessor";
+import { PetitionEventType } from "../../../db/__types";
+import { PetitionEvent } from "../../../db/events/PetitionEvent";
+import { PetitionRepository } from "../../../db/repositories/PetitionRepository";
+import { removeNotDefined } from "../../../util/remedaExtensions";
+import { EventListener } from "../EventProcessorQueue";
 
-export const petitionActivityListener = listener(
-  [
+export const PETITION_ACTIVITY_LISTENER = Symbol.for("PETITION_ACTIVITY_LISTENER");
+
+@injectable()
+export class PetitionActivityListener implements EventListener<PetitionEventType> {
+  constructor(@inject(PetitionRepository) private petitions: PetitionRepository) {}
+
+  public types = [
     "PETITION_CREATED",
     "ACCESS_ACTIVATED",
     "ACCESS_OPENED",
@@ -25,8 +33,9 @@ export const petitionActivityListener = listener(
     "PETITION_REOPENED",
     "RECIPIENT_SIGNED",
     "REMINDERS_OPT_OUT",
-  ],
-  async (event, ctx) => {
+  ] as PetitionEventType[];
+
+  public async handle(event: PetitionEvent) {
     let lastActivityAt: Date | null = null;
     let lastRecipientActivityAt: Date | null = null;
 
@@ -80,7 +89,7 @@ export const petitionActivityListener = listener(
     }
 
     if (event.type === "COMMENT_PUBLISHED") {
-      const comment = await ctx.petitions.loadPetitionFieldComment(
+      const comment = await this.petitions.loadPetitionFieldComment(
         event.data.petition_field_comment_id,
       );
       if (isNonNullish(comment?.petition_access_id)) {
@@ -93,7 +102,7 @@ export const petitionActivityListener = listener(
     }
 
     if (isNonNullish(lastActivityAt ?? lastRecipientActivityAt)) {
-      await ctx.petitions.updatePetitionLastActivityDates(
+      await this.petitions.updatePetitionLastActivityDates(
         (event as PetitionEvent).petition_id,
         removeNotDefined({
           last_activity_at: lastActivityAt,
@@ -101,5 +110,5 @@ export const petitionActivityListener = listener(
         }),
       );
     }
-  },
-);
+  }
+}
