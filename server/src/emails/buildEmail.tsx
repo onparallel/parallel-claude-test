@@ -42,6 +42,14 @@ export async function buildEmail<T extends {}>(
   const text = email.text(props, intl);
   const subject = email.subject(props, intl);
   const from = email.from(props, intl);
-  const minified = await htmlnano.process(html, { minifyCss: false }, htmlnano.presets.safe);
+  const minified = await htmlnano.process(
+    html,
+    {
+      minifyCss: false,
+      minifyJs: false,
+      minifySvg: false,
+    },
+    htmlnano.presets.safe,
+  );
   return { html: minified.html, text, subject, from };
 }
