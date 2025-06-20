@@ -7,10 +7,19 @@ const client_ec2_1 = require("@aws-sdk/client-ec2");
 const client_elastic_load_balancing_1 = require("@aws-sdk/client-elastic-load-balancing");
 const chalk_1 = __importDefault(require("chalk"));
 const cli_table3_1 = __importDefault(require("cli-table3"));
+const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 const ec2 = new client_ec2_1.EC2Client({});
 const elb = new client_elastic_load_balancing_1.ElasticLoadBalancingClient({});
 async function main() {
+    const { includeStopped } = await yargs_1.default
+        .usage("Usage: $0 --include-stopped")
+        .option("include-stopped", {
+        required: false,
+        type: "boolean",
+        description: "Include stopped instances",
+        default: false,
+    }).argv;
     const instances = await ec2
         .send(new client_ec2_1.DescribeInstancesCommand({
         Filters: [{ Name: "tag-key", Values: ["Release"] }],
@@ -63,7 +72,7 @@ async function main() {
         },
     });
     table.push(...instances
-        .filter((i) => { var _a; return ((_a = i.State) === null || _a === void 0 ? void 0 : _a.Name) !== "terminated"; })
+        .filter((i) => { var _a, _b; return ((_a = i.State) === null || _a === void 0 ? void 0 : _a.Name) !== "terminated" && (includeStopped || ((_b = i.State) === null || _b === void 0 ? void 0 : _b.Name) !== "stopped"); })
         .map((i) => {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         const state = (() => {

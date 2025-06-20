@@ -6,12 +6,22 @@ import {
 } from "@aws-sdk/client-elastic-load-balancing";
 import chalk from "chalk";
 import Table from "cli-table3";
+import yargs from "yargs";
 import { run } from "./utils/run";
 
 const ec2 = new EC2Client({});
 const elb = new ElasticLoadBalancingClient({});
 
 async function main() {
+  const { includeStopped } = await yargs
+    .usage("Usage: $0 --include-stopped")
+    .option("include-stopped", {
+      required: false,
+      type: "boolean",
+      description: "Include stopped instances",
+      default: false,
+    }).argv;
+
   const instances = await ec2
     .send(
       new DescribeInstancesCommand({
@@ -71,7 +81,9 @@ async function main() {
   });
   table.push(
     ...instances
-      .filter((i) => i.State?.Name !== "terminated")
+      .filter(
+        (i) => i.State?.Name !== "terminated" && (includeStopped || i.State?.Name !== "stopped"),
+      )
       .map((i) => {
         const state = (() => {
           switch (i.State?.Name) {
