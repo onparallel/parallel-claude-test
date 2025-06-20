@@ -127,7 +127,7 @@ const PETITION_JSON_SCHEMA = {
           type: ["array", "null"],
           items: {
             type: "object",
-            required: ["name", "values"],
+            required: ["listName", "listVersion"],
           },
         },
       },
