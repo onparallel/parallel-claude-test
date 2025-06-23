@@ -2,11 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, HStack, StackProps, Text } from "@chakra-ui/react";
 import { EditSimpleIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import {
-  NoRepliesHintWithButton_PetitionFieldFragment,
-  NoRepliesHintWithButton_PetitionFragment,
-  NoRepliesHintWithButton_UserFragment,
-} from "@parallel/graphql/__types";
+import { NoRepliesHintWithButton_UserFragment } from "@parallel/graphql/__types";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -18,14 +14,14 @@ export const NoRepliesHintWithButton = Object.assign(
     "div",
     StackProps & {
       href: string;
-      petition: NoRepliesHintWithButton_PetitionFragment;
+      petitionId: string;
+      petitionFieldId: string;
       user: NoRepliesHintWithButton_UserFragment;
-      field: NoRepliesHintWithButton_PetitionFieldFragment;
       fieldLogic: FieldLogicResult;
       parentReplyId?: string;
     }
   >(function NoRepliesHintWithButton(
-    { href, petition, user, field, fieldLogic, parentReplyId, ...rest },
+    { href, petitionId, petitionFieldId, user, fieldLogic, parentReplyId, ...rest },
     ref,
   ) {
     const intl = useIntl();
@@ -66,8 +62,8 @@ export const NoRepliesHintWithButton = Object.assign(
         </Box>
         <Box display={{ base: "none", lg: "block" }}>
           <PetitionRepliesPopoverField
-            field={field}
-            petition={petition}
+            petitionFieldId={petitionFieldId}
+            petitionId={petitionId}
             user={user}
             parentReplyId={parentReplyId}
             fieldLogic={fieldLogic}
@@ -90,20 +86,6 @@ export const NoRepliesHintWithButton = Object.assign(
   }),
   {
     fragments: {
-      Petition: gql`
-        fragment NoRepliesHintWithButton_Petition on Petition {
-          id
-          ...PetitionRepliesPopoverField_Petition
-        }
-        ${PetitionRepliesPopoverField.fragments.Petition}
-      `,
-      PetitionField: gql`
-        fragment NoRepliesHintWithButton_PetitionField on PetitionField {
-          id
-          ...PetitionRepliesPopoverField_PetitionField
-        }
-        ${PetitionRepliesPopoverField.fragments.PetitionField}
-      `,
       User: gql`
         fragment NoRepliesHintWithButton_User on User {
           ...PetitionRepliesPopoverField_User

@@ -456,9 +456,9 @@ export const PetitionRepliesField = Object.assign(
                                       field: x.field.id,
                                       parentReply: reply.id,
                                     })}
-                                    petition={petition}
+                                    petitionId={petition.id}
+                                    petitionFieldId={x.field.id}
                                     user={user}
-                                    field={x.field}
                                     fieldLogic={x.fieldLogic}
                                     parentReplyId={reply.id}
                                   />
@@ -481,9 +481,9 @@ export const PetitionRepliesField = Object.assign(
               href={buildUrlToSection("preview", {
                 field: field.id,
               })}
-              petition={petition}
+              petitionId={petition.id}
+              petitionFieldId={field.id}
               user={user}
-              field={field}
               fieldLogic={fieldLogic}
             />
           )}
@@ -640,9 +640,9 @@ export const PetitionRepliesField = Object.assign(
             href={buildUrlToSection("preview", {
               field: field.id,
             })}
-            petition={petition}
+            petitionId={petition.id}
+            petitionFieldId={field.id}
             user={user}
-            field={field}
             fieldLogic={fieldLogic}
           />
         )}
@@ -666,12 +666,8 @@ export const PetitionRepliesField = Object.assign(
         fragment PetitionRepliesField_Petition on Petition {
           id
           ...PetitionRepliesFieldReply_Petition
-          ...PetitionRepliesPopoverField_Petition
-          ...NoRepliesHintWithButton_Petition
         }
         ${PetitionRepliesFieldReply.fragments.Petition}
-        ${PetitionRepliesPopoverField.fragments.Petition}
-        ${NoRepliesHintWithButton.fragments.Petition}
       `,
       PetitionField: gql`
         fragment PetitionRepliesField_PetitionField on PetitionField {
@@ -694,8 +690,6 @@ export const PetitionRepliesField = Object.assign(
               ...FileAttachmentButton_FileUpload
             }
           }
-          ...PetitionRepliesPopoverField_PetitionField
-          ...NoRepliesHintWithButton_PetitionField
         }
         fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
           id
@@ -718,7 +712,6 @@ export const PetitionRepliesField = Object.assign(
                 }
               }
               ...filterPetitionFields_PetitionField
-              ...NoRepliesHintWithButton_PetitionField
             }
             replies {
               ...PetitionRepliesFieldReply_PetitionFieldReply
@@ -728,8 +721,6 @@ export const PetitionRepliesField = Object.assign(
         ${FileAttachmentButton.fragments.FileUpload}
         ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
         ${filterPetitionFields.fragments.PetitionField}
-        ${PetitionRepliesPopoverField.fragments.PetitionField}
-        ${NoRepliesHintWithButton.fragments.PetitionField}
       `,
     },
   },

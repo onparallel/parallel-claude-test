@@ -120,8 +120,8 @@ export function PetitionRepliesFieldReply({
         </Box>
         <Box display={{ base: "none", lg: "block" }}>
           <PetitionRepliesPopoverField
-            field={reply.field!}
-            petition={petition}
+            petitionFieldId={reply.field!.id}
+            petitionId={petition.id}
             user={user}
             parentReplyId={reply.parent ? reply.parent.id : undefined}
             fieldLogic={fieldLogic}
@@ -633,9 +633,7 @@ PetitionRepliesFieldReply.fragments = {
         status
       }
       isReviewFlowEnabled
-      ...PetitionRepliesPopoverField_Petition
     }
-    ${PetitionRepliesPopoverField.fragments.Petition}
   `,
   PetitionFieldReply: gql`
     fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {
@@ -647,7 +645,6 @@ PetitionRepliesFieldReply.fragments = {
         type
         requireApproval
         ...getReplyContents_PetitionField
-        ...PetitionRepliesPopoverField_PetitionField
       }
       parent {
         id
@@ -668,7 +665,6 @@ PetitionRepliesFieldReply.fragments = {
     ${CopyOrDownloadReplyButton.fragments.PetitionFieldReply}
     ${getReplyContents.fragments.PetitionFieldReply}
     ${getReplyContents.fragments.PetitionField}
-    ${PetitionRepliesPopoverField.fragments.PetitionField}
   `,
 };
 

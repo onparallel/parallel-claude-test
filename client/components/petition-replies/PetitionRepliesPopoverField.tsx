@@ -1,6 +1,7 @@
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import {
   Box,
+  Center,
   FocusLock,
   PopoverArrow,
   PopoverBody,
@@ -8,35 +9,36 @@ import {
   PopoverContent,
   PopoverTrigger,
   Portal,
+  Spinner,
   useDisclosure,
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
 import {
-  PetitionRepliesPopoverField_PetitionFieldFragment,
-  PetitionRepliesPopoverField_PetitionFragment,
+  PetitionRepliesPopoverField_dataDocument,
   PetitionRepliesPopoverField_UserFragment,
 } from "@parallel/graphql/__types";
+import { assertTypename } from "@parallel/utils/apollo/typename";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { MouseEvent } from "react";
+import { isNonNullish } from "remeda";
 import { Wrap } from "../common/Wrap";
 import { PreviewPetitionField } from "../petition-preview/PreviewPetitionField";
 
 export function PetitionRepliesPopoverField({
   children,
-  field,
-  petition,
-  user,
+  petitionFieldId,
+  petitionId,
   fieldLogic,
   parentReplyId,
+  user,
 }: {
   children: React.ReactNode;
-  field: PetitionRepliesPopoverField_PetitionFieldFragment;
-  petition: PetitionRepliesPopoverField_PetitionFragment;
-  user: PetitionRepliesPopoverField_UserFragment;
+  petitionFieldId: string;
+  petitionId: string;
   fieldLogic: FieldLogicResult;
   parentReplyId?: string;
+  user: PetitionRepliesPopoverField_UserFragment;
 }) {
-  const myEffectivePermission = petition.myEffectivePermission!.permissionType;
   const { isOpen, onClose, onOpen } = useDisclosure();
   function handleOverlayClick(event: MouseEvent) {
     if (event.currentTarget === event.target) {
@@ -48,10 +50,12 @@ export function PetitionRepliesPopoverField({
       isOpen={isOpen}
       onClose={onClose}
       onOpen={onOpen}
-      placement="end"
+      placement="top-start"
       closeOnBlur={false}
       returnFocusOnClose={false}
       closeOnEsc={true}
+      isLazy
+      lazyBehavior="keepMounted"
     >
       <PopoverTrigger>{children}</PopoverTrigger>
       <Portal>
@@ -78,21 +82,11 @@ export function PetitionRepliesPopoverField({
               <PopoverArrow />
               <PopoverBody minHeight="60px">
                 <PopoverCloseButton top={4} insetEnd={5} />
-                <PreviewPetitionField
-                  field={field}
-                  petition={petition}
+                <LazyPreviewPetitionField
                   user={user}
-                  isDisabled={
-                    petition.status === "CLOSED" ||
-                    petition.isAnonymized ||
-                    user.organization.isPetitionUsageLimitReached ||
-                    petition.hasStartedProcess
-                  }
-                  isCacheOnly={false}
-                  myEffectivePermission={myEffectivePermission}
-                  showErrors={false}
+                  petitionFieldId={petitionFieldId}
+                  petitionId={petitionId}
                   fieldLogic={fieldLogic}
-                  onError={() => {}}
                   parentReplyId={parentReplyId}
                 />
               </PopoverBody>
@@ -104,20 +98,62 @@ export function PetitionRepliesPopoverField({
   );
 }
 
-PetitionRepliesPopoverField.fragments = {
-  Petition: gql`
-    fragment PetitionRepliesPopoverField_Petition on Petition {
-      id
-      status
-      hasStartedProcess
-      isAnonymized
-      myEffectivePermission {
-        permissionType
+function LazyPreviewPetitionField({
+  petitionFieldId,
+  petitionId,
+  user,
+  fieldLogic,
+  parentReplyId,
+}: {
+  petitionFieldId: string;
+  petitionId: string;
+  user: PetitionRepliesPopoverField_UserFragment;
+  fieldLogic: FieldLogicResult;
+  parentReplyId?: string;
+}) {
+  const { data } = useQuery(PetitionRepliesPopoverField_dataDocument, {
+    fetchPolicy: "cache-and-network",
+    variables: { petitionId, petitionFieldId },
+  });
+
+  const field = data?.petitionField;
+  const petition = data?.petition;
+
+  if (isNonNullish(petition)) {
+    assertTypename(petition, "Petition");
+  }
+
+  const myEffectivePermission = petition?.myEffectivePermission!.permissionType;
+
+  return isNonNullish(field) &&
+    isNonNullish(petition) &&
+    isNonNullish(user) &&
+    isNonNullish(myEffectivePermission) ? (
+    <PreviewPetitionField
+      field={field}
+      petition={petition}
+      user={user}
+      isDisabled={
+        petition.status === "CLOSED" ||
+        petition.isAnonymized ||
+        user.organization.isPetitionUsageLimitReached ||
+        petition.hasStartedProcess
       }
-      ...PreviewPetitionField_PetitionBase
-    }
-    ${PreviewPetitionField.fragments.PetitionBase}
-  `,
+      isCacheOnly={false}
+      myEffectivePermission={myEffectivePermission}
+      showErrors={false}
+      fieldLogic={fieldLogic}
+      onError={() => {}}
+      parentReplyId={parentReplyId}
+    />
+  ) : (
+    <Center>
+      <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="primary.500" />
+    </Center>
+  );
+}
+
+PetitionRepliesPopoverField.fragments = {
   User: gql`
     fragment PetitionRepliesPopoverField_User on User {
       id
@@ -129,11 +165,29 @@ PetitionRepliesPopoverField.fragments = {
     }
     ${PreviewPetitionField.fragments.User}
   `,
-  PetitionField: gql`
-    fragment PetitionRepliesPopoverField_PetitionField on PetitionField {
-      id
-      ...PreviewPetitionField_PetitionField
+};
+
+const _queries = [
+  gql`
+    query PetitionRepliesPopoverField_data($petitionId: GID!, $petitionFieldId: GID!) {
+      petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
+        id
+        ...PreviewPetitionField_PetitionField
+      }
+      petition(id: $petitionId) {
+        id
+        ... on Petition {
+          status
+          hasStartedProcess
+          isAnonymized
+          myEffectivePermission {
+            permissionType
+          }
+        }
+        ...PreviewPetitionField_PetitionBase
+      }
     }
+    ${PreviewPetitionField.fragments.PetitionBase}
     ${PreviewPetitionField.fragments.PetitionField}
   `,
-};
+];
