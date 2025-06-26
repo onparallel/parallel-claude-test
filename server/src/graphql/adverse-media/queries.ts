@@ -95,7 +95,8 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
                 },
               },
             ],
-            ctx.user!,
+            "User",
+            ctx.user!.id,
             true, // skip event creation
           );
         } else {

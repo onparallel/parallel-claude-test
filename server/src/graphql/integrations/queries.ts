@@ -248,7 +248,8 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
               },
             },
           ],
-          ctx.user!,
+          "User",
+          ctx.user!.id,
         );
       } else {
         const petition = await ctx.petitions.loadPetition(params.petitionId);

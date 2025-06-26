@@ -55,6 +55,7 @@ import { useAddNewSignature } from "@parallel/utils/useAddNewSignature";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePageVisibility } from "@parallel/utils/usePageVisibility";
+import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
@@ -68,6 +69,7 @@ import { RestrictedFeaturePopover } from "../common/RestrictedFeaturePopover";
 import { SmallPopover } from "../common/SmallPopover";
 import { UserReference } from "../common/UserReference";
 import { isDialogError } from "../common/dialogs/DialogProvider";
+import { PetitionApprovalsAboutToStartAlert } from "./PetitionApprovalsAboutToStartAlert";
 import { CommentsButton } from "./PetitionRepliesField";
 import { PetitionSignaturesCard, PetitionSignaturesCardBody } from "./PetitionSignaturesCard";
 import {
@@ -114,8 +116,14 @@ export function PetitionApprovalsCard({
               id: index.toString(),
               user: approver,
             })),
+            isMock: true,
           };
         }) ?? []);
+
+  const [isParallelJustCompleted, setIsParallelJustCompleted] = useState(false);
+  useTempQueryParam("completed", () => {
+    setIsParallelJustCompleted(true);
+  });
 
   const reviewAfterApproval =
     petition.signatureConfig?.reviewAfterApproval ??
@@ -391,10 +399,104 @@ export function PetitionApprovalsCard({
   const petitionSignatureEnvironment = getPetitionSignatureEnvironment(petition);
 
   return (
-    <Card padding={0} marginBottom={4}>
-      <Tabs index={tabIndex} onChange={(index) => setTabIndex(index)} variant="enclosed">
-        <HStack spacing={0} overflowX="auto" overflowY="hidden">
-          <TabList marginX="-1px" marginTop="-1px" height="52px" flex="1">
+    <>
+      {isParallelJustCompleted && approvalSteps.some((s) => (s as any).isMock) ? (
+        <PetitionApprovalsAboutToStartAlert marginBottom={2} borderRadius="md" />
+      ) : null}
+      <Card padding={0} marginBottom={4}>
+        <Tabs index={tabIndex} onChange={(index) => setTabIndex(index)} variant="enclosed">
+          <HStack spacing={0} overflowX="auto" overflowY="hidden">
+            <TabList marginX="-1px" marginTop="-1px" height="52px" flex="1">
+              {approvalStepsWithSignature.map((step, index) => {
+                const stepNotApplicable = step.status === "NOT_APPLICABLE";
+                const isNotCurrentOrNextStep =
+                  checkIfNextOrCurrentStep(
+                    approvalStepsWithSignature.filter((s) => s.status !== "NOT_APPLICABLE"),
+                    step.id,
+                  ) === false;
+
+                const tabColor =
+                  stepNotApplicable || isNotCurrentOrNextStep ? "gray.400" : undefined;
+
+                return step.id === "signature" ? (
+                  <Tab key={index} color={tabColor} ref={tabsRefs[index]}>
+                    <HStack maxWidth="240px" minWidth={0}>
+                      {petitionSignatureStatus === "NO_SIGNATURE" ? (
+                        <SignatureIcon />
+                      ) : (
+                        <PetitionSignatureStatusIcon
+                          status={petitionSignatureStatus}
+                          environment={petitionSignatureEnvironment}
+                          color={tabColor}
+                        />
+                      )}
+                      <OverflownText whiteSpace="nowrap" fontWeight={500}>
+                        <FormattedMessage id="generic.e-signature" defaultMessage="eSignature" />
+                      </OverflownText>
+                    </HStack>
+                  </Tab>
+                ) : (
+                  <Tab key={index} color={tabColor} ref={tabsRefs[index]}>
+                    <HStack maxWidth="240px" minWidth={0}>
+                      {stepNotApplicable ? (
+                        <SmallPopover
+                          content={
+                            <Text fontSize="sm">
+                              <FormattedMessage
+                                id="component.petition-approvals-card.conditioned-approval-poppover"
+                                defaultMessage="This approval step is conditioned by the replies."
+                              />
+                            </Text>
+                          }
+                        >
+                          <ForbiddenIcon />
+                        </SmallPopover>
+                      ) : (
+                        <PetitionApprovalStepStatusIconWithTooltip
+                          status={step.status}
+                          color={tabColor}
+                        />
+                      )}
+                      <OverflownText whiteSpace="nowrap" fontWeight={500}>
+                        {step.stepName}
+                      </OverflownText>
+                    </HStack>
+                  </Tab>
+                );
+              })}
+            </TabList>
+            <HStack
+              paddingY={2}
+              paddingX={4}
+              borderBottom="1px solid"
+              borderBottomColor="gray.200"
+              height="52px"
+            >
+              <CommentsButton
+                data-action="see-general-comments"
+                isActive={isShowingGeneralComments}
+                commentCount={petition.generalCommentCount}
+                hasUnreadComments={petition.unreadGeneralCommentCount > 0}
+                onClick={onToggleGeneralComments}
+              />
+              {signatureIndex === tabIndex &&
+              (!petition.signatureConfig?.isEnabled ||
+                currentSignatureRequest?.status === "COMPLETED" ||
+                currentSignatureRequest?.status === "CANCELLED") ? (
+                <IconButtonWithTooltip
+                  isDisabled={isDisabled}
+                  label={intl.formatMessage({
+                    id: "component.petition-signatures-card.add-signature-label",
+                    defaultMessage: "Add signature",
+                  })}
+                  size="sm"
+                  icon={<AddIcon />}
+                  onClick={handleAddNewSignature}
+                />
+              ) : null}
+            </HStack>
+          </HStack>
+          <TabPanels>
             {approvalStepsWithSignature.map((step, index) => {
               const stepNotApplicable = step.status === "NOT_APPLICABLE";
               const isNotCurrentOrNextStep =
@@ -403,132 +505,49 @@ export function PetitionApprovalsCard({
                   step.id,
                 ) === false;
 
-              const tabColor = stepNotApplicable || isNotCurrentOrNextStep ? "gray.400" : undefined;
-
               return step.id === "signature" ? (
-                <Tab key={index} color={tabColor} ref={tabsRefs[index]}>
-                  <HStack maxWidth="240px" minWidth={0}>
-                    {petitionSignatureStatus === "NO_SIGNATURE" ? (
-                      <SignatureIcon />
-                    ) : (
-                      <PetitionSignatureStatusIcon
-                        status={petitionSignatureStatus}
-                        environment={petitionSignatureEnvironment}
-                        color={tabColor}
-                      />
-                    )}
-                    <OverflownText whiteSpace="nowrap" fontWeight={500}>
-                      <FormattedMessage id="generic.e-signature" defaultMessage="eSignature" />
-                    </OverflownText>
-                  </HStack>
-                </Tab>
+                <TabPanel padding={0} key={index}>
+                  <PetitionSignaturesCardBody
+                    petition={petition}
+                    user={user}
+                    isDisabled={isDisabled || isNotCurrentOrNextStep || stepNotApplicable}
+                    onRefetchPetition={onRefetchPetition}
+                  />
+                </TabPanel>
               ) : (
-                <Tab key={index} color={tabColor} ref={tabsRefs[index]}>
-                  <HStack maxWidth="240px" minWidth={0}>
-                    {stepNotApplicable ? (
-                      <SmallPopover
-                        content={
-                          <Text fontSize="sm">
-                            <FormattedMessage
-                              id="component.petition-approvals-card.conditioned-approval-poppover"
-                              defaultMessage="This approval step is conditioned by the replies."
-                            />
-                          </Text>
-                        }
-                      >
-                        <ForbiddenIcon />
-                      </SmallPopover>
-                    ) : (
-                      <PetitionApprovalStepStatusIconWithTooltip
-                        status={step.status}
-                        color={tabColor}
-                      />
-                    )}
-                    <OverflownText whiteSpace="nowrap" fontWeight={500}>
-                      {step.stepName}
-                    </OverflownText>
-                  </HStack>
-                </Tab>
+                <TabPanel padding={0} key={index}>
+                  <Grid templateColumns="auto 1fr auto" alignItems="center">
+                    <PetitionApprovalStepRow
+                      step={step}
+                      onStart={() => handleStartApprovalFlow(step)}
+                      onApprove={() =>
+                        handleApproveOrRejectApprovalFlow({ step, action: "APPROVE" })
+                      }
+                      onReject={() => handleApproveOrRejectApprovalFlow({ step, action: "REJECT" })}
+                      onCancel={() => handleCancelApprovalFlow(step)}
+                      onSkip={() => handleSkipApprovalFlow(step)}
+                      onSendReminder={() => handleSendReminder(step)}
+                      isDisabled={
+                        petition.status !== "COMPLETED" ||
+                        isNotCurrentOrNextStep ||
+                        stepNotApplicable ||
+                        (step as any).isMock
+                      }
+                      petitionStatus={petition.status}
+                    />
+                  </Grid>
+                  {petition.oldApprovalRequestSteps.length ? (
+                    <Grid templateColumns="auto 1fr auto" alignItems="center">
+                      <OlderPetitionApprovalStepRows steps={petition.oldApprovalRequestSteps} />
+                    </Grid>
+                  ) : null}
+                </TabPanel>
               );
             })}
-          </TabList>
-          <HStack
-            paddingY={2}
-            paddingX={4}
-            borderBottom="1px solid"
-            borderBottomColor="gray.200"
-            height="52px"
-          >
-            <CommentsButton
-              data-action="see-general-comments"
-              isActive={isShowingGeneralComments}
-              commentCount={petition.generalCommentCount}
-              hasUnreadComments={petition.unreadGeneralCommentCount > 0}
-              onClick={onToggleGeneralComments}
-            />
-            {signatureIndex === tabIndex &&
-            (!petition.signatureConfig?.isEnabled ||
-              currentSignatureRequest?.status === "COMPLETED" ||
-              currentSignatureRequest?.status === "CANCELLED") ? (
-              <IconButtonWithTooltip
-                isDisabled={isDisabled}
-                label={intl.formatMessage({
-                  id: "component.petition-signatures-card.add-signature-label",
-                  defaultMessage: "Add signature",
-                })}
-                size="sm"
-                icon={<AddIcon />}
-                onClick={handleAddNewSignature}
-              />
-            ) : null}
-          </HStack>
-        </HStack>
-        <TabPanels>
-          {approvalStepsWithSignature.map((step, index) => {
-            const stepNotApplicable = step.status === "NOT_APPLICABLE";
-            const isNotCurrentOrNextStep =
-              checkIfNextOrCurrentStep(
-                approvalStepsWithSignature.filter((s) => s.status !== "NOT_APPLICABLE"),
-                step.id,
-              ) === false;
-
-            return step.id === "signature" ? (
-              <TabPanel padding={0} key={index}>
-                <PetitionSignaturesCardBody
-                  petition={petition}
-                  user={user}
-                  isDisabled={isDisabled || isNotCurrentOrNextStep || stepNotApplicable}
-                  onRefetchPetition={onRefetchPetition}
-                />
-              </TabPanel>
-            ) : (
-              <TabPanel padding={0} key={index}>
-                <Grid templateColumns="auto 1fr auto" alignItems="center">
-                  <PetitionApprovalStepRow
-                    step={step}
-                    onStart={() => handleStartApprovalFlow(step)}
-                    onApprove={() => handleApproveOrRejectApprovalFlow({ step, action: "APPROVE" })}
-                    onReject={() => handleApproveOrRejectApprovalFlow({ step, action: "REJECT" })}
-                    onCancel={() => handleCancelApprovalFlow(step)}
-                    onSkip={() => handleSkipApprovalFlow(step)}
-                    onSendReminder={() => handleSendReminder(step)}
-                    isDisabled={
-                      petition.status !== "COMPLETED" || isNotCurrentOrNextStep || stepNotApplicable
-                    }
-                    petitionStatus={petition.status}
-                  />
-                </Grid>
-                {petition.oldApprovalRequestSteps.length ? (
-                  <Grid templateColumns="auto 1fr auto" alignItems="center">
-                    <OlderPetitionApprovalStepRows steps={petition.oldApprovalRequestSteps} />
-                  </Grid>
-                ) : null}
-              </TabPanel>
-            );
-          })}
-        </TabPanels>
-      </Tabs>
-    </Card>
+          </TabPanels>
+        </Tabs>
+      </Card>
+    </>
   );
 }
 

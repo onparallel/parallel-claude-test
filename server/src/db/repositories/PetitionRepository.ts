@@ -2393,7 +2393,8 @@ export class PetitionRepository extends BaseRepository {
   async updatePetitionFieldRepliesContent(
     petitionId: number,
     data: { id: number; content: any; metadata?: any }[],
-    updater: User | PetitionAccess,
+    updater: "User" | "PetitionAccess",
+    updaterId: number,
     skipEventCreation?: boolean,
     t?: Knex.Transaction,
   ) {
@@ -2404,8 +2405,7 @@ export class PetitionRepository extends BaseRepository {
       this.loadFieldReply(replyIds),
     ]);
 
-    const isContact = "keycode" in updater;
-    const updatedBy = isContact ? `Contact:${updater.contact_id}` : `User:${updater.id}`;
+    const updatedBy = `${updater}:${updaterId}`;
 
     const replies = await this.raw<PetitionFieldReply>(
       /* sql */ `
@@ -2432,8 +2432,8 @@ export class PetitionRepository extends BaseRepository {
           ["int", "jsonb", "jsonb"],
         ),
         updatedBy,
-        isContact ? null : updater.id,
-        isContact ? updater.id : null,
+        updater === "User" ? updaterId : null,
+        updater === "PetitionAccess" ? updaterId : null,
       ],
       t,
     );
@@ -2458,9 +2458,8 @@ export class PetitionRepository extends BaseRepository {
       return replies;
     }
 
-    const petitionAccessIdOrUserId = isContact
-      ? { petition_access_id: updater.id }
-      : { user_id: updater.id };
+    const petitionAccessIdOrUserId =
+      updater === "User" ? { user_id: updaterId } : { petition_access_id: updaterId };
 
     await this.createOrUpdateReplyEvents(petitionId, replies, petitionAccessIdOrUserId, t);
 

@@ -5635,6 +5635,11 @@
     "context": "Status"
   },
   {
+    "term": "component.petition-approvals-about-to-start-alert.title",
+    "definition": "Approval process will start soon, please wait...",
+    "context": "Approval process will start soon, please wait..."
+  },
+  {
     "term": "component.petition-approvals-alert.approvals-in-progress",
     "definition": "<b>There is an ongoing approval process.</b>",
     "context": "<b>There is an ongoing approval process.</b>"

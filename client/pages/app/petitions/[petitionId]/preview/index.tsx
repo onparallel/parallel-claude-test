@@ -414,7 +414,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 isClosable: true,
               });
             }
-            router.push(`/app/petitions/${query.petitionId}/replies`);
+            router.push(`/app/petitions/${query.petitionId}/replies?completed=true`);
           } else if (petition.signatureConfig.review) {
             if (!toast.isActive("petition-completed-toast")) {
               toast({
@@ -432,7 +432,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 isClosable: true,
               });
             }
-            router.push(`/app/petitions/${query.petitionId}/replies`);
+            router.push(`/app/petitions/${query.petitionId}/replies?completed=true`);
           } else {
             if (!toast.isActive("petition-completed-signature-sent-toast")) {
               toast({
@@ -449,7 +449,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 isClosable: true,
               });
             }
-            router.push(`/app/petitions/${query.petitionId}/replies`);
+            router.push(`/app/petitions/${query.petitionId}/replies?completed=true`);
           }
         } else {
           if (nextIncompleteField) {

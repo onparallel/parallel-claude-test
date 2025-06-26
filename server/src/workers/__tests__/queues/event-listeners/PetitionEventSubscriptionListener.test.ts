@@ -223,7 +223,7 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
     expect(queueSpy).toHaveBeenCalledTimes(1);
     expect(queueSpy.mock.calls[0]).toEqual([
       "webhooks-worker",
-      [
+      expect.toIncludeSameMembers([
         {
           id: `webhook-${toGlobalId("EventSubscription", subscriptions[0].id)}`,
           body: {
@@ -269,7 +269,7 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
             },
           },
         },
-      ],
+      ]),
     ]);
   });
 });

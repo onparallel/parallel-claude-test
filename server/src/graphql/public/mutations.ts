@@ -12,12 +12,10 @@ import {
 } from "nexus";
 import { outdent } from "outdent";
 import { DatabaseError } from "pg";
-import { isNonNullish, isNullish, unique, zip } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { getClientIp } from "request-ip";
 import { PetitionAccess, User } from "../../db/__types";
 import { Task } from "../../db/repositories/TaskRepository";
-import { evaluateApprovalStepsVisibility } from "../../util/approvalStepsLogic";
-import { buildAutomatedBackgroundCheckFieldQueries } from "../../util/buildAutomatedBackgroundCheckFieldQueries";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { petitionIsCompleted } from "../../util/petitionIsCompleted";
@@ -411,47 +409,6 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
 
       await ctx.petitions.updateRemindersForPetitions(petitionId, null);
 
-      const backgroundCheckAutoSearchQueries =
-        buildAutomatedBackgroundCheckFieldQueries(composedPetition);
-
-      // run an automated background search for each field that has autoSearchConfig and the "name" field replied
-      // if the query is the same as the last one or the field has a stored entity detail, it will not trigger a new search
-      for (const data of backgroundCheckAutoSearchQueries) {
-        if (isNonNullish(data.petitionFieldReplyId)) {
-          await ctx.petitions.updatePetitionFieldRepliesContent(
-            ctx.access!.petition_id,
-            [
-              {
-                id: data.petitionFieldReplyId,
-                content: {
-                  query: data.query,
-                  search: await ctx.backgroundCheck.entitySearch(data.query),
-                  entity: null,
-                },
-              },
-            ],
-            ctx.access!,
-          );
-        } else {
-          await ctx.petitions.createPetitionFieldReply(
-            ctx.access!.petition_id,
-            {
-              type: "BACKGROUND_CHECK",
-              content: {
-                query: data.query,
-                search: await ctx.backgroundCheck.entitySearch(data.query),
-                entity: null,
-              },
-              petition_access_id: ctx.access!.id,
-              petition_field_id: data.petitionFieldId,
-              parent_petition_field_reply_id: data.parentPetitionFieldReplyId,
-              status: "PENDING",
-            },
-            `Contact:${ctx.contact!.id}`,
-          );
-        }
-      }
-
       if (petition.signature_config?.isEnabled) {
         if (petition.signature_config.review === false) {
           // start a new signature request, cancelling previous pending requests if any
@@ -479,61 +436,9 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
         );
       }
 
-      if (petition.approval_flow_config) {
-        const hasFeatureFlag = await ctx.featureFlags.orgHasFeatureFlag(
-          petition.org_id,
-          "PETITION_APPROVAL_FLOW",
-        );
-        if (hasFeatureFlag) {
-          await ctx.approvalRequests.deleteNotStartedPetitionApprovalRequestStepsAndApproversByPetitionId(
-            petition.id,
-          );
-
-          const approvalLogic = evaluateApprovalStepsVisibility(
-            composedPetition,
-            petition.approval_flow_config,
-          );
-
-          // create every approval step. Step statuses will be NOT_STARTED or NOT_APPLICABLE, as completing the petition does not starts the approval flow, only calculates its steps
-          let firstVisibleStepIndex = -1;
-          const approvalRequestSteps =
-            await ctx.approvalRequests.createPetitionApprovalRequestSteps(
-              zip(petition.approval_flow_config, approvalLogic).map(
-                ([step, { isVisible }], index) => {
-                  if (isVisible && firstVisibleStepIndex === -1) {
-                    firstVisibleStepIndex = index;
-                  }
-                  return {
-                    petition_id: petition.id,
-                    status: isVisible ? "NOT_STARTED" : "NOT_APPLICABLE",
-                    approval_type: step.type,
-                    step_name: step.name,
-                    step_number: index,
-                  };
-                },
-              ),
-              `PetitionAccess:${ctx.access!.id}`,
-            );
-
-          // on each step, insert its approvers
-          for (const [step, config] of zip(approvalRequestSteps, petition.approval_flow_config)) {
-            const userGroupsIds = config.values
-              .filter((v) => v.type === "UserGroup")
-              .map((v) => v.id);
-            const groupMembers = (await ctx.userGroups.loadUserGroupMembers(userGroupsIds)).flat();
-            const userIds = unique([
-              ...config.values.filter((v) => v.type === "User").map((v) => v.id),
-              ...groupMembers.map((m) => m.user_id),
-            ]);
-
-            await ctx.approvalRequests.createPetitionApprovalRequestStepApprovers(
-              step.id,
-              userIds.map((id) => ({ id })),
-              `PetitionAccess:${ctx.access!.id}`,
-            );
-          }
-        }
-      }
+      await ctx.approvalRequests.deleteNotStartedPetitionApprovalRequestStepsAndApproversByPetitionId(
+        petition.id,
+      );
 
       await ctx.petitions.createEvent({
         type: "PETITION_COMPLETED",

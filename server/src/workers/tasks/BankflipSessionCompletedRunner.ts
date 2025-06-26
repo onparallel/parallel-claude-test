@@ -218,13 +218,11 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     fillRepliesArrays(modelRequestErrorReplies, modelRequestNewDocuments);
 
     if (updateRepliesData.length > 0) {
-      const updater = isNonNullish(userId)
-        ? await this.ctx.users.loadUser(userId)
-        : await this.ctx.petitions.loadAccess(petitionAccessId!);
       await this.ctx.petitions.updatePetitionFieldRepliesContent(
         petitionId,
         updateRepliesData,
-        updater!,
+        isNonNullish(userId) ? "User" : "PetitionAccess",
+        isNonNullish(userId) ? userId : petitionAccessId!,
       );
     }
 

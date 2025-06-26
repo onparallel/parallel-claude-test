@@ -215,7 +215,8 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
             },
           },
         ],
-        ctx.user!,
+        "User",
+        ctx.user!.id,
         true,
       ),
     ]);
@@ -263,7 +264,8 @@ export const updateFileUploadReplyComplete = mutationField("updateFileUploadRepl
           content: { file_upload_id: reply.content["file_upload_id"] }, // rewrite content to remove old_file_upload_id reference
         },
       ],
-      ctx.user!,
+      "User",
+      ctx.user!.id,
     );
     return updatedReply;
   },
@@ -777,7 +779,8 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
         id: replyData.id,
         content: ctx.petitionFields.mapReplyContentToDatabase(replyData.type, replyData.content),
       })),
-      ctx.user!,
+      "User",
+      ctx.user!.id,
     );
   },
 });
@@ -849,7 +852,8 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
             content: { ...reply.content, entity },
           },
         ],
-        ctx.user!,
+        "User",
+        ctx.user!.id,
       );
     }
 

@@ -160,7 +160,8 @@ export const publicUpdatePetitionFieldReplies = mutationField("publicUpdatePetit
         id: replyData.id,
         content: ctx.petitionFields.mapReplyContentToDatabase(replyData.type, replyData.content),
       })),
-      ctx.access!,
+      "PetitionAccess",
+      ctx.access!.id,
     );
   },
 });

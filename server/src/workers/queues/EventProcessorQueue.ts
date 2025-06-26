@@ -15,6 +15,10 @@ import {
   AnalyticsEventListener,
 } from "./event-listeners/AnalyticsEventListener";
 import {
+  AUTOMATIC_BACKGROUND_CHECK_LISTENER,
+  AutomaticBackgroundCheckListener,
+} from "./event-listeners/AutomaticBackgroundCheckListener";
+import {
   DOCUMENT_PROCESSING_LISTENER,
   DocumentProcessingListener,
 } from "./event-listeners/DocumentProcessingListener";
@@ -22,6 +26,10 @@ import {
   PETITION_ACTIVITY_LISTENER,
   PetitionActivityListener,
 } from "./event-listeners/PetitionActivityListener";
+import {
+  PETITION_APPROVAL_PROCESS_LISTENER,
+  PetitionApprovalProcessListener,
+} from "./event-listeners/PetitionApprovalProcessListener";
 import {
   PETITION_EVENT_SUBSCRIPTIONS_LISTENER,
   PetitionEventSubscriptionsListener,
@@ -78,6 +86,10 @@ export class EventProcessor extends QueueWorker<EventProcessorPayload> {
     documentProcessingListener: DocumentProcessingListener,
     @inject(USER_NOTIFICATIONS_LISTENER)
     userNotificationsListener: UserNotificationsListener,
+    @inject(AUTOMATIC_BACKGROUND_CHECK_LISTENER)
+    automaticBackgroundCheckListener: AutomaticBackgroundCheckListener,
+    @inject(PETITION_APPROVAL_PROCESS_LISTENER)
+    petitionApprovalProcessListener: PetitionApprovalProcessListener,
   ) {
     super();
 
@@ -86,7 +98,10 @@ export class EventProcessor extends QueueWorker<EventProcessorPayload> {
       .register(profileEventSubscriptionsListener)
       .register(petitionActivityListener)
       .register(documentProcessingListener)
-      .register(userNotificationsListener);
+      .register(userNotificationsListener)
+      .register(automaticBackgroundCheckListener)
+      // approvals listener should always run last, as the approval process can have activation conditions that depend on replies created by other listeners
+      .register(petitionApprovalProcessListener);
   }
 
   override async handler(payload: EventProcessorPayload): Promise<void> {

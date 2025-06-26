@@ -112,7 +112,8 @@ export const classifyAdverseMediaArticle = mutationField("classifyAdverseMediaAr
             },
           },
         ],
-        ctx.user!,
+        "User",
+        ctx.user!.id,
       );
     }
 
