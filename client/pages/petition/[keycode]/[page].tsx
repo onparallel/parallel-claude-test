@@ -259,7 +259,11 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const handleErrorFromFields = useCallback(async (error: any) => {
     if (isApolloError(error, "FIELD_ALREADY_REPLIED_ERROR")) {
       setShowRefreshRepliesAlert(true);
-    } else if (isApolloError(error, "REPLY_ALREADY_DELETED_ERROR")) {
+    } else if (
+      isApolloError(error, "REPLY_ALREADY_DELETED_ERROR") ||
+      isApolloError(error, "ONGOING_APPROVAL_REQUEST_ERROR") ||
+      isApolloError(error, "ONGOING_SIGNATURE_REQUEST_ERROR")
+    ) {
       await refetchAccess();
     } else if (
       isApolloError(error, "INVALID_REPLY_ERROR") ||
