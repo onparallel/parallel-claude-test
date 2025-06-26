@@ -269,11 +269,6 @@ const _PetitionAccess = {
       format: "date-time",
       example: new Date(2020, 2, 15).toISOString(),
     },
-    recipientUrl: {
-      description: "URL of the recipient portal for this parallel access",
-      type: ["string", "null"],
-      example: "https://www.onparallel.com/petition/38s5hnjATHXJp5XWHYcucQm",
-    },
   },
 } as const;
 

@@ -718,7 +718,7 @@ export function publicApi(container: Container) {
             required: false,
             array: true,
           }),
-          ...petitionIncludeParam(),
+          ...petitionIncludeParam({ includeRecipientUrl: true }),
         },
         responses: {
           200: SuccessResponse(PaginatedPetitions),
@@ -850,7 +850,7 @@ export function publicApi(container: Container) {
         Returns the specified parallel.
       `,
         query: {
-          ...petitionIncludeParam(),
+          ...petitionIncludeParam({ includeRecipientUrl: true }),
         },
         responses: { 200: SuccessResponse(Petition) },
         tags: ["Parallels"],
@@ -897,7 +897,7 @@ export function publicApi(container: Container) {
       `,
         body: JsonBody(UpdatePetition),
         query: {
-          ...petitionIncludeParam(),
+          ...petitionIncludeParam({ includeRecipientUrl: true }),
         },
         responses: {
           200: SuccessResponse(Petition),
@@ -1052,7 +1052,7 @@ export function publicApi(container: Container) {
       summary: "Closes a parallel",
       description: "Close a parallel",
       query: {
-        ...petitionIncludeParam(),
+        ...petitionIncludeParam({ includeRecipientUrl: true }),
       },
       responses: {
         200: SuccessResponse(Petition),
@@ -1108,7 +1108,7 @@ export function publicApi(container: Container) {
       summary: "Reopen a parallel",
       description: "Reopen a closed or completed parallel",
       query: {
-        ...petitionIncludeParam(),
+        ...petitionIncludeParam({ includeRecipientUrl: true }),
       },
       responses: {
         200: SuccessResponse(Petition),
