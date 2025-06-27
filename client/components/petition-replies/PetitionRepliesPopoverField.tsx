@@ -1,7 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import {
   Box,
-  Center,
   FocusLock,
   PopoverArrow,
   PopoverBody,
@@ -13,10 +12,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
-import {
-  PetitionRepliesPopoverField_dataDocument,
-  PetitionRepliesPopoverField_UserFragment,
-} from "@parallel/graphql/__types";
+import { PetitionRepliesPopoverField_dataDocument } from "@parallel/graphql/__types";
 import { assertTypename } from "@parallel/utils/apollo/typename";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { MouseEvent } from "react";
@@ -30,14 +26,12 @@ export function PetitionRepliesPopoverField({
   petitionId,
   fieldLogic,
   parentReplyId,
-  user,
 }: {
   children: React.ReactNode;
   petitionFieldId: string;
   petitionId: string;
   fieldLogic: FieldLogicResult;
   parentReplyId?: string;
-  user: PetitionRepliesPopoverField_UserFragment;
 }) {
   const { isOpen, onClose, onOpen } = useDisclosure();
   function handleOverlayClick(event: MouseEvent) {
@@ -80,10 +74,15 @@ export function PetitionRepliesPopoverField({
           <PopoverContent width="500px">
             <FocusLock restoreFocus={false}>
               <PopoverArrow />
-              <PopoverBody minHeight="60px">
+              <PopoverBody
+                minHeight="60px"
+                height="100%"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+              >
                 <PopoverCloseButton top={4} insetEnd={5} />
                 <LazyPreviewPetitionField
-                  user={user}
                   petitionFieldId={petitionFieldId}
                   petitionId={petitionId}
                   fieldLogic={fieldLogic}
@@ -101,13 +100,11 @@ export function PetitionRepliesPopoverField({
 function LazyPreviewPetitionField({
   petitionFieldId,
   petitionId,
-  user,
   fieldLogic,
   parentReplyId,
 }: {
   petitionFieldId: string;
   petitionId: string;
-  user: PetitionRepliesPopoverField_UserFragment;
   fieldLogic: FieldLogicResult;
   parentReplyId?: string;
 }) {
@@ -116,6 +113,7 @@ function LazyPreviewPetitionField({
     variables: { petitionId, petitionFieldId },
   });
 
+  const user = data?.me;
   const field = data?.petitionField;
   const petition = data?.petition;
 
@@ -129,47 +127,41 @@ function LazyPreviewPetitionField({
     isNonNullish(petition) &&
     isNonNullish(user) &&
     isNonNullish(myEffectivePermission) ? (
-    <PreviewPetitionField
-      field={field}
-      petition={petition}
-      user={user}
-      isDisabled={
-        petition.status === "CLOSED" ||
-        petition.isAnonymized ||
-        user.organization.isPetitionUsageLimitReached ||
-        petition.hasStartedProcess
-      }
-      isCacheOnly={false}
-      myEffectivePermission={myEffectivePermission}
-      showErrors={false}
-      fieldLogic={fieldLogic}
-      onError={() => {}}
-      parentReplyId={parentReplyId}
-    />
+    <Box height="100%" width="100%">
+      <PreviewPetitionField
+        field={field}
+        petition={petition}
+        user={user}
+        isDisabled={
+          petition.status === "CLOSED" ||
+          petition.isAnonymized ||
+          user.organization.isPetitionUsageLimitReached ||
+          petition.hasStartedProcess
+        }
+        isCacheOnly={false}
+        myEffectivePermission={myEffectivePermission}
+        showErrors={false}
+        fieldLogic={fieldLogic}
+        onError={() => {}}
+        parentReplyId={parentReplyId}
+      />
+    </Box>
   ) : (
-    <Center>
-      <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="primary.500" />
-    </Center>
+    <Spinner thickness="3px" speed="0.65s" emptyColor="gray.200" color="primary.500" />
   );
 }
-
-PetitionRepliesPopoverField.fragments = {
-  User: gql`
-    fragment PetitionRepliesPopoverField_User on User {
-      id
-      organization {
-        id
-        isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
-      }
-      ...PreviewPetitionField_User
-    }
-    ${PreviewPetitionField.fragments.User}
-  `,
-};
 
 const _queries = [
   gql`
     query PetitionRepliesPopoverField_data($petitionId: GID!, $petitionFieldId: GID!) {
+      me {
+        id
+        organization {
+          id
+          isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+        }
+        ...PreviewPetitionField_User
+      }
       petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
         id
         ...PreviewPetitionField_PetitionField
@@ -189,5 +181,6 @@ const _queries = [
     }
     ${PreviewPetitionField.fragments.PetitionBase}
     ${PreviewPetitionField.fragments.PetitionField}
+    ${PreviewPetitionField.fragments.User}
   `,
 ];

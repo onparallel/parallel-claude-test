@@ -4,6 +4,7 @@ import "./init";
 import { ApolloServer, ApolloServerPlugin } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginLandingPageDisabled } from "@apollo/server/plugin/disabled";
+import chalk from "chalk";
 import cookieParser from "cookie-parser";
 import express, { json } from "express";
 import graphqlUploadExpress from "graphql-upload/graphqlUploadExpress.js";
@@ -17,6 +18,7 @@ import { schema } from "./schema";
 import { CORS_SERVICE, ICorsService } from "./services/CorsService";
 import { ILogger, LOGGER } from "./services/Logger";
 import { IRedis, REDIS } from "./services/Redis";
+import { formatBytes } from "./util/formatBytes";
 import { loadEnv } from "./util/loadEnv";
 import { stopwatchEnd } from "./util/stopwatch";
 
@@ -106,8 +108,25 @@ if (process.env.TS_NODE_DEV) {
         const statusCode = res.statusCode;
         const duration = stopwatchEnd(time);
         const length = res.getHeader("content-length");
+        const lengthBytes = Number(length) || 0;
+        let formattedLength: string;
+
+        if (process.env.TS_NODE_DEV && process.env.VERBOSE_LOGS && length) {
+          const formattedSize = formatBytes(lengthBytes);
+          // Color thresholds: yellow > 1MB, red > 5MB
+          if (lengthBytes > 5 * 1024 * 1024) {
+            formattedLength = chalk.red(formattedSize);
+          } else if (lengthBytes > 1024 * 1024) {
+            formattedLength = chalk.yellow(formattedSize);
+          } else {
+            formattedLength = formattedSize;
+          }
+        } else {
+          formattedLength = `${lengthBytes}B`;
+        }
+
         logger[statusCode >= 500 ? "error" : "info"](
-          `${ip} ${method} ${url} ${statusCode} ${length ?? 0}B ${duration}ms`,
+          `${ip} ${method} ${url} ${statusCode} ${formattedLength} ${duration}ms`,
           {
             userId: req.context?.trails.userId,
             accessId: req.context?.trails.accessId,

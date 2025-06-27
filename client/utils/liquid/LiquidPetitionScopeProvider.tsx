@@ -7,6 +7,7 @@ import {
 import { PropsWithChildren, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { isNonNullish, zip } from "remeda";
+import { assert } from "ts-essentials";
 import { PetitionFieldIndex, useFieldsWithIndices } from "../fieldIndices";
 import { useFieldLogic } from "../fieldLogic/useFieldLogic";
 import { isFileTypeField } from "../isFileTypeField";
@@ -26,6 +27,9 @@ export function LiquidPetitionScopeProvider({
 }>) {
   const intl = useIntl();
   const fieldsWithIndices = useFieldsWithIndices(petition);
+  const allFields = useMemo(() => {
+    return petition.fields.flatMap((f) => [f, ...(f.children ?? [])]);
+  }, [petition.fields]);
   const fieldLogic = useFieldLogic(petition, usePreviewReplies);
   const scope = useMemo(() => {
     const scope: Record<string, any> = { petitionId: petition.id, _: {} };
@@ -41,10 +45,12 @@ export function LiquidPetitionScopeProvider({
       if (field.type === "FIELD_GROUP") {
         values = replies.map((r) => {
           const reply: Record<string, any> = { _: {} };
-          for (const [{ field, replies: _replies }, fieldIndex] of zip<
+          for (const [{ field: replyField, replies: _replies }, fieldIndex] of zip<
             UnwrapArray<Exclude<ArrayUnionToUnion<typeof replies>["children"], null | undefined>>,
             PetitionFieldIndex
           >(r.children! as any, childrenFieldIndices!)) {
+            const field = allFields.find((f) => f.id === replyField.id);
+            assert(isNonNullish(field), `Field ${replyField.id} not found`);
             const values = _replies.map((r) => getReplyValue(field, r.content));
             scope._[fieldIndex] = (scope._[fieldIndex] ?? []).concat(values);
             if (isNonNullish(field.alias)) {
@@ -124,7 +130,7 @@ LiquidPetitionScopeProvider.fragments = {
           content
           children {
             field {
-              ...LiquidPetitionScopeProvider_PetitionField
+              id
             }
             replies {
               id
@@ -137,7 +143,7 @@ LiquidPetitionScopeProvider.fragments = {
           content
           children {
             field {
-              ...LiquidPetitionScopeProvider_PetitionField
+              id
             }
             replies {
               id
@@ -145,7 +151,11 @@ LiquidPetitionScopeProvider.fragments = {
             }
           }
         }
+        children {
+          ...LiquidPetitionScopeProvider_PetitionField
+        }
       }
+
       ...useFieldsWithIndices_PetitionBase
       ...useFieldLogic_PetitionBase
     }
@@ -171,7 +181,7 @@ LiquidPetitionScopeProvider.fragments = {
           content
           children {
             field {
-              ...LiquidPetitionScopeProvider_PublicPetitionField
+              id
             }
             replies {
               id
@@ -179,7 +189,11 @@ LiquidPetitionScopeProvider.fragments = {
             }
           }
         }
+        children {
+          ...LiquidPetitionScopeProvider_PublicPetitionField
+        }
       }
+
       ...useFieldsWithIndices_PublicPetition
       ...useFieldLogic_PublicPetition
     }

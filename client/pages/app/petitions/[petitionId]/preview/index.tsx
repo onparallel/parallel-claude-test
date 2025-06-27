@@ -1,26 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
-import {
-  Badge,
-  Box,
-  Button,
-  Center,
-  Flex,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  useBreakpointValue,
-  useToast,
-} from "@chakra-ui/react";
-import {
-  ChevronRightIcon,
-  CommentIcon,
-  EditSimpleIcon,
-  ListIcon,
-  PaperPlaneIcon,
-} from "@parallel/chakra/icons";
+import { Box, Button, Center, Flex, Stack, useToast } from "@chakra-ui/react";
+import { ChevronRightIcon, EditSimpleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NakedLink } from "@parallel/components/common/Link";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
@@ -54,15 +34,14 @@ import {
   useHiddenFieldDialog,
 } from "@parallel/components/petition-compose/dialogs/HiddenFieldDialog";
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
+import { PetitionPreviewRightPaneTabs } from "@parallel/components/petition-preview/PetitionPreviewRightPaneTabs";
 import { PetitionPreviewStartSignatureButton } from "@parallel/components/petition-preview/PetitionPreviewStartSignatureButton";
 import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
 import {
   GeneratePrefilledPublicLinkDialog,
   useGeneratePrefilledPublicLinkDialog,
 } from "@parallel/components/petition-preview/dialogs/GeneratePrefilledPublicLinkDialog";
-import { PetitionComments } from "@parallel/components/petition-replies/PetitionComments";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
-import { RecipientViewContents } from "@parallel/components/recipient-view/RecipientViewContents";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressBar } from "@parallel/components/recipient-view/RecipientViewProgressBar";
 import { RecipientViewSidebarContextProvider } from "@parallel/components/recipient-view/RecipientViewSidebarContextProvider";
@@ -78,7 +57,6 @@ import {
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
 import { useAllFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { focusPetitionField } from "@parallel/utils/focusPetitionField";
@@ -115,8 +93,7 @@ import { withMetadata } from "@parallel/utils/withMetadata";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, omit, sumBy } from "remeda";
-import { noop } from "ts-essentials";
+import { isNonNullish, omit } from "remeda";
 
 type PetitionPreviewProps = UnwrapPromise<ReturnType<typeof PetitionPreview.getInitialProps>>;
 
@@ -158,25 +135,14 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   }, []);
 
   const petition = data!.petition as PetitionPreview_PetitionBaseFragment;
-  const allFieldsUnreadCommentCount =
-    sumBy(petition.fields, (f) => f.unreadCommentCount) +
-    (petition.__typename === "Petition" ? petition.unreadGeneralCommentCount : 0);
 
   const [activeFieldId, setActiveFieldId] = useFieldCommentsQueryState();
   const activeField = activeFieldId ? petition.fields.find((f) => f.id === activeFieldId) : null;
-
-  const [tabIndex, setTabIndex] = useState(activeFieldId ? 1 : 0);
 
   const allFields = useMemo(
     () => petition.fields.flatMap((f) => [f, ...(f.children ?? [])]),
     [petition.fields],
   );
-
-  useEffect(() => {
-    if (activeFieldId) {
-      setTabIndex(1);
-    }
-  }, [activeFieldId]);
 
   const isClosed =
     petition.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status);
@@ -531,13 +497,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
       ["COMPLETED", "CANCELLING", "CANCELLED"].includes(petition.signatureRequests[0].status) ||
       petition.status !== "COMPLETED");
 
-  const extendFlexColumn = {
-    display: "flex",
-    flexDirection: "column",
-    flex: 1,
-    minHeight: 0,
-  } as const;
-
   const createPetitionComment = useCreatePetitionComment();
   async function handleAddComment(content: any, isNote: boolean) {
     await createPetitionComment({
@@ -576,8 +535,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
       isRead: false,
     });
   }
-
-  const isMobile = useBreakpointValue({ base: true, lg: false });
 
   const showPetitionLimitReachedAlert =
     petition.__typename === "Petition" &&
@@ -654,9 +611,14 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           hasRightPane
           isRightPaneActive={Boolean(activeFieldId)}
           rightPane={
-            isMobile ? (
-              activeFieldId && !!activeField ? (
-                <Flex flex="1" flexDirection="column">
+            <>
+              <Flex
+                display={{ base: "flex", lg: "none" }}
+                flex="1"
+                overflow="hidden"
+                flexDirection="column"
+              >
+                {activeFieldId && !!activeField ? (
                   <PetitionRepliesFieldComments
                     key={activeFieldId}
                     petition={petition}
@@ -669,91 +631,23 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                     onMarkAsUnread={handleMarkAsUnread}
                     onlyReadPermission={myEffectivePermission === "READ"}
                   />
-                </Flex>
-              ) : null
-            ) : (
-              <Tabs
-                index={tabIndex}
-                onChange={(index) => setTabIndex(index)}
-                variant="enclosed"
-                overflow="hidden"
-                {...extendFlexColumn}
-              >
-                <TabList marginX="-1px" marginTop="-1px" flex="none">
-                  <Tab
-                    paddingY={4}
-                    paddingX={3.5}
-                    lineHeight={5}
-                    fontWeight="bold"
-                    borderTopRadius={0}
-                    _focusVisible={{ boxShadow: "inline" }}
-                  >
-                    <ListIcon fontSize="18px" marginEnd={1} aria-hidden="true" />
-                    <FormattedMessage id="generic.contents" defaultMessage="Contents" />
-                  </Tab>
-                  <Tab
-                    paddingY={4}
-                    paddingX={3.5}
-                    lineHeight={5}
-                    fontWeight="bold"
-                    borderTopRadius={0}
-                    _focusVisible={{ boxShadow: "inline" }}
-                  >
-                    <CommentIcon fontSize="18px" marginEnd={1} aria-hidden="true" />
-                    <FormattedMessage id="generic.comments" defaultMessage="Comments" />
-                    {allFieldsUnreadCommentCount ? (
-                      <Badge
-                        marginStart={1}
-                        background="primary.500"
-                        color="white"
-                        fontSize="xs"
-                        borderRadius="full"
-                        minW="18px"
-                        minH="18px"
-                        lineHeight="18px"
-                        pointerEvents="none"
-                      >
-                        {allFieldsUnreadCommentCount < 100 ? allFieldsUnreadCommentCount : "99+"}
-                      </Badge>
-                    ) : null}
-                  </Tab>
-                </TabList>
-                <TabPanels {...extendFlexColumn}>
-                  <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
-                    <RecipientViewContents
-                      currentPage={currentPage}
-                      petition={petition}
-                      onClose={noop}
-                      usePreviewReplies={!isPetition}
-                      isPreview
-                    />
-                  </TabPanel>
-                  <TabPanel {...extendFlexColumn} padding={0} overflow="auto" position="relative">
-                    {activeFieldId ? (
-                      <PetitionRepliesFieldComments
-                        key={activeFieldId}
-                        petition={petition}
-                        field={activeField}
-                        isDisabled={
-                          petition.isAnonymized || petition.__typename === "PetitionTemplate"
-                        }
-                        onClose={() => setActiveFieldId(null)}
-                        onAddComment={handleAddComment}
-                        onUpdateComment={handleUpdateComment}
-                        onDeleteComment={handleDeleteComment}
-                        onMarkAsUnread={handleMarkAsUnread}
-                        onlyReadPermission={myEffectivePermission === "READ"}
-                      />
-                    ) : (
-                      <PetitionComments
-                        petition={petition}
-                        onSelectField={(fieldId) => setActiveFieldId(fieldId)}
-                      />
-                    )}
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-            )
+                ) : null}
+              </Flex>
+              <Flex display={{ base: "none", lg: "flex" }} flex="1" overflow="hidden">
+                <PetitionPreviewRightPaneTabs
+                  petition={petition}
+                  currentPage={currentPage}
+                  activeFieldId={activeFieldId}
+                  setActiveFieldId={setActiveFieldId}
+                  onAddComment={handleAddComment}
+                  onUpdateComment={handleUpdateComment}
+                  onDeleteComment={handleDeleteComment}
+                  onMarkAsUnread={handleMarkAsUnread}
+                  activeField={activeField}
+                  onlyReadPermission={myEffectivePermission === "READ"}
+                />
+              </Flex>
+            </>
           }
         >
           {isPetition && petition.status !== "CLOSED" && (
@@ -1045,12 +939,6 @@ const _fragments = {
       fields {
         id
         unreadCommentCount
-        ...PreviewPetitionField_PetitionField
-        ...validatePetitionFields_PetitionField
-        ...FieldErrorDialog_PetitionField
-        ...completedFieldReplies_PetitionField
-        ...HiddenFieldDialog_PetitionField
-        ...focusPetitionField_PetitionField
         children {
           id
           alias
@@ -1069,6 +957,13 @@ const _fragments = {
             id
           }
         }
+        ...PreviewPetitionField_PetitionField
+        ...validatePetitionFields_PetitionField
+        ...FieldErrorDialog_PetitionField
+        ...HiddenFieldDialog_PetitionField
+        ...focusPetitionField_PetitionField
+        ...PetitionPreviewRightPaneTabs_PetitionField
+        ...PetitionRepliesFieldComments_PetitionField
       }
       signatureConfig {
         isEnabled
@@ -1085,13 +980,12 @@ const _fragments = {
       ...usePetitionCanFinalize_PetitionBase
       ...HiddenFieldDialog_PetitionBase
       ...validatePetitionFields_PetitionBase
-      ...RecipientViewContents_PetitionBase
-      ...PetitionComments_PetitionBase
       ...useStartApprovalRequestStep_PetitionBase
       ...useClosePetition_PetitionBase
+      ...PetitionPreviewRightPaneTabs_PetitionBase
+      ...PetitionRepliesFieldComments_PetitionBase
     }
     ${focusPetitionField.fragments.PetitionField}
-    ${RecipientViewContents.fragments.PetitionBase}
     ${PetitionPreviewStartSignatureButton.fragments.Petition}
     ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
     ${RecipientViewProgressBar.fragments.Petition}
@@ -1104,17 +998,19 @@ const _fragments = {
     ${validatePetitionFields.fragments.PetitionField}
     ${FieldErrorDialog.fragments.PetitionField}
     ${LiquidPetitionScopeProvider.fragments.PetitionBase}
-    ${completedFieldReplies.fragments.PetitionField}
     ${HiddenFieldDialog.fragments.PetitionBase}
     ${HiddenFieldDialog.fragments.PetitionField}
     ${GeneratePrefilledPublicLinkDialog.fragments.PetitionTemplate}
     ${usePetitionCanFinalize.fragments.PetitionBase}
     ${validatePetitionFields.fragments.PetitionBase}
-    ${PetitionComments.fragments.PetitionBase}
     ${getPetitionSignatureStatus.fragments.Petition}
     ${useStartSignatureRequest.fragments.Petition}
     ${useStartApprovalRequestStep.fragments.PetitionBase}
     ${useClosePetition.fragments.PetitionBase}
+    ${PetitionPreviewRightPaneTabs.fragments.PetitionField}
+    ${PetitionPreviewRightPaneTabs.fragments.PetitionBase}
+    ${PetitionRepliesFieldComments.fragments.PetitionField}
+    ${PetitionRepliesFieldComments.fragments.PetitionBase}
   `,
   Query: gql`
     fragment PetitionPreview_Query on Query {

@@ -512,9 +512,9 @@ const _fragments = {
       isInteractionWithRecipientsEnabled
       accesses {
         id
-        status
         ...ConfirmDeactivateAccessDialog_PetitionAccess
         ...ConfirmReactivateAccessDialog_PetitionAccess
+        ...useConfigureRemindersDialog_PetitionAccess
       }
       ...PetitionLayout_PetitionBase
       ...PetitionAccessTable_Petition
@@ -549,6 +549,7 @@ const _fragments = {
     ${ConfirmDeactivateAccessDialog.fragments.PetitionAccess}
     ${ConfirmReactivateAccessDialog.fragments.PetitionAccess}
     ${useConfirmSendReminderDialog.fragments.Petition}
+    ${useConfigureRemindersDialog.fragments.PetitionAccess}
   `,
   Query: gql`
     fragment PetitionActivity_Query on Query {
@@ -556,7 +557,7 @@ const _fragments = {
       me {
         id
         organization {
-          name
+          id
           isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
           petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
             limit

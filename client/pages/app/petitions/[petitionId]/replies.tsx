@@ -1,31 +1,12 @@
 import { gql, useMutation } from "@apollo/client";
-import {
-  Badge,
-  Box,
-  Button,
-  Flex,
-  HStack,
-  Heading,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-  useBreakpointValue,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, HStack, Stack, Text, useToast } from "@chakra-ui/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import {
   CheckIcon,
-  CommentIcon,
   DownloadIcon,
   FilePdfIcon,
-  ListIcon,
   ProfilesIcon,
   RepeatIcon,
-  SparklesIcon,
 } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ProfileSelectInstance } from "@parallel/components/common/ProfileSelect";
@@ -43,25 +24,19 @@ import { useAssociateProfileToPetitionDialog } from "@parallel/components/petiti
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionApprovalsCard } from "@parallel/components/petition-replies/PetitionApprovalsCard";
-import { PetitionComments } from "@parallel/components/petition-replies/PetitionComments";
-import { PetitionRepliesContents } from "@parallel/components/petition-replies/PetitionRepliesContents";
 import {
   PetitionRepliesField,
   PetitionRepliesFieldProps,
 } from "@parallel/components/petition-replies/PetitionRepliesField";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
 import { PetitionRepliesFieldReply } from "@parallel/components/petition-replies/PetitionRepliesFieldReply";
-import { PetitionRepliesFilterButton } from "@parallel/components/petition-replies/PetitionRepliesFilterButton";
 import { PetitionRepliesFilteredFields } from "@parallel/components/petition-replies/PetitionRepliesFilteredFields";
-import { PetitionRepliesSummary } from "@parallel/components/petition-replies/PetitionRepliesSummary";
+import { PetitionRepliesRightPaneTabs } from "@parallel/components/petition-replies/PetitionRepliesRightPaneTabs";
 import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
 import { PetitionVariablesCard } from "@parallel/components/petition-replies/PetitionVariablesCard";
 import { ProfileDrawer } from "@parallel/components/petition-replies/ProfileDrawer";
 import { useArchiveFieldGroupReplyIntoProfileDialog } from "@parallel/components/petition-replies/dialogs/ArchiveFieldGroupReplyIntoProfileDialog";
-import {
-  ExportRepliesDialog,
-  useExportRepliesDialog,
-} from "@parallel/components/petition-replies/dialogs/ExportRepliesDialog";
+import { useExportRepliesDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesDialog";
 import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesProgressDialog";
 import {
   AdverseMediaArticle,
@@ -85,8 +60,6 @@ import {
   defaultFieldsFilter,
   filterPetitionFields,
 } from "@parallel/utils/filterPetitionFields";
-import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
-import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
 import { useClosePetition } from "@parallel/utils/hooks/useClosePetition";
 import { useManagedWindow } from "@parallel/utils/hooks/useManagedWindow";
 import { LiquidPetitionScopeProvider } from "@parallel/utils/liquid/LiquidPetitionScopeProvider";
@@ -112,8 +85,9 @@ import { withMetadata } from "@parallel/utils/withMetadata";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, sumBy, zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import { noop } from "ts-essentials";
 type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
 
 const GENERAL_COMMENTS_FIELD_ID = "general";
@@ -146,8 +120,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     [petition.fields],
   );
 
-  const allFieldsUnreadCommentCount =
-    sumBy(petition.fields, (f) => f.unreadCommentCount) + petition.unreadGeneralCommentCount;
   const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
   const fieldLogic = useFieldLogic(petition);
@@ -160,14 +132,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     "comments",
   );
   const [profileId, setProfileId] = useQueryStateSlice(queryState, setQueryState, "profile");
-
-  const [tabIndex, setTabIndex] = useState(activeFieldId ? 1 : 0);
-
-  useEffect(() => {
-    if (activeFieldId) {
-      setTabIndex(1);
-    }
-  }, [activeFieldId]);
 
   const activeField = activeFieldId ? petition.fields.find((f) => f.id === activeFieldId) : null;
   const fieldRefs = useMultipleRefs<HTMLElement>();
@@ -333,7 +297,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         let encodedEntity: string | undefined = undefined;
         const parentReplyId = reply.parent?.id;
 
-        const options = reply.field!.options as FieldOptions["ADVERSE_MEDIA_SEARCH"];
+        const petitionField = allFields.find((f) => f.id === reply.field!.id);
+        const options = petitionField!.options as FieldOptions["ADVERSE_MEDIA_SEARCH"];
         const visibleFields = zip(petition.fields, fieldLogic)
           .filter(([_, { isVisible }]) => isVisible)
           .map(([field, { groupChildrenLogic }]) => {
@@ -423,8 +388,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const handleDownloadAllClick = useCallback(async () => {
     try {
       const res = await showExportRepliesDialog({
-        user: me,
-        petition,
+        petitionId,
       });
 
       if (res.type === "DOWNLOAD_ZIP") {
@@ -507,20 +471,18 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const hasLinkedToProfileTypeFields = allFields.some((f) => f.isLinkedToProfileTypeField);
 
-  const repliesFieldGroupsWithProfileTypes = zip(petition.fields, fieldLogic)
-    .filter(
-      ([field, { isVisible }]) =>
-        isVisible &&
-        field.type === "FIELD_GROUP" &&
-        field.isLinkedToProfileType &&
-        field.replies.length > 0,
-    )
-    .flatMap(([f]) => f.replies);
+  const repliesFieldGroupsWithProfileTypes = zip(petition.fields, fieldLogic).filter(
+    ([field, { isVisible }]) =>
+      isVisible &&
+      field.type === "FIELD_GROUP" &&
+      field.isLinkedToProfileType &&
+      field.replies.length > 0,
+  );
 
   const fieldGroupsWithProfileTypesTotal = repliesFieldGroupsWithProfileTypes.length;
 
-  const fieldGroupsWithProfileTypesLinked = repliesFieldGroupsWithProfileTypes.filter((r) =>
-    isNonNullish(r.associatedProfile),
+  const fieldGroupsWithProfileTypesLinked = repliesFieldGroupsWithProfileTypes.filter(
+    ([f]) => f.isLinkedToProfileType,
   ).length;
 
   const showArchiveFieldGroupReplyIntoProfileDialog = useArchiveFieldGroupReplyIntoProfileDialog();
@@ -549,20 +511,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const [filter, setFilter] = useState<PetitionFieldFilter>(defaultFieldsFilter);
 
-  const petitionSignatureStatus = getPetitionSignatureStatus(petition);
-  const petitionSignatureEnvironment = getPetitionSignatureEnvironment(petition);
-
   const displayPetitionLimitReachedAlert =
     me.organization.isPetitionUsageLimitReached &&
     petition.__typename === "Petition" &&
     petition.status === "DRAFT";
-
-  const extendFlexColumn = {
-    display: "flex",
-    flexDirection: "column",
-    flex: 1,
-    minHeight: 0,
-  } as const;
 
   const [associateProfileToPetition] = useMutation(
     PetitionReplies_associateProfileToPetitionDocument,
@@ -599,7 +551,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     );
   }, [activeFieldId]);
   const drawerInitialRef = useRef<ProfileSelectInstance<false>>(null);
-  const isMobile = useBreakpointValue({ base: true, lg: false });
 
   const hasApprovals = petition.approvalFlowConfig && petition.approvalFlowConfig.length > 0;
 
@@ -635,9 +586,14 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       hasRightPane
       isRightPaneActive={Boolean(activeFieldId)}
       rightPane={
-        isMobile ? (
-          (activeFieldId && !!activeField) || activeFieldId === GENERAL_COMMENTS_FIELD_ID ? (
-            <Flex flex="1" flexDirection="column">
+        <>
+          <Flex
+            display={{ base: "flex", lg: "none" }}
+            flex="1"
+            overflow="hidden"
+            flexDirection="column"
+          >
+            {(activeFieldId && !!activeField) || activeFieldId === GENERAL_COMMENTS_FIELD_ID ? (
               <PetitionRepliesFieldComments
                 key={activeFieldId}
                 petition={petition}
@@ -650,121 +606,32 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 onMarkAsUnread={handleMarkAsUnread}
                 onlyReadPermission={myEffectivePermission === "READ"}
               />
-            </Flex>
-          ) : null
-        ) : (
-          <Tabs
-            index={tabIndex}
-            onChange={(index) => setTabIndex(index)}
-            variant="enclosed"
-            overflow="hidden"
-            {...extendFlexColumn}
-          >
-            <TabList marginX="-1px" marginTop="-1px" flex="none">
-              <Tab
-                paddingY={4}
-                paddingX={3.5}
-                lineHeight={5}
-                fontWeight="bold"
-                borderTopRadius={0}
-                _focusVisible={{ boxShadow: "inline" }}
-              >
-                <ListIcon fontSize="18px" marginEnd={1} aria-hidden="true" />
-                <FormattedMessage id="generic.contents" defaultMessage="Contents" />
-              </Tab>
-
-              <Tab
-                paddingY={4}
-                paddingX={3.5}
-                lineHeight={5}
-                fontWeight="bold"
-                borderTopRadius={0}
-                _focusVisible={{ boxShadow: "inline" }}
-              >
-                <CommentIcon fontSize="18px" marginEnd={1} aria-hidden="true" />
-                <FormattedMessage id="generic.comments" defaultMessage="Comments" />
-                {allFieldsUnreadCommentCount ? (
-                  <Badge
-                    marginStart={1}
-                    background="primary.500"
-                    color="white"
-                    fontSize="xs"
-                    borderRadius="full"
-                    minW="18px"
-                    minH="18px"
-                    lineHeight="18px"
-                    pointerEvents="none"
-                    textAlign="center"
-                  >
-                    {allFieldsUnreadCommentCount < 100 ? allFieldsUnreadCommentCount : "99+"}
-                  </Badge>
-                ) : null}
-              </Tab>
-              <Tab
-                paddingY={4}
-                paddingX={3.5}
-                lineHeight={5}
-                fontWeight="bold"
-                borderTopRadius={0}
-                _focusVisible={{ boxShadow: "inline" }}
-              >
-                <SparklesIcon fontSize="18px" marginEnd={1} role="presentation" />
-                <FormattedMessage id="page.replies.summary-header" defaultMessage="Mike AI" />
-              </Tab>
-            </TabList>
-            <TabPanels {...extendFlexColumn}>
-              <TabPanel {...extendFlexColumn} padding={0} overflow="auto" paddingBottom="64px">
-                <HStack padding={4} paddingTop={3} paddingBottom={0} justify="space-between">
-                  <Heading fontWeight={500} fontSize="xl">
-                    <FormattedMessage
-                      id="page.replies.list-of-contents"
-                      defaultMessage="List of contents"
-                    />
-                  </Heading>
-                  <PetitionRepliesFilterButton value={filter} onChange={setFilter} />
-                </HStack>
-                <PetitionRepliesContents
-                  fieldsWithIndices={fieldsWithIndices}
-                  filter={filter}
-                  fieldLogic={fieldLogic}
-                  onFieldClick={handlePetitionContentsFieldClick}
-                  signatureStatus={
-                    petition.isDocumentGenerationEnabled ? petitionSignatureStatus : undefined
-                  }
-                  signatureEnvironment={petitionSignatureEnvironment}
-                  onSignatureStatusClick={handlePetitionContentsSignatureClick}
-                  onVariablesClick={
-                    petition.variables.length ? handlePetitionContentsVariablesClick : undefined
-                  }
-                />
-              </TabPanel>
-              <TabPanel {...extendFlexColumn} padding={0} overflow="auto" position="relative">
-                {activeFieldId ? (
-                  <PetitionRepliesFieldComments
-                    key={activeFieldId}
-                    petition={petition}
-                    field={activeField}
-                    isDisabled={petition.isAnonymized}
-                    onClose={() => setActiveFieldId(null)}
-                    onAddComment={handleAddComment}
-                    onUpdateComment={handleUpdateComment}
-                    onDeleteComment={handleDeleteComment}
-                    onMarkAsUnread={handleMarkAsUnread}
-                    onlyReadPermission={myEffectivePermission === "READ"}
-                  />
-                ) : (
-                  <PetitionComments
-                    petition={petition}
-                    onSelectField={(fieldId: string) => setActiveFieldId(fieldId)}
-                  />
-                )}
-              </TabPanel>
-              <TabPanel {...extendFlexColumn} padding={0} overflow="auto" position="relative">
-                <PetitionRepliesSummary petition={petition} user={me} onRefetch={refetch} />
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-        )
+            ) : null}
+          </Flex>
+          <Flex display={{ base: "none", lg: "flex" }} flex="1" overflow="hidden">
+            <PetitionRepliesRightPaneTabs
+              me={me}
+              petition={petition}
+              fieldLogic={fieldLogic}
+              onPetitionContentsFieldClick={handlePetitionContentsFieldClick}
+              onAddComment={handleAddComment}
+              onUpdateComment={handleUpdateComment}
+              onDeleteComment={handleDeleteComment}
+              onMarkAsUnread={handleMarkAsUnread}
+              activeFieldId={activeFieldId}
+              filter={filter}
+              setFilter={setFilter}
+              setActiveFieldId={setActiveFieldId}
+              onSignatureStatusClick={handlePetitionContentsSignatureClick}
+              onVariablesClick={
+                petition.variables.length ? handlePetitionContentsVariablesClick : noop
+              }
+              onRefetch={() => {
+                refetch();
+              }}
+            />
+          </Flex>
+        </>
       }
     >
       <HStack
@@ -906,7 +773,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                         data-section="replies-field"
                         data-field-type={x.field.type}
                         petition={petition}
-                        user={me}
                         field={x.field}
                         childrenFieldIndices={x.childrenFieldIndices}
                         fieldIndex={x.fieldIndex}
@@ -947,35 +813,16 @@ PetitionReplies.fragments = {
       fragment PetitionReplies_Petition on Petition {
         id
         isDocumentGenerationEnabled
-        isReviewFlowEnabled
-        unreadGeneralCommentCount
-        accesses {
-          id
-          status
-        }
         organization {
           id
           brandTheme {
             preferredTone
           }
         }
-        ...PetitionLayout_PetitionBase
         fields {
           id
-          isReadOnly
-          requireApproval
-          unreadCommentCount
-          commentCount
-          ...PetitionRepliesField_PetitionField
-          ...PetitionRepliesContents_PetitionField
-          ...PetitionRepliesFieldComments_PetitionField
-
           isLinkedToProfileType
-          isLinkedToProfileTypeField
-          children {
-            id
-            isLinkedToProfileTypeField
-          }
+          ...PetitionReplies_PetitionField
         }
         myEffectivePermission {
           permissionType
@@ -991,44 +838,36 @@ PetitionReplies.fragments = {
         approvalFlowConfig {
           ...Fragments_FullApprovalFlowConfig
         }
+        ...PetitionLayout_PetitionBase
         ...PetitionRepliesField_Petition
         ...PetitionVariablesCard_PetitionBase
         ...PetitionSignaturesCard_Petition
-        ...getPetitionSignatureStatus_Petition
-        ...getPetitionSignatureEnvironment_Petition
         ...useFieldLogic_PetitionBase
         ...LiquidPetitionScopeProvider_PetitionBase
-        ...PetitionRepliesSummary_Petition
         ...PetitionRepliesFieldComments_PetitionBase
-        ...useArchiveFieldGroupReplyIntoProfileDialog_Petition
         ...ProfileDrawer_PetitionBase
         ...ShareButton_PetitionBase
-        ...ExportRepliesDialog_Petition
         ...useFieldsWithIndices_PetitionBase
-        ...PetitionComments_PetitionBase
         ...PetitionApprovalsCard_Petition
         ...useClosePetition_PetitionBase
+        ...PetitionRepliesRightPaneTabs_Petition
       }
+      ${this.PetitionField}
       ${Fragments.FullApprovalFlowConfig}
       ${PetitionLayout.fragments.PetitionBase}
       ${PetitionRepliesField.fragments.Petition}
       ${ShareButton.fragments.PetitionBase}
       ${PetitionSignaturesCard.fragments.Petition}
-      ${getPetitionSignatureStatus.fragments.Petition}
-      ${getPetitionSignatureEnvironment.fragments.Petition}
       ${useFieldLogic.fragments.PetitionBase}
       ${LiquidPetitionScopeProvider.fragments.PetitionBase}
       ${ProfileDrawer.fragments.Profile}
       ${ProfileDrawer.fragments.PetitionBase}
       ${PetitionVariablesCard.fragments.PetitionBase}
-      ${PetitionRepliesSummary.fragments.Petition}
       ${PetitionRepliesFieldComments.fragments.PetitionBase}
-      ${useArchiveFieldGroupReplyIntoProfileDialog.fragments.Petition}
-      ${ExportRepliesDialog.fragments.Petition}
       ${useFieldsWithIndices.fragments.PetitionBase}
-      ${PetitionComments.fragments.PetitionBase}
       ${PetitionApprovalsCard.fragments.Petition}
       ${useClosePetition.fragments.PetitionBase}
+      ${PetitionRepliesRightPaneTabs.fragments.Petition}
     `;
   },
   get PetitionField() {
@@ -1036,15 +875,19 @@ PetitionReplies.fragments = {
       fragment PetitionReplies_PetitionField on PetitionField {
         id
         isReadOnly
-        requireApproval
+        commentCount
+        options
+        isLinkedToProfileType
+        isLinkedToProfileTypeField
+        children {
+          id
+          isLinkedToProfileTypeField
+        }
         ...PetitionRepliesField_PetitionField
-        ...PetitionRepliesContents_PetitionField
         ...PetitionRepliesFieldComments_PetitionField
-        ...useFieldLogic_PetitionField
       }
       ${PetitionRepliesField.fragments.PetitionField}
       ${PetitionRepliesFieldComments.fragments.PetitionField}
-      ${PetitionRepliesContents.fragments.PetitionField}
     `;
   },
 };
@@ -1122,7 +965,6 @@ PetitionReplies.queries = [
         id
         organization {
           id
-          name
           isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
           petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
             limit
@@ -1137,12 +979,10 @@ PetitionReplies.queries = [
         }
         hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
         hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
-        ...ExportRepliesDialog_User
         ...PetitionSignaturesCard_User
         ...useUpdateIsReadNotification_User
-        ...PetitionRepliesSummary_User
         ...PetitionApprovalsCard_User
-        ...PetitionRepliesField_User
+        ...PetitionRepliesRightPaneTabs_User
       }
       metadata {
         country
@@ -1150,12 +990,10 @@ PetitionReplies.queries = [
       }
     }
     ${PetitionLayout.fragments.Query}
-    ${ExportRepliesDialog.fragments.User}
     ${PetitionSignaturesCard.fragments.User}
     ${useUpdateIsReadNotification.fragments.User}
-    ${PetitionRepliesSummary.fragments.User}
     ${PetitionApprovalsCard.fragments.User}
-    ${PetitionRepliesField.fragments.User}
+    ${PetitionRepliesRightPaneTabs.fragments.User}
   `,
   gql`
     query PetitionReplies_petition($id: GID!) {

@@ -2,7 +2,10 @@ import { gql } from "@apollo/client";
 import { Stack } from "@chakra-ui/react";
 import { DownloadIcon, EyeIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { CopyOrDownloadReplyButton_PetitionFieldReplyFragment } from "@parallel/graphql/__types";
+import {
+  CopyOrDownloadReplyButton_PetitionFieldReplyFragment,
+  PetitionFieldType,
+} from "@parallel/graphql/__types";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
@@ -20,19 +23,21 @@ import { PetitionRepliesFieldAction } from "./PetitionRepliesFieldReply";
 
 interface CopyOrDownloadReplyButtonProps {
   reply: CopyOrDownloadReplyButton_PetitionFieldReplyFragment;
+  petitionFieldType: PetitionFieldType;
   content: any;
   onAction: (action: PetitionRepliesFieldAction) => void;
 }
 
 export function CopyOrDownloadReplyButton({
   reply,
+  petitionFieldType,
   content,
   onAction,
 }: CopyOrDownloadReplyButtonProps) {
   const intl = useIntl();
   return (
     <Stack spacing={1}>
-      {reply.field!.type === "BACKGROUND_CHECK" ? (
+      {petitionFieldType === "BACKGROUND_CHECK" ? (
         <IconButtonWithTooltip
           isDisabled={reply.isAnonymized}
           onClick={() => onAction(isNonNullish(content?.entity) ? "VIEW_DETAILS" : "VIEW_RESULTS")}
@@ -50,7 +55,7 @@ export function CopyOrDownloadReplyButton({
                 })
           }
         />
-      ) : reply.field!.type === "ADVERSE_MEDIA_SEARCH" ? (
+      ) : petitionFieldType === "ADVERSE_MEDIA_SEARCH" ? (
         <IconButtonWithTooltip
           isDisabled={reply.isAnonymized}
           onClick={() => onAction("VIEW_ARTICLES")}
@@ -61,14 +66,14 @@ export function CopyOrDownloadReplyButton({
             defaultMessage: "View articles",
           })}
         />
-      ) : isFileTypeField(reply.field!.type) ? (
+      ) : isFileTypeField(petitionFieldType) ? (
         <>
           <ReplyDownloadButton
             isDisabled={reply.isAnonymized || content.uploadComplete === false || content.error}
             contentType={reply.isAnonymized ? "" : content.contentType}
             onDownload={(preview) => onAction(preview ? "PREVIEW_FILE" : "DOWNLOAD_FILE")}
           />
-          {reply.field!.type === "FILE_UPLOAD" &&
+          {petitionFieldType === "FILE_UPLOAD" &&
           reply.metadata.inferred_data_schema &&
           reply.metadata.inferred_data ? (
             <AIGeneratedPopover marginTop={2} />
@@ -78,7 +83,7 @@ export function CopyOrDownloadReplyButton({
         <CopyToClipboardButton
           size="xs"
           fontSize="md"
-          text={reply.field!.type === "PROFILE_SEARCH" ? content.search : content}
+          text={petitionFieldType === "PROFILE_SEARCH" ? content.search : content}
           isDisabled={reply.isAnonymized}
         />
       )}
@@ -105,10 +110,6 @@ CopyOrDownloadReplyButton.fragments = {
     fragment CopyOrDownloadReplyButton_PetitionFieldReply on PetitionFieldReply {
       metadata
       isAnonymized
-      field {
-        id
-        type
-      }
     }
   `,
 };

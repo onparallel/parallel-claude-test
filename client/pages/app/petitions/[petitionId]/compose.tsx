@@ -1,12 +1,6 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
-import { Box, Stack, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
-import {
-  AlertCircleIcon,
-  CalculatorIcon,
-  ListIcon,
-  PaperPlaneIcon,
-  SettingsIcon,
-} from "@parallel/chakra/icons";
+import { Box, Stack, Text } from "@chakra-ui/react";
+import { AlertCircleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { SupportButton } from "@parallel/components/common/SupportButton";
@@ -28,12 +22,10 @@ import { PetitionComposeAndPreviewAlerts } from "@parallel/components/petition-c
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { AddNewFieldPlaceholderProvider } from "@parallel/components/petition-compose/AddNewFieldPlaceholderProvider";
 import { PetitionComposeAttachments } from "@parallel/components/petition-compose/PetitionComposeAttachments";
-import { PetitionComposeContents } from "@parallel/components/petition-compose/PetitionComposeContents";
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionComposeNewFieldDrawer } from "@parallel/components/petition-compose/PetitionComposeNewFieldDrawer";
-import { PetitionComposeVariables } from "@parallel/components/petition-compose/PetitionComposeVariables";
+import { PetitionComposeRightPaneTabs } from "@parallel/components/petition-compose/PetitionComposeRightPaneTabs";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
-import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
 import { useConfigureAdverseMediaAutomateSearchDialog } from "@parallel/components/petition-compose/dialogs/ConfigureAdverseMediaAutomateSearchDialog";
 import { useConfigureBackgroundCheckAutomateSearchDialog } from "@parallel/components/petition-compose/dialogs/ConfigureBackgroundCheckAutomateSearchDialog";
@@ -140,6 +132,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const isSharedByLink = (isTemplate && petition.publicLink?.isActive) ?? false;
 
   const fieldsWithIndices = useFieldsWithIndices(petition);
+
   const allFieldsWithIndices = useMemo(() => {
     return fieldsWithIndices.flatMap(([field, fieldIndex, childrenFieldIndices]) => {
       return [
@@ -151,12 +144,15 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       ][];
     });
   }, [fieldsWithIndices]);
+
   const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
+
   const activeFieldWithIndex = useMemo(() => {
     return isNonNullish(activeFieldId)
       ? (allFieldsWithIndices.find(([field]) => field.id === activeFieldId) ?? null)
       : null;
   }, [allFieldsWithIndices, activeFieldId]);
+
   const activeField = activeFieldWithIndex?.[0] ?? null;
 
   const fieldsRef = useUpdatingRef({ allFieldsWithIndices, activeFieldId, fieldsWithIndices });
@@ -183,14 +179,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   );
 
   const [showErrors, setShowErrors] = useState(false);
-
-  // 0 - Content
-  // 1 - Petition/Template Settings
-  const [tabIndex, setTabIndex] = useState(1);
-
-  const handleTabsChange = (index: number) => {
-    setTabIndex(index);
-  };
 
   const showPublicTemplateDialog = usePublicTemplateDialog();
   useEffect(() => {
@@ -1439,86 +1427,17 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               {...extendFlexColumn}
             />
           ) : (
-            <Tabs
-              variant="enclosed"
-              {...extendFlexColumn}
-              overflow="hidden"
-              index={tabIndex}
-              onChange={handleTabsChange}
-            >
-              <TabList marginX="-1px" marginTop="-1px" flex="none">
-                <Tab
-                  paddingY={4}
-                  paddingX={3.5}
-                  lineHeight={5}
-                  fontWeight="bold"
-                  borderTopRadius={0}
-                  _focusVisible={{ boxShadow: "inline" }}
-                >
-                  <ListIcon fontSize="18px" marginEnd={1} aria-hidden="true" />
-                  <FormattedMessage id="generic.contents" defaultMessage="Contents" />
-                </Tab>
-                <Tab
-                  data-action="petition-settings"
-                  className="petition-settings"
-                  paddingY={4}
-                  paddingX={3.5}
-                  lineHeight={5}
-                  fontWeight="bold"
-                  borderTopRadius={0}
-                  _focusVisible={{ boxShadow: "inline" }}
-                >
-                  <SettingsIcon fontSize="16px" marginEnd={1} aria-hidden="true" />
-                  <FormattedMessage
-                    id="page.compose.petition-settings-header"
-                    defaultMessage="Settings"
-                  />
-                </Tab>
-                <Tab
-                  data-action="petition-settings"
-                  className="petition-settings"
-                  paddingY={4}
-                  paddingX={3.5}
-                  lineHeight={5}
-                  fontWeight="bold"
-                  borderTopRadius={0}
-                  _focusVisible={{ boxShadow: "inline" }}
-                >
-                  <CalculatorIcon fontSize="16px" marginEnd={1} aria-hidden="true" />
-                  <FormattedMessage
-                    id="page.compose.petition-variables-header"
-                    defaultMessage="Variables"
-                  />
-                </Tab>
-              </TabList>
-              <TabPanels {...extendFlexColumn}>
-                <TabPanel {...extendFlexColumn} padding={0} overflow="auto" paddingBottom="52px">
-                  <PetitionComposeContents
-                    fieldsWithIndices={allFieldsWithIndices as any}
-                    onFieldClick={scrollToField}
-                    onFieldEdit={handleFieldEdit}
-                    isReadOnly={isReadOnly}
-                  />
-                </TabPanel>
-                <TabPanel {...extendFlexColumn} padding={0} overflow="auto" paddingBottom="52px">
-                  <PetitionSettings
-                    user={me}
-                    petition={petition}
-                    onUpdatePetition={handleUpdatePetition}
-                    validPetitionFields={validPetitionFields}
-                    onRefetch={() => refetch()}
-                    isDisabled={isReadOnly}
-                  />
-                </TabPanel>
-                <TabPanel {...extendFlexColumn} padding={0} overflow="auto" paddingBottom="52px">
-                  <PetitionComposeVariables
-                    petition={petition}
-                    allFieldsWithIndices={allFieldsWithIndices as any}
-                    isReadOnly={isReadOnly}
-                  />
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
+            <PetitionComposeRightPaneTabs
+              me={me}
+              petition={petition}
+              isReadOnly={isReadOnly}
+              onFieldClick={scrollToField}
+              onFieldEdit={handleFieldEdit}
+              onUpdatePetition={handleUpdatePetition}
+              validPetitionFields={validPetitionFields}
+              onRefetch={() => refetch()}
+              allFieldsWithIndices={allFieldsWithIndices}
+            />
           )
         }
       >
@@ -1636,15 +1555,11 @@ const _fragments = {
           }
           status
           signatureConfig {
-            integration {
-              environment
-              name
-            }
+            reviewAfterApproval
           }
           currentApprovalRequestStatus
           currentSignatureRequest {
             id
-            status
           }
           ...useSendPetitionHandler_Petition
           ...getPetitionSignatureStatus_Petition
@@ -1654,24 +1569,21 @@ const _fragments = {
           description
         }
         ...PetitionLayout_PetitionBase
-        ...PetitionSettings_PetitionBase
         ...PetitionComposeFieldList_PetitionBase
         ...PetitionComposeAttachments_PetitionBase
-        ...PetitionComposeVariables_PetitionBase
         ...validatePetitionFields_PetitionBase
         ...PetitionComposeFieldSettings_PetitionBase
         ...useFieldsWithIndices_PetitionBase
         ...PetitionComposeNewFieldDrawer_PetitionBase
         ...useStartApprovalRequestStep_PetitionBase
         ...useClosePetition_PetitionBase
+        ...PetitionComposeRightPaneTabs_PetitionBase
       }
       ${this.PetitionField}
       ${PetitionLayout.fragments.PetitionBase}
       ${PetitionComposeFieldList.fragments.PetitionBase}
-      ${PetitionSettings.fragments.PetitionBase}
       ${PetitionComposeAttachments.fragments.PetitionBase}
       ${useSendPetitionHandler.fragments.Petition}
-      ${PetitionComposeVariables.fragments.PetitionBase}
       ${validatePetitionFields.fragments.PetitionBase}
       ${PetitionComposeFieldSettings.fragments.PetitionBase}
       ${useFieldsWithIndices.fragments.PetitionBase}
@@ -1680,6 +1592,7 @@ const _fragments = {
       ${useStartSignatureRequest.fragments.Petition}
       ${useStartApprovalRequestStep.fragments.PetitionBase}
       ${useClosePetition.fragments.PetitionBase}
+      ${PetitionComposeRightPaneTabs.fragments.PetitionBase}
     `;
   },
   get PetitionField() {
@@ -1687,18 +1600,18 @@ const _fragments = {
       fragment PetitionCompose_PetitionField on PetitionField {
         id
         ...PetitionComposeFieldList_PetitionField
-        ...PetitionComposeContents_PetitionField
         ...PetitionComposeFieldSettings_PetitionField
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
         ...ReferencedFieldDialog_PetitionField
+        ...PetitionComposeRightPaneTabs_PetitionField
         parent {
           id
           position
         }
         children {
           id
-          ...PetitionComposeContents_PetitionField
+
           ...PetitionComposeFieldSettings_PetitionField
           ...validatePetitionFields_PetitionField
           ...FieldErrorDialog_PetitionField
@@ -1714,10 +1627,10 @@ const _fragments = {
       }
       ${PetitionComposeFieldList.fragments.PetitionField}
       ${PetitionComposeFieldSettings.fragments.PetitionField}
-      ${PetitionComposeContents.fragments.PetitionField}
       ${validatePetitionFields.fragments.PetitionField}
       ${FieldErrorDialog.fragments.PetitionField}
       ${ReferencedFieldDialog.fragments.PetitionField}
+      ${PetitionComposeRightPaneTabs.fragments.PetitionField}
     `;
   },
   get updatePetitionField() {
@@ -1749,12 +1662,12 @@ const _fragments = {
               limit
             }
           }
-          ...PetitionSettings_User
           ...useUpdateIsReadNotification_User
           ...useSendPetitionHandler_User
           ...PetitionComposeFieldSettings_User
           ...PetitionComposeNewFieldDrawer_User
           ...useStartSignatureRequest_User
+          ...PetitionComposeRightPaneTabs_User
         }
         profileTypes(limit: 100, offset: 0) {
           totalCount
@@ -1767,7 +1680,6 @@ const _fragments = {
       }
 
       ${PetitionLayout.fragments.Query}
-      ${PetitionSettings.fragments.User}
       ${useSendPetitionHandler.fragments.User}
       ${useUpdateIsReadNotification.fragments.User}
       ${PetitionComposeFieldSettings.fragments.User}
@@ -1775,6 +1687,7 @@ const _fragments = {
       ${PetitionComposeNewFieldDrawer.fragments.ProfileType}
       ${useCreatePetitionFieldGroupProfileTypeDialog.fragments.ProfileType}
       ${useStartSignatureRequest.fragments.User}
+      ${PetitionComposeRightPaneTabs.fragments.User}
     `;
   },
 };
@@ -1784,13 +1697,13 @@ const _mutations = [
     mutation PetitionCompose_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
       updatePetition(petitionId: $petitionId, data: $data) {
         ...PetitionLayout_PetitionBase
-        ...PetitionSettings_PetitionBase
         ...AddPetitionAccessDialog_Petition
+        ...PetitionComposeRightPaneTabs_PetitionBase
       }
     }
     ${PetitionLayout.fragments.PetitionBase}
-    ${PetitionSettings.fragments.PetitionBase}
     ${AddPetitionAccessDialog.fragments.Petition}
+    ${PetitionComposeRightPaneTabs.fragments.PetitionBase}
   `,
   gql`
     mutation PetitionCompose_updateFieldPositions(

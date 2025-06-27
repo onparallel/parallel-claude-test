@@ -33,7 +33,6 @@ import {
   PetitionRepliesField_PetitionFieldFragment,
   PetitionRepliesField_PetitionFieldReplyFragment,
   PetitionRepliesField_PetitionFragment,
-  PetitionRepliesField_UserFragment,
   PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
@@ -45,7 +44,8 @@ import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { forwardRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
+import { assert } from "ts-essentials";
 import { FieldDescription } from "../common/FieldDescription";
 import { FileAttachmentButton } from "../common/FileAttachmentButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -55,11 +55,9 @@ import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewComme
 import { NoRepliesHintWithButton } from "./NoRepliesHintWithButton";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
 import { PetitionRepliesFilteredFields } from "./PetitionRepliesFilteredFields";
-import { PetitionRepliesPopoverField } from "./PetitionRepliesPopoverField";
 
 export interface PetitionRepliesFieldProps extends Omit<BoxProps, "filter"> {
   petition: PetitionRepliesField_PetitionFragment;
-  user: PetitionRepliesField_UserFragment;
   field: PetitionRepliesField_PetitionFieldFragment;
   fieldIndex: PetitionFieldIndex;
   childrenFieldIndices: string[] | undefined;
@@ -79,7 +77,6 @@ export const PetitionRepliesField = Object.assign(
   forwardRef<HTMLElement, PetitionRepliesFieldProps>(function PetitionRepliesField(
     {
       petition,
-      user,
       field,
       fieldIndex,
       childrenFieldIndices,
@@ -318,10 +315,17 @@ export const PetitionRepliesField = Object.assign(
             field.replies.map((reply, index) => {
               const filteredFields = filterPetitionFields(
                 zip(
-                  reply.children!.map(({ field, replies }) => ({
-                    ...field,
-                    replies,
-                  })),
+                  reply.children!.map(({ field: _childField, replies }) => {
+                    const childrenField = field.children?.find((f) => f.id === _childField.id);
+                    assert(
+                      isNonNullish(childrenField),
+                      `Petition field ${_childField.id} not found`,
+                    );
+                    return {
+                      ...(childrenField as PetitionRepliesField_PetitionFieldFragment),
+                      replies,
+                    };
+                  }),
                   childrenFieldIndices!,
                 ),
                 fieldLogic.groupChildrenLogic![index],
@@ -436,9 +440,9 @@ export const PetitionRepliesField = Object.assign(
                                 {x.field.replies.length ? (
                                   x.field.replies.map((reply) => (
                                     <PetitionRepliesFieldReply
-                                      petition={petition}
-                                      user={user}
                                       key={reply.id}
+                                      petition={petition}
+                                      petitionField={x.field}
                                       reply={reply}
                                       fieldLogic={x.fieldLogic}
                                       onAction={(action) => onAction(action, reply)}
@@ -458,7 +462,6 @@ export const PetitionRepliesField = Object.assign(
                                     })}
                                     petitionId={petition.id}
                                     petitionFieldId={x.field.id}
-                                    user={user}
                                     fieldLogic={x.fieldLogic}
                                     parentReplyId={reply.id}
                                   />
@@ -483,7 +486,6 @@ export const PetitionRepliesField = Object.assign(
               })}
               petitionId={petition.id}
               petitionFieldId={field.id}
-              user={user}
               fieldLogic={fieldLogic}
             />
           )}
@@ -623,8 +625,8 @@ export const PetitionRepliesField = Object.assign(
               {field.replies.map((reply) => (
                 <PetitionRepliesFieldReply
                   key={reply.id}
-                  user={user}
                   petition={petition}
+                  petitionField={field}
                   reply={reply}
                   fieldLogic={fieldLogic}
                   onAction={(action) => onAction(action, reply)}
@@ -642,7 +644,6 @@ export const PetitionRepliesField = Object.assign(
             })}
             petitionId={petition.id}
             petitionFieldId={field.id}
-            user={user}
             fieldLogic={fieldLogic}
           />
         )}
@@ -651,77 +652,68 @@ export const PetitionRepliesField = Object.assign(
   }),
   {
     fragments: {
-      User: gql`
-        fragment PetitionRepliesField_User on User {
-          id
-          ...PetitionRepliesFieldReply_User
-          ...PetitionRepliesPopoverField_User
-          ...NoRepliesHintWithButton_User
-        }
-        ${PetitionRepliesFieldReply.fragments.User}
-        ${PetitionRepliesPopoverField.fragments.User}
-        ${NoRepliesHintWithButton.fragments.User}
-      `,
-      Petition: gql`
-        fragment PetitionRepliesField_Petition on Petition {
-          id
-          ...PetitionRepliesFieldReply_Petition
-        }
-        ${PetitionRepliesFieldReply.fragments.Petition}
-      `,
-      PetitionField: gql`
-        fragment PetitionRepliesField_PetitionField on PetitionField {
-          id
-          type
-          title
-          multiple
-          description
-          optional
-          options
-          isInternal
-          replies {
-            ...PetitionRepliesField_PetitionFieldReply
-          }
-          commentCount
-          unreadCommentCount
-          attachments {
+      get Petition() {
+        return gql`
+          fragment PetitionRepliesField_Petition on Petition {
             id
-            file {
-              ...FileAttachmentButton_FileUpload
-            }
-          }
-        }
-        fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
-          id
-          ...PetitionRepliesFieldReply_PetitionFieldReply
-          children {
-            field {
+            ...PetitionRepliesFieldReply_Petition
+            fields {
               id
-              type
-              title
-              description
-              optional
-              options
-              isInternal
-              commentCount
-              unreadCommentCount
-              attachments {
+              ...PetitionRepliesField_PetitionField
+              children {
                 id
-                file {
-                  ...FileAttachmentButton_FileUpload
-                }
+                ...PetitionRepliesField_PetitionField
               }
-              ...filterPetitionFields_PetitionField
-            }
-            replies {
-              ...PetitionRepliesFieldReply_PetitionFieldReply
             }
           }
-        }
-        ${FileAttachmentButton.fragments.FileUpload}
-        ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
-        ${filterPetitionFields.fragments.PetitionField}
-      `,
+          ${PetitionRepliesFieldReply.fragments.Petition}
+          ${PetitionRepliesFieldReply.fragments.PetitionField}
+          ${this.PetitionField}
+        `;
+      },
+      get PetitionField() {
+        return gql`
+          fragment PetitionRepliesField_PetitionField on PetitionField {
+            id
+            type
+            title
+            multiple
+            description
+            optional
+            options
+            isInternal
+            commentCount
+            unreadCommentCount
+            replies {
+              ...PetitionRepliesField_PetitionFieldReply
+            }
+            attachments {
+              id
+              file {
+                ...FileAttachmentButton_FileUpload
+              }
+            }
+            ...filterPetitionFields_PetitionField
+            ...PetitionRepliesFieldReply_PetitionField
+          }
+          fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
+            id
+            ...PetitionRepliesFieldReply_PetitionFieldReply
+            children {
+              field {
+                id
+              }
+              replies {
+                ...PetitionRepliesFieldReply_PetitionFieldReply
+              }
+            }
+          }
+          ${FileAttachmentButton.fragments.FileUpload}
+          ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
+          ${filterPetitionFields.fragments.PetitionField}
+          ${PetitionRepliesFieldReply.fragments.PetitionField}
+        `;
+      },
     },
   },
 );

@@ -1,7 +1,8 @@
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
+  Center,
   Checkbox,
   FormControl,
   FormErrorMessage,
@@ -9,18 +10,24 @@ import {
   Input,
   Radio,
   RadioGroup,
+  Spinner,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  useWizardDialog,
+  WizardStepDialogProps,
+} from "@parallel/components/common/dialogs/WizardDialog";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   PlaceholderInput,
   PlaceholderInputInstance,
 } from "@parallel/components/common/slate/PlaceholderInput";
 import {
+  ExportRepliesDialog_meDocument,
+  ExportRepliesDialog_petitionDocument,
   ExportRepliesDialog_PetitionFieldFragment,
   ExportRepliesDialog_PetitionFragment,
   ExportRepliesDialog_UserFragment,
@@ -35,8 +42,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export interface ExportRepliesDialogProps {
-  user: ExportRepliesDialog_UserFragment;
-  petition: ExportRepliesDialog_PetitionFragment;
+  petitionId: string;
 }
 
 export type ExportParams =
@@ -52,12 +58,79 @@ export interface ExportOption {
   description: string;
 }
 
-export function ExportRepliesDialog({
+// Wizard steps definition
+type ExportRepliesDialogSteps = {
+  LOADING: { petitionId: string };
+  CONTENT: {
+    user: ExportRepliesDialog_UserFragment;
+    petition: ExportRepliesDialog_PetitionFragment;
+  };
+};
+
+// Loading step component
+function ExportRepliesDialogLoading({
+  petitionId,
+  onStep,
+  ...props
+}: WizardStepDialogProps<ExportRepliesDialogSteps, "LOADING", ExportParams>) {
+  const { data: meData, loading: userLoading } = useQuery(ExportRepliesDialog_meDocument, {
+    fetchPolicy: "cache-and-network",
+  });
+  const user = meData?.me;
+
+  const { data: petitionData, loading: petitionLoading } = useQuery(
+    ExportRepliesDialog_petitionDocument,
+    {
+      variables: { petitionId },
+    },
+  );
+  const petition = petitionData?.petition as ExportRepliesDialog_PetitionFragment | undefined;
+
+  // Once data is loaded, move to content step
+  useEffect(() => {
+    if (!userLoading && !petitionLoading && user && petition) {
+      onStep("CONTENT", { user, petition });
+    }
+  }, [userLoading, petitionLoading, user, petition, onStep]);
+
+  return (
+    <ConfirmDialog
+      size="lg"
+      header={
+        <FormattedMessage
+          id="component.export-replies-dialog.header"
+          defaultMessage="Export replies"
+        />
+      }
+      body={
+        <Center padding={8} minHeight="200px">
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="primary.500"
+            size="xl"
+          />
+        </Center>
+      }
+      confirm={
+        <Button colorScheme="primary" isDisabled>
+          <FormattedMessage id="generic.download" defaultMessage="Download" />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
+// Content step component
+function ExportRepliesDialogContent({
   user,
   petition,
   ...props
-}: DialogProps<ExportRepliesDialogProps, ExportParams>) {
+}: WizardStepDialogProps<ExportRepliesDialogSteps, "CONTENT", ExportParams>) {
   const intl = useIntl();
+
   const [options, setOptions] = useState<{ type: ExportType; isEnabled: boolean }[]>([
     { type: "DOWNLOAD_ZIP", isEnabled: true },
     ...(user.hasExportCuatrecasas
@@ -134,7 +207,7 @@ export function ExportRepliesDialog({
   const example = useMemo(() => {
     function hasFileReply(
       field: Pick<ExportRepliesDialog_PetitionFieldFragment, "type" | "replies">,
-    ) {
+    ): boolean {
       return (
         isFileTypeField(field.type) &&
         field.replies.length > 0 &&
@@ -144,16 +217,21 @@ export function ExportRepliesDialog({
       );
     }
     const field = petition.fields.find(
-      (f) => hasFileReply(f) || (f.type === "FIELD_GROUP" && f.children?.some(hasFileReply)),
+      (f) =>
+        hasFileReply(f) ||
+        (f.type === "FIELD_GROUP" && f.children?.some((child) => hasFileReply(child))),
     );
 
     if (!field) return [null];
-    const fileTypeField = field.type === "FIELD_GROUP" ? field.children?.find(hasFileReply) : field;
+    const fileTypeField =
+      field.type === "FIELD_GROUP" ? field.children?.find((child) => hasFileReply(child)) : field;
     if (!fileTypeField) return [null];
 
     const reply = fileTypeField.replies.find(
       (r) => !r.content.error && r.content.uploadComplete && r.status !== "REJECTED",
-    )!;
+    );
+    if (!reply) return [null];
+
     return [reply.content.filename, placeholdersRename(fileTypeField, reply, pattern)];
   }, [petition.fields, placeholdersRename, pattern]);
 
@@ -316,7 +394,17 @@ export function ExportRepliesDialog({
   );
 }
 
-ExportRepliesDialog.fragments = {
+export function useExportRepliesDialog() {
+  return useWizardDialog(
+    {
+      LOADING: ExportRepliesDialogLoading,
+      CONTENT: ExportRepliesDialogContent,
+    },
+    "LOADING",
+  );
+}
+
+useExportRepliesDialog.fragments = {
   User: gql`
     fragment ExportRepliesDialog_User on User {
       hasExportCuatrecasas: hasFeatureFlag(featureFlag: EXPORT_CUATRECASAS)
@@ -357,6 +445,22 @@ ExportRepliesDialog.fragments = {
   `,
 };
 
-export function useExportRepliesDialog() {
-  return useDialog(ExportRepliesDialog);
-}
+const _queries = [
+  gql`
+    query ExportRepliesDialog_me {
+      me {
+        id
+        ...ExportRepliesDialog_User
+      }
+    }
+    ${useExportRepliesDialog.fragments.User}
+  `,
+  gql`
+    query ExportRepliesDialog_petition($petitionId: GID!) {
+      petition(id: $petitionId) {
+        ...ExportRepliesDialog_Petition
+      }
+    }
+    ${useExportRepliesDialog.fragments.Petition}
+  `,
+];

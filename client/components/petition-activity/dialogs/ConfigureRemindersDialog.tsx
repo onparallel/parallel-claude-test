@@ -15,7 +15,7 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PetitionRemindersConfig } from "@parallel/components/petition-compose/PetitionRemindersConfig";
 import {
-  PetitionAccessTable_PetitionAccessFragment,
+  useConfigureRemindersDialog_PetitionAccessFragment,
   useConfigureRemindersDialog_RemindersConfigFragment,
 } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
@@ -23,7 +23,7 @@ import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 export interface ConfigureRemindersDialogProps {
-  accesses: PetitionAccessTable_PetitionAccessFragment[];
+  accesses: useConfigureRemindersDialog_PetitionAccessFragment[];
   defaultRemindersConfig: Maybe<useConfigureRemindersDialog_RemindersConfigFragment>;
   remindersActive: boolean;
   hideRemindersActiveCheckbox?: boolean;
@@ -110,6 +110,7 @@ useConfigureRemindersDialog.fragments = {
   PetitionAccess: gql`
     fragment useConfigureRemindersDialog_PetitionAccess on PetitionAccess {
       id
+      remindersOptOut
       contact {
         ...ContactReference_Contact
       }

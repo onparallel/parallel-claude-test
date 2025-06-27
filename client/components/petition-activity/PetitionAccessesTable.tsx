@@ -40,7 +40,6 @@ import { DateTime } from "../common/DateTime";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NormalLink } from "../common/Link";
 import { Table, TableColumn } from "../common/Table";
-import { useConfigureRemindersDialog } from "./dialogs/ConfigureRemindersDialog";
 
 export interface PetitionAccessesTable extends BoxProps {
   petition: PetitionAccessTable_PetitionFragment;
@@ -469,9 +468,7 @@ PetitionAccessesTable.fragments = {
       isContactless
       recipientUrl
       createdAt
-      ...useConfigureRemindersDialog_PetitionAccess
     }
     ${ContactReference.fragments.Contact}
-    ${useConfigureRemindersDialog.fragments.PetitionAccess}
   `,
 };

@@ -41,6 +41,7 @@ import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { useIntl } from "react-intl";
 import { isNonNullish, isNullish, zip } from "remeda";
+import { assert } from "ts-essentials";
 import {
   useCreateFieldGroupRepliesFromProfiles,
   usePrefillPetitionFromProfiles,
@@ -339,17 +340,20 @@ export function PreviewPetitionFieldGroup({
               }
               id={`reply-${group.id}`}
             >
-              {zip(group.children!, groupLogic).map(([{ field, replies }, logic]) => {
+              {zip(group.children!, groupLogic).map(([{ field: _children, replies }, logic]) => {
+                const childField = field.children?.find((c) => c.id === _children.id);
+                assert(isNonNullish(childField), `Field ${_children.id} not found`);
+
                 return (
-                  <LiquidPetitionVariableProvider key={field.id} logic={logic}>
+                  <LiquidPetitionVariableProvider key={childField.id} logic={logic}>
                     <PreviewPetitionFieldGroupField
                       user={user}
                       parentReplyId={group.id}
-                      field={{ ...field, replies }}
+                      field={{ ...childField, replies }}
                       petition={petition}
-                      isDisabled={isDisabled || field.options.replyOnlyFromProfile === true}
+                      isDisabled={isDisabled || childField.options.replyOnlyFromProfile === true}
                       isCacheOnly={isCacheOnly}
-                      onDownloadAttachment={onDownloadAttachment(field.id)}
+                      onDownloadAttachment={onDownloadAttachment(childField.id)}
                       onDeleteReply={onDeleteReply}
                       onUpdateReply={onUpdateReply}
                       onCreateReply={onCreateReply}
@@ -599,7 +603,7 @@ PreviewPetitionFieldGroup.fragments = {
   PetitionField: gql`
     fragment PreviewPetitionFieldGroup_PetitionField on PetitionField {
       ...RecipientViewPetitionFieldCard_PetitionField
-      ...PreviewPetitionFieldGroup_PetitionFieldData
+      ...RecipientViewPetitionFieldLayout_PetitionField
       multiple
       profileType {
         id
@@ -612,7 +616,6 @@ PreviewPetitionFieldGroup.fragments = {
         children {
           field {
             id
-            ...PreviewPetitionFieldGroup_PetitionFieldData
           }
           replies {
             id
@@ -625,7 +628,6 @@ PreviewPetitionFieldGroup.fragments = {
         children {
           field {
             id
-            ...RecipientViewPetitionFieldLayout_PetitionField
           }
           replies {
             id

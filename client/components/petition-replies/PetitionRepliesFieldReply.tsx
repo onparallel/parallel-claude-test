@@ -23,9 +23,9 @@ import {
 import {
   PetitionFieldReplyStatus,
   PetitionFieldType,
+  PetitionRepliesFieldReply_PetitionFieldFragment,
   PetitionRepliesFieldReply_PetitionFieldReplyFragment,
   PetitionRepliesFieldReply_PetitionFragment,
-  PetitionRepliesFieldReply_UserFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS, prettifyTimezone } from "@parallel/utils/dates";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
@@ -59,8 +59,8 @@ import { PetitionRepliesPopoverField } from "./PetitionRepliesPopoverField";
 
 export interface PetitionRepliesFieldReplyProps {
   petition: PetitionRepliesFieldReply_PetitionFragment;
+  petitionField: PetitionRepliesFieldReply_PetitionFieldFragment;
   reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment;
-  user: PetitionRepliesFieldReply_UserFragment;
   fieldLogic: FieldLogicResult;
   onUpdateStatus: (status: PetitionFieldReplyStatus) => void;
   onAction: (
@@ -79,15 +79,16 @@ export type PetitionRepliesFieldAction =
 
 export function PetitionRepliesFieldReply({
   petition,
+  petitionField,
   reply,
-  user,
   fieldLogic,
   onUpdateStatus,
   onAction,
   isDisabled,
 }: PetitionRepliesFieldReplyProps) {
   const intl = useIntl();
-  const type = reply.field!.type;
+
+  const type = petitionField.type;
 
   const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const countryNames = useLoadCountryNames(intl.locale);
@@ -99,7 +100,7 @@ export function PetitionRepliesFieldReply({
         <Box display={{ base: "block", lg: "none" }}>
           <NakedLink
             href={buildUrlToSection("preview", {
-              field: reply.field!.id,
+              field: petitionField.id,
               ...(reply.parent ? { parentReply: reply.parent.id } : {}),
               ...(idSuffix ? { sufix: idSuffix } : {}),
             })}
@@ -120,9 +121,8 @@ export function PetitionRepliesFieldReply({
         </Box>
         <Box display={{ base: "none", lg: "block" }}>
           <PetitionRepliesPopoverField
-            petitionFieldId={reply.field!.id}
+            petitionFieldId={petitionField.id}
             petitionId={petition.id}
-            user={user}
             parentReplyId={reply.parent ? reply.parent.id : undefined}
             fieldLogic={fieldLogic}
           >
@@ -163,348 +163,362 @@ export function PetitionRepliesFieldReply({
           },
         }}
       >
-        {getReplyContents({ intl, reply, petitionField: reply.field! }).map((content, i) => (
-          <Fragment key={i}>
-            <GridItem paddingBottom={1}>
-              <CopyOrDownloadReplyButton reply={reply} content={content} onAction={handleAction} />
-            </GridItem>
-            <GridItem
-              borderStart="2px solid"
-              borderColor="gray.200"
-              paddingBottom={1}
-              paddingStart={2}
-            >
-              <HStack alignItems={"center"} gridGap={2} spacing={0}>
-                {reply.isAnonymized ? (
-                  <ReplyNotAvailable type={type} />
-                ) : type === "ES_TAX_DOCUMENTS" && content.error ? (
-                  <Text>
-                    {content.type === "identity-verification" ? (
-                      <FormattedMessage
-                        id="component.petition-replies-field-reply.es-tax-documents-identity-verification-error-header"
-                        defaultMessage="Identity Verification"
-                      />
-                    ) : (
-                      [content.request.model.type, content.request.model.year]
-                        .filter(isNonNullish)
-                        .join("_")
-                    )}
-                  </Text>
-                ) : type === "ID_VERIFICATION" ||
-                  (type === "ES_TAX_DOCUMENTS" &&
-                    ["identity-verification", "identity-verification-selfie"].includes(
-                      reply.content.type,
-                    )) ? (
-                  <PetitionRepliesFieldIdVerificationReply reply={reply} />
-                ) : type === "DOW_JONES_KYC" ? (
-                  <Stack spacing={1}>
-                    <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
-                      <VisuallyHidden>
-                        {intl.formatMessage({
-                          id: "generic.name",
-                          defaultMessage: "Name",
-                        })}
-                      </VisuallyHidden>
-                      <Text as="span">
-                        <Text as="span" display="inline-block" marginEnd={2}>
-                          {content.entity.type === "Entity" ? <BusinessIcon /> : <UserIcon />}
-                        </Text>
-                        {content.entity.name}
-                        {" - "}
-                        <Text
-                          as="span"
-                          aria-label={intl.formatMessage({
-                            id: "generic.file-size",
-                            defaultMessage: "File size",
+        {isNonNullish(petitionField) &&
+          getReplyContents({ intl, reply, petitionField }).map((content, i) => (
+            <Fragment key={i}>
+              <GridItem paddingBottom={1}>
+                <CopyOrDownloadReplyButton
+                  reply={reply}
+                  petitionFieldType={petitionField.type}
+                  content={content}
+                  onAction={handleAction}
+                />
+              </GridItem>
+              <GridItem
+                borderStart="2px solid"
+                borderColor="gray.200"
+                paddingBottom={1}
+                paddingStart={2}
+              >
+                <HStack alignItems={"center"} gridGap={2} spacing={0}>
+                  {reply.isAnonymized ? (
+                    <ReplyNotAvailable type={type} />
+                  ) : type === "ES_TAX_DOCUMENTS" && content.error ? (
+                    <Text>
+                      {content.type === "identity-verification" ? (
+                        <FormattedMessage
+                          id="component.petition-replies-field-reply.es-tax-documents-identity-verification-error-header"
+                          defaultMessage="Identity Verification"
+                        />
+                      ) : (
+                        [content.request.model.type, content.request.model.year]
+                          .filter(isNonNullish)
+                          .join("_")
+                      )}
+                    </Text>
+                  ) : type === "ID_VERIFICATION" ||
+                    (type === "ES_TAX_DOCUMENTS" &&
+                      ["identity-verification", "identity-verification-selfie"].includes(
+                        reply.content.type,
+                      )) ? (
+                    <PetitionRepliesFieldIdVerificationReply reply={reply} />
+                  ) : type === "DOW_JONES_KYC" ? (
+                    <Stack spacing={1}>
+                      <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
+                        <VisuallyHidden>
+                          {intl.formatMessage({
+                            id: "generic.name",
+                            defaultMessage: "Name",
                           })}
-                          fontSize="sm"
-                          color="gray.500"
-                        >
-                          <FileSize value={content.size} />
+                        </VisuallyHidden>
+                        <Text as="span">
+                          <Text as="span" display="inline-block" marginEnd={2}>
+                            {content.entity.type === "Entity" ? <BusinessIcon /> : <UserIcon />}
+                          </Text>
+                          {content.entity.name}
+                          {" - "}
+                          <Text
+                            as="span"
+                            aria-label={intl.formatMessage({
+                              id: "generic.file-size",
+                              defaultMessage: "File size",
+                            })}
+                            fontSize="sm"
+                            color="gray.500"
+                          >
+                            <FileSize value={content.size} />
+                          </Text>
+                          <Box display="inline-block" marginStart={2}>
+                            {editReplyIconButton()}
+                          </Box>
                         </Text>
-                        <Box display="inline-block" marginStart={2}>
+                      </Flex>
+                      <Flex flexWrap="wrap" gap={2} alignItems="center">
+                        {(content.entity.iconHints as string[] | undefined)?.map((hint, i) => (
+                          <DowJonesRiskLabel key={i} risk={hint} />
+                        ))}
+                      </Flex>
+                    </Stack>
+                  ) : type === "BACKGROUND_CHECK" ? (
+                    <Stack spacing={1}>
+                      <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
+                        {content?.entity ? (
+                          <>
+                            <VisuallyHidden>
+                              {intl.formatMessage({
+                                id: "generic.name",
+                                defaultMessage: "Name",
+                              })}
+                            </VisuallyHidden>
+                            <HStack>
+                              {content.entity.type === "Person" ? <UserIcon /> : <BusinessIcon />}
+                              <Text as="span">{content.entity.name}</Text>
+                            </HStack>
+                            {(content.entity.properties.topics as string[] | undefined)?.map(
+                              (hint, i) => <BackgroundCheckRiskLabel key={i} risk={hint} />,
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <VisuallyHidden>
+                              {intl.formatMessage({
+                                id: "generic.search",
+                                defaultMessage: "Search",
+                              })}
+                            </VisuallyHidden>
+                            <Text as="span">
+                              {[
+                                entityTypeLabel,
+                                content?.query?.name,
+                                content?.query?.date,
+                                content?.query?.country && countryNames.countries
+                                  ? countryNames.countries[content?.query?.country]
+                                  : content?.query?.country,
+                              ]
+                                .filter(isNonNullish)
+                                .join(" | ")}
+                            </Text>
+                            <Text as="span" color="gray.500" fontSize="sm">
+                              {`(${intl.formatMessage(
+                                {
+                                  id: "generic.n-results",
+                                  defaultMessage:
+                                    "{count, plural,=0{No results} =1 {1 result} other {# results}}",
+                                },
+                                {
+                                  count: content?.search?.totalCount ?? 0,
+                                },
+                              )})`}
+                            </Text>
+                          </>
+                        )}
+                        <Box display="inline-block" marginStart={1}>
                           {editReplyIconButton()}
                         </Box>
-                      </Text>
-                    </Flex>
-                    <Flex flexWrap="wrap" gap={2} alignItems="center">
-                      {(content.entity.iconHints as string[] | undefined)?.map((hint, i) => (
-                        <DowJonesRiskLabel key={i} risk={hint} />
-                      ))}
-                    </Flex>
-                  </Stack>
-                ) : type === "BACKGROUND_CHECK" ? (
-                  <Stack spacing={1}>
-                    <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
-                      {content?.entity ? (
-                        <>
-                          <VisuallyHidden>
-                            {intl.formatMessage({
-                              id: "generic.name",
-                              defaultMessage: "Name",
-                            })}
-                          </VisuallyHidden>
-                          <HStack>
-                            {content.entity.type === "Person" ? <UserIcon /> : <BusinessIcon />}
-                            <Text as="span">{content.entity.name}</Text>
-                          </HStack>
-                          {(content.entity.properties.topics as string[] | undefined)?.map(
-                            (hint, i) => <BackgroundCheckRiskLabel key={i} risk={hint} />,
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          <VisuallyHidden>
-                            {intl.formatMessage({
-                              id: "generic.search",
-                              defaultMessage: "Search",
-                            })}
-                          </VisuallyHidden>
-                          <Text as="span">
-                            {[
-                              entityTypeLabel,
-                              content?.query?.name,
-                              content?.query?.date,
-                              content?.query?.country && countryNames.countries
-                                ? countryNames.countries[content?.query?.country]
-                                : content?.query?.country,
-                            ]
-                              .filter(isNonNullish)
-                              .join(" | ")}
-                          </Text>
-                          <Text as="span" color="gray.500" fontSize="sm">
-                            {`(${intl.formatMessage(
-                              {
-                                id: "generic.n-results",
-                                defaultMessage:
-                                  "{count, plural,=0{No results} =1 {1 result} other {# results}}",
-                              },
-                              {
-                                count: content?.search?.totalCount ?? 0,
-                              },
-                            )})`}
-                          </Text>
-                        </>
-                      )}
-                      <Box display="inline-block" marginStart={1}>
-                        {editReplyIconButton()}
-                      </Box>
-                    </Flex>
-                  </Stack>
-                ) : type === "PROFILE_SEARCH" ? (
-                  <Stack spacing={content?.value.length === 0 ? 0.5 : 3}>
-                    <Flex flexWrap="wrap" gap={2} alignItems="baseline" minHeight={6}>
-                      <VisuallyHidden>
-                        {intl.formatMessage({
-                          id: "generic.search",
-                          defaultMessage: "Search",
-                        })}
-                      </VisuallyHidden>
-                      <ShortSearchIcon alignSelf="center" />
-                      <Text as="span">{content?.search}</Text>
-                      <Text as="span" color="gray.500" fontSize="sm">
-                        {`(${intl.formatMessage(
-                          {
-                            id: "generic.n-results",
-                            defaultMessage:
-                              "{count, plural,=0{No results} =1 {1 result} other {# results}}",
-                          },
-                          {
-                            count: content?.totalResults ?? 0,
-                          },
-                        )})`}
-                      </Text>
-                      <Box display="inline-block" marginStart={1}>
-                        {editReplyIconButton()}
-                      </Box>
-                    </Flex>
-                    {content?.value.length === 0 ? (
-                      <Box>
-                        <Badge colorScheme="green" variant="outline">
-                          {content?.totalResults > 0 ? (
-                            <FormattedMessage
-                              id="component.petition-replies-field-reply.profile-search-no-relevant-results"
-                              defaultMessage="No relevant results"
-                            />
-                          ) : (
-                            <FormattedMessage
-                              id="component.petition-replies-field-reply.profile-search-no-results"
-                              defaultMessage="No results"
-                            />
-                          )}
-                        </Badge>
-                      </Box>
-                    ) : (
-                      content?.value.map((profile: any, index: number) =>
-                        isNonNullish(profile) ? (
-                          <Stack key={profile.id} paddingStart={1}>
-                            <HStack>
-                              <IconButtonWithTooltip
-                                as="a"
-                                href={`/app/profiles/${profile.id}/general`}
-                                icon={<EyeIcon />}
-                                size="xs"
-                                label={intl.formatMessage({
-                                  id: "generic.view-profile",
-                                  defaultMessage: "View profile",
-                                })}
+                      </Flex>
+                    </Stack>
+                  ) : type === "PROFILE_SEARCH" ? (
+                    <Stack spacing={content?.value.length === 0 ? 0.5 : 3}>
+                      <Flex flexWrap="wrap" gap={2} alignItems="baseline" minHeight={6}>
+                        <VisuallyHidden>
+                          {intl.formatMessage({
+                            id: "generic.search",
+                            defaultMessage: "Search",
+                          })}
+                        </VisuallyHidden>
+                        <ShortSearchIcon alignSelf="center" />
+                        <Text as="span">{content?.search}</Text>
+                        <Text as="span" color="gray.500" fontSize="sm">
+                          {`(${intl.formatMessage(
+                            {
+                              id: "generic.n-results",
+                              defaultMessage:
+                                "{count, plural,=0{No results} =1 {1 result} other {# results}}",
+                            },
+                            {
+                              count: content?.totalResults ?? 0,
+                            },
+                          )})`}
+                        </Text>
+                        <Box display="inline-block" marginStart={1}>
+                          {editReplyIconButton()}
+                        </Box>
+                      </Flex>
+                      {content?.value.length === 0 ? (
+                        <Box>
+                          <Badge colorScheme="green" variant="outline">
+                            {content?.totalResults > 0 ? (
+                              <FormattedMessage
+                                id="component.petition-replies-field-reply.profile-search-no-relevant-results"
+                                defaultMessage="No relevant results"
                               />
-                              <Text as="span">
-                                <LocalizableUserTextRender
-                                  value={profile.name}
-                                  default={
-                                    <Text textStyle="hint" as="span">
-                                      <FormattedMessage
-                                        id="generic.unnamed-profile"
-                                        defaultMessage="Unnamed profile"
-                                      />
-                                    </Text>
-                                  }
+                            ) : (
+                              <FormattedMessage
+                                id="component.petition-replies-field-reply.profile-search-no-results"
+                                defaultMessage="No results"
+                              />
+                            )}
+                          </Badge>
+                        </Box>
+                      ) : (
+                        content?.value.map((profile: any, index: number) =>
+                          isNonNullish(profile) ? (
+                            <Stack key={profile.id} paddingStart={1}>
+                              <HStack>
+                                <IconButtonWithTooltip
+                                  as="a"
+                                  href={`/app/profiles/${profile.id}/general`}
+                                  icon={<EyeIcon />}
+                                  size="xs"
+                                  label={intl.formatMessage({
+                                    id: "generic.view-profile",
+                                    defaultMessage: "View profile",
+                                  })}
                                 />
-                              </Text>
-                            </HStack>
-
-                            <Stack spacing={0.5} paddingStart={3}>
-                              {profile.fields.map((field: any) => (
-                                <Text key={field.id} as="span" fontWeight={500}>
+                                <Text as="span">
                                   <LocalizableUserTextRender
-                                    value={field.name}
+                                    value={profile.name}
                                     default={
                                       <Text textStyle="hint" as="span">
                                         <FormattedMessage
-                                          id="generic.unnamed-profile-type-field"
-                                          defaultMessage="Unnamed property"
+                                          id="generic.unnamed-profile"
+                                          defaultMessage="Unnamed profile"
                                         />
                                       </Text>
                                     }
                                   />
-                                  :
-                                  {isNonNullish(field.value) && field.value.length ? (
-                                    <Text as="span" fontWeight={400} marginStart={1}>
-                                      {field.value}
-                                    </Text>
-                                  ) : (
-                                    <Text
-                                      as="span"
-                                      fontWeight={400}
-                                      textStyle="hint"
-                                      marginStart={1}
-                                    >
-                                      <FormattedMessage
-                                        id="component.profile-property-content.no-value"
-                                        defaultMessage="No value"
-                                      />
-                                    </Text>
-                                  )}
                                 </Text>
-                              ))}
-                            </Stack>
-                          </Stack>
-                        ) : (
-                          <Text textStyle="hint" as="span" key={index}>
-                            <FormattedMessage
-                              id="generic.deleted-profile"
-                              defaultMessage="Deleted profile"
-                            />
-                          </Text>
-                        ),
-                      )
-                    )}
-                  </Stack>
-                ) : type === "ADVERSE_MEDIA_SEARCH" ? (
-                  <PetitionRepliesFieldAdverseMediaSearch reply={reply} />
-                ) : isFileTypeField(type) ? (
-                  <Stack flex="1">
-                    <Flex flexWrap="wrap" gap={1.5} alignItems="center" minHeight={6}>
-                      {isNonNullish(content.password) ? <LockClosedIcon /> : null}
-                      <VisuallyHidden>
-                        {intl.formatMessage({
-                          id: "generic.file-name",
-                          defaultMessage: "File name",
-                        })}
-                      </VisuallyHidden>
-                      <Text as="span" wordBreak="break-all">
-                        {content.filename}
-                        {" - "}
-                        <Text
-                          as="span"
-                          aria-label={intl.formatMessage({
-                            id: "generic.file-size",
-                            defaultMessage: "File size",
-                          })}
-                          fontSize="sm"
-                          color="gray.500"
-                        >
-                          <FileSize value={content.size} />
-                        </Text>
-                        <Box display="inline-block" marginStart={2}>
-                          {editReplyIconButton()}
-                        </Box>
-                      </Text>
-                    </Flex>
-                    {isNonNullish(content.password) ? (
-                      <PetitionRepliesFieldFilePassword password={content.password} />
-                    ) : null}
-                    {type === "FILE_UPLOAD" &&
-                    isNonNullish(reply.metadata) &&
-                    reply.metadata.type === "PAYSLIP" ? (
-                      <PetitionRepliesFieldFileUploadPayslipReply
-                        metadata={reply.metadata as any}
-                      />
-                    ) : null}
+                              </HStack>
 
-                    {type === "FILE_UPLOAD" &&
-                    reply.metadata.inferred_data_schema &&
-                    reply.metadata.inferred_data ? (
-                      <PetitionRepliesFieldFileSchema
-                        data={reply.metadata.inferred_data}
-                        schema={reply.metadata.inferred_data_schema}
-                      />
-                    ) : null}
-                  </Stack>
-                ) : (
-                  <HStack>
-                    {["SELECT", "CHECKBOX"].includes(type) &&
-                    isNonNullish(
-                      (reply.field!.options as FieldOptions["SELECT" | "CHECKBOX"]).labels,
-                    ) ? (
-                      <Text as="span">
-                        {content}{" "}
-                        <Text as="span" textStyle="hint">
-                          {
-                            (reply.field!.options as FieldOptions["SELECT" | "CHECKBOX"]).values[
-                              (
-                                reply.field!.options as FieldOptions["SELECT" | "CHECKBOX"]
-                              ).values.indexOf(
-                                type === "SELECT" ? reply.content.value : reply.content.value[i],
-                              )
-                            ]
-                          }
+                              <Stack spacing={0.5} paddingStart={3}>
+                                {profile.fields.map((field: any) => (
+                                  <Text key={field.id} as="span" fontWeight={500}>
+                                    <LocalizableUserTextRender
+                                      value={field.name}
+                                      default={
+                                        <Text textStyle="hint" as="span">
+                                          <FormattedMessage
+                                            id="generic.unnamed-profile-type-field"
+                                            defaultMessage="Unnamed property"
+                                          />
+                                        </Text>
+                                      }
+                                    />
+                                    :
+                                    {isNonNullish(field.value) && field.value.length ? (
+                                      <Text as="span" fontWeight={400} marginStart={1}>
+                                        {field.value}
+                                      </Text>
+                                    ) : (
+                                      <Text
+                                        as="span"
+                                        fontWeight={400}
+                                        textStyle="hint"
+                                        marginStart={1}
+                                      >
+                                        <FormattedMessage
+                                          id="component.profile-property-content.no-value"
+                                          defaultMessage="No value"
+                                        />
+                                      </Text>
+                                    )}
+                                  </Text>
+                                ))}
+                              </Stack>
+                            </Stack>
+                          ) : (
+                            <Text textStyle="hint" as="span" key={index}>
+                              <FormattedMessage
+                                id="generic.deleted-profile"
+                                defaultMessage="Deleted profile"
+                              />
+                            </Text>
+                          ),
+                        )
+                      )}
+                    </Stack>
+                  ) : type === "ADVERSE_MEDIA_SEARCH" ? (
+                    <PetitionRepliesFieldAdverseMediaSearch reply={reply} />
+                  ) : isFileTypeField(type) ? (
+                    <Stack flex="1">
+                      <Flex flexWrap="wrap" gap={1.5} alignItems="center" minHeight={6}>
+                        {isNonNullish(content.password) ? <LockClosedIcon /> : null}
+                        <VisuallyHidden>
+                          {intl.formatMessage({
+                            id: "generic.file-name",
+                            defaultMessage: "File name",
+                          })}
+                        </VisuallyHidden>
+                        <Text as="span" wordBreak="break-all">
+                          {content.filename}
+                          {" - "}
+                          <Text
+                            as="span"
+                            aria-label={intl.formatMessage({
+                              id: "generic.file-size",
+                              defaultMessage: "File size",
+                            })}
+                            fontSize="sm"
+                            color="gray.500"
+                          >
+                            <FileSize value={content.size} />
+                          </Text>
+                          <Box display="inline-block" marginStart={2}>
+                            {editReplyIconButton()}
+                          </Box>
                         </Text>
-                      </Text>
-                    ) : (
-                      <BreakLines>{content}</BreakLines>
-                    )}{" "}
-                    {reply.field?.type === "DATE_TIME" &&
-                    currentTimezone !== reply.content.timezone ? (
-                      <HelpPopover>
-                        <Text>
-                          {`${intl.formatDate(reply.content.value as string, {
-                            ...FORMATS["L+LT"],
-                            timeZone: currentTimezone,
-                          })} (${prettifyTimezone(currentTimezone)})`}
+                      </Flex>
+                      {isNonNullish(content.password) ? (
+                        <PetitionRepliesFieldFilePassword password={content.password} />
+                      ) : null}
+                      {type === "FILE_UPLOAD" &&
+                      isNonNullish(reply.metadata) &&
+                      reply.metadata.type === "PAYSLIP" ? (
+                        <PetitionRepliesFieldFileUploadPayslipReply
+                          metadata={reply.metadata as any}
+                        />
+                      ) : null}
+
+                      {type === "FILE_UPLOAD" &&
+                      reply.metadata.inferred_data_schema &&
+                      reply.metadata.inferred_data ? (
+                        <PetitionRepliesFieldFileSchema
+                          data={reply.metadata.inferred_data}
+                          schema={reply.metadata.inferred_data_schema}
+                        />
+                      ) : null}
+                    </Stack>
+                  ) : (
+                    <HStack>
+                      {["SELECT", "CHECKBOX"].includes(type) &&
+                      isNonNullish(
+                        (petitionField!.options as FieldOptions["SELECT" | "CHECKBOX"]).labels,
+                      ) ? (
+                        <Text as="span">
+                          {content}{" "}
+                          <Text as="span" textStyle="hint">
+                            {
+                              (petitionField!.options as FieldOptions["SELECT" | "CHECKBOX"])
+                                .values[
+                                (
+                                  petitionField!.options as FieldOptions["SELECT" | "CHECKBOX"]
+                                ).values.indexOf(
+                                  type === "SELECT" ? reply.content.value : reply.content.value[i],
+                                )
+                              ]
+                            }
+                          </Text>
                         </Text>
-                      </HelpPopover>
-                    ) : null}
-                    <Box display="inline-block" height={6} marginStart={2} verticalAlign="baseline">
-                      {editReplyIconButton(reply.field?.type === "DYNAMIC_SELECT" ? `-${i}` : "")}
-                    </Box>
-                  </HStack>
-                )}
-              </HStack>
-            </GridItem>
-          </Fragment>
-        ))}
+                      ) : (
+                        <BreakLines>{content}</BreakLines>
+                      )}{" "}
+                      {petitionField?.type === "DATE_TIME" &&
+                      currentTimezone !== reply.content.timezone ? (
+                        <HelpPopover>
+                          <Text>
+                            {`${intl.formatDate(reply.content.value as string, {
+                              ...FORMATS["L+LT"],
+                              timeZone: currentTimezone,
+                            })} (${prettifyTimezone(currentTimezone)})`}
+                          </Text>
+                        </HelpPopover>
+                      ) : null}
+                      <Box
+                        display="inline-block"
+                        height={6}
+                        marginStart={2}
+                        verticalAlign="baseline"
+                      >
+                        {editReplyIconButton(
+                          petitionField?.type === "DYNAMIC_SELECT" ? `-${i}` : "",
+                        )}
+                      </Box>
+                    </HStack>
+                  )}
+                </HStack>
+              </GridItem>
+            </Fragment>
+          ))}
         <GridItem
           gridColumn={2}
           fontSize="sm"
@@ -575,7 +589,7 @@ export function PetitionRepliesFieldReply({
           )}
         </GridItem>
       </Grid>
-      {reply.field?.requireApproval && petition.isReviewFlowEnabled ? (
+      {petitionField?.requireApproval && petition.isReviewFlowEnabled ? (
         <Stack
           direction="row"
           spacing={1}
@@ -619,21 +633,21 @@ export function PetitionRepliesFieldReply({
 }
 
 PetitionRepliesFieldReply.fragments = {
-  User: gql`
-    fragment PetitionRepliesFieldReply_User on User {
-      id
-      ...PetitionRepliesPopoverField_User
-    }
-    ${PetitionRepliesPopoverField.fragments.User}
-  `,
   Petition: gql`
     fragment PetitionRepliesFieldReply_Petition on Petition {
       id
-      ... on Petition {
-        status
-      }
       isReviewFlowEnabled
     }
+    ${getReplyContents.fragments.PetitionField}
+  `,
+  PetitionField: gql`
+    fragment PetitionRepliesFieldReply_PetitionField on PetitionField {
+      id
+      type
+      requireApproval
+      ...getReplyContents_PetitionField
+    }
+    ${getReplyContents.fragments.PetitionField}
   `,
   PetitionFieldReply: gql`
     fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {
@@ -642,9 +656,6 @@ PetitionRepliesFieldReply.fragments = {
       status
       field {
         id
-        type
-        requireApproval
-        ...getReplyContents_PetitionField
       }
       parent {
         id
@@ -664,7 +675,6 @@ PetitionRepliesFieldReply.fragments = {
     ${UserOrContactReference.fragments.UserOrPetitionAccess}
     ${CopyOrDownloadReplyButton.fragments.PetitionFieldReply}
     ${getReplyContents.fragments.PetitionFieldReply}
-    ${getReplyContents.fragments.PetitionField}
   `,
 };
 
