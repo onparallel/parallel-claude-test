@@ -4,7 +4,7 @@
  */
 
 import { PetitionFieldType } from "@parallel/graphql/__types";
-import { filter, flatMap, flatMapToObj, indexBy, isNonNullish, pipe } from "remeda";
+import { filter, flatMap, fromEntries, indexBy, isNonNullish, pipe } from "remeda";
 import { assert } from "ts-essentials";
 import { completedFieldReplies } from "../completedFieldReplies";
 import { letters, numbers, romanNumerals } from "../generators";
@@ -72,7 +72,8 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
       const parentById = pipe(
         fields,
         filter((f) => isNonNullish(f.children)),
-        flatMapToObj((f) => f.children!.map((c) => [c.id, f])),
+        flatMap((f) => f.children!.map((c) => [c.id, f] as const)),
+        fromEntries(),
       );
       const visibilitiesById: { [fieldId: string]: boolean } = {};
       // we need to collect visible replies for child fields so that these fields can be referenced

@@ -1,4 +1,3 @@
-import { countBy } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionReminder from "../../emails/emails/recipient/PetitionReminder";
@@ -76,10 +75,9 @@ export async function petitionReminder(
       orgId,
       "REMOVE_WHY_WE_USE_PARALLEL",
     );
-    const missingFieldCount = countBy(
-      repliableFields,
+    const missingFieldCount = repliableFields.filter(
       (field) => completedFieldReplies(field).length === 0,
-    );
+    ).length;
     const bodyJson = reminder.email_body ? JSON.parse(reminder.email_body) : null;
     const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(orgId);
 

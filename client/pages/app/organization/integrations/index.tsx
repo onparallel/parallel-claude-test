@@ -39,7 +39,8 @@ import { compose } from "@parallel/utils/compose";
 import { untranslated } from "@parallel/utils/untranslated";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, noop } from "remeda";
+import { isNonNullish } from "remeda";
+import { noop } from "ts-essentials";
 import { useDeactivateDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DeactivateDowJonesIntegrationDialog";
 import { useDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DowJonesIntegrationDialog";
 

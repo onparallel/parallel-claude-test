@@ -2,14 +2,13 @@ import { faker } from "@faker-js/faker";
 import { Duration } from "date-fns";
 import { Knex } from "knex";
 import PostgresInterval from "postgres-interval";
-import { isNonNullish, range } from "remeda";
+import { isNonNullish, isNullish, omitBy, range } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";
 import { IEncryptionService } from "../../../services/EncryptionService";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
 import { generateEDKeyPair } from "../../../util/keyPairs";
 import { defaultPdfDocumentTheme } from "../../../util/PdfDocumentTheme";
-import { removeNotDefined } from "../../../util/remedaExtensions";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { titleize } from "../../../util/strings";
 import { hash, random } from "../../../util/token";
@@ -436,7 +435,7 @@ export class Mocks {
             title: faker.word.words(),
             type: type,
             options: randomPetitionFieldOptions(type),
-            ...removeNotDefined(data),
+            ...omitBy(data, isNullish),
           };
         }),
       )
@@ -1420,7 +1419,7 @@ export class Mocks {
               Object.fromEntries(
                 cacheableValues.map((r) => [
                   r.profile_type_field_id,
-                  removeNotDefined({ content: r.content, expiry_date: r.expiry_date }),
+                  omitBy({ content: r.content, expiry_date: r.expiry_date }, isNullish),
                 ]),
               ),
             ),

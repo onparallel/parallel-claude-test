@@ -1,5 +1,5 @@
 import { arg, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
-import { findLast, isNonNullish, isNullish, minBy } from "remeda";
+import { findLast, firstBy, isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
 import {
   ContactLocaleValues,
@@ -543,7 +543,7 @@ export const Petition = objectType({
       description: "Date when the petition was first sent",
       resolve: async (root, _, ctx) => {
         const messages = await ctx.petitions.loadMessagesByPetitionId(root.id);
-        const firstMessage = minBy(
+        const firstMessage = firstBy(
           messages,
           (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf(),
         );

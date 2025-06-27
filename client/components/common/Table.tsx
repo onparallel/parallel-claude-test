@@ -53,7 +53,7 @@ import {
 } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
-import { identity, isNonNullish, noop, pick } from "remeda";
+import { identity, isNonNullish, pick } from "remeda";
 import { assert } from "ts-essentials";
 import { Collapsible } from "../ui";
 import { HelpPopover } from "./HelpPopover";
@@ -311,7 +311,6 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
               <Checkbox
                 isChecked={anySelected && allSelected}
                 isIndeterminate={anySelected && !allSelected}
-                onChange={noop}
               />
             </Center>
           </Th>
@@ -322,7 +321,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         CellContent: ({ isSelected, onToggleSelection }) => {
           return (
             <Center as="label" boxSize="40px" cursor="pointer" onClick={onToggleSelection}>
-              <Checkbox isChecked={isSelected} onChange={noop} />
+              <Checkbox isChecked={isSelected} />
             </Center>
           );
         },

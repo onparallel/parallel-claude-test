@@ -3,7 +3,7 @@ import "reflect-metadata";
 import { readFile } from "fs/promises";
 import { inject, injectable } from "inversify";
 import pMap from "p-map";
-import { isNonNullish } from "remeda";
+import { isNonNullish, omit } from "remeda";
 import { CONFIG, Config } from "../config";
 import { ContactLocale, OrgIntegration } from "../db/__types";
 import { FileRepository } from "../db/repositories/FileRepository";
@@ -30,7 +30,6 @@ import { I18N_SERVICE, I18nService } from "../services/I18nService";
 import { PETITION_BINDER, PetitionBinder } from "../services/PetitionBinder";
 import { STORAGE_SERVICE, StorageService } from "../services/StorageService";
 import { fullName } from "../util/fullName";
-import { removeKeys } from "../util/remedaExtensions";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { random } from "../util/token";
 import { Maybe, Replace } from "../util/types";
@@ -181,9 +180,7 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
       );
 
       // remove events array from data before saving to DB
-      data.documents = data.documents.map((doc) =>
-        removeKeys(doc as any, ([key]) => key !== "events"),
-      );
+      data.documents = data.documents.map((doc) => omit(doc, ["events"])) as any;
 
       // update signers on signature_config to include the externalId provided by provider so we can match it later on events webhook
       const updatedSignersInfo = signature.signature_config.signersInfo.map(

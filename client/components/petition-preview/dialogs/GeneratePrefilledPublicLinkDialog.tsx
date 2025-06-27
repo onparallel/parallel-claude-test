@@ -30,7 +30,7 @@ import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { toCanvas } from "qrcode";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { isNonNullish, noop } from "remeda";
+import { isNonNullish } from "remeda";
 
 export function GeneratePrefilledPublicLinkDialog({
   petitionId,
@@ -122,7 +122,7 @@ export function GeneratePrefilledPublicLinkDialog({
                 <canvas ref={canvasRef} />
               </Center>
               <InputGroup size="sm">
-                <Input size="sm" borderRadius="md" type="text" value={link} onChange={noop} />
+                <Input size="sm" borderRadius="md" type="text" value={link} />
                 <InputRightAddon borderRadius="md" padding={0}>
                   <CopyToClipboardButton
                     size="sm"

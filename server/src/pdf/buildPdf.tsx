@@ -8,7 +8,7 @@ import pMap from "p-map";
 import { resolve } from "path";
 import { createElement } from "react";
 import { IntlConfig, IntlProvider, createIntl } from "react-intl";
-import { filter, forEach, groupBy, isNullish, mapValues, pipe, toPairs, unique } from "remeda";
+import { entries, filter, forEach, groupBy, isNullish, mapValues, pipe, unique } from "remeda";
 import { Readable } from "stream";
 import { assert } from "ts-essentials";
 import { ContactLocale } from "../db/__types";
@@ -180,7 +180,7 @@ export async function buildPdf<ID, P extends {}, M extends Record<string, any>>(
           filter((p) => p.label === "<web-resource>"),
           groupBy((p) => p.value.url as string),
           mapValues((values) => unique(values.map((v) => v.value.path as string))),
-          toPairs,
+          entries(),
           forEach(([, paths]) => assert(paths.every((p) => p.startsWith("assets/")))),
         ),
         async ([url, paths]) => {

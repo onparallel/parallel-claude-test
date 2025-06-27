@@ -7,10 +7,18 @@ import {
 import { differenceInMinutes } from "date-fns";
 import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
-import { difference, groupBy, isNonNullish, isNullish, partition, unique, zip } from "remeda";
+import {
+  difference,
+  groupBy,
+  isNonNullish,
+  isNullish,
+  omitBy,
+  partition,
+  unique,
+  zip,
+} from "remeda";
 import { LicenseCode, PublicFileUpload } from "../../db/__types";
 import { fullName } from "../../util/fullName";
-import { removeNotDefined } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { Maybe } from "../../util/types";
 import { RESULT } from "../helpers/Result";
@@ -63,10 +71,13 @@ export const updateUser = mutationField("updateUser", {
     const { firstName, lastName } = args;
     await ctx.users.updateUserData(
       ctx.user!.user_data_id,
-      removeNotDefined({
-        first_name: firstName,
-        last_name: lastName,
-      }),
+      omitBy(
+        {
+          first_name: firstName,
+          last_name: lastName,
+        },
+        isNullish,
+      ),
       `User:${ctx.user!.id}`,
     );
     return ctx.user!;

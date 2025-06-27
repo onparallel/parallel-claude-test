@@ -1,5 +1,5 @@
 import { MouseEvent, useMemo, useState } from "react";
-import { countBy, isNonNullish } from "remeda";
+import { isNonNullish } from "remeda";
 import { debounce } from "./debounce";
 import { KeyProp, getKey } from "./keyProp";
 import { useEffectSkipFirst } from "./useEffectSkipFirst";
@@ -48,7 +48,7 @@ export function useSelectionState<T>(
     selection,
     ...useMemo(
       () => ({
-        selectedCount: countBy(items, (r) => selection[getKey(r, keyPropRef.current)]),
+        selectedCount: items.filter((r) => selection[getKey(r, keyPropRef.current)]).length,
         selected: items.filter((r) => selection[getKey(r, keyPropRef.current)]),
         allSelected: items.every((r) => selection[getKey(r, keyPropRef.current)]),
         anySelected: items.some((r) => selection[getKey(r, keyPropRef.current)]),

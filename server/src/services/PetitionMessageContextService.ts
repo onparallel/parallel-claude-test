@@ -1,16 +1,7 @@
 import { inject, injectable } from "inversify";
 import { format as formatPhoneNumber } from "libphonenumber-js";
 import pMap from "p-map";
-import {
-  filter,
-  flatten,
-  groupBy,
-  indexBy,
-  isNonNullish,
-  isNullish,
-  mapValues,
-  pipe,
-} from "remeda";
+import { filter, flat, groupBy, indexBy, isNonNullish, isNullish, mapValues, pipe } from "remeda";
 import { UserLocale } from "../db/__types";
 import { ContactRepository } from "../db/repositories/ContactRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
@@ -103,7 +94,7 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
 
     const repliesByFieldId = pipe(
       await this.petitions.loadRepliesForField(Object.keys(fieldsById).map((id) => parseInt(id))),
-      flatten(),
+      flat(),
       groupBy((r) => r.petition_field_id),
       mapValues((replies) => replies?.[0]),
     );

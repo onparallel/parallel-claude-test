@@ -2,7 +2,7 @@ import "./../init";
 // keep this space to prevent import sorting removing init from top
 import { Knex } from "knex";
 import pMap from "p-map";
-import { isNonNullish, maxBy } from "remeda";
+import { firstBy, isNonNullish } from "remeda";
 import yargs from "yargs";
 import { createContainer } from "../container";
 import {
@@ -216,7 +216,7 @@ async function main() {
         .select("*");
 
       // get latest position to add new properties at the end
-      let position = maxBy(currentProperties, (p) => p.position)?.position ?? 0;
+      let position = firstBy(currentProperties, [(p) => p.position, "desc"])?.position ?? 0;
       for (const propertyDefinition of await profiles.getProfileTypeFieldsDefinition(
         standardType,
       )) {

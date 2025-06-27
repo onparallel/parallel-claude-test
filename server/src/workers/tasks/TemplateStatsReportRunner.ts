@@ -1,4 +1,4 @@
-import { chunk, countBy, difference, findLast, isNonNullish, sortBy } from "remeda";
+import { chunk, difference, findLast, isNonNullish, sortBy } from "remeda";
 import { PetitionStatus } from "../../db/__types";
 import {
   PetitionEvent,
@@ -119,10 +119,10 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
     return {
       status: {
         all: petitions.length,
-        pending: countBy(petitions, (p) => p.status === "PENDING"),
-        completed: countBy(petitions, (p) => p.status === "COMPLETED"),
-        closed: countBy(petitions, (p) => p.status === "CLOSED"),
-        signed: countBy(petitions, (p) => p.latest_signature_status === "COMPLETED"),
+        pending: petitions.filter((p) => p.status === "PENDING").length,
+        completed: petitions.filter((p) => p.status === "COMPLETED").length,
+        closed: petitions.filter((p) => p.status === "CLOSED").length,
+        signed: petitions.filter((p) => p.latest_signature_status === "COMPLETED").length,
       },
       times: {
         pending_to_complete: average(times.map((p) => p.pending_to_complete).filter(isNonNullish)),
@@ -210,7 +210,7 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
 
     // STEP 2
     const opened = sent.filter(
-      ({ events }) => countBy(events, (e) => e.type === "ACCESS_OPENED") > 0,
+      ({ events }) => events.filter((e) => e.type === "ACCESS_OPENED").length > 0,
     );
 
     // STEP 3

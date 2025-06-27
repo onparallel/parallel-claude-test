@@ -1,6 +1,6 @@
 import { ImapFlow } from "imapflow";
 import { simpleParser, Source } from "mailparser";
-import { isNonNullish, noop } from "remeda";
+import { isNonNullish } from "remeda";
 import { promisify } from "util";
 import { Email, EmailEnvelope } from "./types";
 
@@ -23,7 +23,7 @@ export async function waitForEmail(
       user,
       pass: password,
     },
-    logger: Object.fromEntries(["debug", "info", "warn", "error"].map((l) => [l, noop])) as any,
+    logger: Object.fromEntries(["debug", "info", "warn", "error"].map((l) => [l, () => {}])) as any,
   });
   await client.connect();
   try {

@@ -9,7 +9,7 @@ import {
   objectType,
 } from "nexus";
 import pMap from "p-map";
-import { chunk, countBy, isNonNullish, isNullish, uniqueBy } from "remeda";
+import { chunk, isNonNullish, isNullish, uniqueBy } from "remeda";
 import { CreateContact } from "../../db/__types";
 import { importFromExcel } from "../../util/importFromExcel";
 import { withError } from "../../util/promises/withError";
@@ -197,9 +197,9 @@ export const deleteContacts = mutationField("deleteContacts", {
           await ctx.petitions.loadPetition(activeAccesses[0].map((a) => a.petition_id))
         ).filter(isNonNullish);
         data = {
-          PENDING: countBy(petitions, (p) => p.status === "PENDING"),
-          COMPLETED: countBy(petitions, (p) => p.status === "COMPLETED"),
-          CLOSED: countBy(petitions, (p) => p.status === "CLOSED"),
+          PENDING: petitions.filter((p) => p.status === "PENDING").length,
+          COMPLETED: petitions.filter((p) => p.status === "COMPLETED").length,
+          CLOSED: petitions.filter((p) => p.status === "CLOSED").length,
         };
       }
       throw new ApolloError(

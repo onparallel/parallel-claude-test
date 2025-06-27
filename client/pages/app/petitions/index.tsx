@@ -93,7 +93,7 @@ import { useSelection } from "@parallel/utils/useSelectionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { MouseEvent, ReactNode, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, isNullish, map, maxBy, omit, pick, pipe } from "remeda";
+import { firstBy, isNonNullish, isNullish, map, omit, pick, pipe } from "remeda";
 
 const SORTING = [
   "name",
@@ -440,7 +440,7 @@ function Petitions() {
             ? r.myEffectivePermission!.permissionType
             : (null as never),
       ),
-      maxBy((p) => ["OWNER", "WRITE", "READ"].indexOf(p)),
+      firstBy((p) => ["READ", "WRITE", "OWNER"].indexOf(p)),
     )!;
   }, [selectedRows]);
 

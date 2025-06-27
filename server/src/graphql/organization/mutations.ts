@@ -8,11 +8,10 @@ import {
   nullable,
   stringArg,
 } from "nexus";
-import { fromEntries, isNonNullish, pick } from "remeda";
+import { fromEntries, isNonNullish, omitBy, pick } from "remeda";
 import { ContactLocaleValues, Organization, OrganizationTheme } from "../../db/__types";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { fullName } from "../../util/fullName";
-import { removeKeys } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { authenticateAnd, userIsSuperAdmin } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
@@ -129,13 +128,13 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
   resolve: async (_, args, ctx) => {
     await ctx.organizations.updateOrganizationBrandThemeDataByOrgId(
       ctx.user!.org_id,
-      removeKeys(
+      omitBy(
         {
           color: args.data.color ?? undefined,
           fontFamily: args.data.fontFamily,
           preferredTone: args.data.preferredTone ?? undefined,
         },
-        ([_, value]) => value !== undefined,
+        (v) => v === undefined,
       ),
       `User:${ctx.user!.id}`,
     );

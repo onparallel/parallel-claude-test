@@ -12,7 +12,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SelectInstance as _SelectInstance } from "react-select";
-import { countBy } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
@@ -231,7 +230,8 @@ const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
 
   const repliedLabelsCount =
     reply && !reply.isAnonymized
-      ? countBy(reply.content.value as [string, string | null][], ([, value]) => value !== null)
+      ? (reply.content.value as [string, string | null][]).filter(([, value]) => value !== null)
+          .length
       : 0;
 
   const options = (

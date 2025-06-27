@@ -44,7 +44,7 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { MouseEvent, useMemo } from "react";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
-import { isNonNullish, maxBy, minBy } from "remeda";
+import { firstBy, isNonNullish } from "remeda";
 import { EnumerateList } from "./EnumerateList";
 import { useGoToContact } from "./goToContact";
 import { useGoToPetition } from "./goToPetition";
@@ -484,12 +484,12 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
       }),
     CellContent: ({ row }) => {
       if (row.__typename === "Petition" && isNonNullish(row.accesses)) {
-        const lastReminderDate = maxBy(
+        const lastReminderDate = firstBy(
           row.accesses.map((a) => a.reminders?.[0]?.createdAt).filter(isNonNullish),
-          (date) => new Date(date).valueOf(),
+          [(date) => new Date(date).valueOf(), "desc"],
         );
 
-        const nextReminderAt = minBy(
+        const nextReminderAt = firstBy(
           row.accesses.map((a) => a.nextReminderAt).filter(isNonNullish),
           (date) => new Date(date).valueOf(),
         );

@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { countBy, isNonNullish, isNullish, omit } from "remeda";
+import { isNonNullish, isNullish, omit } from "remeda";
 import { CONFIG, Config } from "../config";
 import {
   PetitionAccess,
@@ -229,7 +229,9 @@ export class SignatureService implements ISignatureService {
     );
 
     // avoid recipients restarting the signature process too many times
-    if (countBy(previousSignatureRequests, (r) => r.cancel_reason === "REQUEST_RESTARTED") >= 20) {
+    if (
+      previousSignatureRequests.filter((r) => r.cancel_reason === "REQUEST_RESTARTED").length >= 20
+    ) {
       throw new Error(`Signature request on Petition:${petitionId} was restarted too many times`);
     }
 

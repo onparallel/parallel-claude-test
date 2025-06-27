@@ -1,7 +1,7 @@
 import { addMinutes } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { entries, groupBy, indexBy, isNonNullish, mapValues, omit, pipe, unique } from "remeda";
+import { indexBy, isNonNullish, omit, unique } from "remeda";
 import { keyBuilder } from "../../util/keyBuilder";
 import { hash, random } from "../../util/token";
 import { Maybe, MaybeArray, unMaybeArray } from "../../util/types";
@@ -33,19 +33,11 @@ export class ContactRepository extends BaseRepository {
     string
   >(
     async (keys, t) => {
-      const byOrgId = pipe(
-        keys,
-        groupBy((k) => k.orgId),
-        mapValues((keys) => keys.map((k) => k.email)),
-        entries(),
-      );
       const rows = await this.from("contact", t)
         .whereNull("deleted_at")
-        .where((qb) => {
-          for (const [orgId, emails] of byOrgId) {
-            qb.orWhere((qb) => qb.where("org_id", parseInt(orgId)).whereIn("email", emails));
-          }
-        });
+        .whereIn("org_id", unique(keys.map((k) => k.orgId)))
+        .whereIn("email", unique(keys.map((k) => k.email)));
+
       const results = indexBy(rows, keyBuilder(["org_id", "email"]));
       return keys.map(keyBuilder(["orgId", "email"])).map((key) => results[key] ?? null);
     },

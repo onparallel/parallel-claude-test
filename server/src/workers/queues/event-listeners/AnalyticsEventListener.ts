@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { isNonNullish, maxBy } from "remeda";
+import { firstBy, isNonNullish } from "remeda";
 import {
   PetitionEvent,
   PetitionEventType,
@@ -214,7 +214,8 @@ export class AnalyticsEventListener implements EventListener<EventType> {
     ]);
     return {
       logins: loginEvents.length,
-      latest_login_at: maxBy(loginEvents, (e) => e.created_at.getTime())?.created_at ?? null,
+      latest_login_at:
+        firstBy(loginEvents, [(e) => e.created_at.getTime(), "desc"])?.created_at ?? null,
       ...stats,
     };
   }

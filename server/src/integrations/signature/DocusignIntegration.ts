@@ -1,6 +1,6 @@
 import { json, Request } from "express";
 import { inject, injectable } from "inversify";
-import { isNonNullish, isNullish, maxBy, pick } from "remeda";
+import { firstBy, isNonNullish, isNullish, pick } from "remeda";
 import { CONFIG, Config } from "../../config";
 import { FeatureFlagName, OrgIntegration } from "../../db/__types";
 import { SignatureDeliveredEvent } from "../../db/events/PetitionEvent";
@@ -526,9 +526,10 @@ export class DocusignIntegration extends OAuthIntegration<
 
     // fetch signer with most recent signed_at Date to show it on the Signature Completed email
     const lastSignerIndex = parseInt(
-      maxBy(Object.entries(signature.signer_status as Record<string, { signed_at: string }>), (i) =>
-        new Date(i[1]!.signed_at).getTime(),
-      )![0],
+      firstBy(Object.entries(signature.signer_status as Record<string, { signed_at: string }>), [
+        (i) => new Date(i[1]!.signed_at).getTime(),
+        "desc",
+      ])![0],
     );
     const signer = signature.signature_config.signersInfo[lastSignerIndex];
 

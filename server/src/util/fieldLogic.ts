@@ -3,7 +3,7 @@
  * Don't forget to update it as well!
  */
 
-import { filter, flatMap, flatMapToObj, indexBy, isNonNullish, pipe, zip } from "remeda";
+import { filter, flatMap, fromEntries, indexBy, isNonNullish, pipe, zip } from "remeda";
 import { assert } from "ts-essentials";
 import { PetitionFieldType } from "../db/__types";
 import { completedFieldReplies } from "./completedFieldReplies";
@@ -291,7 +291,8 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
       const parentById = pipe(
         fields,
         filter((f) => isNonNullish(f.children)),
-        flatMapToObj((f) => f.children!.map((c) => [c.id, f])),
+        flatMap((f) => f.children!.map((c) => [c.id, f] as const)),
+        fromEntries(),
       );
       const visibilitiesById: { [fieldId: string]: boolean } = {};
       // we need to collect visible replies for child fields so that these fields can be referenced

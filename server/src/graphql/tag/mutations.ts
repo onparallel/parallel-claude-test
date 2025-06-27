@@ -1,6 +1,6 @@
 import { booleanArg, inputObjectType, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { DatabaseError } from "pg";
-import { countBy, isNonNullish, unique, zip } from "remeda";
+import { isNonNullish, unique, zip } from "remeda";
 import { CreateTag } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { RESULT } from "../helpers/Result";
@@ -138,15 +138,14 @@ export const deleteTag = mutationField("deleteTag", {
         return {
           fullName: fullName(ownerData!.first_name, ownerData!.last_name),
           email: ownerData!.email,
-          petitionCount: countBy(
-            zip(taggedPetitions, petitionOwners),
+          petitionCount: zip(taggedPetitions, petitionOwners).filter(
             ([p, o]) => !p.is_template && o!.user_data_id === ownerData!.id,
-          ),
-          templateCount: countBy(
-            zip(taggedPetitions, petitionOwners),
+          ).length,
+          templateCount: zip(taggedPetitions, petitionOwners).filter(
             ([p, o]) => p.is_template && o!.user_data_id === ownerData!.id,
-          ),
-          petitionListViewCount: countBy(viewsOwners, (vo) => vo!.user_data_id === ownerData!.id),
+          ).length,
+          petitionListViewCount: viewsOwners.filter((vo) => vo!.user_data_id === ownerData!.id)
+            .length,
         };
       });
 

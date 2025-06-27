@@ -58,7 +58,7 @@ import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, noop, pick } from "remeda";
+import { isNonNullish, pick } from "remeda";
 import { CloseButton } from "../common/CloseButton";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { Divider } from "../common/Divider";
@@ -736,13 +736,7 @@ function _PetitionSettings({
                 controlId="share-by-link"
               >
                 <InputGroup size="sm">
-                  <Input
-                    size="sm"
-                    borderRadius="md"
-                    type="text"
-                    value={petition.publicLink?.url}
-                    onChange={noop}
-                  />
+                  <Input size="sm" borderRadius="md" type="text" value={petition.publicLink?.url} />
                   <InputRightAddon borderRadius="md" padding={0}>
                     <CopyToClipboardButton
                       size="sm"

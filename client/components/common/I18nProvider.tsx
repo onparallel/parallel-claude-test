@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
 import { IntlConfig, IntlProvider } from "react-intl";
-import { noop } from "remeda";
+import { noop } from "ts-essentials";
 
 export interface I18nProps {
   locale: string;

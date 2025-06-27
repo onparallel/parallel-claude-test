@@ -96,7 +96,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { doNothing, identity, isNonNullish } from "remeda";
+import { identity, isNonNullish } from "remeda";
 
 type OrganizationProfileTypeProps = UnwrapPromise<
   ReturnType<typeof OrganizationProfileType.getInitialProps>
@@ -664,7 +664,6 @@ function DraggableList({
           <Checkbox
             isChecked={anySelected && allSelected}
             isIndeterminate={anySelected && !allSelected}
-            onChange={doNothing}
           />
         </Center>
         {selectedCount.current > 0 ? (

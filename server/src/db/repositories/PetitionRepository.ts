@@ -4,16 +4,15 @@ import { Knex } from "knex";
 import pMap from "p-map";
 import { DatabaseError } from "pg";
 import {
-  countBy,
   difference,
   filter,
+  firstBy,
   groupBy,
   indexBy,
   isNonNullish,
   isNullish,
   map,
   mapValues,
-  minBy,
   omit,
   partition,
   pick,
@@ -49,7 +48,6 @@ import { paginationLoader } from "../../util/paginationLoader";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
 import { withError } from "../../util/promises/withError";
-import { removeNotDefined } from "../../util/remedaExtensions";
 import { PetitionAccessReminderConfig, calculateNextReminder } from "../../util/reminderUtils";
 import { StopRetryError, retry } from "../../util/retry";
 import { safeJsonParse } from "../../util/safeJsonParse";
@@ -965,44 +963,38 @@ export class PetitionRepository extends BaseRepository {
           }
         });
 
-      const validatedExternal = countBy(
-        visibleExternalFields,
+      const validatedExternal = visibleExternalFields.filter(
         (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED"),
-      );
+      ).length;
 
-      const validatedInternal = countBy(
-        visibleInternalFields,
+      const validatedInternal = visibleInternalFields.filter(
         (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED"),
-      );
+      ).length;
 
       return {
         external: {
           approved: validatedExternal,
-          replied: countBy(
-            visibleExternalFields,
+          replied: visibleExternalFields.filter(
             (f) =>
               completedFieldReplies(f).length > 0 &&
               f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED"),
-          ),
-          optional: countBy(
-            visibleExternalFields,
+          ).length,
+          optional: visibleExternalFields.filter(
             (f) => f.optional && completedFieldReplies(f).length === 0,
-          ),
+          ).length,
           total: visibleExternalFields.length,
         },
         internal: {
           validated: validatedInternal,
           approved: validatedInternal,
-          replied: countBy(
-            visibleInternalFields,
+          replied: visibleInternalFields.filter(
             (f) =>
               completedFieldReplies(f).length > 0 &&
               f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED"),
-          ),
-          optional: countBy(
-            visibleInternalFields,
+          ).length,
+          optional: visibleInternalFields.filter(
             (f) => f.optional && completedFieldReplies(f).length === 0,
-          ),
+          ).length,
           total: visibleInternalFields.length,
         },
       };
@@ -1042,11 +1034,9 @@ export class PetitionRepository extends BaseRepository {
         });
 
       return {
-        replied: countBy(visibleFields, (f) => completedFieldReplies(f).length > 0),
-        optional: countBy(
-          visibleFields,
-          (f) => f.optional && completedFieldReplies(f).length === 0,
-        ),
+        replied: visibleFields.filter((f) => completedFieldReplies(f).length > 0).length,
+        optional: visibleFields.filter((f) => f.optional && completedFieldReplies(f).length === 0)
+          .length,
         total: visibleFields.length,
       };
     });
@@ -4631,9 +4621,7 @@ export class PetitionRepository extends BaseRepository {
           .update(
             {
               read_at: isRead ? this.now() : null,
-              ...removeNotDefined({
-                processed_at: isRead ? this.now() : undefined,
-              }),
+              ...(isRead ? { processed_at: this.now() } : {}),
             },
             "*",
           );
@@ -4667,9 +4655,7 @@ export class PetitionRepository extends BaseRepository {
           .update(
             {
               read_at: isRead ? this.now() : null,
-              ...removeNotDefined({
-                processed_at: isRead ? this.now() : undefined,
-              }),
+              ...(isRead ? { processed_at: this.now() } : {}),
             },
             "*",
           );
@@ -4721,9 +4707,7 @@ export class PetitionRepository extends BaseRepository {
           .update(
             {
               read_at: isRead ? this.now() : null,
-              ...removeNotDefined({
-                processed_at: isRead ? this.now() : undefined,
-              }),
+              ...(isRead ? { processed_at: this.now() } : {}),
             },
             "*",
           );
@@ -4754,9 +4738,7 @@ export class PetitionRepository extends BaseRepository {
       .update(
         {
           read_at: isRead ? this.now() : null,
-          ...removeNotDefined({
-            processed_at: isRead ? this.now() : undefined,
-          }),
+          ...(isRead ? { processed_at: this.now() } : {}),
         },
         "*",
       );
@@ -7075,10 +7057,10 @@ export class PetitionRepository extends BaseRepository {
 
     return {
       petitions_sent: petitions.length,
-      petitions_sent_this_month: countBy(petitions, (p) => isThisMonth(p.sent_at)),
-      petitions_sent_last_month: countBy(petitions, (p) =>
+      petitions_sent_this_month: petitions.filter((p) => isThisMonth(p.sent_at)).length,
+      petitions_sent_last_month: petitions.filter((p) =>
         isSameMonth(p.sent_at, subMonths(new Date(), 1)),
-      ),
+      ).length,
       petitions_pending: petitions.filter((s) => s.status === "PENDING").length,
     };
   }
@@ -7549,10 +7531,10 @@ export class PetitionRepository extends BaseRepository {
       return {
         status: {
           all: petitions.length,
-          pending: countBy(petitions, (p) => p.status === "PENDING"),
-          completed: countBy(petitions, (p) => p.status === "COMPLETED"),
-          closed: countBy(petitions, (p) => p.status === "CLOSED"),
-          signed: countBy(petitions, (p) => p.latest_signature_status === "COMPLETED"),
+          pending: petitions.filter((p) => p.status === "PENDING").length,
+          completed: petitions.filter((p) => p.status === "COMPLETED").length,
+          closed: petitions.filter((p) => p.status === "CLOSED").length,
+          signed: petitions.filter((p) => p.latest_signature_status === "COMPLETED").length,
         },
         times: {
           pending_to_complete: average(
@@ -7643,7 +7625,7 @@ export class PetitionRepository extends BaseRepository {
         events,
         filter((e) => e.type === "ACCESS_ACTIVATED" || e.type === "REPLY_CREATED"),
         map((e) => e.min.getTime()),
-        minBy((t) => t),
+        firstBy([(t) => t, "desc"]),
       );
 
       const completedAt = events.find((e) => e.type === "PETITION_COMPLETED")?.max.getTime();

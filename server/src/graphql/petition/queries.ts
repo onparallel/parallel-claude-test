@@ -10,7 +10,7 @@ import {
   queryField,
   stringArg,
 } from "nexus";
-import { countBy, isNonNullish, sort, unique, zip } from "remeda";
+import { isNonNullish, sort, unique, zip } from "remeda";
 import { assert } from "ts-essentials";
 import { PetitionFieldOptions } from "../../services/PetitionFieldService";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
@@ -226,7 +226,7 @@ export const petitionsSharingInfoQuery = queryField("petitionsSharingInfo", {
           const permissions = (
             await ctx.petitions.loadEffectivePermissions(ids as number[])
           ).flat();
-          return countBy(permissions, (p) => p.user_id === ctx.user!.id && p.type === "OWNER");
+          return permissions.filter((p) => p.user_id === ctx.user!.id && p.type === "OWNER").length;
         },
       });
       t.nonNull.list.nonNull.globalId("ownedOrWriteIds", {

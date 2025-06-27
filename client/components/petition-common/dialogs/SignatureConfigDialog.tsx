@@ -56,7 +56,8 @@ import {
 } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
-import { isNonNullish, noop, pick } from "remeda";
+import { isNonNullish, pick } from "remeda";
+import { noop } from "ts-essentials";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
 import { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";

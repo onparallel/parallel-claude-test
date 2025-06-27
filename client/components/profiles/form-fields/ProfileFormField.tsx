@@ -35,7 +35,8 @@ import {
   useWatch,
 } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, isNullish, noop } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
+import { noop } from "ts-essentials";
 import { ProfileFieldSuggestion } from "../ProfileFieldSuggestion";
 import { ProfileFormData } from "../ProfileForm";
 import { useUpdateProfileFieldExpirationDialog } from "../dialogs/UpdateProfileFieldExpirationDialog";

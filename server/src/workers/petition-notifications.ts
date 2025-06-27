@@ -1,5 +1,5 @@
 import { differenceInMinutes } from "date-fns";
-import { difference, groupBy, maxBy } from "remeda";
+import { difference, firstBy, groupBy } from "remeda";
 import { Config } from "../config";
 import { WorkerContext } from "../context";
 import { PetitionContactNotification, PetitionUserNotification } from "../db/__types";
@@ -10,7 +10,7 @@ function shouldBeProcessed(
   notifications: (PetitionUserNotification | PetitionContactNotification)[],
   minutesBeforeNotify: number,
 ) {
-  const lastNotification = maxBy(notifications, (n) => n.created_at.getTime())!;
+  const lastNotification = firstBy(notifications, [(n) => n.created_at.getTime(), "desc"])!;
   return differenceInMinutes(new Date(), lastNotification.created_at) > minutesBeforeNotify;
 }
 

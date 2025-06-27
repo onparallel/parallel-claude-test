@@ -1,5 +1,5 @@
 import { booleanArg, list, mutationField, nonNull } from "nexus";
-import { maxBy, zip } from "remeda";
+import { firstBy, zip } from "remeda";
 import { toBytes } from "../../../util/fileSize";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
@@ -217,9 +217,9 @@ export const createPetitionAttachmentUploadLink = mutationField(
       );
 
       const maxPosition =
-        maxBy(
+        firstBy(
           petitionAttachments.filter((a) => a.type === args.type),
-          (a) => a.position,
+          [(a) => a.position, "desc"],
         )?.position ?? -1;
 
       const attachments = await ctx.petitions.createPetitionAttachment(

@@ -29,7 +29,7 @@ import { withError } from "@parallel/utils/promises/withError";
 import { useFilenamePlaceholdersRename } from "@parallel/utils/useFilenamePlaceholders";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
-import { countBy, pick } from "remeda";
+import { pick } from "remeda";
 import { useExportFailedDialog } from "./ExportFailedDialog";
 
 export interface ExportRepliesProgressDialogProps {
@@ -97,7 +97,7 @@ export function ExportRepliesProgressDialog({
 
       const totalFiles =
         (hasTextReplies ? 1 : 0) + // exported excel with text replies
-        countBy(replies, (r) => isFileTypeField(r.field.type)) + // every uploaded file reply
+        replies.filter((r) => isFileTypeField(r.field.type)).length + // every uploaded file reply
         (hasSignedDocument ? 1 : 0) + // signed doc
         (hasAuditTrail ? 1 : 0) + // audit trail
         1; // PDF document;

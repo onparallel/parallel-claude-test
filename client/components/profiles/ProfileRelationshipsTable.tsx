@@ -16,7 +16,7 @@ import { integer, useQueryState, values } from "@parallel/utils/queryState";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, noop } from "remeda";
+import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
 import { ProfileReference } from "../common/ProfileReference";
@@ -139,7 +139,6 @@ export function ProfileRelationshipsTable({ profileId }: { profileId: string }) 
       totalCount={totalCount}
       onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
       onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items: items as any, page: 1 }))}
-      onSortChange={noop}
       actions={actions}
       onSelectionChange={onChangeSelectedIds}
       header={

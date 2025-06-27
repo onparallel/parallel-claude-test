@@ -2,8 +2,8 @@ import "reflect-metadata";
 // keep this space to prevent import sorting, removing init from top
 import { SQSClient } from "@aws-sdk/client-sqs";
 import { fork } from "child_process";
-import { noop } from "remeda";
 import { Consumer } from "sqs-consumer";
+import { noop } from "ts-essentials";
 import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";

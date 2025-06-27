@@ -5,7 +5,6 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { Link } from "@parallel/components/common/Link";
 import { FormattedMessage } from "react-intl";
-import { noop } from "remeda";
 
 export interface ContactlessLinkDialogProps {
   link: string;
@@ -39,7 +38,7 @@ export function ContactlessLinkDialog({
             />
           </Text>
           <InputGroup>
-            <Input type="text" value={link} onChange={noop} />
+            <Input type="text" value={link} />
             <InputRightAddon padding={0}>
               <CopyToClipboardButton
                 border={"1px solid"}

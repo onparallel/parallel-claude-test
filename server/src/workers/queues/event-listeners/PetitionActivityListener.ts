@@ -1,9 +1,8 @@
 import { inject, injectable } from "inversify";
-import { isNonNullish } from "remeda";
+import { isNonNullish, isNullish, omitBy } from "remeda";
 import { PetitionEventType } from "../../../db/__types";
 import { PetitionEvent } from "../../../db/events/PetitionEvent";
 import { PetitionRepository } from "../../../db/repositories/PetitionRepository";
-import { removeNotDefined } from "../../../util/remedaExtensions";
 import { EventListener } from "../EventProcessorQueue";
 
 export const PETITION_ACTIVITY_LISTENER = Symbol.for("PETITION_ACTIVITY_LISTENER");
@@ -104,10 +103,13 @@ export class PetitionActivityListener implements EventListener<PetitionEventType
     if (isNonNullish(lastActivityAt ?? lastRecipientActivityAt)) {
       await this.petitions.updatePetitionLastActivityDates(
         (event as PetitionEvent).petition_id,
-        removeNotDefined({
-          last_activity_at: lastActivityAt,
-          last_recipient_activity_at: lastRecipientActivityAt,
-        }),
+        omitBy(
+          {
+            last_activity_at: lastActivityAt,
+            last_recipient_activity_at: lastRecipientActivityAt,
+          },
+          isNullish,
+        ),
       );
     }
   }

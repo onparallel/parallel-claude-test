@@ -1,7 +1,7 @@
 import { formatInTimeZone } from "date-fns-tz";
 import Excel from "exceljs";
 import { IntlShape } from "react-intl";
-import { isNonNullish, minBy, partition, sortBy } from "remeda";
+import { firstBy, isNonNullish, partition, sortBy } from "remeda";
 import { Readable } from "stream";
 import {
   PetitionField,
@@ -186,7 +186,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       const petitionsFirstMessage = petitionsMessages.reduce(
         (result: Maybe<PetitionMessage>[], messages) => {
           const firstMessage =
-            minBy(messages, (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf()) ?? null;
+            firstBy(messages, (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf()) ?? null;
           return result.concat(firstMessage);
         },
         [],

@@ -34,7 +34,7 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useCallback, useMemo, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, isNullish, noop, pick } from "remeda";
+import { isNonNullish, isNullish, pick } from "remeda";
 import { ContactReference } from "../common/ContactReference";
 import { Divider } from "../common/Divider";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
@@ -190,7 +190,6 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
       }}
       onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
       onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items: items as any, page: 1 }))}
-      onSortChange={noop}
       actions={actions}
       onSelectionChange={onChangeSelectedIds}
       header={

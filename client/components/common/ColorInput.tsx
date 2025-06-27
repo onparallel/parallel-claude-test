@@ -12,7 +12,8 @@ import { cx } from "@chakra-ui/utils";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { IMaskInput } from "react-imask";
-import { noop, omit } from "remeda";
+import { omit } from "remeda";
+import { noop } from "ts-essentials";
 
 interface ColorInputProps extends ThemingProps<"Input">, FormControlOptions {
   value: string;

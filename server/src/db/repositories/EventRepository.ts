@@ -38,7 +38,7 @@ export class EventRepository extends BaseRepository {
       > = await pFlatMap(
         pipe(
           keys,
-          map.indexed((k, i) => ({ ...k, originalIndex: i })),
+          map.indexed((k, i) => ({ ...k, originalIndex: i })), // TODO: remeda upgrade
           groupBy((key) => key.tableName),
           entries(),
         ),
