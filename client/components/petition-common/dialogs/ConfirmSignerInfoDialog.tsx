@@ -30,6 +30,8 @@ interface ConfirmSignerInfoDialogProps {
   selection: SignerSelectSelection;
   repeatedSigners: { firstName: string; lastName?: string | null }[];
   allowUpdateFixedSigner?: boolean;
+  allowSignWithDigitalCertificate?: boolean;
+  disableSignWithDigitalCertificate?: boolean;
   tone?: Tone;
 }
 
@@ -37,6 +39,8 @@ function ConfirmSignerInfoDialog({
   selection,
   repeatedSigners,
   allowUpdateFixedSigner,
+  allowSignWithDigitalCertificate,
+  disableSignWithDigitalCertificate,
   tone = "INFORMAL",
   ...props
 }: DialogProps<ConfirmSignerInfoDialogProps, SignerSelectSelection>) {
@@ -52,6 +56,10 @@ function ConfirmSignerInfoDialog({
       firstName: selection.firstName,
       lastName: selection.lastName,
       isPreset: selection.isPreset ?? false,
+      ...(allowSignWithDigitalCertificate &&
+        !disableSignWithDigitalCertificate && {
+          signWithDigitalCertificate: selection.signWithDigitalCertificate ?? false,
+        }),
     },
   });
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -113,7 +121,7 @@ function ConfirmSignerInfoDialog({
             </>
           ) : null}
           <FormControl id="email" isInvalid={!!errors.email}>
-            <FormLabel fontWeight={400}>
+            <FormLabel fontWeight={500}>
               <FormattedMessage id="generic.email" defaultMessage="Email" />
             </FormLabel>
             <Input
@@ -136,7 +144,7 @@ function ConfirmSignerInfoDialog({
           </FormControl>
 
           <FormControl isInvalid={!!errors.firstName}>
-            <FormLabel fontWeight={400}>
+            <FormLabel fontWeight={500}>
               <FormattedMessage id="generic.forms-first-name-label" defaultMessage="First name" />
             </FormLabel>
             <Input {...firstNameProps} />
@@ -148,7 +156,7 @@ function ConfirmSignerInfoDialog({
             </FormErrorMessage>
           </FormControl>
           <FormControl isInvalid={!!errors.lastName}>
-            <FormLabel fontWeight={400}>
+            <FormLabel fontWeight={500}>
               <FormattedMessage id="generic.forms-last-name-label" defaultMessage="Last name" />
             </FormLabel>
             <Input {...register("lastName", { required: true })} />
@@ -182,6 +190,37 @@ function ConfirmSignerInfoDialog({
               </HStack>
             </FormControl>
           )}
+          {allowSignWithDigitalCertificate ? (
+            <FormControl isDisabled={disableSignWithDigitalCertificate}>
+              <HStack alignItems="center" justifyContent="space-between">
+                <Flex alignItems="center">
+                  <FormLabel fontWeight={400} margin="auto">
+                    <FormattedMessage
+                      id="component.confirm-signer-info-dialog.sign-with-digital-certificate"
+                      defaultMessage="Sign with digital certificate"
+                    />
+                  </FormLabel>
+                  <HelpPopover>
+                    <Stack fontSize="sm">
+                      <Text>
+                        <FormattedMessage
+                          id="component.confirm-signer-info-dialog.sign-with-digital-certificate-popover-1"
+                          defaultMessage="Enable this option to require a digital certificate for signing."
+                        />
+                      </Text>
+                      <Text>
+                        <FormattedMessage
+                          id="component.confirm-signer-info-dialog.sign-with-digital-certificate-popover-2"
+                          defaultMessage="This setting is only recommended for signers within the organization who have a digital certificate stored in their Signaturit account."
+                        />
+                      </Text>
+                    </Stack>
+                  </HelpPopover>
+                </Flex>
+                <Switch {...register("signWithDigitalCertificate")} />
+              </HStack>
+            </FormControl>
+          ) : null}
         </Stack>
       }
       confirm={

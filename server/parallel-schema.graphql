@@ -1038,6 +1038,7 @@ enum FeatureFlag {
   REMOVE_WHY_WE_USE_PARALLEL
   SETTING_DELEGATE_ACCESS
   SHOW_CONTACTS_BUTTON
+  SIGN_WITH_DIGITAL_CERTIFICATE
   SKIP_FORWARD_SECURITY
   TEMPLATE_REPLIES_CSV_EXPORT_TASK
   TEMPLATE_REPLIES_PREVIEW_URL
@@ -6095,6 +6096,7 @@ type PetitionSigner {
   fullName: String!
   isPreset: Boolean!
   lastName: String
+  signWithDigitalCertificate: Boolean
 }
 
 """
@@ -8784,6 +8786,7 @@ input SignatureConfigInputSigner {
   firstName: String!
   isPreset: Boolean
   lastName: String
+  signWithDigitalCertificate: Boolean
 }
 
 """

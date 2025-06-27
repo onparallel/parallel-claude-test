@@ -1050,6 +1050,7 @@ export const PetitionSigner = objectType({
     t.boolean("isPreset", {
       resolve: (o) => o.isPreset ?? false,
     });
+    t.nullable.boolean("signWithDigitalCertificate");
   },
   sourceType: /* ts */ `{
     contactId?: number;
@@ -1057,6 +1058,7 @@ export const PetitionSigner = objectType({
     lastName: string;
     email: string;
     isPreset?: boolean;
+    signWithDigitalCertificate?: boolean;
   }`,
 });
 

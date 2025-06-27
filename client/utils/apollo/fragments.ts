@@ -8,6 +8,7 @@ const FullPetitionSigner = gql`
     fullName
     email
     isPreset
+    signWithDigitalCertificate
   }
 `;
 

@@ -141,7 +141,13 @@ export function ConfirmPetitionSignersDialog(
         onChange([
           ...signers,
           repeatedSigners.length > 0
-            ? await showConfirmSignerInfo({ selection: contact!, repeatedSigners })
+            ? await showConfirmSignerInfo({
+                selection: contact!,
+                repeatedSigners,
+                allowSignWithDigitalCertificate: props.user.hasSignWithDigitalCertificate,
+                disableSignWithDigitalCertificate:
+                  props.signatureConfig.integration?.provider !== "SIGNATURIT",
+              })
             : contact!,
         ]);
       } catch {}
@@ -157,6 +163,9 @@ export function ConfirmPetitionSignersDialog(
           await showConfirmSignerInfo({
             selection: signer,
             repeatedSigners: [],
+            allowSignWithDigitalCertificate: props.user.hasSignWithDigitalCertificate,
+            disableSignWithDigitalCertificate:
+              props.signatureConfig.integration?.provider !== "SIGNATURIT",
           }),
           ...signers.slice(index + 1),
         ]);
@@ -262,6 +271,7 @@ export function ConfirmPetitionSignersDialog(
                     firstName: s.firstName,
                     lastName: s.lastName ?? "",
                     isPreset: s.isPreset,
+                    signWithDigitalCertificate: s.signWithDigitalCertificate,
                   })),
                   ...presetSigners.map((s) => ({
                     contactId: s.contactId,
@@ -269,6 +279,7 @@ export function ConfirmPetitionSignersDialog(
                     firstName: s.firstName,
                     lastName: s.lastName ?? "",
                     isPreset: true,
+                    signWithDigitalCertificate: s.signWithDigitalCertificate,
                   })),
                 ],
                 allowAdditionalSigners: props.isInteractionWithRecipientsEnabled
@@ -636,6 +647,7 @@ ConfirmPetitionSignersDialog.fragments = {
         firstName
         lastName
         ...SuggestedSigners_User
+        hasSignWithDigitalCertificate: hasFeatureFlag(featureFlag: SIGN_WITH_DIGITAL_CERTIFICATE)
       }
       ${SuggestedSigners.fragments.User}
     `;
@@ -645,6 +657,7 @@ ConfirmPetitionSignersDialog.fragments = {
       fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
         ...Fragments_FullPetitionSigner
         ...SelectedSignerRow_PetitionSigner
+        signWithDigitalCertificate
       }
       ${Fragments.FullPetitionSigner}
       ${SelectedSignerRow.fragments.PetitionSigner}
@@ -660,6 +673,9 @@ ConfirmPetitionSignersDialog.fragments = {
         useCustomDocument
         signers {
           ...ConfirmPetitionSignersDialog_PetitionSigner
+        }
+        integration {
+          provider
         }
       }
       ${this.PetitionSigner}

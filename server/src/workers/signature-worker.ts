@@ -6,6 +6,7 @@ import pMap from "p-map";
 import { isNonNullish, omit } from "remeda";
 import { CONFIG, Config } from "../config";
 import { ContactLocale, OrgIntegration } from "../db/__types";
+import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import { FileRepository } from "../db/repositories/FileRepository";
 import {
   IntegrationProvider,
@@ -60,6 +61,7 @@ export type SignatureWorkerPayload = {
 @injectable()
 export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
   constructor(
+    @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository,
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(IntegrationRepository) private integrations: IntegrationRepository,
@@ -121,9 +123,16 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
     const integration = await this.fetchOrgSignatureIntegration(orgIntegrationId);
     try {
       const owner = await this.petitions.loadPetitionOwner(petition.id);
+
+      const hasSignWithCertificate = await this.featureFlags.orgHasFeatureFlag(
+        petition.org_id,
+        "SIGN_WITH_DIGITAL_CERTIFICATE",
+      );
+
       const recipients = signersInfo.map((signer) => ({
         name: fullName(signer.firstName, signer.lastName),
         email: signer.email,
+        signWithDigitalCertificate: hasSignWithCertificate && !!signer.signWithDigitalCertificate,
       }));
 
       const outputFileName =

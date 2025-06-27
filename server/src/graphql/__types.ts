@@ -445,6 +445,7 @@ export interface NexusGenInputs {
     firstName: string; // String!
     isPreset?: boolean | null; // Boolean
     lastName?: string | null; // String
+    signWithDigitalCertificate?: boolean | null; // Boolean
   };
   SortByInput: {
     // input type
@@ -1574,6 +1575,7 @@ export interface NexusGenObjects {
     lastName: string;
     email: string;
     isPreset?: boolean;
+    signWithDigitalCertificate?: boolean;
   };
   PetitionTaggedEvent: petitionEvents.PetitionTaggedEvent;
   PetitionTemplate: db.Petition;
@@ -3744,6 +3746,7 @@ export interface NexusGenFieldTypes {
     fullName: string; // String!
     isPreset: boolean; // Boolean!
     lastName: string | null; // String
+    signWithDigitalCertificate: boolean | null; // Boolean
   };
   PetitionTaggedEvent: {
     // field return type
@@ -6908,6 +6911,7 @@ export interface NexusGenFieldTypeNames {
     fullName: "String";
     isPreset: "Boolean";
     lastName: "String";
+    signWithDigitalCertificate: "Boolean";
   };
   PetitionTaggedEvent: {
     // field return type name

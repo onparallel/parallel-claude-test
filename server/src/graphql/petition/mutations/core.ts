@@ -642,6 +642,7 @@ export const SignatureConfigInput = inputObjectType({
           t.string("lastName");
           t.nonNull.string("email");
           t.nullable.boolean("isPreset");
+          t.nullable.boolean("signWithDigitalCertificate");
         },
       }),
     });

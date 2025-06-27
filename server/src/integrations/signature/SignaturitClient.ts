@@ -166,9 +166,10 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
               recipients: recipients.map((r, recipientIndex) => ({
                 email: r.email,
                 name: r.name,
+                sign_with_digital_certificate_file: r.signWithDigitalCertificate ? 1 : 0,
                 widgets: [
                   {
-                    type: "signature",
+                    type: r.signWithDigitalCertificate ? "dcf" : "signature",
                     word_anchor: `3cb39pzCQA9wJ${recipientIndex}`,
                     height: 7.5, // 7.5% of page height
                     width:
@@ -241,12 +242,10 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
     return await this.withSignaturitSDK(async (sdk) => {
       const [signatureId, documentId] = externalId.split("/");
 
-      const result = await retry(
-        async () => await sdk.downloadSignedDocument(signatureId, documentId),
-        { maxRetries: 3, delay: 5_000 },
-      );
-
-      return Buffer.from(result);
+      return await retry(async () => await sdk.downloadSignedDocument(signatureId, documentId), {
+        maxRetries: 3,
+        delay: 5_000,
+      });
     });
   }
 
@@ -254,12 +253,10 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
     return await this.withSignaturitSDK(async (sdk) => {
       const [signatureId, documentId] = externalId.split("/");
 
-      const result = await retry(
-        async () => await sdk.downloadAuditTrail(signatureId, documentId),
-        { maxRetries: 3, delay: 5_000 },
-      );
-
-      return Buffer.from(result);
+      return await retry(async () => await sdk.downloadAuditTrail(signatureId, documentId), {
+        maxRetries: 3,
+        delay: 5_000,
+      });
     });
   }
 
@@ -592,7 +589,7 @@ interface SignaturitWidget {
   width?: number;
   top?: number;
   left?: number;
-  type: "date" | "image" | "check" | "radio" | "select" | "text" | "signature";
+  type: "date" | "image" | "check" | "radio" | "select" | "text" | "signature" | "dcf";
   default?: any;
   /**
    * Set this value to find a single world in the document and anchor the widget to that position. If the word is found multiple times, there will be a widget for each one. This parameter doesn't support spaces or symbols like _ or @.
@@ -763,7 +760,7 @@ class SignaturitSDK {
     return await this.apiRequest<SignaturitBrandingResponse>(
       "POST",
       "/v3/brandings.json",
-      new URLSearchParams(flatten(params)),
+      flatten(params),
     );
   }
 
@@ -771,7 +768,7 @@ class SignaturitSDK {
     return await this.apiRequest<SignaturitBrandingResponse>(
       "PATCH",
       `/v3/brandings/${brandingId}.json`,
-      new URLSearchParams(flatten(params)),
+      flatten(params),
     );
   }
 }

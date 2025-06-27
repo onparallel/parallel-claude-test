@@ -182,7 +182,14 @@ export function SignatureConfigDialog({
         instructions: data.showInstructions ? data.instructions : null,
         signersInfo: data.includePresetSigners
           ? data.signersInfo.map((s) =>
-              pick(s, ["firstName", "lastName", "email", "contactId", "isPreset"]),
+              pick(s, [
+                "firstName",
+                "lastName",
+                "email",
+                "contactId",
+                "isPreset",
+                "signWithDigitalCertificate",
+              ]),
             )
           : [],
         useCustomDocument: data.useCustomDocument,
@@ -695,6 +702,8 @@ function SignatureConfigDialogBodyStep3({
   const signingMode = watch("signingMode");
   const isSequential = signingMode === "SEQUENTIAL";
 
+  const integrationProvider = watch("integration.provider");
+
   const isPetition = petition.__typename === "Petition";
 
   const intl = useIntl();
@@ -715,6 +724,8 @@ function SignatureConfigDialogBodyStep3({
                 selection: { ...contact!, isPreset: false },
                 repeatedSigners,
                 allowUpdateFixedSigner: petition.__typename === "PetitionTemplate",
+                allowSignWithDigitalCertificate: user.hasSignWithDigitalCertificate,
+                disableSignWithDigitalCertificate: integrationProvider !== "SIGNATURIT",
               })
             : {
                 ...pick(contact!, ["firstName", "lastName", "email"]),
@@ -735,6 +746,8 @@ function SignatureConfigDialogBodyStep3({
             selection: signer,
             repeatedSigners: [],
             allowUpdateFixedSigner: petition.__typename === "PetitionTemplate",
+            allowSignWithDigitalCertificate: user.hasSignWithDigitalCertificate,
+            disableSignWithDigitalCertificate: integrationProvider !== "SIGNATURIT",
           }),
           ...signersInfo.slice(index + 1),
         ]);
@@ -888,6 +901,7 @@ SignatureConfigDialog.fragments = {
         name
         isDefault
         environment
+        provider
       }
     `;
   },
@@ -896,6 +910,7 @@ SignatureConfigDialog.fragments = {
       fragment SignatureConfigDialog_User on User {
         id
         hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
+        hasSignWithDigitalCertificate: hasFeatureFlag(featureFlag: SIGN_WITH_DIGITAL_CERTIFICATE)
         firstName
         lastName
         email

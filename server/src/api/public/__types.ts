@@ -916,6 +916,7 @@ export type FeatureFlag =
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SETTING_DELEGATE_ACCESS"
   | "SHOW_CONTACTS_BUTTON"
+  | "SIGN_WITH_DIGITAL_CERTIFICATE"
   | "SKIP_FORWARD_SECURITY"
   | "TEMPLATE_REPLIES_CSV_EXPORT_TASK"
   | "TEMPLATE_REPLIES_PREVIEW_URL";
@@ -4885,6 +4886,7 @@ export type PetitionSigner = {
   fullName: Scalars["String"]["output"];
   isPreset: Scalars["Boolean"]["output"];
   lastName: Maybe<Scalars["String"]["output"]>;
+  signWithDigitalCertificate: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 /** The status of a petition. */
@@ -6792,6 +6794,7 @@ export type SignatureConfigInputSigner = {
   firstName: Scalars["String"]["input"];
   isPreset?: InputMaybe<Scalars["Boolean"]["input"]>;
   lastName?: InputMaybe<Scalars["String"]["input"]>;
+  signWithDigitalCertificate?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 /** The signing mode of a signature config */

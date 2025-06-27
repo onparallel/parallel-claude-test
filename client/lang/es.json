@@ -2000,6 +2000,21 @@
     "context": "Required signers cannot be removed once the parallel is created."
   },
   {
+    "term": "component.confirm-signer-info-dialog.sign-with-digital-certificate",
+    "definition": "Firmar con certificado digital",
+    "context": "Sign with digital certificate"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.sign-with-digital-certificate-popover-1",
+    "definition": "Activa esta opción para requerir un certificado digital para firmar.",
+    "context": "Enable this option to require a digital certificate for signing."
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.sign-with-digital-certificate-popover-2",
+    "definition": "Esta opción solo es recomendable para firmantes de la organización con certificado digital almacenado en su cuenta de Signaturit.",
+    "context": "This setting is only recommended for signers within the organization who have a digital certificate stored in their Signaturit account."
+  },
+  {
     "term": "component.confirm-signer-info-dialog.title",
     "definition": "Confirme los datos del firmante",
     "context": "Confirm the signer's information"
@@ -4103,6 +4118,16 @@
     "term": "component.feature-flag-descriptions.show-contacts-button-name",
     "definition": "Mostrar el botón de contactos",
     "context": "Show contacts button"
+  },
+  {
+    "term": "component.feature-flag-descriptions.sign-with-digital-certificate-description",
+    "definition": "Permite a cada firmante en la peticion firmar con un certificado digital previamente subido",
+    "context": "Allows each signer on a petition to sign with a previously uploaded digital certificate"
+  },
+  {
+    "term": "component.feature-flag-descriptions.sign-with-digital-certificate-name",
+    "definition": "Firmar con certificado digital",
+    "context": "Sign with digital certificate"
   },
   {
     "term": "component.feature-flag-descriptions.skip-forward-security-description",

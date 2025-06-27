@@ -214,6 +214,7 @@ export interface PetitionSignatureConfigSigner {
   lastName: string;
   email: string;
   isPreset?: boolean; // preset signers can only be edited on compose
+  signWithDigitalCertificate?: boolean;
 }
 
 export interface PetitionSignatureConfig {

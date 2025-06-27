@@ -448,6 +448,18 @@ export function useFeatureFlags() {
               defaultMessage: "Shows the contacts button in nav bar",
             }),
           },
+          {
+            name: "SIGN_WITH_DIGITAL_CERTIFICATE",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.sign-with-digital-certificate-name",
+              defaultMessage: "Sign with digital certificate",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.sign-with-digital-certificate-description",
+              defaultMessage:
+                "Allows each signer on a petition to sign with a previously uploaded digital certificate",
+            }),
+          },
           ...(["ca", "it", "pt"] as const).map((locale) => {
             const lang = locales.find((l) => l.key === locale)!.localizedLabel;
             return {

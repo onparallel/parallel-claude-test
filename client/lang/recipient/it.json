@@ -65,6 +65,21 @@
     "context": "Required signers cannot be removed once the parallel is created."
   },
   {
+    "term": "component.confirm-signer-info-dialog.sign-with-digital-certificate",
+    "definition": "Firma con certificato digitale",
+    "context": "Sign with digital certificate"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.sign-with-digital-certificate-popover-1",
+    "definition": "Abilita questa opzione per richiedere un certificato digitale per la firma.",
+    "context": "Enable this option to require a digital certificate for signing."
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.sign-with-digital-certificate-popover-2",
+    "definition": "Questa impostazione è consigliata solo per i firmatari all'interno dell'organizzazione che hanno un certificato digitale memorizzato nel loro account Signaturit.",
+    "context": "This setting is only recommended for signers within the organization who have a digital certificate stored in their Signaturit account."
+  },
+  {
     "term": "component.confirm-signer-info-dialog.title",
     "definition": "Conferma i dati del firmatario",
     "context": "Confirm the signer's information"

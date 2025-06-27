@@ -98,7 +98,8 @@ export type FeatureFlagName =
   | "PROFILE_SEARCH_FIELD"
   | "REMOVE_PREVIEW_FILES"
   | "DOCUMENT_PROCESSING"
-  | "ADVERSE_MEDIA_SEARCH";
+  | "ADVERSE_MEDIA_SEARCH"
+  | "SIGN_WITH_DIGITAL_CERTIFICATE";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -140,6 +141,7 @@ export const FeatureFlagNameValues = [
   "REMOVE_PREVIEW_FILES",
   "DOCUMENT_PROCESSING",
   "ADVERSE_MEDIA_SEARCH",
+  "SIGN_WITH_DIGITAL_CERTIFICATE",
 ] as FeatureFlagName[];
 
 export type IntegrationType =

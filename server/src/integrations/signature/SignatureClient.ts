@@ -41,6 +41,7 @@ export interface SignatureResponse {
 export interface Recipient {
   email: string;
   name: string;
+  signWithDigitalCertificate: boolean;
 }
 
 export const SIGNATURE_CLIENT = Symbol.for("SIGNATURE_CLIENT");
