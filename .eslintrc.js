@@ -63,7 +63,14 @@ module.exports = {
           },
           {
             name: "@chakra-ui/react",
-            importNames: ["Collapse"],
+            importNames: [
+              "Collapse",
+              "Accordion",
+              "AccordionPanel",
+              "AccordionItem",
+              "AccordionButton",
+              "AccordionIcon",
+            ],
             message:
               'Please use the Chakra V3 compatible components from "@parallel/components/ui" instead of "@chakra-ui/react"',
           },

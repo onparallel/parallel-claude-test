@@ -1,10 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
 import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
   Box,
   BoxProps,
   Button,
@@ -52,6 +47,7 @@ import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { NakedLink } from "../common/Link";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
+import { Accordion } from "../ui";
 import { NoRepliesHintWithButton } from "./NoRepliesHintWithButton";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
 import { PetitionRepliesFilteredFields } from "./PetitionRepliesFilteredFields";
@@ -742,9 +738,9 @@ function PetitionRepliesFieldAttachments({
   onAttachmentClick: (attachmentId: string) => void;
 }) {
   return (
-    <Accordion allowToggle margin={-1}>
-      <AccordionItem border="none">
-        <AccordionButton
+    <Accordion.Root collapsible margin={-1}>
+      <Accordion.Item border="none">
+        <Accordion.ItemTrigger
           width="auto"
           color="gray.700"
           _hover={{ background: "transparent" }}
@@ -760,10 +756,10 @@ function PetitionRepliesFieldAttachments({
                 values={{ count: attachments.length }}
               />
             </Box>
-            <AccordionIcon />
+            <Accordion.ItemIndicator />
           </Stack>
-        </AccordionButton>
-        <AccordionPanel
+        </Accordion.ItemTrigger>
+        <Accordion.ItemContent
           paddingTop={2}
           paddingX={1}
           paddingBottom={1}
@@ -778,9 +774,9 @@ function PetitionRepliesFieldAttachments({
               onClick={() => onAttachmentClick(attachment.id)}
             />
           ))}
-        </AccordionPanel>
-      </AccordionItem>
-    </Accordion>
+        </Accordion.ItemContent>
+      </Accordion.Item>
+    </Accordion.Root>
   );
 }
 

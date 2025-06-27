@@ -1,10 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
   Box,
   Button,
   Flex,
@@ -36,6 +31,7 @@ import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMe
 import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
+import { Accordion } from "@parallel/components/ui";
 import {
   PetitionFieldTitleContent_LandingTemplateFieldFragment,
   PetitionFieldTitleContent_PetitionFieldFragment,
@@ -344,26 +340,26 @@ export function TemplateDetailsModal({
                 )}
               </HStack>
             </Flex>
-            <Accordion
-              defaultIndex={[template.descriptionHtml ? 0 : 1]}
+            <Accordion.Root
+              defaultValue={[template.descriptionHtml ? "0" : "1"]}
               sx={{
                 Button: {
                   _hover: { backgroundColor: "gray.75" },
                 },
               }}
             >
-              <AccordionItem borderTop="none">
-                <AccordionButton>
+              <Accordion.Item borderTop="none">
+                <Accordion.ItemTrigger>
                   <Text as="b" flex="1" textAlign="left">
                     <FormattedMessage
                       id="component.template-details-modal.about"
                       defaultMessage="About this template"
                     />
                   </Text>
-                  <AccordionIcon />
-                </AccordionButton>
+                  <Accordion.ItemIndicator />
+                </Accordion.ItemTrigger>
 
-                <AccordionPanel paddingBottom={3}>
+                <Accordion.ItemContent paddingBottom={3}>
                   {template.descriptionHtml ? (
                     <HtmlBlock dangerousInnerHtml={template.descriptionHtml} />
                   ) : (
@@ -374,21 +370,21 @@ export function TemplateDetailsModal({
                       />
                     </Text>
                   )}
-                </AccordionPanel>
-              </AccordionItem>
+                </Accordion.ItemContent>
+              </Accordion.Item>
 
-              <AccordionItem>
-                <AccordionButton>
+              <Accordion.Item>
+                <Accordion.ItemTrigger>
                   <Text as="b" flex="1" textAlign="left">
                     <FormattedMessage
                       id="component.template-details-modal.content"
                       defaultMessage="Content"
                     />
                   </Text>
-                  <AccordionIcon />
-                </AccordionButton>
+                  <Accordion.ItemIndicator />
+                </Accordion.ItemTrigger>
 
-                <AccordionPanel paddingStart={7} paddingBottom={3}>
+                <Accordion.ItemContent paddingStart={7} paddingBottom={3}>
                   {fieldsWithIndices.map(([field, fieldIndex, childrenFieldIndices]) => {
                     if (field.type === "HEADING") {
                       if (!field.title) {
@@ -428,9 +424,9 @@ export function TemplateDetailsModal({
                       </Fragment>
                     );
                   })}
-                </AccordionPanel>
-              </AccordionItem>
-            </Accordion>
+                </Accordion.ItemContent>
+              </Accordion.Item>
+            </Accordion.Root>
           </ModalBody>
         </ModalContent>
       </ModalOverlay>

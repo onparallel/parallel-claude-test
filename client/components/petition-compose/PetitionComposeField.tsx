@@ -6,14 +6,18 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  HStack,
+  Heading,
   IconButton,
   Input,
   Stack,
   Switch,
   Text,
 } from "@chakra-ui/react";
+import { Tooltip } from "@parallel/chakra/components";
 import {
   CalculatorIcon,
+  ChevronFilledIcon,
   ChevronRightIcon,
   ConditionIcon,
   CopyIcon,
@@ -46,59 +50,49 @@ import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { getMinMaxCheckboxLimit, usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
 import { withError } from "@parallel/utils/promises/withError";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
-import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
-import useMergedRef from "@react-hook/merged-ref";
-import { fromEvent } from "file-selector";
-import pMap from "p-map";
-import { RefObject, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { XYCoord, useDrag, useDrop } from "react-dnd";
-import { useDropzone } from "react-dropzone";
-import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, omit, sumBy, takeWhile } from "remeda";
-import { ConfimationPopover } from "../common/ConfirmationPopover";
-import { FileSize } from "../common/FileSize";
-import { GrowingTextarea } from "../common/GrowingTextarea";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { InternalFieldBadge } from "../common/InternalFieldBadge";
-import { NakedLink } from "../common/Link";
-import { SmallPopover } from "../common/SmallPopover";
-import { useErrorDialog } from "../common/dialogs/ErrorDialog";
-import { CheckboxTypeLabel } from "../petition-common/CheckboxTypeLabel";
-import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
-import { PetitionComposeDragActiveIndicator } from "./PetitionComposeDragActiveIndicator";
-import { PetitionComposeFieldAttachment } from "./PetitionComposeFieldAttachment";
-import {
-  PetitionFieldOptionsListEditor,
-  PetitionFieldOptionsListEditorRef,
-} from "./PetitionFieldOptionsListEditor";
-import { PetitionFieldVisibilityEditor } from "./logic/PetitionFieldVisibilityEditor";
-
-import {
-  Accordion,
-  AccordionButton,
-  AccordionItem,
-  AccordionPanel,
-  HStack,
-  Heading,
-} from "@chakra-ui/react";
-import { Tooltip } from "@parallel/chakra/components";
-import { ChevronFilledIcon } from "@parallel/chakra/icons";
 import { Assert, UnwrapArray } from "@parallel/utils/types";
+import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import { useConstant } from "@parallel/utils/useConstant";
 import { useHasAdverseMediaSearch } from "@parallel/utils/useHasAdverseMediaSearch";
 import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
 import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
+import useMergedRef from "@react-hook/merged-ref";
 import usePrevious from "@react-hook/previous";
+import { fromEvent } from "file-selector";
+import pMap from "p-map";
+import { RefObject, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { XYCoord, useDrag, useDrop } from "react-dnd";
 import { NativeTypes } from "react-dnd-html5-backend";
+import { useDropzone } from "react-dropzone";
+import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish, omit, sumBy, takeWhile } from "remeda";
 import { AlertPopover } from "../common/AlertPopover";
+import { ConfimationPopover } from "../common/ConfirmationPopover";
+import { FileSize } from "../common/FileSize";
+import { GrowingTextarea } from "../common/GrowingTextarea";
 import { HelpCenterLink } from "../common/HelpCenterLink";
 import { HelpPopover } from "../common/HelpPopover";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { InternalFieldBadge } from "../common/InternalFieldBadge";
+import { NakedLink } from "../common/Link";
 import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
 import { NumberingBadge } from "../common/NumberingBadge";
+import { SmallPopover } from "../common/SmallPopover";
+import { useErrorDialog } from "../common/dialogs/ErrorDialog";
+import { CheckboxTypeLabel } from "../petition-common/CheckboxTypeLabel";
+import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
 import { RestrictedPetitionFieldAlert } from "../petition-common/alerts/RestrictedPetitionFieldAlert";
+import { Accordion } from "../ui";
+import { PetitionComposeDragActiveIndicator } from "./PetitionComposeDragActiveIndicator";
+import { PetitionComposeFieldAttachment } from "./PetitionComposeFieldAttachment";
 import { PetitionComposeFieldGroupChildren } from "./PetitionComposeFieldGroupChildren";
+import {
+  PetitionFieldOptionsListEditor,
+  PetitionFieldOptionsListEditorRef,
+} from "./PetitionFieldOptionsListEditor";
 import { PetitionFieldMathEditor } from "./logic/PetitionFieldMathEditor";
+import { PetitionFieldVisibilityEditor } from "./logic/PetitionFieldVisibilityEditor";
 
 export type PetitionComposeFieldSelection =
   | PetitionComposeField_PetitionFieldFragment
@@ -1724,21 +1718,21 @@ const PetitionComposeFieldVisibilityAccordion = chakraForwardRef<
   PetitionComposeFieldVisibilityAccordionProps
 >(function PetitionComposeFieldVisibilityAccordion({ isOpen, children }, ref) {
   return (
-    <Accordion
-      defaultIndex={isOpen ? [0] : undefined}
-      allowToggle
+    <Accordion.Root
+      defaultValue={isOpen ? ["0"] : undefined}
+      collapsible
       reduceMotion
       borderRadius="md"
       backgroundColor="gray.100"
       border="none"
       ref={ref}
     >
-      <AccordionItem border="none">
+      <Accordion.Item border="none">
         {({ isExpanded }) => {
           return (
             <>
               <Heading>
-                <AccordionButton borderRadius="md" paddingY={3}>
+                <Accordion.ItemTrigger borderRadius="md" paddingY={3}>
                   <HStack as="span" flex="1" textAlign="left" fontSize="sm" spacing={1}>
                     <ChevronFilledIcon
                       color="gray.500"
@@ -1765,14 +1759,16 @@ const PetitionComposeFieldVisibilityAccordion = chakraForwardRef<
                       </Text>
                     </HelpPopover>
                   </HStack>
-                </AccordionButton>
+                </Accordion.ItemTrigger>
               </Heading>
-              <AccordionPanel padding={0}>{isExpanded ? children : null}</AccordionPanel>
+              <Accordion.ItemContent padding={0}>
+                {isExpanded ? children : null}
+              </Accordion.ItemContent>
             </>
           );
         }}
-      </AccordionItem>
-    </Accordion>
+      </Accordion.Item>
+    </Accordion.Root>
   );
 });
 
@@ -1790,21 +1786,21 @@ const PetitionComposeFieldVariablesAccordion = chakraForwardRef<
   ref,
 ) {
   return (
-    <Accordion
-      defaultIndex={isOpen ? [0] : undefined}
-      allowToggle
+    <Accordion.Root
+      defaultValue={isOpen ? ["0"] : undefined}
+      collapsible
       reduceMotion
       borderRadius="md"
       backgroundColor="purple.75"
       border="none"
       ref={ref}
     >
-      <AccordionItem border="none">
+      <Accordion.Item border="none">
         {({ isExpanded }) => {
           return (
             <>
               <Heading position="relative">
-                <AccordionButton borderRadius="md" backgroundColor="purple.75" paddingY={3}>
+                <Accordion.ItemTrigger borderRadius="md" backgroundColor="purple.75" paddingY={3}>
                   <HStack as="span" flex="1" textAlign="left" fontSize="sm" spacing={1}>
                     <ChevronFilledIcon
                       color="gray.500"
@@ -1831,7 +1827,7 @@ const PetitionComposeFieldVariablesAccordion = chakraForwardRef<
                       </Text>
                     </HelpPopover>
                   </HStack>
-                </AccordionButton>
+                </Accordion.ItemTrigger>
                 {!isReadOnly ? (
                   <Flex position="absolute" insetEnd={3} top={1}>
                     <Button
@@ -1846,13 +1842,13 @@ const PetitionComposeFieldVariablesAccordion = chakraForwardRef<
                   </Flex>
                 ) : null}
               </Heading>
-              <AccordionPanel paddingY={0} paddingX={3} paddingBottom={2}>
+              <Accordion.ItemContent paddingY={0} paddingX={3} paddingBottom={2}>
                 {isExpanded ? children : null}
-              </AccordionPanel>
+              </Accordion.ItemContent>
             </>
           );
         }}
-      </AccordionItem>
-    </Accordion>
+      </Accordion.Item>
+    </Accordion.Root>
   );
 });
