@@ -364,17 +364,20 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
         cancel_reason: null,
         file_upload_id: signedDocument.id,
       });
-      await this.petitions.updatePetition(
-        petition.id,
-        {
-          // when completed, turn signature_config "off" so the signatures card on replies page don't show a "pending start" row
-          signature_config: {
-            ...petition.signature_config!,
-            isEnabled: false,
+
+      if (petition.signature_config?.isEnabled) {
+        await this.petitions.updatePetition(
+          petition.id,
+          {
+            // when completed, turn signature_config "off" so the signatures card on replies page don't show a "pending start" row
+            signature_config: {
+              ...petition.signature_config,
+              isEnabled: false,
+            },
           },
-        },
-        this.config.instanceName,
-      );
+          this.config.instanceName,
+        );
+      }
 
       const petitionSignatures = await this.petitions.loadPetitionSignaturesByPetitionId(
         petition.id,
