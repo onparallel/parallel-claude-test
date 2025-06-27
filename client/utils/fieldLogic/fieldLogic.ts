@@ -40,7 +40,7 @@ interface FieldLogicPetitionFieldInner {
   type: PetitionFieldType;
   options: any;
   visibility: PetitionFieldVisibility | null;
-  math: PetitionFieldMath[] | null;
+  math: PetitionFieldMath | null;
 }
 interface FieldLogicPetitionFieldInput extends FieldLogicPetitionFieldInner {
   children?:
@@ -147,7 +147,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
           visibilitiesById[field.id] = true;
         }
         if (visibilitiesById[field.id] && isNonNullish(field.math)) {
-          for (const { conditions, operator, operations } of field.math as PetitionFieldMath[]) {
+          for (const { conditions, operator, operations } of field.math) {
             const conditionsApply = conditions[operator === "OR" ? "some" : "every"]((c) =>
               evaluateCondition(c),
             );
@@ -236,11 +236,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
                   ...(reply.children!.find((c) => c.field.id === child.id)?.replies ?? []),
                 );
                 if (isNonNullish(child.math)) {
-                  for (const {
-                    conditions,
-                    operator,
-                    operations,
-                  } of child.math as PetitionFieldMath[]) {
+                  for (const { conditions, operator, operations } of child.math) {
                     const conditionsApply = conditions[operator === "OR" ? "some" : "every"]((c) =>
                       evaluateCondition(c),
                     );

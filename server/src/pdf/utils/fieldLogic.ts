@@ -149,7 +149,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
           visibilitiesById[field.id] = true;
         }
         if (visibilitiesById[field.id] && isNonNullish(field.math)) {
-          for (const { conditions, operator, operations } of field.math as PetitionFieldMath[]) {
+          for (const { conditions, operator, operations } of field.math as PetitionFieldMath) {
             const conditionsApply = conditions[operator === "OR" ? "some" : "every"]((c) =>
               evaluateCondition(c),
             );
@@ -242,7 +242,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
                     conditions,
                     operator,
                     operations,
-                  } of child.math as PetitionFieldMath[]) {
+                  } of child.math as PetitionFieldMath) {
                     const conditionsApply = conditions[operator === "OR" ? "some" : "every"]((c) =>
                       evaluateCondition(c),
                     );

@@ -502,7 +502,7 @@ export async function validateFieldLogic<
 
   // JSON schema is already validated here, so its safe to assign types
   const visibility = field.visibility as PetitionFieldVisibility | null;
-  const math = field.math as PetitionFieldMath[] | null;
+  const math = field.math as PetitionFieldMath | null;
 
   for (const c of visibility?.conditions ?? []) {
     const index = visibility!.conditions.indexOf(c);

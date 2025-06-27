@@ -22,6 +22,7 @@ import {
   PetitionFieldLogicConditionLogicalJoin,
   PetitionFieldMath,
   PetitionFieldMathOperation,
+  PetitionFieldMathRule,
 } from "@parallel/utils/fieldLogic/types";
 import { Fragment, SetStateAction, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -40,7 +41,7 @@ import { PetitionVariableSelect } from "./PetitionVariableSelect";
 export interface PetitionFieldMathEditorProps {
   field: PetitionFieldMathEditor_PetitionFieldFragment;
   petition: PetitionFieldMathEditor_PetitionBaseFragment;
-  onMathChange: (math: PetitionFieldMath[]) => void;
+  onMathChange: (math: PetitionFieldMath) => void;
   showErrors?: boolean;
   isReadOnly?: boolean;
   onCreateVariable?: (name: string) => Promise<string>;
@@ -92,17 +93,17 @@ export function PetitionFieldMathEditor({
           operand: { type: "NUMBER", value: 0 },
         },
       ],
-    } as PetitionFieldMath;
+    } as PetitionFieldMathRule;
   };
 
-  const [math, setMath] = useState<PetitionFieldMath[]>(() => {
-    return (field.math as PetitionFieldMath[]) || [getDefaultMath()];
+  const [math, setMath] = useState<PetitionFieldMath>(() => {
+    return (field.math as PetitionFieldMath) || [getDefaultMath()];
   });
 
   useEffect(() => {
     // Update math if field.math changes
     if (field.math && math) {
-      setMath(field.math as PetitionFieldMath[]);
+      setMath(field.math as PetitionFieldMath);
     }
   }, [field.math]);
 
@@ -110,7 +111,7 @@ export function PetitionFieldMathEditor({
     onMathChange(math);
   }, [math]);
 
-  const updateRow = function (index: number, condition: PetitionFieldMath) {
+  const updateRow = function (index: number, condition: PetitionFieldMathRule) {
     setMath((rows) => rows.map((c, i) => (i === index ? condition : c)));
   };
 
@@ -162,14 +163,14 @@ function PetitionFieldMathRow({
   showErrors,
   onCreateVariable,
 }: {
-  row: PetitionFieldMath;
-  onRowChange: (value: PetitionFieldMath) => void;
+  row: PetitionFieldMathRule;
+  onRowChange: (value: PetitionFieldMathRule) => void;
   onDelete?: () => void;
   showErrors?: boolean;
   onCreateVariable?: (name: string) => Promise<string>;
 }) {
   const intl = useIntl();
-  function setMath(dispatch: (prev: PetitionFieldMath) => PetitionFieldMath) {
+  function setMath(dispatch: (prev: PetitionFieldMathRule) => PetitionFieldMathRule) {
     onRowChange(dispatch(row));
   }
   function setMathOperator(value: SetStateAction<PetitionFieldLogicConditionLogicalJoin>) {
@@ -387,7 +388,7 @@ function PetitionFieldMathRow({
   );
 }
 
-function PetitionFieldMathRowReadOnly({ row }: { row: PetitionFieldMath }) {
+function PetitionFieldMathRowReadOnly({ row }: { row: PetitionFieldMathRule }) {
   return (
     <Stack spacing={2} padding={2} borderRadius="md" backgroundColor="purple.75">
       <Grid templateColumns="auto 1fr" alignItems="start" columnGap={2} rowGap={2}>

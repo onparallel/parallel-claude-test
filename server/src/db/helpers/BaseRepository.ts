@@ -34,7 +34,7 @@ export interface TableTypes
     {
       petition_field: Replace<
         db.PetitionField,
-        { visibility: PetitionFieldVisibility | null; math: PetitionFieldMath[] | null }
+        { visibility: PetitionFieldVisibility | null; math: PetitionFieldMath | null }
       >;
       petition_event: PetitionEvent;
       profile_event: ProfileEvent;

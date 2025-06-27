@@ -922,7 +922,7 @@ export const PetitionField = objectType({
       resolve: (o) => {
         if (isNonNullish(o.math)) {
           // map numeric IDs to GlobalId
-          const math = o.math as PetitionFieldMath[];
+          const math = o.math as PetitionFieldMath;
           return (
             mapFieldLogic<number>({ math }, (fieldId) => {
               assert(typeof fieldId === "number", "Expected fieldId to be a number");

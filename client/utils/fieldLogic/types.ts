@@ -59,7 +59,9 @@ export type PseudoPetitionFieldVisibilityConditionOperator =
   | "HAVE_REPLY"
   | "NOT_HAVE_REPLY";
 
-export interface PetitionFieldMath {
+export type PetitionFieldMath = PetitionFieldMathRule[];
+
+export interface PetitionFieldMathRule {
   operator: PetitionFieldLogicConditionLogicalJoin;
   conditions: PetitionFieldLogicCondition[];
   operations: PetitionFieldMathOperation[];

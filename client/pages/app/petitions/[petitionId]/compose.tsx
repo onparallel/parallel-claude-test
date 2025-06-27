@@ -294,7 +294,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     );
 
     const referencingMath = allFieldsWithIndices.filter(([f]) =>
-      (f.math as PetitionFieldMath[])?.some(
+      (f.math as PetitionFieldMath)?.some(
         (calc) =>
           calc.conditions.some((c) => "fieldId" in c && c.fieldId === fieldId) ||
           calc.operations.some((o) => o.operand.type === "FIELD" && o.operand.fieldId === fieldId),
@@ -332,7 +332,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       }
 
       for (const [field] of referencingMath) {
-        const newMath = (field.math! as PetitionFieldMath[])
+        const newMath = (field.math! as PetitionFieldMath)
           .map((calc) => {
             const conditions = calc.conditions.filter(
               (c) => !("fieldId" in c && c.fieldId === fieldId),
@@ -649,7 +649,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         );
 
         const referencingMath = allFieldsWithIndices.filter(([f]) =>
-          (f.math as PetitionFieldMath[])?.some((calc) =>
+          (f.math as PetitionFieldMath)?.some((calc) =>
             calc.conditions.some((c) => !validCondition(c)),
           ),
         );
@@ -675,7 +675,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             );
 
             for (const [field] of referencingMath) {
-              const newMath = (field.math! as PetitionFieldMath[])
+              const newMath = (field.math! as PetitionFieldMath)
                 .map((calc) => {
                   const conditions = calc.conditions.filter(validCondition);
 
@@ -781,7 +781,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       );
 
       const referencingMath = allFieldsWithIndices.filter(([f]) =>
-        (f.math as PetitionFieldMath[])?.some(
+        (f.math as PetitionFieldMath)?.some(
           (calc) =>
             calc.conditions.some((c) => "fieldId" in c && c.fieldId === fieldId) ||
             calc.operations.some(
@@ -815,7 +815,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             }
 
             for (const [field] of referencingMath) {
-              const newMath = (field.math! as PetitionFieldMath[])
+              const newMath = (field.math! as PetitionFieldMath)
                 .map((calc) => {
                   const conditions = calc.conditions.filter(
                     (c) => !("fieldId" in c && c.fieldId === fieldId),

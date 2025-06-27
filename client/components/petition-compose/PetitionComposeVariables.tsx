@@ -87,7 +87,7 @@ export function PetitionComposeVariables({
   );
   const handleDeleteVariable = async (name: string) => {
     const referencingMath = allFieldsWithIndices.filter(([f]) =>
-      (f.math as PetitionFieldMath[])?.some(
+      (f.math as PetitionFieldMath)?.some(
         (calc) =>
           calc.conditions.some((c) => "variableName" in c && c.variableName === name) ||
           calc.operations.some(
@@ -123,7 +123,7 @@ export function PetitionComposeVariables({
         });
       }
       for (const [field] of referencingMath) {
-        const newMath = (field.math! as PetitionFieldMath[])
+        const newMath = (field.math! as PetitionFieldMath)
           .map((calc) => {
             const conditions = calc.conditions.filter(
               (c) => !("variableName" in c && c?.variableName === name),

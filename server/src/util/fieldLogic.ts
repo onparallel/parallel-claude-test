@@ -12,7 +12,7 @@ import { UnwrapArray } from "./types";
 
 export interface PetitionFieldLogic {
   visibility: PetitionFieldVisibility | null;
-  math: PetitionFieldMath[] | null;
+  math: PetitionFieldMath | null;
 }
 export interface PetitionFieldVisibility {
   type: PetitionFieldVisibilityType;
@@ -85,7 +85,9 @@ export type PetitionFieldLogicConditionOperator =
   | "HAS_PROFILE_MATCH"
   | PetitionFieldLogicConditionListOperator;
 
-export interface PetitionFieldMath {
+export type PetitionFieldMath = PetitionFieldMathRule[];
+
+export interface PetitionFieldMathRule {
   operator: PetitionFieldLogicConditionLogicalJoin;
   conditions: PetitionFieldLogicCondition[];
   operations: PetitionFieldMathOperation[];
@@ -135,7 +137,7 @@ interface FieldLogicPetitionFieldInner {
   type: PetitionFieldType;
   options: any;
   visibility: PetitionFieldVisibility | null;
-  math: PetitionFieldMath[] | null;
+  math: PetitionFieldMath | null;
 }
 interface FieldLogicPetitionFieldInput extends FieldLogicPetitionFieldInner {
   children?:
@@ -158,7 +160,7 @@ export function mapFieldLogic<
   TIn extends number | string,
   TOut extends number | string = TIn extends number ? string : number,
 >(
-  field: { visibility?: PetitionFieldVisibility | null; math?: PetitionFieldMath[] | null },
+  field: { visibility?: PetitionFieldVisibility | null; math?: PetitionFieldMath | null },
   idMapper: (id: TIn) => TOut,
 ) {
   const lists = new Set<string>();
@@ -195,7 +197,7 @@ function mapFieldMath<
   TIn extends number | string,
   TOut extends number | string = TIn extends number ? string : number,
 >(
-  math: PetitionFieldMath[],
+  math: PetitionFieldMath,
   idMapper: (fieldId: TIn) => TOut,
   onStandardListReferenced: (listName: string) => void,
 ) {
@@ -366,7 +368,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
           visibilitiesById[field.id] = true;
         }
         if (visibilitiesById[field.id] && isNonNullish(field.math)) {
-          for (const { conditions, operator, operations } of field.math as PetitionFieldMath[]) {
+          for (const { conditions, operator, operations } of field.math) {
             const conditionsApply = conditions[operator === "OR" ? "some" : "every"]((c) =>
               evaluateCondition(c),
             );
@@ -455,11 +457,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
                   ...(reply.children!.find((c) => c.field.id === child.id)?.replies ?? []),
                 );
                 if (isNonNullish(child.math)) {
-                  for (const {
-                    conditions,
-                    operator,
-                    operations,
-                  } of child.math as PetitionFieldMath[]) {
+                  for (const { conditions, operator, operations } of child.math) {
                     const conditionsApply = conditions[operator === "OR" ? "some" : "every"]((c) =>
                       evaluateCondition(c),
                     );

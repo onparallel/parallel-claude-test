@@ -133,7 +133,7 @@ export const PetitionComposeFieldList = Object.assign(
             );
 
             const referencingMath = fields.filter((f) =>
-              (f.math as PetitionFieldMath[])?.some((calc) =>
+              (f.math as PetitionFieldMath)?.some((calc) =>
                 calc.conditions.some(
                   (c) =>
                     "fieldId" in c &&
@@ -184,7 +184,7 @@ export const PetitionComposeFieldList = Object.assign(
             // update math for fields referencing old options
             await Promise.all(
               referencingMath.map(async (field) => {
-                const math = field.math as PetitionFieldMath[];
+                const math = field.math as PetitionFieldMath;
                 await onFieldEdit(field.id, {
                   math: math.map((calc) => {
                     return {

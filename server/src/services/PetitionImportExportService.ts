@@ -145,7 +145,7 @@ interface PetitionFieldJson {
   multiple: boolean;
   options: any;
   visibility: PetitionFieldVisibility | null;
-  math: PetitionFieldMath[] | null;
+  math: PetitionFieldMath | null;
   alias: string | null;
   isInternal: boolean;
   showInPdf: boolean;

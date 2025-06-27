@@ -29,14 +29,14 @@ export function useFieldLogic(
           type: field.type,
           options: field.options,
           visibility: (field.visibility ?? null) as PetitionFieldVisibility | null,
-          math: (field.math ?? null) as PetitionFieldMath[] | null,
+          math: (field.math ?? null) as PetitionFieldMath | null,
           children:
             field.children?.map((child) => ({
               id: child.id,
               type: child.type,
               options: child.options,
               visibility: (child.visibility ?? null) as PetitionFieldVisibility | null,
-              math: (child.math ?? null) as PetitionFieldMath[] | null,
+              math: (child.math ?? null) as PetitionFieldMath | null,
               replies:
                 usePreviewReplies && child.__typename === "PetitionField"
                   ? child.previewReplies

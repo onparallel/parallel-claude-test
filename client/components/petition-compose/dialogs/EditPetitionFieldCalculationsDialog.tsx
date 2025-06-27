@@ -41,7 +41,7 @@ function EditPetitionFieldCalculationsDialog({
   ...props
 }: DialogProps<
   EditPetitionFieldCalculationsDialogProps,
-  { math: PetitionFieldMath[] | null | undefined }
+  { math: PetitionFieldMath | null | undefined }
 >) {
   // get updated values of the petition from cache
   const result = useFragment({
@@ -51,7 +51,7 @@ function EditPetitionFieldCalculationsDialog({
   });
   assert(result.complete);
   const petition = result.data;
-  const math = useRef(field.math as PetitionFieldMath[] | null | undefined);
+  const math = useRef(field.math as PetitionFieldMath | null | undefined);
   const [showErrors, setShowErrors] = useState(false);
 
   const showCreateOrEditVariableDialog = useCreateOrUpdatePetitionVariableDialog();

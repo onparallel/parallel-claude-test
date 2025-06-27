@@ -28,7 +28,9 @@ interface PetitionFieldLogicConditionBase {
   value: string | string[] | number | null;
 }
 
-export interface PetitionFieldMath {
+export type PetitionFieldMath = PetitionFieldMathRule[];
+
+export interface PetitionFieldMathRule {
   operator: PetitionFieldLogicConditionLogicalJoin;
   conditions: PetitionFieldLogicCondition[];
   operations: PetitionFieldMathOperation[];

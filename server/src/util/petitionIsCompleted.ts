@@ -12,7 +12,7 @@ interface FieldLogicPetitionFieldInner {
   type: PetitionFieldType;
   options: any;
   visibility: PetitionFieldVisibility | null;
-  math: PetitionFieldMath[] | null;
+  math: PetitionFieldMath | null;
   is_internal: boolean;
   optional: boolean;
 }

@@ -29,7 +29,7 @@ export function usePetitionComposeFieldReorder<T extends PetitionComposeFieldSel
 
   async function verifyFieldPositions(field: T, position: number, newFieldOrder: string[]) {
     const visibility = field.visibility as Maybe<PetitionFieldVisibility>;
-    const math = field.math as Maybe<PetitionFieldMath[]>;
+    const math = field.math as Maybe<PetitionFieldMath>;
 
     if (
       visibility?.conditions.some(
