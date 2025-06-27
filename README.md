@@ -48,6 +48,10 @@ On dev environment, we use [Ngrok](https://ngrok.com/) to launch a local tunnel 
 
 `brew install ngrok`
 
+Once you install ngrok, you will have to create an account in order to provide an auth token.
+Sign up for an account: https://dashboard.ngrok.com/signup
+Install your authtoken: https://dashboard.ngrok.com/get-started/your-authtoken
+
 In order to launch the localtunnel, run:
 
 `yarn workspace @parallel/server localtunnel`
