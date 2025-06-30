@@ -143,7 +143,7 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
         petitionId: petition.id,
         documentTitle: title,
         showSignatureBoxes: true,
-        maxOutputSize: 10 * 1024 * 1024, // signaturit has a 15MB limit for emails
+        maxOutputSize: 14 * 1024 * 1024, // signaturit has a 15MB limit for emails
         outputFileName,
         includeAnnexedDocuments: true,
         customDocumentTemporaryFileId,
