@@ -1567,107 +1567,114 @@ export class PetitionRepository extends BaseRepository {
   async deleteUserPermissions(
     petitionIds: number[],
     userId: number,
-    deletedBy: User,
+    deletedBy: string,
     t?: Knex.Transaction,
   ) {
-    return await this.from("petition_permission", t)
-      .whereIn("petition_id", petitionIds)
-      .where({
-        deleted_at: null,
-        user_id: userId,
-      })
-      .update({
-        deleted_at: this.now(),
-        deleted_by: `User:${deletedBy.id}`,
-      })
-      .returning("*");
+    return await pMapChunk(
+      petitionIds,
+      async (idsChunk) =>
+        await this.from("petition_permission", t)
+          .whereIn("petition_id", idsChunk)
+          .where({
+            deleted_at: null,
+            user_id: userId,
+          })
+          .update({
+            deleted_at: this.now(),
+            deleted_by: deletedBy,
+          })
+          .returning("*"),
+      { concurrency: 1, chunkSize: 1000 },
+    );
   }
 
-  async deleteAllPermissions(petitionIds: number[], user: User, t?: Knex.Transaction) {
-    return await this.withTransaction(async (t) => {
-      return await this.from("petition_permission", t)
-        .whereIn("petition_id", petitionIds)
-        .where({
-          deleted_at: null,
-        })
-        .update({
-          deleted_at: this.now(),
-          deleted_by: `User:${user.id}`,
-        })
-        .returning("*");
-    }, t);
+  async deleteAllPermissions(petitionIds: number[], deletedBy: string, t?: Knex.Transaction) {
+    return await pMapChunk(
+      petitionIds,
+      async (petitionIdsChunk) =>
+        await this.from("petition_permission", t)
+          .whereIn("petition_id", petitionIdsChunk)
+          .where({
+            deleted_at: null,
+          })
+          .update({
+            deleted_at: this.now(),
+            deleted_by: deletedBy,
+          })
+          .returning("*"),
+      { concurrency: 1, chunkSize: 1000 },
+    );
   }
 
   /**
    * Delete parallel, deactivate all accesses and cancel all scheduled messages
    */
-  async deletePetition(petitionId: MaybeArray<number>, user: User, t?: Knex.Transaction) {
+  async deletePetition(petitionId: MaybeArray<number>, deletedBy: User, t?: Knex.Transaction) {
     const petitionIds = unMaybeArray(petitionId);
+    if (petitionIds.length === 0) {
+      return [];
+    }
     return await this.withTransaction(async (t) => {
-      const [accesses, messages] = await Promise.all([
-        this.from("petition_access", t)
-          .whereIn("petition_id", petitionIds)
-          .where("status", "ACTIVE")
-          .update(
-            {
-              status: "INACTIVE",
-              updated_at: this.now(),
-              updated_by: `User:${user.id}`,
-            },
-            "*",
-          ),
-        this.from("petition_message", t)
-          .whereIn("petition_id", petitionIds)
-          .where("status", "SCHEDULED")
-          .update(
-            {
-              status: "CANCELLED",
-            },
-            "*",
-          ),
-      ]);
-      for (const [, _accesses] of Object.entries(groupBy(accesses, (a) => a.petition_id))) {
-        await this.createEvent(
-          _accesses.map((access) => ({
-            type: "ACCESS_DEACTIVATED",
-            petition_id: _accesses[0].petition_id,
-            data: {
-              petition_access_id: access.id,
-              user_id: user.id,
-              reason: "DEACTIVATED_BY_USER",
-            },
-          })),
-          t,
-        );
-      }
-      for (const [, _messages] of Object.entries(groupBy(messages, (m) => m.petition_id))) {
-        await this.createEvent(
-          _messages.map((message) => ({
-            type: "MESSAGE_CANCELLED",
-            petition_id: _messages[0].petition_id,
-            data: {
-              petition_message_id: message.id,
-              user_id: user.id,
-              reason: "CANCELLED_BY_USER",
-            },
-          })),
-          t,
-        );
-      }
+      return await pMapChunk(
+        petitionIds,
+        async (chunkIds) => {
+          const accesses = await this.from("petition_access", t)
+            .whereIn("petition_id", chunkIds)
+            .where("status", "ACTIVE")
+            .update(
+              {
+                status: "INACTIVE",
+                updated_at: this.now(),
+                updated_by: `User:${deletedBy.id}`,
+              },
+              "*",
+            );
 
-      const [petitions] = await Promise.all([
-        this.from("petition", t)
-          .whereIn("id", petitionIds)
-          .update({
-            deleted_at: this.now(),
-            deleted_by: `User:${user.id}`,
-          })
-          .returning("*"),
-        this.deletePetitionAttachmentByPetitionId(petitionIds, user, t),
-        this.from("petition_profile", t).whereIn("petition_id", petitionIds).delete(),
-      ]);
+          const messages = await this.from("petition_message", t)
+            .whereIn("petition_id", chunkIds)
+            .where("status", "SCHEDULED")
+            .update({ status: "CANCELLED" }, "*");
 
-      return petitions;
+          await this.deletePetitionAttachmentByPetitionId(chunkIds, deletedBy, t);
+
+          await this.from("petition_profile", t).whereIn("petition_id", chunkIds).delete();
+
+          await this.createEvent(
+            accesses.map((access) => ({
+              type: "ACCESS_DEACTIVATED",
+              petition_id: access.petition_id,
+              data: {
+                petition_access_id: access.id,
+                user_id: deletedBy.id,
+                reason: "DEACTIVATED_BY_USER",
+              },
+            })),
+            t,
+          );
+
+          await this.createEvent(
+            messages.map((message) => ({
+              type: "MESSAGE_CANCELLED",
+              petition_id: message.petition_id,
+              data: {
+                petition_message_id: message.id,
+                user_id: deletedBy.id,
+                reason: "CANCELLED_BY_USER",
+              },
+            })),
+            t,
+          );
+
+          return await this.from("petition", t)
+            .whereIn("id", chunkIds)
+            .update({
+              deleted_at: this.now(),
+              deleted_by: `User:${deletedBy.id}`,
+            })
+            .returning("*");
+        },
+        { concurrency: 1, chunkSize: 1000 },
+      );
     }, t);
   }
 
@@ -5433,17 +5440,6 @@ export class PetitionRepository extends BaseRepository {
         .orderByRaw("type asc, user_group_id nulls first, created_at, id"),
   );
 
-  readonly loadDirectlyAssignedUserPetitionPermissionsByUserId = this.buildLoadMultipleBy(
-    "petition_permission",
-    "user_id",
-    (q) =>
-      q
-        .whereNull("deleted_at")
-        .whereNull("user_group_id")
-        .whereNull("from_user_group_id")
-        .orderByRaw("type asc, created_at"),
-  );
-
   readonly loadPetitionOwner = this.buildLoader<number, User | null>(async (ids, t) => {
     const rows = await this.from("petition_permission", t)
       .leftJoin("user", "petition_permission.user_id", "user.id")
@@ -6023,35 +6019,36 @@ export class PetitionRepository extends BaseRepository {
   /**
    * Update the owner of the petition links owned by one of the given ownerIds
    */
-  async transferPublicLinkOwnership(
-    ownerId: number,
-    newOwnerId: number,
-    updatedBy: User,
-    t?: Knex.Transaction,
-  ) {
-    const [deleted] = await this.from("template_default_permission", t)
-      .where({ user_id: ownerId, type: "OWNER", deleted_at: null })
-      .whereRaw(
-        /* sql */ `
-        exists(select * from public_petition_link ppl where ppl.template_id = template_default_permission.template_id)
+  async transferPublicLinkOwnership(userIds: number[], newOwnerId: number, updatedBy: User) {
+    await pMapChunk(
+      userIds,
+      async (userIdsChunk) => {
+        await this.raw(
+          /* sql */ `
+          with deleted_permission as (
+            update template_default_permission
+            set 
+              deleted_at = now(),
+              deleted_by = ?
+            where
+              user_id in ?
+              and type = 'OWNER'
+              and deleted_at is null
+              and exists(
+                select * from public_petition_link ppl 
+                where ppl.template_id = template_default_permission.template_id
+              )
+            returning *
+          )
+          insert into template_default_permission ("user_id", "template_id", "type", "is_subscribed", "created_by")
+          select ?, "template_id", 'OWNER', "is_subscribed", ?
+          from deleted_permission dp;
         `,
-      )
-      .update({
-        deleted_by: `User:${updatedBy.id}`,
-        deleted_at: this.now(),
-      })
-      .returning("*");
-
-    if (deleted) {
-      await this.from("template_default_permission", t).insert({
-        user_id: newOwnerId,
-        type: "OWNER",
-        is_subscribed: deleted.is_subscribed,
-        template_id: deleted.template_id,
-        created_at: this.now(),
-        created_by: `User:${updatedBy.id}`,
-      });
-    }
+          [`User:${updatedBy.id}`, this.sqlIn(userIdsChunk), newOwnerId, `User:${updatedBy.id}`],
+        );
+      },
+      { concurrency: 1, chunkSize: 1000 },
+    );
   }
 
   /**
@@ -6062,95 +6059,56 @@ export class PetitionRepository extends BaseRepository {
     petitionIds: number[],
     toUserId: number,
     keepOriginalPermissions: boolean,
-    updatedBy: User,
-    t?: Knex.Transaction,
+    updatedBy: string,
   ) {
-    return await this.withTransaction(async (t) => {
-      // change permission of original owner to WRITE
-      const previousOwnerPermissions = await pMapChunk(
-        petitionIds,
-        async (petitionIdsChunk) =>
-          await this.from("petition_permission", t)
-            .whereIn("petition_id", petitionIdsChunk)
-            .where({
-              deleted_at: null,
-              type: "OWNER",
-            })
-            .update({
-              type: "WRITE",
-              updated_at: this.now(),
-              updated_by: `User:${updatedBy.id}`,
-            })
-            .returning("*"),
-        { chunkSize: 100, concurrency: 1 },
-      );
-
-      for (const petitionId of petitionIds) {
-        this.loadUserPermissionsByPetitionId.dataloader.clear(petitionId);
-      }
-
-      // UPSERT for new petition owner. Try to insert a new OWNER permission.
-      // If conflict, the new owner already has READ or WRITE access to the petition,
-      // so we have to update the conflicting row to have OWNER permission
-      await pMapChunk(
-        petitionIds,
-        async (petitionIdsChunk) =>
-          await t.raw(
-            /* sql */ `
-            ? on conflict (petition_id, user_id) 
-            where deleted_at is null and from_user_group_id is null and user_group_id is null
-              do update set
-              type = ?,
+    return await pMapChunk(
+      petitionIds,
+      async (petitionIdsChunk) =>
+        await this.raw<PetitionPermission & { previous_owner_id: number }>(
+          /* sql */ `
+          with previous_owner_permissions as (
+            update petition_permission
+            set
+              type = 'WRITE',
+              updated_at = now(),
               updated_by = ?,
-              updated_at = ?,
-              deleted_by = null,
-              deleted_at = null
-            returning *;`,
-            [
-              this.from("petition_permission").insert(
-                petitionIdsChunk.map((petitionId) => ({
-                  created_by: `User:${updatedBy.id}`,
-                  updated_by: `User:${updatedBy.id}`,
-                  updated_at: this.now(),
-                  type: "OWNER",
-                  user_id: toUserId,
-                  petition_id: petitionId,
-                })),
-              ),
-              "OWNER",
-              `User:${updatedBy.id}`,
-              this.now(),
-            ],
+              deleted_at = ?,
+              deleted_by = ?
+            where petition_id in ?
+            and type = 'OWNER'
+            and deleted_at is null
+            returning *
           ),
-        { chunkSize: 100, concurrency: 1 },
-      );
-
-      await this.createEvent(
-        previousOwnerPermissions.map((p) => ({
-          petition_id: p.petition_id,
-          type: "OWNERSHIP_TRANSFERRED",
-          data: {
-            user_id: updatedBy.id,
-            previous_owner_id: p.user_id!,
-            owner_id: toUserId,
-          },
-        })),
-        t,
-      );
-
-      if (!keepOriginalPermissions) {
-        await this.removePetitionPermissionsById(
-          previousOwnerPermissions.map((p) => p.id),
-          updatedBy,
-          t,
-        );
-      }
-
-      return await this.from("petition", t)
-        .whereNull("deleted_at")
-        .whereIn("id", petitionIds)
-        .returning("*");
-    }, t);
+          inserted_rows as (
+            insert into petition_permission ("petition_id", "user_id", "type", "created_by", "updated_by", "updated_at")
+            select pop.petition_id, ?, 'OWNER', ?, ?, now()
+            from previous_owner_permissions pop
+            on conflict (petition_id, user_id) where deleted_at is null and from_user_group_id is null and user_group_id is null
+            do update set
+              type = 'OWNER',
+              updated_at = EXCLUDED.updated_at,
+              updated_by = EXCLUDED.updated_by
+            returning *
+          )
+          select i.*, pop.user_id as previous_owner_id
+          from inserted_rows i
+          join previous_owner_permissions pop on i.petition_id = pop.petition_id;
+      `,
+          [
+            updatedBy,
+            keepOriginalPermissions ? null : this.now(),
+            keepOriginalPermissions ? null : updatedBy,
+            this.sqlIn(petitionIdsChunk),
+            toUserId,
+            updatedBy,
+            updatedBy,
+          ],
+        ),
+      {
+        concurrency: 1,
+        chunkSize: 1000,
+      },
+    );
   }
 
   readonly loadTemplateDefaultPermissions = this.buildLoadMultipleBy(
@@ -6275,38 +6233,6 @@ export class PetitionRepository extends BaseRepository {
           deleted_by: updatedBy,
         });
     }, t);
-  }
-
-  async transferTemplateDefaultPermissions(
-    fromUserId: number,
-    toUserId: number,
-    updatedBy: string,
-    t?: Knex.Transaction,
-  ) {
-    await this.raw(
-      /* sql */ `
-      with deleted_permission as (
-        update template_default_permission
-        set 
-          deleted_at = now(),
-          deleted_by = ?
-        where
-          user_id = ?
-          and deleted_at is null
-        returning *
-      )
-      insert into template_default_permission ("user_id", "template_id", "type", "is_subscribed", "created_by")
-      select ?, "template_id", "type", "is_subscribed", ?
-      from deleted_permission dp
-      on conflict (template_id, user_id) where deleted_at is null
-      do update
-      -- if the new owner already has a permission, we keep the highest one
-      set "type" = least(EXCLUDED.type, template_default_permission.type)
-
-    `,
-      [updatedBy, fromUserId, toUserId, updatedBy],
-      t,
-    );
   }
 
   async createPermissionsFromTemplateDefaultPermissions(
@@ -6815,7 +6741,7 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  private async deletePetitionAttachmentByPetitionId(
+  public async deletePetitionAttachmentByPetitionId(
     petitionIds: number[],
     user: User,
     t?: Knex.Transaction,
@@ -9264,6 +9190,145 @@ export class PetitionRepository extends BaseRepository {
     );
 
     return rows.map((r) => r.id);
+  }
+
+  async transferUserPetitionPermissions(
+    userIds: number[],
+    transferToUserId: number,
+    includeDrafts: boolean,
+    transferredBy: string,
+  ) {
+    return await pMapChunk(
+      userIds,
+      async (userIdsChunk) => {
+        return await this.raw<
+          {
+            petition_id: number;
+          } & (
+            | {
+                source: "transferred_petitions";
+                previous_owner_id: number;
+              }
+            | { source: "deleted_drafts" }
+          )
+        >(
+          /* sql */ `
+          with 
+          -- permissions directly assigned to userIds (not assigned to userIds via an user_group)
+          directly_assigned_petition_permissions as (
+            select pp.id, pp.user_id, pp.type, pp.petition_id, p.status as petition_status
+              from petition_permission pp
+              join petition p on pp.petition_id = p.id
+              where pp.user_id in :userIds
+              and pp.deleted_at is null
+              and pp.user_group_id is null
+              and pp.from_user_group_id is null
+              and p.deleted_at is null
+          ),
+          -- non-owner permissions for userIds will be deleted
+          non_owner_petition_permissions as (
+            select * 
+              from directly_assigned_petition_permissions dapp
+              where dapp.type != 'OWNER'
+          ),
+          -- owner permissions for userIds on petition DRAFTs will be deleted or transferred to the new owner, based on the includeDrafts arg
+          owner_draft_petition_permissions as (
+            select * from directly_assigned_petition_permissions dapp
+              where dapp.type = 'OWNER'
+              and dapp.petition_status = 'DRAFT'
+          ),
+          -- owner permissions for userIds will be transferred to the new owner
+          -- here we will delete those permissions so we can assign new OWNERs later.
+          previous_owner_petition_permissions as (
+            update petition_permission pp
+            set
+              deleted_at = now(),
+              deleted_by = :transferredBy
+            from directly_assigned_petition_permissions dapp
+            where dapp.id = pp.id
+            and dapp.type = 'OWNER'
+            and (:includeDrafts or dapp.petition_status is null or dapp.petition_status != 'DRAFT')
+            returning pp.*
+          ),
+          new_owner_petition_permissions as (
+            insert into petition_permission ("petition_id", "user_id", "type", "created_by", "updated_by", "updated_at")
+            select popp.petition_id, :transferToUserId, 'OWNER', :transferredBy, :transferredBy, now()
+            from previous_owner_petition_permissions popp
+            on conflict (petition_id, user_id) where deleted_at is null and from_user_group_id is null and user_group_id is null
+            do nothing
+            returning *
+          ),
+          -- delete non-owner permissions for userIds
+          deleted_non_owner_petition_permissions as (
+            update petition_permission pp
+            set
+              updated_at = now(),
+              updated_by = :transferredBy,
+              deleted_at = now(),
+              deleted_by = :transferredBy
+            from non_owner_petition_permissions nopp
+            where pp.id = nopp.id
+            and pp.deleted_at is null
+          ),
+          -- delete permissions on DRAFT petitions if includeDrafts=true
+          deleted_owner_draft_petition_permissions as (
+            update petition_permission pp
+            set
+              updated_at = now(),
+              updated_by = :transferredBy,
+              deleted_at = now(),
+              deleted_by = :transferredBy
+            from owner_draft_petition_permissions dodpp
+            where pp.id = dodpp.id
+            and not :includeDrafts
+            returning pp.*
+          ),
+          -- delete DRAFT petitions if those permissions were deleted
+          deleted_draft_petitions as (
+            update petition p
+            set
+              deleted_at = now(),
+              deleted_by = :transferredBy
+            from deleted_owner_draft_petition_permissions dodpp
+            where dodpp.petition_id = p.id
+            returning p.*
+          ),
+          -- delete template default permissions for userIds
+          deleted_template_default_permissions as (
+            update template_default_permission tdp
+            set
+              deleted_at = now(),
+              deleted_by = :transferredBy
+            where tdp.user_id in :userIds
+            and tdp.deleted_at is null
+            returning tdp.*
+          ),
+          -- create template default permissions for the new owner based on deleted permissions from above
+          new_template_default_permissions as (
+            insert into template_default_permission (user_id, template_id, type, is_subscribed, created_by)
+            select :transferToUserId, dtdp.template_id, dtdp.type, dtdp.is_subscribed, :transferredBy
+            from deleted_template_default_permissions dtdp
+            on conflict (template_id, user_id) where deleted_at is null
+            do update
+            -- if the new owner already has a permission, we keep the highest one
+            set "type" = least(EXCLUDED.type, template_default_permission.type)
+          )
+          -- every transferred petition
+          select popp.petition_id, popp.user_id as previous_owner_id, 'transferred_petitions' as source from previous_owner_petition_permissions popp
+          union all
+          -- every deleted DRAFT petition
+          select ddp.id as petition_id, null as previous_owner_id, 'deleted_drafts' as source from deleted_draft_petitions ddp
+        `,
+          {
+            userIds: this.sqlIn(userIdsChunk),
+            includeDrafts,
+            transferToUserId,
+            transferredBy,
+          },
+        );
+      },
+      { concurrency: 1, chunkSize: 1000 },
+    );
   }
 }
 

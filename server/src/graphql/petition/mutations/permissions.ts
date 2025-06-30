@@ -1,4 +1,5 @@
 import { booleanArg, list, mutationField, nonNull } from "nexus";
+import { Petition } from "../../../db/__types";
 import { authenticate, authenticateAnd, chain } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { validateAnd } from "../../helpers/validateArgs";
@@ -21,7 +22,26 @@ export const transferPetitionOwnership = mutationField("transferPetitionOwnershi
   },
   validateArgs: validateAnd(notEmptyArray("petitionIds")),
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.transferOwnership(args.petitionIds, args.userId, true, ctx.user!);
+    const transferredPermissions = await ctx.petitions.transferOwnership(
+      args.petitionIds,
+      args.userId,
+      true,
+      `User:${ctx.user!.id}`,
+    );
+
+    await ctx.petitions.createEvent(
+      transferredPermissions.map((p) => ({
+        petition_id: p.petition_id,
+        type: "OWNERSHIP_TRANSFERRED",
+        data: {
+          user_id: ctx.user!.id,
+          previous_owner_id: p.previous_owner_id,
+          owner_id: args.userId,
+        },
+      })),
+    );
+
+    return (await ctx.petitions.loadPetition(args.petitionIds)) as Petition[];
   },
 });
 

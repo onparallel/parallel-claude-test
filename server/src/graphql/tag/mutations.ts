@@ -221,14 +221,13 @@ export const tagPetition = mutationField("tagPetition", {
     const [petitionTag] = await ctx.tags.tagPetition(args.tagId, args.petitionId, ctx.user!);
 
     if (isNonNullish(petitionTag)) {
-      const tag = (await ctx.tags.loadTag(petitionTag.tag_id))!;
       await ctx.petitions.createEvent({
         petition_id: args.petitionId,
         type: "PETITION_TAGGED",
         data: {
           user_id: ctx.user!.id,
           tag_ids: [petitionTag.tag_id],
-          tag_names: [tag.name],
+          tag_names: [petitionTag.tag_name],
         },
       });
       await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);

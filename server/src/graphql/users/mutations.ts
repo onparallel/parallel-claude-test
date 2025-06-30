@@ -6,17 +6,7 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import { differenceInMinutes } from "date-fns";
 import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
-import pMap from "p-map";
-import {
-  difference,
-  groupBy,
-  isNonNullish,
-  isNullish,
-  omitBy,
-  partition,
-  unique,
-  zip,
-} from "remeda";
+import { difference, isNonNullish, isNullish, omitBy, partition, unique } from "remeda";
 import { LicenseCode, PublicFileUpload } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { random } from "../../util/token";
@@ -270,103 +260,61 @@ export const deactivateUser = mutationField("deactivateUser", {
     includeDrafts: booleanArg(),
   },
   resolve: async (_, { userIds, transferToUserId, tagIds, includeDrafts }, ctx) => {
-    const permissions =
-      await ctx.petitions.loadDirectlyAssignedUserPetitionPermissionsByUserId(userIds);
+    const rows = await ctx.petitions.transferUserPetitionPermissions(
+      userIds,
+      transferToUserId,
+      includeDrafts ?? false,
+      `User:${ctx.user!.id}`,
+    );
 
-    return await ctx.petitions.withTransaction(async (t) => {
-      await ctx.userGroups.removeUsersFromAllGroups(userIds, `User:${ctx.user!.id}`, t);
+    const [transferredPetitions, deletedDrafts] = partition(
+      rows,
+      (r) => r.source === "transferred_petitions",
+    );
 
-      return await pMap(
-        zip(userIds, permissions),
-        async ([userId, userPermissions]) => {
-          const [ownedPermissions, notOwnedPermissions] = partition(
-            userPermissions,
-            (p) => p.type === "OWNER",
-          );
+    await ctx.petitions.deletePetitionAttachmentByPetitionId(
+      deletedDrafts.map((r) => r.petition_id),
+      ctx.user!,
+    );
 
-          const petitions = (
-            await ctx.petitions.loadPetition.raw(
-              ownedPermissions.map((p) => p.petition_id),
-              t,
-            )
-          ).filter(isNonNullish);
-          const draftsIds = petitions.filter((p) => p.status === "DRAFT").map((p) => p.id);
-          const ownedPetitionIds = petitions
-            .filter((p) => (includeDrafts ? true : p.status !== "DRAFT"))
-            .map((p) => p.id);
-
-          const [user] = await ctx.users.updateUserById(
-            userId,
-            { status: "INACTIVE" },
-            `User:${ctx.user!.id}`,
-            t,
-          );
-
-          if (notOwnedPermissions.length > 0) {
-            // delete permissions with type !== OWNER
-            await ctx.petitions.deleteUserPermissions(
-              notOwnedPermissions.map((p) => p.petition_id),
-              userId,
-              ctx.user!,
-              t,
-            );
-          }
-
-          await ctx.petitions.transferTemplateDefaultPermissions(
-            userId,
-            transferToUserId,
-            `User:${ctx.user!.id}`,
-            t,
-          );
-
-          await ctx.profiles.transferProfileSubscriptions(
-            userId,
-            transferToUserId,
-            `User:${ctx.user!.id}`,
-            t,
-          );
-
-          if (ownedPermissions.length > 0) {
-            // transfer OWNER permissions to new user and remove original permissions
-            await ctx.petitions.transferOwnership(
-              ownedPermissions.map((p) => p.petition_id),
-              transferToUserId,
-              false,
-              ctx.user!,
-              t,
-            );
-          }
-
-          await ctx.petitions.transferPublicLinkOwnership(userId, transferToUserId, ctx.user!, t);
-
-          if (isNonNullish(tagIds) && ownedPetitionIds.length > 0) {
-            const petitionTags = await ctx.tags.tagPetition(tagIds, ownedPetitionIds, ctx.user!, t);
-            if (petitionTags.length > 0) {
-              const petitionTagsByPetitionId = groupBy(petitionTags, (pt) => pt.petition_id);
-              for (const [petitionId, pTags] of Object.entries(petitionTagsByPetitionId)) {
-                const tags = await ctx.tags.loadTag(pTags.map((pt) => pt.tag_id));
-                await ctx.petitions.createEvent({
-                  type: "PETITION_TAGGED",
-                  petition_id: parseInt(petitionId),
-                  data: {
-                    user_id: ctx.user!.id,
-                    tag_ids: pTags.map((t) => t.tag_id),
-                    tag_names: tags.map((t) => t!.name),
-                  },
-                });
-              }
-            }
-          }
-
-          if (!includeDrafts && draftsIds.length > 0) {
-            await ctx.petitions.deletePetition(draftsIds, ctx.user!, t);
-          }
-
-          return user;
+    await ctx.petitions.createEvent(
+      transferredPetitions.map((p) => ({
+        type: "OWNERSHIP_TRANSFERRED",
+        petition_id: p.petition_id,
+        data: {
+          user_id: ctx.user!.id,
+          previous_owner_id: p.previous_owner_id,
+          owner_id: transferToUserId,
         },
-        { concurrency: 1 },
+      })),
+    );
+
+    if (isNonNullish(tagIds)) {
+      const petitionIds = transferredPetitions.map((p) => p.petition_id);
+      const petitionTags = await ctx.tags.tagPetition(tagIds, petitionIds, ctx.user!);
+      await ctx.petitions.createEvent(
+        petitionTags.map((pt) => ({
+          type: "PETITION_TAGGED" as const,
+          petition_id: pt.petition_id,
+          data: {
+            user_id: ctx.user!.id,
+            tag_ids: [pt.tag_id],
+            tag_names: [pt.tag_name],
+          },
+        })),
       );
-    });
+    }
+
+    // transfer profile subscriptions to the new owner
+    await ctx.profiles.transferProfileSubscriptions(
+      userIds,
+      transferToUserId,
+      `User:${ctx.user!.id}`,
+    );
+
+    // finally, deactivate users and remove them from all groups
+    await ctx.userGroups.removeUsersFromAllGroups(userIds, `User:${ctx.user!.id}`);
+    return await ctx.users.updateUserById(userIds, { status: "INACTIVE" }, `User:${ctx.user!.id}`);
   },
 });
 

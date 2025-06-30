@@ -995,7 +995,7 @@ describe("repositories/PetitionRepository", () => {
       it("should transfer ownership to a user without access to the petition", async () => {
         const petitionId = user0Petitions[1].id;
 
-        await petitions.transferOwnership([petitionId], users[2].id, true, users[0]);
+        await petitions.transferOwnership([petitionId], users[2].id, true, `User:${users[0].id}`);
 
         const newPermissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         expect(newPermissions).toMatchObject([
@@ -1015,7 +1015,7 @@ describe("repositories/PetitionRepository", () => {
       it("should transfer ownership to a user without access to the petition and remove original permissions", async () => {
         const petitionId = user0Petitions[1].id;
 
-        await petitions.transferOwnership([petitionId], users[2].id, false, users[0]);
+        await petitions.transferOwnership([petitionId], users[2].id, false, `User:${users[0].id}`);
 
         const newPermissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         expect(newPermissions).toMatchObject([
@@ -1037,7 +1037,7 @@ describe("repositories/PetitionRepository", () => {
           users[0].id,
         );
 
-        await petitions.transferOwnership([petitionId], userId, true, users[0]);
+        await petitions.transferOwnership([petitionId], userId, true, `User:${users[0].id}`);
         const newPermissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         expect(newPermissions).toMatchObject([
           {
@@ -1063,7 +1063,7 @@ describe("repositories/PetitionRepository", () => {
           users[0].id,
         );
 
-        await petitions.transferOwnership([petitionId], userId, false, users[0]);
+        await petitions.transferOwnership([petitionId], userId, false, `User:${users[0].id}`);
 
         const newPermissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         expect(newPermissions).toMatchObject([

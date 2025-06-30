@@ -324,10 +324,12 @@ describe("GraphQL/Users", () => {
     });
   });
 
-  describe("activate and deactivate Users", () => {
+  describe("activateUser, deactivateUser", () => {
     let activeUsers: User[];
     let inactiveUsers: User[];
     let user0Petition: Petition;
+    let user0Drafts: Petition[];
+
     let user1Petitions: Petition[];
     let user1Template: Petition;
 
@@ -352,9 +354,26 @@ describe("GraphQL/Users", () => {
         status: "INACTIVE",
       }));
 
-      [user0Petition] = await mocks.createRandomPetitions(organization.id, activeUsers[0].id, 1);
+      user0Drafts = await mocks.createRandomPetitions(
+        organization.id,
+        activeUsers[0].id,
+        2,
+        () => ({ status: "DRAFT" }),
+      );
 
-      user1Petitions = await mocks.createRandomPetitions(organization.id, activeUsers[1].id, 3);
+      [user0Petition] = await mocks.createRandomPetitions(
+        organization.id,
+        activeUsers[0].id,
+        1,
+        () => ({ status: "PENDING" }),
+      );
+
+      user1Petitions = await mocks.createRandomPetitions(
+        organization.id,
+        activeUsers[1].id,
+        3,
+        () => ({ status: "PENDING" }),
+      );
       [user1Template] = await mocks.createRandomPetitions(
         organization.id,
         activeUsers[1].id,
@@ -382,6 +401,103 @@ describe("GraphQL/Users", () => {
     });
 
     it("updates user status to inactive and transfers petition to session user", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($userIds: [GID!]!, $transferToUserId: GID!, $includeDrafts: Boolean) {
+            deactivateUser(
+              userIds: $userIds
+              transferToUserId: $transferToUserId
+              includeDrafts: $includeDrafts
+            ) {
+              id
+              status
+            }
+          }
+        `,
+        {
+          userIds: [toGlobalId("User", activeUsers[0].id)],
+          transferToUserId: sessionUserGID,
+          includeDrafts: true, // also transfer drafts, this way those won't be deleted and the next query on this test will not fail
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data!.deactivateUser).toEqual([
+        {
+          id: toGlobalId("User", activeUsers[0].id),
+          status: "INACTIVE",
+        },
+      ]);
+
+      // query petition to make sure the permissions are correctly set
+      const { errors: petitionsErrors, data: petitionsData } = await testClient.execute(gql`
+        query {
+          petitions(offset: 0, limit: 100) {
+            totalCount
+            items {
+              ... on PetitionBase {
+                id
+                permissions {
+                  ... on PetitionUserPermission {
+                    permissionType
+                    user {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `);
+
+      expect(petitionsErrors).toBeUndefined();
+      expect(petitionsData?.petitions).toEqual({
+        totalCount: 3,
+        items: expect.toIncludeSameMembers([
+          {
+            id: toGlobalId("Petition", user0Petition.id),
+            permissions: [
+              {
+                permissionType: "OWNER",
+                user: {
+                  id: sessionUserGID,
+                },
+              },
+            ],
+          },
+          {
+            id: toGlobalId("Petition", user0Drafts[0].id),
+            permissions: [
+              {
+                permissionType: "OWNER",
+                user: {
+                  id: sessionUserGID,
+                },
+              },
+            ],
+          },
+          {
+            id: toGlobalId("Petition", user0Drafts[1].id),
+            permissions: [
+              {
+                permissionType: "OWNER",
+                user: {
+                  id: sessionUserGID,
+                },
+              },
+            ],
+          },
+        ]),
+      });
+    });
+
+    it("removes user from all their groups and deletes all petition permissions", async () => {
+      // create a group, add user as member and share a petition with the group
+      const [group] = await mocks.createUserGroups(1, organization.id);
+      await mocks.insertUserGroupMembers(group.id, [activeUsers[0].id]);
+      await mocks.sharePetitionWithGroups(user0Petition.id, [group.id]);
+
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($userIds: [GID!]!, $transferToUserId: GID!, $includeDrafts: Boolean) {
@@ -397,73 +513,8 @@ describe("GraphQL/Users", () => {
         `,
         variables: {
           userIds: [toGlobalId("User", activeUsers[0].id)],
-          transferToUserId: sessionUserGID,
-          includeDrafts: true, // also transfer drafts, this way those won't be deleted and the next query on this test will not fail
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data!.deactivateUser).toEqual([
-        {
-          id: toGlobalId("User", activeUsers[0].id),
-          status: "INACTIVE",
-        },
-      ]);
-
-      // query petition to make sure the permissions are correctly set
-      const { errors: petitionErrors, data: petitionData } = await testClient.query({
-        query: gql`
-          query petition($id: GID!) {
-            petition(id: $id) {
-              id
-              permissions {
-                ... on PetitionUserPermission {
-                  permissionType
-                  user {
-                    id
-                  }
-                }
-              }
-            }
-          }
-        `,
-        variables: {
-          id: toGlobalId("Petition", user0Petition.id),
-        },
-      });
-
-      expect(petitionErrors).toBeUndefined();
-      expect(petitionData?.petition).toEqual({
-        id: toGlobalId("Petition", user0Petition.id),
-        permissions: [
-          {
-            permissionType: "OWNER",
-            user: {
-              id: sessionUserGID,
-            },
-          },
-        ],
-      });
-    });
-
-    it("removes user from all their groups and deletes all petition permissions", async () => {
-      // create a group, add user as member and share a petition with the group
-      const [group] = await mocks.createUserGroups(1, organization.id);
-      await mocks.insertUserGroupMembers(group.id, [activeUsers[0].id]);
-      await mocks.sharePetitionWithGroups(user0Petition.id, [group.id]);
-
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($userIds: [GID!]!, $transferToUserId: GID!) {
-            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
-              id
-              status
-            }
-          }
-        `,
-        variables: {
-          userIds: [toGlobalId("User", activeUsers[0].id)],
           transferToUserId: toGlobalId("User", activeUsers[2].id),
+          includeDrafts: true,
         },
       });
 
@@ -475,12 +526,35 @@ describe("GraphQL/Users", () => {
         },
       ]);
 
-      const petitionPermissions = await mocks.knex
+      const deactivatedUserPermissions = await mocks.knex
         .from<PetitionPermission>("petition_permission")
         .where("user_id", activeUsers[0].id)
         .whereNull("deleted_at")
         .select("*");
-      expect(petitionPermissions).toHaveLength(0);
+      expect(deactivatedUserPermissions).toHaveLength(0);
+
+      const transferredUserDirectPermissions = await mocks.knex
+        .from<PetitionPermission>("petition_permission")
+        .where("user_id", activeUsers[2].id)
+        .whereNull("deleted_at")
+        .select(["petition_id", "type", "deleted_at"]);
+      expect(transferredUserDirectPermissions).toIncludeSameMembers([
+        {
+          petition_id: user0Drafts[0].id,
+          type: "OWNER",
+          deleted_at: null,
+        },
+        {
+          petition_id: user0Drafts[1].id,
+          type: "OWNER",
+          deleted_at: null,
+        },
+        {
+          petition_id: user0Petition.id,
+          type: "OWNER",
+          deleted_at: null,
+        },
+      ]);
 
       const members = await mocks.knex
         .from("user_group_member")
@@ -563,14 +637,14 @@ describe("GraphQL/Users", () => {
       // as petitions are private for each user, here we have to obtain the info directly from the database
       const { rows: petitionUserPermissions } = await mocks.knex.raw(
         /* sql */ `
-        select petition_id, type, user_id, updated_by 
-        from petition_permission 
-        where petition_id in (?,?,?,?) and deleted_at is null
-        order by petition_id asc`,
-        [user0Petition.id, ...user1Petitions.map((p) => p.id)],
+          select petition_id, type, user_id, updated_by 
+          from petition_permission 
+          where petition_id in (?,?,?,?,?,?) and deleted_at is null
+        `,
+        [...user0Drafts.map((p) => p.id), user0Petition.id, ...user1Petitions.map((p) => p.id)],
       );
 
-      expect(petitionUserPermissions).toEqual([
+      expect(petitionUserPermissions).toIncludeSameMembers([
         {
           petition_id: user0Petition.id,
           type: "OWNER",
@@ -802,6 +876,74 @@ describe("GraphQL/Users", () => {
           },
         ]),
       );
+    });
+
+    it("transfers public link ownership", async () => {
+      const [template] = await mocks.createRandomTemplates(organization.id, activeUsers[1].id);
+      const publicLink = await mocks.createRandomPublicPetitionLink(template.id);
+      await mocks.knex.from("template_default_permission").insert({
+        user_id: activeUsers[1].id,
+        template_id: template.id,
+        type: "OWNER",
+        is_subscribed: true,
+      });
+
+      const { errors } = await testClient.execute(
+        gql`
+          mutation ($userIds: [GID!]!, $transferToUserId: GID!) {
+            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
+              id
+            }
+          }
+        `,
+        {
+          userIds: [toGlobalId("User", activeUsers[1].id)],
+          transferToUserId: sessionUserGID,
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      // make sure session user has access to template and its linked to public link
+      const { errors: templateErrors, data: templateData } = await testClient.execute(
+        gql`
+          query ($id: GID!) {
+            petition(id: $id) {
+              id
+              ... on PetitionTemplate {
+                publicLink {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          id: toGlobalId("Petition", template.id),
+        },
+      );
+
+      expect(templateErrors).toBeUndefined();
+      expect(templateData?.petition).toMatchObject({
+        id: toGlobalId("Petition", template.id),
+        publicLink: {
+          id: toGlobalId("PublicPetitionLink", publicLink.id),
+        },
+      });
+
+      const dbTemplateDefaultPermissions = await mocks.knex
+        .from("template_default_permission")
+        .where("template_id", template.id)
+        .whereNull("deleted_at")
+        .select("*");
+
+      expect(dbTemplateDefaultPermissions).toHaveLength(1);
+      expect(dbTemplateDefaultPermissions[0]).toMatchObject({
+        user_id: sessionUser.id,
+        type: "OWNER",
+        is_subscribed: true,
+        deleted_at: null,
+      });
     });
 
     it("increases permission if the user to transfer to has a lower permission on the template than the user to deactivate", async () => {

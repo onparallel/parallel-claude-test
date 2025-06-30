@@ -78,12 +78,7 @@ export class TagRepository extends BaseRepository {
       });
   }
 
-  async tagPetition(
-    tagId: MaybeArray<number>,
-    petitionId: MaybeArray<number>,
-    user: User,
-    t?: Knex.Transaction,
-  ) {
+  async tagPetition(tagId: MaybeArray<number>, petitionId: MaybeArray<number>, user: User) {
     const petitionIds = unMaybeArray(petitionId);
     const tagIds = unMaybeArray(tagId);
 
@@ -91,22 +86,25 @@ export class TagRepository extends BaseRepository {
       return [];
     }
 
-    return await this.raw<PetitionTag>(
+    return await this.raw<PetitionTag & { tag_name: string }>(
       /* sql */ `
-    ? on conflict do nothing returning *;
-    `,
+        with new_petition_tag as (
+          insert into petition_tag (tag_id, petition_id, created_by)
+          ?
+          on conflict do nothing returning *
+        )
+        select pt.*, t.name as tag_name
+        from new_petition_tag pt
+        join tag t on t.id = pt.tag_id
+      `,
       [
-        this.from("petition_tag").insert(
-          petitionIds.flatMap((petitionId) =>
-            tagIds.map((tagId) => ({
-              tag_id: tagId,
-              petition_id: petitionId,
-              created_by: `User:${user.id}`,
-            })),
+        this.sqlValues(
+          petitionIds.flatMap(
+            (petitionId) => tagIds.map((tagId) => [tagId, petitionId, `User:${user.id}`]),
+            ["int", "int", "text"],
           ),
         ),
       ],
-      t,
     );
   }
 

@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, omit, partition, unique } from "remeda";
+import { pMapChunk } from "../../util/promises/pMapChunk";
 import { MaybeArray, unMaybeArray } from "../../util/types";
 import {
   CreateUserGroup,
@@ -241,28 +242,30 @@ export class UserGroupRepository extends BaseRepository {
     }, t);
   }
 
-  async removeUsersFromAllGroups(
-    userIds: MaybeArray<number>,
-    deletedBy: string,
-    t?: Knex.Transaction,
-  ) {
-    if (Array.isArray(userIds) && userIds.length === 0) {
+  async removeUsersFromAllGroups(userId: MaybeArray<number>, deletedBy: string) {
+    const userIds = unMaybeArray(userId);
+    if (userIds.length === 0) {
       return;
     }
-    await this.withTransaction(async (t) => {
-      // remove group memberships
-      await this.from("user_group_member", t)
-        .whereIn("user_id", unMaybeArray(userIds))
-        .whereNull("deleted_at")
-        .update({ deleted_at: this.now(), deleted_by: deletedBy });
 
-      // remove permissions coming from the group memberships
-      await this.from("petition_permission", t)
-        .whereIn("user_id", unMaybeArray(userIds))
-        .whereNotNull("from_user_group_id")
-        .whereNull("deleted_at")
-        .update({ deleted_at: this.now(), deleted_by: deletedBy });
-    }, t);
+    await pMapChunk(
+      userIds,
+      async (userIdsChunk) => {
+        // remove group memberships
+        await this.from("user_group_member")
+          .whereIn("user_id", userIdsChunk)
+          .whereNull("deleted_at")
+          .update({ deleted_at: this.now(), deleted_by: deletedBy });
+
+        // remove permissions coming from the group memberships
+        await this.from("petition_permission")
+          .whereIn("user_id", userIdsChunk)
+          .whereNotNull("from_user_group_id")
+          .whereNull("deleted_at")
+          .update({ deleted_at: this.now(), deleted_by: deletedBy });
+      },
+      { concurrency: 1, chunkSize: 1000 },
+    );
   }
 
   async addUsersToGroups(

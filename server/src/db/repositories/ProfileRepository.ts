@@ -2996,31 +2996,31 @@ export class ProfileRepository extends BaseRepository {
     },
   );
 
-  async transferProfileSubscriptions(
-    fromUserId: number,
-    toUserId: number,
-    updatedBy: string,
-    t?: Knex.Transaction,
-  ) {
-    await this.raw(
-      /* sql */ `
-      with deleted_subscription as (
-        update profile_subscription
-        set 
-          deleted_at = now(),
-          deleted_by = ?
-        where
-          user_id = ?
-          and deleted_at is null
-        returning *
-      )
-      insert into profile_subscription ("profile_id", "user_id", "created_by")
-      select "profile_id", ?, ?
-      from deleted_subscription
-      on conflict (profile_id, user_id) where deleted_at is null do nothing;
-    `,
-      [updatedBy, fromUserId, toUserId, updatedBy],
-      t,
+  async transferProfileSubscriptions(fromUserIds: number[], toUserId: number, updatedBy: string) {
+    await pMapChunk(
+      fromUserIds,
+      async (userIdsChunk) => {
+        await this.raw(
+          /* sql */ `
+          with deleted_subscription as (
+            update profile_subscription
+            set 
+              deleted_at = now(),
+              deleted_by = ?
+            where
+              user_id in ?
+              and deleted_at is null
+            returning *
+          )
+          insert into profile_subscription ("profile_id", "user_id", "created_by")
+          select "profile_id", ?, ?
+          from deleted_subscription
+          on conflict (profile_id, user_id) where deleted_at is null do nothing;
+        `,
+          [updatedBy, this.sqlIn(userIdsChunk), toUserId, updatedBy],
+        );
+      },
+      { concurrency: 1, chunkSize: 1000 },
     );
   }
 

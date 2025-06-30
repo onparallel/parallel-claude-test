@@ -2,6 +2,7 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, indexBy, omit, unique } from "remeda";
 import { keyBuilder } from "../../util/keyBuilder";
+import { pMapChunk } from "../../util/promises/pMapChunk";
 import { Maybe, MaybeArray, unMaybeArray } from "../../util/types";
 import { CreateUser, CreateUserData, User, UserData, UserGroupPermissionName } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
@@ -274,14 +275,23 @@ export class UserRepository extends BaseRepository {
     t?: Knex.Transaction,
   ) {
     const ids = unMaybeArray(id);
-    return await this.from("user", t)
-      .update({
-        ...data,
-        updated_at: this.now(),
-        updated_by: updatedBy,
-      })
-      .whereIn("id", ids)
-      .returning("*");
+    if (ids.length === 0) {
+      return [];
+    }
+
+    return await pMapChunk(
+      ids,
+      async (idsChunk) =>
+        await this.from("user", t)
+          .update({
+            ...data,
+            updated_at: this.now(),
+            updated_by: updatedBy,
+          })
+          .whereIn("id", idsChunk)
+          .returning("*"),
+      { concurrency: 1, chunkSize: 1000 },
+    );
   }
 
   async updateUserByExternalId(
