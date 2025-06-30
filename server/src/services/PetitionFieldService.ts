@@ -25,7 +25,6 @@ const STANDARD_LIST_NAMES = [
   "NON_EU_COUNTRIES",
   "CURRENCIES",
   "NACE",
-  "CNAE", // deprecated
   "CNAE_2009",
   "CNAE_2025",
   "SIC",
@@ -848,7 +847,6 @@ export class PetitionFieldService {
                 labels: keys.map((code) => `${code} - ${codes[code]}`),
               };
             }
-            case "CNAE":
             case "CNAE_2009": {
               const codes = (
                 await import(

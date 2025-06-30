@@ -38,7 +38,6 @@ const STANDARD_LIST_NAMES = [
   "EU_COUNTRIES",
   "NON_EU_COUNTRIES",
   "CURRENCIES",
-  "CNAE", // deprecated
   "CNAE_2009",
   "CNAE_2025",
   "NACE",
@@ -470,7 +469,6 @@ export class ProfileTypeFieldService {
                 isStandard: true,
               }));
             }
-            case "CNAE":
             case "CNAE_2009": {
               const locales = ["es", "en"] as const;
               const cnaeByLocale = Object.fromEntries(

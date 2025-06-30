@@ -426,7 +426,6 @@ export async function validateFieldLogic<
             NON_EU_COUNTRIES: "COUNTRIES",
             CURRENCIES: null,
             NACE: null,
-            CNAE: null,
             CNAE_2009: null,
             CNAE_2025: null,
           };

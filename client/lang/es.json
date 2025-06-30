@@ -11760,11 +11760,6 @@
     "context": "Source: {source}"
   },
   {
-    "term": "component.standard-list-select.cnae",
-    "definition": "Códigos CNAE",
-    "context": "CNAE codes"
-  },
-  {
     "term": "component.standard-list-select.cnae-2009",
     "definition": "Códigos CNAE (2009)",
     "context": "CNAE codes (2009)"
