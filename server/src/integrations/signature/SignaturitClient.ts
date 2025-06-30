@@ -3,7 +3,6 @@ import { openAsBlob, PathLike } from "fs";
 import { inject, injectable } from "inversify";
 import pMap from "p-map";
 import { basename } from "path";
-import { flatten } from "q-flat";
 import { isNonNullish, isNullish, omit } from "remeda";
 import { URLSearchParams } from "url";
 import { CONFIG, Config } from "../../config";
@@ -666,20 +665,39 @@ class SignaturitSDK {
     method: string,
     path: string,
     body?: BodyInit,
-    binary?: boolean,
+    headers?: HeadersInit,
   ): Promise<T> {
     try {
       const response = await this.fetch.fetch(`${this.baseUrl}${path}`, {
         method,
-        headers: { Authorization: `Bearer ${this.apiKey}` },
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          ...headers,
+        },
         body,
       });
 
       if (response.ok) {
-        const responseData = binary
-          ? Buffer.from(await response.arrayBuffer())
-          : await response.json();
-        return responseData as T;
+        return (await response.json()) as T;
+      } else {
+        throw await response.json();
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private async apiRequestBinary(method: string, path: string): Promise<Buffer> {
+    try {
+      const response = await this.fetch.fetch(`${this.baseUrl}${path}`, {
+        method,
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+      });
+
+      if (response.ok) {
+        return Buffer.from(await response.arrayBuffer());
       } else {
         throw await response.json();
       }
@@ -732,20 +750,16 @@ class SignaturitSDK {
   }
 
   async downloadSignedDocument(signatureId: string, documentId: string) {
-    return await this.apiRequest<Buffer>(
+    return await this.apiRequestBinary(
       "GET",
       `/v3/signatures/${signatureId}/documents/${documentId}/download/signed`,
-      undefined,
-      true,
     );
   }
 
   async downloadAuditTrail(signatureId: string, documentId: string) {
-    return await this.apiRequest<Buffer>(
+    return await this.apiRequestBinary(
       "GET",
       `/v3/signatures/${signatureId}/documents/${documentId}/download/audit_trail`,
-      undefined,
-      true,
     );
   }
 
@@ -760,7 +774,8 @@ class SignaturitSDK {
     return await this.apiRequest<SignaturitBrandingResponse>(
       "POST",
       "/v3/brandings.json",
-      flatten(params),
+      JSON.stringify(params),
+      { "Content-Type": "application/json" },
     );
   }
 
@@ -768,7 +783,8 @@ class SignaturitSDK {
     return await this.apiRequest<SignaturitBrandingResponse>(
       "PATCH",
       `/v3/brandings/${brandingId}.json`,
-      flatten(params),
+      JSON.stringify(params),
+      { "Content-Type": "application/json" },
     );
   }
 }
