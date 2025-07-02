@@ -1175,6 +1175,11 @@
     "context": "Select approvers"
   },
   {
+    "term": "component.configure-automate-search-dialog.birth-country-label",
+    "definition": "Country of birth",
+    "context": "Country of birth"
+  },
+  {
     "term": "component.configure-automate-search-dialog.body",
     "definition": "Select the fields to be used to automate the list search.",
     "context": "Select the fields to be used to automate the list search."
@@ -1188,6 +1193,11 @@
     "term": "component.configure-automate-search-dialog.country-label",
     "definition": "Country (nationality / jurisdiction)",
     "context": "Country (nationality / jurisdiction)"
+  },
+  {
+    "term": "component.configure-automate-search-dialog.country-of-jurisdiction-label",
+    "definition": "Country of jurisdiction",
+    "context": "Country of jurisdiction"
   },
   {
     "term": "component.configure-automate-search-dialog.date-of-birth-helper-text",
@@ -1218,6 +1228,11 @@
     "term": "component.configure-automate-search-dialog.name-label",
     "definition": "Name of person / entity",
     "context": "Name of person / entity"
+  },
+  {
+    "term": "component.configure-automate-search-dialog.nationality-label",
+    "definition": "Nationality",
+    "context": "Nationality"
   },
   {
     "term": "component.configure-automate-search-dialog.remove-setting",
@@ -15910,9 +15925,19 @@
     "context": "To"
   },
   {
+    "term": "page.background-check.birth-country-label",
+    "definition": "Country of birth",
+    "context": "Country of birth"
+  },
+  {
     "term": "page.background-check.country-label",
     "definition": "Country (nationality / jurisdiction)",
     "context": "Country (nationality / jurisdiction)"
+  },
+  {
+    "term": "page.background-check.country-of-jurisdiction-label",
+    "definition": "Country of jurisdiction",
+    "context": "Country of jurisdiction"
   },
   {
     "term": "page.background-check.date-of-birth",
@@ -15948,6 +15973,11 @@
     "term": "page.background-check.name-person-entity",
     "definition": "Name of the person / entity *",
     "context": "Name of the person / entity *"
+  },
+  {
+    "term": "page.background-check.nationality-label",
+    "definition": "Nationality",
+    "context": "Nationality"
   },
   {
     "term": "page.background-check.search",

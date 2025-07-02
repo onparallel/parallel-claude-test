@@ -6503,6 +6503,7 @@ export interface QuerybackgroundCheckEntityDetailsArgs {
 }
 
 export interface QuerybackgroundCheckEntitySearchArgs {
+  birthCountry?: InputMaybe<Scalars["String"]["input"]>;
   country?: InputMaybe<Scalars["String"]["input"]>;
   date?: InputMaybe<Scalars["Date"]["input"]>;
   name: Scalars["String"]["input"];
@@ -44038,6 +44039,7 @@ export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQueryVa
   date?: InputMaybe<Scalars["Date"]["input"]>;
   type?: InputMaybe<BackgroundCheckEntitySearchType>;
   country?: InputMaybe<Scalars["String"]["input"]>;
+  birthCountry?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQuery = {
@@ -84438,6 +84440,7 @@ export const BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocume
     $date: Date
     $type: BackgroundCheckEntitySearchType
     $country: String
+    $birthCountry: String
   ) {
     backgroundCheckEntitySearch(
       token: $token
@@ -84445,6 +84448,7 @@ export const BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocume
       date: $date
       type: $type
       country: $country
+      birthCountry: $birthCountry
     ) {
       totalCount
       createdAt

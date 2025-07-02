@@ -274,6 +274,9 @@ export function PetitionRepliesFieldReply({
                                 content?.query?.country && countryNames.countries
                                   ? countryNames.countries[content?.query?.country]
                                   : content?.query?.country,
+                                content?.query?.birthCountry && countryNames.countries
+                                  ? countryNames.countries[content?.query?.birthCountry]
+                                  : content?.query?.birthCountry,
                               ]
                                 .filter(isNonNullish)
                                 .join(" | ")}

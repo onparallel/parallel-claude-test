@@ -127,6 +127,7 @@ describe("Background Check - Profiles", () => {
         date: null,
         type: null,
         country: null,
+        birthCountry: null,
       });
 
       const pfvs = await mocks.knex
@@ -147,6 +148,8 @@ describe("Background Check - Profiles", () => {
             name: "Vladimir Putin",
             date: null,
             type: null,
+            country: null,
+            birthCountry: null,
           },
           search: {
             totalCount: 2,
@@ -234,12 +237,14 @@ describe("Background Check - Profiles", () => {
             $name: String!
             $type: BackgroundCheckEntitySearchType
             $country: String
+            $birthCountry: String
           ) {
             backgroundCheckEntitySearch(
               token: $token
               name: $name
               type: $type
               country: $country
+              birthCountry: $birthCountry
             ) {
               totalCount
               items {
@@ -255,6 +260,7 @@ describe("Background Check - Profiles", () => {
           name: "Vladimir Putin",
           type: "COMPANY",
           country: "RU",
+          birthCountry: "GB",
         },
       );
 
@@ -266,12 +272,14 @@ describe("Background Check - Profiles", () => {
         date: null,
         type: null,
         country: null,
+        birthCountry: null,
       });
       expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(2, {
         name: "Vladimir Putin",
         date: null,
         type: "COMPANY",
         country: "RU",
+        birthCountry: "GB",
       });
 
       const pfvs = await mocks.knex
@@ -305,6 +313,8 @@ describe("Background Check - Profiles", () => {
               name: "Vladimir Putin",
               date: null,
               type: null,
+              country: null,
+              birthCountry: null,
             },
             search: {
               totalCount: 2,
@@ -339,6 +349,8 @@ describe("Background Check - Profiles", () => {
               name: "Vladimir Putin",
               date: null,
               type: "COMPANY",
+              country: "RU",
+              birthCountry: "GB",
             },
             search: {
               totalCount: 1,
@@ -463,6 +475,7 @@ describe("Background Check - Profiles", () => {
         date: null,
         type: "PERSON",
         country: null,
+        birthCountry: null,
       });
 
       const pfvs = await mocks.knex
@@ -496,6 +509,8 @@ describe("Background Check - Profiles", () => {
               name: "Vladimir Putin",
               date: null,
               type: "PERSON",
+              country: null,
+              birthCountry: null,
             },
             search: {
               totalCount: 1,

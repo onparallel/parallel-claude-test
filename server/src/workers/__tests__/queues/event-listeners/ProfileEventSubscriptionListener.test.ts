@@ -239,8 +239,8 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
     });
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
-    expect(queueSpy.mock.calls[0]).toEqual([
-      "webhooks-worker",
+    expect(queueSpy.mock.calls[0][0]).toEqual("webhooks-worker");
+    expect(queueSpy.mock.calls[0][1]).toIncludeSameMembers(
       [0, 2, 3, 5, 8].map((index) => ({
         id: `webhook-${toGlobalId("EventSubscription", subscriptions[index].id)}`,
         body: {
@@ -256,7 +256,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
           },
         },
       })),
-    ]);
+    );
   });
 
   it("sends PROFILE_FIELD_VALUE_UPDATED event on a field with default HIDDEN permission", async () => {
@@ -281,27 +281,25 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
     });
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
-    expect(queueSpy.mock.calls[0]).toEqual([
-      "webhooks-worker",
-      [
-        {
-          id: `webhook-${toGlobalId("EventSubscription", subscriptions[3].id)}`,
+    expect(queueSpy.mock.calls[0][0]).toEqual("webhooks-worker");
+    expect(queueSpy.mock.calls[0][1]).toIncludeSameMembers([
+      {
+        id: `webhook-${toGlobalId("EventSubscription", subscriptions[3].id)}`,
+        body: {
+          subscriptionId: subscriptions[3].id,
           body: {
-            subscriptionId: subscriptions[3].id,
-            body: {
-              id: toGlobalId("ProfileEvent", event.id),
-              profileId: toGlobalId("Profile", event.profile_id),
-              type: "PROFILE_FIELD_VALUE_UPDATED",
-              data: {
-                userId: toGlobalId("User", users[0].id),
-                profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[1].id),
-                alias: null,
-              },
-              createdAt: event.created_at,
+            id: toGlobalId("ProfileEvent", event.id),
+            profileId: toGlobalId("Profile", event.profile_id),
+            type: "PROFILE_FIELD_VALUE_UPDATED",
+            data: {
+              userId: toGlobalId("User", users[0].id),
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[1].id),
+              alias: null,
             },
+            createdAt: event.created_at,
           },
         },
-      ],
+      },
     ]);
   });
 
@@ -317,8 +315,8 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
     await profileEventSubscriptionsListener.handle(event);
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
-    expect(queueSpy.mock.calls[0]).toEqual([
-      "webhooks-worker",
+    expect(queueSpy.mock.calls[0][0]).toEqual("webhooks-worker");
+    expect(queueSpy.mock.calls[0][1]).toIncludeSameMembers(
       [0, 4, 5, 8].map((index) => ({
         id: `webhook-${toGlobalId("EventSubscription", subscriptions[index].id)}`,
         body: {
@@ -332,7 +330,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
           },
         },
       })),
-    ]);
+    );
   });
 
   it("sends PROFILE_FIELD_FILE_ADDED event", async () => {
@@ -356,28 +354,26 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
     });
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
-    expect(queueSpy.mock.calls[0]).toEqual([
-      "webhooks-worker",
-      [
-        {
-          id: `webhook-${toGlobalId("EventSubscription", subscriptions[3].id)}`,
+    expect(queueSpy.mock.calls[0][0]).toEqual("webhooks-worker");
+    expect(queueSpy.mock.calls[0][1]).toIncludeSameMembers([
+      {
+        id: `webhook-${toGlobalId("EventSubscription", subscriptions[3].id)}`,
+        body: {
+          subscriptionId: subscriptions[3].id,
           body: {
-            subscriptionId: subscriptions[3].id,
-            body: {
-              id: toGlobalId("ProfileEvent", event.id),
-              profileId: toGlobalId("Profile", event.profile_id),
-              type: "PROFILE_FIELD_FILE_ADDED",
-              data: {
-                userId: toGlobalId("User", users[4].id),
-                profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[1].id),
-                profileFieldFileId: toGlobalId("ProfileFieldFile", 0),
-                alias: null,
-              },
-              createdAt: event.created_at,
+            id: toGlobalId("ProfileEvent", event.id),
+            profileId: toGlobalId("Profile", event.profile_id),
+            type: "PROFILE_FIELD_FILE_ADDED",
+            data: {
+              userId: toGlobalId("User", users[4].id),
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[1].id),
+              profileFieldFileId: toGlobalId("ProfileFieldFile", 0),
+              alias: null,
             },
+            createdAt: event.created_at,
           },
         },
-      ],
+      },
     ]);
   });
 
@@ -396,49 +392,47 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
     await profileEventSubscriptionsListener.handle(event);
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
-    expect(queueSpy.mock.calls[0]).toEqual([
-      "webhooks-worker",
-      [
-        {
-          id: `webhook-${toGlobalId("EventSubscription", subscriptions[0].id)}`,
+    expect(queueSpy.mock.calls[0][0]).toEqual("webhooks-worker");
+    expect(queueSpy.mock.calls[0][1]).toIncludeSameMembers([
+      {
+        id: `webhook-${toGlobalId("EventSubscription", subscriptions[0].id)}`,
+        body: {
+          subscriptionId: subscriptions[0].id,
           body: {
-            subscriptionId: subscriptions[0].id,
-            body: {
-              id: toGlobalId("ProfileEvent", event.id),
-              profileId: toGlobalId("Profile", event.profile_id),
-              type: "PROFILE_CLOSED",
-              data: { userId: toGlobalId("User", users[5].id) },
-              createdAt: event.created_at,
-            },
+            id: toGlobalId("ProfileEvent", event.id),
+            profileId: toGlobalId("Profile", event.profile_id),
+            type: "PROFILE_CLOSED",
+            data: { userId: toGlobalId("User", users[5].id) },
+            createdAt: event.created_at,
           },
         },
-        {
-          id: `webhook-${toGlobalId("EventSubscription", subscriptions[4].id)}`,
+      },
+      {
+        id: `webhook-${toGlobalId("EventSubscription", subscriptions[4].id)}`,
+        body: {
+          subscriptionId: subscriptions[4].id,
           body: {
-            subscriptionId: subscriptions[4].id,
-            body: {
-              id: toGlobalId("ProfileEvent", event.id),
-              profileId: toGlobalId("Profile", event.profile_id),
-              type: "PROFILE_CLOSED",
-              data: { userId: toGlobalId("User", users[5].id) },
-              createdAt: event.created_at,
-            },
+            id: toGlobalId("ProfileEvent", event.id),
+            profileId: toGlobalId("Profile", event.profile_id),
+            type: "PROFILE_CLOSED",
+            data: { userId: toGlobalId("User", users[5].id) },
+            createdAt: event.created_at,
           },
         },
-        {
-          id: `webhook-${toGlobalId("EventSubscription", subscriptions[5].id)}`,
+      },
+      {
+        id: `webhook-${toGlobalId("EventSubscription", subscriptions[5].id)}`,
+        body: {
+          subscriptionId: subscriptions[5].id,
           body: {
-            subscriptionId: subscriptions[5].id,
-            body: {
-              id: toGlobalId("ProfileEvent", event.id),
-              profileId: toGlobalId("Profile", event.profile_id),
-              type: "PROFILE_CLOSED",
-              data: { userId: toGlobalId("User", users[5].id) },
-              createdAt: event.created_at,
-            },
+            id: toGlobalId("ProfileEvent", event.id),
+            profileId: toGlobalId("Profile", event.profile_id),
+            type: "PROFILE_CLOSED",
+            data: { userId: toGlobalId("User", users[5].id) },
+            createdAt: event.created_at,
           },
         },
-      ],
+      },
     ]);
   });
 });

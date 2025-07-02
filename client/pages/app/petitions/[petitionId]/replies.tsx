@@ -264,7 +264,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       case "VIEW_DETAILS":
       case "VIEW_RESULTS":
         const parentReplyId = reply.parent?.id;
-        const { name, date, type, country } = reply.content?.query ?? {};
+        const { name, date, type, country, birthCountry } = reply.content?.query ?? {};
         const tokenBase64 = btoa(
           JSON.stringify({
             fieldId: reply.field!.id,
@@ -286,6 +286,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           ...(date ? { date } : {}),
           ...(type ? { type } : {}),
           ...(country ? { country } : {}),
+          ...(birthCountry ? { birthCountry } : {}),
           ...(isReadOnly ? { readonly: "true" } : {}),
         });
         try {

@@ -486,8 +486,13 @@ export class PetitionValidationService {
       const config = autoSearchConfig as NonNullable<
         PetitionFieldOptions["BACKGROUND_CHECK"]["autoSearchConfig"]
       >;
+
+      if (isNonNullish(config.birthCountry) && config.type !== "PERSON") {
+        throw new Error("Invalid autoSearchConfig");
+      }
+
       const fields = await loadFields(
-        [...config.name, config.date, config.country].filter(isNonNullish),
+        [...config.name, config.date, config.country, config.birthCountry].filter(isNonNullish),
       );
 
       const isValidNameField = config.name.every((id) => {
@@ -503,10 +508,25 @@ export class PetitionValidationService {
       const countryField = fields.find((f) => f?.id === config.country);
       const isValidCountryField = isNonNullish(config.country)
         ? isValidField(countryField, "SELECT", field) &&
-          countryField?.options?.standardList === "COUNTRIES"
+          ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES"].includes(
+            countryField!.options.standardList,
+          )
         : true;
 
-      if (!isValidNameField || !isValidDateField || !isValidCountryField) {
+      const birthCountryField = fields.find((f) => f?.id === config.birthCountry);
+      const isValidBirthCountryField = isNonNullish(config.birthCountry)
+        ? isValidField(birthCountryField, "SELECT", field) &&
+          ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES"].includes(
+            birthCountryField!.options.standardList,
+          )
+        : true;
+
+      if (
+        !isValidNameField ||
+        !isValidDateField ||
+        !isValidCountryField ||
+        !isValidBirthCountryField
+      ) {
         throw new Error("Invalid autoSearchConfig");
       }
     } else if (field.type === "ADVERSE_MEDIA_SEARCH") {

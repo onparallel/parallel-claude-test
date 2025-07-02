@@ -4669,6 +4669,7 @@ describe("GraphQL/Petition Fields", () => {
                 name: [toGlobalId("PetitionField", name.id)],
                 date: toGlobalId("PetitionField", date.id),
                 country: toGlobalId("PetitionField", country.id),
+                birthCountry: toGlobalId("PetitionField", country.id),
               },
             },
           },
@@ -4685,6 +4686,7 @@ describe("GraphQL/Petition Fields", () => {
             name: [toGlobalId("PetitionField", name.id)],
             date: toGlobalId("PetitionField", date.id),
             country: toGlobalId("PetitionField", country.id),
+            birthCountry: toGlobalId("PetitionField", country.id),
           },
         },
       });

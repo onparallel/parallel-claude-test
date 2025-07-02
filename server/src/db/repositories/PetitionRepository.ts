@@ -1966,7 +1966,9 @@ export class PetitionRepository extends BaseRepository {
                     (isNonNullish(o.autoSearchConfig.date) &&
                       originalChildrenIds.includes(o.autoSearchConfig.date)) ||
                     (isNonNullish(o.autoSearchConfig.country) &&
-                      originalChildrenIds.includes(o.autoSearchConfig.country)))
+                      originalChildrenIds.includes(o.autoSearchConfig.country)) ||
+                    (isNonNullish(o.autoSearchConfig.birthCountry) &&
+                      originalChildrenIds.includes(o.autoSearchConfig.birthCountry)))
                 );
               } else if (f.type === "ADVERSE_MEDIA_SEARCH") {
                 const o = f.options as PetitionFieldOptions["ADVERSE_MEDIA_SEARCH"];

@@ -476,12 +476,32 @@ export default function BackgroundCheckProfile(props: BackgroundCheckProfileProp
                 <Text style={styles.boldText}>Birthdate:</Text>
                 <Text style={styles.normalText}>{props.query?.date ?? "All"}</Text>
               </View>
-              <View style={styles.row}>
-                <Text style={styles.boldText}>Country:</Text>
-                <Text style={styles.normalText}>
-                  {props.query?.country ? COUNTRIES[props.query.country.toLowerCase()] : "Any"}
-                </Text>
-              </View>
+              {props.query?.type === "PERSON" ? (
+                <>
+                  <View style={styles.row}>
+                    <Text style={styles.boldText}>Nationality:</Text>
+                    <Text style={styles.normalText}>
+                      {props.query?.country ? COUNTRIES[props.query.country.toLowerCase()] : "Any"}
+                    </Text>
+                  </View>
+                  <View style={styles.row}>
+                    <Text style={styles.boldText}>Country of birth:</Text>
+                    <Text style={styles.normalText}>
+                      {props.query?.birthCountry
+                        ? COUNTRIES[props.query.birthCountry.toLowerCase()]
+                        : "Any"}
+                    </Text>
+                  </View>
+                </>
+              ) : (
+                <View style={styles.row}>
+                  <Text style={styles.boldText}>Country:</Text>
+                  <Text style={styles.normalText}>
+                    {props.query?.country ? COUNTRIES[props.query.country.toLowerCase()] : "Any"}
+                  </Text>
+                </View>
+              )}
+
               <View style={styles.row}>
                 <Text style={styles.boldText}>Saved on:</Text>
                 <Text style={styles.normalText}>

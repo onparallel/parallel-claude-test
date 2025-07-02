@@ -146,13 +146,14 @@ export function PreviewPetitionFieldBackgroundCheck({
 
       const isReadOnly = reply.status === "APPROVED" || isDisabled;
 
-      const { name, date, type, country } = reply.content?.query ?? {};
+      const { name, date, type, country, birthCountry } = reply.content?.query ?? {};
       const urlParams = new URLSearchParams({
         token: tokenBase64,
         ...(name ? { name } : {}),
         ...(date ? { date } : {}),
         ...(type ? { type } : {}),
         ...(country ? { country } : {}),
+        ...(birthCountry ? { birthCountry } : {}),
         ...(isReadOnly ? { readonly: "true" } : {}),
       });
 
@@ -183,7 +184,7 @@ export function PreviewPetitionFieldBackgroundCheck({
 
     if (field.replies.length) {
       const reply = field.replies[0];
-      const { name, date, type, country } = reply.content?.query ?? {};
+      const { name, date, type, country, birthCountry } = reply.content?.query ?? {};
 
       if (name) {
         searchParams.set("name", name);
@@ -196,6 +197,9 @@ export function PreviewPetitionFieldBackgroundCheck({
       }
       if (country) {
         searchParams.set("country", country);
+      }
+      if (birthCountry) {
+        searchParams.set("birthCountry", birthCountry);
       }
     } else if (isNonNullish(options.autoSearchConfig)) {
       const fields = parentReplyId
@@ -226,6 +230,10 @@ export function PreviewPetitionFieldBackgroundCheck({
           fields.find((f) => f.id === options.autoSearchConfig!.country)?.replies[0]?.content
             .value ?? "";
 
+        const birthCountry =
+          fields.find((f) => f.id === options.autoSearchConfig!.birthCountry)?.replies[0]?.content
+            .value ?? "";
+
         if (name) {
           searchParams.set("name", name);
         }
@@ -237,6 +245,10 @@ export function PreviewPetitionFieldBackgroundCheck({
         }
         if (country) {
           searchParams.set("country", country);
+        }
+
+        if (birthCountry) {
+          searchParams.set("birthCountry", birthCountry);
         }
 
         url += `/results`;
@@ -418,6 +430,9 @@ export function KYCResearchFieldReplyProfile({
                     reply.content?.query?.country && countryNames.countries
                       ? countryNames.countries[reply.content?.query?.country]
                       : reply.content?.query?.country,
+                    reply.content?.query?.birthCountry && countryNames.countries
+                      ? countryNames.countries[reply.content?.query?.birthCountry]
+                      : reply.content?.query?.birthCountry,
                   ]
                     .filter(isNonNullish)
                     .join(" | ")}

@@ -417,7 +417,7 @@ export class ContactRepository extends BaseRepository {
     await this.from("contact")
       .whereNotNull("deleted_at")
       .whereNull("anonymized_at")
-      .whereRaw(/* sql */ `"deleted_at" < NOW() - make_interval(days => ?)`, [daysAfterDeletion])
+      .whereRaw(/* sql */ `"deleted_at" <= NOW() - make_interval(days => ?)`, [daysAfterDeletion])
       .update({
         anonymized_at: this.now(),
         email: "",

@@ -183,6 +183,7 @@ describe("Worker - Automatic Background Check Listener", () => {
               content: {
                 entity: null,
                 query: {
+                  birthCountry: null,
                   country: null,
                   date: null,
                   name: "Simpson",
@@ -208,6 +209,7 @@ describe("Worker - Automatic Background Check Listener", () => {
       date: null,
       type: "PERSON",
       country: null,
+      birthCountry: null,
     });
 
     const [dbReply] = await mocks.knex
@@ -223,6 +225,7 @@ describe("Worker - Automatic Background Check Listener", () => {
           date: null,
           type: "PERSON",
           country: null,
+          birthCountry: null,
         },
         // this reply is mocked
         search: {
@@ -427,6 +430,7 @@ describe("Worker - Automatic Background Check Listener", () => {
           date: null,
           type: "PERSON",
           country: null,
+          birthCountry: null,
         },
         search: {
           totalCount: 100,
@@ -495,6 +499,7 @@ describe("Worker - Automatic Background Check Listener", () => {
                   date: null,
                   type: "PERSON",
                   country: null,
+                  birthCountry: null,
                 },
                 search: {
                   totalCount: 100,
@@ -724,6 +729,7 @@ describe("Worker - Automatic Background Check Listener", () => {
                   date: null,
                   type: "PERSON",
                   country: null,
+                  birthCountry: null,
                 },
                 search: {
                   totalCount: 1,
@@ -764,6 +770,7 @@ describe("Worker - Automatic Background Check Listener", () => {
                           date: "1980-01-01",
                           type: "PERSON",
                           country: null,
+                          birthCountry: null,
                         },
                         search: { totalCount: 1 },
                       },
@@ -799,6 +806,7 @@ describe("Worker - Automatic Background Check Listener", () => {
                           date: "1985-01-01",
                           type: "PERSON",
                           country: null,
+                          birthCountry: null,
                         },
                         search: { totalCount: 1 },
                       },
@@ -834,6 +842,7 @@ describe("Worker - Automatic Background Check Listener", () => {
                           date: "1990-01-01",
                           type: "PERSON",
                           country: null,
+                          birthCountry: null,
                         },
                         search: { totalCount: 1 },
                       },
@@ -854,6 +863,7 @@ describe("Worker - Automatic Background Check Listener", () => {
           date: null,
           type: "PERSON",
           country: null,
+          birthCountry: null,
         },
       ],
       [
@@ -862,6 +872,7 @@ describe("Worker - Automatic Background Check Listener", () => {
           date: "1980-01-01",
           type: "PERSON",
           country: null,
+          birthCountry: null,
         },
       ],
       [
@@ -870,6 +881,7 @@ describe("Worker - Automatic Background Check Listener", () => {
           date: "1985-01-01",
           type: "PERSON",
           country: null,
+          birthCountry: null,
         },
       ],
       [
@@ -878,6 +890,7 @@ describe("Worker - Automatic Background Check Listener", () => {
           date: "1990-01-01",
           type: "PERSON",
           country: null,
+          birthCountry: null,
         },
       ],
     ]);
@@ -898,6 +911,7 @@ describe("Worker - Automatic Background Check Listener", () => {
           date: null,
           type: "PERSON",
           country: null,
+          birthCountry: null,
         },
         search: {
           totalCount: 100,
@@ -966,6 +980,7 @@ describe("Worker - Automatic Background Check Listener", () => {
                   date: null,
                   type: "PERSON",
                   country: null,
+                  birthCountry: null,
                 },
                 search: {
                   totalCount: 1,
@@ -987,6 +1002,7 @@ describe("Worker - Automatic Background Check Listener", () => {
       date: null,
       type: "PERSON",
       country: null,
+      birthCountry: null,
     });
 
     const [dbReply] = await mocks.knex
@@ -1002,6 +1018,7 @@ describe("Worker - Automatic Background Check Listener", () => {
           date: null,
           type: "PERSON",
           country: null,
+          birthCountry: null,
         },
         search: {
           totalCount: 1,

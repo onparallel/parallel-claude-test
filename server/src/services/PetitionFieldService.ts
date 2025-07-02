@@ -331,6 +331,7 @@ export const SCHEMAS = {
           },
           date: { type: ["number", "null"] },
           country: { type: ["number", "null"] },
+          birthCountry: { type: ["number", "null"] },
         },
       },
       replyOnlyFromProfile: { type: ["boolean", "null"] },
@@ -726,6 +727,13 @@ export class PetitionFieldService {
                 country: isNonNullish(field.options.autoSearchConfig.country)
                   ? idMapFn("PetitionField", field.options.autoSearchConfig.country)
                   : null,
+                ...(field.options.autoSearchConfig.type === "PERSON"
+                  ? {
+                      birthCountry: isNonNullish(field.options.autoSearchConfig.birthCountry)
+                        ? idMapFn("PetitionField", field.options.autoSearchConfig.birthCountry)
+                        : null,
+                    }
+                  : {}),
               }
             : null,
           replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,

@@ -137,7 +137,7 @@ export class PetitionsHelperService {
     } else if (reply.type === "BACKGROUND_CHECK") {
       return {
         query: isNonNullish(reply.content.query)
-          ? pick(reply.content.query, ["name", "date", "type", "country"])
+          ? pick(reply.content.query, ["name", "date", "type", "country", "birthCountry"])
           : null,
         search: isNonNullish(reply.content.search)
           ? pick(reply.content.search, ["totalCount"])

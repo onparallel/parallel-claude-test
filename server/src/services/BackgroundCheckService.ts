@@ -13,6 +13,7 @@ export interface EntitySearchRequest {
   name: string;
   date?: string | null;
   country?: string | null;
+  birthCountry?: string | null;
   type: "PERSON" | "COMPANY" | null;
 }
 export interface EntitySearchPerson {

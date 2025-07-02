@@ -10175,6 +10175,7 @@ export interface NexusGenArgTypes {
     };
     backgroundCheckEntitySearch: {
       // args
+      birthCountry?: string | null; // String
       country?: string | null; // String
       date?: NexusGenScalars["Date"] | null; // Date
       name: string; // String!

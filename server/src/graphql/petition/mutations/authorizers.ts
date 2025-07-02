@@ -330,7 +330,8 @@ export function fieldIsNotBeingUsedInAutoSearchConfig<
             if (
               config.name.includes(field.id) ||
               config.date === field.id ||
-              config.country === field.id
+              config.country === field.id ||
+              config.birthCountry === field.id
             ) {
               throw new ApolloError(
                 `PetitionField ${toGlobalId("PetitionField", fieldId)} is being referenced on an autoSearchConfig`,

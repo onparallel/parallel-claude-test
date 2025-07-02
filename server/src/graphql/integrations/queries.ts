@@ -202,6 +202,11 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
         description: "Country of the entity",
       }),
     ),
+    birthCountry: nullable(
+      stringArg({
+        description: "Birth country of the entity. Only valid for type PERSON",
+      }),
+    ),
   },
   resolve: async (_, args, ctx) => {
     async function petitionParamsResolver(query: any, params: NumericParams<PetitionReplyParams>) {
@@ -219,7 +224,8 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
         reply.content.query.name === query.name &&
         reply.content.query.date === query.date &&
         reply.content.query.type === query.type &&
-        reply.content.query.country === query.country
+        reply.content.query.country === query.country &&
+        reply.content.query.birthCountry === query.birthCountry
       ) {
         // i found a reply and it matches the search criteria, return it
         return reply.content.search as EntitySearchResponse;
@@ -290,7 +296,8 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
         profileFieldValue.content.query.name === query.name &&
         profileFieldValue.content.query.date === query.date &&
         profileFieldValue.content.query.type === query.type &&
-        profileFieldValue.content.query.country === query.country
+        profileFieldValue.content.query.country === query.country &&
+        profileFieldValue.content.query.birthCountry === query.birthCountry
       ) {
         // i found a pfv and it matches the search criteria, return it
         return profileFieldValue.content.search as EntitySearchResponse;
@@ -328,6 +335,7 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
         date: args.date ?? null,
         type: args.type ?? null,
         country: args.country ?? null,
+        birthCountry: args.birthCountry ?? null,
       };
 
       if ("petitionId" in params) {

@@ -24,6 +24,7 @@ interface ConfigureBackgroundCheckAutomateSearchDialogOutput {
   date: string | null;
   type: string | null;
   country: string | null;
+  birthCountry: string | null;
 }
 
 export function ConfigureBackgroundCheckAutomateSearchDialog({
@@ -62,12 +63,15 @@ export function ConfigureBackgroundCheckAutomateSearchDialog({
           date: allFields.find((field) => autoSearchConfig.date === field.id) ?? null,
           type: autoSearchConfig.type,
           country: allFields.find((field) => autoSearchConfig.country === field.id) ?? null,
+          birthCountry:
+            allFields.find((field) => autoSearchConfig.birthCountry === field.id) ?? null,
         }
       : {
           name: [],
           date: null,
           type: null,
           country: null,
+          birthCountry: null,
         },
   });
 
@@ -75,7 +79,10 @@ export function ConfigureBackgroundCheckAutomateSearchDialog({
   const dateFields = allFields.filter((field) => field.type === "DATE");
   const countryFields = allFields.filter(
     (field) =>
-      field.type === "SELECT" && field.options?.standardList === "COUNTRIES" && !field.multiple,
+      field.type === "SELECT" &&
+      typeof field.options?.standardList === "string" &&
+      field.options?.standardList.includes("COUNTRIES") &&
+      !field.multiple,
   );
   const type = watch("type");
   return (
@@ -90,6 +97,7 @@ export function ConfigureBackgroundCheckAutomateSearchDialog({
               date: data.date?.id ?? null,
               type: data.type,
               country: data.country?.id ?? null,
+              birthCountry: data.birthCountry?.id ?? null,
             });
           }),
         },
@@ -205,10 +213,22 @@ export function ConfigureBackgroundCheckAutomateSearchDialog({
           </FormControl>
           <FormControl isDisabled={!countryFields.length}>
             <FormLabel fontWeight={400}>
-              <FormattedMessage
-                id="component.configure-automate-search-dialog.country-label"
-                defaultMessage="Country (nationality / jurisdiction)"
-              />
+              {type === "PERSON" ? (
+                <FormattedMessage
+                  id="component.configure-automate-search-dialog.nationality-label"
+                  defaultMessage="Nationality"
+                />
+              ) : type === "COMPANY" ? (
+                <FormattedMessage
+                  id="component.configure-automate-search-dialog.country-of-jurisdiction-label"
+                  defaultMessage="Country of jurisdiction"
+                />
+              ) : (
+                <FormattedMessage
+                  id="component.configure-automate-search-dialog.country-label"
+                  defaultMessage="Country (nationality / jurisdiction)"
+                />
+              )}
             </FormLabel>
             <Controller
               name="country"
@@ -225,7 +245,8 @@ export function ConfigureBackgroundCheckAutomateSearchDialog({
                   filterFields={(f) =>
                     f.type === "SELECT" &&
                     !f.multiple &&
-                    f.options?.standardList === "COUNTRIES" &&
+                    typeof f.options?.standardList === "string" &&
+                    f.options?.standardList.includes("COUNTRIES") &&
                     (!f.parent || f.parent.id === field.parent?.id)
                   }
                 />
@@ -240,6 +261,47 @@ export function ConfigureBackgroundCheckAutomateSearchDialog({
               </FormHelperText>
             ) : null}
           </FormControl>
+          {type === "PERSON" ? (
+            <FormControl isDisabled={!countryFields.length}>
+              <FormLabel fontWeight={400}>
+                <FormattedMessage
+                  id="component.configure-automate-search-dialog.birth-country-label"
+                  defaultMessage="Country of birth"
+                />
+              </FormLabel>
+              <Controller
+                name="birthCountry"
+                control={control}
+                shouldUnregister={true}
+                render={({ field: { onChange, value }, fieldState }) => (
+                  <PetitionFieldSelect
+                    petition={petition}
+                    isLoading={loading}
+                    isClearable
+                    expandFieldGroups={fieldIsChild}
+                    isInvalid={fieldState.invalid}
+                    value={value}
+                    onChange={onChange}
+                    filterFields={(f) =>
+                      f.type === "SELECT" &&
+                      !f.multiple &&
+                      typeof f.options?.standardList === "string" &&
+                      f.options?.standardList.includes("COUNTRIES") &&
+                      (!f.parent || f.parent.id === field.parent?.id)
+                    }
+                  />
+                )}
+              />
+              {!countryFields.length ? (
+                <FormHelperText>
+                  <FormattedMessage
+                    id="component.configure-automate-search-dialog.country-helper-text"
+                    defaultMessage="There are no compatible fields in the form."
+                  />
+                </FormHelperText>
+              ) : null}
+            </FormControl>
+          ) : null}
         </Stack>
       }
       alternative={

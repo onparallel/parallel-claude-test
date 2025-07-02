@@ -61,13 +61,14 @@ export function BackgroundCheckEntityDetailsRelationships({
     ) {
       const entity = getOtherEntity(entityId, row);
       if (isNonNullish(entity)) {
-        const { token, name, date, type, readonly } = query;
+        const { token, name, date, type, readonly, birthCountry } = query;
         router.push(
           `/app/background-check/${entity.id}?${new URLSearchParams({
             ...(token && typeof token === "string" ? { token } : {}),
             ...(type && typeof type === "string" ? { type } : {}),
             ...(name && typeof name === "string" ? { name } : {}),
             ...(date && typeof date === "string" ? { date } : {}),
+            ...(birthCountry && typeof birthCountry === "string" ? { birthCountry } : {}),
             ...(readonly === "true" ? { readonly: "true" } : {}),
           })}`,
         );

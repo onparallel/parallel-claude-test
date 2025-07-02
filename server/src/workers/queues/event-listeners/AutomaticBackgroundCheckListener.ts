@@ -152,13 +152,21 @@ export class AutomaticBackgroundCheckListener implements EventListener<"PETITION
 
         const countryValue = countryReply?.content.value || null;
 
+        const birthCountryReply = visibleFields.find(
+          (field) => backgroundCheck.options.autoSearchConfig.birthCountry === field.id,
+        )?.replies?.[0];
+
+        const birthCountryValue = birthCountryReply?.content.value || null;
+
         const currentBackgroundCheckReply = backgroundCheck.replies.at(0);
         if (
           currentBackgroundCheckReply?.status === "APPROVED" ||
           isNonNullish(currentBackgroundCheckReply?.content.entity) ||
           (currentBackgroundCheckReply?.content.query.name === nameValue &&
             currentBackgroundCheckReply?.content.query.date === dateValue &&
-            currentBackgroundCheckReply?.content.query.type === typeValue)
+            currentBackgroundCheckReply?.content.query.type === typeValue &&
+            currentBackgroundCheckReply?.content.query.country === countryValue &&
+            currentBackgroundCheckReply?.content.query.birthCountry === birthCountryValue)
         ) {
           // reply is already approved, has an specific entity stored, or query is the same
           return null;
@@ -173,6 +181,7 @@ export class AutomaticBackgroundCheckListener implements EventListener<"PETITION
             date: dateValue,
             type: typeValue,
             country: countryValue,
+            birthCountry: birthCountryValue,
           },
         };
       })
@@ -255,6 +264,17 @@ export class AutomaticBackgroundCheckListener implements EventListener<"PETITION
 
               const countryValue = countryReply?.content.value ?? null;
 
+              const birthCountryReply = visibleFields
+                .flatMap((f) => [f, ...(f.children ?? [])])
+                .find((f) => f.id === backgroundCheck.options.autoSearchConfig.birthCountry)
+                ?.replies.filter(
+                  (r) =>
+                    isNullish(r.parent_petition_field_reply_id) ||
+                    r.parent_petition_field_reply_id === groupReply.id,
+                )?.[0];
+
+              const birthCountryValue = birthCountryReply?.content.value ?? null;
+
               const currentBackgroundCheckReply = groupReply.children
                 ?.find((c) => c.field.id === backgroundCheck.id)
                 ?.replies.at(0);
@@ -264,7 +284,8 @@ export class AutomaticBackgroundCheckListener implements EventListener<"PETITION
                 (currentBackgroundCheckReply?.content.query.name === nameValue &&
                   currentBackgroundCheckReply?.content.query.date === dateValue &&
                   currentBackgroundCheckReply?.content.query.type === typeValue &&
-                  currentBackgroundCheckReply?.content.query.country === countryValue)
+                  currentBackgroundCheckReply?.content.query.country === countryValue &&
+                  currentBackgroundCheckReply?.content.query.birthCountry === birthCountryValue)
               ) {
                 // reply is already approved, has an specific entity stored, or query is the same
                 return null;
@@ -279,6 +300,7 @@ export class AutomaticBackgroundCheckListener implements EventListener<"PETITION
                   date: dateValue,
                   type: typeValue,
                   country: countryValue,
+                  birthCountry: birthCountryValue,
                 },
               };
             }),

@@ -51,6 +51,7 @@ function BackgroundCheckProfileDetails({
   date,
   type,
   country,
+  birthCountry,
 }: UnwrapPromise<ReturnType<typeof BackgroundCheckProfileDetails.getInitialProps>>) {
   const intl = useIntl();
   const router = useRouter();
@@ -63,10 +64,17 @@ function BackgroundCheckProfileDetails({
   const isTemplate = query.template === "true";
 
   const countryNames = useLoadCountryNames(intl.locale);
+
   const countryName =
     country && isNonNullish(countryNames.countries)
       ? countryNames.countries[country.toUpperCase()]
       : country;
+
+  const birthCountryName =
+    birthCountry && isNonNullish(countryNames.countries)
+      ? countryNames.countries[birthCountry.toUpperCase()]
+      : birthCountry;
+
   const entityTypeLabel = getEntityTypeLabel(intl, type);
 
   const { data, loading, error } = useQuery(
@@ -169,6 +177,7 @@ function BackgroundCheckProfileDetails({
         ...(date ? { date } : {}),
         ...(type ? { type } : {}),
         ...(country ? { country } : {}),
+        ...(birthCountry ? { birthCountry } : {}),
         ...(isReadOnly ? { readonly: "true" } : {}),
         ...(isTemplate ? { template: "true" } : {}),
       })}`,
@@ -221,7 +230,9 @@ function BackgroundCheckProfileDetails({
                 {": "}
               </Text>
               <Text as="span">
-                {[entityTypeLabel, name, date, countryName].filter(isNonNullish).join(" | ")}
+                {[entityTypeLabel, name, date, countryName, birthCountryName]
+                  .filter(isNonNullish)
+                  .join(" | ")}
               </Text>
             </Box>
           </HStack>
@@ -470,8 +481,9 @@ BackgroundCheckProfileDetails.getInitialProps = async ({ query }: WithApolloData
   const date = query.date as string | null;
   const type = query.type as BackgroundCheckEntitySearchType | null;
   const country = query.country as string | null;
+  const birthCountry = query.birthCountry as string | null;
 
-  return { entityId, token, name, date, type, country };
+  return { entityId, token, name, date, type, country, birthCountry };
 };
 
 export default compose(

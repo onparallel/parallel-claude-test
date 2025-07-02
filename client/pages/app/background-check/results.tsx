@@ -60,6 +60,7 @@ function BackgroundCheckFieldSearchResults({
   date,
   type,
   country,
+  birthCountry,
 }: UnwrapPromise<ReturnType<typeof BackgroundCheckFieldSearchResults.getInitialProps>>) {
   const router = useRouter();
   const { query } = router;
@@ -72,10 +73,17 @@ function BackgroundCheckFieldSearchResults({
   const isTemplate = query.template === "true";
 
   const countryNames = useLoadCountryNames(intl.locale);
+
   const countryName =
     country && isNonNullish(countryNames.countries)
       ? countryNames.countries[country.toUpperCase()]
       : country;
+
+  const birthCountryName =
+    birthCountry && isNonNullish(countryNames.countries)
+      ? countryNames.countries[birthCountry.toUpperCase()]
+      : birthCountry;
+
   const entityTypeLabel = getEntityTypeLabel(intl, type);
 
   const { data, loading, error } = useQuery(
@@ -87,6 +95,7 @@ function BackgroundCheckFieldSearchResults({
         date: date ? new Date(date).toISOString().substring(0, 10) : null,
         type,
         country,
+        birthCountry: type === "PERSON" ? birthCountry : null,
       },
       fetchPolicy: "cache-and-network",
     },
@@ -182,12 +191,13 @@ function BackgroundCheckFieldSearchResults({
           ...(date ? { date } : {}),
           ...(type ? { type } : {}),
           ...(country ? { country } : {}),
+          ...(birthCountry ? { birthCountry } : {}),
           ...(isReadOnly ? { readonly: "true" } : {}),
           ...(isTemplate ? { template: "true" } : {}),
         })}`,
       );
     },
-    [token, name, date, type, country, isReadOnly, isTemplate],
+    [token, name, date, type, country, birthCountry, isReadOnly, isTemplate],
   );
 
   const handleResetClick = () => {
@@ -198,6 +208,7 @@ function BackgroundCheckFieldSearchResults({
         ...(date ? { date } : {}),
         ...(type ? { type } : {}),
         ...(country ? { country } : {}),
+        ...(birthCountry ? { birthCountry } : {}),
         ...(isTemplate ? { template: "true" } : {}),
       })}`,
     );
@@ -312,7 +323,9 @@ function BackgroundCheckFieldSearchResults({
                   {": "}
                 </Text>
                 <Text as="span">
-                  {[entityTypeLabel, name, date, countryName].filter(isNonNullish).join(" | ")}
+                  {[entityTypeLabel, name, date, countryName, birthCountryName]
+                    .filter(isNonNullish)
+                    .join(" | ")}
                 </Text>
               </Box>
 
@@ -620,6 +633,7 @@ const _queries = [
       $date: Date
       $type: BackgroundCheckEntitySearchType
       $country: String
+      $birthCountry: String
     ) {
       backgroundCheckEntitySearch(
         token: $token
@@ -627,6 +641,7 @@ const _queries = [
         date: $date
         type: $type
         country: $country
+        birthCountry: $birthCountry
       ) {
         totalCount
         createdAt
@@ -645,8 +660,9 @@ BackgroundCheckFieldSearchResults.getInitialProps = async ({ query }: WithApollo
   const date = query.date as string | null;
   const type = query.type as BackgroundCheckEntitySearchType | null;
   const country = query.country as string | null;
+  const birthCountry = query.birthCountry as string | null;
 
-  return { token, name, date, type, country };
+  return { token, name, date, type, country, birthCountry };
 };
 
 export default compose(

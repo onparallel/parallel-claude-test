@@ -111,6 +111,7 @@ describe("Background Check - Petitions", () => {
             date: null,
             type: null,
             country: null,
+            birthCountry: null,
           },
           search: {
             totalCount: 2,
@@ -139,6 +140,7 @@ describe("Background Check - Petitions", () => {
         date: null,
         type: null,
         country: null,
+        birthCountry: null,
       });
     });
 
@@ -157,6 +159,7 @@ describe("Background Check - Petitions", () => {
             date: "1990-10-10",
             type: "PERSON",
             country: "RU",
+            birthCountry: "GB",
           },
           search: {
             totalCount: 1,
@@ -182,6 +185,7 @@ describe("Background Check - Petitions", () => {
             $date: Date
             $type: BackgroundCheckEntitySearchType
             $country: String
+            $birthCountry: String
           ) {
             backgroundCheckEntitySearch(
               token: $token
@@ -189,6 +193,7 @@ describe("Background Check - Petitions", () => {
               date: $date
               type: $type
               country: $country
+              birthCountry: $birthCountry
             ) {
               totalCount
             }
@@ -200,6 +205,7 @@ describe("Background Check - Petitions", () => {
           date: "1990-10-10",
           type: "PERSON",
           country: "RU",
+          birthCountry: "GB",
         },
       );
 
@@ -223,6 +229,8 @@ describe("Background Check - Petitions", () => {
             name: "Vladimir Putin",
             date: "1990-10-10",
             type: "PERSON",
+            country: null,
+            birthCountry: null,
           },
           search: {
             totalCount: 1,
@@ -252,8 +260,15 @@ describe("Background Check - Petitions", () => {
             $name: String!
             $date: Date
             $type: BackgroundCheckEntitySearchType
+            $country: String
           ) {
-            backgroundCheckEntitySearch(token: $token, name: $name, date: $date, type: $type) {
+            backgroundCheckEntitySearch(
+              token: $token
+              name: $name
+              date: $date
+              type: $type
+              country: $country
+            ) {
               totalCount
             }
           }
@@ -262,6 +277,7 @@ describe("Background Check - Petitions", () => {
           token: buildToken({ petitionId: petition.id, fieldId: field.id }),
           name: "Vladimir Putin",
           type: "COMPANY",
+          country: null,
         },
       );
 
@@ -273,6 +289,7 @@ describe("Background Check - Petitions", () => {
         date: null,
         country: null,
         type: "COMPANY",
+        birthCountry: null,
       });
 
       const replies = await mocks.knex
@@ -289,6 +306,8 @@ describe("Background Check - Petitions", () => {
             name: "Vladimir Putin",
             date: null,
             type: "COMPANY",
+            country: null,
+            birthCountry: null,
           },
           search: {
             totalCount: 1,

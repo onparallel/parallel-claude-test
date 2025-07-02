@@ -7959,6 +7959,11 @@ type Query {
   backgroundCheckEntityDetails(entityId: String!, token: String!): BackgroundCheckEntityDetails!
   backgroundCheckEntitySearch(
     """
+    Birth country of the entity. Only valid for type PERSON
+    """
+    birthCountry: String
+
+    """
     Country of the entity
     """
     country: String

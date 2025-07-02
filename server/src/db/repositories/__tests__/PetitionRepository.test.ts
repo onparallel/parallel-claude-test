@@ -3220,6 +3220,7 @@ describe("repositories/PetitionRepository", () => {
               name: [clonedFields.find((f) => f.type === "SHORT_TEXT")!.id],
               date: clonedFields.find((f) => f.type === "DATE")!.id,
               country: clonedFields.find((f) => f.type === "SELECT")!.id,
+              birthCountry: null,
             },
           },
         },

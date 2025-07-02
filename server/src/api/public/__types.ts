@@ -6256,6 +6256,7 @@ export type QuerybackgroundCheckEntityDetailsArgs = {
 };
 
 export type QuerybackgroundCheckEntitySearchArgs = {
+  birthCountry?: InputMaybe<Scalars["String"]["input"]>;
   country?: InputMaybe<Scalars["String"]["input"]>;
   date?: InputMaybe<Scalars["Date"]["input"]>;
   name: Scalars["String"]["input"];

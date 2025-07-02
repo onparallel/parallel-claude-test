@@ -31,6 +31,7 @@ interface OpenSanctionsPersonSchema {
     gender?: string[];
     country?: string[];
     birthPlace?: string[];
+    birthCountry?: string[];
     education?: string[];
     ethnicity?: string[];
     religion?: string[];
@@ -221,6 +222,9 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
           name: [query.name],
           ...(query.date ? { birthDate: [query.date] } : {}),
           ...(query.country ? { nationality: [query.country.toLowerCase()] } : {}),
+          ...(query.type === "PERSON" && query.birthCountry
+            ? { birthCountry: [query.birthCountry.toLowerCase()] }
+            : {}),
         },
       };
     }
@@ -234,6 +238,7 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
         },
       };
     }
+
     const data = await this.apiCall<OpenSanctionsMatchResponse>("POST", "match/default", {
       queries,
     });
@@ -315,7 +320,7 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
       ...person,
       properties: {
         country: data.properties.country,
-        countryOfBirth: data.properties.birthPlace,
+        countryOfBirth: data.properties.birthCountry,
         dateOfBirth: data.properties.birthDate,
         gender: data.properties.gender,
         nationality: data.properties.nationality,

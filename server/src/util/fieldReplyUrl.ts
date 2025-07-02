@@ -24,6 +24,9 @@ export function fieldReplyUrl(
       ...(reply.content.query?.date ? { date: reply.content.query.date } : {}),
       ...(reply.content.query?.type ? { type: reply.content.query.type } : {}),
       ...(reply.content.query?.country ? { country: reply.content.query.country } : {}),
+      ...(reply.content.query?.birthCountry
+        ? { birthCountry: reply.content.query.birthCountry }
+        : {}),
       readonly: "true",
     })}`;
   } else if (field.type === "ADVERSE_MEDIA_SEARCH") {

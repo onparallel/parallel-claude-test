@@ -44,6 +44,7 @@ export interface BackgroundCheckFormData {
   date: string | null;
   type: BackgroundCheckEntitySearchType | null;
   country: string | null;
+  birthCountry: string | null;
 }
 
 type BackgroundCheckFieldSearchProps = UnwrapPromise<
@@ -55,6 +56,7 @@ function BackgroundCheckFieldSearch({
   date = "",
   type = null,
   country = null,
+  birthCountry = null,
 }: BackgroundCheckFieldSearchProps) {
   const router = useRouter();
   const intl = useIntl();
@@ -77,6 +79,7 @@ function BackgroundCheckFieldSearch({
       date,
       type,
       country,
+      birthCountry,
     },
   });
 
@@ -145,7 +148,7 @@ function BackgroundCheckFieldSearch({
           ) : null}
           <Card
             as="form"
-            onSubmit={handleSubmit(({ name, date, type, country }) => {
+            onSubmit={handleSubmit(({ name, date, type, country, birthCountry }) => {
               const { token, template } = router.query;
               router.push(
                 `/app/background-check/results?${new URLSearchParams({
@@ -154,6 +157,7 @@ function BackgroundCheckFieldSearch({
                   ...(date ? { date } : {}),
                   ...(type ? { type } : {}),
                   ...(country ? { country } : {}),
+                  ...(birthCountry ? { birthCountry } : {}),
                   ...(template === "true" ? { template: "true" } : {}),
                 })}`,
               );
@@ -226,10 +230,22 @@ function BackgroundCheckFieldSearch({
                 </FormControl>
                 <FormControl>
                   <FormLabel fontWeight={400}>
-                    <FormattedMessage
-                      id="page.background-check.country-label"
-                      defaultMessage="Country (nationality / jurisdiction)"
-                    />
+                    {selectedType === "PERSON" ? (
+                      <FormattedMessage
+                        id="page.background-check.nationality-label"
+                        defaultMessage="Nationality"
+                      />
+                    ) : selectedType === "COMPANY" ? (
+                      <FormattedMessage
+                        id="page.background-check.country-of-jurisdiction-label"
+                        defaultMessage="Country of jurisdiction"
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="page.background-check.country-label"
+                        defaultMessage="Country (nationality / jurisdiction)"
+                      />
+                    )}
                   </FormLabel>
                   <Controller
                     name="country"
@@ -249,6 +265,33 @@ function BackgroundCheckFieldSearch({
                     )}
                   />
                 </FormControl>
+                {selectedType === "PERSON" ? (
+                  <FormControl>
+                    <FormLabel fontWeight={400}>
+                      <FormattedMessage
+                        id="page.background-check.birth-country-label"
+                        defaultMessage="Country of birth"
+                      />
+                    </FormLabel>
+                    <Controller
+                      name="birthCountry"
+                      control={control}
+                      render={({ field: { value, onChange } }) => (
+                        <SimpleSelect
+                          isClearable
+                          isSearchable
+                          value={value}
+                          onChange={onChange}
+                          options={countryOptions}
+                          placeholder={intl.formatMessage({
+                            id: "page.background-check.select-country-placeholder",
+                            defaultMessage: "Any country",
+                          })}
+                        />
+                      )}
+                    />
+                  </FormControl>
+                ) : null}
               </Stack>
               <Button colorScheme="primary" type="submit" isDisabled={isDisabled}>
                 <FormattedMessage id="page.background-check.search" defaultMessage="Search" />
@@ -291,12 +334,13 @@ BackgroundCheckFieldSearch.getInitialProps = async ({
   const date = query.date as string | null | undefined;
   const type = query.type as BackgroundCheckEntitySearchType | null | undefined;
   const country = query.country as string | null | undefined;
+  const birthCountry = query.birthCountry as string | null | undefined;
 
   const {
     data: { metadata },
   } = await fetchQuery(BackgroundCheckFieldSearch_userDocument);
 
-  return { metadata, name, date, type, country };
+  return { metadata, name, date, type, country, birthCountry };
 };
 
 export default compose(

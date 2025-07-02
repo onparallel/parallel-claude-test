@@ -1,5 +1,6 @@
 import { Container } from "inversify";
 import { Knex } from "knex";
+import { pick } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
 import { Contact, Organization } from "../../__types";
@@ -87,7 +88,9 @@ describe("repositories/ContactRepository", () => {
     });
 
     it("anonymizes passed contacts", async () => {
-      expect(contacts).toMatchObject([
+      expect(
+        contacts.map(pick(["email", "first_name", "last_name", "deleted_at"])),
+      ).toIncludeSameMembers([
         {
           email: expect.any(String),
           first_name: expect.any(String),
@@ -124,7 +127,11 @@ describe("repositories/ContactRepository", () => {
         )
         .select("*");
 
-      expect(contactsAfter).toMatchObject([
+      expect(
+        contactsAfter.map(
+          pick(["email", "first_name", "last_name", "deleted_at", "anonymized_at"]),
+        ),
+      ).toIncludeSameMembers([
         {
           email: "",
           first_name: "",

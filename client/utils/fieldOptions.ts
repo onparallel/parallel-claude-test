@@ -87,6 +87,7 @@ export interface FieldOptions {
       date: string | null;
       type: BackgroundCheckEntitySearchType | null;
       country: string | null;
+      birthCountry: string | null;
     } | null;
     replyOnlyFromProfile?: boolean;
   };

@@ -47,7 +47,7 @@ export class ProfilesHelperService {
     if (pfv.type === "BACKGROUND_CHECK") {
       return {
         query: isNonNullish(pfv.content.query)
-          ? pick(pfv.content.query, ["name", "date", "type", "country"])
+          ? pick(pfv.content.query, ["name", "date", "type", "country", "birthCountry"])
           : null,
         search: isNonNullish(pfv.content.search)
           ? pick(pfv.content.search, ["totalCount", "createdAt"])

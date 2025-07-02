@@ -113,9 +113,16 @@ export function ProfileFormFieldBackgroundCheck({
       ? countryNames.countries[query?.country.toUpperCase()]
       : query?.country;
 
+  const birthCountryName =
+    query?.birthCountry && isNonNullish(countryNames.countries)
+      ? countryNames.countries[query?.birthCountry.toUpperCase()]
+      : query?.birthCountry;
+
   const entityOrSearchName =
     entity?.name ??
-    [entityTypeLabel, query?.name, query?.date, countryName].filter(isNonNullish).join(" | ");
+    [entityTypeLabel, query?.name, query?.date, countryName, birthCountryName]
+      .filter(isNonNullish)
+      .join(" | ");
 
   useEffect(() => {
     if (router.query.profileTypeField === field.id) {
@@ -191,7 +198,7 @@ export function ProfileFormFieldBackgroundCheck({
     try {
       let url = `/${intl.locale}/app/background-check`;
 
-      const { date, name, type, country } = query ?? {};
+      const { date, name, type, country, birthCountry } = query ?? {};
 
       const searchParams = new URLSearchParams({
         token: tokenBase64,
@@ -199,6 +206,7 @@ export function ProfileFormFieldBackgroundCheck({
         ...(date ? { date } : {}),
         ...(type ? { type } : {}),
         ...(country ? { country } : {}),
+        ...(birthCountry ? { birthCountry } : {}),
       });
 
       url += `?${searchParams.toString()}`;
@@ -211,13 +219,14 @@ export function ProfileFormFieldBackgroundCheck({
     try {
       let url = `/${intl.locale}/app/background-check`;
 
-      const { name, date, type, country } = query ?? {};
+      const { name, date, type, country, birthCountry } = query ?? {};
       const urlParams = new URLSearchParams({
         token: tokenBase64,
         ...(name ? { name } : {}),
         ...(date ? { date } : {}),
         ...(type ? { type } : {}),
         ...(country ? { country } : {}),
+        ...(birthCountry ? { birthCountry } : {}),
         ...(isDisabled ? { readonly: "true" } : {}),
       });
 
@@ -299,12 +308,21 @@ export function ProfileFormFieldBackgroundCheck({
                 reply.content.query.country && countryNames.countries
                   ? countryNames.countries[reply.content.query.country]
                   : reply.content.query.country,
+                reply.content.query.birthCountry && countryNames.countries
+                  ? countryNames.countries[reply.content.query.birthCountry]
+                  : reply.content.query.birthCountry,
               ]
                 .filter(isNonNullish)
                 .join(" | "),
           value:
             reply.content.entity?.id ??
-            [reply.content.query.type, reply.content.query.name, reply.content.query.date]
+            [
+              reply.content.query.type,
+              reply.content.query.name,
+              reply.content.query.date,
+              reply.content.query.country,
+              reply.content.query.birthCountry,
+            ]
               .filter(isNonNullish)
               .join("-"),
           icon: reply.content.entity ? (
