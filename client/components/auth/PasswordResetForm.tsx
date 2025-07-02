@@ -5,8 +5,6 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  PinInput,
-  PinInputField,
   Text,
 } from "@chakra-ui/react";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
@@ -15,6 +13,7 @@ import { ReactElement, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { PasswordStrengthIndicator } from "../common/PasswordStrengthIndicator";
+import { PinInput } from "../ui";
 
 export interface PasswordResetData {
   verificationCode: string;
@@ -63,19 +62,19 @@ export function PasswordResetForm({
       <Box marginBottom={6}>
         <Text as="h1" fontSize="2xl" fontWeight="bold" marginBottom={8}>
           <FormattedMessage
-            id="public.forgot-password.reset-header"
+            id="component.password-reset-form.header"
             defaultMessage="Password reset"
           />
         </Text>
         <Text as="h2" fontSize="xl" fontWeight="bold" marginBottom={2}>
           <FormattedMessage
-            id="public.forgot-password.enter-verification-code"
+            id="component.password-reset-form.enter-verification-code"
             defaultMessage="Enter the verification code"
           />
         </Text>
         <Text>
           <FormattedMessage
-            id="public.forgot-password.reset-explanation"
+            id="component.password-reset-form.reset-explanation"
             defaultMessage="Use the verification code in the email you have received."
           />
         </Text>
@@ -88,33 +87,34 @@ export function PasswordResetForm({
               control={control}
               rules={{ required: true, minLength: 6 }}
               render={({ field: { onChange, value }, fieldState }) => (
-                <PinInput
-                  onChange={onChange}
-                  value={value}
+                <PinInput.Root
+                  value={value?.split("") ?? []}
+                  onValueChange={(e) => onChange(e.value.join(""))}
                   autoFocus
                   isInvalid={fieldState.invalid}
                 >
-                  <PinInputField />
-                  <PinInputField />
-                  <PinInputField />
-                  <PinInputField />
-                  <PinInputField />
-                  <PinInputField />
-                </PinInput>
+                  {/* TODO: Add control when upgrading to v3 */}
+                  <PinInput.Input index={0} />
+                  <PinInput.Input index={1} />
+                  <PinInput.Input index={2} />
+                  <PinInput.Input index={3} />
+                  <PinInput.Input index={4} />
+                  <PinInput.Input index={5} />
+                </PinInput.Root>
               )}
             />
           </Center>
           <FormErrorMessage>
             {errors.verificationCode?.type === "validate" && (
               <FormattedMessage
-                id="generic.forms.invalid-verification-code"
+                id="generic.forms-invalid-verification-code"
                 defaultMessage="The verification code is invalid"
               />
             )}
             {(errors.verificationCode?.type === "required" ||
               errors.verificationCode?.type === "minLength") && (
               <FormattedMessage
-                id="generic.forms.required-verification-code"
+                id="generic.forms-required-verification-code"
                 defaultMessage="The verification code is required"
               />
             )}
@@ -122,7 +122,7 @@ export function PasswordResetForm({
         </FormControl>
         <Text as="h2" fontSize="xl" fontWeight="bold" marginBottom={4}>
           <FormattedMessage
-            id="public.forgot-password.change-your-password"
+            id="component.password-reset-form.change-your-password"
             defaultMessage="Change your password"
           />
         </Text>
@@ -181,7 +181,7 @@ export function PasswordResetForm({
           type="submit"
         >
           <FormattedMessage
-            id="public.forgot-password.reset-button"
+            id="component.password-reset-form.reset-password-button"
             defaultMessage="Reset password"
           />
         </Button>

@@ -1,6 +1,7 @@
-import { Button, Flex, HStack, PinInput, PinInputField, Text } from "@chakra-ui/react";
+import { Button, Flex, HStack, Text } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { PinInput } from "../ui";
 
 interface RecipientViewPinFormProps {
   onSubmit: (code: string) => void;
@@ -15,12 +16,12 @@ export function RecipientViewPinForm({
   isLoading,
   remainingAttempts,
 }: RecipientViewPinFormProps) {
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState<string[]>([]);
   const firstInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isInvalid) {
-      setCode("");
+      setCode([]);
       firstInputRef.current!.focus();
     }
   }, [isInvalid]);
@@ -32,7 +33,7 @@ export function RecipientViewPinForm({
       as="form"
       onSubmit={(event) => {
         event.preventDefault();
-        onSubmit(code);
+        onSubmit(code.join(""));
       }}
       gridGap={4}
     >
@@ -43,14 +44,20 @@ export function RecipientViewPinForm({
           },
         }}
       >
-        <PinInput autoFocus value={code} onChange={setCode} isInvalid={isInvalid}>
-          <PinInputField ref={firstInputRef} data-testid="pin-code-input" />
-          <PinInputField />
-          <PinInputField />
-          <PinInputField />
-          <PinInputField />
-          <PinInputField />
-        </PinInput>
+        <PinInput.Root
+          autoFocus
+          value={code}
+          onValueChange={(e) => setCode(e.value)}
+          isInvalid={isInvalid}
+        >
+          {/* TODO: ChackraV3 Add control */}
+          <PinInput.Input ref={firstInputRef} data-testid="pin-code-input" index={0} />
+          <PinInput.Input index={1} />
+          <PinInput.Input index={2} />
+          <PinInput.Input index={3} />
+          <PinInput.Input index={4} />
+          <PinInput.Input index={5} />
+        </PinInput.Root>
       </HStack>
       {isInvalid ? (
         <Text color="red.500" fontSize="sm" marginTop={2}>

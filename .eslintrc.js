@@ -70,6 +70,8 @@ module.exports = {
               "AccordionItem",
               "AccordionButton",
               "AccordionIcon",
+              "PinInput",
+              "PinInputField",
             ],
             message:
               'Please use the Chakra V3 compatible components from "@parallel/components/ui" instead of "@chakra-ui/react"',

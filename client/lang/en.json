@@ -5605,6 +5605,31 @@
     "context": "<a>Contact sales</a> for more information about this feature and pricing."
   },
   {
+    "term": "component.password-reset-form.change-your-password",
+    "definition": "Change your password",
+    "context": "Change your password"
+  },
+  {
+    "term": "component.password-reset-form.enter-verification-code",
+    "definition": "Enter the verification code",
+    "context": "Enter the verification code"
+  },
+  {
+    "term": "component.password-reset-form.header",
+    "definition": "Password reset",
+    "context": "Password reset"
+  },
+  {
+    "term": "component.password-reset-form.reset-explanation",
+    "definition": "Use the verification code in the email you have received.",
+    "context": "Use the verification code in the email you have received."
+  },
+  {
+    "term": "component.password-reset-form.reset-password-button",
+    "definition": "Reset password",
+    "context": "Reset password"
+  },
+  {
     "term": "component.password-restrict-petition.body",
     "definition": "This parallel is protected. Enter the password to unlock it.",
     "context": "This parallel is protected. Enter the password to unlock it."
@@ -13975,6 +14000,11 @@
     "context": "Please, enter the last name"
   },
   {
+    "term": "generic.forms-invalid-verification-code",
+    "definition": "The verification code is invalid",
+    "context": "The verification code is invalid"
+  },
+  {
     "term": "generic.forms-last-name-label",
     "definition": "Last name",
     "context": "Last name"
@@ -13983,6 +14013,11 @@
     "term": "generic.forms-name-label",
     "definition": "Name",
     "context": "Name"
+  },
+  {
+    "term": "generic.forms-required-verification-code",
+    "definition": "The verification code is required",
+    "context": "The verification code is required"
   },
   {
     "term": "generic.forms.company-email-placeholder",
@@ -14010,11 +14045,6 @@
     "context": "Please, enter the team name"
   },
   {
-    "term": "generic.forms.invalid-verification-code",
-    "definition": "The verification code is invalid",
-    "context": "The verification code is invalid"
-  },
-  {
     "term": "generic.forms.password-label",
     "definition": "Password",
     "context": "Password"
@@ -14033,11 +14063,6 @@
     "term": "generic.forms.required-password-error",
     "definition": "Please, enter a password",
     "context": "Please, enter a password"
-  },
-  {
-    "term": "generic.forms.required-verification-code",
-    "definition": "The verification code is required",
-    "context": "The verification code is required"
   },
   {
     "term": "generic.forms.sso-user-error",
@@ -16168,6 +16193,26 @@
     "term": "page.contacts.title",
     "definition": "Recipients",
     "context": "Recipients"
+  },
+  {
+    "term": "page.forgot-password.toast-description",
+    "definition": "An email is on its way to you with a verification code.",
+    "context": "An email is on its way to you with a verification code."
+  },
+  {
+    "term": "page.forgot-password.toast-title",
+    "definition": "Reset your password",
+    "context": "Reset your password"
+  },
+  {
+    "term": "page.forgot.back-to-forgot-link",
+    "definition": "Go back to forgot password",
+    "context": "Go back to forgot password"
+  },
+  {
+    "term": "page.forgot.title",
+    "definition": "Forgot password",
+    "context": "Forgot password"
   },
   {
     "term": "page.group.no-results",
@@ -18565,16 +18610,6 @@
     "context": "Change language"
   },
   {
-    "term": "public.forgot-password.change-your-password",
-    "definition": "Change your password",
-    "context": "Change your password"
-  },
-  {
-    "term": "public.forgot-password.enter-verification-code",
-    "definition": "Enter the verification code",
-    "context": "Enter the verification code"
-  },
-  {
     "term": "public.forgot-password.explanation",
     "definition": "We will send you a message to reset your password.",
     "context": "We will send you a message to reset your password."
@@ -18590,39 +18625,9 @@
     "context": "I remembered my password"
   },
   {
-    "term": "public.forgot-password.reset-button",
-    "definition": "Reset password",
-    "context": "Reset password"
-  },
-  {
-    "term": "public.forgot-password.reset-explanation",
-    "definition": "Use the verification code in the email you have received.",
-    "context": "Use the verification code in the email you have received."
-  },
-  {
-    "term": "public.forgot-password.reset-header",
-    "definition": "Password reset",
-    "context": "Password reset"
-  },
-  {
     "term": "public.forgot-password.send-button",
     "definition": "Send verification code",
     "context": "Send verification code"
-  },
-  {
-    "term": "public.forgot-password.toast-description",
-    "definition": "An email is on its way to you with a verification code.",
-    "context": "An email is on its way to you with a verification code."
-  },
-  {
-    "term": "public.forgot-password.toast-title",
-    "definition": "Reset your password",
-    "context": "Reset your password"
-  },
-  {
-    "term": "public.forgot.title",
-    "definition": "Forgot password",
-    "context": "Forgot password"
   },
   {
     "term": "public.go-to-parallel",
@@ -18653,11 +18658,6 @@
     "term": "public.login.already-logged-in.relogin",
     "definition": "Login as someone else",
     "context": "Login as someone else"
-  },
-  {
-    "term": "public.login.back-to-forgot-link",
-    "definition": "Go back to forgot password",
-    "context": "Go back to forgot password"
   },
   {
     "term": "public.login.explanation-with-sso",

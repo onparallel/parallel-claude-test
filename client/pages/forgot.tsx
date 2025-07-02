@@ -49,11 +49,11 @@ function Forgot() {
       setVerification({ sent: true, email });
       toast({
         title: intl.formatMessage({
-          id: "public.forgot-password.toast-title",
+          id: "page.forgot-password.toast-title",
           defaultMessage: "Reset your password",
         }),
         description: intl.formatMessage({
-          id: "public.forgot-password.toast-description",
+          id: "page.forgot-password.toast-description",
           defaultMessage: "An email is on its way to you with a verification code.",
         }),
         status: "success",
@@ -133,7 +133,7 @@ function Forgot() {
   return (
     <PublicLayout
       title={intl.formatMessage({
-        id: "public.forgot.title",
+        id: "page.forgot.title",
         defaultMessage: "Forgot password",
       })}
       hideHeader
@@ -193,7 +193,7 @@ function Forgot() {
                   backLink={
                     <NormalLink role="button" onClick={() => setVerification({ sent: false })}>
                       <FormattedMessage
-                        id="public.login.back-to-forgot-link"
+                        id="page.forgot.back-to-forgot-link"
                         defaultMessage="Go back to forgot password"
                       />
                     </NormalLink>
