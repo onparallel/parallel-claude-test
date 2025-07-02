@@ -30,10 +30,7 @@ export function HiddenFieldDialog({
       closeOnEsc={false}
       closeOnOverlayClick={false}
       header={
-        <FormattedMessage
-          id="component.hidden-field-dialog.header"
-          defaultMessage="Field not visible"
-        />
+        <FormattedMessage id="generic.field-not-visible" defaultMessage="Field not visible" />
       }
       body={
         <Stack gridGap={3} spacing={0}>

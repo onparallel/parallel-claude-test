@@ -4390,11 +4390,6 @@
     "context": "The field you are trying to preview is not visible right now. The following conditions must be met for it to be displayed:"
   },
   {
-    "term": "component.hidden-field-dialog.header",
-    "definition": "Campo no visible",
-    "context": "Field not visible"
-  },
-  {
     "term": "component.hidden-filters-button.label",
     "definition": "{count, plural, =1{# filtro oculto} other{# filtros ocultos}}",
     "context": "{count, plural, =1{# hidden filter} other{# hidden filters}}"
@@ -6645,6 +6640,26 @@
     "context": "No format"
   },
   {
+    "term": "component.petition-compose-calculation-rules-dialog.description",
+    "definition": "Reglas que determinan el valor de {variableName}",
+    "context": "Rules that determine the value of {variableName}"
+  },
+  {
+    "term": "component.petition-compose-calculation-rules-dialog.header",
+    "definition": "Reglas de cálculo",
+    "context": "Calculation rules"
+  },
+  {
+    "term": "component.petition-compose-calculation-rules-dialog.how-to-add-calculations-link",
+    "definition": "Cómo añadir cálculos",
+    "context": "How to add calculations"
+  },
+  {
+    "term": "component.petition-compose-calculation-rules-dialog.no-rules",
+    "definition": "No hay cálculos añadidos para esta variable.",
+    "context": "There are no calculations added for this variable."
+  },
+  {
     "term": "component.petition-compose-variables.add-variable",
     "definition": "Añadir variable",
     "context": "Add variable"
@@ -6668,6 +6683,11 @@
     "term": "component.petition-compose-variables.no-variables-available",
     "definition": "No hay variables disponibles",
     "context": "No variables available"
+  },
+  {
+    "term": "component.petition-compose-variables.view-calculation-rules",
+    "definition": "Ver reglas de cálculo",
+    "context": "View calculation rules"
   },
   {
     "term": "component.petition-contents.hidden-fields-divider",
@@ -13828,6 +13848,11 @@
     "term": "generic.female",
     "definition": "Femenino",
     "context": "Female"
+  },
+  {
+    "term": "generic.field-not-visible",
+    "definition": "Campo no visible",
+    "context": "Field not visible"
   },
   {
     "term": "generic.field-required-error",

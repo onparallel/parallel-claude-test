@@ -777,6 +777,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           fieldIndex={fieldIndex}
           as="button"
           onClick={onTypeIndicatorClick}
+          isFixedWidth={!field.isChild}
         />
         {field.isInternal ? <InternalFieldBadge /> : null}
         {field.options.showNumbering ? <NumberingBadge /> : null}

@@ -10,6 +10,7 @@ import { completedFieldReplies } from "../completedFieldReplies";
 import { letters, numbers, romanNumerals } from "../generators";
 import { UnwrapArray } from "../types";
 import {
+  FieldLogicChange,
   FieldLogicResult,
   PetitionFieldLogicCondition,
   PetitionFieldLogicConditionOperator,
@@ -137,6 +138,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
 
       for (const field of fields) {
         const previousVariables = { ...currentVariables };
+        const changes: FieldLogicChange[] = [];
         if (field.visibility) {
           const { conditions, operator, type } = field.visibility as PetitionFieldVisibility;
           const result = conditions[operator === "OR" ? "some" : "every"]((c) =>
@@ -147,17 +149,23 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
           visibilitiesById[field.id] = true;
         }
         if (visibilitiesById[field.id] && isNonNullish(field.math)) {
-          for (const { conditions, operator, operations } of field.math) {
+          for (const rule of field.math) {
+            const { conditions, operator, operations } = rule;
             const conditionsApply = conditions[operator === "OR" ? "some" : "every"]((c) =>
               evaluateCondition(c),
             );
             if (conditionsApply) {
               for (const operation of operations) {
-                applyMathOperation(
+                const operandValue = getOperandValue(operation.operand, currentVariables);
+                const previousValue = currentVariables[operation.variable];
+                applyMathOperation(operation, currentVariables, operandValue);
+                changes.push({
+                  rule,
                   operation,
-                  currentVariables,
-                  getOperandValue(operation.operand, currentVariables),
-                );
+                  previousValue,
+                  newValue: currentVariables[operation.variable],
+                  operandValue,
+                });
               }
             }
           }
@@ -218,6 +226,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
 
             return field.children!.map((child) => {
               const previousVariables = { ...currentVariables };
+              const changes: FieldLogicChange[] = [];
               if (!visibilitiesById[field.id]) {
                 groupVisibilityById[child.id] = false;
               } else if (child.visibility) {
@@ -236,17 +245,23 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
                   ...(reply.children!.find((c) => c.field.id === child.id)?.replies ?? []),
                 );
                 if (isNonNullish(child.math)) {
-                  for (const { conditions, operator, operations } of child.math) {
+                  for (const rule of child.math) {
+                    const { conditions, operator, operations } = rule;
                     const conditionsApply = conditions[operator === "OR" ? "some" : "every"]((c) =>
                       evaluateCondition(c),
                     );
                     if (conditionsApply) {
                       for (const operation of operations) {
-                        applyMathOperation(
+                        const operandValue = getOperandValue(operation.operand, currentVariables);
+                        const previousValue = currentVariables[operation.variable];
+                        applyMathOperation(operation, currentVariables, operandValue);
+                        changes.push({
+                          rule,
                           operation,
-                          currentVariables,
-                          getOperandValue(operation.operand, currentVariables),
-                        );
+                          previousValue,
+                          newValue: currentVariables[operation.variable],
+                          operandValue,
+                        });
                       }
                     }
                   }
@@ -257,6 +272,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
                 currentVariables: { ...currentVariables },
                 previousVariables,
                 finalVariables: currentVariables,
+                changes,
               };
             });
           });
@@ -267,6 +283,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
             finalVariables: currentVariables,
             groupChildrenLogic,
             headerNumber: null,
+            changes,
           };
         } else {
           yield {
@@ -275,6 +292,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
             previousVariables,
             finalVariables: currentVariables,
             headerNumber: visibilitiesById[field.id] ? getNextEnumeration(field) : null,
+            changes,
           };
         }
       }

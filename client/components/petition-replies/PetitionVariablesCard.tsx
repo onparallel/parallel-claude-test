@@ -1,11 +1,15 @@
 import { gql } from "@apollo/client";
 import { Badge, HStack, Stack, Text } from "@chakra-ui/react";
-import { CalculatorIcon } from "@parallel/chakra/icons";
+import { CalculatorIcon, EyeIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionVariablesCard_PetitionBaseFragment } from "@parallel/graphql/__types";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { Card, CardHeader } from "../common/Card";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { OverflownText } from "../common/OverflownText";
+import { Spacer } from "../common/Spacer";
+import { usePetitionComposeCalculationRulesDialog } from "../petition-compose/dialogs/PetitionComposeCalculationRulesDialog";
 
 export interface PetitionSignaturesCardProps {
   petition: PetitionVariablesCard_PetitionBaseFragment;
@@ -17,6 +21,20 @@ export const PetitionVariablesCard = Object.assign(
     { petition, finalVariables, ...props },
     ref,
   ) {
+    const intl = useIntl();
+
+    const showCalculationRulesDialog = usePetitionComposeCalculationRulesDialog();
+
+    const handleViewCalculationRules = async (variableName: string) => {
+      try {
+        await showCalculationRulesDialog({
+          petitionId: petition.id,
+          variableName,
+          showFieldLogicChanges: true,
+        });
+      } catch {}
+    };
+
     return (
       <Card ref={ref} data-section="variables-card" {...props}>
         <CardHeader leftIcon={<CalculatorIcon fontSize="20px" />}>
@@ -31,11 +49,31 @@ export const PetitionVariablesCard = Object.assign(
             return (
               <HStack key={name}>
                 <CopyToClipboardButton size="xs" fontSize="md" text={String(total)} />
-                <Badge colorScheme="blue" textTransform="inherit" fontSize="md">
+                <OverflownText
+                  as={Badge}
+                  colorScheme="blue"
+                  textTransform="inherit"
+                  fontSize="md"
+                  whiteSpace="nowrap"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                  minWidth="0"
+                >
                   {name}
-                </Badge>
+                </OverflownText>
                 <Text as="span">=</Text>
                 <Text>{total}</Text>
+                <Spacer />
+                <IconButtonWithTooltip
+                  variant="outline"
+                  label={intl.formatMessage({
+                    id: "component.petition-compose-variables.view-calculation-rules",
+                    defaultMessage: "View calculation rules",
+                  })}
+                  icon={<EyeIcon />}
+                  size="sm"
+                  onClick={() => handleViewCalculationRules(name)}
+                />
               </HStack>
             );
           })}

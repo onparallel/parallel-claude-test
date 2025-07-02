@@ -93,6 +93,15 @@ export interface FieldLogic {
   previousVariables: Record<string, number>;
   currentVariables: Record<string, number>;
   finalVariables: Record<string, number>;
+  changes: FieldLogicChange[];
+}
+
+export interface FieldLogicChange {
+  rule: PetitionFieldMathRule;
+  operation: PetitionFieldMathOperation;
+  operandValue: number | null;
+  previousValue: number | null;
+  newValue: number | null;
 }
 
 export interface FieldLogicResult extends FieldLogic {

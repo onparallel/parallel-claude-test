@@ -18,6 +18,7 @@ import {
 } from "@parallel/graphql/__types";
 import { defaultFieldCondition } from "@parallel/utils/fieldLogic/conditions";
 import {
+  FieldLogicChange,
   PetitionFieldLogicCondition,
   PetitionFieldLogicConditionLogicalJoin,
   PetitionFieldMath,
@@ -388,7 +389,15 @@ function PetitionFieldMathRow({
   );
 }
 
-function PetitionFieldMathRowReadOnly({ row }: { row: PetitionFieldMathRule }) {
+export function PetitionFieldMathRowReadOnly({
+  row,
+  fieldLogicChanges,
+  filterByVariable,
+}: {
+  row: PetitionFieldMathRule;
+  fieldLogicChanges?: FieldLogicChange[] | null;
+  filterByVariable?: string;
+}) {
   return (
     <Stack spacing={2} padding={2} borderRadius="md" backgroundColor="purple.75">
       <Grid templateColumns="auto 1fr" alignItems="start" columnGap={2} rowGap={2}>
@@ -431,52 +440,68 @@ function PetitionFieldMathRowReadOnly({ row }: { row: PetitionFieldMathRule }) {
         })}
       </Grid>
       <Grid templateColumns="auto 1fr" alignItems="start" columnGap={2} rowGap={2}>
-        {row.operations.map((operation, index) => (
-          <Fragment key={index}>
-            <Box justifySelf="flex-end" fontSize="sm" height="auto">
-              {index === 0 ? (
-                <FormattedMessage
-                  id="component.petition-field-math-editor.then"
-                  defaultMessage="Then"
-                />
-              ) : null}
-            </Box>
-            <HStack fontSize="sm" height="auto" minWidth="0" gap={1.5} flexWrap="wrap">
-              <PetitionFieldMathOperatorSelect
-                value={operation.operator}
-                onChange={noop}
-                isReadOnly={true}
-              />
-              <Box as="span">
-                <PetitionFieldMathOperandSelect
-                  value={operation.operand}
+        {row.operations.map((operation, index) => {
+          if (filterByVariable && operation.variable !== filterByVariable) {
+            return null;
+          }
+          const fieldLogicChange = fieldLogicChanges?.[index];
+          return (
+            <Fragment key={index}>
+              <Box justifySelf="flex-end" fontSize="sm" height="auto">
+                {index === 0 ? (
+                  <FormattedMessage
+                    id="component.petition-field-math-editor.then"
+                    defaultMessage="Then"
+                  />
+                ) : null}
+              </Box>
+              <HStack fontSize="sm" height="auto" minWidth="0" gap={1.5} flexWrap="wrap">
+                <PetitionFieldMathOperatorSelect
+                  value={operation.operator}
                   onChange={noop}
                   isReadOnly={true}
                 />
-              </Box>
-              <Box as="span">
-                <FormattedMessage
-                  id="component.petition-field-math-editor.to"
-                  defaultMessage="to"
-                />
-              </Box>
-              <Badge
-                display="block"
-                colorScheme="blue"
-                fontSize="sm"
-                textTransform="none"
-                whiteSpace="nowrap"
-                overflow="hidden"
-                textOverflow="ellipsis"
-                position="relative"
-                height="auto"
-                minWidth="0"
-              >
-                {operation.variable}
-              </Badge>
-            </HStack>
-          </Fragment>
-        ))}
+                <Box as="span">
+                  <PetitionFieldMathOperandSelect
+                    value={operation.operand}
+                    onChange={noop}
+                    isReadOnly={true}
+                  />
+                </Box>
+                {operation.operand.type !== "NUMBER" && (
+                  <Badge colorScheme="yellow" fontSize="sm">
+                    {fieldLogicChange?.operandValue}
+                  </Badge>
+                )}
+                <Box as="span">
+                  <FormattedMessage
+                    id="component.petition-field-math-editor.to"
+                    defaultMessage="to"
+                  />
+                </Box>
+                <Badge
+                  display="block"
+                  colorScheme="blue"
+                  fontSize="sm"
+                  textTransform="none"
+                  whiteSpace="nowrap"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                  position="relative"
+                  height="auto"
+                  minWidth="0"
+                >
+                  {operation.variable}
+                </Badge>
+                {fieldLogicChange?.newValue && (
+                  <Badge colorScheme="yellow" fontSize="sm">
+                    {fieldLogicChange.previousValue} → {fieldLogicChange.newValue}
+                  </Badge>
+                )}
+              </HStack>
+            </Fragment>
+          );
+        })}
       </Grid>
     </Stack>
   );

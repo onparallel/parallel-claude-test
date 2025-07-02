@@ -19,6 +19,7 @@ import {
   AddIcon,
   BracesIcon,
   EditIcon,
+  EyeIcon,
   HelpOutlineIcon,
   MoreVerticalIcon,
 } from "@parallel/chakra/icons";
@@ -41,6 +42,7 @@ import { IconButtonWithTooltip, IconButtonWithTooltipProps } from "../common/Ico
 import { OverflownText } from "../common/OverflownText";
 import { useConfirmDeleteVariableDialog } from "./dialogs/ConfirmDeleteVariableDialog";
 import { useCreateOrUpdatePetitionVariableDialog } from "./dialogs/CreateOrUpdatePetitionVariableDialog";
+import { usePetitionComposeCalculationRulesDialog } from "./dialogs/PetitionComposeCalculationRulesDialog";
 import {
   ReferencedCalculationsDialog,
   useReferencedCalculationsDialog,
@@ -181,6 +183,17 @@ export function PetitionComposeVariables({
     }),
   });
 
+  const showCalculationRulesDialog = usePetitionComposeCalculationRulesDialog();
+
+  const handleViewCalculationRules = async (variableName: string) => {
+    try {
+      await showCalculationRulesDialog({
+        petitionId: petition.id,
+        variableName,
+      });
+    } catch {}
+  };
+
   return (
     <Stack padding={4} spacing={2}>
       <Stack spacing={1} paddingBottom={2}>
@@ -237,6 +250,16 @@ export function PetitionComposeVariables({
                 </OverflownText>
               </Flex>
               <HStack>
+                <IconButtonWithTooltip
+                  variant="outline"
+                  label={intl.formatMessage({
+                    id: "component.petition-compose-variables.view-calculation-rules",
+                    defaultMessage: "View calculation rules",
+                  })}
+                  icon={<EyeIcon />}
+                  size="sm"
+                  onClick={() => handleViewCalculationRules(variable.name)}
+                />
                 <IconButtonWithTooltip
                   variant="outline"
                   label={intl.formatMessage({

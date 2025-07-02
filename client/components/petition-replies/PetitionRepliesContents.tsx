@@ -279,7 +279,7 @@ const PetitionRepliesContentsItem = memoWithFragments(_PetitionRepliesContentsIt
   field: PetitionRepliesContents.fragments.PetitionField,
 });
 
-function PetitionRepliesContentsDivider({
+export function PetitionRepliesContentsDivider({
   children,
   isDashed,
 }: {

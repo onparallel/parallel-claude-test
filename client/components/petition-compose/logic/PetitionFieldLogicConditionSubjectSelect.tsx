@@ -208,6 +208,7 @@ const ConditionSubjectItem = chakraForwardRef<
           isTooltipDisabled
           flexShrink={0}
           marginStart={indent && option.isChild ? 2 : 0}
+          isFixedWidth={false}
         />
         <Box
           fontSize="sm"
@@ -240,6 +241,7 @@ const ConditionSubjectItem = chakraForwardRef<
           isTooltipDisabled
           flexShrink={0}
           marginStart={indent ? (isChild ? 4 : 2) : 0}
+          isFixedWidth={false}
         />
         <HighlightText
           as="div"

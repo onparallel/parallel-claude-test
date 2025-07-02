@@ -214,6 +214,7 @@ const MathOperandItem = chakraForwardRef<
           isTooltipDisabled
           flexShrink={0}
           marginStart={indent && option.isChild ? 2 : 0}
+          isFixedWidth={false}
         />
         <Box
           fontSize="sm"
