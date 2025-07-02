@@ -154,6 +154,7 @@ async function main() {
                   HttpEndpoint: InstanceMetadataEndpointState.enabled,
                   HttpTokens: HttpTokensState.required,
                   InstanceMetadataTags: InstanceMetadataTagsState.enabled,
+                  HttpPutResponseHopLimit: 1,
                 },
               }),
             );

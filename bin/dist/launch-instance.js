@@ -131,6 +131,7 @@ async function main() {
                             HttpEndpoint: client_ec2_1.InstanceMetadataEndpointState.enabled,
                             HttpTokens: client_ec2_1.HttpTokensState.required,
                             InstanceMetadataTags: client_ec2_1.InstanceMetadataTagsState.enabled,
+                            HttpPutResponseHopLimit: 1,
                         },
                     }));
                 }
