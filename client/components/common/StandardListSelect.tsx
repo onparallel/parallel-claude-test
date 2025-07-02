@@ -46,6 +46,11 @@ const STANDARD_LISTS = {
       id: "component.standard-list-select.cnae-2025",
       defaultMessage: "CNAE codes (2025)",
     }),
+  CNO_2011: (intl) =>
+    intl.formatMessage({
+      id: "component.standard-list-select.cno-2011",
+      defaultMessage: "CNO codes",
+    }),
   SIC: (intl) =>
     intl.formatMessage({
       id: "component.standard-list-select.sic",

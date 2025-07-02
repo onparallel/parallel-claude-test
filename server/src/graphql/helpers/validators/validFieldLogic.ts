@@ -428,6 +428,7 @@ export async function validateFieldLogic<
             NACE: null,
             CNAE_2009: null,
             CNAE_2025: null,
+            CNO_2011: null,
           };
           assert(
             isNonNullish(referencedField.options.standardList) &&

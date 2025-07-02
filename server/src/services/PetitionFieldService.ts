@@ -27,6 +27,7 @@ const STANDARD_LIST_NAMES = [
   "NACE",
   "CNAE_2009",
   "CNAE_2025",
+  "CNO_2011",
   "SIC",
 ] as const;
 
@@ -842,6 +843,18 @@ export class PetitionFieldService {
             }
             case "NACE": {
               const codes = (await import(join(__dirname, `../../data/nace/nace_en.json`))).default;
+              const keys = Object.keys(codes).sort((a, b) => a.localeCompare(b));
+              return {
+                values: keys,
+                labels: keys.map((code) => `${code} - ${codes[code]}`),
+              };
+            }
+            case "CNO_2011": {
+              const codes = (
+                await import(
+                  join(__dirname, `../../data/cno/cno_2011_${locale === "en" ? "en" : "es"}.json`)
+                )
+              ).default;
               const keys = Object.keys(codes).sort((a, b) => a.localeCompare(b));
               return {
                 values: keys,

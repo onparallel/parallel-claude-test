@@ -40,6 +40,7 @@ const STANDARD_LIST_NAMES = [
   "CURRENCIES",
   "CNAE_2009",
   "CNAE_2025",
+  "CNO_2011",
   "NACE",
   "SIC",
 ] as const;
@@ -465,6 +466,25 @@ export class ProfileTypeFieldService {
 
                     return [locale, label.filter(isNonNullish).join(" - ")];
                   }),
+                ) as Record<UserLocale, string>,
+                isStandard: true,
+              }));
+            }
+            case "CNO_2011": {
+              const locales = ["es", "en"] as const;
+              const cnoByLocale = Object.fromEntries(
+                await pMap(locales, async (locale) => [
+                  locale,
+                  (await import(join(__dirname, `../../data/cno/cno_2011_${locale}.json`))).default,
+                ]),
+              );
+
+              const codes = Object.keys(cnoByLocale["en"]).sort((a, b) => a.localeCompare(b));
+
+              return codes.map((code) => ({
+                value: code,
+                label: Object.fromEntries(
+                  locales.map((locale) => [locale, `${code} - ${cnoByLocale[locale][code]}`]),
                 ) as Record<UserLocale, string>,
                 isStandard: true,
               }));

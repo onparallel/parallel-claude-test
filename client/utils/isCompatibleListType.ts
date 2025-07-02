@@ -13,6 +13,7 @@ export function isCompatibleListType(
     NACE: null,
     CNAE_2009: null,
     CNAE_2025: null,
+    CNO_2011: null,
   };
 
   return isNonNullish(standardList) && type === typesMap[standardList];

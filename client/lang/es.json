@@ -11770,6 +11770,11 @@
     "context": "CNAE codes (2025)"
   },
   {
+    "term": "component.standard-list-select.cno-2011",
+    "definition": "Códigos CNO",
+    "context": "CNO codes"
+  },
+  {
     "term": "component.standard-list-select.countries-iso",
     "definition": "Listado de países",
     "context": "List of countries"
