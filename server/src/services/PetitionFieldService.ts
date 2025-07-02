@@ -708,6 +708,7 @@ export class PetitionFieldService {
         return {
           attachToPdf: field.options.attachToPdf ?? false,
           requests: field.options.requests,
+          identityVerification: field.options.identityVerification ?? null,
         };
       case "BACKGROUND_CHECK":
         return {
