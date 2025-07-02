@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, omit, sortBy } from "remeda";
+import { pMapChunk } from "../../util/promises/pMapChunk";
 import { MaybeArray, unMaybeArray } from "../../util/types";
 import { CreateTag, PetitionTag, Tag, User } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
@@ -86,25 +87,24 @@ export class TagRepository extends BaseRepository {
       return [];
     }
 
-    return await this.raw<PetitionTag & { tag_name: string }>(
-      /* sql */ `
-        with new_petition_tag as (
-          insert into petition_tag (tag_id, petition_id, created_by)
-          ?
-          on conflict do nothing returning *
-        )
-        select pt.*, t.name as tag_name
-        from new_petition_tag pt
-        join tag t on t.id = pt.tag_id
-      `,
-      [
-        this.sqlValues(
-          petitionIds.flatMap(
-            (petitionId) => tagIds.map((tagId) => [tagId, petitionId, `User:${user.id}`]),
-            ["int", "int", "text"],
-          ),
-        ),
-      ],
+    return await pMapChunk(
+      petitionIds.flatMap((petitionId) => tagIds.map((tagId) => [tagId, petitionId])),
+      async (chunk) => {
+        return await this.raw<PetitionTag & { tag_name: string }>(
+          /* sql */ `
+            with new_petition_tag as (
+              insert into petition_tag (tag_id, petition_id, created_by)
+              select tag_id, petition_id, ? from (?) as t(tag_id, petition_id)
+              on conflict do nothing returning *
+            )
+            select pt.*, t.name as tag_name
+            from new_petition_tag pt
+            join tag t on t.id = pt.tag_id
+          `,
+          [`User:${user.id}`, this.sqlValues(chunk, ["int", "int"])],
+        );
+      },
+      { chunkSize: 1000, concurrency: 1 },
     );
   }
 
