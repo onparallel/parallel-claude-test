@@ -30,7 +30,6 @@ generates:
       namingConvention: keep
       exportFragmentSpreadSubTypes: true
       preResolveTypes: true
-      maybeValue: T | null
       enumsAsTypes: true
       addDocBlocks: false
       documentMode: graphQLTag

@@ -2,7 +2,7 @@ import type { Duration } from "date-fns";
 import type { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
 import gql from "graphql-tag";
 export type Maybe<T> = T | null;
-export type InputMaybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -7721,7 +7721,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -13250,7 +13250,7 @@ export type AdminSettingsLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -13319,7 +13319,7 @@ export type AppLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -13416,7 +13416,7 @@ export type AppLayoutNavBar_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -13485,7 +13485,7 @@ export type DevelopersLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -13583,7 +13583,7 @@ export type OrganizationSettingsLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -13832,7 +13832,7 @@ export type PetitionLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -13901,7 +13901,7 @@ export type ProfileLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -14196,7 +14196,7 @@ export type ReportsSidebarLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -14265,7 +14265,7 @@ export type SidebarLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -14335,7 +14335,7 @@ export type UserGroupLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -14467,7 +14467,7 @@ export type UserSettingsLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -15661,7 +15661,7 @@ export type OrganizationProfilesLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -42891,7 +42891,7 @@ export type Admin_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -42980,7 +42980,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -43142,7 +43142,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -43431,7 +43431,7 @@ export type AdminOrganizationsMembers_queryQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -43633,7 +43633,7 @@ export type AdminOrganizations_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -43731,7 +43731,7 @@ export type AdminSupportMethods_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -43952,7 +43952,7 @@ export type Alerts_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -44794,7 +44794,7 @@ export type Contact_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -44990,7 +44990,7 @@ export type Contacts_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -45471,7 +45471,7 @@ export type Home_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -46068,7 +46068,7 @@ export type OrganizationBranding_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -46159,7 +46159,7 @@ export type OrganizationCompliance_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -46247,7 +46247,7 @@ export type OrganizationGeneral_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -46441,7 +46441,7 @@ export type OrganizationGroup_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -46550,7 +46550,7 @@ export type PermissionsGroup_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -46780,7 +46780,7 @@ export type OrganizationGroups_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -46851,7 +46851,7 @@ export type OrganizationSettings_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -46952,7 +46952,7 @@ export type OrganizationIntegrations_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -47091,7 +47091,7 @@ export type IntegrationsSignature_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -47321,7 +47321,7 @@ export type OrganizationProfileType_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -47797,7 +47797,7 @@ export type OrganizationProfileTypes_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -47971,7 +47971,7 @@ export type OrganizationUsage_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -48162,7 +48162,7 @@ export type OrganizationUsers_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -48541,7 +48541,7 @@ export type PetitionActivity_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -50365,7 +50365,7 @@ export type PetitionActivity_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -51247,7 +51247,7 @@ export type PetitionCompose_PetitionFieldFragment = {
   }>;
 };
 
-export type PetitionCompose_updatePetitionFieldFragment = {
+export type PetitionCompose_updatePetitionFieldFragmentFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
@@ -51460,7 +51460,7 @@ export type PetitionCompose_QueryFragment = {
     }>;
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
-  profileTypes: {
+  petitionComposeProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -51468,8 +51468,6 @@ export type PetitionCompose_QueryFragment = {
       id: string;
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
-      isPinned: boolean;
-      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
       standardType?: ProfileTypeStandardType | null;
       fields: Array<{
@@ -51488,6 +51486,19 @@ export type PetitionCompose_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  appLayoutNavBarProfileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      canCreate: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -53699,7 +53710,7 @@ export type PetitionCompose_userQuery = {
     }>;
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
-  profileTypes: {
+  petitionComposeProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -53707,8 +53718,6 @@ export type PetitionCompose_userQuery = {
       id: string;
       name: { [locale in UserLocale]?: string };
       icon: ProfileTypeIcon;
-      isPinned: boolean;
-      canCreate: boolean;
       pluralName: { [locale in UserLocale]?: string };
       standardType?: ProfileTypeStandardType | null;
       fields: Array<{
@@ -53727,6 +53736,19 @@ export type PetitionCompose_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  appLayoutNavBarProfileTypes: {
+    __typename?: "ProfileTypePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      icon: ProfileTypeIcon;
+      isPinned: boolean;
+      canCreate: boolean;
+      pluralName: { [locale in UserLocale]?: string };
+    }>;
   };
   metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
@@ -54666,7 +54688,7 @@ export type PetitionMessages_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -54738,7 +54760,7 @@ export type PetitionMessages_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -56196,7 +56218,7 @@ export type PetitionPreview_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -58338,7 +58360,7 @@ export type PetitionPreview_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -59374,7 +59396,7 @@ export type PetitionReplies_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -60453,7 +60475,7 @@ export type Petitions_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -60982,7 +61004,7 @@ export type NewPetition_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -61297,7 +61319,7 @@ export type ProfileDetail_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -61597,7 +61619,7 @@ export type Profiles_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -61811,7 +61833,7 @@ export type Reports_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -61888,7 +61910,7 @@ export type Overview_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -61965,7 +61987,7 @@ export type ReportsReplies_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -62042,7 +62064,7 @@ export type ReportsTemplates_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -62115,7 +62137,7 @@ export type Account_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -62227,7 +62249,7 @@ export type Account_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -62584,7 +62606,7 @@ export type Subscriptions_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -62687,7 +62709,7 @@ export type Tokens_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -62758,7 +62780,7 @@ export type Settings_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -62837,7 +62859,7 @@ export type Security_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
-  profileTypes: {
+  appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
     items: Array<{
@@ -69106,7 +69128,11 @@ export const AppLayoutNavBar_QueryFragmentDoc = gql`
     me {
       ...AppLayoutNavBar_User
     }
-    profileTypes(limit: 100, offset: 0, filter: { includeArchived: true }) {
+    appLayoutNavBarProfileTypes: profileTypes(
+      limit: 100
+      offset: 0
+      filter: { includeArchived: true }
+    ) {
       totalCount
       items {
         id
@@ -76608,8 +76634,8 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
   ${useClosePetition_PetitionBaseFragmentDoc}
   ${PetitionComposeRightPaneTabs_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionCompose_PetitionBaseFragment, unknown>;
-export const PetitionCompose_updatePetitionFieldFragmentDoc = gql`
-  fragment PetitionCompose_updatePetitionField on PetitionField {
+export const PetitionCompose_updatePetitionFieldFragmentFragmentDoc = gql`
+  fragment PetitionCompose_updatePetitionFieldFragment on PetitionField {
     id
     ...PetitionCompose_PetitionField
     petition {
@@ -76621,7 +76647,7 @@ export const PetitionCompose_updatePetitionFieldFragmentDoc = gql`
     }
   }
   ${PetitionCompose_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<PetitionCompose_updatePetitionFieldFragment, unknown>;
+` as unknown as DocumentNode<PetitionCompose_updatePetitionFieldFragmentFragment, unknown>;
 export const PetitionFieldTypeSelectDropdown_UserFragmentDoc = gql`
   fragment PetitionFieldTypeSelectDropdown_User on User {
     hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
@@ -76758,7 +76784,7 @@ export const PetitionCompose_QueryFragmentDoc = gql`
       ...useStartSignatureRequest_User
       ...PetitionComposeRightPaneTabs_User
     }
-    profileTypes(limit: 100, offset: 0) {
+    petitionComposeProfileTypes: profileTypes(limit: 100, offset: 0) {
       totalCount
       items {
         id
@@ -86018,10 +86044,10 @@ export const PetitionCompose_updatePetitionFieldDocument = gql`
     $force: Boolean
   ) {
     updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data, force: $force) {
-      ...PetitionCompose_updatePetitionField
+      ...PetitionCompose_updatePetitionFieldFragment
     }
   }
-  ${PetitionCompose_updatePetitionFieldFragmentDoc}
+  ${PetitionCompose_updatePetitionFieldFragmentFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionCompose_updatePetitionFieldMutation,
   PetitionCompose_updatePetitionFieldMutationVariables

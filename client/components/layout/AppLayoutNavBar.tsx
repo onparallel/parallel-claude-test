@@ -104,7 +104,7 @@ export interface AppLayoutNavBarProps {
 
 export const AppLayoutNavBar = Object.assign(
   function AppLayoutNavBar({ queryObject, onHelpCenterClick }: AppLayoutNavBarProps) {
-    const { me, realMe, profileTypes } = queryObject;
+    const { me, realMe, appLayoutNavBarProfileTypes: profileTypes } = queryObject;
     const intl = useIntl();
 
     const closeRef = useRef<HTMLButtonElement>(null);
@@ -432,7 +432,11 @@ export const AppLayoutNavBar = Object.assign(
             me {
               ...AppLayoutNavBar_User
             }
-            profileTypes(limit: 100, offset: 0, filter: { includeArchived: true }) {
+            appLayoutNavBarProfileTypes: profileTypes(
+              limit: 100
+              offset: 0
+              filter: { includeArchived: true }
+            ) {
               totalCount
               items {
                 id

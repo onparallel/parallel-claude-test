@@ -29,7 +29,6 @@ generates:
         LocalizableUserText: "{ [locale in UserLocale]?: string }"
       namingConvention: keep
       preResolveTypes: true
-      maybeValue: T | null
       declarationKind: interface
       skipTypeNameForRoot: true
       exportFragmentSpreadSubTypes: true

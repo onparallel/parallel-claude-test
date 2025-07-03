@@ -65,7 +65,7 @@ import {
   PetitionCompose_updateFieldPositionsDocument,
   PetitionCompose_updatePetitionDocument,
   PetitionCompose_updatePetitionFieldDocument,
-  PetitionCompose_updatePetitionFieldFragmentDoc,
+  PetitionCompose_updatePetitionFieldFragmentFragmentDoc,
   PetitionCompose_userDocument,
   PetitionFieldType,
   ProfileTypeStandardType,
@@ -709,8 +709,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               ].includes(keys[0])
             ) {
               const cached = apollo.readFragment({
-                fragment: PetitionCompose_updatePetitionFieldFragmentDoc,
-                fragmentName: "PetitionCompose_updatePetitionField",
+                fragment: PetitionCompose_updatePetitionFieldFragmentFragmentDoc,
+                fragmentName: "PetitionCompose_updatePetitionFieldFragment",
                 id: fieldId,
               });
               if (isNonNullish(cached)) {
@@ -1051,7 +1051,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           petitionId: petition.id,
           profileTypeId,
           onAddField: handleAddField,
-          profileTypes: queryObject.profileTypes.items,
+          profileTypes: queryObject.petitionComposeProfileTypes.items,
         });
       } catch {}
     },
@@ -1633,9 +1633,9 @@ const _fragments = {
       ${PetitionComposeRightPaneTabs.fragments.PetitionField}
     `;
   },
-  get updatePetitionField() {
+  get updatePetitionFieldFragment() {
     return gql`
-      fragment PetitionCompose_updatePetitionField on PetitionField {
+      fragment PetitionCompose_updatePetitionFieldFragment on PetitionField {
         id
         ...PetitionCompose_PetitionField
         petition {
@@ -1669,7 +1669,7 @@ const _fragments = {
           ...useStartSignatureRequest_User
           ...PetitionComposeRightPaneTabs_User
         }
-        profileTypes(limit: 100, offset: 0) {
+        petitionComposeProfileTypes: profileTypes(limit: 100, offset: 0) {
           totalCount
           items {
             id
@@ -1823,10 +1823,10 @@ const _mutations = [
       $force: Boolean
     ) {
       updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data, force: $force) {
-        ...PetitionCompose_updatePetitionField
+        ...PetitionCompose_updatePetitionFieldFragment
       }
     }
-    ${_fragments.updatePetitionField}
+    ${_fragments.updatePetitionFieldFragment}
   `,
   gql`
     mutation PetitionCompose_changePetitionFieldType(
