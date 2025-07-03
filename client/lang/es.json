@@ -6085,6 +6085,26 @@
     "context": "No provider"
   },
   {
+    "term": "component.petition-compose-calculation-rules-dialog.description",
+    "definition": "Reglas que determinan el valor de {variableName}",
+    "context": "Rules that determine the value of {variableName}"
+  },
+  {
+    "term": "component.petition-compose-calculation-rules-dialog.header",
+    "definition": "Pasos del cálculo",
+    "context": "Calculation steps"
+  },
+  {
+    "term": "component.petition-compose-calculation-rules-dialog.how-to-add-calculations-link",
+    "definition": "Cómo añadir cálculos",
+    "context": "How to add calculations"
+  },
+  {
+    "term": "component.petition-compose-calculation-rules-dialog.no-rules",
+    "definition": "No hay cálculos añadidos para esta variable.",
+    "context": "There are no calculations added for this variable."
+  },
+  {
     "term": "component.petition-compose-checkbox-settings.description",
     "definition": "Esta opción permite limitar el número de opciones que puede escoger el destinarario.",
     "context": "This option allows you to limit the number of options that the recipient can choose."
@@ -6665,26 +6685,6 @@
     "context": "No format"
   },
   {
-    "term": "component.petition-compose-calculation-rules-dialog.description",
-    "definition": "Reglas que determinan el valor de {variableName}",
-    "context": "Rules that determine the value of {variableName}"
-  },
-  {
-    "term": "component.petition-compose-calculation-rules-dialog.header",
-    "definition": "Reglas de cálculo",
-    "context": "Calculation rules"
-  },
-  {
-    "term": "component.petition-compose-calculation-rules-dialog.how-to-add-calculations-link",
-    "definition": "Cómo añadir cálculos",
-    "context": "How to add calculations"
-  },
-  {
-    "term": "component.petition-compose-calculation-rules-dialog.no-rules",
-    "definition": "No hay cálculos añadidos para esta variable.",
-    "context": "There are no calculations added for this variable."
-  },
-  {
     "term": "component.petition-compose-variables.add-variable",
     "definition": "Añadir variable",
     "context": "Add variable"
@@ -6710,9 +6710,9 @@
     "context": "No variables available"
   },
   {
-    "term": "component.petition-compose-variables.view-calculation-rules",
-    "definition": "Ver reglas de cálculo",
-    "context": "View calculation rules"
+    "term": "component.petition-compose-variables.show-calculation-steps",
+    "definition": "Mostrar pasos del cálculo",
+    "context": "Show calculation steps"
   },
   {
     "term": "component.petition-contents.hidden-fields-divider",

@@ -1,14 +1,12 @@
 import { gql } from "@apollo/client";
 import { Badge, HStack, Stack, Text } from "@chakra-ui/react";
-import { CalculatorIcon, EyeIcon } from "@parallel/chakra/icons";
+import { CalculatorIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionVariablesCard_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Card, CardHeader } from "../common/Card";
-import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { OverflownText } from "../common/OverflownText";
-import { Spacer } from "../common/Spacer";
 import { usePetitionComposeCalculationRulesDialog } from "../petition-compose/dialogs/PetitionComposeCalculationRulesDialog";
 
 export interface PetitionSignaturesCardProps {
@@ -48,7 +46,15 @@ export const PetitionVariablesCard = Object.assign(
             const total = finalVariables[name];
             return (
               <HStack key={name}>
-                <CopyToClipboardButton size="xs" fontSize="md" text={String(total)} />
+                <IconButtonWithTooltip
+                  label={intl.formatMessage({
+                    id: "component.petition-compose-variables.show-calculation-steps",
+                    defaultMessage: "Show calculation steps",
+                  })}
+                  icon={<CalculatorIcon boxSize={4} />}
+                  size="xs"
+                  onClick={() => handleViewCalculationRules(name)}
+                />
                 <OverflownText
                   as={Badge}
                   colorScheme="blue"
@@ -63,17 +69,6 @@ export const PetitionVariablesCard = Object.assign(
                 </OverflownText>
                 <Text as="span">=</Text>
                 <Text>{total}</Text>
-                <Spacer />
-                <IconButtonWithTooltip
-                  variant="outline"
-                  label={intl.formatMessage({
-                    id: "component.petition-compose-variables.view-calculation-rules",
-                    defaultMessage: "View calculation rules",
-                  })}
-                  icon={<EyeIcon />}
-                  size="sm"
-                  onClick={() => handleViewCalculationRules(name)}
-                />
               </HStack>
             );
           })}

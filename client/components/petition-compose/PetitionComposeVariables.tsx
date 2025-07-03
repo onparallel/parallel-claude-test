@@ -18,8 +18,8 @@ import { Menu } from "@parallel/chakra/components";
 import {
   AddIcon,
   BracesIcon,
+  CalculatorIcon,
   EditIcon,
-  EyeIcon,
   HelpOutlineIcon,
   MoreVerticalIcon,
 } from "@parallel/chakra/icons";
@@ -253,10 +253,10 @@ export function PetitionComposeVariables({
                 <IconButtonWithTooltip
                   variant="outline"
                   label={intl.formatMessage({
-                    id: "component.petition-compose-variables.view-calculation-rules",
-                    defaultMessage: "View calculation rules",
+                    id: "component.petition-compose-variables.show-calculation-steps",
+                    defaultMessage: "Show calculation steps",
                   })}
-                  icon={<EyeIcon />}
+                  icon={<CalculatorIcon boxSize={4} />}
                   size="sm"
                   onClick={() => handleViewCalculationRules(variable.name)}
                 />

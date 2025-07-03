@@ -69,7 +69,7 @@ function PetitionComposeCalculationRulesDialogLoading({
       header={
         <FormattedMessage
           id="component.petition-compose-calculation-rules-dialog.header"
-          defaultMessage="Calculation rules"
+          defaultMessage="Calculation steps"
         />
       }
       body={
@@ -125,7 +125,7 @@ export function PetitionComposeCalculationRulesDialog({
       header={
         <FormattedMessage
           id="component.petition-compose-calculation-rules-dialog.header"
-          defaultMessage="Calculation rules"
+          defaultMessage="Calculation steps"
         />
       }
       body={
@@ -159,7 +159,7 @@ export function PetitionComposeCalculationRulesDialog({
                 />
               </Text>
               <Flex>
-                <HelpCenterLink articleId={8575034} display="flex" alignItems="center">
+                <HelpCenterLink articleId={8574972} display="flex" alignItems="center">
                   <FormattedMessage
                     id="component.petition-compose-calculation-rules-dialog.how-to-add-calculations-link"
                     defaultMessage="How to add calculations"
