@@ -27128,11 +27128,11 @@ export type PublicTemplateCard_PetitionTemplateFragment = {
   name?: string | null;
   backgroundColor?: string | null;
   categories?: Array<string> | null;
-  imageUrl?: string | null;
   locale: PetitionLocale;
   isRestricted: boolean;
   isPublic: boolean;
   anonymizeAfterMonths?: number | null;
+  imageUrl212?: string | null;
   publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
   signatureConfig?: { __typename?: "SignatureConfig"; isEnabled: boolean; review: boolean } | null;
   remindersConfig?: {
@@ -39614,7 +39614,7 @@ export type ImportFromExternalSourceDialog_integrationsQuery = {
               __typename?: "ProfileExternalSourceOrgIntegration";
               id: string;
               name: string;
-              logoUrl?: string | null;
+              logoUrl300x60?: string | null;
               searchParams: Array<{
                 __typename?: "ProfileExternalSourceSearchParam";
                 type: ProfileExternalSourceSearchParamType;
@@ -39643,7 +39643,7 @@ export type ImportFromExternalSourceDialog_ProfileExternalSourceOrgIntegrationFr
   __typename?: "ProfileExternalSourceOrgIntegration";
   id: string;
   name: string;
-  logoUrl?: string | null;
+  logoUrl300x60?: string | null;
   searchParams: Array<{
     __typename?: "ProfileExternalSourceSearchParam";
     type: ProfileExternalSourceSearchParamType;
@@ -41349,7 +41349,7 @@ export type useCompletingMessageDialog_PublicPetitionFragment = {
   id: string;
   completingMessageBody?: string | null;
   completingMessageSubject?: string | null;
-  organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
+  organization: { __typename?: "PublicOrganization"; name: string; logoUrl80?: string | null };
 };
 
 export type useDelegateAccessDialog_publicDelegateAccessToContactMutationVariables = Exact<{
@@ -60757,11 +60757,11 @@ export type NewPetition_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
   name?: string | null;
   backgroundColor?: string | null;
   categories?: Array<string> | null;
-  imageUrl?: string | null;
   locale: PetitionLocale;
   isRestricted: boolean;
   isPublic: boolean;
   anonymizeAfterMonths?: number | null;
+  imageUrl212?: string | null;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -60865,11 +60865,11 @@ export type NewPetition_templatesQuery = {
           name?: string | null;
           backgroundColor?: string | null;
           categories?: Array<string> | null;
-          imageUrl?: string | null;
           locale: PetitionLocale;
           isRestricted: boolean;
           isPublic: boolean;
           anonymizeAfterMonths?: number | null;
+          imageUrl212?: string | null;
           permissions: Array<
             | {
                 __typename?: "PetitionUserGroupPermission";
@@ -62932,8 +62932,8 @@ export type RecipientView_PublicPetitionAccessFragment = {
       id: string;
       name: string;
       hasRemoveParallelBranding: boolean;
-      logoUrl?: string | null;
       logoUrl72?: string | null;
+      logoUrl80?: string | null;
       brandTheme: {
         __typename?: "OrganizationBrandThemeData";
         color: string;
@@ -63333,9 +63333,9 @@ export type RecipientView_PublicPetitionFragment = {
   organization: {
     __typename?: "PublicOrganization";
     name: string;
-    logoUrl?: string | null;
     id: string;
     hasRemoveParallelBranding: boolean;
+    logoUrl80?: string | null;
   };
   currentSignatureRequest?: {
     __typename?: "PublicPetitionSignatureRequest";
@@ -63555,9 +63555,9 @@ export type RecipientView_publicCompletePetitionMutation = {
     organization: {
       __typename?: "PublicOrganization";
       name: string;
-      logoUrl?: string | null;
       id: string;
       hasRemoveParallelBranding: boolean;
+      logoUrl80?: string | null;
     };
     currentSignatureRequest?: {
       __typename?: "PublicPetitionSignatureRequest";
@@ -63617,8 +63617,8 @@ export type RecipientView_accessQuery = {
         id: string;
         name: string;
         hasRemoveParallelBranding: boolean;
-        logoUrl?: string | null;
         logoUrl72?: string | null;
+        logoUrl80?: string | null;
         brandTheme: {
           __typename?: "OrganizationBrandThemeData";
           color: string;
@@ -73790,7 +73790,7 @@ export const ImportFromExternalSourceDialog_ProfileExternalSourceOrgIntegrationF
   fragment ImportFromExternalSourceDialog_ProfileExternalSourceOrgIntegration on ProfileExternalSourceOrgIntegration {
     id
     name
-    logoUrl(options: { resize: { width: 300, height: 60, fit: inside } })
+    logoUrl300x60: logoUrl(options: { resize: { width: 300, height: 60, fit: inside } })
     searchParams(profileTypeId: $profileTypeId, profileId: $profileId, locale: $locale) {
       type
       key
@@ -78609,7 +78609,7 @@ export const PublicTemplateCard_PetitionTemplateFragmentDoc = gql`
     name
     backgroundColor
     categories
-    imageUrl(options: { resize: { height: 212 } })
+    imageUrl212: imageUrl(options: { resize: { height: 212 } })
     ...TemplateActiveSettingsIcons_PetitionTemplate
   }
   ${TemplateActiveSettingsIcons_PetitionTemplateFragmentDoc}
@@ -79407,7 +79407,7 @@ export const useCompletingMessageDialog_PublicPetitionFragmentDoc = gql`
     completingMessageSubject
     organization {
       name
-      logoUrl(options: { resize: { height: 80 } })
+      logoUrl80: logoUrl(options: { resize: { height: 80 } })
     }
   }
 ` as unknown as DocumentNode<useCompletingMessageDialog_PublicPetitionFragment, unknown>;

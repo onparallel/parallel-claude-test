@@ -64,7 +64,7 @@ export const PublicTemplateCard = Object.assign(
                 defaultMessage: "Example of question you will find in this template.",
               })}
               src={
-                template.imageUrl ??
+                template.imageUrl212 ??
                 `${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/templates/${intl.locale}_radio_button.png`
               }
             />
@@ -109,7 +109,7 @@ export const PublicTemplateCard = Object.assign(
           name
           backgroundColor
           categories
-          imageUrl(options: { resize: { height: 212 } })
+          imageUrl212: imageUrl(options: { resize: { height: 212 } })
           ...TemplateActiveSettingsIcons_PetitionTemplate
         }
         ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}

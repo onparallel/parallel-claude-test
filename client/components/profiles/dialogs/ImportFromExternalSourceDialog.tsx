@@ -1124,10 +1124,10 @@ function HeaderWithOrgIntegrationLogo({
   return (
     <HStack paddingInlineEnd={6}>
       <Box flex={1}>{children}</Box>
-      {orgIntegration.logoUrl ? (
+      {orgIntegration.logoUrl300x60 ? (
         <Image
           alt={orgIntegration.name}
-          src={orgIntegration.logoUrl}
+          src={orgIntegration.logoUrl300x60}
           width="150px"
           maxHeight="30px"
           objectFit="contain"
@@ -1193,7 +1193,7 @@ const _queries = [
     fragment ImportFromExternalSourceDialog_ProfileExternalSourceOrgIntegration on ProfileExternalSourceOrgIntegration {
       id
       name
-      logoUrl(options: { resize: { width: 300, height: 60, fit: inside } })
+      logoUrl300x60: logoUrl(options: { resize: { width: 300, height: 60, fit: inside } })
       searchParams(profileTypeId: $profileTypeId, profileId: $profileId, locale: $locale) {
         type
         key

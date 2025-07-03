@@ -60,9 +60,9 @@ function CompletingMessageDialog({
             paddingX={4}
             margin="0 auto"
           >
-            {petition.organization.logoUrl ? (
+            {petition.organization.logoUrl80 ? (
               <Img
-                src={petition.organization.logoUrl}
+                src={petition.organization.logoUrl80}
                 aria-label={petition.organization.name}
                 width="auto"
                 height="40px"
@@ -216,7 +216,7 @@ useCompletingMessageDialog.fragments = {
         completingMessageSubject
         organization {
           name
-          logoUrl(options: { resize: { height: 80 } })
+          logoUrl80: logoUrl(options: { resize: { height: 80 } })
         }
       }
     `;
