@@ -1398,7 +1398,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           <PetitionComposeNewFieldDrawer
             ref={fieldDrawerRef}
             user={me}
-            profileTypes={queryObject.profileTypes.items}
+            profileTypes={queryObject.petitionComposeProfileTypes.items}
             onClose={handleCloseFieldDrawer}
             onAddField={handleAddField}
             onAddProfileTypeFieldGroup={handleAddProfileTypeFieldGroup}

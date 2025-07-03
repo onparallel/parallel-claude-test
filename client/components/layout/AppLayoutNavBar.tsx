@@ -279,12 +279,12 @@ export const AppLayoutNavBar = Object.assign(
                         }}
                         overflow="hidden"
                       >
-                        {me.organization.iconUrl ? (
+                        {me.organization.iconUrl80 ? (
                           <Image
                             boxSize="40px"
                             objectFit="contain"
                             alt={me.organization.name}
-                            src={me.organization.iconUrl}
+                            src={me.organization.iconUrl80}
                           />
                         ) : (
                           <Logo width="40px" hideText={true} color="gray.800" padding={1.5} />
@@ -405,7 +405,7 @@ export const AppLayoutNavBar = Object.assign(
             organization {
               id
               name
-              iconUrl: iconUrl(options: { resize: { width: 80 } })
+              iconUrl80: iconUrl(options: { resize: { width: 80 } })
               isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
               currentUsagePeriod(limitName: PETITION_SEND) {
                 id
@@ -456,8 +456,9 @@ export const AppLayoutNavBar = Object.assign(
   },
 );
 
-interface SectionsAndProfilesListProps
-  extends Pick<AppLayoutNavBar_QueryFragment, "me" | "profileTypes"> {
+interface SectionsAndProfilesListProps {
+  me: AppLayoutNavBar_QueryFragment["me"];
+  profileTypes: AppLayoutNavBar_QueryFragment["appLayoutNavBarProfileTypes"];
   onToggle: (isOpen: boolean) => void;
   isMobile: boolean;
 }
