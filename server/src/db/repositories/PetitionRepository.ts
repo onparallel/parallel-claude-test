@@ -929,7 +929,6 @@ export class PetitionRepository extends BaseRepository {
       const visibleFields = applyFieldVisibility(petition).filter((f) => f.type !== "HEADING");
 
       const visibleExternalFields = visibleFields
-        .filter((f) => !f.is_internal)
         .flatMap((f) => {
           if (f.type === "FIELD_GROUP") {
             return f.replies.flatMap((reply) =>
@@ -944,10 +943,10 @@ export class PetitionRepository extends BaseRepository {
           } else {
             return [f];
           }
-        });
+        })
+        .filter((f) => !f.is_internal);
 
       const visibleInternalFields = visibleFields
-        .filter((f) => f.is_internal)
         .flatMap((f) => {
           if (f.type === "FIELD_GROUP") {
             return f.replies.flatMap((reply) =>
@@ -962,7 +961,8 @@ export class PetitionRepository extends BaseRepository {
           } else {
             return [f];
           }
-        });
+        })
+        .filter((f) => f.is_internal);
 
       const validatedExternal = visibleExternalFields.filter(
         (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED"),
