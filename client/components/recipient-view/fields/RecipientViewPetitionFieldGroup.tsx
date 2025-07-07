@@ -302,6 +302,12 @@ export function RecipientViewPetitionFieldGroupLayout({
   const intl = useIntl();
   const isPetitionField = field.__typename === "PetitionField";
   const [commentsFieldId] = useFieldCommentsQueryState();
+  const groupName =
+    field.options.groupName ??
+    intl.formatMessage({
+      id: "generic.group-name-fallback-reply",
+      defaultMessage: "Reply",
+    });
 
   return (
     <Stack spacing={4} as="section" id={`field-${field.id}`}>
@@ -404,13 +410,8 @@ export function RecipientViewPetitionFieldGroupLayout({
                   defaultMessage: "Add {groupName}",
                 },
                 {
-                  groupName: (
-                    field.options.groupName ??
-                    intl.formatMessage({
-                      id: "generic.group-name-fallback-reply",
-                      defaultMessage: "Reply",
-                    })
-                  ).toLowerCase(),
+                  groupName:
+                    groupName === groupName.toUpperCase() ? groupName : groupName.toLowerCase(),
                 },
               )}
             </Text>
@@ -447,6 +448,12 @@ export function RecipientViewPetitionFieldGroupCard({
 }: RecipientViewPetitionFieldGroupCardProps) {
   const intl = useIntl();
   const tone = useTone();
+  const groupName =
+    field.options.groupName ??
+    intl.formatMessage({
+      id: "generic.group-name-fallback-reply",
+      defaultMessage: "Reply",
+    });
   return (
     <Card as={Stack} padding={4} spacing={4} position="relative" id={id}>
       {field.multiple || field.optional ? (
@@ -504,13 +511,8 @@ export function RecipientViewPetitionFieldGroupCard({
                     defaultMessage: "Remove {groupName}",
                   },
                   {
-                    groupName: (
-                      field.options.groupName ??
-                      intl.formatMessage({
-                        id: "generic.group-name-fallback-reply",
-                        defaultMessage: "Reply",
-                      })
-                    ).toLowerCase(),
+                    groupName:
+                      groupName === groupName.toUpperCase() ? groupName : groupName.toLowerCase(),
                   },
                 )}
                 isDisabled={isDisabled}
