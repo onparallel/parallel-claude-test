@@ -246,7 +246,7 @@ function MdList({ token }: { token: Tokens.List }) {
             ) : null}
           </View>
           <View style={{ flex: 1 }}>
-            {t.type === "text" ? (
+            {t.type === "text" || t.type === "paragraph" ? (
               <Text>
                 <MdInlineContent tokens={(t as any).tokens} />
               </Text>

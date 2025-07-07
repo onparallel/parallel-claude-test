@@ -125,7 +125,7 @@ function MdList({ token }: { token: Tokens.List }) {
           {t.tokens.map((t, i) =>
             t.type === "list" ? (
               <MdList key={i} token={t as Tokens.List} />
-            ) : t.type === "text" ? (
+            ) : t.type === "text" || t.type === "paragraph" ? (
               <MdInlineContent key={i} tokens={(t as any).tokens} />
             ) : t.type === "space" ? (
               <chakra.span key={i}>{t.raw}</chakra.span>

@@ -725,7 +725,7 @@ function mdList({ token }: { token: Tokens.List }) {
         if (t.type === "list") {
           return renderList(t as Tokens.List, level + 1);
         } else {
-          return t.type === "text"
+          return t.type === "text" || t.type === "paragraph"
             ? [
                 "  ".repeat(level),
                 j === 0
