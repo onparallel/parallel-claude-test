@@ -1,7 +1,7 @@
 import { Font, renderToStream } from "@react-pdf/renderer";
 import { execSync } from "child_process";
 import { createReadStream, createWriteStream } from "fs";
-import { mkdir, rm, symlink, unlink, writeFile } from "fs/promises";
+import { copyFile, mkdir, rm, stat, symlink, unlink, writeFile } from "fs/promises";
 import hyphen from "hyphen";
 import { tmpdir } from "os";
 import pMap from "p-map";
@@ -110,32 +110,40 @@ interface PdfMetadataItem<TLabel extends string, TValue> {
 }
 
 export async function fetchToFile(
-  url: string,
+  pathOrUrl: string,
   path: string,
   options?: { maxFileSize?: number; fallbackUrl?: string },
 ): Promise<void> {
+  console.log("Fetching...", pathOrUrl, JSON.stringify(options));
+
   try {
-    console.log("Fetching...", url, JSON.stringify(options));
-    if (options?.maxFileSize) {
-      const { ok, headers } = await fetch(url, { method: "HEAD" });
-      if (!ok) {
+    if (pathOrUrl.startsWith("/")) {
+      // It's a local file, copy it directly
+      await stat(pathOrUrl);
+      await copyFile(pathOrUrl, path);
+    } else {
+      const url = pathOrUrl;
+      if (options?.maxFileSize) {
+        const { ok, headers } = await fetch(url, { method: "HEAD" });
+        if (!ok) {
+          throw new Error("Error fetching resource " + url);
+        }
+        const size = parseInt(headers.get("content-length") ?? "0");
+        if (size > options.maxFileSize) {
+          throw new Error("Resource is too big!");
+        }
+      }
+
+      const res = await fetch(url);
+      if (res.ok) {
+        return new Promise((resolve, reject) => {
+          Readable.fromWeb(res.body! as any).pipe(
+            createWriteStream(path).once("error", reject).once("close", resolve),
+          );
+        });
+      } else {
         throw new Error("Error fetching resource " + url);
       }
-      const size = parseInt(headers.get("content-length") ?? "0");
-      if (size > options.maxFileSize) {
-        throw new Error("Resource is too big!");
-      }
-    }
-
-    const res = await fetch(url);
-    if (res.ok) {
-      return new Promise((resolve, reject) => {
-        Readable.fromWeb(res.body! as any).pipe(
-          createWriteStream(path).once("error", reject).once("close", resolve),
-        );
-      });
-    } else {
-      throw new Error("Error fetching resource " + url);
     }
   } catch (error) {
     console.error("ERROR", error);

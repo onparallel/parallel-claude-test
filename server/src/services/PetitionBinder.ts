@@ -516,7 +516,7 @@ export class PetitionBinder implements IPetitionBinder {
         async (file) => {
           const fileHasSize = file.size !== "0";
           if (fileHasSize && file.content_type.startsWith("image/")) {
-            const imageUrl = await this.convertImage(
+            const imagePath = await this.convertImage(
               temporaryDirectory,
               file.path,
               file.content_type,
@@ -525,7 +525,7 @@ export class PetitionBinder implements IPetitionBinder {
               filename: file.filename,
               path: await this.writeTemporaryFile(
                 temporaryDirectory,
-                this.printer.imageToPdf(userId, { imageUrl, theme: theme.data }),
+                this.printer.imageToPdf(userId, { imagePath, theme: theme.data }),
                 "pdf",
               ),
             };

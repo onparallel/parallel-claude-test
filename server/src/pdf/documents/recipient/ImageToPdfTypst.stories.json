@@ -1,0 +1,34 @@
+{
+  "title": "Documents",
+  "stories": [
+    {
+      "name": "Image to PDF Typst",
+      "parameters": {
+        "server": {
+          "id": "documents/recipient/ImageToPdfTypst"
+        }
+      },
+      "args": {
+        "imagePath": "/Users/santialbo/Developer/parallel/client/public/static/emails/logo.png",
+        "theme": {
+          "marginLeft": 25.4,
+          "marginRight": 25.4,
+          "marginTop": 25.4,
+          "marginBottom": 25.4
+        }
+      },
+      "argTypes": {
+        "imagePath": {
+          "control": {
+            "type": "text"
+          }
+        },
+        "theme": {
+          "control": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  ]
+}

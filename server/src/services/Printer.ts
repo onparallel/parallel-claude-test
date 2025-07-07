@@ -4,12 +4,14 @@ import { Readable } from "stream";
 import { CONFIG, Config } from "../config";
 import { ContactLocale } from "../db/__types";
 import { buildPdf } from "../pdf/buildPdf";
-import BackgroundCheckProfile, {
+import BackgroundCheckProfileTypst, {
   BackgroundCheckProfileProps,
-} from "../pdf/documents/BackgroundCheckProfile";
-import AnnexCoverPage, { AnnexCoverPageProps } from "../pdf/documents/recipient/AnnexCoverPage";
+} from "../pdf/documents/BackgroundCheckProfileTypst";
+import AnnexCoverPageTypst, {
+  AnnexCoverPageProps,
+} from "../pdf/documents/recipient/AnnexCoverPageTypst";
 import DamagedFilePage, { DamagedFilePageProps } from "../pdf/documents/recipient/DamagedFilePage";
-import ImageToPdf, { ImageToPdfProps } from "../pdf/documents/recipient/ImageToPdf";
+import ImageToPdfTypst, { ImageToPdfProps } from "../pdf/documents/recipient/ImageToPdfTypst";
 import PetitionExport, {
   PetitionExportInitialData,
 } from "../pdf/documents/recipient/PetitionExport";
@@ -99,13 +101,13 @@ export class Printer implements IPrinter {
 
   public async annexCoverPage(userId: number, props: AnnexCoverPageProps, locale: ContactLocale) {
     const client = await this.createClient(userId);
-    return (await buildPdf(AnnexCoverPage, props, { client, locale })).stream;
+    return (await buildPdf(AnnexCoverPageTypst, props, { client, locale })).stream;
   }
 
   public async imageToPdf(userId: number, props: ImageToPdfProps) {
     const client = await this.createClient(userId);
     return (
-      await buildPdf(ImageToPdf, props, {
+      await buildPdf(ImageToPdfTypst, props, {
         client,
         locale: "es" /* locale doesn't matter here as this is an image-only document */,
       })
@@ -116,7 +118,7 @@ export class Printer implements IPrinter {
     const client = await this.createClient(userId);
     return (
       await buildPdf(
-        BackgroundCheckProfile,
+        BackgroundCheckProfileTypst,
         { ...props, assetsUrl: this.config.misc.assetsUrl },
         { client, locale: "en" },
       )

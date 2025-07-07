@@ -26,7 +26,17 @@ async function parseArgs(req: Request, storyPath: string) {
   return mapValues(story.argTypes, ({ control: { type } }: any, key) => {
     switch (type) {
       case "object":
-        return JSON.parse(req.query[key as string] as string);
+        try {
+          const jsonString = req.query[key as string] as string;
+          if (!jsonString) {
+            return story.args?.[key] || {};
+          }
+          return JSON.parse(jsonString);
+        } catch (error) {
+          console.error(`Error parsing JSON for key "${key}":`, req.query[key as string]);
+          console.error("Falling back to default args for key:", key);
+          return story.args?.[key] || {};
+        }
       case "boolean":
         return req.query[key as string] === "true";
       case "date":

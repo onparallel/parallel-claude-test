@@ -15,13 +15,31 @@
           "marginLeft": 25.4,
           "marginRight": 25.4,
           "marginTop": 25.4,
-          "marginBottom": 25.4
+          "marginBottom": 25.4,
+          "title1FontFamily": "IBM Plex Sans",
+          "title1Color": "#000000",
+          "title1FontSize": 16,
+          "title2FontFamily": "IBM Plex Sans",
+          "title2Color": "#000000",
+          "title2FontSize": 14
         }
       },
       "argTypes": {
-        "fieldTitle": { "control": { "type": "text" } },
-        "fieldNumber": { "control": { "type": "number" } },
-        "theme": { "control": { "type": "object" } }
+        "fieldTitle": {
+          "control": {
+            "type": "text"
+          }
+        },
+        "fieldNumber": {
+          "control": {
+            "type": "number"
+          }
+        },
+        "theme": {
+          "control": {
+            "type": "object"
+          }
+        }
       }
     }
   ]
