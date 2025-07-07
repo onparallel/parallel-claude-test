@@ -1099,6 +1099,7 @@ export class ProfileRepository extends BaseRepository {
       content?: Record<string, any> | null;
       expiryDate?: string | null;
       pendingReview?: boolean;
+      petitionFieldReplyId?: number | null;
     }[],
     userId: number | null,
     orgId: number,
@@ -1115,11 +1116,11 @@ export class ProfileRepository extends BaseRepository {
       const events = await this.raw<ProfileEvent>(
         /* sql */ `
           with new_values as (
-            select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date, pending_review)
+            select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date, pending_review, petition_field_reply_id)
           ),
           with_no_previous_values as (
             -- insert values where a profile_field_value does not exist yet
-            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review)
+            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review, petition_field_reply_id)
             select 
               nv.profile_id, 
               nv.profile_type_field_id, 
@@ -1129,7 +1130,8 @@ export class ProfileRepository extends BaseRepository {
               ?,
               ?,
               case when nv.type in ('BACKGROUND_CHECK', 'ADVERSE_MEDIA_SEARCH') then true else false end, -- this fields are monitored by default
-              nv.pending_review
+              nv.pending_review,
+              nv.petition_field_reply_id
             from new_values nv
             left join profile_field_value pfv2 
               on pfv2.profile_id = nv.profile_id
@@ -1166,7 +1168,7 @@ export class ProfileRepository extends BaseRepository {
           ),
           with_previous_values as (
             -- insert values where a profile_field_value existed already
-            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review)
+            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review, petition_field_reply_id)
             select 
               nv.profile_id,
               nv.profile_type_field_id, 
@@ -1176,7 +1178,8 @@ export class ProfileRepository extends BaseRepository {
               ?,
               ?,
               rpv.active_monitoring, -- active_monitoring is always inherited from previous values
-              nv.pending_review -- pending_review is always set explicitly, not inherited
+              nv.pending_review, -- pending_review is always set explicitly, not inherited
+              nv.petition_field_reply_id
             from removed_previous_values rpv
             join new_values nv on nv.profile_id = rpv.profile_id and rpv.profile_type_field_id = nv.profile_type_field_id
             where nv.content is not null
@@ -1316,8 +1319,9 @@ export class ProfileRepository extends BaseRepository {
               // undefined ('-infinity'::date) uses previous value, null removes
               f.expiryDate === undefined ? "-infinity" : (f.expiryDate ?? null),
               f.pendingReview ?? false,
+              f.petitionFieldReplyId ?? null,
             ]),
-            ["int", "int", "profile_type_field_type", "jsonb", "date", "boolean"],
+            ["int", "int", "profile_type_field_type", "jsonb", "date", "boolean", "int"],
           ),
           // with_no_previous_values
           ...[userId, externalSourceIntegrationId ?? null],
@@ -1508,11 +1512,11 @@ export class ProfileRepository extends BaseRepository {
   async createProfileFieldFiles(
     profileId: number,
     profileTypeFieldId: number,
-    fileUploadIds: number[],
+    files: { fileUploadId: number; petitionFieldReplyId?: number | null }[],
     expiryDate: string | null | undefined,
     userId: number,
   ) {
-    if (fileUploadIds.length === 0) {
+    if (files.length === 0) {
       return [];
     }
     return await this.withTransaction(async (t) => {
@@ -1533,13 +1537,14 @@ export class ProfileRepository extends BaseRepository {
               .returning("*");
       return await this.insert(
         "profile_field_file",
-        fileUploadIds.map((fileUploadId) => ({
+        files.map((file) => ({
           profile_id: profileId,
           profile_type_field_id: profileTypeFieldId,
           type: "FILE" as const,
-          file_upload_id: fileUploadId,
+          file_upload_id: file.fileUploadId,
           expiry_date: previousFiles[0]?.expiry_date ?? expiryDate ?? null,
           created_by_user_id: userId,
+          petition_field_reply_id: file.petitionFieldReplyId ?? null,
         })),
         t,
       );

@@ -8442,6 +8442,18 @@ describe("GraphQL/Profiles", () => {
           file: { contentType: file.content_type, filename: file.filename },
         },
       ]);
+
+      const [pff] = await mocks.knex
+        .from("profile_field_file")
+        .where({
+          profile_id: fromGlobalId(profile.id).id,
+          profile_type_field_id: profileType2Fields[1].id,
+          removed_at: null,
+          deleted_at: null,
+        })
+        .select("*");
+
+      expect(pff.petition_field_reply_id).toEqual(fileUploadReply.id);
     });
 
     it("fails if copying file reply from petition into a closed profile", async () => {

@@ -552,8 +552,11 @@ describe("ProfileLinkedPetitionFields", () => {
     let legalEntityChildFields: PetitionField[];
 
     let individualReply: PetitionFieldReply;
+    let individualChildReplies: PetitionFieldReply[];
     let legalEntityReply: PetitionFieldReply;
+    let legalEntityChildReplies: PetitionFieldReply[];
     let contractReply: PetitionFieldReply;
+    let contractChildReplies: PetitionFieldReply[];
 
     let individualProfileTypeFields: Record<string, ProfileTypeField>;
     let legalEntityProfileTypeFields: Record<string, ProfileTypeField>;
@@ -709,188 +712,194 @@ describe("ProfileLinkedPetitionFields", () => {
       );
 
       // insert replies for every field on INDIVIDUAL group
-      await mocks.knex.from("petition_field_reply").insert([
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_first_name")!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "Mike" },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_last_name")!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "Wazowski" },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_email")!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "mwazowski@monsterinc.com" },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_phone_number")!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "PHONE",
-          user_id: user.id,
-          content: { value: "+123456789" },
-        },
-        {
-          petition_field_id: individualChildFields.find(
-            (f) => f.alias === "i_p_mobile_phone_number",
-          )!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "PHONE",
-          user_id: user.id,
-          content: { value: "+987654321" },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_birth_date")!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "DATE",
-          user_id: user.id,
-          content: { value: "1990-02-02" },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_gender")!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "SELECT",
-          user_id: user.id,
-          content: { value: "M" },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_address")!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "1234 Elm Street" },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_city")!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "Monstropolis" },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_zip")!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "12345" },
-        },
-        {
-          petition_field_id: individualChildFields.find(
-            (f) => f.alias === "i_p_country_of_residence",
-          )!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "SELECT",
-          user_id: user.id,
-          content: { value: "US" },
-        },
-        {
-          petition_field_id: individualChildFields.find(
-            (f) => f.alias === "i_p_proof_of_address_document",
-          )!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "FILE_UPLOAD",
-          user_id: user.id,
-          content: { file_upload_id: fileUploads[fileCount++].id },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_citizenship")!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "SELECT",
-          user_id: user.id,
-          content: { value: "US" },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_tax_id")!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "123456789" },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_id_document")!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "FILE_UPLOAD",
-          user_id: user.id,
-          content: { file_upload_id: fileUploads[fileCount++].id },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_passport_document")!
-            .id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "FILE_UPLOAD",
-          user_id: user.id,
-          content: { file_upload_id: fileUploads[fileCount++].id },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_passport_number")!
-            .id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "A2345678X" },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_is_pep")!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "SELECT",
-          user_id: user.id,
-          content: { value: "N" },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_risk")!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "SELECT",
-          user_id: user.id,
-          content: { value: "LOW" },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_risk_assessment")!
-            .id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "FILE_UPLOAD",
-          user_id: user.id,
-          content: { file_upload_id: fileUploads[fileCount++].id },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_source_of_funds")!
-            .id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "TEXT",
-          user_id: user.id,
-          content: { value: "Salary" },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_background_check")!
-            .id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "BACKGROUND_CHECK",
-          user_id: user.id,
-          content: {
-            query: { name: "Mike Wazowski", date: null, type: "Person" },
-            search: {
-              totalCount: 1,
-              items: [{ id: "1", type: "Person", name: "Mike Wazowski", properties: {} }],
-              createdAt: new Date(),
-            },
-            entity: { id: "1", type: "Person", name: "Mike Wazowski", properties: {} },
+      individualChildReplies = await mocks.knex.from("petition_field_reply").insert(
+        [
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_first_name")!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "Mike" },
           },
-        },
-        {
-          petition_field_id: individualChildFields.find((f) => f.alias === "i_p_occupation")!.id,
-          parent_petition_field_reply_id: individualReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "Scarer" },
-        },
-      ]);
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_last_name")!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "Wazowski" },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_email")!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "mwazowski@monsterinc.com" },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_phone_number")!
+              .id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "PHONE",
+            user_id: user.id,
+            content: { value: "+123456789" },
+          },
+          {
+            petition_field_id: individualChildFields.find(
+              (f) => f.alias === "i_p_mobile_phone_number",
+            )!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "PHONE",
+            user_id: user.id,
+            content: { value: "+987654321" },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_birth_date")!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "DATE",
+            user_id: user.id,
+            content: { value: "1990-02-02" },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_gender")!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "SELECT",
+            user_id: user.id,
+            content: { value: "M" },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_address")!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "1234 Elm Street" },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_city")!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "Monstropolis" },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_zip")!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "12345" },
+          },
+          {
+            petition_field_id: individualChildFields.find(
+              (f) => f.alias === "i_p_country_of_residence",
+            )!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "SELECT",
+            user_id: user.id,
+            content: { value: "US" },
+          },
+          {
+            petition_field_id: individualChildFields.find(
+              (f) => f.alias === "i_p_proof_of_address_document",
+            )!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "FILE_UPLOAD",
+            user_id: user.id,
+            content: { file_upload_id: fileUploads[fileCount++].id },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_citizenship")!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "SELECT",
+            user_id: user.id,
+            content: { value: "US" },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_tax_id")!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "123456789" },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_id_document")!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "FILE_UPLOAD",
+            user_id: user.id,
+            content: { file_upload_id: fileUploads[fileCount++].id },
+          },
+          {
+            petition_field_id: individualChildFields.find(
+              (f) => f.alias === "i_p_passport_document",
+            )!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "FILE_UPLOAD",
+            user_id: user.id,
+            content: { file_upload_id: fileUploads[fileCount++].id },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_passport_number")!
+              .id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "A2345678X" },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_is_pep")!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "SELECT",
+            user_id: user.id,
+            content: { value: "N" },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_risk")!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "SELECT",
+            user_id: user.id,
+            content: { value: "LOW" },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_risk_assessment")!
+              .id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "FILE_UPLOAD",
+            user_id: user.id,
+            content: { file_upload_id: fileUploads[fileCount++].id },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_source_of_funds")!
+              .id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "TEXT",
+            user_id: user.id,
+            content: { value: "Salary" },
+          },
+          {
+            petition_field_id: individualChildFields.find(
+              (f) => f.alias === "i_p_background_check",
+            )!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "BACKGROUND_CHECK",
+            user_id: user.id,
+            content: {
+              query: { name: "Mike Wazowski", date: null, type: "Person" },
+              search: {
+                totalCount: 1,
+                items: [{ id: "1", type: "Person", name: "Mike Wazowski", properties: {} }],
+                createdAt: new Date(),
+              },
+              entity: { id: "1", type: "Person", name: "Mike Wazowski", properties: {} },
+            },
+          },
+          {
+            petition_field_id: individualChildFields.find((f) => f.alias === "i_p_occupation")!.id,
+            parent_petition_field_reply_id: individualReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "Scarer" },
+          },
+        ],
+        "*",
+      );
 
       [legalEntityReply] = await mocks.createFieldGroupReply(
         legalEntityField.id,
@@ -908,193 +917,201 @@ describe("ProfileLinkedPetitionFields", () => {
         .select("*");
 
       // insert replies for every field on LEGAL_ENTITY group
-      await mocks.knex.from("petition_field_reply").insert([
-        {
-          petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_entity_name")!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "Monsters Inc." },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_trade_name")!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "Monsters Inc." },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_entity_type")!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "SELECT",
-          user_id: user.id,
-          content: { value: "INCORPORATED" },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find(
-            (f) => f.alias === "le_p_registration_number",
-          )!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "123456" },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_tax_id")!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "ABCDEF" },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find(
-            (f) => f.alias === "le_p_registered_address",
-          )!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "1234 Monster Street" },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_city")!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "Monstropolis" },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_zip")!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "12345" },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find(
-            (f) => f.alias === "le_p_country_of_incorporation",
-          )!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "SELECT",
-          user_id: user.id,
-          content: { value: "US" },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find(
-            (f) => f.alias === "le_p_date_of_incorporation",
-          )!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "DATE",
-          user_id: user.id,
-          content: { value: "1890-12-24" },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find(
-            (f) => f.alias === "le_p_main_business_activity",
-          )!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "Scaring" },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find(
-            (f) => f.alias === "le_p_ownership_structure",
-          )!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "FILE_UPLOAD",
-          user_id: user.id,
-          content: { file_upload_id: fileUploads[fileCount++].id },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_ubo_statement")!
-            .id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "FILE_UPLOAD",
-          user_id: user.id,
-          content: { file_upload_id: fileUploads[fileCount++].id },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find(
-            (f) => f.alias === "le_p_financial_statements",
-          )!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "FILE_UPLOAD",
-          user_id: user.id,
-          content: { file_upload_id: fileUploads[fileCount++].id },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_risk")!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "SELECT",
-          user_id: user.id,
-          content: { value: "MEDIUM" },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_risk_assessment")!
-            .id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "FILE_UPLOAD",
-          user_id: user.id,
-          content: { file_upload_id: fileUploads[fileCount++].id },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_poa_types")!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "SELECT",
-          user_id: user.id,
-          content: { value: "GENERAL_POA" },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_poa_scope")!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "All" },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_poa_document")!
-            .id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "FILE_UPLOAD",
-          user_id: user.id,
-          content: { file_upload_id: fileUploads[fileCount++].id },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find(
-            (f) => f.alias === "le_p_poa_effective_date",
-          )!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "DATE",
-          user_id: user.id,
-          content: { value: "2020-01-01" },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find(
-            (f) => f.alias === "le_p_poa_expiration_date",
-          )!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "DATE",
-          user_id: user.id,
-          content: { value: "2031-01-01" },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find(
-            (f) => f.alias === "le_p_poa_revocation_conditions",
-          )!.id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "None" },
-        },
-        {
-          petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_poa_registered")!
-            .id,
-          parent_petition_field_reply_id: legalEntityReply.id,
-          type: "SELECT",
-          user_id: user.id,
-          content: { value: "Y" },
-        },
-      ]);
+      legalEntityChildReplies = await mocks.knex.from("petition_field_reply").insert(
+        [
+          {
+            petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_entity_name")!
+              .id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "Monsters Inc." },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_trade_name")!
+              .id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "Monsters Inc." },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_entity_type")!
+              .id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "SELECT",
+            user_id: user.id,
+            content: { value: "INCORPORATED" },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find(
+              (f) => f.alias === "le_p_registration_number",
+            )!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "123456" },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_tax_id")!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "ABCDEF" },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find(
+              (f) => f.alias === "le_p_registered_address",
+            )!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "1234 Monster Street" },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_city")!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "Monstropolis" },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_zip")!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "12345" },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find(
+              (f) => f.alias === "le_p_country_of_incorporation",
+            )!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "SELECT",
+            user_id: user.id,
+            content: { value: "US" },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find(
+              (f) => f.alias === "le_p_date_of_incorporation",
+            )!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "DATE",
+            user_id: user.id,
+            content: { value: "1890-12-24" },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find(
+              (f) => f.alias === "le_p_main_business_activity",
+            )!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "Scaring" },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find(
+              (f) => f.alias === "le_p_ownership_structure",
+            )!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "FILE_UPLOAD",
+            user_id: user.id,
+            content: { file_upload_id: fileUploads[fileCount++].id },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_ubo_statement")!
+              .id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "FILE_UPLOAD",
+            user_id: user.id,
+            content: { file_upload_id: fileUploads[fileCount++].id },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find(
+              (f) => f.alias === "le_p_financial_statements",
+            )!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "FILE_UPLOAD",
+            user_id: user.id,
+            content: { file_upload_id: fileUploads[fileCount++].id },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_risk")!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "SELECT",
+            user_id: user.id,
+            content: { value: "MEDIUM" },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find(
+              (f) => f.alias === "le_p_risk_assessment",
+            )!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "FILE_UPLOAD",
+            user_id: user.id,
+            content: { file_upload_id: fileUploads[fileCount++].id },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_poa_types")!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "SELECT",
+            user_id: user.id,
+            content: { value: "GENERAL_POA" },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_poa_scope")!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "All" },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find((f) => f.alias === "le_p_poa_document")!
+              .id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "FILE_UPLOAD",
+            user_id: user.id,
+            content: { file_upload_id: fileUploads[fileCount++].id },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find(
+              (f) => f.alias === "le_p_poa_effective_date",
+            )!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "DATE",
+            user_id: user.id,
+            content: { value: "2020-01-01" },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find(
+              (f) => f.alias === "le_p_poa_expiration_date",
+            )!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "DATE",
+            user_id: user.id,
+            content: { value: "2031-01-01" },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find(
+              (f) => f.alias === "le_p_poa_revocation_conditions",
+            )!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "None" },
+          },
+          {
+            petition_field_id: legalEntityChildFields.find(
+              (f) => f.alias === "le_p_poa_registered",
+            )!.id,
+            parent_petition_field_reply_id: legalEntityReply.id,
+            type: "SELECT",
+            user_id: user.id,
+            content: { value: "Y" },
+          },
+        ],
+        "*",
+      );
 
       [contractReply] = await mocks.createFieldGroupReply(contractField.id, undefined, 1, () => ({
         user_id: user.id,
@@ -1109,180 +1126,190 @@ describe("ProfileLinkedPetitionFields", () => {
         .select("*");
 
       // insert replies for every field on CONTRACT group
-      await mocks.knex.from("petition_field_reply").insert([
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_counterparty")!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "Sulley" },
-        },
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_contract_type")!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SELECT",
-          user_id: user.id,
-          content: { value: "EMPLOYMENT_CONTRACT" },
-        },
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_effective_date")!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "DATE",
-          user_id: user.id,
-          content: { value: "2020-01-01" },
-        },
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_expiration_date")!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "DATE",
-          user_id: user.id,
-          content: { value: "2022-01-01" },
-        },
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_jurisdiction")!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SELECT",
-          user_id: user.id,
-          content: { value: "US" },
-        },
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_contract_value")!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "NUMBER",
-          user_id: user.id,
-          content: { value: 1000000 },
-        },
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_contract_currency")!
-            .id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SELECT",
-          user_id: user.id,
-          content: { value: "USD" },
-        },
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_payment_terms")!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "Net 30" },
-        },
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_renewal_terms")!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "None" },
-        },
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_original_document")!
-            .id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "FILE_UPLOAD",
-          user_id: user.id,
-          content: { file_upload_id: fileUploads[fileCount++].id },
-        },
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_amendments")!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "FILE_UPLOAD",
-          user_id: user.id,
-          content: { file_upload_id: fileUploads[fileCount++].id },
-        },
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_termination_clauses")!
-            .id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "None" },
-        },
-        {
-          petition_field_id: contractChildFields.find(
-            (f) => f.alias === "c_p_confidentiality_agreement",
-          )!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SELECT",
-          user_id: user.id,
-          content: { value: "Y" },
-        },
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_performance_metrics")!
-            .id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "Metrics are good" },
-        },
-        {
-          petition_field_id: contractChildFields.find(
-            (f) => f.alias === "c_p_dispute_resolution_mechanism",
-          )!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "Arbitration" },
-        },
-        {
-          petition_field_id: contractChildFields.find(
-            (f) => f.alias === "c_p_compliance_obligations",
-          )!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "None" },
-        },
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_security_provisions")!
-            .id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "None" },
-        },
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_notes")!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "TEXT",
-          user_id: user.id,
-          content: { value: "No notes" },
-        },
-        {
-          petition_field_id: contractChildFields.find(
-            (f) => f.alias === "c_p_billing_contact_full_name",
-          )!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "James P. Sullivan" },
-        },
-        {
-          petition_field_id: contractChildFields.find(
-            (f) => f.alias === "c_p_billing_contact_email",
-          )!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "jpsullivan@monsterinc.com" },
-        },
-        {
-          petition_field_id: contractChildFields.find(
-            (f) => f.alias === "c_p_legal_contact_full_name",
-          )!.id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "Randall Boggs" },
-        },
-        {
-          petition_field_id: contractChildFields.find((f) => f.alias === "c_p_legal_contact_email")!
-            .id,
-          parent_petition_field_reply_id: contractReply.id,
-          type: "SHORT_TEXT",
-          user_id: user.id,
-          content: { value: "rboggs@monsterinc.com" },
-        },
-      ]);
+      contractChildReplies = await mocks.knex.from("petition_field_reply").insert(
+        [
+          {
+            petition_field_id: contractChildFields.find((f) => f.alias === "c_p_counterparty")!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "Sulley" },
+          },
+          {
+            petition_field_id: contractChildFields.find((f) => f.alias === "c_p_contract_type")!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SELECT",
+            user_id: user.id,
+            content: { value: "EMPLOYMENT_CONTRACT" },
+          },
+          {
+            petition_field_id: contractChildFields.find((f) => f.alias === "c_p_effective_date")!
+              .id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "DATE",
+            user_id: user.id,
+            content: { value: "2020-01-01" },
+          },
+          {
+            petition_field_id: contractChildFields.find((f) => f.alias === "c_p_expiration_date")!
+              .id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "DATE",
+            user_id: user.id,
+            content: { value: "2022-01-01" },
+          },
+          {
+            petition_field_id: contractChildFields.find((f) => f.alias === "c_p_jurisdiction")!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SELECT",
+            user_id: user.id,
+            content: { value: "US" },
+          },
+          {
+            petition_field_id: contractChildFields.find((f) => f.alias === "c_p_contract_value")!
+              .id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "NUMBER",
+            user_id: user.id,
+            content: { value: 1000000 },
+          },
+          {
+            petition_field_id: contractChildFields.find((f) => f.alias === "c_p_contract_currency")!
+              .id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SELECT",
+            user_id: user.id,
+            content: { value: "USD" },
+          },
+          {
+            petition_field_id: contractChildFields.find((f) => f.alias === "c_p_payment_terms")!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "Net 30" },
+          },
+          {
+            petition_field_id: contractChildFields.find((f) => f.alias === "c_p_renewal_terms")!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "None" },
+          },
+          {
+            petition_field_id: contractChildFields.find((f) => f.alias === "c_p_original_document")!
+              .id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "FILE_UPLOAD",
+            user_id: user.id,
+            content: { file_upload_id: fileUploads[fileCount++].id },
+          },
+          {
+            petition_field_id: contractChildFields.find((f) => f.alias === "c_p_amendments")!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "FILE_UPLOAD",
+            user_id: user.id,
+            content: { file_upload_id: fileUploads[fileCount++].id },
+          },
+          {
+            petition_field_id: contractChildFields.find(
+              (f) => f.alias === "c_p_termination_clauses",
+            )!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "None" },
+          },
+          {
+            petition_field_id: contractChildFields.find(
+              (f) => f.alias === "c_p_confidentiality_agreement",
+            )!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SELECT",
+            user_id: user.id,
+            content: { value: "Y" },
+          },
+          {
+            petition_field_id: contractChildFields.find(
+              (f) => f.alias === "c_p_performance_metrics",
+            )!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "Metrics are good" },
+          },
+          {
+            petition_field_id: contractChildFields.find(
+              (f) => f.alias === "c_p_dispute_resolution_mechanism",
+            )!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "Arbitration" },
+          },
+          {
+            petition_field_id: contractChildFields.find(
+              (f) => f.alias === "c_p_compliance_obligations",
+            )!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "None" },
+          },
+          {
+            petition_field_id: contractChildFields.find(
+              (f) => f.alias === "c_p_security_provisions",
+            )!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "None" },
+          },
+          {
+            petition_field_id: contractChildFields.find((f) => f.alias === "c_p_notes")!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "TEXT",
+            user_id: user.id,
+            content: { value: "No notes" },
+          },
+          {
+            petition_field_id: contractChildFields.find(
+              (f) => f.alias === "c_p_billing_contact_full_name",
+            )!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "James P. Sullivan" },
+          },
+          {
+            petition_field_id: contractChildFields.find(
+              (f) => f.alias === "c_p_billing_contact_email",
+            )!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "jpsullivan@monsterinc.com" },
+          },
+          {
+            petition_field_id: contractChildFields.find(
+              (f) => f.alias === "c_p_legal_contact_full_name",
+            )!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "Randall Boggs" },
+          },
+          {
+            petition_field_id: contractChildFields.find(
+              (f) => f.alias === "c_p_legal_contact_email",
+            )!.id,
+            parent_petition_field_reply_id: contractReply.id,
+            type: "SHORT_TEXT",
+            user_id: user.id,
+            content: { value: "rboggs@monsterinc.com" },
+          },
+        ],
+        "*",
+      );
 
       await mocks.knex.from("petition").where("id", petition.id).update({
         status: "CLOSED",
@@ -1762,6 +1789,43 @@ describe("ProfileLinkedPetitionFields", () => {
           value: null,
         },
       ]);
+
+      for (const [alias, ptf] of Object.entries(individualProfileTypeFields)) {
+        const reply = individualChildReplies.find(
+          (r) =>
+            r.parent_petition_field_reply_id === individualReply.id &&
+            r.petition_field_id === individualChildFields.find((f) => f.alias === `i_${alias}`)!.id,
+        );
+        if (!reply) {
+          continue;
+        }
+
+        if (ptf.type === "FILE") {
+          const [pff] = await mocks.knex
+            .from("profile_field_file")
+            .where({
+              profile_id: profile.id,
+              profile_type_field_id: ptf.id,
+              removed_at: null,
+              deleted_at: null,
+            })
+            .select("*");
+          expect(pff).toBeDefined();
+          expect(pff.petition_field_reply_id).toEqual(reply.id);
+        } else {
+          const [pfv] = await mocks.knex
+            .from("profile_field_value")
+            .where({
+              profile_id: profile.id,
+              profile_type_field_id: ptf.id,
+              removed_at: null,
+              deleted_at: null,
+            })
+            .select("*");
+          expect(pfv).toBeDefined();
+          expect(pfv.petition_field_reply_id).toEqual(reply.id);
+        }
+      }
     });
 
     it("archives LEGAL_ENTITY FIELD_GROUP reply into an empty profile", async () => {
@@ -2234,6 +2298,44 @@ describe("ProfileLinkedPetitionFields", () => {
           value: null,
         },
       ]);
+
+      for (const [alias, ptf] of Object.entries(legalEntityProfileTypeFields)) {
+        const reply = legalEntityChildReplies.find(
+          (r) =>
+            r.parent_petition_field_reply_id === legalEntityReply.id &&
+            r.petition_field_id ===
+              legalEntityChildFields.find((f) => f.alias === `le_${alias}`)!.id,
+        );
+        if (!reply) {
+          continue;
+        }
+
+        if (ptf.type === "FILE") {
+          const [pff] = await mocks.knex
+            .from("profile_field_file")
+            .where({
+              profile_id: profile.id,
+              profile_type_field_id: ptf.id,
+              removed_at: null,
+              deleted_at: null,
+            })
+            .select("*");
+          expect(pff).toBeDefined();
+          expect(pff.petition_field_reply_id).toEqual(reply.id);
+        } else {
+          const [pfv] = await mocks.knex
+            .from("profile_field_value")
+            .where({
+              profile_id: profile.id,
+              profile_type_field_id: ptf.id,
+              removed_at: null,
+              deleted_at: null,
+            })
+            .select("*");
+          expect(pfv).toBeDefined();
+          expect(pfv.petition_field_reply_id).toEqual(reply.id);
+        }
+      }
     });
 
     it("archives CONTRACT FIELD_GROUP reply into an empty profile", async () => {
@@ -2687,6 +2789,43 @@ describe("ProfileLinkedPetitionFields", () => {
           files: null,
         },
       ]);
+
+      for (const [alias, ptf] of Object.entries(contractProfileTypeFields)) {
+        const reply = contractChildReplies.find(
+          (r) =>
+            r.parent_petition_field_reply_id === contractReply.id &&
+            r.petition_field_id === contractChildFields.find((f) => f.alias === `c_${alias}`)!.id,
+        );
+        if (!reply) {
+          continue;
+        }
+
+        if (ptf.type === "FILE") {
+          const [pff] = await mocks.knex
+            .from("profile_field_file")
+            .where({
+              profile_id: profile.id,
+              profile_type_field_id: ptf.id,
+              removed_at: null,
+              deleted_at: null,
+            })
+            .select("*");
+          expect(pff).toBeDefined();
+          expect(pff.petition_field_reply_id).toEqual(reply.id);
+        } else {
+          const [pfv] = await mocks.knex
+            .from("profile_field_value")
+            .where({
+              profile_id: profile.id,
+              profile_type_field_id: ptf.id,
+              removed_at: null,
+              deleted_at: null,
+            })
+            .select("*");
+          expect(pfv).toBeDefined();
+          expect(pfv.petition_field_reply_id).toEqual(reply.id);
+        }
+      }
     });
 
     it("does not update value or create event if BACKGROUND_CHECK value is already present on profile and its the same", async () => {

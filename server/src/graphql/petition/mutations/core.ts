@@ -3380,6 +3380,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         type: ProfileTypeFieldType;
         content: any;
         expiryDate?: string | null;
+        petitionFieldReplyId: number | null;
       }[] = [];
 
       for (const { field, replies } of simpleReplies) {
@@ -3467,6 +3468,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         profileTypeFieldId: number;
         fileUploadId: number;
         expiryDate?: string | null;
+        petitionFieldReplyId?: number | null;
       }[] = [];
 
       // same process than before, with FILE_UPLOADS
@@ -3510,8 +3512,12 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           } else {
             const replyFileUploads = replies
               .filter((r) => isNullish(r.content.error) && isNonNullish(r.content.file_upload_id))
-              .map((r) => r.content.file_upload_id as number)
-              .map((id) => fileUploads.find((fu) => fu?.id === id));
+              .map((r) => ({
+                replyId: r.id,
+                fileUpload: fileUploads.find(
+                  (fu) => fu?.id === (r.content.file_upload_id as number),
+                ),
+              }));
 
             const profileFieldFileUploads = profileFieldFileValues.map((pff) =>
               fileUploads.find((fu) => fu?.id === pff.file_upload_id),
@@ -3520,12 +3526,12 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
             // these are the files that are not present on the profile (compare by file_upload.path)
             // these will be attached to the existing files on the profile if resolution is APPEND or OVERWRITE
             const newFileUploads = replyFileUploads.filter(
-              (r) => !profileFieldFileUploads.find((pff) => pff?.path === r?.path),
+              (r) => !profileFieldFileUploads.find((pff) => pff?.path === r?.fileUpload?.path),
             );
             // these are files that are present on the profile but not on the reply
             // these will be removed from the profile if resolution is OVERWRITE
             const currentProfileFieldFileUploads = profileFieldFileUploads.filter(
-              (pff) => !replyFileUploads.find((r) => r?.path === pff?.path),
+              (pff) => !replyFileUploads.find((r) => r?.fileUpload?.path === pff?.path),
             );
 
             // expiration is required if the field is expirable and the reply has files (meaning profile value will not be removed)
@@ -3546,11 +3552,14 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
               missingConflictResolutions.push(field.profile_type_field_id!);
             } else if (resolution?.action === "APPEND" || resolution?.action === "OVERWRITE") {
               createProfileFieldFiles.push(
-                ...newFileUploads.filter(isNonNullish).map((r) => ({
-                  profileTypeFieldId: field.profile_type_field_id!,
-                  fileUploadId: r.id!,
-                  expiryDate: expiration?.expiryDate,
-                })),
+                ...newFileUploads
+                  .filter((r) => isNonNullish(r.fileUpload))
+                  .map((r) => ({
+                    profileTypeFieldId: field.profile_type_field_id!,
+                    fileUploadId: r.fileUpload!.id,
+                    expiryDate: expiration?.expiryDate,
+                    petitionFieldReplyId: r.replyId,
+                  })),
               );
               if (resolution?.action === "OVERWRITE") {
                 deleteProfileFieldFileIds.push(
@@ -3577,6 +3586,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                 profileTypeFieldId: field.profile_type_field_id!,
                 fileUploadId: r.content.file_upload_id as number,
                 expiryDate: expiration?.expiryDate,
+                petitionFieldReplyId: r.id,
               })),
           );
         }
@@ -3630,8 +3640,9 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
       if (createProfileFieldFiles.length > 0) {
         const byProfileTypeFieldId = groupBy(createProfileFieldFiles, (p) => p.profileTypeFieldId);
         for (const [profileTypeFieldId, values] of Object.entries(byProfileTypeFieldId)) {
-          const clonedFileUploads = await ctx.files.cloneFileUpload(
-            values.map((f) => f.fileUploadId!),
+          const clonedFileUploads = zip(
+            values,
+            await ctx.files.cloneFileUpload(values.map((f) => f.fileUploadId!)),
           );
           const profileTypeField = profileTypeFields.find(
             (ptf) => ptf.id === parseInt(profileTypeFieldId),
@@ -3647,7 +3658,10 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           const profileFieldFiles = await ctx.profiles.createProfileFieldFiles(
             profile!.id,
             profileTypeField.id,
-            clonedFileUploads.map((fu) => fu.id),
+            clonedFileUploads.map(([{ petitionFieldReplyId }, fileUpload]) => ({
+              petitionFieldReplyId,
+              fileUploadId: fileUpload.id,
+            })),
             expiration?.expiryDate,
             ctx.user!.id,
           );

@@ -257,11 +257,12 @@ export class PetitionsHelperService {
   }
 
   mapPetitionFieldReplyToProfileFieldValue(
-    reply: Pick<PetitionFieldReply, "type" | "content">,
-  ): Pick<ProfileFieldValue, "type" | "content"> {
+    reply: Pick<PetitionFieldReply, "type" | "content"> & { id?: number },
+  ): { type: ProfileTypeFieldType; content: any; petitionFieldReplyId: number | null } {
     return {
       type: this.mapPetitionFieldTypeToProfileTypeFieldType(reply.type),
       content: reply.content,
+      petitionFieldReplyId: reply.id ?? null,
     };
   }
 

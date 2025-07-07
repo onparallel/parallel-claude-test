@@ -1263,7 +1263,7 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
       files = await ctx.profiles.createProfileFieldFiles(
         profileId,
         profileTypeFieldId,
-        fileUploads.map((f) => f.id),
+        fileUploads.map((f) => ({ fileUploadId: f.id })),
         expiryDate,
         ctx.user!.id,
       );
@@ -1487,16 +1487,22 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
         ? (await ctx.petitions.loadFieldReply(fileReplyIds)).filter(isNonNullish)
         : [];
 
-    const fileUploadIds = fileReplies
+    const files = fileReplies
       .filter((r) => isNullish(r.content.error) && isNonNullish(r.content.file_upload_id))
-      .map((r) => r.content.file_upload_id as number);
+      .map((r) => ({ replyId: r.id, fileUploadId: r.content.file_upload_id as number }));
 
-    const clonedFiles = await ctx.files.cloneFileUpload(fileUploadIds);
+    const clonedFiles = zip(
+      files,
+      await ctx.files.cloneFileUpload(files.map((f) => f.fileUploadId)),
+    );
 
-    const files = await ctx.profiles.createProfileFieldFiles(
+    const profileFieldFiles = await ctx.profiles.createProfileFieldFiles(
       profileId,
       profileTypeFieldId,
-      clonedFiles.map((f) => f.id),
+      clonedFiles.map(([{ replyId }, fileUpload]) => ({
+        fileUploadId: fileUpload.id,
+        petitionFieldReplyId: replyId,
+      })),
       expiryDate,
       ctx.user!.id,
     );
@@ -1506,7 +1512,7 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
     await ctx.profiles.createProfileUpdatedEvents(
       profileId,
       [
-        ...files.map(
+        ...profileFieldFiles.map(
           (pff) =>
             ({
               org_id: ctx.user!.org_id,
@@ -1540,7 +1546,7 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
       ctx.user!.id,
     );
 
-    return files;
+    return profileFieldFiles;
   },
 });
 

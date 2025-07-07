@@ -2171,6 +2171,7 @@ export interface ProfileFieldFile {
   anonymized_at: Maybe<Date>; // timestamptz
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  petition_field_reply_id: Maybe<number>; // int4
 }
 
 export type CreateProfileFieldFile = PartialProps<
@@ -2183,6 +2184,7 @@ export type CreateProfileFieldFile = PartialProps<
   | "anonymized_at"
   | "deleted_at"
   | "deleted_by"
+  | "petition_field_reply_id"
 >;
 
 export interface ProfileFieldValue {
@@ -2203,6 +2205,7 @@ export interface ProfileFieldValue {
   is_draft: boolean; // bool
   pending_review: boolean; // bool
   active_monitoring: boolean; // bool
+  petition_field_reply_id: Maybe<number>; // int4
 }
 
 export type CreateProfileFieldValue = PartialProps<
@@ -2220,6 +2223,7 @@ export type CreateProfileFieldValue = PartialProps<
   | "is_draft"
   | "pending_review"
   | "active_monitoring"
+  | "petition_field_reply_id"
 >;
 
 export interface ProfileListView {
