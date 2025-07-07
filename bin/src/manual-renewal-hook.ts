@@ -21,7 +21,7 @@ import {
 } from "@aws-sdk/client-route-53";
 import { isNonNullish } from "remeda";
 import { run } from "./utils/run";
-import { waitFor } from "./utils/wait";
+import { waitForResult } from "./utils/wait";
 
 const ZONE_MAP: Record<string, string> = {
   "onparallel.com": "Z02973211MQQN7F0EL8OY",
@@ -146,10 +146,13 @@ async function removeRecord(domain: string, challenge: string) {
 }
 
 async function waitForChange(changeId: string) {
-  await waitFor(async () => {
-    const response = await route53.send(new GetChangeCommand({ Id: changeId }));
-    return response.ChangeInfo?.Status === "INSYNC";
-  }, 3000);
+  await waitForResult(
+    async () => {
+      const response = await route53.send(new GetChangeCommand({ Id: changeId }));
+      return response.ChangeInfo?.Status === "INSYNC";
+    },
+    { delay: 3_000 },
+  );
 }
 
 run(main);

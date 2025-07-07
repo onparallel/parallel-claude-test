@@ -1,7 +1,7 @@
 import { writeFile } from "fs/promises";
 import { chunk } from "remeda";
 import { run } from "../utils/run";
-import { wait } from "../utils/wait";
+import { waitFor } from "../utils/wait";
 
 /**
  * This script sends reminders to every PENDING petition coming from the passed template
@@ -102,7 +102,7 @@ async function main() {
         });
       }
     }
-    await wait(1_000);
+    await waitFor(1_000);
   }
 
   if (errorLog.length > 0) {

@@ -78,7 +78,7 @@ async function main() {
                 });
             }
         }
-        await (0, wait_1.wait)(1000);
+        await (0, wait_1.waitFor)(1000);
     }
     if (errorLog.length > 0) {
         await (0, promises_1.writeFile)("errorLog.json", JSON.stringify(errorLog, null, 2));

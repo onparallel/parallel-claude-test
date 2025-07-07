@@ -5,16 +5,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_ec2_1 = require("@aws-sdk/client-ec2");
 const chalk_1 = __importDefault(require("chalk"));
-const child_process_1 = require("child_process");
 const path_1 = __importDefault(require("path"));
-const remeda_1 = require("remeda");
-const ts_essentials_1 = require("ts-essentials");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
+const ssh_1 = require("./utils/ssh");
 const timestamp_1 = require("./utils/timestamp");
 const wait_1 = require("./utils/wait");
+const withInstance_1 = require("./utils/withInstance");
 const INSTANCE_TYPE = "t3.large";
-const KEY_NAME = "ops";
+const KEY_NAME = "build-image";
 const SECURITY_GROUP_IDS = ["sg-0a7b2cbb5cd5e9020"];
 const KMS_KEY_ID = "acf1d245-abe5-4ff8-a490-09dba3834c45";
 const SUBNET_ID = "subnet-d3cc68b9";
@@ -34,7 +33,7 @@ async function main() {
         description: "The environment for the build",
     }).argv;
     const name = AMI_NAMES[image]();
-    const instanceResult = await ec2.send(new client_ec2_1.RunInstancesCommand({
+    await (0, withInstance_1.withInstance)(ec2, {
         ImageId: "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64",
         KeyName: KEY_NAME,
         SecurityGroupIds: SECURITY_GROUP_IDS,
@@ -69,39 +68,15 @@ async function main() {
             HttpEndpoint: client_ec2_1.InstanceMetadataEndpointState.enabled,
             HttpTokens: client_ec2_1.HttpTokensState.required,
         },
-    }));
-    const instanceId = instanceResult.Instances[0].InstanceId;
-    console.log((0, chalk_1.default) `Launched instance {bold ${instanceId}}`);
-    try {
-        await (0, wait_1.wait)(5000);
-        let ipAddress;
-        await (0, wait_1.waitFor)(async () => {
-            var _a, _b, _c;
-            const result = await ec2.send(new client_ec2_1.DescribeInstancesCommand({ InstanceIds: [instanceId] }));
-            const instance = (_b = (_a = result.Reservations) === null || _a === void 0 ? void 0 : _a[0].Instances) === null || _b === void 0 ? void 0 : _b[0];
-            const isRunning = ((_c = instance === null || instance === void 0 ? void 0 : instance.State) === null || _c === void 0 ? void 0 : _c.Name) === client_ec2_1.InstanceStateName.running;
-            if (isRunning) {
-                ipAddress = instance.PrivateIpAddress;
-            }
-            return isRunning;
-        }, chalk_1.default.italic `Instance {yellow pending}. Waiting 10 more seconds...`, 10000);
-        (0, ts_essentials_1.assert)((0, remeda_1.isNonNullish)(ipAddress));
-        console.log((0, chalk_1.default) `Instance {green ✓ running}`);
-        await waitForInstance(ipAddress);
+    }, async ({ instanceId, ipAddress }, { signal }) => {
         console.log("Uploading build script to the new instance.");
-        (0, child_process_1.execSync)(`scp \
-          -o "UserKnownHostsFile=/dev/null" \
-          -o "StrictHostKeyChecking=no" \
-          ${path_1.default.resolve(__dirname, `../../ops/prod/image/build-image-${image}.sh`)} ec2-user@${ipAddress}:~`, { stdio: "inherit" });
-        (0, child_process_1.execSync)(`scp \
-          -o "UserKnownHostsFile=/dev/null" \
-          -o "StrictHostKeyChecking=no" \
-          ${path_1.default.resolve(__dirname, `../../ops/prod/image/authorized_keys`)} ec2-user@${ipAddress}:~`, { stdio: "inherit" });
+        await (0, ssh_1.copyToRemoteServer)(ipAddress, path_1.default.resolve(__dirname, `../../ops/prod/image/build-image-${image}.sh`), "~", { keyPath: "~/.ssh/build-image.pem", signal });
+        await (0, ssh_1.copyToRemoteServer)(ipAddress, path_1.default.resolve(__dirname, `../../ops/prod/image/authorized_keys`), "~", { keyPath: "~/.ssh/build-image.pem", signal });
         console.log("Executing build script.");
-        (0, child_process_1.execSync)(`ssh \
-          -o "UserKnownHostsFile=/dev/null" \
-          -o StrictHostKeyChecking=no \
-          ec2-user@${ipAddress} /home/ec2-user/build-image-${image}.sh ${name}`, { stdio: "inherit" });
+        await (0, ssh_1.executeRemoteCommand)(ipAddress, `/home/ec2-user/build-image-${image}.sh ${name}`, {
+            keyPath: "~/.ssh/build-image.pem",
+            signal,
+        });
         console.log("Creating Image.");
         const createImageResult = await ec2.send(new client_ec2_1.CreateImageCommand({
             InstanceId: instanceId,
@@ -113,7 +88,7 @@ async function main() {
         }));
         const imageId = createImageResult.ImageId;
         console.log(chalk_1.default.green `Image created: ${imageId}`);
-        await (0, wait_1.waitFor)(async () => {
+        await (0, wait_1.waitForResult)(async () => {
             var _a;
             const result = await ec2.send(new client_ec2_1.DescribeImagesCommand({
                 ImageIds: [imageId],
@@ -125,28 +100,12 @@ async function main() {
             else {
                 throw new Error(`Error creating image ${imageId}, state: ${imageState}`);
             }
-        }, chalk_1.default.italic `Waiting for image to become available...`, 30000);
+        }, {
+            message: chalk_1.default.italic `Waiting for image to become available...`,
+            delay: 30000,
+            signal,
+        });
         console.log(chalk_1.default.green `Image ID: ${imageId}`);
-    }
-    finally {
-        await ec2.send(new client_ec2_1.TerminateInstancesCommand({
-            InstanceIds: [instanceId],
-        }));
-    }
+    }, { keyPath: "~/.ssh/build-image.pem" });
 }
 (0, run_1.run)(main);
-async function waitForInstance(ipAddress) {
-    await (0, wait_1.waitFor)(async () => {
-        try {
-            (0, child_process_1.execSync)(`ssh \
-            -o ConnectTimeout=1 \
-            -o "UserKnownHostsFile=/dev/null" \
-            -o StrictHostKeyChecking=no \
-            ec2-user@${ipAddress} true >/dev/null 2>&1`);
-            return true;
-        }
-        catch {
-            return false;
-        }
-    }, chalk_1.default.italic `SSH not available. Waiting 5 more seconds...`, 5000);
-}

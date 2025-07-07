@@ -122,10 +122,10 @@ async function removeRecord(domain, challenge) {
     }
 }
 async function waitForChange(changeId) {
-    await (0, wait_1.waitFor)(async () => {
+    await (0, wait_1.waitForResult)(async () => {
         var _a;
         const response = await route53.send(new client_route_53_1.GetChangeCommand({ Id: changeId }));
         return ((_a = response.ChangeInfo) === null || _a === void 0 ? void 0 : _a.Status) === "INSYNC";
-    }, 3000);
+    }, { delay: 3000 });
 }
 (0, run_1.run)(main);

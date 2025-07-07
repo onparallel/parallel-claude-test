@@ -1,15 +1,12 @@
 import { CloudWatchClient, PutMetricAlarmCommand } from "@aws-sdk/client-cloudwatch";
 import {
   DescribeImagesCommand,
-  DescribeInstanceStatusCommand,
   EC2Client,
   EC2ServiceException,
   HttpTokensState,
   InstanceMetadataEndpointState,
   InstanceMetadataTagsState,
-  InstanceStateName,
   ResourceType,
-  RunInstancesCommand,
   Tenancy,
   _InstanceType,
 } from "@aws-sdk/client-ec2";
@@ -19,8 +16,8 @@ import { range } from "remeda";
 import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { run } from "./utils/run";
-import { copyToRemoteServer, executeRemoteCommand, pingSsh } from "./utils/ssh";
-import { wait, waitFor } from "./utils/wait";
+import { copyToRemoteServer, executeRemoteCommand } from "./utils/ssh";
+import { withInstance } from "./utils/withInstance";
 
 type Environment = "staging" | "production";
 
@@ -29,7 +26,7 @@ const INSTANCE_TYPES = {
   staging: "t3.large",
 } satisfies Record<Environment, _InstanceType>;
 const KEY_NAME = "ops";
-const IMAGE_ID = "ami-0cb7540b5af738a7a";
+const IMAGE_ID = "ami-0b912e0785f4ef392";
 const KMS_KEY_ID = "acf1d245-abe5-4ff8-a490-09dba3834c45";
 const SECURITY_GROUP_IDS = {
   production: ["sg-078abc8a772035e7a"],
@@ -89,145 +86,120 @@ async function main() {
     range(0, NUM_INSTANCES[env]),
     async (i) => {
       const name = `parallel-${env}-${commit}-${i + 1}`;
-      const result = await (async () => {
-        while (azs.length > 0) {
-          const az = azs.shift()!;
-          const subnet = (SUBNET_ID as any)[env][az];
-          try {
-            console.log(chalk`Launching instance in ${az}...`);
-            return await ec2.send(
-              new RunInstancesCommand({
-                ImageId: IMAGE_ID,
-                KeyName: KEY_NAME,
-                IamInstanceProfile: {
-                  Name: `parallel-server-${env}`,
+      while (azs.length > 0) {
+        const az = azs.shift()!;
+        const subnet = (SUBNET_ID as any)[env][az];
+        try {
+          console.log(chalk`Launching instance in ${az}...`);
+          await withInstance(
+            ec2,
+            {
+              ImageId: IMAGE_ID,
+              KeyName: KEY_NAME,
+              IamInstanceProfile: {
+                Name: `parallel-server-${env}`,
+              },
+              InstanceType: INSTANCE_TYPES[env],
+              Placement: {
+                AvailabilityZone: az,
+                Tenancy: Tenancy.default,
+              },
+              NetworkInterfaces: [
+                {
+                  DeviceIndex: 0,
+                  AssociatePublicIpAddress: true,
+                  SubnetId: subnet,
+                  Groups: SECURITY_GROUP_IDS[env],
                 },
-                InstanceType: INSTANCE_TYPES[env],
-                Placement: {
-                  AvailabilityZone: az,
-                  Tenancy: Tenancy.default,
+              ],
+              MaxCount: 1,
+              MinCount: 1,
+              BlockDeviceMappings: [
+                {
+                  DeviceName: "/dev/xvda",
+                  Ebs: {
+                    KmsKeyId: KMS_KEY_ID,
+                    Encrypted: true,
+                    VolumeSize: 30,
+                    DeleteOnTermination: true,
+                    VolumeType: "gp2",
+                    SnapshotId: image.BlockDeviceMappings![0].Ebs!.SnapshotId,
+                  },
                 },
-                NetworkInterfaces: [
-                  {
-                    DeviceIndex: 0,
-                    AssociatePublicIpAddress: true,
-                    SubnetId: subnet,
-                    Groups: SECURITY_GROUP_IDS[env],
-                  },
-                ],
-                MaxCount: 1,
-                MinCount: 1,
-                BlockDeviceMappings: [
-                  {
-                    DeviceName: "/dev/xvda",
-                    Ebs: {
-                      KmsKeyId: KMS_KEY_ID,
-                      Encrypted: true,
-                      VolumeSize: 30,
-                      DeleteOnTermination: true,
-                      VolumeType: "gp2",
-                      SnapshotId: image.BlockDeviceMappings![0].Ebs!.SnapshotId,
-                    },
-                  },
-                ],
-                Monitoring: {
-                  Enabled: true,
+              ],
+              Monitoring: {
+                Enabled: true,
+              },
+              TagSpecifications: [
+                {
+                  ResourceType: ResourceType.volume,
+                  Tags: [{ Key: "Name", Value: name }],
                 },
-                TagSpecifications: [
-                  {
-                    ResourceType: ResourceType.volume,
-                    Tags: [{ Key: "Name", Value: name }],
-                  },
-                  {
-                    ResourceType: ResourceType.instance,
-                    Tags: [
-                      { Key: "App", Value: "server" },
-                      { Key: "Name", Value: name },
-                      { Key: "Release", Value: commit },
-                      { Key: "Environment", Value: env },
-                      { Key: "InstanceNumber", Value: `${i + 1}` },
-                      { Key: "MalwareScan", Value: `${env === "production"}` },
-                    ],
-                  },
-                ],
-                MetadataOptions: {
-                  HttpEndpoint: InstanceMetadataEndpointState.enabled,
-                  HttpTokens: HttpTokensState.required,
-                  InstanceMetadataTags: InstanceMetadataTagsState.enabled,
-                  HttpPutResponseHopLimit: 1,
+                {
+                  ResourceType: ResourceType.instance,
+                  Tags: [
+                    { Key: "App", Value: "server" },
+                    { Key: "Name", Value: name },
+                    { Key: "Release", Value: commit },
+                    { Key: "Environment", Value: env },
+                    { Key: "InstanceNumber", Value: `${i + 1}` },
+                    { Key: "MalwareScan", Value: `${env === "production"}` },
+                  ],
                 },
-              }),
-            );
-          } catch (e) {
-            if (e instanceof EC2ServiceException && e.name === "InsufficientInstanceCapacity") {
-              console.log(chalk`Not enough capacity in ${az}, trying next...`);
-              continue;
-            }
-            throw e;
-          }
-        }
-        throw new Error("No AZ available");
-      })();
-      const instance = result.Instances![0];
-      const instanceId = instance.InstanceId!;
-      const ipAddress = instance.PrivateIpAddress!;
-      console.log(chalk`Launched instance {bold ${instanceId}} on {bold ${ipAddress}}`);
-      await wait(5000);
-      await waitFor(
-        async () => {
-          const result = await ec2.send(
-            new DescribeInstanceStatusCommand({ InstanceIds: [instanceId] }),
+              ],
+              MetadataOptions: {
+                HttpEndpoint: InstanceMetadataEndpointState.enabled,
+                HttpTokens: HttpTokensState.required,
+                InstanceMetadataTags: InstanceMetadataTagsState.enabled,
+                HttpPutResponseHopLimit: 1,
+              },
+            },
+            async ({ instanceId, ipAddress }, { signal }) => {
+              console.log(chalk`Uploading install script to {bold ${instanceId}}.`);
+              await copyToRemoteServer(ipAddress, `${OPS_DIR}/bootstrap.sh`, `${HOME_DIR}/`, {
+                signal,
+              });
+              await executeRemoteCommand(ipAddress, `${HOME_DIR}/bootstrap.sh`, {
+                signal,
+              });
+              for (const alarm of [
+                // CPU over 60% for 5 consecutive minutes
+                { Period: 60, EvaluationPeriods: 5, DatapointsToAlarm: 5, Threshold: 60.0 },
+                // CPU over 90% for 2 minutes
+                { Period: 60, EvaluationPeriods: 2, DatapointsToAlarm: 2, Threshold: 90.0 },
+              ]) {
+                await cw.send(
+                  new PutMetricAlarmCommand({
+                    AlarmName: `${name}-cpu-${alarm.DatapointsToAlarm}m`,
+                    MetricName: "CPUUtilization",
+                    Namespace: "AWS/EC2",
+                    Statistic: "Average",
+                    Dimensions: [{ Name: "InstanceId", Value: instanceId }],
+                    ComparisonOperator: "GreaterThanThreshold",
+                    TreatMissingData: "missing",
+                    ActionsEnabled: true,
+                    OKActions: [],
+                    AlarmActions: ["arn:aws:sns:eu-central-1:749273139513:ops-alarms"],
+                    ...alarm,
+                  }),
+                );
+              }
+            },
+            { terminate: false },
           );
-          return result.InstanceStatuses?.[0]?.InstanceState?.Name === InstanceStateName.running;
-        },
-        chalk`Instance {bold ${instanceId}} {yellow pending}. Waiting 10 more seconds...`,
-        10000,
-      );
-      console.log(chalk`Instance {bold ${instanceId}} {green ✓ running}`);
-      await waitForInstance(ipAddress);
-
-      console.log(chalk`Uploading install script to {bold ${instanceId}}.`);
-      await copyToRemoteServer(ipAddress, `${OPS_DIR}/bootstrap.sh`, `${HOME_DIR}/`);
-      await executeRemoteCommand(ipAddress, `${HOME_DIR}/bootstrap.sh`);
-      for (const alarm of [
-        // CPU over 60% for 5 consecutive minutes
-        { Period: 60, EvaluationPeriods: 5, DatapointsToAlarm: 5, Threshold: 60.0 },
-        // CPU over 90% for 2 minutes
-        { Period: 60, EvaluationPeriods: 2, DatapointsToAlarm: 2, Threshold: 90.0 },
-      ])
-        await cw.send(
-          new PutMetricAlarmCommand({
-            AlarmName: `${name}-cpu-${alarm.DatapointsToAlarm}m`,
-            MetricName: "CPUUtilization",
-            Namespace: "AWS/EC2",
-            Statistic: "Average",
-            Dimensions: [{ Name: "InstanceId", Value: instanceId }],
-            ComparisonOperator: "GreaterThanThreshold",
-            TreatMissingData: "missing",
-            ActionsEnabled: true,
-            OKActions: [],
-            AlarmActions: ["arn:aws:sns:eu-central-1:749273139513:ops-alarms"],
-            ...alarm,
-          }),
-        );
+          return;
+        } catch (e) {
+          if (e instanceof EC2ServiceException && e.name === "InsufficientInstanceCapacity") {
+            console.log(chalk`Not enough capacity in ${az}, trying next...`);
+            continue;
+          }
+          throw e;
+        }
+      }
+      throw new Error("No AZ available");
     },
     { concurrency: 4 },
   );
 }
 
 run(main);
-
-async function waitForInstance(ipAddress: string) {
-  await waitFor(
-    async () => {
-      try {
-        await pingSsh(ipAddress);
-        return true;
-      } catch {
-        return false;
-      }
-    },
-    chalk`SSH not available. Waiting 5 more seconds...`,
-    5000,
-  );
-}

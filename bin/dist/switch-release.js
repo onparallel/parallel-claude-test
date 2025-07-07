@@ -102,7 +102,7 @@ async function main() {
     const distributionId = await cloudfront
         .send(new client_cloudfront_1.ListDistributionsCommand({}))
         .then((result) => result.DistributionList.Items.find((d) => d.Origins.Items.some((o) => o.Id === `S3-parallel-static-${env}`)).Id);
-    await (0, wait_1.waitFor)(async (iteration) => {
+    await (0, wait_1.waitForResult)(async (iteration) => {
         if (iteration >= 10) {
             throw new Error("Cloudfront is not responding.");
         }
@@ -122,16 +122,19 @@ async function main() {
             }
             throw error;
         }
-    }, 5000);
+    }, { delay: 5000 });
     console.log(chalk_1.default.green.bold `Invalidation created`);
-    await (0, wait_1.waitFor)(async () => {
+    await (0, wait_1.waitForResult)(async () => {
         return await elb
             .send(new client_elastic_load_balancing_1.DescribeInstanceHealthCommand({
             LoadBalancerName: `parallel-${env}`,
             Instances: newInstances,
         }))
             .then((r) => r.InstanceStates.every((i) => i.State === "InService"));
-    }, chalk_1.default.yellow.italic `...Waiting for new instances to become healthy`, 3000);
+    }, {
+        message: chalk_1.default.yellow.italic `...Waiting for new instances to become healthy`,
+        delay: 3000,
+    });
     console.log(chalk_1.default.green.bold `New instances are healthy`);
     if (oldInstances.length) {
         console.log(chalk_1.default.yellow `Deregistering old instances on LB`);
@@ -139,14 +142,17 @@ async function main() {
             LoadBalancerName: `parallel-${env}`,
             Instances: oldInstances,
         }));
-        await (0, wait_1.waitFor)(async () => {
+        await (0, wait_1.waitForResult)(async () => {
             return await elb
                 .send(new client_elastic_load_balancing_1.DescribeInstanceHealthCommand({
                 LoadBalancerName: `parallel-${env}`,
                 Instances: oldInstances,
             }))
                 .then((r) => r.InstanceStates.every((i) => i.State === "OutOfService"));
-        }, chalk_1.default.yellow.italic `...Waiting for old instances to become out of service`, 3000);
+        }, {
+            message: chalk_1.default.yellow.italic `...Waiting for old instances to become out of service`,
+            delay: 3000,
+        });
         console.log(chalk_1.default.green.bold `Old instances deregistered`);
     }
     await (0, p_map_1.default)(newInstances, async (instance) => {

@@ -1,29 +1,38 @@
-export async function wait(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+export interface WaitForOptions {
+  signal?: AbortSignal;
 }
 
-export async function waitFor(
-  fn: (iteration: number) => Promise<boolean>,
-  ms: number,
-): Promise<void>;
-export async function waitFor(
-  fn: (iteration: number) => Promise<boolean>,
-  message: string,
-  ms: number,
-): Promise<void>;
-export async function waitFor(
-  fn: (iteration: number) => Promise<boolean>,
-  message: string | number,
-  ms?: number,
-) {
-  const _ms = typeof message === "number" ? message : ms!;
-  const _message = typeof message === "number" ? undefined : message;
-  let iteration = 0;
-  while (!(await fn(iteration))) {
-    if (_message !== undefined) {
-      console.log(_message);
+export function waitFor(millis: number, options?: WaitForOptions) {
+  return new Promise<void>((resolve, reject) => {
+    if (options?.signal?.aborted) {
+      reject(new Error("The operation was aborted."));
+      return;
     }
-    await wait(_ms);
+    const timeout = setTimeout(() => {
+      resolve();
+    }, millis);
+    options?.signal?.addEventListener("abort", () => {
+      clearTimeout(timeout);
+      reject(new Error("The operation was aborted."));
+    });
+  });
+}
+
+export interface WaitForResultOptions extends WaitForOptions {
+  delay?: number;
+  message?: string;
+}
+
+export async function waitForResult(
+  fn: (iteration: number, { signal }: { signal?: AbortSignal }) => Promise<boolean>,
+  { signal, delay, message }: WaitForResultOptions = {},
+) {
+  let iteration = 0;
+  while (!(await fn(iteration, { signal }))) {
+    if (message !== undefined) {
+      console.log(message);
+    }
+    await waitFor(delay ?? 0, { signal });
     iteration++;
   }
 }

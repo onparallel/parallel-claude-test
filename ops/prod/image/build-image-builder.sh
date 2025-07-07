@@ -32,8 +32,11 @@ ssh-add ~/.ssh/id_ed25519
 echo "Host github.com" >> ~/.ssh/config
 echo "  AddKeysToAgent yes" >> ~/.ssh/config
 echo "  IdentityFile ~/.ssh/id_ed25519" >> ~/.ssh/config
-cat .ssh/id_ed25519.pub
 chmod 700 ~/.ssh
 chmod 600 ~/.ssh/*
-
 ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
+echo ">>>>>> Add key to github user parallel-ops"
+echo "name: ${NAME}"
+cat .ssh/id_ed25519.pub
+echo ">>>>>>"

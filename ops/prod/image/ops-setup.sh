@@ -75,11 +75,14 @@ ssh-add ~/.ssh/id_ed25519
 echo "Host github.com" >> ~/.ssh/config
 echo "  AddKeysToAgent yes" >> ~/.ssh/config
 echo "  IdentityFile ~/.ssh/id_ed25519" >> ~/.ssh/config
-echo ">>>> Copy the next line into the parallel-ops github user settings <<<<"
-cat .ssh/id_ed25519.pub
 chmod 700 ~/.ssh
 chmod 600 ~/.ssh/*
-
-# after adding key
 ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
+echo ">>>>>> Add key to github user parallel-ops"
+echo "name: ${HOSTNAME}"
+cat .ssh/id_ed25519.pub
+echo ">>>>>>"
+read -rp "Enter when done"
+
 git clone git@github.com:onparallel/parallel.git

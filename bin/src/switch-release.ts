@@ -25,7 +25,7 @@ import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { run } from "./utils/run";
 import { executeRemoteCommand } from "./utils/ssh";
-import { waitFor } from "./utils/wait";
+import { waitForResult } from "./utils/wait";
 
 type Environment = "staging" | "production";
 
@@ -145,32 +145,35 @@ async function main() {
           d.Origins!.Items!.some((o) => o.Id === `S3-parallel-static-${env}`),
         )!.Id,
     );
-  await waitFor(async (iteration) => {
-    if (iteration >= 10) {
-      throw new Error("Cloudfront is not responding.");
-    }
-    try {
-      await cloudfront.send(
-        new CreateInvalidationCommand({
-          DistributionId: distributionId,
-          InvalidationBatch: {
-            CallerReference: buildId,
-            Paths: { Quantity: 1, Items: ["/static/*"] },
-          },
-        }),
-      );
-      return true;
-    } catch (error) {
-      if (error instanceof CloudFrontServiceException) {
-        return false;
+  await waitForResult(
+    async (iteration) => {
+      if (iteration >= 10) {
+        throw new Error("Cloudfront is not responding.");
       }
-      throw error;
-    }
-  }, 5_000);
+      try {
+        await cloudfront.send(
+          new CreateInvalidationCommand({
+            DistributionId: distributionId,
+            InvalidationBatch: {
+              CallerReference: buildId,
+              Paths: { Quantity: 1, Items: ["/static/*"] },
+            },
+          }),
+        );
+        return true;
+      } catch (error) {
+        if (error instanceof CloudFrontServiceException) {
+          return false;
+        }
+        throw error;
+      }
+    },
+    { delay: 5_000 },
+  );
 
   console.log(chalk.green.bold`Invalidation created`);
 
-  await waitFor(
+  await waitForResult(
     async () => {
       return await elb
         .send(
@@ -181,8 +184,10 @@ async function main() {
         )
         .then((r) => r.InstanceStates!.every((i) => i.State === "InService"));
     },
-    chalk.yellow.italic`...Waiting for new instances to become healthy`,
-    3000,
+    {
+      message: chalk.yellow.italic`...Waiting for new instances to become healthy`,
+      delay: 3_000,
+    },
   );
   console.log(chalk.green.bold`New instances are healthy`);
 
@@ -195,7 +200,7 @@ async function main() {
       }),
     );
 
-    await waitFor(
+    await waitForResult(
       async () => {
         return await elb
           .send(
@@ -206,8 +211,10 @@ async function main() {
           )
           .then((r) => r.InstanceStates!.every((i) => i.State === "OutOfService"));
       },
-      chalk.yellow.italic`...Waiting for old instances to become out of service`,
-      3_000,
+      {
+        message: chalk.yellow.italic`...Waiting for old instances to become out of service`,
+        delay: 3_000,
+      },
     );
     console.log(chalk.green.bold`Old instances deregistered`);
   }

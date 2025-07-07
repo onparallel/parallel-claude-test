@@ -1,36 +1,33 @@
 import {
   AttachVolumeCommand,
   DescribeImagesCommand,
-  DescribeInstancesCommand,
   DescribeVolumesCommand,
   EC2Client,
   EC2ServiceException,
   HttpTokensState,
   InstanceMetadataEndpointState,
-  InstanceStateName,
   ResourceType,
-  RunInstancesCommand,
   Tenancy,
-  TerminateInstancesCommand,
   VolumeAttachmentState,
 } from "@aws-sdk/client-ec2";
 import chalk from "chalk";
 import { execSync } from "child_process";
 import path from "path";
-import { isNonNullish, isNullish, range } from "remeda";
+import { isNullish, range } from "remeda";
 import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { run } from "./utils/run";
-import { copyToRemoteServer, executeRemoteCommand, pingSsh } from "./utils/ssh";
+import { copyToRemoteServer, executeRemoteCommand } from "./utils/ssh";
 import { withStopwatch } from "./utils/stopwatch";
 import { timestamp } from "./utils/timestamp";
-import { wait, waitFor } from "./utils/wait";
+import { waitForResult } from "./utils/wait";
+import { withInstance } from "./utils/withInstance";
 
 const WORK_DIR = "/home/ec2-user";
 
 type Environment = "staging" | "production";
 
-const BUILDER_IMAGE_ID = "ami-0a3b27591ea8a32e9";
+const BUILDER_IMAGE_ID = "ami-092f5571e90aff5fe";
 const INSTANCE_TYPE = "c6i.2xlarge";
 const KEY_NAME = "ops";
 const SECURITY_GROUP_IDS = {
@@ -101,8 +98,9 @@ async function main() {
       }),
     )
     .then((res) => res.Images![0]);
-  const result = await ec2.send(
-    new RunInstancesCommand({
+  await withInstance(
+    ec2,
+    {
       ImageId: BUILDER_IMAGE_ID,
       KeyName: KEY_NAME,
       InstanceType: INSTANCE_TYPE,
@@ -145,102 +143,66 @@ async function main() {
         HttpEndpoint: InstanceMetadataEndpointState.enabled,
         HttpTokens: HttpTokensState.required,
       },
-    }),
-  );
-  const instance = result.Instances![0];
-  const instanceId = instance.InstanceId!;
-  const ipAddress = instance.PrivateIpAddress!;
-  async function shutdown() {
-    if (terminate) {
-      console.log("Shutting down instance");
-      await ec2.send(
-        new TerminateInstancesCommand({
-          InstanceIds: [instanceId],
-        }),
-      );
-    }
-  }
-  process.on("SIGINT", function () {});
-  process.on("SIGTERM", function () {});
-  console.log(chalk`Launched instance {bold ${instanceId}}`);
-  try {
-    await wait(5_000);
-    await waitFor(
-      async () => {
-        const result = await ec2.send(new DescribeInstancesCommand({ InstanceIds: [instanceId] }));
-        const instance = result.Reservations?.[0].Instances?.[0];
-        return instance?.State?.Name === InstanceStateName.running;
-      },
-      chalk.italic`Instance {yellow pending}. Waiting 10 more seconds...`,
-      10_000,
-    );
-    assert(isNonNullish(ipAddress));
-    await waitForInstance(ipAddress);
-
-    let volumeId!: string;
-    for (const retry of range(0, 2)) {
-      try {
-        console.log(chalk.italic`Trying to use ${YARN_CACHE_VOLUMES[retry]} as cache...`);
-        const res = await ec2.send(
-          new AttachVolumeCommand({
-            InstanceId: instanceId,
-            VolumeId: YARN_CACHE_VOLUMES[retry],
-            Device: "/dev/xvdy",
-          }),
-        );
-        volumeId = res.VolumeId!;
-        break;
-      } catch (e) {
-        if (e instanceof EC2ServiceException && e.name === "VolumeInUse") {
-          console.log(chalk.italic`${YARN_CACHE_VOLUMES[retry]} in use!`);
-        } else {
-          throw e;
+    },
+    async ({ instanceId, ipAddress }, { signal }) => {
+      let volumeId!: string;
+      for (const retry of range(0, 2)) {
+        try {
+          console.log(chalk.italic`Trying to use ${YARN_CACHE_VOLUMES[retry]} as cache...`);
+          const res = await ec2.send(
+            new AttachVolumeCommand({
+              InstanceId: instanceId,
+              VolumeId: YARN_CACHE_VOLUMES[retry],
+              Device: "/dev/xvdy",
+            }),
+          );
+          volumeId = res.VolumeId!;
+          break;
+        } catch (e) {
+          if (e instanceof EC2ServiceException && e.name === "VolumeInUse") {
+            console.log(chalk.italic`${YARN_CACHE_VOLUMES[retry]} in use!`);
+          } else {
+            throw e;
+          }
         }
+        signal.throwIfAborted();
       }
-    }
-    if (isNullish(volumeId)) {
-      throw new Error("All yarn cache volumes are in use");
-    }
-    await waitFor(
-      async () => {
-        const result = await ec2.send(new DescribeVolumesCommand({ VolumeIds: [volumeId] }));
-        return (
-          result.Volumes?.[0].Attachments?.find((a) => a.InstanceId === instanceId)?.State ===
-          VolumeAttachmentState.attached
+      if (isNullish(volumeId)) {
+        throw new Error("All yarn cache volumes are in use");
+      }
+      await waitForResult(
+        async () => {
+          const result = await ec2.send(new DescribeVolumesCommand({ VolumeIds: [volumeId] }));
+          return (
+            result.Volumes?.[0].Attachments?.find((a) => a.InstanceId === instanceId)?.State ===
+            VolumeAttachmentState.attached
+          );
+        },
+        {
+          message: chalk.italic`Volume attaching {yellow pending}. Waiting 3 more seconds...`,
+          signal,
+          delay: 3_000,
+        },
+      );
+      console.log("Uploading build script to the new instance.");
+      await copyToRemoteServer(
+        ipAddress,
+        path.resolve(__dirname, `../../ops/prod/build-release.sh`),
+        "~",
+        { signal },
+      );
+      console.log("Executing build script.");
+      const { time } = await withStopwatch(async () => {
+        await executeRemoteCommand(
+          ipAddress,
+          `'/home/ec2-user/build-release.sh ${commit} ${env}'`,
+          { signal },
         );
-      },
-      chalk.italic`Volume attaching {yellow pending}. Waiting 3 more seconds...`,
-      3_000,
-    );
-    console.log("Uploading build script to the new instance.");
-    await copyToRemoteServer(
-      ipAddress,
-      path.resolve(__dirname, `../../ops/prod/build-release.sh`),
-      "~",
-    );
-    console.log("Executing build script.");
-    const { time } = await withStopwatch(async () => {
-      await executeRemoteCommand(ipAddress, `'/home/ec2-user/build-release.sh ${commit} ${env}'`);
-    });
-    console.log(chalk.green`Build sucessful after ${Math.round(time / 1000)} seconds.`);
-  } finally {
-    await shutdown();
-  }
+      });
+      console.log(chalk.green`Build sucessful after ${Math.round(time / 1000)} seconds.`);
+    },
+    { terminate },
+  );
 }
 
 run(main);
-
-async function waitForInstance(ipAddress: string) {
-  await waitFor(
-    async () => {
-      try {
-        await pingSsh(ipAddress);
-        return true;
-      } catch {
-        return false;
-      }
-    },
-    chalk`SSH not available. Waiting 5 more seconds...`,
-    5000,
-  );
-}
