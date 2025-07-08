@@ -21,6 +21,7 @@ import {
   BadRequestError,
   ConflictError,
   ForbiddenError,
+  InternalError,
   InvalidParameterError,
   ResourceNotFoundError,
   UnauthorizedError,
@@ -2754,6 +2755,7 @@ export function publicApi(container: Container) {
             ],
           } as const),
           302: RedirectResponse("Redirect to the resource on AWS S3"),
+          400: ErrorResponse({ description: "File is too large" }),
           404: ErrorResponse({ description: "File is not ready" }),
           500: ErrorResponse({ description: "Error generating the file" }),
         },
@@ -2768,11 +2770,20 @@ export function publicApi(container: Container) {
           );
         }
         if (isNonNullish(query.taskId)) {
-          const url = await getTaskResultFileUrl(client, query.taskId);
-          if (query.noredirect) {
-            return Created({ file: url }, url);
-          } else {
-            return Redirect(url);
+          try {
+            const url = await getTaskResultFileUrl(client, query.taskId);
+            if (query.noredirect) {
+              return Created({ file: url }, url);
+            } else {
+              return Redirect(url);
+            }
+          } catch (error) {
+            if (error instanceof InternalError && error.message === "MAX_FILE_SIZE_EXCEEDED") {
+              throw new BadRequestError(
+                "This parallel cannot be exported because the total size of the files exceed 1GB. Please, download them manually.",
+              );
+            }
+            throw error;
           }
         } else if (query.format === "zip") {
           req.setTimeout(300_000 + 10_000);
@@ -2811,6 +2822,11 @@ export function publicApi(container: Container) {
               return Redirect(url);
             }
           } catch (error) {
+            if (error instanceof InternalError && error.message === "MAX_FILE_SIZE_EXCEEDED") {
+              throw new BadRequestError(
+                "This parallel cannot be exported because the total size of the files exceed 1GB. Please, download them manually.",
+              );
+            }
             throw error;
           }
         } else if (query.format === "pdf") {

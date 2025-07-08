@@ -6941,6 +6941,7 @@ export type TagPagination = {
 };
 
 export type Task = {
+  error: Maybe<Scalars["JSONObject"]["output"]>;
   id: Scalars["GID"]["output"];
   name: TaskName;
   output: Maybe<Scalars["JSON"]["output"]>;
@@ -7789,6 +7790,7 @@ export type TaskFragment = {
   progress: number | null;
   status: TaskStatus;
   output: any | null;
+  error: { [key: string]: any } | null;
 };
 
 export type ProfileTypeFieldFragment = {
@@ -7978,7 +7980,13 @@ export type waitForTask_TaskQueryVariables = Exact<{
 }>;
 
 export type waitForTask_TaskQuery = {
-  task: { id: string; progress: number | null; status: TaskStatus; output: any | null };
+  task: {
+    id: string;
+    progress: number | null;
+    status: TaskStatus;
+    output: any | null;
+    error: { [key: string]: any } | null;
+  };
 };
 
 export type getTaskResultFileUrl_getTaskResultFileMutationVariables = Exact<{
@@ -9847,6 +9855,7 @@ export type ExportPetitionReplies_createExportRepliesTaskMutation = {
     progress: number | null;
     status: TaskStatus;
     output: any | null;
+    error: { [key: string]: any } | null;
   };
 };
 
@@ -9861,6 +9870,7 @@ export type ExportPetitionReplies_createPrintPdfTaskMutation = {
     progress: number | null;
     status: TaskStatus;
     output: any | null;
+    error: { [key: string]: any } | null;
   };
 };
 
@@ -9875,6 +9885,7 @@ export type ExportPetitionReplies_createExportExcelTaskMutation = {
     progress: number | null;
     status: TaskStatus;
     output: any | null;
+    error: { [key: string]: any } | null;
   };
 };
 
@@ -9944,7 +9955,13 @@ export type SharePetition_createAddPetitionPermissionMaybeTaskMutationVariables 
 export type SharePetition_createAddPetitionPermissionMaybeTaskMutation = {
   createAddPetitionPermissionMaybeTask: {
     status: MaybeTaskStatus;
-    task: { id: string; progress: number | null; status: TaskStatus; output: any | null } | null;
+    task: {
+      id: string;
+      progress: number | null;
+      status: TaskStatus;
+      output: any | null;
+      error: { [key: string]: any } | null;
+    } | null;
   };
 };
 
@@ -10004,7 +10021,13 @@ export type StopSharing_createRemovePetitionPermissionMaybeTaskMutationVariables
 export type StopSharing_createRemovePetitionPermissionMaybeTaskMutation = {
   createRemovePetitionPermissionMaybeTask: {
     status: MaybeTaskStatus;
-    task: { id: string; progress: number | null; status: TaskStatus; output: any | null } | null;
+    task: {
+      id: string;
+      progress: number | null;
+      status: TaskStatus;
+      output: any | null;
+      error: { [key: string]: any } | null;
+    } | null;
   };
 };
 
@@ -10016,7 +10039,13 @@ export type RemoveUserPermission_createRemovePetitionPermissionMaybeTaskMutation
 export type RemoveUserPermission_createRemovePetitionPermissionMaybeTaskMutation = {
   createRemovePetitionPermissionMaybeTask: {
     status: MaybeTaskStatus;
-    task: { id: string; progress: number | null; status: TaskStatus; output: any | null } | null;
+    task: {
+      id: string;
+      progress: number | null;
+      status: TaskStatus;
+      output: any | null;
+      error: { [key: string]: any } | null;
+    } | null;
   };
 };
 
@@ -10029,7 +10058,13 @@ export type RemoveUserGroupPermission_createRemovePetitionPermissionMaybeTaskMut
 export type RemoveUserGroupPermission_createRemovePetitionPermissionMaybeTaskMutation = {
   createRemovePetitionPermissionMaybeTask: {
     status: MaybeTaskStatus;
-    task: { id: string; progress: number | null; status: TaskStatus; output: any | null } | null;
+    task: {
+      id: string;
+      progress: number | null;
+      status: TaskStatus;
+      output: any | null;
+      error: { [key: string]: any } | null;
+    } | null;
   };
 };
 
@@ -12050,6 +12085,7 @@ export type BulkSendTemplate_createBulkPetitionSendTaskMutation = {
     progress: number | null;
     status: TaskStatus;
     output: any | null;
+    error: { [key: string]: any } | null;
   };
 };
 
@@ -12071,6 +12107,7 @@ export type ExportTemplate_createTemplateRepliesCsvExportTaskMutation = {
     progress: number | null;
     status: TaskStatus;
     output: any | null;
+    error: { [key: string]: any } | null;
   };
 };
 
@@ -12819,6 +12856,7 @@ export const TaskFragmentDoc = gql`
     progress
     status
     output
+    error
   }
 ` as unknown as DocumentNode<TaskFragment, unknown>;
 export const ProfileTypeFieldFragmentDoc = gql`

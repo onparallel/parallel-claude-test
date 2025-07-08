@@ -2,6 +2,7 @@ import { createZipFile } from "../../util/createZipFile";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { withTempDir } from "../../util/withTempDir";
 import { TaskRunner } from "../helpers/TaskRunner";
+
 export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
   async run() {
     const { petition_id: petitionId, pattern } = this.task.input;
@@ -31,6 +32,7 @@ export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
           "PETITION_FILE_FIELD_REPLIES",
           "PETITION_LATEST_SIGNATURE",
         ],
+        maxFileSizeBytes: 1024 * 1024 * 1024, // 1GB
       }),
       {
         onProgress: (processed, totalCount) => {

@@ -8977,6 +8977,7 @@ type TagPagination {
 }
 
 type Task {
+  error: JSONObject
   id: GID!
   name: TaskName!
   output: JSON

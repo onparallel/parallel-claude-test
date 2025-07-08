@@ -6941,6 +6941,7 @@ export type TagPagination = {
 };
 
 export type Task = {
+  error: Maybe<Scalars["JSONObject"]["output"]>;
   id: Scalars["GID"]["output"];
   name: TaskName;
   output: Maybe<Scalars["JSON"]["output"]>;

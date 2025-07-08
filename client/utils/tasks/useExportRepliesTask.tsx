@@ -45,7 +45,17 @@ export function useExportRepliesTask() {
       });
     });
 
-    if (taskError?.message === "SERVER_ERROR") {
+    if (taskError?.message === "MAX_FILE_SIZE_EXCEEDED") {
+      await withError(
+        showError({
+          message: intl.formatMessage({
+            id: "component.export-replies-task.max-file-size-exceeded",
+            defaultMessage:
+              "This parallel cannot be exported because the total size of the files exceed 1GB. Please, download them manually.",
+          }),
+        }),
+      );
+    } else if (taskError?.message === "SERVER_ERROR") {
       await withError(
         showError({
           message: intl.formatMessage({

@@ -3840,6 +3840,11 @@
     "context": "Exporting replies..."
   },
   {
+    "term": "component.export-replies-task.max-file-size-exceeded",
+    "definition": "Este parallel no puede ser exportado porque el tamaño total de los archivos excede 1GB. Por favor, descárgalos manualmente.",
+    "context": "This parallel cannot be exported because the total size of the files exceed 1GB. Please, download them manually."
+  },
+  {
     "term": "component.export-report-task.header",
     "definition": "Generando informe...",
     "context": "Generating report..."

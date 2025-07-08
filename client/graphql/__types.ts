@@ -7216,6 +7216,7 @@ export interface TagPagination {
 
 export interface Task {
   __typename?: "Task";
+  error?: Maybe<Scalars["JSONObject"]["output"]>;
   id: Scalars["GID"]["output"];
   name: TaskName;
   output?: Maybe<Scalars["JSON"]["output"]>;
@@ -9168,6 +9169,7 @@ export type TaskProgressDialog_TaskFragment = {
   status: TaskStatus;
   progress?: number | null;
   output?: any | null;
+  error?: { [key: string]: any } | null;
 };
 
 export type TaskProgressDialog_taskQueryVariables = Exact<{
@@ -9181,6 +9183,7 @@ export type TaskProgressDialog_taskQuery = {
     status: TaskStatus;
     progress?: number | null;
     output?: any | null;
+    error?: { [key: string]: any } | null;
   };
 };
 
@@ -9196,6 +9199,7 @@ export type TaskProgressDialog_publicTaskQuery = {
     status: TaskStatus;
     progress?: number | null;
     output?: any | null;
+    error?: { [key: string]: any } | null;
   };
 };
 
@@ -66699,6 +66703,7 @@ export type useBackgroundCheckProfileDownloadTask_createBackgroundCheckProfilePd
     status: TaskStatus;
     progress?: number | null;
     output?: any | null;
+    error?: { [key: string]: any } | null;
   };
 };
 
@@ -66722,6 +66727,7 @@ export type useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskMuta
     status: TaskStatus;
     progress?: number | null;
     output?: any | null;
+    error?: { [key: string]: any } | null;
   };
 };
 
@@ -66781,6 +66787,7 @@ export type useExportRepliesTask_createExportRepliesTaskMutation = {
     status: TaskStatus;
     progress?: number | null;
     output?: any | null;
+    error?: { [key: string]: any } | null;
   };
 };
 
@@ -66805,6 +66812,7 @@ export type useFileExportTask_createFileExportTaskMutation = {
     status: TaskStatus;
     progress?: number | null;
     output?: any | null;
+    error?: { [key: string]: any } | null;
   };
 };
 
@@ -66904,6 +66912,7 @@ export type usePrintPdfTask_createPrintPdfTaskMutation = {
     status: TaskStatus;
     progress?: number | null;
     output?: any | null;
+    error?: { [key: string]: any } | null;
   };
 };
 
@@ -66939,6 +66948,7 @@ export type useProfilesExcelExportTask_createProfilesExcelExportTaskMutation = {
     status: TaskStatus;
     progress?: number | null;
     output?: any | null;
+    error?: { [key: string]: any } | null;
   };
 };
 
@@ -66962,6 +66972,7 @@ export type useProfilesExcelImportTask_createProfilesExcelImportTaskMutation = {
     status: TaskStatus;
     progress?: number | null;
     output?: any | null;
+    error?: { [key: string]: any } | null;
   };
 };
 
@@ -66976,6 +66987,7 @@ export type usePublicPrintPdfTask_publicCreatePrintPdfTaskMutation = {
     status: TaskStatus;
     progress?: number | null;
     output?: any | null;
+    error?: { [key: string]: any } | null;
   };
 };
 
@@ -67002,6 +67014,7 @@ export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutation
     status: TaskStatus;
     progress?: number | null;
     output?: any | null;
+    error?: { [key: string]: any } | null;
   };
 };
 
@@ -69776,6 +69789,7 @@ export const TaskProgressDialog_TaskFragmentDoc = gql`
     status
     progress
     output
+    error
   }
 ` as unknown as DocumentNode<TaskProgressDialog_TaskFragment, unknown>;
 export const ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc = gql`

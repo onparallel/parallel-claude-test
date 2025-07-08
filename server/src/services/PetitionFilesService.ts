@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { indexBy, isNonNullish, isNullish } from "remeda";
+import { indexBy, isNonNullish, isNullish, sumBy } from "remeda";
 import { Readable } from "stream";
 import { PetitionExcelExport } from "../api/helpers/PetitionExcelExport";
 import { Config, CONFIG } from "../config";
@@ -15,6 +15,7 @@ import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { renderTextWithPlaceholders } from "../util/slate/placeholders";
 import { random } from "../util/token";
 import { UnwrapArray } from "../util/types";
+import { HandledTaskRunnerError } from "../workers/helpers/TaskRunner";
 import { I18N_SERVICE, II18nService } from "./I18nService";
 import { ILogger, LOGGER } from "./Logger";
 import { IPrinter, PRINTER } from "./Printer";
@@ -32,6 +33,7 @@ interface GetPetitionFilesOptions {
   pattern?: string | null;
   include: GetPetitionFilesInclude[];
   includeEmptyExcel?: boolean;
+  maxFileSizeBytes?: number;
 }
 
 export type GetPetitionFilesResultMetadata =
@@ -121,10 +123,21 @@ export class PetitionFilesService {
       return [];
     }
 
-    const files = await this.files.loadFileUpload(
-      fileReplies.map((reply) => reply.content["file_upload_id"]),
-    );
-    const filesById = indexBy(files.filter(isNonNullish), (f) => f.id);
+    const files = (
+      await this.files.loadFileUpload(fileReplies.map((reply) => reply.content["file_upload_id"]))
+    ).filter(isNonNullish);
+
+    if (includeFileReplies && isNonNullish(options.maxFileSizeBytes)) {
+      // verify that every file does not exceed size limit for export
+      const totalSize = sumBy(files, (f) => parseInt(f.size));
+      if (totalSize > options.maxFileSizeBytes) {
+        throw new HandledTaskRunnerError("MAX_FILE_SIZE_EXCEEDED", {
+          size: options.maxFileSizeBytes,
+        });
+      }
+    }
+
+    const filesById = indexBy(files, (f) => f.id);
 
     const excelWorkbook = new PetitionExcelExport(intl, this.config.misc.parallelUrl, {
       contacts: this.contacts,

@@ -74,7 +74,7 @@ export function TaskProgressDialog({
           await onCompleted?.(updatedTask);
         } else if (updatedTask.status === "FAILED") {
           done();
-          props.onReject("SERVER_ERROR");
+          props.onReject(updatedTask.error?.message ?? "SERVER_ERROR");
         }
       } catch {
         done();
@@ -137,6 +137,7 @@ TaskProgressDialog.fragments = {
       status
       progress
       output
+      error
     }
   `,
 };

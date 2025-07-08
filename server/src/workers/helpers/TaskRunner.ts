@@ -7,6 +7,15 @@ import { Task, TaskOutput } from "../../db/repositories/TaskRepository";
 import { toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 
+export class HandledTaskRunnerError extends Error {
+  constructor(
+    message: string,
+    public extra?: any,
+  ) {
+    super(message);
+  }
+}
+
 export abstract class TaskRunner<T extends TaskName> {
   private abort!: AbortController;
   private previousProgress = 0;
@@ -27,7 +36,15 @@ export abstract class TaskRunner<T extends TaskName> {
       success = true;
     } catch (error) {
       this.abort.abort();
-      if (error instanceof Error) {
+
+      if (error instanceof HandledTaskRunnerError) {
+        // handled errors are not logged
+        await this.ctx.tasks.taskFailed(
+          this.task.id,
+          { message: error.message, extra: error.extra },
+          this.ctx.config.instanceName,
+        );
+      } else if (error instanceof Error) {
         this.ctx.logger.error(error.message, { stack: error.stack });
         await this.ctx.tasks.taskFailed(
           this.task.id,

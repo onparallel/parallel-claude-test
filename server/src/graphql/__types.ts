@@ -4804,6 +4804,7 @@ export interface NexusGenFieldTypes {
   };
   Task: {
     // field return type
+    error: NexusGenScalars["JSONObject"] | null; // JSONObject
     id: NexusGenScalars["GID"]; // GID!
     name: NexusGenEnums["TaskName"]; // TaskName!
     output: NexusGenScalars["JSON"] | null; // JSON
@@ -7980,6 +7981,7 @@ export interface NexusGenFieldTypeNames {
   };
   Task: {
     // field return type name
+    error: "JSONObject";
     id: "GID";
     name: "TaskName";
     output: "JSON";

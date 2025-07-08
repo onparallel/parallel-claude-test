@@ -51,6 +51,15 @@ export const Task = objectType({
         return t.output;
       },
     });
+    t.nullable.jsonObject("error", {
+      resolve: (t) => {
+        if (t.status !== "FAILED") {
+          return null;
+        }
+
+        return t.error_data ?? null;
+      },
+    });
   },
 });
 

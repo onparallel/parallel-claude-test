@@ -415,7 +415,8 @@ export async function waitForTask(client: GraphQLClient, taskId: string, options
         await waitFor(interval, options);
         break;
       case "FAILED":
-        throw new InternalError("Failed Task");
+        throw new InternalError(result.task.error?.message ?? "Failed Task");
+
       case "COMPLETED":
         return result;
     }
@@ -433,6 +434,10 @@ export async function getTaskResultFileUrl(client: GraphQLClient, taskId: string
   `;
 
   try {
+    const { task } = await client.request(waitForTask_TaskDocument, { id: taskId });
+    if (task.status === "FAILED") {
+      throw new InternalError(task.error?.message ?? "Failed Task");
+    }
     const { getTaskResultFile } = await client.request(
       getTaskResultFileUrl_getTaskResultFileDocument,
       { taskId },

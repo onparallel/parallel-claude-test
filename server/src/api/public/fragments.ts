@@ -314,6 +314,7 @@ export const TaskFragment = gql`
     progress
     status
     output
+    error
   }
 `;
 
