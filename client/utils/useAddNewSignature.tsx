@@ -47,9 +47,10 @@ export function useAddNewSignature({ user, petition }: useAddNewSignatureProps) 
             signatureConfig: {
               isEnabled: true,
               orgIntegrationId: petition.signatureConfig.integration!.id,
-              signersInfo: petition.signatureConfig.signers.map((s) =>
-                pick(s!, ["contactId", "email", "firstName", "lastName", "isPreset"]),
-              ),
+              signersInfo: petition.signatureConfig.signers.map((s) => ({
+                ...pick(s!, ["contactId", "email", "firstName", "lastName", "isPreset"]),
+                signWithEmbeddedImageId: s!.embeddedSignatureImage?.id,
+              })),
               ...pick(petition.signatureConfig, [
                 "allowAdditionalSigners",
                 "minSigners",
@@ -119,6 +120,7 @@ useAddNewSignature.fragments = {
           firstName
           lastName
           isPreset
+          embeddedSignatureImage
         }
       }
       signatureRequests {

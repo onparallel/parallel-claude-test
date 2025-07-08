@@ -643,6 +643,13 @@ export const SignatureConfigInput = inputObjectType({
           t.nonNull.string("email");
           t.nullable.boolean("isPreset");
           t.nullable.boolean("signWithDigitalCertificate");
+          t.nullable.field("signWithEmbeddedImage", {
+            type: "Upload",
+          });
+          t.nullable.globalId("signWithEmbeddedImageId", {
+            prefixName: "FileUpload",
+            description: "ID of the previously uploaded image if you don't want to update current.",
+          });
         },
       }),
     });
@@ -987,7 +994,51 @@ export const updatePetition = mutationField("updatePetition", {
       data.enable_document_generation = isDocumentGenerationEnabled;
     }
     if (signatureConfig !== undefined) {
-      data.signature_config = signatureConfig;
+      data.signature_config =
+        signatureConfig === null
+          ? null
+          : {
+              ...signatureConfig,
+              signersInfo: await pMap(
+                signatureConfig.signersInfo,
+                async (signer) => {
+                  if (isNonNullish(signer.signWithEmbeddedImage)) {
+                    // if provided with an image, upload it to bucket on S3 so it is available when generating the document
+                    const { createReadStream, mimetype } = await signer.signWithEmbeddedImage;
+                    const path = random(16);
+                    const res = await ctx.storage.fileUploads.uploadFile(
+                      path,
+                      mimetype,
+                      createReadStream(),
+                    );
+                    const [file] = await ctx.files.createFileUpload(
+                      {
+                        path,
+                        filename: path,
+                        content_type: mimetype,
+                        upload_complete: true,
+                        size: res["ContentLength"]!.toString(),
+                      },
+                      `User:${ctx.user!.id}`,
+                    );
+
+                    return {
+                      ...omit(signer, ["signWithEmbeddedImage", "signWithEmbeddedImageId"]),
+                      signWithEmbeddedImageFileUploadId: file.id,
+                    };
+                  }
+
+                  // if provided with a public_file_upload.id, use it. This avoids uploading the same image each time
+                  return {
+                    ...omit(signer, ["signWithEmbeddedImage", "signWithEmbeddedImageId"]),
+                    signWithEmbeddedImageFileUploadId: signer.signWithEmbeddedImageId ?? null,
+                  };
+                },
+                {
+                  concurrency: 10,
+                },
+              ),
+            };
     }
     if (description !== undefined) {
       data.template_description = description === null ? null : JSON.stringify(description);

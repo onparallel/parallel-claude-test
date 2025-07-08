@@ -2025,6 +2025,41 @@
     "context": "You already added this email for <b>{signersList}</b>. You can modify the name and add it again."
   },
   {
+    "term": "component.confirm-signer-info-dialog.embed-signature-image",
+    "definition": "Embed signature image",
+    "context": "Embed signature image"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.embed-signature-image-alt",
+    "definition": "Signature image",
+    "context": "Signature image"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.embed-signature-image-error",
+    "definition": "The signature image must be an .PNG image file of size up to {size}.",
+    "context": "The signature image must be an .PNG image file of size up to {size}."
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.embed-signature-image-fallback",
+    "definition": "No image selected",
+    "context": "No image selected"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.embed-signature-image-fallback-description",
+    "definition": "PNG file of size up to {size}",
+    "context": "PNG file of size up to {size}"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.embed-signature-image-popover-1",
+    "definition": "Enable this setting to use an image instead of signing manually.",
+    "context": "Enable this setting to use an image instead of signing manually."
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.embed-signature-image-popover-2",
+    "definition": "Please note that using an image does not meet the requirements to be considered an advanced electronic signature.",
+    "context": "Please note that using an image does not meet the requirements to be considered an advanced electronic signature."
+  },
+  {
     "term": "component.confirm-signer-info-dialog.is-preset",
     "definition": "Required signed",
     "context": "Required signed"
@@ -2046,13 +2081,18 @@
   },
   {
     "term": "component.confirm-signer-info-dialog.sign-with-digital-certificate-popover-2",
-    "definition": "This setting is only recommended for signers within the organization who have a digital certificate stored in their Signaturit account.",
-    "context": "This setting is only recommended for signers within the organization who have a digital certificate stored in their Signaturit account."
+    "definition": "This setting is only recommended for signers within the organization who have a digital certificate stored in their Signaturit account or uses Ivsign.",
+    "context": "This setting is only recommended for signers within the organization who have a digital certificate stored in their Signaturit account or uses Ivsign."
   },
   {
     "term": "component.confirm-signer-info-dialog.title",
     "definition": "Confirm the signer's information",
     "context": "Confirm the signer's information"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.upload-signature-image-button",
+    "definition": "Upload image",
+    "context": "Upload image"
   },
   {
     "term": "component.confirm-skip-forward-security.confirm",
@@ -4163,6 +4203,16 @@
     "term": "component.feature-flag-descriptions.sign-with-digital-certificate-name",
     "definition": "Sign with digital certificate",
     "context": "Sign with digital certificate"
+  },
+  {
+    "term": "component.feature-flag-descriptions.sign-with-image-description",
+    "definition": "Allows each signer on a petition to sign using an embedded PNG",
+    "context": "Allows each signer on a petition to sign using an embedded PNG"
+  },
+  {
+    "term": "component.feature-flag-descriptions.sign-with-image-name",
+    "definition": "Sign with embedded image",
+    "context": "Sign with embedded image"
   },
   {
     "term": "component.feature-flag-descriptions.skip-forward-security-description",
@@ -10228,6 +10278,26 @@
     "term": "component.recipient-view-confirm-petition-signers-dialog.signers-added",
     "definition": "You haven't added any signers yet",
     "context": "You haven't added any signers yet"
+  },
+  {
+    "term": "component.recipient-view-confirm-signer-info-dialog.alert-description",
+    "definition": "If you add multiple signers with the same email address, they'll receive as many separate emails as the number of signers you've assigned to that address.",
+    "context": "If you add multiple signers with the same email address, they'll receive as many separate emails as the number of signers you've assigned to that address."
+  },
+  {
+    "term": "component.recipient-view-confirm-signer-info-dialog.alert-title",
+    "definition": "Each signature email includes a unique and personalized link.",
+    "context": "Each signature email includes a unique and personalized link."
+  },
+  {
+    "term": "component.recipient-view-confirm-signer-info-dialog.body",
+    "definition": "You already added this email for <b>{signersList}</b>. You can modify the name and add it again.",
+    "context": "You already added this email for <b>{signersList}</b>. You can modify the name and add it again."
+  },
+  {
+    "term": "component.recipient-view-confirm-signer-info-dialog.title",
+    "definition": "Confirm the signer's information",
+    "context": "Confirm the signer's information"
   },
   {
     "term": "component.recipient-view-contactless-form.access",

@@ -222,6 +222,54 @@ describe("GraphQL custom validators", () => {
       ).resolves.not.toThrow();
     });
 
+    it("validates the signature configuration with embedded signature images", async () => {
+      const [fileUpload] = await mocks.knex.from("file_upload").insert(
+        {
+          path: "uploads/1.png",
+          filename: "1.png",
+          size: "123",
+          content_type: "image/png",
+          created_at: new Date(),
+        },
+        "*",
+      );
+
+      await expect(
+        validSignatureConfig("petitionId", "config", "approvalFlowConfig")(
+          {},
+          {
+            petitionId: petition.id,
+            config: {
+              orgIntegrationId: signatureIntegration.id,
+              signersInfo: [
+                ...contacts.map((c) => ({
+                  firstName: c.first_name,
+                  lastName: c.last_name,
+                  email: c.email,
+                  contactId: c.id,
+                })),
+                {
+                  firstName: "John",
+                  lastName: "Doe",
+                  email: "john.doe@example.com",
+                  contactId: 1,
+                  signWithEmbeddedImageId: fileUpload.id,
+                },
+              ],
+              timezone: "Europe/Madrid",
+              title: "sign this!",
+              allowAdditionalSigners: false,
+              review: false,
+              minSigners: 2,
+            },
+            approvalFlowConfig: null,
+          },
+          { ...ctx, user: users[0] },
+          {} as any,
+        ),
+      ).resolves.not.toThrow();
+    });
+
     it("throws error if used integration is of another organization", async () => {
       await expect(
         validSignatureConfig("petitionId", "config", "approvalFlowConfig")(
@@ -349,6 +397,74 @@ describe("GraphQL custom validators", () => {
           {} as any,
         ),
       ).resolves.not.toThrow();
+    });
+
+    it("sends error if minSigners is less than 1", async () => {
+      await expect(
+        validSignatureConfig("petitionId", "config", "approvalFlowConfig")(
+          {},
+          {
+            petitionId: petition.id,
+            config: {
+              orgIntegrationId: signatureIntegration.id,
+              signersInfo: contacts.map((c) => ({
+                firstName: c.first_name,
+                lastName: c.last_name,
+                email: c.email,
+                contactId: c.id,
+              })),
+              timezone: "Europe/Madrid",
+              title: "sign this!",
+              allowAdditionalSigners: false,
+              review: false,
+              minSigners: 0,
+            },
+            approvalFlowConfig: null,
+          },
+          { ...ctx, user: users[0] },
+          {} as any,
+        ),
+      ).rejects.toThrow();
+    });
+
+    it("sends error if minSigners is not at least 1 more of embedded signature images", async () => {
+      const [fileUpload] = await mocks.knex.from("file_upload").insert(
+        {
+          path: "uploads/2.png",
+          filename: "2.png",
+          size: "123",
+          content_type: "image/png",
+          created_at: new Date(),
+        },
+        "*",
+      );
+
+      await expect(
+        validSignatureConfig("petitionId", "config", "approvalFlowConfig")(
+          {},
+          {
+            petitionId: petition.id,
+            config: {
+              orgIntegrationId: signatureIntegration.id,
+              signersInfo: contacts.map((c) => ({
+                firstName: c.first_name,
+                lastName: c.last_name,
+                email: c.email,
+                contactId: c.id,
+                signWithEmbeddedImageId: fileUpload.id,
+              })),
+              timezone: "Europe/Madrid",
+              title: "sign this!",
+              allowAdditionalSigners: false,
+              review: false,
+              minSigners: 1,
+            },
+            approvalFlowConfig: null,
+          },
+          { ...ctx, user: users[0] },
+          {} as any,
+        ),
+      ).rejects.toThrow();
     });
   });
 

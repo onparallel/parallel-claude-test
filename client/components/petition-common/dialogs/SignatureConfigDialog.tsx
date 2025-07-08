@@ -105,7 +105,11 @@ export function SignatureConfigDialog({
       ? true
       : (signatureConfig?.reviewAfterApproval ?? null);
 
-  const allSigners = (signatureConfig?.signers ?? []).filter(isNonNullish);
+  const allSigners = (signatureConfig?.signers ?? []).filter(isNonNullish).map((s) => ({
+    ...s,
+    signWithEmbeddedImageId: s.embeddedSignatureImage300?.id,
+  }));
+
   const form = useForm<SignatureConfigFormData>({
     mode: "onSubmit",
     defaultValues: {
@@ -178,7 +182,13 @@ export function SignatureConfigDialog({
         reviewAfterApproval: data.reviewAfterApproval,
         allowAdditionalSigners: data.allowAdditionalSigners,
         signingMode: data.signingMode,
-        minSigners: data.minSigners,
+        // min signers must always be at least the number of embedded signature images + 1
+        minSigners: Math.max(
+          data.minSigners,
+          data.signersInfo.filter(
+            (s) => isNonNullish(s.signWithEmbeddedImage) || isNonNullish(s.signWithEmbeddedImageId),
+          ).length + 1,
+        ),
         instructions: data.showInstructions ? data.instructions : null,
         signersInfo: data.includePresetSigners
           ? data.signersInfo.map((s) =>
@@ -189,6 +199,8 @@ export function SignatureConfigDialog({
                 "contactId",
                 "isPreset",
                 "signWithDigitalCertificate",
+                "signWithEmbeddedImage",
+                "signWithEmbeddedImageId",
               ]),
             )
           : [],
@@ -520,6 +532,7 @@ function SignatureConfigDialogBodyStep2({
   const intl = useIntl();
   const { register, watch, control } = useFormContext<SignatureConfigFormData>();
   const review = watch("review");
+  const signersInfo = watch("signersInfo");
   const useCustomDocument = watch("useCustomDocument");
   const showInstructions = watch("showInstructions");
 
@@ -545,7 +558,14 @@ function SignatureConfigDialogBodyStep2({
                       marginX={2}
                       onChange={(_, value) => onChange(value)}
                       value={value ?? 1}
-                      min={1}
+                      min={Math.max(
+                        1,
+                        signersInfo.filter(
+                          (s) =>
+                            isNonNullish(s.signWithEmbeddedImage) ||
+                            isNonNullish(s.signWithEmbeddedImageId),
+                        ).length + 1,
+                      )}
                       clampValueOnBlur={true}
                       maxWidth="80px"
                     >
@@ -721,10 +741,15 @@ function SignatureConfigDialogBodyStep3({
           ...signersInfo,
           repeatedSigners.length > 0
             ? await showConfirmSignerInfo({
-                selection: { ...contact!, isPreset: false },
+                selection: {
+                  ...contact!,
+                  isPreset: false,
+                  signWithDigitalCertificate: false,
+                },
                 repeatedSigners,
                 allowUpdateFixedSigner: petition.__typename === "PetitionTemplate",
-                allowSignWithDigitalCertificate: user.hasSignWithDigitalCertificate,
+                hasSignWithDigitalCertificate: user.hasSignWithDigitalCertificate,
+                hasSignWithEmbeddedImage: user.hasSignWithEmbeddedImage,
                 disableSignWithDigitalCertificate: integrationProvider !== "SIGNATURIT",
               })
             : {
@@ -746,7 +771,8 @@ function SignatureConfigDialogBodyStep3({
             selection: signer,
             repeatedSigners: [],
             allowUpdateFixedSigner: petition.__typename === "PetitionTemplate",
-            allowSignWithDigitalCertificate: user.hasSignWithDigitalCertificate,
+            hasSignWithDigitalCertificate: user.hasSignWithDigitalCertificate,
+            hasSignWithEmbeddedImage: user.hasSignWithEmbeddedImage,
             disableSignWithDigitalCertificate: integrationProvider !== "SIGNATURIT",
           }),
           ...signersInfo.slice(index + 1),
@@ -795,7 +821,14 @@ function SignatureConfigDialogBodyStep3({
                   isEditable={petition.__typename === "PetitionTemplate" || !signer.isPreset}
                   signer={signer}
                   onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
-                  onEditClick={handleSelectedSignerRowOnEditClick(onChange, signer, index)}
+                  onEditClick={handleSelectedSignerRowOnEditClick(
+                    onChange,
+                    {
+                      ...signer,
+                      signWithDigitalCertificate: signer.signWithDigitalCertificate ?? false,
+                    },
+                    index,
+                  )}
                 />
               ))}
             </ListElement>
@@ -847,6 +880,9 @@ SignatureConfigDialog.fragments = {
         }
         signers {
           ...Fragments_FullPetitionSigner
+          embeddedSignatureImage300: embeddedSignatureImage(
+            options: { resize: { height: 300, fit: inside } }
+          )
         }
         title
         review
@@ -911,6 +947,7 @@ SignatureConfigDialog.fragments = {
         id
         hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
         hasSignWithDigitalCertificate: hasFeatureFlag(featureFlag: SIGN_WITH_DIGITAL_CERTIFICATE)
+        hasSignWithEmbeddedImage: hasFeatureFlag(featureFlag: SIGN_WITH_EMBEDDED_IMAGE)
         firstName
         lastName
         email

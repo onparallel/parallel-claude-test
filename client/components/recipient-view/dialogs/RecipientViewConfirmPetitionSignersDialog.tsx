@@ -21,7 +21,7 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { SelectedSignerRow } from "@parallel/components/petition-common/SelectedSignerRow";
 import { SuggestedSigners } from "@parallel/components/petition-common/SuggestedSigners";
 import type { SignerSelectSelection } from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
-import { useConfirmSignerInfoDialog } from "@parallel/components/petition-common/dialogs/ConfirmSignerInfoDialog";
+import { useRecipientViewConfirmSignerInfoDialog } from "@parallel/components/petition-common/dialogs/RecipientViewConfirmSignerInfoDialog";
 import {
   PublicPetitionSignerDataInput,
   Tone,
@@ -96,7 +96,7 @@ function RecipientViewConfirmPetitionSignersDialog({
 
   const allSigners = [...presetSigners, ...additionalSigners];
 
-  const showConfirmSignerInfo = useConfirmSignerInfoDialog();
+  const showConfirmSignerInfo = useRecipientViewConfirmSignerInfoDialog();
   const handleSelectedSignerRowOnEditClick =
     (onChange: (...events: any[]) => void, signer: SignerSelectSelection, index: number) =>
     async () => {

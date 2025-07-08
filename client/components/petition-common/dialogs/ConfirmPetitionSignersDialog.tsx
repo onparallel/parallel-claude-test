@@ -76,7 +76,9 @@ export interface ConfirmPetitionSignersDialogResult {
 export type SignerSelectSelection = Omit<
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
   "__typename" | "isPreset" | "fullName"
-> & { isPreset?: boolean | null };
+> & {
+  isPreset?: boolean | null;
+};
 
 const MAX_SIGNERS_ALLOWED = 40;
 const MAX_FILESIZE = 1024 * 1024 * 10;
@@ -109,7 +111,10 @@ export function ConfirmPetitionSignersDialog(
   } = useForm<ConfirmPetitionSignersDialogResult>({
     mode: "onSubmit",
     defaultValues: {
-      signers: otherSigners,
+      signers: otherSigners.map((s) => ({
+        ...s,
+        signWithEmbeddedImageId: s.embeddedSignatureImage300?.id,
+      })),
       message: null,
       allowAdditionalSigners: props.isInteractionWithRecipientsEnabled
         ? props.signatureConfig.allowAdditionalSigners
@@ -123,7 +128,13 @@ export function ConfirmPetitionSignersDialog(
   const signers = watch("signers");
   const allowAdditionalSigners = watch("allowAdditionalSigners");
 
-  const allSigners = [...presetSigners, ...signers];
+  const allSigners = [
+    ...presetSigners.map((s) => ({
+      ...s,
+      signWithEmbeddedImageId: s.embeddedSignatureImage300?.id,
+    })),
+    ...signers,
+  ];
 
   const handleSearchContacts = useSearchContacts();
   const handleCreateContact = useCreateContact();
@@ -142,9 +153,13 @@ export function ConfirmPetitionSignersDialog(
           ...signers,
           repeatedSigners.length > 0
             ? await showConfirmSignerInfo({
-                selection: contact!,
+                selection: {
+                  ...contact!,
+                  signWithDigitalCertificate: false,
+                },
                 repeatedSigners,
-                allowSignWithDigitalCertificate: props.user.hasSignWithDigitalCertificate,
+                hasSignWithDigitalCertificate: props.user.hasSignWithDigitalCertificate,
+                hasSignWithEmbeddedImage: props.user.hasSignWithEmbeddedImage,
                 disableSignWithDigitalCertificate:
                   props.signatureConfig.integration?.provider !== "SIGNATURIT",
               })
@@ -163,7 +178,8 @@ export function ConfirmPetitionSignersDialog(
           await showConfirmSignerInfo({
             selection: signer,
             repeatedSigners: [],
-            allowSignWithDigitalCertificate: props.user.hasSignWithDigitalCertificate,
+            hasSignWithDigitalCertificate: props.user.hasSignWithDigitalCertificate,
+            hasSignWithEmbeddedImage: props.user.hasSignWithEmbeddedImage,
             disableSignWithDigitalCertificate:
               props.signatureConfig.integration?.provider !== "SIGNATURIT",
           }),
@@ -272,6 +288,8 @@ export function ConfirmPetitionSignersDialog(
                     lastName: s.lastName ?? "",
                     isPreset: s.isPreset,
                     signWithDigitalCertificate: s.signWithDigitalCertificate,
+                    signWithEmbeddedImage: s.signWithEmbeddedImage,
+                    signWithEmbeddedImageId: s.signWithEmbeddedImageId,
                   })),
                   ...presetSigners.map((s) => ({
                     contactId: s.contactId,
@@ -280,6 +298,7 @@ export function ConfirmPetitionSignersDialog(
                     lastName: s.lastName ?? "",
                     isPreset: true,
                     signWithDigitalCertificate: s.signWithDigitalCertificate,
+                    signWithEmbeddedImageId: s.embeddedSignatureImage300?.id,
                   })),
                 ],
                 allowAdditionalSigners: props.isInteractionWithRecipientsEnabled
@@ -514,7 +533,14 @@ export function ConfirmPetitionSignersDialog(
                           [props.user.email, props.user.firstName, props.user.lastName].join("")
                         }
                         onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
-                        onEditClick={handleSelectedSignerRowOnEditClick(onChange, signer, index)}
+                        onEditClick={handleSelectedSignerRowOnEditClick(
+                          onChange,
+                          {
+                            ...signer,
+                            signWithDigitalCertificate: signer.signWithDigitalCertificate ?? false,
+                          },
+                          index,
+                        )}
                       />
                     ))}
                   </ListElement>
@@ -624,7 +650,16 @@ export function ConfirmPetitionSignersDialog(
           data-action="start-signature"
           colorScheme="primary"
           type="submit"
-          isDisabled={props.isUpdate ? false : allSigners.length === 0}
+          isDisabled={
+            props.isUpdate
+              ? false
+              : allSigners.length === 0 ||
+                allSigners.every(
+                  (s: any) =>
+                    isNonNullish(s.signWithEmbeddedImage) ||
+                    isNonNullish(s.signWithEmbeddedImageId),
+                )
+          }
         >
           {props.isUpdate ? (
             <FormattedMessage id="generic.save" defaultMessage="Save" />
@@ -648,6 +683,7 @@ ConfirmPetitionSignersDialog.fragments = {
         lastName
         ...SuggestedSigners_User
         hasSignWithDigitalCertificate: hasFeatureFlag(featureFlag: SIGN_WITH_DIGITAL_CERTIFICATE)
+        hasSignWithEmbeddedImage: hasFeatureFlag(featureFlag: SIGN_WITH_EMBEDDED_IMAGE)
       }
       ${SuggestedSigners.fragments.User}
     `;
@@ -658,6 +694,9 @@ ConfirmPetitionSignersDialog.fragments = {
         ...Fragments_FullPetitionSigner
         ...SelectedSignerRow_PetitionSigner
         signWithDigitalCertificate
+        embeddedSignatureImage300: embeddedSignatureImage(
+          options: { resize: { height: 300, fit: inside } }
+        )
       }
       ${Fragments.FullPetitionSigner}
       ${SelectedSignerRow.fragments.PetitionSigner}

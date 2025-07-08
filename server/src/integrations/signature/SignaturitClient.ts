@@ -162,26 +162,37 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
                   o: toGlobalId("Organization", orgId),
                 },
               )}`,
-              recipients: recipients.map((r, recipientIndex) => ({
-                email: r.email,
-                name: r.name,
-                sign_with_digital_certificate_file: r.signWithDigitalCertificate ? 1 : 0,
-                widgets: [
-                  {
-                    type: r.signWithDigitalCertificate ? "dcf" : "signature",
-                    word_anchor: `3cb39pzCQA9wJ${recipientIndex}`,
-                    height: 7.5, // 7.5% of page height
-                    width:
-                      ((210 -
-                        petitionTheme.data.marginLeft -
-                        petitionTheme.data.marginRight -
-                        5 /* grid gap */ * 2) /
-                        3 /
-                        210) *
-                      100,
-                  },
-                ],
-              })),
+              recipients: recipients
+                .map((r, recipientIndex) => {
+                  if (r.signWithEmbeddedImageFileUploadId) {
+                    // signers with an embedded signature are not part of the signature request
+                    return null;
+                  }
+
+                  return {
+                    email: r.email,
+                    name: r.name,
+                    sign_with_digital_certificate_file: r.signWithDigitalCertificate ? 1 : 0,
+                    widgets: [
+                      {
+                        type: r.signWithDigitalCertificate
+                          ? ("dcf" as const)
+                          : ("signature" as const),
+                        word_anchor: `3cb39pzCQA9wJ${recipientIndex}`,
+                        height: 7.5, // 7.5% of page height
+                        width:
+                          ((210 -
+                            petitionTheme.data.marginLeft -
+                            petitionTheme.data.marginRight -
+                            5 /* grid gap */ * 2) /
+                            3 /
+                            210) *
+                          100,
+                      },
+                    ],
+                  };
+                })
+                .filter(isNonNullish),
               expire_time: 365,
               reminders: 0,
             });

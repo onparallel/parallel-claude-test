@@ -2011,7 +2011,7 @@
   },
   {
     "term": "component.confirm-signer-info-dialog.alert-description",
-    "definition": "Al añadir varios firmantes con la misma dirección de correo, recibirán tantos correos como firmantes {tone, select, INFORMAL{hayas} other{haya}} indicado con ese mismo correo.",
+    "definition": "Al añadir varios firmantes con la misma dirección de correo, recibirán tantos correos como firmantes hayas indicado con ese mismo correo.",
     "context": "If you add multiple signers with the same email address, they'll receive as many separate emails as the number of signers you've assigned to that address."
   },
   {
@@ -2025,13 +2025,48 @@
     "context": "You already added this email for <b>{signersList}</b>. You can modify the name and add it again."
   },
   {
+    "term": "component.confirm-signer-info-dialog.embed-signature-image",
+    "definition": "Incluir imagen de firma",
+    "context": "Embed signature image"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.embed-signature-image-alt",
+    "definition": "Imagen de firma",
+    "context": "Signature image"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.embed-signature-image-error",
+    "definition": "La imagen de firma debe ser un archivo .PNG de tamaño hasta {size}.",
+    "context": "The signature image must be an .PNG image file of size up to {size}."
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.embed-signature-image-fallback",
+    "definition": "No se ha seleccionado ninguna imagen",
+    "context": "No image selected"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.embed-signature-image-fallback-description",
+    "definition": "Archivo PNG de tamaño hasta {size}",
+    "context": "PNG file of size up to {size}"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.embed-signature-image-popover-1",
+    "definition": "Activa esta opción para usar una imagen en lugar de firmar manualmente.",
+    "context": "Enable this setting to use an image instead of signing manually."
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.embed-signature-image-popover-2",
+    "definition": "Ten en cuenta que, al utilizar una imagen, no cumplirá con los requisitos para considerarse firma electrónica avanzada.",
+    "context": "Please note that using an image does not meet the requirements to be considered an advanced electronic signature."
+  },
+  {
     "term": "component.confirm-signer-info-dialog.is-preset",
-    "definition": "Firmante obligatorio",
+    "definition": "Firmantes requeridos",
     "context": "Required signed"
   },
   {
     "term": "component.confirm-signer-info-dialog.is-preset-popover",
-    "definition": "Los firmantes obligatorios no se podrán eliminar una vez creado el parallel.",
+    "definition": "Los firmantes requeridos no se pueden eliminar una vez creado el parallel.",
     "context": "Required signers cannot be removed once the parallel is created."
   },
   {
@@ -2046,13 +2081,18 @@
   },
   {
     "term": "component.confirm-signer-info-dialog.sign-with-digital-certificate-popover-2",
-    "definition": "Esta opción solo es recomendable para firmantes de la organización con certificado digital almacenado en su cuenta de Signaturit.",
-    "context": "This setting is only recommended for signers within the organization who have a digital certificate stored in their Signaturit account."
+    "definition": "Esta opción solo es recomendable para firmantes de la organización con certificado digital almacenado en su cuenta de Signaturit o cuenta con Ivsign.",
+    "context": "This setting is only recommended for signers within the organization who have a digital certificate stored in their Signaturit account or uses Ivsign."
   },
   {
     "term": "component.confirm-signer-info-dialog.title",
-    "definition": "Confirme los datos del firmante",
+    "definition": "Confirmar la información del firmante",
     "context": "Confirm the signer's information"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.upload-signature-image-button",
+    "definition": "Subir imagen",
+    "context": "Upload image"
   },
   {
     "term": "component.confirm-skip-forward-security.confirm",
@@ -4156,13 +4196,23 @@
   },
   {
     "term": "component.feature-flag-descriptions.sign-with-digital-certificate-description",
-    "definition": "Permite a cada firmante en la peticion firmar con un certificado digital previamente subido",
+    "definition": "Permite a cada firmante en la petición firmar con un certificado digital previamente subido",
     "context": "Allows each signer on a petition to sign with a previously uploaded digital certificate"
   },
   {
     "term": "component.feature-flag-descriptions.sign-with-digital-certificate-name",
     "definition": "Firmar con certificado digital",
     "context": "Sign with digital certificate"
+  },
+  {
+    "term": "component.feature-flag-descriptions.sign-with-image-description",
+    "definition": "Permite a cada firmante en la petición firmar con una imagen incrustada",
+    "context": "Allows each signer on a petition to sign using an embedded PNG"
+  },
+  {
+    "term": "component.feature-flag-descriptions.sign-with-image-name",
+    "definition": "Firmar con imagen incrustada",
+    "context": "Sign with embedded image"
   },
   {
     "term": "component.feature-flag-descriptions.skip-forward-security-description",
@@ -10228,6 +10278,26 @@
     "term": "component.recipient-view-confirm-petition-signers-dialog.signers-added",
     "definition": "No has añadido firmantes todavía",
     "context": "You haven't added any signers yet"
+  },
+  {
+    "term": "component.recipient-view-confirm-signer-info-dialog.alert-description",
+    "definition": "Al añadir varios firmantes con la misma dirección de correo, recibirán tantos correos como firmantes {tone, select, INFORMAL{hayas} other{haya}} indicado con ese mismo correo.",
+    "context": "If you add multiple signers with the same email address, they'll receive as many separate emails as the number of signers you've assigned to that address."
+  },
+  {
+    "term": "component.recipient-view-confirm-signer-info-dialog.alert-title",
+    "definition": "Cada correo de firma incluye un enlace único y personalizado.",
+    "context": "Each signature email includes a unique and personalized link."
+  },
+  {
+    "term": "component.recipient-view-confirm-signer-info-dialog.body",
+    "definition": "Ya has añadido este correo para <b>{signersList}</b>. Puedes modificar el nombre y añadirlo de nuevo.",
+    "context": "You already added this email for <b>{signersList}</b>. You can modify the name and add it again."
+  },
+  {
+    "term": "component.recipient-view-confirm-signer-info-dialog.title",
+    "definition": "Confirme los datos del firmante",
+    "context": "Confirm the signer's information"
   },
   {
     "term": "component.recipient-view-contactless-form.access",

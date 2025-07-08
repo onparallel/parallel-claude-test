@@ -292,7 +292,11 @@ export class SignatureService implements ISignatureService {
       ...(signatureConfig.additionalSignersInfo ?? []),
     ];
 
-    if (allSigners.length === 0) {
+    if (
+      allSigners.length === 0 ||
+      allSigners.every((s) => isNonNullish(s.signWithEmbeddedImageFileUploadId))
+    ) {
+      // At least one signer must be provided (not embedded signature images)
       throw new Error(`REQUIRED_SIGNER_INFO_ERROR`);
     }
 

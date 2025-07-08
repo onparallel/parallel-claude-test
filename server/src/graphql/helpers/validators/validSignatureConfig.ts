@@ -1,9 +1,11 @@
+import { fromStream } from "file-type";
 import { isNonNullish, isNullish } from "remeda";
 import { isValidTimezone } from "../../../util/time";
 import { NexusGenInputs } from "../../__types";
 import { ArgWithPath, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
+import { exceedsMaxSize } from "./maxFileSize";
 import { EMAIL_REGEX } from "./validEmail";
 
 export function validSignatureConfig<TypeName extends string, FieldName extends string>(
@@ -33,7 +35,28 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
         review,
         useCustomDocument,
         reviewAfterApproval,
+        minSigners,
       } = signatureConfigInput;
+
+      if (minSigners < 1) {
+        throw new ArgValidationError(
+          info,
+          `${argName}.minSigners`,
+          `Min signers must be at least 1.`,
+        );
+      }
+
+      const embeddedSignatureImages = signersInfo.filter(
+        (s) => isNonNullish(s.signWithEmbeddedImage) || isNonNullish(s.signWithEmbeddedImageId),
+      ).length;
+
+      if (embeddedSignatureImages >= minSigners) {
+        throw new ArgValidationError(
+          info,
+          `${argName}.minSigners`,
+          `Min signers must be greater than the number of embedded signature images.`,
+        );
+      }
 
       const integration = await ctx.integrations.loadIntegration(orgIntegrationId);
       if (
@@ -42,12 +65,63 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
         !integration.is_enabled ||
         integration.org_id !== ctx.user!.org_id
       ) {
-        throw new ArgValidationError(info, `${argName}.provider`, `Invalid signature provider.`);
+        throw new ArgValidationError(
+          info,
+          `${argName}.orgIntegrationId`,
+          `Invalid signature provider.`,
+        );
       }
 
-      if (signersInfo.some((signer) => !EMAIL_REGEX.test(signer.email))) {
-        throw new ArgValidationError(info, `${argName}.signersInfo`, `Invalid list of emails.`);
+      for (const [index, signer] of signersInfo.entries()) {
+        if (!EMAIL_REGEX.test(signer.email)) {
+          throw new ArgValidationError(
+            info,
+            `${argName}.signersInfo[${index}].email`,
+            `Invalid email.`,
+            {
+              error_code: "INVALID_EMAIL_ERROR",
+            },
+          );
+        }
+
+        if (signer.signWithDigitalCertificate && signer.signWithEmbeddedImage) {
+          throw new ArgValidationError(
+            info,
+            `${argName}.signersInfo[${index}].signWithEmbeddedImage`,
+            `signWithEmbeddedImage cannot be used when signWithDigitalCertificate is enabled.`,
+          );
+        }
+
+        if (signer.signWithEmbeddedImage) {
+          const image = await signer.signWithEmbeddedImage;
+          const result = await fromStream(image.createReadStream());
+          if (result && result.mime !== "image/png") {
+            throw new ArgValidationError(
+              info,
+              `${argName}.signersInfo[${index}].signWithEmbeddedImage`,
+              `Expected image/png, got ${result.mime}`,
+            );
+          }
+
+          if (await exceedsMaxSize(image, 1024 * 1024 * 1)) {
+            throw new ArgValidationError(
+              info,
+              `${argName}.signersInfo[${index}].signWithEmbeddedImage`,
+              `File exceeded max size of 1MB`,
+            );
+          }
+        } else if (signer.signWithEmbeddedImageId) {
+          const file = await ctx.files.loadFileUpload(signer.signWithEmbeddedImageId);
+          if (!file) {
+            throw new ArgValidationError(
+              info,
+              `${argName}.signersInfo[${index}].signWithEmbeddedImageId`,
+              `File not found.`,
+            );
+          }
+        }
       }
+
       if (!isValidTimezone(timezone)) {
         throw new ArgValidationError(
           info,

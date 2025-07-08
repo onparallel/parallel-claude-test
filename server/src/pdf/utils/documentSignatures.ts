@@ -10,24 +10,21 @@ import { SlateNode } from "../../util/slate/render";
 import { paragraphIsEmpty } from "../../util/slate/utils";
 import { hashString } from "../../util/token";
 import { documentSignatures_SignatureConfigFragment } from "../__types";
-import { getHardcodedSignatures } from "./hardcodedSignatures";
 
 export function documentSignatures(
   signatureConfig: documentSignatures_SignatureConfigFragment,
-  { theme, intl, templateId }: { theme: PdfDocumentTheme; intl: IntlShape; templateId?: string },
+  { theme, intl }: { theme: PdfDocumentTheme; intl: IntlShape },
 ) {
   const date = intl.formatDate(new Date(), {
     timeZone: signatureConfig.timezone,
     ...FORMATS.LL,
   });
-  const signers: { fullName: string; signatureImageUrl?: string }[] = [
-    ...(process.env.NODE_ENV === "production" && isNonNullish(templateId)
-      ? getHardcodedSignatures(templateId)
-      : []),
-    ...signatureConfig.signers.map((s) => ({
-      fullName: s!.fullName,
-    })),
-  ];
+
+  const signers = signatureConfig.signers!.map((signer, i) => ({
+    wordAnchor: `3cb39pzCQA9wJ${i}`,
+    fullName: signer!.fullName,
+    signatureImageUrl: signer!.embeddedSignatureImage?.url ?? null,
+  }));
 
   const legalTextSlate = theme.legalText[intl.locale as ContactLocale];
 
@@ -86,31 +83,21 @@ export function documentSignatures(
       columns: (1fr, 1fr, 1fr),
       rows: (36mm),
       gutter: 5mm,
-      ${[
-        ...signers
-          .filter((s) => s.signatureImageUrl)
-          .map(
-            (s, i) => outdent`
+      ${signers
+        .map(
+          (s) => outdent`
             signature(${[
               JSON.stringify(s.fullName),
               JSON.stringify(date),
-              "[]",
-              `signature: prequery.image(${JSON.stringify(s.signatureImageUrl!)}, ${JSON.stringify(`assets/${hashString(s.signatureImageUrl!)}`)})`,
-            ].join(", ")})
+              JSON.stringify(s.wordAnchor),
+              s.signatureImageUrl
+                ? `signature: prequery.image(${JSON.stringify(s.signatureImageUrl!)}, ${JSON.stringify(`assets/${hashString(s.signatureImageUrl!)}`)})`
+                : null,
+            ]
+              .filter(isNonNullish)
+              .join(", ")})
             `,
-          ),
-        ...signers
-          .filter((s) => !s.signatureImageUrl)
-          .map(
-            (s, i) => outdent`
-            signature(${[
-              JSON.stringify(s.fullName),
-              JSON.stringify(date),
-              JSON.stringify(`3cb39pzCQA9wJ${i}`),
-            ].join(", ")})
-            `,
-          ),
-      ]
+        )
         .join(",\n")
         .replaceAll(/\n/g, "\n  ")}
     )
@@ -124,6 +111,7 @@ documentSignatures.fragments = {
       signers {
         fullName
         email
+        embeddedSignatureImage
       }
       timezone
     }

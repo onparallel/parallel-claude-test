@@ -927,6 +927,7 @@ export type FeatureFlag =
   | "SETTING_DELEGATE_ACCESS"
   | "SHOW_CONTACTS_BUTTON"
   | "SIGN_WITH_DIGITAL_CERTIFICATE"
+  | "SIGN_WITH_EMBEDDED_IMAGE"
   | "SKIP_FORWARD_SECURITY"
   | "TEMPLATE_REPLIES_CSV_EXPORT_TASK"
   | "TEMPLATE_REPLIES_PREVIEW_URL";
@@ -4892,11 +4893,17 @@ export type PetitionSignatureStatusFilter =
 export type PetitionSigner = {
   contactId: Maybe<Scalars["GID"]["output"]>;
   email: Scalars["String"]["output"];
+  embeddedSignatureImage: Maybe<Scalars["JSONObject"]["output"]>;
   firstName: Scalars["String"]["output"];
   fullName: Scalars["String"]["output"];
   isPreset: Scalars["Boolean"]["output"];
   lastName: Maybe<Scalars["String"]["output"]>;
   signWithDigitalCertificate: Maybe<Scalars["Boolean"]["output"]>;
+};
+
+/** Information about a signer of the petition */
+export type PetitionSignerembeddedSignatureImageArgs = {
+  options?: InputMaybe<ImageOptions>;
 };
 
 /** The status of a petition. */
@@ -6806,6 +6813,9 @@ export type SignatureConfigInputSigner = {
   isPreset?: InputMaybe<Scalars["Boolean"]["input"]>;
   lastName?: InputMaybe<Scalars["String"]["input"]>;
   signWithDigitalCertificate?: InputMaybe<Scalars["Boolean"]["input"]>;
+  signWithEmbeddedImage?: InputMaybe<Scalars["Upload"]["input"]>;
+  /** ID of the previously uploaded image if you don't want to update current. */
+  signWithEmbeddedImageId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
 /** The signing mode of a signature config */
@@ -7398,7 +7408,11 @@ export type FieldActivity_PetitionFieldReplyFragment = {
 
 export type SignaturesBlock_SignatureConfigFragment = {
   timezone: string;
-  signers: Array<{ fullName: string; email: string } | null>;
+  signers: Array<{
+    fullName: string;
+    email: string;
+    embeddedSignatureImage: { [key: string]: any } | null;
+  } | null>;
 };
 
 export type UserOrContactReference_UserOrPetitionAccess_PetitionAccess_Fragment = {
@@ -7422,11 +7436,14 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
   id: string;
   name: string | null;
-  fromTemplate: { id: string } | null;
   currentSignatureRequest: {
     signatureConfig: {
       timezone: string;
-      signers: Array<{ fullName: string; email: string } | null>;
+      signers: Array<{
+        fullName: string;
+        email: string;
+        embeddedSignatureImage: { [key: string]: any } | null;
+      } | null>;
     };
   } | null;
   fields: Array<{
@@ -7842,11 +7859,14 @@ export type PetitionExport_petitionQuery = {
         __typename: "Petition";
         id: string;
         name: string | null;
-        fromTemplate: { id: string } | null;
         currentSignatureRequest: {
           signatureConfig: {
             timezone: string;
-            signers: Array<{ fullName: string; email: string } | null>;
+            signers: Array<{
+              fullName: string;
+              email: string;
+              embeddedSignatureImage: { [key: string]: any } | null;
+            } | null>;
           };
         } | null;
         fields: Array<{
@@ -8120,11 +8140,14 @@ export type PetitionExport2_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
   id: string;
   name: string | null;
-  fromTemplate: { id: string } | null;
   currentSignatureRequest: {
     signatureConfig: {
       timezone: string;
-      signers: Array<{ fullName: string; email: string } | null>;
+      signers: Array<{
+        fullName: string;
+        email: string;
+        embeddedSignatureImage: { [key: string]: any } | null;
+      } | null>;
     };
   } | null;
   fields: Array<{
@@ -8540,11 +8563,14 @@ export type PetitionExport2_petitionQuery = {
         __typename: "Petition";
         id: string;
         name: string | null;
-        fromTemplate: { id: string } | null;
         currentSignatureRequest: {
           signatureConfig: {
             timezone: string;
-            signers: Array<{ fullName: string; email: string } | null>;
+            signers: Array<{
+              fullName: string;
+              email: string;
+              embeddedSignatureImage: { [key: string]: any } | null;
+            } | null>;
           };
         } | null;
         fields: Array<{
@@ -8804,11 +8830,14 @@ export type PetitionExport2_petitionQuery = {
 
 export type SignatureBoxesPage_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
-  fromTemplate: { id: string } | null;
   currentSignatureRequest: {
     signatureConfig: {
       timezone: string;
-      signers: Array<{ fullName: string; email: string } | null>;
+      signers: Array<{
+        fullName: string;
+        email: string;
+        embeddedSignatureImage: { [key: string]: any } | null;
+      } | null>;
     };
   } | null;
   selectedDocumentTheme: { data: { [key: string]: any } };
@@ -8831,11 +8860,14 @@ export type SignatureBoxesPage_petitionQuery = {
   petition:
     | {
         __typename: "Petition";
-        fromTemplate: { id: string } | null;
         currentSignatureRequest: {
           signatureConfig: {
             timezone: string;
-            signers: Array<{ fullName: string; email: string } | null>;
+            signers: Array<{
+              fullName: string;
+              email: string;
+              embeddedSignatureImage: { [key: string]: any } | null;
+            } | null>;
           };
         } | null;
         selectedDocumentTheme: { data: { [key: string]: any } };
@@ -8846,11 +8878,14 @@ export type SignatureBoxesPage_petitionQuery = {
 
 export type SignatureBoxesPage2_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
-  fromTemplate: { id: string } | null;
   currentSignatureRequest: {
     signatureConfig: {
       timezone: string;
-      signers: Array<{ fullName: string; email: string } | null>;
+      signers: Array<{
+        fullName: string;
+        email: string;
+        embeddedSignatureImage: { [key: string]: any } | null;
+      } | null>;
     };
   } | null;
   selectedDocumentTheme: { data: { [key: string]: any } };
@@ -8873,11 +8908,14 @@ export type SignatureBoxesPage2_petitionQuery = {
   petition:
     | {
         __typename: "Petition";
-        fromTemplate: { id: string } | null;
         currentSignatureRequest: {
           signatureConfig: {
             timezone: string;
-            signers: Array<{ fullName: string; email: string } | null>;
+            signers: Array<{
+              fullName: string;
+              email: string;
+              embeddedSignatureImage: { [key: string]: any } | null;
+            } | null>;
           };
         } | null;
         selectedDocumentTheme: { data: { [key: string]: any } };
@@ -8888,7 +8926,11 @@ export type SignatureBoxesPage2_petitionQuery = {
 
 export type documentSignatures_SignatureConfigFragment = {
   timezone: string;
-  signers: Array<{ fullName: string; email: string } | null>;
+  signers: Array<{
+    fullName: string;
+    email: string;
+    embeddedSignatureImage: { [key: string]: any } | null;
+  } | null>;
 };
 
 export type LiquidPetitionScopeProvider_PetitionBase_Petition_Fragment = {
@@ -9110,6 +9152,7 @@ export const SignaturesBlock_SignatureConfigFragmentDoc = gql`
     signers {
       fullName
       email
+      embeddedSignatureImage
     }
     timezone
   }
@@ -9194,9 +9237,6 @@ export const PetitionExport_PetitionBaseFragmentDoc = gql`
       data
     }
     ... on Petition {
-      fromTemplate {
-        id
-      }
       currentSignatureRequest {
         signatureConfig {
           ...SignaturesBlock_SignatureConfig
@@ -9303,6 +9343,7 @@ export const documentSignatures_SignatureConfigFragmentDoc = gql`
     signers {
       fullName
       email
+      embeddedSignatureImage
     }
     timezone
   }
@@ -9325,9 +9366,6 @@ export const PetitionExport2_PetitionBaseFragmentDoc = gql`
       data
     }
     ... on Petition {
-      fromTemplate {
-        id
-      }
       currentSignatureRequest {
         signatureConfig {
           ...documentSignatures_SignatureConfig
@@ -9348,9 +9386,6 @@ export const SignatureBoxesPage_PetitionBaseFragmentDoc = gql`
       data
     }
     ... on Petition {
-      fromTemplate {
-        id
-      }
       currentSignatureRequest {
         signatureConfig {
           ...documentSignatures_SignatureConfig
@@ -9367,9 +9402,6 @@ export const SignatureBoxesPage2_PetitionBaseFragmentDoc = gql`
       data
     }
     ... on Petition {
-      fromTemplate {
-        id
-      }
       currentSignatureRequest {
         signatureConfig {
           ...documentSignatures_SignatureConfig

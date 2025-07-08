@@ -446,6 +446,8 @@ export interface NexusGenInputs {
     isPreset?: boolean | null; // Boolean
     lastName?: string | null; // String
     signWithDigitalCertificate?: boolean | null; // Boolean
+    signWithEmbeddedImage?: NexusGenScalars["Upload"] | null; // Upload
+    signWithEmbeddedImageId?: NexusGenScalars["GID"] | null; // GID
   };
   SortByInput: {
     // input type
@@ -1568,6 +1570,7 @@ export interface NexusGenObjects {
     firstName: string;
     lastName: string;
     email: string;
+    signWithEmbeddedImageFileUploadId?: number;
     status?:
       | {
           sent_at?: Date;
@@ -1585,6 +1588,7 @@ export interface NexusGenObjects {
     email: string;
     isPreset?: boolean;
     signWithDigitalCertificate?: boolean;
+    signWithEmbeddedImageFileUploadId?: number;
   };
   PetitionTaggedEvent: petitionEvents.PetitionTaggedEvent;
   PetitionTemplate: db.Petition;
@@ -1810,6 +1814,8 @@ export interface NexusGenObjects {
       lastName: string;
       email: string;
       isPreset?: boolean;
+      signWithDigitalCertificate?: boolean;
+      signWithEmbeddedImageFileUploadId?: number;
     }[];
     timezone: string;
     title: string | null;
@@ -3760,6 +3766,7 @@ export interface NexusGenFieldTypes {
     // field return type
     contactId: NexusGenScalars["GID"] | null; // GID
     email: string; // String!
+    embeddedSignatureImage: NexusGenScalars["JSONObject"] | null; // JSONObject
     firstName: string; // String!
     fullName: string; // String!
     isPreset: boolean; // Boolean!
@@ -6935,6 +6942,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     contactId: "GID";
     email: "String";
+    embeddedSignatureImage: "JSONObject";
     firstName: "String";
     fullName: "String";
     isPreset: "Boolean";
@@ -10110,6 +10118,12 @@ export interface NexusGenArgTypes {
       // args
       limit?: number | null; // Int
       offset?: number | null; // Int
+    };
+  };
+  PetitionSigner: {
+    embeddedSignatureImage: {
+      // args
+      options?: NexusGenInputs["ImageOptions"] | null; // ImageOptions
     };
   };
   PetitionTemplate: {

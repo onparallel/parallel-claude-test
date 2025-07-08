@@ -14,7 +14,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
-import { omit } from "remeda";
+import { isNonNullish, omit } from "remeda";
 import { isApolloError } from "./apollo/isApolloError";
 import { useGoToPetitionSection } from "./goToPetition";
 import { withError } from "./promises/withError";
@@ -113,6 +113,14 @@ export function useStartSignatureRequest({
             petitionId: petition.id,
             signatureConfig: {
               ...omit(petition.signatureConfig!, ["integration", "signers", "__typename"]),
+              minSigners: Math.max(
+                petition.signatureConfig!.minSigners,
+                signersInfo.filter(
+                  (s) =>
+                    isNonNullish(s.signWithEmbeddedImage) ||
+                    isNonNullish(s.signWithEmbeddedImageId),
+                ).length + 1,
+              ),
               isEnabled: true,
               timezone: petition.signatureConfig!.timezone,
               orgIntegrationId: petition.signatureConfig!.integration!.id,

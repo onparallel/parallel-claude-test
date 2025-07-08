@@ -124,15 +124,19 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
     try {
       const owner = await this.petitions.loadPetitionOwner(petition.id);
 
-      const hasSignWithCertificate = await this.featureFlags.orgHasFeatureFlag(
-        petition.org_id,
-        "SIGN_WITH_DIGITAL_CERTIFICATE",
-      );
+      const [hasSignWithCertificate, hasSignWithEmbeddedImage] =
+        await this.featureFlags.orgHasFeatureFlag(petition.org_id, [
+          "SIGN_WITH_DIGITAL_CERTIFICATE",
+          "SIGN_WITH_EMBEDDED_IMAGE",
+        ]);
 
       const recipients = signersInfo.map((signer) => ({
         name: fullName(signer.firstName, signer.lastName),
         email: signer.email,
         signWithDigitalCertificate: hasSignWithCertificate && !!signer.signWithDigitalCertificate,
+        signWithEmbeddedImageFileUploadId: hasSignWithEmbeddedImage
+          ? signer.signWithEmbeddedImageFileUploadId
+          : undefined,
       }));
 
       const outputFileName =
@@ -191,12 +195,27 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
       // remove events array from data before saving to DB
       data.documents = data.documents.map((doc) => omit(doc, ["events"])) as any;
 
+      let embeddedSignatureImages = 0;
       // update signers on signature_config to include the externalId provided by provider so we can match it later on events webhook
       const updatedSignersInfo = signature.signature_config.signersInfo.map(
-        (signer, signerIndex) => ({
-          ...signer,
-          externalId: this.findSignerExternalId(data.documents, signer, signerIndex),
-        }),
+        (signer, signerIndex) => {
+          if (signer.signWithEmbeddedImageFileUploadId) {
+            embeddedSignatureImages++;
+            return signer;
+          }
+
+          return {
+            ...signer,
+            // if signer is using embedded image, we don't need to find the externalId as the document was not sent to them
+            externalId: !signer.signWithEmbeddedImageFileUploadId
+              ? this.findSignerExternalId(
+                  data.documents,
+                  signer,
+                  signerIndex - embeddedSignatureImages,
+                )
+              : undefined,
+          };
+        },
       );
 
       await this.petitions.updatePetitionSignatures(signature.id, {
@@ -503,15 +522,15 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
       return signerByEmail[0].id;
     } else if (signerByEmail.length > 1) {
       // if more than 1 signer found with the same email, match by position in the array
-      const externalId = documents[signerIndex]?.id;
-      if (!externalId) {
+      const signer = documents[signerIndex];
+      if (!signer) {
         throw new Error(
           `Index out of bounds on signature document. document:${JSON.stringify(
             documents,
           )}, index: ${signerIndex} `,
         );
       }
-      return externalId;
+      return signer.id;
     } else if (signerByEmail.length === 0) {
       // if no signers were found with that email, there's an error
       throw new Error(

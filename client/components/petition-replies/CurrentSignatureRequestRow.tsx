@@ -40,7 +40,9 @@ export function CurrentSignatureRequestRow({
   // because the signed documents are being generated. In this window it makes no sense to cancel the request or send reminders,
   // so we will show this actions only of there is at least one signer that didn't sign/decline the document
   const someSignerIsPending = signerStatus.some(
-    (s) => s.status === "PENDING" || s.status === "NOT_STARTED",
+    (s) =>
+      isNullish(s.signer.embeddedSignatureImage) &&
+      (s.status === "PENDING" || s.status === "NOT_STARTED"),
   );
 
   const showConfirmSendSignatureReminderDialog = useConfirmSendSignatureReminderDialog();
@@ -194,6 +196,7 @@ CurrentSignatureRequestRow.fragments = {
       signerStatus {
         signer {
           ...SignerReference_PetitionSigner
+          embeddedSignatureImage
         }
         ...PetitionSignatureRequestSignerStatusIcon_SignerStatus
       }

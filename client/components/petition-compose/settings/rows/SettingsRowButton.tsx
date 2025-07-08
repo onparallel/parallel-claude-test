@@ -37,7 +37,7 @@ export function SettingsRowButton({
                 id: "generic.edit-settings",
                 defaultMessage: "Edit settings",
               })}
-              placement="bottom"
+              placement="bottom-start"
               size="sm"
               onClick={() => onConfig?.()}
             />

@@ -42,6 +42,7 @@ export interface Recipient {
   email: string;
   name: string;
   signWithDigitalCertificate: boolean;
+  signWithEmbeddedImageFileUploadId?: number;
 }
 
 export const SIGNATURE_CLIENT = Symbol.for("SIGNATURE_CLIENT");

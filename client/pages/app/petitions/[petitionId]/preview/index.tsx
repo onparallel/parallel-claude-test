@@ -348,6 +348,14 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 data: {
                   signatureConfig: {
                     ...omit(petition.signatureConfig!, ["integration", "signers", "__typename"]),
+                    minSigners: Math.max(
+                      petition.signatureConfig!.minSigners,
+                      completeSignerInfoData!.signers.filter(
+                        (s) =>
+                          isNonNullish(s.signWithEmbeddedImage) ||
+                          isNonNullish(s.signWithEmbeddedImageId),
+                      ).length + 1,
+                    ),
                     timezone: petition.signatureConfig!.timezone,
                     orgIntegrationId: petition.signatureConfig!.integration!.id,
                     signersInfo: completeSignerInfoData!.signers,

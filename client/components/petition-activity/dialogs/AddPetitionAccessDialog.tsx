@@ -252,6 +252,13 @@ export function AddPetitionAccessDialog({
             "integration",
             "__typename",
           ]),
+          minSigners: Math.max(
+            signatureConfig.minSigners,
+            signers.filter(
+              (s) =>
+                isNonNullish(s.signWithEmbeddedImage) || isNonNullish(s.signWithEmbeddedImageId),
+            ).length + 1,
+          ),
           timezone: signatureConfig.timezone,
           orgIntegrationId: signatureConfig.integration!.id,
           signersInfo: signers,

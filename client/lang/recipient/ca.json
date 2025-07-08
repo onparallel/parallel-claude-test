@@ -40,51 +40,6 @@
     "context": "You have {count, plural, =1{# pending process} other{# pending processes}}"
   },
   {
-    "term": "component.confirm-signer-info-dialog.alert-description",
-    "definition": "En afegir diversos signants amb la mateixa adreça de correu, rebran tants correus com signants {tone, select, INFORMAL{hagis} other{hagi}} indicat amb aquesta mateixa adreça.",
-    "context": "If you add multiple signers with the same email address, they'll receive as many separate emails as the number of signers you've assigned to that address."
-  },
-  {
-    "term": "component.confirm-signer-info-dialog.alert-title",
-    "definition": "Cada correu electrònic de signatura inclou un enllaç únic i personalitzat.",
-    "context": "Each signature email includes a unique and personalized link."
-  },
-  {
-    "term": "component.confirm-signer-info-dialog.body",
-    "definition": "Ja has afegit aquest correu per a <b>{signersList}</b>. Pots modificar el nom i afegir-lo de nou.",
-    "context": "You already added this email for <b>{signersList}</b>. You can modify the name and add it again."
-  },
-  {
-    "term": "component.confirm-signer-info-dialog.is-preset",
-    "definition": "Signant obligatori",
-    "context": "Required signed"
-  },
-  {
-    "term": "component.confirm-signer-info-dialog.is-preset-popover",
-    "definition": "Els signants obligatoris no es podran eliminar un cop creat el parallel.",
-    "context": "Required signers cannot be removed once the parallel is created."
-  },
-  {
-    "term": "component.confirm-signer-info-dialog.sign-with-digital-certificate",
-    "definition": "Signar amb certificat digital",
-    "context": "Sign with digital certificate"
-  },
-  {
-    "term": "component.confirm-signer-info-dialog.sign-with-digital-certificate-popover-1",
-    "definition": "Habilita aquesta opció per exigir un certificat digital per signar.",
-    "context": "Enable this option to require a digital certificate for signing."
-  },
-  {
-    "term": "component.confirm-signer-info-dialog.sign-with-digital-certificate-popover-2",
-    "definition": "Aquesta configuració només és recomanable per signants dins de l'organització que tenen un certificat digital emmagatzemat en el seu compte Signaturit.",
-    "context": "This setting is only recommended for signers within the organization who have a digital certificate stored in their Signaturit account."
-  },
-  {
-    "term": "component.confirm-signer-info-dialog.title",
-    "definition": "Confirma les dades del signant",
-    "context": "Confirm the signer's information"
-  },
-  {
     "term": "component.date-time.a-moment-ago",
     "definition": "fa un moment",
     "context": "a moment ago"
@@ -388,6 +343,26 @@
     "term": "component.recipient-view-confirm-petition-signers-dialog.signers-added",
     "definition": "Encara no has afegit signants",
     "context": "You haven't added any signers yet"
+  },
+  {
+    "term": "component.recipient-view-confirm-signer-info-dialog.alert-description",
+    "definition": "En afegir diversos signants amb la mateixa adreça de correu, rebran tants correus com signants {tone, select, INFORMAL{hagis} other{hagi}} indicat amb aquesta mateixa adreça.",
+    "context": "If you add multiple signers with the same email address, they'll receive as many separate emails as the number of signers you've assigned to that address."
+  },
+  {
+    "term": "component.recipient-view-confirm-signer-info-dialog.alert-title",
+    "definition": "Cada correu electrònic de signatura inclou un enllaç únic i personalitzat.",
+    "context": "Each signature email includes a unique and personalized link."
+  },
+  {
+    "term": "component.recipient-view-confirm-signer-info-dialog.body",
+    "definition": "Ja has afegit aquest correu per a <b>{signersList}</b>. Pots modificar el nom i afegir-lo de nou.",
+    "context": "You already added this email for <b>{signersList}</b>. You can modify the name and add it again."
+  },
+  {
+    "term": "component.recipient-view-confirm-signer-info-dialog.title",
+    "definition": "Confirma les dades del signant",
+    "context": "Confirm the signer's information"
   },
   {
     "term": "component.recipient-view-contactless-form.access",

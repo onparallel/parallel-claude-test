@@ -460,6 +460,17 @@ export function useFeatureFlags() {
                 "Allows each signer on a petition to sign with a previously uploaded digital certificate",
             }),
           },
+          {
+            name: "SIGN_WITH_EMBEDDED_IMAGE",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.sign-with-image-name",
+              defaultMessage: "Sign with embedded image",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.sign-with-image-description",
+              defaultMessage: "Allows each signer on a petition to sign using an embedded PNG",
+            }),
+          },
           ...(["ca", "it", "pt"] as const).map((locale) => {
             const lang = locales.find((l) => l.key === locale)!.localizedLabel;
             return {

@@ -109,7 +109,7 @@ interface PdfMetadataItem<TLabel extends string, TValue> {
   value: TValue;
 }
 
-export async function fetchToFile(
+async function fetchToFile(
   pathOrUrl: string,
   path: string,
   options?: { maxFileSize?: number; fallbackUrl?: string },
@@ -124,11 +124,21 @@ export async function fetchToFile(
     } else {
       const url = pathOrUrl;
       if (options?.maxFileSize) {
-        const { ok, headers } = await fetch(url, { method: "HEAD" });
+        const { ok, headers } = await fetch(url, {
+          // to check file size, we will do a fetch of only the first byte
+          // and check content-range header to get the full size
+          // method: "HEAD" does not work if the URL is a signed download URL from S3
+          // as those URLs only accept GET requests
+          headers: { Range: "bytes=0-0" },
+        });
+
         if (!ok) {
           throw new Error("Error fetching resource " + url);
         }
-        const size = parseInt(headers.get("content-length") ?? "0");
+
+        // if "Content-Range: bytes 0-0/1000"
+        // total file size will be 1000 bytes
+        const size = parseInt(headers.get("content-range")?.split("/")?.[1] ?? "0");
         if (size > options.maxFileSize) {
           throw new Error("Resource is too big!");
         }

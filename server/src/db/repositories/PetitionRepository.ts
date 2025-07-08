@@ -215,6 +215,7 @@ export interface PetitionSignatureConfigSigner {
   email: string;
   isPreset?: boolean; // preset signers can only be edited on compose
   signWithDigitalCertificate?: boolean;
+  signWithEmbeddedImageFileUploadId?: number;
 }
 
 export interface PetitionSignatureConfig {

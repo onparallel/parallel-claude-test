@@ -4,11 +4,13 @@ import {
   AlertIcon,
   AlertTitle,
   Button,
+  Center,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
   HStack,
+  Image,
   Input,
   Stack,
   Switch,
@@ -16,56 +18,90 @@ import {
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import { Dropzone } from "@parallel/components/common/Dropzone";
+import { FileSize } from "@parallel/components/common/FileSize";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
-import { Tone } from "@parallel/graphql/__types";
+import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
+import { SignatureConfigInputSigner } from "@parallel/graphql/__types";
 import { fullName } from "@parallel/utils/fullName";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
-import { useRef } from "react";
-import { useForm } from "react-hook-form";
+import { useMemo, useRef } from "react";
+import { DropzoneRef, FileRejection } from "react-dropzone";
+import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
 import type { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
 
+const MAX_FILE_SIZE = 1024 * 1024 * 1;
+
 interface ConfirmSignerInfoDialogProps {
-  selection: SignerSelectSelection;
+  selection: SignerSelectSelection & {
+    signWithEmbeddedImage?: File;
+  };
   repeatedSigners: { firstName: string; lastName?: string | null }[];
   allowUpdateFixedSigner?: boolean;
-  allowSignWithDigitalCertificate?: boolean;
+  hasSignWithDigitalCertificate?: boolean;
   disableSignWithDigitalCertificate?: boolean;
-  tone?: Tone;
+  hasSignWithEmbeddedImage?: boolean;
 }
 
 function ConfirmSignerInfoDialog({
   selection,
   repeatedSigners,
   allowUpdateFixedSigner,
-  allowSignWithDigitalCertificate,
+  hasSignWithDigitalCertificate,
   disableSignWithDigitalCertificate,
-  tone = "INFORMAL",
+  hasSignWithEmbeddedImage,
   ...props
-}: DialogProps<ConfirmSignerInfoDialogProps, SignerSelectSelection>) {
+}: DialogProps<
+  ConfirmSignerInfoDialogProps,
+  SignatureConfigInputSigner & { embeddedSignatureImage?: { id: string; url: string } }
+>) {
   const intl = useIntl();
+
   const {
     handleSubmit,
     register,
+    control,
     formState: { errors },
-  } = useForm<SignerSelectSelection>({
+    watch,
+  } = useForm<SignatureConfigInputSigner & { useEmbeddedSignatureImage?: boolean }>({
     mode: "onSubmit",
     defaultValues: {
       email: selection.email,
       firstName: selection.firstName,
       lastName: selection.lastName,
       isPreset: selection.isPreset ?? false,
-      ...(allowSignWithDigitalCertificate &&
+      ...(hasSignWithDigitalCertificate &&
         !disableSignWithDigitalCertificate && {
           signWithDigitalCertificate: selection.signWithDigitalCertificate ?? false,
         }),
+      ...(hasSignWithEmbeddedImage && {
+        useEmbeddedSignatureImage:
+          isNonNullish(selection.embeddedSignatureImage300) ||
+          isNonNullish(selection.signWithEmbeddedImage),
+        signWithEmbeddedImage: selection.signWithEmbeddedImage,
+      }),
     },
   });
+  const dropzoneRef = useRef<DropzoneRef>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
   const firstNameProps = useRegisterWithRef(firstNameRef, register, "firstName", {
     required: true,
   });
+  const showErrorDialog = useErrorDialog();
+
+  const signWithDigitalCertificate = watch("signWithDigitalCertificate");
+  const useEmbeddedSignatureImage = watch("useEmbeddedSignatureImage");
+  const signWithEmbeddedImage = watch("signWithEmbeddedImage");
+
+  const embedSignatureImageObjectUrl = useMemo(() => {
+    return isNonNullish(signWithEmbeddedImage) && typeof signWithEmbeddedImage !== "string"
+      ? URL.createObjectURL(signWithEmbeddedImage)
+      : "";
+  }, [signWithEmbeddedImage]);
 
   return (
     <ConfirmDialog
@@ -74,7 +110,24 @@ function ConfirmSignerInfoDialog({
       content={{
         containerProps: {
           as: "form",
-          onSubmit: handleSubmit(props.onResolve),
+          onSubmit: handleSubmit((data) => {
+            const { useEmbeddedSignatureImage, signWithEmbeddedImage, ...rest } = data;
+            props.onResolve({
+              ...rest,
+              signWithEmbeddedImage: useEmbeddedSignatureImage ? signWithEmbeddedImage : null,
+              embeddedSignatureImage:
+                useEmbeddedSignatureImage && isNonNullish(selection.embeddedSignatureImage300)
+                  ? {
+                      id: selection.embeddedSignatureImage300.id,
+                      url: selection.embeddedSignatureImage300.url,
+                    }
+                  : undefined,
+              signWithEmbeddedImageId:
+                useEmbeddedSignatureImage && isNonNullish(selection.embeddedSignatureImage300)
+                  ? selection.embeddedSignatureImage300.id
+                  : undefined,
+            });
+          }),
         },
       }}
       header={
@@ -111,9 +164,6 @@ function ConfirmSignerInfoDialog({
                     <FormattedMessage
                       id="component.confirm-signer-info-dialog.alert-description"
                       defaultMessage="If you add multiple signers with the same email address, they'll receive as many separate emails as the number of signers you've assigned to that address."
-                      values={{
-                        tone,
-                      }}
                     />
                   </AlertDescription>
                 </Stack>
@@ -190,8 +240,10 @@ function ConfirmSignerInfoDialog({
               </HStack>
             </FormControl>
           )}
-          {allowSignWithDigitalCertificate ? (
-            <FormControl isDisabled={disableSignWithDigitalCertificate}>
+          {hasSignWithDigitalCertificate ? (
+            <FormControl
+              isDisabled={disableSignWithDigitalCertificate || useEmbeddedSignatureImage}
+            >
               <HStack alignItems="center" justifyContent="space-between">
                 <Flex alignItems="center">
                   <FormLabel fontWeight={400} margin="auto">
@@ -211,7 +263,7 @@ function ConfirmSignerInfoDialog({
                       <Text>
                         <FormattedMessage
                           id="component.confirm-signer-info-dialog.sign-with-digital-certificate-popover-2"
-                          defaultMessage="This setting is only recommended for signers within the organization who have a digital certificate stored in their Signaturit account."
+                          defaultMessage="This setting is only recommended for signers within the organization who have a digital certificate stored in their Signaturit account or uses Ivsign."
                         />
                       </Text>
                     </Stack>
@@ -219,6 +271,129 @@ function ConfirmSignerInfoDialog({
                 </Flex>
                 <Switch {...register("signWithDigitalCertificate")} />
               </HStack>
+            </FormControl>
+          ) : null}
+          {hasSignWithEmbeddedImage ? (
+            <FormControl
+              as={Stack}
+              isDisabled={signWithDigitalCertificate ?? false}
+              isInvalid={!!errors.signWithEmbeddedImage}
+            >
+              <HStack alignItems="center" justifyContent="space-between">
+                <Flex alignItems="center">
+                  <FormLabel fontWeight={400} margin="auto">
+                    <FormattedMessage
+                      id="component.confirm-signer-info-dialog.embed-signature-image"
+                      defaultMessage="Embed signature image"
+                    />
+                  </FormLabel>
+                  <HelpPopover>
+                    <Stack fontSize="sm">
+                      <Text>
+                        <FormattedMessage
+                          id="component.confirm-signer-info-dialog.embed-signature-image-popover-1"
+                          defaultMessage="Enable this setting to use an image instead of signing manually."
+                        />
+                      </Text>
+                      <Text>
+                        <FormattedMessage
+                          id="component.confirm-signer-info-dialog.embed-signature-image-popover-2"
+                          defaultMessage="Please note that using an image does not meet the requirements to be considered an advanced electronic signature."
+                        />
+                      </Text>
+                    </Stack>
+                  </HelpPopover>
+                </Flex>
+                <Switch {...register("useEmbeddedSignatureImage")} />
+              </HStack>
+              <PaddedCollapse open={useEmbeddedSignatureImage ?? false}>
+                <Stack>
+                  <Controller
+                    control={control}
+                    name="signWithEmbeddedImage"
+                    rules={{
+                      required:
+                        useEmbeddedSignatureImage &&
+                        !isNonNullish(selection.embeddedSignatureImage300),
+                    }}
+                    render={({ field }) => (
+                      <Dropzone
+                        as={Center}
+                        ref={dropzoneRef}
+                        onDrop={async (files: File[], rejected: FileRejection[]) => {
+                          if (rejected.length > 0) {
+                            await showErrorDialog({
+                              message: intl.formatMessage(
+                                {
+                                  id: "component.confirm-signer-info-dialog.embed-signature-image-error",
+                                  defaultMessage:
+                                    "The signature image must be an .PNG image file of size up to {size}.",
+                                },
+                                { size: <FileSize value={MAX_FILE_SIZE} /> },
+                              ),
+                            });
+                          } else {
+                            field.onChange(files[0]);
+                          }
+                        }}
+                        accept={{
+                          "image/png": [".png"],
+                        }}
+                        maxSize={MAX_FILE_SIZE}
+                        multiple={false}
+                        height="160px"
+                        maxWidth="100%"
+                        textAlign="center"
+                        disabled={false}
+                        isInvalid={!!errors.signWithEmbeddedImage}
+                      >
+                        <Image
+                          maxWidth="100%"
+                          height="150px"
+                          objectFit="contain"
+                          alt={intl.formatMessage({
+                            id: "component.confirm-signer-info-dialog.embed-signature-image-alt",
+                            defaultMessage: "Signature image",
+                          })}
+                          src={
+                            embedSignatureImageObjectUrl ||
+                            selection.embeddedSignatureImage300?.url ||
+                            undefined
+                          }
+                          fallback={
+                            <Stack textAlign="center" spacing={1}>
+                              <Text fontSize="sm">
+                                <FormattedMessage
+                                  id="component.confirm-signer-info-dialog.embed-signature-image-fallback"
+                                  defaultMessage="No image selected"
+                                />
+                              </Text>
+                              <Text fontSize="sm">
+                                (
+                                <FormattedMessage
+                                  id="component.confirm-signer-info-dialog.embed-signature-image-fallback-description"
+                                  defaultMessage="PNG file of size up to {size}"
+                                  values={{
+                                    size: <FileSize value={MAX_FILE_SIZE} />,
+                                  }}
+                                />
+                                )
+                              </Text>
+                            </Stack>
+                          }
+                        />
+                      </Dropzone>
+                    )}
+                  />
+
+                  <Button onClick={() => dropzoneRef.current?.open()}>
+                    <FormattedMessage
+                      id="component.confirm-signer-info-dialog.upload-signature-image-button"
+                      defaultMessage="Upload image"
+                    />
+                  </Button>
+                </Stack>
+              </PaddedCollapse>
             </FormControl>
           ) : null}
         </Stack>

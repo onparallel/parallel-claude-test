@@ -1050,7 +1050,30 @@ export const PetitionSigner = objectType({
     t.boolean("isPreset", {
       resolve: (o) => o.isPreset ?? false,
     });
+
     t.nullable.boolean("signWithDigitalCertificate");
+    t.nullable.jsonObject("embeddedSignatureImage", {
+      args: {
+        options: arg({ type: "ImageOptions" }),
+      },
+      resolve: async (root, args, ctx) => {
+        if (!root.signWithEmbeddedImageFileUploadId) {
+          return null;
+        }
+
+        const file = await ctx.files.loadFileUpload(root.signWithEmbeddedImageFileUploadId);
+        return isNonNullish(file)
+          ? {
+              id: toGlobalId("FileUpload", file.id),
+              url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
+                file.path,
+                file.filename,
+                "inline",
+              ),
+            }
+          : null;
+      },
+    });
   },
   sourceType: /* ts */ `{
     contactId?: number;
@@ -1059,6 +1082,7 @@ export const PetitionSigner = objectType({
     email: string;
     isPreset?: boolean;
     signWithDigitalCertificate?: boolean;
+    signWithEmbeddedImageFileUploadId?: number;
   }`,
 });
 
@@ -1126,6 +1150,8 @@ export const SignatureConfig = objectType({
       lastName: string;
       email: string;
       isPreset?: boolean;
+      signWithDigitalCertificate?: boolean;
+      signWithEmbeddedImageFileUploadId?: number;
     }[];
     timezone: string;
     title: string | null;

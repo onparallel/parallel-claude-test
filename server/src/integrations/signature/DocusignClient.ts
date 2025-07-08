@@ -3,6 +3,7 @@ import stringify from "fast-safe-stringify";
 import { readFile, stat } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { basename, extname } from "path";
+import { isNonNullish } from "remeda";
 import { CONFIG, Config } from "../../config";
 import { I18N_SERVICE, II18nService } from "../../services/I18nService";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
@@ -153,24 +154,34 @@ export class DocusignClient extends BaseClient implements ISignatureClient {
             },
           ],
           recipients: {
-            signers: recipients.map((r, recipientIndex) => ({
-              recipientId: (recipientIndex + 1).toString(),
-              routingOrder:
-                options.signingMode === "PARALLEL" ? undefined : (recipientIndex + 1).toString(),
-              email: r.email,
-              name: r.name,
-              tabs: {
-                signHereTabs: [
-                  {
-                    anchorString: `3cb39pzCQA9wJ${recipientIndex}`,
-                    anchorUnits: "inches",
-                    anchorXOffset: "0.2",
-                    anchorYOffset: "0.5",
-                    scaleValue: "1.4",
+            signers: recipients
+              .map((r, recipientIndex) => {
+                if (r.signWithEmbeddedImageFileUploadId) {
+                  // signers with an embedded signature are not part of the signature request
+                  return null;
+                }
+                return {
+                  recipientId: (recipientIndex + 1).toString(),
+                  routingOrder:
+                    options.signingMode === "PARALLEL"
+                      ? undefined
+                      : (recipientIndex + 1).toString(),
+                  email: r.email,
+                  name: r.name,
+                  tabs: {
+                    signHereTabs: [
+                      {
+                        anchorString: `3cb39pzCQA9wJ${recipientIndex}`,
+                        anchorUnits: "inches",
+                        anchorXOffset: "0.2",
+                        anchorYOffset: "0.5",
+                        scaleValue: "1.4",
+                      },
+                    ],
                   },
-                ],
-              },
-            })),
+                };
+              })
+              .filter(isNonNullish),
           },
         } as EnvelopeDefinition,
       });

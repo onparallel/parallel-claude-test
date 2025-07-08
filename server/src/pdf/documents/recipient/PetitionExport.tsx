@@ -201,7 +201,6 @@ export default function PetitionExport({
                 isNonNullish(petition.currentSignatureRequest) ? (
                   <SignaturesBlock
                     signatureConfig={petition.currentSignatureRequest.signatureConfig}
-                    templateId={petition.fromTemplate?.id ?? null}
                   />
                 ) : null}
                 <View
@@ -600,9 +599,6 @@ PetitionExport.fragments = {
           data
         }
         ... on Petition {
-          fromTemplate {
-            id
-          }
           currentSignatureRequest {
             signatureConfig {
               ...SignaturesBlock_SignatureConfig

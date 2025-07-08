@@ -927,6 +927,7 @@ export type FeatureFlag =
   | "SETTING_DELEGATE_ACCESS"
   | "SHOW_CONTACTS_BUTTON"
   | "SIGN_WITH_DIGITAL_CERTIFICATE"
+  | "SIGN_WITH_EMBEDDED_IMAGE"
   | "SKIP_FORWARD_SECURITY"
   | "TEMPLATE_REPLIES_CSV_EXPORT_TASK"
   | "TEMPLATE_REPLIES_PREVIEW_URL";
@@ -4892,11 +4893,17 @@ export type PetitionSignatureStatusFilter =
 export type PetitionSigner = {
   contactId: Maybe<Scalars["GID"]["output"]>;
   email: Scalars["String"]["output"];
+  embeddedSignatureImage: Maybe<Scalars["JSONObject"]["output"]>;
   firstName: Scalars["String"]["output"];
   fullName: Scalars["String"]["output"];
   isPreset: Scalars["Boolean"]["output"];
   lastName: Maybe<Scalars["String"]["output"]>;
   signWithDigitalCertificate: Maybe<Scalars["Boolean"]["output"]>;
+};
+
+/** Information about a signer of the petition */
+export type PetitionSignerembeddedSignatureImageArgs = {
+  options?: InputMaybe<ImageOptions>;
 };
 
 /** The status of a petition. */
@@ -6806,6 +6813,9 @@ export type SignatureConfigInputSigner = {
   isPreset?: InputMaybe<Scalars["Boolean"]["input"]>;
   lastName?: InputMaybe<Scalars["String"]["input"]>;
   signWithDigitalCertificate?: InputMaybe<Scalars["Boolean"]["input"]>;
+  signWithEmbeddedImage?: InputMaybe<Scalars["Upload"]["input"]>;
+  /** ID of the previously uploaded image if you don't want to update current. */
+  signWithEmbeddedImageId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
 /** The signing mode of a signature config */

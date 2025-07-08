@@ -331,7 +331,6 @@ function PetitionExport2(
       ? documentSignatures(petition.currentSignatureRequest.signatureConfig, {
           intl,
           theme,
-          templateId: petition.fromTemplate?.id,
         })
       : []),
   ].join("\n");
@@ -837,9 +836,6 @@ PetitionExport2.fragments = {
           data
         }
         ... on Petition {
-          fromTemplate {
-            id
-          }
           currentSignatureRequest {
             signatureConfig {
               ...documentSignatures_SignatureConfig

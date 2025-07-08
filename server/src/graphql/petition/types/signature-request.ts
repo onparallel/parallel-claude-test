@@ -21,6 +21,7 @@ export const PetitionSignatureRequestSignerStatus = objectType({
     firstName: string;
     lastName: string;
     email: string;
+    signWithEmbeddedImageFileUploadId?: number;
     status?:
       | {
           sent_at?: Date;
@@ -38,6 +39,7 @@ export const PetitionSignatureRequestSignerStatus = objectType({
         firstName: o.firstName,
         lastName: o.lastName,
         email: o.email,
+        signWithEmbeddedImageFileUploadId: o.signWithEmbeddedImageFileUploadId ?? undefined,
       }),
     });
     t.string("status", {
