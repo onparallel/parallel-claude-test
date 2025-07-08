@@ -564,7 +564,7 @@ export default function BackgroundCheckProfile(props: BackgroundCheckProfileProp
                     <Text style={styles.boldText}>Date of birth:</Text>
                     <Text style={styles.normalText}>
                       {props.entity.properties?.dateOfBirth
-                        ?.map((date) => formatPartialDate({ date }))
+                        ?.map((date) => formatPartialDate({ date, intl }))
                         .join(" · ") ?? " - "}
                     </Text>
                   </View>
@@ -583,7 +583,7 @@ export default function BackgroundCheckProfile(props: BackgroundCheckProfileProp
                     <Text style={styles.boldText}>Date of registration:</Text>
                     <Text style={styles.normalText}>
                       {props.entity.properties?.dateOfRegistration
-                        ?.map((date) => formatPartialDate({ date }))
+                        ?.map((date) => formatPartialDate({ date, intl }))
                         .join(" · ") ?? " - "}
                     </Text>
                   </View>
@@ -689,14 +689,14 @@ export default function BackgroundCheckProfile(props: BackgroundCheckProfileProp
                       <Text style={[tableStyles.cell, tableStyles.bodyCell, tableStyles.from]}>
                         {sanction.properties?.startDate
                           ? sanction.properties.startDate
-                              .map((date) => formatPartialDate({ date }))
+                              .map((date) => formatPartialDate({ date, intl }))
                               .join(" · ")
                           : "-"}
                       </Text>
                       <Text style={[tableStyles.cell, tableStyles.bodyCell, tableStyles.to]}>
                         {sanction.properties?.endDate
                           ? sanction.properties.endDate
-                              .map((date) => formatPartialDate({ date }))
+                              .map((date) => formatPartialDate({ date, intl }))
                               .join(" · ")
                           : "-"}
                       </Text>
@@ -754,12 +754,12 @@ export default function BackgroundCheckProfile(props: BackgroundCheckProfileProp
                     </Text>
                     <Text style={[tableStyles.cell, tableStyles.bodyCell, tableStyles.from]}>
                       {relationship.properties?.startDate
-                        ?.map((date) => formatPartialDate({ date }))
+                        ?.map((date) => formatPartialDate({ date, intl }))
                         .join(" · ") ?? "-"}
                     </Text>
                     <Text style={[tableStyles.cell, tableStyles.bodyCell, tableStyles.to]}>
                       {relationship.properties?.endDate
-                        ?.map((date) => formatPartialDate({ date }))
+                        ?.map((date) => formatPartialDate({ date, intl }))
                         .join(" · ") ?? "-"}
                     </Text>
                   </View>
