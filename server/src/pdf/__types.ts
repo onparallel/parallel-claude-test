@@ -220,6 +220,7 @@ export type AutomaticNumberingType = "LETTERS" | "NUMBERS" | "ROMAN_NUMERALS";
 
 export type BackgroundCheckEntityDetails = {
   createdAt: Maybe<Scalars["DateTime"]["output"]>;
+  datasets: Maybe<Array<BackgroundCheckEntityDetailsDataset>>;
   id: Scalars["String"]["output"];
   name: Scalars["String"]["output"];
   type: Scalars["String"]["output"];
@@ -227,6 +228,7 @@ export type BackgroundCheckEntityDetails = {
 
 export type BackgroundCheckEntityDetailsCompany = BackgroundCheckEntityDetails & {
   createdAt: Maybe<Scalars["DateTime"]["output"]>;
+  datasets: Maybe<Array<BackgroundCheckEntityDetailsDataset>>;
   id: Scalars["String"]["output"];
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntityDetailsCompanyProperties;
@@ -244,8 +246,16 @@ export type BackgroundCheckEntityDetailsCompanyProperties = {
   topics: Maybe<Array<Scalars["String"]["output"]>>;
 };
 
+export type BackgroundCheckEntityDetailsDataset = {
+  name: Scalars["String"]["output"];
+  summary: Maybe<Scalars["String"]["output"]>;
+  title: Maybe<Scalars["String"]["output"]>;
+  url: Maybe<Scalars["String"]["output"]>;
+};
+
 export type BackgroundCheckEntityDetailsPerson = BackgroundCheckEntityDetails & {
   createdAt: Maybe<Scalars["DateTime"]["output"]>;
+  datasets: Maybe<Array<BackgroundCheckEntityDetailsDataset>>;
   id: Scalars["String"]["output"];
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntityDetailsPersonProperties;

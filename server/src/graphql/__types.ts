@@ -932,6 +932,7 @@ export interface NexusGenObjects {
   BackgroundCheckEntityDetailsCompany: {
     // root type
     createdAt?: NexusGenScalars["DateTime"] | null; // DateTime
+    datasets?: NexusGenRootTypes["BackgroundCheckEntityDetailsDataset"][] | null; // [BackgroundCheckEntityDetailsDataset!]
     id: string; // String!
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntityDetailsCompanyProperties"]; // BackgroundCheckEntityDetailsCompanyProperties!
@@ -948,9 +949,17 @@ export interface NexusGenObjects {
     sanctions?: NexusGenRootTypes["BackgroundCheckEntityDetailsSanction"][] | null; // [BackgroundCheckEntityDetailsSanction!]
     topics?: string[] | null; // [String!]
   };
+  BackgroundCheckEntityDetailsDataset: {
+    // root type
+    name: string; // String!
+    summary?: string | null; // String
+    title?: string | null; // String
+    url?: string | null; // String
+  };
   BackgroundCheckEntityDetailsPerson: {
     // root type
     createdAt?: NexusGenScalars["DateTime"] | null; // DateTime
+    datasets?: NexusGenRootTypes["BackgroundCheckEntityDetailsDataset"][] | null; // [BackgroundCheckEntityDetailsDataset!]
     id: string; // String!
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntityDetailsPersonProperties"]; // BackgroundCheckEntityDetailsPersonProperties!
@@ -2090,6 +2099,7 @@ export interface NexusGenFieldTypes {
   BackgroundCheckEntityDetailsCompany: {
     // field return type
     createdAt: NexusGenScalars["DateTime"] | null; // DateTime
+    datasets: NexusGenRootTypes["BackgroundCheckEntityDetailsDataset"][] | null; // [BackgroundCheckEntityDetailsDataset!]
     id: string; // String!
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntityDetailsCompanyProperties"]; // BackgroundCheckEntityDetailsCompanyProperties!
@@ -2106,9 +2116,17 @@ export interface NexusGenFieldTypes {
     sanctions: NexusGenRootTypes["BackgroundCheckEntityDetailsSanction"][] | null; // [BackgroundCheckEntityDetailsSanction!]
     topics: string[] | null; // [String!]
   };
+  BackgroundCheckEntityDetailsDataset: {
+    // field return type
+    name: string; // String!
+    summary: string | null; // String
+    title: string | null; // String
+    url: string | null; // String
+  };
   BackgroundCheckEntityDetailsPerson: {
     // field return type
     createdAt: NexusGenScalars["DateTime"] | null; // DateTime
+    datasets: NexusGenRootTypes["BackgroundCheckEntityDetailsDataset"][] | null; // [BackgroundCheckEntityDetailsDataset!]
     id: string; // String!
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntityDetailsPersonProperties"]; // BackgroundCheckEntityDetailsPersonProperties!
@@ -4947,6 +4965,7 @@ export interface NexusGenFieldTypes {
   BackgroundCheckEntityDetails: {
     // field return type
     createdAt: NexusGenScalars["DateTime"] | null; // DateTime
+    datasets: NexusGenRootTypes["BackgroundCheckEntityDetailsDataset"][] | null; // [BackgroundCheckEntityDetailsDataset!]
     id: string; // String!
     name: string; // String!
     type: string; // String!
@@ -5257,6 +5276,7 @@ export interface NexusGenFieldTypeNames {
   BackgroundCheckEntityDetailsCompany: {
     // field return type name
     createdAt: "DateTime";
+    datasets: "BackgroundCheckEntityDetailsDataset";
     id: "String";
     name: "String";
     properties: "BackgroundCheckEntityDetailsCompanyProperties";
@@ -5273,9 +5293,17 @@ export interface NexusGenFieldTypeNames {
     sanctions: "BackgroundCheckEntityDetailsSanction";
     topics: "String";
   };
+  BackgroundCheckEntityDetailsDataset: {
+    // field return type name
+    name: "String";
+    summary: "String";
+    title: "String";
+    url: "String";
+  };
   BackgroundCheckEntityDetailsPerson: {
     // field return type name
     createdAt: "DateTime";
+    datasets: "BackgroundCheckEntityDetailsDataset";
     id: "String";
     name: "String";
     properties: "BackgroundCheckEntityDetailsPersonProperties";
@@ -8112,6 +8140,7 @@ export interface NexusGenFieldTypeNames {
   BackgroundCheckEntityDetails: {
     // field return type name
     createdAt: "DateTime";
+    datasets: "BackgroundCheckEntityDetailsDataset";
     id: "String";
     name: "String";
     type: "String";

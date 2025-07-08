@@ -212,6 +212,16 @@ export const BackgroundCheckEntityDetailsRelationship = objectType({
   },
 });
 
+export const BackgroundCheckEntityDetailsDataset = objectType({
+  name: "BackgroundCheckEntityDetailsDataset",
+  definition(t) {
+    t.nonNull.string("name");
+    t.nullable.string("title");
+    t.nullable.string("summary");
+    t.nullable.string("url");
+  },
+});
+
 export const BackgroundCheckEntityDetailsPerson = objectType({
   name: "BackgroundCheckEntityDetailsPerson",
   definition(t) {
@@ -278,6 +288,9 @@ export const BackgroundCheckEntityDetails = interfaceType({
     t.nonNull.string("id");
     t.nonNull.string("type");
     t.nonNull.string("name");
+    t.nullable.list.nonNull.field("datasets", {
+      type: "BackgroundCheckEntityDetailsDataset",
+    });
     t.nullable.datetime("createdAt");
   },
   resolveType: (o) => {

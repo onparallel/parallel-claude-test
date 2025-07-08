@@ -1,8 +1,15 @@
-import { useIntl } from "react-intl";
+import { IntlShape } from "react-intl";
 import { FORMATS } from "../../util/dates";
 
-export function formatPartialDate({ date, separator = "-" }: { date: string; separator?: string }) {
-  const intl = useIntl();
+export function formatPartialDate({
+  date,
+  separator = "-",
+  intl,
+}: {
+  date: string;
+  separator?: string;
+  intl: IntlShape;
+}) {
   const splittedDate = date.split(separator).map((d) => parseInt(d));
 
   if (splittedDate.length === 1) {

@@ -9,14 +9,14 @@ import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { usePreviewPetitionFieldBackgroundCheckReplaceReplyDialog } from "@parallel/components/petition-preview/dialogs/PreviewPetitionFieldBackgroundCheckReplaceReplyDialog";
 import { BackgroundCheckEntityDetailsCompanyBasic } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsCompanyBasic";
 import { BackgroundCheckEntityDetailsCompanyOverview } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsCompanyOverview";
+import { BackgroundCheckEntityDetailsDatasets } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsDatasets";
 import { BackgroundCheckEntityDetailsPersonBasic } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsPersonBasic";
 import { BackgroundCheckEntityDetailsPersonOverview } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsPersonOverview";
 import { BackgroundCheckEntityDetailsRelationships } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsRelationships";
 import { BackgroundCheckEntityDetailsSanctions } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsSanctions";
 import {
   BackgroundCheckEntitySearchType,
-  BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompanyFragment,
-  BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPersonFragment,
+  BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragment,
   BackgroundCheckProfileDetails_backgroundCheckEntityDetailsDocument,
   BackgroundCheckProfileDetails_updateBackgroundCheckEntityDocument,
 } from "@parallel/graphql/__types";
@@ -34,15 +34,6 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-
-type BackgroundCheckProfileDetails_Selection = { createdAt: string } & (
-  | ({
-      type: "Person";
-    } & BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPersonFragment)
-  | ({
-      type: "Company";
-    } & BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompanyFragment)
-);
 
 function BackgroundCheckProfileDetails({
   entityId,
@@ -93,7 +84,8 @@ function BackgroundCheckProfileDetails({
     showGenericErrorToast();
   }
 
-  const details = data?.backgroundCheckEntityDetails as BackgroundCheckProfileDetails_Selection;
+  const details =
+    data?.backgroundCheckEntityDetails as BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragment;
 
   useInterval(
     () => {
@@ -237,7 +229,7 @@ function BackgroundCheckProfileDetails({
             </Box>
           </HStack>
 
-          {loading || !details ? (
+          {loading || !details || !details.createdAt ? (
             <Skeleton height="18px" width="280px" />
           ) : (
             <Text>
@@ -321,34 +313,34 @@ function BackgroundCheckProfileDetails({
           </>
         ) : (
           <>
-            {details.type === "Company" ? (
-              <BackgroundCheckEntityDetailsCompanyBasic
-                hasReply={isSaved}
-                isReadOnly={isReadOnly || isTemplate}
-                isDeleting={isDeletingReply}
-                isSaving={isSavingProfile}
-                onDelete={handleDeleteClick}
-                onDownloadPDF={handleDownloadPDFClick}
-                onSave={handleSaveClick}
-                data={details}
-              />
-            ) : details.type === "Person" ? (
-              <BackgroundCheckEntityDetailsPersonBasic
-                hasReply={isSaved}
-                isReadOnly={isReadOnly || isTemplate}
-                isDeleting={isDeletingReply}
-                isSaving={isSavingProfile}
-                onDelete={handleDeleteClick}
-                onDownloadPDF={handleDownloadPDFClick}
-                onSave={handleSaveClick}
-                data={details}
-              />
-            ) : null}
-
-            {details.type === "Company" ? (
-              <BackgroundCheckEntityDetailsCompanyOverview overview={details} />
-            ) : details.type === "Person" ? (
-              <BackgroundCheckEntityDetailsPersonOverview overview={details} />
+            {details.__typename === "BackgroundCheckEntityDetailsCompany" ? (
+              <>
+                <BackgroundCheckEntityDetailsCompanyBasic
+                  hasReply={isSaved}
+                  isReadOnly={isReadOnly || isTemplate}
+                  isDeleting={isDeletingReply}
+                  isSaving={isSavingProfile}
+                  onDelete={handleDeleteClick}
+                  onDownloadPDF={handleDownloadPDFClick}
+                  onSave={handleSaveClick}
+                  data={details}
+                />
+                <BackgroundCheckEntityDetailsCompanyOverview overview={details} />
+              </>
+            ) : details.__typename === "BackgroundCheckEntityDetailsPerson" ? (
+              <>
+                <BackgroundCheckEntityDetailsPersonBasic
+                  hasReply={isSaved}
+                  isReadOnly={isReadOnly || isTemplate}
+                  isDeleting={isDeletingReply}
+                  isSaving={isSavingProfile}
+                  onDelete={handleDeleteClick}
+                  onDownloadPDF={handleDownloadPDFClick}
+                  onSave={handleSaveClick}
+                  data={details}
+                />
+                <BackgroundCheckEntityDetailsPersonOverview overview={details} />
+              </>
             ) : null}
 
             {isNonNullish(details.properties.sanctions) ? (
@@ -360,6 +352,10 @@ function BackgroundCheckProfileDetails({
                 entityId={entityId}
                 relationships={details.properties.relationships}
               />
+            ) : null}
+
+            {isNonNullish(details.datasets) ? (
+              <BackgroundCheckEntityDetailsDatasets datasets={details.datasets} />
             ) : null}
           </>
         )}
@@ -428,6 +424,28 @@ const _fragments = {
       ${BackgroundCheckEntityDetailsSanctions.fragments.BackgroundCheckEntityDetailsSanction}
     `;
   },
+  get BackgroundCheckEntityDetails() {
+    return gql`
+      fragment BackgroundCheckProfileDetails_BackgroundCheckEntityDetails on BackgroundCheckEntityDetails {
+        id
+        type
+        name
+        ... on BackgroundCheckEntityDetailsPerson {
+          ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPerson
+        }
+        ... on BackgroundCheckEntityDetailsCompany {
+          ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompany
+        }
+        datasets {
+          ...BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDataset
+        }
+        createdAt
+      }
+      ${BackgroundCheckEntityDetailsDatasets.fragments.BackgroundCheckEntityDetailsDataset}
+      ${this.BackgroundCheckEntityDetailsPerson}
+      ${this.BackgroundCheckEntityDetailsCompany}
+    `;
+  },
 };
 
 const _queries = [
@@ -446,20 +464,10 @@ const _queries = [
       $entityId: String!
     ) {
       backgroundCheckEntityDetails(token: $token, entityId: $entityId) {
-        id
-        type
-        name
-        ... on BackgroundCheckEntityDetailsPerson {
-          ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPerson
-        }
-        ... on BackgroundCheckEntityDetailsCompany {
-          ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompany
-        }
-        createdAt
+        ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetails
       }
     }
-    ${_fragments.BackgroundCheckEntityDetailsPerson}
-    ${_fragments.BackgroundCheckEntityDetailsCompany}
+    ${_fragments.BackgroundCheckEntityDetails}
   `,
 ];
 

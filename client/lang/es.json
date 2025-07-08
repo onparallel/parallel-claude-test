@@ -650,6 +650,26 @@
     "context": "Overview"
   },
   {
+    "term": "component.background-check-entity-details-datasets.data-sources",
+    "definition": "Fuentes de datos",
+    "context": "Data sources"
+  },
+  {
+    "term": "component.background-check-entity-details-datasets.description",
+    "definition": "Descripción",
+    "context": "Description"
+  },
+  {
+    "term": "component.background-check-entity-details-datasets.no-data-sources-found-message",
+    "definition": "No hemos encontrado ninguna fuente de datos para esta entidad.",
+    "context": "We have not found any data sources for this entity."
+  },
+  {
+    "term": "component.background-check-entity-details-datasets.source",
+    "definition": "Fuente",
+    "context": "Source"
+  },
+  {
     "term": "component.background-check-entity-details-person-basic.country",
     "definition": "País",
     "context": "Country"

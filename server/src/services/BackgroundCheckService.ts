@@ -75,6 +75,13 @@ export interface EntityDetailsRelationship {
   };
 }
 
+export interface DatasetDetails {
+  name: string;
+  title: string | null;
+  summary: string | null;
+  url: string | null;
+}
+
 export interface EntityDetailsPerson {
   id: string;
   type: "Person";
@@ -97,6 +104,7 @@ export interface EntityDetailsPerson {
     sanctions?: EntityDetailsSanction[];
     relationships?: EntityDetailsRelationship[];
   };
+  datasets?: DatasetDetails[];
 }
 
 export interface EntityDetailsCompany {
@@ -113,6 +121,7 @@ export interface EntityDetailsCompany {
     sanctions?: EntityDetailsSanction[];
     relationships?: EntityDetailsRelationship[];
   };
+  datasets?: DatasetDetails[];
 }
 
 export type EntityDetailsResponse = (EntityDetailsPerson | EntityDetailsCompany) & {

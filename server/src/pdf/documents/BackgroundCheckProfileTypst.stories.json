@@ -141,7 +141,21 @@
                                 }
                             }
                         ]
-                    }
+                    },
+                    "datasets": [
+                        {
+                            "name": "ua_nsdc_sanctions",
+                            "title": "Ukraine NSDC State Register of Sanctions",
+                            "summary": "List of individuals and legal entities subject to restrictive measures.",
+                            "url": "https://drs.nsdc.gov.ua/"
+                        },
+                        {
+                            "name": "ua_nsdc_sanctions_no_url",
+                            "title": "Ukraine NSDC State Register of Sanctions no URL",
+                            "summary": "List of individuals and legal entities subject to restrictive measures no URL.",
+                            "url": "null"
+                        }
+                    ]
                 },
                 "query": {
                     "name": "Vladimir Putin",

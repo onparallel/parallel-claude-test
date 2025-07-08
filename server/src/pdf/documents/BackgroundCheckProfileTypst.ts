@@ -1,6 +1,6 @@
 import { outdent } from "outdent";
 import { IntlShape } from "react-intl";
-import { isNullish, unique } from "remeda";
+import { isNonNullish, isNullish, unique } from "remeda";
 import {
   EntityDetailsResponse,
   EntitySearchRequest,
@@ -311,9 +311,9 @@ function formatListOfTexts(values?: string[]): string {
   return values?.join(" · ") ?? " - ";
 }
 
-function formatDate(date: string): string {
+function formatDate(date: string, intl: IntlShape): string {
   try {
-    return formatPartialDate({ date });
+    return formatPartialDate({ date, intl });
   } catch {
     return date;
   }
@@ -362,10 +362,10 @@ function BackgroundCheckProfileTypst(props: BackgroundCheckProfileProps, intl: I
       #item("Gender", [#capitalize("${formatListOfTexts((props.entity.properties as any)?.gender)}")])
       #item("Nationality", "${(props.entity.properties as any)?.nationality?.map((n: string) => COUNTRIES[n]).join(" · ") ?? " - "}")
       #item("Country", "${(props.entity.properties as any)?.country?.map((c: string) => COUNTRIES[c]).join(" · ") ?? " - "}")
-      #item("Date of birth", "${(props.entity.properties as any)?.dateOfBirth?.map((date: string) => formatDate(date)).join(" · ") ?? " - "}")`
+      #item("Date of birth", "${(props.entity.properties as any)?.dateOfBirth?.map((date: string) => formatDate(date, intl)).join(" · ") ?? " - "}")`
           : outdent`
       #item("Jurisdiction", "${(props.entity.properties as any)?.jurisdiction?.map((n: string) => COUNTRIES[n]).join(" · ") ?? " - "}")
-      #item("Date of registration", "${(props.entity.properties as any)?.dateOfRegistration?.map((date: string) => formatDate(date)).join(" · ") ?? " - "}")`
+      #item("Date of registration", "${(props.entity.properties as any)?.dateOfRegistration?.map((date: string) => formatDate(date, intl)).join(" · ") ?? " - "}")`
       }
   `
       : "";
@@ -399,20 +399,27 @@ function BackgroundCheckProfileTypst(props: BackgroundCheckProfileProps, intl: I
   const sanctionsTable = props.entity.properties.sanctions?.length
     ? outdent`
     #table(
-      columns: (30%, 40%, 15%, 15%),
-      [List Name / Authority], [Program], [From], [To],
+      columns: (30%, 30%, 10%, 15%, 15%),
+      [List Name / Authority], [Program], [Sources], [From], [To],
       ${props.entity.properties.sanctions
         ?.map((sanction) => {
           const authority = sanction.properties?.authority?.join(" · ") ?? "-";
           const datasets = sanction.datasets?.map((d) => d.title).join(" · ") || null;
           const combinedAuthority = [datasets, authority].filter(Boolean).join(" / ");
           const program = formatListOfTexts(sanction.properties?.program);
+          const sources =
+            sanction.properties?.sourceUrl
+              ?.map(
+                (url, index) => `#link("${url}")[#text(fill: rgb(77, 71, 198))[[${index + 1}]]]`,
+              )
+              .join("") ?? "-";
           const startDate =
-            sanction.properties?.startDate?.map((date) => formatDate(date)).join(" · ") ?? "-";
+            sanction.properties?.startDate?.map((date) => formatDate(date, intl)).join(" · ") ??
+            "-";
           const endDate =
-            sanction.properties?.endDate?.map((date) => formatDate(date)).join(" · ") ?? "-";
+            sanction.properties?.endDate?.map((date) => formatDate(date, intl)).join(" · ") ?? "-";
 
-          return outdent`[${combinedAuthority}], [${program}], [${startDate}], [${endDate}],`;
+          return outdent`[${combinedAuthority}], [${program}], [${sources}], [${startDate}], [${endDate}],`;
         })
         .join("")}
     )
@@ -425,7 +432,6 @@ function BackgroundCheckProfileTypst(props: BackgroundCheckProfileProps, intl: I
   `;
 
   // Generate relationships table
-  console.log(props.entity.properties.relationships?.map((r) => r.properties?.relationship));
   const relationshipsTable = props.entity.properties?.relationships?.length
     ? outdent`
     #table(
@@ -443,9 +449,11 @@ function BackgroundCheckProfileTypst(props: BackgroundCheckProfileProps, intl: I
           );
           const relation = formatListOfTexts(relationships);
           const startDate =
-            relationship.properties?.startDate?.map((date) => formatDate(date)).join(" · ") ?? "-";
+            relationship.properties?.startDate?.map((date) => formatDate(date, intl)).join(" · ") ??
+            "-";
           const endDate =
-            relationship.properties?.endDate?.map((date) => formatDate(date)).join(" · ") ?? "-";
+            relationship.properties?.endDate?.map((date) => formatDate(date, intl)).join(" · ") ??
+            "-";
 
           return `[${name}], [${type}], [${relation}], [${startDate}], [${endDate}],`;
         })
@@ -457,6 +465,20 @@ function BackgroundCheckProfileTypst(props: BackgroundCheckProfileProps, intl: I
     #line(length: 100%, stroke: (thickness: 0.32mm, paint: rgb("#E2E8F0")))
     #v(2pt)
     #text(size: 9pt)[We have not found any relevant relationship for this entity.]
+  `;
+
+  const datasetsTable = outdent`
+    #table(
+      columns: (30%, 70%),
+      [Source], [Description],
+      ${props.entity.datasets?.map((dataset) => {
+        const sourceText =
+          isNonNullish(dataset.url) && dataset.url !== "null"
+            ? `#link("${dataset.url}")[#text(fill: rgb(77, 71, 198))[#underline[${dataset.title}]]]`
+            : dataset.title;
+        return outdent`[${sourceText}], [${dataset.summary}]`;
+      })}
+    )
   `;
 
   return outdent`
@@ -609,6 +631,19 @@ function BackgroundCheckProfileTypst(props: BackgroundCheckProfileProps, intl: I
     #text(size: 10.5pt, weight: 600)[Relationships (${props.entity.properties.relationships?.length ?? 0})]
     #v(-6pt)
     ${relationshipsTable}
+    `
+        : ""
+    }
+
+    ${
+      isNonNullish(props.entity.datasets)
+        ? outdent`
+    #v(12pt)  
+    
+    // Data sources
+    #text(size: 10.5pt, weight: 600)[Data sources (${props.entity.datasets?.length ?? 0})]
+    #v(-6pt)
+    ${datasetsTable}
     `
         : ""
     }

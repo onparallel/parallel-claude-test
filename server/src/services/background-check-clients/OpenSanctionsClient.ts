@@ -2,6 +2,7 @@ import { inject, injectable } from "inversify";
 import { isNonNullish } from "remeda";
 import { CONFIG, Config } from "../../config";
 import {
+  DatasetDetails,
   EntityDetailsCompany,
   EntityDetailsPerson,
   EntityDetailsRelationship,
@@ -42,6 +43,7 @@ interface OpenSanctionsPersonSchema {
     directorshipDirector?: OpenSanctionsDirectorshipDirectorSchema[];
     sanctions?: OpenSanctionsSanctionSchema[];
   };
+  datasets?: string[];
 }
 
 interface OpenSanctionsAssociationSchema {
@@ -125,6 +127,7 @@ interface OpenSanctionsCompanySchema {
     sanctions?: OpenSanctionsSanctionSchema[];
     directorshipOrganization?: OpenSanctionsDirectorshipOrganizationSchema[];
   };
+  datasets?: string[];
 }
 
 interface OpenSanctionsDirectorshipDirectorSchema {
@@ -172,11 +175,11 @@ interface DatasetSchema {
   name: string;
   title: string;
   summary: string;
-  url: string;
+  url: string | null;
   load: boolean;
-  entities_url: string;
-  version: string;
-  index_version: string;
+  entities_url: string | null;
+  version: string | null;
+  index_version: string | null;
   index_current: boolean;
   children: string[];
 }
@@ -354,6 +357,7 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
           .filter(this.isSanctionSchema)
           .map((sanction) => this.mapSanction(sanction, catalogData)),
       },
+      datasets: data.datasets?.map((name) => this.mapDataset(name, catalogData)),
       createdAt: new Date(),
     };
   }
@@ -386,6 +390,7 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
           .filter(this.isSanctionSchema)
           .map((sanction) => this.mapSanction(sanction, catalogData)),
       },
+      datasets: data.datasets?.map((name) => this.mapDataset(name, catalogData)),
       createdAt: new Date(),
     };
   }
@@ -570,6 +575,16 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
         endDate: data.properties.endDate,
         sourceUrl: data.properties.sourceUrl,
       },
+    };
+  }
+
+  private mapDataset(name: string, catalogData: CatalogDataSchema): DatasetDetails {
+    const dataset = catalogData.datasets.find((d) => d.name === name);
+    return {
+      name,
+      summary: dataset?.summary ?? null,
+      title: dataset?.title ?? null,
+      url: dataset?.url ?? null,
     };
   }
 }

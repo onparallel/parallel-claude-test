@@ -237,6 +237,7 @@ export type AutomaticNumberingType = "LETTERS" | "NUMBERS" | "ROMAN_NUMERALS";
 
 export interface BackgroundCheckEntityDetails {
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
+  datasets?: Maybe<Array<BackgroundCheckEntityDetailsDataset>>;
   id: Scalars["String"]["output"];
   name: Scalars["String"]["output"];
   type: Scalars["String"]["output"];
@@ -245,6 +246,7 @@ export interface BackgroundCheckEntityDetails {
 export interface BackgroundCheckEntityDetailsCompany extends BackgroundCheckEntityDetails {
   __typename?: "BackgroundCheckEntityDetailsCompany";
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
+  datasets?: Maybe<Array<BackgroundCheckEntityDetailsDataset>>;
   id: Scalars["String"]["output"];
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntityDetailsCompanyProperties;
@@ -263,9 +265,18 @@ export interface BackgroundCheckEntityDetailsCompanyProperties {
   topics?: Maybe<Array<Scalars["String"]["output"]>>;
 }
 
+export interface BackgroundCheckEntityDetailsDataset {
+  __typename?: "BackgroundCheckEntityDetailsDataset";
+  name: Scalars["String"]["output"];
+  summary?: Maybe<Scalars["String"]["output"]>;
+  title?: Maybe<Scalars["String"]["output"]>;
+  url?: Maybe<Scalars["String"]["output"]>;
+}
+
 export interface BackgroundCheckEntityDetailsPerson extends BackgroundCheckEntityDetails {
   __typename?: "BackgroundCheckEntityDetailsPerson";
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
+  datasets?: Maybe<Array<BackgroundCheckEntityDetailsDataset>>;
   id: Scalars["String"]["output"];
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntityDetailsPersonProperties;
@@ -30201,6 +30212,14 @@ export type BackgroundCheckEntityDetailsCompanyOverview_BackgroundCheckEntityDet
     };
   };
 
+export type BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDatasetFragment = {
+  __typename?: "BackgroundCheckEntityDetailsDataset";
+  name: string;
+  title?: string | null;
+  summary?: string | null;
+  url?: string | null;
+};
+
 export type BackgroundCheckEntityDetailsPersonBasic_BackgroundCheckEntityDetailsPersonFragment = {
   __typename?: "BackgroundCheckEntityDetailsPerson";
   id: string;
@@ -44187,6 +44206,180 @@ export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompanyFra
   };
 };
 
+export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetails_BackgroundCheckEntityDetailsCompany_Fragment =
+  {
+    __typename?: "BackgroundCheckEntityDetailsCompany";
+    id: string;
+    type: string;
+    name: string;
+    createdAt?: string | null;
+    datasets?: Array<{
+      __typename?: "BackgroundCheckEntityDetailsDataset";
+      name: string;
+      title?: string | null;
+      summary?: string | null;
+      url?: string | null;
+    }> | null;
+    properties: {
+      __typename?: "BackgroundCheckEntityDetailsCompanyProperties";
+      dateOfRegistration?: Array<string> | null;
+      topics?: Array<string> | null;
+      jurisdiction?: Array<string> | null;
+      name?: Array<string> | null;
+      alias?: Array<string> | null;
+      address?: Array<string> | null;
+      relationships?: Array<{
+        __typename?: "BackgroundCheckEntityDetailsRelationship";
+        id: string;
+        type: string;
+        properties: {
+          __typename?: "BackgroundCheckEntityDetailsRelationshipProperties";
+          startDate?: Array<string> | null;
+          endDate?: Array<string> | null;
+          relationship?: Array<string> | null;
+          entityA?:
+            | {
+                __typename?: "BackgroundCheckEntityDetailsCompany";
+                id: string;
+                name: string;
+                type: string;
+              }
+            | {
+                __typename?: "BackgroundCheckEntityDetailsPerson";
+                id: string;
+                name: string;
+                type: string;
+              }
+            | null;
+          entityB?:
+            | {
+                __typename?: "BackgroundCheckEntityDetailsCompany";
+                id: string;
+                name: string;
+                type: string;
+              }
+            | {
+                __typename?: "BackgroundCheckEntityDetailsPerson";
+                id: string;
+                name: string;
+                type: string;
+              }
+            | null;
+        };
+      }> | null;
+      sanctions?: Array<{
+        __typename?: "BackgroundCheckEntityDetailsSanction";
+        id: string;
+        type: string;
+        datasets?: Array<{
+          __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+          title: string;
+        }> | null;
+        properties: {
+          __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
+          authority?: Array<string> | null;
+          startDate?: Array<string> | null;
+          endDate?: Array<string> | null;
+          program?: Array<string> | null;
+          sourceUrl?: Array<string> | null;
+        };
+      }> | null;
+    };
+  };
+
+export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetails_BackgroundCheckEntityDetailsPerson_Fragment =
+  {
+    __typename?: "BackgroundCheckEntityDetailsPerson";
+    id: string;
+    type: string;
+    name: string;
+    createdAt?: string | null;
+    datasets?: Array<{
+      __typename?: "BackgroundCheckEntityDetailsDataset";
+      name: string;
+      title?: string | null;
+      summary?: string | null;
+      url?: string | null;
+    }> | null;
+    properties: {
+      __typename?: "BackgroundCheckEntityDetailsPersonProperties";
+      country?: Array<string> | null;
+      countryOfBirth?: Array<string> | null;
+      dateOfBirth?: Array<string> | null;
+      gender?: Array<string> | null;
+      nationality?: Array<string> | null;
+      topics?: Array<string> | null;
+      alias?: Array<string> | null;
+      birthPlace?: Array<string> | null;
+      education?: Array<string> | null;
+      ethnicity?: Array<string> | null;
+      name?: Array<string> | null;
+      position?: Array<string> | null;
+      religion?: Array<string> | null;
+      status?: Array<string> | null;
+      relationships?: Array<{
+        __typename?: "BackgroundCheckEntityDetailsRelationship";
+        id: string;
+        type: string;
+        properties: {
+          __typename?: "BackgroundCheckEntityDetailsRelationshipProperties";
+          startDate?: Array<string> | null;
+          endDate?: Array<string> | null;
+          relationship?: Array<string> | null;
+          entityA?:
+            | {
+                __typename?: "BackgroundCheckEntityDetailsCompany";
+                id: string;
+                name: string;
+                type: string;
+              }
+            | {
+                __typename?: "BackgroundCheckEntityDetailsPerson";
+                id: string;
+                name: string;
+                type: string;
+              }
+            | null;
+          entityB?:
+            | {
+                __typename?: "BackgroundCheckEntityDetailsCompany";
+                id: string;
+                name: string;
+                type: string;
+              }
+            | {
+                __typename?: "BackgroundCheckEntityDetailsPerson";
+                id: string;
+                name: string;
+                type: string;
+              }
+            | null;
+        };
+      }> | null;
+      sanctions?: Array<{
+        __typename?: "BackgroundCheckEntityDetailsSanction";
+        id: string;
+        type: string;
+        datasets?: Array<{
+          __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+          title: string;
+        }> | null;
+        properties: {
+          __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
+          authority?: Array<string> | null;
+          startDate?: Array<string> | null;
+          endDate?: Array<string> | null;
+          program?: Array<string> | null;
+          sourceUrl?: Array<string> | null;
+        };
+      }> | null;
+    };
+  };
+
+export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragment =
+  | BackgroundCheckProfileDetails_BackgroundCheckEntityDetails_BackgroundCheckEntityDetailsCompany_Fragment
+  | BackgroundCheckProfileDetails_BackgroundCheckEntityDetails_BackgroundCheckEntityDetailsPerson_Fragment;
+
 export type BackgroundCheckProfileDetails_petitionFieldQueryVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   petitionFieldId: Scalars["GID"]["input"];
@@ -44218,6 +44411,13 @@ export type BackgroundCheckProfileDetails_backgroundCheckEntityDetailsQuery = {
         type: string;
         name: string;
         createdAt?: string | null;
+        datasets?: Array<{
+          __typename?: "BackgroundCheckEntityDetailsDataset";
+          name: string;
+          title?: string | null;
+          summary?: string | null;
+          url?: string | null;
+        }> | null;
         properties: {
           __typename?: "BackgroundCheckEntityDetailsCompanyProperties";
           dateOfRegistration?: Array<string> | null;
@@ -44290,6 +44490,13 @@ export type BackgroundCheckProfileDetails_backgroundCheckEntityDetailsQuery = {
         type: string;
         name: string;
         createdAt?: string | null;
+        datasets?: Array<{
+          __typename?: "BackgroundCheckEntityDetailsDataset";
+          name: string;
+          title?: string | null;
+          summary?: string | null;
+          url?: string | null;
+        }> | null;
         properties: {
           __typename?: "BackgroundCheckEntityDetailsPersonProperties";
           country?: Array<string> | null;
@@ -74359,6 +74566,41 @@ export const BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompanyFr
   BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompanyFragment,
   unknown
 >;
+export const BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDatasetFragmentDoc =
+  gql`
+    fragment BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDataset on BackgroundCheckEntityDetailsDataset {
+      name
+      title
+      summary
+      url
+    }
+  ` as unknown as DocumentNode<
+    BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDatasetFragment,
+    unknown
+  >;
+export const BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragmentDoc = gql`
+  fragment BackgroundCheckProfileDetails_BackgroundCheckEntityDetails on BackgroundCheckEntityDetails {
+    id
+    type
+    name
+    ... on BackgroundCheckEntityDetailsPerson {
+      ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPerson
+    }
+    ... on BackgroundCheckEntityDetailsCompany {
+      ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompany
+    }
+    datasets {
+      ...BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDataset
+    }
+    createdAt
+  }
+  ${BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPersonFragmentDoc}
+  ${BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompanyFragmentDoc}
+  ${BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDatasetFragmentDoc}
+` as unknown as DocumentNode<
+  BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragment,
+  unknown
+>;
 export const BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchemaFragmentDoc = gql`
   fragment BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema on BackgroundCheckEntitySearchSchema {
     id
@@ -84837,20 +85079,10 @@ export const BackgroundCheckProfileDetails_backgroundCheckEntityDetailsDocument 
     $entityId: String!
   ) {
     backgroundCheckEntityDetails(token: $token, entityId: $entityId) {
-      id
-      type
-      name
-      ... on BackgroundCheckEntityDetailsPerson {
-        ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPerson
-      }
-      ... on BackgroundCheckEntityDetailsCompany {
-        ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompany
-      }
-      createdAt
+      ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetails
     }
   }
-  ${BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPersonFragmentDoc}
-  ${BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompanyFragmentDoc}
+  ${BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragmentDoc}
 ` as unknown as DocumentNode<
   BackgroundCheckProfileDetails_backgroundCheckEntityDetailsQuery,
   BackgroundCheckProfileDetails_backgroundCheckEntityDetailsQueryVariables
