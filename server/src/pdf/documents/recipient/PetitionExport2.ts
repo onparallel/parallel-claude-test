@@ -675,7 +675,9 @@ function fieldDescription(
               ? times(Math.max(0, (t.raw.match(/\n/g)?.length ?? 1) - 2), () => "#linebreak()")
               : t.type === "hr"
                 ? [
+                    "#v(-16pt)",
                     '#line(length: 100%, stroke: 1pt + rgb("#e2e8f0"))',
+                    "#v(-16pt)",
                     ...trailingNewLines({ raw: t.raw }),
                   ]
                 : `#text(${JSON.stringify(JSON.stringify(t))})`,
