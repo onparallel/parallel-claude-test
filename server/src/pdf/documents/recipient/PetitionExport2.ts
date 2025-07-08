@@ -672,7 +672,7 @@ function fieldDescription(
           : t.type === "table"
             ? [...mdTable({ token: t as Tokens.Table }), ...trailingNewLines({ raw: t.raw })]
             : t.type === "space"
-              ? times((t.raw.match(/\n/g)?.length ?? 1) - 2, () => "#linebreak()")
+              ? times(Math.max(0, (t.raw.match(/\n/g)?.length ?? 1) - 2), () => "#linebreak()")
               : t.type === "hr"
                 ? [
                     '#line(length: 100%, stroke: 1pt + rgb("#e2e8f0"))',
@@ -738,7 +738,7 @@ function mdList({ token }: { token: Tokens.List }) {
               ? [
                   "",
                   ...times(
-                    (t.raw.match(/\n/g)?.length ?? 1) - 2,
+                    Math.max(0, (t.raw.match(/\n/g)?.length ?? 1) - 2),
                     () => "  ".repeat(level + 1) + "#linebreak()",
                   ),
                 ]
@@ -751,7 +751,7 @@ function mdList({ token }: { token: Tokens.List }) {
 }
 
 function mdTable({ token }: { token: Tokens.Table }) {
-  const columns = token.header.length;
+  const columns = Math.max(1, token.header.length);
   return outdent`
     #table(
       columns: (${times(columns, () => "1fr").join(", ")}),
@@ -764,7 +764,7 @@ function mdTable({ token }: { token: Tokens.Table }) {
 
 function trailingNewLines({ raw }: { raw: string }) {
   const newLines = raw.match(/\n+$/)?.[0].match(/\n/g)?.length ?? 1;
-  return newLines === 1 ? [] : times(newLines - 1, () => "#linebreak()");
+  return newLines === 1 ? [] : times(Math.max(0, newLines - 1), () => "#linebreak()");
 }
 
 function groupFieldsByPages<T extends PetitionExport2_PetitionBaseFragment>(
