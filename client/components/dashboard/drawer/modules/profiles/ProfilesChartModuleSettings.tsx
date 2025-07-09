@@ -62,7 +62,7 @@ export function ProfilesChartModuleSettings({
             <Radio value="2">
               <FormattedMessage
                 id="component.petitions-chart-module-settings.from-profile-type-field-chart-items"
-                defaultMessage="From profile type field"
+                defaultMessage="From profile property"
               />
             </Radio>
           </Stack>
@@ -88,10 +88,9 @@ export function ProfilesChartModuleSettings({
               render={({ field: { onChange, value } }) => (
                 <ProfileTypeFieldSelect
                   value={profileTypeFields.find((f) => f.id === value) as any}
-                  fields={profileTypeFields.filter((f) => f.type === "SELECT")}
-                  onChange={(v) => {
-                    onChange(v?.id);
-                  }}
+                  fields={profileTypeFields}
+                  filterFields={(f) => f.type === "SELECT"}
+                  onChange={(v) => onChange(v?.id)}
                 />
               )}
             />

@@ -8551,8 +8551,8 @@
   },
   {
     "term": "component.petitions-chart-module-settings.from-profile-type-field-chart-items",
-    "definition": "Desde campo de tipo de perfil",
-    "context": "From profile type field"
+    "definition": "Desde propiedad de perfil",
+    "context": "From profile property"
   },
   {
     "term": "component.petitions-chart-module-settings.item-color",
