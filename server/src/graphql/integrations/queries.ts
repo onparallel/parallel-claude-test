@@ -222,10 +222,10 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
         isNonNullish(reply) &&
         isNonNullish(reply.content.search) &&
         reply.content.query.name === query.name &&
-        reply.content.query.date === query.date &&
-        reply.content.query.type === query.type &&
-        reply.content.query.country === query.country &&
-        reply.content.query.birthCountry === query.birthCountry
+        (reply.content.query.date ?? null) === query.date &&
+        (reply.content.query.type ?? null) === query.type &&
+        (reply.content.query.country ?? null) === query.country &&
+        (reply.content.query.birthCountry ?? null) === query.birthCountry
       ) {
         // i found a reply and it matches the search criteria, return it
         return reply.content.search as EntitySearchResponse;
@@ -294,10 +294,10 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
         isNonNullish(profileFieldValue) &&
         isNonNullish(profileFieldValue.content.search) &&
         profileFieldValue.content.query.name === query.name &&
-        profileFieldValue.content.query.date === query.date &&
-        profileFieldValue.content.query.type === query.type &&
-        profileFieldValue.content.query.country === query.country &&
-        profileFieldValue.content.query.birthCountry === query.birthCountry
+        (profileFieldValue.content.query.date ?? null) === query.date &&
+        (profileFieldValue.content.query.type ?? null) === query.type &&
+        (profileFieldValue.content.query.country ?? null) === query.country &&
+        (profileFieldValue.content.query.birthCountry ?? null) === query.birthCountry
       ) {
         // i found a pfv and it matches the search criteria, return it
         return profileFieldValue.content.search as EntitySearchResponse;
