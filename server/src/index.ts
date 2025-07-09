@@ -5,6 +5,7 @@ import { ApolloServer, ApolloServerPlugin } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginLandingPageDisabled } from "@apollo/server/plugin/disabled";
 import chalk from "chalk";
+import compression from "compression";
 import cookieParser from "cookie-parser";
 import express, { json } from "express";
 import graphqlUploadExpress from "graphql-upload/graphqlUploadExpress.js";
@@ -142,6 +143,11 @@ if (process.env.TS_NODE_DEV) {
     .use(
       "/graphql",
       cors.handler(),
+      compression({
+        threshold: "1mb",
+        // TODO: remove this after testing
+        filter: (req) => req.headers["origin"] === "https://admin.onparallel.com",
+      }),
       json({ limit: "2mb" }),
       graphqlUploadExpress(),
       expressMiddleware(server, {
