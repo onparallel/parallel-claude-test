@@ -84,5 +84,6 @@ echo "name: ${HOSTNAME}"
 cat .ssh/id_ed25519.pub
 echo ">>>>>>"
 read -rp "Enter when done"
-
 git clone git@github.com:onparallel/parallel.git
+
+echo ">>>>>> Go to https://login.tailscale.com/admin/machines/new-linux and enter install script"
