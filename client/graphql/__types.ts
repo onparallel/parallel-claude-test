@@ -353,6 +353,7 @@ export interface BackgroundCheckEntitySearchCompany extends BackgroundCheckEntit
   id: Scalars["String"]["output"];
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntitySearchCompanyProperties;
+  score?: Maybe<Scalars["Float"]["output"]>;
   type: Scalars["String"]["output"];
 }
 
@@ -368,6 +369,7 @@ export interface BackgroundCheckEntitySearchPerson extends BackgroundCheckEntity
   id: Scalars["String"]["output"];
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntitySearchPersonProperties;
+  score?: Maybe<Scalars["Float"]["output"]>;
   type: Scalars["String"]["output"];
 }
 
@@ -375,6 +377,7 @@ export interface BackgroundCheckEntitySearchPersonProperties {
   __typename?: "BackgroundCheckEntitySearchPersonProperties";
   birthDate?: Maybe<Array<Scalars["String"]["output"]>>;
   country?: Maybe<Array<Scalars["String"]["output"]>>;
+  countryOfBirth?: Maybe<Array<Scalars["String"]["output"]>>;
   gender?: Maybe<Array<Scalars["String"]["output"]>>;
   topics?: Maybe<Array<Scalars["String"]["output"]>>;
 }
@@ -382,6 +385,7 @@ export interface BackgroundCheckEntitySearchPersonProperties {
 export interface BackgroundCheckEntitySearchSchema {
   id: Scalars["String"]["output"];
   name: Scalars["String"]["output"];
+  score?: Maybe<Scalars["Float"]["output"]>;
   type: Scalars["String"]["output"];
 }
 
@@ -44674,6 +44678,7 @@ export type BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_
     id: string;
     type: string;
     name: string;
+    score?: number | null;
     properties: {
       __typename?: "BackgroundCheckEntitySearchCompanyProperties";
       incorporationDate?: Array<string> | null;
@@ -44688,8 +44693,10 @@ export type BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_
     id: string;
     type: string;
     name: string;
+    score?: number | null;
     properties: {
       __typename?: "BackgroundCheckEntitySearchPersonProperties";
+      countryOfBirth?: Array<string> | null;
       birthDate?: Array<string> | null;
       country?: Array<string> | null;
       gender?: Array<string> | null;
@@ -44747,6 +44754,7 @@ export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQuery =
           id: string;
           type: string;
           name: string;
+          score?: number | null;
           properties: {
             __typename?: "BackgroundCheckEntitySearchCompanyProperties";
             incorporationDate?: Array<string> | null;
@@ -44759,8 +44767,10 @@ export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQuery =
           id: string;
           type: string;
           name: string;
+          score?: number | null;
           properties: {
             __typename?: "BackgroundCheckEntitySearchPersonProperties";
+            countryOfBirth?: Array<string> | null;
             birthDate?: Array<string> | null;
             country?: Array<string> | null;
             gender?: Array<string> | null;
@@ -74726,8 +74736,10 @@ export const BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema
     id
     type
     name
+    score
     ... on BackgroundCheckEntitySearchPerson {
       properties {
+        countryOfBirth
         birthDate
         country
         gender

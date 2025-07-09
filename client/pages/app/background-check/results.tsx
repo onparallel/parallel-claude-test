@@ -478,6 +478,32 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
           );
         },
       },
+      ...(type !== "COMPANY"
+        ? [
+            {
+              key: "countryOfBirth",
+              label: intl.formatMessage({
+                id: "component.background-check-search-result.country-of-birth",
+                defaultMessage: "Country of birth",
+              }),
+              CellContent: ({ row }: { row: BackgroundCheckFieldSearchResults_Selection }) => {
+                if (row.type === "Person") {
+                  return (
+                    <Flex gap={2} flexWrap="wrap">
+                      {row.properties.countryOfBirth?.map((c, i) => (
+                        <Text as="span" key={i}>
+                          {countries?.[c] ?? countries?.[c.toUpperCase()] ?? "-"}
+                        </Text>
+                      )) ?? "-"}
+                    </Flex>
+                  );
+                } else {
+                  return <>{"-"}</>;
+                }
+              },
+            },
+          ]
+        : []),
       {
         key: "dateOfBirth",
         label:
@@ -514,6 +540,26 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
           } else {
             return <>{"-"} </>;
           }
+        },
+      },
+      {
+        key: "score",
+        label: intl.formatMessage({
+          id: "component.background-check-search-result.score",
+          defaultMessage: "Score",
+        }),
+        CellContent: ({ row }) => {
+          return (
+            <>
+              {row.score
+                ? intl.formatNumber(row.score, {
+                    style: "percent",
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })
+                : "-"}
+            </>
+          );
         },
       },
       {
@@ -571,7 +617,7 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
         },
       },
     ],
-    [intl.locale, countries],
+    [intl.locale, countries, type],
   );
 }
 
@@ -581,8 +627,10 @@ const _fragments = {
       id
       type
       name
+      score
       ... on BackgroundCheckEntitySearchPerson {
         properties {
+          countryOfBirth
           birthDate
           country
           gender

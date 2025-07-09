@@ -324,6 +324,7 @@ export type BackgroundCheckEntitySearchCompany = BackgroundCheckEntitySearchSche
   id: Scalars["String"]["output"];
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntitySearchCompanyProperties;
+  score: Maybe<Scalars["Float"]["output"]>;
   type: Scalars["String"]["output"];
 };
 
@@ -337,12 +338,14 @@ export type BackgroundCheckEntitySearchPerson = BackgroundCheckEntitySearchSchem
   id: Scalars["String"]["output"];
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntitySearchPersonProperties;
+  score: Maybe<Scalars["Float"]["output"]>;
   type: Scalars["String"]["output"];
 };
 
 export type BackgroundCheckEntitySearchPersonProperties = {
   birthDate: Maybe<Array<Scalars["String"]["output"]>>;
   country: Maybe<Array<Scalars["String"]["output"]>>;
+  countryOfBirth: Maybe<Array<Scalars["String"]["output"]>>;
   gender: Maybe<Array<Scalars["String"]["output"]>>;
   topics: Maybe<Array<Scalars["String"]["output"]>>;
 };
@@ -350,6 +353,7 @@ export type BackgroundCheckEntitySearchPersonProperties = {
 export type BackgroundCheckEntitySearchSchema = {
   id: Scalars["String"]["output"];
   name: Scalars["String"]["output"];
+  score: Maybe<Scalars["Float"]["output"]>;
   type: Scalars["String"]["output"];
 };
 

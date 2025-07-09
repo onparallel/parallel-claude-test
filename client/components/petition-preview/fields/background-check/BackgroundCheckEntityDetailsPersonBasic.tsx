@@ -47,7 +47,7 @@ export function BackgroundCheckEntityDetailsPersonBasic({
 
   const {
     name: fullName,
-    properties: { country, dateOfBirth, gender, nationality, topics },
+    properties: { country, countryOfBirth, dateOfBirth, gender, nationality, topics },
   } = data;
 
   const detailsSpanProps = {
@@ -208,6 +208,37 @@ export function BackgroundCheckEntityDetailsPersonBasic({
             :
           </Text>
           {country?.map((c, i) => {
+            const countryFlag = !isOpenSanctionsCountryCode(c) ? (
+              <Image
+                fallback={<Box width="12px" height="10px" bgColor="black"></Box>}
+                alt={getCountryName(c)}
+                boxSize={6}
+                src={`${
+                  process.env.NEXT_PUBLIC_ASSETS_URL ?? ""
+                }/static/countries/flags/${c.toLowerCase()}.png`}
+              />
+            ) : (
+              <Box boxSize={6}></Box>
+            );
+
+            return (
+              <HStack key={i}>
+                {countryFlag}
+                <Text>{getCountryName(c)}</Text>
+              </HStack>
+            );
+          }) ?? <Text>{"-"}</Text>}
+        </Stack>
+
+        <Stack>
+          <Text {...detailsSpanProps}>
+            <FormattedMessage
+              id="component.background-check-entity-details-person-basic.country-of-birth"
+              defaultMessage="Country of birth"
+            />
+            :
+          </Text>
+          {countryOfBirth?.map((c, i) => {
             const countryFlag = !isOpenSanctionsCountryCode(c) ? (
               <Image
                 fallback={<Box width="12px" height="10px" bgColor="black"></Box>}

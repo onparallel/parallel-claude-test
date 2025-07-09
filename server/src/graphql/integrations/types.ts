@@ -106,6 +106,7 @@ export const BackgroundCheckEntitySearchPerson = objectType({
       type: objectType({
         name: "BackgroundCheckEntitySearchPersonProperties",
         definition(t) {
+          t.nullable.list.nonNull.string("countryOfBirth");
           t.nullable.list.nonNull.string("birthDate");
           t.nullable.list.nonNull.string("gender");
           t.nullable.list.nonNull.string("country");
@@ -144,6 +145,7 @@ export const BackgroundCheckEntitySearch = objectType({
           t.nonNull.string("id");
           t.nonNull.string("type");
           t.nonNull.string("name");
+          t.nullable.float("score");
         },
         resolveType: (o) => {
           if (o.type === "Person") {

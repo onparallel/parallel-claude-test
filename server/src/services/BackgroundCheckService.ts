@@ -22,6 +22,7 @@ export interface EntitySearchPerson {
   name: string;
   score?: number;
   properties: {
+    countryOfBirth?: string[];
     birthDate?: string[];
     gender?: string[];
     country?: string[];

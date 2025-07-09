@@ -675,6 +675,11 @@
     "context": "Country"
   },
   {
+    "term": "component.background-check-entity-details-person-basic.country-of-birth",
+    "definition": "País de nacimiento",
+    "context": "Country of birth"
+  },
+  {
     "term": "component.background-check-entity-details-person-basic.date-of-birth",
     "definition": "Fecha de nacimiento",
     "context": "Date of birth"
@@ -785,6 +790,11 @@
     "context": "Individuals"
   },
   {
+    "term": "component.background-check-search-result.country-of-birth",
+    "definition": "País de nacimiento",
+    "context": "Country of birth"
+  },
+  {
     "term": "component.background-check-search-result.country-territory",
     "definition": "País/Territorio",
     "context": "Country/Territory"
@@ -838,6 +848,11 @@
     "term": "component.background-check-search-result.save-search-text",
     "definition": "Hemos guardado la búsqueda automáticamente para conservar la evidencia de cara a una futura auditoría.",
     "context": "We have automatically saved the search to preserve the evidence for a future audit."
+  },
+  {
+    "term": "component.background-check-search-result.score",
+    "definition": "Puntuación",
+    "context": "Score"
   },
   {
     "term": "component.background-check-search-result.searching-for",

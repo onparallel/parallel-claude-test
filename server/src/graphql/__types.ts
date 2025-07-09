@@ -1030,6 +1030,7 @@ export interface NexusGenObjects {
     id: string; // String!
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntitySearchCompanyProperties"]; // BackgroundCheckEntitySearchCompanyProperties!
+    score?: number | null; // Float
     type: string; // String!
   };
   BackgroundCheckEntitySearchCompanyProperties: {
@@ -1043,12 +1044,14 @@ export interface NexusGenObjects {
     id: string; // String!
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntitySearchPersonProperties"]; // BackgroundCheckEntitySearchPersonProperties!
+    score?: number | null; // Float
     type: string; // String!
   };
   BackgroundCheckEntitySearchPersonProperties: {
     // root type
     birthDate?: string[] | null; // [String!]
     country?: string[] | null; // [String!]
+    countryOfBirth?: string[] | null; // [String!]
     gender?: string[] | null; // [String!]
     topics?: string[] | null; // [String!]
   };
@@ -2201,6 +2204,7 @@ export interface NexusGenFieldTypes {
     id: string; // String!
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntitySearchCompanyProperties"]; // BackgroundCheckEntitySearchCompanyProperties!
+    score: number | null; // Float
     type: string; // String!
   };
   BackgroundCheckEntitySearchCompanyProperties: {
@@ -2214,12 +2218,14 @@ export interface NexusGenFieldTypes {
     id: string; // String!
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntitySearchPersonProperties"]; // BackgroundCheckEntitySearchPersonProperties!
+    score: number | null; // Float
     type: string; // String!
   };
   BackgroundCheckEntitySearchPersonProperties: {
     // field return type
     birthDate: string[] | null; // [String!]
     country: string[] | null; // [String!]
+    countryOfBirth: string[] | null; // [String!]
     gender: string[] | null; // [String!]
     topics: string[] | null; // [String!]
   };
@@ -4982,6 +4988,7 @@ export interface NexusGenFieldTypes {
     // field return type
     id: string; // String!
     name: string; // String!
+    score: number | null; // Float
     type: string; // String!
   };
   CreatedAt: {
@@ -5380,6 +5387,7 @@ export interface NexusGenFieldTypeNames {
     id: "String";
     name: "String";
     properties: "BackgroundCheckEntitySearchCompanyProperties";
+    score: "Float";
     type: "String";
   };
   BackgroundCheckEntitySearchCompanyProperties: {
@@ -5393,12 +5401,14 @@ export interface NexusGenFieldTypeNames {
     id: "String";
     name: "String";
     properties: "BackgroundCheckEntitySearchPersonProperties";
+    score: "Float";
     type: "String";
   };
   BackgroundCheckEntitySearchPersonProperties: {
     // field return type name
     birthDate: "String";
     country: "String";
+    countryOfBirth: "String";
     gender: "String";
     topics: "String";
   };
@@ -8159,6 +8169,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     id: "String";
     name: "String";
+    score: "Float";
     type: "String";
   };
   CreatedAt: {

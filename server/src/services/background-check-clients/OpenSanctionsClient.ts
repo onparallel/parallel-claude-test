@@ -286,6 +286,7 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
       name: data.caption,
       score: data.score,
       properties: {
+        countryOfBirth: data.properties.birthCountry,
         birthDate: data.properties.birthDate,
         gender: data.properties.gender,
         country: data.properties.country,

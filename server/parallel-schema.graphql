@@ -339,6 +339,7 @@ type BackgroundCheckEntitySearchCompany implements BackgroundCheckEntitySearchSc
   id: String!
   name: String!
   properties: BackgroundCheckEntitySearchCompanyProperties!
+  score: Float
   type: String!
 }
 
@@ -352,12 +353,14 @@ type BackgroundCheckEntitySearchPerson implements BackgroundCheckEntitySearchSch
   id: String!
   name: String!
   properties: BackgroundCheckEntitySearchPersonProperties!
+  score: Float
   type: String!
 }
 
 type BackgroundCheckEntitySearchPersonProperties {
   birthDate: [String!]
   country: [String!]
+  countryOfBirth: [String!]
   gender: [String!]
   topics: [String!]
 }
@@ -365,6 +368,7 @@ type BackgroundCheckEntitySearchPersonProperties {
 interface BackgroundCheckEntitySearchSchema {
   id: String!
   name: String!
+  score: Float
   type: String!
 }
 

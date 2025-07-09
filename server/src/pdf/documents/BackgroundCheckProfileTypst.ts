@@ -362,6 +362,7 @@ function BackgroundCheckProfileTypst(props: BackgroundCheckProfileProps, intl: I
       #item("Gender", [#capitalize("${formatListOfTexts((props.entity.properties as any)?.gender)}")])
       #item("Nationality", "${(props.entity.properties as any)?.nationality?.map((n: string) => COUNTRIES[n]).join(" · ") ?? " - "}")
       #item("Country", "${(props.entity.properties as any)?.country?.map((c: string) => COUNTRIES[c]).join(" · ") ?? " - "}")
+      #item("Country of birth", "${(props.entity.properties as any)?.countryOfBirth?.map((c: string) => COUNTRIES[c]).join(" · ") ?? " - "}")
       #item("Date of birth", "${(props.entity.properties as any)?.dateOfBirth?.map((date: string) => formatDate(date, intl)).join(" · ") ?? " - "}")`
           : outdent`
       #item("Jurisdiction", "${(props.entity.properties as any)?.jurisdiction?.map((n: string) => COUNTRIES[n]).join(" · ") ?? " - "}")
