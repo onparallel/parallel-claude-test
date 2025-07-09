@@ -47,7 +47,9 @@ async function main() {
             { Name: "instance-state-name", Values: [client_ec2_1.InstanceStateName.running] },
         ],
     }))
-        .then((r) => r.Reservations.flatMap((r) => r.Instances));
+        .then((r) => r
+        .Reservations.flatMap((r) => r.Instances)
+        .filter((newInstance) => !oldInstances.some((oldInstance) => oldInstance.InstanceId === newInstance.InstanceId)));
     if (newInstances.length === 0) {
         throw new Error(`No running instances for environment ${env} and release ${commit}.`);
     }
