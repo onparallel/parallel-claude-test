@@ -146,7 +146,9 @@ if (process.env.TS_NODE_DEV) {
       compression({
         threshold: "1mb",
         // TODO: remove this after testing
-        filter: (req) => req.headers["origin"] === "https://admin.onparallel.com",
+        filter: (req) =>
+          req.headers["origin"] === "https://admin.onparallel.com" ||
+          req.headers["origin"] === "https://test-subdomain.onparallel.com",
       }),
       json({ limit: "2mb" }),
       graphqlUploadExpress(),
