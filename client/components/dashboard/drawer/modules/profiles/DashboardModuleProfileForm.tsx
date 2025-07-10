@@ -146,7 +146,8 @@ export function DashboardModuleProfileForm() {
               </DashboardModuleFormLabel>
               <ProfileTypeFieldSelect
                 value={profileTypeFields.find((f) => f.id === value) as any}
-                fields={profileTypeFields.filter((f) => f.type === "NUMBER")}
+                fields={profileTypeFields}
+                filterFields={(f) => f.type === "NUMBER"}
                 onChange={(v) => onChange(v?.id)}
               />
             </FormControl>
