@@ -143,13 +143,7 @@ if (process.env.TS_NODE_DEV) {
     .use(
       "/graphql",
       cors.handler(),
-      compression({
-        threshold: "1mb",
-        // TODO: remove this after testing
-        filter: (req) =>
-          req.headers["origin"] === "https://admin.onparallel.com" ||
-          req.headers["origin"] === "https://test-subdomain.onparallel.com",
-      }),
+      compression({ threshold: "500kb" }),
       json({ limit: "2mb" }),
       graphqlUploadExpress(),
       expressMiddleware(server, {
