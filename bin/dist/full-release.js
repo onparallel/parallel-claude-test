@@ -38,6 +38,7 @@ async function main() {
         `yarn launch-instance --commit ${commit} --env ${env}`,
         `yarn switch-release --commit ${commit} --env ${env}`,
         ...(skipPrune ? [] : [`yarn prune-instances --env ${env}`]),
+        `sleep 10`,
         `yarn queue-redrive --env ${env}`,
     ]) {
         (0, child_process_1.execSync)(command, { encoding: "utf-8", stdio: "inherit" });

@@ -42,6 +42,7 @@ async function main() {
     `yarn launch-instance --commit ${commit} --env ${env}`,
     `yarn switch-release --commit ${commit} --env ${env}`,
     ...(skipPrune ? [] : [`yarn prune-instances --env ${env}`]),
+    `sleep 10`,
     `yarn queue-redrive --env ${env}`,
   ]) {
     execSync(command, { encoding: "utf-8", stdio: "inherit" });
