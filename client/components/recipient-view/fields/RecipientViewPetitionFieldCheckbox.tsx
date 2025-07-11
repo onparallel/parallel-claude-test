@@ -26,7 +26,6 @@ import {
 import { filter, isIncludedIn, isNonNullish, isNot, zip } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
-  RecipientViewPetitionFieldLayout_PetitionFieldSelection,
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
@@ -88,16 +87,28 @@ export function RecipientViewPetitionFieldCheckbox({
     ? field.replies.filter((r) => r.parent?.id === parentReplyId)
     : field.replies;
 
-  const options = field.options as FieldOptions["CHECKBOX"];
-  const showMultiSelect =
-    isNonNullish(field.options.standardList) || (options.values.length > 15 && field.multiple);
-  const { type = "UNLIMITED", max = 1 } = options.limit ?? {};
+  const {
+    values,
+    labels,
+    standardList,
+    limit: { type = "UNLIMITED", max = 1 } = {},
+  } = field.options as FieldOptions["CHECKBOX"];
+  const showMultiSelect = isNonNullish(standardList) || values.length > 15;
   const reply = filteredReplies.length > 0 ? filteredReplies[0] : undefined;
   const isRejected = reply?.status === "REJECTED" || false;
   const showRadio = max === 1 && type !== "UNLIMITED";
   const [hasAlreadyRepliedError, setHasAlreadyRepliedError] = useState(false);
   const [checkedItems, setCheckedItems] = useState<string[]>(reply?.content?.value ?? []);
   const [isSaving, setIsSaving] = useState(false);
+
+  const options = useSimpleSelectOptions(
+    () =>
+      zip(values, labels ?? values).map(([value, label]) => ({
+        value,
+        label,
+      })),
+    [],
+  );
 
   useEffect(() => {
     if (haveChanges({ checked: checkedItems, value: reply?.content?.value ?? [], max: max })) {
@@ -165,7 +176,7 @@ export function RecipientViewPetitionFieldCheckbox({
     }
     setCheckedItems(newCheckedItems);
     // make sure we only submit existing options
-    const filteredChecked = newCheckedItems.filter((c) => options.values.includes(c));
+    const filteredChecked = newCheckedItems.filter((c) => values.includes(c));
 
     if (!filteredChecked.length && reply) {
       handleDelete();
@@ -174,7 +185,7 @@ export function RecipientViewPetitionFieldCheckbox({
         haveChanges({
           checked: filteredChecked,
           value: reply.content.value,
-          max: type === "UNLIMITED" ? options.values.length : max,
+          max: type === "UNLIMITED" ? values.length : max,
         })
       ) {
         handleUpdate(filteredChecked);
@@ -248,14 +259,13 @@ export function RecipientViewPetitionFieldCheckbox({
         {showMultiSelect ? (
           <HStack align="start">
             <Box flex="1">
-              <PetitionFieldCheckboxStandardList
+              <PetitionFieldCheckboxMultiSelect
+                maxItems={type === "UNLIMITED" ? undefined : max}
                 isDisabled={isDisabled || reply?.status === "APPROVED" || reply?.isAnonymized}
                 isInvalid={isRejected || isInvalid || hasAlreadyRepliedError}
-                field={field}
                 value={checkedItems}
-                onChange={(values) => {
-                  setCheckedItems(values);
-                }}
+                options={options}
+                onChange={(values) => setCheckedItems(values)}
                 onBlur={async () => {
                   if (!checkedItems.length && isNonNullish(reply?.id)) {
                     await handleDelete();
@@ -280,64 +290,6 @@ export function RecipientViewPetitionFieldCheckbox({
                   },
                   { tone },
                 )}
-                styles={{
-                  control: (baseStyles) => ({
-                    ...baseStyles,
-                    ":focus-within": {
-                      "[data-rs='multi-value']": { backgroundColor: "#e2e8f0" },
-
-                      "[data-rs='multi-value-remove']": { display: "flex" },
-                      "[data-rs='value-container'] > :last-child": {
-                        height: "auto",
-                        position: "relative",
-                      },
-                      "[data-rs='value-container'] > :last-child > input": {
-                        height: "auto",
-                      },
-                      "[data-rs='placeholder']": {
-                        display: "none",
-                      },
-                    },
-                  }),
-                  valueContainer: (baseStyles) => ({
-                    ...baseStyles,
-                    paddingInlineStart: "10px",
-                    paddingInlineEnd: "16px",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    justifyContent: checkedItems.length > 0 ? "flex-start" : "center",
-                  }),
-                  multiValue: (baseStyles) => ({
-                    ...baseStyles,
-                    backgroundColor: "transparent",
-                  }),
-                  multiValueRemove: (baseStyles) => ({
-                    ...baseStyles,
-                    display: "none",
-                  }),
-                  multiValueLabel: (baseStyles) => ({
-                    ...baseStyles,
-                    fontSize: "16px",
-                    whiteSpace: "wrap",
-                  }),
-                  placeholder: (baseStyles) => ({
-                    ...baseStyles,
-                    ...(isNonNullish(reply?.content?.value) ? { display: "none" } : {}),
-                    ":focus-within": {
-                      display: "none",
-                    },
-                    overflow: "hidden",
-                  }),
-                  input: (baseStyles) => ({
-                    ...baseStyles,
-                    height: "auto",
-                    position: "absolute",
-                    "> input": {
-                      height: "auto",
-                    },
-                  }),
-                }}
               />
             </Box>
 
@@ -357,7 +309,7 @@ export function RecipientViewPetitionFieldCheckbox({
             ) : null}
           </HStack>
         ) : (
-          zip(options.values, options.labels ?? options.values).map(([value, label], index) => (
+          options.map(({ value, label }, index) => (
             <Checkbox
               key={index}
               data-value={value}
@@ -378,35 +330,20 @@ export function RecipientViewPetitionFieldCheckbox({
   );
 }
 
-interface PetitionFieldCheckboxStandardListProps extends MultiCheckboxSimpleSelectProps {
-  field: RecipientViewPetitionFieldLayout_PetitionFieldSelection;
-}
+interface PetitionFieldCheckboxStandardListProps extends MultiCheckboxSimpleSelectProps {}
 
-export const PetitionFieldCheckboxStandardList = forwardRef<
+const PetitionFieldCheckboxMultiSelect = forwardRef<
   MultiCheckboxSimpleSelectInstance,
   PetitionFieldCheckboxStandardListProps
->(function ProfileFieldSelectInner({ field, value, ...props }, ref) {
-  const { values, labels } = field.options as FieldOptions["CHECKBOX"];
-
-  const options = useSimpleSelectOptions(
-    () =>
-      zip(values, labels ?? values).map(([value, label]) => ({
-        value,
-        label,
-      })),
-    [],
-  );
-
+>(function ProfileFieldSelectInner(props, ref) {
   return (
     <MultiCheckboxSimpleSelect
       ref={ref}
       {...props}
-      options={options}
-      value={value}
       isClearable={false}
       filterOption={createFilter({
         // this improves search performance on long lists
-        ignoreAccents: options.length > 1000 ? false : true,
+        ignoreAccents: props.options!.length > 1000 ? false : true,
       })}
       components={
         {
@@ -414,9 +351,69 @@ export const PetitionFieldCheckboxStandardList = forwardRef<
           MultiValueRemove,
           MultiValue,
           Placeholder,
-          ...(options.length > 100 ? { MenuList: OptimizedMenuList as any } : {}),
+          ...(props.options!.length > 100 ? { MenuList: OptimizedMenuList as any } : {}),
         } as any
       }
+      styles={{
+        control: (baseStyles) => ({
+          ...baseStyles,
+          ":focus-within": {
+            "[data-rs='multi-value']": { backgroundColor: "#e2e8f0" },
+            "[data-rs='multi-value-remove']": { display: "flex" },
+            "[data-rs='value-container'] > :last-child": {
+              height: "auto",
+              position: "relative",
+            },
+            "[data-rs='value-container'] > :last-child > input": {
+              height: "auto",
+            },
+            "[data-rs='placeholder']": {
+              display: "none",
+            },
+          },
+        }),
+        valueContainer: (baseStyles) => ({
+          ...baseStyles,
+          paddingInlineStart: "10px",
+          paddingInlineEnd: "16px",
+          paddingBlock: "2px",
+          display: "flex",
+          flexDirection: "column",
+          flexWrap: "nowrap",
+          alignItems: "flex-start",
+        }),
+        multiValue: (baseStyles) => ({
+          ...baseStyles,
+          backgroundColor: "transparent",
+        }),
+        multiValueRemove: (baseStyles) => ({
+          ...baseStyles,
+          display: "none",
+        }),
+        multiValueLabel: (baseStyles) => ({
+          ...baseStyles,
+          fontSize: "16px",
+          whiteSpace: "wrap",
+        }),
+        placeholder: (baseStyles) => ({
+          ...baseStyles,
+          ":focus-within": {
+            display: "none",
+          },
+          overflow: "hidden",
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+        }),
+        input: (baseStyles) => ({
+          ...baseStyles,
+          height: "auto",
+          position: "absolute",
+          "> input": {
+            height: "auto",
+          },
+        }),
+      }}
       checkboxColorScheme="blue"
     />
   );

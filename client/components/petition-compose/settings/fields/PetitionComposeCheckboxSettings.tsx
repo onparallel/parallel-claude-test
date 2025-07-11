@@ -16,7 +16,6 @@ import { getMinMaxCheckboxLimit } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { isNonNullish } from "remeda";
 import { useConfirmOverwriteOptionsDialog } from "../../dialogs/ConfirmOverwriteOptionsDialog";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { ImportOptionsSettingsRow } from "../rows/ImportOptionsSettingsRow";
@@ -144,9 +143,6 @@ export function PetitionComposeCheckboxSettings({
     } catch {}
   };
 
-  const selectedStandardList = field.options?.standardList;
-  const hasStandardList = isNonNullish(selectedStandardList);
-
   return (
     <>
       <SettingsRow
@@ -205,7 +201,7 @@ export function PetitionComposeCheckboxSettings({
         isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
       />
       <SettingsRowSwitch
-        isDisabled={isReadOnly || field.isLinkedToProfileTypeField || hasStandardList}
+        isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
         isChecked={limitType !== "RADIO"}
         onChange={(value) => {
           setLimitType(value ? "UNLIMITED" : "RADIO");
@@ -239,7 +235,7 @@ export function PetitionComposeCheckboxSettings({
         <Stack direction="row">
           <Box flex="1" minWidth="0">
             <SimpleSelect
-              isDisabled={isReadOnly || field.isLinkedToProfileTypeField || hasStandardList}
+              isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
               options={options}
               value={limitType}
               isSearchable={false}
@@ -268,7 +264,7 @@ export function PetitionComposeCheckboxSettings({
               width={"72px"}
               onChange={handleMinOnChange}
               allowMouseWheel={true}
-              isDisabled={isReadOnly || field.isLinkedToProfileTypeField || hasStandardList}
+              isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
             >
               <NumberInputField ref={refMin} />
               <NumberInputStepper>
@@ -285,7 +281,7 @@ export function PetitionComposeCheckboxSettings({
               width={"72px"}
               onChange={handleMaxOnChange}
               allowMouseWheel={true}
-              isDisabled={isReadOnly || field.isLinkedToProfileTypeField || hasStandardList}
+              isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
             >
               <NumberInputField ref={refMax} />
               <NumberInputStepper>
