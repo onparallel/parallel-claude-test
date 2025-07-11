@@ -110,24 +110,25 @@ if (process.env.TS_NODE_DEV) {
         const duration = stopwatchEnd(time);
         const length = res.getHeader("content-length");
         const lengthBytes = Number(length) || 0;
-        let formattedLength: string;
+        let contentLength: string;
 
-        if (process.env.TS_NODE_DEV && process.env.VERBOSE_LOGS && length) {
+        // In development show the content length in a more readable format
+        if (process.env.NODE_ENV === "development" && length) {
           const formattedSize = formatBytes(lengthBytes);
           // Color thresholds: yellow > 1MB, red > 5MB
           if (lengthBytes > 5 * 1024 * 1024) {
-            formattedLength = chalk.red(formattedSize);
+            contentLength = chalk.red(formattedSize);
           } else if (lengthBytes > 1024 * 1024) {
-            formattedLength = chalk.yellow(formattedSize);
+            contentLength = chalk.yellow(formattedSize);
           } else {
-            formattedLength = formattedSize;
+            contentLength = formattedSize;
           }
         } else {
-          formattedLength = `${lengthBytes}B`;
+          contentLength = `${lengthBytes}B`;
         }
 
         logger[statusCode >= 500 ? "error" : "info"](
-          `${ip} ${method} ${url} ${statusCode} ${formattedLength} ${duration}ms`,
+          `${ip} ${method} ${url} ${statusCode} ${contentLength} ${duration}ms`,
           {
             userId: req.context?.trails.userId,
             accessId: req.context?.trails.accessId,
@@ -143,7 +144,7 @@ if (process.env.TS_NODE_DEV) {
     .use(
       "/graphql",
       cors.handler(),
-      compression({ threshold: "500kb" }),
+      ...(process.env.NODE_ENV === "development" ? [] : [compression({ threshold: "500kb" })]),
       json({ limit: "2mb" }),
       graphqlUploadExpress(),
       expressMiddleware(server, {
