@@ -6,15 +6,17 @@ import { ContactLocale } from "../../db/__types";
 import { FORMATS } from "../../util/dates";
 import { isEmptyRTEValue } from "../../util/slate/utils";
 import { SignaturesBlock_SignatureConfigFragment } from "../__types";
+import { getHardcodedSignatures } from "../utils/hadrcodedSignatures";
 import { useTheme } from "../utils/ThemeProvider";
 import { RichTextBlock } from "./RichTextBlock";
 import { SignatureBox } from "./SignatureBox";
 
 interface SignaturesBlockProps {
   signatureConfig: SignaturesBlock_SignatureConfigFragment;
+  templateId?: string | null;
 }
 
-export function SignaturesBlock({ signatureConfig }: SignaturesBlockProps) {
+export function SignaturesBlock({ signatureConfig, templateId }: SignaturesBlockProps) {
   const theme = useTheme();
   const intl = useIntl();
 
@@ -38,12 +40,27 @@ export function SignaturesBlock({ signatureConfig }: SignaturesBlockProps) {
     ...FORMATS.LL,
   });
 
-  const signers = signatureConfig.signers!.map((signer, i) => ({
-    wordAnchor: `3cb39pzCQA9wJ${i}`,
-    fullName: signer!.fullName,
-    signatureImageUrl: signer!.embeddedSignatureImage?.url ?? undefined,
-    date,
-  }));
+  const someHasEmbeddedImage = signatureConfig.signers!.some((s) =>
+    isNonNullish(s?.embeddedSignatureImage),
+  );
+
+  const signers = someHasEmbeddedImage
+    ? signatureConfig.signers!.map((signer, i) => ({
+        wordAnchor: `3cb39pzCQA9wJ${i}`,
+        fullName: signer!.fullName,
+        signatureImageUrl: signer!.embeddedSignatureImage?.url ?? undefined,
+        date,
+      }))
+    : [
+        ...(process.env.NODE_ENV === "production" && isNonNullish(templateId)
+          ? getHardcodedSignatures(templateId).map((s) => ({ ...s, date }))
+          : []),
+        ...signatureConfig.signers!.map((signer, i) => ({
+          wordAnchor: `3cb39pzCQA9wJ${i}`,
+          fullName: signer!.fullName,
+          date,
+        })),
+      ];
 
   const legalText = theme.legalText[intl.locale as ContactLocale];
   return (

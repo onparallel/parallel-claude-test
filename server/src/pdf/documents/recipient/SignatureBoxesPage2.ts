@@ -53,6 +53,7 @@ function SignatureBoxesPage2({ petition }: SignatureBoxesPageProps, intl: IntlSh
       ? documentSignatures(petition.currentSignatureRequest.signatureConfig, {
           intl,
           theme,
+          templateId: petition.fromTemplate?.id,
         })
       : []),
   ].join("\n");
@@ -68,6 +69,9 @@ SignatureBoxesPage2.fragments = {
           data
         }
         ... on Petition {
+          fromTemplate {
+            id
+          }
           currentSignatureRequest {
             signatureConfig {
               ...documentSignatures_SignatureConfig

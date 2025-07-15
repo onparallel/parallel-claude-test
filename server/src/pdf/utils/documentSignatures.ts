@@ -10,21 +10,37 @@ import { SlateNode } from "../../util/slate/render";
 import { paragraphIsEmpty } from "../../util/slate/utils";
 import { hashString } from "../../util/token";
 import { documentSignatures_SignatureConfigFragment } from "../__types";
+import { getHardcodedSignatures } from "./hadrcodedSignatures";
 
 export function documentSignatures(
   signatureConfig: documentSignatures_SignatureConfigFragment,
-  { theme, intl }: { theme: PdfDocumentTheme; intl: IntlShape },
+  { theme, intl, templateId }: { theme: PdfDocumentTheme; intl: IntlShape; templateId?: string },
 ) {
   const date = intl.formatDate(new Date(), {
     timeZone: signatureConfig.timezone,
     ...FORMATS.LL,
   });
 
-  const signers = signatureConfig.signers!.map((signer, i) => ({
-    wordAnchor: `3cb39pzCQA9wJ${i}`,
-    fullName: signer!.fullName,
-    signatureImageUrl: signer!.embeddedSignatureImage?.url ?? null,
-  }));
+  const someHasEmbeddedImage = signatureConfig.signers!.some((s) =>
+    isNonNullish(s?.embeddedSignatureImage),
+  );
+
+  const signers: { fullName: string; signatureImageUrl?: string; wordAnchor?: string }[] =
+    someHasEmbeddedImage
+      ? signatureConfig.signers!.map((signer, i) => ({
+          wordAnchor: `3cb39pzCQA9wJ${i}`,
+          fullName: signer!.fullName,
+          signatureImageUrl: signer!.embeddedSignatureImage?.url ?? null,
+        }))
+      : [
+          ...(process.env.NODE_ENV === "production" && isNonNullish(templateId)
+            ? getHardcodedSignatures(templateId)
+            : []),
+          ...signatureConfig.signers!.map((s, i) => ({
+            fullName: s!.fullName,
+            wordAnchor: `3cb39pzCQA9wJ${i}`,
+          })),
+        ];
 
   const legalTextSlate = theme.legalText[intl.locale as ContactLocale];
 
@@ -89,7 +105,7 @@ export function documentSignatures(
             signature(${[
               JSON.stringify(s.fullName),
               JSON.stringify(date),
-              JSON.stringify(s.wordAnchor),
+              s.wordAnchor ? JSON.stringify(s.wordAnchor) : "[]",
               s.signatureImageUrl
                 ? `signature: prequery.image(${JSON.stringify(s.signatureImageUrl!)}, ${JSON.stringify(`assets/${hashString(s.signatureImageUrl!)}`)})`
                 : null,

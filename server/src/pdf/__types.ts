@@ -7441,6 +7441,7 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
   id: string;
   name: string | null;
+  fromTemplate: { id: string } | null;
   currentSignatureRequest: {
     signatureConfig: {
       timezone: string;
@@ -7864,6 +7865,7 @@ export type PetitionExport_petitionQuery = {
         __typename: "Petition";
         id: string;
         name: string | null;
+        fromTemplate: { id: string } | null;
         currentSignatureRequest: {
           signatureConfig: {
             timezone: string;
@@ -8145,6 +8147,7 @@ export type PetitionExport2_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
   id: string;
   name: string | null;
+  fromTemplate: { id: string } | null;
   currentSignatureRequest: {
     signatureConfig: {
       timezone: string;
@@ -8568,6 +8571,7 @@ export type PetitionExport2_petitionQuery = {
         __typename: "Petition";
         id: string;
         name: string | null;
+        fromTemplate: { id: string } | null;
         currentSignatureRequest: {
           signatureConfig: {
             timezone: string;
@@ -8835,6 +8839,7 @@ export type PetitionExport2_petitionQuery = {
 
 export type SignatureBoxesPage_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
+  fromTemplate: { id: string } | null;
   currentSignatureRequest: {
     signatureConfig: {
       timezone: string;
@@ -8865,6 +8870,7 @@ export type SignatureBoxesPage_petitionQuery = {
   petition:
     | {
         __typename: "Petition";
+        fromTemplate: { id: string } | null;
         currentSignatureRequest: {
           signatureConfig: {
             timezone: string;
@@ -8883,6 +8889,7 @@ export type SignatureBoxesPage_petitionQuery = {
 
 export type SignatureBoxesPage2_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
+  fromTemplate: { id: string } | null;
   currentSignatureRequest: {
     signatureConfig: {
       timezone: string;
@@ -8913,6 +8920,7 @@ export type SignatureBoxesPage2_petitionQuery = {
   petition:
     | {
         __typename: "Petition";
+        fromTemplate: { id: string } | null;
         currentSignatureRequest: {
           signatureConfig: {
             timezone: string;
@@ -9242,6 +9250,9 @@ export const PetitionExport_PetitionBaseFragmentDoc = gql`
       data
     }
     ... on Petition {
+      fromTemplate {
+        id
+      }
       currentSignatureRequest {
         signatureConfig {
           ...SignaturesBlock_SignatureConfig
@@ -9371,6 +9382,9 @@ export const PetitionExport2_PetitionBaseFragmentDoc = gql`
       data
     }
     ... on Petition {
+      fromTemplate {
+        id
+      }
       currentSignatureRequest {
         signatureConfig {
           ...documentSignatures_SignatureConfig
@@ -9391,6 +9405,9 @@ export const SignatureBoxesPage_PetitionBaseFragmentDoc = gql`
       data
     }
     ... on Petition {
+      fromTemplate {
+        id
+      }
       currentSignatureRequest {
         signatureConfig {
           ...documentSignatures_SignatureConfig
@@ -9407,6 +9424,9 @@ export const SignatureBoxesPage2_PetitionBaseFragmentDoc = gql`
       data
     }
     ... on Petition {
+      fromTemplate {
+        id
+      }
       currentSignatureRequest {
         signatureConfig {
           ...documentSignatures_SignatureConfig
