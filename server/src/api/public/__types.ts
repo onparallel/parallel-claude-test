@@ -7565,16 +7565,16 @@ export type PetitionSignatureRequestFragment = {
   };
 };
 
-export type PetitionFragment = {
+export type Petition_Petition_Fragment = {
+  status: PetitionStatus;
+  deadline: string | null;
+  isAnonymized: boolean;
   id: string;
   path: string;
   name: string | null;
-  status: PetitionStatus;
-  deadline: string | null;
   locale: PetitionLocale;
   createdAt: string;
   customProperties: { [key: string]: any };
-  isAnonymized: boolean;
   fromTemplate: { id: string } | null;
   recipients?: Array<{
     recipientUrl: string | null;
@@ -7601,6 +7601,39 @@ export type PetitionFragment = {
       firstName: string | null;
       lastName: string | null;
     } | null;
+  }>;
+  replies?: Array<{
+    id: string;
+    alias: string | null;
+    type: PetitionFieldType;
+    replies: Array<{
+      id: string;
+      content: { [key: string]: any };
+      metadata: { [key: string]: any };
+      children: Array<{
+        field: { id: string; alias: string | null; type: PetitionFieldType };
+        replies: Array<{
+          id: string;
+          content: { [key: string]: any };
+          metadata: { [key: string]: any };
+        }>;
+      }> | null;
+    }>;
+  }>;
+  progress?: {
+    external: { approved: number; replied: number; optional: number; total: number };
+    internal: { approved: number; replied: number; optional: number; total: number };
+  };
+  variablesResult?: Array<{ name: string; value: number | null }>;
+  signatures?: Array<{
+    id: string;
+    status: PetitionSignatureRequestStatus;
+    environment: SignatureOrgIntegrationEnvironment;
+    createdAt: string;
+    updatedAt: string;
+    signatureConfig: {
+      signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+    };
   }>;
   fields?: Array<{
     id: string;
@@ -7643,44 +7676,11 @@ export type PetitionFragment = {
       multiple: boolean;
     }> | null;
   }>;
-  replies?: Array<{
-    id: string;
-    alias: string | null;
-    type: PetitionFieldType;
-    replies: Array<{
-      id: string;
-      content: { [key: string]: any };
-      metadata: { [key: string]: any };
-      children: Array<{
-        field: { id: string; alias: string | null; type: PetitionFieldType };
-        replies: Array<{
-          id: string;
-          content: { [key: string]: any };
-          metadata: { [key: string]: any };
-        }>;
-      }> | null;
-    }>;
-  }>;
   tags?: Array<{ id: string; name: string }>;
   signatureConfig?: {
     isEnabled: boolean;
     signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
   } | null;
-  progress?: {
-    external: { approved: number; replied: number; optional: number; total: number };
-    internal: { approved: number; replied: number; optional: number; total: number };
-  };
-  variablesResult?: Array<{ name: string; value: number | null }>;
-  signatures?: Array<{
-    id: string;
-    status: PetitionSignatureRequestStatus;
-    environment: SignatureOrgIntegrationEnvironment;
-    createdAt: string;
-    updatedAt: string;
-    signatureConfig: {
-      signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
-    };
-  }>;
   owner?: {
     id: string;
     email: string;
@@ -7689,6 +7689,70 @@ export type PetitionFragment = {
     lastName: string | null;
   };
 };
+
+export type Petition_PetitionTemplate_Fragment = {
+  id: string;
+  path: string;
+  name: string | null;
+  locale: PetitionLocale;
+  createdAt: string;
+  customProperties: { [key: string]: any };
+  fields?: Array<{
+    id: string;
+    title: string | null;
+    description: string | null;
+    type: PetitionFieldType;
+    fromPetitionFieldId: string | null;
+    alias: string | null;
+    options: { [key: string]: any };
+    optional: boolean;
+    multiple: boolean;
+    replies: Array<{
+      id: string;
+      content: { [key: string]: any };
+      status: PetitionFieldReplyStatus;
+      metadata: { [key: string]: any };
+      createdAt: string;
+      updatedAt: string;
+      children: Array<{
+        field: { id: string; type: PetitionFieldType };
+        replies: Array<{
+          id: string;
+          content: { [key: string]: any };
+          status: PetitionFieldReplyStatus;
+          metadata: { [key: string]: any };
+          createdAt: string;
+          updatedAt: string;
+        }>;
+      }> | null;
+    }>;
+    children: Array<{
+      id: string;
+      title: string | null;
+      description: string | null;
+      type: PetitionFieldType;
+      fromPetitionFieldId: string | null;
+      alias: string | null;
+      options: { [key: string]: any };
+      optional: boolean;
+      multiple: boolean;
+    }> | null;
+  }>;
+  tags?: Array<{ id: string; name: string }>;
+  signatureConfig?: {
+    isEnabled: boolean;
+    signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+  } | null;
+  owner?: {
+    id: string;
+    email: string;
+    fullName: string | null;
+    firstName: string | null;
+    lastName: string | null;
+  };
+};
+
+export type PetitionFragment = Petition_Petition_Fragment | Petition_PetitionTemplate_Fragment;
 
 export type TemplateFragment = {
   id: string;
@@ -8116,15 +8180,15 @@ export type GetPetitions_petitionsQuery = {
     totalCount: number;
     items: Array<
       | {
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
           id: string;
           path: string;
           name: string | null;
-          status: PetitionStatus;
-          deadline: string | null;
           locale: PetitionLocale;
           createdAt: string;
           customProperties: { [key: string]: any };
-          isAnonymized: boolean;
           fromTemplate: { id: string } | null;
           recipients?: Array<{
             recipientUrl: string | null;
@@ -8151,6 +8215,39 @@ export type GetPetitions_petitionsQuery = {
               firstName: string | null;
               lastName: string | null;
             } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: number | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+            };
           }>;
           fields?: Array<{
             id: string;
@@ -8193,44 +8290,72 @@ export type GetPetitions_petitionsQuery = {
               multiple: boolean;
             }> | null;
           }>;
-          replies?: Array<{
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+          } | null;
+          owner?: {
             id: string;
-            alias: string | null;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+        }
+      | {
+          id: string;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
             type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
               metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
               children: Array<{
-                field: { id: string; alias: string | null; type: PetitionFieldType };
+                field: { id: string; type: PetitionFieldType };
                 replies: Array<{
                   id: string;
                   content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
                   metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
                 }>;
               }> | null;
             }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
           signatureConfig?: {
             isEnabled: boolean;
             signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
           } | null;
-          progress?: {
-            external: { approved: number; replied: number; optional: number; total: number };
-            internal: { approved: number; replied: number; optional: number; total: number };
-          };
-          variablesResult?: Array<{ name: string; value: number | null }>;
-          signatures?: Array<{
-            id: string;
-            status: PetitionSignatureRequestStatus;
-            environment: SignatureOrgIntegrationEnvironment;
-            createdAt: string;
-            updatedAt: string;
-            signatureConfig: {
-              signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
-            };
-          }>;
           owner?: {
             id: string;
             email: string;
@@ -8262,15 +8387,15 @@ export type CreatePetition_petitionMutationVariables = Exact<{
 export type CreatePetition_petitionMutation = {
   createPetition:
     | {
+        status: PetitionStatus;
+        deadline: string | null;
+        isAnonymized: boolean;
         id: string;
         path: string;
         name: string | null;
-        status: PetitionStatus;
-        deadline: string | null;
         locale: PetitionLocale;
         createdAt: string;
         customProperties: { [key: string]: any };
-        isAnonymized: boolean;
         fromTemplate: { id: string } | null;
         recipients?: Array<{
           recipientUrl: string | null;
@@ -8297,6 +8422,39 @@ export type CreatePetition_petitionMutation = {
             firstName: string | null;
             lastName: string | null;
           } | null;
+        }>;
+        replies?: Array<{
+          id: string;
+          alias: string | null;
+          type: PetitionFieldType;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+            children: Array<{
+              field: { id: string; alias: string | null; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                metadata: { [key: string]: any };
+              }>;
+            }> | null;
+          }>;
+        }>;
+        progress?: {
+          external: { approved: number; replied: number; optional: number; total: number };
+          internal: { approved: number; replied: number; optional: number; total: number };
+        };
+        variablesResult?: Array<{ name: string; value: number | null }>;
+        signatures?: Array<{
+          id: string;
+          status: PetitionSignatureRequestStatus;
+          environment: SignatureOrgIntegrationEnvironment;
+          createdAt: string;
+          updatedAt: string;
+          signatureConfig: {
+            signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+          };
         }>;
         fields?: Array<{
           id: string;
@@ -8339,44 +8497,11 @@ export type CreatePetition_petitionMutation = {
             multiple: boolean;
           }> | null;
         }>;
-        replies?: Array<{
-          id: string;
-          alias: string | null;
-          type: PetitionFieldType;
-          replies: Array<{
-            id: string;
-            content: { [key: string]: any };
-            metadata: { [key: string]: any };
-            children: Array<{
-              field: { id: string; alias: string | null; type: PetitionFieldType };
-              replies: Array<{
-                id: string;
-                content: { [key: string]: any };
-                metadata: { [key: string]: any };
-              }>;
-            }> | null;
-          }>;
-        }>;
         tags?: Array<{ id: string; name: string }>;
         signatureConfig?: {
           isEnabled: boolean;
           signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
         } | null;
-        progress?: {
-          external: { approved: number; replied: number; optional: number; total: number };
-          internal: { approved: number; replied: number; optional: number; total: number };
-        };
-        variablesResult?: Array<{ name: string; value: number | null }>;
-        signatures?: Array<{
-          id: string;
-          status: PetitionSignatureRequestStatus;
-          environment: SignatureOrgIntegrationEnvironment;
-          createdAt: string;
-          updatedAt: string;
-          signatureConfig: {
-            signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
-          };
-        }>;
         owner?: {
           id: string;
           email: string;
@@ -8385,7 +8510,67 @@ export type CreatePetition_petitionMutation = {
           lastName: string | null;
         };
       }
-    | {};
+    | {
+        id: string;
+        path: string;
+        name: string | null;
+        locale: PetitionLocale;
+        createdAt: string;
+        customProperties: { [key: string]: any };
+        fields?: Array<{
+          id: string;
+          title: string | null;
+          description: string | null;
+          type: PetitionFieldType;
+          fromPetitionFieldId: string | null;
+          alias: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          multiple: boolean;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+            children: Array<{
+              field: { id: string; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                status: PetitionFieldReplyStatus;
+                metadata: { [key: string]: any };
+                createdAt: string;
+                updatedAt: string;
+              }>;
+            }> | null;
+          }>;
+          children: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+          }> | null;
+        }>;
+        tags?: Array<{ id: string; name: string }>;
+        signatureConfig?: {
+          isEnabled: boolean;
+          signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+        } | null;
+        owner?: {
+          id: string;
+          email: string;
+          fullName: string | null;
+          firstName: string | null;
+          lastName: string | null;
+        };
+      };
 };
 
 export type GetPetition_petitionQueryVariables = Exact<{
@@ -8405,15 +8590,15 @@ export type GetPetition_petitionQueryVariables = Exact<{
 export type GetPetition_petitionQuery = {
   petition:
     | {
+        status: PetitionStatus;
+        deadline: string | null;
+        isAnonymized: boolean;
         id: string;
         path: string;
         name: string | null;
-        status: PetitionStatus;
-        deadline: string | null;
         locale: PetitionLocale;
         createdAt: string;
         customProperties: { [key: string]: any };
-        isAnonymized: boolean;
         fromTemplate: { id: string } | null;
         recipients?: Array<{
           recipientUrl: string | null;
@@ -8440,6 +8625,39 @@ export type GetPetition_petitionQuery = {
             firstName: string | null;
             lastName: string | null;
           } | null;
+        }>;
+        replies?: Array<{
+          id: string;
+          alias: string | null;
+          type: PetitionFieldType;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+            children: Array<{
+              field: { id: string; alias: string | null; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                metadata: { [key: string]: any };
+              }>;
+            }> | null;
+          }>;
+        }>;
+        progress?: {
+          external: { approved: number; replied: number; optional: number; total: number };
+          internal: { approved: number; replied: number; optional: number; total: number };
+        };
+        variablesResult?: Array<{ name: string; value: number | null }>;
+        signatures?: Array<{
+          id: string;
+          status: PetitionSignatureRequestStatus;
+          environment: SignatureOrgIntegrationEnvironment;
+          createdAt: string;
+          updatedAt: string;
+          signatureConfig: {
+            signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+          };
         }>;
         fields?: Array<{
           id: string;
@@ -8482,44 +8700,11 @@ export type GetPetition_petitionQuery = {
             multiple: boolean;
           }> | null;
         }>;
-        replies?: Array<{
-          id: string;
-          alias: string | null;
-          type: PetitionFieldType;
-          replies: Array<{
-            id: string;
-            content: { [key: string]: any };
-            metadata: { [key: string]: any };
-            children: Array<{
-              field: { id: string; alias: string | null; type: PetitionFieldType };
-              replies: Array<{
-                id: string;
-                content: { [key: string]: any };
-                metadata: { [key: string]: any };
-              }>;
-            }> | null;
-          }>;
-        }>;
         tags?: Array<{ id: string; name: string }>;
         signatureConfig?: {
           isEnabled: boolean;
           signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
         } | null;
-        progress?: {
-          external: { approved: number; replied: number; optional: number; total: number };
-          internal: { approved: number; replied: number; optional: number; total: number };
-        };
-        variablesResult?: Array<{ name: string; value: number | null }>;
-        signatures?: Array<{
-          id: string;
-          status: PetitionSignatureRequestStatus;
-          environment: SignatureOrgIntegrationEnvironment;
-          createdAt: string;
-          updatedAt: string;
-          signatureConfig: {
-            signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
-          };
-        }>;
         owner?: {
           id: string;
           email: string;
@@ -8528,7 +8713,67 @@ export type GetPetition_petitionQuery = {
           lastName: string | null;
         };
       }
-    | {}
+    | {
+        id: string;
+        path: string;
+        name: string | null;
+        locale: PetitionLocale;
+        createdAt: string;
+        customProperties: { [key: string]: any };
+        fields?: Array<{
+          id: string;
+          title: string | null;
+          description: string | null;
+          type: PetitionFieldType;
+          fromPetitionFieldId: string | null;
+          alias: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          multiple: boolean;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+            children: Array<{
+              field: { id: string; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                status: PetitionFieldReplyStatus;
+                metadata: { [key: string]: any };
+                createdAt: string;
+                updatedAt: string;
+              }>;
+            }> | null;
+          }>;
+          children: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+          }> | null;
+        }>;
+        tags?: Array<{ id: string; name: string }>;
+        signatureConfig?: {
+          isEnabled: boolean;
+          signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+        } | null;
+        owner?: {
+          id: string;
+          email: string;
+          fullName: string | null;
+          firstName: string | null;
+          lastName: string | null;
+        };
+      }
     | null;
 };
 
@@ -8587,15 +8832,15 @@ export type UpdatePetition_updatePetitionMutationVariables = Exact<{
 export type UpdatePetition_updatePetitionMutation = {
   updatePetition:
     | {
+        status: PetitionStatus;
+        deadline: string | null;
+        isAnonymized: boolean;
         id: string;
         path: string;
         name: string | null;
-        status: PetitionStatus;
-        deadline: string | null;
         locale: PetitionLocale;
         createdAt: string;
         customProperties: { [key: string]: any };
-        isAnonymized: boolean;
         fromTemplate: { id: string } | null;
         recipients?: Array<{
           recipientUrl: string | null;
@@ -8622,6 +8867,39 @@ export type UpdatePetition_updatePetitionMutation = {
             firstName: string | null;
             lastName: string | null;
           } | null;
+        }>;
+        replies?: Array<{
+          id: string;
+          alias: string | null;
+          type: PetitionFieldType;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+            children: Array<{
+              field: { id: string; alias: string | null; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                metadata: { [key: string]: any };
+              }>;
+            }> | null;
+          }>;
+        }>;
+        progress?: {
+          external: { approved: number; replied: number; optional: number; total: number };
+          internal: { approved: number; replied: number; optional: number; total: number };
+        };
+        variablesResult?: Array<{ name: string; value: number | null }>;
+        signatures?: Array<{
+          id: string;
+          status: PetitionSignatureRequestStatus;
+          environment: SignatureOrgIntegrationEnvironment;
+          createdAt: string;
+          updatedAt: string;
+          signatureConfig: {
+            signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+          };
         }>;
         fields?: Array<{
           id: string;
@@ -8664,44 +8942,11 @@ export type UpdatePetition_updatePetitionMutation = {
             multiple: boolean;
           }> | null;
         }>;
-        replies?: Array<{
-          id: string;
-          alias: string | null;
-          type: PetitionFieldType;
-          replies: Array<{
-            id: string;
-            content: { [key: string]: any };
-            metadata: { [key: string]: any };
-            children: Array<{
-              field: { id: string; alias: string | null; type: PetitionFieldType };
-              replies: Array<{
-                id: string;
-                content: { [key: string]: any };
-                metadata: { [key: string]: any };
-              }>;
-            }> | null;
-          }>;
-        }>;
         tags?: Array<{ id: string; name: string }>;
         signatureConfig?: {
           isEnabled: boolean;
           signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
         } | null;
-        progress?: {
-          external: { approved: number; replied: number; optional: number; total: number };
-          internal: { approved: number; replied: number; optional: number; total: number };
-        };
-        variablesResult?: Array<{ name: string; value: number | null }>;
-        signatures?: Array<{
-          id: string;
-          status: PetitionSignatureRequestStatus;
-          environment: SignatureOrgIntegrationEnvironment;
-          createdAt: string;
-          updatedAt: string;
-          signatureConfig: {
-            signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
-          };
-        }>;
         owner?: {
           id: string;
           email: string;
@@ -8710,7 +8955,67 @@ export type UpdatePetition_updatePetitionMutation = {
           lastName: string | null;
         };
       }
-    | {};
+    | {
+        id: string;
+        path: string;
+        name: string | null;
+        locale: PetitionLocale;
+        createdAt: string;
+        customProperties: { [key: string]: any };
+        fields?: Array<{
+          id: string;
+          title: string | null;
+          description: string | null;
+          type: PetitionFieldType;
+          fromPetitionFieldId: string | null;
+          alias: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          multiple: boolean;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+            children: Array<{
+              field: { id: string; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                status: PetitionFieldReplyStatus;
+                metadata: { [key: string]: any };
+                createdAt: string;
+                updatedAt: string;
+              }>;
+            }> | null;
+          }>;
+          children: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+          }> | null;
+        }>;
+        tags?: Array<{ id: string; name: string }>;
+        signatureConfig?: {
+          isEnabled: boolean;
+          signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+        } | null;
+        owner?: {
+          id: string;
+          email: string;
+          fullName: string | null;
+          firstName: string | null;
+          lastName: string | null;
+        };
+      };
 };
 
 export type DeletePetition_deletePetitionsMutationVariables = Exact<{
@@ -8736,15 +9041,15 @@ export type ClosePetition_closePetitionMutationVariables = Exact<{
 
 export type ClosePetition_closePetitionMutation = {
   closePetition: {
+    status: PetitionStatus;
+    deadline: string | null;
+    isAnonymized: boolean;
     id: string;
     path: string;
     name: string | null;
-    status: PetitionStatus;
-    deadline: string | null;
     locale: PetitionLocale;
     createdAt: string;
     customProperties: { [key: string]: any };
-    isAnonymized: boolean;
     fromTemplate: { id: string } | null;
     recipients?: Array<{
       recipientUrl: string | null;
@@ -8771,6 +9076,39 @@ export type ClosePetition_closePetitionMutation = {
         firstName: string | null;
         lastName: string | null;
       } | null;
+    }>;
+    replies?: Array<{
+      id: string;
+      alias: string | null;
+      type: PetitionFieldType;
+      replies: Array<{
+        id: string;
+        content: { [key: string]: any };
+        metadata: { [key: string]: any };
+        children: Array<{
+          field: { id: string; alias: string | null; type: PetitionFieldType };
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+          }>;
+        }> | null;
+      }>;
+    }>;
+    progress?: {
+      external: { approved: number; replied: number; optional: number; total: number };
+      internal: { approved: number; replied: number; optional: number; total: number };
+    };
+    variablesResult?: Array<{ name: string; value: number | null }>;
+    signatures?: Array<{
+      id: string;
+      status: PetitionSignatureRequestStatus;
+      environment: SignatureOrgIntegrationEnvironment;
+      createdAt: string;
+      updatedAt: string;
+      signatureConfig: {
+        signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+      };
     }>;
     fields?: Array<{
       id: string;
@@ -8813,44 +9151,11 @@ export type ClosePetition_closePetitionMutation = {
         multiple: boolean;
       }> | null;
     }>;
-    replies?: Array<{
-      id: string;
-      alias: string | null;
-      type: PetitionFieldType;
-      replies: Array<{
-        id: string;
-        content: { [key: string]: any };
-        metadata: { [key: string]: any };
-        children: Array<{
-          field: { id: string; alias: string | null; type: PetitionFieldType };
-          replies: Array<{
-            id: string;
-            content: { [key: string]: any };
-            metadata: { [key: string]: any };
-          }>;
-        }> | null;
-      }>;
-    }>;
     tags?: Array<{ id: string; name: string }>;
     signatureConfig?: {
       isEnabled: boolean;
       signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
     } | null;
-    progress?: {
-      external: { approved: number; replied: number; optional: number; total: number };
-      internal: { approved: number; replied: number; optional: number; total: number };
-    };
-    variablesResult?: Array<{ name: string; value: number | null }>;
-    signatures?: Array<{
-      id: string;
-      status: PetitionSignatureRequestStatus;
-      environment: SignatureOrgIntegrationEnvironment;
-      createdAt: string;
-      updatedAt: string;
-      signatureConfig: {
-        signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
-      };
-    }>;
     owner?: {
       id: string;
       email: string;
@@ -8877,15 +9182,15 @@ export type ReopenPetition_reopenPetitionMutationVariables = Exact<{
 
 export type ReopenPetition_reopenPetitionMutation = {
   reopenPetition: {
+    status: PetitionStatus;
+    deadline: string | null;
+    isAnonymized: boolean;
     id: string;
     path: string;
     name: string | null;
-    status: PetitionStatus;
-    deadline: string | null;
     locale: PetitionLocale;
     createdAt: string;
     customProperties: { [key: string]: any };
-    isAnonymized: boolean;
     fromTemplate: { id: string } | null;
     recipients?: Array<{
       recipientUrl: string | null;
@@ -8912,6 +9217,39 @@ export type ReopenPetition_reopenPetitionMutation = {
         firstName: string | null;
         lastName: string | null;
       } | null;
+    }>;
+    replies?: Array<{
+      id: string;
+      alias: string | null;
+      type: PetitionFieldType;
+      replies: Array<{
+        id: string;
+        content: { [key: string]: any };
+        metadata: { [key: string]: any };
+        children: Array<{
+          field: { id: string; alias: string | null; type: PetitionFieldType };
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+          }>;
+        }> | null;
+      }>;
+    }>;
+    progress?: {
+      external: { approved: number; replied: number; optional: number; total: number };
+      internal: { approved: number; replied: number; optional: number; total: number };
+    };
+    variablesResult?: Array<{ name: string; value: number | null }>;
+    signatures?: Array<{
+      id: string;
+      status: PetitionSignatureRequestStatus;
+      environment: SignatureOrgIntegrationEnvironment;
+      createdAt: string;
+      updatedAt: string;
+      signatureConfig: {
+        signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+      };
     }>;
     fields?: Array<{
       id: string;
@@ -8954,44 +9292,11 @@ export type ReopenPetition_reopenPetitionMutation = {
         multiple: boolean;
       }> | null;
     }>;
-    replies?: Array<{
-      id: string;
-      alias: string | null;
-      type: PetitionFieldType;
-      replies: Array<{
-        id: string;
-        content: { [key: string]: any };
-        metadata: { [key: string]: any };
-        children: Array<{
-          field: { id: string; alias: string | null; type: PetitionFieldType };
-          replies: Array<{
-            id: string;
-            content: { [key: string]: any };
-            metadata: { [key: string]: any };
-          }>;
-        }> | null;
-      }>;
-    }>;
     tags?: Array<{ id: string; name: string }>;
     signatureConfig?: {
       isEnabled: boolean;
       signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
     } | null;
-    progress?: {
-      external: { approved: number; replied: number; optional: number; total: number };
-      internal: { approved: number; replied: number; optional: number; total: number };
-    };
-    variablesResult?: Array<{ name: string; value: number | null }>;
-    signatures?: Array<{
-      id: string;
-      status: PetitionSignatureRequestStatus;
-      environment: SignatureOrgIntegrationEnvironment;
-      createdAt: string;
-      updatedAt: string;
-      signatureConfig: {
-        signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
-      };
-    }>;
     owner?: {
       id: string;
       email: string;
@@ -9035,15 +9340,15 @@ export type TagPetition_tagPetitionMutationVariables = Exact<{
 export type TagPetition_tagPetitionMutation = {
   tagPetition:
     | {
+        status: PetitionStatus;
+        deadline: string | null;
+        isAnonymized: boolean;
         id: string;
         path: string;
         name: string | null;
-        status: PetitionStatus;
-        deadline: string | null;
         locale: PetitionLocale;
         createdAt: string;
         customProperties: { [key: string]: any };
-        isAnonymized: boolean;
         fromTemplate: { id: string } | null;
         recipients?: Array<{
           recipientUrl: string | null;
@@ -9070,6 +9375,39 @@ export type TagPetition_tagPetitionMutation = {
             firstName: string | null;
             lastName: string | null;
           } | null;
+        }>;
+        replies?: Array<{
+          id: string;
+          alias: string | null;
+          type: PetitionFieldType;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+            children: Array<{
+              field: { id: string; alias: string | null; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                metadata: { [key: string]: any };
+              }>;
+            }> | null;
+          }>;
+        }>;
+        progress?: {
+          external: { approved: number; replied: number; optional: number; total: number };
+          internal: { approved: number; replied: number; optional: number; total: number };
+        };
+        variablesResult?: Array<{ name: string; value: number | null }>;
+        signatures?: Array<{
+          id: string;
+          status: PetitionSignatureRequestStatus;
+          environment: SignatureOrgIntegrationEnvironment;
+          createdAt: string;
+          updatedAt: string;
+          signatureConfig: {
+            signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+          };
         }>;
         fields?: Array<{
           id: string;
@@ -9112,44 +9450,11 @@ export type TagPetition_tagPetitionMutation = {
             multiple: boolean;
           }> | null;
         }>;
-        replies?: Array<{
-          id: string;
-          alias: string | null;
-          type: PetitionFieldType;
-          replies: Array<{
-            id: string;
-            content: { [key: string]: any };
-            metadata: { [key: string]: any };
-            children: Array<{
-              field: { id: string; alias: string | null; type: PetitionFieldType };
-              replies: Array<{
-                id: string;
-                content: { [key: string]: any };
-                metadata: { [key: string]: any };
-              }>;
-            }> | null;
-          }>;
-        }>;
         tags?: Array<{ id: string; name: string }>;
         signatureConfig?: {
           isEnabled: boolean;
           signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
         } | null;
-        progress?: {
-          external: { approved: number; replied: number; optional: number; total: number };
-          internal: { approved: number; replied: number; optional: number; total: number };
-        };
-        variablesResult?: Array<{ name: string; value: number | null }>;
-        signatures?: Array<{
-          id: string;
-          status: PetitionSignatureRequestStatus;
-          environment: SignatureOrgIntegrationEnvironment;
-          createdAt: string;
-          updatedAt: string;
-          signatureConfig: {
-            signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
-          };
-        }>;
         owner?: {
           id: string;
           email: string;
@@ -9158,7 +9463,67 @@ export type TagPetition_tagPetitionMutation = {
           lastName: string | null;
         };
       }
-    | {};
+    | {
+        id: string;
+        path: string;
+        name: string | null;
+        locale: PetitionLocale;
+        createdAt: string;
+        customProperties: { [key: string]: any };
+        fields?: Array<{
+          id: string;
+          title: string | null;
+          description: string | null;
+          type: PetitionFieldType;
+          fromPetitionFieldId: string | null;
+          alias: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          multiple: boolean;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+            children: Array<{
+              field: { id: string; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                status: PetitionFieldReplyStatus;
+                metadata: { [key: string]: any };
+                createdAt: string;
+                updatedAt: string;
+              }>;
+            }> | null;
+          }>;
+          children: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+          }> | null;
+        }>;
+        tags?: Array<{ id: string; name: string }>;
+        signatureConfig?: {
+          isEnabled: boolean;
+          signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+        } | null;
+        owner?: {
+          id: string;
+          email: string;
+          fullName: string | null;
+          firstName: string | null;
+          lastName: string | null;
+        };
+      };
 };
 
 export type UntagPetition_tagsByNameQueryVariables = Exact<{
@@ -9247,15 +9612,15 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
   sendPetition: Array<{
     result: Result;
     petition: {
+      status: PetitionStatus;
+      deadline: string | null;
+      isAnonymized: boolean;
       id: string;
       path: string;
       name: string | null;
-      status: PetitionStatus;
-      deadline: string | null;
       locale: PetitionLocale;
       createdAt: string;
       customProperties: { [key: string]: any };
-      isAnonymized: boolean;
       fromTemplate: { id: string } | null;
       recipients?: Array<{
         recipientUrl: string | null;
@@ -9282,6 +9647,39 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
           firstName: string | null;
           lastName: string | null;
         } | null;
+      }>;
+      replies?: Array<{
+        id: string;
+        alias: string | null;
+        type: PetitionFieldType;
+        replies: Array<{
+          id: string;
+          content: { [key: string]: any };
+          metadata: { [key: string]: any };
+          children: Array<{
+            field: { id: string; alias: string | null; type: PetitionFieldType };
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+            }>;
+          }> | null;
+        }>;
+      }>;
+      progress?: {
+        external: { approved: number; replied: number; optional: number; total: number };
+        internal: { approved: number; replied: number; optional: number; total: number };
+      };
+      variablesResult?: Array<{ name: string; value: number | null }>;
+      signatures?: Array<{
+        id: string;
+        status: PetitionSignatureRequestStatus;
+        environment: SignatureOrgIntegrationEnvironment;
+        createdAt: string;
+        updatedAt: string;
+        signatureConfig: {
+          signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+        };
       }>;
       fields?: Array<{
         id: string;
@@ -9324,44 +9722,11 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
           multiple: boolean;
         }> | null;
       }>;
-      replies?: Array<{
-        id: string;
-        alias: string | null;
-        type: PetitionFieldType;
-        replies: Array<{
-          id: string;
-          content: { [key: string]: any };
-          metadata: { [key: string]: any };
-          children: Array<{
-            field: { id: string; alias: string | null; type: PetitionFieldType };
-            replies: Array<{
-              id: string;
-              content: { [key: string]: any };
-              metadata: { [key: string]: any };
-            }>;
-          }> | null;
-        }>;
-      }>;
       tags?: Array<{ id: string; name: string }>;
       signatureConfig?: {
         isEnabled: boolean;
         signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
       } | null;
-      progress?: {
-        external: { approved: number; replied: number; optional: number; total: number };
-        internal: { approved: number; replied: number; optional: number; total: number };
-      };
-      variablesResult?: Array<{ name: string; value: number | null }>;
-      signatures?: Array<{
-        id: string;
-        status: PetitionSignatureRequestStatus;
-        environment: SignatureOrgIntegrationEnvironment;
-        createdAt: string;
-        updatedAt: string;
-        signatureConfig: {
-          signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
-        };
-      }>;
       owner?: {
         id: string;
         email: string;
@@ -12360,15 +12725,15 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutationVariables = Exact<{
 
 export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
   bulkCreatePetitionReplies: {
+    status: PetitionStatus;
+    deadline: string | null;
+    isAnonymized: boolean;
     id: string;
     path: string;
     name: string | null;
-    status: PetitionStatus;
-    deadline: string | null;
     locale: PetitionLocale;
     createdAt: string;
     customProperties: { [key: string]: any };
-    isAnonymized: boolean;
     fromTemplate: { id: string } | null;
     recipients?: Array<{
       recipientUrl: string | null;
@@ -12395,6 +12760,39 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
         firstName: string | null;
         lastName: string | null;
       } | null;
+    }>;
+    replies?: Array<{
+      id: string;
+      alias: string | null;
+      type: PetitionFieldType;
+      replies: Array<{
+        id: string;
+        content: { [key: string]: any };
+        metadata: { [key: string]: any };
+        children: Array<{
+          field: { id: string; alias: string | null; type: PetitionFieldType };
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+          }>;
+        }> | null;
+      }>;
+    }>;
+    progress?: {
+      external: { approved: number; replied: number; optional: number; total: number };
+      internal: { approved: number; replied: number; optional: number; total: number };
+    };
+    variablesResult?: Array<{ name: string; value: number | null }>;
+    signatures?: Array<{
+      id: string;
+      status: PetitionSignatureRequestStatus;
+      environment: SignatureOrgIntegrationEnvironment;
+      createdAt: string;
+      updatedAt: string;
+      signatureConfig: {
+        signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
+      };
     }>;
     fields?: Array<{
       id: string;
@@ -12437,44 +12835,11 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
         multiple: boolean;
       }> | null;
     }>;
-    replies?: Array<{
-      id: string;
-      alias: string | null;
-      type: PetitionFieldType;
-      replies: Array<{
-        id: string;
-        content: { [key: string]: any };
-        metadata: { [key: string]: any };
-        children: Array<{
-          field: { id: string; alias: string | null; type: PetitionFieldType };
-          replies: Array<{
-            id: string;
-            content: { [key: string]: any };
-            metadata: { [key: string]: any };
-          }>;
-        }> | null;
-      }>;
-    }>;
     tags?: Array<{ id: string; name: string }>;
     signatureConfig?: {
       isEnabled: boolean;
       signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
     } | null;
-    progress?: {
-      external: { approved: number; replied: number; optional: number; total: number };
-      internal: { approved: number; replied: number; optional: number; total: number };
-    };
-    variablesResult?: Array<{ name: string; value: number | null }>;
-    signatures?: Array<{
-      id: string;
-      status: PetitionSignatureRequestStatus;
-      environment: SignatureOrgIntegrationEnvironment;
-      createdAt: string;
-      updatedAt: string;
-      signatureConfig: {
-        signers: Array<{ email: string; firstName: string; lastName: string | null } | null>;
-      };
-    }>;
     owner?: {
       id: string;
       email: string;
@@ -12567,45 +12932,6 @@ export const OrganizationFragmentDoc = gql`
     name
   }
 ` as unknown as DocumentNode<OrganizationFragment, unknown>;
-export const ContactFragmentDoc = gql`
-  fragment Contact on Contact {
-    id
-    email
-    fullName
-    firstName
-    lastName
-    createdAt
-    updatedAt
-  }
-` as unknown as DocumentNode<ContactFragment, unknown>;
-export const UserFragmentDoc = gql`
-  fragment User on User {
-    id
-    email
-    fullName
-    firstName
-    lastName
-  }
-` as unknown as DocumentNode<UserFragment, unknown>;
-export const PetitionAccessFragmentDoc = gql`
-  fragment PetitionAccess on PetitionAccess {
-    id
-    contact {
-      ...Contact
-    }
-    granter {
-      ...User
-    }
-    status
-    reminderCount
-    remindersLeft
-    remindersActive
-    nextReminderAt
-    createdAt
-  }
-  ${ContactFragmentDoc}
-  ${UserFragmentDoc}
-` as unknown as DocumentNode<PetitionAccessFragment, unknown>;
 export const _PetitionFieldFragmentDoc = gql`
   fragment _PetitionField on PetitionField {
     id
@@ -12669,6 +12995,45 @@ export const TagFragmentDoc = gql`
     name
   }
 ` as unknown as DocumentNode<TagFragment, unknown>;
+export const UserFragmentDoc = gql`
+  fragment User on User {
+    id
+    email
+    fullName
+    firstName
+    lastName
+  }
+` as unknown as DocumentNode<UserFragment, unknown>;
+export const ContactFragmentDoc = gql`
+  fragment Contact on Contact {
+    id
+    email
+    fullName
+    firstName
+    lastName
+    createdAt
+    updatedAt
+  }
+` as unknown as DocumentNode<ContactFragment, unknown>;
+export const PetitionAccessFragmentDoc = gql`
+  fragment PetitionAccess on PetitionAccess {
+    id
+    contact {
+      ...Contact
+    }
+    granter {
+      ...User
+    }
+    status
+    reminderCount
+    remindersLeft
+    remindersActive
+    nextReminderAt
+    createdAt
+  }
+  ${ContactFragmentDoc}
+  ${UserFragmentDoc}
+` as unknown as DocumentNode<PetitionAccessFragment, unknown>;
 export const PetitionSignatureRequestFragmentDoc = gql`
   fragment PetitionSignatureRequest on PetitionSignatureRequest {
     id
@@ -12686,48 +13051,15 @@ export const PetitionSignatureRequestFragmentDoc = gql`
   }
 ` as unknown as DocumentNode<PetitionSignatureRequestFragment, unknown>;
 export const PetitionFragmentDoc = gql`
-  fragment Petition on Petition {
+  fragment Petition on PetitionBase {
     id
     path
     name
-    status
-    deadline
     locale
     createdAt
-    fromTemplate {
-      id
-    }
     customProperties
-    recipients: accesses @include(if: $includeRecipients) {
-      ...PetitionAccess
-    }
-    recipients: accesses @include(if: $includeRecipientUrl) {
-      recipientUrl
-    }
     fields @include(if: $includeFields) {
       ...PetitionFieldWithReplies
-    }
-    replies: fields @include(if: $includeReplies) {
-      id
-      alias
-      type
-      replies {
-        id
-        content
-        metadata
-        children {
-          field {
-            id
-            alias
-            type
-          }
-          replies {
-            id
-            content
-            metadata
-          }
-        }
-      }
     }
     tags @include(if: $includeTags) {
       ...Tag
@@ -12740,37 +13072,72 @@ export const PetitionFragmentDoc = gql`
         lastName
       }
     }
-    progress @include(if: $includeProgress) {
-      external {
-        approved
-        replied
-        optional
-        total
-      }
-      internal {
-        approved
-        replied
-        optional
-        total
-      }
-    }
-    variablesResult @include(if: $includeVariablesResult) {
-      name
-      value
-    }
-    signatures: signatureRequests @include(if: $includeSignatureRequests) {
-      ...PetitionSignatureRequest
-    }
     owner @include(if: $includeOwner) {
       ...User
     }
-    isAnonymized
+    ... on Petition {
+      status
+      deadline
+      fromTemplate {
+        id
+      }
+      recipients: accesses @include(if: $includeRecipients) {
+        ...PetitionAccess
+      }
+      recipients: accesses @include(if: $includeRecipientUrl) {
+        recipientUrl
+      }
+      replies: fields @include(if: $includeReplies) {
+        id
+        alias
+        type
+        replies {
+          id
+          content
+          metadata
+          children {
+            field {
+              id
+              alias
+              type
+            }
+            replies {
+              id
+              content
+              metadata
+            }
+          }
+        }
+      }
+      progress @include(if: $includeProgress) {
+        external {
+          approved
+          replied
+          optional
+          total
+        }
+        internal {
+          approved
+          replied
+          optional
+          total
+        }
+      }
+      variablesResult @include(if: $includeVariablesResult) {
+        name
+        value
+      }
+      signatures: signatureRequests @include(if: $includeSignatureRequests) {
+        ...PetitionSignatureRequest
+      }
+      isAnonymized
+    }
   }
-  ${PetitionAccessFragmentDoc}
   ${PetitionFieldWithRepliesFragmentDoc}
   ${TagFragmentDoc}
-  ${PetitionSignatureRequestFragmentDoc}
   ${UserFragmentDoc}
+  ${PetitionAccessFragmentDoc}
+  ${PetitionSignatureRequestFragmentDoc}
 ` as unknown as DocumentNode<PetitionFragment, unknown>;
 export const TemplateFragmentDoc = gql`
   fragment Template on PetitionTemplate {

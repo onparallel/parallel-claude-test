@@ -142,48 +142,15 @@ export const PetitionSignatureRequestFragment = gql`
 `;
 
 export const PetitionFragment = gql`
-  fragment Petition on Petition {
+  fragment Petition on PetitionBase {
     id
     path
     name
-    status
-    deadline
     locale
     createdAt
-    fromTemplate {
-      id
-    }
     customProperties
-    recipients: accesses @include(if: $includeRecipients) {
-      ...PetitionAccess
-    }
-    recipients: accesses @include(if: $includeRecipientUrl) {
-      recipientUrl
-    }
     fields @include(if: $includeFields) {
       ...PetitionFieldWithReplies
-    }
-    replies: fields @include(if: $includeReplies) {
-      id
-      alias
-      type
-      replies {
-        id
-        content
-        metadata
-        children {
-          field {
-            id
-            alias
-            type
-          }
-          replies {
-            id
-            content
-            metadata
-          }
-        }
-      }
     }
     tags @include(if: $includeTags) {
       ...Tag
@@ -196,31 +163,66 @@ export const PetitionFragment = gql`
         lastName
       }
     }
-    progress @include(if: $includeProgress) {
-      external {
-        approved
-        replied
-        optional
-        total
-      }
-      internal {
-        approved
-        replied
-        optional
-        total
-      }
-    }
-    variablesResult @include(if: $includeVariablesResult) {
-      name
-      value
-    }
-    signatures: signatureRequests @include(if: $includeSignatureRequests) {
-      ...PetitionSignatureRequest
-    }
     owner @include(if: $includeOwner) {
       ...User
     }
-    isAnonymized
+    ... on Petition {
+      status
+      deadline
+      fromTemplate {
+        id
+      }
+      recipients: accesses @include(if: $includeRecipients) {
+        ...PetitionAccess
+      }
+      recipients: accesses @include(if: $includeRecipientUrl) {
+        recipientUrl
+      }
+      replies: fields @include(if: $includeReplies) {
+        id
+        alias
+        type
+        replies {
+          id
+          content
+          metadata
+          children {
+            field {
+              id
+              alias
+              type
+            }
+            replies {
+              id
+              content
+              metadata
+            }
+          }
+        }
+      }
+      progress @include(if: $includeProgress) {
+        external {
+          approved
+          replied
+          optional
+          total
+        }
+        internal {
+          approved
+          replied
+          optional
+          total
+        }
+      }
+      variablesResult @include(if: $includeVariablesResult) {
+        name
+        value
+      }
+      signatures: signatureRequests @include(if: $includeSignatureRequests) {
+        ...PetitionSignatureRequest
+      }
+      isAnonymized
+    }
   }
   ${PetitionAccessFragment}
   ${PetitionFieldWithRepliesFragment}
