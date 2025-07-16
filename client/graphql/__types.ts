@@ -262,6 +262,7 @@ export interface BackgroundCheckEntityDetailsCompanyProperties {
   name?: Maybe<Array<Scalars["String"]["output"]>>;
   relationships?: Maybe<Array<BackgroundCheckEntityDetailsRelationship>>;
   sanctions?: Maybe<Array<BackgroundCheckEntityDetailsSanction>>;
+  sourceUrl?: Maybe<Array<Scalars["String"]["output"]>>;
   topics?: Maybe<Array<Scalars["String"]["output"]>>;
 }
 
@@ -299,6 +300,7 @@ export interface BackgroundCheckEntityDetailsPersonProperties {
   relationships?: Maybe<Array<BackgroundCheckEntityDetailsRelationship>>;
   religion?: Maybe<Array<Scalars["String"]["output"]>>;
   sanctions?: Maybe<Array<BackgroundCheckEntityDetailsSanction>>;
+  sourceUrl?: Maybe<Array<Scalars["String"]["output"]>>;
   status?: Maybe<Array<Scalars["String"]["output"]>>;
   topics?: Maybe<Array<Scalars["String"]["output"]>>;
 }
@@ -30248,6 +30250,7 @@ export type BackgroundCheckEntityDetailsCompanyOverview_BackgroundCheckEntityDet
       name?: Array<string> | null;
       alias?: Array<string> | null;
       address?: Array<string> | null;
+      sourceUrl?: Array<string> | null;
     };
   };
 
@@ -30288,6 +30291,7 @@ export type BackgroundCheckEntityDetailsPersonOverview_BackgroundCheckEntityDeta
       position?: Array<string> | null;
       religion?: Array<string> | null;
       status?: Array<string> | null;
+      sourceUrl?: Array<string> | null;
     };
   };
 
@@ -44150,6 +44154,7 @@ export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPersonFrag
     position?: Array<string> | null;
     religion?: Array<string> | null;
     status?: Array<string> | null;
+    sourceUrl?: Array<string> | null;
     relationships?: Array<{
       __typename?: "BackgroundCheckEntityDetailsRelationship";
       id: string;
@@ -44221,6 +44226,7 @@ export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompanyFra
     name?: Array<string> | null;
     alias?: Array<string> | null;
     address?: Array<string> | null;
+    sourceUrl?: Array<string> | null;
     relationships?: Array<{
       __typename?: "BackgroundCheckEntityDetailsRelationship";
       id: string;
@@ -44302,6 +44308,7 @@ export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetails_Backgroun
       name?: Array<string> | null;
       alias?: Array<string> | null;
       address?: Array<string> | null;
+      sourceUrl?: Array<string> | null;
       relationships?: Array<{
         __typename?: "BackgroundCheckEntityDetailsRelationship";
         id: string;
@@ -44391,6 +44398,7 @@ export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetails_Backgroun
       position?: Array<string> | null;
       religion?: Array<string> | null;
       status?: Array<string> | null;
+      sourceUrl?: Array<string> | null;
       relationships?: Array<{
         __typename?: "BackgroundCheckEntityDetailsRelationship";
         id: string;
@@ -44500,6 +44508,7 @@ export type BackgroundCheckProfileDetails_backgroundCheckEntityDetailsQuery = {
           name?: Array<string> | null;
           alias?: Array<string> | null;
           address?: Array<string> | null;
+          sourceUrl?: Array<string> | null;
           relationships?: Array<{
             __typename?: "BackgroundCheckEntityDetailsRelationship";
             id: string;
@@ -44587,6 +44596,7 @@ export type BackgroundCheckProfileDetails_backgroundCheckEntityDetailsQuery = {
           position?: Array<string> | null;
           religion?: Array<string> | null;
           status?: Array<string> | null;
+          sourceUrl?: Array<string> | null;
           relationships?: Array<{
             __typename?: "BackgroundCheckEntityDetailsRelationship";
             id: string;
@@ -74572,6 +74582,7 @@ export const BackgroundCheckEntityDetailsPersonOverview_BackgroundCheckEntityDet
         position
         religion
         status
+        sourceUrl
       }
     }
   ` as unknown as DocumentNode<
@@ -74668,6 +74679,7 @@ export const BackgroundCheckEntityDetailsCompanyOverview_BackgroundCheckEntityDe
         name
         alias
         address
+        sourceUrl
       }
     }
   ` as unknown as DocumentNode<

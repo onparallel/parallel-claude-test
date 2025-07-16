@@ -258,6 +258,7 @@ type BackgroundCheckEntityDetailsCompanyProperties {
   name: [String!]
   relationships: [BackgroundCheckEntityDetailsRelationship!]
   sanctions: [BackgroundCheckEntityDetailsSanction!]
+  sourceUrl: [String!]
   topics: [String!]
 }
 
@@ -292,6 +293,7 @@ type BackgroundCheckEntityDetailsPersonProperties {
   relationships: [BackgroundCheckEntityDetailsRelationship!]
   religion: [String!]
   sanctions: [BackgroundCheckEntityDetailsSanction!]
+  sourceUrl: [String!]
   status: [String!]
   topics: [String!]
 }

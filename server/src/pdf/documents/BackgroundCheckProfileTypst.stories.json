@@ -19,8 +19,7 @@
                         "name": [
                             "ウラジーミル・プーチン",
                             "Vladimir Vladimirovich POUTINE",
-                            "ПУТИН Владимир Владимирович",
-                            "Vladimir Vladimirovich PUTIN"
+                            "ПУТИН Владимир Владимирович"
                         ],
                         "alias": [
                             "ヴラジーミル・ヴラジーミロヴィッチ・プーチン",
@@ -46,8 +45,6 @@
                         ],
                         "position": [
                             "Secretary of the Security Council of Russia (1999-1999)",
-                            "Prime Minister of Russia (1999-2000)",
-                            "party leader (1995-1997)",
                             "постоянный член Совета безопасности Российской Федерации"
                         ],
                         "religion": [
@@ -56,8 +53,6 @@
                         "education": [
                             "Candidate of Economic Sciences (1997)",
                             "FSB Academy",
-                            "School 193 (1960-1968)",
-                            "Faculty of Law, Saint Petersburg State University (1970-1975)",
                             "Saint Petersburg Mining University (-1997)"
                         ],
                         "ethnicity": [
@@ -66,8 +61,6 @@
                         "birthPlace": [
                             "レニングラード（現サンクトペテルブルク）（ロシア）",
                             "St. Petersburg",
-                            "V.F. Snegiryov Maternity Hospital No.6",
-                            "Saint-Petersburg, Russian Federation",
                             "Санкт-Петербург"
                         ],
                         "dateOfBirth": [
@@ -135,11 +128,14 @@
                                     "relationship": [
                                         "son-in-law",
                                         "father-in-law",
-                                        "father in law",
-                                        "relative"
+                                        "father in law"
                                     ]
                                 }
                             }
+                        ],
+                        "sourceUrl": [
+                            "https://www.cia.gov/resources/world-leaders/foreign-governments/russia",
+                            "https://www.cia.gov/the-world-factbook/countries/russia"
                         ]
                     },
                     "datasets": [

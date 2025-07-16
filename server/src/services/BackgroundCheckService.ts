@@ -104,6 +104,7 @@ export interface EntityDetailsPerson {
     ethnicity?: string[];
     sanctions?: EntityDetailsSanction[];
     relationships?: EntityDetailsRelationship[];
+    sourceUrl?: string[];
   };
   datasets?: DatasetDetails[];
 }
@@ -121,6 +122,7 @@ export interface EntityDetailsCompany {
     address?: string[];
     sanctions?: EntityDetailsSanction[];
     relationships?: EntityDetailsRelationship[];
+    sourceUrl?: string[];
   };
   datasets?: DatasetDetails[];
 }

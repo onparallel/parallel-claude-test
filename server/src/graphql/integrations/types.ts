@@ -252,6 +252,7 @@ export const BackgroundCheckEntityDetailsPerson = objectType({
           t.nullable.list.nonNull.field("relationships", {
             type: "BackgroundCheckEntityDetailsRelationship",
           });
+          t.nullable.list.nonNull.string("sourceUrl");
         },
       }),
     });
@@ -278,6 +279,7 @@ export const BackgroundCheckEntityDetailsCompany = objectType({
           t.nullable.list.nonNull.field("relationships", {
             type: "BackgroundCheckEntityDetailsRelationship",
           });
+          t.nullable.list.nonNull.string("sourceUrl");
         },
       }),
     });

@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { Table as ChakraTable, TableContainer, Tbody, Td, Text, Tr } from "@chakra-ui/react";
 import { Card, CardHeader } from "@parallel/components/common/Card";
+import { ExternalLink } from "@parallel/components/common/ExternalLink";
 import { ViewMoreText } from "@parallel/components/common/ViewMoreText";
 import { BackgroundCheckEntityDetailsPersonOverview_BackgroundCheckEntityDetailsPersonFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
@@ -154,6 +155,23 @@ export function BackgroundCheckEntityDetailsPersonOverview({
                 )}
               </Td>
             </Tr>
+            <Tr>
+              <Td>
+                <FormattedMessage
+                  id="component.background-check-entity-details-person-overview.sources-url"
+                  defaultMessage="Sources"
+                />
+              </Td>
+              <Td>
+                {properties.sourceUrl
+                  ? properties.sourceUrl?.map((url, i) => (
+                      <ExternalLink key={i} href={url} title={url} hideIcon marginEnd={1.5}>
+                        [{i + 1}]
+                      </ExternalLink>
+                    ))
+                  : "-"}
+              </Td>
+            </Tr>
           </Tbody>
         </ChakraTable>
       </TableContainer>
@@ -175,6 +193,7 @@ BackgroundCheckEntityDetailsPersonOverview.fragments = {
           position
           religion
           status
+          sourceUrl
         }
       }
     `;

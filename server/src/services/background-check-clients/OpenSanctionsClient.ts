@@ -42,6 +42,7 @@ interface OpenSanctionsPersonSchema {
     familyPerson?: OpenSanctionsFamilyPersonSchema[];
     directorshipDirector?: OpenSanctionsDirectorshipDirectorSchema[];
     sanctions?: OpenSanctionsSanctionSchema[];
+    sourceUrl?: string[];
   };
   datasets?: string[];
 }
@@ -126,6 +127,7 @@ interface OpenSanctionsCompanySchema {
     registrationNumber?: string[];
     sanctions?: OpenSanctionsSanctionSchema[];
     directorshipOrganization?: OpenSanctionsDirectorshipOrganizationSchema[];
+    sourceUrl?: string[];
   };
   datasets?: string[];
 }
@@ -337,6 +339,7 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
         position: data.properties.position,
         status: data.properties.status,
         religion: data.properties.religion,
+        sourceUrl: data.properties.sourceUrl,
         relationships: [
           ...(data.properties.familyPerson ?? [])
             .filter(this.isFamilyPersonSchema)
@@ -382,6 +385,7 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
         name: data.properties.name,
         alias: data.properties.alias,
         address: data.properties.address,
+        sourceUrl: data.properties.sourceUrl,
         relationships: [
           ...(data.properties.directorshipOrganization ?? [])
             .filter(this.isDirectorShipOrganizationSchema)

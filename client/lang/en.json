@@ -650,6 +650,11 @@
     "context": "Overview"
   },
   {
+    "term": "component.background-check-entity-details-company-overview.sources-url",
+    "definition": "Sources",
+    "context": "Sources"
+  },
+  {
     "term": "component.background-check-entity-details-datasets.data-sources",
     "definition": "Data sources",
     "context": "Data sources"
@@ -748,6 +753,11 @@
     "term": "component.background-check-entity-details-person-overview.regilion",
     "definition": "Religion",
     "context": "Religion"
+  },
+  {
+    "term": "component.background-check-entity-details-person-overview.sources-url",
+    "definition": "Sources",
+    "context": "Sources"
   },
   {
     "term": "component.background-check-entity-details-person-overview.status",

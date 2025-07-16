@@ -371,6 +371,11 @@ function BackgroundCheckProfileTypst(props: BackgroundCheckProfileProps, intl: I
   `
       : "";
 
+  const propertiesSources =
+    props.entity.properties?.sourceUrl
+      ?.map((url, index) => `#link("${url}")[#text(fill: rgb(77, 71, 198))[[${index + 1}]]]`)
+      .join("") ?? "-";
+
   // Generate overview fields
   const overviewFields = outdent`
     #grid(
@@ -388,9 +393,11 @@ function BackgroundCheckProfileTypst(props: BackgroundCheckProfileProps, intl: I
       [#text(size: 8.25pt, weight: 600)[Status:]], [#text(size: 9pt)[${formatListOfTexts((props.entity.properties as any)?.status)}]],
       [#text(size: 8.25pt, weight: 600)[Religion:]], [#text(size: 9pt)[${formatListOfTexts((props.entity.properties as any)?.religion)}]],
       [#text(size: 8.25pt, weight: 600)[Ethnicity:]], [#text(size: 9pt)[${formatListOfTexts((props.entity.properties as any)?.ethnicity)}]],
+      [#text(size: 8.25pt, weight: 600)[Sources:]], [#text(size: 9pt)[${propertiesSources}]],
       `
           : outdent`
       [#text(size: 8.25pt, weight: 600)[Address:]], [#text(size: 9pt)[${formatListOfTexts((props.entity.properties as any)?.address)}]],
+      [#text(size: 8.25pt, weight: 600)[Sources:]], [#text(size: 9pt)[${propertiesSources}]],
       `
       }
     )

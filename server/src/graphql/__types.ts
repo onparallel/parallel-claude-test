@@ -949,6 +949,7 @@ export interface NexusGenObjects {
     name?: string[] | null; // [String!]
     relationships?: NexusGenRootTypes["BackgroundCheckEntityDetailsRelationship"][] | null; // [BackgroundCheckEntityDetailsRelationship!]
     sanctions?: NexusGenRootTypes["BackgroundCheckEntityDetailsSanction"][] | null; // [BackgroundCheckEntityDetailsSanction!]
+    sourceUrl?: string[] | null; // [String!]
     topics?: string[] | null; // [String!]
   };
   BackgroundCheckEntityDetailsDataset: {
@@ -983,6 +984,7 @@ export interface NexusGenObjects {
     relationships?: NexusGenRootTypes["BackgroundCheckEntityDetailsRelationship"][] | null; // [BackgroundCheckEntityDetailsRelationship!]
     religion?: string[] | null; // [String!]
     sanctions?: NexusGenRootTypes["BackgroundCheckEntityDetailsSanction"][] | null; // [BackgroundCheckEntityDetailsSanction!]
+    sourceUrl?: string[] | null; // [String!]
     status?: string[] | null; // [String!]
     topics?: string[] | null; // [String!]
   };
@@ -2123,6 +2125,7 @@ export interface NexusGenFieldTypes {
     name: string[] | null; // [String!]
     relationships: NexusGenRootTypes["BackgroundCheckEntityDetailsRelationship"][] | null; // [BackgroundCheckEntityDetailsRelationship!]
     sanctions: NexusGenRootTypes["BackgroundCheckEntityDetailsSanction"][] | null; // [BackgroundCheckEntityDetailsSanction!]
+    sourceUrl: string[] | null; // [String!]
     topics: string[] | null; // [String!]
   };
   BackgroundCheckEntityDetailsDataset: {
@@ -2157,6 +2160,7 @@ export interface NexusGenFieldTypes {
     relationships: NexusGenRootTypes["BackgroundCheckEntityDetailsRelationship"][] | null; // [BackgroundCheckEntityDetailsRelationship!]
     religion: string[] | null; // [String!]
     sanctions: NexusGenRootTypes["BackgroundCheckEntityDetailsSanction"][] | null; // [BackgroundCheckEntityDetailsSanction!]
+    sourceUrl: string[] | null; // [String!]
     status: string[] | null; // [String!]
     topics: string[] | null; // [String!]
   };
@@ -5306,6 +5310,7 @@ export interface NexusGenFieldTypeNames {
     name: "String";
     relationships: "BackgroundCheckEntityDetailsRelationship";
     sanctions: "BackgroundCheckEntityDetailsSanction";
+    sourceUrl: "String";
     topics: "String";
   };
   BackgroundCheckEntityDetailsDataset: {
@@ -5340,6 +5345,7 @@ export interface NexusGenFieldTypeNames {
     relationships: "BackgroundCheckEntityDetailsRelationship";
     religion: "String";
     sanctions: "BackgroundCheckEntityDetailsSanction";
+    sourceUrl: "String";
     status: "String";
     topics: "String";
   };
