@@ -734,7 +734,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           slug: publicPetitionLink.slug,
           contactFirstName: faker.person.firstName(),
           contactLastName: faker.person.lastName(),
-          contactEmail: faker.internet.email(),
+          contactEmail: faker.internet.email({ provider: "onparallel.com" }),
         },
       });
 

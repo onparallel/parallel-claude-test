@@ -61,7 +61,7 @@ describe("repositories/OrganizationRepository", () => {
           return {
             first_name: faker.person.firstName(),
             last_name: faker.person.lastName(),
-            email: faker.internet.email(),
+            email: faker.internet.email({ provider: "onparallel.com" }),
           };
       }
     }

@@ -25,7 +25,10 @@ describe("GraphQL/Contacts", () => {
     ({ user, organization } = await mocks.createSessionUserAndOrganization());
 
     userContacts = await mocks.createRandomContacts(organization.id, 5, (n) => ({
-      email: n === 4 ? "email.search@onparallel.com" : faker.internet.email().toLowerCase(),
+      email:
+        n === 4
+          ? "email.search@onparallel.com"
+          : faker.internet.email({ provider: "onparallel.com" }).toLowerCase(),
     }));
 
     [otherOrg] = await mocks.createRandomOrganizations(1);

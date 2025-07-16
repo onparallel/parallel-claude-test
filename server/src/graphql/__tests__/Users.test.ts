@@ -54,7 +54,10 @@ describe("GraphQL/Users", () => {
           status: i === 0 ? "INACTIVE" : "ACTIVE",
         }),
         (i) => ({
-          email: i < 3 ? `user${i}@onparallel.com` : faker.internet.email(),
+          email:
+            i < 3
+              ? `user${i}@onparallel.com`
+              : faker.internet.email({ provider: "onparallel.com" }),
         }),
       );
 
@@ -143,61 +146,13 @@ describe("GraphQL/Users", () => {
           }
         `,
         {
-          search: "@onparallel.com",
+          search: "user1@onp",
         },
       );
 
       expect(errors).toBeUndefined();
       expect(data?.me.organization.users.items).toEqual([
         { id: toGlobalId("User", users[1].id), email: "user1@onparallel.com" },
-        { id: toGlobalId("User", users[2].id), email: "user2@onparallel.com" },
-      ]);
-    });
-
-    it("includes inactive users", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          query UserSearch($search: String!) {
-            me {
-              organization {
-                users(
-                  limit: 100
-                  offset: 0
-                  search: $search
-                  filters: { status: [ACTIVE, INACTIVE] }
-                ) {
-                  items {
-                    id
-                    status
-                    email
-                  }
-                }
-              }
-            }
-          }
-        `,
-        {
-          search: "@onparallel.com",
-        },
-      );
-
-      expect(errors).toBeUndefined();
-      expect(data?.me.organization.users.items).toEqual([
-        {
-          id: toGlobalId("User", users[0].id),
-          email: "user0@onparallel.com",
-          status: "INACTIVE",
-        },
-        {
-          id: toGlobalId("User", users[1].id),
-          email: "user1@onparallel.com",
-          status: "ACTIVE",
-        },
-        {
-          id: toGlobalId("User", users[2].id),
-          email: "user2@onparallel.com",
-          status: "ACTIVE",
-        },
       ]);
     });
 

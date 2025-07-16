@@ -4264,7 +4264,8 @@ describe("GraphQL/Petitions", () => {
     let contacts: Contact[];
     beforeAll(async () => {
       contacts = await mocks.createRandomContacts(organization.id, 3, (i) => ({
-        email: i === 0 ? sessionUserData.email : faker.internet.email(),
+        email:
+          i === 0 ? sessionUserData.email : faker.internet.email({ provider: "onparallel.com" }),
       }));
       usageLimit = await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 0);
     });
@@ -5865,7 +5866,7 @@ describe("GraphQL/Petitions", () => {
       );
 
       [contact] = await mocks.createRandomContacts(organization.id, 1, () => ({
-        email: faker.internet.email(),
+        email: faker.internet.email({ provider: "onparallel.com" }),
       }));
 
       [access] = await mocks.createPetitionAccess(
@@ -6195,7 +6196,7 @@ describe("GraphQL/Petitions", () => {
       );
 
       [contact] = await mocks.createRandomContacts(organization.id, 1, () => ({
-        email: faker.internet.email(),
+        email: faker.internet.email({ provider: "onparallel.com" }),
       }));
 
       [access] = await mocks.createPetitionAccess(
@@ -6350,7 +6351,7 @@ describe("GraphQL/Petitions", () => {
       );
 
       [contact] = await mocks.createRandomContacts(organization.id, 1, () => ({
-        email: faker.internet.email(),
+        email: faker.internet.email({ provider: "onparallel.com" }),
       }));
 
       [access] = await mocks.createPetitionAccess(

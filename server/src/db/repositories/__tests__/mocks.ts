@@ -233,9 +233,13 @@ export class Mocks {
         const firstName = faker.person.firstName();
         const lastName = faker.person.lastName();
         // ensure emails are unique
-        let email = faker.internet.email({ firstName, lastName }).toLowerCase();
+        let email = faker.internet
+          .email({ firstName, lastName, provider: "onparallel.com" })
+          .toLowerCase();
         while (emails.has(email)) {
-          email = faker.internet.email({ firstName, lastName }).toLowerCase();
+          email = faker.internet
+            .email({ firstName, lastName, provider: "onparallel.com" })
+            .toLowerCase();
         }
         emails.add(email);
         return {
@@ -315,7 +319,9 @@ export class Mocks {
             org_id: orgId,
             first_name: firstName,
             last_name: lastName,
-            email: faker.internet.email({ firstName, lastName }).toLowerCase(),
+            email: faker.internet
+              .email({ firstName, lastName, provider: "onparallel.com" })
+              .toLowerCase(),
             ...builder?.(index),
           };
         }),
@@ -1086,14 +1092,14 @@ export class Mocks {
     return await this.knex<EmailLog>("email_log")
       .insert(
         range(0, amount || 1).map(() => ({
-          to: faker.internet.email(),
-          from: faker.internet.email(),
+          to: faker.internet.email({ provider: "onparallel.com" }),
+          from: faker.internet.email({ provider: "onparallel.com" }),
           subject: faker.lorem.words(),
           text: faker.lorem.paragraphs(),
           html: faker.lorem.paragraphs(),
           track_opens: false,
           created_at: new Date(),
-          created_from: faker.internet.email(),
+          created_from: faker.internet.email({ provider: "onparallel.com" }),
         })),
       )
       .returning("*");
