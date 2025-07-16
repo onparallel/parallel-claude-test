@@ -3,7 +3,7 @@ import { useIntl } from "react-intl";
 import { isNonNullish, isNullish, unique } from "remeda";
 import { ibanDefinitions, ibanRegex } from "./iban";
 import { useLoadCountryNames } from "./useLoadCountryNames";
-import { EMAIL_REGEX } from "./validation";
+import { isValidEmail } from "./validation";
 
 export type ShortTextFormat = ShortTextFormatImplementation & {
   value: string;
@@ -35,7 +35,7 @@ export function useShortTextFormats() {
         }),
         type: "INPUT",
         inputProps: { type: "email", autoComplete: "email", name: "email" },
-        validate: (value) => EMAIL_REGEX.test(value),
+        validate: (value) => isValidEmail(value),
       },
       {
         value: "IBAN",

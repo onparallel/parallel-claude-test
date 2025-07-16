@@ -26,7 +26,7 @@ import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { SignatureConfigInputSigner } from "@parallel/graphql/__types";
 import { fullName } from "@parallel/utils/fullName";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { isValidEmail } from "@parallel/utils/validation";
 import { useMemo, useRef } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
@@ -178,7 +178,7 @@ function ConfirmSignerInfoDialog({
               type="email"
               {...register("email", {
                 required: true,
-                pattern: EMAIL_REGEX,
+                validate: { isValidEmail },
               })}
               placeholder={intl.formatMessage({
                 id: "generic.forms.company-email-placeholder",

@@ -31,7 +31,7 @@ import { resolveUrl } from "@parallel/utils/next";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useCodeExpiredToast } from "@parallel/utils/useCodeExpiredToast";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { isValidEmail } from "@parallel/utils/validation";
 import { isPast } from "date-fns";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -93,7 +93,7 @@ export function RecipientViewContactlessForm({
   const emailRef = useRef<HTMLInputElement>(null);
   const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
     required: true,
-    pattern: EMAIL_REGEX,
+    validate: isValidEmail,
   });
 
   const firstNameRef = useRef<HTMLInputElement>(null);

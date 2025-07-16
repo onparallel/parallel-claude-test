@@ -3,7 +3,7 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { isNotEmptyText } from "@parallel/utils/strings";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { isValidEmail } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -45,7 +45,7 @@ export function AskContactDetailsDialog({
   const emailRef = useRef<HTMLInputElement>(null);
   const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
     required: true,
-    pattern: EMAIL_REGEX,
+    validate: { isValidEmail },
   });
 
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -66,7 +66,7 @@ export function AskContactDetailsDialog({
       }}
       header={
         <FormattedMessage
-          id="contacts.create-new-contact.header"
+          id="component.ask-contact-details-dialog.header"
           defaultMessage="Enter the contact details"
         />
       }

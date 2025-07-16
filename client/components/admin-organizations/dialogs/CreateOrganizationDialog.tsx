@@ -13,7 +13,7 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { OrganizationStatus, UserLocale } from "@parallel/graphql/__types";
 import { asSupportedUserLocale, useSupportedUserLocales } from "@parallel/utils/locales";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { isValidEmail } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -50,7 +50,7 @@ export function CreateOrganizationDialog({
   const emailRef = useRef<HTMLInputElement>(null);
   const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
     required: true,
-    pattern: EMAIL_REGEX,
+    validate: isValidEmail,
   });
 
   const locales = useSupportedUserLocales();

@@ -1,4 +1,4 @@
-import { EMAIL_REGEX } from "./validators/validEmail";
+import { isValidEmail } from "./validators/validEmail";
 
 export type ExcelParsingCodeErrors =
   | "FIRST_NAME_REQUIRED"
@@ -52,7 +52,7 @@ export async function parseContactList(
     const lastName = row[1]?.trim();
     const email = row[2]?.trim().toLowerCase();
 
-    if (!EMAIL_REGEX.test(email)) {
+    if (!isValidEmail(email)) {
       rowHasError = true;
       errors.push({
         code: "INVALID_EMAIL_FORMAT",

@@ -2,7 +2,7 @@ import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { Tone } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { isValidEmail } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -35,7 +35,7 @@ function AddNewSignerDialog({
   const firstNameRef = useRef<HTMLInputElement>(null);
   const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
     required: true,
-    pattern: EMAIL_REGEX,
+    validate: { isValidEmail },
   });
   const firstNameRegisterProps = useRegisterWithRef(firstNameRef, register, "firstName", {
     required: true,

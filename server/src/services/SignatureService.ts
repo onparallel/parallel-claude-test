@@ -16,7 +16,7 @@ import {
   PetitionSignatureConfigSigner,
   PetitionSignatureRequestCancelData,
 } from "../db/repositories/PetitionRepository";
-import { EMAIL_REGEX } from "../graphql/helpers/validators/validEmail";
+import { isValidEmail } from "../graphql/helpers/validators/validEmail";
 import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
 import { MaybeArray, unMaybeArray } from "../util/types";
@@ -316,7 +316,7 @@ export class SignatureService implements ISignatureService {
       }
     }
 
-    if (allSigners.some((s) => !EMAIL_REGEX.test(s.email))) {
+    if (allSigners.some((s) => !isValidEmail(s.email))) {
       throw new Error("INVALID_SIGNER_EMAIL_ERROR");
     }
 

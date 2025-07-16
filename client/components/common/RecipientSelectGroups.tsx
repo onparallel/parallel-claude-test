@@ -27,7 +27,7 @@ import { useUpdateContact } from "@parallel/utils/mutations/useUpdateContact";
 import { untranslated } from "@parallel/utils/untranslated";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useSearchContactsByEmail } from "@parallel/utils/useSearchContactsByEmail";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { isValidEmail } from "@parallel/utils/validation";
 import { useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { differenceWith, isNonNullish, unique, uniqueBy, zip } from "remeda";
@@ -316,7 +316,7 @@ export function RecipientSelectGroups({
         if (field.type === "SHORT_TEXT") {
           return (
             (field.alias?.includes("email") || field.options.format === "EMAIL") &&
-            field.replies.some((r) => EMAIL_REGEX.test(r.content?.value ?? ""))
+            field.replies.some((r) => isValidEmail(r.content?.value ?? ""))
           );
         } else if (field.type === "FIELD_GROUP") {
           return field.replies.some((r) =>
@@ -341,7 +341,7 @@ export function RecipientSelectGroups({
         if (field.type === "SHORT_TEXT") {
           return field.replies
             .map((r) => {
-              if (EMAIL_REGEX.test(r.content?.value ?? "")) {
+              if (isValidEmail(r.content?.value ?? "")) {
                 return {
                   email: r.content.value,
                   petitionField: field,

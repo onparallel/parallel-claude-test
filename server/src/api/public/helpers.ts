@@ -4,7 +4,7 @@ import pMap from "p-map";
 import { performance } from "perf_hooks";
 import { filter, isNonNullish, isNullish, map, omit, pick, pipe, unique, zip } from "remeda";
 import { ProfileTypeFieldType } from "../../db/__types";
-import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
+import { isValidEmail } from "../../graphql/helpers/validators/validEmail";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { waitFor, WaitForOptions } from "../../util/promises/waitFor";
@@ -998,7 +998,7 @@ export async function parsePetitionCommentContent(client: GraphQLClient, content
         };
       } else if (mention.startsWith("@[email:")) {
         const email = mention.slice(8, -1);
-        if (!email.match(EMAIL_REGEX)) {
+        if (!isValidEmail(email)) {
           throw new Error();
         }
         const {

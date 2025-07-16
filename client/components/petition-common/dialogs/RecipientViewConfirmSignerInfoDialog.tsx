@@ -16,7 +16,7 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { Tone } from "@parallel/graphql/__types";
 import { fullName } from "@parallel/utils/fullName";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { isValidEmail } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -119,7 +119,7 @@ function RecipientViewConfirmSignerInfoDialog({
               type="email"
               {...register("email", {
                 required: true,
-                pattern: EMAIL_REGEX,
+                validate: { isValidEmail },
               })}
               placeholder={intl.formatMessage({
                 id: "generic.forms.company-email-placeholder",

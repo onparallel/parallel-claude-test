@@ -15,7 +15,7 @@ import { Link } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { postJSON } from "@parallel/utils/rest";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { isValidEmail } from "@parallel/utils/validation";
 import router, { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -57,7 +57,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
       }
       setSsoUrl(result?.url);
     }
-    if (EMAIL_REGEX.test(email)) {
+    if (isValidEmail(email)) {
       guessLogin().then();
     }
   }, [email, locale]);
@@ -95,7 +95,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
             type="email"
             {...register("email", {
               required: true,
-              pattern: EMAIL_REGEX,
+              validate: isValidEmail,
             })}
             placeholder={intl.formatMessage({
               id: "generic.forms.company-email-placeholder",

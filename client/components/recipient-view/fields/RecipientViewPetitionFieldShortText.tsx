@@ -10,7 +10,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useShortTextFormats } from "@parallel/utils/useShortTextFormats";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { isValidEmail } from "@parallel/utils/validation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ComponentProps,
@@ -220,7 +220,7 @@ export function RecipientViewPetitionFieldShortText({
     maxLength: field.options.maxLength ?? undefined,
     value,
     onKeyDown: async (event: KeyboardEvent) => {
-      if (options.format === "EMAIL" && !EMAIL_REGEX.test(value)) {
+      if (options.format === "EMAIL" && !isValidEmail(value)) {
         return;
       }
       if (isMetaReturn(event) && field.multiple) {

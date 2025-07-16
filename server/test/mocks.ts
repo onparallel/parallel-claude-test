@@ -11,7 +11,7 @@ import {
 } from "../src/db/repositories/IntegrationRepository";
 import { UserAuthenticationRepository } from "../src/db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../src/db/repositories/UserRepository";
-import { EMAIL_REGEX } from "../src/graphql/helpers/validators/validEmail";
+import { isValidEmail } from "../src/graphql/helpers/validators/validEmail";
 import {
   IDowJonesClient,
   RiskEntityProfilePdfResult,
@@ -163,7 +163,7 @@ export class MockEmailsService implements IEmailsService {
   async sendPetitionApprovalRequestStepRejectedEmail() {}
   async sendPetitionApprovalRequestStepCanceledEmail() {}
   async validateEmail(email: string) {
-    return EMAIL_REGEX.test(email);
+    return isValidEmail(email);
   }
 }
 

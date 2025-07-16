@@ -8,7 +8,7 @@ import { outdent } from "outdent";
 import { isNonNullish, isNullish, omit, pick, unique, zip } from "remeda";
 import { assert } from "ts-essentials";
 import { PetitionEventTypeValues, ProfileEventTypeValues } from "../../db/__types";
-import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
+import { isValidEmail } from "../../graphql/helpers/validators/validEmail";
 import { ILogger, LOGGER } from "../../services/Logger";
 import { IRedis, REDIS } from "../../services/Redis";
 import { isGlobalId, toGlobalId } from "../../util/globalId";
@@ -1535,12 +1535,11 @@ export function publicApi(container: Container) {
         }
 
         let senderId: string | null = null;
-        const EMAIL_REGEX =
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
         if (isNonNullish(body.sendAs)) {
           if (isGlobalId(body.sendAs, "User")) {
             senderId = body.sendAs;
-          } else if (EMAIL_REGEX.test(body.sendAs)) {
+          } else if (isValidEmail(body.sendAs)) {
             const _query = gql`
               query CreatePetitionRecipients_userByEmail($email: String!) {
                 me {
@@ -2983,7 +2982,7 @@ export function publicApi(container: Container) {
         `;
         const userIds = body.userIds ?? [];
         if (isNonNullish(body.emails)) {
-          if (!body.emails.every((email) => email.match(EMAIL_REGEX))) {
+          if (!body.emails.every((email) => isValidEmail(email))) {
             throw new BadRequestError("Some of the provided emails are invalid");
           }
 
@@ -3220,7 +3219,7 @@ export function publicApi(container: Container) {
           throw new BadRequestError("Bad user input. You must specify a userId or an email");
         }
 
-        if (isNonNullish(query.email) && !query.email.match(EMAIL_REGEX)) {
+        if (isNonNullish(query.email) && !isValidEmail(query.email)) {
           throw new BadRequestError("Invalid email");
         }
 

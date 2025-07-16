@@ -11,7 +11,7 @@ import {
   type PetitionSignatureConfigSigner,
 } from "../db/repositories/PetitionRepository";
 import { ProfilesExpiringPropertiesEmailProps } from "../emails/emails/app/ProfilesExpiringPropertiesEmail";
-import { EMAIL_REGEX } from "../graphql/helpers/validators/validEmail";
+import { isValidEmail } from "../graphql/helpers/validators/validEmail";
 import { Maybe, MaybeArray, unMaybeArray } from "../util/types";
 import { EmailPayload } from "../workers/email-sender";
 import { QUEUES_SERVICE, QueuesService } from "./QueuesService";
@@ -493,7 +493,7 @@ export class EmailsService implements IEmailsService {
   })();
 
   async validateEmail(email: string) {
-    return EMAIL_REGEX.test(email) && (await this.resolveMx.load(email.split("@")[1]));
+    return isValidEmail(email) && (await this.resolveMx.load(email.split("@")[1]));
   }
 
   async onPetitionMessageBounced(petitionMessageId: number, updatedBy: string) {

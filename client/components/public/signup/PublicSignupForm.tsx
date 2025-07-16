@@ -16,7 +16,7 @@ import { PasswordStrengthIndicator } from "@parallel/components/common/PasswordS
 import { PublicSignupForm_emailIsAvailableDocument } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
-import { EMAIL_REGEX, PASSWORD_REGEX } from "@parallel/utils/validation";
+import { isValidEmail, PASSWORD_REGEX } from "@parallel/utils/validation";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -31,6 +31,7 @@ interface PublicSignupFormProps {
   email?: string;
   source?: string;
 }
+
 export function PublicSignupForm({ onNext, email, source }: PublicSignupFormProps) {
   const intl = useIntl();
 
@@ -120,8 +121,7 @@ export function PublicSignupForm({ onNext, email, source }: PublicSignupFormProp
             <Input
               {...register("email", {
                 required: true,
-                pattern: EMAIL_REGEX,
-                validate: { emailIsAvailable },
+                validate: { isValidEmail, emailIsAvailable },
               })}
               autoComplete="email"
               placeholder={intl.formatMessage({

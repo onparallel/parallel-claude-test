@@ -11,7 +11,7 @@ import {
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { isNotEmptyText } from "@parallel/utils/strings";
 import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { isValidEmail } from "@parallel/utils/validation";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -62,7 +62,7 @@ function CreateOrUpdateUserDialog({
   const emailRef = useRef<HTMLInputElement>(null);
   const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
     required: true,
-    pattern: EMAIL_REGEX,
+    validate: { isValidEmail },
   });
 
   return (

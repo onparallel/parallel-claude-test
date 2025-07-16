@@ -22,7 +22,7 @@ import { QuestionOutlineIcon } from "@parallel/chakra/icons";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { Collapsible } from "@parallel/components/ui";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { isValidEmail } from "@parallel/utils/validation";
 import useResizeObserver from "@react-hook/resize-observer";
 import { useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -213,7 +213,7 @@ export function PublicPetitionInitialForm({
               isDisabled={isDisabled}
               type="email"
               autoComplete="email"
-              {...register("email", { required: true, pattern: EMAIL_REGEX })}
+              {...register("email", { required: true, validate: { isValidEmail } })}
             />
             <FormErrorMessage>
               <FormattedMessage

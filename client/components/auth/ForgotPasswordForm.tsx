@@ -8,7 +8,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Link } from "@parallel/components/common/Link";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { isValidEmail } from "@parallel/utils/validation";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -54,7 +54,7 @@ export function ForgotPasswordForm({
             type="email"
             {...register("email", {
               required: true,
-              pattern: EMAIL_REGEX,
+              validate: isValidEmail,
             })}
             placeholder={intl.formatMessage({
               id: "generic.forms.company-email-placeholder",

@@ -6,7 +6,7 @@ import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
 import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/types";
 import { Maybe, MaybePromise, unMaybeArray } from "@parallel/utils/types";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { isValidEmail } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
 import {
   ClipboardEvent,
@@ -162,7 +162,7 @@ export const ContactSelect = Object.assign(
           break;
         case "input-blur":
           const cleaned = inputValue.trim();
-          if (EMAIL_REGEX.test(cleaned)) {
+          if (isValidEmail(cleaned)) {
             const option = options?.find((o) => o.email === cleaned);
             if (option) {
               onChange([...((value ?? []) as ContactSelectSelection[]), option] as any, {
@@ -267,7 +267,7 @@ const getOptionLabel = (option: ContactSelectSelection) => {
 const getOptionValue = (option: ContactSelectSelection) => option.id;
 
 const isValidNewOption = (value: string, _: any, options: readonly ContactSelectSelection[]) => {
-  return options.length === 0 && EMAIL_REGEX.test(value);
+  return options.length === 0 && isValidEmail(value);
 };
 
 const formatCreateLabel = (label: string) => {
@@ -423,7 +423,7 @@ function Input(
               if (lines.length === 1) {
                 const emails = text
                   .split(/(?:\s*[;,]\s*|\s+)/g)
-                  .filter((part) => part.match(EMAIL_REGEX));
+                  .filter((part) => isValidEmail(part));
                 if (emails.length > 1) {
                   e.preventDefault();
                   props.selectProps.onPasteEmails?.([emails]);
@@ -434,7 +434,7 @@ function Input(
                   for (const [line, row] of zip(lines, range(0, lines.length))) {
                     const current = [];
                     for (const word of line.split(/(?:\s*[;,]\s*|\s+)/g)) {
-                      if (word.match(EMAIL_REGEX)) {
+                      if (isValidEmail(word)) {
                         current.push(word);
                       } else {
                         e.preventDefault();

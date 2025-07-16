@@ -6,7 +6,7 @@ import { ArgWithPath, getArgWithPath } from "../authorize";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 import { exceedsMaxSize } from "./maxFileSize";
-import { EMAIL_REGEX } from "./validEmail";
+import { isValidEmail } from "./validEmail";
 
 export function validSignatureConfig<TypeName extends string, FieldName extends string>(
   petitionIdProp: ArgWithPath<TypeName, FieldName, number>,
@@ -73,7 +73,7 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
       }
 
       for (const [index, signer] of signersInfo.entries()) {
-        if (!EMAIL_REGEX.test(signer.email)) {
+        if (!isValidEmail(signer.email)) {
           throw new ArgValidationError(
             info,
             `${argName}.signersInfo[${index}].email`,
@@ -185,7 +185,7 @@ export function validPetitionSignerData<TypeName extends string, FieldName exten
       return;
     }
     for (const [index, signer] of signersInfo.entries()) {
-      if (!EMAIL_REGEX.test(signer.email)) {
+      if (!isValidEmail(signer.email)) {
         throw new ArgValidationError(info, `${signersInfoProp}[${index}].email`, `Invalid email.`, {
           error_code: "INVALID_EMAIL_ERROR",
         });

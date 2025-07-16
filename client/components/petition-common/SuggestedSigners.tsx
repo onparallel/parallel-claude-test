@@ -11,7 +11,7 @@ import {
 import { Fragments } from "@parallel/utils/apollo/fragments";
 import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { ArrayUnionToUnion } from "@parallel/utils/types";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { isValidEmail } from "@parallel/utils/validation";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, pick, uniqueBy, zip } from "remeda";
 import { useAddNewSignerDialog } from "../recipient-view/dialogs/AddNewSignerDialog";
@@ -146,7 +146,7 @@ export function SuggestedSigners({
         const contactKey = [suggestion.email, suggestion.firstName, suggestion.lastName].join("|");
         const isInvalid =
           isNullish(suggestion.email) ||
-          !EMAIL_REGEX.test(suggestion.email) ||
+          !isValidEmail(suggestion.email) ||
           currentSigners.some(
             (s) =>
               s.email === suggestion.email &&

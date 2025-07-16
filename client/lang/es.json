@@ -13355,7 +13355,7 @@
     "context": "Parallels sent{name, select, null {} other { to {name}}}"
   },
   {
-    "term": "contacts.create-new-contact.header",
+    "term": "component.ask-contact-details-dialog.header",
     "definition": "Introduce los datos del contacto",
     "context": "Enter the contact details"
   },
