@@ -256,7 +256,8 @@ export function AddPetitionAccessDialog({
             signatureConfig.minSigners,
             signers.filter(
               (s) =>
-                isNonNullish(s.signWithEmbeddedImage) || isNonNullish(s.signWithEmbeddedImageId),
+                isNonNullish(s.signWithEmbeddedImage) ||
+                isNonNullish(s.signWithEmbeddedImageFileUploadId),
             ).length + 1,
           ),
           timezone: signatureConfig.timezone,

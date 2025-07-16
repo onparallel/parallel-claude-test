@@ -4,6 +4,7 @@ import { readFile, stat } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { basename, extname } from "path";
 import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { CONFIG, Config } from "../../config";
 import { I18N_SERVICE, II18nService } from "../../services/I18nService";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
@@ -160,6 +161,9 @@ export class DocusignClient extends BaseClient implements ISignatureClient {
                   // signers with an embedded signature are not part of the signature request
                   return null;
                 }
+
+                assert(isNonNullish(r.email), "Email is required");
+
                 return {
                   recipientId: (recipientIndex + 1).toString(),
                   routingOrder:

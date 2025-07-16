@@ -243,6 +243,7 @@ export type BackgroundCheckEntityDetailsCompanyProperties = {
   name: Maybe<Array<Scalars["String"]["output"]>>;
   relationships: Maybe<Array<BackgroundCheckEntityDetailsRelationship>>;
   sanctions: Maybe<Array<BackgroundCheckEntityDetailsSanction>>;
+  sourceUrl: Maybe<Array<Scalars["String"]["output"]>>;
   topics: Maybe<Array<Scalars["String"]["output"]>>;
 };
 
@@ -277,6 +278,7 @@ export type BackgroundCheckEntityDetailsPersonProperties = {
   relationships: Maybe<Array<BackgroundCheckEntityDetailsRelationship>>;
   religion: Maybe<Array<Scalars["String"]["output"]>>;
   sanctions: Maybe<Array<BackgroundCheckEntityDetailsSanction>>;
+  sourceUrl: Maybe<Array<Scalars["String"]["output"]>>;
   status: Maybe<Array<Scalars["String"]["output"]>>;
   topics: Maybe<Array<Scalars["String"]["output"]>>;
 };
@@ -4896,17 +4898,18 @@ export type PetitionSignatureStatusFilter =
 /** Information about a signer of the petition */
 export type PetitionSigner = {
   contactId: Maybe<Scalars["GID"]["output"]>;
-  email: Scalars["String"]["output"];
-  embeddedSignatureImage: Maybe<Scalars["JSONObject"]["output"]>;
+  email: Maybe<Scalars["String"]["output"]>;
   firstName: Scalars["String"]["output"];
   fullName: Scalars["String"]["output"];
   isPreset: Scalars["Boolean"]["output"];
   lastName: Maybe<Scalars["String"]["output"]>;
   signWithDigitalCertificate: Maybe<Scalars["Boolean"]["output"]>;
+  signWithEmbeddedImageFileUploadId: Maybe<Scalars["String"]["output"]>;
+  signWithEmbeddedImageUrl: Maybe<Scalars["String"]["output"]>;
 };
 
 /** Information about a signer of the petition */
-export type PetitionSignerembeddedSignatureImageArgs = {
+export type PetitionSignersignWithEmbeddedImageUrlArgs = {
   options?: InputMaybe<ImageOptions>;
 };
 
@@ -6812,14 +6815,14 @@ export type SignatureConfigInput = {
 /** The signer that need to sign the generated document. */
 export type SignatureConfigInputSigner = {
   contactId?: InputMaybe<Scalars["GID"]["input"]>;
-  email: Scalars["String"]["input"];
+  email?: InputMaybe<Scalars["String"]["input"]>;
   firstName: Scalars["String"]["input"];
   isPreset?: InputMaybe<Scalars["Boolean"]["input"]>;
   lastName?: InputMaybe<Scalars["String"]["input"]>;
   signWithDigitalCertificate?: InputMaybe<Scalars["Boolean"]["input"]>;
   signWithEmbeddedImage?: InputMaybe<Scalars["Upload"]["input"]>;
   /** ID of the previously uploaded image if you don't want to update current. */
-  signWithEmbeddedImageId?: InputMaybe<Scalars["GID"]["input"]>;
+  signWithEmbeddedImageFileUploadId?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 /** The signing mode of a signature config */
@@ -7415,8 +7418,8 @@ export type SignaturesBlock_SignatureConfigFragment = {
   timezone: string;
   signers: Array<{
     fullName: string;
-    email: string;
-    embeddedSignatureImage: { [key: string]: any } | null;
+    email: string | null;
+    signWithEmbeddedImageUrl300: string | null;
   } | null>;
 };
 
@@ -7447,8 +7450,8 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
       timezone: string;
       signers: Array<{
         fullName: string;
-        email: string;
-        embeddedSignatureImage: { [key: string]: any } | null;
+        email: string | null;
+        signWithEmbeddedImageUrl300: string | null;
       } | null>;
     };
   } | null;
@@ -7871,8 +7874,8 @@ export type PetitionExport_petitionQuery = {
             timezone: string;
             signers: Array<{
               fullName: string;
-              email: string;
-              embeddedSignatureImage: { [key: string]: any } | null;
+              email: string | null;
+              signWithEmbeddedImageUrl300: string | null;
             } | null>;
           };
         } | null;
@@ -8153,8 +8156,8 @@ export type PetitionExport2_PetitionBase_Petition_Fragment = {
       timezone: string;
       signers: Array<{
         fullName: string;
-        email: string;
-        embeddedSignatureImage: { [key: string]: any } | null;
+        email: string | null;
+        signWithEmbeddedImageUrl300: string | null;
       } | null>;
     };
   } | null;
@@ -8577,8 +8580,8 @@ export type PetitionExport2_petitionQuery = {
             timezone: string;
             signers: Array<{
               fullName: string;
-              email: string;
-              embeddedSignatureImage: { [key: string]: any } | null;
+              email: string | null;
+              signWithEmbeddedImageUrl300: string | null;
             } | null>;
           };
         } | null;
@@ -8845,8 +8848,8 @@ export type SignatureBoxesPage_PetitionBase_Petition_Fragment = {
       timezone: string;
       signers: Array<{
         fullName: string;
-        email: string;
-        embeddedSignatureImage: { [key: string]: any } | null;
+        email: string | null;
+        signWithEmbeddedImageUrl300: string | null;
       } | null>;
     };
   } | null;
@@ -8876,8 +8879,8 @@ export type SignatureBoxesPage_petitionQuery = {
             timezone: string;
             signers: Array<{
               fullName: string;
-              email: string;
-              embeddedSignatureImage: { [key: string]: any } | null;
+              email: string | null;
+              signWithEmbeddedImageUrl300: string | null;
             } | null>;
           };
         } | null;
@@ -8895,8 +8898,8 @@ export type SignatureBoxesPage2_PetitionBase_Petition_Fragment = {
       timezone: string;
       signers: Array<{
         fullName: string;
-        email: string;
-        embeddedSignatureImage: { [key: string]: any } | null;
+        email: string | null;
+        signWithEmbeddedImageUrl300: string | null;
       } | null>;
     };
   } | null;
@@ -8926,8 +8929,8 @@ export type SignatureBoxesPage2_petitionQuery = {
             timezone: string;
             signers: Array<{
               fullName: string;
-              email: string;
-              embeddedSignatureImage: { [key: string]: any } | null;
+              email: string | null;
+              signWithEmbeddedImageUrl300: string | null;
             } | null>;
           };
         } | null;
@@ -8941,8 +8944,8 @@ export type documentSignatures_SignatureConfigFragment = {
   timezone: string;
   signers: Array<{
     fullName: string;
-    email: string;
-    embeddedSignatureImage: { [key: string]: any } | null;
+    email: string | null;
+    signWithEmbeddedImageUrl300: string | null;
   } | null>;
 };
 
@@ -9165,7 +9168,7 @@ export const SignaturesBlock_SignatureConfigFragmentDoc = gql`
     signers {
       fullName
       email
-      embeddedSignatureImage
+      signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(options: { resize: { height: 300 } })
     }
     timezone
   }
@@ -9359,7 +9362,7 @@ export const documentSignatures_SignatureConfigFragmentDoc = gql`
     signers {
       fullName
       email
-      embeddedSignatureImage
+      signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(options: { resize: { height: 300 } })
     }
     timezone
   }

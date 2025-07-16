@@ -353,7 +353,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                       completeSignerInfoData!.signers.filter(
                         (s) =>
                           isNonNullish(s.signWithEmbeddedImage) ||
-                          isNonNullish(s.signWithEmbeddedImageId),
+                          isNonNullish(s.signWithEmbeddedImageFileUploadId),
                       ).length + 1,
                     ),
                     timezone: petition.signatureConfig!.timezone,

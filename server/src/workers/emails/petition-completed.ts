@@ -36,7 +36,7 @@ export async function petitionCompleted(
     contact = {
       first_name: payload.signer.firstName,
       last_name: payload.signer.lastName,
-      email: payload.signer.email,
+      email: payload.signer.email!,
     };
   }
 

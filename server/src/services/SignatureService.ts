@@ -90,11 +90,12 @@ export class SignatureService implements ISignatureService {
       .concat(signatureConfig.signersInfo)
       .map((s) => ({
         ...s,
-        email: s.email.replace(
-          // Remove control characters, zero-width spaces, direction markers, and other invisible formatting characters
-          /[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF\u00AD]/g,
-          "",
-        ),
+        email:
+          s.email?.replace(
+            // Remove control characters, zero-width spaces, direction markers, and other invisible formatting characters
+            /[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF\u00AD]/g,
+            "",
+          ) ?? null,
       }));
 
     const signatureRequest = await this.petitions.createPetitionSignature(petitionId, {
@@ -302,12 +303,14 @@ export class SignatureService implements ISignatureService {
 
     if (process.env.NODE_ENV === "development") {
       if (
-        !allSigners.every((s) =>
-          this.config.development.whitelistedEmails.some((e) => {
-            const [l, d] = e.split("@");
-            const [local, domain] = s.email.split("@");
-            return d === domain && (l === local || local.startsWith(l + "+"));
-          }),
+        !allSigners.every(
+          (s) =>
+            isNullish(s.email) ||
+            this.config.development.whitelistedEmails.some((e) => {
+              const [l, d] = e.split("@");
+              const [local, domain] = s.email!.split("@");
+              return d === domain && (l === local || local.startsWith(l + "+"));
+            }),
         )
       ) {
         throw new Error(
@@ -316,7 +319,7 @@ export class SignatureService implements ISignatureService {
       }
     }
 
-    if (allSigners.some((s) => !isValidEmail(s.email))) {
+    if (allSigners.some((s) => isNonNullish(s.email) && !isValidEmail(s.email))) {
       throw new Error("INVALID_SIGNER_EMAIL_ERROR");
     }
 

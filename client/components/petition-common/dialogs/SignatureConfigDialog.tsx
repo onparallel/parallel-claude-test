@@ -56,7 +56,7 @@ import {
 } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
-import { isNonNullish, pick } from "remeda";
+import { isNonNullish, omit, pick } from "remeda";
 import { noop } from "ts-essentials";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
@@ -105,10 +105,9 @@ export function SignatureConfigDialog({
       ? true
       : (signatureConfig?.reviewAfterApproval ?? null);
 
-  const allSigners = (signatureConfig?.signers ?? []).filter(isNonNullish).map((s) => ({
-    ...s,
-    signWithEmbeddedImageId: s.embeddedSignatureImage300?.id,
-  }));
+  const allSigners = (signatureConfig?.signers ?? [])
+    .filter(isNonNullish)
+    .map(omit(["__typename"]));
 
   const form = useForm<SignatureConfigFormData>({
     mode: "onSubmit",
@@ -186,7 +185,9 @@ export function SignatureConfigDialog({
         minSigners: Math.max(
           data.minSigners,
           data.signersInfo.filter(
-            (s) => isNonNullish(s.signWithEmbeddedImage) || isNonNullish(s.signWithEmbeddedImageId),
+            (s) =>
+              isNonNullish(s.signWithEmbeddedImage) ||
+              isNonNullish(s.signWithEmbeddedImageFileUploadId),
           ).length + 1,
         ),
         instructions: data.showInstructions ? data.instructions : null,
@@ -200,7 +201,7 @@ export function SignatureConfigDialog({
                 "isPreset",
                 "signWithDigitalCertificate",
                 "signWithEmbeddedImage",
-                "signWithEmbeddedImageId",
+                "signWithEmbeddedImageFileUploadId",
               ]),
             )
           : [],
@@ -563,7 +564,7 @@ function SignatureConfigDialogBodyStep2({
                         signersInfo.filter(
                           (s) =>
                             isNonNullish(s.signWithEmbeddedImage) ||
-                            isNonNullish(s.signWithEmbeddedImageId),
+                            isNonNullish(s.signWithEmbeddedImageFileUploadId),
                         ).length + 1,
                       )}
                       clampValueOnBlur={true}
@@ -880,7 +881,8 @@ SignatureConfigDialog.fragments = {
         }
         signers {
           ...Fragments_FullPetitionSigner
-          embeddedSignatureImage300: embeddedSignatureImage(
+          signWithEmbeddedImageFileUploadId
+          signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(
             options: { resize: { height: 300, fit: inside } }
           )
         }

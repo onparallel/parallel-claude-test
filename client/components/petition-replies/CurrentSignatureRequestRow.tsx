@@ -41,7 +41,7 @@ export function CurrentSignatureRequestRow({
   // so we will show this actions only of there is at least one signer that didn't sign/decline the document
   const someSignerIsPending = signerStatus.some(
     (s) =>
-      isNullish(s.signer.embeddedSignatureImage) &&
+      isNullish(s.signer.signWithEmbeddedImageFileUploadId) &&
       (s.status === "PENDING" || s.status === "NOT_STARTED"),
   );
 
@@ -97,6 +97,7 @@ export function CurrentSignatureRequestRow({
                 <Fragment key={index}>
                   <SignerReference signer={sStatus.signer} />
                   {isAwaitingSignature &&
+                  !sStatus.signer.signWithEmbeddedImageFileUploadId &&
                   (signingMode === "PARALLEL" || index > 0 || sStatus.status !== "NOT_STARTED") ? (
                     <PetitionSignatureRequestSignerStatusIcon
                       signerStatus={sStatus}
@@ -196,7 +197,7 @@ CurrentSignatureRequestRow.fragments = {
       signerStatus {
         signer {
           ...SignerReference_PetitionSigner
-          embeddedSignatureImage
+          signWithEmbeddedImageFileUploadId
         }
         ...PetitionSignatureRequestSignerStatusIcon_SignerStatus
       }

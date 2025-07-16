@@ -11400,6 +11400,11 @@
     "context": "Identity document only"
   },
   {
+    "term": "component.selected-signer-row.embedded-signature-image",
+    "definition": "Imagen de firma incrustada",
+    "context": "Embedded signature image"
+  },
+  {
     "term": "component.send-button.schedule",
     "definition": "Programar envío",
     "context": "Schedule send"

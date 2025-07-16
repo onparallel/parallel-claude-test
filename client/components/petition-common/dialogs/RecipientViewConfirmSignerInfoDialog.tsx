@@ -65,7 +65,7 @@ function RecipientViewConfirmSignerInfoDialog({
       content={{
         containerProps: {
           as: "form",
-          onSubmit: handleSubmit(props.onResolve),
+          onSubmit: handleSubmit((data) => props.onResolve({ ...data, email: data.email! })),
         },
       }}
       header={
@@ -119,7 +119,7 @@ function RecipientViewConfirmSignerInfoDialog({
               type="email"
               {...register("email", {
                 required: true,
-                validate: { isValidEmail },
+                validate: { isValidEmail: (email) => !!email && isValidEmail(email) },
               })}
               placeholder={intl.formatMessage({
                 id: "generic.forms.company-email-placeholder",

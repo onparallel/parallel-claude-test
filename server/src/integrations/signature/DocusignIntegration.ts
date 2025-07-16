@@ -422,7 +422,10 @@ export class DocusignIntegration extends OAuthIntegration<
       type: "SIGNATURE_OPENED",
       petition_id: petitionId,
       data: {
-        signer,
+        signer: {
+          ...signer,
+          email: signer.email!,
+        },
         petition_signature_request_id: signature!.id,
       },
     });
@@ -444,7 +447,13 @@ export class DocusignIntegration extends OAuthIntegration<
 
     await this.petitions.updatePetitionSignatureRequestAsCancelled(signature.id, {
       cancel_reason: "DECLINED_BY_SIGNER",
-      cancel_data: { canceller, decline_reason: declineReason },
+      cancel_data: {
+        canceller: {
+          ...canceller,
+          email: canceller.email!,
+        },
+        decline_reason: declineReason,
+      },
       signer_status: {
         ...signature.signer_status,
         [cancellerIndex]: {
@@ -472,7 +481,10 @@ export class DocusignIntegration extends OAuthIntegration<
     await this.petitions.updatePetitionSignatureRequestAsCancelled(signature.id, {
       cancel_reason: "DECLINED_BY_SIGNER",
       cancel_data: {
-        canceller,
+        canceller: {
+          ...canceller,
+          email: canceller.email!,
+        },
         decline_reason: body.data.envelopeSummary.voidedReason,
       },
       signer_status: {
@@ -512,7 +524,10 @@ export class DocusignIntegration extends OAuthIntegration<
       type: "RECIPIENT_SIGNED",
       petition_id: petitionId,
       data: {
-        signer,
+        signer: {
+          ...signer,
+          email: signer.email!,
+        },
         petition_signature_request_id: signature!.id,
       },
     });
@@ -658,7 +673,10 @@ export class DocusignIntegration extends OAuthIntegration<
         petition_id: petitionId,
         data: {
           petition_signature_request_id: signature.id,
-          signer: pick(signer, ["email", "firstName", "lastName", "externalId"]),
+          signer: {
+            ...pick(signer, ["firstName", "lastName", "externalId"]),
+            email: signer.email!,
+          },
           ...data,
         },
       });

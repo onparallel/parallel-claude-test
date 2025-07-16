@@ -1,3 +1,4 @@
+import { isNonNullish } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import SignatureCancelledRequestErrorEmail from "../../emails/emails/app/SignatureCancelledRequestErrorEmail";
@@ -36,10 +37,12 @@ export async function signatureCancelledRequestError(
         petitionId: toGlobalId("Petition", petition.id),
         petitionName: petition.name,
         userName: userData.first_name,
-        signers: signatureRequest.signature_config.signersInfo.map((s) => ({
-          email: s.email,
-          name: fullName(s.firstName, s.lastName),
-        })),
+        signers: signatureRequest.signature_config.signersInfo
+          .filter((s) => isNonNullish(s.email)) // do not include signers with embedded signature image, as those people did not receive the request
+          .map((s) => ({
+            email: s.email!,
+            name: fullName(s.firstName, s.lastName),
+          })),
         ...layoutProps,
       },
       { locale: userData.preferred_locale },

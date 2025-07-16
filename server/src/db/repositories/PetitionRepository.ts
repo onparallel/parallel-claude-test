@@ -212,7 +212,7 @@ type EffectivePetitionPermission = Pick<
 export interface PetitionSignatureConfigSigner {
   firstName: string;
   lastName: string;
-  email: string;
+  email: string | null;
   isPreset?: boolean; // preset signers can only be edited on compose
   signWithDigitalCertificate?: boolean;
   signWithEmbeddedImageFileUploadId?: number;

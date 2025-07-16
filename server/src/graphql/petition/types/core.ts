@@ -1046,13 +1046,28 @@ export const PetitionSigner = objectType({
     t.string("firstName", { resolve: (o) => o?.firstName ?? "" });
     t.nullable.string("lastName", { resolve: (o) => o?.lastName ?? null });
     t.string("fullName", { resolve: (o) => fullName(o?.firstName, o?.lastName) ?? "" });
-    t.string("email", { resolve: (o) => o?.email ?? "" });
+    t.nullable.string("email", { resolve: (o) => o?.email ?? null });
     t.boolean("isPreset", {
       resolve: (o) => o.isPreset ?? false,
     });
 
     t.nullable.boolean("signWithDigitalCertificate");
-    t.nullable.jsonObject("embeddedSignatureImage", {
+    t.nullable.string("signWithEmbeddedImageFileUploadId", {
+      resolve: async (o, _, ctx) => {
+        if (!o.signWithEmbeddedImageFileUploadId) {
+          return null;
+        }
+
+        // send a signed JWT so we can be sure that user does not tamper with the file upload id
+        return await ctx.jwt.sign({
+          signWithEmbeddedImageFileUploadId: toGlobalId(
+            "PublicFileUpload",
+            o.signWithEmbeddedImageFileUploadId,
+          ),
+        });
+      },
+    });
+    t.nullable.string("signWithEmbeddedImageUrl", {
       args: {
         options: arg({ type: "ImageOptions" }),
       },
@@ -1060,17 +1075,9 @@ export const PetitionSigner = objectType({
         if (!root.signWithEmbeddedImageFileUploadId) {
           return null;
         }
-
-        const file = await ctx.files.loadFileUpload(root.signWithEmbeddedImageFileUploadId);
+        const file = await ctx.files.loadPublicFile(root.signWithEmbeddedImageFileUploadId);
         return isNonNullish(file)
-          ? {
-              id: toGlobalId("FileUpload", file.id),
-              url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
-                file.path,
-                file.filename,
-                "inline",
-              ),
-            }
+          ? await ctx.images.getImageUrl(file.path, args.options as any)
           : null;
       },
     });
@@ -1079,7 +1086,7 @@ export const PetitionSigner = objectType({
     contactId?: number;
     firstName: string;
     lastName: string;
-    email: string;
+    email: string | null;
     isPreset?: boolean;
     signWithDigitalCertificate?: boolean;
     signWithEmbeddedImageFileUploadId?: number;

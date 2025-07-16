@@ -176,8 +176,8 @@ export function SuggestedSigners({
       [
         ...emailFieldsSuggestions,
         ...(petition.signatureRequests.flatMap((s) => s.signatureConfig.signers) ?? [])
-          .filter(isNonNullish)
-          .map((signer) => pick(signer, ["firstName", "lastName", "email"])),
+          .filter((s) => isNonNullish(s?.email))
+          .map((signer) => pick(signer!, ["firstName", "lastName", "email"])),
 
         ...petition.accesses
           .filter((a) => a.status === "ACTIVE" && isNonNullish(a.contact))
@@ -283,7 +283,7 @@ function SuggestedSignersRow({
     } else {
       try {
         const _signer = await showAddNewSignerDialog({
-          email: signer.email,
+          email: signer.email!,
           tone: tone ?? "INFORMAL",
         });
         onAddSigner(_signer);

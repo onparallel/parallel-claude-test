@@ -4,6 +4,7 @@ import { inject, injectable } from "inversify";
 import pMap from "p-map";
 import { basename } from "path";
 import { isNonNullish, isNullish, omit } from "remeda";
+import { assert } from "ts-essentials";
 import { URLSearchParams } from "url";
 import { CONFIG, Config } from "../../config";
 import { ContactLocale } from "../../db/__types";
@@ -169,6 +170,7 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
                     return null;
                   }
 
+                  assert(isNonNullish(r.email), "Email is required");
                   return {
                     email: r.email,
                     name: r.name,
@@ -475,7 +477,7 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
         cancel_data: {
           decline_reason: declinedDocument.decline_reason,
           canceller: {
-            email: canceller.email,
+            email: canceller.email!,
             firstName: canceller.firstName,
             lastName: canceller.lastName,
           },

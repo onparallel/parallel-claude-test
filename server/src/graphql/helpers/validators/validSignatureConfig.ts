@@ -1,5 +1,6 @@
 import { fromStream } from "file-type";
 import { isNonNullish, isNullish } from "remeda";
+import { fromGlobalId } from "../../../util/globalId";
 import { isValidTimezone } from "../../../util/time";
 import { NexusGenInputs } from "../../__types";
 import { ArgWithPath, getArgWithPath } from "../authorize";
@@ -47,7 +48,9 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
       }
 
       const embeddedSignatureImages = signersInfo.filter(
-        (s) => isNonNullish(s.signWithEmbeddedImage) || isNonNullish(s.signWithEmbeddedImageId),
+        (s) =>
+          isNonNullish(s.signWithEmbeddedImage) ||
+          isNonNullish(s.signWithEmbeddedImageFileUploadId),
       ).length;
 
       if (embeddedSignatureImages >= minSigners) {
@@ -73,18 +76,31 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
       }
 
       for (const [index, signer] of signersInfo.entries()) {
-        if (!isValidEmail(signer.email)) {
-          throw new ArgValidationError(
-            info,
-            `${argName}.signersInfo[${index}].email`,
-            `Invalid email.`,
-            {
-              error_code: "INVALID_EMAIL_ERROR",
-            },
-          );
+        if (isNullish(signer.email)) {
+          if (!signer.signWithEmbeddedImage && !signer.signWithEmbeddedImageFileUploadId) {
+            throw new ArgValidationError(
+              info,
+              `${argName}.signersInfo[${index}].email`,
+              `Email is required when signWithEmbeddedImage is not provided.`,
+            );
+          }
+        } else {
+          if (!isValidEmail(signer.email)) {
+            throw new ArgValidationError(
+              info,
+              `${argName}.signersInfo[${index}].email`,
+              `Invalid email.`,
+              {
+                error_code: "INVALID_EMAIL_ERROR",
+              },
+            );
+          }
         }
 
-        if (signer.signWithDigitalCertificate && signer.signWithEmbeddedImage) {
+        if (
+          signer.signWithDigitalCertificate &&
+          (signer.signWithEmbeddedImage || signer.signWithEmbeddedImageFileUploadId)
+        ) {
           throw new ArgValidationError(
             info,
             `${argName}.signersInfo[${index}].signWithEmbeddedImage`,
@@ -110,14 +126,31 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
               `File exceeded max size of 1MB`,
             );
           }
-        } else if (signer.signWithEmbeddedImageId) {
-          const file = await ctx.files.loadFileUpload(signer.signWithEmbeddedImageId);
-          if (!file) {
-            throw new ArgValidationError(
-              info,
-              `${argName}.signersInfo[${index}].signWithEmbeddedImageId`,
-              `File not found.`,
+        } else if (signer.signWithEmbeddedImageFileUploadId) {
+          try {
+            const payload = await ctx.jwt.verify<{ signWithEmbeddedImageFileUploadId: string }>(
+              signer.signWithEmbeddedImageFileUploadId,
             );
+
+            const publicFileId = fromGlobalId(
+              payload.signWithEmbeddedImageFileUploadId,
+              "PublicFileUpload",
+            ).id;
+
+            const file = await ctx.files.loadPublicFile(publicFileId);
+            if (!file) {
+              throw new Error(`File not found.`);
+            }
+          } catch (error) {
+            if (error instanceof Error) {
+              throw new ArgValidationError(
+                info,
+                `${argName}.signersInfo[${index}].signWithEmbeddedImageFileUploadId`,
+                error.message,
+              );
+            }
+
+            throw error;
           }
         }
       }

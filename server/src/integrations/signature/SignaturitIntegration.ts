@@ -204,7 +204,10 @@ export class SignaturitIntegration extends GenericIntegration<
       type: "SIGNATURE_OPENED",
       petition_id: petitionId,
       data: {
-        signer,
+        signer: {
+          ...signer,
+          email: signer.email!,
+        },
         petition_signature_request_id: signature!.id,
       },
     });
@@ -224,7 +227,10 @@ export class SignaturitIntegration extends GenericIntegration<
       type: "RECIPIENT_SIGNED",
       petition_id: petitionId,
       data: {
-        signer,
+        signer: {
+          ...signer,
+          email: signer.email!,
+        },
         petition_signature_request_id: signature!.id,
       },
     });
@@ -241,7 +247,10 @@ export class SignaturitIntegration extends GenericIntegration<
     await this.petitions.updatePetitionSignatureRequestAsCancelled(signature.id, {
       cancel_reason: "DECLINED_BY_SIGNER",
       cancel_data: {
-        canceller,
+        canceller: {
+          ...canceller,
+          email: canceller.email!,
+        },
         decline_reason: data.document.decline_reason,
       },
       signer_status: {
@@ -412,7 +421,10 @@ export class SignaturitIntegration extends GenericIntegration<
         petition_id: petitionId,
         data: {
           petition_signature_request_id: signature.id,
-          signer: pick(signer, ["email", "firstName", "lastName", "externalId"]),
+          signer: {
+            ...pick(signer, ["firstName", "lastName", "externalId"]),
+            email: signer.email!,
+          },
           ...data,
         },
       });

@@ -6108,13 +6108,14 @@ Information about a signer of the petition
 """
 type PetitionSigner {
   contactId: GID
-  email: String!
-  embeddedSignatureImage(options: ImageOptions): JSONObject
+  email: String
   firstName: String!
   fullName: String!
   isPreset: Boolean!
   lastName: String
   signWithDigitalCertificate: Boolean
+  signWithEmbeddedImageFileUploadId: String
+  signWithEmbeddedImageUrl(options: ImageOptions): String
 }
 
 """
@@ -8805,7 +8806,7 @@ The signer that need to sign the generated document.
 """
 input SignatureConfigInputSigner {
   contactId: GID
-  email: String!
+  email: String
   firstName: String!
   isPreset: Boolean
   lastName: String
@@ -8815,7 +8816,7 @@ input SignatureConfigInputSigner {
   """
   ID of the previously uploaded image if you don't want to update current.
   """
-  signWithEmbeddedImageId: GID
+  signWithEmbeddedImageFileUploadId: String
 }
 
 """

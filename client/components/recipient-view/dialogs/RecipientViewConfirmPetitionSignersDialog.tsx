@@ -104,7 +104,7 @@ function RecipientViewConfirmPetitionSignersDialog({
         onChange([
           ...additionalSigners.slice(0, index),
           await showConfirmSignerInfo({
-            selection: signer,
+            selection: { ...signer, email: signer.email! },
             repeatedSigners: [],
             tone,
           }),
@@ -144,7 +144,7 @@ function RecipientViewConfirmPetitionSignersDialog({
             props.onResolve({
               message: showMessage ? message : null,
               additionalSigners: additionalSigners.map((s) => ({
-                email: s.email,
+                email: s.email!,
                 firstName: s.firstName,
                 lastName: s.lastName ?? "",
               })),
@@ -229,19 +229,25 @@ function RecipientViewConfirmPetitionSignersDialog({
                       overflowY="auto"
                       listStylePosition="inside"
                     >
-                      {signers.map((signer, index) => (
-                        <SelectedSignerRow
-                          key={index}
-                          isEditable
-                          signer={signer}
-                          isMe={
-                            [signer.email, signer.firstName, signer.lastName].join("") ===
-                            [contact.email, contact.firstName, contact.lastName].join("")
-                          }
-                          onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
-                          onEditClick={handleSelectedSignerRowOnEditClick(onChange, signer, index)}
-                        />
-                      ))}
+                      {signers
+                        .filter((s) => isNonNullish(s.email))
+                        .map((signer, index) => (
+                          <SelectedSignerRow
+                            key={index}
+                            isEditable
+                            signer={signer}
+                            isMe={
+                              [signer.email, signer.firstName, signer.lastName].join("") ===
+                              [contact.email, contact.firstName, contact.lastName].join("")
+                            }
+                            onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
+                            onEditClick={handleSelectedSignerRowOnEditClick(
+                              onChange,
+                              signer,
+                              index,
+                            )}
+                          />
+                        ))}
                     </ListElement>
                     {!isMaxSignersReached ? (
                       <Stack marginTop={2}>
@@ -342,9 +348,11 @@ function RecipientViewConfirmPetitionSignersDialog({
               overflowY="auto"
               listStylePosition="inside"
             >
-              {presetSigners.map((signer, index) => (
-                <SelectedSignerRow key={index} signer={signer} />
-              ))}
+              {presetSigners
+                .filter((s) => isNonNullish(s.email))
+                .map((signer, index) => (
+                  <SelectedSignerRow key={index} signer={signer} />
+                ))}
             </ListElement>
           </>
         )

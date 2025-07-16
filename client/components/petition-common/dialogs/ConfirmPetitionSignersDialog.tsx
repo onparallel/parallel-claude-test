@@ -111,10 +111,7 @@ export function ConfirmPetitionSignersDialog(
   } = useForm<ConfirmPetitionSignersDialogResult>({
     mode: "onSubmit",
     defaultValues: {
-      signers: otherSigners.map((s) => ({
-        ...s,
-        signWithEmbeddedImageId: s.embeddedSignatureImage300?.id,
-      })),
+      signers: otherSigners,
       message: null,
       allowAdditionalSigners: props.isInteractionWithRecipientsEnabled
         ? props.signatureConfig.allowAdditionalSigners
@@ -128,13 +125,7 @@ export function ConfirmPetitionSignersDialog(
   const signers = watch("signers");
   const allowAdditionalSigners = watch("allowAdditionalSigners");
 
-  const allSigners = [
-    ...presetSigners.map((s) => ({
-      ...s,
-      signWithEmbeddedImageId: s.embeddedSignatureImage300?.id,
-    })),
-    ...signers,
-  ];
+  const allSigners = [...presetSigners, ...signers];
 
   const handleSearchContacts = useSearchContacts();
   const handleCreateContact = useCreateContact();
@@ -283,22 +274,22 @@ export function ConfirmPetitionSignersDialog(
                 signers: [
                   ...signers.map((s) => ({
                     contactId: s.contactId,
-                    email: s.email,
+                    email: s.email ?? null,
                     firstName: s.firstName,
                     lastName: s.lastName ?? "",
                     isPreset: s.isPreset,
                     signWithDigitalCertificate: s.signWithDigitalCertificate,
                     signWithEmbeddedImage: s.signWithEmbeddedImage,
-                    signWithEmbeddedImageId: s.signWithEmbeddedImageId,
+                    signWithEmbeddedImageFileUploadId: s.signWithEmbeddedImageFileUploadId,
                   })),
                   ...presetSigners.map((s) => ({
                     contactId: s.contactId,
-                    email: s.email,
+                    email: s.email ?? null,
                     firstName: s.firstName,
                     lastName: s.lastName ?? "",
                     isPreset: true,
                     signWithDigitalCertificate: s.signWithDigitalCertificate,
-                    signWithEmbeddedImageId: s.embeddedSignatureImage300?.id,
+                    signWithEmbeddedImageFileUploadId: s.signWithEmbeddedImageFileUploadId,
                   })),
                 ],
                 allowAdditionalSigners: props.isInteractionWithRecipientsEnabled
@@ -657,7 +648,7 @@ export function ConfirmPetitionSignersDialog(
                 allSigners.every(
                   (s: any) =>
                     isNonNullish(s.signWithEmbeddedImage) ||
-                    isNonNullish(s.signWithEmbeddedImageId),
+                    isNonNullish(s.signWithEmbeddedImageFileUploadId),
                 )
           }
         >
@@ -694,7 +685,8 @@ ConfirmPetitionSignersDialog.fragments = {
         ...Fragments_FullPetitionSigner
         ...SelectedSignerRow_PetitionSigner
         signWithDigitalCertificate
-        embeddedSignatureImage300: embeddedSignatureImage(
+        signWithEmbeddedImageFileUploadId
+        signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(
           options: { resize: { height: 300, fit: inside } }
         )
       }

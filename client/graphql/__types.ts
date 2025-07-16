@@ -5074,17 +5074,18 @@ export type PetitionSignatureStatusFilter =
 export interface PetitionSigner {
   __typename?: "PetitionSigner";
   contactId?: Maybe<Scalars["GID"]["output"]>;
-  email: Scalars["String"]["output"];
-  embeddedSignatureImage?: Maybe<Scalars["JSONObject"]["output"]>;
+  email?: Maybe<Scalars["String"]["output"]>;
   firstName: Scalars["String"]["output"];
   fullName: Scalars["String"]["output"];
   isPreset: Scalars["Boolean"]["output"];
   lastName?: Maybe<Scalars["String"]["output"]>;
   signWithDigitalCertificate?: Maybe<Scalars["Boolean"]["output"]>;
+  signWithEmbeddedImageFileUploadId?: Maybe<Scalars["String"]["output"]>;
+  signWithEmbeddedImageUrl?: Maybe<Scalars["String"]["output"]>;
 }
 
 /** Information about a signer of the petition */
-export interface PetitionSignerembeddedSignatureImageArgs {
+export interface PetitionSignersignWithEmbeddedImageUrlArgs {
   options?: InputMaybe<ImageOptions>;
 }
 
@@ -7078,14 +7079,14 @@ export interface SignatureConfigInput {
 /** The signer that need to sign the generated document. */
 export interface SignatureConfigInputSigner {
   contactId?: InputMaybe<Scalars["GID"]["input"]>;
-  email: Scalars["String"]["input"];
+  email?: InputMaybe<Scalars["String"]["input"]>;
   firstName: Scalars["String"]["input"];
   isPreset?: InputMaybe<Scalars["Boolean"]["input"]>;
   lastName?: InputMaybe<Scalars["String"]["input"]>;
   signWithDigitalCertificate?: InputMaybe<Scalars["Boolean"]["input"]>;
   signWithEmbeddedImage?: InputMaybe<Scalars["Upload"]["input"]>;
   /** ID of the previously uploaded image if you don't want to update current. */
-  signWithEmbeddedImageId?: InputMaybe<Scalars["GID"]["input"]>;
+  signWithEmbeddedImageFileUploadId?: InputMaybe<Scalars["String"]["input"]>;
 }
 
 /** The signing mode of a signature config */
@@ -7828,7 +7829,7 @@ export type ContactListPopover_PetitionSignerFragment = {
   firstName: string;
   lastName?: string | null;
   fullName: string;
-  email: string;
+  email?: string | null;
   isPreset: boolean;
   signWithDigitalCertificate?: boolean | null;
 };
@@ -8938,7 +8939,7 @@ export type SignerReference_PetitionSignerFragment = {
   firstName: string;
   lastName?: string | null;
   fullName: string;
-  email: string;
+  email?: string | null;
   isPreset: boolean;
   signWithDigitalCertificate?: boolean | null;
 };
@@ -16741,7 +16742,7 @@ export type PetitionActivityTimeline_PetitionEvent_RecipientSignedEvent_Fragment
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
     signWithDigitalCertificate?: boolean | null;
   } | null;
@@ -16955,7 +16956,7 @@ export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragm
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
     signWithDigitalCertificate?: boolean | null;
   } | null;
@@ -16990,7 +16991,7 @@ export type PetitionActivityTimeline_PetitionEvent_SignatureDeliveredEvent_Fragm
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
     signWithDigitalCertificate?: boolean | null;
   } | null;
@@ -17006,7 +17007,7 @@ export type PetitionActivityTimeline_PetitionEvent_SignatureOpenedEvent_Fragment
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
     signWithDigitalCertificate?: boolean | null;
   } | null;
@@ -17257,13 +17258,14 @@ export type AddPetitionAccessDialog_SignatureConfigFragment = {
   signers: Array<{
     __typename?: "PetitionSigner";
     signWithDigitalCertificate?: boolean | null;
+    signWithEmbeddedImageFileUploadId?: string | null;
     contactId?: string | null;
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
-    embeddedSignatureImage300?: { [key: string]: any } | null;
+    signWithEmbeddedImageUrl300?: string | null;
   } | null>;
 };
 
@@ -17309,13 +17311,14 @@ export type AddPetitionAccessDialog_PetitionFragment = {
     signers: Array<{
       __typename?: "PetitionSigner";
       signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
   } | null;
   remindersConfig?: {
@@ -17496,13 +17499,14 @@ export type AddPetitionAccessDialog_petitionQuery = {
           signers: Array<{
             __typename?: "PetitionSigner";
             signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
         } | null;
         remindersConfig?: {
@@ -17694,13 +17698,14 @@ export type AddPetitionAccessDialog_createContactlessPetitionAccessMutation = {
         signers: Array<{
           __typename?: "PetitionSigner";
           signWithDigitalCertificate?: boolean | null;
+          signWithEmbeddedImageFileUploadId?: string | null;
           contactId?: string | null;
           firstName: string;
           lastName?: string | null;
           fullName: string;
-          email: string;
+          email?: string | null;
           isPreset: boolean;
-          embeddedSignatureImage300?: { [key: string]: any } | null;
+          signWithEmbeddedImageUrl300?: string | null;
         } | null>;
       } | null;
       remindersConfig?: {
@@ -18604,7 +18609,7 @@ export type TimelineRecipientSignedEvent_RecipientSignedEventFragment = {
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
     signWithDigitalCertificate?: boolean | null;
   } | null;
@@ -18811,7 +18816,7 @@ export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
     signWithDigitalCertificate?: boolean | null;
   } | null;
@@ -18844,7 +18849,7 @@ export type TimelineSignatureDeliveredEvent_SignatureDeliveredEventFragment = {
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
     signWithDigitalCertificate?: boolean | null;
   } | null;
@@ -18859,7 +18864,7 @@ export type TimelineSignatureOpenedEvent_SignatureOpenedEventFragment = {
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
     signWithDigitalCertificate?: boolean | null;
   } | null;
@@ -19154,7 +19159,7 @@ export type SelectedSignerRow_PetitionSignerFragment = {
   firstName: string;
   lastName?: string | null;
   fullName: string;
-  email: string;
+  email?: string | null;
   isPreset: boolean;
   signWithDigitalCertificate?: boolean | null;
 };
@@ -19165,7 +19170,7 @@ export type SuggestedSigners_PetitionSignerFragment = {
   firstName: string;
   lastName?: string | null;
   fullName: string;
-  email: string;
+  email?: string | null;
   isPreset: boolean;
   signWithDigitalCertificate?: boolean | null;
 };
@@ -19189,7 +19194,7 @@ export type SuggestedSigners_PublicPetitionFragment = {
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
       signWithDigitalCertificate?: boolean | null;
     }>;
@@ -19306,7 +19311,7 @@ export type SuggestedSigners_PetitionBase_Petition_Fragment = {
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       } | null>;
@@ -19553,13 +19558,14 @@ export type ConfirmPetitionSignersDialog_UserFragment = {
 export type ConfirmPetitionSignersDialog_PetitionSignerFragment = {
   __typename?: "PetitionSigner";
   signWithDigitalCertificate?: boolean | null;
+  signWithEmbeddedImageFileUploadId?: string | null;
   contactId?: string | null;
   firstName: string;
   lastName?: string | null;
   fullName: string;
-  email: string;
+  email?: string | null;
   isPreset: boolean;
-  embeddedSignatureImage300?: { [key: string]: any } | null;
+  signWithEmbeddedImageUrl300?: string | null;
 };
 
 export type ConfirmPetitionSignersDialog_SignatureConfigFragment = {
@@ -19572,13 +19578,14 @@ export type ConfirmPetitionSignersDialog_SignatureConfigFragment = {
   signers: Array<{
     __typename?: "PetitionSigner";
     signWithDigitalCertificate?: boolean | null;
+    signWithEmbeddedImageFileUploadId?: string | null;
     contactId?: string | null;
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
-    embeddedSignatureImage300?: { [key: string]: any } | null;
+    signWithEmbeddedImageUrl300?: string | null;
   } | null>;
   integration?: {
     __typename?: "SignatureOrgIntegration";
@@ -19641,7 +19648,7 @@ export type ConfirmPetitionSignersDialog_PetitionBase_Petition_Fragment = {
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       } | null>;
@@ -19890,7 +19897,7 @@ export type ConfirmPetitionSignersDialog_petitionQuery = {
               firstName: string;
               lastName?: string | null;
               fullName: string;
-              email: string;
+              email?: string | null;
               isPreset: boolean;
               signWithDigitalCertificate?: boolean | null;
             } | null>;
@@ -20602,14 +20609,15 @@ export type SignatureConfigDialog_SignatureConfigFragment = {
   } | null;
   signers: Array<{
     __typename?: "PetitionSigner";
+    signWithEmbeddedImageFileUploadId?: string | null;
     contactId?: string | null;
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
     signWithDigitalCertificate?: boolean | null;
-    embeddedSignatureImage300?: { [key: string]: any } | null;
+    signWithEmbeddedImageUrl300?: string | null;
   } | null>;
 };
 
@@ -20654,14 +20662,15 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
     } | null;
     signers: Array<{
       __typename?: "PetitionSigner";
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
       signWithDigitalCertificate?: boolean | null;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
   } | null;
   approvalFlowConfig?: Array<{
@@ -20682,7 +20691,7 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       } | null>;
@@ -20812,14 +20821,15 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
     } | null;
     signers: Array<{
       __typename?: "PetitionSigner";
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
       signWithDigitalCertificate?: boolean | null;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
   } | null;
   approvalFlowConfig?: Array<{
@@ -23110,13 +23120,14 @@ export type PetitionComposeRightPaneTabs_PetitionBase_Petition_Fragment = {
     signers: Array<{
       __typename?: "PetitionSigner";
       signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -23151,7 +23162,7 @@ export type PetitionComposeRightPaneTabs_PetitionBase_Petition_Fragment = {
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       } | null>;
@@ -23324,13 +23335,14 @@ export type PetitionComposeRightPaneTabs_PetitionBase_PetitionTemplate_Fragment 
     signers: Array<{
       __typename?: "PetitionSigner";
       signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -23593,7 +23605,7 @@ export type PetitionSettings_SignatureConfigFragment = {
   signers: Array<{
     __typename?: "PetitionSigner";
     contactId?: string | null;
-    email: string;
+    email?: string | null;
     firstName: string;
     fullName: string;
     isPreset: boolean;
@@ -23660,13 +23672,14 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     signers: Array<{
       __typename?: "PetitionSigner";
       signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -23700,7 +23713,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       } | null>;
@@ -23873,13 +23886,14 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     signers: Array<{
       __typename?: "PetitionSigner";
       signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -24648,7 +24662,7 @@ export type CopySignatureConfigDialog_PetitionSignerFragment = {
   firstName: string;
   lastName?: string | null;
   fullName: string;
-  email: string;
+  email?: string | null;
   isPreset: boolean;
   signWithDigitalCertificate?: boolean | null;
 };
@@ -27800,13 +27814,14 @@ export type PetitionPreviewStartSignatureButton_PetitionFragment = {
     signers: Array<{
       __typename?: "PetitionSigner";
       signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
   } | null;
   fields: Array<{
@@ -30584,12 +30599,12 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
     bouncedAt?: string | null;
     signer: {
       __typename?: "PetitionSigner";
-      embeddedSignatureImage?: { [key: string]: any } | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
       signWithDigitalCertificate?: boolean | null;
     };
@@ -30626,13 +30641,14 @@ export type NewSignatureRequestRow_PetitionFragment = {
     signers: Array<{
       __typename?: "PetitionSigner";
       signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -30807,7 +30823,7 @@ export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
       signWithDigitalCertificate?: boolean | null;
     };
@@ -30966,15 +30982,15 @@ export type PetitionApprovalsCard_PetitionFragment = {
     } | null;
     signers: Array<{
       __typename?: "PetitionSigner";
+      signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
-      email: string;
       firstName: string;
       lastName?: string | null;
-      isPreset: boolean;
-      embeddedSignatureImage?: { [key: string]: any } | null;
-      signWithDigitalCertificate?: boolean | null;
       fullName: string;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      email?: string | null;
+      isPreset: boolean;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
   } | null;
   signatureRequests: Array<{
@@ -30998,7 +31014,7 @@ export type PetitionApprovalsCard_PetitionFragment = {
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       } | null>;
@@ -31013,12 +31029,12 @@ export type PetitionApprovalsCard_PetitionFragment = {
       bouncedAt?: string | null;
       signer: {
         __typename?: "PetitionSigner";
-        embeddedSignatureImage?: { [key: string]: any } | null;
+        signWithEmbeddedImageFileUploadId?: string | null;
         contactId?: string | null;
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       };
@@ -31343,15 +31359,15 @@ export type PetitionApprovalsCard_cancelPetitionApprovalRequestStepMutation = {
         } | null;
         signers: Array<{
           __typename?: "PetitionSigner";
+          signWithDigitalCertificate?: boolean | null;
+          signWithEmbeddedImageFileUploadId?: string | null;
           contactId?: string | null;
-          email: string;
           firstName: string;
           lastName?: string | null;
-          isPreset: boolean;
-          embeddedSignatureImage?: { [key: string]: any } | null;
-          signWithDigitalCertificate?: boolean | null;
           fullName: string;
-          embeddedSignatureImage300?: { [key: string]: any } | null;
+          email?: string | null;
+          isPreset: boolean;
+          signWithEmbeddedImageUrl300?: string | null;
         } | null>;
       } | null;
       signatureRequests: Array<{
@@ -31375,7 +31391,7 @@ export type PetitionApprovalsCard_cancelPetitionApprovalRequestStepMutation = {
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
             signWithDigitalCertificate?: boolean | null;
           } | null>;
@@ -31390,12 +31406,12 @@ export type PetitionApprovalsCard_cancelPetitionApprovalRequestStepMutation = {
           bouncedAt?: string | null;
           signer: {
             __typename?: "PetitionSigner";
-            embeddedSignatureImage?: { [key: string]: any } | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
             signWithDigitalCertificate?: boolean | null;
           };
@@ -31710,15 +31726,15 @@ export type PetitionApprovalsCard_skipPetitionApprovalRequestStepMutation = {
         } | null;
         signers: Array<{
           __typename?: "PetitionSigner";
+          signWithDigitalCertificate?: boolean | null;
+          signWithEmbeddedImageFileUploadId?: string | null;
           contactId?: string | null;
-          email: string;
           firstName: string;
           lastName?: string | null;
-          isPreset: boolean;
-          embeddedSignatureImage?: { [key: string]: any } | null;
-          signWithDigitalCertificate?: boolean | null;
           fullName: string;
-          embeddedSignatureImage300?: { [key: string]: any } | null;
+          email?: string | null;
+          isPreset: boolean;
+          signWithEmbeddedImageUrl300?: string | null;
         } | null>;
       } | null;
       signatureRequests: Array<{
@@ -31742,7 +31758,7 @@ export type PetitionApprovalsCard_skipPetitionApprovalRequestStepMutation = {
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
             signWithDigitalCertificate?: boolean | null;
           } | null>;
@@ -31757,12 +31773,12 @@ export type PetitionApprovalsCard_skipPetitionApprovalRequestStepMutation = {
           bouncedAt?: string | null;
           signer: {
             __typename?: "PetitionSigner";
-            embeddedSignatureImage?: { [key: string]: any } | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
             signWithDigitalCertificate?: boolean | null;
           };
@@ -32079,15 +32095,15 @@ export type PetitionApprovalsCard_rejectPetitionApprovalRequestStepMutation = {
         } | null;
         signers: Array<{
           __typename?: "PetitionSigner";
+          signWithDigitalCertificate?: boolean | null;
+          signWithEmbeddedImageFileUploadId?: string | null;
           contactId?: string | null;
-          email: string;
           firstName: string;
           lastName?: string | null;
-          isPreset: boolean;
-          embeddedSignatureImage?: { [key: string]: any } | null;
-          signWithDigitalCertificate?: boolean | null;
           fullName: string;
-          embeddedSignatureImage300?: { [key: string]: any } | null;
+          email?: string | null;
+          isPreset: boolean;
+          signWithEmbeddedImageUrl300?: string | null;
         } | null>;
       } | null;
       signatureRequests: Array<{
@@ -32111,7 +32127,7 @@ export type PetitionApprovalsCard_rejectPetitionApprovalRequestStepMutation = {
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
             signWithDigitalCertificate?: boolean | null;
           } | null>;
@@ -32126,12 +32142,12 @@ export type PetitionApprovalsCard_rejectPetitionApprovalRequestStepMutation = {
           bouncedAt?: string | null;
           signer: {
             __typename?: "PetitionSigner";
-            embeddedSignatureImage?: { [key: string]: any } | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
             signWithDigitalCertificate?: boolean | null;
           };
@@ -32447,15 +32463,15 @@ export type PetitionApprovalsCard_approvePetitionApprovalRequestStepMutation = {
         } | null;
         signers: Array<{
           __typename?: "PetitionSigner";
+          signWithDigitalCertificate?: boolean | null;
+          signWithEmbeddedImageFileUploadId?: string | null;
           contactId?: string | null;
-          email: string;
           firstName: string;
           lastName?: string | null;
-          isPreset: boolean;
-          embeddedSignatureImage?: { [key: string]: any } | null;
-          signWithDigitalCertificate?: boolean | null;
           fullName: string;
-          embeddedSignatureImage300?: { [key: string]: any } | null;
+          email?: string | null;
+          isPreset: boolean;
+          signWithEmbeddedImageUrl300?: string | null;
         } | null>;
       } | null;
       signatureRequests: Array<{
@@ -32479,7 +32495,7 @@ export type PetitionApprovalsCard_approvePetitionApprovalRequestStepMutation = {
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
             signWithDigitalCertificate?: boolean | null;
           } | null>;
@@ -32494,12 +32510,12 @@ export type PetitionApprovalsCard_approvePetitionApprovalRequestStepMutation = {
           bouncedAt?: string | null;
           signer: {
             __typename?: "PetitionSigner";
-            embeddedSignatureImage?: { [key: string]: any } | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
             signWithDigitalCertificate?: boolean | null;
           };
@@ -32815,15 +32831,15 @@ export type PetitionApprovalsCard_startPetitionApprovalRequestStepMutation = {
         } | null;
         signers: Array<{
           __typename?: "PetitionSigner";
+          signWithDigitalCertificate?: boolean | null;
+          signWithEmbeddedImageFileUploadId?: string | null;
           contactId?: string | null;
-          email: string;
           firstName: string;
           lastName?: string | null;
-          isPreset: boolean;
-          embeddedSignatureImage?: { [key: string]: any } | null;
-          signWithDigitalCertificate?: boolean | null;
           fullName: string;
-          embeddedSignatureImage300?: { [key: string]: any } | null;
+          email?: string | null;
+          isPreset: boolean;
+          signWithEmbeddedImageUrl300?: string | null;
         } | null>;
       } | null;
       signatureRequests: Array<{
@@ -32847,7 +32863,7 @@ export type PetitionApprovalsCard_startPetitionApprovalRequestStepMutation = {
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
             signWithDigitalCertificate?: boolean | null;
           } | null>;
@@ -32862,12 +32878,12 @@ export type PetitionApprovalsCard_startPetitionApprovalRequestStepMutation = {
           bouncedAt?: string | null;
           signer: {
             __typename?: "PetitionSigner";
-            embeddedSignatureImage?: { [key: string]: any } | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
             signWithDigitalCertificate?: boolean | null;
           };
@@ -33207,15 +33223,15 @@ export type PetitionApprovalsCard_petitionQuery = {
           } | null;
           signers: Array<{
             __typename?: "PetitionSigner";
+            signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
-            email: string;
             firstName: string;
             lastName?: string | null;
-            isPreset: boolean;
-            embeddedSignatureImage?: { [key: string]: any } | null;
-            signWithDigitalCertificate?: boolean | null;
             fullName: string;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            email?: string | null;
+            isPreset: boolean;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
         } | null;
         signatureRequests: Array<{
@@ -33239,7 +33255,7 @@ export type PetitionApprovalsCard_petitionQuery = {
               firstName: string;
               lastName?: string | null;
               fullName: string;
-              email: string;
+              email?: string | null;
               isPreset: boolean;
               signWithDigitalCertificate?: boolean | null;
             } | null>;
@@ -33254,12 +33270,12 @@ export type PetitionApprovalsCard_petitionQuery = {
             bouncedAt?: string | null;
             signer: {
               __typename?: "PetitionSigner";
-              embeddedSignatureImage?: { [key: string]: any } | null;
+              signWithEmbeddedImageFileUploadId?: string | null;
               contactId?: string | null;
               firstName: string;
               lastName?: string | null;
               fullName: string;
-              email: string;
+              email?: string | null;
               isPreset: boolean;
               signWithDigitalCertificate?: boolean | null;
             };
@@ -35197,7 +35213,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       } | null>;
@@ -35212,12 +35228,12 @@ export type PetitionSignaturesCard_PetitionFragment = {
       bouncedAt?: string | null;
       signer: {
         __typename?: "PetitionSigner";
-        embeddedSignatureImage?: { [key: string]: any } | null;
+        signWithEmbeddedImageFileUploadId?: string | null;
         contactId?: string | null;
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       };
@@ -35246,15 +35262,15 @@ export type PetitionSignaturesCard_PetitionFragment = {
     } | null;
     signers: Array<{
       __typename?: "PetitionSigner";
+      signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
-      email: string;
       firstName: string;
       lastName?: string | null;
-      isPreset: boolean;
-      embeddedSignatureImage?: { [key: string]: any } | null;
-      signWithDigitalCertificate?: boolean | null;
       fullName: string;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      email?: string | null;
+      isPreset: boolean;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
   } | null;
   currentSignatureRequest?: {
@@ -35506,7 +35522,7 @@ export type PetitionSignaturesCard_completePetitionMutation = {
           firstName: string;
           lastName?: string | null;
           fullName: string;
-          email: string;
+          email?: string | null;
           isPreset: boolean;
           signWithDigitalCertificate?: boolean | null;
         } | null>;
@@ -35521,12 +35537,12 @@ export type PetitionSignaturesCard_completePetitionMutation = {
         bouncedAt?: string | null;
         signer: {
           __typename?: "PetitionSigner";
-          embeddedSignatureImage?: { [key: string]: any } | null;
+          signWithEmbeddedImageFileUploadId?: string | null;
           contactId?: string | null;
           firstName: string;
           lastName?: string | null;
           fullName: string;
-          email: string;
+          email?: string | null;
           isPreset: boolean;
           signWithDigitalCertificate?: boolean | null;
         };
@@ -35555,15 +35571,15 @@ export type PetitionSignaturesCard_completePetitionMutation = {
       } | null;
       signers: Array<{
         __typename?: "PetitionSigner";
+        signWithDigitalCertificate?: boolean | null;
+        signWithEmbeddedImageFileUploadId?: string | null;
         contactId?: string | null;
-        email: string;
         firstName: string;
         lastName?: string | null;
-        isPreset: boolean;
-        embeddedSignatureImage?: { [key: string]: any } | null;
-        signWithDigitalCertificate?: boolean | null;
         fullName: string;
-        embeddedSignatureImage300?: { [key: string]: any } | null;
+        email?: string | null;
+        isPreset: boolean;
+        signWithEmbeddedImageUrl300?: string | null;
       } | null>;
     } | null;
     currentSignatureRequest?: {
@@ -35780,7 +35796,7 @@ export type PetitionSignaturesCard_petitionQuery = {
               firstName: string;
               lastName?: string | null;
               fullName: string;
-              email: string;
+              email?: string | null;
               isPreset: boolean;
               signWithDigitalCertificate?: boolean | null;
             } | null>;
@@ -35795,12 +35811,12 @@ export type PetitionSignaturesCard_petitionQuery = {
             bouncedAt?: string | null;
             signer: {
               __typename?: "PetitionSigner";
-              embeddedSignatureImage?: { [key: string]: any } | null;
+              signWithEmbeddedImageFileUploadId?: string | null;
               contactId?: string | null;
               firstName: string;
               lastName?: string | null;
               fullName: string;
-              email: string;
+              email?: string | null;
               isPreset: boolean;
               signWithDigitalCertificate?: boolean | null;
             };
@@ -35829,15 +35845,15 @@ export type PetitionSignaturesCard_petitionQuery = {
           } | null;
           signers: Array<{
             __typename?: "PetitionSigner";
+            signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
-            email: string;
             firstName: string;
             lastName?: string | null;
-            isPreset: boolean;
-            embeddedSignatureImage?: { [key: string]: any } | null;
-            signWithDigitalCertificate?: boolean | null;
             fullName: string;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            email?: string | null;
+            isPreset: boolean;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
         } | null;
         currentSignatureRequest?: {
@@ -41400,7 +41416,7 @@ export type RecipientViewPetitionAlerts_PublicSignatureConfigFragment = {
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
     signWithDigitalCertificate?: boolean | null;
   }>;
@@ -41410,7 +41426,7 @@ export type RecipientViewPetitionAlerts_PublicSignatureConfigFragment = {
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
     signWithDigitalCertificate?: boolean | null;
   }>;
@@ -41425,7 +41441,7 @@ export type RecipientViewSignatureSentAlert_PublicSignatureConfigFragment = {
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
     signWithDigitalCertificate?: boolean | null;
   }>;
@@ -41435,7 +41451,7 @@ export type RecipientViewSignatureSentAlert_PublicSignatureConfigFragment = {
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
     signWithDigitalCertificate?: boolean | null;
   }>;
@@ -41479,7 +41495,7 @@ export type useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragment 
   firstName: string;
   lastName?: string | null;
   fullName: string;
-  email: string;
+  email?: string | null;
   isPreset: boolean;
   signWithDigitalCertificate?: boolean | null;
 };
@@ -41504,7 +41520,7 @@ export type useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfigFr
     firstName: string;
     lastName?: string | null;
     fullName: string;
-    email: string;
+    email?: string | null;
     isPreset: boolean;
     signWithDigitalCertificate?: boolean | null;
   }>;
@@ -41525,7 +41541,7 @@ export type useRecipientViewConfirmPetitionSignersDialog_PublicPetitionFragment 
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
       signWithDigitalCertificate?: boolean | null;
     }>;
@@ -41625,7 +41641,7 @@ export type useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccessFra
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       }>;
@@ -41729,7 +41745,7 @@ export type RecipientViewSignatureStatusDialog_PublicPetitionFragment = {
     signerStatus: Array<{
       __typename?: "PetitionSignatureRequestSignerStatus";
       status: string;
-      signer: { __typename?: "PetitionSigner"; fullName: string; email: string };
+      signer: { __typename?: "PetitionSigner"; fullName: string; email?: string | null };
     }>;
   } | null;
 };
@@ -48707,13 +48723,14 @@ export type PetitionActivity_PetitionFragment = {
     signers: Array<{
       __typename?: "PetitionSigner";
       signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
   } | null;
   remindersConfig?: {
@@ -49049,13 +49066,14 @@ export type PetitionActivity_updatePetitionMutation = {
           signers: Array<{
             __typename?: "PetitionSigner";
             signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
         } | null;
         remindersConfig?: {
@@ -49934,7 +49952,7 @@ export type PetitionActivity_eventsQuery = {
                   firstName: string;
                   lastName?: string | null;
                   fullName: string;
-                  email: string;
+                  email?: string | null;
                   isPreset: boolean;
                   signWithDigitalCertificate?: boolean | null;
                 } | null;
@@ -50188,7 +50206,7 @@ export type PetitionActivity_eventsQuery = {
                   firstName: string;
                   lastName?: string | null;
                   fullName: string;
-                  email: string;
+                  email?: string | null;
                   isPreset: boolean;
                   signWithDigitalCertificate?: boolean | null;
                 } | null;
@@ -50217,7 +50235,7 @@ export type PetitionActivity_eventsQuery = {
                   firstName: string;
                   lastName?: string | null;
                   fullName: string;
-                  email: string;
+                  email?: string | null;
                   isPreset: boolean;
                   signWithDigitalCertificate?: boolean | null;
                 } | null;
@@ -50232,7 +50250,7 @@ export type PetitionActivity_eventsQuery = {
                   firstName: string;
                   lastName?: string | null;
                   fullName: string;
-                  email: string;
+                  email?: string | null;
                   isPreset: boolean;
                   signWithDigitalCertificate?: boolean | null;
                 } | null;
@@ -50521,13 +50539,14 @@ export type PetitionActivity_petitionQuery = {
           signers: Array<{
             __typename?: "PetitionSigner";
             signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
         } | null;
         remindersConfig?: {
@@ -50736,13 +50755,14 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     signers: Array<{
       __typename?: "PetitionSigner";
       signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -51058,7 +51078,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       } | null>;
@@ -51389,13 +51409,14 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     signers: Array<{
       __typename?: "PetitionSigner";
       signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -51865,13 +51886,14 @@ export type PetitionCompose_updatePetitionMutation = {
           signers: Array<{
             __typename?: "PetitionSigner";
             signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -52061,7 +52083,7 @@ export type PetitionCompose_updatePetitionMutation = {
               firstName: string;
               lastName?: string | null;
               fullName: string;
-              email: string;
+              email?: string | null;
               isPreset: boolean;
               signWithDigitalCertificate?: boolean | null;
             } | null>;
@@ -52145,13 +52167,14 @@ export type PetitionCompose_updatePetitionMutation = {
           signers: Array<{
             __typename?: "PetitionSigner";
             signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -54120,13 +54143,14 @@ export type PetitionCompose_petitionQuery = {
           signers: Array<{
             __typename?: "PetitionSigner";
             signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -54470,7 +54494,7 @@ export type PetitionCompose_petitionQuery = {
               firstName: string;
               lastName?: string | null;
               fullName: string;
-              email: string;
+              email?: string | null;
               isPreset: boolean;
               signWithDigitalCertificate?: boolean | null;
             } | null>;
@@ -54819,13 +54843,14 @@ export type PetitionCompose_petitionQuery = {
           signers: Array<{
             __typename?: "PetitionSigner";
             signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -56037,13 +56062,14 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     signers: Array<{
       __typename?: "PetitionSigner";
       signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
   } | null;
   currentApprovalRequestSteps?: Array<{
@@ -56431,13 +56457,14 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
     signers: Array<{
       __typename?: "PetitionSigner";
       signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -56901,13 +56928,14 @@ export type PetitionPreview_updatePetitionMutation = {
           signers: Array<{
             __typename?: "PetitionSigner";
             signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
         } | null;
         currentApprovalRequestSteps?: Array<{
@@ -57312,13 +57340,14 @@ export type PetitionPreview_updatePetitionMutation = {
           signers: Array<{
             __typename?: "PetitionSigner";
             signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -57698,13 +57727,14 @@ export type PetitionPreview_completePetitionMutation = {
       signers: Array<{
         __typename?: "PetitionSigner";
         signWithDigitalCertificate?: boolean | null;
+        signWithEmbeddedImageFileUploadId?: string | null;
         contactId?: string | null;
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
-        embeddedSignatureImage300?: { [key: string]: any } | null;
+        signWithEmbeddedImageUrl300?: string | null;
       } | null>;
     } | null;
     currentApprovalRequestSteps?: Array<{
@@ -58157,13 +58187,14 @@ export type PetitionPreview_petitionQuery = {
           signers: Array<{
             __typename?: "PetitionSigner";
             signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
         } | null;
         currentApprovalRequestSteps?: Array<{
@@ -58568,13 +58599,14 @@ export type PetitionPreview_petitionQuery = {
           signers: Array<{
             __typename?: "PetitionSigner";
             signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -59159,7 +59191,7 @@ export type PetitionReplies_PetitionFragment = {
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       } | null>;
@@ -59174,12 +59206,12 @@ export type PetitionReplies_PetitionFragment = {
       bouncedAt?: string | null;
       signer: {
         __typename?: "PetitionSigner";
-        embeddedSignatureImage?: { [key: string]: any } | null;
+        signWithEmbeddedImageFileUploadId?: string | null;
         contactId?: string | null;
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       };
@@ -59208,15 +59240,15 @@ export type PetitionReplies_PetitionFragment = {
     } | null;
     signers: Array<{
       __typename?: "PetitionSigner";
+      signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
-      email: string;
       firstName: string;
       lastName?: string | null;
-      isPreset: boolean;
-      embeddedSignatureImage?: { [key: string]: any } | null;
-      signWithDigitalCertificate?: boolean | null;
       fullName: string;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      email?: string | null;
+      isPreset: boolean;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
   } | null;
   automaticNumberingConfig?: {
@@ -60205,7 +60237,7 @@ export type PetitionReplies_petitionQuery = {
               firstName: string;
               lastName?: string | null;
               fullName: string;
-              email: string;
+              email?: string | null;
               isPreset: boolean;
               signWithDigitalCertificate?: boolean | null;
             } | null>;
@@ -60220,12 +60252,12 @@ export type PetitionReplies_petitionQuery = {
             bouncedAt?: string | null;
             signer: {
               __typename?: "PetitionSigner";
-              embeddedSignatureImage?: { [key: string]: any } | null;
+              signWithEmbeddedImageFileUploadId?: string | null;
               contactId?: string | null;
               firstName: string;
               lastName?: string | null;
               fullName: string;
-              email: string;
+              email?: string | null;
               isPreset: boolean;
               signWithDigitalCertificate?: boolean | null;
             };
@@ -60254,15 +60286,15 @@ export type PetitionReplies_petitionQuery = {
           } | null;
           signers: Array<{
             __typename?: "PetitionSigner";
+            signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
-            email: string;
             firstName: string;
             lastName?: string | null;
-            isPreset: boolean;
-            embeddedSignatureImage?: { [key: string]: any } | null;
-            signWithDigitalCertificate?: boolean | null;
             fullName: string;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            email?: string | null;
+            isPreset: boolean;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
         } | null;
         automaticNumberingConfig?: {
@@ -63421,7 +63453,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       }>;
@@ -63431,7 +63463,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       }>;
@@ -63448,7 +63480,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
       signerStatus: Array<{
         __typename?: "PetitionSignatureRequestSignerStatus";
         status: string;
-        signer: { __typename?: "PetitionSigner"; fullName: string; email: string };
+        signer: { __typename?: "PetitionSigner"; fullName: string; email?: string | null };
       }>;
     } | null;
     automaticNumberingConfig?: {
@@ -63633,7 +63665,7 @@ export type RecipientView_PublicPetitionFragment = {
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
       signWithDigitalCertificate?: boolean | null;
     }>;
@@ -63643,7 +63675,7 @@ export type RecipientView_PublicPetitionFragment = {
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
       signWithDigitalCertificate?: boolean | null;
     }>;
@@ -63675,7 +63707,7 @@ export type RecipientView_PublicPetitionFragment = {
     signerStatus: Array<{
       __typename?: "PetitionSignatureRequestSignerStatus";
       status: string;
-      signer: { __typename?: "PetitionSigner"; fullName: string; email: string };
+      signer: { __typename?: "PetitionSigner"; fullName: string; email?: string | null };
     }>;
   } | null;
   automaticNumberingConfig?: {
@@ -63855,7 +63887,7 @@ export type RecipientView_publicCompletePetitionMutation = {
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       }>;
@@ -63865,7 +63897,7 @@ export type RecipientView_publicCompletePetitionMutation = {
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       }>;
@@ -63897,7 +63929,7 @@ export type RecipientView_publicCompletePetitionMutation = {
       signerStatus: Array<{
         __typename?: "PetitionSignatureRequestSignerStatus";
         status: string;
-        signer: { __typename?: "PetitionSigner"; fullName: string; email: string };
+        signer: { __typename?: "PetitionSigner"; fullName: string; email?: string | null };
       }>;
     } | null;
     automaticNumberingConfig?: {
@@ -64106,7 +64138,7 @@ export type RecipientView_accessQuery = {
           firstName: string;
           lastName?: string | null;
           fullName: string;
-          email: string;
+          email?: string | null;
           isPreset: boolean;
           signWithDigitalCertificate?: boolean | null;
         }>;
@@ -64116,7 +64148,7 @@ export type RecipientView_accessQuery = {
           firstName: string;
           lastName?: string | null;
           fullName: string;
-          email: string;
+          email?: string | null;
           isPreset: boolean;
           signWithDigitalCertificate?: boolean | null;
         }>;
@@ -64133,7 +64165,7 @@ export type RecipientView_accessQuery = {
         signerStatus: Array<{
           __typename?: "PetitionSignatureRequestSignerStatus";
           status: string;
-          signer: { __typename?: "PetitionSigner"; fullName: string; email: string };
+          signer: { __typename?: "PetitionSigner"; fullName: string; email?: string | null };
         }>;
       } | null;
       automaticNumberingConfig?: {
@@ -64797,7 +64829,7 @@ export type Fragments_FullPetitionSignerFragment = {
   firstName: string;
   lastName?: string | null;
   fullName: string;
-  email: string;
+  email?: string | null;
   isPreset: boolean;
   signWithDigitalCertificate?: boolean | null;
 };
@@ -67171,15 +67203,15 @@ export type useAddNewSignature_PetitionFragment = {
     } | null;
     signers: Array<{
       __typename?: "PetitionSigner";
+      signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
-      email: string;
       firstName: string;
       lastName?: string | null;
-      isPreset: boolean;
-      embeddedSignatureImage?: { [key: string]: any } | null;
-      signWithDigitalCertificate?: boolean | null;
       fullName: string;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      email?: string | null;
+      isPreset: boolean;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
   } | null;
   signatureRequests: Array<{
@@ -67194,7 +67226,7 @@ export type useAddNewSignature_PetitionFragment = {
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
         signWithDigitalCertificate?: boolean | null;
       } | null>;
@@ -67352,15 +67384,15 @@ export type useAddNewSignature_updatePetitionSignatureConfigMutation = {
           } | null;
           signers: Array<{
             __typename?: "PetitionSigner";
+            signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
-            email: string;
             firstName: string;
             lastName?: string | null;
-            isPreset: boolean;
-            embeddedSignatureImage?: { [key: string]: any } | null;
-            signWithDigitalCertificate?: boolean | null;
             fullName: string;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            email?: string | null;
+            isPreset: boolean;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
         } | null;
         signatureRequests: Array<{
@@ -67375,7 +67407,7 @@ export type useAddNewSignature_updatePetitionSignatureConfigMutation = {
               firstName: string;
               lastName?: string | null;
               fullName: string;
-              email: string;
+              email?: string | null;
               isPreset: boolean;
               signWithDigitalCertificate?: boolean | null;
             } | null>;
@@ -68809,13 +68841,14 @@ export type useStartSignatureRequest_PetitionFragment = {
     signers: Array<{
       __typename?: "PetitionSigner";
       signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
       contactId?: string | null;
       firstName: string;
       lastName?: string | null;
       fullName: string;
-      email: string;
+      email?: string | null;
       isPreset: boolean;
-      embeddedSignatureImage300?: { [key: string]: any } | null;
+      signWithEmbeddedImageUrl300?: string | null;
     } | null>;
   } | null;
   fields: Array<{
@@ -68989,13 +69022,14 @@ export type useStartSignatureRequest_updateSignatureConfigMutation = {
           signers: Array<{
             __typename?: "PetitionSigner";
             signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
             contactId?: string | null;
             firstName: string;
             lastName?: string | null;
             fullName: string;
-            email: string;
+            email?: string | null;
             isPreset: boolean;
-            embeddedSignatureImage300?: { [key: string]: any } | null;
+            signWithEmbeddedImageUrl300?: string | null;
           } | null>;
         } | null;
         fields: Array<{
@@ -69174,13 +69208,14 @@ export type useStartSignatureRequest_completePetitionMutation = {
       signers: Array<{
         __typename?: "PetitionSigner";
         signWithDigitalCertificate?: boolean | null;
+        signWithEmbeddedImageFileUploadId?: string | null;
         contactId?: string | null;
         firstName: string;
         lastName?: string | null;
         fullName: string;
-        email: string;
+        email?: string | null;
         isPreset: boolean;
-        embeddedSignatureImage300?: { [key: string]: any } | null;
+        signWithEmbeddedImageUrl300?: string | null;
       } | null>;
     } | null;
     fields: Array<{
@@ -75774,7 +75809,8 @@ export const ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc = gql`
     ...Fragments_FullPetitionSigner
     ...SelectedSignerRow_PetitionSigner
     signWithDigitalCertificate
-    embeddedSignatureImage300: embeddedSignatureImage(
+    signWithEmbeddedImageFileUploadId
+    signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(
       options: { resize: { height: 300, fit: inside } }
     )
   }
@@ -76790,7 +76826,8 @@ export const SignatureConfigDialog_SignatureConfigFragmentDoc = gql`
     }
     signers {
       ...Fragments_FullPetitionSigner
-      embeddedSignatureImage300: embeddedSignatureImage(
+      signWithEmbeddedImageFileUploadId
+      signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(
         options: { resize: { height: 300, fit: inside } }
       )
     }
@@ -78362,7 +78399,7 @@ export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gq
     signerStatus {
       signer {
         ...SignerReference_PetitionSigner
-        embeddedSignatureImage
+        signWithEmbeddedImageFileUploadId
       }
       ...PetitionSignatureRequestSignerStatusIcon_SignerStatus
     }
@@ -78434,7 +78471,7 @@ export const useAddNewSignature_PetitionFragmentDoc = gql`
         firstName
         lastName
         isPreset
-        embeddedSignatureImage
+        signWithEmbeddedImageFileUploadId
       }
     }
     signatureRequests {

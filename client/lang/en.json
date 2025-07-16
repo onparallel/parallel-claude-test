@@ -11400,6 +11400,11 @@
     "context": "Identity document only"
   },
   {
+    "term": "component.selected-signer-row.embedded-signature-image",
+    "definition": "Embedded signature image",
+    "context": "Embedded signature image"
+  },
+  {
     "term": "component.send-button.schedule",
     "definition": "Schedule send",
     "context": "Schedule send"

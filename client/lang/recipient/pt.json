@@ -820,6 +820,11 @@
     "context": "Search..."
   },
   {
+    "term": "component.selected-signer-row.embedded-signature-image",
+    "definition": "Imagem de assinatura incrustada",
+    "context": "Embedded signature image"
+  },
+  {
     "term": "component.signature-sent-alert.petition-requires-signature-alert-1",
     "definition": "<b>Assinatura digital pendente,</b> {tone, select, INFORMAL{enviaremos o documento para assinar quando a informação for revista.} other{enviaremos o documento para assinar uma vez que a informação tenha sido revista.}}",
     "context": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."

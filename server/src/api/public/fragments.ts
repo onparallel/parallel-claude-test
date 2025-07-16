@@ -142,7 +142,7 @@ export const PetitionSignatureRequestFragment = gql`
 `;
 
 export const PetitionFragment = gql`
-  fragment Petition on PetitionBase {
+  fragment Petition on Petition {
     id
     path
     name
@@ -166,63 +166,62 @@ export const PetitionFragment = gql`
     owner @include(if: $includeOwner) {
       ...User
     }
-    ... on Petition {
-      status
-      deadline
-      fromTemplate {
+
+    status
+    deadline
+    fromTemplate {
+      id
+    }
+    recipients: accesses @include(if: $includeRecipients) {
+      ...PetitionAccess
+    }
+    recipients: accesses @include(if: $includeRecipientUrl) {
+      recipientUrl
+    }
+    replies: fields @include(if: $includeReplies) {
+      id
+      alias
+      type
+      replies {
         id
-      }
-      recipients: accesses @include(if: $includeRecipients) {
-        ...PetitionAccess
-      }
-      recipients: accesses @include(if: $includeRecipientUrl) {
-        recipientUrl
-      }
-      replies: fields @include(if: $includeReplies) {
-        id
-        alias
-        type
-        replies {
-          id
-          content
-          metadata
-          children {
-            field {
-              id
-              alias
-              type
-            }
-            replies {
-              id
-              content
-              metadata
-            }
+        content
+        metadata
+        children {
+          field {
+            id
+            alias
+            type
+          }
+          replies {
+            id
+            content
+            metadata
           }
         }
       }
-      progress @include(if: $includeProgress) {
-        external {
-          approved
-          replied
-          optional
-          total
-        }
-        internal {
-          approved
-          replied
-          optional
-          total
-        }
-      }
-      variablesResult @include(if: $includeVariablesResult) {
-        name
-        value
-      }
-      signatures: signatureRequests @include(if: $includeSignatureRequests) {
-        ...PetitionSignatureRequest
-      }
-      isAnonymized
     }
+    progress @include(if: $includeProgress) {
+      external {
+        approved
+        replied
+        optional
+        total
+      }
+      internal {
+        approved
+        replied
+        optional
+        total
+      }
+    }
+    variablesResult @include(if: $includeVariablesResult) {
+      name
+      value
+    }
+    signatures: signatureRequests @include(if: $includeSignatureRequests) {
+      ...PetitionSignatureRequest
+    }
+    isAnonymized
   }
   ${PetitionAccessFragment}
   ${PetitionFieldWithRepliesFragment}

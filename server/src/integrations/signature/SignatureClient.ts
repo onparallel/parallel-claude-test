@@ -39,7 +39,7 @@ export interface SignatureResponse {
 }
 
 export interface Recipient {
-  email: string;
+  email: string | null;
   name: string;
   signWithDigitalCertificate: boolean;
   signWithEmbeddedImageFileUploadId?: number;

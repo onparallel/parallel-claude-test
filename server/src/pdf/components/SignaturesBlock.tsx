@@ -41,14 +41,14 @@ export function SignaturesBlock({ signatureConfig, templateId }: SignaturesBlock
   });
 
   const someHasEmbeddedImage = signatureConfig.signers!.some((s) =>
-    isNonNullish(s?.embeddedSignatureImage),
+    isNonNullish(s?.signWithEmbeddedImageUrl300),
   );
 
   const signers = someHasEmbeddedImage
     ? signatureConfig.signers!.map((signer, i) => ({
         wordAnchor: `3cb39pzCQA9wJ${i}`,
         fullName: signer!.fullName,
-        signatureImageUrl: signer!.embeddedSignatureImage?.url ?? undefined,
+        signatureImageUrl: signer!.signWithEmbeddedImageUrl300 ?? undefined,
         date,
       }))
     : [
@@ -96,7 +96,7 @@ SignaturesBlock.fragments = {
       signers {
         fullName
         email
-        embeddedSignatureImage
+        signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(options: { resize: { height: 300 } })
       }
       timezone
     }

@@ -31,7 +31,7 @@ import { useMemo, useRef } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import type { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
 
 const MAX_FILE_SIZE = 1024 * 1024 * 1;
@@ -57,7 +57,9 @@ function ConfirmSignerInfoDialog({
   ...props
 }: DialogProps<
   ConfirmSignerInfoDialogProps,
-  SignatureConfigInputSigner & { embeddedSignatureImage?: { id: string; url: string } }
+  SignatureConfigInputSigner & {
+    signWithEmbeddedImage?: File;
+  }
 >) {
   const intl = useIntl();
 
@@ -80,8 +82,9 @@ function ConfirmSignerInfoDialog({
         }),
       ...(hasSignWithEmbeddedImage && {
         useEmbeddedSignatureImage:
-          isNonNullish(selection.embeddedSignatureImage300) ||
+          isNonNullish(selection.signWithEmbeddedImageFileUploadId) ||
           isNonNullish(selection.signWithEmbeddedImage),
+        signWithEmbeddedImageFileUploadId: selection.signWithEmbeddedImageFileUploadId,
         signWithEmbeddedImage: selection.signWithEmbeddedImage,
       }),
     },
@@ -111,20 +114,17 @@ function ConfirmSignerInfoDialog({
         containerProps: {
           as: "form",
           onSubmit: handleSubmit((data) => {
-            const { useEmbeddedSignatureImage, signWithEmbeddedImage, ...rest } = data;
+            const { useEmbeddedSignatureImage, signWithEmbeddedImage, email, ...rest } = data;
             props.onResolve({
               ...rest,
-              signWithEmbeddedImage: useEmbeddedSignatureImage ? signWithEmbeddedImage : null,
-              embeddedSignatureImage:
-                useEmbeddedSignatureImage && isNonNullish(selection.embeddedSignatureImage300)
-                  ? {
-                      id: selection.embeddedSignatureImage300.id,
-                      url: selection.embeddedSignatureImage300.url,
-                    }
-                  : undefined,
-              signWithEmbeddedImageId:
-                useEmbeddedSignatureImage && isNonNullish(selection.embeddedSignatureImage300)
-                  ? selection.embeddedSignatureImage300.id
+              email: useEmbeddedSignatureImage ? null : email,
+              signWithEmbeddedImage: useEmbeddedSignatureImage
+                ? (signWithEmbeddedImage ?? undefined)
+                : undefined,
+              signWithEmbeddedImageFileUploadId:
+                useEmbeddedSignatureImage &&
+                isNonNullish(selection.signWithEmbeddedImageFileUploadId)
+                  ? selection.signWithEmbeddedImageFileUploadId
                   : undefined,
             });
           }),
@@ -170,29 +170,31 @@ function ConfirmSignerInfoDialog({
               </Alert>
             </>
           ) : null}
-          <FormControl id="email" isInvalid={!!errors.email}>
-            <FormLabel fontWeight={500}>
-              <FormattedMessage id="generic.email" defaultMessage="Email" />
-            </FormLabel>
-            <Input
-              type="email"
-              {...register("email", {
-                required: true,
-                validate: { isValidEmail },
-              })}
-              placeholder={intl.formatMessage({
-                id: "generic.forms.company-email-placeholder",
-                defaultMessage: "example@company.com",
-              })}
-            />
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms-invalid-email-error"
-                defaultMessage="Please, enter a valid email"
-              />
-            </FormErrorMessage>
-          </FormControl>
 
+          {useEmbeddedSignatureImage ? null : (
+            <FormControl id="email" isInvalid={!!errors.email}>
+              <FormLabel fontWeight={500}>
+                <FormattedMessage id="generic.email" defaultMessage="Email" />
+              </FormLabel>
+              <Input
+                type="email"
+                {...register("email", {
+                  required: true,
+                  validate: (v) => !!v && isValidEmail(v),
+                })}
+                placeholder={intl.formatMessage({
+                  id: "generic.forms.company-email-placeholder",
+                  defaultMessage: "example@company.com",
+                })}
+              />
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="generic.forms-invalid-email-error"
+                  defaultMessage="Please, enter a valid email"
+                />
+              </FormErrorMessage>
+            </FormControl>
+          )}
           <FormControl isInvalid={!!errors.firstName}>
             <FormLabel fontWeight={500}>
               <FormattedMessage id="generic.forms-first-name-label" defaultMessage="First name" />
@@ -314,7 +316,7 @@ function ConfirmSignerInfoDialog({
                     rules={{
                       required:
                         useEmbeddedSignatureImage &&
-                        !isNonNullish(selection.embeddedSignatureImage300),
+                        isNullish(selection.signWithEmbeddedImageFileUploadId),
                     }}
                     render={({ field }) => (
                       <Dropzone
@@ -357,7 +359,7 @@ function ConfirmSignerInfoDialog({
                           })}
                           src={
                             embedSignatureImageObjectUrl ||
-                            selection.embeddedSignatureImage300?.url ||
+                            selection.signWithEmbeddedImageUrl300 ||
                             undefined
                           }
                           fallback={

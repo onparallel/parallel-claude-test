@@ -1,5 +1,5 @@
 import { enumType, objectType } from "nexus";
-import { isNonNullish } from "remeda";
+import { isNonNullish, pick } from "remeda";
 import {
   PetitionSignatureCancelReasonValues,
   PetitionSignatureStatusValues,
@@ -35,12 +35,8 @@ export const PetitionSignatureRequestSignerStatus = objectType({
   definition(t) {
     t.field("signer", {
       type: "PetitionSigner",
-      resolve: (o) => ({
-        firstName: o.firstName,
-        lastName: o.lastName,
-        email: o.email,
-        signWithEmbeddedImageFileUploadId: o.signWithEmbeddedImageFileUploadId ?? undefined,
-      }),
+      resolve: (o) =>
+        pick(o, ["firstName", "lastName", "email", "signWithEmbeddedImageFileUploadId"]),
     });
     t.string("status", {
       description: "The signing status of the individual contact.",

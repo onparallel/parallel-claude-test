@@ -1,9 +1,11 @@
 import { Knex } from "knex";
+import pMap from "p-map";
 import { createTestContainer } from "../../../test/testContainer";
 import { ApiContext } from "../../context";
 import { Contact, Organization, OrgIntegration, Petition, User } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
+import { toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
 import { random } from "../../util/token";
 import { ApolloError } from "../helpers/errors";
@@ -223,7 +225,7 @@ describe("GraphQL custom validators", () => {
     });
 
     it("validates the signature configuration with embedded signature images", async () => {
-      const [fileUpload] = await mocks.knex.from("file_upload").insert(
+      const [publicFile] = await mocks.knex.from("public_file_upload").insert(
         {
           path: "uploads/1.png",
           filename: "1.png",
@@ -251,9 +253,14 @@ describe("GraphQL custom validators", () => {
                 {
                   firstName: "John",
                   lastName: "Doe",
-                  email: "john.doe@example.com",
+                  email: null,
                   contactId: 1,
-                  signWithEmbeddedImageId: fileUpload.id,
+                  signWithEmbeddedImageFileUploadId: await ctx.jwt.sign({
+                    signWithEmbeddedImageFileUploadId: toGlobalId(
+                      "PublicFileUpload",
+                      publicFile.id,
+                    ),
+                  }),
                 },
               ],
               timezone: "Europe/Madrid",
@@ -428,7 +435,7 @@ describe("GraphQL custom validators", () => {
     });
 
     it("sends error if minSigners is not at least 1 more of embedded signature images", async () => {
-      const [fileUpload] = await mocks.knex.from("file_upload").insert(
+      const [publicFile] = await mocks.knex.from("public_file_upload").insert(
         {
           path: "uploads/2.png",
           filename: "2.png",
@@ -446,13 +453,22 @@ describe("GraphQL custom validators", () => {
             petitionId: petition.id,
             config: {
               orgIntegrationId: signatureIntegration.id,
-              signersInfo: contacts.map((c) => ({
-                firstName: c.first_name,
-                lastName: c.last_name,
-                email: c.email,
-                contactId: c.id,
-                signWithEmbeddedImageId: fileUpload.id,
-              })),
+              signersInfo: await pMap(
+                contacts,
+                async (c) => ({
+                  firstName: c.first_name,
+                  lastName: c.last_name,
+                  email: null,
+                  contactId: c.id,
+                  signWithEmbeddedImageFileUploadId: await ctx.jwt.sign({
+                    signWithEmbeddedImageFileUploadId: toGlobalId(
+                      "PublicFileUpload",
+                      publicFile.id,
+                    ),
+                  }),
+                }),
+                { concurrency: 1 },
+              ),
               timezone: "Europe/Madrid",
               title: "sign this!",
               allowAdditionalSigners: false,

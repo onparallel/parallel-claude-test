@@ -441,13 +441,13 @@ export interface NexusGenInputs {
   SignatureConfigInputSigner: {
     // input type
     contactId?: NexusGenScalars["GID"] | null; // GID
-    email: string; // String!
+    email?: string | null; // String
     firstName: string; // String!
     isPreset?: boolean | null; // Boolean
     lastName?: string | null; // String
     signWithDigitalCertificate?: boolean | null; // Boolean
     signWithEmbeddedImage?: NexusGenScalars["Upload"] | null; // Upload
-    signWithEmbeddedImageId?: NexusGenScalars["GID"] | null; // GID
+    signWithEmbeddedImageFileUploadId?: string | null; // String
   };
   SortByInput: {
     // input type
@@ -1590,7 +1590,7 @@ export interface NexusGenObjects {
     contactId?: number;
     firstName: string;
     lastName: string;
-    email: string;
+    email: string | null;
     isPreset?: boolean;
     signWithDigitalCertificate?: boolean;
     signWithEmbeddedImageFileUploadId?: number;
@@ -3775,13 +3775,14 @@ export interface NexusGenFieldTypes {
   PetitionSigner: {
     // field return type
     contactId: NexusGenScalars["GID"] | null; // GID
-    email: string; // String!
-    embeddedSignatureImage: NexusGenScalars["JSONObject"] | null; // JSONObject
+    email: string | null; // String
     firstName: string; // String!
     fullName: string; // String!
     isPreset: boolean; // Boolean!
     lastName: string | null; // String
     signWithDigitalCertificate: boolean | null; // Boolean
+    signWithEmbeddedImageFileUploadId: string | null; // String
+    signWithEmbeddedImageUrl: string | null; // String
   };
   PetitionTaggedEvent: {
     // field return type
@@ -6959,12 +6960,13 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     contactId: "GID";
     email: "String";
-    embeddedSignatureImage: "JSONObject";
     firstName: "String";
     fullName: "String";
     isPreset: "Boolean";
     lastName: "String";
     signWithDigitalCertificate: "Boolean";
+    signWithEmbeddedImageFileUploadId: "String";
+    signWithEmbeddedImageUrl: "String";
   };
   PetitionTaggedEvent: {
     // field return type name
@@ -10140,7 +10142,7 @@ export interface NexusGenArgTypes {
     };
   };
   PetitionSigner: {
-    embeddedSignatureImage: {
+    signWithEmbeddedImageUrl: {
       // args
       options?: NexusGenInputs["ImageOptions"] | null; // ImageOptions
     };

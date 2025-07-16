@@ -820,6 +820,11 @@
     "context": "Search..."
   },
   {
+    "term": "component.selected-signer-row.embedded-signature-image",
+    "definition": "Embedded signature image",
+    "context": "Embedded signature image"
+  },
+  {
     "term": "component.signature-sent-alert.petition-requires-signature-alert-1",
     "definition": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed.",
     "context": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."

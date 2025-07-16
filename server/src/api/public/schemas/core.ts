@@ -717,7 +717,7 @@ export const _PetitionSigner = {
   properties: {
     firstName: { type: "string" },
     lastName: { type: ["string", "null"] },
-    email: { type: "string" },
+    email: { type: ["string", "null"] },
   },
   example: {
     firstName: "Tywin",
