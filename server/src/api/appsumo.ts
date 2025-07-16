@@ -1,6 +1,5 @@
 import { Router, urlencoded } from "express";
 import { isNonNullish } from "remeda";
-import { sign, verify } from "../util/jwt";
 
 type AppSumoPayload =
   | {
@@ -25,9 +24,7 @@ export const appsumo = Router()
       req.body.password === req.context.config.appsumo.password
     ) {
       res.status(200).json({
-        access: await sign({}, req.context.config.security.jwtSecret, {
-          expiresIn: "1 minute",
-        }),
+        access: await req.context.jwt.sign({}, { expiresIn: "1 minute" }),
       });
     } else {
       res.status(401).json({ message: "Unauthorized" });
@@ -53,7 +50,7 @@ export const appsumo = Router()
           throw new Error();
         }
 
-        await verify(match[1], req.context.config.security.jwtSecret);
+        await req.context.jwt.verify(match[1]);
 
         const orgs = await req.context.organizations.getOrganizationsByUserEmail(
           (req.body.activation_email as string).toLowerCase(),

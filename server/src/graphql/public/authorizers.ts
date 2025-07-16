@@ -5,7 +5,6 @@ import { isNonNullish, isNullish, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { FeatureFlagName } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { verify } from "../../util/jwt";
 import { MaybeArray, unMaybeArray } from "../../util/types";
 import { Arg, chain, getArg } from "../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../helpers/errors";
@@ -232,7 +231,7 @@ export function validPublicPetitionLinkPrefill<
       const prefill = getArg(args, argPrefill);
       const publicLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
       if (isNonNullish(publicLink?.prefill_secret)) {
-        await verify(prefill!, publicLink!.prefill_secret, {});
+        await ctx.jwt.verify(prefill!, { secret: publicLink!.prefill_secret });
         return true;
       }
     } catch {}

@@ -53,6 +53,7 @@ import {
   INTEGRATIONS_SETUP_SERVICE,
   IntegrationsSetupService,
 } from "./IntegrationsSetupService";
+import { IJwtService, JWT_SERVICE, JwtService } from "./JwtService";
 import { ILogger, LOGGER, createLogger } from "./Logger";
 import { IOrgLimitsService, ORG_LIMITS_SERVICE, OrgLimitsService } from "./OrgLimitsService";
 import {
@@ -125,6 +126,7 @@ export const servicesModule = new ContainerModule((options) => {
   options.bind<IImageService>(IMAGE_SERVICE).to(ImageService).inSingletonScope();
   options.bind<II18nService>(I18N_SERVICE).to(I18nService).inSingletonScope();
   options.bind<IEncryptionService>(ENCRYPTION_SERVICE).to(EncryptionService).inSingletonScope();
+  options.bind<IJwtService>(JWT_SERVICE).to(JwtService).inSingletonScope();
   options
     .bind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE)
     .to(BackgroundCheckService)

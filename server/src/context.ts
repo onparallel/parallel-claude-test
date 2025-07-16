@@ -61,6 +61,7 @@ import {
   IIntegrationsSetupService,
   INTEGRATIONS_SETUP_SERVICE,
 } from "./services/IntegrationsSetupService";
+import { IJwtService, JWT_SERVICE } from "./services/JwtService";
 import { ILogger, LOGGER } from "./services/Logger";
 import { IOrgLimitsService, ORG_LIMITS_SERVICE } from "./services/OrgLimitsService";
 import {
@@ -144,6 +145,7 @@ export class ApiContext {
     @inject(I18N_SERVICE) public readonly i18n: II18nService,
     @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
     @inject(ENCRYPTION_SERVICE) public readonly encryption: IEncryptionService,
+    @inject(JWT_SERVICE) public readonly jwt: IJwtService,
     @inject(ORGANIZATION_CREDITS_SERVICE) public readonly orgCredits: IOrganizationCreditsService,
     @inject(DOW_JONES_CLIENT) public readonly dowJonesKyc: IDowJonesClient,
     @inject(REDIS) public readonly redis: IRedis,

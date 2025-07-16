@@ -48,12 +48,12 @@ import { UserRepository } from "../db/repositories/UserRepository";
 import { ApolloError, ForbiddenError } from "../graphql/helpers/errors";
 import { awsLogger } from "../util/awsLogger";
 import { fullName } from "../util/fullName";
-import { sign, verify } from "../util/jwt";
 import { withError } from "../util/promises/withError";
 import { random } from "../util/token";
 import { Maybe, MaybePromise } from "../util/types";
 import { EmailPayload } from "../workers/email-sender";
 import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./AccountSetupService";
+import { IJwtService, JWT_SERVICE } from "./JwtService";
 import { ILogger, LOGGER } from "./Logger";
 import { IQueuesService, QUEUES_SERVICE } from "./QueuesService";
 import { IRedis, REDIS } from "./Redis";
@@ -130,6 +130,7 @@ export class Auth implements IAuth {
     @inject(QUEUES_SERVICE) private queues: IQueuesService,
     @inject(LOGGER) private logger: ILogger,
     @inject(ACCOUNT_SETUP_SERVICE) public readonly accountSetup: IAccountSetupService,
+    @inject(JWT_SERVICE) private jwt: IJwtService,
     @inject(OrganizationRepository) private orgs: OrganizationRepository,
     @inject(IntegrationRepository) private integrations: IntegrationRepository,
     @inject(UserRepository) private users: UserRepository,
@@ -918,7 +919,7 @@ export class Auth implements IAuth {
       return null;
     }
     try {
-      const { userId } = await verify(token, this.config.security.jwtSecret);
+      const { userId } = await this.jwt.verify(token);
       const user = await this.users.loadUser(userId);
       if (isNullish(user) || !["ACTIVE", "ON_HOLD"].includes(user.status)) {
         return null;
@@ -935,7 +936,7 @@ export class Auth implements IAuth {
   }
 
   async generateTempAuthToken(userId: number) {
-    return await sign({ userId }, this.config.security.jwtSecret, { expiresIn: 30 });
+    return await this.jwt.sign({ userId }, { expiresIn: 30 });
   }
 
   async changePassword(req: IncomingMessage, password: string, newPassword: string) {
