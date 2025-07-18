@@ -356,7 +356,7 @@ export function ProfileFieldMonitoringSettings({
                           filterFields={(f) => f.type === "SELECT"}
                           onCreateProperty={async (name, isSuggested) => {
                             try {
-                              const { profileTypeField } =
+                              const profileTypeField =
                                 await showCreateOrUpdateProfileTypeFieldDialog({
                                   profileType: profileType as any,
                                   profileTypeField: isSuggested
@@ -501,14 +501,15 @@ export function ProfileFieldMonitoringSettings({
                         filterFields={(f) => f.type === "SELECT"}
                         onCreateProperty={async (name, isSuggested) => {
                           try {
-                            const { profileTypeField } =
-                              await showCreateOrUpdateProfileTypeFieldDialog({
+                            const profileTypeField = await showCreateOrUpdateProfileTypeFieldDialog(
+                              {
                                 profileType: profileType as any,
                                 profileTypeField: isSuggested
                                   ? SUGGESTED_RISK_LEVEL
                                   : getDefaultSelectProfileField(name),
                                 disableFieldTypeSelect: true,
-                              });
+                              },
+                            );
                             setProfileTypeFields((profileTypeFields) => [
                               ...profileTypeFields,
                               profileTypeField,

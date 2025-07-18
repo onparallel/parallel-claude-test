@@ -2443,6 +2443,7 @@ export class ProfileRepository extends BaseRepository {
     }[],
     userId: number,
     orgId: number,
+    t?: Knex.Transaction,
   ) {
     return await this.withTransaction(async (t) => {
       const values = await this.raw<ProfileFieldValue>(
@@ -2496,7 +2497,7 @@ export class ProfileRepository extends BaseRepository {
         };
       });
       await this.updateProfileFieldValues(updates, userId, orgId, undefined, t);
-    });
+    }, t);
   }
 
   async getProfileEventsForUser(

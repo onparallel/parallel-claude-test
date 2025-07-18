@@ -55,14 +55,12 @@ import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/erro
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { dateArg } from "../helpers/scalars/DateTime";
 import { validateAnd, validateOr } from "../helpers/validateArgs";
-import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { uniqueValues } from "../helpers/validators/uniqueValues";
 import { validFileUploadInput } from "../helpers/validators/validFileUploadInput";
 import { validIsNotUndefined } from "../helpers/validators/validIsDefined";
 import { validLocalizableUserText } from "../helpers/validators/validLocalizableUserText";
-import { validateRegex } from "../helpers/validators/validateRegex";
 import { userHasAccessToIntegrations } from "../integrations/authorizers";
 import {
   petitionIsNotAnonymized,
@@ -106,9 +104,9 @@ import {
   userHasPermissionOnProfileTypeField,
 } from "./authorizers";
 import {
+  validCreateProfileTypeFieldData,
   validProfileNamePattern,
-  validProfileTypeFieldOptions,
-  validProfileTypeFieldSubstitution,
+  validUpdateProfileTypeFieldData,
 } from "./validators";
 
 export const createProfileType = mutationField("createProfileType", {
@@ -311,13 +309,7 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
     userHasAccessToProfileType("profileTypeId"),
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
   ),
-  validateArgs: validateAnd(
-    notEmptyObject("data"),
-    validLocalizableUserText("data.name", { maxLength: 200 }),
-    maxLength("data.alias", 100),
-    validateRegex("data.alias", /^(?!p_)[A-Za-z0-9_]+$/),
-    validProfileTypeFieldOptions("profileTypeId", "data"),
-  ),
+  validateArgs: validCreateProfileTypeFieldData("profileTypeId", "data"),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
     data: nonNull(
@@ -385,7 +377,10 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
     userHasAccessToProfileType("profileTypeId"),
     profileTypeFieldBelongsToProfileType("profileTypeFieldId", "profileTypeId"),
-    profileTypeFieldIsNotUsedInMonitoringRules("profileTypeId", "profileTypeFieldId"),
+    ifArgDefined(
+      (args) => args.data.options,
+      profileTypeFieldIsNotUsedInMonitoringRules("profileTypeId", "profileTypeFieldId"),
+    ),
     ifArgDefined(
       (args) => args.data.name || args.data.alias,
       profileTypeFieldIsNotStandard("profileTypeFieldId"),
@@ -422,14 +417,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
       }),
     ),
   },
-  validateArgs: validateAnd(
-    notEmptyObject("data"),
-    maxLength("data.name.en", 500),
-    maxLength("data.name.es", 500),
-    maxLength("data.alias", 100),
-    validateRegex("data.alias", /^(?!p_)[A-Za-z0-9_]+$/),
-    validProfileTypeFieldSubstitution("data"),
-  ),
+  validateArgs: validUpdateProfileTypeFieldData("profileTypeFieldId", "data"),
   resolve: async (_, args, ctx, info) => {
     const updateData: Partial<CreateProfileTypeField> = {};
     const profileTypeField = (await ctx.profiles.loadProfileTypeField(args.profileTypeFieldId))!;
@@ -547,15 +535,6 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
             );
           }
         }
-        if (isNonNullish(args.data.substitutions) && args.data.substitutions.length > 0) {
-          await ctx.profiles.updateProfileFieldValueContentByProfileTypeFieldId(
-            profileTypeField.id,
-            profileTypeField.type,
-            args.data.substitutions,
-            ctx.user!.id,
-            ctx.user!.org_id,
-          );
-        }
       }
 
       if (
@@ -586,6 +565,20 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     try {
       const { updatedProfileTypeField, isProfileNamePatternUpdated } =
         await ctx.profiles.withTransaction(async (t) => {
+          if (
+            (profileTypeField.type === "SELECT" || profileTypeField.type === "CHECKBOX") &&
+            isNonNullish(args.data.substitutions) &&
+            args.data.substitutions.length > 0
+          ) {
+            await ctx.profiles.updateProfileFieldValueContentByProfileTypeFieldId(
+              profileTypeField.id,
+              profileTypeField.type,
+              args.data.substitutions,
+              ctx.user!.id,
+              ctx.user!.org_id,
+              t,
+            );
+          }
           if (updateData.is_expirable === false) {
             const repliesHaveExpirySet = await ctx.profiles.profileFieldRepliesHaveExpiryDateSet(
               args.profileTypeFieldId,

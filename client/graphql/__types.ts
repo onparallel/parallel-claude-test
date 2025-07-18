@@ -15821,13 +15821,10 @@ export type useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment = {
   fields: Array<{
     __typename?: "ProfileTypeField";
     id: string;
-    name: { [locale in UserLocale]?: string };
     type: ProfileTypeFieldType;
-    alias?: string | null;
     options: { [key: string]: any };
-    isExpirable: boolean;
-    expiryAlertAheadTime?: Duration | null;
-    isStandard: boolean;
+    name: { [locale in UserLocale]?: string };
+    alias?: string | null;
   }>;
 };
 
@@ -16020,6 +16017,25 @@ export type ProfileFieldMonitoringSettings_ProfileTypeFragment = {
     options: { [key: string]: any };
     alias?: string | null;
   }>;
+};
+
+export type ProfileFieldSelectSettings_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  fields: Array<{
+    __typename?: "ProfileTypeField";
+    id: string;
+    type: ProfileTypeFieldType;
+    options: { [key: string]: any };
+    name: { [locale in UserLocale]?: string };
+  }>;
+};
+
+export type ProfileFieldSelectSettings_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  type: ProfileTypeFieldType;
+  isStandard: boolean;
 };
 
 export type PetitionAccessTable_PetitionFragment = {
@@ -70565,24 +70581,15 @@ export const getFieldsReferencedInMonitoring_ProfileTypeFieldFragmentDoc = gql`
     name
   }
 ` as unknown as DocumentNode<getFieldsReferencedInMonitoring_ProfileTypeFieldFragment, unknown>;
-export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc = gql`
-  fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
+export const ProfileFieldSelectSettings_ProfileTypeFragmentDoc = gql`
+  fragment ProfileFieldSelectSettings_ProfileType on ProfileType {
     id
-    name
-    type
-    alias
-    options
-    isExpirable
-    expiryAlertAheadTime
-    options
-    isStandard
-    ...getFieldsReferencedInMonitoring_ProfileTypeField
+    fields {
+      ...getFieldsReferencedInMonitoring_ProfileTypeField
+    }
   }
   ${getFieldsReferencedInMonitoring_ProfileTypeFieldFragmentDoc}
-` as unknown as DocumentNode<
-  useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment,
-  unknown
->;
+` as unknown as DocumentNode<ProfileFieldSelectSettings_ProfileTypeFragment, unknown>;
 export const ProfileFieldMonitoringSettings_ProfileTypeFieldFragmentDoc = gql`
   fragment ProfileFieldMonitoringSettings_ProfileTypeField on ProfileTypeField {
     id
@@ -70609,11 +70616,11 @@ export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragmentDoc = gq
     id
     fields {
       id
-      ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
     }
+    ...ProfileFieldSelectSettings_ProfileType
     ...ProfileFieldMonitoringSettings_ProfileType
   }
-  ${useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc}
+  ${ProfileFieldSelectSettings_ProfileTypeFragmentDoc}
   ${ProfileFieldMonitoringSettings_ProfileTypeFragmentDoc}
 ` as unknown as DocumentNode<useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment, unknown>;
 export const TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc = gql`
@@ -75413,6 +75420,31 @@ export const useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc = gql`
     expiryAlertAheadTime
   }
 ` as unknown as DocumentNode<useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment, unknown>;
+export const ProfileFieldSelectSettings_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileFieldSelectSettings_ProfileTypeField on ProfileTypeField {
+    id
+    type
+    isStandard
+  }
+` as unknown as DocumentNode<ProfileFieldSelectSettings_ProfileTypeFieldFragment, unknown>;
+export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc = gql`
+  fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
+    id
+    name
+    type
+    alias
+    options
+    isExpirable
+    expiryAlertAheadTime
+    options
+    isStandard
+    ...ProfileFieldSelectSettings_ProfileTypeField
+  }
+  ${ProfileFieldSelectSettings_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<
+  useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment,
+  unknown
+>;
 export const ProfileTypeSettings_ProfileTypeFieldFragmentDoc = gql`
   fragment ProfileTypeSettings_ProfileTypeField on ProfileTypeField {
     id

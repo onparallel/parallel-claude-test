@@ -1,4 +1,8 @@
+import { gql } from "@apollo/client";
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
   Box,
   Button,
   Checkbox,
@@ -7,6 +11,8 @@ import {
   FormLabel,
   HStack,
   Input,
+  List,
+  ListItem,
   Radio,
   RadioGroup,
   Stack,
@@ -24,12 +30,19 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { LocalizableUserTextInput } from "@parallel/components/common/LocalizableUserTextInput";
 import {
   isValidLocalizableUserText,
+  LocalizableUserTextRender,
   localizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
 import { StandardListSelect } from "@parallel/components/common/StandardListSelect";
 import { TagColorSelect } from "@parallel/components/common/TagColorSelect";
 import { useImportSelectOptionsDialog } from "@parallel/components/common/dialogs/ImportSelectOptionsDialog";
+import {
+  ProfileFieldSelectSettings_ProfileTypeFieldFragment,
+  ProfileFieldSelectSettings_ProfileTypeFragment,
+  ProfileTypeFieldType,
+} from "@parallel/graphql/__types";
 import { generateExcel } from "@parallel/utils/generateExcel";
+import { getFieldsReferencedInMonitoring } from "@parallel/utils/getFieldsReferencedInMonitoring";
 import { parseProfileSelectOptionsFromExcel } from "@parallel/utils/parseProfileSelectOptionsFromExcel";
 import { useFieldArrayReorder } from "@parallel/utils/react-form-hook/useFieldArrayReorder";
 import { sanitizeFilenameWithSuffix } from "@parallel/utils/sanitizeFilenameWithSuffix";
@@ -41,7 +54,7 @@ import { nanoid } from "nanoid";
 import { KeyboardEvent, useCallback } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
-import { times, zip } from "remeda";
+import { isNonNullish, times, zip } from "remeda";
 import { CreateOrUpdateProfileTypeFieldDialogData } from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";
 
 const DEFAULT_TAG_COLOR = "#E2E8F0";
@@ -50,16 +63,29 @@ export type SelectOptionValue = UnwrapArray<
   CreateOrUpdateProfileTypeFieldDialogData["options"]["values"]
 >;
 
+interface ProfileFieldSelectSettingsProps {
+  profileType: ProfileFieldSelectSettings_ProfileTypeFragment;
+  profileTypeField?: ProfileFieldSelectSettings_ProfileTypeFieldFragment;
+  profileFieldType: ProfileTypeFieldType;
+}
+
 export function ProfileFieldSelectSettings({
-  isDisabled,
-  isStandard,
-  hideColor,
-}: {
-  isDisabled?: boolean;
-  isStandard?: boolean;
-  hideColor?: boolean;
-}) {
+  profileType,
+  profileTypeField,
+  profileFieldType,
+}: ProfileFieldSelectSettingsProps) {
   const intl = useIntl();
+  const isUpdating = isNonNullish(profileTypeField) && "id" in profileTypeField;
+  const isStandard = isUpdating ? profileTypeField.isStandard : false;
+
+  const referencedByFields =
+    isUpdating && profileTypeField.type === "SELECT"
+      ? getFieldsReferencedInMonitoring({
+          profileTypeFields: profileType.fields,
+          profileTypeFieldId: profileTypeField.id,
+        })
+      : [];
+  const isReferenced = referencedByFields.length > 0;
 
   const {
     control,
@@ -131,7 +157,7 @@ export function ProfileFieldSelectSettings({
                 id: nanoid(),
                 label,
                 value,
-                ...(hideColor
+                ...(profileTypeField?.type === "CHECKBOX"
                   ? {}
                   : { color: showOptionsWithColors ? DEFAULT_TAG_COLOR : undefined }),
               })),
@@ -154,6 +180,31 @@ export function ProfileFieldSelectSettings({
             defaultMessage="Options:"
           />
         </FormLabel>
+        {referencedByFields.length ? (
+          <Alert status="warning" rounded="md" marginBottom={2}>
+            <AlertIcon />
+            <AlertDescription>
+              <Stack spacing={2}>
+                <FormattedMessage
+                  id="component.property-referenced-alert.referenced-by-monitored-fields-1"
+                  defaultMessage="This options of this property cannot be changed as it is currently referenced by the monitoring configuration of the following {count, plural, =1{property} other {properties}}:"
+                  values={{ count: fields.length }}
+                />
+                <List paddingInlineStart={5} listStyleType="disc">
+                  {referencedByFields.map((field) => (
+                    <ListItem key={field.id} fontWeight="bold">
+                      <LocalizableUserTextRender value={field.name} default={null} />
+                    </ListItem>
+                  ))}
+                </List>
+                <FormattedMessage
+                  id="component.property-referenced-alert.referenced-by-monitored-fields-2"
+                  defaultMessage="To make changes, you must first remove it from the monitoring configuration."
+                />
+              </Stack>
+            </AlertDescription>
+          </Alert>
+        ) : null}
         <Controller
           name="options.listingType"
           defaultValue="CUSTOM"
@@ -164,7 +215,7 @@ export function ProfileFieldSelectSettings({
               value={value}
               as={HStack}
               spacing={2}
-              isDisabled={isDisabled || isStandard}
+              isDisabled={isReferenced || isStandard}
             >
               <Radio value="CUSTOM">
                 <FormattedMessage
@@ -185,7 +236,7 @@ export function ProfileFieldSelectSettings({
       {listingType === "STANDARD" ? (
         <FormControl
           isInvalid={!!errors.options?.standardList}
-          isDisabled={isDisabled || isStandard}
+          isDisabled={isReferenced || isStandard}
         >
           <Controller
             name="options.standardList"
@@ -202,8 +253,8 @@ export function ProfileFieldSelectSettings({
         </FormControl>
       ) : (
         <>
-          {hideColor ? null : (
-            <FormControl as={HStack} spacing={0} isDisabled={isDisabled}>
+          {profileFieldType === "CHECKBOX" ? null : (
+            <FormControl as={HStack} spacing={0} isDisabled={isReferenced || isStandard}>
               <Checkbox {...register("options.showOptionsWithColors")}>
                 <FormattedMessage
                   id="component.create-or-update-property-dialog.enable-colored-options"
@@ -265,7 +316,7 @@ export function ProfileFieldSelectSettings({
                         fields={fields}
                         onRemove={handleRemoveOption}
                         canRemoveOption={fields.length > 1}
-                        isDisabled={isDisabled}
+                        isDisabled={isReferenced} // standard fields can still add options
                         showOptionsWithColors={showOptionsWithColors ?? false}
                       />
                     );
@@ -278,13 +329,13 @@ export function ProfileFieldSelectSettings({
             <Button
               leftIcon={<PlusCircleIcon />}
               variant="outline"
-              isDisabled={fields.length >= 1000 || isDisabled}
+              isDisabled={fields.length >= 1000 || isReferenced} // standard fields can still add options
               onClick={() => {
                 append({
                   id: nanoid(),
                   label: { [intl.locale]: "" },
                   value: "",
-                  ...(hideColor
+                  ...(profileFieldType === "CHECKBOX"
                     ? {}
                     : { color: showOptionsWithColors ? DEFAULT_TAG_COLOR : undefined }),
                 });
@@ -299,7 +350,7 @@ export function ProfileFieldSelectSettings({
             <Button
               variant="outline"
               onClick={handleImportOptions}
-              isDisabled={isDisabled || isStandard}
+              isDisabled={isReferenced || isStandard}
             >
               <FormattedMessage
                 id="component.create-or-update-property-dialog.import-options-button"
@@ -312,6 +363,25 @@ export function ProfileFieldSelectSettings({
     </Stack>
   );
 }
+
+ProfileFieldSelectSettings.fragments = {
+  ProfileType: gql`
+    fragment ProfileFieldSelectSettings_ProfileType on ProfileType {
+      id
+      fields {
+        ...getFieldsReferencedInMonitoring_ProfileTypeField
+      }
+    }
+    ${getFieldsReferencedInMonitoring.fragments.ProfileTypeField}
+  `,
+  ProfileTypeField: gql`
+    fragment ProfileFieldSelectSettings_ProfileTypeField on ProfileTypeField {
+      id
+      type
+      isStandard
+    }
+  `,
+};
 
 function ProfileFieldSelectOption({
   index,

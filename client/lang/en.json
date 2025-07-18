@@ -480,6 +480,11 @@
     "context": "Archive profile type"
   },
   {
+    "term": "component.ask-contact-details-dialog.header",
+    "definition": "Enter the contact details",
+    "context": "Enter the contact details"
+  },
+  {
     "term": "component.ask-view-name-dialog.max-length-error",
     "definition": "Name cannot exceed {max} characters",
     "context": "Name cannot exceed {max} characters"
@@ -9760,9 +9765,14 @@
     "context": "Properties"
   },
   {
-    "term": "component.property-referenced-alert.referenced-in",
-    "definition": "This property cannot be edited as it is currently employed for the ongoing monitoring of the {properties} {count, plural, =1{property} other {properties}}. To make changes, you must first remove it from the configuration.",
-    "context": "This property cannot be edited as it is currently employed for the ongoing monitoring of the {properties} {count, plural, =1{property} other {properties}}. To make changes, you must first remove it from the configuration."
+    "term": "component.property-referenced-alert.referenced-by-monitored-fields-1",
+    "definition": "This options of this property cannot be changed as it is currently referenced by the monitoring configuration of the following {count, plural, =1{property} other {properties}}:",
+    "context": "This options of this property cannot be changed as it is currently referenced by the monitoring configuration of the following {count, plural, =1{property} other {properties}}:"
+  },
+  {
+    "term": "component.property-referenced-alert.referenced-by-monitored-fields-2",
+    "definition": "To make changes, you must first remove it from the monitoring configuration.",
+    "context": "To make changes, you must first remove it from the monitoring configuration."
   },
   {
     "term": "component.property-used-in-pattern-dialog.body",
@@ -13358,11 +13368,6 @@
     "term": "contact.parallels-header",
     "definition": "Parallels sent{name, select, null {} other { to {name}}}",
     "context": "Parallels sent{name, select, null {} other { to {name}}}"
-  },
-  {
-    "term": "component.ask-contact-details-dialog.header",
-    "definition": "Enter the contact details",
-    "context": "Enter the contact details"
   },
   {
     "term": "contacts.import-from-excel.attach-xlsx",

@@ -81,21 +81,43 @@ export function getArg<TypeName extends string, FieldName extends string, Type =
   }
 }
 
-export function getArgWithPath<TypeName extends string, FieldName extends string, Type = any>(
+function resolveKey<T extends Record<string, any>, U>(source: T, path: DeepKeysOfType<T, U>): U {
+  return path.includes(".")
+    ? path.split(".").reduce((current, path) => current?.[path], source as any)
+    : (source as any)[path];
+}
+
+export function getArgWithPath<TypeName extends string, FieldName extends string, Type>(
   args: core.ArgsValue<TypeName, FieldName>,
   path: ArgWithPath<TypeName, FieldName, Type>,
-) {
+): [Type, string] {
   if (typeof path === "string") {
-    return [
-      (path.includes(".")
-        ? path.split(".").reduce((current, path) => current?.[path], args as any)
-        : (args as any)[path]) as Type,
-      path,
-    ] as const;
+    return [resolveKey(args, path), path as string];
   } else {
     const [getter, name] = path;
-    return [getter(args), name] as const;
+    return [getter(args), name];
   }
+}
+
+export function mapArgWithPath<
+  TypeName extends string,
+  FieldName extends string,
+  Type extends Record<string, any>,
+  TResult,
+>(
+  argWithPath: ArgWithPath<TypeName, FieldName, Type>,
+  mapper: KeyOrFnWithPath<Type, TResult>,
+): ArgWithPath<TypeName, FieldName, TResult> {
+  const [getter1, path1] =
+    typeof argWithPath === "string"
+      ? [(args: core.ArgsValue<TypeName, FieldName>) => resolveKey(args, argWithPath), argWithPath]
+      : argWithPath;
+  const [getter2, path2] =
+    typeof mapper === "string" ? [(source: Type) => resolveKey(source, mapper), mapper] : mapper;
+  return [
+    (args: core.ArgsValue<TypeName, FieldName>) => getter2(getter1(args)),
+    `${path1}.${path2}`,
+  ];
 }
 
 function _all<TypeName extends string, FieldName extends string>(

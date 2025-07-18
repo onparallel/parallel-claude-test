@@ -3,7 +3,6 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  AlertProps,
   Box,
   Button,
   Center,
@@ -18,7 +17,6 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { LocalizableUserTextInput } from "@parallel/components/common/LocalizableUserTextInput";
 import { isValidLocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
@@ -31,14 +29,12 @@ import {
   CreateProfileTypeFieldInput,
   ProfileTypeFieldType,
   Scalars,
-  UserLocale,
   useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment,
   useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment,
   useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldDocument,
   useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { getFieldsReferencedInMonitoring } from "@parallel/utils/getFieldsReferencedInMonitoring";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useSetFocusRef } from "@parallel/utils/react-form-hook/useSetFocusRef";
 import { assertType } from "@parallel/utils/types";
@@ -161,28 +157,14 @@ function CreateOrUpdateProfileTypeFieldDialog({
   ...props
 }: DialogProps<
   CreateOrUpdateProfileTypeFieldDialogProps,
-  { profileTypeField: useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment }
+  useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment
 >) {
   const intl = useIntl();
 
   const isUpdating = isNonNullish(profileTypeField) && "id" in profileTypeField;
   const hasBackgroundCheck = useHasBackgroundCheck();
   const hasAdverseMediaSearch = useHasAdverseMediaSearch();
-  const isStandard = isUpdating ? profileTypeField!.isStandard : false;
-
-  const referencedIn =
-    isUpdating && profileTypeField.type === "SELECT"
-      ? getFieldsReferencedInMonitoring({
-          profileTypeFields: profileType.fields,
-          profileTypeFieldId: profileTypeField.id,
-        })
-      : [];
-
-  const referencedPropertiesNames = referencedIn
-    .map((field) => field.name[intl.locale as UserLocale])
-    .filter(isNonNullish);
-
-  const isDisabled = referencedIn.length > 0;
+  const isStandard = isUpdating ? profileTypeField.isStandard : false;
 
   const form = useForm<CreateOrUpdateProfileTypeFieldDialogData>({
     mode: "onSubmit",
@@ -217,7 +199,6 @@ function CreateOrUpdateProfileTypeFieldDialog({
 
   const isExpirable = watch("isExpirable");
   const selectedType = watch("type");
-  const values = watch("options.values");
 
   const showConfirmRemovedSelectOptionsReplacementDialog =
     useConfirmRemovedSelectOptionsReplacementDialog();
@@ -228,61 +209,61 @@ function CreateOrUpdateProfileTypeFieldDialog({
     useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldDocument,
   );
 
-  function useUpdateProfileTypeFieldWithForce() {
-    const intl = useIntl();
-    const [updateProfileTypeField] = useMutation(
-      useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocument,
-    );
-    const showRemoveProfileTypeFieldIsExpirableErrorDialog = useConfirmDeleteDialog();
+  const [updateProfileTypeFieldMutation] = useMutation(
+    useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocument,
+  );
+  const showRemoveProfileTypeFieldIsExpirableErrorDialog = useConfirmDeleteDialog();
 
-    return async (options: Parameters<typeof updateProfileTypeField>[0]) => {
-      try {
-        await updateProfileTypeField(options);
-      } catch (e) {
-        if (isApolloError(e, "REMOVE_PROFILE_TYPE_FIELD_IS_EXPIRABLE_ERROR")) {
-          await showRemoveProfileTypeFieldIsExpirableErrorDialog({
-            header: intl.formatMessage({
-              id: "component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog-header",
-              defaultMessage: "Remove expiration dates",
-            }),
-            description: (
-              <FormattedMessage
-                id="component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog-description"
-                defaultMessage="There are some properties with expiration dates set. If you remove the expiration from this field, these dates will be removed. Would you like to continue?"
-              />
-            ),
-            confirmation: intl
-              .formatMessage({
-                id: "generic.confirm",
-                defaultMessage: "Confirm",
-              })
-              .toLocaleLowerCase(),
-            cancel: (
-              <Button onClick={() => props.onReject("CANCEL")}>
-                <FormattedMessage id="generic.no-go-back" defaultMessage="No, go back" />
-              </Button>
-            ),
-            confirm: (
-              <Button colorScheme="red" type="submit">
-                <FormattedMessage id="generic.yes-continue" defaultMessage="Yes, continue" />
-              </Button>
-            ),
-          });
-          await updateProfileTypeField({
-            ...options,
-            variables: {
-              ...options!.variables!,
-              force: true,
-            },
-          });
-        } else {
-          throw e;
-        }
+  async function updateProfileTypeField(
+    options: Parameters<typeof updateProfileTypeFieldMutation>[0],
+  ) {
+    try {
+      const { data } = await updateProfileTypeFieldMutation(options);
+      return data!.updateProfileTypeField;
+    } catch (e) {
+      if (isApolloError(e, "REMOVE_PROFILE_TYPE_FIELD_IS_EXPIRABLE_ERROR")) {
+        await showRemoveProfileTypeFieldIsExpirableErrorDialog({
+          header: intl.formatMessage({
+            id: "component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog-header",
+            defaultMessage: "Remove expiration dates",
+          }),
+          description: (
+            <FormattedMessage
+              id="component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog-description"
+              defaultMessage="There are some properties with expiration dates set. If you remove the expiration from this field, these dates will be removed. Would you like to continue?"
+            />
+          ),
+          confirmation: intl
+            .formatMessage({
+              id: "generic.confirm",
+              defaultMessage: "Confirm",
+            })
+            .toLocaleLowerCase(),
+          cancel: (
+            <Button onClick={() => props.onReject("CANCEL")}>
+              <FormattedMessage id="generic.no-go-back" defaultMessage="No, go back" />
+            </Button>
+          ),
+          confirm: (
+            <Button colorScheme="red" type="submit">
+              <FormattedMessage id="generic.yes-continue" defaultMessage="Yes, continue" />
+            </Button>
+          ),
+        });
+        const { data } = await updateProfileTypeFieldMutation({
+          ...options,
+          variables: {
+            ...options!.variables!,
+            force: true,
+          },
+        });
+        return data!.updateProfileTypeField;
+      } else {
+        throw e;
       }
-    };
+    }
   }
 
-  const updateProfileTypeField = useUpdateProfileTypeFieldWithForce();
   const showConfirmDisableMonitoringDialog = useConfirmDisableMonitoringDialog();
 
   function getDirtyFieldsKeys(obj: Record<string, any>): string[] {
@@ -307,9 +288,6 @@ function CreateOrUpdateProfileTypeFieldDialog({
         containerProps: {
           as: "form",
           onSubmit: handleSubmit(async (formData) => {
-            let profileField =
-              {} as useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment;
-
             try {
               const dirtyFieldsKeys = getDirtyFieldsKeys(omit(dirtyFields, ["type"]));
               const dirtyData = pick(
@@ -344,26 +322,28 @@ function CreateOrUpdateProfileTypeFieldDialog({
                       }
                     : undefined;
                   try {
-                    await updateProfileTypeField({
-                      variables: {
-                        profileTypeId: profileType.id,
-                        profileTypeFieldId: profileTypeField.id,
-                        data: {
-                          ...(isStandard
-                            ? {}
-                            : {
-                                ...dirtyData,
-                                ...(isNonNullish(dirtyData.alias)
-                                  ? { alias: dirtyData.alias || null }
-                                  : {}),
-                              }),
+                    props.onResolve(
+                      await updateProfileTypeField({
+                        variables: {
+                          profileTypeId: profileType.id,
+                          profileTypeFieldId: profileTypeField.id,
+                          data: {
+                            ...(isStandard
+                              ? {}
+                              : {
+                                  ...dirtyData,
+                                  ...(isNonNullish(dirtyData.alias)
+                                    ? { alias: dirtyData.alias || null }
+                                    : {}),
+                                }),
 
-                          options,
-                          isExpirable: formData.isExpirable,
-                          expiryAlertAheadTime,
+                            options,
+                            isExpirable: formData.isExpirable,
+                            expiryAlertAheadTime,
+                          },
                         },
-                      },
-                    });
+                      }),
+                    );
                   } catch (error) {
                     if (isApolloError(error, "REMOVE_PROFILE_TYPE_FIELD_SELECT_OPTIONS_ERROR")) {
                       const removedOptions = error.graphQLErrors[0].extensions
@@ -379,51 +359,55 @@ function CreateOrUpdateProfileTypeFieldDialog({
                           showOptionsWithColors: dirtyData.options.showOptionsWithColors ?? false,
                         });
 
-                      await updateProfileTypeField({
-                        variables: {
-                          profileTypeId: profileType.id,
-                          profileTypeFieldId: profileTypeField.id,
-                          data: {
-                            ...(isStandard ? {} : dirtyData),
-                            ...(isNonNullish(dirtyData.alias)
-                              ? { alias: dirtyData.alias || null }
-                              : {}),
-                            options,
-                            isExpirable: formData.isExpirable,
-                            expiryAlertAheadTime,
-                            substitutions: optionValuesToUpdate,
+                      props.onResolve(
+                        await updateProfileTypeField({
+                          variables: {
+                            profileTypeId: profileType.id,
+                            profileTypeFieldId: profileTypeField.id,
+                            data: {
+                              ...(isStandard ? {} : dirtyData),
+                              ...(isNonNullish(dirtyData.alias)
+                                ? { alias: dirtyData.alias || null }
+                                : {}),
+                              options,
+                              isExpirable: formData.isExpirable,
+                              expiryAlertAheadTime,
+                              substitutions: optionValuesToUpdate,
+                            },
                           },
-                        },
-                      });
+                        }),
+                      );
                     } else {
                       throw error;
                     }
                   }
                 } else {
                   try {
-                    await updateProfileTypeField({
-                      variables: {
-                        profileTypeId: profileType.id,
-                        profileTypeFieldId: profileTypeField.id,
-                        data: {
-                          ...dirtyData,
-                          ...(isNonNullish(dirtyData.alias)
-                            ? { alias: dirtyData.alias || null }
-                            : {}),
-                          options:
-                            formData.type === "DATE"
-                              ? pick(formData.options, ["useReplyAsExpiryDate"])
-                              : formData.type === "BACKGROUND_CHECK" ||
-                                  formData.type === "ADVERSE_MEDIA_SEARCH"
-                                ? formData.options.hasMonitoring
-                                  ? pick(formData.options, ["monitoring"])
-                                  : { monitoring: null }
-                                : {},
-                          isExpirable: formData.isExpirable,
-                          expiryAlertAheadTime,
+                    props.onResolve(
+                      await updateProfileTypeField({
+                        variables: {
+                          profileTypeId: profileType.id,
+                          profileTypeFieldId: profileTypeField.id,
+                          data: {
+                            ...dirtyData,
+                            ...(isNonNullish(dirtyData.alias)
+                              ? { alias: dirtyData.alias || null }
+                              : {}),
+                            options:
+                              formData.type === "DATE"
+                                ? pick(formData.options, ["useReplyAsExpiryDate"])
+                                : formData.type === "BACKGROUND_CHECK" ||
+                                    formData.type === "ADVERSE_MEDIA_SEARCH"
+                                  ? formData.options.hasMonitoring
+                                    ? pick(formData.options, ["monitoring"])
+                                    : { monitoring: null }
+                                  : {},
+                            isExpirable: formData.isExpirable,
+                            expiryAlertAheadTime,
+                          },
                         },
-                      },
-                    });
+                      }),
+                    );
                   } catch (error) {
                     if (isApolloError(error, "REMOVE_PROFILE_TYPE_FIELD_MONITORING_ERROR")) {
                       try {
@@ -432,27 +416,29 @@ function CreateOrUpdateProfileTypeFieldDialog({
                         await showConfirmDisableMonitoringDialog({
                           profileCount: profileIds?.length ?? 1,
                         });
-                        await updateProfileTypeField({
-                          variables: {
-                            profileTypeId: profileType.id,
-                            profileTypeFieldId: profileTypeField.id,
-                            data: {
-                              ...omit(formData, ["expiryAlertAheadTime", "type", "alias"]),
-                              alias: formData.alias || null,
-                              expiryAlertAheadTime,
-                              options:
-                                formData.type === "DATE"
-                                  ? pick(formData.options, ["useReplyAsExpiryDate"])
-                                  : formData.type === "BACKGROUND_CHECK" ||
-                                      formData.type === "ADVERSE_MEDIA_SEARCH"
-                                    ? formData.options.hasMonitoring
-                                      ? pick(formData.options, ["monitoring"])
-                                      : { monitoring: null }
-                                    : {},
+                        props.onResolve(
+                          await updateProfileTypeField({
+                            variables: {
+                              profileTypeId: profileType.id,
+                              profileTypeFieldId: profileTypeField.id,
+                              data: {
+                                ...omit(formData, ["expiryAlertAheadTime", "type", "alias"]),
+                                alias: formData.alias || null,
+                                expiryAlertAheadTime,
+                                options:
+                                  formData.type === "DATE"
+                                    ? pick(formData.options, ["useReplyAsExpiryDate"])
+                                    : formData.type === "BACKGROUND_CHECK" ||
+                                        formData.type === "ADVERSE_MEDIA_SEARCH"
+                                      ? formData.options.hasMonitoring
+                                        ? pick(formData.options, ["monitoring"])
+                                        : { monitoring: null }
+                                      : {},
+                              },
+                              force: true,
                             },
-                            force: true,
-                          },
-                        });
+                          }),
+                        );
                       } catch {}
                     }
                   }
@@ -512,11 +498,9 @@ function CreateOrUpdateProfileTypeFieldDialog({
                   },
                 });
                 if (data?.createProfileTypeField) {
-                  profileField = data!.createProfileTypeField;
+                  props.onResolve(data.createProfileTypeField);
                 }
               }
-
-              props.onResolve({ profileTypeField: profileField });
             } catch (e) {
               if (isApolloError(e, "ALIAS_ALREADY_EXISTS")) {
                 setError("alias", { type: "unavailable" });
@@ -563,10 +547,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
             <RestrictedPetitionFieldAlert fieldType={selectedType} />
           ) : null}
 
-          {referencedIn.length ? (
-            <PropertyReferencedAlert propertyNames={referencedPropertiesNames} />
-          ) : null}
-          <FormControl isInvalid={!!errors.name} isDisabled={isDisabled || isStandard}>
+          <FormControl isInvalid={!!errors.name} isDisabled={isStandard}>
             <FormLabel fontWeight={400}>
               <FormattedMessage
                 id="component.create-or-update-property-dialog.property-name"
@@ -595,7 +576,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
               />
             </FormErrorMessage>
           </FormControl>
-          <FormControl isInvalid={!!errors.type} isDisabled={isUpdating || isDisabled}>
+          <FormControl isInvalid={!!errors.type} isDisabled={isUpdating}>
             <FormLabel fontWeight={400}>
               <FormattedMessage
                 id="component.create-or-update-property-dialog.type-of-property"
@@ -636,7 +617,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
               />
             </FormErrorMessage>
           </FormControl>
-          <FormControl isInvalid={!!errors.alias} isDisabled={isStandard || isDisabled}>
+          <FormControl isInvalid={!!errors.alias} isDisabled={isStandard}>
             <FormLabel display="flex" alignItems="center" fontWeight={400}>
               <FormattedMessage
                 id="component.create-or-update-property-dialog.unique-identifier"
@@ -686,25 +667,24 @@ function CreateOrUpdateProfileTypeFieldDialog({
 
           <FormProvider {...form}>
             {selectedType === "SHORT_TEXT" ? (
-              <ProfileFieldShortTextSettings isDisabled={isUpdating || isDisabled} />
+              <ProfileFieldShortTextSettings isDisabled={isUpdating} />
             ) : null}
             {selectedType === "SELECT" || selectedType === "CHECKBOX" ? (
               <ProfileFieldSelectSettings
-                isStandard={isStandard || values?.some((v: any) => v.isStandard)}
-                isDisabled={isDisabled || referencedIn.length > 0}
-                hideColor={selectedType === "CHECKBOX"}
+                profileType={profileType}
+                profileTypeField={isUpdating ? profileTypeField : undefined}
+                profileFieldType={selectedType}
               />
             ) : null}
             {selectedType === "BACKGROUND_CHECK" || selectedType === "ADVERSE_MEDIA_SEARCH" ? (
               <ProfileFieldMonitoringSettings
                 profileFieldType={selectedType}
                 profileType={profileType}
-                isDisabled={isDisabled}
               />
             ) : null}
           </FormProvider>
           <Stack spacing={2}>
-            <FormControl as={HStack} isInvalid={!!errors.isExpirable} isDisabled={isDisabled}>
+            <FormControl as={HStack} isInvalid={!!errors.isExpirable}>
               <Stack flex={1} spacing={1}>
                 <FormLabel margin={0}>
                   <FormattedMessage
@@ -726,7 +706,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
             {isExpirable ? (
               <>
                 {selectedType === "DATE" ? (
-                  <FormControl isDisabled={isDisabled}>
+                  <FormControl>
                     <Checkbox {...register("options.useReplyAsExpiryDate")}>
                       <FormattedMessage
                         id="component.create-or-update-property-dialog.use-reply-as-expiry-date"
@@ -735,11 +715,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                     </Checkbox>
                   </FormControl>
                 ) : null}
-                <FormControl
-                  as={HStack}
-                  isInvalid={!!errors.expiryAlertAheadTime}
-                  isDisabled={isDisabled}
-                >
+                <FormControl as={HStack} isInvalid={!!errors.expiryAlertAheadTime}>
                   <FormLabel fontSize="sm" whiteSpace="nowrap" fontWeight="normal" margin={0}>
                     <FormattedMessage
                       id="component.create-or-update-property-dialog.expiry-alert-ahead-time-label"
@@ -790,9 +766,9 @@ useCreateOrUpdateProfileTypeFieldDialog.fragments = {
         expiryAlertAheadTime
         options
         isStandard
-        ...getFieldsReferencedInMonitoring_ProfileTypeField
+        ...ProfileFieldSelectSettings_ProfileTypeField
       }
-      ${getFieldsReferencedInMonitoring.fragments.ProfileTypeField}
+      ${ProfileFieldSelectSettings.fragments.ProfileTypeField}
     `;
   },
   get ProfileType() {
@@ -801,12 +777,12 @@ useCreateOrUpdateProfileTypeFieldDialog.fragments = {
         id
         fields {
           id
-          ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
         }
+        ...ProfileFieldSelectSettings_ProfileType
         ...ProfileFieldMonitoringSettings_ProfileType
       }
+      ${ProfileFieldSelectSettings.fragments.ProfileType}
       ${ProfileFieldMonitoringSettings.fragments.ProfileType}
-      ${this.ProfileTypeField}
     `;
   },
 };
@@ -842,31 +818,6 @@ const _mutations = [
     ${useCreateOrUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
   `,
 ];
-
-interface PropertyReferencedAlertProps extends AlertProps {
-  propertyNames: string[];
-}
-
-const PropertyReferencedAlert = chakraForwardRef<"div", PropertyReferencedAlertProps>(
-  function PropertyReferencedAlert({ propertyNames, ...props }, ref) {
-    const intl = useIntl();
-    return (
-      <Alert status="warning" rounded="md" ref={ref} {...props}>
-        <AlertIcon />
-        <AlertDescription>
-          <FormattedMessage
-            id="component.property-referenced-alert.referenced-in"
-            defaultMessage="This property cannot be edited as it is currently employed for the ongoing monitoring of the {properties} {count, plural, =1{property} other {properties}}. To make changes, you must first remove it from the configuration."
-            values={{
-              properties: intl.formatList(propertyNames.map((name, i) => <b key={i}>{name}</b>)),
-              count: propertyNames.length,
-            }}
-          />
-        </AlertDescription>
-      </Alert>
-    );
-  },
-);
 
 function useConfirmDisableMonitoringDialog() {
   const showDialog = useConfirmDeleteDialog();

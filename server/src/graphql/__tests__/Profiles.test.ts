@@ -5177,7 +5177,7 @@ describe("GraphQL/Profiles", () => {
       ]);
     });
 
-    it("fails if trying to update a profile type field that is being used in monitoring rules", async () => {
+    it("fails if trying to update options of a profile type field that is being used in monitoring rules", async () => {
       await mocks.knex
         .from("profile_type_field")
         .where("id", backgroundCheckProfileTypeField.id)
@@ -5213,7 +5213,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
           profileTypeFieldId: toGlobalId("ProfileTypeField", selectProfileTypeField.id),
-          data: { isExpirable: false },
+          data: { options: { standardList: "NON_EU_COUNTRIES" } },
         },
       );
 
@@ -5221,6 +5221,67 @@ describe("GraphQL/Profiles", () => {
         profileTypeFieldIds: [toGlobalId("ProfileTypeField", backgroundCheckProfileTypeField.id)],
       });
       expect(data).toBeNull();
+    });
+
+    it("allows to update everything except options of a profile type field that is being used in monitoring rules", async () => {
+      await mocks.knex
+        .from("profile_type_field")
+        .where("id", backgroundCheckProfileTypeField.id)
+        .update({
+          options: {
+            monitoring: {
+              searchFrequency: { type: "FIXED", frequency: "5_YEARS" },
+              activationCondition: {
+                profileTypeFieldId: selectProfileTypeField.id,
+                values: ["high"],
+              },
+            },
+          },
+        });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+              alias
+              name
+              isExpirable
+              expiryAlertAheadTime
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", selectProfileTypeField.id),
+          data: {
+            alias: "my_new_select_alias",
+            name: {
+              en: "MY SELECT",
+              es: "MI SELECT",
+            },
+            isExpirable: true,
+            expiryAlertAheadTime: { months: 1 },
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileTypeField).toEqual({
+        id: toGlobalId("ProfileTypeField", selectProfileTypeField.id),
+        alias: "my_new_select_alias",
+        name: { en: "MY SELECT", es: "MI SELECT" },
+        isExpirable: true,
+        expiryAlertAheadTime: { months: 1 },
+      });
     });
 
     it("fails if trying to disable monitoring from a BACKGROUND_CHECK field but there are profiles with active monitoring - no activationCondition", async () => {
