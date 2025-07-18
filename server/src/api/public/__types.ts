@@ -7695,10 +7695,10 @@ export type PetitionFragment = {
 
 export type TemplateFragment = {
   id: string;
-  name: string | null;
   path: string;
-  description: any | null;
+  name: string | null;
   locale: PetitionLocale;
+  description: any | null;
   createdAt: string;
   customProperties: { [key: string]: any };
   fields?: Array<{
@@ -7725,6 +7725,170 @@ export type TemplateFragment = {
   }>;
   tags?: Array<{ id: string; name: string }>;
 };
+
+export type PetitionBase_Petition_Fragment = {
+  __typename: "Petition";
+  id: string;
+  path: string;
+  name: string | null;
+  locale: PetitionLocale;
+  createdAt: string;
+  customProperties: { [key: string]: any };
+  status: PetitionStatus;
+  deadline: string | null;
+  isAnonymized: boolean;
+  fields?: Array<{
+    id: string;
+    title: string | null;
+    description: string | null;
+    type: PetitionFieldType;
+    fromPetitionFieldId: string | null;
+    alias: string | null;
+    options: { [key: string]: any };
+    optional: boolean;
+    multiple: boolean;
+    replies: Array<{
+      id: string;
+      content: { [key: string]: any };
+      status: PetitionFieldReplyStatus;
+      metadata: { [key: string]: any };
+      createdAt: string;
+      updatedAt: string;
+      children: Array<{
+        field: { id: string; type: PetitionFieldType };
+        replies: Array<{
+          id: string;
+          content: { [key: string]: any };
+          status: PetitionFieldReplyStatus;
+          metadata: { [key: string]: any };
+          createdAt: string;
+          updatedAt: string;
+        }>;
+      }> | null;
+    }>;
+    children: Array<{
+      id: string;
+      title: string | null;
+      description: string | null;
+      type: PetitionFieldType;
+      fromPetitionFieldId: string | null;
+      alias: string | null;
+      options: { [key: string]: any };
+      optional: boolean;
+      multiple: boolean;
+    }> | null;
+  }>;
+  tags?: Array<{ id: string; name: string }>;
+  signatureConfig?: {
+    isEnabled: boolean;
+    signers: Array<{ email: string | null; firstName: string; lastName: string | null } | null>;
+  } | null;
+  owner?: {
+    id: string;
+    email: string;
+    fullName: string | null;
+    firstName: string | null;
+    lastName: string | null;
+  };
+  fromTemplate: { id: string } | null;
+  recipients?: Array<{
+    recipientUrl: string | null;
+    id: string;
+    status: PetitionAccessStatus;
+    reminderCount: number;
+    remindersLeft: number;
+    remindersActive: boolean;
+    nextReminderAt: string | null;
+    createdAt: string;
+    contact: {
+      id: string;
+      email: string;
+      fullName: string;
+      firstName: string;
+      lastName: string | null;
+      createdAt: string;
+      updatedAt: string;
+    } | null;
+    granter: {
+      id: string;
+      email: string;
+      fullName: string | null;
+      firstName: string | null;
+      lastName: string | null;
+    } | null;
+  }>;
+  replies?: Array<{
+    id: string;
+    alias: string | null;
+    type: PetitionFieldType;
+    replies: Array<{
+      id: string;
+      content: { [key: string]: any };
+      metadata: { [key: string]: any };
+      children: Array<{
+        field: { id: string; alias: string | null; type: PetitionFieldType };
+        replies: Array<{
+          id: string;
+          content: { [key: string]: any };
+          metadata: { [key: string]: any };
+        }>;
+      }> | null;
+    }>;
+  }>;
+  progress?: {
+    external: { approved: number; replied: number; optional: number; total: number };
+    internal: { approved: number; replied: number; optional: number; total: number };
+  };
+  variablesResult?: Array<{ name: string; value: number | null }>;
+  signatures?: Array<{
+    id: string;
+    status: PetitionSignatureRequestStatus;
+    environment: SignatureOrgIntegrationEnvironment;
+    createdAt: string;
+    updatedAt: string;
+    signatureConfig: {
+      signers: Array<{ email: string | null; firstName: string; lastName: string | null } | null>;
+    };
+  }>;
+};
+
+export type PetitionBase_PetitionTemplate_Fragment = {
+  __typename: "PetitionTemplate";
+  id: string;
+  path: string;
+  name: string | null;
+  locale: PetitionLocale;
+  description: any | null;
+  createdAt: string;
+  customProperties: { [key: string]: any };
+  fields?: Array<{
+    id: string;
+    title: string | null;
+    description: string | null;
+    type: PetitionFieldType;
+    fromPetitionFieldId: string | null;
+    alias: string | null;
+    options: { [key: string]: any };
+    optional: boolean;
+    multiple: boolean;
+    children: Array<{
+      id: string;
+      title: string | null;
+      description: string | null;
+      type: PetitionFieldType;
+      fromPetitionFieldId: string | null;
+      alias: string | null;
+      options: { [key: string]: any };
+      optional: boolean;
+      multiple: boolean;
+    }> | null;
+  }>;
+  tags?: Array<{ id: string; name: string }>;
+};
+
+export type PetitionBaseFragment =
+  | PetitionBase_Petition_Fragment
+  | PetitionBase_PetitionTemplate_Fragment;
 
 export type Permission_PetitionUserGroupPermission_Fragment = {
   permissionType: PetitionPermissionType;
@@ -8614,6 +8778,7 @@ export type UpdatePetition_updatePetitionMutationVariables = Exact<{
 export type UpdatePetition_updatePetitionMutation = {
   updatePetition:
     | {
+        __typename: "Petition";
         id: string;
         path: string;
         name: string | null;
@@ -8745,7 +8910,39 @@ export type UpdatePetition_updatePetitionMutation = {
           };
         }>;
       }
-    | {};
+    | {
+        __typename: "PetitionTemplate";
+        id: string;
+        path: string;
+        name: string | null;
+        locale: PetitionLocale;
+        description: any | null;
+        createdAt: string;
+        customProperties: { [key: string]: any };
+        fields?: Array<{
+          id: string;
+          title: string | null;
+          description: string | null;
+          type: PetitionFieldType;
+          fromPetitionFieldId: string | null;
+          alias: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          multiple: boolean;
+          children: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+          }> | null;
+        }>;
+        tags?: Array<{ id: string; name: string }>;
+      };
 };
 
 export type DeletePetition_deletePetitionsMutationVariables = Exact<{
@@ -10427,10 +10624,10 @@ export type GetTemplates_templatesQuery = {
     items: Array<
       | {
           id: string;
-          name: string | null;
           path: string;
-          description: any | null;
+          name: string | null;
           locale: PetitionLocale;
+          description: any | null;
           createdAt: string;
           customProperties: { [key: string]: any };
           fields?: Array<{
@@ -10472,10 +10669,10 @@ export type GetTemplate_templateQuery = {
   template:
     | {
         id: string;
-        name: string | null;
         path: string;
-        description: any | null;
+        name: string | null;
         locale: PetitionLocale;
+        description: any | null;
         createdAt: string;
         customProperties: { [key: string]: any };
         fields?: Array<{
@@ -12826,10 +13023,10 @@ export const PetitionFragmentDoc = gql`
 export const TemplateFragmentDoc = gql`
   fragment Template on PetitionTemplate {
     id
-    name
     path
-    description
+    name
     locale
+    description
     createdAt
     customProperties
     fields @include(if: $includeFields) {
@@ -12842,6 +13039,20 @@ export const TemplateFragmentDoc = gql`
   ${PetitionFieldFragmentDoc}
   ${TagFragmentDoc}
 ` as unknown as DocumentNode<TemplateFragment, unknown>;
+export const PetitionBaseFragmentDoc = gql`
+  fragment PetitionBase on PetitionBase {
+    id
+    ... on Petition {
+      ...Petition
+    }
+    ... on PetitionTemplate {
+      ...Template
+    }
+    __typename
+  }
+  ${PetitionFragmentDoc}
+  ${TemplateFragmentDoc}
+` as unknown as DocumentNode<PetitionBaseFragment, unknown>;
 export const UserGroupFragmentDoc = gql`
   fragment UserGroup on UserGroup {
     id
@@ -13310,10 +13521,10 @@ export const UpdatePetition_updatePetitionDocument = gql`
     $includeOwner: Boolean!
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
-      ...Petition
+      ...PetitionBase
     }
   }
-  ${PetitionFragmentDoc}
+  ${PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<
   UpdatePetition_updatePetitionMutation,
   UpdatePetition_updatePetitionMutationVariables

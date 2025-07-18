@@ -1121,6 +1121,11 @@ const _Permission = {
 } as const;
 
 export const Petition = schema(_Petition);
+
+export const PetitionBase = schema({
+  oneOf: [_Petition, _Template],
+});
+
 export const UpdatePetition = schema({
   title: "UpdatePetition",
   type: "object",

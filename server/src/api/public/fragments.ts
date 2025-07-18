@@ -233,10 +233,10 @@ export const PetitionFragment = gql`
 export const TemplateFragment = gql`
   fragment Template on PetitionTemplate {
     id
-    name
     path
-    description
+    name
     locale
+    description
     createdAt
     customProperties
     fields @include(if: $includeFields) {
@@ -248,6 +248,21 @@ export const TemplateFragment = gql`
   }
   ${PetitionFieldFragment}
   ${PetitionTagFragment}
+`;
+
+export const PetitionBaseFragment = gql`
+  fragment PetitionBase on PetitionBase {
+    id
+    ... on Petition {
+      ...Petition
+    }
+    ... on PetitionTemplate {
+      ...Template
+    }
+    __typename
+  }
+  ${PetitionFragment}
+  ${TemplateFragment}
 `;
 
 export const PermissionFragment = gql`

@@ -160,6 +160,7 @@ import {
   EventSubscriptionFragment,
   PermissionFragment,
   PetitionAccessFragment,
+  PetitionBaseFragment,
   PetitionEventSubscriptionFragment,
   PetitionFieldCommentFragment,
   PetitionFieldFragment,
@@ -235,6 +236,7 @@ import {
   PaginatedUsers,
   Petition,
   PetitionAccess,
+  PetitionBase,
   PetitionComment,
   PetitionCustomProperties,
   PetitionField,
@@ -901,7 +903,7 @@ export function publicApi(container: Container) {
           ...petitionIncludeParam({ includeRecipientUrl: true }),
         },
         responses: {
-          200: SuccessResponse(Petition),
+          200: SuccessResponse(PetitionBase),
           400: ErrorResponse({ description: "Invalid request body" }),
           403: ErrorResponse({ description: "You don't have access to this resource" }),
           409: ErrorResponse({
@@ -947,10 +949,10 @@ export function publicApi(container: Container) {
             $includeOwner: Boolean!
           ) {
             updatePetition(petitionId: $petitionId, data: $data) {
-              ...Petition
+              ...PetitionBase
             }
           }
-          ${PetitionFragment}
+          ${PetitionBaseFragment}
         `;
 
         const inputData: UpdatePetitionInput = omit(body, ["signers"]);
@@ -984,7 +986,11 @@ export function publicApi(container: Container) {
             ...getPetitionIncludesFromQuery(query),
           });
           assert("id" in result.updatePetition!);
-          return Ok(mapPetition(result.updatePetition!));
+          if (result.updatePetition.__typename === "Petition") {
+            return Ok(mapPetition(omit(result.updatePetition!, ["__typename"])));
+          } else {
+            return Ok(mapTemplate(omit(result.updatePetition!, ["__typename"])));
+          }
         } catch (error) {
           if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
             throw new BadRequestError(
