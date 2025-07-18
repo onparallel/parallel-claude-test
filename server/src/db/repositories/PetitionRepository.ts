@@ -2164,6 +2164,10 @@ export class PetitionRepository extends BaseRepository {
     deletedBy: string,
     t?: Knex.Transaction,
   ) {
+    if (fields.length === 0) {
+      return;
+    }
+
     await this.raw(
       /* sql */ `
       with fields as (
