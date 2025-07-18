@@ -25,10 +25,23 @@ const SECURITY_GROUP_IDS = {
     staging: ["sg-099b8951613ae3bc0"],
 };
 const KMS_KEY_ID = "acf1d245-abe5-4ff8-a490-09dba3834c45";
-const AVAILABILITY_ZONE = `eu-central-1a`;
-const SUBNET_ID = { production: "subnet-d3cc68b9", staging: "subnet-0324d190a292cbcdb" };
+const SUBNET_ID = {
+    production: {
+        "eu-central-1a": "subnet-d3cc68b9",
+        "eu-central-1b": "subnet-77f2e10a",
+        "eu-central-1c": "subnet-eb22c4a7",
+    },
+    staging: {
+        "eu-central-1a": "subnet-0324d190a292cbcdb",
+        "eu-central-1b": "subnet-0d412e1f270c6d2dc",
+    },
+};
 const ENHANCED_MONITORING = true;
-const YARN_CACHE_VOLUMES = ["vol-0d498fe71cba530de", "vol-02eb0c410dd9891c6"];
+const YARN_CACHE_VOLUMES = {
+    "eu-central-1a": ["vol-0d498fe71cba530de", "vol-02eb0c410dd9891c6"],
+    "eu-central-1b": ["vol-0b18f9f00f10a004e", "vol-0da829b9c738f1a28"],
+    "eu-central-1c": ["vol-00e29b6d2008f8e58", "vol-081c2d21ef1c59a54"],
+};
 async function main() {
     const { commit: _commit, env, force, terminate, } = await yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
@@ -74,92 +87,107 @@ async function main() {
         ImageIds: [BUILDER_IMAGE_ID],
     }))
         .then((res) => res.Images[0]);
-    await (0, withInstance_1.withInstance)(ec2, {
-        ImageId: BUILDER_IMAGE_ID,
-        KeyName: KEY_NAME,
-        InstanceType: INSTANCE_TYPE,
-        Placement: {
-            AvailabilityZone: AVAILABILITY_ZONE,
-            Tenancy: client_ec2_1.Tenancy.default,
-        },
-        IamInstanceProfile: { Name: "parallel-builder" },
-        MaxCount: 1,
-        MinCount: 1,
-        Monitoring: {
-            Enabled: ENHANCED_MONITORING,
-        },
-        NetworkInterfaces: [
-            {
-                DeviceIndex: 0,
-                AssociatePublicIpAddress: true,
-                SubnetId: SUBNET_ID[env],
-                Groups: SECURITY_GROUP_IDS[env],
-            },
-        ],
-        BlockDeviceMappings: [
-            {
-                DeviceName: "/dev/xvda",
-                Ebs: {
-                    KmsKeyId: KMS_KEY_ID,
-                    Encrypted: true,
-                    VolumeSize: 30,
-                    DeleteOnTermination: true,
-                    VolumeType: "gp2",
-                    SnapshotId: image.BlockDeviceMappings[0].Ebs.SnapshotId,
+    const azs = Object.keys(SUBNET_ID[env]);
+    let az;
+    while ((az = azs.shift())) {
+        try {
+            await (0, withInstance_1.withInstance)(ec2, {
+                ImageId: BUILDER_IMAGE_ID,
+                KeyName: KEY_NAME,
+                InstanceType: INSTANCE_TYPE,
+                Placement: {
+                    AvailabilityZone: az,
+                    Tenancy: client_ec2_1.Tenancy.default,
                 },
-            },
-        ],
-        TagSpecifications: [
-            { ResourceType: client_ec2_1.ResourceType.instance, Tags: [{ Key: "Name", Value: name }] },
-            { ResourceType: client_ec2_1.ResourceType.volume, Tags: [{ Key: "Name", Value: name }] },
-        ],
-        MetadataOptions: {
-            HttpEndpoint: client_ec2_1.InstanceMetadataEndpointState.enabled,
-            HttpTokens: client_ec2_1.HttpTokensState.required,
-        },
-    }, async ({ instanceId, ipAddress }, { signal }) => {
-        let volumeId;
-        for (const retry of (0, remeda_1.range)(0, 2)) {
-            try {
-                console.log(chalk_1.default.italic `Trying to use ${YARN_CACHE_VOLUMES[retry]} as cache...`);
-                const res = await ec2.send(new client_ec2_1.AttachVolumeCommand({
-                    InstanceId: instanceId,
-                    VolumeId: YARN_CACHE_VOLUMES[retry],
-                    Device: "/dev/xvdy",
-                }));
-                volumeId = res.VolumeId;
-                break;
-            }
-            catch (e) {
-                if (e instanceof client_ec2_1.EC2ServiceException && e.name === "VolumeInUse") {
-                    console.log(chalk_1.default.italic `${YARN_CACHE_VOLUMES[retry]} in use!`);
+                IamInstanceProfile: { Name: "parallel-builder" },
+                MaxCount: 1,
+                MinCount: 1,
+                Monitoring: {
+                    Enabled: ENHANCED_MONITORING,
+                },
+                NetworkInterfaces: [
+                    {
+                        DeviceIndex: 0,
+                        AssociatePublicIpAddress: true,
+                        SubnetId: SUBNET_ID[env][az],
+                        Groups: SECURITY_GROUP_IDS[env],
+                    },
+                ],
+                BlockDeviceMappings: [
+                    {
+                        DeviceName: "/dev/xvda",
+                        Ebs: {
+                            KmsKeyId: KMS_KEY_ID,
+                            Encrypted: true,
+                            VolumeSize: 30,
+                            DeleteOnTermination: true,
+                            VolumeType: "gp2",
+                            SnapshotId: image.BlockDeviceMappings[0].Ebs.SnapshotId,
+                        },
+                    },
+                ],
+                TagSpecifications: [
+                    { ResourceType: client_ec2_1.ResourceType.instance, Tags: [{ Key: "Name", Value: name }] },
+                    { ResourceType: client_ec2_1.ResourceType.volume, Tags: [{ Key: "Name", Value: name }] },
+                ],
+                MetadataOptions: {
+                    HttpEndpoint: client_ec2_1.InstanceMetadataEndpointState.enabled,
+                    HttpTokens: client_ec2_1.HttpTokensState.required,
+                },
+            }, async ({ instanceId, ipAddress }, { signal }) => {
+                let volumeId;
+                for (const volume of YARN_CACHE_VOLUMES[az]) {
+                    try {
+                        console.log(chalk_1.default.italic `Trying to use ${volume} as cache...`);
+                        const res = await ec2.send(new client_ec2_1.AttachVolumeCommand({
+                            InstanceId: instanceId,
+                            VolumeId: volume,
+                            Device: "/dev/xvdy",
+                        }));
+                        volumeId = res.VolumeId;
+                        break;
+                    }
+                    catch (e) {
+                        if (e instanceof client_ec2_1.EC2ServiceException && e.name === "VolumeInUse") {
+                            console.log(chalk_1.default.italic `${volume} in use!`);
+                        }
+                        else {
+                            throw e;
+                        }
+                    }
+                    signal.throwIfAborted();
                 }
-                else {
-                    throw e;
+                if ((0, remeda_1.isNullish)(volumeId)) {
+                    throw new Error("All yarn cache volumes are in use");
                 }
+                await (0, wait_1.waitForResult)(async () => {
+                    var _a, _b, _c;
+                    const result = await ec2.send(new client_ec2_1.DescribeVolumesCommand({ VolumeIds: [volumeId] }));
+                    return (((_c = (_b = (_a = result.Volumes) === null || _a === void 0 ? void 0 : _a[0].Attachments) === null || _b === void 0 ? void 0 : _b.find((a) => a.InstanceId === instanceId)) === null || _c === void 0 ? void 0 : _c.State) ===
+                        client_ec2_1.VolumeAttachmentState.attached);
+                }, {
+                    message: chalk_1.default.italic `Volume attaching {yellow pending}. Waiting 3 more seconds...`,
+                    signal,
+                    delay: 3000,
+                });
+                console.log("Uploading build script to the new instance.");
+                await (0, ssh_1.copyToRemoteServer)(ipAddress, path_1.default.resolve(__dirname, `../../ops/prod/build-release.sh`), "~", { signal });
+                console.log("Executing build script.");
+                const { time } = await (0, stopwatch_1.withStopwatch)(async () => {
+                    await (0, ssh_1.executeRemoteCommand)(ipAddress, `'/home/ec2-user/build-release.sh ${commit} ${env}'`, { signal });
+                });
+                console.log(chalk_1.default.green `Build sucessful after ${Math.round(time / 1000)} seconds.`);
+            }, { terminate });
+            return;
+        }
+        catch (e) {
+            if (e instanceof client_ec2_1.EC2ServiceException && e.name === "InsufficientInstanceCapacity") {
+                console.log(chalk_1.default.italic `Not enough capacity in ${az}, trying next...`);
+                continue;
             }
-            signal.throwIfAborted();
+            throw e;
         }
-        if ((0, remeda_1.isNullish)(volumeId)) {
-            throw new Error("All yarn cache volumes are in use");
-        }
-        await (0, wait_1.waitForResult)(async () => {
-            var _a, _b, _c;
-            const result = await ec2.send(new client_ec2_1.DescribeVolumesCommand({ VolumeIds: [volumeId] }));
-            return (((_c = (_b = (_a = result.Volumes) === null || _a === void 0 ? void 0 : _a[0].Attachments) === null || _b === void 0 ? void 0 : _b.find((a) => a.InstanceId === instanceId)) === null || _c === void 0 ? void 0 : _c.State) ===
-                client_ec2_1.VolumeAttachmentState.attached);
-        }, {
-            message: chalk_1.default.italic `Volume attaching {yellow pending}. Waiting 3 more seconds...`,
-            signal,
-            delay: 3000,
-        });
-        console.log("Uploading build script to the new instance.");
-        await (0, ssh_1.copyToRemoteServer)(ipAddress, path_1.default.resolve(__dirname, `../../ops/prod/build-release.sh`), "~", { signal });
-        console.log("Executing build script.");
-        const { time } = await (0, stopwatch_1.withStopwatch)(async () => {
-            await (0, ssh_1.executeRemoteCommand)(ipAddress, `'/home/ec2-user/build-release.sh ${commit} ${env}'`, { signal });
-        });
-        console.log(chalk_1.default.green `Build sucessful after ${Math.round(time / 1000)} seconds.`);
-    }, { terminate });
+    }
+    throw new Error("No instance capacity in any AZ available");
 }
 (0, run_1.run)(main);

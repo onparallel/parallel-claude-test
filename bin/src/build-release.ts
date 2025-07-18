@@ -13,7 +13,7 @@ import {
 import chalk from "chalk";
 import { execSync } from "child_process";
 import path from "path";
-import { isNullish, range } from "remeda";
+import { isNullish } from "remeda";
 import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { run } from "./utils/run";
@@ -34,11 +34,25 @@ const SECURITY_GROUP_IDS = {
   production: ["sg-0f7aae421410e4758"],
   staging: ["sg-099b8951613ae3bc0"],
 };
+type AvailabilityZone = `eu-central-1${"a" | "b" | "c"}`;
 const KMS_KEY_ID = "acf1d245-abe5-4ff8-a490-09dba3834c45";
-const AVAILABILITY_ZONE = `eu-central-1a`;
-const SUBNET_ID = { production: "subnet-d3cc68b9", staging: "subnet-0324d190a292cbcdb" };
+const SUBNET_ID = {
+  production: {
+    "eu-central-1a": "subnet-d3cc68b9",
+    "eu-central-1b": "subnet-77f2e10a",
+    "eu-central-1c": "subnet-eb22c4a7",
+  } as Record<AvailabilityZone, string>,
+  staging: {
+    "eu-central-1a": "subnet-0324d190a292cbcdb",
+    "eu-central-1b": "subnet-0d412e1f270c6d2dc",
+  } as Record<AvailabilityZone, string>,
+};
 const ENHANCED_MONITORING = true;
-const YARN_CACHE_VOLUMES = ["vol-0d498fe71cba530de", "vol-02eb0c410dd9891c6"];
+const YARN_CACHE_VOLUMES = {
+  "eu-central-1a": ["vol-0d498fe71cba530de", "vol-02eb0c410dd9891c6"],
+  "eu-central-1b": ["vol-0b18f9f00f10a004e", "vol-0da829b9c738f1a28"],
+  "eu-central-1c": ["vol-00e29b6d2008f8e58", "vol-081c2d21ef1c59a54"],
+} as Record<AvailabilityZone, string[]>;
 
 async function main() {
   const {
@@ -98,111 +112,125 @@ async function main() {
       }),
     )
     .then((res) => res.Images![0]);
-  await withInstance(
-    ec2,
-    {
-      ImageId: BUILDER_IMAGE_ID,
-      KeyName: KEY_NAME,
-      InstanceType: INSTANCE_TYPE,
-      Placement: {
-        AvailabilityZone: AVAILABILITY_ZONE,
-        Tenancy: Tenancy.default,
-      },
-      IamInstanceProfile: { Name: "parallel-builder" },
-      MaxCount: 1,
-      MinCount: 1,
-      Monitoring: {
-        Enabled: ENHANCED_MONITORING,
-      },
-      NetworkInterfaces: [
+  const azs = Object.keys(SUBNET_ID[env]) as AvailabilityZone[];
+  let az: AvailabilityZone | undefined;
+  while ((az = azs.shift())) {
+    try {
+      await withInstance(
+        ec2,
         {
-          DeviceIndex: 0,
-          AssociatePublicIpAddress: true,
-          SubnetId: SUBNET_ID[env],
-          Groups: SECURITY_GROUP_IDS[env],
-        },
-      ],
-      BlockDeviceMappings: [
-        {
-          DeviceName: "/dev/xvda",
-          Ebs: {
-            KmsKeyId: KMS_KEY_ID,
-            Encrypted: true,
-            VolumeSize: 30,
-            DeleteOnTermination: true,
-            VolumeType: "gp2",
-            SnapshotId: image.BlockDeviceMappings![0].Ebs!.SnapshotId,
+          ImageId: BUILDER_IMAGE_ID,
+          KeyName: KEY_NAME,
+          InstanceType: INSTANCE_TYPE,
+          Placement: {
+            AvailabilityZone: az,
+            Tenancy: Tenancy.default,
+          },
+          IamInstanceProfile: { Name: "parallel-builder" },
+          MaxCount: 1,
+          MinCount: 1,
+          Monitoring: {
+            Enabled: ENHANCED_MONITORING,
+          },
+          NetworkInterfaces: [
+            {
+              DeviceIndex: 0,
+              AssociatePublicIpAddress: true,
+              SubnetId: SUBNET_ID[env][az],
+              Groups: SECURITY_GROUP_IDS[env],
+            },
+          ],
+          BlockDeviceMappings: [
+            {
+              DeviceName: "/dev/xvda",
+              Ebs: {
+                KmsKeyId: KMS_KEY_ID,
+                Encrypted: true,
+                VolumeSize: 30,
+                DeleteOnTermination: true,
+                VolumeType: "gp2",
+                SnapshotId: image.BlockDeviceMappings![0].Ebs!.SnapshotId,
+              },
+            },
+          ],
+          TagSpecifications: [
+            { ResourceType: ResourceType.instance, Tags: [{ Key: "Name", Value: name }] },
+            { ResourceType: ResourceType.volume, Tags: [{ Key: "Name", Value: name }] },
+          ],
+          MetadataOptions: {
+            HttpEndpoint: InstanceMetadataEndpointState.enabled,
+            HttpTokens: HttpTokensState.required,
           },
         },
-      ],
-      TagSpecifications: [
-        { ResourceType: ResourceType.instance, Tags: [{ Key: "Name", Value: name }] },
-        { ResourceType: ResourceType.volume, Tags: [{ Key: "Name", Value: name }] },
-      ],
-      MetadataOptions: {
-        HttpEndpoint: InstanceMetadataEndpointState.enabled,
-        HttpTokens: HttpTokensState.required,
-      },
-    },
-    async ({ instanceId, ipAddress }, { signal }) => {
-      let volumeId!: string;
-      for (const retry of range(0, 2)) {
-        try {
-          console.log(chalk.italic`Trying to use ${YARN_CACHE_VOLUMES[retry]} as cache...`);
-          const res = await ec2.send(
-            new AttachVolumeCommand({
-              InstanceId: instanceId,
-              VolumeId: YARN_CACHE_VOLUMES[retry],
-              Device: "/dev/xvdy",
-            }),
-          );
-          volumeId = res.VolumeId!;
-          break;
-        } catch (e) {
-          if (e instanceof EC2ServiceException && e.name === "VolumeInUse") {
-            console.log(chalk.italic`${YARN_CACHE_VOLUMES[retry]} in use!`);
-          } else {
-            throw e;
+        async ({ instanceId, ipAddress }, { signal }) => {
+          let volumeId!: string;
+          for (const volume of YARN_CACHE_VOLUMES[az!]) {
+            try {
+              console.log(chalk.italic`Trying to use ${volume} as cache...`);
+              const res = await ec2.send(
+                new AttachVolumeCommand({
+                  InstanceId: instanceId,
+                  VolumeId: volume,
+                  Device: "/dev/xvdy",
+                }),
+              );
+              volumeId = res.VolumeId!;
+              break;
+            } catch (e) {
+              if (e instanceof EC2ServiceException && e.name === "VolumeInUse") {
+                console.log(chalk.italic`${volume} in use!`);
+              } else {
+                throw e;
+              }
+            }
+            signal.throwIfAborted();
           }
-        }
-        signal.throwIfAborted();
-      }
-      if (isNullish(volumeId)) {
-        throw new Error("All yarn cache volumes are in use");
-      }
-      await waitForResult(
-        async () => {
-          const result = await ec2.send(new DescribeVolumesCommand({ VolumeIds: [volumeId] }));
-          return (
-            result.Volumes?.[0].Attachments?.find((a) => a.InstanceId === instanceId)?.State ===
-            VolumeAttachmentState.attached
+          if (isNullish(volumeId)) {
+            throw new Error("All yarn cache volumes are in use");
+          }
+          await waitForResult(
+            async () => {
+              const result = await ec2.send(new DescribeVolumesCommand({ VolumeIds: [volumeId] }));
+              return (
+                result.Volumes?.[0].Attachments?.find((a) => a.InstanceId === instanceId)?.State ===
+                VolumeAttachmentState.attached
+              );
+            },
+            {
+              message: chalk.italic`Volume attaching {yellow pending}. Waiting 3 more seconds...`,
+              signal,
+              delay: 3_000,
+            },
           );
+          console.log("Uploading build script to the new instance.");
+          await copyToRemoteServer(
+            ipAddress,
+            path.resolve(__dirname, `../../ops/prod/build-release.sh`),
+            "~",
+            { signal },
+          );
+          console.log("Executing build script.");
+          const { time } = await withStopwatch(async () => {
+            await executeRemoteCommand(
+              ipAddress,
+              `'/home/ec2-user/build-release.sh ${commit} ${env}'`,
+              { signal },
+            );
+          });
+          console.log(chalk.green`Build sucessful after ${Math.round(time / 1000)} seconds.`);
         },
-        {
-          message: chalk.italic`Volume attaching {yellow pending}. Waiting 3 more seconds...`,
-          signal,
-          delay: 3_000,
-        },
+        { terminate },
       );
-      console.log("Uploading build script to the new instance.");
-      await copyToRemoteServer(
-        ipAddress,
-        path.resolve(__dirname, `../../ops/prod/build-release.sh`),
-        "~",
-        { signal },
-      );
-      console.log("Executing build script.");
-      const { time } = await withStopwatch(async () => {
-        await executeRemoteCommand(
-          ipAddress,
-          `'/home/ec2-user/build-release.sh ${commit} ${env}'`,
-          { signal },
-        );
-      });
-      console.log(chalk.green`Build sucessful after ${Math.round(time / 1000)} seconds.`);
-    },
-    { terminate },
-  );
+      return;
+    } catch (e) {
+      if (e instanceof EC2ServiceException && e.name === "InsufficientInstanceCapacity") {
+        console.log(chalk.italic`Not enough capacity in ${az}, trying next...`);
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw new Error("No instance capacity in any AZ available");
 }
 
 run(main);
