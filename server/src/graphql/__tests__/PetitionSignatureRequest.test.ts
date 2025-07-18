@@ -269,6 +269,15 @@ describe("GraphQL/PetitionSignatureRequest", () => {
 
       expect(errors).toBeUndefined();
       expect(data?.startSignatureRequest).not.toBeNull();
+
+      const petitionEvents = await mocks.knex
+        .from("petition_event")
+        .where("petition_id", petition.id)
+        .where("type", "PETITION_COMPLETED")
+        .select("*");
+
+      // does not create PETITION_CREATED event, as it is already completed when signature starts
+      expect(petitionEvents).toHaveLength(0);
     });
   });
 

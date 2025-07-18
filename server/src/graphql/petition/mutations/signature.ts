@@ -98,17 +98,19 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
       const petition = (await ctx.petitions.loadPetition(args.petitionId))!;
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(petition.id, `User:${ctx.user!.id}`);
 
-      await ctx.petitions.updatePetition(
-        args.petitionId,
-        { status: "COMPLETED" },
-        `User:${ctx.user!.id}`,
-      );
+      if (petition.status !== "COMPLETED") {
+        await ctx.petitions.updatePetition(
+          args.petitionId,
+          { status: "COMPLETED" },
+          `User:${ctx.user!.id}`,
+        );
 
-      await ctx.petitions.createEvent({
-        petition_id: args.petitionId,
-        type: "PETITION_COMPLETED",
-        data: { user_id: ctx.user!.id },
-      });
+        await ctx.petitions.createEvent({
+          petition_id: args.petitionId,
+          type: "PETITION_COMPLETED",
+          data: { user_id: ctx.user!.id },
+        });
+      }
 
       const { signatureRequest } = await ctx.signature.createSignatureRequest(
         petition.id,
