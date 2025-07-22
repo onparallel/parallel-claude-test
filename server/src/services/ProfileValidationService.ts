@@ -74,7 +74,7 @@ export class ProfileValidationService {
       case "DATE": {
         this.assertString(content);
         if (!isValidDate(content.value)) {
-          throw new Error("Value is not a valid datetime");
+          throw new Error("Value is not a valid date");
         }
         return;
       }
