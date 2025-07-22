@@ -177,7 +177,17 @@ function _PetitionSettings({
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                 signersInfo: petition.signatureConfig.signers
                   .filter(isNonNullish)
-                  .map(pick(["firstName", "lastName", "email", "contactId", "isPreset"])),
+                  .map(
+                    pick([
+                      "firstName",
+                      "lastName",
+                      "email",
+                      "contactId",
+                      "isPreset",
+                      "signWithDigitalCertificate",
+                      "signWithEmbeddedImageFileUploadId",
+                    ]),
+                  ),
                 orgIntegrationId: petition.signatureConfig.integration!.id,
                 isEnabled: false,
               }
