@@ -296,6 +296,7 @@ describe("GraphQL/Petition Fields", () => {
                 attachToPdf: false,
                 replyOnlyFromProfile: false,
                 documentProcessing: null,
+                maxFileSize: null,
                 processDocument: false,
               },
               isReadOnly: false,
@@ -5202,6 +5203,7 @@ describe("GraphQL/Petition Fields", () => {
           accepts: null,
           attachToPdf: false,
           documentProcessing: null,
+          maxFileSize: null,
           processDocument: false,
         },
       });

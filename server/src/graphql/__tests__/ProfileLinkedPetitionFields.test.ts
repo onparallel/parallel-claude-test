@@ -476,6 +476,7 @@ describe("ProfileLinkedPetitionFields", () => {
             accepts: null,
             attachToPdf: false,
             documentProcessing: null,
+            maxFileSize: null,
             processDocument: false,
           },
         },

@@ -120,6 +120,7 @@ export const SCHEMAS = {
         additionalProperties: false,
         required: ["processDocumentAs"],
         properties: {
+          integrationId: { type: ["string", "null"] },
           processDocumentAs: {
             type: "string",
             enum: DocumentProcessingTypeValues,
@@ -691,6 +692,7 @@ export class PetitionFieldService {
           attachToPdf: field.options.attachToPdf ?? false,
           replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,
           processDocument: field.options.processDocument ?? false,
+          maxFileSize: field.options.maxFileSize ?? null,
           /** @deprecated use processDocument */
           documentProcessing: field.options.documentProcessing ?? null,
         };
