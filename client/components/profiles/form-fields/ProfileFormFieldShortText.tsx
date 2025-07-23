@@ -58,13 +58,7 @@ export function ProfileFormFieldShortText({
           return (
             <ShortTextInput
               value={value ?? ""}
-              style={
-                showBaseStyles
-                  ? undefined
-                  : {
-                      borderColor: "transparent",
-                    }
-              }
+              borderColor={showBaseStyles ? undefined : "transparent"}
               placeholder={
                 isNonNullish(format)
                   ? intl.formatMessage(
