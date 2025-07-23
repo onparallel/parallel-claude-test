@@ -201,9 +201,6 @@ CurrentSignatureRequestRow.fragments = {
         }
         ...PetitionSignatureRequestSignerStatusIcon_SignerStatus
       }
-      petition {
-        id
-      }
       signatureConfig {
         signingMode
       }

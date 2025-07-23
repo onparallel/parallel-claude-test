@@ -7,7 +7,6 @@ import {
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import {
   useStartSignatureRequest_PetitionFragment,
-  useStartSignatureRequest_UserFragment,
   useStartSignatureRequest_completePetitionDocument,
   useStartSignatureRequest_startSignatureRequestDocument,
   useStartSignatureRequest_updateSignatureConfigDocument,
@@ -24,14 +23,12 @@ import { usePetitionCanFinalize } from "./usePetitionCanFinalize";
 import { usePetitionLimitReachedErrorDialog } from "./usePetitionLimitReachedErrorDialog";
 
 interface UseStartSignatureRequestProps {
-  user: useStartSignatureRequest_UserFragment;
   petition: useStartSignatureRequest_PetitionFragment;
   onRefetch?: () => MaybePromise<void>;
   options?: { redirect: boolean };
 }
 
 export function useStartSignatureRequest({
-  user,
   petition,
   onRefetch,
   options = { redirect: true },
@@ -101,7 +98,6 @@ export function useStartSignatureRequest({
           allowAdditionalSigners: allowMoreSigners,
           customDocumentTemporaryFileId,
         } = await showConfirmPetitionSignersDialog({
-          user,
           signatureConfig: petition.signatureConfig!,
           isUpdate: !startSignature && !canFinalize,
           petitionId: petition.id,
@@ -184,13 +180,6 @@ export function useStartSignatureRequest({
 }
 
 useStartSignatureRequest.fragments = {
-  User: gql`
-    fragment useStartSignatureRequest_User on User {
-      id
-      ...ConfirmPetitionSignersDialog_User
-    }
-    ${ConfirmPetitionSignersDialog.fragments.User}
-  `,
   Petition: gql`
     fragment useStartSignatureRequest_Petition on Petition {
       id

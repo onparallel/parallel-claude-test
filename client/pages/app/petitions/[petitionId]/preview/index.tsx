@@ -327,7 +327,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           let completeSignerInfoData: ConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.isEnabled && petition.signatureConfig.review === false) {
             completeSignerInfoData = await showConfirmPetitionSignersDialog({
-              user: me,
               signatureConfig: petition.signatureConfig,
               petitionId: petition.id,
               isInteractionWithRecipientsEnabled: petition.isInteractionWithRecipientsEnabled,
@@ -555,7 +554,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     petition.__typename === "Petition" ? getPetitionSignatureStatus(petition) : "NO_SIGNATURE";
 
   const { handleStartSignature } = useStartSignatureRequest({
-    user: me,
     petition: petition as any,
   });
 
@@ -610,7 +608,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 data-action="preview-start-signature"
                 id="petition-start-signature"
                 colorScheme="primary"
-                user={me}
                 petition={petition}
                 isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
               />
@@ -1038,8 +1035,6 @@ const _fragments = {
         ...useSendPetitionHandler_User
         ...ConfirmPetitionSignersDialog_User
         ...PreviewPetitionField_User
-        ...PetitionPreviewStartSignatureButton_User
-        ...useStartSignatureRequest_User
       }
     }
     ${PetitionLayout.fragments.Query}
@@ -1047,8 +1042,6 @@ const _fragments = {
     ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
     ${useSendPetitionHandler.fragments.User}
     ${ConfirmPetitionSignersDialog.fragments.User}
-    ${PetitionPreviewStartSignatureButton.fragments.User}
-    ${useStartSignatureRequest.fragments.User}
   `,
 };
 

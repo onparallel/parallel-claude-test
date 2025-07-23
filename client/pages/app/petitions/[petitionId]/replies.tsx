@@ -87,7 +87,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { noop } from "ts-essentials";
 type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
 
 const GENERAL_COMMENTS_FIELD_ID = "general";
@@ -624,9 +623,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               setFilter={setFilter}
               setActiveFieldId={setActiveFieldId}
               onSignatureStatusClick={handlePetitionContentsSignatureClick}
-              onVariablesClick={
-                petition.variables.length ? handlePetitionContentsVariablesClick : noop
-              }
+              onVariablesClick={handlePetitionContentsVariablesClick}
               onRefetch={() => {
                 refetch();
               }}
@@ -732,6 +729,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         <Box padding={4} zIndex={1}>
           {me.hasPetitionApprovalFlow && hasApprovals ? (
             <PetitionApprovalsCard
+              ref={signaturesRef as any}
               petition={petition}
               user={me}
               onRefetchPetition={refetch}

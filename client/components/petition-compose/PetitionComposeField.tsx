@@ -1430,8 +1430,10 @@ const fragments = {
           isReadOnly
         }
         ...PetitionFieldVisibilityEditor_PetitionBase
+        ...PetitionFieldMathEditor_PetitionBase
       }
       ${PetitionFieldVisibilityEditor.fragments.PetitionBase}
+      ${PetitionFieldMathEditor.fragments.PetitionBase}
     `;
   },
   get BasePetitionField() {

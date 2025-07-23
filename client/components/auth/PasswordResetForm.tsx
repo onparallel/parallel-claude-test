@@ -93,7 +93,7 @@ export function PasswordResetForm({
                   autoFocus
                   isInvalid={fieldState.invalid}
                 >
-                  {/* TODO: Add control when upgrading to v3 */}
+                  {/* TODO: ChackraV3 Add control */}
                   <PinInput.Input index={0} />
                   <PinInput.Input index={1} />
                   <PinInput.Input index={2} />

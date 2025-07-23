@@ -38,7 +38,8 @@ export interface PetitionRepliesContentsProps<
   signatureStatus?: PetitionSignatureStatusFilter;
   signatureEnvironment?: SignatureOrgIntegrationEnvironment | null;
   onSignatureStatusClick?: () => void;
-  onVariablesClick?: () => void;
+  onVariablesClick: () => void;
+  hasVariables?: boolean;
 }
 
 export function PetitionRepliesContents<T extends PetitionRepliesContents_PetitionFieldFragment>({
@@ -50,6 +51,7 @@ export function PetitionRepliesContents<T extends PetitionRepliesContents_Petiti
   signatureEnvironment,
   onSignatureStatusClick,
   onVariablesClick,
+  hasVariables,
 }: PetitionRepliesContentsProps<T>) {
   const handleFieldClick = useMemoFactory(
     (fieldId: string) => () => onFieldClick(fieldId),
@@ -65,7 +67,7 @@ export function PetitionRepliesContents<T extends PetitionRepliesContents_Petiti
           onClick={onSignatureStatusClick}
         />
       ) : null}
-      {onVariablesClick !== undefined ? (
+      {hasVariables ? (
         <Box as="li" listStyleType="none" display="flex">
           <Button
             variant="ghost"

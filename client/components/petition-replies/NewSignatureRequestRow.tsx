@@ -1,10 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Button, GridItem, Heading, Stack, Text } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
-import {
-  NewSignatureRequestRow_PetitionFragment,
-  NewSignatureRequestRow_UserFragment,
-} from "@parallel/graphql/__types";
+import { NewSignatureRequestRow_PetitionFragment } from "@parallel/graphql/__types";
 import { useStartSignatureRequest } from "@parallel/utils/useStartSignatureRequest";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -12,21 +9,18 @@ import { SignerReference } from "../common/SignerReference";
 
 interface NewSignatureRequestRowProps {
   petition: NewSignatureRequestRow_PetitionFragment;
-  user: NewSignatureRequestRow_UserFragment;
   onRefetch?: () => void;
   isDisabled?: boolean;
 }
 
 export function NewSignatureRequestRow({
   petition,
-  user,
   onRefetch,
   isDisabled,
 }: NewSignatureRequestRowProps) {
   const signers = petition.signatureConfig?.signers.filter(isNonNullish) ?? [];
 
   const { handleStartSignature, buttonLabel } = useStartSignatureRequest({
-    user,
     petition,
     onRefetch,
     options: { redirect: false },
@@ -85,12 +79,6 @@ export function NewSignatureRequestRow({
 }
 
 NewSignatureRequestRow.fragments = {
-  User: gql`
-    fragment NewSignatureRequestRow_User on User {
-      ...useStartSignatureRequest_User
-    }
-    ${useStartSignatureRequest.fragments.User}
-  `,
   Petition: gql`
     fragment NewSignatureRequestRow_Petition on Petition {
       ...useStartSignatureRequest_Petition

@@ -160,6 +160,7 @@ export function PetitionRepliesRightPaneTabs({
             signatureEnvironment={petitionSignatureEnvironment}
             onSignatureStatusClick={onSignatureStatusClick}
             onVariablesClick={onVariablesClick}
+            hasVariables={petition.variables.length > 0}
           />
         </TabPanel>
         <TabPanel {...extendFlexColumn} padding={0} overflow="auto" position="relative">
@@ -202,6 +203,9 @@ PetitionRepliesRightPaneTabs.fragments = {
   Petition: gql`
     fragment PetitionRepliesRightPaneTabs_Petition on Petition {
       id
+      variables {
+        name
+      }
       myEffectivePermission {
         permissionType
       }

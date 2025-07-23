@@ -9,7 +9,7 @@ import {
   PetitionFieldVisibility,
   PetitionFieldVisibilityType,
 } from "@parallel/utils/fieldLogic/types";
-import { Fragment, SetStateAction, useMemo } from "react";
+import { Fragment, SetStateAction, useEffect, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionFieldLogicAddConditionButton } from "./PetitionFieldLogicAddConditionButton";
 import { PetitionFieldLogicConditionEditor } from "./PetitionFieldLogicConditionEditor";
@@ -48,6 +48,14 @@ export function PetitionApprovalStepsVisibilityEditor({
       operator: "AND",
       conditions: field && field.type !== "HEADING" ? [defaultFieldCondition(field)] : [{}],
     } as PetitionFieldVisibility);
+
+  useEffect(() => {
+    // This is a workaround to ensure that the visibility is always set when the component is mounted and the value is not provided
+    if (!value) {
+      onChange(visibility);
+    }
+  }, []);
+
   function setVisibility(dispatch: (prev: PetitionFieldVisibility) => PetitionFieldVisibility) {
     onChange(dispatch(visibility));
   }

@@ -35,16 +35,21 @@ export function SelectedSignerRow({
       {...props}
     >
       <Text as="span">
-        {signer.firstName} {signer.lastName} {"<"}
-        {signer.email ?? (
-          <Text as="span" fontStyle="italic">
+        {signer.firstName} {signer.lastName}{" "}
+        {signer.email ? (
+          <Text as="span">
+            {"<"}
+            {signer.email}
+            {">"}
+          </Text>
+        ) : (
+          <Text as="span" textStyle="hint" fontSize="sm">
             <FormattedMessage
               id="component.selected-signer-row.embedded-signature-image"
               defaultMessage="Embedded signature image"
             />
           </Text>
         )}
-        {">"}
         {isMe ? (
           <Text as="span" fontStyle="italic">
             {"("}

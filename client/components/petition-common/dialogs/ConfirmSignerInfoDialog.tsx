@@ -38,19 +38,19 @@ const MAX_FILE_SIZE = 1024 * 1024 * 1;
 
 interface ConfirmSignerInfoDialogProps {
   selection: SignerSelectSelection & {
-    signWithEmbeddedImage?: File;
+    signWithEmbeddedImage?: File | null;
   };
   repeatedSigners: { firstName: string; lastName?: string | null }[];
-  allowUpdateFixedSigner?: boolean;
-  hasSignWithDigitalCertificate?: boolean;
-  disableSignWithDigitalCertificate?: boolean;
-  hasSignWithEmbeddedImage?: boolean;
+  isPetitionTemplate: boolean;
+  hasSignWithDigitalCertificate: boolean;
+  disableSignWithDigitalCertificate: boolean;
+  hasSignWithEmbeddedImage: boolean;
 }
 
 function ConfirmSignerInfoDialog({
   selection,
   repeatedSigners,
-  allowUpdateFixedSigner,
+  isPetitionTemplate,
   hasSignWithDigitalCertificate,
   disableSignWithDigitalCertificate,
   hasSignWithEmbeddedImage,
@@ -85,7 +85,7 @@ function ConfirmSignerInfoDialog({
           isNonNullish(selection.signWithEmbeddedImageFileUploadId) ||
           isNonNullish(selection.signWithEmbeddedImage),
         signWithEmbeddedImageFileUploadId: selection.signWithEmbeddedImageFileUploadId,
-        signWithEmbeddedImage: selection.signWithEmbeddedImage,
+        signWithEmbeddedImage: selection.signWithEmbeddedImage ?? null,
       }),
     },
   });
@@ -219,7 +219,7 @@ function ConfirmSignerInfoDialog({
               />
             </FormErrorMessage>
           </FormControl>
-          {allowUpdateFixedSigner && (
+          {isPetitionTemplate ? (
             <FormControl>
               <HStack alignItems="center" justifyContent="space-between">
                 <Flex alignItems="center">
@@ -241,7 +241,7 @@ function ConfirmSignerInfoDialog({
                 <Switch {...register("isPreset")} />
               </HStack>
             </FormControl>
-          )}
+          ) : null}
           {hasSignWithDigitalCertificate ? (
             <FormControl
               isDisabled={disableSignWithDigitalCertificate || useEmbeddedSignatureImage}

@@ -182,7 +182,7 @@ export function useConfigureApprovalStepsDialog() {
   return useDialog(ConfigureApprovalStepsDialog);
 }
 
-useConfigureApprovalStepsDialog.fragmets = {
+useConfigureApprovalStepsDialog.fragments = {
   PetitionBase: gql`
     fragment ConfigureApprovalStepsDialog_PetitionBase on PetitionBase {
       id
@@ -209,7 +209,7 @@ const _queries = [
         ...ConfigureApprovalStepsDialog_PetitionBase
       }
     }
-    ${useConfigureApprovalStepsDialog.fragmets.PetitionBase}
+    ${useConfigureApprovalStepsDialog.fragments.PetitionBase}
   `,
 ];
 

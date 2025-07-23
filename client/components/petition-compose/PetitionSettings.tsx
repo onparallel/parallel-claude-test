@@ -49,7 +49,7 @@ import {
 } from "@parallel/graphql/__types";
 import { Fragments } from "@parallel/utils/apollo/fragments";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/typename";
+import { assertTypename } from "@parallel/utils/apollo/typename";
 import { FORMATS } from "@parallel/utils/dates";
 import { useAvailablePetitionLocales } from "@parallel/utils/locales";
 import { memoWithFragments } from "@parallel/utils/memoWithFragments";
@@ -75,10 +75,7 @@ import {
   usePublicLinkSettingsDialog,
 } from "../petition-common/dialogs/PublicLinkSettingsDialog";
 import { useSelectFolderDialog } from "../petition-common/dialogs/SelectFolderDialog";
-import {
-  SignatureConfigDialog,
-  useSignatureConfigDialog,
-} from "../petition-common/dialogs/SignatureConfigDialog";
+import { useSignatureConfigDialog } from "../petition-common/dialogs/SignatureConfigDialog";
 import {
   TemplateDefaultPermissionsDialog,
   useTemplateDefaultPermissionsDialog,
@@ -144,11 +141,8 @@ function _PetitionSettings({
 
   async function handleConfigureSignatureClick() {
     try {
-      assertTypenameArray(signatureIntegrations, "SignatureOrgIntegration");
       const signatureConfig = await showSignatureConfigDialog({
-        user,
-        petition,
-        integrations: signatureIntegrations,
+        petitionId: petition.id,
       });
 
       await onUpdatePetition({ signatureConfig });
@@ -1117,7 +1111,8 @@ const fragments = {
           signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
             items {
               ... on SignatureOrgIntegration {
-                ...SignatureConfigDialog_SignatureOrgIntegration
+                id
+                environment
               }
             }
           }
@@ -1126,13 +1121,10 @@ const fragments = {
             name
           }
         }
-        ...SignatureConfigDialog_User
       }
       ${useAvailablePetitionLocales.fragments.User}
       ${TestModeSignatureBadge.fragments.User}
       ${PublicLinkSettingsDialog.fragments.User}
-      ${SignatureConfigDialog.fragments.SignatureOrgIntegration}
-      ${SignatureConfigDialog.fragments.User}
     `;
   },
   get SignatureConfig() {
@@ -1157,6 +1149,7 @@ const fragments = {
         isEnabled
         integration {
           id
+          environment
         }
         instructions
         allowAdditionalSigners
@@ -1192,7 +1185,6 @@ const fragments = {
         signatureConfig {
           ...PetitionSettings_SignatureConfig
         }
-        ...SignatureConfigDialog_PetitionBase
         ...CompliancePeriodDialog_PetitionBase
         ... on Petition {
           status
@@ -1227,7 +1219,6 @@ const fragments = {
       }
       ${this.SignatureConfig}
       ${Fragments.FullApprovalFlowConfig}
-      ${SignatureConfigDialog.fragments.PetitionBase}
       ${CompliancePeriodDialog.fragments.PetitionBase}
       ${PublicLinkSettingsDialog.fragments.PetitionTemplate}
       ${useConfigureRemindersDialog.fragments.RemindersConfig}

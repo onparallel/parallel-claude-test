@@ -36,8 +36,8 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import {
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
   ConfirmPetitionSignersDialog_SignatureConfigFragment,
-  ConfirmPetitionSignersDialog_UserFragment,
   ConfirmPetitionSignersDialog_createCustomSignatureDocumentUploadLinkDocument,
+  ConfirmPetitionSignersDialog_meDocument,
   ConfirmPetitionSignersDialog_petitionDocument,
   SignatureConfigInputSigner,
 } from "@parallel/graphql/__types";
@@ -59,7 +59,6 @@ import { SuggestedSigners } from "../SuggestedSigners";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
 
 interface ConfirmPetitionSignersDialogProps {
-  user: ConfirmPetitionSignersDialog_UserFragment;
   signatureConfig: ConfirmPetitionSignersDialog_SignatureConfigFragment;
   isUpdate?: boolean;
   petitionId: string;
@@ -95,8 +94,15 @@ export function ConfirmPetitionSignersDialog(
   const petitionId = props.petitionId;
   const { data } = useQuery(ConfirmPetitionSignersDialog_petitionDocument, {
     variables: { id: petitionId },
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-only",
   });
 
+  const { data: meData } = useQuery(ConfirmPetitionSignersDialog_meDocument, {
+    fetchPolicy: "cache-and-network",
+  });
+
+  const user = meData?.me;
   const petition = data?.petition;
 
   const isSequential = signingMode === "SEQUENTIAL";
@@ -149,8 +155,9 @@ export function ConfirmPetitionSignersDialog(
                   signWithDigitalCertificate: false,
                 },
                 repeatedSigners,
-                hasSignWithDigitalCertificate: props.user.hasSignWithDigitalCertificate,
-                hasSignWithEmbeddedImage: props.user.hasSignWithEmbeddedImage,
+                isPetitionTemplate: false,
+                hasSignWithDigitalCertificate: user!.hasSignWithDigitalCertificate,
+                hasSignWithEmbeddedImage: user!.hasSignWithEmbeddedImage,
                 disableSignWithDigitalCertificate:
                   props.signatureConfig.integration?.provider !== "SIGNATURIT",
               })
@@ -169,8 +176,9 @@ export function ConfirmPetitionSignersDialog(
           await showConfirmSignerInfo({
             selection: signer,
             repeatedSigners: [],
-            hasSignWithDigitalCertificate: props.user.hasSignWithDigitalCertificate,
-            hasSignWithEmbeddedImage: props.user.hasSignWithEmbeddedImage,
+            isPetitionTemplate: false,
+            hasSignWithDigitalCertificate: user!.hasSignWithDigitalCertificate,
+            hasSignWithEmbeddedImage: user!.hasSignWithEmbeddedImage,
             disableSignWithDigitalCertificate:
               props.signatureConfig.integration?.provider !== "SIGNATURIT",
           }),
@@ -521,7 +529,7 @@ export function ConfirmPetitionSignersDialog(
                         signer={signer}
                         isMe={
                           [signer.email, signer.firstName, signer.lastName].join("") ===
-                          [props.user.email, props.user.firstName, props.user.lastName].join("")
+                          [user?.email, user?.firstName, user?.lastName].join("")
                         }
                         onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
                         onEditClick={handleSelectedSignerRowOnEditClick(
@@ -546,7 +554,7 @@ export function ConfirmPetitionSignersDialog(
                     ) : null}
                     <ContactSelect
                       ref={contactSelectRef as any}
-                      isDisabled={isMaxSignersReached}
+                      isDisabled={isMaxSignersReached || !user}
                       value={selectedContact}
                       onChange={handleContactSelectOnChange(onChange)}
                       onSearchContacts={handleSearchContacts}
@@ -578,7 +586,7 @@ export function ConfirmPetitionSignersDialog(
                         currentSigners={allSigners}
                         isDisabled={isMaxSignersReached}
                         petition={petition}
-                        user={props.user}
+                        user={user}
                         onAddSigner={(s) => onChange([...signers, s])}
                       />
                     ) : null}
@@ -769,6 +777,15 @@ const _queries = [
       }
     }
     ${ConfirmPetitionSignersDialog.fragments.PetitionBase}
+  `,
+  gql`
+    query ConfirmPetitionSignersDialog_me {
+      me {
+        id
+        ...ConfirmPetitionSignersDialog_User
+      }
+    }
+    ${ConfirmPetitionSignersDialog.fragments.User}
   `,
 ];
 

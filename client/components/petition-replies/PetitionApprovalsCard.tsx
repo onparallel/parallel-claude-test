@@ -30,6 +30,7 @@ import {
   ThumbsUpIcon,
   TimeIcon,
 } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionApprovalRequestStep,
   PetitionApprovalRequestStepStatus,
@@ -90,323 +91,418 @@ interface PetitionApprovalsCardProps {
   isDisabled: boolean;
 }
 
-export function PetitionApprovalsCard({
-  petition,
-  user,
-  onToggleGeneralComments,
-  onRefetchPetition,
-  isShowingGeneralComments,
-  isDisabled,
-}: PetitionApprovalsCardProps) {
-  usePetitionApprovalsCardPolling(petition);
-  const intl = useIntl();
-  const toast = useToast();
-  const tabsRefs = useMultipleRefs<HTMLButtonElement>();
-  const approvalSteps =
-    isNonNullish(petition.currentApprovalRequestSteps) &&
-    petition.currentApprovalRequestSteps.length > 0
-      ? petition.currentApprovalRequestSteps
-      : (petition.approvalFlowConfig?.map((step, index) => {
-          return {
-            id: index.toString(),
-            stepName: step.name,
-            status: "NOT_STARTED",
-            approvalType: step.type,
-            approvers: step.approvers.map((approver, index) => ({
-              id: index.toString(),
-              user: approver,
-            })),
-            isMock: true,
-          };
-        }) ?? []);
-
-  const [isParallelJustCompleted, setIsParallelJustCompleted] = useState(false);
-  useTempQueryParam("completed", () => {
-    setIsParallelJustCompleted(true);
-  });
-
-  const reviewAfterApproval =
-    petition.signatureConfig?.reviewAfterApproval ??
-    petition.currentSignatureRequest?.signatureConfig?.reviewAfterApproval ??
-    false;
-
-  const signatureStatus = isNonNullish(petition.currentSignatureRequest)
-    ? petition.currentSignatureRequest.status === "COMPLETED"
-      ? "APPROVED"
-      : "PENDING"
-    : "NOT_STARTED";
-
-  const approvalStepsWithSignature = [
-    ...(reviewAfterApproval ? approvalSteps : []),
+export const PetitionApprovalsCard = Object.assign(
+  chakraForwardRef<"section", PetitionApprovalsCardProps>(function PetitionApprovalsCard(
     {
-      id: "signature",
-      stepName: "eSignature",
-      status: !!petition.signatureConfig?.isEnabled
-        ? reviewAfterApproval && petition.currentApprovalRequestStatus !== "APPROVED"
-          ? "NOT_APPLICABLE"
-          : signatureStatus
-        : "APPROVED",
-      approvalType: "ANY",
-      approvers: [],
+      petition,
+      user,
+      onToggleGeneralComments,
+      onRefetchPetition,
+      isShowingGeneralComments,
+      isDisabled,
     },
-    ...(!reviewAfterApproval ? approvalSteps : []),
-  ] as PetitionApprovalRequestStep[];
-
-  const pendingOrNotStartedStepIndex = approvalStepsWithSignature.findIndex(
-    (s) => s.status === "PENDING" || s.status === "NOT_STARTED",
-  );
-  const [tabIndex, setTabIndex] = useState(
-    pendingOrNotStartedStepIndex === -1
-      ? approvalStepsWithSignature.findIndex((s) => s.id === "signature")
-      : pendingOrNotStartedStepIndex,
-  );
-  const showGenericErrorToast = useGenericErrorToast();
-
-  const signatureIndex = approvalStepsWithSignature.findIndex((step) => step.id === "signature");
-
-  let currentSignatureRequest: Maybe<
-    UnwrapArray<PetitionApprovalsCard_PetitionFragment["signatureRequests"]>
-  > = petition.signatureRequests[0];
-  if (
-    petition.signatureConfig?.isEnabled &&
-    isNonNullish(currentSignatureRequest) &&
-    ["COMPLETED", "CANCELLING", "CANCELLED"].includes(currentSignatureRequest.status)
+    ref,
   ) {
-    currentSignatureRequest = null;
-  }
+    usePetitionApprovalsCardPolling(petition);
+    const intl = useIntl();
+    const toast = useToast();
+    const tabsRefs = useMultipleRefs<HTMLButtonElement>();
+    const approvalSteps =
+      isNonNullish(petition.currentApprovalRequestSteps) &&
+      petition.currentApprovalRequestSteps.length > 0
+        ? petition.currentApprovalRequestSteps
+        : (petition.approvalFlowConfig?.map((step, index) => {
+            return {
+              id: index.toString(),
+              stepName: step.name,
+              status: "NOT_STARTED",
+              approvalType: step.type,
+              approvers: step.approvers.map((approver, index) => ({
+                id: index.toString(),
+                user: approver,
+              })),
+              isMock: true,
+            };
+          }) ?? []);
 
-  const addNewSignature = useAddNewSignature({ user, petition });
-  const handleAddNewSignature = async () => {
-    await addNewSignature();
-  };
-
-  const showApprovedToast = (stepName: string) => {
-    toast({
-      description: intl.formatMessage(
-        {
-          id: "component.petition-approvals-card.approved-toast-title",
-          defaultMessage: "<b>{stepName}</b> was approved successfully",
-        },
-        {
-          stepName,
-        },
-      ),
-      status: "success",
+    const [isParallelJustCompleted, setIsParallelJustCompleted] = useState(false);
+    useTempQueryParam("completed", () => {
+      setIsParallelJustCompleted(true);
     });
-  };
 
-  const showRejectedToast = (stepName: string) => {
-    toast({
-      description: intl.formatMessage(
-        {
-          id: "component.petition-approvals-card.rejected-toast-description",
-          defaultMessage: "<b>{stepName}</b> was rejected successfully",
-        },
-        {
-          stepName,
-        },
-      ),
-      status: "success",
-    });
-  };
+    const reviewAfterApproval =
+      petition.signatureConfig?.reviewAfterApproval ??
+      petition.currentSignatureRequest?.signatureConfig?.reviewAfterApproval ??
+      false;
 
-  const showCanceledToast = (stepName: string) => {
-    toast({
-      description: intl.formatMessage(
-        {
-          id: "component.petition-approvals-card.canceled-toast-description",
-          defaultMessage: "<b>{stepName}</b> was canceled successfully",
-        },
-        {
-          stepName,
-        },
-      ),
-      status: "success",
-    });
-  };
+    const signatureStatus = isNonNullish(petition.currentSignatureRequest)
+      ? petition.currentSignatureRequest.status === "COMPLETED"
+        ? "APPROVED"
+        : "PENDING"
+      : "NOT_STARTED";
 
-  const showReminderToast = (stepName: string) => {
-    toast({
-      description: intl.formatMessage(
-        {
-          id: "component.petition-approvals-card.reminder-toast-description",
-          defaultMessage: "The reminder for <b>{stepName}</b> has been sent successfully",
-        },
-        {
-          stepName,
-        },
-      ),
-      status: "success",
-      isClosable: true,
-    });
-  };
+    const approvalStepsWithSignature = [
+      ...(reviewAfterApproval ? approvalSteps : []),
+      {
+        id: "signature",
+        stepName: "eSignature",
+        status: !!petition.signatureConfig?.isEnabled
+          ? reviewAfterApproval && petition.currentApprovalRequestStatus !== "APPROVED"
+            ? "NOT_APPLICABLE"
+            : signatureStatus
+          : "APPROVED",
+        approvalType: "ANY",
+        approvers: [],
+      },
+      ...(!reviewAfterApproval ? approvalSteps : []),
+    ] as PetitionApprovalRequestStep[];
 
-  const { handleStartApprovalFlow } = useStartApprovalRequestStep({ petition });
+    const pendingOrNotStartedStepIndex = approvalStepsWithSignature.findIndex(
+      (s) => s.status === "PENDING" || s.status === "NOT_STARTED",
+    );
+    const [tabIndex, setTabIndex] = useState(
+      pendingOrNotStartedStepIndex === -1
+        ? approvalStepsWithSignature.findIndex((s) => s.id === "signature")
+        : pendingOrNotStartedStepIndex,
+    );
+    const showGenericErrorToast = useGenericErrorToast();
 
-  const showConfirmCancelPetitionApprovalFlowDialog = useConfirmCancelPetitionApprovalFlowDialog();
-  const [cancelPetitionApprovalRequestStep] = useMutation(
-    PetitionApprovalsCard_cancelPetitionApprovalRequestStepDocument,
-  );
-  const handleCancelApprovalFlow = async (
-    step: PetitionApprovalsCard_PetitionApprovalRequestStepFragment,
-  ) => {
-    try {
-      await showConfirmCancelPetitionApprovalFlowDialog();
-      await cancelPetitionApprovalRequestStep({
-        variables: {
-          petitionId: petition.id,
-          approvalRequestStepId: step.id,
-        },
-      });
-      showCanceledToast(step.stepName);
-    } catch (error) {
-      if (!isDialogError(error)) {
-        showGenericErrorToast(error);
-      }
+    const signatureIndex = approvalStepsWithSignature.findIndex((step) => step.id === "signature");
+
+    let currentSignatureRequest: Maybe<
+      UnwrapArray<PetitionApprovalsCard_PetitionFragment["signatureRequests"]>
+    > = petition.signatureRequests[0];
+    if (
+      petition.signatureConfig?.isEnabled &&
+      isNonNullish(currentSignatureRequest) &&
+      ["COMPLETED", "CANCELLING", "CANCELLED"].includes(currentSignatureRequest.status)
+    ) {
+      currentSignatureRequest = null;
     }
-  };
 
-  const showApproveOrRejectPetitionApprovalFlow = useApproveOrRejectPetitionApprovalFlowDialog();
-  const [approvePetitionApprovalRequestStep] = useMutation(
-    PetitionApprovalsCard_approvePetitionApprovalRequestStepDocument,
-  );
+    const addNewSignature = useAddNewSignature({ petition });
+    const handleAddNewSignature = async () => {
+      await addNewSignature();
+    };
 
-  const [rejectPetitionApprovalRequestStep] = useMutation(
-    PetitionApprovalsCard_rejectPetitionApprovalRequestStepDocument,
-  );
-
-  const handleApproveOrRejectApprovalFlow = async ({
-    step,
-    action,
-  }: {
-    step: PetitionApprovalsCard_PetitionApprovalRequestStepFragment;
-    action: ApproveOrRejectAction;
-  }) => {
-    try {
-      const res = await showApproveOrRejectPetitionApprovalFlow({
-        action,
-        stepName: step.stepName,
+    const showApprovedToast = (stepName: string) => {
+      toast({
+        description: intl.formatMessage(
+          {
+            id: "component.petition-approvals-card.approved-toast-title",
+            defaultMessage: "<b>{stepName}</b> was approved successfully",
+          },
+          {
+            stepName,
+          },
+        ),
+        status: "success",
       });
-      if (res.action === "APPROVE") {
-        await approvePetitionApprovalRequestStep({
+    };
+
+    const showRejectedToast = (stepName: string) => {
+      toast({
+        description: intl.formatMessage(
+          {
+            id: "component.petition-approvals-card.rejected-toast-description",
+            defaultMessage: "<b>{stepName}</b> was rejected successfully",
+          },
+          {
+            stepName,
+          },
+        ),
+        status: "success",
+      });
+    };
+
+    const showCanceledToast = (stepName: string) => {
+      toast({
+        description: intl.formatMessage(
+          {
+            id: "component.petition-approvals-card.canceled-toast-description",
+            defaultMessage: "<b>{stepName}</b> was canceled successfully",
+          },
+          {
+            stepName,
+          },
+        ),
+        status: "success",
+      });
+    };
+
+    const showReminderToast = (stepName: string) => {
+      toast({
+        description: intl.formatMessage(
+          {
+            id: "component.petition-approvals-card.reminder-toast-description",
+            defaultMessage: "The reminder for <b>{stepName}</b> has been sent successfully",
+          },
+          {
+            stepName,
+          },
+        ),
+        status: "success",
+        isClosable: true,
+      });
+    };
+
+    const { handleStartApprovalFlow } = useStartApprovalRequestStep({ petition });
+
+    const showConfirmCancelPetitionApprovalFlowDialog =
+      useConfirmCancelPetitionApprovalFlowDialog();
+    const [cancelPetitionApprovalRequestStep] = useMutation(
+      PetitionApprovalsCard_cancelPetitionApprovalRequestStepDocument,
+    );
+    const handleCancelApprovalFlow = async (
+      step: PetitionApprovalsCard_PetitionApprovalRequestStepFragment,
+    ) => {
+      try {
+        await showConfirmCancelPetitionApprovalFlowDialog();
+        await cancelPetitionApprovalRequestStep({
           variables: {
             petitionId: petition.id,
-            message: res.message,
-            attachments: res.attachments,
             approvalRequestStepId: step.id,
           },
         });
-        showApprovedToast(step.stepName);
-      } else {
-        await rejectPetitionApprovalRequestStep({
+        showCanceledToast(step.stepName);
+      } catch (error) {
+        if (!isDialogError(error)) {
+          showGenericErrorToast(error);
+        }
+      }
+    };
+
+    const showApproveOrRejectPetitionApprovalFlow = useApproveOrRejectPetitionApprovalFlowDialog();
+    const [approvePetitionApprovalRequestStep] = useMutation(
+      PetitionApprovalsCard_approvePetitionApprovalRequestStepDocument,
+    );
+
+    const [rejectPetitionApprovalRequestStep] = useMutation(
+      PetitionApprovalsCard_rejectPetitionApprovalRequestStepDocument,
+    );
+
+    const handleApproveOrRejectApprovalFlow = async ({
+      step,
+      action,
+    }: {
+      step: PetitionApprovalsCard_PetitionApprovalRequestStepFragment;
+      action: ApproveOrRejectAction;
+    }) => {
+      try {
+        const res = await showApproveOrRejectPetitionApprovalFlow({
+          action,
+          stepName: step.stepName,
+        });
+        if (res.action === "APPROVE") {
+          await approvePetitionApprovalRequestStep({
+            variables: {
+              petitionId: petition.id,
+              message: res.message,
+              attachments: res.attachments,
+              approvalRequestStepId: step.id,
+            },
+          });
+          showApprovedToast(step.stepName);
+        } else {
+          await rejectPetitionApprovalRequestStep({
+            variables: {
+              petitionId: petition.id,
+              message: res.message,
+              rejectionType: res.rejectionType,
+              attachments: res.attachments,
+              approvalRequestStepId: step.id,
+            },
+          });
+          showRejectedToast(step.stepName);
+        }
+      } catch (error) {
+        if (!isDialogError(error)) {
+          showGenericErrorToast(error);
+        }
+      }
+    };
+
+    const showConfirmSkipPetitionApprovalFlowDialog = useConfirmSkipPetitionApprovalFlowDialog();
+    const [skipPetitionApprovalRequestStep] = useMutation(
+      PetitionApprovalsCard_skipPetitionApprovalRequestStepDocument,
+    );
+    const handleSkipApprovalFlow = async (
+      step: PetitionApprovalsCard_PetitionApprovalRequestStepFragment,
+    ) => {
+      try {
+        const message = await showConfirmSkipPetitionApprovalFlowDialog({
+          modalProps: {
+            finalFocusRef: tabsRefs[tabIndex],
+          },
+        });
+
+        if (
+          isNonNullish(petition.currentApprovalRequestSteps) &&
+          petition.currentApprovalRequestSteps.length > 0
+        ) {
+          await skipPetitionApprovalRequestStep({
+            variables: {
+              petitionId: petition.id,
+              message,
+              approvalRequestStepId: step.id,
+            },
+          });
+          showApprovedToast(step.stepName);
+        }
+      } catch (error) {
+        if (!isDialogError(error)) {
+          showGenericErrorToast(error);
+        }
+      }
+    };
+
+    const showConfirmSendReminderPetitionApprovalFlowDialog =
+      useConfirmSendReminderPetitionApprovalFlowDialog();
+    const [sendPetitionApprovalRequestStepReminder] = useMutation(
+      PetitionApprovalsCard_sendPetitionApprovalRequestStepReminderDocument,
+    );
+    const handleSendReminder = async (
+      step: PetitionApprovalsCard_PetitionApprovalRequestStepFragment,
+    ) => {
+      try {
+        await showConfirmSendReminderPetitionApprovalFlowDialog();
+        await sendPetitionApprovalRequestStepReminder({
           variables: {
             petitionId: petition.id,
-            message: res.message,
-            rejectionType: res.rejectionType,
-            attachments: res.attachments,
             approvalRequestStepId: step.id,
           },
         });
-        showRejectedToast(step.stepName);
+        showReminderToast(step.stepName);
+      } catch (error) {
+        if (!isDialogError(error)) {
+          showGenericErrorToast(error);
+        }
       }
-    } catch (error) {
-      if (!isDialogError(error)) {
-        showGenericErrorToast(error);
-      }
-    }
-  };
+    };
 
-  const showConfirmSkipPetitionApprovalFlowDialog = useConfirmSkipPetitionApprovalFlowDialog();
-  const [skipPetitionApprovalRequestStep] = useMutation(
-    PetitionApprovalsCard_skipPetitionApprovalRequestStepDocument,
-  );
-  const handleSkipApprovalFlow = async (
-    step: PetitionApprovalsCard_PetitionApprovalRequestStepFragment,
-  ) => {
-    try {
-      const message = await showConfirmSkipPetitionApprovalFlowDialog({
-        modalProps: {
-          finalFocusRef: tabsRefs[tabIndex],
-        },
-      });
+    const checkIfNextOrCurrentStep = (
+      steps: PetitionApprovalRequestStep[],
+      currentStepId: string,
+    ): boolean => {
+      const stepIndex = steps.findIndex((step) => step.id === currentStepId);
 
-      if (
-        isNonNullish(petition.currentApprovalRequestSteps) &&
-        petition.currentApprovalRequestSteps.length > 0
-      ) {
-        await skipPetitionApprovalRequestStep({
-          variables: {
-            petitionId: petition.id,
-            message,
-            approvalRequestStepId: step.id,
-          },
-        });
-        showApprovedToast(step.stepName);
-      }
-    } catch (error) {
-      if (!isDialogError(error)) {
-        showGenericErrorToast(error);
-      }
-    }
-  };
+      const step = steps[stepIndex];
+      const prevStep =
+        steps[stepIndex - 1]?.id === "signature" && steps[stepIndex - 1]?.status === "APPROVED"
+          ? steps[stepIndex - 2]
+          : steps[stepIndex - 1];
 
-  const showConfirmSendReminderPetitionApprovalFlowDialog =
-    useConfirmSendReminderPetitionApprovalFlowDialog();
-  const [sendPetitionApprovalRequestStepReminder] = useMutation(
-    PetitionApprovalsCard_sendPetitionApprovalRequestStepReminderDocument,
-  );
-  const handleSendReminder = async (
-    step: PetitionApprovalsCard_PetitionApprovalRequestStepFragment,
-  ) => {
-    try {
-      await showConfirmSendReminderPetitionApprovalFlowDialog();
-      await sendPetitionApprovalRequestStepReminder({
-        variables: {
-          petitionId: petition.id,
-          approvalRequestStepId: step.id,
-        },
-      });
-      showReminderToast(step.stepName);
-    } catch (error) {
-      if (!isDialogError(error)) {
-        showGenericErrorToast(error);
-      }
-    }
-  };
+      return isNonNullish(prevStep)
+        ? step?.status !== "NOT_STARTED" ||
+            (step?.status === "NOT_STARTED" &&
+              prevStep?.status !== "NOT_STARTED" &&
+              prevStep?.status !== "PENDING" &&
+              prevStep?.status !== "REJECTED")
+        : true;
+    };
 
-  const checkIfNextOrCurrentStep = (
-    steps: PetitionApprovalRequestStep[],
-    currentStepId: string,
-  ): boolean => {
-    const stepIndex = steps.findIndex((step) => step.id === currentStepId);
+    const petitionSignatureStatus = getPetitionSignatureStatus(petition);
+    const petitionSignatureEnvironment = getPetitionSignatureEnvironment(petition);
 
-    const step = steps[stepIndex];
-    const prevStep =
-      steps[stepIndex - 1]?.id === "signature" && steps[stepIndex - 1]?.status === "APPROVED"
-        ? steps[stepIndex - 2]
-        : steps[stepIndex - 1];
+    return (
+      <>
+        {isParallelJustCompleted && approvalSteps.some((s) => (s as any).isMock) ? (
+          <PetitionApprovalsAboutToStartAlert marginBottom={2} borderRadius="md" />
+        ) : null}
+        <Card ref={ref} padding={0} marginBottom={4} data-section="signature-card">
+          <Tabs index={tabIndex} onChange={(index) => setTabIndex(index)} variant="enclosed">
+            <HStack spacing={0} overflowX="auto" overflowY="hidden">
+              <TabList marginX="-1px" marginTop="-1px" height="52px" flex="1">
+                {approvalStepsWithSignature.map((step, index) => {
+                  const stepNotApplicable = step.status === "NOT_APPLICABLE";
+                  const isNotCurrentOrNextStep =
+                    checkIfNextOrCurrentStep(
+                      approvalStepsWithSignature.filter((s) => s.status !== "NOT_APPLICABLE"),
+                      step.id,
+                    ) === false;
 
-    return isNonNullish(prevStep)
-      ? step?.status !== "NOT_STARTED" ||
-          (step?.status === "NOT_STARTED" &&
-            prevStep?.status !== "NOT_STARTED" &&
-            prevStep?.status !== "PENDING" &&
-            prevStep?.status !== "REJECTED")
-      : true;
-  };
+                  const tabColor =
+                    stepNotApplicable || isNotCurrentOrNextStep ? "gray.400" : undefined;
 
-  const petitionSignatureStatus = getPetitionSignatureStatus(petition);
-  const petitionSignatureEnvironment = getPetitionSignatureEnvironment(petition);
-
-  return (
-    <>
-      {isParallelJustCompleted && approvalSteps.some((s) => (s as any).isMock) ? (
-        <PetitionApprovalsAboutToStartAlert marginBottom={2} borderRadius="md" />
-      ) : null}
-      <Card padding={0} marginBottom={4}>
-        <Tabs index={tabIndex} onChange={(index) => setTabIndex(index)} variant="enclosed">
-          <HStack spacing={0} overflowX="auto" overflowY="hidden">
-            <TabList marginX="-1px" marginTop="-1px" height="52px" flex="1">
+                  return step.id === "signature" ? (
+                    <Tab key={index} color={tabColor} ref={tabsRefs[index]}>
+                      <HStack maxWidth="240px" minWidth={0}>
+                        {petitionSignatureStatus === "NO_SIGNATURE" ? (
+                          <SignatureIcon />
+                        ) : (
+                          <PetitionSignatureStatusIcon
+                            status={petitionSignatureStatus}
+                            environment={petitionSignatureEnvironment}
+                            color={tabColor}
+                          />
+                        )}
+                        <OverflownText whiteSpace="nowrap" fontWeight={500}>
+                          <FormattedMessage id="generic.e-signature" defaultMessage="eSignature" />
+                        </OverflownText>
+                      </HStack>
+                    </Tab>
+                  ) : (
+                    <Tab key={index} color={tabColor} ref={tabsRefs[index]}>
+                      <HStack maxWidth="240px" minWidth={0}>
+                        {stepNotApplicable ? (
+                          <SmallPopover
+                            content={
+                              <Text fontSize="sm">
+                                <FormattedMessage
+                                  id="component.petition-approvals-card.conditioned-approval-poppover"
+                                  defaultMessage="This approval step is conditioned by the replies."
+                                />
+                              </Text>
+                            }
+                          >
+                            <ForbiddenIcon />
+                          </SmallPopover>
+                        ) : (
+                          <PetitionApprovalStepStatusIconWithTooltip
+                            status={step.status}
+                            color={tabColor}
+                          />
+                        )}
+                        <OverflownText whiteSpace="nowrap" fontWeight={500}>
+                          {step.stepName}
+                        </OverflownText>
+                      </HStack>
+                    </Tab>
+                  );
+                })}
+              </TabList>
+              <HStack
+                paddingY={2}
+                paddingX={4}
+                borderBottom="1px solid"
+                borderBottomColor="gray.200"
+                height="52px"
+              >
+                <CommentsButton
+                  data-action="see-general-comments"
+                  isActive={isShowingGeneralComments}
+                  commentCount={petition.generalCommentCount}
+                  hasUnreadComments={petition.unreadGeneralCommentCount > 0}
+                  onClick={onToggleGeneralComments}
+                />
+                {signatureIndex === tabIndex &&
+                (!petition.signatureConfig?.isEnabled ||
+                  currentSignatureRequest?.status === "COMPLETED" ||
+                  currentSignatureRequest?.status === "CANCELLED") ? (
+                  <IconButtonWithTooltip
+                    isDisabled={isDisabled}
+                    label={intl.formatMessage({
+                      id: "component.petition-signatures-card.add-signature-label",
+                      defaultMessage: "Add signature",
+                    })}
+                    size="sm"
+                    icon={<AddIcon />}
+                    onClick={handleAddNewSignature}
+                  />
+                ) : null}
+              </HStack>
+            </HStack>
+            <TabPanels>
               {approvalStepsWithSignature.map((step, index) => {
                 const stepNotApplicable = step.status === "NOT_APPLICABLE";
                 const isNotCurrentOrNextStep =
@@ -415,248 +511,215 @@ export function PetitionApprovalsCard({
                     step.id,
                   ) === false;
 
-                const tabColor =
-                  stepNotApplicable || isNotCurrentOrNextStep ? "gray.400" : undefined;
-
                 return step.id === "signature" ? (
-                  <Tab key={index} color={tabColor} ref={tabsRefs[index]}>
-                    <HStack maxWidth="240px" minWidth={0}>
-                      {petitionSignatureStatus === "NO_SIGNATURE" ? (
-                        <SignatureIcon />
-                      ) : (
-                        <PetitionSignatureStatusIcon
-                          status={petitionSignatureStatus}
-                          environment={petitionSignatureEnvironment}
-                          color={tabColor}
-                        />
-                      )}
-                      <OverflownText whiteSpace="nowrap" fontWeight={500}>
-                        <FormattedMessage id="generic.e-signature" defaultMessage="eSignature" />
-                      </OverflownText>
-                    </HStack>
-                  </Tab>
+                  <TabPanel padding={0} key={index}>
+                    <PetitionSignaturesCardBody
+                      petition={petition}
+                      user={user}
+                      isDisabled={isDisabled || isNotCurrentOrNextStep || stepNotApplicable}
+                      onRefetchPetition={onRefetchPetition}
+                    />
+                  </TabPanel>
                 ) : (
-                  <Tab key={index} color={tabColor} ref={tabsRefs[index]}>
-                    <HStack maxWidth="240px" minWidth={0}>
-                      {stepNotApplicable ? (
-                        <SmallPopover
-                          content={
-                            <Text fontSize="sm">
-                              <FormattedMessage
-                                id="component.petition-approvals-card.conditioned-approval-poppover"
-                                defaultMessage="This approval step is conditioned by the replies."
-                              />
-                            </Text>
-                          }
-                        >
-                          <ForbiddenIcon />
-                        </SmallPopover>
-                      ) : (
-                        <PetitionApprovalStepStatusIconWithTooltip
-                          status={step.status}
-                          color={tabColor}
-                        />
-                      )}
-                      <OverflownText whiteSpace="nowrap" fontWeight={500}>
-                        {step.stepName}
-                      </OverflownText>
-                    </HStack>
-                  </Tab>
+                  <TabPanel padding={0} key={index}>
+                    <Grid templateColumns="auto 1fr auto" alignItems="center">
+                      <PetitionApprovalStepRow
+                        step={step}
+                        onStart={() => handleStartApprovalFlow(step)}
+                        onApprove={() =>
+                          handleApproveOrRejectApprovalFlow({ step, action: "APPROVE" })
+                        }
+                        onReject={() =>
+                          handleApproveOrRejectApprovalFlow({ step, action: "REJECT" })
+                        }
+                        onCancel={() => handleCancelApprovalFlow(step)}
+                        onSkip={() => handleSkipApprovalFlow(step)}
+                        onSendReminder={() => handleSendReminder(step)}
+                        isDisabled={
+                          petition.status !== "COMPLETED" ||
+                          isNotCurrentOrNextStep ||
+                          stepNotApplicable ||
+                          (step as any).isMock
+                        }
+                        petitionStatus={petition.status}
+                      />
+                    </Grid>
+                    {petition.oldApprovalRequestSteps.length ? (
+                      <Grid templateColumns="auto 1fr auto" alignItems="center">
+                        <OlderPetitionApprovalStepRows steps={petition.oldApprovalRequestSteps} />
+                      </Grid>
+                    ) : null}
+                  </TabPanel>
                 );
               })}
-            </TabList>
-            <HStack
-              paddingY={2}
-              paddingX={4}
-              borderBottom="1px solid"
-              borderBottomColor="gray.200"
-              height="52px"
-            >
-              <CommentsButton
-                data-action="see-general-comments"
-                isActive={isShowingGeneralComments}
-                commentCount={petition.generalCommentCount}
-                hasUnreadComments={petition.unreadGeneralCommentCount > 0}
-                onClick={onToggleGeneralComments}
-              />
-              {signatureIndex === tabIndex &&
-              (!petition.signatureConfig?.isEnabled ||
-                currentSignatureRequest?.status === "COMPLETED" ||
-                currentSignatureRequest?.status === "CANCELLED") ? (
-                <IconButtonWithTooltip
-                  isDisabled={isDisabled}
-                  label={intl.formatMessage({
-                    id: "component.petition-signatures-card.add-signature-label",
-                    defaultMessage: "Add signature",
-                  })}
-                  size="sm"
-                  icon={<AddIcon />}
-                  onClick={handleAddNewSignature}
-                />
-              ) : null}
-            </HStack>
-          </HStack>
-          <TabPanels>
-            {approvalStepsWithSignature.map((step, index) => {
-              const stepNotApplicable = step.status === "NOT_APPLICABLE";
-              const isNotCurrentOrNextStep =
-                checkIfNextOrCurrentStep(
-                  approvalStepsWithSignature.filter((s) => s.status !== "NOT_APPLICABLE"),
-                  step.id,
-                ) === false;
-
-              return step.id === "signature" ? (
-                <TabPanel padding={0} key={index}>
-                  <PetitionSignaturesCardBody
-                    petition={petition}
-                    user={user}
-                    isDisabled={isDisabled || isNotCurrentOrNextStep || stepNotApplicable}
-                    onRefetchPetition={onRefetchPetition}
-                  />
-                </TabPanel>
-              ) : (
-                <TabPanel padding={0} key={index}>
-                  <Grid templateColumns="auto 1fr auto" alignItems="center">
-                    <PetitionApprovalStepRow
-                      step={step}
-                      onStart={() => handleStartApprovalFlow(step)}
-                      onApprove={() =>
-                        handleApproveOrRejectApprovalFlow({ step, action: "APPROVE" })
-                      }
-                      onReject={() => handleApproveOrRejectApprovalFlow({ step, action: "REJECT" })}
-                      onCancel={() => handleCancelApprovalFlow(step)}
-                      onSkip={() => handleSkipApprovalFlow(step)}
-                      onSendReminder={() => handleSendReminder(step)}
-                      isDisabled={
-                        petition.status !== "COMPLETED" ||
-                        isNotCurrentOrNextStep ||
-                        stepNotApplicable ||
-                        (step as any).isMock
-                      }
-                      petitionStatus={petition.status}
-                    />
-                  </Grid>
-                  {petition.oldApprovalRequestSteps.length ? (
-                    <Grid templateColumns="auto 1fr auto" alignItems="center">
-                      <OlderPetitionApprovalStepRows steps={petition.oldApprovalRequestSteps} />
-                    </Grid>
-                  ) : null}
-                </TabPanel>
-              );
-            })}
-          </TabPanels>
-        </Tabs>
-      </Card>
-    </>
-  );
-}
-
-PetitionApprovalsCard.fragments = {
-  get PetitionApprovalRequestStepApprover() {
-    return gql`
-      fragment PetitionApprovalsCard_PetitionApprovalRequestStepApprover on PetitionApprovalRequestStepApprover {
-        id
-        approvedAt
-        canceledAt
-        rejectedAt
-        sentAt
-        skippedAt
-        user {
-          id
-          isMe
-          ...UserReference_User
-        }
-      }
-      ${UserReference.fragments.User}
-    `;
-  },
-  get PetitionApprovalRequestStep() {
-    return gql`
-      fragment PetitionApprovalsCard_PetitionApprovalRequestStep on PetitionApprovalRequestStep {
-        id
-        status
-        stepName
-        approvalType
-        approvers {
-          ...PetitionApprovalsCard_PetitionApprovalRequestStepApprover
-        }
-        ...useStartPetitionApprovalFlowDialog_PetitionApprovalRequestStep
-      }
-      ${this.PetitionApprovalRequestStepApprover}
-      ${useStartPetitionApprovalFlowDialog.fragments.PetitionApprovalRequestStep}
-    `;
-  },
-  get Petition() {
-    return gql`
-      fragment PetitionApprovalsCard_Petition on Petition {
-        id
-        status
-        currentApprovalRequestStatus
-        generalCommentCount
-        unreadGeneralCommentCount
-        approvalFlowConfig {
-          ...Fragments_FullApprovalFlowConfig
-          approvers {
+            </TabPanels>
+          </Tabs>
+        </Card>
+      </>
+    );
+  }),
+  {
+    fragments: {
+      get PetitionApprovalRequestStepApprover() {
+        return gql`
+          fragment PetitionApprovalsCard_PetitionApprovalRequestStepApprover on PetitionApprovalRequestStepApprover {
             id
-            isMe
-            ...useStartPetitionApprovalFlowDialog_User
+            approvedAt
+            canceledAt
+            rejectedAt
+            sentAt
+            skippedAt
+            user {
+              id
+              isMe
+              ...UserReference_User
+            }
+          }
+          ${UserReference.fragments.User}
+        `;
+      },
+      get PetitionApprovalRequestStep() {
+        return gql`
+          fragment PetitionApprovalsCard_PetitionApprovalRequestStep on PetitionApprovalRequestStep {
+            id
+            status
+            stepName
+            approvalType
+            approvers {
+              ...PetitionApprovalsCard_PetitionApprovalRequestStepApprover
+            }
+            ...useStartPetitionApprovalFlowDialog_PetitionApprovalRequestStep
+          }
+          ${this.PetitionApprovalRequestStepApprover}
+          ${useStartPetitionApprovalFlowDialog.fragments.PetitionApprovalRequestStep}
+        `;
+      },
+      get Petition() {
+        return gql`
+          fragment PetitionApprovalsCard_Petition on Petition {
+            id
+            status
+            currentApprovalRequestStatus
+            generalCommentCount
+            unreadGeneralCommentCount
+            currentSignatureRequest {
+              id
+              status
+              signatureConfig {
+                review
+                reviewAfterApproval
+              }
+            }
+            signatureConfig {
+              isEnabled
+              review
+              reviewAfterApproval
+            }
+            signatureRequests {
+              id
+              status
+            }
+            currentApprovalRequestSteps {
+              id
+              ...PetitionApprovalsCard_PetitionApprovalRequestStep
+            }
+            oldApprovalRequestSteps {
+              id
+              ...PetitionApprovalsCard_PetitionApprovalRequestStep
+            }
+            approvalFlowConfig {
+              ...Fragments_FullApprovalFlowConfig
+              approvers {
+                id
+                isMe
+                ...useStartPetitionApprovalFlowDialog_User
+                ...UserReference_User
+              }
+            }
+            ...PetitionSignaturesCard_Petition
+            ...getPetitionSignatureStatus_Petition
+            ...getPetitionSignatureEnvironment_Petition
+            ...useStartApprovalRequestStep_PetitionBase
+          }
+          ${UserReference.fragments.User}
+          ${Fragments.FullApprovalFlowConfig}
+          ${PetitionSignaturesCard.fragments.Petition}
+          ${useAddNewSignature.fragments.Petition}
+          ${useStartPetitionApprovalFlowDialog.fragments.User}
+          ${this.PetitionApprovalRequestStep}
+          ${getPetitionSignatureStatus.fragments.Petition}
+          ${getPetitionSignatureEnvironment.fragments.Petition}
+          ${useStartApprovalRequestStep.fragments.PetitionBase}
+        `;
+      },
+      get PetitionPolling() {
+        return gql`
+          fragment PetitionApprovalsCard_PetitionPolling on Petition {
+            id
+            status
+            currentApprovalRequestStatus
+            generalCommentCount
+            unreadGeneralCommentCount
+            currentSignatureRequest {
+              id
+              status
+              signatureConfig {
+                review
+                reviewAfterApproval
+              }
+            }
+            signatureConfig {
+              isEnabled
+              review
+              reviewAfterApproval
+            }
+            signatureRequests {
+              id
+              status
+            }
+            approvalFlowConfig {
+              ...Fragments_FullApprovalFlowConfig
+              approvers {
+                id
+                isMe
+                ...useStartPetitionApprovalFlowDialog_User
+                ...UserReference_User
+              }
+            }
+            currentApprovalRequestSteps {
+              id
+              ...PetitionApprovalsCard_PetitionApprovalRequestStep
+            }
+            ...PetitionSignaturesCard_PetitionPolling
+            ...getPetitionSignatureStatus_Petition
+            ...getPetitionSignatureEnvironment_Petition
+            ...useStartApprovalRequestStep_PetitionBase
+          }
+          ${UserReference.fragments.User}
+          ${Fragments.FullApprovalFlowConfig}
+          ${PetitionSignaturesCard.fragments.PetitionPolling}
+          ${useAddNewSignature.fragments.Petition}
+          ${useStartPetitionApprovalFlowDialog.fragments.User}
+          ${this.PetitionApprovalRequestStep}
+          ${getPetitionSignatureStatus.fragments.Petition}
+          ${getPetitionSignatureEnvironment.fragments.Petition}
+          ${useStartApprovalRequestStep.fragments.PetitionBase}
+        `;
+      },
+      get User() {
+        return gql`
+          fragment PetitionApprovalsCard_User on User {
+            id
+            ...PetitionSignaturesCard_User
             ...UserReference_User
           }
-        }
-        currentSignatureRequest {
-          id
-          status
-          signatureConfig {
-            review
-            reviewAfterApproval
-          }
-        }
-        currentApprovalRequestSteps {
-          id
-          ...PetitionApprovalsCard_PetitionApprovalRequestStep
-        }
-        oldApprovalRequestSteps {
-          id
-          ...PetitionApprovalsCard_PetitionApprovalRequestStep
-        }
-        ...PetitionSignaturesCard_Petition
-        signatureConfig {
-          isEnabled
-          review
-          reviewAfterApproval
-        }
-        signatureRequests {
-          id
-          status
-        }
-        ...getPetitionSignatureStatus_Petition
-        ...getPetitionSignatureEnvironment_Petition
-        ...useStartApprovalRequestStep_PetitionBase
-      }
-      ${UserReference.fragments.User}
-      ${Fragments.FullApprovalFlowConfig}
-      ${PetitionSignaturesCard.fragments.Petition}
-      ${useAddNewSignature.fragments.Petition}
-      ${useStartPetitionApprovalFlowDialog.fragments.User}
-      ${this.PetitionApprovalRequestStep}
-      ${getPetitionSignatureStatus.fragments.Petition}
-      ${getPetitionSignatureEnvironment.fragments.Petition}
-      ${useStartApprovalRequestStep.fragments.PetitionBase}
-    `;
+          ${PetitionSignaturesCard.fragments.User}
+          ${UserReference.fragments.User}
+        `;
+      },
+    },
   },
-  get User() {
-    return gql`
-      fragment PetitionApprovalsCard_User on User {
-        id
-        ...PetitionSignaturesCard_User
-        ...UserReference_User
-      }
-      ${PetitionSignaturesCard.fragments.User}
-      ${useAddNewSignature.fragments.User}
-      ${UserReference.fragments.User}
-    `;
-  },
-};
+);
 
 const _mutations = [
   gql`
@@ -796,10 +859,10 @@ const _queries = [
   gql`
     query PetitionApprovalsCard_petition($petitionId: GID!) {
       petition(id: $petitionId) {
-        ...PetitionApprovalsCard_Petition
+        ...PetitionApprovalsCard_PetitionPolling
       }
     }
-    ${PetitionApprovalsCard.fragments.Petition}
+    ${PetitionApprovalsCard.fragments.PetitionPolling}
   `,
 ];
 
@@ -1244,7 +1307,7 @@ function usePetitionApprovalsCardPolling(petition: PetitionApprovalsCard_Petitio
   const { startPolling, stopPolling } = useQuery(PetitionApprovalsCard_petitionDocument, {
     pollInterval: POLL_INTERVAL,
     variables: { petitionId: petition.id },
-    skip: !isPageVisible,
+    skip: !isPageVisible || (isNullish(petition?.signatureConfig) && isNullish(current)),
   });
 
   useEffect(() => {

@@ -42,36 +42,52 @@ const fragments = {
   User: gql`
     fragment PetitionSignaturesCard_User on User {
       ...TestModeSignatureBadge_User
-      ...NewSignatureRequestRow_User
-      ...useAddNewSignature_User
     }
     ${TestModeSignatureBadge.fragments.User}
-    ${NewSignatureRequestRow.fragments.User}
-    ${useAddNewSignature.fragments.User}
   `,
   Petition: gql`
     fragment PetitionSignaturesCard_Petition on Petition {
       id
       status
-      ...NewSignatureRequestRow_Petition
+      signatureConfig {
+        isEnabled
+      }
+      generalCommentCount
+      unreadGeneralCommentCount
       signatureRequests {
         id
         ...CurrentSignatureRequestRow_PetitionSignatureRequest
         ...OlderSignatureRequestRows_PetitionSignatureRequest
       }
+      ...NewSignatureRequestRow_Petition
+      ...getPetitionSignatureEnvironment_Petition
+      ...useAddNewSignature_Petition
+    }
+    ${CurrentSignatureRequestRow.fragments.PetitionSignatureRequest}
+    ${OlderSignatureRequestRows.fragments.PetitionSignatureRequest}
+    ${NewSignatureRequestRow.fragments.Petition}
+    ${getPetitionSignatureEnvironment.fragments.Petition}
+    ${useAddNewSignature.fragments.Petition}
+  `,
+  PetitionPolling: gql`
+    fragment PetitionSignaturesCard_PetitionPolling on Petition {
+      id
+      status
       signatureConfig {
         isEnabled
       }
-      ...getPetitionSignatureEnvironment_Petition
       generalCommentCount
       unreadGeneralCommentCount
+      signatureRequests {
+        id
+        ...CurrentSignatureRequestRow_PetitionSignatureRequest
+      }
       ...useAddNewSignature_Petition
+      ...getPetitionSignatureEnvironment_Petition
     }
-    ${NewSignatureRequestRow.fragments.Petition}
-    ${CurrentSignatureRequestRow.fragments.PetitionSignatureRequest}
-    ${OlderSignatureRequestRows.fragments.PetitionSignatureRequest}
-    ${getPetitionSignatureEnvironment.fragments.Petition}
     ${useAddNewSignature.fragments.Petition}
+    ${getPetitionSignatureEnvironment.fragments.Petition}
+    ${CurrentSignatureRequestRow.fragments.PetitionSignatureRequest}
   `,
 };
 
@@ -126,10 +142,10 @@ const _queries = [
   gql`
     query PetitionSignaturesCard_petition($petitionId: GID!) {
       petition(id: $petitionId) {
-        ...PetitionSignaturesCard_Petition
+        ...PetitionSignaturesCard_PetitionPolling
       }
     }
-    ${fragments.Petition}
+    ${fragments.PetitionPolling}
   `,
 ];
 
@@ -163,13 +179,13 @@ export const PetitionSignaturesCard = Object.assign(
 
     const signatureEnvironment = getPetitionSignatureEnvironment(petition);
 
-    const addNewSignature = useAddNewSignature({ user, petition });
+    const addNewSignature = useAddNewSignature({ petition });
     const handleAddNewSignature = async () => {
       await addNewSignature();
     };
 
     return (
-      <Card ref={ref} data-section="signature-card" {...props}>
+      <Card ref={ref} data-section="approvals-card" {...props}>
         <CardHeader
           leftIcon={<SignatureIcon fontSize="20px" />}
           rightAction={
@@ -327,7 +343,6 @@ export function PetitionSignaturesCardBody({
     <Grid templateColumns="auto 1fr auto" alignItems="center">
       {petition.signatureConfig?.isEnabled && !current ? (
         <NewSignatureRequestRow
-          user={user}
           petition={petition}
           onRefetch={onRefetchPetition}
           isDisabled={isDisabled}
@@ -365,7 +380,7 @@ function usePetitionSignaturesCardPolling(petition: PetitionSignaturesCard_Petit
   const { startPolling, stopPolling } = useQuery(PetitionSignaturesCard_petitionDocument, {
     pollInterval: POLL_INTERVAL,
     variables: { petitionId: petition.id },
-    skip: !isPageVisible,
+    skip: !isPageVisible || (isNullish(petition?.signatureConfig) && isNullish(current)),
   });
 
   useEffect(() => {

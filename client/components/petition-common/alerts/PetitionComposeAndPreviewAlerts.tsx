@@ -20,7 +20,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
-export interface PetitionComposeAlertsProps {
+interface PetitionComposeAndPreviewAlertsProps {
   petitionStatus: PetitionStatus;
   signatureStatus: PetitionSignatureStatusFilter;
   approvalsStatus: PetitionApprovalRequestStatus;
@@ -44,7 +44,7 @@ export function PetitionComposeAndPreviewAlerts({
   onCancelApprovals,
   onClosePetition,
   onCancelSignature,
-}: PetitionComposeAlertsProps) {
+}: PetitionComposeAndPreviewAlertsProps) {
   const showSignatureAlert = petitionStatus === "COMPLETED" && signatureStatus === "PROCESSING";
 
   const showApprovalsAlert = approvalsStatus === "PENDING";

@@ -237,7 +237,6 @@ export function AddPetitionAccessDialog({
     if (!petition) return;
     try {
       const { signers, allowAdditionalSigners } = await showConfirmPetitionSignersDialog({
-        user,
         signatureConfig,
         isUpdate: true,
         petitionId: petition.id,
@@ -612,9 +611,7 @@ AddPetitionAccessDialog.fragments = {
         ...AddPetitionAccessDialog_DelegateUser
       }
       hasOnBehalfOf: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
-      ...ConfirmPetitionSignersDialog_User
     }
-    ${ConfirmPetitionSignersDialog.fragments.User}
   `,
   SignatureConfig: gql`
     fragment AddPetitionAccessDialog_SignatureConfig on SignatureConfig {
