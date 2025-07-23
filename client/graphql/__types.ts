@@ -23943,6 +23943,8 @@ export type PetitionComposeRightPaneTabs_PetitionBase_Petition_Fragment = {
       fullName: string;
       isPreset: boolean;
       lastName?: string | null;
+      signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
     } | null>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -24033,6 +24035,8 @@ export type PetitionComposeRightPaneTabs_PetitionBase_PetitionTemplate_Fragment 
       fullName: string;
       isPreset: boolean;
       lastName?: string | null;
+      signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
     } | null>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -24199,6 +24203,8 @@ export type PetitionSettings_SignatureConfigFragment = {
     fullName: string;
     isPreset: boolean;
     lastName?: string | null;
+    signWithDigitalCertificate?: boolean | null;
+    signWithEmbeddedImageFileUploadId?: string | null;
   } | null>;
   integration?: {
     __typename?: "SignatureOrgIntegration";
@@ -24268,6 +24274,8 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
       fullName: string;
       isPreset: boolean;
       lastName?: string | null;
+      signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
     } | null>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -24356,6 +24364,8 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
       fullName: string;
       isPreset: boolean;
       lastName?: string | null;
+      signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
     } | null>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -50502,6 +50512,8 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       fullName: string;
       isPreset: boolean;
       lastName?: string | null;
+      signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
     } | null>;
   } | null;
   currentSignatureRequest?: {
@@ -50996,6 +51008,8 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       fullName: string;
       isPreset: boolean;
       lastName?: string | null;
+      signWithDigitalCertificate?: boolean | null;
+      signWithEmbeddedImageFileUploadId?: string | null;
     } | null>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -51710,6 +51724,8 @@ export type PetitionCompose_updatePetitionMutation = {
             fullName: string;
             isPreset: boolean;
             lastName?: string | null;
+            signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
           } | null>;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -53580,6 +53596,8 @@ export type PetitionCompose_petitionQuery = {
             fullName: string;
             isPreset: boolean;
             lastName?: string | null;
+            signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
           } | null>;
         } | null;
         currentSignatureRequest?: {
@@ -54115,6 +54133,8 @@ export type PetitionCompose_petitionQuery = {
             fullName: string;
             isPreset: boolean;
             lastName?: string | null;
+            signWithDigitalCertificate?: boolean | null;
+            signWithEmbeddedImageFileUploadId?: string | null;
           } | null>;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -75943,6 +75963,8 @@ export const PetitionSettings_SignatureConfigFragmentDoc = gql`
       fullName
       isPreset
       lastName
+      signWithDigitalCertificate
+      signWithEmbeddedImageFileUploadId
     }
     reviewAfterApproval
     review

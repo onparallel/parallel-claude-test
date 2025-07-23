@@ -1141,6 +1141,8 @@ const fragments = {
           fullName
           isPreset
           lastName
+          signWithDigitalCertificate
+          signWithEmbeddedImageFileUploadId
         }
         reviewAfterApproval
         review
