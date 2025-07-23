@@ -1,6 +1,7 @@
 import { PhoneInputLazy } from "@parallel/components/common/PhoneInputLazy";
-import { Controller } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { isNonNullish } from "remeda";
+import { ProfileFormData } from "../ProfileForm";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import {
   ProfileFormFieldInputGroup,
@@ -14,11 +15,8 @@ interface ProfileFormFieldPhoneProps
 }
 
 export function ProfileFormFieldPhone({
-  index,
   field,
-  control,
-  clearErrors,
-  setError,
+
   expiryDate,
   isDisabled,
   showExpiryDateDialog,
@@ -26,6 +24,8 @@ export function ProfileFormFieldPhone({
   areSuggestionsVisible,
   onToggleSuggestions,
 }: ProfileFormFieldPhoneProps) {
+  const { control, clearErrors, setError } = useFormContext<ProfileFormData>();
+
   return (
     <ProfileFormFieldInputGroup
       field={field}
@@ -36,7 +36,7 @@ export function ProfileFormFieldPhone({
       onToggleSuggestions={onToggleSuggestions}
     >
       <Controller
-        name={`fields.${index}.content.value`}
+        name={`fields.${field.id}.content.value`}
         control={control}
         render={({ field: { ref, onChange, value, ...rest }, fieldState }) => (
           <PhoneInputLazy
@@ -45,9 +45,9 @@ export function ProfileFormFieldPhone({
             onChange={(value: string, { isValid }) => {
               onChange(value ?? "");
               if (isNonNullish(value) && !isValid && !fieldState.error) {
-                setError(`fields.${index}.content.value`, { type: "validate" });
+                setError(`fields.${field.id}.content.value`, { type: "validate" });
               } else if (isValid && fieldState.error) {
-                clearErrors(`fields.${index}.content.value`);
+                clearErrors(`fields.${field.id}.content.value`);
               }
             }}
             inputRef={ref}

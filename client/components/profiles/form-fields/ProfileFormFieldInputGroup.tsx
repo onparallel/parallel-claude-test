@@ -10,11 +10,12 @@ import { useMetadata } from "@parallel/utils/withMetadata";
 import { Duration, isPast, sub } from "date-fns";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish, isNullish } from "remeda";
 
 export interface ProfileFormFieldInputGroupProps {
-  showSuggestionsButton: boolean;
-  areSuggestionsVisible: boolean;
-  onToggleSuggestions: () => void;
+  showSuggestionsButton?: boolean;
+  areSuggestionsVisible?: boolean;
+  onToggleSuggestions?: () => void;
   field: ProfileFormFieldInputGroup_ProfileTypeFieldFragment;
   children?: ReactNode;
   expiryDate?: string | null;
@@ -31,6 +32,16 @@ export function ProfileFormFieldInputGroup({
   isDisabled,
 }: ProfileFormFieldInputGroupProps) {
   const { browserName } = useMetadata();
+
+  // If all the props are nullish, we don't need to render the input group
+  if (
+    isNullish(onToggleSuggestions) &&
+    isNullish(showSuggestionsButton) &&
+    isNullish(areSuggestionsVisible) &&
+    isNullish(expiryDate)
+  ) {
+    return <>{children}</>;
+  }
 
   return (
     <HStack align="start">
@@ -73,10 +84,10 @@ export function ProfileFormFieldInputGroup({
           expiryAlertAheadTime={field.expiryAlertAheadTime}
         />
       ) : null}
-      {showSuggestionsButton ? (
+      {showSuggestionsButton && isNonNullish(onToggleSuggestions) ? (
         <Box paddingTop={1}>
           <SuggestionsButton
-            areSuggestionsVisible={areSuggestionsVisible}
+            areSuggestionsVisible={areSuggestionsVisible ?? false}
             onClick={onToggleSuggestions}
           />
         </Box>

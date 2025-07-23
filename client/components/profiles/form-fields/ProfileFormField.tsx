@@ -25,15 +25,7 @@ import { unMaybeArray } from "@parallel/utils/types";
 import usePrevious from "@react-hook/previous";
 import { Duration, isPast, sub } from "date-fns";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import {
-  Control,
-  UseFormClearErrors,
-  UseFormRegister,
-  UseFormSetError,
-  UseFormSetValue,
-  useFormState,
-  useWatch,
-} from "react-hook-form";
+import { useFormContext, UseFormSetValue, useFormState, useWatch } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 import { noop } from "ts-essentials";
@@ -57,31 +49,30 @@ import { ProfileFormFieldShortText } from "./ProfileFormFieldShortText";
 import { ProfileFormFieldText } from "./ProfileFormFieldText";
 
 export interface ProfileFormFieldProps {
-  index: number;
-  control: Control<ProfileFormData, any>;
-  register: UseFormRegister<ProfileFormData>;
-  setValue: UseFormSetValue<ProfileFormData>;
-  clearErrors: UseFormClearErrors<ProfileFormData>;
-  setError: UseFormSetError<ProfileFormData>;
-  onRefetch: () => void;
-  profileId: string;
+  onRefetch?: () => void;
+  profileId?: string;
   field: ProfileFormField_ProfileTypeFieldFragment;
   value?: ProfileFormField_ProfileFieldValueFragment | null;
   files?: ProfileFormField_ProfileFieldFileFragment[] | null;
-  fieldsWithIndices: [ProfileFormField_PetitionFieldFragment, PetitionFieldIndex][];
+  fieldsWithIndices?: [ProfileFormField_PetitionFieldFragment, PetitionFieldIndex][];
   isDisabled?: boolean;
   petitionId?: string;
-  properties: ProfileFormField_ProfileFieldPropertyFragment[];
+  properties?: ProfileFormField_ProfileFieldPropertyFragment[];
+  // Dialog-specific props
+  showBaseStyles?: boolean;
+  isRequired?: boolean;
 }
 
 export function ProfileFormField(props: ProfileFormFieldProps) {
   const intl = useIntl();
-  const { index, field, files, control, setValue, fieldsWithIndices } = props;
-  const { dirtyFields, errors } = useFormState({ control });
-  const isDirty = !!dirtyFields?.fields?.[index];
-  const isInvalid = !!errors.fields?.[index];
 
-  const fieldValue = useWatch({ control, name: `fields.${index}` });
+  const { control, setValue } = useFormContext<ProfileFormData>();
+  const { field, fieldsWithIndices, files } = props;
+  const { dirtyFields, errors } = useFormState({ control });
+  const isDirty = !!dirtyFields?.fields?.[field.id];
+  const isInvalid = !!errors.fields?.[field.id];
+
+  const fieldValue = useWatch({ control, name: `fields.${field.id}` });
   const expiryDate = fieldValue?.expiryDate;
   const content = fieldValue?.content;
 
@@ -101,17 +92,17 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
       content?.value &&
       !(content.value as ProfileFormFieldFileAction[]).some(discriminator("type", "UPDATE"))
     ) {
-      setValue(`fields.${index}.content.value`, [
+      setValue(`fields.${field.id}.content.value`, [
         ...content.value,
         { id: "update-expiry-date", type: "UPDATE" },
       ]);
     }
 
-    setValue(`fields.${index}.expiryDate`, value || null, { shouldDirty: value !== expiryDate });
+    setValue(`fields.${field.id}.expiryDate`, value || null, { shouldDirty: value !== expiryDate });
   };
 
   const showModifyExpirationDialog = useModifyExpirationDialog({
-    index,
+    fieldId: field.id,
     isDirty,
     expiryAlertAheadTime: field.expiryAlertAheadTime,
     fieldName: field.name,
@@ -146,13 +137,19 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
   const needsExpirationDialog =
     field.isExpirable && (field.type !== "DATE" || !field.options?.useReplyAsExpiryDate);
 
-  const bgCheckSuggestions = fieldsWithIndices.filter(([petitionField]) => {
-    return petitionField.type === "BACKGROUND_CHECK";
-  });
-  const adverseMediaSuggestions = fieldsWithIndices.filter(([petitionField]) => {
-    return petitionField.type === "ADVERSE_MEDIA_SEARCH";
-  });
-  const suggestions = fieldsWithIndices.flatMap(([petitionField, fieldIndex]) => {
+  const bgCheckSuggestions = isNonNullish(fieldsWithIndices)
+    ? fieldsWithIndices.filter(([petitionField]) => {
+        return petitionField.type === "BACKGROUND_CHECK";
+      })
+    : [];
+
+  const adverseMediaSuggestions = isNonNullish(fieldsWithIndices)
+    ? fieldsWithIndices?.filter(([petitionField]) => {
+        return petitionField.type === "ADVERSE_MEDIA_SEARCH";
+      })
+    : [];
+
+  const suggestions = fieldsWithIndices?.flatMap(([petitionField, fieldIndex]) => {
     return petitionField.replies
       .filter((reply) => {
         if (reply.isAnonymized) {
@@ -200,7 +197,7 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
               petitionFieldIndex={fieldIndex}
               onClick={() => {
                 setValue(
-                  `fields.${index}.content.value`,
+                  `fields.${field.id}.content.value`,
                   [
                     ...(content?.value ?? []),
                     {
@@ -305,7 +302,7 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
                   petitionField={petitionField}
                   petitionFieldIndex={fieldIndex}
                   onClick={() => {
-                    setValue(`fields.${index}.content.value`, value, { shouldDirty: true });
+                    setValue(`fields.${field.id}.content.value`, value, { shouldDirty: true });
                     if (needsExpirationDialog) {
                       showModifyExpirationDialog({ isDirty: true });
                     }
@@ -322,7 +319,8 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
   const commonProps = {
     ...props,
     expiryDate,
-    showSuggestionsButton: suggestions.length > 0 && fieldHasValue && !props.isDisabled,
+    showSuggestionsButton:
+      isNonNullish(suggestions) && suggestions.length > 0 && fieldHasValue && !props.isDisabled,
     areSuggestionsVisible: showSuggestions && !props.isDisabled,
     onToggleSuggestions: () => setShowSuggestions((v) => !v),
     showExpiryDateDialog: needsExpirationDialog ? showModifyExpirationDialog : noop,
@@ -394,20 +392,20 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
         ) : field.type === "SHORT_TEXT" ? (
           <ProfileFormFieldShortText {...commonProps} />
         ) : field.type === "SELECT" ? (
-          <ProfileFormFieldSelect {...commonProps} control={control} />
+          <ProfileFormFieldSelect {...commonProps} />
         ) : field.type === "BACKGROUND_CHECK" ? (
           <ProfileFormFieldBackgroundCheck
             {...commonProps}
-            profileId={props.profileId}
-            onRefreshField={props.onRefetch}
+            profileId={props.profileId ?? ""}
+            onRefreshField={props.onRefetch ?? noop}
             fieldsWithIndices={bgCheckSuggestions}
             petitionId={props.petitionId}
           />
         ) : field.type === "ADVERSE_MEDIA_SEARCH" ? (
           <ProfileFormFieldAdverseMediaSearch
             {...commonProps}
-            profileId={props.profileId}
-            onRefreshField={props.onRefetch}
+            profileId={props.profileId ?? ""}
+            onRefreshField={props.onRefetch ?? noop}
             fieldsWithIndices={adverseMediaSuggestions}
             petitionId={props.petitionId}
           />
@@ -433,7 +431,10 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
           </HStack>
         ) : null}
       </FormControl>
-      {(showSuggestions || !fieldHasValue) && suggestions.length && !props.isDisabled ? (
+      {(showSuggestions || !fieldHasValue) &&
+      isNonNullish(suggestions) &&
+      suggestions.length &&
+      !props.isDisabled ? (
         <HStack wrap="wrap" paddingX={2}>
           {suggestions}
         </HStack>
@@ -512,14 +513,14 @@ ProfileFormField.fragments = {
 };
 
 export function useModifyExpirationDialog({
-  index,
+  fieldId,
   isDirty,
   expiryAlertAheadTime,
   fieldName,
   setValue,
   expiryDate,
 }: {
-  index: number;
+  fieldId: string;
   isDirty: boolean;
   expiryAlertAheadTime?: Duration | null;
   fieldName: LocalizableUserText;
@@ -546,13 +547,13 @@ export function useModifyExpirationDialog({
             expiryAlertAheadTime,
             fieldName,
           });
-          setValue(`fields.${index}.expiryDate`, data.expiryDate || null, {
+          setValue(`fields.${fieldId}.expiryDate`, data.expiryDate || null, {
             shouldDirty: data.expiryDate !== expiryDate,
           });
         } catch {}
         hasBeenShown.current = true;
       }
     },
-    [index, isDirty, expiryDate],
+    [fieldId, isDirty, expiryDate],
   );
 }

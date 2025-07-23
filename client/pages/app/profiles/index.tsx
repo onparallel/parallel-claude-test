@@ -52,7 +52,7 @@ import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { getProfileTypeFieldIcon } from "@parallel/components/organization/profiles/getProfileTypeFieldIcon";
 import { useConfirmChangeViewAllDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeViewAllDialog";
 import { useAskNameDialog } from "@parallel/components/petition-list/AskNameDialog";
-import { useCreateProfileFromProfileTypeDialog } from "@parallel/components/profiles/dialogs/CreateProfileFromProfileTypeDialog";
+import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/CreateProfileDialog";
 import { useImportProfilesFromExcelDialog } from "@parallel/components/profiles/dialogs/ImportProfilesFromExcelDialog";
 import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
 import {
@@ -251,7 +251,7 @@ function Profiles() {
   const columns = useProfileTableColumns(profileType);
   const selection = queryState.columns ?? DEFAULT_PROFILE_COLUMN_SELECTION;
 
-  const showCreateProfileFromProfileTypeDialog = useCreateProfileFromProfileTypeDialog();
+  const showCreateProfileDialog = useCreateProfileDialog();
   const handleCreateProfile = async () => {
     if (isNullish(profileType)) {
       return;
@@ -260,7 +260,7 @@ function Profiles() {
       const {
         hasValues,
         profile: { id },
-      } = await showCreateProfileFromProfileTypeDialog({
+      } = await showCreateProfileDialog({
         profileTypeId: profileType.id,
         profileTypeName: profileType.name,
       });

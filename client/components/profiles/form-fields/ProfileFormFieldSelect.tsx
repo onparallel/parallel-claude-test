@@ -6,7 +6,7 @@ import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { UnwrapArray } from "@parallel/utils/types";
 import { ForwardedRef, PropsWithChildren, ReactElement, forwardRef, useMemo } from "react";
-import { Controller } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { useIntl } from "react-intl";
 import Select, {
   IndicatorsContainerProps,
@@ -20,6 +20,7 @@ import Select, {
   components,
 } from "react-select";
 import { isNonNullish, sortBy } from "remeda";
+import { ProfileFormData } from "../ProfileForm";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import {
   ProfileFormFieldInputGroup,
@@ -29,22 +30,23 @@ import {
 interface ProfileFormFieldSelectProps
   extends ProfileFormFieldProps,
     Omit<ProfileFormFieldInputGroupProps, "field"> {
-  showExpiryDateDialog: (props: { force?: boolean; isDirty?: boolean }) => void;
+  showExpiryDateDialog?: (props: { force?: boolean; isDirty?: boolean }) => void;
 }
 
 type SelectOptionValue = UnwrapArray<ProfileTypeFieldOptions<"SELECT">["values"]>;
 
 export function ProfileFormFieldSelect({
-  index,
   field,
   expiryDate,
   isDisabled,
   showExpiryDateDialog,
-  control,
   showSuggestionsButton,
   areSuggestionsVisible,
   onToggleSuggestions,
+  showBaseStyles,
+  isRequired,
 }: ProfileFormFieldSelectProps) {
+  const { control } = useFormContext<ProfileFormData>();
   return (
     <ProfileFormFieldInputGroup
       field={field}
@@ -56,8 +58,11 @@ export function ProfileFormFieldSelect({
     >
       <Box width="100%">
         <Controller
-          name={`fields.${index}.content.value`}
+          name={`fields.${field.id}.content.value` as const}
           control={control}
+          rules={{
+            required: isRequired,
+          }}
           render={({ field: { value, onChange, onBlur } }) => {
             return (
               <ProfileFormFieldSelectInner
@@ -67,38 +72,42 @@ export function ProfileFormFieldSelect({
                 onChange={onChange}
                 onBlur={() => {
                   if (isNonNullish(value)) {
-                    return showExpiryDateDialog({});
+                    return showExpiryDateDialog?.({});
                   }
                   onBlur();
                 }}
-                styles={{
-                  control: (baseStyles) => ({
-                    ...baseStyles,
-                    borderColor: "transparent",
-                    ":hover": {
-                      borderColor: "inherit",
-                    },
-                    ":focus-within": {
-                      borderColor: baseStyles.borderColor,
-                    },
-                    ":hover, :focus-within": {
-                      "[data-rs='value-container']": { paddingInlineEnd: 0 },
-                      "[data-rs='indicators-container']": { display: "flex" },
-                    },
-                  }),
-                  valueContainer: (baseStyles) => ({
-                    ...baseStyles,
-                    paddingInlineEnd: "16px",
-                  }),
-                  indicatorsContainer: (baseStyles) => ({
-                    ...baseStyles,
-                    display: "none",
-                  }),
-                  placeholder: (baseStyles) => ({
-                    ...baseStyles,
-                    opacity: 0,
-                  }),
-                }}
+                styles={
+                  showBaseStyles
+                    ? undefined
+                    : {
+                        control: (baseStyles) => ({
+                          ...baseStyles,
+                          borderColor: "transparent",
+                          ":hover": {
+                            borderColor: "inherit",
+                          },
+                          ":focus-within": {
+                            borderColor: baseStyles.borderColor,
+                          },
+                          ":hover, :focus-within": {
+                            "[data-rs='value-container']": { paddingInlineEnd: 0 },
+                            "[data-rs='indicators-container']": { display: "flex" },
+                          },
+                        }),
+                        valueContainer: (baseStyles) => ({
+                          ...baseStyles,
+                          paddingInlineEnd: "16px",
+                        }),
+                        indicatorsContainer: (baseStyles) => ({
+                          ...baseStyles,
+                          display: "none",
+                        }),
+                        placeholder: (baseStyles) => ({
+                          ...baseStyles,
+                          opacity: 0,
+                        }),
+                      }
+                }
               />
             );
           }}

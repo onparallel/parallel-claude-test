@@ -4,7 +4,9 @@ import { DateInput } from "@parallel/components/common/DateInput";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useMetadata } from "@parallel/utils/withMetadata";
 import { isPast, sub } from "date-fns";
+import { useFormContext } from "react-hook-form";
 import { isNonNullish } from "remeda";
+import { ProfileFormData } from "../ProfileForm";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import {
   ProfileFormFieldInputGroup,
@@ -18,10 +20,8 @@ interface ProfileFormFieldDateProps
 }
 
 export function ProfileFormFieldDate({
-  index,
   field,
   expiryDate,
-  register,
   isDisabled,
   showExpiryDateDialog,
   showSuggestionsButton,
@@ -29,7 +29,7 @@ export function ProfileFormFieldDate({
   onToggleSuggestions,
 }: ProfileFormFieldDateProps) {
   const { browserName } = useMetadata();
-
+  const { register } = useFormContext<ProfileFormData>();
   const alertIsActive =
     isNonNullish(expiryDate) &&
     isNonNullish(field.expiryAlertAheadTime) &&
@@ -48,7 +48,7 @@ export function ProfileFormFieldDate({
     >
       <Flex flex="1" position="relative">
         <DateInput
-          {...register(`fields.${index}.content.value`)}
+          {...register(`fields.${field.id}.content.value`)}
           borderColor="transparent"
           color={!!useReplyAsExpiryDate && alertIsActive ? "red.500" : undefined}
           onBlur={(e) => {

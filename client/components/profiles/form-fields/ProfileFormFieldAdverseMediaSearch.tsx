@@ -62,9 +62,7 @@ interface ProfileFormFieldAdverseMediaSearchProps
 }
 
 export function ProfileFormFieldAdverseMediaSearch({
-  index,
   field,
-  register,
   isDisabled,
   expiryDate,
   showExpiryDateDialog,

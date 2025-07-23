@@ -9,9 +9,10 @@ import { discriminator } from "@parallel/utils/discriminator";
 import { downloadLocalFile } from "@parallel/utils/downloadLocalFile";
 import { useDownloadProfileFieldFile } from "@parallel/utils/useDownloadProfileFieldFile";
 import { nanoid } from "nanoid";
-import { Controller } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { differenceWith, isNullish, sumBy } from "remeda";
+import { ProfileFormData } from "../ProfileForm";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import { ProfileFieldExpiresAtIcon } from "./ProfileFormFieldInputGroup";
 
@@ -30,11 +31,9 @@ export type ProfileFormFieldFileAction =
   | { type: "UPDATE" };
 
 export function ProfileFormFieldFileUpload({
-  profileId,
+  profileId = "",
   field,
   files,
-  index,
-  control,
   expiryDate,
   isDisabled,
   showExpiryDateDialog,
@@ -44,7 +43,7 @@ export function ProfileFormFieldFileUpload({
 }: ProfileFormFieldFileUploadProps) {
   const MAX_FILE_SIZE = 1024 * 1024 * 100; // 100 MB
   const intl = useIntl();
-
+  const { control } = useFormContext<ProfileFormData>();
   const downloadProfileFieldFile = useDownloadProfileFieldFile();
 
   const handleDownloadAttachment = async (profileFieldFileId: string, preview?: boolean) => {
@@ -55,7 +54,7 @@ export function ProfileFormFieldFileUpload({
 
   return (
     <Controller
-      name={`fields.${index}.content.value`}
+      name={`fields.${field.id}.content.value`}
       control={control}
       render={({ field: { onChange, value, ...rest } }) => {
         const actions = (value as ProfileFormFieldFileAction[]) ?? [];

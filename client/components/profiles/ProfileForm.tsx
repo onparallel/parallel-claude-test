@@ -50,9 +50,9 @@ import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { useRouter } from "next/router";
 import pMap from "p-map";
 import { useCallback, useMemo } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, partition } from "remeda";
+import { fromEntries, isNonNullish, partition } from "remeda";
 import { isDialogError } from "../common/dialogs/DialogProvider";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -63,7 +63,7 @@ import { Spacer } from "../common/Spacer";
 import { useImportFromExternalSourceDialog } from "./dialogs/ImportFromExternalSourceDialog";
 
 export interface ProfileFormData {
-  fields: ({ type: ProfileTypeFieldType } & UpdateProfileFieldValueInput)[];
+  fields: Record<string, { type: ProfileTypeFieldType } & UpdateProfileFieldValueInput>;
 }
 
 interface ProfileFormProps {
@@ -79,16 +79,19 @@ interface ProfileFormProps {
 
 function buildFormDefaultValue(properties: ProfileForm_ProfileFieldPropertyFragment[]) {
   return {
-    fields: properties.map(({ field: { id, type, isExpirable }, files, value }) => {
-      return {
-        type,
-        profileTypeFieldId: id,
-        content: type === "FILE" ? { value: [] } : (value?.content ?? { value: null }),
-        expiryDate: isExpirable
-          ? ((type === "FILE" ? files?.[0]?.expiryDate : value?.expiryDate) ?? null)
-          : null,
-      };
-    }),
+    fields: fromEntries(
+      properties.map(({ field: { id, type, isExpirable }, files, value }) => [
+        id,
+        {
+          type,
+          profileTypeFieldId: id,
+          content: type === "FILE" ? { value: [] } : (value?.content ?? { value: null }),
+          expiryDate: isExpirable
+            ? ((type === "FILE" ? files?.[0]?.expiryDate : value?.expiryDate) ?? null)
+            : null,
+        },
+      ]),
+    ),
   };
 }
 
@@ -134,20 +137,12 @@ export const ProfileForm = Object.assign(
       [profile.properties],
     );
 
-    const {
-      register,
-      formState,
-      reset,
-      control,
-      setFocus,
-      setError,
-      clearErrors,
-      handleSubmit,
-      setValue,
-      getValues,
-    } = useForm<ProfileFormData>({
+    const form = useForm<ProfileFormData>({
       defaultValues: buildFormDefaultValue(properties),
     });
+
+    const { formState, reset, setFocus, setError, handleSubmit, getValues } = form;
+
     useEffectSkipFirst(() => {
       reset(buildFormDefaultValue(properties), { keepDirty: true, keepDirtyValues: true });
     }, [properties]);
@@ -164,12 +159,9 @@ export const ProfileForm = Object.assign(
 
     useAutoConfirmDiscardChangesDialog(checkPath);
 
-    const { fields } = useFieldArray({ name: "fields", control });
-
     useTempQueryParam("field", async (fieldId) => {
       try {
-        const index = fields.findIndex((f) => f.profileTypeFieldId === fieldId)!;
-        setFocus(`fields.${index}.content.value`);
+        setFocus(`fields.${fieldId}.content.value`);
       } catch {
         // ignore FILE .focus() errors
       }
@@ -190,7 +182,9 @@ export const ProfileForm = Object.assign(
 
     const [deleteProfileFieldFile] = useMutation(ProfileForm_deleteProfileFieldFileDocument);
 
-    const editedFieldsCount = formState.dirtyFields.fields?.filter((f) => isNonNullish(f)).length;
+    const editedFieldsCount = formState.dirtyFields.fields
+      ? Object.values(formState.dirtyFields.fields).filter((f) => isNonNullish(f)).length
+      : 0;
 
     const fieldsWithIndices = useAllFieldsWithIndices(petition ?? { fields: [] });
 
@@ -263,9 +257,9 @@ export const ProfileForm = Object.assign(
         {...props}
         onSubmit={handleSubmit(async (formData) => {
           try {
-            const editedFields = formData.fields.filter(
-              (_, i) => formState.dirtyFields.fields?.[i],
-            );
+            const editedFields = Object.entries(formData.fields)
+              .filter(([fieldId, _]) => formState.dirtyFields.fields?.[fieldId])
+              .map(([_, field]) => field);
 
             const [fileFields, fields] = partition(editedFields, (field) => field.type === "FILE");
 
@@ -445,10 +439,7 @@ export const ProfileForm = Object.assign(
                 }[]) ?? [];
 
               for (const err of aggregatedErrors) {
-                const index = fields.findIndex(
-                  (f) => f.profileTypeFieldId === err.profileTypeFieldId,
-                );
-                setError(`fields.${index}.content.value`, { type: "validate" });
+                setError(`fields.${err.profileTypeFieldId}.content.value`, { type: "validate" });
               }
             } else {
               throw e;
@@ -564,31 +555,26 @@ export const ProfileForm = Object.assign(
           spacing={4}
           overflow="auto"
         >
-          <Stack as="ul" width="100%">
-            {propertiesWithSuggestedFields.map(([{ field, value, files }, suggestedFields]) => {
-              const fieldIndex = fields.findIndex((f) => f.profileTypeFieldId === field.id)!;
-              return (
-                <ProfileFormField
-                  key={field.id}
-                  profileId={profileId}
-                  field={field}
-                  value={value}
-                  files={files}
-                  index={fieldIndex}
-                  setValue={setValue}
-                  control={control}
-                  register={register}
-                  setError={setError}
-                  clearErrors={clearErrors}
-                  fieldsWithIndices={suggestedFields}
-                  isDisabled={field.myPermission === "READ" || isFormDisabled}
-                  onRefetch={onRefetch}
-                  petitionId={petitionId}
-                  properties={properties}
-                />
-              );
-            })}
-          </Stack>
+          <FormProvider {...form}>
+            <Stack as="ul" width="100%">
+              {propertiesWithSuggestedFields.map(([{ field, value, files }, suggestedFields]) => {
+                return (
+                  <ProfileFormField
+                    key={field.id}
+                    profileId={profileId}
+                    field={field}
+                    value={value}
+                    files={files}
+                    fieldsWithIndices={suggestedFields}
+                    isDisabled={field.myPermission === "READ" || isFormDisabled}
+                    onRefetch={onRefetch}
+                    petitionId={petitionId}
+                    properties={properties}
+                  />
+                );
+              })}
+            </Stack>
+          </FormProvider>
           {hiddenProperties.length ? (
             <Stack spacing={4}>
               <HStack>

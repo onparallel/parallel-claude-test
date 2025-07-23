@@ -39283,98 +39283,6 @@ export type useCreateProfileDialog_createProfileMutation = {
   };
 };
 
-export type useCreateProfileFromProfileTypeDialog_ProfileFragment = {
-  __typename?: "Profile";
-  id: string;
-  localizableName: { [locale in UserLocale]?: string };
-  status: ProfileStatus;
-  profileType: {
-    __typename?: "ProfileType";
-    id: string;
-    name: { [locale in UserLocale]?: string };
-  };
-};
-
-export type useCreateProfileFromProfileTypeDialog_ProfileTypeFragment = {
-  __typename?: "ProfileType";
-  id: string;
-  name: { [locale in UserLocale]?: string };
-  createdAt: string;
-  fields: Array<{
-    __typename?: "ProfileTypeField";
-    id: string;
-    type: ProfileTypeFieldType;
-    name: { [locale in UserLocale]?: string };
-    isUsedInProfileName: boolean;
-    myPermission: ProfileTypeFieldPermissionType;
-    options: { [key: string]: any };
-    isExpirable: boolean;
-  }>;
-};
-
-export type useCreateProfileFromProfileTypeDialog_ProfileTypePaginationFragment = {
-  __typename?: "ProfileTypePagination";
-  totalCount: number;
-  items: Array<{
-    __typename?: "ProfileType";
-    id: string;
-    name: { [locale in UserLocale]?: string };
-    createdAt: string;
-    fields: Array<{
-      __typename?: "ProfileTypeField";
-      id: string;
-      type: ProfileTypeFieldType;
-      name: { [locale in UserLocale]?: string };
-      isUsedInProfileName: boolean;
-      myPermission: ProfileTypeFieldPermissionType;
-      options: { [key: string]: any };
-      isExpirable: boolean;
-    }>;
-  }>;
-};
-
-export type useCreateProfileFromProfileTypeDialog_profileTypeQueryVariables = Exact<{
-  profileTypeId: Scalars["GID"]["input"];
-}>;
-
-export type useCreateProfileFromProfileTypeDialog_profileTypeQuery = {
-  profileType: {
-    __typename?: "ProfileType";
-    id: string;
-    name: { [locale in UserLocale]?: string };
-    createdAt: string;
-    fields: Array<{
-      __typename?: "ProfileTypeField";
-      id: string;
-      type: ProfileTypeFieldType;
-      name: { [locale in UserLocale]?: string };
-      isUsedInProfileName: boolean;
-      myPermission: ProfileTypeFieldPermissionType;
-      options: { [key: string]: any };
-      isExpirable: boolean;
-    }>;
-  };
-};
-
-export type useCreateProfileFromProfileTypeDialog_createProfileMutationVariables = Exact<{
-  profileTypeId: Scalars["GID"]["input"];
-  fields?: InputMaybe<Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput>;
-}>;
-
-export type useCreateProfileFromProfileTypeDialog_createProfileMutation = {
-  createProfile: {
-    __typename?: "Profile";
-    id: string;
-    localizableName: { [locale in UserLocale]?: string };
-    status: ProfileStatus;
-    profileType: {
-      __typename?: "ProfileType";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-    };
-  };
-};
-
 export type useCreateProfileRelationshipsDialog_ProfileFragment = {
   __typename?: "Profile";
   id: string;
@@ -73344,45 +73252,6 @@ export const useCreateProfileDialog_ProfileTypePaginationFragmentDoc = gql`
   }
   ${useCreateProfileDialog_ProfileTypeFragmentDoc}
 ` as unknown as DocumentNode<useCreateProfileDialog_ProfileTypePaginationFragment, unknown>;
-export const useCreateProfileFromProfileTypeDialog_ProfileFragmentDoc = gql`
-  fragment useCreateProfileFromProfileTypeDialog_Profile on Profile {
-    id
-    localizableName
-    status
-    profileType {
-      id
-      name
-    }
-  }
-` as unknown as DocumentNode<useCreateProfileFromProfileTypeDialog_ProfileFragment, unknown>;
-export const useCreateProfileFromProfileTypeDialog_ProfileTypeFragmentDoc = gql`
-  fragment useCreateProfileFromProfileTypeDialog_ProfileType on ProfileType {
-    id
-    name
-    createdAt
-    fields {
-      id
-      type
-      name
-      isUsedInProfileName
-      myPermission
-      options
-      isExpirable
-    }
-  }
-` as unknown as DocumentNode<useCreateProfileFromProfileTypeDialog_ProfileTypeFragment, unknown>;
-export const useCreateProfileFromProfileTypeDialog_ProfileTypePaginationFragmentDoc = gql`
-  fragment useCreateProfileFromProfileTypeDialog_ProfileTypePagination on ProfileTypePagination {
-    items {
-      ...useCreateProfileFromProfileTypeDialog_ProfileType
-    }
-    totalCount
-  }
-  ${useCreateProfileFromProfileTypeDialog_ProfileTypeFragmentDoc}
-` as unknown as DocumentNode<
-  useCreateProfileFromProfileTypeDialog_ProfileTypePaginationFragment,
-  unknown
->;
 export const useCreateProfileRelationshipsDialog_ProfileRelationshipTypeWithDirectionFragmentDoc =
   gql`
     fragment useCreateProfileRelationshipsDialog_ProfileRelationshipTypeWithDirection on ProfileRelationshipTypeWithDirection {
@@ -82929,31 +82798,6 @@ export const useCreateProfileDialog_createProfileDocument = gql`
 ` as unknown as DocumentNode<
   useCreateProfileDialog_createProfileMutation,
   useCreateProfileDialog_createProfileMutationVariables
->;
-export const useCreateProfileFromProfileTypeDialog_profileTypeDocument = gql`
-  query useCreateProfileFromProfileTypeDialog_profileType($profileTypeId: GID!) {
-    profileType(profileTypeId: $profileTypeId) {
-      ...useCreateProfileFromProfileTypeDialog_ProfileType
-    }
-  }
-  ${useCreateProfileFromProfileTypeDialog_ProfileTypeFragmentDoc}
-` as unknown as DocumentNode<
-  useCreateProfileFromProfileTypeDialog_profileTypeQuery,
-  useCreateProfileFromProfileTypeDialog_profileTypeQueryVariables
->;
-export const useCreateProfileFromProfileTypeDialog_createProfileDocument = gql`
-  mutation useCreateProfileFromProfileTypeDialog_createProfile(
-    $profileTypeId: GID!
-    $fields: [UpdateProfileFieldValueInput!]
-  ) {
-    createProfile(profileTypeId: $profileTypeId, fields: $fields, subscribe: true) {
-      ...useCreateProfileFromProfileTypeDialog_Profile
-    }
-  }
-  ${useCreateProfileFromProfileTypeDialog_ProfileFragmentDoc}
-` as unknown as DocumentNode<
-  useCreateProfileFromProfileTypeDialog_createProfileMutation,
-  useCreateProfileFromProfileTypeDialog_createProfileMutationVariables
 >;
 export const useCreateProfileRelationshipsDialog_profileRelationshipTypesWithDirectionDocument =
   gql`

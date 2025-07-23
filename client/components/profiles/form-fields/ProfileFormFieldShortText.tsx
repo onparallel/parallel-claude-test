@@ -1,8 +1,9 @@
 import { FormatFormErrorMessage, ShortTextInput } from "@parallel/components/common/ShortTextInput";
 import { useShortTextFormats } from "@parallel/utils/useShortTextFormats";
-import { Controller } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { ProfileFormData } from "../ProfileForm";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import {
   ProfileFormFieldInputGroup,
@@ -12,20 +13,21 @@ import {
 interface ProfileFormFieldShortTextProps
   extends ProfileFormFieldProps,
     Omit<ProfileFormFieldInputGroupProps, "field"> {
-  showExpiryDateDialog: (props: { force?: boolean; isDirty?: boolean }) => void;
+  showExpiryDateDialog?: (props: { force?: boolean; isDirty?: boolean }) => void;
 }
 
 export function ProfileFormFieldShortText({
-  index,
   field,
-  control,
   expiryDate,
   isDisabled,
   showExpiryDateDialog,
   showSuggestionsButton,
   areSuggestionsVisible,
   onToggleSuggestions,
+  showBaseStyles,
+  isRequired,
 }: ProfileFormFieldShortTextProps) {
+  const { control } = useFormContext<ProfileFormData>();
   const intl = useIntl();
   const formats = useShortTextFormats();
   const format = isNonNullish(field.options.format)
@@ -42,7 +44,7 @@ export function ProfileFormFieldShortText({
       onToggleSuggestions={onToggleSuggestions}
     >
       <Controller
-        name={`fields.${index}.content.value`}
+        name={`fields.${field.id}.content.value` as const}
         control={control}
         rules={{
           validate: (value) => {
@@ -50,12 +52,19 @@ export function ProfileFormFieldShortText({
               ? (format.validate?.(value) ?? true)
               : true;
           },
+          required: isRequired,
         }}
         render={({ field: { onChange, value, ...rest } }) => {
           return (
             <ShortTextInput
               value={value ?? ""}
-              borderColor="transparent"
+              style={
+                showBaseStyles
+                  ? undefined
+                  : {
+                      borderColor: "transparent",
+                    }
+              }
               placeholder={
                 isNonNullish(format)
                   ? intl.formatMessage(
@@ -76,7 +85,7 @@ export function ProfileFormFieldShortText({
               {...rest}
               onBlur={(e) => {
                 if (e.target.value) {
-                  showExpiryDateDialog({});
+                  showExpiryDateDialog?.({});
                 }
               }}
               format={format}

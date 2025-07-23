@@ -89,7 +89,7 @@ import { useAlertsContactUsDialog } from "../common/dialogs/AlertsContactUsDialo
 import { useProfilesContactUsDialog } from "../common/dialogs/ProfilesContactUsDialog";
 import { NotificationsButton } from "../notifications/NotificationsButton";
 import { getProfileTypeFieldIcon } from "../organization/profiles/getProfileTypeFieldIcon";
-import { useCreateProfileFromProfileTypeDialog } from "../profiles/dialogs/CreateProfileFromProfileTypeDialog";
+import { useCreateProfileDialog } from "../profiles/dialogs/CreateProfileDialog";
 import { NavBarButton } from "./NavBarButton";
 import { UserMenu } from "./UserMenu";
 
@@ -927,13 +927,13 @@ function CreateMenuButtonSection({
   const emptyRef = useRef<any>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const showCreateProfileFromProfileTypeDialog = useCreateProfileFromProfileTypeDialog();
+  const showCreateProfileDialog = useCreateProfileDialog();
   async function handleCreateNewProfileFromProfileType(
     profileTypeId: string,
     profileTypeName: LocalizableUserText,
   ) {
     try {
-      const { profile } = await showCreateProfileFromProfileTypeDialog({
+      const { profile } = await showCreateProfileDialog({
         profileTypeId,
         profileTypeName,
         modalProps: { finalFocusRef: isForceOpen ? buttonRef : emptyRef },

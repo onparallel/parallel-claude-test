@@ -1,4 +1,6 @@
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
+import { useFormContext } from "react-hook-form";
+import { ProfileFormData } from "../ProfileForm";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import {
   ProfileFormFieldInputGroup,
@@ -12,9 +14,7 @@ interface ProfileFormFieldTextProps
 }
 
 export function ProfileFormFieldText({
-  index,
   field,
-  register,
   expiryDate,
   isDisabled,
   showExpiryDateDialog,
@@ -22,6 +22,7 @@ export function ProfileFormFieldText({
   areSuggestionsVisible,
   onToggleSuggestions,
 }: ProfileFormFieldTextProps) {
+  const { register } = useFormContext<ProfileFormData>();
   return (
     <ProfileFormFieldInputGroup
       field={field}
@@ -34,7 +35,7 @@ export function ProfileFormFieldText({
       <GrowingTextarea
         borderColor="transparent"
         maxLength={10_000}
-        {...register(`fields.${index}.content.value`)}
+        {...register(`fields.${field.id}.content.value`)}
         onBlur={(e) => {
           if (e.target.value) {
             return showExpiryDateDialog({});

@@ -57,10 +57,8 @@ interface ProfileFormFieldBackgroundCheckProps
 }
 
 export function ProfileFormFieldBackgroundCheck({
-  index,
   field,
   expiryDate,
-  register,
   isDisabled,
   showExpiryDateDialog,
   onRefreshField,

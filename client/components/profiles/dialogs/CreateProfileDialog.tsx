@@ -1,24 +1,32 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Button, FormControl, FormErrorMessage, FormLabel, Stack } from "@chakra-ui/react";
-import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
-import { ProfileTypeSelect } from "@parallel/components/common/ProfileTypeSelect";
-import { FormatFormErrorMessage, ShortTextInput } from "@parallel/components/common/ShortTextInput";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
+  LocalizableUserText,
+  localizableUserTextRender,
+  LocalizableUserTextRender,
+} from "@parallel/components/common/LocalizableUserTextRender";
+import { ProfileTypeSelect } from "@parallel/components/common/ProfileTypeSelect";
+import {
   UpdateProfileFieldValueInput,
-  useCreateProfileDialog_ProfileFragment,
   useCreateProfileDialog_createProfileDocument,
+  useCreateProfileDialog_ProfileFragment,
   useCreateProfileDialog_profileTypeDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { Focusable } from "@parallel/utils/types";
-import { useShortTextFormats } from "@parallel/utils/useShortTextFormats";
 import { useEffect, useRef } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
-import { ProfileFormFieldSelectInner } from "../form-fields/ProfileFormFieldSelect";
+import { ProfileFormFieldSelect } from "../form-fields/ProfileFormFieldSelect";
+import { ProfileFormFieldShortText } from "../form-fields/ProfileFormFieldShortText";
+
+interface CreateProfileFormData {
+  profileTypeId: string | null;
+  fields: Record<string, UpdateProfileFieldValueInput>;
+}
 
 interface CreateProfileDialogResult {
   profile: useCreateProfileDialog_ProfileFragment;
@@ -28,17 +36,25 @@ interface CreateProfileDialogResult {
 interface CreateProfileDialogProps {
   suggestedName?: string;
   profileTypeId?: string;
+  profileTypeName?: LocalizableUserText;
   profileFieldValues?: Record<string, string | number>;
 }
 
 function CreateProfileDialog({
   profileTypeId,
+  profileTypeName,
   suggestedName,
   profileFieldValues,
   ...props
 }: DialogProps<CreateProfileDialogProps, CreateProfileDialogResult>) {
   const intl = useIntl();
 
+  const form = useForm<CreateProfileFormData>({
+    defaultValues: {
+      profileTypeId: profileTypeId ?? null,
+      fields: {},
+    },
+  });
   const {
     control,
     formState: { errors },
@@ -46,67 +62,72 @@ function CreateProfileDialog({
     handleSubmit,
     setFocus,
     setError,
-    setValue,
-  } = useForm<{ profileTypeId: string | null; fieldValues: UpdateProfileFieldValueInput[] }>({
-    defaultValues: {
-      profileTypeId: profileTypeId ?? null,
-      fieldValues: [],
-    },
-  });
-
-  const { fields, replace } = useFieldArray({ name: "fieldValues", control });
+    reset,
+  } = form;
 
   const _profileTypeId = watch("profileTypeId");
-  const { data: profileTypeData } = useQuery(useCreateProfileDialog_profileTypeDocument, {
-    variables: { profileTypeId: _profileTypeId! },
-    skip: isNullish(_profileTypeId),
-  });
-
-  useEffect(() => {
-    if (isNonNullish(profileTypeData)) {
-      const fields = profileTypeData.profileType.fields.filter((f) => f.isUsedInProfileName);
-      if (profileFieldValues) {
-        replace(
-          fields.map((field) => {
-            return {
-              profileTypeFieldId: field.id,
-              content: { value: profileFieldValues[field.id] },
-            };
-          }),
-        );
-      } else {
-        const suggestions = (suggestedName ?? "").split(" ");
-        replace(
-          fields.map((field, i, rest) => {
-            const defaultValue = field.type === "SHORT_TEXT" ? "" : null;
-            const moreShortTextsAfterThis = rest.slice(i + 1).some((f) => f.type === "SHORT_TEXT");
-            const value =
-              field.myPermission !== "WRITE"
-                ? defaultValue
-                : moreShortTextsAfterThis
-                  ? (suggestions.shift() ?? "")
-                  : suggestions.join(" ");
-            return {
-              profileTypeFieldId: field.id,
-              content: { value },
-            };
-          }),
-        );
-      }
-      setTimeout(() => {
-        setFocus(`fieldValues.0.content.value`);
-      }, 100);
-    }
-  }, [profileTypeData]);
-
-  const formats = useShortTextFormats();
-
   const [createProfile, { loading }] = useMutation(useCreateProfileDialog_createProfileDocument);
+
   const selectRef = useRef<Focusable>({
     focus: () => {
       setFocus("profileTypeId");
     },
   });
+
+  const isFixedTypeMode = isNonNullish(profileTypeName) && isNonNullish(profileTypeId);
+  const { data: profileTypeData } = useQuery(useCreateProfileDialog_profileTypeDocument, {
+    variables: { profileTypeId: _profileTypeId! },
+    skip: isNullish(_profileTypeId),
+  });
+
+  const fieldsForProfileName =
+    profileTypeData?.profileType.fields.filter((f) => f.isUsedInProfileName) || [];
+
+  useEffect(() => {
+    if (isNonNullish(profileTypeData) && fieldsForProfileName.length > 0) {
+      const fieldsData: Record<string, UpdateProfileFieldValueInput> = {};
+
+      if (profileFieldValues) {
+        fieldsForProfileName.forEach((field) => {
+          fieldsData[field.id] = {
+            profileTypeFieldId: field.id,
+            content: { value: profileFieldValues[field.id] },
+          };
+        });
+      } else {
+        const suggestions = (suggestedName ?? "").split(" ");
+        fieldsForProfileName.forEach((field, index) => {
+          const defaultValue = field.type === "SHORT_TEXT" ? "" : null;
+          const moreShortTextsAfterThis = fieldsForProfileName
+            .slice(index + 1)
+            .some((f) => f.type === "SHORT_TEXT");
+          const value =
+            field.myPermission !== "WRITE"
+              ? defaultValue
+              : moreShortTextsAfterThis
+                ? (suggestions.shift() ?? "")
+                : suggestions.join(" ");
+
+          fieldsData[field.id] = {
+            profileTypeFieldId: field.id,
+            content: { value },
+          };
+        });
+      }
+
+      reset({
+        profileTypeId: _profileTypeId,
+        fields: fieldsData,
+      });
+
+      setTimeout(() => {
+        const firstFieldId = fieldsForProfileName[0]?.id;
+        if (firstFieldId) {
+          setFocus(`fields.${firstFieldId}.content.value`);
+        }
+      }, 100);
+    }
+  }, [profileTypeData, profileFieldValues, suggestedName]);
 
   return (
     <ConfirmDialog
@@ -116,19 +137,19 @@ function CreateProfileDialog({
       content={{
         containerProps: {
           as: "form",
-          onSubmit: handleSubmit(async ({ profileTypeId, fieldValues }) => {
+          onSubmit: handleSubmit(async ({ profileTypeId, fields }) => {
             try {
               const profile = await createProfile({
                 variables: {
                   profileTypeId: profileTypeId!,
-                  fields: fieldValues.filter(
+                  fields: Object.values(fields).filter(
                     (value) => isNonNullish(value?.content?.value) && value!.content!.value !== "",
                   ),
                 },
               });
               props.onResolve({
                 profile: profile.data!.createProfile,
-                hasValues: fieldValues.length > 0,
+                hasValues: Object.keys(fields).length > 0,
               });
             } catch (error) {
               if (isApolloError(error, "INVALID_PROFILE_FIELD_VALUE")) {
@@ -139,131 +160,112 @@ function CreateProfileDialog({
                   }[]) ?? [];
 
                 for (const err of aggregatedErrors) {
-                  const index = fieldValues.findIndex(
-                    (f) => f.profileTypeFieldId === err.profileTypeFieldId,
-                  );
-                  setError(`fieldValues.${index}.content.value`, { type: "validate" });
+                  setError(`fields.${err.profileTypeFieldId}.content.value`, { type: "validate" });
                 }
               }
             }
           }),
         },
       }}
-      initialFocusRef={selectRef}
+      initialFocusRef={isFixedTypeMode ? undefined : selectRef}
       header={
-        <FormattedMessage
-          id="component.create-profile-dialog.new-profile"
-          defaultMessage="New profile"
-        />
+        isNonNullish(profileTypeName) ? (
+          <FormattedMessage
+            id="generic.create-name"
+            defaultMessage="Create {name}"
+            values={{
+              name: localizableUserTextRender({
+                value: profileTypeName,
+                intl,
+                default: intl.formatMessage({
+                  id: "generic.unnamed-profile-type",
+                  defaultMessage: "Unnamed profile type",
+                }),
+              }).toLowerCase(),
+            }}
+          />
+        ) : (
+          <FormattedMessage
+            id="component.create-profile-dialog.new-profile"
+            defaultMessage="New profile"
+          />
+        )
       }
       body={
         <Stack spacing={4}>
-          <FormControl isInvalid={!!errors.profileTypeId} isDisabled={isNonNullish(profileTypeId)}>
-            <FormLabel fontWeight={400}>
-              <FormattedMessage
-                id="component.create-profile-dialog.profile-type"
-                defaultMessage="Profile type"
-              />
-            </FormLabel>
-            <Controller
-              name="profileTypeId"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { onChange, ...props } }) => (
-                <ProfileTypeSelect
-                  defaultOptions
-                  onChange={(v) => {
-                    onChange(v?.id ?? null);
-                    setValue("fieldValues", []);
-                  }}
-                  showOnlyCreatable
-                  {...props}
+          {isFixedTypeMode ? null : (
+            <FormControl
+              isInvalid={!!errors.profileTypeId}
+              isDisabled={isNonNullish(profileTypeId)}
+            >
+              <FormLabel fontWeight={400}>
+                <FormattedMessage
+                  id="component.create-profile-dialog.profile-type"
+                  defaultMessage="Profile type"
                 />
-              )}
-            />
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.field-required-error"
-                defaultMessage="This field is required"
-              />
-            </FormErrorMessage>
-          </FormControl>
-          {fields.map((field, index) => {
-            const profileTypeField = profileTypeData!.profileType.fields.find(
-              (f) => f.id === field.profileTypeFieldId,
-            )!;
-            const format = isNonNullish(profileTypeField.options.format)
-              ? formats.find((f) => f.value === profileTypeField.options.format)
-              : null;
-
-            return (
-              <FormControl key={field.id} isInvalid={!!errors.fieldValues?.[index]?.content?.value}>
-                <FormLabel fontWeight={400}>
-                  <LocalizableUserTextRender value={profileTypeField.name} default="" />
-                </FormLabel>
-                {profileTypeField.type === "SHORT_TEXT" ? (
-                  <>
-                    <Controller
-                      name={`fieldValues.${index}.content.value`}
-                      control={control}
-                      rules={{
-                        validate: (value) => {
-                          return isNonNullish(format) && value?.length
-                            ? (format.validate?.(value) ?? true)
-                            : true;
-                        },
-                        required: true,
-                      }}
-                      render={({ field: { value, ...props } }) => {
-                        return (
-                          <ShortTextInput
-                            value={value ?? ""}
-                            {...props}
-                            disabled={profileTypeField.myPermission !== "WRITE"}
-                            format={format}
-                            placeholder={
-                              isNonNullish(format)
-                                ? intl.formatMessage(
-                                    {
-                                      id: "generic.for-example",
-                                      defaultMessage: "E.g. {example}",
-                                    },
-                                    {
-                                      example: format.example,
-                                    },
-                                  )
-                                : undefined
-                            }
-                          />
-                        );
-                      }}
-                    />
-                    {isNonNullish(format) ? <FormatFormErrorMessage format={format} /> : null}
-                  </>
-                ) : (
-                  <Controller
-                    name={`fieldValues.${index}.content.value`}
-                    control={control}
-                    render={({ field: { ...props } }) => {
-                      return (
-                        <ProfileFormFieldSelectInner
-                          field={profileTypeField}
-                          {...props}
-                          isDisabled={profileTypeField.myPermission !== "WRITE"}
-                        />
-                      );
+              </FormLabel>
+              <Controller
+                name="profileTypeId"
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { onChange, ...props } }) => (
+                  <ProfileTypeSelect
+                    defaultOptions
+                    onChange={(v) => {
+                      onChange(v?.id ?? null);
+                      reset({
+                        profileTypeId: v?.id ?? null,
+                        fields: {},
+                      });
                     }}
+                    showOnlyCreatable
+                    {...props}
                   />
                 )}
-                <FormErrorMessage>
-                  <FormattedMessage
-                    id="generic.field-required-error"
-                    defaultMessage="This field is required"
-                  />
-                </FormErrorMessage>
-              </FormControl>
-            );
-          })}
+              />
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="generic.field-required-error"
+                  defaultMessage="This field is required"
+                />
+              </FormErrorMessage>
+            </FormControl>
+          )}
+          <FormProvider {...form}>
+            {fieldsForProfileName.map((profileTypeField) => {
+              return (
+                <FormControl
+                  key={profileTypeField.id}
+                  isInvalid={!!errors.fields?.[profileTypeField.id]?.content?.value}
+                >
+                  <FormLabel fontWeight={400}>
+                    <LocalizableUserTextRender value={profileTypeField.name} default="" />
+                  </FormLabel>
+                  {profileTypeField.type === "SHORT_TEXT" ? (
+                    <ProfileFormFieldShortText
+                      field={profileTypeField}
+                      isDisabled={profileTypeField.myPermission !== "WRITE"}
+                      showBaseStyles
+                      isRequired
+                    />
+                  ) : (
+                    <ProfileFormFieldSelect
+                      field={profileTypeField}
+                      isDisabled={profileTypeField.myPermission !== "WRITE"}
+                      showBaseStyles
+                      isRequired
+                    />
+                  )}
+                  <FormErrorMessage>
+                    <FormattedMessage
+                      id="generic.field-required-error"
+                      defaultMessage="This field is required"
+                    />
+                  </FormErrorMessage>
+                </FormControl>
+              );
+            })}
+          </FormProvider>
         </Stack>
       }
       confirm={

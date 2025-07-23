@@ -9,7 +9,7 @@ import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
 import { UnwrapArray } from "@parallel/utils/types";
 import { forwardRef, useMemo } from "react";
-import { Controller } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { useIntl } from "react-intl";
 import {
   IndicatorsContainerProps,
@@ -20,6 +20,7 @@ import {
   createFilter,
 } from "react-select";
 import { isNonNullish, sortBy } from "remeda";
+import { ProfileFormData } from "../ProfileForm";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import {
   ProfileFormFieldInputGroup,
@@ -35,9 +36,7 @@ interface ProfileFormFieldCheckboxProps
 type SelectOptionValue = UnwrapArray<ProfileTypeFieldOptions<"CHECKBOX">["values"]>;
 
 export function ProfileFormFieldCheckbox({
-  index,
   field,
-  control,
   expiryDate,
   isDisabled,
   showExpiryDateDialog,
@@ -45,6 +44,7 @@ export function ProfileFormFieldCheckbox({
   areSuggestionsVisible,
   onToggleSuggestions,
 }: ProfileFormFieldCheckboxProps) {
+  const { control } = useFormContext<ProfileFormData>();
   return (
     <ProfileFormFieldInputGroup
       field={field}
@@ -55,7 +55,7 @@ export function ProfileFormFieldCheckbox({
       onToggleSuggestions={onToggleSuggestions}
     >
       <Controller
-        name={`fields.${index}.content.value`}
+        name={`fields.${field.id}.content.value`}
         control={control}
         render={({ field: { value, onChange, onBlur } }) => {
           return (
