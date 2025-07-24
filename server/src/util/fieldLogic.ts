@@ -555,6 +555,18 @@ function evaluatePredicate(
   petition: FieldLogicPetitionInput,
   fieldType?: PetitionFieldType, // this is required to distinguish between empty CHECKBOX and empty PROFILE_SEARCH reply
 ) {
+  function isInList(listName: string, reply: string) {
+    const customList = petition.customLists.find((l) => l.name === listName);
+    if (isNonNullish(customList)) {
+      return customList.values.some((v) => v === reply);
+    }
+    const standardList = petition.standardListDefinitions.find((l) => l.listName === listName);
+    if (isNonNullish(standardList)) {
+      return standardList.values.some((v) => v.key === reply);
+    }
+    return false;
+  }
+
   try {
     if (reply === undefined) {
       return false;
@@ -576,8 +588,6 @@ function evaluatePredicate(
 
     // CHECKBOX
     if (fieldType === "CHECKBOX" && Array.isArray(reply)) {
-      const standardList = petition.standardListDefinitions.find((l) => l.listName === value);
-
       switch (operator) {
         case "CONTAIN":
           assert(typeof value === "string");
@@ -590,16 +600,13 @@ function evaluatePredicate(
           return reply.length === value;
         case "ALL_IS_IN_LIST":
           assert(typeof value === "string");
-          assert(isNonNullish(standardList));
-          return reply.every((value) => standardList.values.some((v) => v.key === value));
+          return reply.every((r) => isInList(value, r));
         case "ANY_IS_IN_LIST":
           assert(typeof value === "string");
-          assert(isNonNullish(standardList));
-          return reply.some((value) => standardList.values.some((v) => v.key === value));
+          return reply.some((r) => isInList(value, r));
         case "NONE_IS_IN_LIST":
           assert(typeof value === "string");
-          assert(isNonNullish(standardList));
-          return !reply.some((value) => standardList.values.some((v) => v.key === value));
+          return !reply.some((r) => isInList(value, r));
         default:
           return false;
       }
@@ -652,19 +659,9 @@ function evaluatePredicate(
       }
       case "IS_IN_LIST":
       case "NOT_IS_IN_LIST": {
-        assert(typeof _reply === "string");
+        assert(typeof reply === "string");
         assert(typeof value === "string");
-        const customList = petition.customLists.find((l) => l.name === value);
-        const standardList = petition.standardListDefinitions.find((l) => l.listName === value);
-
-        let result;
-        if (isNonNullish(customList)) {
-          result = customList.values.some((v) => v.toLowerCase() === _reply);
-        } else if (isNonNullish(standardList)) {
-          result = standardList.values.some((v) => v.key.toLowerCase() === _reply);
-        }
-
-        assert(isNonNullish(result), `Can't find list ${value} referenced in condition`);
+        const result = isInList(value, reply);
         return operator.startsWith("NOT_") ? !result : result;
       }
       default:
