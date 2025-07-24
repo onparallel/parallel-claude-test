@@ -146,6 +146,12 @@ export const getServerSideProps: GetServerSideProps<{
       variables: { offset: 0, limit: 50, category, locale },
     });
 
+    if (templates.length === 0) {
+      return {
+        notFound: true,
+      };
+    }
+
     return {
       props: { samples, templates, category },
     };
