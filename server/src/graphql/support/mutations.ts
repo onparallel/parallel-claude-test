@@ -1,6 +1,6 @@
 import Ajv from "ajv";
 import { booleanArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
-import { isNonNullish, isNullish, unique } from "remeda";
+import { indexBy, isNonNullish, isNullish, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { UserGroupPermissionName } from "../../db/__types";
 import { toBytes } from "../../util/fileSize";
@@ -1403,14 +1403,18 @@ export const createProfileRelationshipsExcel = mutationField("createProfileRelat
         throw new Error(`[Error in cell ${colIndex}${rowIndex + 1}]: Invalid Profile ID`);
       }
 
-      const aliases = createData.map((row) => row.relationship_alias);
-      const orgRelationships = await ctx.profiles.loadProfileRelationshipTypesByOrgId(args.orgId);
-      const validOrgAliases = orgRelationships.map((r) => r.alias);
+      const orgRelationshipsTypes = indexBy(
+        await ctx.profiles.loadProfileRelationshipTypesByOrgId(args.orgId),
+        (rt) => rt.alias,
+      );
 
-      const [firstInvalidAlias] = aliases.filter((alias) => !validOrgAliases.includes(alias));
-      if (firstInvalidAlias) {
-        const rowIndex = aliases.indexOf(firstInvalidAlias);
-        throw new Error(`[Error in cell C${rowIndex + 1}]: Invalid relationship alias`);
+      const firstInvalidAliasIndex = createData.findIndex((r) =>
+        isNullish(orgRelationshipsTypes[r.relationship_alias]),
+      );
+      if (firstInvalidAliasIndex !== -1) {
+        throw new Error(
+          `[Error in cell C${firstInvalidAliasIndex + 1}]: Invalid relationship alias`,
+        );
       }
 
       const profiles = (
@@ -1428,9 +1432,7 @@ export const createProfileRelationshipsExcel = mutationField("createProfileRelat
             .profile_type_id,
           rightSideProfileTypeId: profiles.find((p) => p.id === row.right_side_profile_id)!
             .profile_type_id,
-          profileRelationshipTypeId: orgRelationships.find(
-            (r) => r.alias === row.relationship_alias,
-          )!.id,
+          profileRelationshipTypeId: orgRelationshipsTypes[row.relationship_alias].id,
         })),
       );
 
@@ -1446,13 +1448,17 @@ export const createProfileRelationshipsExcel = mutationField("createProfileRelat
       }
 
       await ctx.profiles.createProfileRelationship(
-        createData.map((d) => ({
-          left_side_profile_id: d.left_side_profile_id,
-          right_side_profile_id: d.right_side_profile_id,
-          profile_relationship_type_id: orgRelationships.find(
-            (r) => r.alias === d.relationship_alias,
-          )!.id,
-        })),
+        createData.map((d) => {
+          const profileRelationshipType = orgRelationshipsTypes[d.relationship_alias];
+          const [leftSideProfileId, rightSideProfileId] = profileRelationshipType.is_reciprocal
+            ? [d.left_side_profile_id, d.right_side_profile_id].sort()
+            : [d.left_side_profile_id, d.right_side_profile_id];
+          return {
+            left_side_profile_id: leftSideProfileId,
+            right_side_profile_id: rightSideProfileId,
+            profile_relationship_type_id: profileRelationshipType.id,
+          };
+        }),
         ctx.user!.id,
         args.orgId,
       );
