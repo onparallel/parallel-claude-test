@@ -94,6 +94,16 @@ export const PetitionFieldReplyFragment = gql`
   }
   fragment PetitionFieldReply on PetitionFieldReply {
     ..._PetitionFieldReply
+    associatedProfile {
+      id
+      name
+      status
+      profileType {
+        id
+        name
+      }
+      createdAt
+    }
     children {
       field {
         id

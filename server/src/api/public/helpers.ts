@@ -163,7 +163,8 @@ function mapFieldReply(reply: PetitionFieldReplyFragment, type: PetitionFieldTyp
         "id",
         "status",
         // show metadata info only on FILE fields
-        ...(isFileTypeField(type) ? ["metadata" as keyof PetitionFieldReplyFragment] : []),
+        ...(isFileTypeField(type) ? ["metadata" as const] : []),
+        ...(type === "FIELD_GROUP" ? ["associatedProfile" as const] : []),
         "createdAt",
         "updatedAt",
       ]),
@@ -176,7 +177,7 @@ function mapFieldReply(reply: PetitionFieldReplyFragment, type: PetitionFieldTyp
       reply.children?.map((child) => ({
         field: pick(child.field, ["id", "type"]),
         replies: child.replies.map((r) => ({
-          ...mapReply({ ...r, children: null }, child.field.type),
+          ...mapReply({ ...r, children: null, associatedProfile: null }, child.field.type),
         })),
       })) ?? null,
   };

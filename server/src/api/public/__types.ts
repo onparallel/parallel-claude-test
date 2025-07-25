@@ -7500,6 +7500,13 @@ export type PetitionFieldReplyFragment = {
   metadata: { [key: string]: any };
   createdAt: string;
   updatedAt: string;
+  associatedProfile: {
+    id: string;
+    name: string;
+    status: ProfileStatus;
+    createdAt: string;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+  } | null;
   children: Array<{
     field: { id: string; type: PetitionFieldType };
     replies: Array<{
@@ -7530,6 +7537,13 @@ export type PetitionFieldWithRepliesFragment = {
     metadata: { [key: string]: any };
     createdAt: string;
     updatedAt: string;
+    associatedProfile: {
+      id: string;
+      name: string;
+      status: ProfileStatus;
+      createdAt: string;
+      profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    } | null;
     children: Array<{
       field: { id: string; type: PetitionFieldType };
       replies: Array<{
@@ -7595,6 +7609,13 @@ export type PetitionFragment = {
       metadata: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
+      associatedProfile: {
+        id: string;
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      } | null;
       children: Array<{
         field: { id: string; type: PetitionFieldType };
         replies: Array<{
@@ -7754,6 +7775,13 @@ export type PetitionBase_Petition_Fragment = {
       metadata: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
+      associatedProfile: {
+        id: string;
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      } | null;
       children: Array<{
         field: { id: string; type: PetitionFieldType };
         replies: Array<{
@@ -8309,6 +8337,13 @@ export type GetPetitions_petitionsQuery = {
               metadata: { [key: string]: any };
               createdAt: string;
               updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
               children: Array<{
                 field: { id: string; type: PetitionFieldType };
                 replies: Array<{
@@ -8463,6 +8498,13 @@ export type CreatePetition_petitionMutation = {
             metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
+            associatedProfile: {
+              id: string;
+              name: string;
+              status: ProfileStatus;
+              createdAt: string;
+              profileType: { id: string; name: { [locale in UserLocale]?: string } };
+            } | null;
             children: Array<{
               field: { id: string; type: PetitionFieldType };
               replies: Array<{
@@ -8614,6 +8656,13 @@ export type GetPetition_petitionQuery = {
             metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
+            associatedProfile: {
+              id: string;
+              name: string;
+              status: ProfileStatus;
+              createdAt: string;
+              profileType: { id: string; name: { [locale in UserLocale]?: string } };
+            } | null;
             children: Array<{
               field: { id: string; type: PetitionFieldType };
               replies: Array<{
@@ -8805,6 +8854,13 @@ export type UpdatePetition_updatePetitionMutation = {
             metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
+            associatedProfile: {
+              id: string;
+              name: string;
+              status: ProfileStatus;
+              createdAt: string;
+              profileType: { id: string; name: { [locale in UserLocale]?: string } };
+            } | null;
             children: Array<{
               field: { id: string; type: PetitionFieldType };
               replies: Array<{
@@ -8994,6 +9050,13 @@ export type ClosePetition_closePetitionMutation = {
         metadata: { [key: string]: any };
         createdAt: string;
         updatedAt: string;
+        associatedProfile: {
+          id: string;
+          name: string;
+          status: ProfileStatus;
+          createdAt: string;
+          profileType: { id: string; name: { [locale in UserLocale]?: string } };
+        } | null;
         children: Array<{
           field: { id: string; type: PetitionFieldType };
           replies: Array<{
@@ -9135,6 +9198,13 @@ export type ReopenPetition_reopenPetitionMutation = {
         metadata: { [key: string]: any };
         createdAt: string;
         updatedAt: string;
+        associatedProfile: {
+          id: string;
+          name: string;
+          status: ProfileStatus;
+          createdAt: string;
+          profileType: { id: string; name: { [locale in UserLocale]?: string } };
+        } | null;
         children: Array<{
           field: { id: string; type: PetitionFieldType };
           replies: Array<{
@@ -9293,6 +9363,13 @@ export type TagPetition_tagPetitionMutation = {
             metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
+            associatedProfile: {
+              id: string;
+              name: string;
+              status: ProfileStatus;
+              createdAt: string;
+              profileType: { id: string; name: { [locale in UserLocale]?: string } };
+            } | null;
             children: Array<{
               field: { id: string; type: PetitionFieldType };
               replies: Array<{
@@ -9513,6 +9590,13 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
           metadata: { [key: string]: any };
           createdAt: string;
           updatedAt: string;
+          associatedProfile: {
+            id: string;
+            name: string;
+            status: ProfileStatus;
+            createdAt: string;
+            profileType: { id: string; name: { [locale in UserLocale]?: string } };
+          } | null;
           children: Array<{
             field: { id: string; type: PetitionFieldType };
             replies: Array<{
@@ -9789,6 +9873,13 @@ export type PetitionReplies_repliesQuery = {
             metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
+            associatedProfile: {
+              id: string;
+              name: string;
+              status: ProfileStatus;
+              createdAt: string;
+              profileType: { id: string; name: { [locale in UserLocale]?: string } };
+            } | null;
             children: Array<{
               field: { id: string; type: PetitionFieldType };
               replies: Array<{
@@ -9832,6 +9923,13 @@ export type PetitionReplies_repliesQuery = {
             metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
+            associatedProfile: {
+              id: string;
+              name: string;
+              status: ProfileStatus;
+              createdAt: string;
+              profileType: { id: string; name: { [locale in UserLocale]?: string } };
+            } | null;
             children: Array<{
               field: { id: string; type: PetitionFieldType };
               replies: Array<{
@@ -12397,6 +12495,13 @@ export type SubmitReply_createPetitionFieldRepliesMutation = {
     metadata: { [key: string]: any };
     createdAt: string;
     updatedAt: string;
+    associatedProfile: {
+      id: string;
+      name: string;
+      status: ProfileStatus;
+      createdAt: string;
+      profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    } | null;
     children: Array<{
       field: { id: string; type: PetitionFieldType };
       replies: Array<{
@@ -12429,6 +12534,13 @@ export type SubmitReply_createFileUploadReplyMutation = {
       metadata: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
+      associatedProfile: {
+        id: string;
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      } | null;
       children: Array<{
         field: { id: string; type: PetitionFieldType };
         replies: Array<{
@@ -12457,6 +12569,13 @@ export type SubmitReply_createFileUploadReplyCompleteMutation = {
     metadata: { [key: string]: any };
     createdAt: string;
     updatedAt: string;
+    associatedProfile: {
+      id: string;
+      name: string;
+      status: ProfileStatus;
+      createdAt: string;
+      profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    } | null;
     children: Array<{
       field: { id: string; type: PetitionFieldType };
       replies: Array<{
@@ -12488,6 +12607,13 @@ export type UpdateReplyStatus_updatePetitionFieldRepliesStatusMutation = {
       createdAt: string;
       updatedAt: string;
       field: { id: string } | null;
+      associatedProfile: {
+        id: string;
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      } | null;
       children: Array<{
         field: { id: string; type: PetitionFieldType };
         replies: Array<{
@@ -12517,6 +12643,13 @@ export type UpdateReply_updatePetitionFieldRepliesMutation = {
     createdAt: string;
     updatedAt: string;
     field: { id: string } | null;
+    associatedProfile: {
+      id: string;
+      name: string;
+      status: ProfileStatus;
+      createdAt: string;
+      profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    } | null;
     children: Array<{
       field: { id: string; type: PetitionFieldType };
       replies: Array<{
@@ -12548,6 +12681,13 @@ export type UpdateReply_updateFileUploadReplyMutation = {
       metadata: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
+      associatedProfile: {
+        id: string;
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      } | null;
       children: Array<{
         field: { id: string; type: PetitionFieldType };
         replies: Array<{
@@ -12577,6 +12717,13 @@ export type UpdateReply_updateFileUploadReplyCompleteMutation = {
     createdAt: string;
     updatedAt: string;
     field: { id: string } | null;
+    associatedProfile: {
+      id: string;
+      name: string;
+      status: ProfileStatus;
+      createdAt: string;
+      profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    } | null;
     children: Array<{
       field: { id: string; type: PetitionFieldType };
       replies: Array<{
@@ -12634,6 +12781,13 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
         metadata: { [key: string]: any };
         createdAt: string;
         updatedAt: string;
+        associatedProfile: {
+          id: string;
+          name: string;
+          status: ProfileStatus;
+          createdAt: string;
+          profileType: { id: string; name: { [locale in UserLocale]?: string } };
+        } | null;
         children: Array<{
           field: { id: string; type: PetitionFieldType };
           replies: Array<{
@@ -12850,6 +13004,16 @@ export const _PetitionFieldReplyFragmentDoc = gql`
 export const PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionFieldReply on PetitionFieldReply {
     ..._PetitionFieldReply
+    associatedProfile {
+      id
+      name
+      status
+      profileType {
+        id
+        name
+      }
+      createdAt
+    }
     children {
       field {
         id

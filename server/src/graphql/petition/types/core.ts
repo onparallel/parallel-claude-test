@@ -1451,7 +1451,6 @@ export const PetitionFieldReply = objectType({
         if (isNullish(o.associated_profile_id)) {
           return null;
         }
-
         return await ctx.profiles.loadProfile(o.associated_profile_id);
       },
     });
