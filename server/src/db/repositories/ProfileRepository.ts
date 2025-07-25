@@ -629,23 +629,22 @@ export class ProfileRepository extends BaseRepository {
       }),
   );
 
-  readonly loadDraftProfileFieldValuesByProfileId = this.buildLoadMultipleBy(
+  readonly loadProfileFieldValuesAndDraftsByProfileId = this.buildLoadMultipleBy(
     "profile_field_value",
     "profile_id",
     (q) =>
       q.where({
         removed_at: null,
         deleted_at: null,
-        is_draft: true,
       }),
   );
 
-  readonly loadProfileFieldValue = this.buildLoader<
+  readonly loadProfileFieldValueWithDraft = this.buildLoader<
     {
       profileId: number;
       profileTypeFieldId: number;
     },
-    ProfileFieldValue | null,
+    { value: ProfileFieldValue | null; draftValue: ProfileFieldValue | null },
     string
   >(
     async (keys, t) => {
@@ -655,11 +654,13 @@ export class ProfileRepository extends BaseRepository {
         .where({
           removed_at: null,
           deleted_at: null,
-          is_draft: false,
         });
 
-      const byKey = indexBy(values, keyBuilder(["profile_id", "profile_type_field_id"]));
-      return keys.map(keyBuilder(["profileId", "profileTypeFieldId"])).map((k) => byKey[k] ?? null);
+      const byKey = groupBy(values, keyBuilder(["profile_id", "profile_type_field_id"]));
+      return keys.map(keyBuilder(["profileId", "profileTypeFieldId"])).map((k) => ({
+        value: (byKey[k] ?? []).find((v) => !v.is_draft) ?? null,
+        draftValue: (byKey[k] ?? []).find((v) => v.is_draft) ?? null,
+      }));
     },
     { cacheKeyFn: keyBuilder(["profileId", "profileTypeFieldId"]) },
   );
@@ -1153,12 +1154,15 @@ export class ProfileRepository extends BaseRepository {
               pfv.profile_id = nv.profile_id 
               and pfv.profile_type_field_id = nv.profile_type_field_id
             and (
-              nv.content is null -- explicitly removed
-              or (nv.content != 'null'::jsonb and not profile_field_value_content_is_equal(pfv.type, pfv.content, nv.content)) -- explicitly updated
-              or (nv.expiry_date != '-infinity'::date and (
-                (nv.expiry_date is null and pfv.expiry_date is not null)
-                or (nv.expiry_date is not null and (pfv.expiry_date is null or pfv.expiry_date != nv.expiry_date))
-              )) -- explicitly updated expiry date
+              pfv.is_draft -- draft is always removed if exists
+              or (
+                nv.content is null -- explicitly removed
+                or (nv.content != 'null'::jsonb and not profile_field_value_content_is_equal(pfv.type, pfv.content, nv.content)) -- explicitly updated
+                or (nv.expiry_date != '-infinity'::date and (
+                  (nv.expiry_date is null and pfv.expiry_date is not null)
+                  or (nv.expiry_date is not null and (pfv.expiry_date is null or pfv.expiry_date != nv.expiry_date))
+                )) -- explicitly updated expiry date
+              )
             )
             and pfv.removed_at is null
             returning pfv.*
@@ -1384,6 +1388,7 @@ export class ProfileRepository extends BaseRepository {
       type: ProfileTypeFieldType;
       content?: Record<string, any> | null;
       expiryDate?: string | null;
+      pendingReview?: boolean;
     }[],
     userId: number | null,
   ) {
@@ -1396,22 +1401,25 @@ export class ProfileRepository extends BaseRepository {
     await this.raw(
       /* sql */ `
         with new_values as (
-          select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date)
+          select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date, pending_review)
         )
-        insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, is_draft)
+        insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, pending_review, active_monitoring, created_by_user_id, is_draft)
         select
           nv.profile_id,
           nv.profile_type_field_id,
           nv.type,
           nv.content,
           nv.expiry_date,
+          nv.pending_review,
+          case when nv.type in ('BACKGROUND_CHECK', 'ADVERSE_MEDIA_SEARCH') then true else false end, -- this fields are monitored by default
           ?,
           true
         from new_values nv
         on conflict ("profile_id", "profile_type_field_id") where ((removed_at is null) and (deleted_at is null) and (is_draft = true))
         do update
         set
-          content = EXCLUDED.content
+          content = EXCLUDED.content,
+          pending_review = EXCLUDED.pending_review
         returning *;
       `,
       [
@@ -1424,23 +1432,13 @@ export class ProfileRepository extends BaseRepository {
               ? JSON.stringify(this.profileTypeFields.mapValueContentToDatabase(f.type, f.content))
               : null,
             f.expiryDate ?? null,
+            f.pendingReview ?? false,
           ]),
-          ["int", "int", "profile_type_field_type", "jsonb", "date"],
+          ["int", "int", "profile_type_field_type", "jsonb", "date", "boolean"],
         ),
         userId,
       ],
     );
-  }
-
-  async deleteDraftProfileFieldValue(id: number, t?: Knex.Transaction) {
-    await this.from("profile_field_value", t)
-      .where({
-        id,
-        deleted_at: null,
-        removed_at: null,
-        is_draft: true,
-      })
-      .delete();
   }
 
   async profileFieldRepliesHaveExpiryDateSet(
@@ -2598,7 +2596,6 @@ export class ProfileRepository extends BaseRepository {
    * profile field values for monitoring refresh must meet the following criteria:
    *  - profile must be OPEN
    *  - active_monitoring must be true
-   *  - value must not have an unsaved draft
    *  - value's property must have monitoring config set
    *  - if monitoring config has activation conditions, those must pass
    */
@@ -2610,17 +2607,18 @@ export class ProfileRepository extends BaseRepository {
       monitoring: ProfileTypeFieldMonitoring,
       selectPfvs: Pick<ProfileFieldValue, "profile_type_field_id" | "content">[],
     ) => boolean,
-  ): Promise<ProfileFieldValue[]> {
+  ) {
     const profileFieldValues = await this.raw<
       ProfileFieldValue & {
         monitoring: ProfileTypeFieldMonitoring;
         select_values: Pick<ProfileFieldValue, "profile_type_field_id" | "content">[];
+        has_draft: boolean;
       }
     >(
       /* sql */ `
-        select 
-          pfv.*,
-          ptf.options->'monitoring' as monitoring,
+          select 
+            pfv.*,
+            ptf.options->'monitoring' as monitoring,
           coalesce(
 	          jsonb_agg(
 	            jsonb_build_object(
@@ -2629,39 +2627,39 @@ export class ProfileRepository extends BaseRepository {
 	            )
 	          ) filter (where select_pfv.profile_type_field_id is not null),
 	          '[]'::jsonb
-          ) as select_values
-        from profile p
-        join profile_field_value pfv
-          on pfv.profile_id = p.id
-          and pfv.type = :type
-          and pfv.removed_at is null
-          and pfv.deleted_at is null
-          and pfv.is_draft = false
-          and pfv.active_monitoring = true
-        left join profile_field_value draft_pfv
-          on draft_pfv.profile_id = pfv.profile_id
-          and draft_pfv.profile_type_field_id = pfv.profile_type_field_id
-          and draft_pfv.type = pfv.type
-          and draft_pfv.removed_at is null
-          and draft_pfv.deleted_at is null
-          and draft_pfv.is_draft = true
-        left join profile_field_value select_pfv
-          on select_pfv.profile_id = p.id
-          and select_pfv.type = 'SELECT' 
-          and select_pfv.removed_at is null
-          and select_pfv.deleted_at is null
-          and select_pfv.is_draft = false
-        join profile_type_field ptf 
-          on ptf.id = pfv.profile_type_field_id 
-          and ptf.type = :type
-          and ptf."options"->>'monitoring' is not null
-          and ptf.deleted_at is null
-        where
-          p.status = 'OPEN'
-          and p.org_id = :orgId
-          and p.deleted_at is null
-          and draft_pfv.id is null
-        group by pfv.id, ptf.options;
+          ) as select_values,
+          draft_pfv.id is not null as has_draft
+          from profile p
+          join profile_field_value pfv
+            on pfv.profile_id = p.id
+            and pfv.type = :type
+            and pfv.removed_at is null
+            and pfv.deleted_at is null
+            and pfv.is_draft = false
+            and pfv.active_monitoring = true
+          left join profile_field_value draft_pfv
+            on draft_pfv.profile_id = pfv.profile_id
+            and draft_pfv.profile_type_field_id = pfv.profile_type_field_id
+            and draft_pfv.type = pfv.type
+            and draft_pfv.removed_at is null
+            and draft_pfv.deleted_at is null
+            and draft_pfv.is_draft = true
+          left join profile_field_value select_pfv
+            on select_pfv.profile_id = p.id
+            and select_pfv.type = 'SELECT' 
+            and select_pfv.removed_at is null
+            and select_pfv.deleted_at is null
+            and select_pfv.is_draft = false
+          join profile_type_field ptf 
+            on ptf.id = pfv.profile_type_field_id 
+            and ptf.type = :type
+            and ptf."options"->>'monitoring' is not null
+            and ptf.deleted_at is null
+          where
+            p.status = 'OPEN'
+            and p.org_id = :orgId
+            and p.deleted_at is null
+        group by pfv.id, ptf.options, draft_pfv.id;
       `,
       { orgId, type },
     );
@@ -3410,7 +3408,7 @@ export class ProfileRepository extends BaseRepository {
   async updateProfileFieldValueOptionsByProfileId(
     profileId: number,
     profileTypeFieldId: number,
-    data: Pick<ProfileFieldValue, "active_monitoring">,
+    data: Partial<Pick<ProfileFieldValue, "active_monitoring" | "pending_review">>,
   ) {
     await this.from("profile_field_value")
       .where({

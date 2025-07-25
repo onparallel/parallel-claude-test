@@ -12,7 +12,6 @@ import {
   Profile,
   ProfileType,
   ProfileTypeField,
-  ProfileTypeFieldPermission,
   ProfileTypeFieldType,
   User,
   UserGroup,
@@ -464,6 +463,7 @@ describe("GraphQL/Profiles", () => {
             },
             search: {
               totalCount: 1,
+              items: [], // doesn't matter
               createdAt: new Date(),
             },
             entity: null,
@@ -495,6 +495,7 @@ describe("GraphQL/Profiles", () => {
             },
             search: {
               totalCount: 2,
+              items: [], // doesn't matter
               createdAt: new Date(),
             },
             entity: {
@@ -523,8 +524,9 @@ describe("GraphQL/Profiles", () => {
               type: "PERSON",
             },
             search: {
-              items: [],
               totalCount: 0,
+              items: [], // doesn't matter
+              createdAt: new Date(),
             },
             entity: null,
           }),
@@ -10514,25 +10516,29 @@ describe("GraphQL/Profiles", () => {
     });
   });
 
-  describe("copyBackgroundCheckReplyToProfileFieldValue", () => {
+  describe("copyReplyContentToProfileFieldValue", () => {
     let petition: Petition;
     let textReply: PetitionFieldReply;
-    let backgroundCheckReply: PetitionFieldReply;
 
     let profile: Profile;
-    let profileTypeField: ProfileTypeField;
-    let profileTypeFieldPermission: ProfileTypeFieldPermission;
 
-    beforeEach(async () => {
+    let withSavedEntity: PetitionFieldReply;
+    let withAllFalsePositives: PetitionFieldReply;
+    let withNoSavedEntity: PetitionFieldReply;
+    let withEmptySearch: PetitionFieldReply;
+
+    beforeAll(async () => {
       [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
       const petitionFields = await mocks.createRandomPetitionFields(petition.id, 2, (i) => ({
         type: ["TEXT", "BACKGROUND_CHECK"][i] as PetitionFieldType,
+        multiple: true,
       }));
 
       [textReply] = await mocks.createRandomTextReply(petitionFields[0].id, undefined, 1, () => ({
         user_id: sessionUser.id,
       }));
-      [backgroundCheckReply] = await mocks.createRandomTextReply(
+
+      [withSavedEntity] = await mocks.createRandomTextReply(
         petitionFields[1].id,
         undefined,
         1,
@@ -10546,8 +10552,15 @@ describe("GraphQL/Profiles", () => {
               type: "PERSON",
             },
             search: {
-              items: [],
-              totalCount: 0,
+              totalCount: 1,
+              items: [
+                {
+                  id: "Q7747",
+                  type: "Person",
+                  name: "Vladimir Vladimirovich PUTIN",
+                  properties: {},
+                },
+              ],
               createdAt: new Date().toISOString(),
             },
             entity: {
@@ -10561,33 +10574,127 @@ describe("GraphQL/Profiles", () => {
         }),
       );
 
-      const [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
-      [profileTypeField] = await mocks.createRandomProfileTypeFields(
-        organization.id,
-        profileType.id,
+      [withAllFalsePositives] = await mocks.createRandomTextReply(
+        petitionFields[1].id,
+        undefined,
         1,
         () => ({
+          user_id: sessionUser.id,
           type: "BACKGROUND_CHECK",
-          permission: "HIDDEN",
+          content: {
+            query: {
+              name: "Vladimir Putin",
+              date: null,
+              type: "PERSON",
+            },
+            search: {
+              totalCount: 2,
+              items: [
+                {
+                  id: "Q7747",
+                  type: "Person",
+                  name: "Vladimir Vladimirovich PUTIN",
+                  properties: {},
+                },
+                {
+                  id: "Q7748",
+                  type: "Person",
+                  name: "Vladimir Vladimirovich PUTIN",
+                  properties: {},
+                },
+              ],
+              createdAt: new Date().toISOString(),
+            },
+            entity: null,
+            falsePositives: [
+              { id: "Q7747", addedAt: new Date().toISOString(), addedByUserId: sessionUser.id },
+              { id: "Q7748", addedAt: new Date().toISOString(), addedByUserId: sessionUser.id },
+            ],
+          },
         }),
       );
 
-      [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
-
-      [profileTypeFieldPermission] = await mocks.knex
-        .from("profile_type_field_permission")
-        .insert({
-          permission: "WRITE",
+      [withNoSavedEntity] = await mocks.createRandomTextReply(
+        petitionFields[1].id,
+        undefined,
+        1,
+        () => ({
           user_id: sessionUser.id,
-          profile_type_field_id: profileTypeField.id,
-        })
-        .returning("*");
+          type: "BACKGROUND_CHECK",
+          content: {
+            query: {
+              name: "Vladimir Putin",
+              date: null,
+              type: "PERSON",
+            },
+            search: {
+              totalCount: 2,
+              items: [
+                {
+                  id: "Q7747",
+                  type: "Person",
+                  name: "Vladimir Vladimirovich PUTIN",
+                  properties: {},
+                },
+                {
+                  id: "Q7748",
+                  type: "Person",
+                  name: "Vladimir Vladimirovich PUTIN",
+                  properties: {},
+                },
+              ],
+              createdAt: new Date().toISOString(),
+            },
+            entity: null,
+            falsePositives: [
+              { id: "Q7747", addedAt: new Date().toISOString(), addedByUserId: sessionUser.id },
+            ],
+          },
+        }),
+      );
+
+      [withEmptySearch] = await mocks.createRandomTextReply(
+        petitionFields[1].id,
+        undefined,
+        1,
+        () => ({
+          user_id: sessionUser.id,
+          type: "BACKGROUND_CHECK",
+          content: {
+            query: {
+              name: "Vladimir Putin",
+              date: null,
+              type: "PERSON",
+            },
+            search: {
+              totalCount: 0,
+              items: [],
+              createdAt: new Date().toISOString(),
+            },
+            entity: null,
+          },
+        }),
+      );
+    });
+
+    beforeEach(async () => {
+      await mocks.knex.from("profile_type_field_permission").insert({
+        profile_type_field_id: profileType0Fields[8].id,
+        permission: "WRITE",
+        user_id: sessionUser.id,
+      });
+
+      [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[0].id);
     });
 
     it("fails if user does not have WRITE permission on the profile type field", async () => {
+      await mocks.knex.from("profile_type_field").where("id", profileType0Fields[8].id).update({
+        permission: "HIDDEN",
+      });
+
       await mocks.knex
         .from("profile_type_field_permission")
-        .where("id", profileTypeFieldPermission.id)
+        .where({ profile_type_field_id: profileType0Fields[8].id, user_id: sessionUser.id })
         .update({ permission: "READ" });
 
       const { errors, data } = await testClient.execute(
@@ -10598,7 +10705,7 @@ describe("GraphQL/Profiles", () => {
             $profileId: GID!
             $profileTypeFieldId: GID!
           ) {
-            copyBackgroundCheckReplyToProfileFieldValue(
+            copyReplyContentToProfileFieldValue(
               petitionId: $petitionId
               replyId: $replyId
               profileId: $profileId
@@ -10611,11 +10718,15 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           petitionId: toGlobalId("Petition", petition.id),
-          replyId: toGlobalId("PetitionFieldReply", backgroundCheckReply.id),
+          replyId: toGlobalId("PetitionFieldReply", withSavedEntity.id),
           profileId: toGlobalId("Profile", profile.id),
-          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
         },
       );
+
+      await mocks.knex.from("profile_type_field").where("id", profileType0Fields[8].id).update({
+        permission: "WRITE",
+      });
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -10630,7 +10741,7 @@ describe("GraphQL/Profiles", () => {
             $profileId: GID!
             $profileTypeFieldId: GID!
           ) {
-            copyBackgroundCheckReplyToProfileFieldValue(
+            copyReplyContentToProfileFieldValue(
               petitionId: $petitionId
               replyId: $replyId
               profileId: $profileId
@@ -10645,7 +10756,7 @@ describe("GraphQL/Profiles", () => {
           petitionId: toGlobalId("Petition", petition.id),
           replyId: toGlobalId("PetitionFieldReply", textReply.id),
           profileId: toGlobalId("Profile", profile.id),
-          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
         },
       );
 
@@ -10653,7 +10764,7 @@ describe("GraphQL/Profiles", () => {
       expect(data).toBeNull();
     });
 
-    it("copies BACKGROUND_CHECK reply to profile", async () => {
+    it("copies BACKGROUND_CHECK reply with saved entity to profile as non-draft value", async () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation (
@@ -10662,7 +10773,7 @@ describe("GraphQL/Profiles", () => {
             $profileId: GID!
             $profileTypeFieldId: GID!
           ) {
-            copyBackgroundCheckReplyToProfileFieldValue(
+            copyReplyContentToProfileFieldValue(
               petitionId: $petitionId
               replyId: $replyId
               profileId: $profileId
@@ -10670,20 +10781,22 @@ describe("GraphQL/Profiles", () => {
             ) {
               id
               content
+              isDraft
             }
           }
         `,
         {
           petitionId: toGlobalId("Petition", petition.id),
-          replyId: toGlobalId("PetitionFieldReply", backgroundCheckReply.id),
+          replyId: toGlobalId("PetitionFieldReply", withSavedEntity.id),
           profileId: toGlobalId("Profile", profile.id),
-          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
         },
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.copyBackgroundCheckReplyToProfileFieldValue).toEqual({
+      expect(data?.copyReplyContentToProfileFieldValue).toEqual({
         id: expect.any(String),
+        isDraft: false,
         content: {
           query: {
             name: "Vladimir Putin",
@@ -10691,7 +10804,8 @@ describe("GraphQL/Profiles", () => {
             type: "PERSON",
           },
           search: {
-            totalCount: 0,
+            totalCount: 1,
+            falsePositivesCount: 0,
             createdAt: expect.any(String),
           },
           entity: {
@@ -10701,6 +10815,153 @@ describe("GraphQL/Profiles", () => {
             properties: {},
             createdAt: expect.any(String),
           },
+        },
+      });
+    });
+
+    it("copies BACKGROUND_CHECK reply with all false positives to profile as non-draft value", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $replyId: GID!
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+          ) {
+            copyReplyContentToProfileFieldValue(
+              petitionId: $petitionId
+              replyId: $replyId
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+            ) {
+              id
+              content
+              isDraft
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", withAllFalsePositives.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.copyReplyContentToProfileFieldValue).toEqual({
+        id: expect.any(String),
+        isDraft: false,
+        content: {
+          query: {
+            name: "Vladimir Putin",
+            date: null,
+            type: "PERSON",
+          },
+          search: {
+            totalCount: 2,
+            falsePositivesCount: 2,
+            createdAt: expect.any(String),
+          },
+          entity: null,
+        },
+      });
+    });
+
+    it("copies BACKGROUND_CHECK reply with no saved entity to profile as draft value", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $replyId: GID!
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+          ) {
+            copyReplyContentToProfileFieldValue(
+              petitionId: $petitionId
+              replyId: $replyId
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+            ) {
+              id
+              content
+              isDraft
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", withNoSavedEntity.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.copyReplyContentToProfileFieldValue).toEqual({
+        id: expect.any(String),
+        isDraft: true,
+        content: {
+          query: {
+            name: "Vladimir Putin",
+            date: null,
+            type: "PERSON",
+          },
+          search: {
+            totalCount: 2,
+            falsePositivesCount: 1,
+            createdAt: expect.any(String),
+          },
+          entity: null,
+        },
+      });
+    });
+
+    it("copies BACKGROUND_CHECK reply with empty search to profile as draft value", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $replyId: GID!
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+          ) {
+            copyReplyContentToProfileFieldValue(
+              petitionId: $petitionId
+              replyId: $replyId
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+            ) {
+              id
+              content
+              isDraft
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", withEmptySearch.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.copyReplyContentToProfileFieldValue).toEqual({
+        id: expect.any(String),
+        isDraft: true,
+        content: {
+          query: {
+            name: "Vladimir Putin",
+            date: null,
+            type: "PERSON",
+          },
+          search: {
+            totalCount: 0,
+            falsePositivesCount: 0,
+            createdAt: expect.any(String),
+          },
+          entity: null,
         },
       });
     });

@@ -610,6 +610,41 @@
     "context": "Profile"
   },
   {
+    "term": "component.background-check-badges.false-positives-text",
+    "definition": "Falsos positivos",
+    "context": "False positives"
+  },
+  {
+    "term": "component.background-check-badges.pending-resolution-popover",
+    "definition": "Marca una coincidencia si la hay, o indica que todos los resultados son falsos positivos para marcar esta propiedad como resuelta.",
+    "context": "Save a match if there is one, or indicate that all results are false positives to mark this field as resolved."
+  },
+  {
+    "term": "component.background-check-badges.pending-resolution-text",
+    "definition": "Falta resolución",
+    "context": "Pending resolution"
+  },
+  {
+    "term": "component.background-check-badges.pending-review-popover",
+    "definition": "Hay actualizaciones pendientes. Por favor, confírmalas o descártalas.",
+    "context": "There are new updates. Please, confirm or discard them."
+  },
+  {
+    "term": "component.background-check-badges.pending-review-text",
+    "definition": "Alerta",
+    "context": "Alert"
+  },
+  {
+    "term": "component.background-check-contents-not-updated-dialog.header",
+    "definition": "No se encontraron cambios",
+    "context": "No changes found"
+  },
+  {
+    "term": "component.background-check-contents-not-updated-dialog.message",
+    "definition": "No se han actualizado los resultados ya que no han habido cambios desde la última búsqueda.",
+    "context": "We have not updated the results as nothing has changed since the last search."
+  },
+  {
     "term": "component.background-check-entity-details-company-basic.date-of-registration",
     "definition": "Fecha de registro",
     "context": "Date of registration"
@@ -805,6 +840,21 @@
     "context": "Individuals"
   },
   {
+    "term": "component.background-check-profile-details.mark-as-reviewed",
+    "definition": "Marcar como revisado",
+    "context": "Mark as reviewed"
+  },
+  {
+    "term": "component.background-check-search-result.automatically-saved-search-text",
+    "definition": "Hemos guardado la búsqueda automáticamente para conservar la evidencia de cara a una futura auditoría.",
+    "context": "We have automatically saved the search to preserve the evidence for a future audit."
+  },
+  {
+    "term": "component.background-check-search-result.company",
+    "definition": "Compañía",
+    "context": "Company"
+  },
+  {
     "term": "component.background-check-search-result.country-of-birth",
     "definition": "País de nacimiento",
     "context": "Country of birth"
@@ -820,6 +870,11 @@
     "context": "Date of birth"
   },
   {
+    "term": "component.background-check-search-result.false-positive",
+    "definition": "Falso positivo",
+    "context": "False positive"
+  },
+  {
     "term": "component.background-check-search-result.gender",
     "definition": "Género",
     "context": "Gender"
@@ -828,6 +883,16 @@
     "term": "component.background-check-search-result.incorporation-date",
     "definition": "Fecha de incorporación",
     "context": "Incorporation date"
+  },
+  {
+    "term": "component.background-check-search-result.manual-save-search-profile-text",
+    "definition": "<b>Guarda la búsqueda en el perfil</b> para conservar la evidencia para una futura auditoría.",
+    "context": "<b>Save the search to the profile</b> to preserve the evidence for a future audit."
+  },
+  {
+    "term": "component.background-check-search-result.mark-as-false-positives",
+    "definition": "Marcar como falsos positivos",
+    "context": "Mark as false positives"
   },
   {
     "term": "component.background-check-search-result.modify-search",
@@ -845,9 +910,14 @@
     "context": "It seems that the entity you are looking for is not listed anywhere!"
   },
   {
-    "term": "component.background-check-search-result.none-of-these-results",
-    "definition": "¿No es ninguno de estos resultados?",
-    "context": "None of these results?"
+    "term": "component.background-check-search-result.person",
+    "definition": "Persona",
+    "context": "Person"
+  },
+  {
+    "term": "component.background-check-search-result.refresh-search",
+    "definition": "Actualizar búsqueda",
+    "context": "Refresh search"
   },
   {
     "term": "component.background-check-search-result.results-found",
@@ -860,9 +930,9 @@
     "context": "Risk labels"
   },
   {
-    "term": "component.background-check-search-result.save-search-text",
-    "definition": "Hemos guardado la búsqueda automáticamente para conservar la evidencia de cara a una futura auditoría.",
-    "context": "We have automatically saved the search to preserve the evidence for a future audit."
+    "term": "component.background-check-search-result.save-match",
+    "definition": "Marcar coincidencia",
+    "context": "Save match"
   },
   {
     "term": "component.background-check-search-result.score",
@@ -870,9 +940,24 @@
     "context": "Score"
   },
   {
+    "term": "component.background-check-search-result.search-refreshed-toast-description",
+    "definition": "Se han actualizado los resultados de la búsqueda.",
+    "context": "The search results have been refreshed."
+  },
+  {
+    "term": "component.background-check-search-result.search-refreshed-toast-title",
+    "definition": "Búsqueda actualizada",
+    "context": "Search refreshed"
+  },
+  {
     "term": "component.background-check-search-result.searching-for",
     "definition": "Búsqueda de",
     "context": "Searching for"
+  },
+  {
+    "term": "component.background-check-search-result.unmark-as-false-positive",
+    "definition": "Desmarcar como falso positivo",
+    "context": "Unmark as false positive"
   },
   {
     "term": "component.branding-document-preview.document-title",
@@ -1733,6 +1818,26 @@
     "term": "component.confirm-link-field-dialog.header",
     "definition": "Añadir campo al grupo",
     "context": "Add field to group"
+  },
+  {
+    "term": "component.confirm-modify-search-dialog.body-with-monitoring",
+    "definition": "Si continúas, se borrará la entidad guardada, lo que afectará tanto al monitoreo como al historial de búsqueda almacenado, en caso de existir. ¿Estás seguro de querer descartar esta entidad?",
+    "context": "If you proceed, the saved entity will be deleted, interrupting monitoring and erasing the search history, if any. Are you sure you want to remove this entity?"
+  },
+  {
+    "term": "component.confirm-modify-search-dialog.body-without-monitoring",
+    "definition": "Si continúas, se descartará la entidad guardada. ¿Estás seguro de querer descartar esta entidad?",
+    "context": "If you proceed, the saved entity will be deleted. Are you sure you want to remove this entity?"
+  },
+  {
+    "term": "component.confirm-modify-search-dialog.confirm",
+    "definition": "continuar",
+    "context": "continue"
+  },
+  {
+    "term": "component.confirm-modify-search-dialog.header",
+    "definition": "Modificar búsqueda",
+    "context": "Modify search"
   },
   {
     "term": "component.confirm-overwrite-options-dialog.body",
@@ -8815,6 +8920,21 @@
     "context": "View details"
   },
   {
+    "term": "component.preview-petition-field-background-check-false-positives-dialog.body",
+    "definition": "Márcalos como falsos positivos para conservar la evidencia de que han sido revisados, de cara a una futura auditoría.",
+    "context": "Mark them as false positives to keep evidence that they have been reviewed for a future audit."
+  },
+  {
+    "term": "component.preview-petition-field-background-check-false-positives-dialog.button",
+    "definition": "Marcar como falsos positivos",
+    "context": "Mark as false positives"
+  },
+  {
+    "term": "component.preview-petition-field-background-check-false-positives-dialog.header",
+    "definition": "¿No es ninguno de estos resultados?",
+    "context": "None of these results?"
+  },
+  {
     "term": "component.preview-petition-field-background-check-replace-reply-dialog.body",
     "definition": "Este campo solo admite un elemento. Si guardas una nueva, se descartará la anterior.",
     "context": "This field only admits one element. If you save a new one, the current one will be removed."
@@ -8833,16 +8953,6 @@
     "term": "component.preview-petition-field-background-check-replace-reply-dialog.yes-overwrite",
     "definition": "Sí, sobreescribir",
     "context": "Yes, overwrite"
-  },
-  {
-    "term": "component.preview-petition-field-background-check-save-search-dialog.body",
-    "definition": "En ese caso, puedes cerrar esta página. Parallel ya ha guardado la búsqueda automáticamente para conservar la evidencia de cara a una futura auditoría.",
-    "context": "In that case, you can close this page. Parallel has already automatically saved the search to preserve the evidence for a future audit."
-  },
-  {
-    "term": "component.preview-petition-field-background-check-save-search-dialog.header",
-    "definition": "¿No es ninguno de estos resultados?",
-    "context": "None of these results?"
   },
   {
     "term": "component.preview-petition-field-background-check.approved-profile",
@@ -8950,7 +9060,7 @@
     "context": "Modify search"
   },
   {
-    "term": "component.profile-field-background-check.paused-monitoring-draft",
+    "term": "component.profile-field-background-check.paused-monitoring",
     "definition": "Monitorización pausada porque hay cambios sin guardar.",
     "context": "Monitoring is paused because there are changes not saved."
   },
@@ -9120,14 +9230,19 @@
     "context": "Set expiration"
   },
   {
-    "term": "component.profile-form-field-adverse-media-search.draft",
-    "definition": "Hay cambios sin guardar",
-    "context": "There are changes not saved"
-  },
-  {
     "term": "component.profile-form-field-adverse-media-search.monitoring-active",
     "definition": "Hay noticias nuevas sin revisar",
     "context": "There is news not reviewed"
+  },
+  {
+    "term": "component.profile-form-field-adverse-media-search.pending-confirmation-badge",
+    "definition": "Falta confirmación",
+    "context": "Pending confirmation"
+  },
+  {
+    "term": "component.profile-form-field-adverse-media-search.pending-confirmation-popover",
+    "definition": "Confirma la clasificación de los artículos para marcar esta propiedad como resuelta.",
+    "context": "Confirm article classification to mark this property as resolved"
   },
   {
     "term": "component.profile-form-field-adverse-media-search.remove-adverse-media-search",
@@ -14865,6 +14980,11 @@
     "context": "has these topics"
   },
   {
+    "term": "generic.profile-field-values-filter-operator-has-pending-review",
+    "definition": "está pendiente de revisión",
+    "context": "has pending review"
+  },
+  {
     "term": "generic.profile-field-values-filter-operator-has-value",
     "definition": "tiene valor",
     "context": "has value"
@@ -14933,6 +15053,11 @@
     "term": "generic.profile-field-values-filter-operator-not-has-expiry",
     "definition": "no tiene caducidad establecida",
     "context": "has no expiry set"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-not-has-pending-review",
+    "definition": "no está pendiente de revisión",
+    "context": "does not have pending review"
   },
   {
     "term": "generic.profile-field-values-filter-operator-not-has-value",

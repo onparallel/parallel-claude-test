@@ -1,12 +1,8 @@
-import { EntityDetailsResponse, EntitySearchResponse } from "../../services/BackgroundCheckService";
-import {
-  isNotifiableEntityDifference,
-  isNotifiableSearchDifference,
-  requiresRefresh,
-} from "../helpers/monitoringUtils";
+import { EntityDetailsResponse } from "../../services/BackgroundCheckService";
+import { isRelevantEntityDifference, requiresRefresh } from "../helpers/monitoringUtils";
 
 describe("monitoringUtils", () => {
-  describe("isNotifiableEntityDifference", () => {
+  describe("isRelevantEntityDifference", () => {
     let entity: EntityDetailsResponse;
     beforeAll(() => {
       entity = {
@@ -26,7 +22,7 @@ describe("monitoringUtils", () => {
 
     test("with different type", () => {
       expect(
-        isNotifiableEntityDifference(entity, {
+        isRelevantEntityDifference(entity, {
           id: "1",
           type: "Company",
           name: "Vladimir Putin",
@@ -43,7 +39,7 @@ describe("monitoringUtils", () => {
 
     test("with more topics", () => {
       expect(
-        isNotifiableEntityDifference(entity, {
+        isRelevantEntityDifference(entity, {
           id: "1",
           type: "Person",
           name: "Vladimir Putin",
@@ -61,7 +57,7 @@ describe("monitoringUtils", () => {
 
     test("with less topics", () => {
       expect(
-        isNotifiableEntityDifference(entity, {
+        isRelevantEntityDifference(entity, {
           id: "1",
           type: "Person",
           name: "Vladimir Putin",
@@ -79,7 +75,7 @@ describe("monitoringUtils", () => {
 
     test("with different topics", () => {
       expect(
-        isNotifiableEntityDifference(entity, {
+        isRelevantEntityDifference(entity, {
           id: "1",
           type: "Person",
           name: "Vladimir Putin",
@@ -97,7 +93,7 @@ describe("monitoringUtils", () => {
 
     test("with more alias", () => {
       expect(
-        isNotifiableEntityDifference(entity, {
+        isRelevantEntityDifference(entity, {
           id: "1",
           type: "Person",
           name: "Vladimir Putin",
@@ -115,7 +111,7 @@ describe("monitoringUtils", () => {
 
     test("with more properties", () => {
       expect(
-        isNotifiableEntityDifference(entity, {
+        isRelevantEntityDifference(entity, {
           id: "1",
           type: "Person",
           name: "Vladimir Putin",
@@ -135,7 +131,7 @@ describe("monitoringUtils", () => {
 
     test("same entity", () => {
       expect(
-        isNotifiableEntityDifference(entity, {
+        isRelevantEntityDifference(entity, {
           id: "1",
           type: "Person",
           name: "Vladimir Putin",
@@ -153,7 +149,7 @@ describe("monitoringUtils", () => {
 
     test("with new sanctions", () => {
       expect(
-        isNotifiableEntityDifference(entity, {
+        isRelevantEntityDifference(entity, {
           id: "1",
           type: "Person",
           name: "Vladimir Putin",
@@ -174,7 +170,7 @@ describe("monitoringUtils", () => {
 
     test("with less sanctions", () => {
       expect(
-        isNotifiableEntityDifference(entity, {
+        isRelevantEntityDifference(entity, {
           id: "1",
           type: "Person",
           name: "Vladimir Putin",
@@ -192,7 +188,7 @@ describe("monitoringUtils", () => {
 
     test("with different sanctions", () => {
       expect(
-        isNotifiableEntityDifference(entity, {
+        isRelevantEntityDifference(entity, {
           id: "1",
           type: "Person",
           name: "Vladimir Putin",
@@ -203,97 +199,6 @@ describe("monitoringUtils", () => {
             country: ["RU"],
             sanctions: [{ id: "sanction-2", type: "Sanction", properties: {} }],
           },
-          createdAt: new Date(),
-        }),
-      ).toBe(true);
-    });
-  });
-
-  describe("isNotifiableSearchDifference", () => {
-    let search: EntitySearchResponse;
-    beforeAll(() => {
-      search = {
-        totalCount: 3,
-        items: [
-          {
-            id: "1",
-            type: "Person",
-            name: "Vladimir Vladimirovich Putin",
-            properties: { topics: ["pep", "san", "spy"] },
-          },
-          { id: "2", type: "Person", name: "Vladimir Pekhtin", properties: { topics: ["pep"] } },
-          {
-            id: "3",
-            type: "Company",
-            name: "Military Commissariat of Vladimir Region",
-            properties: { topics: ["gov"] },
-          },
-        ],
-        createdAt: new Date(),
-      };
-    });
-
-    test("with less results", () => {
-      expect(
-        isNotifiableSearchDifference(search, {
-          totalCount: 2,
-          items: search.items.slice(0, 2),
-          createdAt: new Date(),
-        }),
-      ).toBe(false);
-    });
-
-    test("with more results", () => {
-      expect(
-        isNotifiableSearchDifference(search, {
-          totalCount: 4,
-          items: search.items.concat({
-            id: "4",
-            type: "Person",
-            name: "Vladimir Putin",
-            properties: { topics: ["pep"] },
-          }),
-          createdAt: new Date(),
-        }),
-      ).toBe(true);
-    });
-
-    test("with different results", () => {
-      expect(
-        isNotifiableSearchDifference(search, {
-          totalCount: 3,
-          items: [
-            {
-              id: "1",
-              type: "Person",
-              name: "Vladimir Vladimirovich Putin",
-              properties: { topics: ["pep", "san", "spy"] },
-            },
-            { id: "2", type: "Person", name: "Vladimir Pekhtin", properties: { topics: ["pep"] } },
-            {
-              id: "4",
-              type: "Company",
-              name: "Military Commissariat of Vladimir Region",
-              properties: { topics: ["gov"] },
-            },
-          ],
-          createdAt: new Date(),
-        }),
-      ).toBe(true);
-    });
-
-    test("with a single different result", () => {
-      expect(
-        isNotifiableSearchDifference(search, {
-          totalCount: 1,
-          items: [
-            {
-              id: "4",
-              type: "Person",
-              name: "Vladimir Vladimirovich Putin",
-              properties: { topics: ["pep", "san", "spy"] },
-            },
-          ],
           createdAt: new Date(),
         }),
       ).toBe(true);

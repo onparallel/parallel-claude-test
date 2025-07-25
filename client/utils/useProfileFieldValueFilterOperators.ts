@@ -223,6 +223,20 @@ export function useProfileFieldValueFilterOperators(
           }),
           value: "NOT_HAS_ANY_BG_CHECK_TOPICS",
         },
+        {
+          label: intl.formatMessage({
+            id: "generic.profile-field-values-filter-operator-has-pending-review",
+            defaultMessage: "has pending review",
+          }),
+          value: "HAS_PENDING_REVIEW",
+        },
+        {
+          label: intl.formatMessage({
+            id: "generic.profile-field-values-filter-operator-not-has-pending-review",
+            defaultMessage: "does not have pending review",
+          }),
+          value: "NOT_HAS_PENDING_REVIEW",
+        },
       );
     }
     if (field.isExpirable) {

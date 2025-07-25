@@ -1,7 +1,7 @@
 import { subDays, subMonths, subYears } from "date-fns";
 import { isNonNullish } from "remeda";
 import { ProfileFieldValue } from "../../db/__types";
-import { EntityDetailsResponse, EntitySearchResponse } from "../../services/BackgroundCheckService";
+import { EntityDetailsResponse } from "../../services/BackgroundCheckService";
 import { ProfileTypeFieldMonitoring } from "../../services/ProfileTypeFieldService";
 
 /**
@@ -83,12 +83,12 @@ export function requiresRefresh(currentDate: Date) {
 }
 
 /**
- * a difference between two entities is notifiable if:
+ * a difference between two entities is relevant if:
  *  - the entity id or type has changed (its another entity)
  *  - the topics have changed in any way (more, less or different)
  *  - the sanctions have changed in any way (more, less or different)
  */
-export function isNotifiableEntityDifference(a: EntityDetailsResponse, b: EntityDetailsResponse) {
+export function isRelevantEntityDifference(a: EntityDetailsResponse, b: EntityDetailsResponse) {
   if (a.id !== b.id) {
     return true;
   }
@@ -112,28 +112,6 @@ export function isNotifiableEntityDifference(a: EntityDetailsResponse, b: Entity
     .sort()
     .join(",");
   if (sanctionsA !== sanctionsB) {
-    return true;
-  }
-
-  return false;
-}
-
-/**
- * a difference between two searches is notifiable if:
- *  - the total count of results has increased
- *  - the ids of the results have changed (different results)
- */
-export function isNotifiableSearchDifference(a: EntitySearchResponse, b: EntitySearchResponse) {
-  if (a.totalCount < b.totalCount) {
-    // new items have been found
-    return true;
-  }
-
-  const idsA = a.items.map((i) => i.id).sort();
-  const idsB = b.items.map((i) => i.id).sort();
-
-  if (!idsB.every((id) => idsA.includes(id))) {
-    // less or same amount of results as before, but with different ids
     return true;
   }
 

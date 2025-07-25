@@ -457,6 +457,7 @@ export function ProfileValueFilterLine({
         "HAS_ANY_BG_CHECK_TOPICS",
         "IS_EXPIRED",
         "HAS_EXPIRY",
+        "HAS_PENDING_REVIEW",
       ].includes(operator.startsWith("NOT_") ? operator.slice("NOT_".length) : operator) ? (
         <></>
       ) : (

@@ -23,16 +23,9 @@ export class BackgroundCheckProfilePdfRunner extends TaskRunner<"BACKGROUND_CHEC
           r.parent_petition_field_reply_id === (params.parentReplyId ?? null),
       )?.content;
     } else if ("profileId" in params) {
-      const profileFieldValues = await this.ctx.profiles.loadProfileFieldValuesByProfileId(
-        params.profileId,
-      );
-
-      replyContent = profileFieldValues.find(
-        (pfv) =>
-          pfv.type === "BACKGROUND_CHECK" &&
-          pfv.profile_type_field_id === params.profileTypeFieldId &&
-          pfv.content.entity?.id === entityId,
-      )?.content;
+      // PDFs are generated based on a entity match, so in this case there should never be a draft
+      const { value } = await this.ctx.profiles.loadProfileFieldValueWithDraft(params);
+      replyContent = value && value.content.entity?.id === entityId ? value.content : null;
     }
 
     const props = isNonNullish(replyContent)

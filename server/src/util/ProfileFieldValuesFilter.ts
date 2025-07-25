@@ -41,6 +41,8 @@ export const ProfileFieldValuesFilterOperatorValues = [
   "EXPIRES_IN",
   "HAS_EXPIRY",
   "NOT_HAS_EXPIRY",
+  "HAS_PENDING_REVIEW",
+  "NOT_HAS_PENDING_REVIEW",
 ] as const;
 
 export type ProfileFieldValuesFilterOperator =
@@ -195,6 +197,8 @@ function validateSchema(
               "NOT_HAS_BG_CHECK_TOPICS",
               "HAS_ANY_BG_CHECK_TOPICS",
               "NOT_HAS_ANY_BG_CHECK_TOPICS",
+              "HAS_PENDING_REVIEW",
+              "NOT_HAS_PENDING_REVIEW",
             ],
             profileTypeField,
           );
@@ -206,6 +210,8 @@ function validateSchema(
               "NOT_HAS_BG_CHECK_MATCH",
               "HAS_ANY_BG_CHECK_TOPICS",
               "NOT_HAS_ANY_BG_CHECK_TOPICS",
+              "HAS_PENDING_REVIEW",
+              "NOT_HAS_PENDING_REVIEW",
             ].includes(value.operator)
           ) {
             assert(isNullish(value.value), `value not needed when ${value.operator}`);

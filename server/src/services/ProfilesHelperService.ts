@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { format as formatPhoneNumber } from "libphonenumber-js";
 import { isNonNullish, pick } from "remeda";
-import { ProfileFieldValue } from "../db/__types";
+import { PetitionFieldType, ProfileFieldValue, ProfileTypeFieldType } from "../db/__types";
 import { ProfileRepository } from "../db/repositories/ProfileRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { ForbiddenError } from "../graphql/helpers/errors";
@@ -11,6 +11,7 @@ import {
   AdverseMediaSearchContent,
   IAdverseMediaSearchService,
 } from "./AdverseMediaSearchService";
+import { BackgroundCheckContent } from "./BackgroundCheckService";
 
 export const PROFILES_HELPER_SERVICE = Symbol.for("PROFILES_HELPER_SERVICE");
 
@@ -45,17 +46,18 @@ export class ProfilesHelperService {
 
   mapValueContentFromDatabase(pfv: Pick<ProfileFieldValue, "type" | "content" | "is_draft">) {
     if (pfv.type === "BACKGROUND_CHECK") {
+      const content = pfv.content as BackgroundCheckContent;
       return {
-        query: isNonNullish(pfv.content.query)
-          ? pick(pfv.content.query, ["name", "date", "type", "country", "birthCountry"])
-          : null,
-        search: isNonNullish(pfv.content.search)
-          ? pick(pfv.content.search, ["totalCount", "createdAt"])
-          : null,
-        entity: isNonNullish(pfv.content.entity)
+        query: content.query,
+        search: {
+          falsePositivesCount: (content.falsePositives ?? []).length,
+          totalCount: content.search.totalCount,
+          createdAt: content.search.createdAt,
+        },
+        entity: isNonNullish(content.entity)
           ? {
-              ...pick(pfv.content.entity, ["id", "type", "name", "createdAt"]),
-              properties: pick(pfv.content.entity.properties, ["topics"]),
+              ...pick(content.entity, ["id", "type", "name", "createdAt"]),
+              properties: pick(content.entity.properties, ["topics"]),
             }
           : null,
       };
@@ -80,5 +82,43 @@ export class ProfilesHelperService {
     } else {
       return pfv.content;
     }
+  }
+
+  /**
+   * Checks if the content for a profile field should be considered a "draft" when copying from a petition field reply.
+   *
+   * For BACKGROUND_CHECK fields:
+   * - If there is a matched entity (a "hit"), it's not a draft.
+   * - If the search found no results, its a draft as user needs to explicitly save the search criteria.
+   * - If all search results are marked as false positives, it's not a draft (completed).
+   * - If there is at least one search result not marked as a false positive, it's still a draft.
+   *
+   * For all other field types, this always returns false (never a draft).
+   *
+   * @param type The type of the profile field (e.g., "BACKGROUND_CHECK").
+   * @param content The value/content of the field. Its content is expected to be valid for the given type.
+   * @returns {boolean} True if the content is still a draft, false otherwise.
+   */
+  public isDraftContent(type: ProfileTypeFieldType | PetitionFieldType, content: any): boolean {
+    if (type === "BACKGROUND_CHECK") {
+      const _content = content as BackgroundCheckContent;
+      if (isNonNullish(_content.entity)) {
+        // There is a hit, so it's not a draft
+        return false;
+      }
+
+      if (_content.search.totalCount === 0) {
+        // Search gives no results, so it's a draft as user needs to explicitly save the search criteria
+        return true;
+      }
+
+      const falsePositiveIds = (_content.falsePositives ?? []).map(({ id }) => id);
+      // If every search result is a false positive, it's not a draft (completed)
+      // If at least one result is not a false positive, it's still a draft
+      return !_content.search.items.every((item) => falsePositiveIds.includes(item.id));
+    }
+
+    // Every other field type will never be a draft
+    return false;
   }
 }

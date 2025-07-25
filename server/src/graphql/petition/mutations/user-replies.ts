@@ -18,22 +18,13 @@ import { PetitionFieldOptions } from "../../../services/PetitionFieldService";
 import { fromGlobalId, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { never } from "../../../util/never";
-import { isAtLeast } from "../../../util/profileTypeFieldPermission";
 import { random } from "../../../util/token";
-import { SUCCESS } from "../../helpers/Success";
 import { and, authenticateAnd, chain, not } from "../../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonObjectArg } from "../../helpers/scalars/JSON";
 import { validateAnd } from "../../helpers/validateArgs";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
-import { authenticatePetitionOrProfileReplyToken } from "../../integrations/authorizers";
-import {
-  NumericParams,
-  PetitionReplyParams,
-  ProfileReplyParams,
-  parseReplyToken,
-} from "../../integrations/utils";
 import {
   fieldCanBeReplied,
   fieldHasType,
@@ -782,159 +773,5 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
       "User",
       ctx.user!.id,
     );
-  },
-});
-
-export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckEntity", {
-  type: "Success",
-  authorize: authenticateAnd(
-    userHasFeatureFlag("BACKGROUND_CHECK"),
-    authenticatePetitionOrProfileReplyToken("token", "BACKGROUND_CHECK"),
-  ),
-  args: {
-    token: nonNull(stringArg()),
-    entityId: stringArg(),
-  },
-  resolve: async (_, args, ctx) => {
-    async function petitionParamsResolver(
-      entityId: string | null,
-      params: NumericParams<PetitionReplyParams>,
-    ) {
-      const petition = await ctx.petitions.loadPetition(params.petitionId);
-      if (petition?.status === "CLOSED") {
-        throw new ForbiddenError("The petition is closed and does not accept new replies");
-      }
-
-      const replies = await ctx.petitions.loadRepliesForField(params.fieldId);
-      const reply = replies.find(
-        (r) =>
-          r.type === "BACKGROUND_CHECK" &&
-          isNonNullish(r.content.query) &&
-          r.parent_petition_field_reply_id === (params.parentReplyId ?? null),
-      );
-
-      if (isNullish(reply)) {
-        throw new ApolloError(`Can't find BACKGROUND_CHECK reply`, "REPLY_NOT_FOUND");
-      }
-
-      const updateCheck = await ctx.petitions.repliesCanBeUpdated([reply.id]);
-      if (updateCheck === "REPLY_ALREADY_APPROVED") {
-        throw new ApolloError(
-          `The reply has been approved and cannot be updated.`,
-          "REPLY_ALREADY_APPROVED_ERROR",
-        );
-      } else if (updateCheck === "REPLY_ONLY_FROM_PROFILE") {
-        throw new ApolloError(
-          `The reply can only be updated from a profile`,
-          "REPLY_ONLY_FROM_PROFILE_ERROR",
-        );
-      } else if (updateCheck === "REPLY_NOT_FOUND") {
-        throw new ForbiddenError("FORBIDDEN");
-      }
-
-      const [process] = await ctx.petitions.getPetitionStartedProcesses(params.petitionId);
-      if (isNonNullish(process)) {
-        throw new ApolloError(
-          `Petition has an ongoing ${process.toLowerCase()} process`,
-          `ONGOING_${process}_REQUEST_ERROR`,
-        );
-      }
-
-      const entity = isNonNullish(entityId)
-        ? await ctx.backgroundCheck.entityProfileDetails(entityId, ctx.user!.id)
-        : null;
-
-      await ctx.petitions.updatePetitionFieldRepliesContent(
-        params.petitionId,
-        [
-          {
-            id: reply.id,
-            content: { ...reply.content, entity },
-          },
-        ],
-        "User",
-        ctx.user!.id,
-      );
-    }
-
-    async function profileParamsResolver(
-      entityId: string | null,
-      params: NumericParams<ProfileReplyParams>,
-    ) {
-      const profile = await ctx.profiles.loadProfile(params.profileId);
-
-      if (profile!.status !== "OPEN") {
-        throw new ForbiddenError(
-          `The profile is ${profile!.status} and does not accept new replies`,
-        );
-      }
-
-      const effectivePermission = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission({
-        userId: ctx.user!.id,
-        profileTypeFieldId: params.profileTypeFieldId,
-      });
-      if (!isAtLeast(effectivePermission, "WRITE")) {
-        throw new ForbiddenError("User does not have WRITE permission on this field");
-      }
-
-      const userPermissions = await ctx.users.loadUserPermissions(ctx.user!.id);
-      if (!userPermissions.includes("PROFILES:CREATE_PROFILES")) {
-        throw new ForbiddenError("User does not have permission to write profiles");
-      }
-
-      const profileFieldValues = await ctx.profiles.loadProfileFieldValuesByProfileId(
-        params.profileId,
-      );
-
-      const pfv = profileFieldValues.find(
-        (pfv) =>
-          pfv.type === "BACKGROUND_CHECK" &&
-          pfv.profile_type_field_id === params.profileTypeFieldId &&
-          isNonNullish(pfv.content.query),
-      );
-
-      if (isNullish(pfv)) {
-        throw new ApolloError(`Can't find BACKGROUND_CHECK profile field value`, "REPLY_NOT_FOUND");
-      }
-
-      const entity = isNonNullish(entityId)
-        ? await ctx.backgroundCheck.entityProfileDetails(entityId, ctx.user!.id)
-        : null;
-
-      await ctx.profiles.updateProfileFieldValues(
-        [
-          {
-            profileId: params.profileId,
-            profileTypeFieldId: params.profileTypeFieldId,
-            type: "BACKGROUND_CHECK",
-            content: { ...pfv.content, entity },
-          },
-        ],
-        ctx.user!.id,
-        ctx.user!.org_id,
-      );
-    }
-
-    try {
-      const params = parseReplyToken(args.token);
-
-      if ("petitionId" in params) {
-        await petitionParamsResolver(args.entityId ?? null, params);
-      } else if ("profileId" in params) {
-        await profileParamsResolver(args.entityId ?? null, params);
-      }
-
-      return SUCCESS;
-    } catch (error) {
-      if (error instanceof Error) {
-        if (error.message === "PROFILE_NOT_FOUND") {
-          throw new ApolloError("Profile not found", "PROFILE_NOT_FOUND");
-        }
-        if (error.message === "INVALID_CREDENTIALS") {
-          throw new ForbiddenError("Invalid credentials");
-        }
-      }
-      throw error;
-    }
   },
 });

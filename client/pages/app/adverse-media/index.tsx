@@ -27,7 +27,7 @@ import {
   AdverseMediaSearch_adverseMediaAlternativeSearchSuggestionsDocument,
   AdverseMediaSearch_adverseMediaArticleSearchDocument,
   AdverseMediaSearch_classifyAdverseMediaArticleDocument,
-  AdverseMediaSearch_saveAdverseMediaChangesDocument,
+  AdverseMediaSearch_saveProfileFieldValueDraftDocument,
   AdverseMediaSearchTermInput,
 } from "@parallel/graphql/__types";
 import { compose } from "@parallel/utils/compose";
@@ -152,7 +152,7 @@ function AdverseMediaSearch({
 
           setIsDraft(refetchData?.adverseMediaArticleSearch?.isDraft);
         } catch (error: unknown) {
-          await showGenericError(error);
+          showGenericError(error);
         } finally {
           setIsSearching(false);
         }
@@ -180,19 +180,27 @@ function AdverseMediaSearch({
         window.opener?.postMessage("refresh");
         setIsDraft(true);
       } catch (error) {
-        await showGenericError(error);
+        showGenericError(error);
       }
     },
     [classifyAdverseMediaArticle, token],
   );
 
-  const [saveAdverseMediaChanges] = useMutation(AdverseMediaSearch_saveAdverseMediaChangesDocument);
+  const [saveProfileFieldValueDraft] = useMutation(
+    AdverseMediaSearch_saveProfileFieldValueDraftDocument,
+  );
 
-  const handleSaveAdverseMediaChanges = async () => {
+  const handleSaveToProfile = async () => {
     try {
-      const { data } = await saveAdverseMediaChanges({ variables: { token } });
+      const data = JSON.parse(atob(token));
+      await saveProfileFieldValueDraft({
+        variables: {
+          profileId: data.profileId as string,
+          profileTypeFieldId: data.profileTypeFieldId as string,
+        },
+      });
       window.opener?.postMessage("refresh");
-      setIsDraft(data?.saveAdverseMediaChanges?.isDraft);
+      setIsDraft(false);
       toast({
         title: intl.formatMessage({
           id: "page.adverse-media-search.search-saved",
@@ -205,7 +213,7 @@ function AdverseMediaSearch({
         status: "success",
       });
     } catch (error) {
-      await showGenericError(error);
+      showGenericError(error);
     }
   };
 
@@ -308,7 +316,7 @@ function AdverseMediaSearch({
                   colorScheme="purple"
                   isDisabled={!isDraft}
                   icon={<SaveIcon boxSize={5} />}
-                  onClick={handleSaveAdverseMediaChanges}
+                  onClick={handleSaveToProfile}
                   label={intl.formatMessage({
                     id: "page.adverse-media-search.save-search",
                     defaultMessage: "Save to profile",
@@ -593,24 +601,11 @@ const _mutations = [
     }
   `,
   gql`
-    mutation AdverseMediaSearch_saveAdverseMediaChanges($token: String!) {
-      saveAdverseMediaChanges(token: $token) {
-        isDraft
-        articles {
-          totalCount
-          createdAt
-          items {
-            id
-            ...AdverseMediaSearch_AdverseMediaArticle
-          }
-        }
-        search {
-          entityId
-          label
-          term
-          wikiDataId
-        }
-      }
+    mutation AdverseMediaSearch_saveProfileFieldValueDraft(
+      $profileId: GID!
+      $profileTypeFieldId: GID!
+    ) {
+      saveProfileFieldValueDraft(profileId: $profileId, profileTypeFieldId: $profileTypeFieldId)
     }
   `,
 ];

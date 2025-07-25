@@ -127,6 +127,7 @@ const result: PossibleTypesResultData = {
       "ProfileFieldExpiryUpdatedEvent",
       "ProfileFieldFileAddedEvent",
       "ProfileFieldFileRemovedEvent",
+      "ProfileFieldValueMonitoredEvent",
       "ProfileFieldValueUpdatedEvent",
       "ProfileRelationshipCreatedEvent",
       "ProfileRelationshipRemovedEvent",

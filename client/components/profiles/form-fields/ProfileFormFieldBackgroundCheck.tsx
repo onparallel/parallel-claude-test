@@ -11,6 +11,11 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { BusinessIcon, SearchIcon, ShortSearchIcon, UserIcon } from "@parallel/chakra/icons";
+import {
+  FalsePositivesBadge,
+  PendingResolutionBadge,
+  PendingReviewBadge,
+} from "@parallel/components/common/BackgroundCheckBadges";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
 import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
@@ -32,6 +37,7 @@ import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 import { ProfileFieldSuggestion } from "../ProfileFieldSuggestion";
+import { useConfirmModifyBackgroundCheckSearch } from "../dialogs/ConfirmModifyBackgroundCheckSearchDialog";
 import { useConfirmRemoveEntityDialog } from "../dialogs/ConfirmRemoveEntityDialog";
 import { useConfirmUpdateEntityDialog } from "../dialogs/ConfirmUpdateEntityDialog";
 import { ProfileFormFieldProps } from "./ProfileFormField";
@@ -85,6 +91,7 @@ export function ProfileFormFieldBackgroundCheck({
   });
 
   const hasReply = isNonNullish(props.value?.content);
+  const hasPendingReview = props.value?.hasPendingReview ?? false;
 
   useEffect(() => {
     if (showSuggestions && hasReply) {
@@ -192,8 +199,25 @@ export function ProfileFormFieldBackgroundCheck({
     } catch {}
   };
 
+  const showConfirmModifySearchDialog = useConfirmModifyBackgroundCheckSearch();
   const handleModifySearch = async () => {
     try {
+      if (props.value?.hasStoredValue) {
+        await showConfirmModifySearchDialog({ hasMonitoring });
+        await updateProfileFieldValue({
+          variables: {
+            profileId,
+            fields: [
+              {
+                profileTypeFieldId: field.id,
+                content: null,
+              },
+            ],
+          },
+        });
+        onRefreshField();
+      }
+
       let url = `/${intl.locale}/app/background-check`;
 
       const { date, name, type, country, birthCountry } = query ?? {};
@@ -226,6 +250,7 @@ export function ProfileFormFieldBackgroundCheck({
         ...(country ? { country } : {}),
         ...(birthCountry ? { birthCountry } : {}),
         ...(isDisabled ? { readonly: "true" } : {}),
+        ...(hasPendingReview ? { pendingReview: "true" } : {}),
       });
 
       if (entity) {
@@ -386,44 +411,56 @@ export function ProfileFormFieldBackgroundCheck({
                   <BusinessIcon />
                 )}
               </Flex>
-              <HStack
-                wrap="wrap"
-                flex="1"
-                lineHeight={1.5}
-                spacing={isSearch ? 1 : 2}
-                paddingTop={0.5}
-              >
-                <Button
-                  ref={entityButtonRef}
-                  variant="link"
-                  fontWeight={500}
-                  whiteSpace="pre-wrap"
-                  textAlign="left"
-                  onClick={handleOpenSearchOrEntity}
-                  isDisabled={!hasBackgroundCheck}
+              <Stack flex="1">
+                <HStack
+                  wrap="wrap"
+                  flex="1"
+                  lineHeight={1.5}
+                  spacing={isSearch ? 1 : 2}
+                  paddingTop={0.5}
                 >
-                  {entityOrSearchName}
-                </Button>
-                {isSearch ? (
-                  <Text color="gray.500" fontSize="sm">
-                    (
-                    <FormattedMessage
-                      id="generic.x-results"
-                      defaultMessage="{count, plural, =0 {No results} =1 {1 result} other {# results}}"
-                      values={{
-                        count: search?.totalCount ?? 0,
-                      }}
-                    />
-                    )
-                  </Text>
-                ) : (
-                  <HStack wrap="wrap">
-                    {(entity?.properties?.topics as string[] | undefined)?.map((topic, i) => (
-                      <BackgroundCheckRiskLabel key={i} risk={topic} />
-                    ))}
-                  </HStack>
-                )}
-              </HStack>
+                  <Button
+                    ref={entityButtonRef}
+                    variant="link"
+                    fontWeight={500}
+                    whiteSpace="pre-wrap"
+                    textAlign="left"
+                    onClick={handleOpenSearchOrEntity}
+                    isDisabled={!hasBackgroundCheck}
+                  >
+                    {entityOrSearchName}
+                  </Button>
+                  {isSearch ? (
+                    <Text color="gray.500" fontSize="sm">
+                      (
+                      <FormattedMessage
+                        id="generic.x-results"
+                        defaultMessage="{count, plural, =0 {No results} =1 {1 result} other {# results}}"
+                        values={{
+                          count: search?.totalCount ?? 0,
+                        }}
+                      />
+                      )
+                    </Text>
+                  ) : (
+                    <HStack wrap="wrap">
+                      {(entity?.properties?.topics as string[] | undefined)?.map((topic, i) => (
+                        <BackgroundCheckRiskLabel key={i} risk={topic} />
+                      ))}
+                    </HStack>
+                  )}
+                </HStack>
+                <HStack>
+                  {isSearch &&
+                  search?.totalCount > 0 &&
+                  search?.falsePositivesCount === search?.totalCount ? (
+                    <FalsePositivesBadge />
+                  ) : props.value?.isDraft ? (
+                    <PendingResolutionBadge />
+                  ) : null}
+                  {props.value.hasPendingReview ? <PendingReviewBadge /> : null}
+                </HStack>
+              </Stack>
               {(isSearch && !isDisabled) || !isSearch ? (
                 <MoreOptionsMenuButton
                   variant="outline"

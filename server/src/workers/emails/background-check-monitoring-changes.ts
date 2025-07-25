@@ -1,8 +1,10 @@
 import { isNonNullish, pick } from "remeda";
+import { assert } from "ts-essentials";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import BackgroundCheckMonitoringChanges from "../../emails/emails/app/BackgroundCheckMonitoringChanges";
 import { buildFrom } from "../../emails/utils/buildFrom";
+import { BackgroundCheckContent } from "../../services/BackgroundCheckService";
 import { toGlobalId } from "../../util/globalId";
 
 export async function backgroundCheckMonitoringChanges(
@@ -21,9 +23,9 @@ export async function backgroundCheckMonitoringChanges(
     return;
   }
 
-  const profileFieldValues = (
-    await context.profiles.loadProfileFieldValue(payload.profileFieldValues)
-  ).filter(isNonNullish);
+  const profileFieldValues = await context.profiles.loadProfileFieldValueWithDraft(
+    payload.profileFieldValues,
+  );
 
   const userData = (await context.users.loadUserData(user.user_data_id))!;
 
@@ -33,14 +35,22 @@ export async function backgroundCheckMonitoringChanges(
     BackgroundCheckMonitoringChanges,
     {
       userName: userData.first_name,
-      properties: profileFieldValues.map((pfv) => ({
-        content: {
-          query: pfv.content.query ? pick(pfv.content.query, ["name", "date"]) : undefined,
-          entity: pfv.content.entity ? pick(pfv.content.entity, ["name", "type"]) : undefined,
-        },
-        profileId: toGlobalId("Profile", pfv.profile_id),
-        profileTypeFieldId: toGlobalId("ProfileTypeField", pfv.profile_type_field_id),
-      })),
+      properties: profileFieldValues
+        .filter(({ value, draftValue }) => isNonNullish(value) || isNonNullish(draftValue))
+        .map(({ value, draftValue }) => {
+          const currentValue = draftValue ?? value;
+          assert(isNonNullish(currentValue));
+
+          const content = currentValue.content as BackgroundCheckContent;
+          return {
+            content: {
+              query: pick(content.query, ["name", "date"]),
+              entity: content.entity ? pick(content.entity, ["name", "type"]) : undefined,
+            },
+            profileId: toGlobalId("Profile", currentValue.profile_id),
+            profileTypeFieldId: toGlobalId("ProfileTypeField", currentValue.profile_type_field_id),
+          };
+        }),
       ...layoutProps,
       logoUrl: `${layoutProps.assetsUrl}/static/emails/logo-bg-check.png`,
       logoAlt: "Parallel - Background Check",

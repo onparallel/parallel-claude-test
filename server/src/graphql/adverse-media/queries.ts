@@ -2,6 +2,7 @@ import { list, nonNull, nullable, objectType, queryField, stringArg } from "nexu
 import { outdent } from "outdent";
 import { isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
+import { AdverseMediaSearchContent } from "../../services/AdverseMediaSearchService";
 import { schema } from "../../util/jsonSchema";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
@@ -164,24 +165,9 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
     }
 
     async function profileParamsResolver(params: NumericParams<ProfileReplyParams>) {
-      const [draftValues, profileValues] = await Promise.all([
-        ctx.profiles.loadDraftProfileFieldValuesByProfileId(params.profileId),
-        ctx.profiles.loadProfileFieldValuesByProfileId(params.profileId),
-      ]);
+      const { value, draftValue } = await ctx.profiles.loadProfileFieldValueWithDraft(params);
 
-      const draftValue = draftValues.find(
-        (v) =>
-          v.profile_type_field_id === params.profileTypeFieldId &&
-          v.type === "ADVERSE_MEDIA_SEARCH",
-      );
-
-      const profileValue = profileValues.find(
-        (v) =>
-          v.profile_type_field_id === params.profileTypeFieldId &&
-          v.type === "ADVERSE_MEDIA_SEARCH",
-      );
-
-      const currentValue = draftValue ?? profileValue;
+      const currentValue = draftValue ?? value;
 
       if (isNullish(args.search)) {
         // if no search terms provided, return value from DB
@@ -197,10 +183,12 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
         ctx.user!.id,
       );
 
+      const currentContent = currentValue?.content as AdverseMediaSearchContent | undefined;
+
       const classifiedArticleIds = [
-        ...(currentValue?.content?.relevant_articles ?? []),
-        ...(currentValue?.content?.irrelevant_articles ?? []),
-        ...(currentValue?.content?.dismissed_articles ?? []),
+        ...(currentContent?.relevant_articles ?? []),
+        ...(currentContent?.irrelevant_articles ?? []),
+        ...(currentContent?.dismissed_articles ?? []),
       ].map((a) => a.id);
 
       const articlesSearch = await ctx.adverseMedia.searchArticles(args.search, {
@@ -210,7 +198,7 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
       const content = ctx.adverseMedia.buildAdverseMediaSearchContent(
         args.search,
         articlesSearch,
-        currentValue?.content ?? null,
+        currentContent ?? null,
       );
 
       if (isNullish(currentValue)) {
@@ -305,26 +293,11 @@ export const adverseMediaArticleDetails = queryField("adverseMediaArticleDetails
     }
 
     async function profileParamsResolver(params: NumericParams<ProfileReplyParams>) {
-      const [draftValues, profileValues] = await Promise.all([
-        ctx.profiles.loadDraftProfileFieldValuesByProfileId(params.profileId),
-        ctx.profiles.loadProfileFieldValuesByProfileId(params.profileId),
-      ]);
+      const { value, draftValue } = await ctx.profiles.loadProfileFieldValueWithDraft(params);
 
       const article = await ctx.adverseMedia.fetchArticle(args.id, { searchTerms: args.search });
 
-      const draftValue = draftValues.find(
-        (v) =>
-          v.profile_type_field_id === params.profileTypeFieldId &&
-          v.type === "ADVERSE_MEDIA_SEARCH",
-      );
-
-      const profileValue = profileValues.find(
-        (v) =>
-          v.profile_type_field_id === params.profileTypeFieldId &&
-          v.type === "ADVERSE_MEDIA_SEARCH",
-      );
-
-      const currentValue = draftValue ?? profileValue;
+      const currentValue = draftValue ?? value;
 
       return ctx.adverseMedia.addRelevanceToArticle(article, currentValue?.content);
     }

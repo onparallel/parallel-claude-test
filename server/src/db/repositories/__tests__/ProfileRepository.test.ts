@@ -263,6 +263,18 @@ describe("repositories/ProfileRepository", () => {
         },
       ]);
 
+      // value only has a draft
+      await mocks.createProfileFieldValues(profiles[3].id, [
+        {
+          content: { query: "query", search: "search" },
+          profile_type_field_id: bgCheckWithMonitoring.id,
+          created_by_user_id: user.id,
+          type: "BACKGROUND_CHECK",
+          active_monitoring: true,
+          is_draft: true,
+        },
+      ]);
+
       // profile is closed
       await mocks.createProfileFieldValues(profiles[4].id, [
         {
@@ -282,7 +294,7 @@ describe("repositories/ProfileRepository", () => {
       expect(result.map((r) => r.id)).toIncludeSameMembers([p0Values[0].id, p1Values[0].id]);
     });
 
-    it("does not return values with ongoing drafts", async () => {
+    it("returns stored value if draft is present", async () => {
       const p0Values = await mocks.createProfileFieldValues(profiles[0].id, [
         {
           content: {
@@ -313,7 +325,7 @@ describe("repositories/ProfileRepository", () => {
         },
       ]);
 
-      await mocks.createProfileFieldValues(profiles[1].id, [
+      const p1Values = await mocks.createProfileFieldValues(profiles[1].id, [
         {
           content: {
             search: [],
@@ -350,7 +362,10 @@ describe("repositories/ProfileRepository", () => {
         (_, monitoring) => isNonNullish(monitoring),
       );
 
-      expect(result.map((r) => r.id)).toIncludeSameMembers([p0Values[0].id]);
+      expect(result.map(pick(["id", "has_draft"]))).toIncludeSameMembers([
+        { id: p0Values[0].id, has_draft: false },
+        { id: p1Values[0].id, has_draft: true },
+      ]);
     });
   });
 
@@ -690,7 +705,7 @@ describe("repositories/ProfileRepository", () => {
       expect(pfvs).toHaveLength(1);
     });
 
-    it("does nothing if updating BACKGROUND_CHECK field with exactly same content", async () => {
+    it("updates BACKGROUND_CHECK field with exactly same content", async () => {
       const [profile] = await repo.createProfiles(
         { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
         user.id,
@@ -802,6 +817,8 @@ describe("repositories/ProfileRepository", () => {
         { type: "PROFILE_CREATED" },
         { type: "PROFILE_FIELD_VALUE_UPDATED" },
         { type: "PROFILE_UPDATED" },
+        { type: "PROFILE_FIELD_VALUE_UPDATED" },
+        { type: "PROFILE_UPDATED" },
       ]);
 
       const pfvs = await mocks.knex
@@ -809,10 +826,76 @@ describe("repositories/ProfileRepository", () => {
         .where("profile_id", profile.id)
         .select("*");
 
-      expect(pfvs).toHaveLength(1);
+      expect(pfvs).toHaveLength(2);
+      expect(
+        pfvs.map(pick(["profile_type_field_id", "content", "is_draft", "removed_at"])),
+      ).toIncludeSameMembers([
+        {
+          profile_type_field_id: fields[2].id,
+          content: {
+            query: {
+              name: "John Doe",
+              date: "2024-10-10",
+              type: "PERSON",
+              country: "FR",
+            },
+            entity: {
+              id: "123",
+              type: "PERSON",
+              name: "John Doe",
+              properties: {},
+            },
+            search: {
+              totalCount: 1,
+              items: [
+                {
+                  id: "123",
+                  type: "PERSON",
+                  name: "John Doe",
+                  properties: {},
+                },
+              ],
+              createdAt: expect.any(String),
+            },
+          },
+          is_draft: false,
+          removed_at: expect.any(Date),
+        },
+        {
+          profile_type_field_id: fields[2].id,
+          content: {
+            query: {
+              name: "John Doe",
+              date: "2024-10-10",
+              type: "PERSON",
+              country: "FR",
+            },
+            entity: {
+              id: "123",
+              type: "PERSON",
+              name: "John Doe",
+              properties: {},
+            },
+            search: {
+              totalCount: 1,
+              items: [
+                {
+                  id: "123",
+                  type: "PERSON",
+                  name: "John Doe",
+                  properties: {},
+                },
+              ],
+              createdAt: expect.any(String),
+            },
+          },
+          is_draft: false,
+          removed_at: null,
+        },
+      ]);
     });
 
-    it("does nothing if updating ADVERSE_MEDIA_SEARCH field with exactly same content", async () => {
+    it("updates ADVERSE_MEDIA_SEARCH field with exactly same content", async () => {
       const [profile] = await repo.createProfiles(
         { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
         user.id,
@@ -944,6 +1027,8 @@ describe("repositories/ProfileRepository", () => {
         { type: "PROFILE_CREATED" },
         { type: "PROFILE_FIELD_VALUE_UPDATED" },
         { type: "PROFILE_UPDATED" },
+        { type: "PROFILE_FIELD_VALUE_UPDATED" },
+        { type: "PROFILE_UPDATED" },
       ]);
 
       const pfvs = await mocks.knex
@@ -951,7 +1036,93 @@ describe("repositories/ProfileRepository", () => {
         .where("profile_id", profile.id)
         .select("*");
 
-      expect(pfvs).toHaveLength(1);
+      expect(pfvs).toHaveLength(2);
+      expect(
+        pfvs.map(pick(["profile_type_field_id", "content", "is_draft", "removed_at"])),
+      ).toIncludeSameMembers([
+        {
+          profile_type_field_id: fields[3].id,
+          content: {
+            search: [{ term: "John Doe" }, { wikiDataId: "Q7747", label: "Vladimir Putin" }],
+            articles: {
+              totalCount: 4,
+              items: [
+                {
+                  id: "1",
+                  header: "John Doe is a good person",
+                  timestamp: 1712345678,
+                  source: "Google",
+                },
+                {
+                  id: "2",
+                  header: "Putin's speech",
+                  timestamp: 1712345678,
+                  source: "Google",
+                },
+                {
+                  id: "3",
+                  header: "Vladimir Putin in talks with Trump",
+                  timestamp: 1712345678,
+                  source: "Google",
+                },
+                {
+                  id: "4",
+                  header: "Jane Smith wins prestigious award",
+                  timestamp: 1712345678,
+                  source: "Google",
+                },
+              ],
+              createdAt: expect.any(String),
+            },
+            relevant_articles: [{ id: "1" }],
+            irrelevant_articles: [{ id: "2" }, { id: "4" }],
+            dismissed_articles: [{ id: "3" }],
+          },
+          is_draft: false,
+          removed_at: expect.any(Date),
+        },
+        {
+          profile_type_field_id: fields[3].id,
+          content: {
+            search: [{ term: "John Doe" }, { wikiDataId: "Q7747", label: "Vladimir Putin" }],
+            articles: {
+              totalCount: 4,
+              items: [
+                {
+                  id: "1",
+                  header: "John Doe is a good person",
+                  timestamp: 1712345678,
+                  source: "Google",
+                },
+                {
+                  id: "2",
+                  header: "Putin's speech",
+                  timestamp: 1712345678,
+                  source: "Google",
+                },
+                {
+                  id: "3",
+                  header: "Vladimir Putin in talks with Trump",
+                  timestamp: 1712345678,
+                  source: "Google",
+                },
+                {
+                  id: "4",
+                  header: "Jane Smith wins prestigious award",
+                  timestamp: 1712345678,
+                  source: "Google",
+                },
+              ],
+              createdAt: expect.any(String),
+            },
+            relevant_articles: [{ id: "1" }],
+            irrelevant_articles: [{ id: "2" }, { id: "4" }],
+            dismissed_articles: [{ id: "3" }],
+          },
+          is_draft: false,
+          removed_at: null,
+        },
+      ]);
     });
 
     it("removes draft when removing value", async () => {

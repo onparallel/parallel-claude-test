@@ -11,6 +11,7 @@ import {
   ShortSearchIcon,
   UserIcon,
 } from "@parallel/chakra/icons";
+import { FalsePositivesBadge } from "@parallel/components/common/BackgroundCheckBadges";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
@@ -449,6 +450,11 @@ export function KYCResearchFieldReplyProfile({
                     },
                   )})`}
                 </Text>
+                {reply.content?.search &&
+                reply.content?.search?.totalCount > 0 &&
+                reply.content?.search?.falsePositivesCount === reply.content?.search?.totalCount ? (
+                  <FalsePositivesBadge />
+                ) : null}
               </Flex>
             )
           ) : (

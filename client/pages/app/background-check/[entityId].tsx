@@ -1,6 +1,16 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { Box, Center, HStack, Skeleton, Spinner, Stack, Text } from "@chakra-ui/react";
-import { ShortSearchIcon } from "@parallel/chakra/icons";
+import {
+  Box,
+  Button,
+  Center,
+  HStack,
+  Skeleton,
+  Spinner,
+  Stack,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
+import { CheckIcon, RepeatIcon, ShortSearchIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -14,26 +24,30 @@ import { BackgroundCheckEntityDetailsPersonBasic } from "@parallel/components/pe
 import { BackgroundCheckEntityDetailsPersonOverview } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsPersonOverview";
 import { BackgroundCheckEntityDetailsRelationships } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsRelationships";
 import { BackgroundCheckEntityDetailsSanctions } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsSanctions";
+import { useBackgroundCheckContentsNotUpdatedDialog } from "@parallel/components/profiles/dialogs/BackgroundCheckContentsNotUpdatedDialog";
 import {
   BackgroundCheckEntitySearchType,
   BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragment,
   BackgroundCheckProfileDetails_backgroundCheckEntityDetailsDocument,
   BackgroundCheckProfileDetails_updateBackgroundCheckEntityDocument,
+  BackgroundCheckProfileDetails_updateProfileFieldValueOptionsDocument,
 } from "@parallel/graphql/__types";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
+import { withError } from "@parallel/utils/promises/withError";
 import { useBackgroundCheckProfileDownloadTask } from "@parallel/utils/tasks/useBackgroundCheckProfileDownloadTask";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useInterval } from "@parallel/utils/useInterval";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
+import { createHash } from "crypto";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish } from "remeda";
+import { isNonNullish, pick } from "remeda";
 
 function BackgroundCheckProfileDetails({
   entityId,
@@ -43,6 +57,7 @@ function BackgroundCheckProfileDetails({
   type,
   country,
   birthCountry,
+  pendingReview,
 }: UnwrapPromise<ReturnType<typeof BackgroundCheckProfileDetails.getInitialProps>>) {
   const intl = useIntl();
   const router = useRouter();
@@ -68,7 +83,7 @@ function BackgroundCheckProfileDetails({
 
   const entityTypeLabel = getEntityTypeLabel(intl, type);
 
-  const { data, loading, error } = useQuery(
+  const { data, loading, error, refetch } = useQuery(
     BackgroundCheckProfileDetails_backgroundCheckEntityDetailsDocument,
     {
       variables: {
@@ -186,6 +201,65 @@ function BackgroundCheckProfileDetails({
     } catch {}
   };
 
+  const [isPendingReview, setIsPendingReview] = useState(pendingReview);
+  const [updateProfileFieldValueOptions] = useMutation(
+    BackgroundCheckProfileDetails_updateProfileFieldValueOptionsDocument,
+  );
+
+  const handleConfirmChangesClick = async () => {
+    try {
+      const data = JSON.parse(atob(token));
+      if (!("profileId" in data)) {
+        return;
+      }
+
+      await updateProfileFieldValueOptions({
+        variables: {
+          profileId: data.profileId,
+          profileTypeFieldId: data.profileTypeFieldId,
+          data: { pendingReview: false },
+        },
+      });
+
+      window.opener?.postMessage("refresh");
+
+      setIsPendingReview(false);
+    } catch {}
+  };
+
+  const toast = useToast();
+  const showBackgroundCheckContentsNotUpdatedDialog = useBackgroundCheckContentsNotUpdatedDialog();
+  const handleRefreshEntity = useCallback(async () => {
+    try {
+      const oldData = details
+        ? pick(details, ["id", "name", "properties", "type", "datasets"])
+        : null;
+      const { data } = await refetch({ force: true });
+      const newData = data
+        ? pick(data.backgroundCheckEntityDetails, ["id", "name", "properties", "type", "datasets"])
+        : null;
+
+      const oldMd5 = createHash("md5").update(JSON.stringify(oldData)).digest("hex");
+      const newMd5 = createHash("md5").update(JSON.stringify(newData)).digest("hex");
+      if (oldMd5 === newMd5) {
+        await withError(showBackgroundCheckContentsNotUpdatedDialog());
+      } else {
+        toast({
+          title: intl.formatMessage({
+            id: "component.background-check-search-result.search-refreshed-toast-title",
+            defaultMessage: "Search refreshed",
+          }),
+          description: intl.formatMessage({
+            id: "component.background-check-search-result.search-refreshed-toast-description",
+            defaultMessage: "The search results have been refreshed.",
+          }),
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    } catch {}
+  }, [details, refetch]);
   return (
     <>
       <Head>
@@ -229,19 +303,43 @@ function BackgroundCheckProfileDetails({
             </Box>
           </HStack>
 
-          {loading || !details || !details.createdAt ? (
-            <Skeleton height="18px" width="280px" />
-          ) : (
-            <Text>
-              <FormattedMessage
-                id="generic.results-for"
-                defaultMessage="Results for {date}"
-                values={{
-                  date: intl.formatDate(details.createdAt, FORMATS.FULL),
-                }}
+          <HStack>
+            {loading || !details || !details.createdAt ? (
+              <Skeleton height="18px" width="280px" />
+            ) : (
+              <Text>
+                <FormattedMessage
+                  id="generic.results-for"
+                  defaultMessage="Results for {date}"
+                  values={{
+                    date: intl.formatDate(details.createdAt, FORMATS.FULL),
+                  }}
+                />
+              </Text>
+            )}
+            {isPendingReview ? (
+              <Button
+                colorScheme="primary"
+                leftIcon={<CheckIcon />}
+                onClick={handleConfirmChangesClick}
+              >
+                <FormattedMessage
+                  id="component.background-check-profile-details.mark-as-reviewed"
+                  defaultMessage="Mark as reviewed"
+                />
+              </Button>
+            ) : isSaved && !isReadOnly ? (
+              <IconButtonWithTooltip
+                variant="outline"
+                label={intl.formatMessage({
+                  id: "component.background-check-search-result.refresh-search",
+                  defaultMessage: "Refresh search",
+                })}
+                icon={<RepeatIcon />}
+                onClick={handleRefreshEntity}
               />
-            </Text>
-          )}
+            ) : null}
+          </HStack>
         </HStack>
 
         {loading || !details ? (
@@ -365,18 +463,6 @@ function BackgroundCheckProfileDetails({
 }
 
 const _fragments = {
-  get PetitionField() {
-    return gql`
-      fragment BackgroundCheckProfileDetails_PetitionField on PetitionField {
-        id
-        type
-        replies {
-          id
-          content
-        }
-      }
-    `;
-  },
   get BackgroundCheckEntityDetailsPerson() {
     return gql`
       fragment BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPerson on BackgroundCheckEntityDetailsPerson {
@@ -424,6 +510,7 @@ const _fragments = {
       ${BackgroundCheckEntityDetailsSanctions.fragments.BackgroundCheckEntityDetailsSanction}
     `;
   },
+
   get BackgroundCheckEntityDetails() {
     return gql`
       fragment BackgroundCheckProfileDetails_BackgroundCheckEntityDetails on BackgroundCheckEntityDetails {
@@ -450,20 +537,12 @@ const _fragments = {
 
 const _queries = [
   gql`
-    query BackgroundCheckProfileDetails_petitionField($petitionId: GID!, $petitionFieldId: GID!) {
-      petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
-        ...BackgroundCheckProfileDetails_PetitionField
-      }
-    }
-    ${_fragments.PetitionField}
-  `,
-
-  gql`
     query BackgroundCheckProfileDetails_backgroundCheckEntityDetails(
       $token: String!
       $entityId: String!
+      $force: Boolean
     ) {
-      backgroundCheckEntityDetails(token: $token, entityId: $entityId) {
+      backgroundCheckEntityDetails(token: $token, entityId: $entityId, force: $force) {
         ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetails
       }
     }
@@ -480,6 +559,22 @@ const _mutations = [
       updateBackgroundCheckEntity(token: $token, entityId: $entityId)
     }
   `,
+  gql`
+    mutation BackgroundCheckProfileDetails_updateProfileFieldValueOptions(
+      $profileId: GID!
+      $profileTypeFieldId: GID!
+      $data: UpdateProfileFieldValueOptionsDataInput!
+    ) {
+      updateProfileFieldValueOptions(
+        profileId: $profileId
+        profileTypeFieldId: $profileTypeFieldId
+        data: $data
+      ) {
+        id
+        hasPendingReview
+      }
+    }
+  `,
 ];
 
 BackgroundCheckProfileDetails.getInitialProps = async ({ query }: WithApolloDataContext) => {
@@ -490,8 +585,9 @@ BackgroundCheckProfileDetails.getInitialProps = async ({ query }: WithApolloData
   const type = query.type as BackgroundCheckEntitySearchType | null;
   const country = query.country as string | null;
   const birthCountry = query.birthCountry as string | null;
+  const pendingReview = query.pendingReview === "true";
 
-  return { entityId, token, name, date, type, country, birthCountry };
+  return { entityId, token, name, date, type, country, birthCountry, pendingReview };
 };
 
 export default compose(

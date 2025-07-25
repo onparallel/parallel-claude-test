@@ -928,7 +928,7 @@ describe("Adverse Media - Profiles", () => {
     });
   });
 
-  describe("saveAdverseMediaChanges", () => {
+  describe("saveProfileFieldValueDraft", () => {
     let profileId: number;
 
     beforeEach(async () => {
@@ -1035,52 +1035,21 @@ describe("Adverse Media - Profiles", () => {
     it("saves changes made in draft value to profile value", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($token: String!) {
-            saveAdverseMediaChanges(token: $token) {
-              isDraft
-              articles {
-                totalCount
-                items {
-                  id
-                  classification
-                  classifiedAt
-                }
-                createdAt
-              }
-              search {
-                term
-                entityId
-                wikiDataId
-                label
-              }
-            }
+          mutation ($profileId: GID!, $profileTypeFieldId: GID!) {
+            saveProfileFieldValueDraft(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+            )
           }
         `,
         {
-          token: buildToken({
-            profileId: profileId,
-            profileTypeFieldId: profileTypeField.id,
-          }),
+          profileId: toGlobalId("Profile", profileId),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
         },
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.saveAdverseMediaChanges).toEqual({
-        isDraft: false,
-        articles: {
-          totalCount: 5,
-          items: expect.toBeArrayOfSize(5),
-          createdAt: expect.any(Date),
-        },
-        search: [
-          {
-            term: "free text search",
-            entityId: null,
-            wikiDataId: null,
-            label: null,
-          },
-        ],
-      });
+      expect(data?.saveProfileFieldValueDraft).toEqual("SUCCESS");
 
       const dbPfvs = await mocks.knex.from("profile_field_value").where({
         profile_id: profileId,
@@ -1091,6 +1060,7 @@ describe("Adverse Media - Profiles", () => {
       expect(
         dbPfvs.map(pick(["is_draft", "removed_at", "removed_by_user_id", "deleted_at", "content"])),
       ).toIncludeSameMembers([
+        // original search. no draft, removed
         {
           is_draft: false,
           removed_at: expect.any(Date),
@@ -1108,10 +1078,33 @@ describe("Adverse Media - Profiles", () => {
             dismissed_articles: [],
           },
         },
+        // new search. no draft, not removed
         {
           is_draft: false,
           removed_at: null,
           removed_by_user_id: null,
+          deleted_at: null,
+          content: {
+            search: [{ term: "free text search" }],
+            articles: {
+              totalCount: 5,
+              items: expect.toBeArrayOfSize(5),
+              createdAt: expect.any(String),
+            },
+            relevant_articles: [
+              { id: "VLADIMIR_PUTIN", added_at: expect.any(String), added_by_user_id: user.id },
+            ],
+            irrelevant_articles: [
+              { id: "JOHN_DOE", added_at: expect.any(String), added_by_user_id: user.id },
+            ],
+            dismissed_articles: [],
+          },
+        },
+        {
+          // draft. removed
+          is_draft: true,
+          removed_at: expect.any(Date),
+          removed_by_user_id: user.id,
           deleted_at: null,
           content: {
             search: [{ term: "free text search" }],
@@ -1160,17 +1153,16 @@ describe("Adverse Media - Profiles", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($token: String!) {
-            saveAdverseMediaChanges(token: $token) {
-              __typename
-            }
+          mutation ($profileId: GID!, $profileTypeFieldId: GID!) {
+            saveProfileFieldValueDraft(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+            )
           }
         `,
         {
-          token: buildToken({
-            profileId: profileId,
-            profileTypeFieldId: profileTypeField.id,
-          }),
+          profileId: toGlobalId("Profile", profileId),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
         },
       );
 
@@ -1185,17 +1177,16 @@ describe("Adverse Media - Profiles", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($token: String!) {
-            saveAdverseMediaChanges(token: $token) {
-              __typename
-            }
+          mutation ($profileId: GID!, $profileTypeFieldId: GID!) {
+            saveProfileFieldValueDraft(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+            )
           }
         `,
         {
-          token: buildToken({
-            profileId: profileId,
-            profileTypeFieldId: profileTypeField.id,
-          }),
+          profileId: toGlobalId("Profile", profileId),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
         },
       );
 

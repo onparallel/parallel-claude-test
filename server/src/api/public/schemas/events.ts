@@ -1237,6 +1237,16 @@ const ProfileEventSchemas = {
       },
     },
   },
+  PROFILE_FIELD_VALUE_MONITORED: {
+    description: "A property on the profile was monitored for changes",
+    properties: {
+      profileTypeFieldId: {
+        description: "The ID of the profile field",
+        type: "string",
+        example: toGlobalId("ProfileTypeField", 1),
+      },
+    },
+  },
 } as Record<ProfileEventType, JsonSchema>;
 
 const _ProfileEvent = {

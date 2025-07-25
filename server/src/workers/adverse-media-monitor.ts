@@ -9,8 +9,10 @@ createCronWorker("adverse-media-monitor", async (ctx) => {
   const guard = new RateLimitGuard(2);
 
   const now = new Date();
-  const organizations =
-    await ctx.organizations.getOrganizationsWithFeatureFlag("ADVERSE_MEDIA_SEARCH");
+  const organizations = await ctx.organizations.getOrganizationsWithFeatureFlag([
+    "PROFILES",
+    "ADVERSE_MEDIA_SEARCH",
+  ]);
 
   for (const org of organizations) {
     const valuesForRefresh = await ctx.profiles.getProfileFieldValuesForRefreshByOrgId(
@@ -20,7 +22,7 @@ createCronWorker("adverse-media-monitor", async (ctx) => {
     );
 
     await pMap(
-      valuesForRefresh,
+      valuesForRefresh.filter((v) => !v.has_draft), // exclude values with drafts to ensure same behavior as before.
       async (value) => {
         await guard.waitUntilAllowed();
         const content = value.content as AdverseMediaSearchContent;

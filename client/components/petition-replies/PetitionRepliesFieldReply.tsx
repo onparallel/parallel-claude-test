@@ -38,6 +38,7 @@ import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { Fragment } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { FalsePositivesBadge } from "../common/BackgroundCheckBadges";
 import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
@@ -293,6 +294,11 @@ export function PetitionRepliesFieldReply({
                                 },
                               )})`}
                             </Text>
+                            {content?.search &&
+                            content?.search?.totalCount > 0 &&
+                            content?.search?.falsePositivesCount === content?.search?.totalCount ? (
+                              <FalsePositivesBadge />
+                            ) : null}
                           </>
                         )}
                         <Box display="inline-block" marginStart={1}>

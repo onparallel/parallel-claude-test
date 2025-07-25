@@ -979,6 +979,7 @@ export const deleteProfile = mutationField("deleteProfile", {
     const values = (await ctx.profiles.loadProfileFieldValuesByProfileId(profileIds)).flat();
     const files = (await ctx.profiles.loadProfileFieldFilesByProfileId(profileIds)).flat();
 
+    // don't consider drafts on this check
     if (values.length + files.length > 0 && !force) {
       throw new ApolloError(`Profile has replies`, "PROFILE_HAS_REPLIES_ERROR", {
         count: values.length + files.length,
@@ -1095,13 +1096,13 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
 
     if (invalidField) {
       const property = profileTypeFields.find((ptf) => ptf.id === invalidField.profileTypeFieldId)!;
-      throw new ForbiddenError(`Cannot update ${property.type} contents with this mutation`);
+      throw new ForbiddenError(`Cannot update ${property.type} contents.`);
     }
 
     const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
     // validate contents and expiryDate
-    const values = await ctx.profiles.loadProfileFieldValuesByProfileId(profileId);
-    const valuesByPtfId = indexBy(values, (v) => v.profile_type_field_id);
+    const values = await ctx.profiles.loadProfileFieldValuesAndDraftsByProfileId(profileId);
+    const valuesByPtfId = groupBy(values, (v) => v.profile_type_field_id);
 
     const aggregatedErrors: {
       profileTypeFieldId: string;
@@ -1151,7 +1152,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
         if (
           field.expiryDate !== undefined &&
           field.content === undefined &&
-          isNullish(valuesByPtfId[field.profileTypeFieldId])
+          (valuesByPtfId[field.profileTypeFieldId] ?? []).length === 0
         ) {
           throw new ApolloError(
             `Can't set expiry on a field with no value`,
@@ -1188,8 +1189,10 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
       ctx.user!.id,
       ctx.user!.org_id,
     );
-    ctx.profiles.loadProfileFieldValue.dataloader.clearAll();
-    ctx.profiles.loadProfileFieldValuesByProfileId.dataloader.clear(profileId);
+
+    ctx.profiles.loadProfileFieldValuesAndDraftsByProfileId.dataloader.clear(profileId);
+
+    // reload profile again to get possible name updates
     return (await ctx.profiles.loadProfile(profileId, { refresh: true }))!;
   },
 });
@@ -1543,53 +1546,6 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
   },
 });
 
-export const copyBackgroundCheckReplyToProfileFieldValue = mutationField(
-  "copyBackgroundCheckReplyToProfileFieldValue",
-  {
-    deprecation: "use copyReplyContentToProfileFieldValue",
-    type: "ProfileFieldValue",
-    authorize: authenticateAnd(
-      userHasFeatureFlag("PROFILES"),
-      contextUserHasPermission("PROFILES:CREATE_PROFILES"),
-      userHasAccessToProfile("profileId"),
-      profileHasStatus("profileId", "OPEN"),
-      profileIsNotAnonymized("profileId"),
-      profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
-      userHasPermissionOnProfileTypeField("profileTypeFieldId", "WRITE"),
-      userHasAccessToPetitions("petitionId"),
-      petitionIsNotAnonymized("petitionId"),
-      repliesBelongsToPetition("petitionId", "replyId"),
-      replyIsForFieldOfType("replyId", ["BACKGROUND_CHECK"]),
-    ),
-    args: {
-      profileId: nonNull(globalIdArg("Profile")),
-      profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
-      petitionId: nonNull(globalIdArg("Petition")),
-      replyId: nonNull(globalIdArg("PetitionFieldReply")),
-      expiryDate: dateArg(),
-    },
-    resolve: async (_, { profileId, profileTypeFieldId, expiryDate, replyId }, ctx) => {
-      const reply = await ctx.petitions.loadFieldReply(replyId);
-
-      await ctx.profiles.updateProfileFieldValues(
-        [
-          {
-            profileId,
-            profileTypeFieldId,
-            type: "BACKGROUND_CHECK",
-            content: reply!.content,
-            expiryDate,
-          },
-        ],
-        ctx.user!.id,
-        ctx.user!.org_id,
-      );
-
-      return (await ctx.profiles.loadProfileFieldValue({ profileId, profileTypeFieldId }))!;
-    },
-  },
-);
-
 export const copyReplyContentToProfileFieldValue = mutationField(
   "copyReplyContentToProfileFieldValue",
   {
@@ -1622,22 +1578,54 @@ export const copyReplyContentToProfileFieldValue = mutationField(
     },
     resolve: async (_, { profileId, profileTypeFieldId, expiryDate, replyId }, ctx) => {
       const reply = await ctx.petitions.loadFieldReply(replyId);
+      assert(reply?.type === "BACKGROUND_CHECK" || reply?.type === "ADVERSE_MEDIA_SEARCH");
 
-      await ctx.profiles.updateProfileFieldValues(
-        [
-          {
-            profileId,
-            profileTypeFieldId,
-            type: reply!.type as "BACKGROUND_CHECK" | "ADVERSE_MEDIA_SEARCH",
-            content: reply!.content,
-            expiryDate,
-          },
-        ],
-        ctx.user!.id,
-        ctx.user!.org_id,
+      const isDraftContent = ctx.profilesHelper.isDraftContent(
+        reply!.type as "BACKGROUND_CHECK" | "ADVERSE_MEDIA_SEARCH",
+        reply!.content,
       );
 
-      return (await ctx.profiles.loadProfileFieldValue({ profileId, profileTypeFieldId }))!;
+      if (isDraftContent) {
+        await ctx.profiles.upsertDraftProfileFieldValues(
+          [
+            {
+              profileId,
+              profileTypeFieldId,
+              type: reply!.type as "BACKGROUND_CHECK" | "ADVERSE_MEDIA_SEARCH",
+              content: reply!.content,
+              expiryDate,
+            },
+          ],
+          ctx.user!.id,
+        );
+      } else {
+        await ctx.profiles.updateProfileFieldValues(
+          [
+            {
+              profileId,
+              profileTypeFieldId,
+              type: reply!.type as "BACKGROUND_CHECK" | "ADVERSE_MEDIA_SEARCH",
+              content: reply!.content,
+              expiryDate,
+            },
+          ],
+          ctx.user!.id,
+          ctx.user!.org_id,
+        );
+      }
+
+      const { value, draftValue } = await ctx.profiles.loadProfileFieldValueWithDraft({
+        profileId,
+        profileTypeFieldId,
+      });
+
+      const currentValue = draftValue ?? value;
+      assert(currentValue, "Profile field value not found");
+
+      return {
+        ...currentValue,
+        has_stored_value: isNonNullish(value),
+      };
     },
   },
 );
@@ -2605,9 +2593,11 @@ export const profileImportExcelModelDownloadLink = mutationField(
   },
 );
 
+/** @deprecated */
 export const updateProfileFieldValueMonitoringStatus = mutationField(
   "updateProfileFieldValueMonitoringStatus",
   {
+    deprecation: "use updateProfileFieldValueOptions",
     type: "Profile",
     authorize: authenticateAnd(
       userHasFeatureFlag("PROFILES"),
@@ -2634,3 +2624,101 @@ export const updateProfileFieldValueMonitoringStatus = mutationField(
     },
   },
 );
+
+export const updateProfileFieldValueOptions = mutationField("updateProfileFieldValueOptions", {
+  type: "ProfileFieldValue",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfile("profileId"),
+    profileHasStatus("profileId", "OPEN"),
+    profileIsNotAnonymized("profileId"),
+    profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
+    userHasPermissionOnProfileTypeField("profileTypeFieldId", "WRITE"),
+  ),
+  args: {
+    profileId: nonNull(globalIdArg("Profile")),
+    profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
+    data: nonNull(
+      inputObjectType({
+        name: "UpdateProfileFieldValueOptionsDataInput",
+        definition(t) {
+          t.nullable.boolean("activeMonitoring");
+          t.nullable.boolean("pendingReview");
+        },
+      }),
+    ),
+  },
+  resolve: async (_, args, ctx) => {
+    const data: Partial<ProfileFieldValue> = {};
+
+    if (isNonNullish(args.data.activeMonitoring)) {
+      data.active_monitoring = args.data.activeMonitoring;
+    }
+
+    if (isNonNullish(args.data.pendingReview)) {
+      data.pending_review = args.data.pendingReview;
+    }
+
+    await ctx.profiles.updateProfileFieldValueOptionsByProfileId(
+      args.profileId,
+      args.profileTypeFieldId,
+      data,
+    );
+
+    const { value, draftValue } = await ctx.profiles.loadProfileFieldValueWithDraft({
+      profileId: args.profileId,
+      profileTypeFieldId: args.profileTypeFieldId,
+    });
+
+    const currentValue = draftValue ?? value;
+    assert(currentValue, "ProfileFieldValue not found");
+
+    return {
+      ...currentValue,
+      has_stored_value: isNonNullish(value),
+    };
+  },
+});
+
+export const saveProfileFieldValueDraft = mutationField("saveProfileFieldValueDraft", {
+  description: "Saves a draft of a profile field value",
+  type: "Success",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfile("profileId"),
+    profileHasStatus("profileId", "OPEN"),
+    profileIsNotAnonymized("profileId"),
+    profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
+    userHasPermissionOnProfileTypeField("profileTypeFieldId", "WRITE"),
+    contextUserHasPermission("PROFILES:CREATE_PROFILES"),
+  ),
+  args: {
+    profileId: nonNull(globalIdArg("Profile")),
+    profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
+  },
+  resolve: async (_, args, ctx) => {
+    const { draftValue } = await ctx.profiles.loadProfileFieldValueWithDraft.raw({
+      profileId: args.profileId,
+      profileTypeFieldId: args.profileTypeFieldId,
+    });
+
+    if (!draftValue) {
+      throw new ForbiddenError("Property does not have a draft");
+    }
+
+    await ctx.profiles.updateProfileFieldValues(
+      [
+        {
+          profileId: args.profileId,
+          profileTypeFieldId: args.profileTypeFieldId,
+          type: draftValue.type,
+          content: draftValue.content,
+        },
+      ],
+      ctx.user!.id,
+      ctx.user!.org_id,
+    );
+
+    return RESULT.SUCCESS;
+  },
+});

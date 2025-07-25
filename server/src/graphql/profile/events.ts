@@ -53,6 +53,8 @@ export const ProfileEvent = interfaceType({
         return "ProfileRelationshipCreatedEvent";
       case "PROFILE_RELATIONSHIP_REMOVED":
         return "ProfileRelationshipRemovedEvent";
+      case "PROFILE_FIELD_VALUE_MONITORED":
+        return "ProfileFieldValueMonitoredEvent";
     }
   },
   sourceType: "profileEvents.ProfileEvent",
@@ -227,4 +229,9 @@ export const ProfileRelationshipRemovedEvent = createProfileEvent(
     });
     t.nonNull.string("reason", { resolve: (o) => o.data.reason });
   },
+);
+
+export const ProfileFieldValueMonitoredEvent = createProfileEvent(
+  "ProfileFieldValueMonitoredEvent",
+  () => {},
 );

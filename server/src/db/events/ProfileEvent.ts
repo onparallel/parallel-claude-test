@@ -64,6 +64,9 @@ export type ProfileEventPayload<TType extends ProfileEventType> = {
     profile_relationship_type_alias: string | null;
     reason: string;
   };
+  PROFILE_FIELD_VALUE_MONITORED: {
+    profile_type_field_id: number;
+  };
 }[TType];
 
 export type GenericProfileEvent<
@@ -131,6 +134,10 @@ export type ProfileRelationshipRemovedEvent<IsCreate extends boolean = false> = 
   "PROFILE_RELATIONSHIP_REMOVED",
   IsCreate
 >;
+export type ProfileFieldValueMonitoredEvent<IsCreate extends boolean = false> = GenericProfileEvent<
+  "PROFILE_FIELD_VALUE_MONITORED",
+  IsCreate
+>;
 
 export type ProfileEvent<IsCreate extends boolean = false> =
   | ProfileCreatedEvent<IsCreate>
@@ -146,6 +153,7 @@ export type ProfileEvent<IsCreate extends boolean = false> =
   | ProfileAnonymizedEvent<IsCreate>
   | ProfileUpdatedEvent<IsCreate>
   | ProfileRelationshipCreatedEvent<IsCreate>
-  | ProfileRelationshipRemovedEvent<IsCreate>;
+  | ProfileRelationshipRemovedEvent<IsCreate>
+  | ProfileFieldValueMonitoredEvent<IsCreate>;
 
 export type CreateProfileEvent = ProfileEvent<true>;

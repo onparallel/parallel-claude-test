@@ -1,37 +1,67 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { Box, Button, Flex, Heading, HStack, Image, Skeleton, Stack, Text } from "@chakra-ui/react";
-import { CheckIcon, DeleteIcon, SaveIcon } from "@parallel/chakra/icons";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  HStack,
+  Image,
+  Skeleton,
+  Stack,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
+import {
+  BusinessIcon,
+  CheckIcon,
+  DeleteIcon,
+  RepeatIcon,
+  SaveIcon,
+  StarEmptyIcon,
+  UserIcon,
+  UserXIcon,
+  XCircleIcon,
+} from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
+import { usePreviewPetitionFieldBackgroundCheckFalsePositivesDialog } from "@parallel/components/petition-preview/dialogs/PreviewPetitionFieldBackgroundCheckFalsePositivesDialog";
 import { usePreviewPetitionFieldBackgroundCheckReplaceReplyDialog } from "@parallel/components/petition-preview/dialogs/PreviewPetitionFieldBackgroundCheckReplaceReplyDialog";
-import { usePreviewPetitionFieldBackgroundCheckSaveSearchDialog } from "@parallel/components/petition-preview/dialogs/PreviewPetitionFieldBackgroundCheckSaveSearchDialog";
+import { useBackgroundCheckContentsNotUpdatedDialog } from "@parallel/components/profiles/dialogs/BackgroundCheckContentsNotUpdatedDialog";
+import { useConfirmModifyBackgroundCheckSearch } from "@parallel/components/profiles/dialogs/ConfirmModifyBackgroundCheckSearchDialog";
+import { Tooltip } from "@parallel/components/ui";
 import {
   BackgroundCheckEntitySearchType,
   BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocument,
   BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_BackgroundCheckEntitySearchCompany_Fragment,
   BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_BackgroundCheckEntitySearchPerson_Fragment,
+  BackgroundCheckFieldSearchResults_saveProfileFieldValueDraftDocument,
   BackgroundCheckFieldSearchResults_updateBackgroundCheckEntityDocument,
+  BackgroundCheckFieldSearchResults_updateBackgroundCheckSearchFalsePositivesDocument,
+  BackgroundCheckFieldSearchResults_updateProfileFieldValueDocument,
 } from "@parallel/graphql/__types";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { formatPartialDate } from "@parallel/utils/formatPartialDate";
 import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
+import { withError } from "@parallel/utils/promises/withError";
 import { integer, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { useLoadOpenSanctionsCountryNames } from "@parallel/utils/useLoadOpenSanctionsCountryNames";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
+import { createHash } from "crypto";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish } from "remeda";
+import { isNonNullish, pick } from "remeda";
 type BackgroundCheckFieldSearchResults_Selection =
   | ({
       type: "Person";
@@ -47,6 +77,7 @@ interface BackgroundCheckFieldSearchResultsTableContext {
   isDeletingEntity: Record<string, boolean>;
   isSavingEntity: Record<string, boolean>;
   isReadOnly: boolean;
+  onFalsePositiveClick: (entityIds: string[], isFalsePositive: boolean) => Promise<void>;
 }
 
 const QUERY_STATE = {
@@ -86,7 +117,7 @@ function BackgroundCheckFieldSearchResults({
 
   const entityTypeLabel = getEntityTypeLabel(intl, type);
 
-  const { data, loading, error } = useQuery(
+  const { data, loading, error, refetch } = useQuery(
     BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocument,
     {
       variables: {
@@ -102,6 +133,11 @@ function BackgroundCheckFieldSearchResults({
   );
 
   const result = data?.backgroundCheckEntitySearch;
+
+  const [hasStoredValue, setHasStoredValue] = useState(result?.hasStoredValue ?? false);
+  useEffect(() => {
+    setHasStoredValue(result?.hasStoredValue ?? false);
+  }, [result?.hasStoredValue]);
 
   useEffect(() => {
     window.opener?.postMessage(
@@ -150,6 +186,7 @@ function BackgroundCheckFieldSearchResults({
           },
         });
         setSavedEntityIds([entityId]);
+        setHasStoredValue(true);
         window.opener?.postMessage("refresh");
       } catch {
       } finally {
@@ -200,26 +237,69 @@ function BackgroundCheckFieldSearchResults({
     [token, name, date, type, country, birthCountry, isReadOnly, isTemplate],
   );
 
-  const handleResetClick = () => {
-    router.push(
-      `/app/background-check?${new URLSearchParams({
-        token,
-        name,
-        ...(date ? { date } : {}),
-        ...(type ? { type } : {}),
-        ...(country ? { country } : {}),
-        ...(birthCountry ? { birthCountry } : {}),
-        ...(isTemplate ? { template: "true" } : {}),
-      })}`,
-    );
+  const showConfirmModifySearchDialog = useConfirmModifyBackgroundCheckSearch();
+  const [updateProfileFieldValue] = useMutation(
+    BackgroundCheckFieldSearchResults_updateProfileFieldValueDocument,
+  );
+  const handleResetClick = async () => {
+    try {
+      const tokenData = JSON.parse(atob(token));
+      if (hasStoredValue && "profileId" in tokenData) {
+        await showConfirmModifySearchDialog({ hasMonitoring: true });
+        await updateProfileFieldValue({
+          variables: {
+            profileId: tokenData.profileId as string,
+            fields: [
+              {
+                profileTypeFieldId: tokenData.profileTypeFieldId as string,
+                content: null,
+              },
+            ],
+          },
+        });
+      }
+
+      router.push(
+        `/app/background-check?${new URLSearchParams({
+          token,
+          name,
+          ...(date ? { date } : {}),
+          ...(type ? { type } : {}),
+          ...(country ? { country } : {}),
+          ...(birthCountry ? { birthCountry } : {}),
+          ...(isTemplate ? { template: "true" } : {}),
+        })}`,
+      );
+    } catch {}
   };
 
-  const showPreviewPetitionFieldBackgroundCheckSaveSearchDialog =
-    usePreviewPetitionFieldBackgroundCheckSaveSearchDialog();
+  const showPreviewPetitionFieldBackgroundCheckFalsePositivesDialog =
+    usePreviewPetitionFieldBackgroundCheckFalsePositivesDialog();
 
-  const handleNoneOfTheResultsClick = async () => {
+  const [updateBackgroundCheckSearchFalsePositives] = useMutation(
+    BackgroundCheckFieldSearchResults_updateBackgroundCheckSearchFalsePositivesDocument,
+  );
+
+  const handleSetFalsePositives = useCallback(
+    async (entityIds: string[], isFalsePositive: boolean) => {
+      await updateBackgroundCheckSearchFalsePositives({
+        variables: {
+          token,
+          entityIds,
+          isFalsePositive,
+        },
+      });
+      await refetch({ force: false });
+      window.opener?.postMessage("refresh");
+    },
+    [token, savedEntityIds.length],
+  );
+
+  const handleFalsePositivesButtonClick = async () => {
     try {
-      await showPreviewPetitionFieldBackgroundCheckSaveSearchDialog();
+      await showPreviewPetitionFieldBackgroundCheckFalsePositivesDialog();
+      await handleSetFalsePositives(result?.items.map((i) => i.id) ?? [], true);
+      setHasStoredValue(true);
     } catch {}
   };
 
@@ -231,6 +311,7 @@ function BackgroundCheckFieldSearchResults({
       onDeleteEntity: handleDelete,
       onSaveEntity: handleSave,
       isReadOnly: isTemplate || isReadOnly,
+      onFalsePositiveClick: handleSetFalsePositives,
     }),
     [savedEntityIds, isDeletingEntity, isSavingEntity],
   );
@@ -244,6 +325,65 @@ function BackgroundCheckFieldSearchResults({
     }
     return [rows.slice((page - 1) * items, page * items), result?.totalCount];
   }, [result, page, items]);
+
+  const isProfile = "profileId" in JSON.parse(atob(token));
+  const [isDraft, setIsDraft] = useState(result?.isDraft ?? false);
+  useEffect(() => {
+    setIsDraft(result?.isDraft ?? false);
+  }, [result]);
+
+  const [saveProfileFieldValueDraft] = useMutation(
+    BackgroundCheckFieldSearchResults_saveProfileFieldValueDraftDocument,
+  );
+
+  const handleSaveToProfile = async () => {
+    try {
+      const data = JSON.parse(atob(token));
+      if (!("profileId" in data)) {
+        return;
+      }
+      await saveProfileFieldValueDraft({
+        variables: {
+          profileId: data.profileId,
+          profileTypeFieldId: data.profileTypeFieldId,
+        },
+      });
+      setIsDraft(false);
+      setHasStoredValue(true);
+      window.opener?.postMessage("refresh");
+    } catch {}
+  };
+
+  const toast = useToast();
+  const showBackgroundCheckContentsNotUpdatedDialog = useBackgroundCheckContentsNotUpdatedDialog();
+
+  const handleRefreshSearch = useCallback(async () => {
+    try {
+      const oldData = result ? pick(result, ["items", "totalCount"]) : null;
+      const { data } = await refetch({ force: true });
+      const newData = data ? pick(data.backgroundCheckEntitySearch, ["items", "totalCount"]) : null;
+
+      const oldMd5 = createHash("md5").update(JSON.stringify(oldData)).digest("hex");
+      const newMd5 = createHash("md5").update(JSON.stringify(newData)).digest("hex");
+      if (oldMd5 === newMd5) {
+        await withError(showBackgroundCheckContentsNotUpdatedDialog());
+      } else {
+        toast({
+          title: intl.formatMessage({
+            id: "component.background-check-search-result.search-refreshed-toast-title",
+            defaultMessage: "Search refreshed",
+          }),
+          description: intl.formatMessage({
+            id: "component.background-check-search-result.search-refreshed-toast-description",
+            defaultMessage: "The search results have been refreshed.",
+          }),
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    } catch {}
+  }, [result, refetch]);
 
   return (
     <>
@@ -270,16 +410,26 @@ function BackgroundCheckFieldSearchResults({
                   values={{ amount: totalCount }}
                 />
               </Heading>
-
-              <Text as="span">
-                <FormattedMessage
-                  id="generic.results-for"
-                  defaultMessage="Results for {date}"
-                  values={{
-                    date: intl.formatDate(result.createdAt, FORMATS.FULL),
-                  }}
+              <HStack>
+                <Text as="span">
+                  <FormattedMessage
+                    id="generic.results-for"
+                    defaultMessage="Results for {date}"
+                    values={{
+                      date: intl.formatDate(result.createdAt, FORMATS.FULL),
+                    }}
+                  />
+                </Text>
+                <IconButtonWithTooltip
+                  variant="outline"
+                  label={intl.formatMessage({
+                    id: "component.background-check-search-result.refresh-search",
+                    defaultMessage: "Refresh search",
+                  })}
+                  icon={<RepeatIcon />}
+                  onClick={handleRefreshSearch}
                 />
-              </Text>
+              </HStack>
             </>
           ) : (
             <>
@@ -341,6 +491,37 @@ function BackgroundCheckFieldSearchResults({
                     defaultMessage="Modify search"
                   />
                 </Button>
+                {isProfile && isDraft && totalCount === 0 ? (
+                  <ResponsiveButtonIcon
+                    colorScheme="purple"
+                    icon={<SaveIcon boxSize={5} />}
+                    onClick={handleSaveToProfile}
+                    label={intl.formatMessage({
+                      id: "page.adverse-media-search.save-search",
+                      defaultMessage: "Save to profile",
+                    })}
+                    breakpoint="lg"
+                  />
+                ) : (
+                  <Button
+                    variant="outline"
+                    fontWeight={500}
+                    color="primary.500"
+                    borderColor="primary.500"
+                    onClick={handleFalsePositivesButtonClick}
+                    isDisabled={
+                      query.readonly === "true" ||
+                      totalCount === 0 ||
+                      savedEntityIds.length > 0 ||
+                      result?.items.every((i) => i.isFalsePositive)
+                    }
+                  >
+                    <FormattedMessage
+                      id="component.background-check-search-result.mark-as-false-positives"
+                      defaultMessage="Mark as false positives"
+                    />
+                  </Button>
+                )}
               </HStack>
             </Flex>
           }
@@ -361,24 +542,23 @@ function BackgroundCheckFieldSearchResults({
                     />
                   </Text>
                   <Text>
-                    <FormattedMessage
-                      id="component.background-check-search-result.save-search-text"
-                      defaultMessage="We have automatically saved the search to preserve the evidence for a future audit."
-                    />
+                    {isProfile && isDraft ? (
+                      <FormattedMessage
+                        id="component.background-check-search-result.manual-save-search-profile-text"
+                        defaultMessage="<b>Save the search to the profile</b> to preserve the evidence for a future audit."
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="component.background-check-search-result.automatically-saved-search-text"
+                        defaultMessage="We have automatically saved the search to preserve the evidence for a future audit."
+                      />
+                    )}
                   </Text>
                 </Stack>
               </Stack>
             ) : null
           }
         />
-        <Box>
-          <Button variant="link" onClick={handleNoneOfTheResultsClick} fontWeight={600}>
-            <FormattedMessage
-              id="component.background-check-search-result.none-of-these-results"
-              defaultMessage="None of these results?"
-            />
-          </Button>
-        </Box>
       </Stack>
     </>
   );
@@ -401,7 +581,32 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
           defaultMessage: "Name",
         }),
         CellContent: ({ row }) => {
-          return <>{row.name}</>;
+          return (
+            <Flex alignItems="center" gap={2}>
+              {row.type === "Person" ? (
+                <Tooltip
+                  placement="bottom-end"
+                  label={intl.formatMessage({
+                    id: "component.background-check-search-result.person",
+                    defaultMessage: "Person",
+                  })}
+                >
+                  <UserIcon />
+                </Tooltip>
+              ) : (
+                <Tooltip
+                  placement="bottom-end"
+                  label={intl.formatMessage({
+                    id: "component.background-check-search-result.company",
+                    defaultMessage: "Company",
+                  })}
+                >
+                  <BusinessIcon />
+                </Tooltip>
+              )}
+              {row.name}
+            </Flex>
+          );
         },
       },
       {
@@ -593,24 +798,76 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                       e.stopPropagation();
                       handleDeleteClick();
                     }}
+                    placement="bottom-end"
+                  />
+                </HStack>
+              ) : row.isFalsePositive ? (
+                <HStack>
+                  <XCircleIcon color="red.500" />
+                  <Text fontWeight={500}>
+                    <FormattedMessage
+                      id="component.background-check-search-result.false-positive"
+                      defaultMessage="False positive"
+                    />
+                  </Text>
+                  <IconButtonWithTooltip
+                    size="sm"
+                    fontSize="md"
+                    label={intl.formatMessage({
+                      id: "component.background-check-search-result.unmark-as-false-positive",
+                      defaultMessage: "Unmark as false positive",
+                    })}
+                    icon={<DeleteIcon />}
+                    isLoading={context.isDeletingEntity[row.id]}
+                    isDisabled={
+                      context.isSavingEntity[row.id] ||
+                      context.isReadOnly ||
+                      context.savedEntityIds.length > 0
+                    }
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      context.onFalsePositiveClick([row.id], false);
+                    }}
+                    placement="bottom-end"
                   />
                 </HStack>
               ) : (
-                <Button
-                  size="sm"
-                  fontSize="md"
-                  isLoading={context.isSavingEntity[row.id]}
-                  isDisabled={context.isReadOnly}
-                  variant="solid"
-                  colorScheme="primary"
-                  leftIcon={<SaveIcon />}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSaveClick();
-                  }}
-                >
-                  <FormattedMessage id="generic.save" defaultMessage="Save" />
-                </Button>
+                <HStack>
+                  <Button
+                    size="sm"
+                    fontSize="md"
+                    isLoading={context.isSavingEntity[row.id]}
+                    isDisabled={context.isReadOnly}
+                    variant="solid"
+                    colorScheme="primary"
+                    leftIcon={<StarEmptyIcon />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSaveClick();
+                    }}
+                  >
+                    <FormattedMessage
+                      id="component.background-check-search-result.save-match"
+                      defaultMessage="Save match"
+                    />
+                  </Button>
+                  <Button
+                    size="sm"
+                    fontSize="md"
+                    leftIcon={<UserXIcon />}
+                    isDisabled={context.isReadOnly || context.savedEntityIds.length > 0}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      context.onFalsePositiveClick([row.id], true);
+                    }}
+                  >
+                    <FormattedMessage
+                      id="component.background-check-search-result.false-positive"
+                      defaultMessage="False positive"
+                    />
+                  </Button>
+                </HStack>
               )}
             </Flex>
           );
@@ -628,6 +885,7 @@ const _fragments = {
       type
       name
       score
+      isFalsePositive
       ... on BackgroundCheckEntitySearchPerson {
         properties {
           countryOfBirth
@@ -650,25 +908,42 @@ const _fragments = {
 
 const _mutations = [
   gql`
-    mutation BackgroundCheckFieldSearchResults_deletePetitionFieldReply(
-      $petitionId: GID!
-      $replyId: GID!
-    ) {
-      deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
-        id
-        replies {
-          id
-          content
-        }
-      }
-    }
-  `,
-  gql`
     mutation BackgroundCheckFieldSearchResults_updateBackgroundCheckEntity(
       $token: String!
       $entityId: String
     ) {
       updateBackgroundCheckEntity(token: $token, entityId: $entityId)
+    }
+  `,
+  gql`
+    mutation BackgroundCheckFieldSearchResults_updateBackgroundCheckSearchFalsePositives(
+      $token: String!
+      $entityIds: [String!]!
+      $isFalsePositive: Boolean!
+    ) {
+      updateBackgroundCheckSearchFalsePositives(
+        token: $token
+        entityIds: $entityIds
+        isFalsePositive: $isFalsePositive
+      )
+    }
+  `,
+  gql`
+    mutation BackgroundCheckFieldSearchResults_saveProfileFieldValueDraft(
+      $profileId: GID!
+      $profileTypeFieldId: GID!
+    ) {
+      saveProfileFieldValueDraft(profileId: $profileId, profileTypeFieldId: $profileTypeFieldId)
+    }
+  `,
+  gql`
+    mutation BackgroundCheckFieldSearchResults_updateProfileFieldValue(
+      $profileId: GID!
+      $fields: [UpdateProfileFieldValueInput!]!
+    ) {
+      updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+        id
+      }
     }
   `,
 ];
@@ -682,6 +957,7 @@ const _queries = [
       $type: BackgroundCheckEntitySearchType
       $country: String
       $birthCountry: String
+      $force: Boolean
     ) {
       backgroundCheckEntitySearch(
         token: $token
@@ -690,12 +966,15 @@ const _queries = [
         type: $type
         country: $country
         birthCountry: $birthCountry
+        force: $force
       ) {
         totalCount
         createdAt
         items {
           ...BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema
         }
+        isDraft
+        hasStoredValue
       }
     }
     ${_fragments.BackgroundCheckEntitySearchSchema}

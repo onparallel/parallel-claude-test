@@ -79,3 +79,7 @@ export * from "./petition-approval-request/types";
 export * from "./adverse-media/mutations";
 export * from "./adverse-media/queries";
 export * from "./adverse-media/types";
+
+export * from "./background-check/mutations";
+export * from "./background-check/queries";
+export * from "./background-check/types";

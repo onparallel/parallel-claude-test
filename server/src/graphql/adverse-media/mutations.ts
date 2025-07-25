@@ -1,5 +1,6 @@
 import { mutationField, nonNull, nullable, stringArg } from "nexus";
 import { uniqueBy } from "remeda";
+import { AdverseMediaSearchContent } from "../../services/AdverseMediaSearchService";
 import { authenticateAnd } from "../helpers/authorize";
 import { ForbiddenError } from "../helpers/errors";
 import { authenticatePetitionOrProfileReplyToken } from "../integrations/authorizers";
@@ -118,31 +119,15 @@ export const classifyAdverseMediaArticle = mutationField("classifyAdverseMediaAr
     }
 
     async function profileParamsResolver(params: NumericParams<ProfileReplyParams>) {
-      const [profileValues, draftValues] = await Promise.all([
-        ctx.profiles.loadProfileFieldValuesByProfileId(params.profileId),
-        ctx.profiles.loadDraftProfileFieldValuesByProfileId(params.profileId),
-      ]);
-
-      const profileValue = profileValues.find(
-        (v) =>
-          v.profile_type_field_id === params.profileTypeFieldId &&
-          v.type === "ADVERSE_MEDIA_SEARCH",
-      );
-
-      if (!profileValue) {
+      const { value, draftValue } = await ctx.profiles.loadProfileFieldValueWithDraft(params);
+      if (!value) {
         throw new ForbiddenError("Expected a profile field value");
       }
 
-      const draftValue = draftValues.find(
-        (v) =>
-          v.profile_type_field_id === params.profileTypeFieldId &&
-          v.type === "ADVERSE_MEDIA_SEARCH",
-      );
-
-      const currentValue = draftValue ?? profileValue;
+      const content = (draftValue ?? value).content as AdverseMediaSearchContent;
 
       // check if the article exists in content
-      if (!currentValue.content.articles.items.some((a: any) => a.id === args.id)) {
+      if (!content.articles.items.some((a) => a.id === args.id)) {
         throw new ForbiddenError("Article not found");
       }
 
@@ -161,8 +146,8 @@ export const classifyAdverseMediaArticle = mutationField("classifyAdverseMediaAr
             profileTypeFieldId: params.profileTypeFieldId,
             type: "ADVERSE_MEDIA_SEARCH",
             content: {
-              ...currentValue.content,
-              ...buildClassification(currentValue.content),
+              ...content,
+              ...buildClassification(content),
             },
           },
         ],
@@ -186,7 +171,9 @@ export const classifyAdverseMediaArticle = mutationField("classifyAdverseMediaAr
   },
 });
 
+/** @deprecated */
 export const saveAdverseMediaChanges = mutationField("saveAdverseMediaChanges", {
+  deprecation: "use saveProfileFieldValueDraft instead",
   type: "AdverseMediaArticleSearchResult",
   args: {
     token: nonNull(stringArg()),
@@ -197,23 +184,9 @@ export const saveAdverseMediaChanges = mutationField("saveAdverseMediaChanges", 
   ),
   resolve: async (_, args, ctx) => {
     async function profileParamsResolver(params: NumericParams<ProfileReplyParams>) {
-      const [profileValues, draftValues] = await Promise.all([
-        ctx.profiles.loadProfileFieldValuesByProfileId(params.profileId),
-        ctx.profiles.loadDraftProfileFieldValuesByProfileId(params.profileId),
-      ]);
+      const { draftValue } = await ctx.profiles.loadProfileFieldValueWithDraft(params);
 
-      const profileValue = profileValues.find(
-        (v) =>
-          v.profile_type_field_id === params.profileTypeFieldId &&
-          v.type === "ADVERSE_MEDIA_SEARCH",
-      );
-      const draftValue = draftValues.find(
-        (v) =>
-          v.profile_type_field_id === params.profileTypeFieldId &&
-          v.type === "ADVERSE_MEDIA_SEARCH",
-      );
-
-      if (!profileValue || !draftValue) {
+      if (!draftValue) {
         throw new ForbiddenError("Expected a profile field value");
       }
 
@@ -236,8 +209,6 @@ export const saveAdverseMediaChanges = mutationField("saveAdverseMediaChanges", 
         ctx.user!.id,
         ctx.user!.org_id,
       );
-
-      await ctx.profiles.deleteDraftProfileFieldValue(draftValue.id);
 
       return ctx.profilesHelper.mapValueContentFromDatabase({
         type: "ADVERSE_MEDIA_SEARCH",

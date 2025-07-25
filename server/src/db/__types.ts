@@ -497,7 +497,8 @@ export type ProfileEventType =
   | "PROFILE_ANONYMIZED"
   | "PROFILE_UPDATED"
   | "PROFILE_RELATIONSHIP_CREATED"
-  | "PROFILE_RELATIONSHIP_REMOVED";
+  | "PROFILE_RELATIONSHIP_REMOVED"
+  | "PROFILE_FIELD_VALUE_MONITORED";
 
 export const ProfileEventTypeValues = [
   "PROFILE_CREATED",
@@ -514,6 +515,7 @@ export const ProfileEventTypeValues = [
   "PROFILE_UPDATED",
   "PROFILE_RELATIONSHIP_CREATED",
   "PROFILE_RELATIONSHIP_REMOVED",
+  "PROFILE_FIELD_VALUE_MONITORED",
 ] as ProfileEventType[];
 
 export type ProfileRelationshipTypeDirection = "LEFT_RIGHT" | "RIGHT_LEFT";

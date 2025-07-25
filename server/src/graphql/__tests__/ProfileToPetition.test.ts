@@ -741,6 +741,38 @@ describe("GraphQL/Profiles to Petitions", () => {
           content: { value: "US" },
           created_by_user_id: user.id,
         },
+        {
+          profile_type_field_id: individualIdx["p_background_check"].id,
+          type: "BACKGROUND_CHECK",
+          content: {
+            query: {
+              name: "Bart Simpson",
+              date: "1980-04-01",
+              type: "PERSON",
+            },
+            search: {
+              totalCount: 2,
+              items: [
+                {
+                  id: "bart-1",
+                  type: "PERSON",
+                  name: "Bart Simpson",
+                  properties: {},
+                },
+                {
+                  id: "el-barto-1",
+                  type: "PERSON",
+                  name: "El Barto",
+                  properties: {},
+                },
+              ],
+              createdAt: new Date().toISOString(),
+            },
+            entity: null,
+          },
+          created_by_user_id: user.id,
+          is_draft: true,
+        },
       ]);
       const bartFiles = await mocks.createRandomFileUpload(1, () => ({
         filename: "id_document__bart_simpson",
@@ -1823,6 +1855,7 @@ describe("GraphQL/Profiles to Petitions", () => {
                           },
                           search: {
                             totalCount: 1,
+                            falsePositivesCount: 0,
                           },
                           entity: {
                             id: "Q7747",
@@ -2366,6 +2399,7 @@ describe("GraphQL/Profiles to Petitions", () => {
                           },
                           search: {
                             totalCount: 0,
+                            falsePositivesCount: 0,
                           },
                           entity: null,
                         },
@@ -2813,7 +2847,22 @@ describe("GraphQL/Profiles to Petitions", () => {
                         id: toGlobalId("ProfileTypeField", individualIdx["p_background_check"].id),
                       },
                     },
-                    replies: [],
+                    replies: [
+                      {
+                        content: {
+                          query: {
+                            name: "Bart Simpson",
+                            date: "1980-04-01",
+                            type: "PERSON",
+                          },
+                          search: {
+                            totalCount: 2,
+                            falsePositivesCount: 0,
+                          },
+                          entity: null,
+                        },
+                      },
+                    ],
                   },
                   {
                     field: {
@@ -6198,13 +6247,9 @@ describe("GraphQL/Profiles to Petitions", () => {
               ],
               createdAt: expect.any(String),
             },
-            entity: {
-              id: "Q7747",
-              type: "Person",
-              name: "Mike ROSS",
-              properties: {},
-            },
+            entity: null,
           },
+          is_draft: false,
         },
         {
           type: "CHECKBOX",
@@ -6218,6 +6263,7 @@ describe("GraphQL/Profiles to Petitions", () => {
           content: {
             search: [{ wikiDataId: "Q7747", name: "Vladimir Putin" }, { term: "economic war" }],
             articles: {
+              createdAt: new Date(),
               totalCount: 3,
               items: [
                 {
@@ -6613,13 +6659,9 @@ describe("GraphQL/Profiles to Petitions", () => {
                       },
                       search: {
                         totalCount: 1,
+                        falsePositivesCount: 0,
                       },
-                      entity: {
-                        id: "Q7747",
-                        type: "Person",
-                        name: "Mike ROSS",
-                        properties: {},
-                      },
+                      entity: null,
                     },
                   },
                 ],
@@ -6656,6 +6698,7 @@ describe("GraphQL/Profiles to Petitions", () => {
                         { term: "economic war" },
                       ],
                       articles: {
+                        createdAt: expect.any(String),
                         totalCount: 3,
                         items: [
                           {
@@ -6854,13 +6897,9 @@ describe("GraphQL/Profiles to Petitions", () => {
                       },
                       search: {
                         totalCount: 1,
+                        falsePositivesCount: 0,
                       },
-                      entity: {
-                        id: "Q7747",
-                        type: "Person",
-                        name: "Mike ROSS",
-                        properties: {},
-                      },
+                      entity: null,
                     },
                   },
                 ],
@@ -6897,6 +6936,7 @@ describe("GraphQL/Profiles to Petitions", () => {
                         { term: "economic war" },
                       ],
                       articles: {
+                        createdAt: expect.any(String),
                         totalCount: 3,
                         items: [
                           {
@@ -7046,6 +7086,7 @@ describe("GraphQL/Profiles to Petitions", () => {
                       },
                       search: {
                         totalCount: 1,
+                        falsePositivesCount: 0,
                       },
                       entity: {
                         id: "Q7748",
@@ -7295,13 +7336,9 @@ describe("GraphQL/Profiles to Petitions", () => {
                       },
                       search: {
                         totalCount: 1,
+                        falsePositivesCount: 0,
                       },
-                      entity: {
-                        id: "Q7747",
-                        type: "Person",
-                        name: "Mike ROSS",
-                        properties: {},
-                      },
+                      entity: null,
                     },
                   },
                 ],
@@ -7339,6 +7376,7 @@ describe("GraphQL/Profiles to Petitions", () => {
                       ],
                       articles: {
                         totalCount: 3,
+                        createdAt: expect.any(String),
                         items: [
                           {
                             id: "OPOINT/1-1",
@@ -7812,6 +7850,7 @@ describe("GraphQL/Profiles to Petitions", () => {
                       },
                       search: {
                         totalCount: 1,
+                        falsePositivesCount: 0,
                       },
                       entity: {
                         id: "Q7748",

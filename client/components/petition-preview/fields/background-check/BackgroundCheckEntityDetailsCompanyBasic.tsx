@@ -6,7 +6,7 @@ import {
   DeleteIcon,
   EyeIcon,
   FieldDateIcon,
-  SaveIcon,
+  StarEmptyIcon,
 } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -108,13 +108,16 @@ export function BackgroundCheckEntityDetailsCompanyBasic({
               <Button
                 variant="solid"
                 colorScheme="primary"
-                leftIcon={<SaveIcon />}
+                leftIcon={<StarEmptyIcon />}
                 onClick={onSave}
                 isLoading={isSaving}
                 isDisabled={isReadOnly}
                 width={{ base: "100%", sm: "auto" }}
               >
-                <FormattedMessage id="generic.save" defaultMessage="Save" />
+                <FormattedMessage
+                  id="component.background-check-search-result.save-match"
+                  defaultMessage="Save match"
+                />
               </Button>
             )}
           </HStack>

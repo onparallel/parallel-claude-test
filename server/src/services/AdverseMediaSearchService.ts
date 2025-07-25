@@ -26,9 +26,9 @@ export interface AdverseMediaSearchContent {
     items: Pick<AdverseMediaArticle, "id" | "header" | "timestamp" | "source">[];
     createdAt: Date;
   };
-  relevant_articles: { id: string; added_at: Date }[];
-  irrelevant_articles: { id: string; added_at: Date }[];
-  dismissed_articles: { id: string; added_at: Date }[];
+  relevant_articles: { id: string; added_at: Date; added_by_user_id: number }[];
+  irrelevant_articles: { id: string; added_at: Date; added_by_user_id: number }[];
+  dismissed_articles: { id: string; added_at: Date; added_by_user_id: number }[];
 }
 
 export interface IAdverseMediaSearchService {

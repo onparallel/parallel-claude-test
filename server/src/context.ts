@@ -248,6 +248,10 @@ export class WorkerContext {
     public readonly eventSubscription: IEventSubscriptionService,
     @inject(ADVERSE_MEDIA_SEARCH_SERVICE) public readonly adverseMedia: IAdverseMediaSearchService,
 
+    // Helper services
+    @inject(PETITIONS_HELPER_SERVICE) public readonly petitionsHelper: PetitionsHelperService,
+    @inject(PROFILES_HELPER_SERVICE) public readonly profilesHelper: ProfilesHelperService,
+
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,

@@ -481,9 +481,10 @@ ProfileFormField.fragments = {
       fragment ProfileFormField_ProfileFieldValue on ProfileFieldValue {
         id
         content
-        hasDraft
+        isDraft
         hasPendingReview
         hasActiveMonitoring
+        hasStoredValue
       }
     `;
   },

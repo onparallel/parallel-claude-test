@@ -1040,35 +1040,4 @@ describe("Adverse Media - Petitions", () => {
       });
     });
   });
-
-  describe("saveAdverseMediaChanges", () => {
-    it("sends error if trying to save changes on a petition token", async () => {
-      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
-        is_template: false,
-      }));
-
-      const [field] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
-        type: "ADVERSE_MEDIA_SEARCH",
-      }));
-
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($token: String!) {
-            saveAdverseMediaChanges(token: $token) {
-              __typename
-            }
-          }
-        `,
-        {
-          token: buildToken({
-            petitionId: petition.id,
-            fieldId: field.id,
-          }),
-        },
-      );
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-  });
 });

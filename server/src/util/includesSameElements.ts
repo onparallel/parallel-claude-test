@@ -21,9 +21,11 @@
  * includesSameElements(arr1, arr2, (a, b) => a.id === b.id); // returns true
  */
 export function includesSameElements<T>(
-  a: T[] | undefined,
-  b: T[] | undefined,
+  _a: T[] | undefined,
+  _b: T[] | undefined,
   compareFn: (a: T, b: T) => boolean,
 ) {
+  const a = _a ?? [];
+  const b = _b ?? [];
   return !!a && !!b && a.length === b.length && a.every((v) => b.some((w) => compareFn(v, w)));
 }

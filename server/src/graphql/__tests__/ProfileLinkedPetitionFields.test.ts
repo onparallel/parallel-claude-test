@@ -16,6 +16,7 @@ import {
 } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
+import { BackgroundCheckContent } from "../../services/BackgroundCheckService";
 import { PROFILES_SETUP_SERVICE, ProfilesSetupService } from "../../services/ProfilesSetupService";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
@@ -1728,6 +1729,7 @@ describe("ProfileLinkedPetitionFields", () => {
               search: {
                 totalCount: 1,
                 createdAt: expect.any(String),
+                falsePositivesCount: 0,
               },
               entity: {
                 id: "1",
@@ -2840,8 +2842,8 @@ describe("ProfileLinkedPetitionFields", () => {
           content: {
             query: { name: "Mike Wazowski", date: null, type: "Person" },
             search: {
-              totalCount: 0,
-              items: [],
+              totalCount: 1,
+              items: [{ id: "1", type: "Person", name: "Mike Wazowski", properties: {} }],
               createdAt: new Date(),
             },
             entity: { id: "1", type: "Person", name: "Mike Wazowski", properties: {} },
@@ -2923,8 +2925,9 @@ describe("ProfileLinkedPetitionFields", () => {
                 content: {
                   query: { name: "Mike Wazowski", date: null, type: "Person" },
                   search: {
-                    totalCount: 0,
+                    totalCount: 1,
                     createdAt: expect.any(String),
+                    falsePositivesCount: 0,
                   },
                   entity: { id: "1", type: "Person", name: "Mike Wazowski", properties: {} },
                 },
@@ -5306,6 +5309,7 @@ describe("ProfileLinkedPetitionFields", () => {
               search: {
                 totalCount: 1,
                 createdAt: expect.any(String),
+                falsePositivesCount: 0,
               },
               entity: {
                 id: "1",
@@ -7217,6 +7221,7 @@ describe("ProfileLinkedPetitionFields", () => {
     let petition: Petition;
     let fieldGroup: PetitionField;
     let checkboxChild: PetitionField;
+    let backgroundCheckChild: PetitionField;
 
     beforeEach(async () => {
       [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
@@ -7234,11 +7239,18 @@ describe("ProfileLinkedPetitionFields", () => {
         type: "FIELD_GROUP",
         profile_type_id: profileType.id,
       }));
-      [checkboxChild] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
-        type: "CHECKBOX",
-        parent_petition_field_id: fieldGroup.id,
-        profile_type_field_id: profileTypeFields.find((f) => f.type === "CHECKBOX")!.id,
-      }));
+      [checkboxChild, backgroundCheckChild] = await mocks.createRandomPetitionFields(
+        petition.id,
+        2,
+        (i) => {
+          const type = ["CHECKBOX", "BACKGROUND_CHECK"][i] as PetitionFieldType;
+          return {
+            type,
+            parent_petition_field_id: fieldGroup.id,
+            profile_type_field_id: profileTypeFields.find((f) => f.type === type)!.id,
+          };
+        },
+      );
     });
 
     it("archives a CHECKBOX reply into a profile", async () => {
@@ -7259,6 +7271,7 @@ describe("ProfileLinkedPetitionFields", () => {
             $profileId: GID!
             $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
             $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            $profileTypeFieldId: GID!
           ) {
             archiveFieldGroupReplyIntoProfile(
               petitionId: $petitionId
@@ -7270,12 +7283,13 @@ describe("ProfileLinkedPetitionFields", () => {
             ) {
               associatedProfile {
                 id
-                properties {
+                properties(filter: [{ profileTypeFieldId: $profileTypeFieldId }]) {
                   field {
                     id
                     type
                   }
                   value {
+                    isDraft
                     content
                   }
                 }
@@ -7288,6 +7302,7 @@ describe("ProfileLinkedPetitionFields", () => {
           petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
           parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
           profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[8].id),
           conflictResolutions: [],
           expirations: [],
         },
@@ -7299,75 +7314,13 @@ describe("ProfileLinkedPetitionFields", () => {
           properties: [
             {
               field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
-                type: "TEXT",
-              },
-              value: null,
-            },
-            {
-              field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[1].id),
-                type: "SHORT_TEXT",
-              },
-              value: null,
-            },
-            {
-              field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[2].id),
-                type: "FILE",
-              },
-              value: null,
-            },
-            {
-              field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[3].id),
-                type: "DATE",
-              },
-              value: null,
-            },
-            {
-              field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[4].id),
-                type: "PHONE",
-              },
-              value: null,
-            },
-            {
-              field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[5].id),
-                type: "NUMBER",
-              },
-              value: null,
-            },
-            {
-              field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[6].id),
-                type: "SELECT",
-              },
-              value: null,
-            },
-            {
-              field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
-                type: "BACKGROUND_CHECK",
-              },
-              value: null,
-            },
-            {
-              field: {
                 id: toGlobalId("ProfileTypeField", profileTypeFields[8].id),
                 type: "CHECKBOX",
               },
               value: {
+                isDraft: false,
                 content: { value: ["A", "C"] },
               },
-            },
-            {
-              field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[9].id),
-                type: "ADVERSE_MEDIA_SEARCH",
-              },
-              value: null,
             },
           ],
         },
@@ -7470,6 +7423,7 @@ describe("ProfileLinkedPetitionFields", () => {
             $profileId: GID!
             $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
             $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            $profileTypeFieldId: GID!
           ) {
             archiveFieldGroupReplyIntoProfile(
               petitionId: $petitionId
@@ -7481,7 +7435,7 @@ describe("ProfileLinkedPetitionFields", () => {
             ) {
               associatedProfile {
                 id
-                properties {
+                properties(filter: [{ profileTypeFieldId: $profileTypeFieldId }]) {
                   field {
                     id
                     type
@@ -7499,6 +7453,7 @@ describe("ProfileLinkedPetitionFields", () => {
           petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
           parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
           profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[8].id),
           conflictResolutions: [],
           expirations: [],
         },
@@ -7510,62 +7465,6 @@ describe("ProfileLinkedPetitionFields", () => {
           properties: [
             {
               field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
-                type: "TEXT",
-              },
-              value: null,
-            },
-            {
-              field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[1].id),
-                type: "SHORT_TEXT",
-              },
-              value: null,
-            },
-            {
-              field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[2].id),
-                type: "FILE",
-              },
-              value: null,
-            },
-            {
-              field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[3].id),
-                type: "DATE",
-              },
-              value: null,
-            },
-            {
-              field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[4].id),
-                type: "PHONE",
-              },
-              value: null,
-            },
-            {
-              field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[5].id),
-                type: "NUMBER",
-              },
-              value: null,
-            },
-            {
-              field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[6].id),
-                type: "SELECT",
-              },
-              value: null,
-            },
-            {
-              field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
-                type: "BACKGROUND_CHECK",
-              },
-              value: null,
-            },
-            {
-              field: {
                 id: toGlobalId("ProfileTypeField", profileTypeFields[8].id),
                 type: "CHECKBOX",
               },
@@ -7573,16 +7472,1708 @@ describe("ProfileLinkedPetitionFields", () => {
                 content: { value: ["C", "A"] }, // keep the value in the profile
               },
             },
+          ],
+        },
+      });
+    });
+
+    it("archiving a FIELD_GROUP with a BACKGROUND_CHECK reply with saved entity should create a non-draft on profile", async () => {
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createPetitionFieldReply(backgroundCheckChild.id, 1, () => ({
+        user_id: user.id,
+        type: "BACKGROUND_CHECK",
+        parent_petition_field_reply_id: groupReply.id,
+        content: {
+          query: {
+            name: "John Doe",
+            type: null,
+            date: null,
+          },
+          search: {
+            totalCount: 2,
+            items: [
+              {
+                id: "Q7747",
+                type: "Person",
+                name: "Vladimir Vladimirovich PUTIN",
+                properties: {},
+              },
+
+              {
+                id: "rupep-company-718",
+                type: "Company",
+                name: "Putin Consulting LLC",
+                properties: {},
+              },
+            ],
+            createdAt: new Date(),
+          },
+          entity: {
+            id: "Q7747",
+            name: "Vladimir Vladimirovich PUTIN",
+            type: "Person",
+            properties: {},
+            createdAt: new Date(),
+          },
+          falsePositives: [
+            { id: "rupep-company-718", addedAt: new Date(), addedByUserId: user.id },
+          ],
+        } as BackgroundCheckContent,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+            $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            $profileTypeFieldId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: $expirations
+            ) {
+              associatedProfile {
+                id
+                properties(filter: [{ profileTypeFieldId: $profileTypeFieldId }]) {
+                  field {
+                    id
+                    type
+                  }
+                  value {
+                    isDraft
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+          conflictResolutions: [],
+          expirations: [],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+        associatedProfile: {
+          id: toGlobalId("Profile", profile.id),
+          properties: [
             {
               field: {
-                id: toGlobalId("ProfileTypeField", profileTypeFields[9].id),
-                type: "ADVERSE_MEDIA_SEARCH",
+                id: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+                type: "BACKGROUND_CHECK",
               },
-              value: null,
+              value: {
+                isDraft: false,
+                content: {
+                  query: {
+                    name: "John Doe",
+                    type: null,
+                    date: null,
+                  },
+                  search: {
+                    totalCount: 2,
+                    falsePositivesCount: 1,
+                    createdAt: expect.any(String),
+                  },
+                  entity: {
+                    id: "Q7747",
+                    name: "Vladimir Vladimirovich PUTIN",
+                    type: "Person",
+                    createdAt: expect.any(String),
+                    properties: {},
+                  },
+                },
+              },
             },
           ],
         },
       });
+    });
+
+    it("archiving a FIELD_GROUP with a BACKGROUND_CHECK reply with all false positives should create a non-draft on profile", async () => {
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createPetitionFieldReply(backgroundCheckChild.id, 1, () => ({
+        user_id: user.id,
+        type: "BACKGROUND_CHECK",
+        parent_petition_field_reply_id: groupReply.id,
+        content: {
+          query: {
+            name: "John Doe",
+            type: null,
+            date: null,
+          },
+          search: {
+            totalCount: 2,
+            items: [
+              {
+                id: "Q7747",
+                type: "Person",
+                name: "Vladimir Vladimirovich PUTIN",
+                properties: {},
+              },
+
+              {
+                id: "rupep-company-718",
+                type: "Company",
+                name: "Putin Consulting LLC",
+                properties: {},
+              },
+            ],
+            createdAt: new Date(),
+          },
+          entity: null,
+          falsePositives: [
+            { id: "rupep-company-718", addedAt: new Date(), addedByUserId: user.id },
+            { id: "Q7747", addedAt: new Date(), addedByUserId: user.id },
+          ],
+        } as BackgroundCheckContent,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+            $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            $profileTypeFieldId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: $expirations
+            ) {
+              associatedProfile {
+                id
+                properties(filter: [{ profileTypeFieldId: $profileTypeFieldId }]) {
+                  field {
+                    id
+                    type
+                  }
+                  value {
+                    isDraft
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+          conflictResolutions: [],
+          expirations: [],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+        associatedProfile: {
+          id: toGlobalId("Profile", profile.id),
+          properties: [
+            {
+              field: {
+                id: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+                type: "BACKGROUND_CHECK",
+              },
+              value: {
+                isDraft: false,
+                content: {
+                  query: {
+                    name: "John Doe",
+                    type: null,
+                    date: null,
+                  },
+                  search: {
+                    totalCount: 2,
+                    falsePositivesCount: 2,
+                    createdAt: expect.any(String),
+                  },
+                  entity: null,
+                },
+              },
+            },
+          ],
+        },
+      });
+    });
+
+    it("archiving a FIELD_GROUP with a BACKGROUND_CHECK reply with an empty search should create a draft on profile", async () => {
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createPetitionFieldReply(backgroundCheckChild.id, 1, () => ({
+        user_id: user.id,
+        type: "BACKGROUND_CHECK",
+        parent_petition_field_reply_id: groupReply.id,
+        content: {
+          query: {
+            name: "John Doe",
+            type: null,
+            date: null,
+          },
+          search: {
+            totalCount: 0,
+            items: [],
+            createdAt: new Date(),
+          },
+          entity: null,
+        } as BackgroundCheckContent,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+            $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            $profileTypeFieldId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: $expirations
+            ) {
+              associatedProfile {
+                id
+                properties(filter: [{ profileTypeFieldId: $profileTypeFieldId }]) {
+                  field {
+                    id
+                    type
+                  }
+                  value {
+                    isDraft
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+          conflictResolutions: [],
+          expirations: [],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+        associatedProfile: {
+          id: toGlobalId("Profile", profile.id),
+          properties: [
+            {
+              field: {
+                id: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+                type: "BACKGROUND_CHECK",
+              },
+              value: {
+                isDraft: true,
+                content: {
+                  query: {
+                    name: "John Doe",
+                    type: null,
+                    date: null,
+                  },
+                  search: {
+                    totalCount: 0,
+                    falsePositivesCount: 0,
+                    createdAt: expect.any(String),
+                  },
+                  entity: null,
+                },
+              },
+            },
+          ],
+        },
+      });
+    });
+
+    it("archiving a FIELD_GROUP with a BACKGROUND_CHECK reply with no saved entity should create a draft on profile", async () => {
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createPetitionFieldReply(backgroundCheckChild.id, 1, () => ({
+        user_id: user.id,
+        type: "BACKGROUND_CHECK",
+        parent_petition_field_reply_id: groupReply.id,
+        content: {
+          query: {
+            name: "John Doe",
+            type: null,
+            date: null,
+          },
+          search: {
+            totalCount: 2,
+            items: [
+              {
+                id: "Q7747",
+                type: "Person",
+                name: "Vladimir Vladimirovich PUTIN",
+                properties: {},
+              },
+
+              {
+                id: "rupep-company-718",
+                type: "Company",
+                name: "Putin Consulting LLC",
+                properties: {},
+              },
+            ],
+            createdAt: new Date(),
+          },
+          entity: null,
+          falsePositives: [
+            { id: "rupep-company-718", addedAt: new Date(), addedByUserId: user.id },
+          ],
+        } as BackgroundCheckContent,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+            $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            $profileTypeFieldId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: $expirations
+            ) {
+              associatedProfile {
+                id
+                properties(filter: [{ profileTypeFieldId: $profileTypeFieldId }]) {
+                  field {
+                    id
+                    type
+                  }
+                  value {
+                    isDraft
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+          conflictResolutions: [],
+          expirations: [],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+        associatedProfile: {
+          id: toGlobalId("Profile", profile.id),
+          properties: [
+            {
+              field: {
+                id: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+                type: "BACKGROUND_CHECK",
+              },
+              value: {
+                isDraft: true,
+                content: {
+                  query: {
+                    name: "John Doe",
+                    type: null,
+                    date: null,
+                  },
+                  search: {
+                    totalCount: 2,
+                    falsePositivesCount: 1,
+                    createdAt: expect.any(String),
+                  },
+                  entity: null,
+                },
+              },
+            },
+          ],
+        },
+      });
+    });
+
+    it("archiving a FIELD_GROUP with a BACKGROUND_CHECK incomplete reply entity should create a draft on profile with a draft value", async () => {
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createPetitionFieldReply(backgroundCheckChild.id, 1, () => ({
+        user_id: user.id,
+        type: "BACKGROUND_CHECK",
+        parent_petition_field_reply_id: groupReply.id,
+        content: {
+          query: {
+            name: "John Doe",
+            type: null,
+            date: null,
+          },
+          search: {
+            totalCount: 2,
+            items: [
+              {
+                id: "Q7747",
+                type: "Person",
+                name: "Vladimir Vladimirovich PUTIN",
+                properties: {},
+              },
+              {
+                id: "rupep-company-718",
+                type: "Company",
+                name: "Putin Consulting LLC",
+                properties: {},
+              },
+            ],
+            createdAt: new Date(),
+          },
+          entity: null,
+          falsePositives: [
+            { id: "rupep-company-718", addedAt: new Date(), addedByUserId: user.id },
+          ],
+        } as BackgroundCheckContent,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeFields[7].id,
+          type: "BACKGROUND_CHECK",
+          content: {
+            query: {
+              name: "Mike Ross",
+              type: "PERSON",
+              date: null,
+            },
+            search: {
+              totalCount: 1,
+              items: [
+                {
+                  id: "mike-1",
+                  type: "Person",
+                  name: "Mike Ross",
+                  properties: {},
+                },
+              ],
+              createdAt: new Date(),
+            },
+            entity: null,
+          },
+          created_by_user_id: user.id,
+          is_draft: true,
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+            $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            $profileTypeFieldId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: $expirations
+            ) {
+              associatedProfile {
+                id
+                properties(filter: [{ profileTypeFieldId: $profileTypeFieldId }]) {
+                  field {
+                    id
+                    type
+                  }
+                  value {
+                    isDraft
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+          conflictResolutions: [],
+          expirations: [],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+        associatedProfile: {
+          id: toGlobalId("Profile", profile.id),
+          properties: [
+            {
+              field: {
+                id: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+                type: "BACKGROUND_CHECK",
+              },
+              value: {
+                isDraft: true,
+                content: {
+                  query: {
+                    name: "John Doe",
+                    type: null,
+                    date: null,
+                  },
+                  search: {
+                    totalCount: 2,
+                    falsePositivesCount: 1,
+                    createdAt: expect.any(String),
+                  },
+                  entity: null,
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      const pfvs = await mocks
+        .knex("profile_field_value")
+        .where("profile_id", profile.id)
+        .where("profile_type_field_id", profileTypeFields[7].id);
+
+      expect(pfvs).toHaveLength(1);
+      expect(pick(pfvs[0], ["content", "is_draft", "removed_at"])).toEqual({
+        content: {
+          query: {
+            name: "John Doe",
+            type: null,
+            date: null,
+          },
+          search: {
+            totalCount: 2,
+            items: [
+              {
+                id: "Q7747",
+                type: "Person",
+                name: "Vladimir Vladimirovich PUTIN",
+                properties: {},
+              },
+              {
+                id: "rupep-company-718",
+                type: "Company",
+                name: "Putin Consulting LLC",
+                properties: {},
+              },
+            ],
+            createdAt: expect.any(String),
+          },
+          entity: null,
+          falsePositives: [
+            { id: "rupep-company-718", addedAt: expect.any(String), addedByUserId: user.id },
+          ],
+        },
+        is_draft: true,
+        removed_at: null,
+      });
+    });
+
+    it("archiving a FIELD_GROUP with a BACKGROUND_CHECK complete reply entity should create a non-draft value on profile with a draft value, and remove the draft", async () => {
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createPetitionFieldReply(backgroundCheckChild.id, 1, () => ({
+        user_id: user.id,
+        type: "BACKGROUND_CHECK",
+        parent_petition_field_reply_id: groupReply.id,
+        content: {
+          query: {
+            name: "John Doe",
+            type: null,
+            date: null,
+          },
+          search: {
+            totalCount: 2,
+            items: [
+              {
+                id: "Q7747",
+                type: "Person",
+                name: "Vladimir Vladimirovich PUTIN",
+                properties: {},
+              },
+              {
+                id: "rupep-company-718",
+                type: "Company",
+                name: "Putin Consulting LLC",
+                properties: {},
+              },
+            ],
+            createdAt: new Date(),
+          },
+          entity: {
+            id: "rupep-company-718",
+            type: "Company",
+            name: "Putin Consulting LLC",
+            properties: {},
+          },
+          falsePositives: [{ id: "Q7747", addedAt: new Date(), addedByUserId: user.id }],
+        } as BackgroundCheckContent,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeFields[7].id,
+          type: "BACKGROUND_CHECK",
+          content: {
+            query: {
+              name: "John Doe",
+              type: null,
+              date: null,
+            },
+            search: {
+              totalCount: 2,
+              items: [
+                {
+                  id: "Q7747",
+                  type: "Person",
+                  name: "Vladimir Vladimirovich PUTIN",
+                  properties: {},
+                },
+                {
+                  id: "rupep-company-718",
+                  type: "Company",
+                  name: "Putin Consulting LLC",
+                  properties: {},
+                },
+              ],
+              createdAt: new Date(),
+            },
+            entity: null,
+            falsePositives: [{ id: "Q7747", addedAt: new Date(), addedByUserId: user.id }],
+          },
+          created_by_user_id: user.id,
+          is_draft: true,
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+            $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            $profileTypeFieldId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: $expirations
+            ) {
+              associatedProfile {
+                id
+                properties(filter: [{ profileTypeFieldId: $profileTypeFieldId }]) {
+                  field {
+                    id
+                    type
+                  }
+                  value {
+                    isDraft
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+          conflictResolutions: [],
+          expirations: [],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+        associatedProfile: {
+          id: toGlobalId("Profile", profile.id),
+          properties: [
+            {
+              field: {
+                id: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+                type: "BACKGROUND_CHECK",
+              },
+              value: {
+                isDraft: false,
+                content: {
+                  query: {
+                    name: "John Doe",
+                    type: null,
+                    date: null,
+                  },
+                  search: {
+                    totalCount: 2,
+                    falsePositivesCount: 1,
+                    createdAt: expect.any(String),
+                  },
+                  entity: {
+                    id: "rupep-company-718",
+                    type: "Company",
+                    name: "Putin Consulting LLC",
+                    properties: {},
+                  },
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      const pfvs = await mocks
+        .knex("profile_field_value")
+        .where("profile_id", profile.id)
+        .where("profile_type_field_id", profileTypeFields[7].id);
+
+      expect(pfvs).toHaveLength(2);
+      expect(pfvs.map(pick(["content", "is_draft", "removed_at"]))).toIncludeSameMembers([
+        {
+          content: {
+            query: {
+              name: "John Doe",
+              type: null,
+              date: null,
+            },
+            search: {
+              totalCount: 2,
+              items: [
+                {
+                  id: "Q7747",
+                  type: "Person",
+                  name: "Vladimir Vladimirovich PUTIN",
+                  properties: {},
+                },
+                {
+                  id: "rupep-company-718",
+                  type: "Company",
+                  name: "Putin Consulting LLC",
+                  properties: {},
+                },
+              ],
+              createdAt: expect.any(String),
+            },
+            entity: null,
+            falsePositives: [{ id: "Q7747", addedAt: expect.any(String), addedByUserId: user.id }],
+          },
+          is_draft: true,
+          removed_at: expect.any(Date),
+        },
+        {
+          content: {
+            query: {
+              name: "John Doe",
+              type: null,
+              date: null,
+            },
+            search: {
+              totalCount: 2,
+              items: [
+                {
+                  id: "Q7747",
+                  type: "Person",
+                  name: "Vladimir Vladimirovich PUTIN",
+                  properties: {},
+                },
+                {
+                  id: "rupep-company-718",
+                  type: "Company",
+                  name: "Putin Consulting LLC",
+                  properties: {},
+                },
+              ],
+              createdAt: expect.any(String),
+            },
+            entity: {
+              id: "rupep-company-718",
+              type: "Company",
+              name: "Putin Consulting LLC",
+              properties: {},
+            },
+            falsePositives: [{ id: "Q7747", addedAt: expect.any(String), addedByUserId: user.id }],
+          },
+          is_draft: false,
+          removed_at: null,
+        },
+      ]);
+    });
+
+    it("archiving a FIELD_GROUP with a BACKGROUND_CHECK incomplete reply should create a draft value on profile with a non-draft value, and keep the non-draft", async () => {
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createPetitionFieldReply(backgroundCheckChild.id, 1, () => ({
+        user_id: user.id,
+        type: "BACKGROUND_CHECK",
+        parent_petition_field_reply_id: groupReply.id,
+        content: {
+          query: {
+            name: "John Doe",
+            type: null,
+            date: null,
+          },
+          search: {
+            totalCount: 2,
+            items: [
+              {
+                id: "Q7747",
+                type: "Person",
+                name: "Vladimir Vladimirovich PUTIN",
+                properties: {},
+              },
+              {
+                id: "rupep-company-718",
+                type: "Company",
+                name: "Putin Consulting LLC",
+                properties: {},
+              },
+            ],
+            createdAt: new Date(),
+          },
+          entity: null,
+        } as BackgroundCheckContent,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeFields[7].id,
+          type: "BACKGROUND_CHECK",
+          content: {
+            query: {
+              name: "Mike Ross",
+              type: "PERSON",
+              date: null,
+            },
+            search: {
+              totalCount: 1,
+              items: [
+                {
+                  id: "mike-1",
+                  type: "Person",
+                  name: "Mike Ross",
+                  properties: {},
+                },
+              ],
+              createdAt: new Date(),
+            },
+            entity: {
+              id: "mike-1",
+              type: "Person",
+              name: "Mike Ross",
+              properties: {},
+            },
+          },
+          created_by_user_id: user.id,
+          is_draft: false,
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+            $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            $profileTypeFieldId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: $expirations
+            ) {
+              associatedProfile {
+                id
+                properties(filter: [{ profileTypeFieldId: $profileTypeFieldId }]) {
+                  field {
+                    id
+                    type
+                  }
+                  value {
+                    isDraft
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+          conflictResolutions: [],
+          expirations: [],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+        associatedProfile: {
+          id: toGlobalId("Profile", profile.id),
+          properties: [
+            {
+              field: {
+                id: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+                type: "BACKGROUND_CHECK",
+              },
+              value: {
+                isDraft: true,
+                content: {
+                  query: {
+                    name: "John Doe",
+                    type: null,
+                    date: null,
+                  },
+                  search: {
+                    totalCount: 2,
+                    falsePositivesCount: 0,
+                    createdAt: expect.any(String),
+                  },
+                  entity: null,
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      const pfvs = await mocks
+        .knex("profile_field_value")
+        .where("profile_id", profile.id)
+        .where("profile_type_field_id", profileTypeFields[7].id);
+
+      expect(pfvs).toHaveLength(2);
+      expect(pfvs.map(pick(["content", "is_draft", "removed_at"]))).toIncludeSameMembers([
+        {
+          content: {
+            query: {
+              name: "John Doe",
+              type: null,
+              date: null,
+            },
+            search: {
+              totalCount: 2,
+              items: [
+                {
+                  id: "Q7747",
+                  type: "Person",
+                  name: "Vladimir Vladimirovich PUTIN",
+                  properties: {},
+                },
+                {
+                  id: "rupep-company-718",
+                  type: "Company",
+                  name: "Putin Consulting LLC",
+                  properties: {},
+                },
+              ],
+              createdAt: expect.any(String),
+            },
+            entity: null,
+          },
+          is_draft: true,
+          removed_at: null,
+        },
+        {
+          content: {
+            query: {
+              name: "Mike Ross",
+              type: "PERSON",
+              date: null,
+            },
+            search: {
+              totalCount: 1,
+              items: [
+                {
+                  id: "mike-1",
+                  type: "Person",
+                  name: "Mike Ross",
+                  properties: {},
+                },
+              ],
+              createdAt: expect.any(String),
+            },
+            entity: {
+              id: "mike-1",
+              type: "Person",
+              name: "Mike Ross",
+              properties: {},
+            },
+          },
+          is_draft: false,
+          removed_at: null,
+        },
+      ]);
+    });
+
+    it("sends conflict if trying to archive background check on a profile with different search results", async () => {
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createPetitionFieldReply(backgroundCheckChild.id, 1, () => ({
+        user_id: user.id,
+        type: "BACKGROUND_CHECK",
+        parent_petition_field_reply_id: groupReply.id,
+        content: {
+          query: {
+            name: "John Doe",
+            type: null,
+            date: null,
+          },
+          search: {
+            totalCount: 2,
+            items: [
+              {
+                id: "Q7747",
+                type: "Person",
+                name: "Vladimir Vladimirovich PUTIN",
+                properties: {},
+              },
+              {
+                id: "rupep-company-718",
+                type: "Company",
+                name: "Putin Consulting LLC",
+                properties: {},
+              },
+            ],
+            createdAt: new Date(),
+          },
+          entity: null,
+          falsePositives: [
+            { id: "Q7747", addedAt: new Date(), addedByUserId: user.id },
+            { id: "rupep-company-718", addedAt: new Date(), addedByUserId: user.id },
+          ],
+        } as BackgroundCheckContent,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeFields[7].id,
+          type: "BACKGROUND_CHECK",
+          content: {
+            query: {
+              name: "John Doe",
+              type: null,
+              date: null,
+            },
+            search: {
+              totalCount: 1,
+              items: [
+                {
+                  id: "mike-1",
+                  type: "Person",
+                  name: "Mike Ross",
+                  properties: {},
+                },
+              ],
+              createdAt: new Date(),
+            },
+            entity: null,
+            falsePositives: [{ id: "mike-1", addedAt: new Date(), addedByUserId: user.id }],
+          },
+          created_by_user_id: user.id,
+          is_draft: false,
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+            $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: $expirations
+            ) {
+              __typename
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          conflictResolutions: [],
+          expirations: [],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("CONFLICT_RESOLUTION_REQUIRED_ERROR", {
+        conflictResolutions: [toGlobalId("ProfileTypeField", profileTypeFields[7].id)],
+        expirations: [],
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends conflict if trying to archive background check on a profile with a different entity", async () => {
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createPetitionFieldReply(backgroundCheckChild.id, 1, () => ({
+        user_id: user.id,
+        type: "BACKGROUND_CHECK",
+        parent_petition_field_reply_id: groupReply.id,
+        content: {
+          query: {
+            name: "John Doe",
+            type: null,
+            date: null,
+          },
+          search: {
+            totalCount: 2,
+            items: [
+              {
+                id: "Q7747",
+                type: "Person",
+                name: "Vladimir Vladimirovich PUTIN",
+                properties: {},
+              },
+              {
+                id: "rupep-company-718",
+                type: "Company",
+                name: "Putin Consulting LLC",
+                properties: {},
+              },
+            ],
+            createdAt: new Date(),
+          },
+          entity: {
+            id: "rupep-company-718",
+            type: "Company",
+            name: "Putin Consulting LLC",
+            properties: {},
+          },
+        } as BackgroundCheckContent,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeFields[7].id,
+          type: "BACKGROUND_CHECK",
+          content: {
+            query: {
+              name: "John Doe",
+              type: null,
+              date: null,
+            },
+            search: {
+              totalCount: 2,
+              items: [
+                {
+                  id: "Q7747",
+                  type: "Person",
+                  name: "Vladimir Vladimirovich PUTIN",
+                  properties: {},
+                },
+                {
+                  id: "rupep-company-718",
+                  type: "Company",
+                  name: "Putin Consulting LLC",
+                  properties: {},
+                },
+              ],
+              createdAt: new Date(),
+            },
+            entity: {
+              id: "Q7747",
+              type: "Person",
+              name: "Vladimir Vladimirovich PUTIN",
+              properties: {},
+            },
+          },
+          created_by_user_id: user.id,
+          is_draft: false,
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+            $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: $expirations
+            ) {
+              __typename
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          conflictResolutions: [],
+          expirations: [],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("CONFLICT_RESOLUTION_REQUIRED_ERROR", {
+        conflictResolutions: [toGlobalId("ProfileTypeField", profileTypeFields[7].id)],
+        expirations: [],
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends conflict if trying to archive background check with saved entity on a profile with non-draft value", async () => {
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createPetitionFieldReply(backgroundCheckChild.id, 1, () => ({
+        user_id: user.id,
+        type: "BACKGROUND_CHECK",
+        parent_petition_field_reply_id: groupReply.id,
+        content: {
+          query: {
+            name: "John Doe",
+            type: null,
+            date: null,
+          },
+          search: {
+            totalCount: 2,
+            items: [
+              {
+                id: "Q7747",
+                type: "Person",
+                name: "Vladimir Vladimirovich PUTIN",
+                properties: {},
+              },
+              {
+                id: "rupep-company-718",
+                type: "Company",
+                name: "Putin Consulting LLC",
+                properties: {},
+              },
+            ],
+            createdAt: new Date(),
+          },
+          entity: {
+            id: "rupep-company-718",
+            type: "Company",
+            name: "Putin Consulting LLC",
+            properties: {},
+          },
+        } as BackgroundCheckContent,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeFields[7].id,
+          type: "BACKGROUND_CHECK",
+          content: {
+            query: {
+              name: "John Doe",
+              type: null,
+              date: null,
+            },
+            search: {
+              totalCount: 2,
+              items: [
+                {
+                  id: "Q7747",
+                  type: "Person",
+                  name: "Vladimir Vladimirovich PUTIN",
+                  properties: {},
+                },
+                {
+                  id: "rupep-company-718",
+                  type: "Company",
+                  name: "Putin Consulting LLC",
+                  properties: {},
+                },
+              ],
+              createdAt: new Date(),
+            },
+            entity: null,
+            falsePositives: [
+              { id: "Q7747", addedAt: new Date(), addedByUserId: user.id },
+              { id: "rupep-company-718", addedAt: new Date(), addedByUserId: user.id },
+            ],
+          },
+          created_by_user_id: user.id,
+          is_draft: false,
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+            $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: $expirations
+            ) {
+              __typename
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          conflictResolutions: [],
+          expirations: [],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("CONFLICT_RESOLUTION_REQUIRED_ERROR", {
+        conflictResolutions: [toGlobalId("ProfileTypeField", profileTypeFields[7].id)],
+        expirations: [],
+      });
+      expect(data).toBeNull();
+    });
+
+    it("does not send conflict if trying to archive background check on a profile with the same entity", async () => {
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createPetitionFieldReply(backgroundCheckChild.id, 1, () => ({
+        user_id: user.id,
+        type: "BACKGROUND_CHECK",
+        parent_petition_field_reply_id: groupReply.id,
+        content: {
+          query: {
+            name: "John Doe",
+            type: null,
+            date: null,
+          },
+          search: {
+            totalCount: 2,
+            items: [
+              {
+                id: "Q7747",
+                type: "Person",
+                name: "Vladimir Vladimirovich PUTIN",
+                properties: {},
+              },
+              {
+                id: "rupep-company-718",
+                type: "Company",
+                name: "Putin Consulting LLC",
+                properties: {},
+              },
+            ],
+            createdAt: new Date(),
+          },
+          entity: {
+            id: "rupep-company-718",
+            type: "Company",
+            name: "Putin Consulting LLC",
+            properties: {},
+          },
+        } as BackgroundCheckContent,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeFields[7].id,
+          type: "BACKGROUND_CHECK",
+          content: {
+            query: {
+              name: "John Doe",
+              type: null,
+              date: null,
+            },
+            search: {
+              totalCount: 2,
+              items: [
+                {
+                  id: "Q7747",
+                  type: "Person",
+                  name: "Vladimir Vladimirovich PUTIN",
+                  properties: {},
+                },
+                {
+                  id: "rupep-company-718",
+                  type: "Company",
+                  name: "Putin Consulting LLC",
+                  properties: {},
+                },
+              ],
+              createdAt: new Date(),
+            },
+            entity: {
+              id: "rupep-company-718",
+              type: "Company",
+              name: "Putin Consulting LLC",
+              properties: {},
+            },
+          },
+          created_by_user_id: user.id,
+          is_draft: false,
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+            $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: $expirations
+            ) {
+              __typename
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          conflictResolutions: [],
+          expirations: [],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data).not.toBeNull();
+    });
+
+    it("does not send conflict if trying to archive background check on a profile with the same search results and false positives", async () => {
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createPetitionFieldReply(backgroundCheckChild.id, 1, () => ({
+        user_id: user.id,
+        type: "BACKGROUND_CHECK",
+        parent_petition_field_reply_id: groupReply.id,
+        content: {
+          query: {
+            name: "John Doe",
+            type: null,
+            date: null,
+          },
+          search: {
+            totalCount: 2,
+            items: [
+              {
+                id: "Q7747",
+                type: "Person",
+                name: "Vladimir Vladimirovich PUTIN",
+                properties: {},
+              },
+              {
+                id: "rupep-company-718",
+                type: "Company",
+                name: "Putin Consulting LLC",
+                properties: {},
+              },
+            ],
+            createdAt: new Date(),
+          },
+          entity: null,
+          falsePositives: [
+            { id: "Q7747", addedAt: new Date(), addedByUserId: user.id },
+            { id: "rupep-company-718", addedAt: new Date(), addedByUserId: user.id },
+          ],
+        } as BackgroundCheckContent,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeFields[7].id,
+          type: "BACKGROUND_CHECK",
+          content: {
+            query: {
+              name: "John Doe",
+              type: null,
+              date: null,
+            },
+            search: {
+              totalCount: 2,
+              items: [
+                {
+                  id: "Q7747",
+                  type: "Person",
+                  name: "Vladimir Vladimirovich PUTIN",
+                  properties: {},
+                },
+                {
+                  id: "rupep-company-718",
+                  type: "Company",
+                  name: "Putin Consulting LLC",
+                  properties: {},
+                },
+              ],
+              createdAt: new Date(),
+            },
+            entity: null,
+            falsePositives: [
+              { id: "Q7747", addedAt: new Date(), addedByUserId: user.id },
+              { id: "rupep-company-718", addedAt: new Date(), addedByUserId: user.id },
+            ],
+          },
+          created_by_user_id: user.id,
+          is_draft: false,
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+            $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: $expirations
+            ) {
+              __typename
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          conflictResolutions: [],
+          expirations: [],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data).not.toBeNull();
     });
   });
 

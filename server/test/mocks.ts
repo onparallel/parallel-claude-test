@@ -38,6 +38,7 @@ import {
 import { IAnalyticsService } from "../src/services/AnalyticsService";
 import { IAuth } from "../src/services/AuthService";
 import {
+  BackgroundCheckService,
   EntityDetailsResponse,
   EntitySearchRequest,
   EntitySearchResponse,
@@ -253,9 +254,19 @@ export class MockDowJonesClient implements IDowJonesClient {
 }
 
 @injectable()
-export class MockBackgroundCheckService implements IBackgroundCheckService {
-  constructor() {}
-  async entitySearch(query: EntitySearchRequest): Promise<EntitySearchResponse> {
+export class MockBackgroundCheckService
+  extends BackgroundCheckService
+  implements IBackgroundCheckService
+{
+  override async entitySearch(query: EntitySearchRequest): Promise<EntitySearchResponse> {
+    if (query.name === "UNKNOWN") {
+      return {
+        totalCount: 0,
+        items: [],
+        createdAt: new Date(),
+      };
+    }
+
     if (query.type === "PERSON") {
       return {
         totalCount: 1,
@@ -303,20 +314,32 @@ export class MockBackgroundCheckService implements IBackgroundCheckService {
       };
     }
   }
-  async entityProfileDetails(entityId: string, userId: number): Promise<EntityDetailsResponse> {
-    if (entityId !== "Q7747") {
-      throw new Error("PROFILE_NOT_FOUND");
+  override async entityProfileDetails(
+    entityId: string,
+    userId: number,
+  ): Promise<EntityDetailsResponse> {
+    if (entityId === "Q7747") {
+      return {
+        id: "Q7747",
+        name: "Vladimir Vladimirovich PUTIN",
+        type: "Person",
+        properties: {},
+        createdAt: new Date(),
+      };
+    } else if (entityId === "rupep-company-718") {
+      return {
+        id: "rupep-company-718",
+        name: "Putin Consulting LLC",
+        type: "Company",
+        properties: {},
+        createdAt: new Date(),
+      };
     }
 
-    return {
-      id: "Q7747",
-      name: "Vladimir Vladimirovich PUTIN",
-      type: "Person",
-      properties: {},
-      createdAt: new Date(),
-    };
+    throw new Error("PROFILE_NOT_FOUND");
   }
-  async entityProfileDetailsPdf(userId: number, props: BackgroundCheckProfileProps) {
+
+  override async entityProfileDetailsPdf(userId: number, props: BackgroundCheckProfileProps) {
     return {
       mime_type: "application/pdf",
       binary_stream: Readable.from(""),

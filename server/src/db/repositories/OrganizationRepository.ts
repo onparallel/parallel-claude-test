@@ -463,15 +463,22 @@ export class OrganizationRepository extends BaseRepository {
     return usage;
   }
 
-  async getOrganizationsWithFeatureFlag(name: FeatureFlagName) {
+  async getOrganizationsWithFeatureFlag(name: MaybeArray<FeatureFlagName>) {
+    const names = unMaybeArray(name);
+    if (names.length === 0) {
+      return [];
+    }
+
     return await this.raw<Organization>(
       /* sql */ `
       select distinct(o.*) from organization o
-      join feature_flag ff on ff.name = ?
+      join feature_flag ff on ff.name in ?
       left join feature_flag_override ffoo on ffoo.feature_flag_name = ff.name and ffoo.org_id = o.id
       where coalesce(ffoo.value, ff.default_value) = true
+      group by o.id
+      having count(distinct ff.name) = ?
     `,
-      [name],
+      [this.sqlIn(names), names.length],
     );
   }
 

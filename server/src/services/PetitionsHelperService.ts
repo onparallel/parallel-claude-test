@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { extension } from "mime-types";
 import pMap from "p-map";
-import { isNonNullish, omit, pick, unique, zip } from "remeda";
+import { isDeepEqual, isNonNullish, isNullish, omit, omitBy, pick, unique, zip } from "remeda";
 import { assert } from "ts-essentials";
 import {
   CreatePetitionFieldReply,
@@ -27,6 +27,11 @@ import {
   AdverseMediaSearchContent,
   IAdverseMediaSearchService,
 } from "./AdverseMediaSearchService";
+import {
+  BACKGROUND_CHECK_SERVICE,
+  BackgroundCheckContent,
+  IBackgroundCheckService,
+} from "./BackgroundCheckService";
 import { ENCRYPTION_SERVICE, IEncryptionService } from "./EncryptionService";
 import {
   IOrganizationCreditsService,
@@ -45,6 +50,7 @@ export class PetitionsHelperService {
     @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: IOrganizationCreditsService,
     @inject(ENCRYPTION_SERVICE) private encryption: IEncryptionService,
     @inject(ADVERSE_MEDIA_SEARCH_SERVICE) private adverseMedia: IAdverseMediaSearchService,
+    @inject(BACKGROUND_CHECK_SERVICE) private backgroundCheck: IBackgroundCheckService,
   ) {}
 
   async userCanWriteOnPetitionField(
@@ -135,17 +141,17 @@ export class PetitionsHelperService {
                 : {}),
             };
     } else if (reply.type === "BACKGROUND_CHECK") {
+      const content = reply.content as BackgroundCheckContent;
       return {
-        query: isNonNullish(reply.content.query)
-          ? pick(reply.content.query, ["name", "date", "type", "country", "birthCountry"])
-          : null,
-        search: isNonNullish(reply.content.search)
-          ? pick(reply.content.search, ["totalCount"])
-          : null,
-        entity: isNonNullish(reply.content.entity)
+        query: content.query,
+        search: {
+          falsePositivesCount: (content.falsePositives ?? []).length,
+          totalCount: content.search.totalCount,
+        },
+        entity: isNonNullish(content.entity)
           ? {
-              ...pick(reply.content.entity, ["id", "type", "name"]),
-              properties: pick(reply.content.entity.properties, ["topics"]),
+              ...pick(content.entity, ["id", "type", "name"]),
+              properties: pick(content.entity.properties, ["topics"]),
             }
           : null,
       };
@@ -288,13 +294,59 @@ export class PetitionsHelperService {
     }
 
     if (a.type === "BACKGROUND_CHECK") {
-      return (
-        a.content?.query?.name === b.content?.query?.name &&
-        a.content?.query?.date === b.content?.query?.date &&
-        a.content?.query?.type === b.content?.query?.type &&
-        a.content?.query?.country === b.content?.query?.country &&
-        a.content?.entity?.id === b.content?.entity?.id
-      );
+      const aContent = a.content as BackgroundCheckContent | undefined;
+      const bContent = b.content as BackgroundCheckContent | undefined;
+
+      const queryIsEqual =
+        (aContent?.query?.name ?? null) === (bContent?.query?.name ?? null) &&
+        (aContent?.query?.date ?? null) === (bContent?.query?.date ?? null) &&
+        (aContent?.query?.type ?? null) === (bContent?.query?.type ?? null) &&
+        (aContent?.query?.country ?? null) === (bContent?.query?.country ?? null) &&
+        (aContent?.query?.birthCountry ?? null) === (bContent?.query?.birthCountry ?? null);
+
+      const searchIsEqual =
+        aContent?.search.totalCount === bContent?.search.totalCount &&
+        aContent?.search.items.length === bContent?.search.items.length &&
+        aContent?.search.items.every((item) =>
+          bContent?.search.items.some((bItem) => bItem.id === item.id),
+        );
+
+      const entityIsEqual =
+        (isNullish(aContent?.entity) && isNullish(bContent?.entity)) ||
+        (isNonNullish(aContent?.entity) &&
+          isNonNullish(bContent?.entity) &&
+          isDeepEqual(
+            omit(aContent.entity, ["properties", "createdAt"]),
+            omit(bContent.entity, ["properties", "createdAt"]),
+          ) &&
+          isDeepEqual(
+            omitBy(
+              aContent.entity.properties,
+              (value, key) => isNullish(value) || key === "relationships" || key === "sanctions",
+            ),
+            omitBy(
+              bContent.entity.properties,
+              (value, key) => isNullish(value) || key === "relationships" || key === "sanctions",
+            ),
+          ) &&
+          includesSameElements(
+            aContent.entity.properties.relationships,
+            bContent.entity.properties.relationships,
+            (a, b) => a.id === b.id,
+          ) &&
+          includesSameElements(
+            aContent.entity.properties.sanctions,
+            bContent.entity.properties.sanctions,
+            (a, b) => a.id === b.id,
+          ));
+
+      const aFalsePositives = aContent?.falsePositives ?? [];
+      const bFalsePositives = bContent?.falsePositives ?? [];
+      const falsePositivesAreEqual =
+        aFalsePositives.length === bFalsePositives.length &&
+        aFalsePositives.every((item) => bFalsePositives.some((bItem) => bItem.id === item.id));
+
+      return queryIsEqual && !!searchIsEqual && entityIsEqual && falsePositivesAreEqual;
     } else if (a.type === "CHECKBOX") {
       // contents are equal if both arrays contain exactly the same elements in any order
       return includesSameElements<string>(a.content?.value, b.content?.value, (a, b) => a === b);
@@ -370,7 +422,8 @@ export class PetitionsHelperService {
       );
 
       for (const profileId of input.profileIds) {
-        const profileFieldValues = await this.profiles.loadProfileFieldValuesByProfileId(profileId);
+        const profileFieldValuesAndDrafts =
+          await this.profiles.loadProfileFieldValuesAndDraftsByProfileId(profileId);
         const profileFieldFiles = await this.profiles.loadProfileFieldFilesByProfileId(profileId);
 
         const linkedChildren = children.filter((c) => isNonNullish(c.profile_type_field_id));
@@ -387,9 +440,13 @@ export class PetitionsHelperService {
           // do not prefill petition fields if the user does not have at least READ permission on the profile property
           isAtLeast(permission, "READ"),
         )) {
-          const profileValue = profileFieldValues.find(
+          const profileFieldValues = profileFieldValuesAndDrafts.filter(
             (v) => v.profile_type_field_id === child.profile_type_field_id,
           );
+          const profileValue =
+            profileFieldValues.find((v) => v.is_draft) ??
+            profileFieldValues.find((v) => !v.is_draft);
+
           const profileFiles = profileFieldFiles.filter(
             (f) => f.profile_type_field_id === child.profile_type_field_id,
           );

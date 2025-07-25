@@ -333,12 +333,15 @@ type BackgroundCheckEntityDetailsSanctionProperties {
 
 type BackgroundCheckEntitySearch {
   createdAt: DateTime!
+  hasStoredValue: Boolean
+  isDraft: Boolean
   items: [BackgroundCheckEntitySearchSchema!]!
   totalCount: Int!
 }
 
 type BackgroundCheckEntitySearchCompany implements BackgroundCheckEntitySearchSchema {
   id: String!
+  isFalsePositive: Boolean
   name: String!
   properties: BackgroundCheckEntitySearchCompanyProperties!
   score: Float
@@ -353,6 +356,7 @@ type BackgroundCheckEntitySearchCompanyProperties {
 
 type BackgroundCheckEntitySearchPerson implements BackgroundCheckEntitySearchSchema {
   id: String!
+  isFalsePositive: Boolean
   name: String!
   properties: BackgroundCheckEntitySearchPersonProperties!
   score: Float
@@ -369,6 +373,7 @@ type BackgroundCheckEntitySearchPersonProperties {
 
 interface BackgroundCheckEntitySearchSchema {
   id: String!
+  isFalsePositive: Boolean
   name: String!
   score: Float
   type: String!
@@ -1575,13 +1580,6 @@ type Mutation {
     profileId: GID
     profileTypeId: GID!
   ): Profile!
-  copyBackgroundCheckReplyToProfileFieldValue(
-    expiryDate: Date
-    petitionId: GID!
-    profileId: GID!
-    profileTypeFieldId: GID!
-    replyId: GID!
-  ): ProfileFieldValue! @deprecated(reason: "use copyReplyContentToProfileFieldValue")
   copyFileReplyToProfileFieldFile(
     expiryDate: Date
     fileReplyIds: [GID!]!
@@ -1863,16 +1861,6 @@ type Mutation {
     """
     skipFormatErrors: Boolean
   ): PetitionField!
-  createFieldGroupReplyFromProfile(
-    """
-    Pass force=true to associate the profile to an empty field reply even if there is nothing to import from the profile
-    """
-    force: Boolean
-    parentReplyId: GID!
-    petitionFieldId: GID!
-    petitionId: GID!
-    profileId: GID!
-  ): PetitionFieldReply! @deprecated(reason: "use createFieldGroupRepliesFromProfiles")
 
   """
   Creates a task for exporting files from a petition using an integration
@@ -3049,6 +3037,12 @@ type Mutation {
   """
   revokeUserAuthToken(authTokenIds: [GID!]!): Result!
   saveAdverseMediaChanges(token: String!): AdverseMediaArticleSearchResult!
+    @deprecated(reason: "use saveProfileFieldValueDraft instead")
+
+  """
+  Saves a draft of a profile field value
+  """
+  saveProfileFieldValueDraft(profileId: GID!, profileTypeFieldId: GID!): Success!
 
   """
   Moves a profile to DELETION_SCHEDULED status
@@ -3263,6 +3257,11 @@ type Mutation {
   """
   untagPetition(petitionId: GID!, tagId: GID!): PetitionBase!
   updateBackgroundCheckEntity(entityId: String, token: String!): Success!
+  updateBackgroundCheckSearchFalsePositives(
+    entityIds: [String!]!
+    isFalsePositive: Boolean!
+    token: String!
+  ): Success!
   updateCompaniesHouseCustomProperties(
     """
     {[profileTypeId: number]: {[profileTypeFieldId: number]: string }} @form:type=textarea
@@ -3625,7 +3624,12 @@ type Mutation {
     enabled: Boolean!
     profileId: GID!
     profileTypeFieldId: GID!
-  ): Profile!
+  ): Profile! @deprecated(reason: "use updateProfileFieldValueOptions")
+  updateProfileFieldValueOptions(
+    data: UpdateProfileFieldValueOptionsDataInput!
+    profileId: GID!
+    profileTypeFieldId: GID!
+  ): ProfileFieldValue!
 
   """
   Updates a profile list view
@@ -6655,6 +6659,7 @@ enum ProfileEventType {
   PROFILE_FIELD_EXPIRY_UPDATED
   PROFILE_FIELD_FILE_ADDED
   PROFILE_FIELD_FILE_REMOVED
+  PROFILE_FIELD_VALUE_MONITORED
   PROFILE_FIELD_VALUE_UPDATED
   PROFILE_RELATIONSHIP_CREATED
   PROFILE_RELATIONSHIP_REMOVED
@@ -6901,13 +6906,11 @@ type ProfileFieldValue implements ProfileFieldResponse {
   expiryDate: String
   field: ProfileTypeField!
   hasActiveMonitoring: Boolean!
-
-  """
-  Whether this value has an unsaved draft.
-  """
-  hasDraft: Boolean!
+  hasDraft: Boolean! @deprecated(reason: "don't use!")
   hasPendingReview: Boolean!
+  hasStoredValue: Boolean!
   id: GID!
+  isDraft: Boolean!
   profile: Profile!
 
   """
@@ -6915,6 +6918,14 @@ type ProfileFieldValue implements ProfileFieldResponse {
   """
   removedAt: DateTime
   removedBy: User
+}
+
+type ProfileFieldValueMonitoredEvent implements ProfileEvent {
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  profile: Profile
+  type: ProfileEventType!
 }
 
 type ProfileFieldValueUpdatedEvent implements ProfileEvent {
@@ -6951,6 +6962,7 @@ enum ProfileFieldValuesFilterOperator {
   HAS_BG_CHECK_RESULTS
   HAS_BG_CHECK_TOPICS
   HAS_EXPIRY
+  HAS_PENDING_REVIEW
   HAS_VALUE
   IS_EXPIRED
   IS_ONE_OF
@@ -6963,6 +6975,7 @@ enum ProfileFieldValuesFilterOperator {
   NOT_HAS_BG_CHECK_RESULTS
   NOT_HAS_BG_CHECK_TOPICS
   NOT_HAS_EXPIRY
+  NOT_HAS_PENDING_REVIEW
   NOT_HAS_VALUE
   NOT_IS_ONE_OF
   START_WITH
@@ -7975,7 +7988,15 @@ type Query {
     excludeIds: [String!]
     searchTerm: String!
   ): [AdverseMediaEntitySuggestItem!]!
-  backgroundCheckEntityDetails(entityId: String!, token: String!): BackgroundCheckEntityDetails!
+  backgroundCheckEntityDetails(
+    entityId: String!
+
+    """
+    Force an entity refresh
+    """
+    force: Boolean
+    token: String!
+  ): BackgroundCheckEntityDetails!
   backgroundCheckEntitySearch(
     """
     Birth country of the entity. Only valid for type PERSON
@@ -7991,6 +8012,11 @@ type Query {
     Date of birth if entity is a Person, or date of registration if entity is a Company
     """
     date: Date
+
+    """
+    Force a new search, even if the search criteria are the same as the previous search
+    """
+    force: Boolean
 
     """
     Name of the entity
@@ -9234,6 +9260,11 @@ input UpdateProfileFieldValueInput {
   content: JSONObject
   expiryDate: Date
   profileTypeFieldId: GID!
+}
+
+input UpdateProfileFieldValueOptionsDataInput {
+  activeMonitoring: Boolean
+  pendingReview: Boolean
 }
 
 input UpdateProfileTypeFieldInput {

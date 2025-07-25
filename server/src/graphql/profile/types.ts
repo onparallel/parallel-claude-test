@@ -444,7 +444,21 @@ export const ProfileFieldProperty = objectType({
         if (myPermission === "HIDDEN") {
           return null;
         }
-        return await ctx.profiles.loadProfileFieldValue({ profileId, profileTypeFieldId });
+
+        const { value, draftValue } = await ctx.profiles.loadProfileFieldValueWithDraft({
+          profileId,
+          profileTypeFieldId,
+        });
+
+        const currentValue = draftValue ?? value;
+        if (!currentValue) {
+          return null;
+        }
+
+        return {
+          ...currentValue,
+          has_stored_value: isNonNullish(value),
+        };
       },
     });
     t.nullable.list.field("files", {
@@ -487,18 +501,11 @@ export const ProfileFieldValue = objectType({
       resolve: (root, _, ctx) => ctx.profilesHelper.mapValueContentFromDatabase(root),
     });
     t.nonNull.boolean("hasDraft", {
-      description: "Whether this value has an unsaved draft.",
-      resolve: async (root, _, ctx) => {
-        // only this field type applies
-        if (root.type === "ADVERSE_MEDIA_SEARCH") {
-          const draftValues = await ctx.profiles.loadDraftProfileFieldValuesByProfileId(
-            root.profile_id,
-          );
-          return draftValues.some((v) => v.type === "ADVERSE_MEDIA_SEARCH");
-        }
-
-        return false;
-      },
+      deprecation: "don't use!",
+      resolve: () => false,
+    });
+    t.nonNull.boolean("isDraft", {
+      resolve: (o) => o.is_draft,
     });
     t.nonNull.boolean("hasActiveMonitoring", {
       resolve: (o) => o.active_monitoring,
@@ -506,7 +513,13 @@ export const ProfileFieldValue = objectType({
     t.nonNull.boolean("hasPendingReview", {
       resolve: (o) => o.pending_review,
     });
+    t.nonNull.boolean("hasStoredValue", {
+      resolve: (o) => o.has_stored_value,
+    });
   },
+  sourceType: /* ts */ `
+    db.ProfileFieldValue & { has_stored_value: boolean }
+  `,
 });
 
 export const ProfileFieldFile = objectType({

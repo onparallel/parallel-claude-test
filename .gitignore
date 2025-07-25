@@ -11,6 +11,7 @@ server/dist
 server/bin/localtunnel-dev.url
 server/lang/compiled
 server/.development.env
+server/coverage
 
 e2e/test-results/
 e2e/playwright-report/

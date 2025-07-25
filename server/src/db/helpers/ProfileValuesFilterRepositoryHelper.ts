@@ -53,7 +53,7 @@ export class ProfileValuesFilterRepositoryHelper {
           alias,
         ]);
       } else {
-        return this.knex.raw(`??.content`, [alias]);
+        return this.knex.raw(`coalesce(??.content, ??.content)`, [`draft_${alias}`, alias]);
       }
     }
   }
@@ -108,6 +108,16 @@ export class ProfileValuesFilterRepositoryHelper {
               and ${alias}.is_draft = false
           `,
           [profileTypeField.id, profileTypeField.id],
+        ).joinRaw(
+          /* sql */ `
+            left join profile_field_value draft_${alias}
+              on draft_${alias}.profile_id = p.id
+              and draft_${alias}.profile_type_field_id = ?
+              and draft_${alias}.deleted_at is null 
+              and draft_${alias}.removed_at is null
+              and draft_${alias}.is_draft = true
+            `,
+          [profileTypeField.id],
         );
       }
     }
@@ -306,6 +316,16 @@ export class ProfileValuesFilterRepositoryHelper {
           } else {
             q.whereRaw(/* sql*/ `? is not null`, [expiryDate]);
           }
+          break;
+        case "HAS_PENDING_REVIEW":
+          const alias = joins[profileTypeField.id];
+          q.whereRaw(/* sql*/ `? = ${negated ? "false" : "true"}`, [
+            this.knex.raw(`coalesce(??.pending_review, ??.pending_review, false)`, [
+              `draft_${alias}`,
+              alias,
+            ]),
+          ]);
+
           break;
         default:
           throw new Error(`Operator ${operator} not implemented`);

@@ -18,6 +18,7 @@ import {
   ShortSearchIcon,
 } from "@parallel/chakra/icons";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
+import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
 import { useConfirmDeleteAdverseMediaSearchDialog } from "@parallel/components/petition-preview/dialogs/ConfirmDeleteAdverseMediaSearchDialog";
 import {
@@ -26,7 +27,7 @@ import {
   ProfileFormField_PetitionFieldFragment,
   ProfileFormFieldAdverseMediaSearch_copyReplyContentToProfileFieldValueDocument,
   ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueDocument,
-  ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMonitoringStatusDocument,
+  ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueOptionsDocument,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { useManagedWindow } from "@parallel/utils/hooks/useManagedWindow";
@@ -128,17 +129,17 @@ export function ProfileFormFieldAdverseMediaSearch({
 
   const monitoringFrequency = hasMonitoring ? getSearchFrequency(monitoring, properties) : null;
 
-  const [updateProfileFieldValueMonitoringStatus] = useMutation(
-    ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMonitoringStatusDocument,
+  const [updateProfileFieldValueOptions] = useMutation(
+    ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueOptionsDocument,
   );
 
-  const handleUpdateMonitoringStatus = async (enabled: boolean) => {
+  const handleUpdateMonitoringStatus = async (activeMonitoring: boolean) => {
     try {
-      await updateProfileFieldValueMonitoringStatus({
+      await updateProfileFieldValueOptions({
         variables: {
           profileId,
           profileTypeFieldId: field.id,
-          enabled,
+          data: { activeMonitoring },
         },
       });
     } catch {}
@@ -379,15 +380,24 @@ export function ProfileFormFieldAdverseMediaSearch({
                     />
                   </Text>
                 ) : null}
-                {props.value?.hasDraft ? (
-                  <Box>
-                    <Badge colorScheme="blue">
+                {props.value?.isDraft ? (
+                  <SmallPopover
+                    content={
+                      <Text fontSize="sm">
+                        <FormattedMessage
+                          id="component.profile-form-field-adverse-media-search.pending-confirmation-popover"
+                          defaultMessage="Confirm article classification to mark this property as resolved"
+                        />
+                      </Text>
+                    }
+                  >
+                    <Badge colorScheme="blue" width="fit-content">
                       <FormattedMessage
-                        id="component.profile-form-field-adverse-media-search.draft"
-                        defaultMessage="There are changes not saved"
+                        id="component.profile-form-field-adverse-media-search.pending-confirmation-badge"
+                        defaultMessage="Pending confirmation"
                       />
                     </Badge>
-                  </Box>
+                  </SmallPopover>
                 ) : null}
               </Stack>
             </HStack>
@@ -395,7 +405,7 @@ export function ProfileFormFieldAdverseMediaSearch({
             <MonitoringInfo
               isMonitoringActive={isMonitoringActive}
               hasActiveMonitoring={props.value?.hasActiveMonitoring}
-              hasDraft={props.value?.hasDraft}
+              isMonitoringPaused={props.value?.isDraft} // ADVERSE_MEDIA monitoring pauses when a draft exists
               monitoringFrequency={monitoringFrequency}
               createdAt={createdAt}
             />
@@ -453,26 +463,19 @@ const _mutations = [
     }
   `,
   gql`
-    mutation ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMonitoringStatus(
+    mutation ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueOptions(
       $profileId: GID!
       $profileTypeFieldId: GID!
-      $enabled: Boolean!
+      $data: UpdateProfileFieldValueOptionsDataInput!
     ) {
-      updateProfileFieldValueMonitoringStatus(
+      updateProfileFieldValueOptions(
         profileId: $profileId
         profileTypeFieldId: $profileTypeFieldId
-        enabled: $enabled
+        data: $data
       ) {
         id
-        properties {
-          value {
-            id
-            hasActiveMonitoring
-          }
-          field {
-            id
-          }
-        }
+        hasActiveMonitoring
+        hasPendingReview
       }
     }
   `,

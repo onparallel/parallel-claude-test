@@ -497,6 +497,11 @@ export function mapProfileEventPayload(event: ProfileEvent) {
         reason: event.data.reason,
       };
     }
+    case "PROFILE_FIELD_VALUE_MONITORED": {
+      return {
+        profileTypeFieldId: toGlobalId("ProfileTypeField", event.data.profile_type_field_id),
+      };
+    }
     default:
       return {};
   }

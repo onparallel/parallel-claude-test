@@ -318,12 +318,15 @@ export type BackgroundCheckEntityDetailsSanctionProperties = {
 
 export type BackgroundCheckEntitySearch = {
   createdAt: Scalars["DateTime"]["output"];
+  hasStoredValue: Maybe<Scalars["Boolean"]["output"]>;
+  isDraft: Maybe<Scalars["Boolean"]["output"]>;
   items: Array<BackgroundCheckEntitySearchSchema>;
   totalCount: Scalars["Int"]["output"];
 };
 
 export type BackgroundCheckEntitySearchCompany = BackgroundCheckEntitySearchSchema & {
   id: Scalars["String"]["output"];
+  isFalsePositive: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntitySearchCompanyProperties;
   score: Maybe<Scalars["Float"]["output"]>;
@@ -338,6 +341,7 @@ export type BackgroundCheckEntitySearchCompanyProperties = {
 
 export type BackgroundCheckEntitySearchPerson = BackgroundCheckEntitySearchSchema & {
   id: Scalars["String"]["output"];
+  isFalsePositive: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntitySearchPersonProperties;
   score: Maybe<Scalars["Float"]["output"]>;
@@ -354,6 +358,7 @@ export type BackgroundCheckEntitySearchPersonProperties = {
 
 export type BackgroundCheckEntitySearchSchema = {
   id: Scalars["String"]["output"];
+  isFalsePositive: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   score: Maybe<Scalars["Float"]["output"]>;
   type: Scalars["String"]["output"];
@@ -1243,8 +1248,6 @@ export type Mutation = {
    */
   completePetition: Petition;
   completeProfileFromExternalSource: Profile;
-  /** @deprecated use copyReplyContentToProfileFieldValue */
-  copyBackgroundCheckReplyToProfileFieldValue: ProfileFieldValue;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
   copyReplyContentToProfileFieldValue: ProfileFieldValue;
   /**
@@ -1301,8 +1304,6 @@ export type Mutation = {
   createExportRepliesTask: Task;
   /** Creates replies on a FIELD_GROUP field with the provided profiles */
   createFieldGroupRepliesFromProfiles: PetitionField;
-  /** @deprecated use createFieldGroupRepliesFromProfiles */
-  createFieldGroupReplyFromProfile: PetitionFieldReply;
   /** Creates a task for exporting files from a petition using an integration */
   createFileExportTask: Task;
   /** Creates a reply to a file upload field. */
@@ -1577,7 +1578,10 @@ export type Mutation = {
   retryAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
+  /** @deprecated use saveProfileFieldValueDraft instead */
   saveAdverseMediaChanges: AdverseMediaArticleSearchResult;
+  /** Saves a draft of a profile field value */
+  saveProfileFieldValueDraft: Success;
   /** Moves a profile to DELETION_SCHEDULED status */
   scheduleProfileForDeletion: Array<Profile>;
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
@@ -1626,6 +1630,7 @@ export type Mutation = {
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
   updateBackgroundCheckEntity: Success;
+  updateBackgroundCheckSearchFalsePositives: Success;
   updateCompaniesHouseCustomProperties: SupportMethodResponse;
   /** Updates a contact. */
   updateContact: Contact;
@@ -1701,7 +1706,9 @@ export type Mutation = {
   /** Updates an existing event subscription for the user's profiles */
   updateProfileEventSubscription: ProfileEventSubscription;
   updateProfileFieldValue: Profile;
+  /** @deprecated use updateProfileFieldValueOptions */
   updateProfileFieldValueMonitoringStatus: Profile;
+  updateProfileFieldValueOptions: ProfileFieldValue;
   /** Updates a profile list view */
   updateProfileListView: ProfileListView;
   updateProfileType: ProfileType;
@@ -1893,14 +1900,6 @@ export type MutationcompleteProfileFromExternalSourceArgs = {
   profileTypeId: Scalars["GID"]["input"];
 };
 
-export type MutationcopyBackgroundCheckReplyToProfileFieldValueArgs = {
-  expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
-  petitionId: Scalars["GID"]["input"];
-  profileId: Scalars["GID"]["input"];
-  profileTypeFieldId: Scalars["GID"]["input"];
-  replyId: Scalars["GID"]["input"];
-};
-
 export type MutationcopyFileReplyToProfileFieldFileArgs = {
   expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
   fileReplyIds: Array<Scalars["GID"]["input"]>;
@@ -2048,14 +2047,6 @@ export type MutationcreateFieldGroupRepliesFromProfilesArgs = {
   petitionId: Scalars["GID"]["input"];
   profileIds: Array<Scalars["GID"]["input"]>;
   skipFormatErrors?: InputMaybe<Scalars["Boolean"]["input"]>;
-};
-
-export type MutationcreateFieldGroupReplyFromProfileArgs = {
-  force?: InputMaybe<Scalars["Boolean"]["input"]>;
-  parentReplyId: Scalars["GID"]["input"];
-  petitionFieldId: Scalars["GID"]["input"];
-  petitionId: Scalars["GID"]["input"];
-  profileId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateFileExportTaskArgs = {
@@ -2892,6 +2883,11 @@ export type MutationsaveAdverseMediaChangesArgs = {
   token: Scalars["String"]["input"];
 };
 
+export type MutationsaveProfileFieldValueDraftArgs = {
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+};
+
 export type MutationscheduleProfileForDeletionArgs = {
   profileIds: Array<Scalars["GID"]["input"]>;
 };
@@ -3051,6 +3047,12 @@ export type MutationuntagPetitionArgs = {
 
 export type MutationupdateBackgroundCheckEntityArgs = {
   entityId?: InputMaybe<Scalars["String"]["input"]>;
+  token: Scalars["String"]["input"];
+};
+
+export type MutationupdateBackgroundCheckSearchFalsePositivesArgs = {
+  entityIds: Array<Scalars["String"]["input"]>;
+  isFalsePositive: Scalars["Boolean"]["input"];
   token: Scalars["String"]["input"];
 };
 
@@ -3295,6 +3297,12 @@ export type MutationupdateProfileFieldValueArgs = {
 
 export type MutationupdateProfileFieldValueMonitoringStatusArgs = {
   enabled: Scalars["Boolean"]["input"];
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+};
+
+export type MutationupdateProfileFieldValueOptionsArgs = {
+  data: UpdateProfileFieldValueOptionsDataInput;
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
 };
@@ -5274,6 +5282,7 @@ export type ProfileEventType =
   | "PROFILE_FIELD_EXPIRY_UPDATED"
   | "PROFILE_FIELD_FILE_ADDED"
   | "PROFILE_FIELD_FILE_REMOVED"
+  | "PROFILE_FIELD_VALUE_MONITORED"
   | "PROFILE_FIELD_VALUE_UPDATED"
   | "PROFILE_RELATIONSHIP_CREATED"
   | "PROFILE_RELATIONSHIP_REMOVED"
@@ -5466,14 +5475,24 @@ export type ProfileFieldValue = ProfileFieldResponse & {
   expiryDate: Maybe<Scalars["String"]["output"]>;
   field: ProfileTypeField;
   hasActiveMonitoring: Scalars["Boolean"]["output"];
-  /** Whether this value has an unsaved draft. */
+  /** @deprecated don't use! */
   hasDraft: Scalars["Boolean"]["output"];
   hasPendingReview: Scalars["Boolean"]["output"];
+  hasStoredValue: Scalars["Boolean"]["output"];
   id: Scalars["GID"]["output"];
+  isDraft: Scalars["Boolean"]["output"];
   profile: Profile;
   /** Time when the response was removed. */
   removedAt: Maybe<Scalars["DateTime"]["output"]>;
   removedBy: Maybe<User>;
+};
+
+export type ProfileFieldValueMonitoredEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  profile: Maybe<Profile>;
+  type: ProfileEventType;
 };
 
 export type ProfileFieldValueUpdatedEvent = ProfileEvent & {
@@ -5507,6 +5526,7 @@ export type ProfileFieldValuesFilterOperator =
   | "HAS_BG_CHECK_RESULTS"
   | "HAS_BG_CHECK_TOPICS"
   | "HAS_EXPIRY"
+  | "HAS_PENDING_REVIEW"
   | "HAS_VALUE"
   | "IS_EXPIRED"
   | "IS_ONE_OF"
@@ -5519,6 +5539,7 @@ export type ProfileFieldValuesFilterOperator =
   | "NOT_HAS_BG_CHECK_RESULTS"
   | "NOT_HAS_BG_CHECK_TOPICS"
   | "NOT_HAS_EXPIRY"
+  | "NOT_HAS_PENDING_REVIEW"
   | "NOT_HAS_VALUE"
   | "NOT_IS_ONE_OF"
   | "START_WITH";
@@ -6276,6 +6297,7 @@ export type QueryadverseMediaEntitySuggestArgs = {
 
 export type QuerybackgroundCheckEntityDetailsArgs = {
   entityId: Scalars["String"]["input"];
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
   token: Scalars["String"]["input"];
 };
 
@@ -6283,6 +6305,7 @@ export type QuerybackgroundCheckEntitySearchArgs = {
   birthCountry?: InputMaybe<Scalars["String"]["input"]>;
   country?: InputMaybe<Scalars["String"]["input"]>;
   date?: InputMaybe<Scalars["Date"]["input"]>;
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
   name: Scalars["String"]["input"];
   token: Scalars["String"]["input"];
   type?: InputMaybe<BackgroundCheckEntitySearchType>;
@@ -7141,6 +7164,11 @@ export type UpdateProfileFieldValueInput = {
   content?: InputMaybe<Scalars["JSONObject"]["input"]>;
   expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
   profileTypeFieldId: Scalars["GID"]["input"];
+};
+
+export type UpdateProfileFieldValueOptionsDataInput = {
+  activeMonitoring?: InputMaybe<Scalars["Boolean"]["input"]>;
+  pendingReview?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type UpdateProfileTypeFieldInput = {
@@ -11555,6 +11583,13 @@ export type GetProfileEvents_ProfileEventsQueryVariables = Exact<{
 
 export type GetProfileEvents_ProfileEventsQuery = {
   profileEvents: Array<
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: ProfileEventType;
+        createdAt: string;
+        profile: { id: string } | null;
+      }
     | {
         id: string;
         data: { [key: string]: any };

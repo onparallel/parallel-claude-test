@@ -16,7 +16,7 @@ export interface EntitySearchRequest {
   birthCountry?: string | null;
   type: "PERSON" | "COMPANY" | null;
 }
-export interface EntitySearchPerson {
+export interface EntitySearchPerson<IncludeFalsePositives extends boolean = false> {
   id: string;
   type: "Person";
   name: string;
@@ -28,9 +28,10 @@ export interface EntitySearchPerson {
     country?: string[];
     topics?: string[];
   };
+  isFalsePositive?: IncludeFalsePositives extends true ? boolean : never;
 }
 
-export interface EntitySearchCompany {
+export interface EntitySearchCompany<IncludeFalsePositives extends boolean = false> {
   id: string;
   type: "Company";
   name: string;
@@ -40,11 +41,12 @@ export interface EntitySearchCompany {
     jurisdiction?: string[];
     topics?: string[];
   };
+  isFalsePositive?: IncludeFalsePositives extends true ? boolean : never;
 }
 
-export interface EntitySearchResponse {
+export interface EntitySearchResponse<IncludeFalsePositives extends boolean = false> {
   totalCount: number;
-  items: (EntitySearchPerson | EntitySearchCompany)[];
+  items: (EntitySearchPerson<IncludeFalsePositives> | EntitySearchCompany<IncludeFalsePositives>)[];
   createdAt: Date;
 }
 
@@ -136,13 +138,26 @@ interface EntityDetailsPdfResponse {
   binary_stream: Readable;
 }
 
+export interface BackgroundCheckContent {
+  query: EntitySearchRequest;
+  search: EntitySearchResponse;
+  entity: EntityDetailsResponse | null;
+  /** IDs of the found entities that are marked as false positives */
+  falsePositives?: { id: string; addedAt: Date; addedByUserId: number }[];
+}
+
 export interface IBackgroundCheckService {
   entitySearch(query: EntitySearchRequest): Promise<EntitySearchResponse>;
-  entityProfileDetails(entityId: string, userId?: number): Promise<EntityDetailsResponse>;
+  entityProfileDetails(
+    entityId: string,
+    userId?: number,
+    opts?: { skipCache?: boolean },
+  ): Promise<EntityDetailsResponse>;
   entityProfileDetailsPdf(
     userId: number,
     props: Omit<BackgroundCheckProfileProps, "assetsUrl">,
   ): Promise<EntityDetailsPdfResponse>;
+  mapBackgroundCheckSearch(content: BackgroundCheckContent): EntitySearchResponse<true>;
 }
 
 export const BACKGROUND_CHECK_SERVICE = Symbol.for("BACKGROUND_CHECK_SERVICE");
@@ -164,16 +179,22 @@ export class BackgroundCheckService implements IBackgroundCheckService {
     return await this.getClient().entitySearch(query);
   }
 
-  async entityProfileDetails(entityId: string, userId?: number): Promise<EntityDetailsResponse> {
+  async entityProfileDetails(
+    entityId: string,
+    userId?: number,
+    opts?: { skipCache?: boolean },
+  ): Promise<EntityDetailsResponse> {
     if (isNullish(userId)) {
       return await this.getClient().entityProfileDetails(entityId);
     }
 
     // look inside Redis cache before making the API call
     const redisKey = `BackgroundCheck:${userId}:${entityId}`;
-    const redisCached = await this.redis.get(redisKey);
-    if (redisCached) {
-      return JSON.parse(redisCached) as EntityDetailsResponse;
+    if (!opts?.skipCache) {
+      const redisCached = await this.redis.get(redisKey);
+      if (redisCached) {
+        return JSON.parse(redisCached) as EntityDetailsResponse;
+      }
     }
 
     const details = await this.getClient().entityProfileDetails(entityId);
@@ -191,6 +212,18 @@ export class BackgroundCheckService implements IBackgroundCheckService {
     return {
       binary_stream: Readable.from(stream),
       mime_type: "application/pdf",
+    };
+  }
+
+  public mapBackgroundCheckSearch(content: BackgroundCheckContent) {
+    const falsePositiveIds = (content?.falsePositives ?? []).map(({ id }) => id);
+
+    return {
+      ...content.search,
+      items: content.search.items.map((item) => ({
+        ...item,
+        isFalsePositive: falsePositiveIds.includes(item.id),
+      })),
     };
   }
 }

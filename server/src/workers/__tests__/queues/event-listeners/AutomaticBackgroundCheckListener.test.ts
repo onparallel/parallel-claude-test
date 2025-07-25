@@ -191,6 +191,7 @@ describe("Worker - Automatic Background Check Listener", () => {
                 },
                 search: {
                   totalCount: 1,
+                  falsePositivesCount: 0,
                 },
               },
             },
@@ -399,6 +400,7 @@ describe("Worker - Automatic Background Check Listener", () => {
                 },
                 search: {
                   totalCount: 1,
+                  falsePositivesCount: 0,
                 },
               },
             },
@@ -503,6 +505,7 @@ describe("Worker - Automatic Background Check Listener", () => {
                 },
                 search: {
                   totalCount: 100,
+                  falsePositivesCount: 0,
                 },
               },
             },
@@ -606,6 +609,7 @@ describe("Worker - Automatic Background Check Listener", () => {
                 },
                 search: {
                   totalCount: 100,
+                  falsePositivesCount: 0,
                 },
               },
             },
@@ -733,6 +737,7 @@ describe("Worker - Automatic Background Check Listener", () => {
                 },
                 search: {
                   totalCount: 1,
+                  falsePositivesCount: 0,
                 },
               },
               children: null,
@@ -772,7 +777,10 @@ describe("Worker - Automatic Background Check Listener", () => {
                           country: null,
                           birthCountry: null,
                         },
-                        search: { totalCount: 1 },
+                        search: {
+                          totalCount: 1,
+                          falsePositivesCount: 0,
+                        },
                       },
                     },
                   ],
@@ -808,7 +816,10 @@ describe("Worker - Automatic Background Check Listener", () => {
                           country: null,
                           birthCountry: null,
                         },
-                        search: { totalCount: 1 },
+                        search: {
+                          totalCount: 1,
+                          falsePositivesCount: 0,
+                        },
                       },
                     },
                   ],
@@ -844,7 +855,10 @@ describe("Worker - Automatic Background Check Listener", () => {
                           country: null,
                           birthCountry: null,
                         },
-                        search: { totalCount: 1 },
+                        search: {
+                          totalCount: 1,
+                          falsePositivesCount: 0,
+                        },
                       },
                     },
                   ],
@@ -984,6 +998,7 @@ describe("Worker - Automatic Background Check Listener", () => {
                 },
                 search: {
                   totalCount: 1,
+                  falsePositivesCount: 0,
                 },
               },
             },

@@ -63,32 +63,32 @@ export function MonitoringInfo({
   monitoringFrequency,
   createdAt,
   hasActiveMonitoring,
-  hasDraft,
+  isMonitoringPaused,
 }: {
   isMonitoringActive: boolean;
   monitoringFrequency: string[] | null;
   createdAt: string;
   hasActiveMonitoring?: boolean;
-  hasDraft?: boolean;
+  isMonitoringPaused?: boolean;
 }) {
   const intl = useIntl();
 
-  const isMonitoringPaused = isMonitoringActive && hasActiveMonitoring === false;
+  const isMonitoringDeactivated = isMonitoringActive && hasActiveMonitoring === false;
 
-  if ((isMonitoringActive || isMonitoringPaused) && monitoringFrequency) {
+  if ((isMonitoringActive || isMonitoringDeactivated) && monitoringFrequency) {
     return (
       <HStack>
         <SmallPopover
           content={
             <Text fontSize="sm">
-              {isMonitoringPaused ? (
+              {isMonitoringDeactivated ? (
                 <FormattedMessage
                   id="component.profile-field-background-check.deactivated-monitoring"
                   defaultMessage="Monitoring is deactivated."
                 />
-              ) : hasDraft ? (
+              ) : isMonitoringPaused ? (
                 <FormattedMessage
-                  id="component.profile-field-background-check.paused-monitoring-draft"
+                  id="component.profile-field-background-check.paused-monitoring"
                   defaultMessage="Monitoring is paused because there are changes not saved."
                 />
               ) : (
@@ -124,9 +124,9 @@ export function MonitoringInfo({
           maxWidth="250px"
           width="auto"
         >
-          {isMonitoringPaused ? (
+          {isMonitoringDeactivated ? (
             <RepeatOffIcon color="red.300" marginBottom={0.5} />
-          ) : hasDraft ? (
+          ) : isMonitoringPaused ? (
             <RepeatPauseIcon color="gray.400" marginBottom={0.5} />
           ) : (
             <RepeatIcon color="yellow.500" marginBottom={0.5} />

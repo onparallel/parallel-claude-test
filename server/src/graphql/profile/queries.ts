@@ -136,6 +136,8 @@ export const profiles = queryField((t) => {
                       "EXPIRES_IN",
                       "HAS_EXPIRY",
                       "NOT_HAS_EXPIRY",
+                      "HAS_PENDING_REVIEW",
+                      "NOT_HAS_PENDING_REVIEW",
                     ],
                   }),
                 });

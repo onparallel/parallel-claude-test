@@ -549,6 +549,11 @@ export interface NexusGenInputs {
     expiryDate?: NexusGenScalars["Date"] | null; // Date
     profileTypeFieldId: NexusGenScalars["GID"]; // GID!
   };
+  UpdateProfileFieldValueOptionsDataInput: {
+    // input type
+    activeMonitoring?: boolean | null; // Boolean
+    pendingReview?: boolean | null; // Boolean
+  };
   UpdateProfileTypeFieldInput: {
     // input type
     alias?: string | null; // String
@@ -764,6 +769,7 @@ export interface NexusGenEnums {
     | "HAS_BG_CHECK_RESULTS"
     | "HAS_BG_CHECK_TOPICS"
     | "HAS_EXPIRY"
+    | "HAS_PENDING_REVIEW"
     | "HAS_VALUE"
     | "IS_EXPIRED"
     | "IS_ONE_OF"
@@ -776,6 +782,7 @@ export interface NexusGenEnums {
     | "NOT_HAS_BG_CHECK_RESULTS"
     | "NOT_HAS_BG_CHECK_TOPICS"
     | "NOT_HAS_EXPIRY"
+    | "NOT_HAS_PENDING_REVIEW"
     | "NOT_HAS_VALUE"
     | "NOT_IS_ONE_OF"
     | "START_WITH";
@@ -1024,12 +1031,15 @@ export interface NexusGenObjects {
   BackgroundCheckEntitySearch: {
     // root type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    hasStoredValue?: boolean | null; // Boolean
+    isDraft?: boolean | null; // Boolean
     items: NexusGenRootTypes["BackgroundCheckEntitySearchSchema"][]; // [BackgroundCheckEntitySearchSchema!]!
     totalCount: number; // Int!
   };
   BackgroundCheckEntitySearchCompany: {
     // root type
     id: string; // String!
+    isFalsePositive?: boolean | null; // Boolean
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntitySearchCompanyProperties"]; // BackgroundCheckEntitySearchCompanyProperties!
     score?: number | null; // Float
@@ -1044,6 +1054,7 @@ export interface NexusGenObjects {
   BackgroundCheckEntitySearchPerson: {
     // root type
     id: string; // String!
+    isFalsePositive?: boolean | null; // Boolean
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntitySearchPersonProperties"]; // BackgroundCheckEntitySearchPersonProperties!
     score?: number | null; // Float
@@ -1683,7 +1694,8 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["ProfileFieldProperty"][]; // [ProfileFieldProperty!]!
     totalCount: number; // Int!
   };
-  ProfileFieldValue: db.ProfileFieldValue;
+  ProfileFieldValue: db.ProfileFieldValue & { has_stored_value: boolean };
+  ProfileFieldValueMonitoredEvent: profileEvents.ProfileFieldValueMonitoredEvent;
   ProfileFieldValueUpdatedEvent: profileEvents.ProfileFieldValueUpdatedEvent;
   ProfileListView: db.ProfileListView;
   ProfileListViewData: {
@@ -2200,12 +2212,15 @@ export interface NexusGenFieldTypes {
   BackgroundCheckEntitySearch: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    hasStoredValue: boolean | null; // Boolean
+    isDraft: boolean | null; // Boolean
     items: NexusGenRootTypes["BackgroundCheckEntitySearchSchema"][]; // [BackgroundCheckEntitySearchSchema!]!
     totalCount: number; // Int!
   };
   BackgroundCheckEntitySearchCompany: {
     // field return type
     id: string; // String!
+    isFalsePositive: boolean | null; // Boolean
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntitySearchCompanyProperties"]; // BackgroundCheckEntitySearchCompanyProperties!
     score: number | null; // Float
@@ -2220,6 +2235,7 @@ export interface NexusGenFieldTypes {
   BackgroundCheckEntitySearchPerson: {
     // field return type
     id: string; // String!
+    isFalsePositive: boolean | null; // Boolean
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntitySearchPersonProperties"]; // BackgroundCheckEntitySearchPersonProperties!
     score: number | null; // Float
@@ -2766,7 +2782,6 @@ export interface NexusGenFieldTypes {
     closeProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     completePetition: NexusGenRootTypes["Petition"]; // Petition!
     completeProfileFromExternalSource: NexusGenRootTypes["Profile"]; // Profile!
-    copyBackgroundCheckReplyToProfileFieldValue: NexusGenRootTypes["ProfileFieldValue"]; // ProfileFieldValue!
     copyFileReplyToProfileFieldFile: NexusGenRootTypes["ProfileFieldFile"][]; // [ProfileFieldFile!]!
     copyReplyContentToProfileFieldValue: NexusGenRootTypes["ProfileFieldValue"]; // ProfileFieldValue!
     createAddPetitionPermissionMaybeTask: NexusGenRootTypes["MaybeTask"]; // MaybeTask!
@@ -2791,7 +2806,6 @@ export interface NexusGenFieldTypes {
     createExportExcelTask: NexusGenRootTypes["Task"]; // Task!
     createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
     createFieldGroupRepliesFromProfiles: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    createFieldGroupReplyFromProfile: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createFileExportTask: NexusGenRootTypes["Task"]; // Task!
     createFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     createFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
@@ -2938,6 +2952,7 @@ export interface NexusGenFieldTypes {
     retryAsyncFieldCompletion: NexusGenRootTypes["AsyncFieldCompletionResponse"]; // AsyncFieldCompletionResponse!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
     saveAdverseMediaChanges: NexusGenRootTypes["AdverseMediaArticleSearchResult"]; // AdverseMediaArticleSearchResult!
+    saveProfileFieldValueDraft: NexusGenEnums["Success"]; // Success!
     scheduleProfileForDeletion: NexusGenRootTypes["Profile"][]; // [Profile!]!
     sendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
     sendPetitionApprovalRequestStepReminder: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
@@ -2965,6 +2980,7 @@ export interface NexusGenFieldTypes {
     unsubscribeFromProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateBackgroundCheckEntity: NexusGenEnums["Success"]; // Success!
+    updateBackgroundCheckSearchFalsePositives: NexusGenEnums["Success"]; // Success!
     updateCompaniesHouseCustomProperties: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateCreatePetitionButtonDashboardModule: NexusGenRootTypes["DashboardModule"]; // DashboardModule!
@@ -3005,6 +3021,7 @@ export interface NexusGenFieldTypes {
     updateProfileEventSubscription: NexusGenRootTypes["ProfileEventSubscription"]; // ProfileEventSubscription!
     updateProfileFieldValue: NexusGenRootTypes["Profile"]; // Profile!
     updateProfileFieldValueMonitoringStatus: NexusGenRootTypes["Profile"]; // Profile!
+    updateProfileFieldValueOptions: NexusGenRootTypes["ProfileFieldValue"]; // ProfileFieldValue!
     updateProfileListView: NexusGenRootTypes["ProfileListView"]; // ProfileListView!
     updateProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     updateProfileTypeField: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
@@ -4105,10 +4122,20 @@ export interface NexusGenFieldTypes {
     hasActiveMonitoring: boolean; // Boolean!
     hasDraft: boolean; // Boolean!
     hasPendingReview: boolean; // Boolean!
+    hasStoredValue: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
+    isDraft: boolean; // Boolean!
     profile: NexusGenRootTypes["Profile"]; // Profile!
     removedAt: NexusGenScalars["DateTime"] | null; // DateTime
     removedBy: NexusGenRootTypes["User"] | null; // User
+  };
+  ProfileFieldValueMonitoredEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+    profile: NexusGenRootTypes["Profile"] | null; // Profile
+    type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
   };
   ProfileFieldValueUpdatedEvent: {
     // field return type
@@ -4992,6 +5019,7 @@ export interface NexusGenFieldTypes {
   BackgroundCheckEntitySearchSchema: {
     // field return type
     id: string; // String!
+    isFalsePositive: boolean | null; // Boolean
     name: string; // String!
     score: number | null; // Float
     type: string; // String!
@@ -5386,12 +5414,15 @@ export interface NexusGenFieldTypeNames {
   BackgroundCheckEntitySearch: {
     // field return type name
     createdAt: "DateTime";
+    hasStoredValue: "Boolean";
+    isDraft: "Boolean";
     items: "BackgroundCheckEntitySearchSchema";
     totalCount: "Int";
   };
   BackgroundCheckEntitySearchCompany: {
     // field return type name
     id: "String";
+    isFalsePositive: "Boolean";
     name: "String";
     properties: "BackgroundCheckEntitySearchCompanyProperties";
     score: "Float";
@@ -5406,6 +5437,7 @@ export interface NexusGenFieldTypeNames {
   BackgroundCheckEntitySearchPerson: {
     // field return type name
     id: "String";
+    isFalsePositive: "Boolean";
     name: "String";
     properties: "BackgroundCheckEntitySearchPersonProperties";
     score: "Float";
@@ -5950,7 +5982,6 @@ export interface NexusGenFieldTypeNames {
     closeProfile: "Profile";
     completePetition: "Petition";
     completeProfileFromExternalSource: "Profile";
-    copyBackgroundCheckReplyToProfileFieldValue: "ProfileFieldValue";
     copyFileReplyToProfileFieldFile: "ProfileFieldFile";
     copyReplyContentToProfileFieldValue: "ProfileFieldValue";
     createAddPetitionPermissionMaybeTask: "MaybeTask";
@@ -5975,7 +6006,6 @@ export interface NexusGenFieldTypeNames {
     createExportExcelTask: "Task";
     createExportRepliesTask: "Task";
     createFieldGroupRepliesFromProfiles: "PetitionField";
-    createFieldGroupReplyFromProfile: "PetitionFieldReply";
     createFileExportTask: "Task";
     createFileUploadReply: "FileUploadReplyResponse";
     createFileUploadReplyComplete: "PetitionFieldReply";
@@ -6122,6 +6152,7 @@ export interface NexusGenFieldTypeNames {
     retryAsyncFieldCompletion: "AsyncFieldCompletionResponse";
     revokeUserAuthToken: "Result";
     saveAdverseMediaChanges: "AdverseMediaArticleSearchResult";
+    saveProfileFieldValueDraft: "Success";
     scheduleProfileForDeletion: "Profile";
     sendPetition: "SendPetitionResult";
     sendPetitionApprovalRequestStepReminder: "PetitionApprovalRequestStep";
@@ -6149,6 +6180,7 @@ export interface NexusGenFieldTypeNames {
     unsubscribeFromProfile: "Profile";
     untagPetition: "PetitionBase";
     updateBackgroundCheckEntity: "Success";
+    updateBackgroundCheckSearchFalsePositives: "Success";
     updateCompaniesHouseCustomProperties: "SupportMethodResponse";
     updateContact: "Contact";
     updateCreatePetitionButtonDashboardModule: "DashboardModule";
@@ -6189,6 +6221,7 @@ export interface NexusGenFieldTypeNames {
     updateProfileEventSubscription: "ProfileEventSubscription";
     updateProfileFieldValue: "Profile";
     updateProfileFieldValueMonitoringStatus: "Profile";
+    updateProfileFieldValueOptions: "ProfileFieldValue";
     updateProfileListView: "ProfileListView";
     updateProfileType: "ProfileType";
     updateProfileTypeField: "ProfileTypeField";
@@ -7289,10 +7322,20 @@ export interface NexusGenFieldTypeNames {
     hasActiveMonitoring: "Boolean";
     hasDraft: "Boolean";
     hasPendingReview: "Boolean";
+    hasStoredValue: "Boolean";
     id: "GID";
+    isDraft: "Boolean";
     profile: "Profile";
     removedAt: "DateTime";
     removedBy: "User";
+  };
+  ProfileFieldValueMonitoredEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    data: "JSONObject";
+    id: "GID";
+    profile: "Profile";
+    type: "ProfileEventType";
   };
   ProfileFieldValueUpdatedEvent: {
     // field return type name
@@ -8176,6 +8219,7 @@ export interface NexusGenFieldTypeNames {
   BackgroundCheckEntitySearchSchema: {
     // field return type name
     id: "String";
+    isFalsePositive: "Boolean";
     name: "String";
     score: "Float";
     type: "String";
@@ -8523,14 +8567,6 @@ export interface NexusGenArgTypes {
       profileId?: NexusGenScalars["GID"] | null; // GID
       profileTypeId: NexusGenScalars["GID"]; // GID!
     };
-    copyBackgroundCheckReplyToProfileFieldValue: {
-      // args
-      expiryDate?: NexusGenScalars["Date"] | null; // Date
-      petitionId: NexusGenScalars["GID"]; // GID!
-      profileId: NexusGenScalars["GID"]; // GID!
-      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
-      replyId: NexusGenScalars["GID"]; // GID!
-    };
     copyFileReplyToProfileFieldFile: {
       // args
       expiryDate?: NexusGenScalars["Date"] | null; // Date
@@ -8679,14 +8715,6 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       profileIds: NexusGenScalars["GID"][]; // [GID!]!
       skipFormatErrors?: boolean | null; // Boolean
-    };
-    createFieldGroupReplyFromProfile: {
-      // args
-      force?: boolean | null; // Boolean
-      parentReplyId: NexusGenScalars["GID"]; // GID!
-      petitionFieldId: NexusGenScalars["GID"]; // GID!
-      petitionId: NexusGenScalars["GID"]; // GID!
-      profileId: NexusGenScalars["GID"]; // GID!
     };
     createFileExportTask: {
       // args
@@ -9522,6 +9550,11 @@ export interface NexusGenArgTypes {
       // args
       token: string; // String!
     };
+    saveProfileFieldValueDraft: {
+      // args
+      profileId: NexusGenScalars["GID"]; // GID!
+      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+    };
     scheduleProfileForDeletion: {
       // args
       profileIds: NexusGenScalars["GID"][]; // [GID!]!
@@ -9682,6 +9715,12 @@ export interface NexusGenArgTypes {
     updateBackgroundCheckEntity: {
       // args
       entityId?: string | null; // String
+      token: string; // String!
+    };
+    updateBackgroundCheckSearchFalsePositives: {
+      // args
+      entityIds: string[]; // [String!]!
+      isFalsePositive: boolean; // Boolean!
       token: string; // String!
     };
     updateCompaniesHouseCustomProperties: {
@@ -9926,6 +9965,12 @@ export interface NexusGenArgTypes {
     updateProfileFieldValueMonitoringStatus: {
       // args
       enabled: boolean; // Boolean!
+      profileId: NexusGenScalars["GID"]; // GID!
+      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+    };
+    updateProfileFieldValueOptions: {
+      // args
+      data: NexusGenInputs["UpdateProfileFieldValueOptionsDataInput"]; // UpdateProfileFieldValueOptionsDataInput!
       profileId: NexusGenScalars["GID"]; // GID!
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
     };
@@ -10235,6 +10280,7 @@ export interface NexusGenArgTypes {
     backgroundCheckEntityDetails: {
       // args
       entityId: string; // String!
+      force?: boolean | null; // Boolean
       token: string; // String!
     };
     backgroundCheckEntitySearch: {
@@ -10242,6 +10288,7 @@ export interface NexusGenArgTypes {
       birthCountry?: string | null; // String
       country?: string | null; // String
       date?: NexusGenScalars["Date"] | null; // Date
+      force?: boolean | null; // Boolean
       name: string; // String!
       token: string; // String!
       type?: NexusGenEnums["BackgroundCheckEntitySearchType"] | null; // BackgroundCheckEntitySearchType
@@ -10658,6 +10705,7 @@ export interface NexusGenAbstractTypeMembers {
     | "ProfileFieldExpiryUpdatedEvent"
     | "ProfileFieldFileAddedEvent"
     | "ProfileFieldFileRemovedEvent"
+    | "ProfileFieldValueMonitoredEvent"
     | "ProfileFieldValueUpdatedEvent"
     | "ProfileRelationshipCreatedEvent"
     | "ProfileRelationshipRemovedEvent"
@@ -10772,6 +10820,7 @@ export interface NexusGenTypeInterfaces {
   ProfileFieldFileAddedEvent: "ProfileEvent";
   ProfileFieldFileRemovedEvent: "ProfileEvent";
   ProfileFieldValue: "ProfileFieldResponse";
+  ProfileFieldValueMonitoredEvent: "ProfileEvent";
   ProfileFieldValueUpdatedEvent: "ProfileEvent";
   ProfileListView: "ListView";
   ProfileRelationshipCreatedEvent: "ProfileEvent";

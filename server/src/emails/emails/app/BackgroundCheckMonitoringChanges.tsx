@@ -11,7 +11,7 @@ export type BackgroundCheckMonitoringChangesProps = {
   userName: string | null;
   properties: {
     content: {
-      query?: { name: string; date: string };
+      query: { name: string; date?: string | null };
       entity?: { name: string; type: string };
     };
     profileId: string;

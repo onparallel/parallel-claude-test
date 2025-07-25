@@ -346,6 +346,8 @@ export interface BackgroundCheckEntityDetailsSanctionProperties {
 export interface BackgroundCheckEntitySearch {
   __typename?: "BackgroundCheckEntitySearch";
   createdAt: Scalars["DateTime"]["output"];
+  hasStoredValue?: Maybe<Scalars["Boolean"]["output"]>;
+  isDraft?: Maybe<Scalars["Boolean"]["output"]>;
   items: Array<BackgroundCheckEntitySearchSchema>;
   totalCount: Scalars["Int"]["output"];
 }
@@ -353,6 +355,7 @@ export interface BackgroundCheckEntitySearch {
 export interface BackgroundCheckEntitySearchCompany extends BackgroundCheckEntitySearchSchema {
   __typename?: "BackgroundCheckEntitySearchCompany";
   id: Scalars["String"]["output"];
+  isFalsePositive?: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntitySearchCompanyProperties;
   score?: Maybe<Scalars["Float"]["output"]>;
@@ -369,6 +372,7 @@ export interface BackgroundCheckEntitySearchCompanyProperties {
 export interface BackgroundCheckEntitySearchPerson extends BackgroundCheckEntitySearchSchema {
   __typename?: "BackgroundCheckEntitySearchPerson";
   id: Scalars["String"]["output"];
+  isFalsePositive?: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntitySearchPersonProperties;
   score?: Maybe<Scalars["Float"]["output"]>;
@@ -386,6 +390,7 @@ export interface BackgroundCheckEntitySearchPersonProperties {
 
 export interface BackgroundCheckEntitySearchSchema {
   id: Scalars["String"]["output"];
+  isFalsePositive?: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   score?: Maybe<Scalars["Float"]["output"]>;
   type: Scalars["String"]["output"];
@@ -1341,8 +1346,6 @@ export interface Mutation {
    */
   completePetition: Petition;
   completeProfileFromExternalSource: Profile;
-  /** @deprecated use copyReplyContentToProfileFieldValue */
-  copyBackgroundCheckReplyToProfileFieldValue: ProfileFieldValue;
   copyFileReplyToProfileFieldFile: Array<ProfileFieldFile>;
   copyReplyContentToProfileFieldValue: ProfileFieldValue;
   /**
@@ -1399,8 +1402,6 @@ export interface Mutation {
   createExportRepliesTask: Task;
   /** Creates replies on a FIELD_GROUP field with the provided profiles */
   createFieldGroupRepliesFromProfiles: PetitionField;
-  /** @deprecated use createFieldGroupRepliesFromProfiles */
-  createFieldGroupReplyFromProfile: PetitionFieldReply;
   /** Creates a task for exporting files from a petition using an integration */
   createFileExportTask: Task;
   /** Creates a reply to a file upload field. */
@@ -1675,7 +1676,10 @@ export interface Mutation {
   retryAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
+  /** @deprecated use saveProfileFieldValueDraft instead */
   saveAdverseMediaChanges: AdverseMediaArticleSearchResult;
+  /** Saves a draft of a profile field value */
+  saveProfileFieldValueDraft: Success;
   /** Moves a profile to DELETION_SCHEDULED status */
   scheduleProfileForDeletion: Array<Profile>;
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
@@ -1724,6 +1728,7 @@ export interface Mutation {
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
   updateBackgroundCheckEntity: Success;
+  updateBackgroundCheckSearchFalsePositives: Success;
   updateCompaniesHouseCustomProperties: SupportMethodResponse;
   /** Updates a contact. */
   updateContact: Contact;
@@ -1799,7 +1804,9 @@ export interface Mutation {
   /** Updates an existing event subscription for the user's profiles */
   updateProfileEventSubscription: ProfileEventSubscription;
   updateProfileFieldValue: Profile;
+  /** @deprecated use updateProfileFieldValueOptions */
   updateProfileFieldValueMonitoringStatus: Profile;
+  updateProfileFieldValueOptions: ProfileFieldValue;
   /** Updates a profile list view */
   updateProfileListView: ProfileListView;
   updateProfileType: ProfileType;
@@ -1991,14 +1998,6 @@ export interface MutationcompleteProfileFromExternalSourceArgs {
   profileTypeId: Scalars["GID"]["input"];
 }
 
-export interface MutationcopyBackgroundCheckReplyToProfileFieldValueArgs {
-  expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
-  petitionId: Scalars["GID"]["input"];
-  profileId: Scalars["GID"]["input"];
-  profileTypeFieldId: Scalars["GID"]["input"];
-  replyId: Scalars["GID"]["input"];
-}
-
 export interface MutationcopyFileReplyToProfileFieldFileArgs {
   expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
   fileReplyIds: Array<Scalars["GID"]["input"]>;
@@ -2146,14 +2145,6 @@ export interface MutationcreateFieldGroupRepliesFromProfilesArgs {
   petitionId: Scalars["GID"]["input"];
   profileIds: Array<Scalars["GID"]["input"]>;
   skipFormatErrors?: InputMaybe<Scalars["Boolean"]["input"]>;
-}
-
-export interface MutationcreateFieldGroupReplyFromProfileArgs {
-  force?: InputMaybe<Scalars["Boolean"]["input"]>;
-  parentReplyId: Scalars["GID"]["input"];
-  petitionFieldId: Scalars["GID"]["input"];
-  petitionId: Scalars["GID"]["input"];
-  profileId: Scalars["GID"]["input"];
 }
 
 export interface MutationcreateFileExportTaskArgs {
@@ -2990,6 +2981,11 @@ export interface MutationsaveAdverseMediaChangesArgs {
   token: Scalars["String"]["input"];
 }
 
+export interface MutationsaveProfileFieldValueDraftArgs {
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+}
+
 export interface MutationscheduleProfileForDeletionArgs {
   profileIds: Array<Scalars["GID"]["input"]>;
 }
@@ -3149,6 +3145,12 @@ export interface MutationuntagPetitionArgs {
 
 export interface MutationupdateBackgroundCheckEntityArgs {
   entityId?: InputMaybe<Scalars["String"]["input"]>;
+  token: Scalars["String"]["input"];
+}
+
+export interface MutationupdateBackgroundCheckSearchFalsePositivesArgs {
+  entityIds: Array<Scalars["String"]["input"]>;
+  isFalsePositive: Scalars["Boolean"]["input"];
   token: Scalars["String"]["input"];
 }
 
@@ -3393,6 +3395,12 @@ export interface MutationupdateProfileFieldValueArgs {
 
 export interface MutationupdateProfileFieldValueMonitoringStatusArgs {
   enabled: Scalars["Boolean"]["input"];
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+}
+
+export interface MutationupdateProfileFieldValueOptionsArgs {
+  data: UpdateProfileFieldValueOptionsDataInput;
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
 }
@@ -5463,6 +5471,7 @@ export type ProfileEventType =
   | "PROFILE_FIELD_EXPIRY_UPDATED"
   | "PROFILE_FIELD_FILE_ADDED"
   | "PROFILE_FIELD_FILE_REMOVED"
+  | "PROFILE_FIELD_VALUE_MONITORED"
   | "PROFILE_FIELD_VALUE_UPDATED"
   | "PROFILE_RELATIONSHIP_CREATED"
   | "PROFILE_RELATIONSHIP_REMOVED"
@@ -5672,14 +5681,25 @@ export interface ProfileFieldValue extends ProfileFieldResponse {
   expiryDate?: Maybe<Scalars["String"]["output"]>;
   field: ProfileTypeField;
   hasActiveMonitoring: Scalars["Boolean"]["output"];
-  /** Whether this value has an unsaved draft. */
+  /** @deprecated don't use! */
   hasDraft: Scalars["Boolean"]["output"];
   hasPendingReview: Scalars["Boolean"]["output"];
+  hasStoredValue: Scalars["Boolean"]["output"];
   id: Scalars["GID"]["output"];
+  isDraft: Scalars["Boolean"]["output"];
   profile: Profile;
   /** Time when the response was removed. */
   removedAt?: Maybe<Scalars["DateTime"]["output"]>;
   removedBy?: Maybe<User>;
+}
+
+export interface ProfileFieldValueMonitoredEvent extends ProfileEvent {
+  __typename?: "ProfileFieldValueMonitoredEvent";
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  profile?: Maybe<Profile>;
+  type: ProfileEventType;
 }
 
 export interface ProfileFieldValueUpdatedEvent extends ProfileEvent {
@@ -5714,6 +5734,7 @@ export type ProfileFieldValuesFilterOperator =
   | "HAS_BG_CHECK_RESULTS"
   | "HAS_BG_CHECK_TOPICS"
   | "HAS_EXPIRY"
+  | "HAS_PENDING_REVIEW"
   | "HAS_VALUE"
   | "IS_EXPIRED"
   | "IS_ONE_OF"
@@ -5726,6 +5747,7 @@ export type ProfileFieldValuesFilterOperator =
   | "NOT_HAS_BG_CHECK_RESULTS"
   | "NOT_HAS_BG_CHECK_TOPICS"
   | "NOT_HAS_EXPIRY"
+  | "NOT_HAS_PENDING_REVIEW"
   | "NOT_HAS_VALUE"
   | "NOT_IS_ONE_OF"
   | "START_WITH";
@@ -6524,6 +6546,7 @@ export interface QueryadverseMediaEntitySuggestArgs {
 
 export interface QuerybackgroundCheckEntityDetailsArgs {
   entityId: Scalars["String"]["input"];
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
   token: Scalars["String"]["input"];
 }
 
@@ -6531,6 +6554,7 @@ export interface QuerybackgroundCheckEntitySearchArgs {
   birthCountry?: InputMaybe<Scalars["String"]["input"]>;
   country?: InputMaybe<Scalars["String"]["input"]>;
   date?: InputMaybe<Scalars["Date"]["input"]>;
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
   name: Scalars["String"]["input"];
   token: Scalars["String"]["input"];
   type?: InputMaybe<BackgroundCheckEntitySearchType>;
@@ -7418,6 +7442,11 @@ export interface UpdateProfileFieldValueInput {
   content?: InputMaybe<Scalars["JSONObject"]["input"]>;
   expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
   profileTypeFieldId: Scalars["GID"]["input"];
+}
+
+export interface UpdateProfileFieldValueOptionsDataInput {
+  activeMonitoring?: InputMaybe<Scalars["Boolean"]["input"]>;
+  pendingReview?: InputMaybe<Scalars["Boolean"]["input"]>;
 }
 
 export interface UpdateProfileTypeFieldInput {
@@ -14020,9 +14049,10 @@ export type ProfileLayout_ProfileFragment = {
       content?: { [key: string]: any } | null;
       createdAt: string;
       expiryDate?: string | null;
-      hasDraft: boolean;
+      isDraft: boolean;
       hasPendingReview: boolean;
       hasActiveMonitoring: boolean;
+      hasStoredValue: boolean;
     } | null;
   }>;
   petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
@@ -14092,9 +14122,10 @@ export type ProfileLayout_subscribeToProfileMutation = {
         content?: { [key: string]: any } | null;
         createdAt: string;
         expiryDate?: string | null;
-        hasDraft: boolean;
+        isDraft: boolean;
         hasPendingReview: boolean;
         hasActiveMonitoring: boolean;
+        hasStoredValue: boolean;
       } | null;
     }>;
     petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
@@ -14165,9 +14196,10 @@ export type ProfileLayout_unsubscribeFromProfileMutation = {
         content?: { [key: string]: any } | null;
         createdAt: string;
         expiryDate?: string | null;
-        hasDraft: boolean;
+        isDraft: boolean;
         hasPendingReview: boolean;
         hasActiveMonitoring: boolean;
+        hasStoredValue: boolean;
       } | null;
     }>;
     petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
@@ -35942,9 +35974,10 @@ export type ProfileDrawer_profileQuery = {
         content?: { [key: string]: any } | null;
         createdAt: string;
         expiryDate?: string | null;
-        hasDraft: boolean;
+        isDraft: boolean;
         hasPendingReview: boolean;
         hasActiveMonitoring: boolean;
+        hasStoredValue: boolean;
       } | null;
     }>;
     petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
@@ -37655,9 +37688,10 @@ export type ProfileForm_ProfileFieldValueFragment = {
   content?: { [key: string]: any } | null;
   createdAt: string;
   expiryDate?: string | null;
-  hasDraft: boolean;
+  isDraft: boolean;
   hasPendingReview: boolean;
   hasActiveMonitoring: boolean;
+  hasStoredValue: boolean;
 };
 
 export type ProfileForm_ProfileFieldPropertyFragment = {
@@ -37692,9 +37726,10 @@ export type ProfileForm_ProfileFieldPropertyFragment = {
     content?: { [key: string]: any } | null;
     createdAt: string;
     expiryDate?: string | null;
-    hasDraft: boolean;
+    isDraft: boolean;
     hasPendingReview: boolean;
     hasActiveMonitoring: boolean;
+    hasStoredValue: boolean;
   } | null;
 };
 
@@ -37742,9 +37777,10 @@ export type ProfileForm_ProfileFragment = {
       content?: { [key: string]: any } | null;
       createdAt: string;
       expiryDate?: string | null;
-      hasDraft: boolean;
+      isDraft: boolean;
       hasPendingReview: boolean;
       hasActiveMonitoring: boolean;
+      hasStoredValue: boolean;
     } | null;
   }>;
   petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
@@ -37892,9 +37928,10 @@ export type ProfileForm_updateProfileFieldValueMutation = {
         content?: { [key: string]: any } | null;
         createdAt: string;
         expiryDate?: string | null;
-        hasDraft: boolean;
+        isDraft: boolean;
         hasPendingReview: boolean;
         hasActiveMonitoring: boolean;
+        hasStoredValue: boolean;
       } | null;
     }>;
     petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
@@ -37964,9 +38001,10 @@ export type ProfileForm_createProfileFieldFileUploadLinkMutation = {
         content?: { [key: string]: any } | null;
         createdAt: string;
         expiryDate?: string | null;
-        hasDraft: boolean;
+        isDraft: boolean;
         hasPendingReview: boolean;
         hasActiveMonitoring: boolean;
+        hasStoredValue: boolean;
       } | null;
     };
   };
@@ -39700,9 +39738,10 @@ export type ProfileFormField_ProfileFieldPropertyFragment = {
     __typename?: "ProfileFieldValue";
     id: string;
     content?: { [key: string]: any } | null;
-    hasDraft: boolean;
+    isDraft: boolean;
     hasPendingReview: boolean;
     hasActiveMonitoring: boolean;
+    hasStoredValue: boolean;
   } | null;
 };
 
@@ -39720,9 +39759,10 @@ export type ProfileFormField_ProfileFieldValueFragment = {
   __typename?: "ProfileFieldValue";
   id: string;
   content?: { [key: string]: any } | null;
-  hasDraft: boolean;
+  isDraft: boolean;
   hasPendingReview: boolean;
   hasActiveMonitoring: boolean;
+  hasStoredValue: boolean;
 };
 
 export type ProfileFormField_ProfileFieldFileFragment = {
@@ -39761,22 +39801,19 @@ export type ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMutation =
   updateProfileFieldValue: { __typename?: "Profile"; id: string };
 };
 
-export type ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMonitoringStatusMutationVariables =
+export type ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueOptionsMutationVariables =
   Exact<{
     profileId: Scalars["GID"]["input"];
     profileTypeFieldId: Scalars["GID"]["input"];
-    enabled: Scalars["Boolean"]["input"];
+    data: UpdateProfileFieldValueOptionsDataInput;
   }>;
 
-export type ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMonitoringStatusMutation = {
-  updateProfileFieldValueMonitoringStatus: {
-    __typename?: "Profile";
+export type ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueOptionsMutation = {
+  updateProfileFieldValueOptions: {
+    __typename?: "ProfileFieldValue";
     id: string;
-    properties: Array<{
-      __typename?: "ProfileFieldProperty";
-      value?: { __typename?: "ProfileFieldValue"; id: string; hasActiveMonitoring: boolean } | null;
-      field: { __typename?: "ProfileTypeField"; id: string };
-    }>;
+    hasActiveMonitoring: boolean;
+    hasPendingReview: boolean;
   };
 };
 
@@ -43598,36 +43635,13 @@ export type AdverseMediaSearch_classifyAdverseMediaArticleMutation = {
   };
 };
 
-export type AdverseMediaSearch_saveAdverseMediaChangesMutationVariables = Exact<{
-  token: Scalars["String"]["input"];
+export type AdverseMediaSearch_saveProfileFieldValueDraftMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
 }>;
 
-export type AdverseMediaSearch_saveAdverseMediaChangesMutation = {
-  saveAdverseMediaChanges: {
-    __typename?: "AdverseMediaArticleSearchResult";
-    isDraft?: boolean | null;
-    articles: {
-      __typename?: "AdverseMediaArticleSearchResultArticles";
-      totalCount: number;
-      createdAt: string;
-      items: Array<{
-        __typename?: "AdverseMediaArticle";
-        id: string;
-        classification?: AdverseMediaArticleRelevance | null;
-        classifiedAt?: string | null;
-        header?: string | null;
-        source?: string | null;
-        timestamp?: number | null;
-      }>;
-    };
-    search: Array<{
-      __typename?: "AdverseMediaSearchTerm";
-      entityId?: string | null;
-      label?: string | null;
-      term?: string | null;
-      wikiDataId?: string | null;
-    }>;
-  };
+export type AdverseMediaSearch_saveProfileFieldValueDraftMutation = {
+  saveProfileFieldValueDraft: Success;
 };
 
 export type Alerts_ProfileFieldPropertyFragment = {
@@ -43802,17 +43816,6 @@ export type Alerts_expiringProfilePropertiesQuery = {
       }> | null;
     }>;
   };
-};
-
-export type BackgroundCheckProfileDetails_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  replies: Array<{
-    __typename?: "PetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-  }>;
 };
 
 export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPersonFragment = {
@@ -44143,27 +44146,10 @@ export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragment =
   | BackgroundCheckProfileDetails_BackgroundCheckEntityDetails_BackgroundCheckEntityDetailsCompany_Fragment
   | BackgroundCheckProfileDetails_BackgroundCheckEntityDetails_BackgroundCheckEntityDetailsPerson_Fragment;
 
-export type BackgroundCheckProfileDetails_petitionFieldQueryVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  petitionFieldId: Scalars["GID"]["input"];
-}>;
-
-export type BackgroundCheckProfileDetails_petitionFieldQuery = {
-  petitionField: {
-    __typename?: "PetitionField";
-    id: string;
-    type: PetitionFieldType;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-    }>;
-  };
-};
-
 export type BackgroundCheckProfileDetails_backgroundCheckEntityDetailsQueryVariables = Exact<{
   token: Scalars["String"]["input"];
   entityId: Scalars["String"]["input"];
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type BackgroundCheckProfileDetails_backgroundCheckEntityDetailsQuery = {
@@ -44347,6 +44333,20 @@ export type BackgroundCheckProfileDetails_updateBackgroundCheckEntityMutation = 
   updateBackgroundCheckEntity: Success;
 };
 
+export type BackgroundCheckProfileDetails_updateProfileFieldValueOptionsMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+  data: UpdateProfileFieldValueOptionsDataInput;
+}>;
+
+export type BackgroundCheckProfileDetails_updateProfileFieldValueOptionsMutation = {
+  updateProfileFieldValueOptions: {
+    __typename?: "ProfileFieldValue";
+    id: string;
+    hasPendingReview: boolean;
+  };
+};
+
 export type BackgroundCheckFieldSearch_petitionFieldQueryVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   petitionFieldId: Scalars["GID"]["input"];
@@ -44370,6 +44370,7 @@ export type BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_
     type: string;
     name: string;
     score?: number | null;
+    isFalsePositive?: boolean | null;
     properties: {
       __typename?: "BackgroundCheckEntitySearchCompanyProperties";
       incorporationDate?: Array<string> | null;
@@ -44385,6 +44386,7 @@ export type BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_
     type: string;
     name: string;
     score?: number | null;
+    isFalsePositive?: boolean | null;
     properties: {
       __typename?: "BackgroundCheckEntitySearchPersonProperties";
       countryOfBirth?: Array<string> | null;
@@ -44399,23 +44401,6 @@ export type BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchemaF
   | BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_BackgroundCheckEntitySearchCompany_Fragment
   | BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_BackgroundCheckEntitySearchPerson_Fragment;
 
-export type BackgroundCheckFieldSearchResults_deletePetitionFieldReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  replyId: Scalars["GID"]["input"];
-}>;
-
-export type BackgroundCheckFieldSearchResults_deletePetitionFieldReplyMutation = {
-  deletePetitionReply: {
-    __typename?: "PetitionField";
-    id: string;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-    }>;
-  };
-};
-
 export type BackgroundCheckFieldSearchResults_updateBackgroundCheckEntityMutationVariables = Exact<{
   token: Scalars["String"]["input"];
   entityId?: InputMaybe<Scalars["String"]["input"]>;
@@ -44425,6 +44410,35 @@ export type BackgroundCheckFieldSearchResults_updateBackgroundCheckEntityMutatio
   updateBackgroundCheckEntity: Success;
 };
 
+export type BackgroundCheckFieldSearchResults_updateBackgroundCheckSearchFalsePositivesMutationVariables =
+  Exact<{
+    token: Scalars["String"]["input"];
+    entityIds: Array<Scalars["String"]["input"]> | Scalars["String"]["input"];
+    isFalsePositive: Scalars["Boolean"]["input"];
+  }>;
+
+export type BackgroundCheckFieldSearchResults_updateBackgroundCheckSearchFalsePositivesMutation = {
+  updateBackgroundCheckSearchFalsePositives: Success;
+};
+
+export type BackgroundCheckFieldSearchResults_saveProfileFieldValueDraftMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+}>;
+
+export type BackgroundCheckFieldSearchResults_saveProfileFieldValueDraftMutation = {
+  saveProfileFieldValueDraft: Success;
+};
+
+export type BackgroundCheckFieldSearchResults_updateProfileFieldValueMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  fields: Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput;
+}>;
+
+export type BackgroundCheckFieldSearchResults_updateProfileFieldValueMutation = {
+  updateProfileFieldValue: { __typename?: "Profile"; id: string };
+};
+
 export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQueryVariables = Exact<{
   token: Scalars["String"]["input"];
   name: Scalars["String"]["input"];
@@ -44432,6 +44446,7 @@ export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQueryVa
   type?: InputMaybe<BackgroundCheckEntitySearchType>;
   country?: InputMaybe<Scalars["String"]["input"]>;
   birthCountry?: InputMaybe<Scalars["String"]["input"]>;
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQuery = {
@@ -44439,6 +44454,8 @@ export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQuery =
     __typename?: "BackgroundCheckEntitySearch";
     totalCount: number;
     createdAt: string;
+    isDraft?: boolean | null;
+    hasStoredValue?: boolean | null;
     items: Array<
       | {
           __typename?: "BackgroundCheckEntitySearchCompany";
@@ -44446,6 +44463,7 @@ export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQuery =
           type: string;
           name: string;
           score?: number | null;
+          isFalsePositive?: boolean | null;
           properties: {
             __typename?: "BackgroundCheckEntitySearchCompanyProperties";
             incorporationDate?: Array<string> | null;
@@ -44459,6 +44477,7 @@ export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQuery =
           type: string;
           name: string;
           score?: number | null;
+          isFalsePositive?: boolean | null;
           properties: {
             __typename?: "BackgroundCheckEntitySearchPersonProperties";
             countryOfBirth?: Array<string> | null;
@@ -60900,9 +60919,10 @@ export type ProfileDetail_profileQuery = {
         content?: { [key: string]: any } | null;
         createdAt: string;
         expiryDate?: string | null;
-        hasDraft: boolean;
+        isDraft: boolean;
         hasPendingReview: boolean;
         hasActiveMonitoring: boolean;
+        hasStoredValue: boolean;
       } | null;
     }>;
     petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
@@ -68823,9 +68843,10 @@ export const ProfileFormField_ProfileFieldValueFragmentDoc = gql`
   fragment ProfileFormField_ProfileFieldValue on ProfileFieldValue {
     id
     content
-    hasDraft
+    isDraft
     hasPendingReview
     hasActiveMonitoring
+    hasStoredValue
   }
 ` as unknown as DocumentNode<ProfileFormField_ProfileFieldValueFragment, unknown>;
 export const ProfileForm_ProfileFieldValueFragmentDoc = gql`
@@ -73710,16 +73731,6 @@ export const Alerts_ProfileFieldPropertyFragmentDoc = gql`
   }
   ${UserAvatarList_UserFragmentDoc}
 ` as unknown as DocumentNode<Alerts_ProfileFieldPropertyFragment, unknown>;
-export const BackgroundCheckProfileDetails_PetitionFieldFragmentDoc = gql`
-  fragment BackgroundCheckProfileDetails_PetitionField on PetitionField {
-    id
-    type
-    replies {
-      id
-      content
-    }
-  }
-` as unknown as DocumentNode<BackgroundCheckProfileDetails_PetitionFieldFragment, unknown>;
 export const BackgroundCheckEntityDetailsPersonBasic_BackgroundCheckEntityDetailsPersonFragmentDoc =
   gql`
     fragment BackgroundCheckEntityDetailsPersonBasic_BackgroundCheckEntityDetailsPerson on BackgroundCheckEntityDetailsPerson {
@@ -73918,6 +73929,7 @@ export const BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema
     type
     name
     score
+    isFalsePositive
     ... on BackgroundCheckEntitySearchPerson {
       properties {
         countryOfBirth
@@ -82970,34 +82982,26 @@ export const ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueDocument 
   ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMutation,
   ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMutationVariables
 >;
-export const ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMonitoringStatusDocument =
-  gql`
-    mutation ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMonitoringStatus(
-      $profileId: GID!
-      $profileTypeFieldId: GID!
-      $enabled: Boolean!
+export const ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueOptionsDocument = gql`
+  mutation ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueOptions(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $data: UpdateProfileFieldValueOptionsDataInput!
+  ) {
+    updateProfileFieldValueOptions(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      data: $data
     ) {
-      updateProfileFieldValueMonitoringStatus(
-        profileId: $profileId
-        profileTypeFieldId: $profileTypeFieldId
-        enabled: $enabled
-      ) {
-        id
-        properties {
-          value {
-            id
-            hasActiveMonitoring
-          }
-          field {
-            id
-          }
-        }
-      }
+      id
+      hasActiveMonitoring
+      hasPendingReview
     }
-  ` as unknown as DocumentNode<
-    ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMonitoringStatusMutation,
-    ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueMonitoringStatusMutationVariables
-  >;
+  }
+` as unknown as DocumentNode<
+  ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueOptionsMutation,
+  ProfileFormFieldAdverseMediaSearch_updateProfileFieldValueOptionsMutationVariables
+>;
 export const ProfileFormFieldAdverseMediaSearch_copyReplyContentToProfileFieldValueDocument = gql`
   mutation ProfileFormFieldAdverseMediaSearch_copyReplyContentToProfileFieldValue(
     $profileId: GID!
@@ -84012,30 +84016,16 @@ export const AdverseMediaSearch_classifyAdverseMediaArticleDocument = gql`
   AdverseMediaSearch_classifyAdverseMediaArticleMutation,
   AdverseMediaSearch_classifyAdverseMediaArticleMutationVariables
 >;
-export const AdverseMediaSearch_saveAdverseMediaChangesDocument = gql`
-  mutation AdverseMediaSearch_saveAdverseMediaChanges($token: String!) {
-    saveAdverseMediaChanges(token: $token) {
-      isDraft
-      articles {
-        totalCount
-        createdAt
-        items {
-          id
-          ...AdverseMediaSearch_AdverseMediaArticle
-        }
-      }
-      search {
-        entityId
-        label
-        term
-        wikiDataId
-      }
-    }
+export const AdverseMediaSearch_saveProfileFieldValueDraftDocument = gql`
+  mutation AdverseMediaSearch_saveProfileFieldValueDraft(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+  ) {
+    saveProfileFieldValueDraft(profileId: $profileId, profileTypeFieldId: $profileTypeFieldId)
   }
-  ${AdverseMediaSearch_AdverseMediaArticleFragmentDoc}
 ` as unknown as DocumentNode<
-  AdverseMediaSearch_saveAdverseMediaChangesMutation,
-  AdverseMediaSearch_saveAdverseMediaChangesMutationVariables
+  AdverseMediaSearch_saveProfileFieldValueDraftMutation,
+  AdverseMediaSearch_saveProfileFieldValueDraftMutationVariables
 >;
 export const Alerts_userDocument = gql`
   query Alerts_user {
@@ -84062,23 +84052,13 @@ export const Alerts_expiringProfilePropertiesDocument = gql`
   Alerts_expiringProfilePropertiesQuery,
   Alerts_expiringProfilePropertiesQueryVariables
 >;
-export const BackgroundCheckProfileDetails_petitionFieldDocument = gql`
-  query BackgroundCheckProfileDetails_petitionField($petitionId: GID!, $petitionFieldId: GID!) {
-    petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
-      ...BackgroundCheckProfileDetails_PetitionField
-    }
-  }
-  ${BackgroundCheckProfileDetails_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<
-  BackgroundCheckProfileDetails_petitionFieldQuery,
-  BackgroundCheckProfileDetails_petitionFieldQueryVariables
->;
 export const BackgroundCheckProfileDetails_backgroundCheckEntityDetailsDocument = gql`
   query BackgroundCheckProfileDetails_backgroundCheckEntityDetails(
     $token: String!
     $entityId: String!
+    $force: Boolean
   ) {
-    backgroundCheckEntityDetails(token: $token, entityId: $entityId) {
+    backgroundCheckEntityDetails(token: $token, entityId: $entityId, force: $force) {
       ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetails
     }
   }
@@ -84097,6 +84077,25 @@ export const BackgroundCheckProfileDetails_updateBackgroundCheckEntityDocument =
 ` as unknown as DocumentNode<
   BackgroundCheckProfileDetails_updateBackgroundCheckEntityMutation,
   BackgroundCheckProfileDetails_updateBackgroundCheckEntityMutationVariables
+>;
+export const BackgroundCheckProfileDetails_updateProfileFieldValueOptionsDocument = gql`
+  mutation BackgroundCheckProfileDetails_updateProfileFieldValueOptions(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $data: UpdateProfileFieldValueOptionsDataInput!
+  ) {
+    updateProfileFieldValueOptions(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      data: $data
+    ) {
+      id
+      hasPendingReview
+    }
+  }
+` as unknown as DocumentNode<
+  BackgroundCheckProfileDetails_updateProfileFieldValueOptionsMutation,
+  BackgroundCheckProfileDetails_updateProfileFieldValueOptionsMutationVariables
 >;
 export const BackgroundCheckFieldSearch_petitionFieldDocument = gql`
   query BackgroundCheckFieldSearch_petitionField($petitionId: GID!, $petitionFieldId: GID!) {
@@ -84123,23 +84122,6 @@ export const BackgroundCheckFieldSearch_userDocument = gql`
   BackgroundCheckFieldSearch_userQuery,
   BackgroundCheckFieldSearch_userQueryVariables
 >;
-export const BackgroundCheckFieldSearchResults_deletePetitionFieldReplyDocument = gql`
-  mutation BackgroundCheckFieldSearchResults_deletePetitionFieldReply(
-    $petitionId: GID!
-    $replyId: GID!
-  ) {
-    deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
-      id
-      replies {
-        id
-        content
-      }
-    }
-  }
-` as unknown as DocumentNode<
-  BackgroundCheckFieldSearchResults_deletePetitionFieldReplyMutation,
-  BackgroundCheckFieldSearchResults_deletePetitionFieldReplyMutationVariables
->;
 export const BackgroundCheckFieldSearchResults_updateBackgroundCheckEntityDocument = gql`
   mutation BackgroundCheckFieldSearchResults_updateBackgroundCheckEntity(
     $token: String!
@@ -84151,6 +84133,47 @@ export const BackgroundCheckFieldSearchResults_updateBackgroundCheckEntityDocume
   BackgroundCheckFieldSearchResults_updateBackgroundCheckEntityMutation,
   BackgroundCheckFieldSearchResults_updateBackgroundCheckEntityMutationVariables
 >;
+export const BackgroundCheckFieldSearchResults_updateBackgroundCheckSearchFalsePositivesDocument =
+  gql`
+    mutation BackgroundCheckFieldSearchResults_updateBackgroundCheckSearchFalsePositives(
+      $token: String!
+      $entityIds: [String!]!
+      $isFalsePositive: Boolean!
+    ) {
+      updateBackgroundCheckSearchFalsePositives(
+        token: $token
+        entityIds: $entityIds
+        isFalsePositive: $isFalsePositive
+      )
+    }
+  ` as unknown as DocumentNode<
+    BackgroundCheckFieldSearchResults_updateBackgroundCheckSearchFalsePositivesMutation,
+    BackgroundCheckFieldSearchResults_updateBackgroundCheckSearchFalsePositivesMutationVariables
+  >;
+export const BackgroundCheckFieldSearchResults_saveProfileFieldValueDraftDocument = gql`
+  mutation BackgroundCheckFieldSearchResults_saveProfileFieldValueDraft(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+  ) {
+    saveProfileFieldValueDraft(profileId: $profileId, profileTypeFieldId: $profileTypeFieldId)
+  }
+` as unknown as DocumentNode<
+  BackgroundCheckFieldSearchResults_saveProfileFieldValueDraftMutation,
+  BackgroundCheckFieldSearchResults_saveProfileFieldValueDraftMutationVariables
+>;
+export const BackgroundCheckFieldSearchResults_updateProfileFieldValueDocument = gql`
+  mutation BackgroundCheckFieldSearchResults_updateProfileFieldValue(
+    $profileId: GID!
+    $fields: [UpdateProfileFieldValueInput!]!
+  ) {
+    updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  BackgroundCheckFieldSearchResults_updateProfileFieldValueMutation,
+  BackgroundCheckFieldSearchResults_updateProfileFieldValueMutationVariables
+>;
 export const BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocument = gql`
   query BackgroundCheckFieldSearchResults_backgroundCheckEntitySearch(
     $token: String!
@@ -84159,6 +84182,7 @@ export const BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocume
     $type: BackgroundCheckEntitySearchType
     $country: String
     $birthCountry: String
+    $force: Boolean
   ) {
     backgroundCheckEntitySearch(
       token: $token
@@ -84167,12 +84191,15 @@ export const BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocume
       type: $type
       country: $country
       birthCountry: $birthCountry
+      force: $force
     ) {
       totalCount
       createdAt
       items {
         ...BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema
       }
+      isDraft
+      hasStoredValue
     }
   }
   ${BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchemaFragmentDoc}

@@ -35,7 +35,6 @@ import { assert } from "ts-essentials";
 import {
   CreatePetition,
   CreatePetitionField,
-  CreatePetitionFieldReply,
   CreatePublicPetitionLink,
   Petition,
   PetitionFieldType,
@@ -3399,14 +3398,13 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           .children?.filter((c) => isNonNullish(c.field.profile_type_field_id)) ?? [];
 
       // load profile and get its values and files
-      const [profile, profileTypeFields, profileFieldValues, profileFieldFiles] = await Promise.all(
-        [
+      const [profile, profileTypeFields, profileFieldValuesAndDrafts, profileFieldFiles] =
+        await Promise.all([
           ctx.profiles.loadProfile(args.profileId),
           ctx.profiles.loadProfileTypeFieldsByProfileTypeId(fieldGroup.profile_type_id!),
-          ctx.profiles.loadProfileFieldValuesByProfileId(args.profileId),
+          ctx.profiles.loadProfileFieldValuesAndDraftsByProfileId(args.profileId),
           ctx.profiles.loadProfileFieldFilesByProfileId(args.profileId),
-        ],
-      );
+        ]);
 
       const effectivePermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
         groupReplies.map((r) => ({
@@ -3464,20 +3462,41 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           continue;
         }
 
-        const profileFieldValue = profileFieldValues.find(
-          (v) => v.profile_type_field_id === field.profile_type_field_id!,
+        const pfvs = profileFieldValuesAndDrafts.filter(
+          (v) => v.profile_type_field_id === field.profile_type_field_id,
         );
 
+        // always prioritize drafts
+        const profileFieldValue = pfvs.find((v) => v.is_draft) || pfvs.find((v) => !v.is_draft);
+
         const resolution = args.conflictResolutions.find(
-          (cr) => cr.profileTypeFieldId === field.profile_type_field_id!,
+          (cr) => cr.profileTypeFieldId === field.profile_type_field_id,
         );
         const expiration = args.expirations.find(
-          (e) => e.profileTypeFieldId === field.profile_type_field_id!,
+          (e) => e.profileTypeFieldId === field.profile_type_field_id,
         );
 
         // if already exists a value on the profile, there could be a conflict with reply so we need to check
         if (isNonNullish(profileFieldValue)) {
-          if (isNullish(reply) || !ctx.petitionsHelper.contentsAreEqual(reply, profileFieldValue)) {
+          if (
+            isNonNullish(reply) &&
+            // if petition reply is a draft, or profile contains a draft, we don't need to check for conflicts
+            (ctx.profilesHelper.isDraftContent(reply.type, reply.content) ||
+              ctx.profilesHelper.isDraftContent(profileFieldValue.type, profileFieldValue.content))
+          ) {
+            updateProfileFieldValues.push({
+              profileId: profile!.id,
+              ...ctx.petitionsHelper.mapPetitionFieldReplyToProfileFieldValue(reply),
+              profileTypeFieldId: field.profile_type_field_id!,
+              expiryDate:
+                reply && profileTypeField.options.useReplyAsExpiryDate
+                  ? reply.content.value
+                  : expiration?.expiryDate,
+            });
+          } else if (
+            isNullish(reply) ||
+            !ctx.petitionsHelper.contentsAreEqual(reply, profileFieldValue)
+          ) {
             // expiration is required if the field is expirable and the reply is defined (meaning profile value will be modified)
             if (
               isNonNullish(reply) &&
@@ -3873,11 +3892,12 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
 
       await ctx.profiles.createEvent(profileFileEvents);
 
-      await ctx.profiles.updateProfileFieldValues(
-        updateProfileFieldValues,
-        ctx.user!.id,
-        ctx.user!.org_id,
+      const [draftUpdates, valueUpdates] = partition(updateProfileFieldValues, (p) =>
+        ctx.profilesHelper.isDraftContent(p.type, p.content),
       );
+
+      await ctx.profiles.updateProfileFieldValues(valueUpdates, ctx.user!.id, ctx.user!.org_id);
+      await ctx.profiles.upsertDraftProfileFieldValues(draftUpdates, ctx.user!.id);
 
       return await ctx.petitions.updatePetitionFieldReply(
         args.parentReplyId,
@@ -4171,153 +4191,6 @@ export const prefillPetitionFromProfiles = mutationField("prefillPetitionFromPro
     );
 
     return (await ctx.petitions.loadPetition(args.petitionId))!;
-  },
-});
-
-/** @deprecated */
-export const createFieldGroupReplyFromProfile = mutationField("createFieldGroupReplyFromProfile", {
-  deprecation: "use createFieldGroupRepliesFromProfiles",
-  type: "PetitionFieldReply",
-  authorize: authenticateAnd(
-    userHasFeatureFlag("PROFILES"),
-    petitionIsNotAnonymized("petitionId"),
-    userHasAccessToPetitions("petitionId"),
-    fieldsBelongsToPetition("petitionId", "petitionFieldId"),
-    fieldHasType("petitionFieldId", ["FIELD_GROUP"]),
-    repliesBelongsToField("petitionFieldId", "parentReplyId"),
-    userHasAccessToProfile("profileId"),
-    profileHasStatus("profileId", ["OPEN", "CLOSED"]),
-    profileIsNotAnonymized("profileId"),
-    profileHasSameProfileTypeAsField("profileId", "petitionFieldId"),
-  ),
-  args: {
-    petitionId: nonNull(globalIdArg("Petition")),
-    petitionFieldId: nonNull(globalIdArg("PetitionField")),
-    parentReplyId: nonNull(globalIdArg("PetitionFieldReply")),
-    profileId: nonNull(globalIdArg("Profile")),
-    force: booleanArg({
-      description:
-        "Pass force=true to associate the profile to an empty field reply even if there is nothing to import from the profile",
-    }),
-  },
-  resolve: async (_, args, ctx) => {
-    const profileLinkedChildren = (
-      await ctx.petitions.loadPetitionFieldChildren(args.petitionFieldId)
-    ).filter((f) => isNonNullish(f.profile_type_field_id));
-
-    const userPermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
-      profileLinkedChildren.map((child) => ({
-        profileTypeFieldId: child.profile_type_field_id!,
-        userId: ctx.user!.id,
-      })),
-    );
-
-    const profileFieldValues = await ctx.profiles.loadProfileFieldValuesByProfileId(args.profileId);
-    const profileFieldFiles = await ctx.profiles.loadProfileFieldFilesByProfileId(args.profileId);
-
-    const replies: CreatePetitionFieldReply[] = [];
-
-    for (const [child] of zip(profileLinkedChildren, userPermissions).filter(([, permission]) =>
-      // do not prefill petition fields if the user does not have at least READ permission on the profile property
-      isAtLeast(permission, "READ"),
-    )) {
-      const profileValue = profileFieldValues.find(
-        (v) => v.profile_type_field_id === child.profile_type_field_id,
-      );
-      const profileFiles = profileFieldFiles.filter(
-        (f) => f.profile_type_field_id === child.profile_type_field_id,
-      );
-
-      const fileUploadIds = profileFiles.map((f) => f.file_upload_id).filter(isNonNullish);
-      const clonedFileUploads =
-        fileUploadIds.length > 0 ? await ctx.files.cloneFileUpload(fileUploadIds) : [];
-
-      if (isNonNullish(profileValue)) {
-        replies.push({
-          petition_field_id: child.id,
-          parent_petition_field_reply_id: args.parentReplyId,
-          content: profileValue.content,
-          type: child.type,
-          user_id: ctx.user!.id,
-        });
-      } else if (clonedFileUploads.length > 0) {
-        replies.push(
-          ...clonedFileUploads.map((file) => ({
-            petition_field_id: child.id,
-            parent_petition_field_reply_id: args.parentReplyId,
-            content: { file_upload_id: file.id },
-            type: child.type,
-            user_id: ctx.user!.id,
-          })),
-        );
-      }
-    }
-
-    if (replies.length === 0 && !args.force) {
-      throw new ApolloError(
-        "Nothing to import from the profile. Pass force=true to associate the profile to the empty reply",
-        "NOTHING_TO_IMPORT_ERROR",
-      );
-    }
-
-    const parentReply = await ctx.petitions.loadFieldReply(args.parentReplyId);
-    const updatedReply = await ctx.petitions.updatePetitionFieldReply(
-      args.parentReplyId,
-      { associated_profile_id: args.profileId },
-      `User:${ctx.user!.id}`,
-    );
-
-    if (isNonNullish(parentReply?.associated_profile_id)) {
-      // call safeRemove AFTER updating associated_profile_id on reply, so old profile_id can be safe removed
-      // (calling this function before updating will result in no disassociation as there is still a reference to the profile on the parentReply)
-      const disassociated = await ctx.petitions.safeRemovePetitionProfileAssociation(
-        args.petitionId,
-        parentReply.associated_profile_id,
-      );
-      if (disassociated) {
-        await ctx.petitions.createEvent({
-          type: "PROFILE_DISASSOCIATED",
-          petition_id: disassociated.petition_id,
-          data: {
-            user_id: ctx.user!.id,
-            profile_id: disassociated.profile_id,
-          },
-        });
-
-        await ctx.profiles.createEvent({
-          type: "PETITION_DISASSOCIATED",
-          org_id: ctx.user!.org_id,
-          profile_id: disassociated.profile_id,
-          data: {
-            user_id: ctx.user!.id,
-            petition_id: disassociated.petition_id,
-          },
-        });
-      }
-    }
-
-    await ctx.profiles.associateProfilesToPetition(
-      [{ profile_id: args.profileId, petition_id: args.petitionId }],
-      ctx.user!,
-    );
-
-    if (profileLinkedChildren.length > 0) {
-      await ctx.petitions.deletePetitionFieldReplies(
-        profileLinkedChildren.map((c) => ({ id: c.id, parentReplyId: args.parentReplyId })),
-        `User:${ctx.user!.id}`,
-      );
-    }
-
-    if (replies.length > 0) {
-      await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
-      await ctx.petitions.createPetitionFieldReply(
-        args.petitionId,
-        replies,
-        `User:${ctx.user!.id}`,
-      );
-    }
-
-    return updatedReply;
   },
 });
 
