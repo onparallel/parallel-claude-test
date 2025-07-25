@@ -555,7 +555,7 @@ function evaluatePredicate(
   petition: FieldLogicPetitionInput,
   fieldType?: PetitionFieldType, // this is required to distinguish between empty CHECKBOX and empty PROFILE_SEARCH reply
 ) {
-  function isInList(listName: string, reply: string) {
+  function isInList(listName: string, reply: any) {
     const customList = petition.customLists.find((l) => l.name === listName);
     if (isNonNullish(customList)) {
       return customList.values.some((v) => v === reply);
