@@ -108,6 +108,7 @@ import {
 } from "@parallel/utils/useProfileTableColumns";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useUnpinProfileType } from "@parallel/utils/useUnpinProfileType";
+import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import {
   ChangeEvent,
@@ -429,6 +430,43 @@ function Profiles() {
       .map((key) => columns.find((c) => c.key === key))
       .filter(isNonNullish);
   }, [selection?.join(",")]);
+
+  useWindowEvent(
+    "message",
+    async (e: MessageEvent) => {
+      if (e.data.event === "update-info") {
+        const token = e.data.token;
+        // Parse token to get field and petition info
+        try {
+          const tokenData = JSON.parse(atob(token));
+          const profile = profiles?.items.find((p) => p.id === tokenData.profileId);
+          if (profile) {
+            // Find the reply
+            const property = profile.properties.find(
+              (p) => p.field.id === tokenData.profileTypeFieldId,
+            );
+
+            if (
+              e.source &&
+              property?.field.type === "BACKGROUND_CHECK" &&
+              property.value?.content?.entity?.id
+            ) {
+              (e.source as Window).postMessage(
+                {
+                  event: "info-updated",
+                  entityIds: [property.value?.content?.entity?.id].filter(isNonNullish),
+                },
+                (e.source as Window).origin,
+              );
+            }
+          }
+        } catch {
+          // Invalid token, ignore
+        }
+      }
+    },
+    [profiles],
+  );
 
   return (
     <AppLayout

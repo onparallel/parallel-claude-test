@@ -8607,6 +8607,7 @@ export type ProfilePropertyContent_ProfileTypeFieldFragment = {
 export type ProfilePropertyContent_ProfileFieldValueFragment = {
   __typename?: "ProfileFieldValue";
   content?: { [key: string]: any } | null;
+  hasPendingReview: boolean;
 };
 
 export type ProfilePropertyContent_ProfileFieldFileFragment = {
@@ -60635,6 +60636,7 @@ export type ProfileSearch_ProfileFragment = {
       __typename?: "ProfileFieldValue";
       id: string;
       content?: { [key: string]: any } | null;
+      hasPendingReview: boolean;
     } | null;
     files?: Array<{
       __typename?: "ProfileFieldFile";
@@ -60708,6 +60710,7 @@ export type ProfileSearch_conflictCheckProfileSearchQuery = {
         __typename?: "ProfileFieldValue";
         id: string;
         content?: { [key: string]: any } | null;
+        hasPendingReview: boolean;
       } | null;
       files?: Array<{
         __typename?: "ProfileFieldFile";
@@ -61172,6 +61175,7 @@ export type Profiles_profilesQuery = {
         value?: {
           __typename?: "ProfileFieldValue";
           content?: { [key: string]: any } | null;
+          hasPendingReview: boolean;
         } | null;
       }>;
       profileType: {
@@ -67484,7 +67488,11 @@ export type useProfileTableColumns_ProfileFieldPropertyFragment = {
     id?: string;
     file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
   }> | null;
-  value?: { __typename?: "ProfileFieldValue"; content?: { [key: string]: any } | null } | null;
+  value?: {
+    __typename?: "ProfileFieldValue";
+    content?: { [key: string]: any } | null;
+    hasPendingReview: boolean;
+  } | null;
 };
 
 export type useProfileTableColumns_ProfileWithPropertiesFragment = {
@@ -67506,7 +67514,11 @@ export type useProfileTableColumns_ProfileWithPropertiesFragment = {
       id?: string;
       file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
     }> | null;
-    value?: { __typename?: "ProfileFieldValue"; content?: { [key: string]: any } | null } | null;
+    value?: {
+      __typename?: "ProfileFieldValue";
+      content?: { [key: string]: any } | null;
+      hasPendingReview: boolean;
+    } | null;
   }>;
   subscribers: Array<{
     __typename?: "ProfileSubscription";
@@ -77871,6 +77883,7 @@ export const ProfileSearch_ProfileTypeFragmentDoc = gql`
 export const ProfilePropertyContent_ProfileFieldValueFragmentDoc = gql`
   fragment ProfilePropertyContent_ProfileFieldValue on ProfileFieldValue {
     content
+    hasPendingReview
   }
 ` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldValueFragment, unknown>;
 export const ProfilePropertyContent_ProfileFieldFileFragmentDoc = gql`
