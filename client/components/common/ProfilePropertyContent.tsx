@@ -359,7 +359,6 @@ const ProfileFieldBackgroundCheckValue = chakraForwardRef<"div", ProfileProperty
             ...(type ? { type } : {}),
             ...(country ? { country } : {}),
             ...(birthCountry ? { birthCountry } : {}),
-            readonly: "true",
           },
         )}`;
         await openNewWindow(url);
