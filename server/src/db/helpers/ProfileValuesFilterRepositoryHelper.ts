@@ -319,12 +319,17 @@ export class ProfileValuesFilterRepositoryHelper {
           break;
         case "HAS_PENDING_REVIEW":
           const alias = joins[profileTypeField.id];
-          q.whereRaw(/* sql*/ `? = ${negated ? "false" : "true"}`, [
-            this.knex.raw(`coalesce(??.pending_review, ??.pending_review, false)`, [
+          if (negated) {
+            q.whereRaw(/* sql */ `??.id is null and ??.pending_review = false`, [
               `draft_${alias}`,
               alias,
-            ]),
-          ]);
+            ]);
+          } else {
+            q.whereRaw(/* sql */ `??.id is not null or ??.pending_review = true`, [
+              `draft_${alias}`,
+              alias,
+            ]);
+          }
 
           break;
         default:
