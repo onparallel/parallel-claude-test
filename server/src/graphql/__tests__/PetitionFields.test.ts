@@ -5887,6 +5887,83 @@ describe("GraphQL/Petition Fields", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("does not set petition to PENDING if there is an ongoing approval process", async () => {
+      const [completedPetition] = await mocks.createRandomPetitions(
+        organization.id,
+        user.id,
+        1,
+        () => ({ status: "COMPLETED" }),
+      );
+
+      const [field] = await mocks.createRandomPetitionFields(completedPetition.id, 1, () => ({
+        type: "TEXT",
+      }));
+
+      const [reply] = await mocks.createRandomTextReply(field.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      const [approvalRequest] = await mocks.knex.from("petition_approval_request_step").insert(
+        {
+          approval_type: "ALL",
+          petition_id: completedPetition.id,
+          status: "PENDING",
+          step_name: "Step 1",
+          step_number: 1,
+        },
+        "*",
+      );
+      await mocks.knex.from("petition_approval_request_step_approver").insert(
+        {
+          petition_approval_request_step_id: approvalRequest.id,
+          user_id: user.id,
+          sent_at: new Date(),
+        },
+        "*",
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $petitionFieldReplyIds: [GID!]!
+            $status: PetitionFieldReplyStatus!
+          ) {
+            updatePetitionFieldRepliesStatus(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              petitionFieldReplyIds: $petitionFieldReplyIds
+              status: $status
+            ) {
+              id
+              petition {
+                id
+                ... on Petition {
+                  status
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", completedPetition.id),
+          petitionFieldId: toGlobalId("PetitionField", field.id),
+          petitionFieldReplyIds: [toGlobalId("PetitionFieldReply", reply.id)],
+          status: "REJECTED",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetitionFieldRepliesStatus).toEqual({
+        id: toGlobalId("PetitionField", field.id),
+        petition: {
+          id: toGlobalId("Petition", completedPetition.id),
+          status: "COMPLETED",
+        },
+      });
+    });
   });
 
   describe("approveOrRejectPetitionFieldReplies", () => {

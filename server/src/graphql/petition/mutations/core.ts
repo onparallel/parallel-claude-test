@@ -1917,7 +1917,8 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
 
     if (args.status === "REJECTED") {
       const petition = await ctx.petitions.loadPetition(args.petitionId);
-      if (petition?.status === "COMPLETED") {
+      const ongoingProcesses = await ctx.petitions.getPetitionStartedProcesses(args.petitionId);
+      if (petition?.status === "COMPLETED" && ongoingProcesses.length === 0) {
         await ctx.petitions.updatePetition(
           args.petitionId,
           { status: "PENDING" },
