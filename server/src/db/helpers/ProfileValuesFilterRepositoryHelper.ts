@@ -16,6 +16,17 @@ export const PROFILE_VALUES_FILTER_REPOSITORY_HELPER = Symbol.for(
   "PROFILE_VALUES_FILTER_REPOSITORY_HELPER",
 );
 
+const CACHED_PROFILE_TYPE_FIELDS = [
+  "SHORT_TEXT",
+  "SELECT",
+  "CHECKBOX",
+  "DATE",
+  "PHONE",
+  "NUMBER",
+] as const;
+
+const DRAFTABLE_PROFILE_TYPE_FIELDS = ["ADVERSE_MEDIA_SEARCH", "BACKGROUND_CHECK"] as const;
+
 @injectable()
 export class ProfileValuesFilterRepositoryHelper {
   constructor(@inject(KNEX) private knex: Knex) {}
@@ -42,19 +53,15 @@ export class ProfileValuesFilterRepositoryHelper {
     const alias = joins[profileTypeField.id];
     if (profileTypeField.type === "FILE") {
       return this.knex.raw(`??.id`, [alias]);
+    } else if (DRAFTABLE_PROFILE_TYPE_FIELDS.includes(profileTypeField.type)) {
+      return this.knex.raw(`coalesce(??.content, ??.content)`, [`draft_${alias}`, alias]);
+    } else if (CACHED_PROFILE_TYPE_FIELDS.includes(profileTypeField.type)) {
+      return this.knex.raw(`coalesce(p.value_cache->?->'content', ??.content)`, [
+        profileTypeField.id,
+        alias,
+      ]);
     } else {
-      if (
-        ["SHORT_TEXT", "SELECT", "CHECKBOX", "DATE", "PHONE", "NUMBER"].includes(
-          profileTypeField.type,
-        )
-      ) {
-        return this.knex.raw(`coalesce(p.value_cache->?->'content', ??.content)`, [
-          profileTypeField.id,
-          alias,
-        ]);
-      } else {
-        return this.knex.raw(`coalesce(??.content, ??.content)`, [`draft_${alias}`, alias]);
-      }
+      return this.knex.raw(`??.content`, [alias]);
     }
   }
 
@@ -63,11 +70,7 @@ export class ProfileValuesFilterRepositoryHelper {
     profileTypeField: ProfileTypeField,
   ) {
     const alias = joins[profileTypeField.id];
-    if (
-      ["SHORT_TEXT", "SELECT", "CHECKBOX", "DATE", "PHONE", "NUMBER"].includes(
-        profileTypeField.type,
-      )
-    ) {
+    if (CACHED_PROFILE_TYPE_FIELDS.includes(profileTypeField.type)) {
       return this.knex.raw(`coalesce((p.value_cache->?->>'expiry_date')::date, ??.expiry_date)`, [
         profileTypeField.id,
         alias,
@@ -96,7 +99,30 @@ export class ProfileValuesFilterRepositoryHelper {
             `,
           [profileTypeField.id],
         );
-      } else {
+      } else if (DRAFTABLE_PROFILE_TYPE_FIELDS.includes(profileTypeField.type)) {
+        q.joinRaw(
+          /* sql */ `
+          left join profile_field_value ${alias}
+            on ${alias}.profile_id = p.id
+              and ${alias}.profile_type_field_id = ?
+              and ${alias}.deleted_at is null 
+              and ${alias}.removed_at is null
+              and ${alias}.is_draft = false
+          `,
+          [profileTypeField.id],
+        ).joinRaw(
+          /* sql */ `
+            left join profile_field_value draft_${alias}
+              on draft_${alias}.profile_id = p.id
+              and draft_${alias}.profile_type_field_id = ?
+              and draft_${alias}.deleted_at is null 
+              and draft_${alias}.removed_at is null
+              and draft_${alias}.is_draft = true
+            `,
+          [profileTypeField.id],
+        );
+      } else if (CACHED_PROFILE_TYPE_FIELDS.includes(profileTypeField.type)) {
+        // cached fields try to avoid the join if possible
         q.joinRaw(
           /* sql */ `
           left join profile_field_value ${alias}
@@ -108,15 +134,17 @@ export class ProfileValuesFilterRepositoryHelper {
               and ${alias}.is_draft = false
           `,
           [profileTypeField.id, profileTypeField.id],
-        ).joinRaw(
+        );
+      } else {
+        q.joinRaw(
           /* sql */ `
-            left join profile_field_value draft_${alias}
-              on draft_${alias}.profile_id = p.id
-              and draft_${alias}.profile_type_field_id = ?
-              and draft_${alias}.deleted_at is null 
-              and draft_${alias}.removed_at is null
-              and draft_${alias}.is_draft = true
-            `,
+          left join profile_field_value ${alias}
+            on ${alias}.profile_id = p.id
+              and ${alias}.profile_type_field_id = ?
+              and ${alias}.deleted_at is null 
+              and ${alias}.removed_at is null
+              and ${alias}.is_draft = false
+          `,
           [profileTypeField.id],
         );
       }
@@ -292,7 +320,7 @@ export class ProfileValuesFilterRepositoryHelper {
         case "IS_EXPIRED":
           where(
             (q) =>
-              q.whereRaw(`? is not null and now() > (? + 'P1D'::interval)`, [
+              q.whereRaw(/* sql */ `(? is not null and now() > (? + 'P1D'::interval))`, [
                 expiryDate,
                 expiryDate,
               ]),
@@ -302,11 +330,10 @@ export class ProfileValuesFilterRepositoryHelper {
         case "EXPIRES_IN":
           where(
             (q) =>
-              q.whereRaw(`? is not null and (now() + ?::interval) > (? + 'P1D'::interval)`, [
-                expiryDate,
-                value,
-                expiryDate,
-              ]),
+              q.whereRaw(
+                /* sql */ `(? is not null and (now() + ?::interval) > (? + 'P1D'::interval))`,
+                [expiryDate, value, expiryDate],
+              ),
             currentOp === "OR",
           );
           break;
@@ -320,12 +347,12 @@ export class ProfileValuesFilterRepositoryHelper {
         case "HAS_PENDING_REVIEW":
           const alias = joins[profileTypeField.id];
           if (negated) {
-            q.whereRaw(/* sql */ `??.id is null and ??.pending_review = false`, [
+            q.whereRaw(/* sql */ `(??.id is null and ??.pending_review = false)`, [
               `draft_${alias}`,
               alias,
             ]);
           } else {
-            q.whereRaw(/* sql */ `??.id is not null or ??.pending_review = true`, [
+            q.whereRaw(/* sql */ `(??.id is not null or ??.pending_review = true)`, [
               `draft_${alias}`,
               alias,
             ]);
