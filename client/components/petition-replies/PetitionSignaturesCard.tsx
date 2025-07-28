@@ -267,7 +267,7 @@ export function PetitionSignaturesCardBody({
   if (
     petition.signatureConfig?.isEnabled &&
     isNonNullish(current) &&
-    ["COMPLETED", "CANCELLING", "CANCELLED"].includes(current.status)
+    ["COMPLETED", "CANCELLED"].includes(current.status)
   ) {
     older.unshift(current);
     current = null;

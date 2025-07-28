@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { isNonNullish, isNullish, omit } from "remeda";
+import { isNonNullish, isNullish, omit, partition } from "remeda";
 import { CONFIG, Config } from "../config";
 import {
   PetitionAccess,
@@ -154,10 +154,11 @@ export class SignatureService implements ISignatureService {
     extraData?: Partial<PetitionSignatureRequest>,
     t?: Knex.Transaction,
   ) {
-    const signatures = unMaybeArray(signature).filter((s) => s.status === "PROCESSED");
+    const signatures = unMaybeArray(signature);
+    const [processed, other] = partition(signatures, (s) => s.status === "PROCESSED");
 
-    const rows = await this.petitions.updatePetitionSignatures(
-      signatures.map((s) => s.id),
+    const processedRows = await this.petitions.updatePetitionSignatures(
+      processed.map((s) => s.id),
       {
         status: "CANCELLING",
         cancel_reason: cancelReason,
@@ -167,10 +168,11 @@ export class SignatureService implements ISignatureService {
       t,
     );
 
-    if (rows.length > 0) {
+    // send cancel request to signature provider only if the signature already has been processed
+    if (processedRows.length > 0) {
       await this.queues.enqueueMessages(
         "signature-worker",
-        rows.map((s) => ({
+        processedRows.map((s) => ({
           id: `signature-${toGlobalId("Petition", s.petition_id)}`,
           groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,
           body: {
@@ -182,7 +184,24 @@ export class SignatureService implements ISignatureService {
       );
     }
 
-    return rows;
+    // other signatures, not in PROCESSED status will be cancelled without sending request to provider
+    const otherRows = await this.petitions.updatePetitionSignatures(
+      other.map((s) => s.id),
+      {
+        status: "CANCELLED",
+        cancel_reason: cancelReason,
+        cancel_data: cancelData,
+        ...extraData,
+      },
+      t,
+    );
+
+    return signatures.map((s) => {
+      if (s.status === "PROCESSED") {
+        return processedRows.find((r) => r.id === s.id)!;
+      }
+      return otherRows.find((r) => r.id === s.id)!;
+    });
   }
 
   async sendSignatureReminders(signature: MaybeArray<PetitionSignatureRequest>, userId: number) {

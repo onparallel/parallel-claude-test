@@ -11,6 +11,7 @@ import {
   PetitionAttachmentType,
   PetitionFieldType,
   PetitionPermissionType,
+  PetitionSignatureStatus,
   PetitionStatus,
 } from "../../db/__types";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
@@ -715,6 +716,22 @@ export function signatureRequestIsNotAnonymized<
       getArg(args, argSignatureRequestId),
     );
     return signature?.anonymized_at === null;
+  };
+}
+
+export function signatureRequestHasStatus<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, number>,
+>(
+  argSignatureRequestId: TArg1,
+  status: PetitionSignatureStatus[],
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const signature = await ctx.petitions.loadPetitionSignatureById(
+      getArg(args, argSignatureRequestId),
+    );
+    return !!signature && status.includes(signature.status);
   };
 }
 

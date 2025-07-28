@@ -6451,6 +6451,10 @@ export class PetitionRepository extends BaseRepository {
     t?: Knex.Transaction,
   ) {
     const ids = unMaybeArray(petitionSignatureId);
+    if (ids.length === 0) {
+      return [];
+    }
+
     const rows = await this.from("petition_signature_request", t)
       .whereIn("id", ids)
       .update({
@@ -6460,7 +6464,7 @@ export class PetitionRepository extends BaseRepository {
       })
       .returning("*");
 
-    if (isNonNullish(data.status)) {
+    if (isNonNullish(data.status) && rows.length > 0) {
       await this.from("petition", t)
         .whereIn("id", unique(rows.map((r) => r.petition_id)))
         .update({
@@ -9152,7 +9156,7 @@ export class PetitionRepository extends BaseRepository {
     const currentSignature = await this.loadLatestPetitionSignatureByPetitionId.raw(petitionId);
     if (
       currentSignature &&
-      ["ENQUEUED", "PROCESSING", "PROCESSED", "CANCELLING"].includes(currentSignature.status)
+      ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(currentSignature.status)
     ) {
       processes.push("SIGNATURE");
     }

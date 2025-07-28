@@ -1,5 +1,6 @@
 import { booleanArg, list, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { isNonNullish, isNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { toBytes } from "../../../util/fileSize";
 import { toGlobalId } from "../../../util/globalId";
 import { random } from "../../../util/token";
@@ -14,6 +15,7 @@ import {
   petitionCanUploadCustomSignatureDocument,
   petitionIsNotAnonymized,
   petitionsAreOfTypePetition,
+  signatureRequestHasStatus,
   signatureRequestIsNotAnonymized,
   userHasAccessToPetitions,
   userHasAccessToSignatureRequest,
@@ -152,28 +154,20 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"]),
     signatureRequestIsNotAnonymized("petitionSignatureRequestId"),
+    signatureRequestHasStatus("petitionSignatureRequestId", [
+      "ENQUEUED", // not processed yet by queue, will be cancelled without processing
+      "PROCESSED", // already processed by queue, will send a cancel request to signature provider
+      "CANCELLED", // already cancelled, will be returned as is
+      "COMPLETED", // already completed, will be returned as is
+    ]),
   ),
   resolve: async (_, { petitionSignatureRequestId }, ctx) => {
     const signature = await ctx.petitions.loadPetitionSignatureById(petitionSignatureRequestId);
-
-    if (!signature) {
-      throw new Error(`Petition signature request with id ${petitionSignatureRequestId} not found`);
-    }
-
-    if (signature.status === "ENQUEUED") {
-      throw new Error("Can't cancel a signature request that is still enqueued");
-    }
+    assert(signature);
 
     // if, for any reason, signature was already cancelled or completed, just return it
     if (signature.status === "CANCELLED" || signature.status === "COMPLETED") {
       return signature;
-    }
-
-    const petition = await ctx.petitions.loadPetition(signature.petition_id);
-    if (!petition) {
-      throw new Error(
-        `Can't find Petition:${signature.petition_id} on PetitionSignatureRequest:${petitionSignatureRequestId}`,
-      );
     }
 
     const [signatureRequest] = await ctx.signature.cancelSignatureRequest(
