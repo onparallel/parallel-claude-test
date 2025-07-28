@@ -35,7 +35,7 @@ export interface ProfilePropertyContentProps {
   profileId?: string;
   field: ProfilePropertyContent_ProfileTypeFieldFragment;
   files?: ProfilePropertyContent_ProfileFieldFileFragment[] | null;
-  value?: ProfilePropertyContent_ProfileFieldValueFragment | null;
+  value?: Partial<ProfilePropertyContent_ProfileFieldValueFragment> | null;
   singleLine?: boolean;
 }
 
