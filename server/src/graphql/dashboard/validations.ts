@@ -172,6 +172,10 @@ async function validateProfileFilter(
     }
   }
 
+  if (filter.status?.includes("DELETION_SCHEDULED")) {
+    throw new ArgValidationError(info, `${argName}.status`, "Invalid status");
+  }
+
   if (isNonNullish(filter.values)) {
     const profileTypeFields =
       await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);

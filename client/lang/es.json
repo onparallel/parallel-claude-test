@@ -19745,11 +19745,6 @@
     "context": "Closed"
   },
   {
-    "term": "util.use-profile-status-labels.deletion-scheduled",
-    "definition": "Programado para eliminación",
-    "context": "Deletion scheduled"
-  },
-  {
     "term": "util.use-profile-status-labels.open",
     "definition": "Abierto",
     "context": "Open"
