@@ -5565,7 +5565,7 @@ export type ProfileListViewData = {
   columns: Maybe<Array<Scalars["String"]["output"]>>;
   search: Maybe<Scalars["String"]["output"]>;
   sort: Maybe<ProfileListViewSort>;
-  status: Maybe<ProfileStatus>;
+  status: Maybe<Array<ProfileStatus>>;
   values: Maybe<Scalars["JSONObject"]["output"]>;
 };
 
@@ -5574,7 +5574,7 @@ export type ProfileListViewDataInput = {
   columns?: InputMaybe<Array<Scalars["String"]["input"]>>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   sort?: InputMaybe<ProfileListViewSortInput>;
-  status?: InputMaybe<ProfileStatus>;
+  status?: InputMaybe<Array<ProfileStatus>>;
   values?: InputMaybe<ProfileFieldValuesFilter>;
 };
 

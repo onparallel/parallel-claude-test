@@ -224,7 +224,7 @@ describe("GraphQL/ProfileListView", () => {
           name: "my first view",
           data: {
             search: "aaa",
-            status: "CLOSED",
+            status: ["CLOSED"],
             columns: [
               "subscribers",
               "createdAt",
@@ -242,7 +242,7 @@ describe("GraphQL/ProfileListView", () => {
         isDefault: false,
         data: {
           search: "aaa",
-          status: "CLOSED",
+          status: ["CLOSED"],
           columns: [
             "subscribers",
             "createdAt",
@@ -367,7 +367,7 @@ describe("GraphQL/ProfileListView", () => {
     });
 
     it("sends error if trying to update filters of an ALL type view", async () => {
-      for (const filterData of [{ search: "Vladimir Putin" }, { status: "CLOSED" }]) {
+      for (const filterData of [{ search: "Vladimir Putin" }, { status: ["CLOSED"] }]) {
         const { errors, data } = await testClient.execute(
           gql`
             mutation (

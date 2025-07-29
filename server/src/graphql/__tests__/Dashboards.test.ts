@@ -2463,7 +2463,6 @@ describe("GraphQL / Dashboards", () => {
             items: [
               { label: "Open", color: "#00ff00", filter: { status: ["OPEN"] } },
               { label: "Closed", color: "#ff0000", filter: { status: ["CLOSED"] } },
-              { label: "Deleted", color: "#0000ff", filter: { status: ["DELETION_SCHEDULED"] } },
             ],
           },
         },
@@ -2473,6 +2472,49 @@ describe("GraphQL / Dashboards", () => {
       expect(data?.createProfilesPieChartDashboardModule).toEqual({
         id: toGlobalId("Dashboard", dashboards[0].id),
       });
+    });
+
+    it("sends error if trying to filter DELETION_SCHEDULED profiles", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: ProfilesPieChartDashboardModuleSettingsInput!
+          ) {
+            createProfilesPieChartDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Profiles pie chart",
+          size: "SMALL",
+          settings: {
+            graphicType: "PIE",
+            type: "COUNT",
+            profileTypeId: toGlobalId("ProfileType", profileType.id),
+            items: [
+              { label: "Open", color: "#00ff00", filter: { status: ["OPEN"] } },
+              { label: "Closed", color: "#ff0000", filter: { status: ["CLOSED"] } },
+              { label: "Deleted", color: "#0000ff", filter: { status: ["DELETION_SCHEDULED"] } },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        argName: "settings.items[2].filter.status",
+        message: "Invalid status",
+      });
+      expect(data).toBeNull();
     });
 
     it("sends error if user does not have permissions", async () => {
@@ -2505,7 +2547,6 @@ describe("GraphQL / Dashboards", () => {
             items: [
               { label: "Open", color: "#00ff00", filter: { status: ["OPEN"] } },
               { label: "Closed", color: "#ff0000", filter: { status: ["CLOSED"] } },
-              { label: "Deleted", color: "#0000ff", filter: { status: ["DELETION_SCHEDULED"] } },
             ],
           },
         },
@@ -2547,7 +2588,6 @@ describe("GraphQL / Dashboards", () => {
             items: [
               { label: "Open", color: "#00ff00", filter: { status: ["OPEN"] } },
               { label: "Closed", color: "#ff0000", filter: { status: ["CLOSED"] } },
-              { label: "Deleted", color: "#0000ff", filter: { status: ["DELETION_SCHEDULED"] } },
             ],
           },
         },
@@ -2629,15 +2669,14 @@ describe("GraphQL / Dashboards", () => {
             profileTypeFieldId: toGlobalId("ProfileTypeField", numberProfileTypeField.id),
             items: [
               { label: "Open", color: "#00ff00", filter: { status: ["OPEN"] } },
-              { label: "Closed", color: "#ff0000", filter: { status: ["CLOSED"] } },
-              { label: "Deleted", color: "red", filter: { status: ["DELETION_SCHEDULED"] } },
+              { label: "Closed", color: "red", filter: { status: ["CLOSED"] } },
             ],
           },
         },
       );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
-        argName: "settings.items[2].color",
+        argName: "settings.items[1].color",
         message: "Argument must represent a HEX color value.",
       });
       expect(data).toBeNull();
@@ -2673,7 +2712,6 @@ describe("GraphQL / Dashboards", () => {
             items: [
               { label: "Open", color: "#00ff00", filter: { status: ["OPEN"] } },
               { label: "Closed", color: "#ff0000", filter: { status: ["CLOSED"] } },
-              { label: "Deleted", color: "#0000ff", filter: { status: ["DELETION_SCHEDULED"] } },
             ],
           },
         },
@@ -2720,7 +2758,7 @@ describe("GraphQL / Dashboards", () => {
                 },
               },
               { label: "Closed", color: "#ff0000", filter: { status: ["CLOSED"] } },
-              { label: "Deleted", color: "#0000ff", filter: { status: ["DELETION_SCHEDULED"] } },
+              { label: "Open", color: "#0000ff", filter: { status: ["OPEN"] } },
             ],
           },
         },
@@ -2932,7 +2970,7 @@ describe("GraphQL / Dashboards", () => {
                 },
               },
               { label: "Closed", color: "#ff0000", filter: { status: ["CLOSED"] } },
-              { label: "Deleted", color: "#0000ff", filter: { status: ["DELETION_SCHEDULED"] } },
+              { label: "Open", color: "#0000ff", filter: { status: ["OPEN"] } },
             ],
           },
         },

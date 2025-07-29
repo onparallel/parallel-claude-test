@@ -5775,7 +5775,7 @@ export interface ProfileListViewData {
   columns?: Maybe<Array<Scalars["String"]["output"]>>;
   search?: Maybe<Scalars["String"]["output"]>;
   sort?: Maybe<ProfileListViewSort>;
-  status?: Maybe<ProfileStatus>;
+  status?: Maybe<Array<ProfileStatus>>;
   values?: Maybe<Scalars["JSONObject"]["output"]>;
 }
 
@@ -5784,7 +5784,7 @@ export interface ProfileListViewDataInput {
   columns?: InputMaybe<Array<Scalars["String"]["input"]>>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   sort?: InputMaybe<ProfileListViewSortInput>;
-  status?: InputMaybe<ProfileStatus>;
+  status?: InputMaybe<Array<ProfileStatus>>;
   values?: InputMaybe<ProfileFieldValuesFilter>;
 }
 
@@ -9498,7 +9498,7 @@ export type ProfileViewTabs_ProfileListViewDataFragment = {
   __typename?: "ProfileListViewData";
   columns?: Array<string> | null;
   search?: string | null;
-  status?: ProfileStatus | null;
+  status?: Array<ProfileStatus> | null;
   values?: { [key: string]: any } | null;
   sort?: {
     __typename?: "ProfileListViewSort";
@@ -9517,7 +9517,7 @@ export type ProfileViewTabs_ProfileListViewFragment = {
     __typename?: "ProfileListViewData";
     columns?: Array<string> | null;
     search?: string | null;
-    status?: ProfileStatus | null;
+    status?: Array<ProfileStatus> | null;
     values?: { [key: string]: any } | null;
     sort?: {
       __typename?: "ProfileListViewSort";
@@ -9575,7 +9575,7 @@ export type ProfileViewTabs_createProfileListViewMutation = {
       __typename?: "ProfileListViewData";
       columns?: Array<string> | null;
       search?: string | null;
-      status?: ProfileStatus | null;
+      status?: Array<ProfileStatus> | null;
       values?: { [key: string]: any } | null;
       sort?: {
         __typename?: "ProfileListViewSort";
@@ -9609,7 +9609,7 @@ export type ProfileViewTabs_updateProfileListViewMutation = {
       __typename?: "ProfileListViewData";
       columns?: Array<string> | null;
       search?: string | null;
-      status?: ProfileStatus | null;
+      status?: Array<ProfileStatus> | null;
       values?: { [key: string]: any } | null;
       sort?: {
         __typename?: "ProfileListViewSort";
@@ -61008,7 +61008,7 @@ export type Profiles_ProfileListViewFragment = {
     __typename?: "ProfileListViewData";
     columns?: Array<string> | null;
     search?: string | null;
-    status?: ProfileStatus | null;
+    status?: Array<ProfileStatus> | null;
     values?: { [key: string]: any } | null;
     sort?: {
       __typename?: "ProfileListViewSort";
@@ -61053,7 +61053,7 @@ export type Profiles_userQuery = {
         __typename?: "ProfileListViewData";
         columns?: Array<string> | null;
         search?: string | null;
-        status?: ProfileStatus | null;
+        status?: Array<ProfileStatus> | null;
         values?: { [key: string]: any } | null;
         sort?: {
           __typename?: "ProfileListViewSort";
@@ -61220,7 +61220,7 @@ export type Profiles_createProfileListViewMutation = {
       __typename?: "ProfileListViewData";
       columns?: Array<string> | null;
       search?: string | null;
-      status?: ProfileStatus | null;
+      status?: Array<ProfileStatus> | null;
       values?: { [key: string]: any } | null;
       sort?: {
         __typename?: "ProfileListViewSort";
@@ -61249,7 +61249,7 @@ export type Profiles_updateProfileListViewMutation = {
       __typename?: "ProfileListViewData";
       columns?: Array<string> | null;
       search?: string | null;
-      status?: ProfileStatus | null;
+      status?: Array<ProfileStatus> | null;
       values?: { [key: string]: any } | null;
       sort?: {
         __typename?: "ProfileListViewSort";

@@ -38,7 +38,11 @@ export function mapProfileListViewDataFromDatabase(data: NexusGenObjects["Profil
       }) ?? null,
     search: data.search ?? null,
     sort: data.sort ?? null,
-    status: data.status ?? null,
+    // TODO: REMOVE AFTER RELEASE
+    // this is a temporal workaround to allow status to be stored as string in the database
+    // and may be removed once the release and migration are done
+    // status: data.status ?? null,
+    status: data.status && typeof data.status === "string" ? [data.status] : (data.status ?? null),
     values: data.values ? mapValuesFilter(data.values) : null,
   };
 }

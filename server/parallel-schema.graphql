@@ -7002,7 +7002,7 @@ type ProfileListViewData {
   columns: [String!]
   search: String
   sort: ProfileListViewSort
-  status: ProfileStatus
+  status: [ProfileStatus!]
   values: JSONObject
 }
 
@@ -7013,7 +7013,7 @@ input ProfileListViewDataInput {
   columns: [String!]
   search: String
   sort: ProfileListViewSortInput
-  status: ProfileStatus
+  status: [ProfileStatus!]
   values: ProfileFieldValuesFilter
 }
 

@@ -351,7 +351,7 @@ export interface NexusGenInputs {
     columns?: string[] | null; // [String!]
     search?: string | null; // String
     sort?: NexusGenInputs["ProfileListViewSortInput"] | null; // ProfileListViewSortInput
-    status?: NexusGenEnums["ProfileStatus"] | null; // ProfileStatus
+    status?: NexusGenEnums["ProfileStatus"][] | null; // [ProfileStatus!]
     values?: NexusGenInputs["ProfileFieldValuesFilter"] | null; // ProfileFieldValuesFilter
   };
   ProfileListViewSortInput: {
@@ -1699,12 +1699,11 @@ export interface NexusGenObjects {
   ProfileFieldValueUpdatedEvent: profileEvents.ProfileFieldValueUpdatedEvent;
   ProfileListView: db.ProfileListView;
   ProfileListViewData: {
-    // root type
-    columns?: string[] | null; // [String!]
-    search?: string | null; // String
-    sort?: NexusGenRootTypes["ProfileListViewSort"] | null; // ProfileListViewSort
-    status?: NexusGenEnums["ProfileStatus"] | null; // ProfileStatus
-    values?: NexusGenScalars["JSONObject"] | null; // JSONObject
+    columns?: string[] | null;
+    search?: string | null;
+    sort?: NexusGenRootTypes["ProfileListViewSort"] | null;
+    values?: NexusGenScalars["JSONObject"] | null;
+    status?: NexusGenEnums["ProfileStatus"] | NexusGenEnums["ProfileStatus"][] | null;
   };
   ProfileListViewSort: {
     // root type
@@ -4161,7 +4160,7 @@ export interface NexusGenFieldTypes {
     columns: string[] | null; // [String!]
     search: string | null; // String
     sort: NexusGenRootTypes["ProfileListViewSort"] | null; // ProfileListViewSort
-    status: NexusGenEnums["ProfileStatus"] | null; // ProfileStatus
+    status: NexusGenEnums["ProfileStatus"][] | null; // [ProfileStatus!]
     values: NexusGenScalars["JSONObject"] | null; // JSONObject
   };
   ProfileListViewSort: {

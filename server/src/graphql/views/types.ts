@@ -227,9 +227,19 @@ export const ProfileListViewData = objectType({
     t.nullable.list.nonNull.string("columns");
     t.nullable.string("search");
     t.nullable.field("sort", { type: "ProfileListViewSort" });
-    t.nullable.field("status", { type: "ProfileStatus" });
+    t.nullable.list.nonNull.field("status", { type: "ProfileStatus" });
     t.nullable.jsonObject("values");
   },
+  // TODO: REMOVE AFTER RELEASE
+  // this is a temporal workaround to allow status to be stored as string in the database
+  // and may be removed once the release and migration are done
+  sourceType: /* ts */ `{
+    columns?: string[] | null;
+    search?: string | null;
+    sort?: NexusGenRootTypes["ProfileListViewSort"] | null;
+    values?: NexusGenScalars["JSONObject"] | null;
+    status?: NexusGenEnums["ProfileStatus"] | NexusGenEnums["ProfileStatus"][] | null;
+  }`,
 });
 
 export const ProfileListViewDataInput = inputObjectType({
@@ -249,7 +259,7 @@ export const ProfileListViewDataInput = inputObjectType({
         },
       }),
     });
-    t.nullable.field("status", { type: "ProfileStatus" });
+    t.nullable.list.nonNull.field("status", { type: "ProfileStatus" });
     t.nullable.field("values", { type: "ProfileFieldValuesFilter" });
   },
 });

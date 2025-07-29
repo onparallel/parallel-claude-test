@@ -383,7 +383,7 @@ export const createProfilesNumberDashboardModule = mutationField(
                 }),
             profileTypeId: settings.profileTypeId,
             filters: {
-              status: settings.filter.status,
+              status: settings.filter.status ?? ["OPEN"],
               values: settings.filter.values as ProfileFieldValuesFilter,
             },
           },
@@ -461,7 +461,10 @@ export const createProfilesRatioDashboardModule = mutationField(
                 }),
             profileTypeId: settings.profileTypeId,
             graphicType: settings.graphicType,
-            filters: settings.filters as [ProfileFilter, ProfileFilter],
+            filters: settings.filters.map((f) => ({
+              ...f,
+              status: f.status ?? ["OPEN"],
+            })) as [ProfileFilter, ProfileFilter],
           },
         },
         `User:${ctx.user!.id}`,
@@ -556,7 +559,7 @@ export const createProfilesPieChartDashboardModule = mutationField(
             groupByProfileTypeFieldId: settings.groupByProfileTypeFieldId ?? undefined,
             groupByFilter: settings.groupByFilter
               ? {
-                  status: settings.groupByFilter.status,
+                  status: settings.groupByFilter.status ?? ["OPEN"],
                   values: settings.groupByFilter.values as ProfileFieldValuesFilter,
                 }
               : undefined,
@@ -565,7 +568,7 @@ export const createProfilesPieChartDashboardModule = mutationField(
               color: item.color,
               label: item.label,
               filter: {
-                status: item.filter.status,
+                status: item.filter.status ?? ["OPEN"],
                 values: item.filter.values as ProfileFieldValuesFilter,
               },
             })),
