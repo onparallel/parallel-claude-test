@@ -643,6 +643,8 @@ export type DashboardModuleResultItem = {
   count: Scalars["Int"]["output"];
   /** Label of the item, in string or LocalizableUserText format */
   label: Maybe<Scalars["JSON"]["output"]>;
+  /** Value of the SELECT item, when grouping by a SELECT field */
+  value: Maybe<Scalars["String"]["output"]>;
 };
 
 export type DashboardModuleResultMultiItem = {
@@ -710,7 +712,7 @@ export type DashboardProfilesNumberModuleSettings = {
   aggregate: Maybe<ModuleResultAggregateType>;
   filters: DashboardModuleProfileFilter;
   profileTypeFieldId: Maybe<Scalars["GID"]["output"]>;
-  profileTypeId: Maybe<Scalars["GID"]["output"]>;
+  profileTypeId: Scalars["GID"]["output"];
   type: ModuleResultType;
 };
 
@@ -736,7 +738,7 @@ export type DashboardProfilesPieChartModuleSettings = {
   groupByProfileTypeFieldId: Maybe<Scalars["GID"]["output"]>;
   items: Array<DashboardProfilesPieChartModuleItems>;
   profileTypeFieldId: Maybe<Scalars["GID"]["output"]>;
-  profileTypeId: Maybe<Scalars["GID"]["output"]>;
+  profileTypeId: Scalars["GID"]["output"];
   type: ModuleResultType;
 };
 
@@ -753,7 +755,7 @@ export type DashboardProfilesRatioModuleSettings = {
   filters: Array<DashboardModuleProfileFilter>;
   graphicType: DashboardRatioModuleSettingsType;
   profileTypeFieldId: Maybe<Scalars["GID"]["output"]>;
-  profileTypeId: Maybe<Scalars["GID"]["output"]>;
+  profileTypeId: Scalars["GID"]["output"];
   type: ModuleResultType;
 };
 

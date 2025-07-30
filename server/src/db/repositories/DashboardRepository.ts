@@ -662,6 +662,7 @@ export class DashboardRepository extends BaseRepository {
             ? ((showOptionsWithColors ? value.color : null) ??
               COLORS[Math.abs(hashString(value.value)) % COLORS.length])
             : null,
+          value: d.group_by_value,
         };
       }),
       isIncongruent: false, // values grouped by SELECT field will never be incongruent

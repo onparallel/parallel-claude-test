@@ -217,6 +217,9 @@ export const DashboardModuleResultItem = objectType({
       description: "Label of the item, in string or LocalizableUserText format",
     });
     t.nullable.string("color");
+    t.nullable.string("value", {
+      description: "Value of the SELECT item, when grouping by a SELECT field",
+    });
   },
 });
 
@@ -254,7 +257,7 @@ export const DashboardProfilesNumberModule = objectType({
         definition(t) {
           t.nonNull.field("type", { type: "ModuleResultType" });
           t.nonNull.field("filters", { type: "DashboardModuleProfileFilter" });
-          t.nullable.globalId("profileTypeId", { prefixName: "ProfileType" });
+          t.nonNull.globalId("profileTypeId", { prefixName: "ProfileType" });
           t.nullable.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
           t.nullable.field("aggregate", { type: "ModuleResultAggregateType" });
         },
@@ -292,7 +295,7 @@ export const DashboardProfilesRatioModule = objectType({
           t.nonNull.field("graphicType", { type: "DashboardRatioModuleSettingsType" });
           t.nonNull.field("type", { type: "ModuleResultType" });
           t.nonNull.list.field("filters", { type: "DashboardModuleProfileFilter" });
-          t.nullable.globalId("profileTypeId", { prefixName: "ProfileType" });
+          t.nonNull.globalId("profileTypeId", { prefixName: "ProfileType" });
           t.nullable.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
           t.nullable.field("aggregate", { type: "ModuleResultAggregateType" });
         },
@@ -338,7 +341,7 @@ export const DashboardProfilesPieChartModule = objectType({
         definition(t) {
           t.nonNull.field("graphicType", { type: "DashboardPieChartModuleSettingsType" });
           t.nonNull.field("type", { type: "ModuleResultType" });
-          t.nullable.globalId("profileTypeId", { prefixName: "ProfileType" });
+          t.nonNull.globalId("profileTypeId", { prefixName: "ProfileType" });
           t.nullable.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
           t.nullable.field("aggregate", { type: "ModuleResultAggregateType" });
           t.nullable.globalId("groupByProfileTypeFieldId", {

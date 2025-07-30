@@ -696,6 +696,8 @@ export interface DashboardModuleResultItem {
   count: Scalars["Int"]["output"];
   /** Label of the item, in string or LocalizableUserText format */
   label?: Maybe<Scalars["JSON"]["output"]>;
+  /** Value of the SELECT item, when grouping by a SELECT field */
+  value?: Maybe<Scalars["String"]["output"]>;
 }
 
 export interface DashboardModuleResultMultiItem {
@@ -773,7 +775,7 @@ export interface DashboardProfilesNumberModuleSettings {
   aggregate?: Maybe<ModuleResultAggregateType>;
   filters: DashboardModuleProfileFilter;
   profileTypeFieldId?: Maybe<Scalars["GID"]["output"]>;
-  profileTypeId?: Maybe<Scalars["GID"]["output"]>;
+  profileTypeId: Scalars["GID"]["output"];
   type: ModuleResultType;
 }
 
@@ -802,7 +804,7 @@ export interface DashboardProfilesPieChartModuleSettings {
   groupByProfileTypeFieldId?: Maybe<Scalars["GID"]["output"]>;
   items: Array<DashboardProfilesPieChartModuleItems>;
   profileTypeFieldId?: Maybe<Scalars["GID"]["output"]>;
-  profileTypeId?: Maybe<Scalars["GID"]["output"]>;
+  profileTypeId: Scalars["GID"]["output"];
   type: ModuleResultType;
 }
 
@@ -821,7 +823,7 @@ export interface DashboardProfilesRatioModuleSettings {
   filters: Array<DashboardModuleProfileFilter>;
   graphicType: DashboardRatioModuleSettingsType;
   profileTypeFieldId?: Maybe<Scalars["GID"]["output"]>;
-  profileTypeId?: Maybe<Scalars["GID"]["output"]>;
+  profileTypeId: Scalars["GID"]["output"];
   type: ModuleResultType;
 }
 
@@ -10051,7 +10053,7 @@ export type DashboardModuleDrawer_DashboardModule_DashboardProfilesNumberModule_
   profilesNumberSettings: {
     __typename?: "DashboardProfilesNumberModuleSettings";
     type: ModuleResultType;
-    profileTypeId?: string | null;
+    profileTypeId: string;
     profileTypeFieldId?: string | null;
     aggregate?: ModuleResultAggregateType | null;
     filters: {
@@ -10098,7 +10100,7 @@ export type DashboardModuleDrawer_DashboardModule_DashboardProfilesPieChartModul
     __typename?: "DashboardProfilesPieChartModuleSettings";
     type: ModuleResultType;
     graphicType: DashboardPieChartModuleSettingsType;
-    profileTypeId?: string | null;
+    profileTypeId: string;
     profileTypeFieldId?: string | null;
     groupByProfileTypeFieldId?: string | null;
     aggregate?: ModuleResultAggregateType | null;
@@ -10183,7 +10185,7 @@ export type DashboardModuleDrawer_DashboardModule_DashboardProfilesRatioModule_F
     __typename?: "DashboardProfilesRatioModuleSettings";
     type: ModuleResultType;
     graphicType: DashboardRatioModuleSettingsType;
-    profileTypeId?: string | null;
+    profileTypeId: string;
     profileTypeFieldId?: string | null;
     aggregate?: ModuleResultAggregateType | null;
     filters: Array<{
@@ -10797,7 +10799,7 @@ export type DashboardModuleDrawer_updateProfilesRatioDashboardModuleMutation = {
         profilesNumberSettings: {
           __typename?: "DashboardProfilesNumberModuleSettings";
           type: ModuleResultType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           filters: {
@@ -10843,7 +10845,7 @@ export type DashboardModuleDrawer_updateProfilesRatioDashboardModuleMutation = {
           __typename?: "DashboardProfilesPieChartModuleSettings";
           type: ModuleResultType;
           graphicType: DashboardPieChartModuleSettingsType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           groupByProfileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
@@ -10927,7 +10929,7 @@ export type DashboardModuleDrawer_updateProfilesRatioDashboardModuleMutation = {
           __typename?: "DashboardProfilesRatioModuleSettings";
           type: ModuleResultType;
           graphicType: DashboardRatioModuleSettingsType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           filters: Array<{
@@ -11126,7 +11128,7 @@ export type DashboardModuleDrawer_updateProfilesPieChartDashboardModuleMutation 
         profilesNumberSettings: {
           __typename?: "DashboardProfilesNumberModuleSettings";
           type: ModuleResultType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           filters: {
@@ -11172,7 +11174,7 @@ export type DashboardModuleDrawer_updateProfilesPieChartDashboardModuleMutation 
           __typename?: "DashboardProfilesPieChartModuleSettings";
           type: ModuleResultType;
           graphicType: DashboardPieChartModuleSettingsType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           groupByProfileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
@@ -11256,7 +11258,7 @@ export type DashboardModuleDrawer_updateProfilesPieChartDashboardModuleMutation 
           __typename?: "DashboardProfilesRatioModuleSettings";
           type: ModuleResultType;
           graphicType: DashboardRatioModuleSettingsType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           filters: Array<{
@@ -11455,7 +11457,7 @@ export type DashboardModuleDrawer_updateProfilesNumberDashboardModuleMutation = 
         profilesNumberSettings: {
           __typename?: "DashboardProfilesNumberModuleSettings";
           type: ModuleResultType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           filters: {
@@ -11501,7 +11503,7 @@ export type DashboardModuleDrawer_updateProfilesNumberDashboardModuleMutation = 
           __typename?: "DashboardProfilesPieChartModuleSettings";
           type: ModuleResultType;
           graphicType: DashboardPieChartModuleSettingsType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           groupByProfileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
@@ -11585,7 +11587,7 @@ export type DashboardModuleDrawer_updateProfilesNumberDashboardModuleMutation = 
           __typename?: "DashboardProfilesRatioModuleSettings";
           type: ModuleResultType;
           graphicType: DashboardRatioModuleSettingsType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           filters: Array<{
@@ -11784,7 +11786,7 @@ export type DashboardModuleDrawer_updatePetitionsPieChartDashboardModuleMutation
         profilesNumberSettings: {
           __typename?: "DashboardProfilesNumberModuleSettings";
           type: ModuleResultType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           filters: {
@@ -11830,7 +11832,7 @@ export type DashboardModuleDrawer_updatePetitionsPieChartDashboardModuleMutation
           __typename?: "DashboardProfilesPieChartModuleSettings";
           type: ModuleResultType;
           graphicType: DashboardPieChartModuleSettingsType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           groupByProfileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
@@ -11914,7 +11916,7 @@ export type DashboardModuleDrawer_updatePetitionsPieChartDashboardModuleMutation
           __typename?: "DashboardProfilesRatioModuleSettings";
           type: ModuleResultType;
           graphicType: DashboardRatioModuleSettingsType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           filters: Array<{
@@ -12113,7 +12115,7 @@ export type DashboardModuleDrawer_updatePetitionsRatioDashboardModuleMutation = 
         profilesNumberSettings: {
           __typename?: "DashboardProfilesNumberModuleSettings";
           type: ModuleResultType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           filters: {
@@ -12159,7 +12161,7 @@ export type DashboardModuleDrawer_updatePetitionsRatioDashboardModuleMutation = 
           __typename?: "DashboardProfilesPieChartModuleSettings";
           type: ModuleResultType;
           graphicType: DashboardPieChartModuleSettingsType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           groupByProfileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
@@ -12243,7 +12245,7 @@ export type DashboardModuleDrawer_updatePetitionsRatioDashboardModuleMutation = 
           __typename?: "DashboardProfilesRatioModuleSettings";
           type: ModuleResultType;
           graphicType: DashboardRatioModuleSettingsType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           filters: Array<{
@@ -12443,7 +12445,7 @@ export type DashboardModuleDrawer_updateCreatePetitionButtonDashboardModuleMutat
         profilesNumberSettings: {
           __typename?: "DashboardProfilesNumberModuleSettings";
           type: ModuleResultType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           filters: {
@@ -12489,7 +12491,7 @@ export type DashboardModuleDrawer_updateCreatePetitionButtonDashboardModuleMutat
           __typename?: "DashboardProfilesPieChartModuleSettings";
           type: ModuleResultType;
           graphicType: DashboardPieChartModuleSettingsType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           groupByProfileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
@@ -12573,7 +12575,7 @@ export type DashboardModuleDrawer_updateCreatePetitionButtonDashboardModuleMutat
           __typename?: "DashboardProfilesRatioModuleSettings";
           type: ModuleResultType;
           graphicType: DashboardRatioModuleSettingsType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           filters: Array<{
@@ -12772,7 +12774,7 @@ export type DashboardModuleDrawer_updatePetitionsNumberDashboardModuleMutation =
         profilesNumberSettings: {
           __typename?: "DashboardProfilesNumberModuleSettings";
           type: ModuleResultType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           filters: {
@@ -12818,7 +12820,7 @@ export type DashboardModuleDrawer_updatePetitionsNumberDashboardModuleMutation =
           __typename?: "DashboardProfilesPieChartModuleSettings";
           type: ModuleResultType;
           graphicType: DashboardPieChartModuleSettingsType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           groupByProfileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
@@ -12902,7 +12904,7 @@ export type DashboardModuleDrawer_updatePetitionsNumberDashboardModuleMutation =
           __typename?: "DashboardProfilesRatioModuleSettings";
           type: ModuleResultType;
           graphicType: DashboardRatioModuleSettingsType;
-          profileTypeId?: string | null;
+          profileTypeId: string;
           profileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           filters: Array<{
@@ -45201,7 +45203,7 @@ export type Home_DashboardModule_DashboardProfilesNumberModule_Fragment = {
   profilesNumberSettings: {
     __typename?: "DashboardProfilesNumberModuleSettings";
     type: ModuleResultType;
-    profileTypeId?: string | null;
+    profileTypeId: string;
     profileTypeFieldId?: string | null;
     aggregate?: ModuleResultAggregateType | null;
     filters: {
@@ -45253,7 +45255,7 @@ export type Home_DashboardModule_DashboardProfilesPieChartModule_Fragment = {
     __typename?: "DashboardProfilesPieChartModuleSettings";
     type: ModuleResultType;
     graphicType: DashboardPieChartModuleSettingsType;
-    profileTypeId?: string | null;
+    profileTypeId: string;
     profileTypeFieldId?: string | null;
     groupByProfileTypeFieldId?: string | null;
     aggregate?: ModuleResultAggregateType | null;
@@ -45349,7 +45351,7 @@ export type Home_DashboardModule_DashboardProfilesRatioModule_Fragment = {
     __typename?: "DashboardProfilesRatioModuleSettings";
     type: ModuleResultType;
     graphicType: DashboardRatioModuleSettingsType;
-    profileTypeId?: string | null;
+    profileTypeId: string;
     profileTypeFieldId?: string | null;
     aggregate?: ModuleResultAggregateType | null;
     filters: Array<{
@@ -45679,7 +45681,7 @@ export type Home_dashboardQuery = {
           profilesNumberSettings: {
             __typename?: "DashboardProfilesNumberModuleSettings";
             type: ModuleResultType;
-            profileTypeId?: string | null;
+            profileTypeId: string;
             profileTypeFieldId?: string | null;
             aggregate?: ModuleResultAggregateType | null;
             filters: {
@@ -45730,7 +45732,7 @@ export type Home_dashboardQuery = {
             __typename?: "DashboardProfilesPieChartModuleSettings";
             type: ModuleResultType;
             graphicType: DashboardPieChartModuleSettingsType;
-            profileTypeId?: string | null;
+            profileTypeId: string;
             profileTypeFieldId?: string | null;
             groupByProfileTypeFieldId?: string | null;
             aggregate?: ModuleResultAggregateType | null;
@@ -45825,7 +45827,7 @@ export type Home_dashboardQuery = {
             __typename?: "DashboardProfilesRatioModuleSettings";
             type: ModuleResultType;
             graphicType: DashboardRatioModuleSettingsType;
-            profileTypeId?: string | null;
+            profileTypeId: string;
             profileTypeFieldId?: string | null;
             aggregate?: ModuleResultAggregateType | null;
             filters: Array<{

@@ -1450,9 +1450,9 @@ describe("DashboardRepository", () => {
         }),
       ).toEqual({
         items: expect.toIncludeSameMembers([
-          { label: { en: "High Risk" }, color: "#aa0000", count: 3, aggr: 1700 },
-          { label: { en: "Medium Risk" }, color: "#bb0000", count: 3, aggr: 700 },
-          { label: null, color: null, count: 1, aggr: 12345 },
+          { label: { en: "High Risk" }, color: "#aa0000", count: 3, aggr: 1700, value: "HIGH" },
+          { label: { en: "Medium Risk" }, color: "#bb0000", count: 3, aggr: 700, value: "MEDIUM" },
+          { label: null, color: null, count: 1, aggr: 12345, value: null },
         ]),
         isIncongruent: false,
       });
@@ -1483,8 +1483,8 @@ describe("DashboardRepository", () => {
         }),
       ).toEqual({
         items: expect.toIncludeSameMembers([
-          { label: { en: "High Risk" }, color: "#aa0000", count: 3, aggr: 1700 },
-          { label: { en: "Medium Risk" }, color: "#bb0000", count: 3, aggr: 700 },
+          { label: { en: "High Risk" }, color: "#aa0000", count: 3, aggr: 1700, value: "HIGH" },
+          { label: { en: "Medium Risk" }, color: "#bb0000", count: 3, aggr: 700, value: "MEDIUM" },
         ]),
         isIncongruent: false,
       });
@@ -1518,10 +1518,10 @@ describe("DashboardRepository", () => {
         }),
       ).toEqual({
         items: expect.toIncludeSameMembers([
-          { label: { en: "High Risk" }, color: "#aa0000", count: 3, aggr: null },
-          { label: { en: "Medium Risk" }, color: "#bb0000", count: 3, aggr: null },
-          { label: { en: "Low Risk" }, color: "#cc0000", count: 1, aggr: null },
-          { label: null, color: null, count: 3, aggr: null },
+          { label: { en: "High Risk" }, color: "#aa0000", count: 3, aggr: null, value: "HIGH" },
+          { label: { en: "Medium Risk" }, color: "#bb0000", count: 3, aggr: null, value: "MEDIUM" },
+          { label: { en: "Low Risk" }, color: "#cc0000", count: 1, aggr: null, value: "LOW" },
+          { label: null, color: null, count: 3, aggr: null, value: null },
         ]),
         isIncongruent: false,
       });
@@ -1545,15 +1545,23 @@ describe("DashboardRepository", () => {
             color: expect.any(String),
             aggr: 1200,
             count: 3,
+            value: "AR",
           },
           {
             label: { en: "France", es: "Francia" },
             color: expect.any(String),
             aggr: 1200,
             count: 3,
+            value: "FR",
           },
-          { label: { en: "Spain", es: "España" }, color: expect.any(String), aggr: 8000, count: 1 },
-          { label: null, color: null, aggr: 12345, count: 1 },
+          {
+            label: { en: "Spain", es: "España" },
+            color: expect.any(String),
+            aggr: 8000,
+            count: 1,
+            value: "ES",
+          },
+          { label: null, color: null, aggr: 12345, count: 1, value: null },
         ]),
         isIncongruent: false,
       });

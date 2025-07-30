@@ -723,6 +723,11 @@ type DashboardModuleResultItem {
   Label of the item, in string or LocalizableUserText format
   """
   label: JSON
+
+  """
+  Value of the SELECT item, when grouping by a SELECT field
+  """
+  value: String
 }
 
 type DashboardModuleResultMultiItem {
@@ -797,7 +802,7 @@ type DashboardProfilesNumberModuleSettings {
   aggregate: ModuleResultAggregateType
   filters: DashboardModuleProfileFilter!
   profileTypeFieldId: GID
-  profileTypeId: GID
+  profileTypeId: GID!
   type: ModuleResultType!
 }
 
@@ -826,7 +831,7 @@ type DashboardProfilesPieChartModuleSettings {
   groupByProfileTypeFieldId: GID
   items: [DashboardProfilesPieChartModuleItems!]!
   profileTypeFieldId: GID
-  profileTypeId: GID
+  profileTypeId: GID!
   type: ModuleResultType!
 }
 
@@ -843,7 +848,7 @@ type DashboardProfilesRatioModuleSettings {
   filters: [DashboardModuleProfileFilter!]!
   graphicType: DashboardRatioModuleSettingsType!
   profileTypeFieldId: GID
-  profileTypeId: GID
+  profileTypeId: GID!
   type: ModuleResultType!
 }
 
