@@ -1,9 +1,13 @@
+import { gql } from "@apollo/client";
 import {
   DashboardModuleDrawer_DashboardModuleFragment,
   DashboardModuleDrawer_DashboardModulePetitionFilterFragment,
-  DashboardModuleDrawer_DashboardModuleProfileFilterFragment,
+  DashboardModuleProfileFieldValuesFilter,
   DashboardModuleSize,
+  fullDashboardModuleProfileFilterFragment,
 } from "@parallel/graphql/__types";
+import { removeTypenames } from "@parallel/utils/apollo/removeTypenames";
+import { ProfileFieldValuesFilter } from "@parallel/utils/ProfileFieldValuesFilter";
 import { isNonNullish } from "remeda";
 import {
   DashboardModuleDrawerFormData,
@@ -54,71 +58,38 @@ export function findTabForModuleType(
   return null;
 }
 
-/**
- * Recursively removes all properties with nullish values (null or undefined)
- * and all "__typename" properties from a filter object and its nested objects
- * @param obj The object to clean
- * @returns The clean object without nullish properties and __typename
- */
-function removeNullishValues<T>(obj: T): T {
-  // If it's not an object or it's null, return the value as is
-  if (obj === null || typeof obj !== "object") {
-    return obj;
+function cleanDashboardModuleProfileFieldValuesFilter(
+  values: DashboardModuleProfileFieldValuesFilter,
+): ProfileFieldValuesFilter {
+  if (isNonNullish(values.logicalOperator)) {
+    return {
+      logicalOperator: values.logicalOperator!,
+      conditions: values.conditions!.map(cleanDashboardModuleProfileFieldValuesFilter),
+    };
+  } else {
+    return {
+      profileTypeFieldId: values.profileTypeFieldId!,
+      operator: values.operator!,
+      value: values.value!,
+    };
   }
-
-  // If it's an array, clean each element of the array
-  if (Array.isArray(obj)) {
-    return obj.map((item) => removeNullishValues(item)) as unknown as T;
-  }
-
-  // Create a new object to store cleaned properties
-  const cleanedObj = {} as T;
-
-  // Go through all the properties of the object
-  Object.entries(obj).forEach(([key, value]) => {
-    // Skip __typename properties and nullish values
-    if (key === "__typename" || value === null || value === undefined) {
-      return;
-    }
-
-    // If it's an object, apply the function recursively
-    if (typeof value === "object") {
-      (cleanedObj as any)[key] = removeNullishValues(value);
-    } else {
-      // If it's a simple value, copy it directly
-      (cleanedObj as any)[key] = value;
-    }
-  });
-
-  return cleanedObj;
 }
 
-export function mapProfileFilter(
-  filter: DashboardModuleDrawer_DashboardModuleProfileFilterFragment,
+export function cleanDashboardModuleProfileFilter(
+  filter: fullDashboardModuleProfileFilterFragment,
 ) {
-  // Clean nullish values from the filter
-  const cleanedValues = removeNullishValues(filter.values);
-
   return {
-    values: cleanedValues,
-    status: filter.status,
+    values: isNonNullish(filter.values)
+      ? cleanDashboardModuleProfileFieldValuesFilter(filter.values)
+      : undefined,
+    status: filter.status ?? undefined,
   };
 }
 
-export function mapPetitionFilter(
+export function cleanDashboardModulePetitionFilter(
   filter: DashboardModuleDrawer_DashboardModulePetitionFilterFragment,
 ) {
-  // Clean nullish values and "__typename" from the filter
-  const cleanedValues = removeNullishValues(filter);
-
-  return {
-    status: cleanedValues.status,
-    signature: cleanedValues.signature,
-    tags: cleanedValues.tags,
-    fromTemplateId: cleanedValues.fromTemplateId,
-    sharedWith: cleanedValues.sharedWith,
-    approvals: cleanedValues.approvals,
-  };
+  return removeTypenames(filter);
 }
 
 export function getDefaultValuesFromModule(
@@ -158,13 +129,17 @@ export function getDefaultValuesFromModule(
     // Petition related modules
     case "DashboardPetitionsNumberModule":
       if ("petitionsNumberSettings" in module) {
-        settings.filters = [mapPetitionFilter(module.petitionsNumberSettings.filters)];
+        settings.filters = [
+          cleanDashboardModulePetitionFilter(module.petitionsNumberSettings.filters),
+        ];
       }
       break;
     case "DashboardPetitionsRatioModule":
       if ("petitionsRatioSettings" in module) {
         settings.ratioGraphicType = module.petitionsRatioSettings.graphicType;
-        settings.filters = module.petitionsRatioSettings.filters.map(mapPetitionFilter);
+        settings.filters = module.petitionsRatioSettings.filters.map(
+          cleanDashboardModulePetitionFilter,
+        );
       }
       break;
     case "DashboardPetitionsPieChartModule":
@@ -173,7 +148,7 @@ export function getDefaultValuesFromModule(
         settings.items = module.petitionsPieChartSettings.items.map((item) => ({
           color: item.color,
           label: item.label,
-          filters: [mapPetitionFilter(item.filter)],
+          filters: [cleanDashboardModulePetitionFilter(item.filter)],
         }));
       }
       break;
@@ -192,7 +167,9 @@ export function getDefaultValuesFromModule(
             : module.profilesNumberSettings.aggregate;
         settings.profileTypeId = module.profilesNumberSettings.profileTypeId ?? undefined;
         settings.profileTypeFieldId = module.profilesNumberSettings.profileTypeFieldId ?? undefined;
-        settings.filters = [mapProfileFilter(module.profilesNumberSettings.filters)];
+        settings.filters = [
+          cleanDashboardModuleProfileFilter(module.profilesNumberSettings.filters),
+        ];
       }
       break;
     case "DashboardProfilesRatioModule":
@@ -203,7 +180,9 @@ export function getDefaultValuesFromModule(
             : module.profilesRatioSettings.aggregate;
         settings.profileTypeId = module.profilesRatioSettings.profileTypeId ?? undefined;
         settings.profileTypeFieldId = module.profilesRatioSettings.profileTypeFieldId ?? undefined;
-        settings.filters = module.profilesRatioSettings.filters.map(mapProfileFilter);
+        settings.filters = module.profilesRatioSettings.filters.map((f) =>
+          cleanDashboardModuleProfileFilter(f),
+        );
         settings.ratioGraphicType = module.profilesRatioSettings.graphicType;
       }
       break;
@@ -220,14 +199,14 @@ export function getDefaultValuesFromModule(
         settings.items = module.profilesPieChartSettings.items.map((item) => ({
           color: item.color,
           label: item.label,
-          filters: [mapProfileFilter(item.filter)],
+          filters: [cleanDashboardModuleProfileFilter(item.filter)],
         }));
         settings.groupByProfileTypeFieldId =
           module.profilesPieChartSettings.groupByProfileTypeFieldId ?? undefined;
         settings.filters =
           isNonNullish(module.profilesPieChartSettings.groupByProfileTypeFieldId) &&
           isNonNullish(module.profilesPieChartSettings.groupByFilter)
-            ? [mapProfileFilter(module.profilesPieChartSettings.groupByFilter)]
+            ? [cleanDashboardModuleProfileFilter(module.profilesPieChartSettings.groupByFilter)]
             : [];
       }
       break;
@@ -262,3 +241,33 @@ export function filterEmptyFilters(filters?: Record<string, any>[]) {
     );
   });
 }
+
+export const fullDashboardModuleProfileFilter = gql`
+  fragment fullDashboardModuleProfileFilter on DashboardModuleProfileFilter {
+    status
+    values {
+      logicalOperator
+      operator
+      profileTypeFieldId
+      value
+      conditions {
+        logicalOperator
+        operator
+        profileTypeFieldId
+        value
+        conditions {
+          logicalOperator
+          operator
+          profileTypeFieldId
+          value
+          conditions {
+            logicalOperator
+            operator
+            profileTypeFieldId
+            value
+          }
+        }
+      }
+    }
+  }
+`;

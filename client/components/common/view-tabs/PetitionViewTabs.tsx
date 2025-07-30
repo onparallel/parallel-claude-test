@@ -9,8 +9,7 @@ import {
   PetitionViewTabs_reorderPetitionListViewsDocument,
   PetitionViewTabs_updatePetitionListViewDocument,
 } from "@parallel/graphql/__types";
-import { PetitionsQueryState } from "@parallel/pages/app/petitions";
-import { SetQueryState } from "@parallel/utils/queryState";
+import { usePetitionsQueryState } from "@parallel/utils/petitionsQueryState";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useIntl } from "react-intl";
 import { isNonNullish, omit } from "remeda";
@@ -18,28 +17,26 @@ import { assert } from "ts-essentials";
 import { ViewTabs } from "./ViewTabs";
 
 interface PetitionViewTabsProps {
-  state: PetitionsQueryState;
-  onStateChange: SetQueryState<Partial<PetitionsQueryState>>;
   views: PetitionViewTabs_PetitionListViewFragment[];
 }
 
 export const PetitionViewTabs = Object.assign(
-  chakraForwardRef<"div", PetitionViewTabsProps>(function PetitionViewTabs(
-    { state, onStateChange, views },
-    ref,
-  ) {
+  chakraForwardRef<"div", PetitionViewTabsProps>(function PetitionViewTabs({ views }, ref) {
+    const [queryState, setQueryState] = usePetitionsQueryState();
     const intl = useIntl();
     const toast = useToast();
     const showGenericErrorToast = useGenericErrorToast();
 
     const allView = views.find((v) => v.type === "ALL")!;
     const currentView =
-      state.view === "ALL" ? allView : (views.find((v) => v.id === state.view) ?? allView);
+      queryState.view === "ALL"
+        ? allView
+        : (views.find((v) => v.id === queryState.view) ?? allView);
 
     const handleViewChange = async (viewId: string) => {
       const view = views.find((v) => v.id === viewId);
       if (isNonNullish(view)) {
-        onStateChange({
+        setQueryState({
           view: view.type === "ALL" ? "ALL" : view.id,
           ...omit(view.data, ["__typename"]),
         });
@@ -94,7 +91,7 @@ export const PetitionViewTabs = Object.assign(
           },
         });
         if (isNonNullish(data)) {
-          onStateChange({
+          setQueryState({
             view: data.createPetitionListView.id,
             ...omit(data.createPetitionListView.data, ["__typename"]),
           });

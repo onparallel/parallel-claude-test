@@ -761,7 +761,7 @@ type DashboardPetitionsPieChartModule implements DashboardModule {
   title: String
 }
 
-type DashboardPetitionsPieChartModuleItems {
+type DashboardPetitionsPieChartModuleItem {
   color: String!
   filter: DashboardModulePetitionFilter!
   label: String!
@@ -769,7 +769,7 @@ type DashboardPetitionsPieChartModuleItems {
 
 type DashboardPetitionsPieChartModuleSettings {
   graphicType: DashboardPieChartModuleSettingsType!
-  items: [DashboardPetitionsPieChartModuleItems!]!
+  items: [DashboardPetitionsPieChartModuleItem!]!
 }
 
 type DashboardPetitionsRatioModule implements DashboardModule {
@@ -814,7 +814,7 @@ type DashboardProfilesPieChartModule implements DashboardModule {
   title: String
 }
 
-type DashboardProfilesPieChartModuleItems {
+type DashboardProfilesPieChartModuleItem {
   color: String!
   filter: DashboardModuleProfileFilter!
   label: String!
@@ -829,7 +829,7 @@ type DashboardProfilesPieChartModuleSettings {
   Optional SELECT field to group by its values instead of items array
   """
   groupByProfileTypeFieldId: GID
-  items: [DashboardProfilesPieChartModuleItems!]!
+  items: [DashboardProfilesPieChartModuleItem!]!
   profileTypeFieldId: GID
   profileTypeId: GID!
   type: ModuleResultType!

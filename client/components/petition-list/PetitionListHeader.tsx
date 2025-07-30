@@ -9,8 +9,10 @@ import {
   PetitionListViewData,
   PetitionListViewDataInput,
 } from "@parallel/graphql/__types";
-import type { PetitionsQueryState } from "@parallel/pages/app/petitions";
-import { QueryStateOf, SetQueryState, useBuildStateUrl } from "@parallel/utils/queryState";
+import {
+  buildPetitionsQueryStateUrl,
+  usePetitionsQueryState,
+} from "@parallel/utils/petitionsQueryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -30,43 +32,38 @@ import { useConfirmChangeViewAllDialog } from "../petition-compose/dialogs/Confi
 import { useAskNameDialog } from "./AskNameDialog";
 
 export interface PetitionListHeaderProps {
-  shape: QueryStateOf<PetitionsQueryState>;
-  state: PetitionsQueryState;
   columns: TableColumn<any, any, any>[];
   selection: PetitionListViewColumn[];
-  onStateChange: SetQueryState<Partial<PetitionsQueryState>>;
   onReload: () => void;
   views: PetitionListHeader_PetitionListViewFragment[];
 }
 
 export function PetitionListHeader({
-  shape,
-  state,
   columns,
   selection,
-  onStateChange,
   onReload,
   views,
 }: PetitionListHeaderProps) {
+  const [queryState, setQueryState] = usePetitionsQueryState();
   const intl = useIntl();
-  const [search, setSearch] = useState(state.search ?? "");
+  const [search, setSearch] = useState(queryState.search ?? "");
 
   const showGenericErrorToast = useGenericErrorToast();
 
   useEffect(() => {
-    setSearch(state.search ?? "");
-  }, [state.view]);
+    setSearch(queryState.search ?? "");
+  }, [queryState.view]);
 
   const debouncedOnSearchChange = useDebouncedCallback(
     (search) =>
-      onStateChange(({ searchIn, ...current }) => ({
+      setQueryState(({ searchIn, ...current }) => ({
         ...current,
         search,
         searchIn: search ? searchIn : "EVERYWHERE",
         page: 1,
       })),
     300,
-    [onStateChange],
+    [setQueryState],
   );
   const handleSearchChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -77,24 +74,14 @@ export function PetitionListHeader({
     [debouncedOnSearchChange],
   );
 
-  const buildUrl = useBuildStateUrl(shape);
-
-  const handleSearchInChange = (value: string) => {
-    onStateChange((current) => ({
-      ...current,
-      searchIn: value as PetitionsQueryState["searchIn"],
-      page: 1,
-    }));
-  };
-
   const saveViewRef = useRef<HTMLButtonElement>(null);
 
   const isViewDirty = useMemo(() => {
-    if (state.type === "TEMPLATE") {
+    if (queryState.type === "TEMPLATE") {
       return false;
     }
     const currentView = views.find((v) =>
-      state.view === "ALL" ? v.type === "ALL" : v.id === state.view,
+      queryState.view === "ALL" ? v.type === "ALL" : v.id === queryState.view,
     );
 
     if (!currentView) return false;
@@ -103,13 +90,13 @@ export function PetitionListHeader({
       // "ALL" view can only update columns and sortBy
       return !viewsAreEqual(
         pick(currentView.data, ["sort", "columns"]),
-        pick(state, ["sort", "columns"]),
+        pick(queryState, ["sort", "columns"]),
       );
     }
 
     return !viewsAreEqual(
       currentView!.data,
-      pick(state, [
+      pick(queryState, [
         "status",
         "tagsFilters",
         "sharedWith",
@@ -123,13 +110,14 @@ export function PetitionListHeader({
         "columns",
       ]) as Omit<PetitionListViewData, "__typename">,
     );
-  }, [state, views]);
+  }, [queryState, views]);
 
   const showAskNameDialog = useAskNameDialog();
   const [createPetitionListView] = useMutation(PetitionListHeader_createPetitionListViewDocument);
   const handleSaveAsNewViewClick = async () => {
     try {
-      const currentView = state.view !== "ALL" ? views.find((v) => v.id === state.view) : null;
+      const currentView =
+        queryState.view !== "ALL" ? views.find((v) => v.id === queryState.view) : null;
       const name = await showAskNameDialog({
         name: currentView?.name,
         header: (
@@ -150,9 +138,9 @@ export function PetitionListHeader({
         variables: {
           name,
           data: {
-            tagsFilters: state.tagsFilters,
-            sharedWith: state.sharedWith,
-            ...pick(state, [
+            tagsFilters: queryState.tagsFilters,
+            sharedWith: queryState.sharedWith,
+            ...pick(queryState, [
               "status",
               "signature",
               "fromTemplateId",
@@ -167,7 +155,7 @@ export function PetitionListHeader({
         },
       });
       if (isNonNullish(data)) {
-        onStateChange({
+        setQueryState({
           view: data.createPetitionListView.id,
           ...omit(data.createPetitionListView.data, ["__typename"]),
         });
@@ -189,9 +177,9 @@ export function PetitionListHeader({
       // to choose whether to save and ignore the filters or switch to create a new VIEW.
 
       if (
-        state.view === "ALL" &&
+        queryState.view === "ALL" &&
         Object.values(
-          pick(state, [
+          pick(queryState, [
             "sharedWith",
             "status",
             "tagsFilters",
@@ -212,7 +200,7 @@ export function PetitionListHeader({
       }
 
       const view = views.find((v) =>
-        state.view === "ALL" ? v.type === "ALL" : v.id === state.view,
+        queryState.view === "ALL" ? v.type === "ALL" : v.id === queryState.view,
       )!;
 
       await updatePetitionListView({
@@ -222,12 +210,12 @@ export function PetitionListHeader({
           data: {
             ...(view.type === "ALL"
               ? // "ALL" view can only update columns and sort
-                pick(state, ["sort", "columns"])
+                pick(queryState, ["sort", "columns"])
               : {
-                  tagsFilters: state.tagsFilters,
-                  sharedWith: state.sharedWith,
-                  approvals: state.approvals,
-                  ...pick(state, [
+                  tagsFilters: queryState.tagsFilters,
+                  sharedWith: queryState.sharedWith,
+                  approvals: queryState.approvals,
+                  ...pick(queryState, [
                     "status",
                     "signature",
                     "fromTemplateId",
@@ -255,7 +243,7 @@ export function PetitionListHeader({
         columns,
         selection,
       });
-      onStateChange((current) => ({ ...current, columns: newColumns }));
+      setQueryState((current) => ({ ...current, columns: newColumns }));
     } catch {}
   };
 
@@ -275,17 +263,17 @@ export function PetitionListHeader({
         <Box flex="0 1 400px">
           <SearchInput value={search ?? ""} onChange={handleSearchChange} />
         </Box>
-        {state.type === "PETITION" ? (
+        {queryState.type === "PETITION" ? (
           <HiddenFiltersButton
             columns={columns}
             selection={selection}
-            filter={state}
+            filter={queryState}
             onRemoveFilter={(key) => {
-              onStateChange((current) => ({ ...omit(current, [key as any]), page: 1 }));
+              setQueryState((current) => ({ ...omit(current, [key as any]), page: 1 }));
             }}
           />
         ) : null}
-        {state.type === "PETITION" ? (
+        {queryState.type === "PETITION" ? (
           <HStack flex={1} justifyContent="flex-end">
             <ResponsiveButtonIcon
               icon={<ColumnsIcon />}
@@ -306,18 +294,24 @@ export function PetitionListHeader({
           </HStack>
         ) : null}
       </HStack>
-      {state.search ? (
+      {queryState.search ? (
         <SearchAllOrCurrentFolder
-          onChange={handleSearchInChange}
-          value={state.searchIn}
-          path={state.path}
-          type={state.type}
+          onChange={(value) =>
+            setQueryState((current) => ({
+              ...current,
+              searchIn: value,
+              page: 1,
+            }))
+          }
+          value={queryState.searchIn}
+          path={queryState.path}
+          type={queryState.type}
         />
-      ) : state.path !== "/" ? (
+      ) : queryState.path !== "/" ? (
         <PathBreadcrumbs
-          path={state.path}
-          type={state.type}
-          pathUrl={(path) => buildUrl((current) => ({ ...current, path, page: 1 }))}
+          path={queryState.path}
+          type={queryState.type}
+          pathUrl={(path) => buildPetitionsQueryStateUrl({ ...queryState, path, page: 1 })}
         />
       ) : null}
     </Stack>

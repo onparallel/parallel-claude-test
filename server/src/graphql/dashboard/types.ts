@@ -316,7 +316,7 @@ export const DashboardPetitionsPieChartModule = objectType({
           t.nonNull.field("graphicType", { type: "DashboardPieChartModuleSettingsType" });
           t.nonNull.list.field("items", {
             type: objectType({
-              name: "DashboardPetitionsPieChartModuleItems",
+              name: "DashboardPetitionsPieChartModuleItem",
               definition(t) {
                 t.nonNull.string("label");
                 t.nonNull.string("color");
@@ -350,7 +350,7 @@ export const DashboardProfilesPieChartModule = objectType({
           });
           t.nonNull.list.field("items", {
             type: objectType({
-              name: "DashboardProfilesPieChartModuleItems",
+              name: "DashboardProfilesPieChartModuleItem",
               definition(t) {
                 t.nonNull.string("label");
                 t.nonNull.string("color");

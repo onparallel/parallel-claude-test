@@ -3040,11 +3040,6 @@
     "context": "Options included:"
   },
   {
-    "term": "component.dashboard-chart-legend.total",
-    "definition": "Total {count}",
-    "context": "Total {count}"
-  },
-  {
     "term": "component.dashboard-module-card.confirm-delete",
     "definition": "¿Quieres eliminar este módulo?",
     "context": "Do you want to delete this module?"
@@ -3180,9 +3175,14 @@
     "context": "Numerator"
   },
   {
-    "term": "component.dashboard-pie-chart-module.not-replied",
-    "definition": "Sin responder",
-    "context": "Not replied"
+    "term": "component.dashboard-petitions-pie-chart-module.view-petitions",
+    "definition": "Ver parallels para: {segment}",
+    "context": "View parallels for: {segment}"
+  },
+  {
+    "term": "component.dashboard-profiles-pie-chart-module.view-profiles",
+    "definition": "Ver perfiles para: {segment}",
+    "context": "View profiles for: {segment}"
   },
   {
     "term": "component.dashboard-tabs.clone-dashboard-header",
@@ -9435,11 +9435,6 @@
     "context": "Remove association"
   },
   {
-    "term": "component.profile-property-content.no-value",
-    "definition": "Sin valor",
-    "context": "No value"
-  },
-  {
     "term": "component.profile-relationship-type-with-direction-select.placeholder",
     "definition": "Selecciona el tipo de relación",
     "context": "Select a relationship type"
@@ -15090,6 +15085,11 @@
     "context": "Property"
   },
   {
+    "term": "generic.profile-property-no-value",
+    "definition": "Sin valor",
+    "context": "No value"
+  },
+  {
     "term": "generic.profile-type-field-type-adverse-media-search",
     "definition": "Búsqueda de medios adversos",
     "context": "Adverse media search"
@@ -15520,6 +15520,11 @@
     "context": "Informal"
   },
   {
+    "term": "generic.total",
+    "definition": "Total",
+    "context": "Total"
+  },
+  {
     "term": "generic.transfer-ownership",
     "definition": "Transferir propiedad",
     "context": "Transfer ownership"
@@ -15650,9 +15655,19 @@
     "context": "Users"
   },
   {
+    "term": "generic.view-petitions",
+    "definition": "Ver parallels",
+    "context": "View parallels"
+  },
+  {
     "term": "generic.view-profile",
     "definition": "Ver perfil",
     "context": "View profile"
+  },
+  {
+    "term": "generic.view-profiles",
+    "definition": "Ver perfiles",
+    "context": "View profiles"
   },
   {
     "term": "generic.weeks",
@@ -17375,6 +17390,11 @@
     "context": "New template"
   },
   {
+    "term": "page.petitions.from-dashboard-description",
+    "definition": "Estás viendo un filtro del módulo del dashboard: {module}. Los resultados pueden diferir debido a parallels no compartidos contigo.",
+    "context": "You are viewing a filter from the dashboard module: {module}. Results may differ due to the parallels not being shared with you."
+  },
+  {
     "term": "page.petitions.no-parallels",
     "definition": "No tienes ningún parallel todavía. ¡Empieza creando uno nuevo!",
     "context": "You have no parallels yet. Start by creating one now!"
@@ -17510,11 +17530,6 @@
     "context": "Close {count, plural, =1 {profile} other {profiles}}"
   },
   {
-    "term": "page.profiles.closed",
-    "definition": "Cerrados",
-    "context": "Closed"
-  },
-  {
     "term": "page.profiles.delete-permanently",
     "definition": "Eliminar permanentemente",
     "context": "Delete permanently"
@@ -17548,11 +17563,6 @@
     "term": "page.profiles.no-results",
     "definition": "No encontramos perfiles con este criterio",
     "context": "There are no profiles matching your criteria"
-  },
-  {
-    "term": "page.profiles.open",
-    "definition": "Abiertos",
-    "context": "Open"
   },
   {
     "term": "page.profiles.pin-to-menu",

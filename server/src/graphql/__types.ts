@@ -1186,7 +1186,7 @@ export interface NexusGenObjects {
     settings: NexusGenRootTypes["DashboardPetitionsPieChartModuleSettings"]; // DashboardPetitionsPieChartModuleSettings!
     title?: string | null; // String
   };
-  DashboardPetitionsPieChartModuleItems: {
+  DashboardPetitionsPieChartModuleItem: {
     // root type
     color: string; // String!
     filter: NexusGenRootTypes["DashboardModulePetitionFilter"]; // DashboardModulePetitionFilter!
@@ -1195,7 +1195,7 @@ export interface NexusGenObjects {
   DashboardPetitionsPieChartModuleSettings: {
     // root type
     graphicType: NexusGenEnums["DashboardPieChartModuleSettingsType"]; // DashboardPieChartModuleSettingsType!
-    items: NexusGenRootTypes["DashboardPetitionsPieChartModuleItems"][]; // [DashboardPetitionsPieChartModuleItems!]!
+    items: NexusGenRootTypes["DashboardPetitionsPieChartModuleItem"][]; // [DashboardPetitionsPieChartModuleItem!]!
   };
   DashboardPetitionsRatioModule: {
     // root type
@@ -1231,7 +1231,7 @@ export interface NexusGenObjects {
     settings: NexusGenRootTypes["DashboardProfilesPieChartModuleSettings"]; // DashboardProfilesPieChartModuleSettings!
     title?: string | null; // String
   };
-  DashboardProfilesPieChartModuleItems: {
+  DashboardProfilesPieChartModuleItem: {
     // root type
     color: string; // String!
     filter: NexusGenRootTypes["DashboardModuleProfileFilter"]; // DashboardModuleProfileFilter!
@@ -1243,7 +1243,7 @@ export interface NexusGenObjects {
     graphicType: NexusGenEnums["DashboardPieChartModuleSettingsType"]; // DashboardPieChartModuleSettingsType!
     groupByFilter?: NexusGenRootTypes["DashboardModuleProfileFilter"] | null; // DashboardModuleProfileFilter
     groupByProfileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
-    items: NexusGenRootTypes["DashboardProfilesPieChartModuleItems"][]; // [DashboardProfilesPieChartModuleItems!]!
+    items: NexusGenRootTypes["DashboardProfilesPieChartModuleItem"][]; // [DashboardProfilesPieChartModuleItem!]!
     profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
     profileTypeId: NexusGenScalars["GID"]; // GID!
     type: NexusGenEnums["ModuleResultType"]; // ModuleResultType!
@@ -2431,7 +2431,7 @@ export interface NexusGenFieldTypes {
     size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
     title: string | null; // String
   };
-  DashboardPetitionsPieChartModuleItems: {
+  DashboardPetitionsPieChartModuleItem: {
     // field return type
     color: string; // String!
     filter: NexusGenRootTypes["DashboardModulePetitionFilter"]; // DashboardModulePetitionFilter!
@@ -2440,7 +2440,7 @@ export interface NexusGenFieldTypes {
   DashboardPetitionsPieChartModuleSettings: {
     // field return type
     graphicType: NexusGenEnums["DashboardPieChartModuleSettingsType"]; // DashboardPieChartModuleSettingsType!
-    items: NexusGenRootTypes["DashboardPetitionsPieChartModuleItems"][]; // [DashboardPetitionsPieChartModuleItems!]!
+    items: NexusGenRootTypes["DashboardPetitionsPieChartModuleItem"][]; // [DashboardPetitionsPieChartModuleItem!]!
   };
   DashboardPetitionsRatioModule: {
     // field return type
@@ -2479,7 +2479,7 @@ export interface NexusGenFieldTypes {
     size: NexusGenEnums["DashboardModuleSize"]; // DashboardModuleSize!
     title: string | null; // String
   };
-  DashboardProfilesPieChartModuleItems: {
+  DashboardProfilesPieChartModuleItem: {
     // field return type
     color: string; // String!
     filter: NexusGenRootTypes["DashboardModuleProfileFilter"]; // DashboardModuleProfileFilter!
@@ -2491,7 +2491,7 @@ export interface NexusGenFieldTypes {
     graphicType: NexusGenEnums["DashboardPieChartModuleSettingsType"]; // DashboardPieChartModuleSettingsType!
     groupByFilter: NexusGenRootTypes["DashboardModuleProfileFilter"] | null; // DashboardModuleProfileFilter
     groupByProfileTypeFieldId: NexusGenScalars["GID"] | null; // GID
-    items: NexusGenRootTypes["DashboardProfilesPieChartModuleItems"][]; // [DashboardProfilesPieChartModuleItems!]!
+    items: NexusGenRootTypes["DashboardProfilesPieChartModuleItem"][]; // [DashboardProfilesPieChartModuleItem!]!
     profileTypeFieldId: NexusGenScalars["GID"] | null; // GID
     profileTypeId: NexusGenScalars["GID"]; // GID!
     type: NexusGenEnums["ModuleResultType"]; // ModuleResultType!
@@ -5632,7 +5632,7 @@ export interface NexusGenFieldTypeNames {
     size: "DashboardModuleSize";
     title: "String";
   };
-  DashboardPetitionsPieChartModuleItems: {
+  DashboardPetitionsPieChartModuleItem: {
     // field return type name
     color: "String";
     filter: "DashboardModulePetitionFilter";
@@ -5641,7 +5641,7 @@ export interface NexusGenFieldTypeNames {
   DashboardPetitionsPieChartModuleSettings: {
     // field return type name
     graphicType: "DashboardPieChartModuleSettingsType";
-    items: "DashboardPetitionsPieChartModuleItems";
+    items: "DashboardPetitionsPieChartModuleItem";
   };
   DashboardPetitionsRatioModule: {
     // field return type name
@@ -5680,7 +5680,7 @@ export interface NexusGenFieldTypeNames {
     size: "DashboardModuleSize";
     title: "String";
   };
-  DashboardProfilesPieChartModuleItems: {
+  DashboardProfilesPieChartModuleItem: {
     // field return type name
     color: "String";
     filter: "DashboardModuleProfileFilter";
@@ -5692,7 +5692,7 @@ export interface NexusGenFieldTypeNames {
     graphicType: "DashboardPieChartModuleSettingsType";
     groupByFilter: "DashboardModuleProfileFilter";
     groupByProfileTypeFieldId: "GID";
-    items: "DashboardProfilesPieChartModuleItems";
+    items: "DashboardProfilesPieChartModuleItem";
     profileTypeFieldId: "GID";
     profileTypeId: "GID";
     type: "ModuleResultType";

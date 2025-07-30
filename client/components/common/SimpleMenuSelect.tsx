@@ -2,6 +2,7 @@ import {
   Button,
   ButtonProps,
   MenuButton,
+  MenuDivider,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
@@ -9,40 +10,55 @@ import {
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { unMaybeArray } from "@parallel/utils/types";
+import { FormattedList } from "react-intl";
 import { SimpleOption } from "./SimpleSelect";
 
-export interface SimpleMenuSelectProps extends Omit<ButtonProps, "onChange"> {
-  options: SimpleOption[];
-  value: string;
-  onChange: (value: string) => void;
+export interface SimpleMenuSelectProps<T extends string = string, IsMulti extends boolean = false>
+  extends Omit<ButtonProps, "onChange"> {
+  isMulti?: IsMulti;
+  options: (SimpleOption<T> | "DIVIDER")[];
+  value: IsMulti extends true ? T[] : T;
+  onChange: IsMulti extends true ? (value: T[]) => void : (value: T) => void;
 }
 
-export const SimpleMenuSelect = chakraForwardRef<"button", SimpleMenuSelectProps>(
-  function SimpleMenuSelect({ options, value, onChange, ...props }, ref) {
-    return (
-      <Menu placement="bottom-start">
-        <MenuButton
-          ref={ref}
-          as={Button}
-          fontWeight={400}
-          rightIcon={<ChevronDownIcon boxSize={4} />}
-          {...(props as any)}
-        >
-          {options.find((o) => o.value === value)?.label}
-        </MenuButton>
-        <Portal>
-          <MenuList fontSize="sm" minWidth={0} width="auto">
-            <MenuOptionGroup value={value} onChange={onChange as any} type="radio">
-              {options.map((o) => (
+export function SimpleMenuSelect<T extends string = string, IsMulti extends boolean = false>({
+  isMulti,
+  options,
+  value,
+  onChange,
+  ...props
+}: SimpleMenuSelectProps<T, IsMulti>) {
+  return (
+    <Menu placement="bottom-start">
+      <MenuButton
+        as={Button}
+        fontWeight={400}
+        rightIcon={<ChevronDownIcon boxSize={4} />}
+        {...(props as any)}
+      >
+        <FormattedList
+          value={unMaybeArray(value).map(
+            (v) => (options.find((o) => o !== "DIVIDER" && o.value === v)! as SimpleOption).label,
+          )}
+          style="short"
+        />
+      </MenuButton>
+      <Portal>
+        <MenuList fontSize="sm" minWidth={0} width="auto">
+          <MenuOptionGroup value={value} onChange={onChange as any} type="checkbox">
+            {options.map((o, i) =>
+              o === "DIVIDER" ? (
+                <MenuDivider key={i} />
+              ) : (
                 <MenuItemOption key={o.value} value={o.value}>
                   {o.label}
                 </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Portal>
-      </Menu>
-    );
-  },
-);
+              ),
+            )}
+          </MenuOptionGroup>
+        </MenuList>
+      </Portal>
+    </Menu>
+  );
+}

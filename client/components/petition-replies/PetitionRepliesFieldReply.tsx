@@ -406,7 +406,7 @@ export function PetitionRepliesFieldReply({
                                         marginStart={1}
                                       >
                                         <FormattedMessage
-                                          id="component.profile-property-content.no-value"
+                                          id="generic.profile-property-no-value"
                                           defaultMessage="No value"
                                         />
                                       </Text>

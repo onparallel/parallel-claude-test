@@ -1,5 +1,5 @@
-import type { Duration } from "date-fns";
 import type { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
+import type { Duration } from "date-fns";
 import gql from "graphql-tag";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -674,7 +674,7 @@ export type DashboardPetitionsPieChartModule = DashboardModule & {
   title: Maybe<Scalars["String"]["output"]>;
 };
 
-export type DashboardPetitionsPieChartModuleItems = {
+export type DashboardPetitionsPieChartModuleItem = {
   color: Scalars["String"]["output"];
   filter: DashboardModulePetitionFilter;
   label: Scalars["String"]["output"];
@@ -682,7 +682,7 @@ export type DashboardPetitionsPieChartModuleItems = {
 
 export type DashboardPetitionsPieChartModuleSettings = {
   graphicType: DashboardPieChartModuleSettingsType;
-  items: Array<DashboardPetitionsPieChartModuleItems>;
+  items: Array<DashboardPetitionsPieChartModuleItem>;
 };
 
 export type DashboardPetitionsRatioModule = DashboardModule & {
@@ -724,7 +724,7 @@ export type DashboardProfilesPieChartModule = DashboardModule & {
   title: Maybe<Scalars["String"]["output"]>;
 };
 
-export type DashboardProfilesPieChartModuleItems = {
+export type DashboardProfilesPieChartModuleItem = {
   color: Scalars["String"]["output"];
   filter: DashboardModuleProfileFilter;
   label: Scalars["String"]["output"];
@@ -736,7 +736,7 @@ export type DashboardProfilesPieChartModuleSettings = {
   groupByFilter: Maybe<DashboardModuleProfileFilter>;
   /** Optional SELECT field to group by its values instead of items array */
   groupByProfileTypeFieldId: Maybe<Scalars["GID"]["output"]>;
-  items: Array<DashboardProfilesPieChartModuleItems>;
+  items: Array<DashboardProfilesPieChartModuleItem>;
   profileTypeFieldId: Maybe<Scalars["GID"]["output"]>;
   profileTypeId: Scalars["GID"]["output"];
   type: ModuleResultType;

@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { DashboardNumberValue } from "./DashboardNumberValue";
 
 export function DashboardRatio({
@@ -15,10 +15,10 @@ export function DashboardRatio({
   return isPercentage ? (
     <DashboardNumberValue value={value / total} isPercentage isEditing={isEditing} />
   ) : (
-    <>
+    <Flex alignItems="center" justifyContent="center">
       <DashboardNumberValue value={value} isEditing={isEditing} />
       <Box lineHeight={1}>{"/"}</Box>
       <DashboardNumberValue value={total} isEditing={isEditing} />
-    </>
+    </Flex>
   );
 }

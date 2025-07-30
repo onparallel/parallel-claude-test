@@ -171,7 +171,6 @@ async function validateProfileFilter(
       throw new ArgValidationError(info, `${argName}.${invalidKey}`, "Cannot be set");
     }
   }
-
   if (filter.status?.includes("DELETION_SCHEDULED")) {
     throw new ArgValidationError(info, `${argName}.status`, "Invalid status");
   }

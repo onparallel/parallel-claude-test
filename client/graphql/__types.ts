@@ -731,8 +731,8 @@ export interface DashboardPetitionsPieChartModule extends DashboardModule {
   title?: Maybe<Scalars["String"]["output"]>;
 }
 
-export interface DashboardPetitionsPieChartModuleItems {
-  __typename?: "DashboardPetitionsPieChartModuleItems";
+export interface DashboardPetitionsPieChartModuleItem {
+  __typename?: "DashboardPetitionsPieChartModuleItem";
   color: Scalars["String"]["output"];
   filter: DashboardModulePetitionFilter;
   label: Scalars["String"]["output"];
@@ -741,7 +741,7 @@ export interface DashboardPetitionsPieChartModuleItems {
 export interface DashboardPetitionsPieChartModuleSettings {
   __typename?: "DashboardPetitionsPieChartModuleSettings";
   graphicType: DashboardPieChartModuleSettingsType;
-  items: Array<DashboardPetitionsPieChartModuleItems>;
+  items: Array<DashboardPetitionsPieChartModuleItem>;
 }
 
 export interface DashboardPetitionsRatioModule extends DashboardModule {
@@ -788,8 +788,8 @@ export interface DashboardProfilesPieChartModule extends DashboardModule {
   title?: Maybe<Scalars["String"]["output"]>;
 }
 
-export interface DashboardProfilesPieChartModuleItems {
-  __typename?: "DashboardProfilesPieChartModuleItems";
+export interface DashboardProfilesPieChartModuleItem {
+  __typename?: "DashboardProfilesPieChartModuleItem";
   color: Scalars["String"]["output"];
   filter: DashboardModuleProfileFilter;
   label: Scalars["String"]["output"];
@@ -802,7 +802,7 @@ export interface DashboardProfilesPieChartModuleSettings {
   groupByFilter?: Maybe<DashboardModuleProfileFilter>;
   /** Optional SELECT field to group by its values instead of items array */
   groupByProfileTypeFieldId?: Maybe<Scalars["GID"]["output"]>;
-  items: Array<DashboardProfilesPieChartModuleItems>;
+  items: Array<DashboardProfilesPieChartModuleItem>;
   profileTypeFieldId?: Maybe<Scalars["GID"]["output"]>;
   profileTypeId: Scalars["GID"]["output"];
   type: ModuleResultType;
@@ -9709,6 +9709,42 @@ export type DashboardModule_DashboardModule_DashboardPetitionsNumberModule_Fragm
   title?: string | null;
   size: DashboardModuleSize;
   petitionsNumberResult?: { __typename?: "DashboardModuleResultItem"; count: number } | null;
+  settings: {
+    __typename?: "DashboardPetitionsNumberModuleSettings";
+    filters: {
+      __typename?: "DashboardModulePetitionFilter";
+      fromTemplateId?: Array<string> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
+      status?: Array<PetitionStatus> | null;
+      approvals?: {
+        __typename?: "DashboardModulePetitionFilterApprovals";
+        operator: PetitionApprovalsFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+          value: string;
+          operator: PetitionApprovalsFilterOperator;
+        }>;
+      } | null;
+      sharedWith?: {
+        __typename?: "DashboardModulePetitionFilterSharedWith";
+        operator: FilterSharedWithLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterSharedWithFilters";
+          operator: FilterSharedWithOperator;
+          value: string;
+        }>;
+      } | null;
+      tags?: {
+        __typename?: "DashboardModulePetitionFilterTags";
+        operator: PetitionTagFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
+        }>;
+      } | null;
+    };
+  };
 };
 
 export type DashboardModule_DashboardModule_DashboardPetitionsPieChartModule_Fragment = {
@@ -9729,6 +9765,42 @@ export type DashboardModule_DashboardModule_DashboardPetitionsPieChartModule_Fra
   petitionsPieChartSettings: {
     __typename?: "DashboardPetitionsPieChartModuleSettings";
     graphicType: DashboardPieChartModuleSettingsType;
+    items: Array<{
+      __typename?: "DashboardPetitionsPieChartModuleItem";
+      filter: {
+        __typename?: "DashboardModulePetitionFilter";
+        status?: Array<PetitionStatus> | null;
+        signature?: Array<PetitionSignatureStatusFilter> | null;
+        fromTemplateId?: Array<string> | null;
+        tags?: {
+          __typename?: "DashboardModulePetitionFilterTags";
+          operator: PetitionTagFilterLogicalOperator;
+          filters: Array<{
+            __typename?: "DashboardModulePetitionFilterTagsFilters";
+            value: Array<string>;
+            operator: PetitionTagFilterLineOperator;
+          }>;
+        } | null;
+        sharedWith?: {
+          __typename?: "DashboardModulePetitionFilterSharedWith";
+          operator: FilterSharedWithLogicalOperator;
+          filters: Array<{
+            __typename?: "DashboardModulePetitionFilterSharedWithFilters";
+            value: string;
+            operator: FilterSharedWithOperator;
+          }>;
+        } | null;
+        approvals?: {
+          __typename?: "DashboardModulePetitionFilterApprovals";
+          operator: PetitionApprovalsFilterLogicalOperator;
+          filters: Array<{
+            __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+            value: string;
+            operator: PetitionApprovalsFilterOperator;
+          }>;
+        } | null;
+      };
+    }>;
   };
 };
 
@@ -9745,6 +9817,39 @@ export type DashboardModule_DashboardModule_DashboardPetitionsRatioModule_Fragme
   petitionsRatioSettings: {
     __typename?: "DashboardPetitionsRatioModuleSettings";
     graphicType: DashboardRatioModuleSettingsType;
+    filters: Array<{
+      __typename?: "DashboardModulePetitionFilter";
+      fromTemplateId?: Array<string> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
+      status?: Array<PetitionStatus> | null;
+      approvals?: {
+        __typename?: "DashboardModulePetitionFilterApprovals";
+        operator: PetitionApprovalsFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+          operator: PetitionApprovalsFilterOperator;
+          value: string;
+        }>;
+      } | null;
+      sharedWith?: {
+        __typename?: "DashboardModulePetitionFilterSharedWith";
+        operator: FilterSharedWithLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterSharedWithFilters";
+          operator: FilterSharedWithOperator;
+          value: string;
+        }>;
+      } | null;
+      tags?: {
+        __typename?: "DashboardModulePetitionFilterTags";
+        operator: PetitionTagFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
+        }>;
+      } | null;
+    }>;
   };
 };
 
@@ -9761,6 +9866,39 @@ export type DashboardModule_DashboardModule_DashboardProfilesNumberModule_Fragme
   profilesNumberSettings: {
     __typename?: "DashboardProfilesNumberModuleSettings";
     type: ModuleResultType;
+    profileTypeId: string;
+    filters: {
+      __typename?: "DashboardModuleProfileFilter";
+      status?: Array<ProfileStatus> | null;
+      values?: {
+        __typename?: "DashboardModuleProfileFieldValuesFilter";
+        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        profileTypeFieldId?: string | null;
+        value?: any | null;
+        conditions?: Array<{
+          __typename?: "DashboardModuleProfileFieldValuesFilter";
+          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          profileTypeFieldId?: string | null;
+          value?: any | null;
+          conditions?: Array<{
+            __typename?: "DashboardModuleProfileFieldValuesFilter";
+            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            profileTypeFieldId?: string | null;
+            value?: any | null;
+            conditions?: Array<{
+              __typename?: "DashboardModuleProfileFieldValuesFilter";
+              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              profileTypeFieldId?: string | null;
+              value?: any | null;
+            }> | null;
+          }> | null;
+        }> | null;
+      } | null;
+    };
   };
 };
 
@@ -9778,12 +9916,83 @@ export type DashboardModule_DashboardModule_DashboardProfilesPieChartModule_Frag
       aggr?: number | null;
       label?: any | null;
       color?: string | null;
+      value?: string | null;
     }>;
   } | null;
   profilesPieChartSettings: {
     __typename?: "DashboardProfilesPieChartModuleSettings";
     graphicType: DashboardPieChartModuleSettingsType;
     type: ModuleResultType;
+    profileTypeId: string;
+    profileTypeFieldId?: string | null;
+    groupByProfileTypeFieldId?: string | null;
+    items: Array<{
+      __typename?: "DashboardProfilesPieChartModuleItem";
+      filter: {
+        __typename?: "DashboardModuleProfileFilter";
+        status?: Array<ProfileStatus> | null;
+        values?: {
+          __typename?: "DashboardModuleProfileFieldValuesFilter";
+          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          profileTypeFieldId?: string | null;
+          value?: any | null;
+          conditions?: Array<{
+            __typename?: "DashboardModuleProfileFieldValuesFilter";
+            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            profileTypeFieldId?: string | null;
+            value?: any | null;
+            conditions?: Array<{
+              __typename?: "DashboardModuleProfileFieldValuesFilter";
+              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              profileTypeFieldId?: string | null;
+              value?: any | null;
+              conditions?: Array<{
+                __typename?: "DashboardModuleProfileFieldValuesFilter";
+                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                profileTypeFieldId?: string | null;
+                value?: any | null;
+              }> | null;
+            }> | null;
+          }> | null;
+        } | null;
+      };
+    }>;
+    groupByFilter?: {
+      __typename?: "DashboardModuleProfileFilter";
+      status?: Array<ProfileStatus> | null;
+      values?: {
+        __typename?: "DashboardModuleProfileFieldValuesFilter";
+        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        profileTypeFieldId?: string | null;
+        value?: any | null;
+        conditions?: Array<{
+          __typename?: "DashboardModuleProfileFieldValuesFilter";
+          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          profileTypeFieldId?: string | null;
+          value?: any | null;
+          conditions?: Array<{
+            __typename?: "DashboardModuleProfileFieldValuesFilter";
+            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            profileTypeFieldId?: string | null;
+            value?: any | null;
+            conditions?: Array<{
+              __typename?: "DashboardModuleProfileFieldValuesFilter";
+              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              profileTypeFieldId?: string | null;
+              value?: any | null;
+            }> | null;
+          }> | null;
+        }> | null;
+      } | null;
+    } | null;
   };
 };
 
@@ -9801,6 +10010,39 @@ export type DashboardModule_DashboardModule_DashboardProfilesRatioModule_Fragmen
     __typename?: "DashboardProfilesRatioModuleSettings";
     graphicType: DashboardRatioModuleSettingsType;
     type: ModuleResultType;
+    profileTypeId: string;
+    filters: Array<{
+      __typename?: "DashboardModuleProfileFilter";
+      status?: Array<ProfileStatus> | null;
+      values?: {
+        __typename?: "DashboardModuleProfileFieldValuesFilter";
+        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        profileTypeFieldId?: string | null;
+        value?: any | null;
+        conditions?: Array<{
+          __typename?: "DashboardModuleProfileFieldValuesFilter";
+          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          profileTypeFieldId?: string | null;
+          value?: any | null;
+          conditions?: Array<{
+            __typename?: "DashboardModuleProfileFieldValuesFilter";
+            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            profileTypeFieldId?: string | null;
+            value?: any | null;
+            conditions?: Array<{
+              __typename?: "DashboardModuleProfileFieldValuesFilter";
+              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              profileTypeFieldId?: string | null;
+              value?: any | null;
+            }> | null;
+          }> | null;
+        }> | null;
+      } | null;
+    }>;
   };
 };
 
@@ -9820,47 +10062,6 @@ export type DashboardTabs_DashboardFragment = {
   isRefreshing: boolean;
   lastRefreshAt?: string | null;
   name: string;
-};
-
-export type DashboardModuleDrawer_DashboardModuleProfileFieldValuesFilterFragment = {
-  __typename?: "DashboardModuleProfileFieldValuesFilter";
-  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
-  profileTypeFieldId?: string | null;
-  value?: any | null;
-};
-
-export type DashboardModuleDrawer_DashboardModuleProfileFilterFragment = {
-  __typename?: "DashboardModuleProfileFilter";
-  status?: Array<ProfileStatus> | null;
-  values?: {
-    __typename?: "DashboardModuleProfileFieldValuesFilter";
-    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
-    profileTypeFieldId?: string | null;
-    value?: any | null;
-    conditions?: Array<{
-      __typename?: "DashboardModuleProfileFieldValuesFilter";
-      logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-      operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
-      profileTypeFieldId?: string | null;
-      value?: any | null;
-      conditions?: Array<{
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
-        profileTypeFieldId?: string | null;
-        value?: any | null;
-        conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
-          profileTypeFieldId?: string | null;
-          value?: any | null;
-        }> | null;
-      }> | null;
-    }> | null;
-  } | null;
 };
 
 export type DashboardModuleDrawer_DashboardModulePetitionFilterFragment = {
@@ -9961,7 +10162,7 @@ export type DashboardModuleDrawer_DashboardModule_DashboardPetitionsPieChartModu
     __typename?: "DashboardPetitionsPieChartModuleSettings";
     graphicType: DashboardPieChartModuleSettingsType;
     items: Array<{
-      __typename?: "DashboardPetitionsPieChartModuleItems";
+      __typename?: "DashboardPetitionsPieChartModuleItem";
       color: string;
       label: string;
       filter: {
@@ -10105,7 +10306,7 @@ export type DashboardModuleDrawer_DashboardModule_DashboardProfilesPieChartModul
     groupByProfileTypeFieldId?: string | null;
     aggregate?: ModuleResultAggregateType | null;
     items: Array<{
-      __typename?: "DashboardProfilesPieChartModuleItems";
+      __typename?: "DashboardProfilesPieChartModuleItem";
       color: string;
       label: string;
       filter: {
@@ -10709,7 +10910,7 @@ export type DashboardModuleDrawer_updateProfilesRatioDashboardModuleMutation = {
           __typename?: "DashboardPetitionsPieChartModuleSettings";
           graphicType: DashboardPieChartModuleSettingsType;
           items: Array<{
-            __typename?: "DashboardPetitionsPieChartModuleItems";
+            __typename?: "DashboardPetitionsPieChartModuleItem";
             color: string;
             label: string;
             filter: {
@@ -10850,7 +11051,7 @@ export type DashboardModuleDrawer_updateProfilesRatioDashboardModuleMutation = {
           groupByProfileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           items: Array<{
-            __typename?: "DashboardProfilesPieChartModuleItems";
+            __typename?: "DashboardProfilesPieChartModuleItem";
             color: string;
             label: string;
             filter: {
@@ -11038,7 +11239,7 @@ export type DashboardModuleDrawer_updateProfilesPieChartDashboardModuleMutation 
           __typename?: "DashboardPetitionsPieChartModuleSettings";
           graphicType: DashboardPieChartModuleSettingsType;
           items: Array<{
-            __typename?: "DashboardPetitionsPieChartModuleItems";
+            __typename?: "DashboardPetitionsPieChartModuleItem";
             color: string;
             label: string;
             filter: {
@@ -11179,7 +11380,7 @@ export type DashboardModuleDrawer_updateProfilesPieChartDashboardModuleMutation 
           groupByProfileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           items: Array<{
-            __typename?: "DashboardProfilesPieChartModuleItems";
+            __typename?: "DashboardProfilesPieChartModuleItem";
             color: string;
             label: string;
             filter: {
@@ -11367,7 +11568,7 @@ export type DashboardModuleDrawer_updateProfilesNumberDashboardModuleMutation = 
           __typename?: "DashboardPetitionsPieChartModuleSettings";
           graphicType: DashboardPieChartModuleSettingsType;
           items: Array<{
-            __typename?: "DashboardPetitionsPieChartModuleItems";
+            __typename?: "DashboardPetitionsPieChartModuleItem";
             color: string;
             label: string;
             filter: {
@@ -11508,7 +11709,7 @@ export type DashboardModuleDrawer_updateProfilesNumberDashboardModuleMutation = 
           groupByProfileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           items: Array<{
-            __typename?: "DashboardProfilesPieChartModuleItems";
+            __typename?: "DashboardProfilesPieChartModuleItem";
             color: string;
             label: string;
             filter: {
@@ -11696,7 +11897,7 @@ export type DashboardModuleDrawer_updatePetitionsPieChartDashboardModuleMutation
           __typename?: "DashboardPetitionsPieChartModuleSettings";
           graphicType: DashboardPieChartModuleSettingsType;
           items: Array<{
-            __typename?: "DashboardPetitionsPieChartModuleItems";
+            __typename?: "DashboardPetitionsPieChartModuleItem";
             color: string;
             label: string;
             filter: {
@@ -11837,7 +12038,7 @@ export type DashboardModuleDrawer_updatePetitionsPieChartDashboardModuleMutation
           groupByProfileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           items: Array<{
-            __typename?: "DashboardProfilesPieChartModuleItems";
+            __typename?: "DashboardProfilesPieChartModuleItem";
             color: string;
             label: string;
             filter: {
@@ -12025,7 +12226,7 @@ export type DashboardModuleDrawer_updatePetitionsRatioDashboardModuleMutation = 
           __typename?: "DashboardPetitionsPieChartModuleSettings";
           graphicType: DashboardPieChartModuleSettingsType;
           items: Array<{
-            __typename?: "DashboardPetitionsPieChartModuleItems";
+            __typename?: "DashboardPetitionsPieChartModuleItem";
             color: string;
             label: string;
             filter: {
@@ -12166,7 +12367,7 @@ export type DashboardModuleDrawer_updatePetitionsRatioDashboardModuleMutation = 
           groupByProfileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           items: Array<{
-            __typename?: "DashboardProfilesPieChartModuleItems";
+            __typename?: "DashboardProfilesPieChartModuleItem";
             color: string;
             label: string;
             filter: {
@@ -12355,7 +12556,7 @@ export type DashboardModuleDrawer_updateCreatePetitionButtonDashboardModuleMutat
           __typename?: "DashboardPetitionsPieChartModuleSettings";
           graphicType: DashboardPieChartModuleSettingsType;
           items: Array<{
-            __typename?: "DashboardPetitionsPieChartModuleItems";
+            __typename?: "DashboardPetitionsPieChartModuleItem";
             color: string;
             label: string;
             filter: {
@@ -12496,7 +12697,7 @@ export type DashboardModuleDrawer_updateCreatePetitionButtonDashboardModuleMutat
           groupByProfileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           items: Array<{
-            __typename?: "DashboardProfilesPieChartModuleItems";
+            __typename?: "DashboardProfilesPieChartModuleItem";
             color: string;
             label: string;
             filter: {
@@ -12684,7 +12885,7 @@ export type DashboardModuleDrawer_updatePetitionsNumberDashboardModuleMutation =
           __typename?: "DashboardPetitionsPieChartModuleSettings";
           graphicType: DashboardPieChartModuleSettingsType;
           items: Array<{
-            __typename?: "DashboardPetitionsPieChartModuleItems";
+            __typename?: "DashboardPetitionsPieChartModuleItem";
             color: string;
             label: string;
             filter: {
@@ -12825,7 +13026,7 @@ export type DashboardModuleDrawer_updatePetitionsNumberDashboardModuleMutation =
           groupByProfileTypeFieldId?: string | null;
           aggregate?: ModuleResultAggregateType | null;
           items: Array<{
-            __typename?: "DashboardProfilesPieChartModuleItems";
+            __typename?: "DashboardProfilesPieChartModuleItem";
             color: string;
             label: string;
             filter: {
@@ -13024,6 +13225,39 @@ export type ProfilesRatioModuleSettings_ProfileTypeFragment = {
   }>;
 };
 
+export type fullDashboardModuleProfileFilterFragment = {
+  __typename?: "DashboardModuleProfileFilter";
+  status?: Array<ProfileStatus> | null;
+  values?: {
+    __typename?: "DashboardModuleProfileFieldValuesFilter";
+    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+    profileTypeFieldId?: string | null;
+    value?: any | null;
+    conditions?: Array<{
+      __typename?: "DashboardModuleProfileFieldValuesFilter";
+      logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+      operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+      profileTypeFieldId?: string | null;
+      value?: any | null;
+      conditions?: Array<{
+        __typename?: "DashboardModuleProfileFieldValuesFilter";
+        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        profileTypeFieldId?: string | null;
+        value?: any | null;
+        conditions?: Array<{
+          __typename?: "DashboardModuleProfileFieldValuesFilter";
+          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          profileTypeFieldId?: string | null;
+          value?: any | null;
+        }> | null;
+      }> | null;
+    }> | null;
+  } | null;
+};
+
 export type DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragment = {
   __typename?: "DashboardCreatePetitionButtonModule";
   id: string;
@@ -13049,6 +13283,42 @@ export type DashboardPetitionsNumberModule_DashboardPetitionsNumberModuleFragmen
   title?: string | null;
   size: DashboardModuleSize;
   petitionsNumberResult?: { __typename?: "DashboardModuleResultItem"; count: number } | null;
+  settings: {
+    __typename?: "DashboardPetitionsNumberModuleSettings";
+    filters: {
+      __typename?: "DashboardModulePetitionFilter";
+      fromTemplateId?: Array<string> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
+      status?: Array<PetitionStatus> | null;
+      approvals?: {
+        __typename?: "DashboardModulePetitionFilterApprovals";
+        operator: PetitionApprovalsFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+          value: string;
+          operator: PetitionApprovalsFilterOperator;
+        }>;
+      } | null;
+      sharedWith?: {
+        __typename?: "DashboardModulePetitionFilterSharedWith";
+        operator: FilterSharedWithLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterSharedWithFilters";
+          operator: FilterSharedWithOperator;
+          value: string;
+        }>;
+      } | null;
+      tags?: {
+        __typename?: "DashboardModulePetitionFilterTags";
+        operator: PetitionTagFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
+        }>;
+      } | null;
+    };
+  };
 };
 
 export type DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment = {
@@ -13069,6 +13339,42 @@ export type DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFra
   petitionsPieChartSettings: {
     __typename?: "DashboardPetitionsPieChartModuleSettings";
     graphicType: DashboardPieChartModuleSettingsType;
+    items: Array<{
+      __typename?: "DashboardPetitionsPieChartModuleItem";
+      filter: {
+        __typename?: "DashboardModulePetitionFilter";
+        status?: Array<PetitionStatus> | null;
+        signature?: Array<PetitionSignatureStatusFilter> | null;
+        fromTemplateId?: Array<string> | null;
+        tags?: {
+          __typename?: "DashboardModulePetitionFilterTags";
+          operator: PetitionTagFilterLogicalOperator;
+          filters: Array<{
+            __typename?: "DashboardModulePetitionFilterTagsFilters";
+            value: Array<string>;
+            operator: PetitionTagFilterLineOperator;
+          }>;
+        } | null;
+        sharedWith?: {
+          __typename?: "DashboardModulePetitionFilterSharedWith";
+          operator: FilterSharedWithLogicalOperator;
+          filters: Array<{
+            __typename?: "DashboardModulePetitionFilterSharedWithFilters";
+            value: string;
+            operator: FilterSharedWithOperator;
+          }>;
+        } | null;
+        approvals?: {
+          __typename?: "DashboardModulePetitionFilterApprovals";
+          operator: PetitionApprovalsFilterLogicalOperator;
+          filters: Array<{
+            __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+            value: string;
+            operator: PetitionApprovalsFilterOperator;
+          }>;
+        } | null;
+      };
+    }>;
   };
 };
 
@@ -13085,6 +13391,39 @@ export type DashboardPetitionsRatioModule_DashboardPetitionsRatioModuleFragment 
   petitionsRatioSettings: {
     __typename?: "DashboardPetitionsRatioModuleSettings";
     graphicType: DashboardRatioModuleSettingsType;
+    filters: Array<{
+      __typename?: "DashboardModulePetitionFilter";
+      fromTemplateId?: Array<string> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
+      status?: Array<PetitionStatus> | null;
+      approvals?: {
+        __typename?: "DashboardModulePetitionFilterApprovals";
+        operator: PetitionApprovalsFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+          operator: PetitionApprovalsFilterOperator;
+          value: string;
+        }>;
+      } | null;
+      sharedWith?: {
+        __typename?: "DashboardModulePetitionFilterSharedWith";
+        operator: FilterSharedWithLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterSharedWithFilters";
+          operator: FilterSharedWithOperator;
+          value: string;
+        }>;
+      } | null;
+      tags?: {
+        __typename?: "DashboardModulePetitionFilterTags";
+        operator: PetitionTagFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
+        }>;
+      } | null;
+    }>;
   };
 };
 
@@ -13101,6 +13440,39 @@ export type DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragment 
   profilesNumberSettings: {
     __typename?: "DashboardProfilesNumberModuleSettings";
     type: ModuleResultType;
+    profileTypeId: string;
+    filters: {
+      __typename?: "DashboardModuleProfileFilter";
+      status?: Array<ProfileStatus> | null;
+      values?: {
+        __typename?: "DashboardModuleProfileFieldValuesFilter";
+        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        profileTypeFieldId?: string | null;
+        value?: any | null;
+        conditions?: Array<{
+          __typename?: "DashboardModuleProfileFieldValuesFilter";
+          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          profileTypeFieldId?: string | null;
+          value?: any | null;
+          conditions?: Array<{
+            __typename?: "DashboardModuleProfileFieldValuesFilter";
+            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            profileTypeFieldId?: string | null;
+            value?: any | null;
+            conditions?: Array<{
+              __typename?: "DashboardModuleProfileFieldValuesFilter";
+              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              profileTypeFieldId?: string | null;
+              value?: any | null;
+            }> | null;
+          }> | null;
+        }> | null;
+      } | null;
+    };
   };
 };
 
@@ -13118,12 +13490,83 @@ export type DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragm
       aggr?: number | null;
       label?: any | null;
       color?: string | null;
+      value?: string | null;
     }>;
   } | null;
   profilesPieChartSettings: {
     __typename?: "DashboardProfilesPieChartModuleSettings";
     graphicType: DashboardPieChartModuleSettingsType;
     type: ModuleResultType;
+    profileTypeId: string;
+    profileTypeFieldId?: string | null;
+    groupByProfileTypeFieldId?: string | null;
+    items: Array<{
+      __typename?: "DashboardProfilesPieChartModuleItem";
+      filter: {
+        __typename?: "DashboardModuleProfileFilter";
+        status?: Array<ProfileStatus> | null;
+        values?: {
+          __typename?: "DashboardModuleProfileFieldValuesFilter";
+          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          profileTypeFieldId?: string | null;
+          value?: any | null;
+          conditions?: Array<{
+            __typename?: "DashboardModuleProfileFieldValuesFilter";
+            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            profileTypeFieldId?: string | null;
+            value?: any | null;
+            conditions?: Array<{
+              __typename?: "DashboardModuleProfileFieldValuesFilter";
+              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              profileTypeFieldId?: string | null;
+              value?: any | null;
+              conditions?: Array<{
+                __typename?: "DashboardModuleProfileFieldValuesFilter";
+                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                profileTypeFieldId?: string | null;
+                value?: any | null;
+              }> | null;
+            }> | null;
+          }> | null;
+        } | null;
+      };
+    }>;
+    groupByFilter?: {
+      __typename?: "DashboardModuleProfileFilter";
+      status?: Array<ProfileStatus> | null;
+      values?: {
+        __typename?: "DashboardModuleProfileFieldValuesFilter";
+        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        profileTypeFieldId?: string | null;
+        value?: any | null;
+        conditions?: Array<{
+          __typename?: "DashboardModuleProfileFieldValuesFilter";
+          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          profileTypeFieldId?: string | null;
+          value?: any | null;
+          conditions?: Array<{
+            __typename?: "DashboardModuleProfileFieldValuesFilter";
+            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            profileTypeFieldId?: string | null;
+            value?: any | null;
+            conditions?: Array<{
+              __typename?: "DashboardModuleProfileFieldValuesFilter";
+              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              profileTypeFieldId?: string | null;
+              value?: any | null;
+            }> | null;
+          }> | null;
+        }> | null;
+      } | null;
+    } | null;
   };
 };
 
@@ -13141,6 +13584,39 @@ export type DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragment = 
     __typename?: "DashboardProfilesRatioModuleSettings";
     graphicType: DashboardRatioModuleSettingsType;
     type: ModuleResultType;
+    profileTypeId: string;
+    filters: Array<{
+      __typename?: "DashboardModuleProfileFilter";
+      status?: Array<ProfileStatus> | null;
+      values?: {
+        __typename?: "DashboardModuleProfileFieldValuesFilter";
+        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        profileTypeFieldId?: string | null;
+        value?: any | null;
+        conditions?: Array<{
+          __typename?: "DashboardModuleProfileFieldValuesFilter";
+          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          profileTypeFieldId?: string | null;
+          value?: any | null;
+          conditions?: Array<{
+            __typename?: "DashboardModuleProfileFieldValuesFilter";
+            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            profileTypeFieldId?: string | null;
+            value?: any | null;
+            conditions?: Array<{
+              __typename?: "DashboardModuleProfileFieldValuesFilter";
+              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              profileTypeFieldId?: string | null;
+              value?: any | null;
+            }> | null;
+          }> | null;
+        }> | null;
+      } | null;
+    }>;
   };
 };
 
@@ -45085,6 +45561,42 @@ export type Home_DashboardModule_DashboardPetitionsNumberModule_Fragment = {
     };
   };
   petitionsNumberResult?: { __typename?: "DashboardModuleResultItem"; count: number } | null;
+  settings: {
+    __typename?: "DashboardPetitionsNumberModuleSettings";
+    filters: {
+      __typename?: "DashboardModulePetitionFilter";
+      fromTemplateId?: Array<string> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
+      status?: Array<PetitionStatus> | null;
+      approvals?: {
+        __typename?: "DashboardModulePetitionFilterApprovals";
+        operator: PetitionApprovalsFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+          value: string;
+          operator: PetitionApprovalsFilterOperator;
+        }>;
+      } | null;
+      sharedWith?: {
+        __typename?: "DashboardModulePetitionFilterSharedWith";
+        operator: FilterSharedWithLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterSharedWithFilters";
+          operator: FilterSharedWithOperator;
+          value: string;
+        }>;
+      } | null;
+      tags?: {
+        __typename?: "DashboardModulePetitionFilterTags";
+        operator: PetitionTagFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
+        }>;
+      } | null;
+    };
+  };
 };
 
 export type Home_DashboardModule_DashboardPetitionsPieChartModule_Fragment = {
@@ -45096,21 +45608,21 @@ export type Home_DashboardModule_DashboardPetitionsPieChartModule_Fragment = {
     __typename?: "DashboardPetitionsPieChartModuleSettings";
     graphicType: DashboardPieChartModuleSettingsType;
     items: Array<{
-      __typename?: "DashboardPetitionsPieChartModuleItems";
+      __typename?: "DashboardPetitionsPieChartModuleItem";
       color: string;
       label: string;
       filter: {
         __typename?: "DashboardModulePetitionFilter";
-        fromTemplateId?: Array<string> | null;
-        signature?: Array<PetitionSignatureStatusFilter> | null;
         status?: Array<PetitionStatus> | null;
-        approvals?: {
-          __typename?: "DashboardModulePetitionFilterApprovals";
-          operator: PetitionApprovalsFilterLogicalOperator;
+        signature?: Array<PetitionSignatureStatusFilter> | null;
+        fromTemplateId?: Array<string> | null;
+        tags?: {
+          __typename?: "DashboardModulePetitionFilterTags";
+          operator: PetitionTagFilterLogicalOperator;
           filters: Array<{
-            __typename?: "DashboardModulePetitionFilterApprovalsFilters";
-            value: string;
-            operator: PetitionApprovalsFilterOperator;
+            __typename?: "DashboardModulePetitionFilterTagsFilters";
+            value: Array<string>;
+            operator: PetitionTagFilterLineOperator;
           }>;
         } | null;
         sharedWith?: {
@@ -45122,13 +45634,13 @@ export type Home_DashboardModule_DashboardPetitionsPieChartModule_Fragment = {
             operator: FilterSharedWithOperator;
           }>;
         } | null;
-        tags?: {
-          __typename?: "DashboardModulePetitionFilterTags";
-          operator: PetitionTagFilterLogicalOperator;
+        approvals?: {
+          __typename?: "DashboardModulePetitionFilterApprovals";
+          operator: PetitionApprovalsFilterLogicalOperator;
           filters: Array<{
-            __typename?: "DashboardModulePetitionFilterTagsFilters";
-            value: Array<string>;
-            operator: PetitionTagFilterLineOperator;
+            __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+            value: string;
+            operator: PetitionApprovalsFilterOperator;
           }>;
         } | null;
       };
@@ -45156,16 +45668,16 @@ export type Home_DashboardModule_DashboardPetitionsRatioModule_Fragment = {
     graphicType: DashboardRatioModuleSettingsType;
     filters: Array<{
       __typename?: "DashboardModulePetitionFilter";
-      fromTemplateId?: Array<string> | null;
-      signature?: Array<PetitionSignatureStatusFilter> | null;
       status?: Array<PetitionStatus> | null;
-      approvals?: {
-        __typename?: "DashboardModulePetitionFilterApprovals";
-        operator: PetitionApprovalsFilterLogicalOperator;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
+      fromTemplateId?: Array<string> | null;
+      tags?: {
+        __typename?: "DashboardModulePetitionFilterTags";
+        operator: PetitionTagFilterLogicalOperator;
         filters: Array<{
-          __typename?: "DashboardModulePetitionFilterApprovalsFilters";
-          value: string;
-          operator: PetitionApprovalsFilterOperator;
+          __typename?: "DashboardModulePetitionFilterTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
         }>;
       } | null;
       sharedWith?: {
@@ -45177,13 +45689,13 @@ export type Home_DashboardModule_DashboardPetitionsRatioModule_Fragment = {
           operator: FilterSharedWithOperator;
         }>;
       } | null;
-      tags?: {
-        __typename?: "DashboardModulePetitionFilterTags";
-        operator: PetitionTagFilterLogicalOperator;
+      approvals?: {
+        __typename?: "DashboardModulePetitionFilterApprovals";
+        operator: PetitionApprovalsFilterLogicalOperator;
         filters: Array<{
-          __typename?: "DashboardModulePetitionFilterTagsFilters";
-          value: Array<string>;
-          operator: PetitionTagFilterLineOperator;
+          __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+          value: string;
+          operator: PetitionApprovalsFilterOperator;
         }>;
       } | null;
     }>;
@@ -45260,7 +45772,7 @@ export type Home_DashboardModule_DashboardProfilesPieChartModule_Fragment = {
     groupByProfileTypeFieldId?: string | null;
     aggregate?: ModuleResultAggregateType | null;
     items: Array<{
-      __typename?: "DashboardProfilesPieChartModuleItems";
+      __typename?: "DashboardProfilesPieChartModuleItem";
       color: string;
       label: string;
       filter: {
@@ -45338,6 +45850,7 @@ export type Home_DashboardModule_DashboardProfilesPieChartModule_Fragment = {
       aggr?: number | null;
       label?: any | null;
       color?: string | null;
+      value?: string | null;
     }>;
   } | null;
 };
@@ -45566,6 +46079,42 @@ export type Home_dashboardQuery = {
             __typename?: "DashboardModuleResultItem";
             count: number;
           } | null;
+          settings: {
+            __typename?: "DashboardPetitionsNumberModuleSettings";
+            filters: {
+              __typename?: "DashboardModulePetitionFilter";
+              fromTemplateId?: Array<string> | null;
+              signature?: Array<PetitionSignatureStatusFilter> | null;
+              status?: Array<PetitionStatus> | null;
+              approvals?: {
+                __typename?: "DashboardModulePetitionFilterApprovals";
+                operator: PetitionApprovalsFilterLogicalOperator;
+                filters: Array<{
+                  __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+                  value: string;
+                  operator: PetitionApprovalsFilterOperator;
+                }>;
+              } | null;
+              sharedWith?: {
+                __typename?: "DashboardModulePetitionFilterSharedWith";
+                operator: FilterSharedWithLogicalOperator;
+                filters: Array<{
+                  __typename?: "DashboardModulePetitionFilterSharedWithFilters";
+                  operator: FilterSharedWithOperator;
+                  value: string;
+                }>;
+              } | null;
+              tags?: {
+                __typename?: "DashboardModulePetitionFilterTags";
+                operator: PetitionTagFilterLogicalOperator;
+                filters: Array<{
+                  __typename?: "DashboardModulePetitionFilterTagsFilters";
+                  value: Array<string>;
+                  operator: PetitionTagFilterLineOperator;
+                }>;
+              } | null;
+            };
+          };
         }
       | {
           __typename?: "DashboardPetitionsPieChartModule";
@@ -45576,21 +46125,21 @@ export type Home_dashboardQuery = {
             __typename?: "DashboardPetitionsPieChartModuleSettings";
             graphicType: DashboardPieChartModuleSettingsType;
             items: Array<{
-              __typename?: "DashboardPetitionsPieChartModuleItems";
+              __typename?: "DashboardPetitionsPieChartModuleItem";
               color: string;
               label: string;
               filter: {
                 __typename?: "DashboardModulePetitionFilter";
-                fromTemplateId?: Array<string> | null;
-                signature?: Array<PetitionSignatureStatusFilter> | null;
                 status?: Array<PetitionStatus> | null;
-                approvals?: {
-                  __typename?: "DashboardModulePetitionFilterApprovals";
-                  operator: PetitionApprovalsFilterLogicalOperator;
+                signature?: Array<PetitionSignatureStatusFilter> | null;
+                fromTemplateId?: Array<string> | null;
+                tags?: {
+                  __typename?: "DashboardModulePetitionFilterTags";
+                  operator: PetitionTagFilterLogicalOperator;
                   filters: Array<{
-                    __typename?: "DashboardModulePetitionFilterApprovalsFilters";
-                    value: string;
-                    operator: PetitionApprovalsFilterOperator;
+                    __typename?: "DashboardModulePetitionFilterTagsFilters";
+                    value: Array<string>;
+                    operator: PetitionTagFilterLineOperator;
                   }>;
                 } | null;
                 sharedWith?: {
@@ -45602,13 +46151,13 @@ export type Home_dashboardQuery = {
                     operator: FilterSharedWithOperator;
                   }>;
                 } | null;
-                tags?: {
-                  __typename?: "DashboardModulePetitionFilterTags";
-                  operator: PetitionTagFilterLogicalOperator;
+                approvals?: {
+                  __typename?: "DashboardModulePetitionFilterApprovals";
+                  operator: PetitionApprovalsFilterLogicalOperator;
                   filters: Array<{
-                    __typename?: "DashboardModulePetitionFilterTagsFilters";
-                    value: Array<string>;
-                    operator: PetitionTagFilterLineOperator;
+                    __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+                    value: string;
+                    operator: PetitionApprovalsFilterOperator;
                   }>;
                 } | null;
               };
@@ -45635,16 +46184,16 @@ export type Home_dashboardQuery = {
             graphicType: DashboardRatioModuleSettingsType;
             filters: Array<{
               __typename?: "DashboardModulePetitionFilter";
-              fromTemplateId?: Array<string> | null;
-              signature?: Array<PetitionSignatureStatusFilter> | null;
               status?: Array<PetitionStatus> | null;
-              approvals?: {
-                __typename?: "DashboardModulePetitionFilterApprovals";
-                operator: PetitionApprovalsFilterLogicalOperator;
+              signature?: Array<PetitionSignatureStatusFilter> | null;
+              fromTemplateId?: Array<string> | null;
+              tags?: {
+                __typename?: "DashboardModulePetitionFilterTags";
+                operator: PetitionTagFilterLogicalOperator;
                 filters: Array<{
-                  __typename?: "DashboardModulePetitionFilterApprovalsFilters";
-                  value: string;
-                  operator: PetitionApprovalsFilterOperator;
+                  __typename?: "DashboardModulePetitionFilterTagsFilters";
+                  value: Array<string>;
+                  operator: PetitionTagFilterLineOperator;
                 }>;
               } | null;
               sharedWith?: {
@@ -45656,13 +46205,13 @@ export type Home_dashboardQuery = {
                   operator: FilterSharedWithOperator;
                 }>;
               } | null;
-              tags?: {
-                __typename?: "DashboardModulePetitionFilterTags";
-                operator: PetitionTagFilterLogicalOperator;
+              approvals?: {
+                __typename?: "DashboardModulePetitionFilterApprovals";
+                operator: PetitionApprovalsFilterLogicalOperator;
                 filters: Array<{
-                  __typename?: "DashboardModulePetitionFilterTagsFilters";
-                  value: Array<string>;
-                  operator: PetitionTagFilterLineOperator;
+                  __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+                  value: string;
+                  operator: PetitionApprovalsFilterOperator;
                 }>;
               } | null;
             }>;
@@ -45737,7 +46286,7 @@ export type Home_dashboardQuery = {
             groupByProfileTypeFieldId?: string | null;
             aggregate?: ModuleResultAggregateType | null;
             items: Array<{
-              __typename?: "DashboardProfilesPieChartModuleItems";
+              __typename?: "DashboardProfilesPieChartModuleItem";
               color: string;
               label: string;
               filter: {
@@ -45815,6 +46364,7 @@ export type Home_dashboardQuery = {
               aggr?: number | null;
               label?: any | null;
               color?: string | null;
+              value?: string | null;
             }>;
           } | null;
         }
@@ -74086,12 +74636,69 @@ export const DashboardPetitionsNumberModule_DashboardPetitionsNumberModuleFragme
     petitionsNumberResult: result {
       count
     }
+    settings {
+      filters {
+        approvals {
+          filters {
+            value
+            operator
+          }
+          operator
+        }
+        fromTemplateId
+        sharedWith {
+          filters {
+            operator
+            value
+          }
+          operator
+        }
+        signature
+        status
+        tags {
+          operator
+          filters {
+            value
+            operator
+          }
+        }
+      }
+    }
   }
   ${DashboardSimpleModuleCard_DashboardModuleFragmentDoc}
 ` as unknown as DocumentNode<
   DashboardPetitionsNumberModule_DashboardPetitionsNumberModuleFragment,
   unknown
 >;
+export const fullDashboardModuleProfileFilterFragmentDoc = gql`
+  fragment fullDashboardModuleProfileFilter on DashboardModuleProfileFilter {
+    status
+    values {
+      logicalOperator
+      operator
+      profileTypeFieldId
+      value
+      conditions {
+        logicalOperator
+        operator
+        profileTypeFieldId
+        value
+        conditions {
+          logicalOperator
+          operator
+          profileTypeFieldId
+          value
+          conditions {
+            logicalOperator
+            operator
+            profileTypeFieldId
+            value
+          }
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<fullDashboardModuleProfileFilterFragment, unknown>;
 export const DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragmentDoc = gql`
   fragment DashboardProfilesNumberModule_DashboardProfilesNumberModule on DashboardProfilesNumberModule {
     ...DashboardSimpleModuleCard_DashboardModule
@@ -74101,9 +74708,14 @@ export const DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragment
     }
     profilesNumberSettings: settings {
       type
+      profileTypeId
+      filters {
+        ...fullDashboardModuleProfileFilter
+      }
     }
   }
   ${DashboardSimpleModuleCard_DashboardModuleFragmentDoc}
+  ${fullDashboardModuleProfileFilterFragmentDoc}
 ` as unknown as DocumentNode<
   DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragment,
   unknown
@@ -74119,6 +74731,32 @@ export const DashboardPetitionsRatioModule_DashboardPetitionsRatioModuleFragment
     }
     petitionsRatioSettings: settings {
       graphicType
+      filters {
+        approvals {
+          filters {
+            operator
+            value
+          }
+          operator
+        }
+        fromTemplateId
+        sharedWith {
+          filters {
+            operator
+            value
+          }
+          operator
+        }
+        signature
+        status
+        tags {
+          operator
+          filters {
+            value
+            operator
+          }
+        }
+      }
     }
   }
   ${DashboardSimpleModuleCard_DashboardModuleFragmentDoc}
@@ -74139,9 +74777,14 @@ export const DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragmentDo
     profilesRatioSettings: settings {
       graphicType
       type
+      profileTypeId
+      filters {
+        ...fullDashboardModuleProfileFilter
+      }
     }
   }
   ${DashboardSimpleModuleCard_DashboardModuleFragmentDoc}
+  ${fullDashboardModuleProfileFilterFragmentDoc}
 ` as unknown as DocumentNode<
   DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragment,
   unknown
@@ -74161,6 +74804,34 @@ export const DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFr
     }
     petitionsPieChartSettings: settings {
       graphicType
+      items {
+        filter {
+          tags {
+            operator
+            filters {
+              value
+              operator
+            }
+          }
+          status
+          signature
+          sharedWith {
+            operator
+            filters {
+              value
+              operator
+            }
+          }
+          fromTemplateId
+          approvals {
+            operator
+            filters {
+              value
+              operator
+            }
+          }
+        }
+      }
     }
   }
 ` as unknown as DocumentNode<
@@ -74178,14 +74849,27 @@ export const DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFrag
         aggr
         label
         color
+        value
       }
       isIncongruent
     }
     profilesPieChartSettings: settings {
       graphicType
       type
+      profileTypeId
+      profileTypeFieldId
+      items {
+        filter {
+          ...fullDashboardModuleProfileFilter
+        }
+      }
+      groupByProfileTypeFieldId
+      groupByFilter {
+        ...fullDashboardModuleProfileFilter
+      }
     }
   }
+  ${fullDashboardModuleProfileFilterFragmentDoc}
 ` as unknown as DocumentNode<
   DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragment,
   unknown
@@ -74242,35 +74926,6 @@ export const DashboardModule_DashboardModuleFragmentDoc = gql`
   ${DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragmentDoc}
   ${DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragmentDoc}
 ` as unknown as DocumentNode<DashboardModule_DashboardModuleFragment, unknown>;
-export const DashboardModuleDrawer_DashboardModuleProfileFieldValuesFilterFragmentDoc = gql`
-  fragment DashboardModuleDrawer_DashboardModuleProfileFieldValuesFilter on DashboardModuleProfileFieldValuesFilter {
-    logicalOperator
-    operator
-    profileTypeFieldId
-    value
-  }
-` as unknown as DocumentNode<
-  DashboardModuleDrawer_DashboardModuleProfileFieldValuesFilterFragment,
-  unknown
->;
-export const DashboardModuleDrawer_DashboardModuleProfileFilterFragmentDoc = gql`
-  fragment DashboardModuleDrawer_DashboardModuleProfileFilter on DashboardModuleProfileFilter {
-    status
-    values {
-      ...DashboardModuleDrawer_DashboardModuleProfileFieldValuesFilter
-      conditions {
-        ...DashboardModuleDrawer_DashboardModuleProfileFieldValuesFilter
-        conditions {
-          ...DashboardModuleDrawer_DashboardModuleProfileFieldValuesFilter
-          conditions {
-            ...DashboardModuleDrawer_DashboardModuleProfileFieldValuesFilter
-          }
-        }
-      }
-    }
-  }
-  ${DashboardModuleDrawer_DashboardModuleProfileFieldValuesFilterFragmentDoc}
-` as unknown as DocumentNode<DashboardModuleDrawer_DashboardModuleProfileFilterFragment, unknown>;
 export const DashboardModuleDrawer_DashboardModulePetitionFilterFragmentDoc = gql`
   fragment DashboardModuleDrawer_DashboardModulePetitionFilter on DashboardModulePetitionFilter {
     approvals {
@@ -74311,7 +74966,7 @@ export const DashboardModuleDrawer_DashboardModuleFragmentDoc = gql`
         profileTypeFieldId
         aggregate
         filters {
-          ...DashboardModuleDrawer_DashboardModuleProfileFilter
+          ...fullDashboardModuleProfileFilter
         }
       }
     }
@@ -74331,7 +74986,7 @@ export const DashboardModuleDrawer_DashboardModuleFragmentDoc = gql`
         profileTypeFieldId
         aggregate
         filters {
-          ...DashboardModuleDrawer_DashboardModuleProfileFilter
+          ...fullDashboardModuleProfileFilter
         }
       }
     }
@@ -74357,13 +75012,13 @@ export const DashboardModuleDrawer_DashboardModuleFragmentDoc = gql`
         aggregate
         items {
           filter {
-            ...DashboardModuleDrawer_DashboardModuleProfileFilter
+            ...fullDashboardModuleProfileFilter
           }
           color
           label
         }
         groupByFilter {
-          ...DashboardModuleDrawer_DashboardModuleProfileFilter
+          ...fullDashboardModuleProfileFilter
         }
       }
     }
@@ -74383,7 +75038,7 @@ export const DashboardModuleDrawer_DashboardModuleFragmentDoc = gql`
       }
     }
   }
-  ${DashboardModuleDrawer_DashboardModuleProfileFilterFragmentDoc}
+  ${fullDashboardModuleProfileFilterFragmentDoc}
   ${DashboardModuleDrawer_DashboardModulePetitionFilterFragmentDoc}
 ` as unknown as DocumentNode<DashboardModuleDrawer_DashboardModuleFragment, unknown>;
 export const Home_DashboardModuleFragmentDoc = gql`

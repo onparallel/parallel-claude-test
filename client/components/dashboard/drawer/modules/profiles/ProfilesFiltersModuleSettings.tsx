@@ -9,10 +9,10 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { ProfilesFiltersModuleSettings_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useLogicalOperators } from "@parallel/utils/useLogicalOperators";
-import { useProfileStatusLabels } from "@parallel/utils/useProfileStatusLabels";
+import { useProfileStatusOptions } from "@parallel/utils/useProfileStatusOptions";
 import { ProfileValueFilterLine } from "@parallel/utils/useProfileTableColumns";
 import { format, startOfMonth } from "date-fns";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -87,13 +87,7 @@ function ProfileStatusFilter({
   isDisabled?: boolean;
 }) {
   const intl = useIntl();
-  const profileStatuses = useProfileStatusLabels();
-  const profileStatusesOptions = useMemo(() => {
-    return Object.entries(profileStatuses).map(([value, text]) => ({
-      value: value,
-      label: text,
-    }));
-  }, [profileStatuses]);
+  const profileStatusesOptions = useProfileStatusOptions();
 
   const handleChange = useCallback(
     (newValue: string[]) => {

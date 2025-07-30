@@ -1,5 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import {
+  AlertDescription,
+  AlertIcon,
   Box,
   Button,
   Center,
@@ -24,9 +26,9 @@ import {
   PaperPlaneIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
+import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
-import { SearchInOptions } from "@parallel/components/common/SearchAllOrCurrentFolder";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -43,22 +45,17 @@ import { useMoveToFolderDialog } from "@parallel/components/petition-common/dial
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { useRenameDialog } from "@parallel/components/petition-common/dialogs/RenameDialog";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
-import { approvalsQueryItem } from "@parallel/components/petition-list/filters/PetitionListApprovalsFilter";
-import { sharedWithQueryItem } from "@parallel/components/petition-list/filters/PetitionListSharedWithFilter";
-import { tagFilterQueryItem } from "@parallel/components/petition-list/filters/PetitionListTagFilter";
 import { useNewTemplateDialog } from "@parallel/components/petition-new/dialogs/NewTemplateDialog";
 import {
   PetitionBaseType,
   PetitionPermissionType,
-  PetitionSignatureStatusFilter,
-  PetitionStatus,
-  PetitionTagFilter,
   Petitions_PetitionBaseOrFolderFragment,
   Petitions_movePetitionsDocument,
   Petitions_petitionsDocument,
   Petitions_renameFolderDocument,
   Petitions_userDocument,
 } from "@parallel/graphql/__types";
+import { removeTypenames } from "@parallel/utils/apollo/removeTypenames";
 import { isTypename } from "@parallel/utils/apollo/typename";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
@@ -70,69 +67,23 @@ import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import {
-  QueryItem,
-  QueryStateFrom,
-  buildStateUrl,
-  integer,
-  parseQuery,
-  sorting,
-  string,
-  useQueryState,
-  values,
-} from "@parallel/utils/queryState";
+  buildPetitionsQueryStateUrl,
+  parsePetitionsQuery,
+  usePetitionsQueryState,
+} from "@parallel/utils/petitionsQueryState";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import {
   DEFAULT_PETITION_COLUMN_SELECTION,
-  PETITIONS_COLUMNS,
-  PetitionsTableColumn,
   getPetitionsTableIncludes,
   getTemplatesTableIncludes,
   usePetitionsTableColumns,
 } from "@parallel/utils/usePetitionsTableColumns";
 import { useSelection } from "@parallel/utils/useSelectionState";
+import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import { MouseEvent, ReactNode, useCallback, useMemo } from "react";
+import { MouseEvent, ReactNode, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { firstBy, isNonNullish, isNullish, map, omit, pick, pipe } from "remeda";
-
-const SORTING = [
-  "name",
-  "createdAt",
-  "sentAt",
-  "lastActivityAt",
-  "lastRecipientActivityAt",
-] as const;
-
-const QUERY_STATE = {
-  view: string(),
-  path: string()
-    .withValidation((value) => typeof value === "string" && /^\/([^\/]+\/)*$/.test(value))
-    .orDefault("/"),
-  page: integer({ min: 1 }).orDefault(1),
-  items: values([10, 25, 50]).orDefault(10),
-  status: values<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED", "CLOSED"]).list(),
-  type: values<PetitionBaseType>(["PETITION", "TEMPLATE"]).orDefault("PETITION"),
-  search: string(),
-  searchIn: values<SearchInOptions>(["EVERYWHERE", "CURRENT_FOLDER"]).orDefault("EVERYWHERE"),
-  sort: sorting(SORTING),
-  sharedWith: sharedWithQueryItem(),
-  approvals: approvalsQueryItem(),
-  tagsFilters: tagFilterQueryItem(),
-  fromTemplateId: string().list(),
-  signature: values<PetitionSignatureStatusFilter>([
-    "NO_SIGNATURE",
-    "NOT_STARTED",
-    "PENDING_START",
-    "PROCESSING",
-    "COMPLETED",
-    "CANCELLED",
-  ]).list(),
-  columns: values(
-    PETITIONS_COLUMNS.filter((c) => !c.isFixed).map((c) => c.key as PetitionsTableColumn),
-  ).list({ allowEmpty: true }),
-};
-
-export type PetitionsQueryState = QueryStateFrom<typeof QUERY_STATE>;
 
 function rowKeyProp(row: Petitions_PetitionBaseOrFolderFragment) {
   return row.__typename === "PetitionFolder" ? row.folderId : (row as any).id;
@@ -141,11 +92,19 @@ function rowKeyProp(row: Petitions_PetitionBaseOrFolderFragment) {
 function Petitions() {
   const intl = useIntl();
 
-  const [state, setQueryState] = useQueryState(QUERY_STATE);
-  const stateRef = useUpdatingRef(state);
+  const [queryState, setQueryState] = usePetitionsQueryState();
+  const [fromDashboardModule, setFromDashboardModule] = useState<string | null>(null);
+  useTempQueryParam("fromDashboardModule", (value) => {
+    if (value) {
+      setFromDashboardModule(value);
+    }
+  });
+
+  const stateRef = useUpdatingRef(queryState);
+
   const sort =
-    state.sort ??
-    (state.type === "PETITION"
+    queryState.sort ??
+    (queryState.type === "PETITION"
       ? ({ field: "sentAt", direction: "DESC" } as const)
       : ({ field: "createdAt", direction: "DESC" } as const));
   const { data: queryObject } = useAssertQuery(Petitions_userDocument);
@@ -155,28 +114,28 @@ function Petitions() {
     ? DEFAULT_PETITION_COLUMN_SELECTION
     : DEFAULT_PETITION_COLUMN_SELECTION.filter((c) => c !== "approvals");
   const currentColumns = me.hasPetitionApprovalFlow
-    ? state.columns
-    : state.columns?.filter((c) => c !== "approvals");
+    ? queryState.columns
+    : queryState.columns?.filter((c) => c !== "approvals");
 
   const { data, loading, refetch } = useQueryOrPreviousData(
     Petitions_petitionsDocument,
     {
       variables: {
-        offset: state.items * (state.page - 1),
-        limit: state.items,
-        search: state.search,
+        offset: queryState.items * (queryState.page - 1),
+        limit: queryState.items,
+        search: queryState.search,
         filters: {
-          path: state.search && state.searchIn === "EVERYWHERE" ? null : state.path,
-          status: state.status,
-          signature: state.signature,
-          type: state.type,
-          tags: state.tagsFilters,
-          sharedWith: state.sharedWith,
-          fromTemplateId: state.fromTemplateId,
-          approvals: state.approvals,
+          path: queryState.search && queryState.searchIn === "EVERYWHERE" ? null : queryState.path,
+          status: queryState.status,
+          signature: queryState.signature,
+          type: queryState.type,
+          tags: queryState.tagsFilters,
+          sharedWith: queryState.sharedWith,
+          fromTemplateId: queryState.fromTemplateId,
+          approvals: queryState.approvals,
         },
         sortBy: [`${sort.field}_${sort.direction}`],
-        ...(state.type === "PETITION"
+        ...(queryState.type === "PETITION"
           ? getPetitionsTableIncludes(currentColumns ?? fallbackColumns)
           : getTemplatesTableIncludes()),
       },
@@ -195,6 +154,10 @@ function Petitions() {
     petitions?.items,
     rowKeyProp,
   );
+
+  const handleFilterChange = useCallback((key: string, value: any) => {
+    setQueryState((current) => ({ ...current, [key]: value, page: 1 }));
+  }, []);
 
   function handleTypeChange(type: PetitionBaseType) {
     if (type === "PETITION") {
@@ -217,18 +180,18 @@ function Petitions() {
   const navigate = useHandleNavigation();
   const handleCreateNewParallelOrTemplate = async () => {
     try {
-      if (state.type === "PETITION") {
+      if (queryState.type === "PETITION") {
         navigate(`/app/petitions/new`);
       } else {
         const templateId = await showNewTemplateDialog();
         if (!templateId) {
-          const id = await createPetition({ type: "TEMPLATE", path: state.path });
+          const id = await createPetition({ type: "TEMPLATE", path: queryState.path });
           goToPetition(id, "compose", { query: { new: "" } });
         } else {
           const petitionIds = await clonePetitions({
             petitionIds: [templateId],
             keepTitle: true,
-            path: state.path,
+            path: queryState.path,
           });
           goToPetition(petitionIds[0], "compose", { query: { new: "" } });
         }
@@ -241,15 +204,15 @@ function Petitions() {
   const handleCreateFolder = async () => {
     try {
       const data = await showCreateFolderDialog({
-        isTemplate: state.type === "TEMPLATE",
-        currentPath: state.path,
+        isTemplate: queryState.type === "TEMPLATE",
+        currentPath: queryState.path,
       });
       await movePetitions({
         variables: {
           ids: data.petitions.map((p) => p.id),
-          source: state.path,
-          destination: `${state.path}${data.name}/`,
-          type: state.type,
+          source: queryState.path,
+          destination: `${queryState.path}${data.name}/`,
+          type: queryState.type,
         },
       });
       await refetch();
@@ -315,7 +278,7 @@ function Petitions() {
         folderIds: selectedRowsRef.current
           .filter(isTypename("PetitionFolder"))
           .map((p) => p.folderId),
-        type: state.type,
+        type: queryState.type,
         currentPath: stateRef.current.path,
       });
     } catch {}
@@ -414,19 +377,19 @@ function Petitions() {
     } catch {}
   }, []);
 
-  const columns = usePetitionsTableColumns(state.type);
+  const columns = usePetitionsTableColumns(queryState.type);
 
-  const selection = state.type === "PETITION" ? (currentColumns ?? fallbackColumns) : [];
+  const selection = queryState.type === "PETITION" ? (currentColumns ?? fallbackColumns) : [];
 
   const filteredColumns = useMemo(() => {
-    if (state.type === "TEMPLATE") {
+    if (queryState.type === "TEMPLATE") {
       return columns;
     } else {
       return ["name", ...selection]
         .map((key) => columns.find((c) => c.key === key))
         .filter(isNonNullish);
     }
-  }, [selection.join(","), state.type]);
+  }, [selection.join(","), queryState.type]);
 
   const context = useMemo(() => ({ user: me! }), [me]);
 
@@ -452,7 +415,7 @@ function Petitions() {
     userCanChangePath,
     userCanCreateTemplate: userCanCreateTemplate && !selectedPetitionIsAnonymized,
     userCanCreatePetition,
-    type: state.type,
+    type: queryState.type,
     selectedCount: selectedRows.length,
     hasSelectedFolders: selectedRows.some((c) => c.__typename === "PetitionFolder"),
     minimumPermission,
@@ -468,7 +431,7 @@ function Petitions() {
   return (
     <AppLayout
       title={
-        state.type === "PETITION"
+        queryState.type === "PETITION"
           ? intl.formatMessage({
               id: "generic.root-petitions",
               defaultMessage: "Parallels",
@@ -496,7 +459,7 @@ function Petitions() {
                 leftIcon={<PaperPlaneIcon boxSize={6} />}
                 rightIcon={<ChevronDownIcon boxSize={5} />}
               >
-                {state.type === "PETITION"
+                {queryState.type === "PETITION"
                   ? intl.formatMessage({
                       id: "generic.parallel-type-plural",
                       defaultMessage: "Parallels",
@@ -508,7 +471,7 @@ function Petitions() {
               </MenuButton>
               <Portal>
                 <MenuList minWidth="154px">
-                  <MenuOptionGroup value={state.type}>
+                  <MenuOptionGroup value={queryState.type}>
                     <MenuItemOption
                       value="PETITION"
                       onClick={() => handleTypeChange("PETITION")}
@@ -546,15 +509,15 @@ function Petitions() {
               </Button>
             </RestrictedFeaturePopover>
             <RestrictedFeaturePopover
-              isRestricted={!userCanCreateTemplate && state.type === "TEMPLATE"}
+              isRestricted={!userCanCreateTemplate && queryState.type === "TEMPLATE"}
             >
               <Button
                 display={{ base: "none", md: "block" }}
                 colorScheme="primary"
                 onClick={handleCreateNewParallelOrTemplate}
-                isDisabled={!userCanCreateTemplate && state.type === "TEMPLATE"}
+                isDisabled={!userCanCreateTemplate && queryState.type === "TEMPLATE"}
               >
-                {state.type === "PETITION" ? (
+                {queryState.type === "PETITION" ? (
                   <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
                 ) : (
                   <FormattedMessage id="generic.create-template" defaultMessage="Create template" />
@@ -582,9 +545,9 @@ function Petitions() {
                   </MenuItem>
                   <MenuItem
                     onClick={handleCreateNewParallelOrTemplate}
-                    isDisabled={!userCanCreateTemplate && state.type === "TEMPLATE"}
+                    isDisabled={!userCanCreateTemplate && queryState.type === "TEMPLATE"}
                   >
-                    {state.type === "PETITION" ? (
+                    {queryState.type === "PETITION" ? (
                       <FormattedMessage id="generic.new-petition" defaultMessage="New parallel" />
                     ) : (
                       <FormattedMessage
@@ -598,6 +561,18 @@ function Petitions() {
             </Menu>
           </Flex>
         </Flex>
+        {isNonNullish(fromDashboardModule) && (
+          <CloseableAlert status="info" variant="subtle" borderRadius="md" padding={4}>
+            <AlertIcon />
+            <AlertDescription flex={1}>
+              <FormattedMessage
+                id="page.petitions.from-dashboard-description"
+                defaultMessage="You are viewing a filter from the dashboard module: {module}. Results may differ due to the parallels not being shared with you."
+                values={{ module: <b>{fromDashboardModule}</b> }}
+              />
+            </AlertDescription>
+          </CloseableAlert>
+        )}
         <Flex direction="column" flex={1} minHeight={0} paddingBottom={16}>
           <TablePage
             flex="0 1 auto"
@@ -609,11 +584,11 @@ function Petitions() {
             isHighlightable
             loading={loading}
             onRowClick={handleRowClick}
-            page={state.page}
-            pageSize={state.items}
+            page={queryState.page}
+            pageSize={queryState.items}
             totalCount={petitions?.totalCount}
             sort={sort}
-            filter={pick(state, [
+            filter={pick(queryState, [
               "sharedWith",
               "status",
               "tagsFilters",
@@ -621,9 +596,7 @@ function Petitions() {
               "fromTemplateId",
               "approvals",
             ])}
-            onFilterChange={(key, value) => {
-              setQueryState((current) => ({ ...current, [key]: value, page: 1 }));
-            }}
+            onFilterChange={handleFilterChange}
             onSelectionChange={onChangeSelectedIds}
             onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
             onPageSizeChange={(items) =>
@@ -633,23 +606,16 @@ function Petitions() {
             actions={actions}
             header={
               <>
-                {state.type === "PETITION" ? (
-                  <PetitionViewTabs
-                    state={state}
-                    onStateChange={setQueryState}
-                    views={me.petitionListViews}
-                  />
+                {queryState.type === "PETITION" ? (
+                  <PetitionViewTabs views={me.petitionListViews} />
                 ) : null}
                 <PetitionListHeader
-                  shape={QUERY_STATE}
-                  state={state}
                   columns={
                     me.hasPetitionApprovalFlow
                       ? columns
                       : columns.filter((c) => c.key !== "approvals")
                   }
                   selection={selection}
-                  onStateChange={setQueryState}
                   onReload={() => refetch()}
                   views={me.petitionListViews}
                 />
@@ -657,12 +623,12 @@ function Petitions() {
             }
             body={
               data?.petitions.totalCount === 0 && !loading ? (
-                state.search ||
-                state.sharedWith ||
-                state.tagsFilters ||
-                state.status ||
-                state.signature ||
-                state.approvals ? (
+                queryState.search ||
+                queryState.sharedWith ||
+                queryState.tagsFilters ||
+                queryState.status ||
+                queryState.signature ||
+                queryState.approvals ? (
                   <Center flex="1" minHeight="200px">
                     <Text color="gray.400" fontSize="lg">
                       <FormattedMessage
@@ -671,16 +637,16 @@ function Petitions() {
                       />
                     </Text>
                   </Center>
-                ) : state.path !== "/" ? (
+                ) : queryState.path !== "/" ? (
                   <EmptyFolderIllustration
                     flex="1"
                     minHeight="200px"
-                    isTemplate={state.type === "TEMPLATE"}
+                    isTemplate={queryState.type === "TEMPLATE"}
                   />
                 ) : (
                   <Center flex="1" minHeight="200px">
                     <Text fontSize="lg">
-                      {state.type === "TEMPLATE" ? (
+                      {queryState.type === "TEMPLATE" ? (
                         <FormattedMessage
                           id="page.petitions.no-templates"
                           defaultMessage="You have no templates yet. Start by creating one now!"
@@ -935,96 +901,39 @@ function usePetitionListActions({
   ];
 }
 
-Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDataContext) => {
-  const state = parseQuery(query, QUERY_STATE);
+Petitions.getInitialProps = async ({ fetchQuery, query }: WithApolloDataContext) => {
+  const state = parsePetitionsQuery(query);
   const { data } = await fetchQuery(Petitions_userDocument);
   const views = data.me.petitionListViews;
 
   if (state.type === "PETITION") {
-    let tags: PetitionTagFilter | undefined = undefined;
-    if (isNonNullish(query.tags)) {
-      const tagsState = parseQuery(query, {
-        tags: new QueryItem<string[] | null>((value) =>
-          typeof value === "string" ? (value === "NO_TAGS" ? [] : value.split(",")) : null,
-        ),
-      });
-      if (Array.isArray(tagsState.tags)) {
-        tags = (
-          tagsState.tags.length === 0
-            ? {
-                filters: [
-                  {
-                    value: [],
-                    operator: "IS_EMPTY",
-                  },
-                ],
-                operator: "AND",
-              }
-            : {
-                filters: [
-                  {
-                    value: tagsState.tags,
-                    operator: "CONTAINS",
-                  },
-                ],
-                operator: "AND",
-              }
-        ) as PetitionTagFilter;
-      }
-    }
-
-    const tagsFiltersOrNothing = tags ? { tagsFilters: tags } : {};
-
-    if (isNullish(state.view)) {
-      const defaultView = views.find((v) => v.isDefault);
-      if (isNonNullish(defaultView)) {
-        throw new RedirectError(
-          buildStateUrl(
-            QUERY_STATE,
-            {
-              view: defaultView.type === "ALL" ? "ALL" : defaultView.id,
-              ...omit(defaultView.data, ["__typename"]),
-              ...tagsFiltersOrNothing,
-            },
-            pathname,
-            omit(query, ["tags"]),
-          ),
-        );
-      } else {
-        const allView = views.find((v) => v.type === "ALL");
-        throw new RedirectError(
-          buildStateUrl(
-            QUERY_STATE,
-            {
-              view: "ALL",
-              ...(allView ? omit(allView.data, ["__typename"]) : {}),
-              ...tagsFiltersOrNothing,
-            },
-            pathname,
-            omit(query, ["tags"]),
-          ),
-        );
-      }
-    } else if (state.view !== "ALL") {
-      const view = views.find((v) => v.id === state.view);
-      if (isNullish(view)) {
-        throw new RedirectError(
-          buildStateUrl(
-            QUERY_STATE,
-            { ...state, view: "ALL", ...tagsFiltersOrNothing },
-            pathname,
-            omit(query, ["tags"]),
-          ),
-        );
-      }
-    }
-    if (tags) {
+    if (
+      isNullish(state.view) ||
+      (state.view !== "ALL" && !views.some((v) => v.id === state.view))
+    ) {
+      const allView = views.find((v) => v.type === "ALL")!;
+      const view =
+        (isNullish(state.view)
+          ? views.find((v) => v.isDefault)
+          : views.find((v) => v.id === state.view)) ?? allView;
       throw new RedirectError(
-        buildStateUrl(
-          QUERY_STATE,
-          { ...state, tagsFilters: tags },
-          pathname,
-          omit(query, ["tags"]),
+        buildPetitionsQueryStateUrl(
+          {
+            type: state.type,
+            view: view.type === "ALL" ? "ALL" : view.id,
+            search: state.search ?? view.data.search,
+            searchIn: state.searchIn ?? view.data.searchIn,
+            sort: state.sort ?? removeTypenames(view.data.sort) ?? undefined,
+            path: state.path ?? view.data.path,
+            status: state.status ?? view.data.status ?? undefined,
+            sharedWith: state.sharedWith ?? removeTypenames(view.data.sharedWith) ?? undefined,
+            approvals: state.approvals ?? removeTypenames(view.data.approvals) ?? undefined,
+            tagsFilters: state.tagsFilters ?? removeTypenames(view.data.tagsFilters) ?? undefined,
+            fromTemplateId: state.fromTemplateId ?? view.data.fromTemplateId ?? undefined,
+            signature: state.signature ?? view.data.signature ?? undefined,
+            columns: state.columns ?? view.data.columns ?? undefined,
+          },
+          query,
         ),
       );
     }

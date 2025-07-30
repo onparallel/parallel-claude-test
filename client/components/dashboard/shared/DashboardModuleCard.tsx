@@ -8,7 +8,6 @@ import { Card, CardProps } from "@parallel/components/common/Card";
 import { ConfimationPopover } from "@parallel/components/common/ConfirmationPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { OverflownText } from "@parallel/components/common/OverflownText";
-import { Spacer } from "@parallel/components/common/Spacer";
 import { DashboardModuleCard_DashboardModuleFragment } from "@parallel/graphql/__types";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -21,6 +20,7 @@ export interface DashboardModuleCardProps extends CardProps {
   onEdit: () => void;
   onDelete: () => void;
   headerAddon?: ReactNode;
+  linkToResults?: ReactNode;
   children: ReactNode;
   attributes?: DraggableAttributes;
   listeners?: SyntheticListenerMap;
@@ -32,6 +32,7 @@ export const DashboardModuleCard = Object.assign(
       module,
       children,
       headerAddon,
+      linkToResults,
       isEditing,
       onEdit,
       onDelete,
@@ -97,8 +98,12 @@ export const DashboardModuleCard = Object.assign(
             <DragHandleIcon role="presentation" transform="rotate(90deg)" />
           </Box>
         )}
-        <HStack as="header" marginBottom={1} fontSize="lg" minHeight={"32px"}>
-          <OverflownText textStyle={isNullish(module.title) ? "hint" : undefined} fontWeight="bold">
+        <HStack as="header" marginBottom={1} fontSize="lg" minHeight={"32px"} spacing={1}>
+          <OverflownText
+            flex={1}
+            textStyle={isNullish(module.title) ? "hint" : undefined}
+            fontWeight="bold"
+          >
             {isNonNullish(module.title)
               ? module.title
               : intl.formatMessage({
@@ -106,10 +111,8 @@ export const DashboardModuleCard = Object.assign(
                   defaultMessage: "Untitled module",
                 })}
           </OverflownText>
-          {headerAddon}
           {isEditing ? (
             <>
-              <Spacer />
               <HStack spacing={1} alignSelf="flex-end">
                 <IconButtonWithTooltip
                   size="sm"
@@ -148,7 +151,9 @@ export const DashboardModuleCard = Object.assign(
                 </ConfimationPopover>
               </HStack>
             </>
-          ) : null}
+          ) : (
+            <>{headerAddon}</>
+          )}
         </HStack>
         <Flex
           flexDirection="column"

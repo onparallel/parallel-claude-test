@@ -1,11 +1,10 @@
 import type { TableSorting, TableSortingDirection } from "@parallel/components/common/Table";
-import type Router from "next/router";
 import { NextRouter, useRouter } from "next/router";
 import { ParsedUrlQuery } from "querystring";
 import { MouseEvent, useCallback, useMemo } from "react";
 import { isDeepEqual, isNonNullish, pick } from "remeda";
 import { fromBase64, toBase64 } from "./base64";
-import { useHandleNavigation } from "./navigation";
+import { NavigationOptions, useHandleNavigation } from "./navigation";
 import { pathParams, resolveUrl } from "./next";
 import { useUpdatingRef } from "./useUpdatingRef";
 
@@ -116,14 +115,14 @@ export function date() {
   );
 }
 
-export function values<T extends string | number>(values: readonly T[]): QueryItem<T | null> {
+export function values<const T extends string | number>(values: readonly T[]): QueryItem<T | null> {
   return new QueryItem<any>((value) => {
     // eslint-disable-next-line eqeqeq
     return values.find((v) => v == (value as string)) ?? null;
   });
 }
 
-export function sorting<T extends string>(fields: readonly T[]) {
+export function sorting<const T extends string>(fields: readonly T[]) {
   return new QueryItem<TableSorting<T> | null>(
     (value) => {
       if (value) {
@@ -175,7 +174,7 @@ export interface ParseQueryOptions {
 }
 
 export function parseQuery<T extends {}>(
-  query: (typeof Router)["query"],
+  query: ParsedUrlQuery,
   shape: QueryStateOf<T>,
   { prefix }: ParseQueryOptions = {},
 ): T {
@@ -186,9 +185,7 @@ export function parseQuery<T extends {}>(
   ) as any;
 }
 
-export interface QueryStateOptions {
-  prefix?: string;
-}
+export interface QueryStateOptions extends ParseQueryOptions {}
 
 export type QueryStateOf<T extends {}> = { [P in keyof T]: QueryItem<T[P]> };
 export type QueryStateFrom<T extends Record<string, QueryItem<any>>> =
@@ -304,4 +301,61 @@ export function useQueryStateSlice<T extends {}, const K extends keyof T>(
       [setState],
     ),
   ];
+}
+
+export function buildUseQueryState<T extends {}>(
+  shape: QueryStateOf<T>,
+  options: QueryStateOptions = {},
+) {
+  return function () {
+    return useQueryState(shape, options);
+  };
+}
+
+export function buildUseQueryStateSlice<T extends {}>(
+  shape: QueryStateOf<T>,
+  options: QueryStateOptions = {},
+) {
+  return function <const K extends keyof T>(slice: K) {
+    return useQueryStateSlice(...useQueryState(shape, options), slice);
+  };
+}
+
+export function buildParseQuery<T extends {}>(
+  shape: QueryStateOf<T>,
+  { prefix }: ParseQueryOptions = {},
+) {
+  return function (query: ParsedUrlQuery) {
+    return parseQuery(query, shape, { prefix });
+  };
+}
+
+export function buildBuildStateUrl<T extends {}>(
+  pathname: string,
+  shape: QueryStateOf<T>,
+  options: QueryStateOptions = {},
+) {
+  return function (state: Partial<T>, query: ParsedUrlQuery = {}) {
+    return buildStateUrl(shape, state, pathname, query, options);
+  };
+}
+
+export function buildUseGoTo<T extends {}>(
+  pathname: string,
+  shape: QueryStateOf<T>,
+  options: QueryStateOptions = {},
+) {
+  const buildStateUrl = buildBuildStateUrl(pathname, shape, options);
+  return function () {
+    const navigate = useHandleNavigation();
+    return useCallback(
+      (
+        state: Partial<T>,
+        query = {},
+        event?: MouseEvent | globalThis.MouseEvent,
+        options: NavigationOptions = {},
+      ) => navigate(buildStateUrl(state, query), event, options),
+      [],
+    );
+  };
 }

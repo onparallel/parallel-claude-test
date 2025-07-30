@@ -187,10 +187,7 @@ const ProfileFieldValue = chakraForwardRef<"p" | "span" | "div", ProfileProperty
     if (isNullish(value)) {
       return (
         <Box ref={ref} as="span" textStyle="hint" {...props}>
-          <FormattedMessage
-            id="component.profile-property-content.no-value"
-            defaultMessage="No value"
-          />
+          <FormattedMessage id="generic.profile-property-no-value" defaultMessage="No value" />
         </Box>
       );
     } else {

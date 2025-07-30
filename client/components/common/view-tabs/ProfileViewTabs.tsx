@@ -10,8 +10,8 @@ import {
   ProfileViewTabs_reorderProfileListViewsDocument,
   ProfileViewTabs_updateProfileListViewDocument,
 } from "@parallel/graphql/__types";
-import { ProfilesQueryState } from "@parallel/pages/app/profiles";
-import { SetQueryState } from "@parallel/utils/queryState";
+import { useProfilesQueryState } from "@parallel/utils/profilesQueryState";
+import { unMaybeArray } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useIntl } from "react-intl";
 import { isNonNullish, omit } from "remeda";
@@ -19,35 +19,33 @@ import { assert } from "ts-essentials";
 import { ViewTabs } from "./ViewTabs";
 
 interface ProfileViewTabsProps {
-  state: ProfilesQueryState;
-  onStateChange: SetQueryState<Partial<ProfilesQueryState>>;
   views: ProfileViewTabs_ProfileListViewFragment[];
-  profileTypeId: string;
 }
 
 export const ProfileViewTabs = Object.assign(
-  chakraForwardRef<"div", ProfileViewTabsProps>(function ProfileViewTabs(
-    { state, onStateChange, views, profileTypeId },
-    ref,
-  ) {
+  chakraForwardRef<"div", ProfileViewTabsProps>(function ProfileViewTabs({ views }, ref) {
     const intl = useIntl();
     const toast = useToast();
     const showGenericErrorToast = useGenericErrorToast();
+    const [queryState, setQueryState] = useProfilesQueryState();
 
     const allView = views.find((v) => v.type === "ALL")!;
     const currentView =
-      state.view === "ALL" ? allView : (views.find((v) => v.id === state.view) ?? allView);
+      queryState.view === "ALL"
+        ? allView
+        : (views.find((v) => v.id === queryState.view) ?? allView);
 
     const handleViewChange = async (viewId: string) => {
       const view = views.find((v) => v.id === viewId);
       if (isNonNullish(view)) {
-        onStateChange({
-          ...state,
+        setQueryState({
+          ...queryState,
           view: view.type === "ALL" ? "ALL" : view.id,
           columns: view.data.columns,
           search: view.data.search,
           sort: isNonNullish(view.data.sort) ? omit(view.data.sort, ["__typename"]) : undefined,
-          status: view.data.status ?? "OPEN",
+          // TODO: remove unMaybeArray after profile views are updated
+          status: isNonNullish(view.data.status) ? unMaybeArray(view.data.status) : undefined,
           values: view.data.values as any,
         });
       }
@@ -59,7 +57,7 @@ export const ProfileViewTabs = Object.assign(
         const view = views.find((v) => viewId === v.id);
         assert(isNonNullish(view), "view should exist");
         await updateProfileListView({
-          variables: { profileListViewId: view.id, name, profileTypeId },
+          variables: { profileListViewId: view.id, name, profileTypeId: queryState.type! },
         });
       } catch (error) {
         showGenericErrorToast(error);
@@ -80,13 +78,13 @@ export const ProfileViewTabs = Object.assign(
                 ? omit(view.data.sort, ["__typename"])
                 : view.data.sort,
             },
-            profileTypeId,
+            profileTypeId: queryState.type!,
           },
         });
         if (isNonNullish(data)) {
           const newView = data.createProfileListView;
-          onStateChange({
-            ...state,
+          setQueryState({
+            ...queryState,
             view: newView.id,
             columns: newView.data.columns,
             search: newView.data.search,
@@ -107,7 +105,7 @@ export const ProfileViewTabs = Object.assign(
     const handleMarkViewAsDefaultClick = async (viewId: string) => {
       try {
         await markProfileListViewAsDefault({
-          variables: { profileListViewId: viewId, profileTypeId },
+          variables: { profileListViewId: viewId, profileTypeId: queryState.type! },
         });
         toast({
           isClosable: true,
@@ -131,7 +129,9 @@ export const ProfileViewTabs = Object.assign(
       try {
         const view = views.find((v) => viewId === v.id);
         assert(isNonNullish(view), "view should exist");
-        await deleteProfileListView({ variables: { id: view.id, profileTypeId } });
+        await deleteProfileListView({
+          variables: { id: view.id, profileTypeId: queryState.type! },
+        });
         const defaultView = views.find((v) => v.isDefault && v.id !== view.id);
         handleViewChange(defaultView ? defaultView.id : allView.id);
       } catch (error) {
@@ -145,7 +145,7 @@ export const ProfileViewTabs = Object.assign(
         await reorderProfileListViews({
           variables: {
             ids,
-            profileTypeId,
+            profileTypeId: queryState.type!,
           },
         });
       } catch {}

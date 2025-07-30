@@ -1,8 +1,11 @@
 import { gql } from "@apollo/client";
 import { DashboardPetitionsRatioModule_DashboardPetitionsRatioModuleFragment } from "@parallel/graphql/__types";
-import { forwardRef } from "react";
+import { buildPetitionsQueryStateUrl } from "@parallel/utils/petitionsQueryState";
+import { forwardRef, useMemo } from "react";
+import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-import { DashboardModuleAlertIncongruent } from "../../shared/DashboardModuleAlertIncongruent";
+import { cleanDashboardModulePetitionFilter } from "../../drawer/utils/moduleUtils";
+import { DashboardLinkToResults } from "../../shared/DashboardLinkToResults";
 import { DashboardRatio } from "../../shared/DashboardRatio";
 import { DashboardSimpleModuleCard } from "../../shared/DashboardSimpleModuleCard";
 
@@ -17,14 +20,41 @@ export const DashboardPetitionsRatioModule = Object.assign(
       onDelete: () => void;
     }
   >(function DashboardPetitionsRatioModule({ module, ...rest }, ref) {
+    const intl = useIntl();
+
+    const resultsUrls = useMemo(() => {
+      const { tags, ...filters } = cleanDashboardModulePetitionFilter(
+        module.petitionsRatioSettings.filters[0],
+      );
+      return buildPetitionsQueryStateUrl(
+        {
+          view: "-ALL", // this forces ALL instead of the default view
+          ...filters,
+          tagsFilters: tags,
+        },
+        {
+          fromDashboardModule:
+            module.title ||
+            intl.formatMessage({
+              id: "component.dashboard-module-card.untitled-module",
+              defaultMessage: "Untitled module",
+            }),
+        },
+      );
+    }, []);
+
     return (
       <DashboardSimpleModuleCard
         ref={ref}
         module={module}
         headerAddon={
-          module.petitionsRatioResult?.isIncongruent ? (
-            <DashboardModuleAlertIncongruent />
-          ) : undefined
+          <DashboardLinkToResults
+            href={resultsUrls}
+            label={intl.formatMessage({
+              id: "generic.view-petitions",
+              defaultMessage: "View parallels",
+            })}
+          />
         }
         {...rest}
       >
@@ -52,6 +82,32 @@ export const DashboardPetitionsRatioModule = Object.assign(
           }
           petitionsRatioSettings: settings {
             graphicType
+            filters {
+              approvals {
+                filters {
+                  operator
+                  value
+                }
+                operator
+              }
+              fromTemplateId
+              sharedWith {
+                filters {
+                  operator
+                  value
+                }
+                operator
+              }
+              signature
+              status
+              tags {
+                operator
+                filters {
+                  value
+                  operator
+                }
+              }
+            }
           }
         }
         ${DashboardSimpleModuleCard.fragments.DashboardModule}

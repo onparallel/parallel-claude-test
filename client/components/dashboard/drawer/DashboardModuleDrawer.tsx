@@ -62,6 +62,7 @@ import { useParallelModules } from "./hooks/useParallelModules";
 import { useProfileModules } from "./hooks/useProfileModules";
 import {
   filterEmptyFilters,
+  fullDashboardModuleProfileFilter,
   getDefaultFilters,
   getDefaultValuesFromModule,
 } from "./utils/moduleUtils";
@@ -287,7 +288,7 @@ export function DashboardModuleDrawer({
     profileTypeId: data.settings.profileTypeId!,
     filter: filterEmptyFilters(data.settings.filters)[0],
     type: data.settings.type === "COUNT" ? "COUNT" : "AGGREGATE",
-    profileTypeFieldId: data.settings.profileTypeFieldId,
+    profileTypeFieldId: data.settings.type === "COUNT" ? null : data.settings.profileTypeFieldId,
     aggregate: data.settings.type === "COUNT" ? null : data.settings.type,
   });
 
@@ -295,7 +296,7 @@ export function DashboardModuleDrawer({
     data: DashboardModuleDrawerFormData,
   ): ProfilesRatioDashboardModuleSettingsInput => ({
     profileTypeId: data.settings.profileTypeId!,
-    profileTypeFieldId: data.settings.profileTypeFieldId,
+    profileTypeFieldId: data.settings.type === "COUNT" ? null : data.settings.profileTypeFieldId,
     filters: filterEmptyFilters(data.settings.filters),
     graphicType: data.settings.ratioGraphicType!,
     type: data.settings.type === "COUNT" ? "COUNT" : "AGGREGATE",
@@ -306,7 +307,7 @@ export function DashboardModuleDrawer({
     data: DashboardModuleDrawerFormData,
   ): ProfilesPieChartDashboardModuleSettingsInput => ({
     profileTypeId: data.settings.profileTypeId!,
-    profileTypeFieldId: data.settings.profileTypeFieldId,
+    profileTypeFieldId: data.settings.type === "COUNT" ? null : data.settings.profileTypeFieldId,
     items:
       data.settings.items?.map((item) => ({
         color: item.color,
@@ -568,36 +569,6 @@ export function DashboardModuleDrawer({
 }
 
 DashboardModuleDrawer.fragments = {
-  get DashboardModuleProfileFieldValuesFilter() {
-    return gql`
-      fragment DashboardModuleDrawer_DashboardModuleProfileFieldValuesFilter on DashboardModuleProfileFieldValuesFilter {
-        logicalOperator
-        operator
-        profileTypeFieldId
-        value
-      }
-    `;
-  },
-  get DashboardModuleProfileFilter() {
-    return gql`
-      fragment DashboardModuleDrawer_DashboardModuleProfileFilter on DashboardModuleProfileFilter {
-        status
-        values {
-          ...DashboardModuleDrawer_DashboardModuleProfileFieldValuesFilter
-          conditions {
-            ...DashboardModuleDrawer_DashboardModuleProfileFieldValuesFilter
-            conditions {
-              ...DashboardModuleDrawer_DashboardModuleProfileFieldValuesFilter
-              conditions {
-                ...DashboardModuleDrawer_DashboardModuleProfileFieldValuesFilter
-              }
-            }
-          }
-        }
-      }
-      ${this.DashboardModuleProfileFieldValuesFilter}
-    `;
-  },
   get DashboardModulePetitionFilter() {
     return gql`
       fragment DashboardModuleDrawer_DashboardModulePetitionFilter on DashboardModulePetitionFilter {
@@ -641,7 +612,7 @@ DashboardModuleDrawer.fragments = {
             profileTypeFieldId
             aggregate
             filters {
-              ...DashboardModuleDrawer_DashboardModuleProfileFilter
+              ...fullDashboardModuleProfileFilter
             }
           }
         }
@@ -661,7 +632,7 @@ DashboardModuleDrawer.fragments = {
             profileTypeFieldId
             aggregate
             filters {
-              ...DashboardModuleDrawer_DashboardModuleProfileFilter
+              ...fullDashboardModuleProfileFilter
             }
           }
         }
@@ -687,13 +658,13 @@ DashboardModuleDrawer.fragments = {
             aggregate
             items {
               filter {
-                ...DashboardModuleDrawer_DashboardModuleProfileFilter
+                ...fullDashboardModuleProfileFilter
               }
               color
               label
             }
             groupByFilter {
-              ...DashboardModuleDrawer_DashboardModuleProfileFilter
+              ...fullDashboardModuleProfileFilter
             }
           }
         }
@@ -714,7 +685,7 @@ DashboardModuleDrawer.fragments = {
         }
       }
       ${this.DashboardModulePetitionFilter}
-      ${this.DashboardModuleProfileFilter}
+      ${fullDashboardModuleProfileFilter}
     `;
   },
 };

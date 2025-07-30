@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { MouseEvent, useCallback } from "react";
 import { useUpdatingRef } from "./useUpdatingRef";
 
-interface NavigationOptions {
+export interface NavigationOptions {
   type?: "push" | "replace";
   shallow?: boolean;
 }

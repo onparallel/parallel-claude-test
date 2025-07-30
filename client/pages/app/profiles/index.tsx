@@ -33,7 +33,6 @@ import { ProfileTypeReference } from "@parallel/components/common/ProfileTypeRef
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { SimpleMenuSelect } from "@parallel/components/common/SimpleMenuSelect";
-import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
@@ -57,7 +56,6 @@ import { useImportProfilesFromExcelDialog } from "@parallel/components/profiles/
 import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
 import {
   ConnectionMetadata,
-  ProfileListViewData,
   ProfileListViewDataInput,
   ProfileStatus,
   Profiles_ProfileFragment,
@@ -70,10 +68,11 @@ import {
   UserLocale,
 } from "@parallel/graphql/__types";
 import {
+  ProfileFieldValuesFilter,
   ProfileFieldValuesFilterCondition,
-  ProfileFieldValuesFilterGroup,
-  profileFieldValuesFilter,
+  simplifyProfileFieldValuesFilter,
 } from "@parallel/utils/ProfileFieldValuesFilter";
+import { removeTypenames } from "@parallel/utils/apollo/removeTypenames";
 import {
   useAssertQuery,
   useAssertQueryOrPreviousData,
@@ -87,21 +86,18 @@ import { useRecoverProfile } from "@parallel/utils/mutations/useRecoverProfile";
 import { useReopenProfile } from "@parallel/utils/mutations/useReopenProfile";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import {
-  QueryStateFrom,
-  SetQueryState,
-  buildStateUrl,
-  integer,
-  parseQuery,
-  sorting,
-  string,
-  useQueryState,
-  useQueryStateSlice,
-  values,
-} from "@parallel/utils/queryState";
+  ProfilesQueryState,
+  buildProfilesQueryStateUrl,
+  parseProfilesQuery,
+  useProfilesQueryState,
+} from "@parallel/utils/profilesQueryState";
+import { SetQueryState } from "@parallel/utils/queryState";
 import { useProfilesExcelExportTask } from "@parallel/utils/tasks/useProfilesExcelExportTask";
+import { unMaybeArray } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { usePinProfileType } from "@parallel/utils/usePinProfileType";
+import { useProfileStatusOptions } from "@parallel/utils/useProfileStatusOptions";
 import {
   ProfileValueColumnFilter,
   useProfileTableColumns,
@@ -121,35 +117,27 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDeepEqual, isNonNullish, isNullish, omit, pick, unique } from "remeda";
-
-const SORTING = ["name", "createdAt"] as const;
-
-export const DEFAULT_PROFILE_COLUMN_SELECTION = ["subscribers", "createdAt"];
-
-const QUERY_STATE = {
-  view: string(),
-  page: integer({ min: 1 }).orDefault(1),
-  items: values([10, 25, 50]).orDefault(10),
-  search: string(),
-  sort: sorting(SORTING),
-  type: string(),
-  status: values(["OPEN", "CLOSED", "DELETION_SCHEDULED"] as ProfileStatus[]).orDefault("OPEN"),
-  columns: string().list({ allowEmpty: true }),
-  values: profileFieldValuesFilter(),
-};
-export type ProfilesQueryState = QueryStateFrom<typeof QUERY_STATE>;
+import { groupBy, isDeepEqual, isNonNullish, isNullish, mapValues, omit, pick, pipe } from "remeda";
+import { assert } from "ts-essentials";
 
 interface ProfilesTableContext {
-  status: ProfileStatus;
-  setStatus: (status: ProfileStatus) => void;
+  status: ProfileStatus[];
+  setStatus: (status: ProfileStatus[]) => void;
 }
+
+// do not put these values as defaults in the query state
+const DEFAULT_SORT = { field: "name", direction: "ASC" } as const;
+const DEFAULT_COLUMNS = ["subscribers", "createdAt"];
 
 function Profiles() {
   const intl = useIntl();
-  const [queryState, setQueryState] = useQueryState(QUERY_STATE);
+  const [queryState, setQueryState] = useProfilesQueryState();
 
-  const [status, setStatus] = useQueryStateSlice(queryState, setQueryState, "status");
+  const status = queryState.status ?? ["OPEN"];
+  const sort = queryState.sort ?? DEFAULT_SORT;
+  const columns = queryState.columns ?? DEFAULT_COLUMNS;
+  const values = queryState.values;
+
   const navigate = useHandleNavigation();
   const showToast = useToast();
 
@@ -165,8 +153,6 @@ function Profiles() {
   });
   const { me } = queryObject;
 
-  const sort = queryState.sort ?? ({ field: "name", direction: "ASC" } as const);
-
   const {
     data: { profileType },
   } = useAssertQuery(Profiles_profileTypeDocument, {
@@ -174,38 +160,29 @@ function Profiles() {
     fetchPolicy: "cache-and-network",
   });
 
-  const [values, setValues] = useQueryStateSlice(queryState, setQueryState, "values");
   const [filter, isAdvancedFilter] = useMemo(() => {
-    // check if filter is compatible with column filtering
+    if (isNullish(values)) {
+      return [{}, false];
+    }
+    const simplifiedFilter = simplifyProfileFieldValuesFilter(values);
     const isColumnable =
-      isNullish(values) ||
-      ("logicalOperator" in values &&
-        values.logicalOperator === "AND" &&
-        values.conditions.every(
-          (c) =>
-            "logicalOperator" in c &&
-            c.conditions.every((c) => "profileTypeFieldId" in c) &&
-            unique(
-              (c.conditions as ProfileFieldValuesFilterCondition[]).map(
-                (c) => c.profileTypeFieldId,
-              ),
-            ).length === 1,
-        ));
-    return [
-      isColumnable && isNonNullish(values)
-        ? (Object.fromEntries(
-            values.conditions.map((c) => {
-              const profileTypeFieldId = (
-                (c as ProfileFieldValuesFilterGroup)
-                  .conditions[0] as ProfileFieldValuesFilterCondition
-              ).profileTypeFieldId;
-              return [`field_${profileTypeFieldId}`, c];
-            }),
-          ) as Record<string, ProfileValueColumnFilter>)
-        : {},
-      !isColumnable,
-    ] as const;
+      simplifiedFilter.logicalOperator === "AND" &&
+      simplifiedFilter.conditions.every((c) => "profileTypeFieldId" in c);
+    // check if filter is compatible with column filtering
+    if (isColumnable) {
+      return [
+        pipe(
+          simplifiedFilter.conditions as ProfileFieldValuesFilterCondition[],
+          groupBy((c) => `field_${c.profileTypeFieldId}`),
+          mapValues((conditions) => ({ logicalOperator: "AND" as const, conditions })),
+        ) as Record<string, ProfileValueColumnFilter>,
+        false,
+      ];
+    } else {
+      return [{}, true];
+    }
   }, [values]);
+
   const handleFilterChange = useCallback(
     (key: string, value: ProfileValueColumnFilter) => {
       if (key.startsWith("field_")) {
@@ -213,14 +190,16 @@ function Profiles() {
           ...(filter ?? {}),
           [key]: value.conditions.length > 0 ? value : null,
         }).filter(isNonNullish);
-        setValues(
-          conditions.length > 0
-            ? {
-                logicalOperator: "AND",
-                conditions,
-              }
-            : null,
-        );
+        setQueryState((current) => ({
+          ...current,
+          values:
+            conditions.length > 0
+              ? {
+                  logicalOperator: "AND",
+                  conditions,
+                }
+              : null,
+        }));
       }
     },
     [filter],
@@ -234,7 +213,7 @@ function Profiles() {
       sortBy: [`${sort.field}_${sort.direction}` as const],
       filter: {
         profileTypeId: [queryState.type!],
-        status: [queryState.status],
+        status,
         values,
       },
       propertiesFilter:
@@ -249,8 +228,7 @@ function Profiles() {
 
   const { selectedIds, selectedRows, onChangeSelectedIds } = useSelection(profiles?.items, "id");
 
-  const columns = useProfileTableColumns(profileType);
-  const selection = queryState.columns ?? DEFAULT_PROFILE_COLUMN_SELECTION;
+  const allColumns = useProfileTableColumns(profileType);
 
   const showCreateProfileDialog = useCreateProfileDialog();
   const handleCreateProfile = async () => {
@@ -275,7 +253,7 @@ function Profiles() {
   const permanentlyDeleteProfile = usePermanentlyDeleteProfile();
   const handleDeleteClick = async () => {
     try {
-      if (status === "DELETION_SCHEDULED") {
+      if (status.length === 1 && status[0] === "DELETION_SCHEDULED") {
         await permanentlyDeleteProfile({
           profileIds: selectedIds,
           profileName: <ProfileReference profile={selectedRows[0]} showNameEvenIfDeleted />,
@@ -319,8 +297,12 @@ function Profiles() {
   }, [selectedRows, selectedIds.join(",")]);
 
   const context = useMemo<ProfilesTableContext>(
-    () => ({ status, setStatus, profileType }),
-    [status, setStatus, profileType],
+    () => ({
+      status,
+      setStatus: (status) => setQueryState((current) => ({ ...current, status })),
+      profileType,
+    }),
+    [status.join(","), setQueryState, profileType],
   );
 
   const reopenProfile = useReopenProfile();
@@ -402,8 +384,8 @@ function Profiles() {
   const handleEditColumns = async () => {
     try {
       const newColumns = await showColumnVisibilityDialog({
-        columns,
-        selection,
+        columns: allColumns,
+        selection: columns,
       });
       setQueryState((current) => ({ ...current, columns: newColumns }));
     } catch {}
@@ -426,10 +408,10 @@ function Profiles() {
   const icon = getProfileTypeFieldIcon(profileType?.icon);
 
   const sortedAndFilteredColumns = useMemo(() => {
-    return ["name", ...(selection ?? [])]
-      .map((key) => columns.find((c) => c.key === key))
+    return ["name", ...(columns ?? [])]
+      .map((key) => allColumns.find((c) => c.key === key))
       .filter(isNonNullish);
-  }, [selection?.join(",")]);
+  }, [columns?.join(",")]);
 
   useWindowEvent(
     "message",
@@ -536,7 +518,7 @@ function Profiles() {
                           locale: intl.locale as UserLocale,
                           profileTypeId: queryState.type!,
                           values: queryState.values,
-                          status: [queryState.status],
+                          status,
                           search: queryState.search,
                           sortBy: queryState.sort,
                         })
@@ -624,18 +606,13 @@ function Profiles() {
             actions={actions}
             header={
               <>
-                <ProfileViewTabs
-                  state={queryState}
-                  onStateChange={setQueryState}
-                  views={me.profileListViews}
-                  profileTypeId={profileType.id}
-                />
+                <ProfileViewTabs views={me.profileListViews} />
                 <ProfilesListHeader
                   state={queryState}
-                  columns={columns}
+                  columns={allColumns}
                   filter={filter}
                   isAdvancedFilter={isAdvancedFilter}
-                  selection={selection}
+                  selection={columns}
                   onStateChange={setQueryState}
                   onReload={refetch}
                   onEditColumns={handleEditColumns}
@@ -655,25 +632,8 @@ function Profiles() {
                       />
                     </Text>
                   </Center>
-                ) : queryState.status === "OPEN" ? (
-                  <Center flex="1" minHeight="200px">
-                    <Text fontSize="lg">
-                      <FormattedMessage
-                        id="page.profiles.no-profiles"
-                        defaultMessage="You have no profiles yet. Start by creating one now!"
-                      />
-                    </Text>
-                  </Center>
-                ) : queryState.status === "CLOSED" ? (
-                  <Center flex="1" minHeight="200px">
-                    <Text fontSize="lg">
-                      <FormattedMessage
-                        id="page.profiles.no-closed-profiles"
-                        defaultMessage="There are no closed profiles"
-                      />
-                    </Text>
-                  </Center>
-                ) : queryState.status === "DELETION_SCHEDULED" ? (
+                ) : queryState.status?.length === 1 &&
+                  queryState.status[0] === "DELETION_SCHEDULED" ? (
                   <Center flex="1" minHeight="200px">
                     <Text fontSize="lg">
                       <FormattedMessage
@@ -682,7 +642,25 @@ function Profiles() {
                       />
                     </Text>
                   </Center>
-                ) : null
+                ) : queryState.status?.length === 1 && queryState.status[0] === "CLOSED" ? (
+                  <Center flex="1" minHeight="200px">
+                    <Text fontSize="lg">
+                      <FormattedMessage
+                        id="page.profiles.no-closed-profiles"
+                        defaultMessage="There are no closed profiles"
+                      />
+                    </Text>
+                  </Center>
+                ) : (
+                  <Center flex="1" minHeight="200px">
+                    <Text fontSize="lg">
+                      <FormattedMessage
+                        id="page.profiles.no-profiles"
+                        defaultMessage="You have no profiles yet. Start by creating one now!"
+                      />
+                    </Text>
+                  </Center>
+                )
               ) : null
             }
             Footer={CustomFooter}
@@ -694,36 +672,41 @@ function Profiles() {
 }
 
 function CustomFooter({ status, setStatus, children }: PropsWithChildren<ProfilesTableContext>) {
-  const options = useSimpleSelectOptions<ProfileStatus>(
-    (intl) => [
-      {
-        label: intl.formatMessage({ id: "page.profiles.open", defaultMessage: "Open" }),
-        value: "OPEN",
-      },
-      {
-        label: intl.formatMessage({
-          id: "page.profiles.closed",
-          defaultMessage: "Closed",
-        }),
-        value: "CLOSED",
-      },
-
+  const intl = useIntl();
+  const statusOptions = useProfileStatusOptions();
+  const options = useMemo(
+    () => [
+      ...statusOptions,
+      "DIVIDER" as const,
       {
         label: intl.formatMessage({
           id: "page.profiles.bin",
           defaultMessage: "Bin",
         }),
-        value: "DELETION_SCHEDULED",
+        value: "DELETION_SCHEDULED" as const,
       },
     ],
-    [],
+    [intl.locale],
+  );
+  const handleChange = useCallback(
+    (value: ProfileStatus[]) => {
+      if (value.length === 0) {
+        // do nothing
+      } else if (value.length === 1) {
+        setStatus(value);
+      } else {
+        setStatus([value.at(1)!]);
+      }
+    },
+    [status.join(","), setStatus],
   );
   return (
     <>
       <SimpleMenuSelect
+        isMulti
         options={options}
         value={status}
-        onChange={setStatus as any}
+        onChange={handleChange}
         size="sm"
         variant="ghost"
       />
@@ -754,11 +737,11 @@ function useProfileListActions({
   canDelete: boolean;
   canCloseOpen: boolean;
   canDeletePermanently: boolean;
-  status: ProfileStatus;
+  status: ProfileStatus[];
   selectedCount: number;
 }) {
   return [
-    ...(status === "OPEN"
+    ...(status.length === 1 && status[0] === "OPEN"
       ? [
           {
             key: "subscribe",
@@ -790,7 +773,7 @@ function useProfileListActions({
           },
         ]
       : []),
-    ...(status === "CLOSED"
+    ...(status.length === 1 && status[0] === "CLOSED"
       ? [
           {
             key: "reopen",
@@ -815,7 +798,7 @@ function useProfileListActions({
           },
         ]
       : []),
-    ...(status === "DELETION_SCHEDULED"
+    ...(status.length === 1 && status[0] === "DELETION_SCHEDULED"
       ? [
           {
             key: "recover",
@@ -905,23 +888,26 @@ function ProfilesListHeader({
     const currentView = views.find((v) =>
       state.view === "ALL" ? v.type === "ALL" : v.id === state.view,
     );
-
-    if (!currentView) return false;
-
-    if (currentView.type === "ALL") {
-      // "ALL" view can only update columns and sortBy
-      return !viewsAreEqual(
-        pick(currentView.data, ["sort", "columns"]),
-        pick(state, ["sort", "columns"]),
+    assert(isNonNullish(currentView));
+    const toCompare: [any, any][] = [
+      // columns
+      [currentView.data.columns ?? DEFAULT_COLUMNS, state.columns ?? DEFAULT_COLUMNS],
+      // sort
+      [removeTypenames(currentView.data.sort ?? DEFAULT_SORT), state.sort ?? DEFAULT_SORT],
+    ];
+    if (currentView.type !== "ALL") {
+      // "ALL" view can only update columns and sort
+      toCompare.push(
+        [
+          // TODO remove unMaybeArray after profile views are updated
+          isNonNullish(currentView.data.status) ? unMaybeArray(currentView.data.status) : ["OPEN"],
+          state.status ?? ["OPEN"],
+        ],
+        [currentView.data.values ?? null, state.values ?? null],
+        [currentView.data.search ?? null, state.search ?? null],
       );
     }
-
-    return !viewsAreEqual(currentView!.data, {
-      ...(pick(state, ["search", "sort", "columns", "status", "values"]) as Omit<
-        ProfileListViewData,
-        "__typename"
-      >),
-    });
+    return !toCompare.every(([a, b]) => isDeepEqual(a, b));
   }, [state, views]);
 
   const [updateProfileListView] = useMutation(Profiles_updateProfileListViewDocument);
@@ -1000,12 +986,17 @@ function ProfilesListHeader({
         onStateChange({
           ...state,
           view: data.createProfileListView.id,
-          columns: data.createProfileListView.data.columns,
+          columns: data.createProfileListView.data.columns ?? undefined,
           search: data.createProfileListView.data.search,
           sort: isNonNullish(data.createProfileListView.data.sort)
             ? omit(data.createProfileListView.data.sort, ["__typename"])
             : undefined,
-          status: data.createProfileListView.data.status ?? "OPEN",
+          status:
+            state.status ??
+            (isNonNullish(data.createProfileListView.data.status)
+              ? // TODO: remove unMaybeArray after profile views are updated
+                unMaybeArray(data.createProfileListView.data.status)
+              : undefined),
           values: data.createProfileListView.data.values as any,
         });
       }
@@ -1084,20 +1075,6 @@ function ProfilesListHeader({
         />
       </HStack>
     </HStack>
-  );
-}
-
-function viewsAreEqual(view1: Partial<ProfileListViewData>, view2: Partial<ProfileListViewData>) {
-  return (
-    isDeepEqual(omit(view1, ["__typename", "sort"]), omit(view2, ["__typename", "sort"])) &&
-    isDeepEqual(
-      isNonNullish(view1.sort)
-        ? omit(view1.sort, ["__typename"])
-        : { field: "createdAt", direction: "DESC" },
-      isNonNullish(view2.sort)
-        ? omit(view2.sort, ["__typename"])
-        : { field: "createdAt", direction: "DESC" },
-    )
   );
 }
 
@@ -1249,7 +1226,7 @@ const _mutations = [
 ];
 
 Profiles.getInitialProps = async ({ query, pathname, fetchQuery }: WithApolloDataContext) => {
-  const state = parseQuery(query, QUERY_STATE);
+  const state = parseProfilesQuery(query);
   if (isNullish(state.type)) {
     throw new RedirectError("/app");
   }
@@ -1266,69 +1243,26 @@ Profiles.getInitialProps = async ({ query, pathname, fetchQuery }: WithApolloDat
     throw new RedirectError("/app");
   }
 
-  if (isNullish(state.view) && isNonNullish(views)) {
-    const defaultView = views.find((v) => v.isDefault);
-    if (isNonNullish(defaultView)) {
-      throw new RedirectError(
-        buildStateUrl(
-          QUERY_STATE,
-          {
-            ...state,
-            view: defaultView.id,
-            search: defaultView.data.search,
-            columns: defaultView.data.columns,
-            sort: isNonNullish(defaultView.data.sort)
-              ? omit(defaultView.data.sort, ["__typename"])
-              : undefined,
-            status: defaultView.data.status ?? "OPEN",
-            values: defaultView.data.values as any,
-          },
-          pathname,
-          query,
-        ),
-      );
-    } else {
-      const allView = views.find((v) => v.type === "ALL");
-
-      if (allView) {
-        throw new RedirectError(
-          buildStateUrl(
-            QUERY_STATE,
-            {
-              ...state,
-              view: "ALL",
-              ...omit(allView.data, ["__typename", "sort"]),
-              sort: isNonNullish(allView.data.sort)
-                ? omit(allView.data.sort, ["__typename"])
-                : undefined,
-              status: allView.data.status ?? "OPEN",
-              values: allView.data.values as any,
-            },
-            pathname,
-            query,
-          ),
-        );
-      } else {
-        throw new RedirectError(
-          buildStateUrl(
-            QUERY_STATE,
-            {
-              ...state,
-              view: "ALL",
-            },
-            pathname,
-            query,
-          ),
-        );
-      }
-    }
-  } else if (state.view !== "ALL") {
-    const view = views.find((v) => v.id === state.view);
-    if (isNullish(view)) {
-      throw new RedirectError(
-        buildStateUrl(QUERY_STATE, { ...state, view: "ALL" }, pathname, query),
-      );
-    }
+  if (isNullish(state.view) || (state.view !== "ALL" && !views.some((v) => v.id === state.view))) {
+    const allView = views.find((v) => v.type === "ALL")!;
+    const view =
+      (isNullish(state.view)
+        ? views.find((v) => v.isDefault)
+        : views.find((v) => v.id === state.view)) ?? allView;
+    throw new RedirectError(
+      buildProfilesQueryStateUrl(
+        {
+          type: state.type,
+          view: view.type === "ALL" ? "ALL" : view.id,
+          search: state.search ?? view.data.search,
+          columns: state.columns ?? view.data.columns ?? undefined,
+          sort: state.sort ?? removeTypenames(view.data.sort) ?? undefined,
+          status: state.status ?? view.data.status ?? undefined,
+          values: state.values ?? (view.data.values as ProfileFieldValuesFilter) ?? undefined,
+        },
+        query,
+      ),
+    );
   }
   return { metadata };
 };

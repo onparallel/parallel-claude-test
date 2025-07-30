@@ -9,7 +9,7 @@ import { RadioButton } from "./RadioButton";
 export type SearchInOptions = "EVERYWHERE" | "CURRENT_FOLDER";
 
 interface SearchAllOrCurrentFolderProps {
-  onChange: (value: string) => void;
+  onChange: (value: SearchInOptions) => void;
   value: SearchInOptions;
   path: string;
   type: PetitionBaseType;

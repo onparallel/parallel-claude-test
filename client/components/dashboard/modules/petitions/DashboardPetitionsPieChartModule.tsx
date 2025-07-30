@@ -1,13 +1,16 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Stack } from "@chakra-ui/react";
-import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { Box, Center, Grid, GridItem, Square, Stack, Text } from "@chakra-ui/react";
+import { OverflownText } from "@parallel/components/common/OverflownText";
+import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
 import { DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment } from "@parallel/graphql/__types";
-import { forwardRef } from "react";
-import { useIntl } from "react-intl";
-import { isNonNullish } from "remeda";
-import { DashboardChartLegend } from "../../charts/DashboardChartLegend";
+import { buildPetitionsQueryStateUrl } from "@parallel/utils/petitionsQueryState";
+import { forwardRef, Fragment, useMemo } from "react";
+import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
+import { isNonNullish, sumBy, zip } from "remeda";
 import { DashboardDoughnutChart } from "../../charts/DashboardDoughnutChart";
 import { DashboardPieChart } from "../../charts/DashboardPieChart";
+import { cleanDashboardModulePetitionFilter } from "../../drawer/utils/moduleUtils";
+import { DashboardLinkToResults } from "../../shared/DashboardLinkToResults";
 import { DashboardModuleAlertIncongruent } from "../../shared/DashboardModuleAlertIncongruent";
 import { DashboardModuleCard } from "../../shared/DashboardModuleCard";
 import { DashboardModuleSpinner } from "../../shared/DashboardModuleSpinner";
@@ -25,30 +28,44 @@ export const DashboardPetitionsPieChartModule = Object.assign(
   >(function DashboardPetitionsPieChartModule({ module, ...rest }, ref) {
     const intl = useIntl();
 
-    const data = {
-      datasets: [
-        {
-          data: module.petitionsPieChartResult?.items?.map((item) => item.count) ?? [],
-          backgroundColor:
-            module.petitionsPieChartResult?.items?.map((item) => item.color ?? "#E2E8F0") ?? [],
-          borderColor: "white",
-          hoverBackgroundColor:
-            module.petitionsPieChartResult?.items?.map((item) => item.color ?? "#E2E8F0") ?? [],
-          hoverBorderColor: "white",
-        },
-      ],
-      labels:
-        module.petitionsPieChartResult?.items?.map(({ label }) =>
-          label === null
-            ? intl.formatMessage({
-                id: "component.dashboard-pie-chart-module.not-replied",
-                defaultMessage: "Not replied",
-              })
-            : typeof label === "string"
-              ? label
-              : localizableUserTextRender({ intl, value: label, default: "" }),
-        ) ?? [],
-    };
+    const data = useMemo(
+      () => ({
+        datasets: [
+          {
+            data: module.petitionsPieChartResult?.items?.map((item) => item.count) ?? [],
+            backgroundColor:
+              module.petitionsPieChartResult?.items?.map((item) => item.color ?? "#E2E8F0") ?? [],
+            borderColor: "white",
+            hoverBackgroundColor:
+              module.petitionsPieChartResult?.items?.map((item) => item.color ?? "#E2E8F0") ?? [],
+            hoverBorderColor: "white",
+          },
+        ],
+        labels: module.petitionsPieChartResult?.items?.map(({ label }) => label) ?? [],
+      }),
+      [module],
+    );
+    const totalCount = sumBy(module.petitionsPieChartResult?.items ?? [], (item) => item.count);
+    const resultsUrls = useMemo(() => {
+      return module.petitionsPieChartSettings.items.map((item) => {
+        const { tags, ...filters } = cleanDashboardModulePetitionFilter(item.filter);
+        return buildPetitionsQueryStateUrl(
+          {
+            view: "-ALL", // this forces ALL instead of the default view
+            ...filters,
+            tagsFilters: tags,
+          },
+          {
+            fromDashboardModule:
+              module.title ||
+              intl.formatMessage({
+                id: "component.dashboard-module-card.untitled-module",
+                defaultMessage: "Untitled module",
+              }),
+          },
+        );
+      });
+    }, [module, intl.locale]);
 
     return (
       <DashboardModuleCard
@@ -70,7 +87,7 @@ export const DashboardPetitionsPieChartModule = Object.assign(
           <Stack
             direction={{ base: "column", md: "row" }}
             alignItems="stretch"
-            spacing={{ base: 2, md: 8 }}
+            spacing={{ base: 2, md: 4 }}
             flex="1"
             minHeight={0}
           >
@@ -90,7 +107,66 @@ export const DashboardPetitionsPieChartModule = Object.assign(
                 )}
               </Box>
             </Center>
-            <DashboardChartLegend data={data} />
+            <Stack flex="1">
+              <Text>
+                <FormattedMessage id="generic.total" defaultMessage="Total" />
+                {": "}
+                <Text as="span" fontWeight={600}>
+                  <FormattedNumber value={totalCount} />
+                </Text>
+              </Text>
+              <ScrollShadows flex={1} direction="vertical" overflowY="auto">
+                <Grid
+                  gap={1}
+                  columnGap={2}
+                  templateColumns="auto 1fr auto auto auto"
+                  alignItems="center"
+                  paddingEnd={2}
+                  overflow="hidden"
+                >
+                  {zip(module.petitionsPieChartResult.items, resultsUrls).map(
+                    ([item, href], index) => {
+                      return (
+                        <Fragment key={index}>
+                          <GridItem>
+                            <Square size={4} backgroundColor={item.color!} borderRadius="4px" />
+                          </GridItem>
+                          <GridItem minWidth={0}>
+                            <OverflownText>{item.label}</OverflownText>
+                          </GridItem>
+                          <GridItem textAlign="end" fontSize="xl" fontWeight={600}>
+                            <FormattedNumber value={item.count} />
+                          </GridItem>
+                          <GridItem textAlign="end" fontSize="sm">
+                            {totalCount === 0 ? (
+                              "-"
+                            ) : (
+                              <FormattedNumber
+                                value={item.count / totalCount}
+                                style="percent"
+                                maximumSignificantDigits={3}
+                              />
+                            )}
+                          </GridItem>
+                          <GridItem>
+                            <DashboardLinkToResults
+                              href={href}
+                              label={intl.formatMessage(
+                                {
+                                  id: "component.dashboard-petitions-pie-chart-module.view-petitions",
+                                  defaultMessage: "View parallels for: {segment}",
+                                },
+                                { segment: item.label },
+                              )}
+                            />
+                          </GridItem>
+                        </Fragment>
+                      );
+                    },
+                  )}
+                </Grid>
+              </ScrollShadows>
+            </Stack>
           </Stack>
         ) : (
           <DashboardModuleSpinner />
@@ -116,6 +192,34 @@ export const DashboardPetitionsPieChartModule = Object.assign(
             }
             petitionsPieChartSettings: settings {
               graphicType
+              items {
+                filter {
+                  tags {
+                    operator
+                    filters {
+                      value
+                      operator
+                    }
+                  }
+                  status
+                  signature
+                  sharedWith {
+                    operator
+                    filters {
+                      value
+                      operator
+                    }
+                  }
+                  fromTemplateId
+                  approvals {
+                    operator
+                    filters {
+                      value
+                      operator
+                    }
+                  }
+                }
+              }
             }
           }
         `;

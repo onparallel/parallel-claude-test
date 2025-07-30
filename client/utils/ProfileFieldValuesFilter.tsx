@@ -37,6 +37,50 @@ type FlattenedProfileFieldValuesFilterCondition = [
   value?: ProfileFieldValuesFilterCondition["value"],
 ];
 
+/**
+ * A simplified filter always consists of a parent filter group, and no redundant inner filter groups.
+ * @param filter
+ */
+export function simplifyProfileFieldValuesFilter(
+  filter: ProfileFieldValuesFilter,
+): ProfileFieldValuesFilterGroup {
+  function simplifyFilter(filter: ProfileFieldValuesFilter): ProfileFieldValuesFilter {
+    if ("logicalOperator" in filter) {
+      return {
+        logicalOperator: filter.logicalOperator,
+        conditions: simplifyGroupConditions(filter.conditions, filter.logicalOperator),
+      };
+    } else {
+      return filter;
+    }
+  }
+  function simplifyGroupConditions(
+    conditions: ProfileFieldValuesFilter[],
+    parentLogicalOperator: ProfileFieldValuesFilterGroupLogicalOperator,
+  ): ProfileFieldValuesFilter[] {
+    return conditions.flatMap((c) => {
+      if ("logicalOperator" in c) {
+        if (c.logicalOperator === parentLogicalOperator) {
+          return simplifyGroupConditions(c.conditions, parentLogicalOperator);
+        } else {
+          return [simplifyFilter(c)];
+        }
+      } else {
+        return [simplifyFilter(c)];
+      }
+    });
+  }
+
+  if ("logicalOperator" in filter) {
+    return simplifyFilter(filter) as ProfileFieldValuesFilterGroup;
+  } else {
+    return {
+      logicalOperator: "AND",
+      conditions: [filter],
+    };
+  }
+}
+
 export function profileFieldValuesFilter() {
   return object<ProfileFieldValuesFilter>({
     flatten(filter: ProfileFieldValuesFilter): FlattenedProfileFieldValuesFilter {

@@ -16,7 +16,7 @@ export const DashboardNumberValue = chakraForwardRef<"span", DashboardNumberValu
     const format =
       isNonNullish(value) && !Number.isNaN(value)
         ? isPercentage
-          ? { style: "percent", maximumFractionDigits: 2 }
+          ? { style: "percent", maximumFractionDigits: 1 }
           : value >= 10_000
             ? {
                 notation: "compact",
