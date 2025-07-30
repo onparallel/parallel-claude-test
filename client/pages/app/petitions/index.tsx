@@ -71,6 +71,7 @@ import {
   parsePetitionsQuery,
   usePetitionsQueryState,
 } from "@parallel/utils/petitionsQueryState";
+import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import {
   DEFAULT_PETITION_COLUMN_SELECTION,
@@ -155,7 +156,12 @@ function Petitions() {
     rowKeyProp,
   );
 
+  useEffectSkipFirst(() => {
+    setFromDashboardModule(null);
+  }, [queryState.view, queryState.type]);
+
   const handleFilterChange = useCallback((key: string, value: any) => {
+    setFromDashboardModule(null);
     setQueryState((current) => ({ ...current, [key]: value, page: 1 }));
   }, []);
 
