@@ -69,6 +69,7 @@ import {
 } from "@parallel/graphql/__types";
 import {
   ProfileFieldValuesFilter,
+  ProfileFieldValuesFilterCondition,
   simplifyProfileFieldValuesFilter,
 } from "@parallel/utils/ProfileFieldValuesFilter";
 import { removeTypenames } from "@parallel/utils/apollo/removeTypenames";
@@ -183,17 +184,22 @@ function Profiles() {
           conditionsByFieldId[profileTypeFieldIds[0]].push(condition);
         }
       }
-      const filtersByColumn: Record<string, ProfileFieldValuesFilter> = {};
+      const filtersByColumn: Record<string, ProfileValueColumnFilter> = {};
       for (const [profileTypeFieldId, conditions] of Object.entries(conditionsByFieldId)) {
         if (conditions.length > 1 && conditions.some((c) => "logicalOperator" in c)) {
           // if there are multiple conditions and some of them are grouped, can't be columnable
           throw new Error();
         } else if (conditions.length === 1 && "logicalOperator" in conditions[0]) {
-          filtersByColumn[`field_${profileTypeFieldId}`] = conditions[0];
+          const group = conditions[0];
+          if (group.conditions.some((c) => "logicalOperator" in c)) {
+            throw new Error();
+          } else {
+            filtersByColumn[`field_${profileTypeFieldId}`] = group as ProfileValueColumnFilter;
+          }
         } else {
           filtersByColumn[`field_${profileTypeFieldId}`] = {
             logicalOperator: "AND",
-            conditions,
+            conditions: conditions as ProfileFieldValuesFilterCondition[],
           };
         }
       }
