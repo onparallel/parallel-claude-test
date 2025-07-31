@@ -47,7 +47,7 @@ export function simplifyProfileFieldValuesFilter(
   function simplifyFilter(filter: ProfileFieldValuesFilter): ProfileFieldValuesFilter {
     if ("logicalOperator" in filter) {
       if (filter.conditions.length === 1) {
-        return filter.conditions[0];
+        return simplifyFilter(filter.conditions[0]);
       } else {
         return {
           logicalOperator: filter.logicalOperator,
@@ -81,7 +81,7 @@ export function simplifyProfileFieldValuesFilter(
   } else {
     return {
       logicalOperator: "AND",
-      conditions: [filter],
+      conditions: [simplified],
     };
   }
 }
