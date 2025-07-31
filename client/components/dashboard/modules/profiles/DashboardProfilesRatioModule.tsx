@@ -1,5 +1,9 @@
 import { gql } from "@apollo/client";
 import { DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragment } from "@parallel/graphql/__types";
+import {
+  ProfileFieldValuesFilterGroup,
+  simplifyProfileFieldValuesFilter,
+} from "@parallel/utils/ProfileFieldValuesFilter";
 import { buildProfilesQueryStateUrl } from "@parallel/utils/profilesQueryState";
 import { forwardRef, useMemo } from "react";
 import { useIntl } from "react-intl";
@@ -31,12 +35,32 @@ export const DashboardProfilesRatioModule = Object.assign(
         : (module.profilesRatioResult?.items.map((i) => i.aggr ?? 0) ?? []);
 
     const resultsUrls = useMemo(() => {
+      const { status, values } = cleanDashboardModuleProfileFilter(
+        module.profilesRatioSettings.filters[0],
+      );
+      const valueFilter = {
+        logicalOperator: "AND",
+        conditions: [],
+      } as ProfileFieldValuesFilterGroup;
+      if (isNonNullish(values)) {
+        valueFilter.conditions.push(values);
+      }
+      if (module.profilesRatioSettings.type === "AGGREGATE") {
+        // when aggregating, we need to add a filter to exclude profiles without a value
+        valueFilter.conditions.push({
+          profileTypeFieldId: module.profilesRatioSettings.profileTypeFieldId!,
+          operator: "HAS_VALUE",
+          value: null,
+        });
+      }
       return buildProfilesQueryStateUrl({
         view: "-ALL", // this forces ALL instead of the default view
-        type: module.profilesRatioSettings.profileTypeId!,
-        ...cleanDashboardModuleProfileFilter(module.profilesRatioSettings.filters[0]),
+        type: module.profilesRatioSettings.profileTypeId,
+        status,
+        values:
+          valueFilter.conditions.length > 0 ? simplifyProfileFieldValuesFilter(valueFilter) : null,
       });
-    }, []);
+    }, [module]);
 
     return (
       <DashboardSimpleModuleCard
@@ -85,6 +109,7 @@ export const DashboardProfilesRatioModule = Object.assign(
             graphicType
             type
             profileTypeId
+            profileTypeFieldId
             filters {
               ...fullDashboardModuleProfileFilter
             }

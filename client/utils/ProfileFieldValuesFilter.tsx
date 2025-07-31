@@ -38,7 +38,7 @@ type FlattenedProfileFieldValuesFilterCondition = [
 ];
 
 /**
- * A simplified filter always consists of a parent filter group, and no redundant inner filter groups.
+ * A simplified filter always consists of a parent AND filter group, and no redundant inner filter groups.
  * @param filter
  */
 export function simplifyProfileFieldValuesFilter(
@@ -46,10 +46,14 @@ export function simplifyProfileFieldValuesFilter(
 ): ProfileFieldValuesFilterGroup {
   function simplifyFilter(filter: ProfileFieldValuesFilter): ProfileFieldValuesFilter {
     if ("logicalOperator" in filter) {
-      return {
-        logicalOperator: filter.logicalOperator,
-        conditions: simplifyGroupConditions(filter.conditions, filter.logicalOperator),
-      };
+      if (filter.conditions.length === 1) {
+        return filter.conditions[0];
+      } else {
+        return {
+          logicalOperator: filter.logicalOperator,
+          conditions: simplifyGroupConditions(filter.conditions, filter.logicalOperator),
+        };
+      }
     } else {
       return filter;
     }
@@ -71,8 +75,9 @@ export function simplifyProfileFieldValuesFilter(
     });
   }
 
-  if ("logicalOperator" in filter) {
-    return simplifyFilter(filter) as ProfileFieldValuesFilterGroup;
+  const simplified = simplifyFilter(filter) as ProfileFieldValuesFilterGroup;
+  if ("logicalOperator" in simplified && simplified.logicalOperator === "AND") {
+    return simplified;
   } else {
     return {
       logicalOperator: "AND",

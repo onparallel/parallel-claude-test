@@ -9867,6 +9867,7 @@ export type DashboardModule_DashboardModule_DashboardProfilesNumberModule_Fragme
     __typename?: "DashboardProfilesNumberModuleSettings";
     type: ModuleResultType;
     profileTypeId: string;
+    profileTypeFieldId?: string | null;
     filters: {
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
@@ -10011,6 +10012,7 @@ export type DashboardModule_DashboardModule_DashboardProfilesRatioModule_Fragmen
     graphicType: DashboardRatioModuleSettingsType;
     type: ModuleResultType;
     profileTypeId: string;
+    profileTypeFieldId?: string | null;
     filters: Array<{
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
@@ -13441,6 +13443,7 @@ export type DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragment 
     __typename?: "DashboardProfilesNumberModuleSettings";
     type: ModuleResultType;
     profileTypeId: string;
+    profileTypeFieldId?: string | null;
     filters: {
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
@@ -13585,6 +13588,7 @@ export type DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragment = 
     graphicType: DashboardRatioModuleSettingsType;
     type: ModuleResultType;
     profileTypeId: string;
+    profileTypeFieldId?: string | null;
     filters: Array<{
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
@@ -74709,6 +74713,7 @@ export const DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragment
     profilesNumberSettings: settings {
       type
       profileTypeId
+      profileTypeFieldId
       filters {
         ...fullDashboardModuleProfileFilter
       }
@@ -74778,6 +74783,7 @@ export const DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragmentDo
       graphicType
       type
       profileTypeId
+      profileTypeFieldId
       filters {
         ...fullDashboardModuleProfileFilter
       }

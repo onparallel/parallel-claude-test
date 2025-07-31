@@ -69,7 +69,6 @@ import {
 } from "@parallel/graphql/__types";
 import {
   ProfileFieldValuesFilter,
-  ProfileFieldValuesFilterCondition,
   simplifyProfileFieldValuesFilter,
 } from "@parallel/utils/ProfileFieldValuesFilter";
 import { removeTypenames } from "@parallel/utils/apollo/removeTypenames";
@@ -117,7 +116,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { groupBy, isDeepEqual, isNonNullish, isNullish, mapValues, omit, pick, pipe } from "remeda";
+import { isDeepEqual, isNonNullish, isNullish, omit, pick, unique } from "remeda";
 import { assert } from "ts-essentials";
 
 interface ProfilesTableContext {
@@ -165,20 +164,41 @@ function Profiles() {
       return [{}, false];
     }
     const simplifiedFilter = simplifyProfileFieldValuesFilter(values);
-    const isColumnable =
-      simplifiedFilter.logicalOperator === "AND" &&
-      simplifiedFilter.conditions.every((c) => "profileTypeFieldId" in c);
-    // check if filter is compatible with column filtering
-    if (isColumnable) {
-      return [
-        pipe(
-          simplifiedFilter.conditions as ProfileFieldValuesFilterCondition[],
-          groupBy((c) => `field_${c.profileTypeFieldId}`),
-          mapValues((conditions) => ({ logicalOperator: "AND" as const, conditions })),
-        ) as Record<string, ProfileValueColumnFilter>,
-        false,
-      ];
-    } else {
+    // we try to group conditions by profile type field id and see if we can create a single group per column
+    try {
+      const conditionsByFieldId: Record<string, ProfileFieldValuesFilter[]> = {};
+      const getProfileTypeFieldIds = (item: ProfileFieldValuesFilter): string[] => {
+        if ("logicalOperator" in item) {
+          return item.conditions.flatMap(getProfileTypeFieldIds);
+        } else {
+          return [item.profileTypeFieldId];
+        }
+      };
+      for (const condition of simplifiedFilter.conditions) {
+        const profileTypeFieldIds = unique(getProfileTypeFieldIds(condition));
+        if (profileTypeFieldIds.length > 1) {
+          throw new Error();
+        } else {
+          conditionsByFieldId[profileTypeFieldIds[0]] ??= [];
+          conditionsByFieldId[profileTypeFieldIds[0]].push(condition);
+        }
+      }
+      const filtersByColumn: Record<string, ProfileFieldValuesFilter> = {};
+      for (const [profileTypeFieldId, conditions] of Object.entries(conditionsByFieldId)) {
+        if (conditions.length > 1 && conditions.some((c) => "logicalOperator" in c)) {
+          // if there are multiple conditions and some of them are grouped, can't be columnable
+          throw new Error();
+        } else if (conditions.length === 1 && "logicalOperator" in conditions[0]) {
+          filtersByColumn[`field_${profileTypeFieldId}`] = conditions[0];
+        } else {
+          filtersByColumn[`field_${profileTypeFieldId}`] = {
+            logicalOperator: "AND",
+            conditions,
+          };
+        }
+      }
+      return [filtersByColumn, false];
+    } catch {
       return [{}, true];
     }
   }, [values]);

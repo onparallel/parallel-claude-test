@@ -5,7 +5,7 @@ import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
 import { DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragment } from "@parallel/graphql/__types";
 import {
-  ProfileFieldValuesFilter,
+  ProfileFieldValuesFilterGroup,
   simplifyProfileFieldValuesFilter,
 } from "@parallel/utils/ProfileFieldValuesFilter";
 import { buildProfilesQueryStateUrl } from "@parallel/utils/profilesQueryState";
@@ -35,14 +35,13 @@ export const DashboardProfilesPieChartModule = Object.assign(
     }
   >(function DashboardProfilesPieChartModule({ module, ...rest }, ref) {
     const intl = useIntl();
-    const type = module.profilesPieChartSettings.type;
     const data = useMemo(
       () => ({
         datasets: [
           {
             data:
               module.profilesPieChartResult?.items?.map((item) =>
-                type === "COUNT" ? item.count : (item.aggr ?? 0),
+                module.profilesPieChartSettings.type === "COUNT" ? item.count : (item.aggr ?? 0),
               ) ?? [],
             backgroundColor:
               module.profilesPieChartResult?.items?.map((item) => item.color ?? "#E2E8F0") ?? [],
@@ -78,40 +77,73 @@ export const DashboardProfilesPieChartModule = Object.assign(
         );
         return (
           module.profilesPieChartResult?.items.map((item) => {
-            const valueFilter = isNonNullish(item.value)
-              ? ({
-                  profileTypeFieldId: module.profilesPieChartSettings.groupByProfileTypeFieldId,
-                  operator: "EQUAL",
-                  value: item.value,
-                } as ProfileFieldValuesFilter)
-              : ({
-                  profileTypeFieldId: module.profilesPieChartSettings.groupByProfileTypeFieldId,
-                  operator: "NOT_HAS_VALUE",
-                  value: null,
-                } as ProfileFieldValuesFilter);
+            const valueFilter = {
+              logicalOperator: "AND",
+              conditions: [
+                isNonNullish(item.value)
+                  ? {
+                      profileTypeFieldId: module.profilesPieChartSettings.groupByProfileTypeFieldId,
+                      operator: "EQUAL",
+                      value: item.value,
+                    }
+                  : {
+                      profileTypeFieldId: module.profilesPieChartSettings.groupByProfileTypeFieldId,
+                      operator: "NOT_HAS_VALUE",
+                      value: null,
+                    },
+              ],
+            } as ProfileFieldValuesFilterGroup;
+            if (isNonNullish(groupBy.values)) {
+              // add global filter
+              valueFilter.conditions.push(groupBy.values);
+            }
+            if (module.profilesPieChartSettings.type === "AGGREGATE") {
+              // when aggregating, we need to add a filter to exclude profiles without a value
+              valueFilter.conditions.push({
+                profileTypeFieldId: module.profilesPieChartSettings.profileTypeFieldId!,
+                operator: "HAS_VALUE",
+                value: null,
+              });
+            }
             return buildProfilesQueryStateUrl({
               view: "-ALL", // this forces ALL instead of the default view
-              type: module.profilesPieChartSettings.profileTypeId!,
+              type: module.profilesPieChartSettings.profileTypeId,
               status: groupBy.status,
-              values: isNonNullish(groupBy.values)
-                ? simplifyProfileFieldValuesFilter({
-                    logicalOperator: "AND",
-                    conditions: [groupBy.values, valueFilter],
-                  })
-                : valueFilter,
+              values: simplifyProfileFieldValuesFilter(valueFilter),
             });
           }) ?? []
         );
       } else {
         return module.profilesPieChartSettings.items.map((item) => {
+          const { status, values } = cleanDashboardModuleProfileFilter(item.filter);
+          const valueFilter = {
+            logicalOperator: "AND",
+            conditions: [],
+          } as ProfileFieldValuesFilterGroup;
+          if (isNonNullish(values)) {
+            valueFilter.conditions.push(values);
+          }
+          if (module.profilesPieChartSettings.type === "AGGREGATE") {
+            // when aggregating, we need to add a filter to exclude profiles without a value
+            valueFilter.conditions.push({
+              profileTypeFieldId: module.profilesPieChartSettings.profileTypeFieldId!,
+              operator: "HAS_VALUE",
+              value: null,
+            });
+          }
           return buildProfilesQueryStateUrl({
             view: "-ALL", // this forces ALL instead of the default view
-            type: module.profilesPieChartSettings.profileTypeId!,
-            ...cleanDashboardModuleProfileFilter(item.filter),
+            type: module.profilesPieChartSettings.profileTypeId,
+            status,
+            values:
+              valueFilter.conditions.length > 0
+                ? simplifyProfileFieldValuesFilter(valueFilter)
+                : null,
           });
         });
       }
     }, [module]);
+
     return (
       <DashboardModuleCard
         ref={ref}
