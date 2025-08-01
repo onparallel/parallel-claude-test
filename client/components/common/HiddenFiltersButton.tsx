@@ -9,7 +9,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
-import { CloseIcon, FilterIcon } from "@parallel/chakra/icons";
+import { CloseIcon, EyeIcon, FilterIcon } from "@parallel/chakra/icons";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
@@ -20,6 +20,7 @@ export interface HiddenFiltersButtonProps<TFilter extends Record<string, any>> {
   columns: TableColumn<any, any, TFilter>[];
   selection: string[];
   filter: Record<string, any>;
+  onShowColumn: (key: string) => void;
   onRemoveFilter: (key: string) => void;
 }
 
@@ -27,6 +28,7 @@ export function HiddenFiltersButton<TFilter extends Record<string, any>>({
   columns,
   selection,
   filter,
+  onShowColumn,
   onRemoveFilter,
 }: HiddenFiltersButtonProps<TFilter>) {
   const intl = useIntl();
@@ -73,14 +75,22 @@ export function HiddenFiltersButton<TFilter extends Record<string, any>>({
                     <IconButtonWithTooltip
                       variant="ghost"
                       label={intl.formatMessage({
+                        id: "component.hidden-filters-button.show-column",
+                        defaultMessage: "Show column",
+                      })}
+                      size="xs"
+                      icon={<EyeIcon />}
+                      onClick={() => onShowColumn(column.key)}
+                    />
+                    <IconButtonWithTooltip
+                      variant="ghost"
+                      label={intl.formatMessage({
                         id: "generic.remove",
                         defaultMessage: "Remove",
                       })}
                       size="xs"
                       icon={<CloseIcon />}
-                      onClick={() => {
-                        onRemoveFilter(column.key);
-                      }}
+                      onClick={() => onRemoveFilter(column.key)}
                     />
                   </HStack>
                 );

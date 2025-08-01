@@ -1048,6 +1048,9 @@ function ProfilesListHeader({
         columns={columns}
         selection={selection}
         filter={filter}
+        onShowColumn={(key) => {
+          onStateChange((current) => ({ ...current, columns: [...(current.columns ?? []), key] }));
+        }}
         onRemoveFilter={(key) => {
           onStateChange((current) => ({
             ...current,

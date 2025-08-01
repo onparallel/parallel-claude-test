@@ -67953,6 +67953,11 @@ export type usePetitionsTableColumns_PetitionBaseFragment =
   | usePetitionsTableColumns_PetitionBase_Petition_Fragment
   | usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment;
 
+export type usePetitionsTableColumns_UserFragment = {
+  __typename?: "User";
+  hasPetitionApprovalFlow: boolean;
+};
+
 export type usePinProfileType_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
@@ -78228,6 +78233,11 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
   ${useClosePetition_PetitionBaseFragmentDoc}
   ${PetitionRepliesRightPaneTabs_PetitionFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_PetitionFragment, unknown>;
+export const usePetitionsTableColumns_UserFragmentDoc = gql`
+  fragment usePetitionsTableColumns_User on User {
+    hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
+  }
+` as unknown as DocumentNode<usePetitionsTableColumns_UserFragment, unknown>;
 export const PetitionViewTabs_PetitionListViewDataFragmentDoc = gql`
   fragment PetitionViewTabs_PetitionListViewData on PetitionListViewData {
     status
@@ -78331,12 +78341,14 @@ export const PetitionListHeader_PetitionListViewFragmentDoc = gql`
 export const Petitions_UserFragmentDoc = gql`
   fragment Petitions_User on User {
     id
+    ...usePetitionsTableColumns_User
     hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
     petitionListViews {
       ...PetitionViewTabs_PetitionListView
       ...PetitionListHeader_PetitionListView
     }
   }
+  ${usePetitionsTableColumns_UserFragmentDoc}
   ${PetitionViewTabs_PetitionListViewFragmentDoc}
   ${PetitionListHeader_PetitionListViewFragmentDoc}
 ` as unknown as DocumentNode<Petitions_UserFragment, unknown>;

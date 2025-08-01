@@ -268,6 +268,12 @@ export function PetitionListHeader({
             columns={columns}
             selection={selection}
             filter={queryState}
+            onShowColumn={(key) => {
+              setQueryState((current) => ({
+                ...current,
+                columns: [...(current.columns ?? []), key as PetitionListViewColumn],
+              }));
+            }}
             onRemoveFilter={(key) => {
               setQueryState((current) => ({ ...omit(current, [key as any]), page: 1 }));
             }}

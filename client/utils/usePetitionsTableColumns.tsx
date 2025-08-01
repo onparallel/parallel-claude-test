@@ -40,6 +40,7 @@ import {
   usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment,
   usePetitionsTableColumns_PetitionBase_Petition_Fragment,
   usePetitionsTableColumns_PetitionFolderFragment,
+  usePetitionsTableColumns_UserFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { MouseEvent, useMemo } from "react";
@@ -778,13 +779,16 @@ function ApprovalStatusIcon({ status }: { status: PetitionApprovalRequestStepSta
 }
 export function usePetitionsTableColumns(
   type: PetitionBaseType,
+  me: usePetitionsTableColumns_UserFragment,
 ): PetitionsTableColumns_PetitionBaseOrFolder[] {
   const intl = useIntl();
   return useMemo(() => {
     if (type === "TEMPLATE") {
       return TEMPLATES_COLUMNS(intl);
     } else {
-      return PETITIONS_COLUMNS;
+      return PETITIONS_COLUMNS.filter((c) =>
+        c.key === "approvals" ? me.hasPetitionApprovalFlow : true,
+      );
     }
   }, [type]) as any;
 }
@@ -864,5 +868,10 @@ usePetitionsTableColumns.fragments = {
     ${PetitionStatusCellContent.fragments.Petition}
     ${PetitionSignatureCellContent.fragments.Petition}
     ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}
+  `,
+  User: gql`
+    fragment usePetitionsTableColumns_User on User {
+      hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
+    }
   `,
 };

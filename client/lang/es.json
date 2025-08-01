@@ -4605,6 +4605,11 @@
     "context": "{count, plural, =1{# hidden filter} other{# hidden filters}}"
   },
   {
+    "term": "component.hidden-filters-button.show-column",
+    "definition": "Mostrar columna",
+    "context": "Show column"
+  },
+  {
     "term": "component.import-from-external-source-dialog.create-profile-button",
     "definition": "Crear perfil",
     "context": "Create profile"

@@ -114,9 +114,7 @@ function Petitions() {
   const fallbackColumns = me.hasPetitionApprovalFlow
     ? DEFAULT_PETITION_COLUMN_SELECTION
     : DEFAULT_PETITION_COLUMN_SELECTION.filter((c) => c !== "approvals");
-  const currentColumns = me.hasPetitionApprovalFlow
-    ? queryState.columns
-    : queryState.columns?.filter((c) => c !== "approvals");
+  const currentColumns = queryState.columns;
 
   const { data, loading, refetch } = useQueryOrPreviousData(
     Petitions_petitionsDocument,
@@ -383,7 +381,7 @@ function Petitions() {
     } catch {}
   }, []);
 
-  const columns = usePetitionsTableColumns(queryState.type);
+  const columns = usePetitionsTableColumns(queryState.type, me);
 
   const selection = queryState.type === "PETITION" ? (currentColumns ?? fallbackColumns) : [];
 
@@ -616,11 +614,7 @@ function Petitions() {
                   <PetitionViewTabs views={me.petitionListViews} />
                 ) : null}
                 <PetitionListHeader
-                  columns={
-                    me.hasPetitionApprovalFlow
-                      ? columns
-                      : columns.filter((c) => c.key !== "approvals")
-                  }
+                  columns={columns}
                   selection={selection}
                   onReload={() => refetch()}
                   views={me.petitionListViews}
@@ -680,12 +674,14 @@ Petitions.fragments = {
     return gql`
       fragment Petitions_User on User {
         id
+        ...usePetitionsTableColumns_User
         hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
         petitionListViews {
           ...PetitionViewTabs_PetitionListView
           ...PetitionListHeader_PetitionListView
         }
       }
+      ${usePetitionsTableColumns.fragments.User}
       ${PetitionListHeader.fragments.PetitionListView}
       ${PetitionViewTabs.fragments.PetitionListView}
     `;
