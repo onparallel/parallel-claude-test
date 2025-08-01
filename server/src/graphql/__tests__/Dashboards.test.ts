@@ -792,14 +792,14 @@ describe("GraphQL / Dashboards", () => {
           size: "SMALL",
           settings: {
             filters: {
-              fromTemplateId: toGlobalId("Petition", otherTemplate.id),
+              fromTemplateId: [toGlobalId("Petition", otherTemplate.id)],
             },
           },
         },
       );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
-        argName: "settings.filters.fromTemplateId",
+        argName: "settings.filters.fromTemplateId[0]",
         message: "Template not found",
       });
       expect(data).toBeNull();
@@ -988,7 +988,7 @@ describe("GraphQL / Dashboards", () => {
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
         argName: "settings.filters.tags.filters",
-        message: "A maximum of 5 filter lines is allowed",
+        message: "Must have between 1 and 5 filter lines",
       });
       expect(data).toBeNull();
     });
@@ -1088,7 +1088,7 @@ describe("GraphQL / Dashboards", () => {
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
         argName: "settings.filters.sharedWith.filters",
-        message: "A maximum of 5 filter lines is allowed",
+        message: "Must have between 1 and 5 filter lines",
       });
       expect(data).toBeNull();
     });
@@ -1351,7 +1351,7 @@ describe("GraphQL / Dashboards", () => {
             filters: [
               {
                 status: ["DRAFT", "PENDING"],
-                fromTemplateId: toGlobalId("Petition", otherTemplate.id),
+                fromTemplateId: [toGlobalId("Petition", otherTemplate.id)],
               },
               { status: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"] },
             ],
@@ -1360,7 +1360,7 @@ describe("GraphQL / Dashboards", () => {
       );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
-        argName: "settings.filters[0].fromTemplateId",
+        argName: "settings.filters[0].fromTemplateId[0]",
         message: "Template not found",
       });
       expect(data).toBeNull();

@@ -1,5 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { assert } from "ts-essentials";
 import { fromGlobalId } from "../../util/globalId";
 import { KNEX } from "../knex";
 import { PetitionFilter } from "../repositories/PetitionRepository";
@@ -24,7 +25,7 @@ export class PetitionFilterRepositoryHelper {
       builders.push((q) => q.whereRaw("p.status in ?", [sqlIn(this.knex, filter.status!)]));
     }
 
-    if (filter.tags) {
+    if (filter.tags && filter.tags.filters.length > 0) {
       const { filters: tagsFilters, operator } = filter.tags;
 
       builders.push((q) => {
@@ -37,6 +38,7 @@ export class PetitionFilterRepositoryHelper {
             switch (filter.operator) {
               case "CONTAINS":
               case "DOES_NOT_CONTAIN":
+                assert(filter.value.length > 0, "Tag filter value must not be empty");
                 const condition = /* sql */ `(pt.tag_ids is not null and pt.tag_ids @> ?)`;
                 bindings.push(sqlArray(this.knex, filter.value, "int"));
                 conditions.push(

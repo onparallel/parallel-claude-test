@@ -2,6 +2,7 @@ import fastSafeStringify from "fast-safe-stringify";
 import { GraphQLResolveInfo } from "graphql";
 import { indexBy, isNonNullish, isNullish, partition } from "remeda";
 import { ApiContext } from "../../context";
+import { ProfileStatusValues } from "../../db/__types";
 import { fromGlobalId, isGlobalId } from "../../util/globalId";
 import { validateProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
 import { NexusGenInputs } from "../__types";
@@ -17,27 +18,33 @@ async function validatePetitionFilter(
   ctx: ApiContext,
 ) {
   if (isNonNullish(filter.fromTemplateId)) {
-    const [template] = await ctx.petitions.loadPetition(filter.fromTemplateId);
-    if (!template || template.org_id !== orgId) {
-      throw new ArgValidationError(info, `${argName}.fromTemplateId`, "Template not found");
+    const templates = await ctx.petitions.loadPetition(filter.fromTemplateId);
+    const invalidTemplateIndex = templates.findIndex((t) => !t || t.org_id !== orgId);
+    if (invalidTemplateIndex !== -1) {
+      throw new ArgValidationError(
+        info,
+        `${argName}.fromTemplateId[${invalidTemplateIndex}]`,
+        "Template not found",
+      );
     }
   }
 
   if (isNonNullish(filter.sharedWith)) {
-    if (filter.sharedWith.filters.length > 5) {
+    if (filter.sharedWith.filters.length < 1 || filter.sharedWith.filters.length > 5) {
       throw new ArgValidationError(
         info,
         `${argName}.sharedWith.filters`,
-        "A maximum of 5 filter lines is allowed",
+        "Must have between 1 and 5 filter lines",
       );
     }
 
     const targets = filter.sharedWith.filters.map((filter) => fromGlobalId(filter.value));
     const [userIds, userGroupIds] = partition(targets, (t) => t.type === "User");
-    const [users, userGroups] = await Promise.all([
-      ctx.users.loadUser(userIds.map((u) => u.id)),
-      ctx.userGroups.loadUserGroup(userGroupIds.map((g) => g.id)),
-    ]);
+    const users = userIds.length > 0 ? await ctx.users.loadUser(userIds.map((u) => u.id)) : [];
+    const userGroups =
+      userGroupIds.length > 0
+        ? await ctx.userGroups.loadUserGroup(userGroupIds.map((g) => g.id))
+        : [];
 
     for (const target of targets) {
       if (target.type !== "User" && target.type !== "UserGroup") {
@@ -70,11 +77,11 @@ async function validatePetitionFilter(
   }
 
   if (isNonNullish(filter.tags)) {
-    if (filter.tags.filters.length > 5) {
+    if (filter.tags.filters.length < 1 || filter.tags.filters.length > 5) {
       throw new ArgValidationError(
         info,
         `${argName}.tags.filters`,
-        "A maximum of 5 filter lines is allowed",
+        "Must have between 1 and 5 filter lines",
       );
     }
 
@@ -109,11 +116,11 @@ async function validatePetitionFilter(
   }
 
   if (isNonNullish(filter.approvals)) {
-    if (filter.approvals.filters.length > 5) {
+    if (filter.approvals.filters.length < 1 || filter.approvals.filters.length > 5) {
       throw new ArgValidationError(
         info,
         `${argName}.approvals.filters`,
-        "A maximum of 5 filter lines is allowed",
+        "Must have between 1 and 5 filter lines",
       );
     }
 
@@ -171,8 +178,19 @@ async function validateProfileFilter(
       throw new ArgValidationError(info, `${argName}.${invalidKey}`, "Cannot be set");
     }
   }
-  if (filter.status?.includes("DELETION_SCHEDULED")) {
-    throw new ArgValidationError(info, `${argName}.status`, "Invalid status");
+
+  if (filter.status) {
+    if (filter.status.length < 1 || filter.status.length > ProfileStatusValues.length) {
+      throw new ArgValidationError(
+        info,
+        `${argName}.status`,
+        `Must have between 1 and ${ProfileStatusValues.length} values`,
+      );
+    }
+
+    if (filter.status.includes("DELETION_SCHEDULED")) {
+      throw new ArgValidationError(info, `${argName}.status`, "Invalid status");
+    }
   }
 
   if (isNonNullish(filter.values)) {
