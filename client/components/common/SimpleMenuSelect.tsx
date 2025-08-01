@@ -46,7 +46,11 @@ export function SimpleMenuSelect<T extends string = string, IsMulti extends bool
       </MenuButton>
       <Portal>
         <MenuList fontSize="sm" minWidth={0} width="auto">
-          <MenuOptionGroup value={value} onChange={onChange as any} type="checkbox">
+          <MenuOptionGroup
+            value={value}
+            onChange={onChange as any}
+            type={isMulti ? "checkbox" : "radio"}
+          >
             {options.map((o, i) =>
               o === "DIVIDER" ? (
                 <MenuDivider key={i} />
