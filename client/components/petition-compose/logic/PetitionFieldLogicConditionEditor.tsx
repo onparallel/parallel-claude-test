@@ -131,7 +131,9 @@ function ConditionMultipleValueModifier({
       if (
         isFileTypeField(conditionField.type) ||
         (conditionField.type === "DYNAMIC_SELECT" && condition.column === undefined) ||
-        conditionField.type === "FIELD_GROUP"
+        conditionField.type === "FIELD_GROUP" ||
+        conditionField.type === "BACKGROUND_CHECK" ||
+        conditionField.type === "ADVERSE_MEDIA_SEARCH"
       ) {
         return [
           {
