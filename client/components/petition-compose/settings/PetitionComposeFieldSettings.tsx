@@ -112,9 +112,10 @@ export const PetitionComposeFieldSettings = Object.assign(
 
       const isFieldGroupChild = isNonNullish(field.parent);
 
-      const showInPdf = isFieldGroupChild ? field.parent!.showInPdf : field.showInPdf;
-
       const parentIsInternal = isFieldGroupChild ? field.parent!.isInternal : false;
+
+      const parentHasShowInPdf = isFieldGroupChild ? field.parent!.showInPdf : false;
+      const disableChildShowInPdf = isFieldGroupChild && !parentHasShowInPdf;
 
       const canOnlyBeInternal = ONLY_INTERNAL_FIELD_TYPES.includes(field.type);
 
@@ -323,8 +324,7 @@ export const PetitionComposeFieldSettings = Object.assign(
               </SettingsRowGroup>
             ) : null}
 
-            {(isFieldGroupChild && !isFileTypeField(field.type)) ||
-            canOnlyBeInternal ||
+            {(!isFileTypeField(field.type) || canOnlyBeInternal) &&
             !petition.isDocumentGenerationEnabled ? null : (
               <SettingsRowGroup
                 label={
@@ -335,19 +335,16 @@ export const PetitionComposeFieldSettings = Object.assign(
                 }
                 isReadOnly={isReadOnly}
               >
-                {isFieldGroupChild || canOnlyBeInternal ? null : (
-                  <ShowPdfSettingsRow
-                    isDisabled={isReadOnly}
-                    isChecked={showInPdf}
-                    onChange={handleFieldEdit}
-                  />
-                )}
-                {showInPdf &&
-                (field.type === "FIELD_GROUP" || isReplyable) &&
-                !isFieldGroupChild ? (
+                <ShowPdfSettingsRow
+                  isDisabled={isReadOnly || disableChildShowInPdf}
+                  isChecked={field.showInPdf && !disableChildShowInPdf}
+                  onChange={handleFieldEdit}
+                />
+
+                {field.showInPdf && (field.type === "FIELD_GROUP" || isReplyable) ? (
                   <ShowReplyActivitySettingsRow
-                    isDisabled={isReadOnly}
-                    isChecked={field.showActivityInPdf}
+                    isDisabled={isReadOnly || disableChildShowInPdf}
+                    isChecked={field.showActivityInPdf && !disableChildShowInPdf}
                     onChange={handleFieldEdit}
                   />
                 ) : null}
