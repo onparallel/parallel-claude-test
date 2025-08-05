@@ -2,6 +2,7 @@
 
 # Migration script for Chakra UI components
 # Usage: ./scripts/migrate-component.sh Accordion
+# This local script 
 
 COMPONENT=$1
 

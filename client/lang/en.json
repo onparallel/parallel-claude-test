@@ -1265,11 +1265,6 @@
     "context": "Add approval"
   },
   {
-    "term": "component.configure-approval-steps-dialog.add-condition",
-    "definition": "Add condition",
-    "context": "Add condition"
-  },
-  {
     "term": "component.configure-approval-steps-dialog.all",
     "definition": "All approve",
     "context": "All approve"
@@ -6220,6 +6215,11 @@
     "context": "Too many attachments"
   },
   {
+    "term": "component.petition-compose-attachments.visibility-popover",
+    "definition": "This attachment will only be shown or hidden when the conditions are met.",
+    "context": "This attachment will only be shown or hidden when the conditions are met."
+  },
+  {
     "term": "component.petition-compose-background-check-settings.automate-search",
     "definition": "Automate the search",
     "context": "Automate the search"
@@ -6498,11 +6498,6 @@
     "term": "component.petition-compose-field.add-calculation",
     "definition": "Add calculation",
     "context": "Add calculation"
-  },
-  {
-    "term": "component.petition-compose-field.add-condition",
-    "definition": "Add condition",
-    "context": "Add condition"
   },
   {
     "term": "component.petition-compose-field.calculations-help",
@@ -6923,11 +6918,6 @@
     "term": "component.petition-field-file-upload-payslip-reply.error-reading-document",
     "definition": "We have not been able to read this document. Please check it to make sure it is the correct type of document.",
     "context": "We have not been able to read this document. Please check it to make sure it is the correct type of document."
-  },
-  {
-    "term": "component.petition-field-logic-add-condition-button.add-condition",
-    "definition": "Add condition",
-    "context": "Add condition"
   },
   {
     "term": "component.petition-field-logic-condition-editor.view-list-content",
@@ -9798,11 +9788,6 @@
     "term": "component.profiles-excel-import.header",
     "definition": "Importing profiles...",
     "context": "Importing profiles..."
-  },
-  {
-    "term": "component.profiles-module-filter-editor.add-condition",
-    "definition": "Add condition",
-    "context": "Add condition"
   },
   {
     "term": "component.profiles-module-filter-editor.add-group",
@@ -13548,6 +13533,11 @@
     "term": "generic.add-comment",
     "definition": "Add comment",
     "context": "Add comment"
+  },
+  {
+    "term": "generic.add-condition",
+    "definition": "Add condition",
+    "context": "Add condition"
   },
   {
     "term": "generic.add-filter",

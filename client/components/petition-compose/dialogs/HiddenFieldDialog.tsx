@@ -9,7 +9,7 @@ import {
 
 import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
-import { PetitionFieldVisibilityEditor } from "../logic/PetitionFieldVisibilityEditor";
+import { PetitionVisibilityEditor } from "../logic/PetitionVisibilityEditor";
 
 interface HiddenFieldDialogProps {
   field: HiddenFieldDialog_PetitionFieldFragment;
@@ -38,12 +38,13 @@ export function HiddenFieldDialog({
             id="component.hidden-field-dialog.body"
             defaultMessage="The field you are trying to preview is not visible right now. The following conditions must be met for it to be displayed:"
           />
-          <PetitionFieldVisibilityEditor
-            field={field}
+          <PetitionVisibilityEditor
             petition={petition}
+            fieldId={field.id}
             showErrors={false}
             isReadOnly={true}
-            onVisibilityEdit={() => {}}
+            onChange={() => {}}
+            visibilityOn="FIELD"
           />
         </Stack>
       }
@@ -69,14 +70,15 @@ export function useHiddenFieldDialog() {
 HiddenFieldDialog.fragments = {
   PetitionBase: gql`
     fragment HiddenFieldDialog_PetitionBase on PetitionBase {
-      ...PetitionFieldVisibilityEditor_PetitionBase
+      ...PetitionVisibilityEditor_PetitionBase
     }
-    ${PetitionFieldVisibilityEditor.fragments.PetitionBase}
+    ${PetitionVisibilityEditor.fragments.PetitionBase}
   `,
   PetitionField: gql`
     fragment HiddenFieldDialog_PetitionField on PetitionField {
-      ...PetitionFieldVisibilityEditor_PetitionField
+      id
+      ...PetitionVisibilityEditor_PetitionField
     }
-    ${PetitionFieldVisibilityEditor.fragments.PetitionField}
+    ${PetitionVisibilityEditor.fragments.PetitionField}
   `,
 };

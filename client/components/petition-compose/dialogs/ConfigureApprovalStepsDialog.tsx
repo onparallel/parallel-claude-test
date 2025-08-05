@@ -38,8 +38,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, omit } from "remeda";
-import { PetitionApprovalStepsVisibilityEditor } from "../logic/PetitionApprovalStepsVisibilityEditor";
-import { PetitionFieldVisibilityEditor } from "../logic/PetitionFieldVisibilityEditor";
+import { PetitionVisibilityEditor } from "../logic/PetitionVisibilityEditor";
 
 interface ConfigureApprovalStepsDialogProps {
   petitionId: string;
@@ -186,18 +185,18 @@ useConfigureApprovalStepsDialog.fragments = {
   PetitionBase: gql`
     fragment ConfigureApprovalStepsDialog_PetitionBase on PetitionBase {
       id
-      ...PetitionFieldVisibilityEditor_PetitionBase
+      ...PetitionVisibilityEditor_PetitionBase
       approvalFlowConfig {
         ...Fragments_FullApprovalFlowConfig
       }
       fields {
         id
-        ...PetitionFieldVisibilityEditor_PetitionField
+        ...PetitionVisibilityEditor_PetitionField
       }
     }
     ${Fragments.FullApprovalFlowConfig}
-    ${PetitionFieldVisibilityEditor.fragments.PetitionBase}
-    ${PetitionFieldVisibilityEditor.fragments.PetitionField}
+    ${PetitionVisibilityEditor.fragments.PetitionBase}
+    ${PetitionVisibilityEditor.fragments.PetitionField}
   `,
 };
 
@@ -347,16 +346,17 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
             }}
             render={({ field: { onChange, value } }) => {
               return (
-                <PetitionApprovalStepsVisibilityEditor
+                <PetitionVisibilityEditor
                   petition={petition}
                   value={value as any}
                   showErrors={errors.approvals?.[index]?.visibility ? true : false}
                   onChange={(v) => {
-                    onChange(v);
+                    onChange(v as any);
                   }}
                   onRemove={() => {
                     handleAddCondition(false);
                   }}
+                  visibilityOn="APPROVAL"
                 />
               );
             }}
@@ -377,7 +377,7 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
                   defaultMessage: "Remove condition",
                 })
               : intl.formatMessage({
-                  id: "component.configure-approval-steps-dialog.add-condition",
+                  id: "generic.add-condition",
                   defaultMessage: "Add condition",
                 })
           }

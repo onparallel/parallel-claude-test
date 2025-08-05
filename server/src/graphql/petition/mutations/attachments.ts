@@ -1,11 +1,15 @@
-import { booleanArg, list, mutationField, nonNull } from "nexus";
+import { booleanArg, list, mutationField, nonNull, nullable } from "nexus";
 import { firstBy, zip } from "remeda";
+import { assert } from "ts-essentials";
+import { mapFieldLogic, PetitionFieldVisibility } from "../../../util/fieldLogic";
 import { toBytes } from "../../../util/fileSize";
+import { fromGlobalId } from "../../../util/globalId";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
-import { ApolloError } from "../../helpers/errors";
+import { ApolloError, ForbiddenError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { RESULT } from "../../helpers/Result";
+import { validateFieldLogicSchema } from "../../helpers/validators/validFieldLogic";
 import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
 import {
   fieldAttachmentBelongsToField,
@@ -393,3 +397,77 @@ export const updatePetitionAttachmentType = mutationField("updatePetitionAttachm
     return petitionAttachment;
   },
 });
+
+export const updatePetitionAttachmentVisibility = mutationField(
+  "updatePetitionAttachmentVisibility",
+  {
+    description: "Updates the visibility of a petition attachment. Pass null to remove visibility.",
+    type: "PetitionAttachment",
+    authorize: authenticateAnd(
+      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
+      petitionsAreNotPublicTemplates("petitionId"),
+      petitionIsNotAnonymized("petitionId"),
+      petitionsAreEditable("petitionId"),
+      petitionDoesNotHaveStartedProcess("petitionId"),
+    ),
+    args: {
+      petitionId: nonNull(globalIdArg("Petition")),
+      attachmentId: nonNull(globalIdArg("PetitionAttachment")),
+      visibility: nullable("JSONObject"),
+    },
+    resolve: async (_, args, ctx) => {
+      let mappedVisibility: PetitionFieldVisibility | null = null;
+
+      if (args.visibility !== null) {
+        try {
+          // Validate JSON schema if not null
+          const logic = { visibility: args.visibility as any, math: null };
+          validateFieldLogicSchema(logic, "string");
+
+          // Convert globalIds to numeric IDs for database storage
+          const mappedLogic = mapFieldLogic<string>(
+            { visibility: args.visibility as any },
+            (fieldId) => {
+              assert(typeof fieldId === "string", "Expected fieldId to be a string");
+              return fromGlobalId(fieldId, "PetitionField").id;
+            },
+          );
+
+          // Validate that referenced fields belong to the same petition
+          const visibility = mappedLogic.field.visibility as PetitionFieldVisibility;
+          if (visibility?.conditions) {
+            const allFields = await ctx.petitions.loadAllFieldsByPetitionId(args.petitionId);
+
+            for (const condition of visibility.conditions) {
+              if ("fieldId" in condition) {
+                const referencedField = allFields.find((f) => f.id === condition.fieldId);
+                assert(
+                  referencedField !== undefined,
+                  `Can't find PetitionField:${condition.fieldId} referenced in visibility condition`,
+                );
+              }
+            }
+          }
+
+          mappedVisibility = visibility;
+        } catch (e) {
+          if (e instanceof Error) {
+            throw new ForbiddenError(e.message);
+          }
+
+          throw e;
+        }
+      }
+
+      const petitionAttachment = await ctx.petitions.updatePetitionAttachmentVisibility(
+        args.attachmentId,
+        mappedVisibility,
+        `User:${ctx.user!.id}`,
+      );
+      await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);
+
+      return petitionAttachment;
+    },
+  },
+);

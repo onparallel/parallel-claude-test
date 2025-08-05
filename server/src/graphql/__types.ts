@@ -3004,6 +3004,7 @@ export interface NexusGenFieldTypes {
     updateOrganizationUserLimit: NexusGenRootTypes["Organization"]; // Organization!
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionAttachmentType: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
+    updatePetitionAttachmentVisibility: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     updatePetitionComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     updatePetitionEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     updatePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -3351,6 +3352,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     type: NexusGenEnums["PetitionAttachmentType"]; // PetitionAttachmentType!
+    visibility: NexusGenScalars["JSONObject"] | null; // JSONObject
   };
   PetitionAttachmentUploadData: {
     // field return type
@@ -6206,6 +6208,7 @@ export interface NexusGenFieldTypeNames {
     updateOrganizationUserLimit: "Organization";
     updatePetition: "PetitionBase";
     updatePetitionAttachmentType: "PetitionAttachment";
+    updatePetitionAttachmentVisibility: "PetitionAttachment";
     updatePetitionComment: "PetitionFieldComment";
     updatePetitionEventSubscription: "PetitionEventSubscription";
     updatePetitionField: "PetitionField";
@@ -6553,6 +6556,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     petition: "PetitionBase";
     type: "PetitionAttachmentType";
+    visibility: "JSONObject";
   };
   PetitionAttachmentUploadData: {
     // field return type name
@@ -9849,6 +9853,12 @@ export interface NexusGenArgTypes {
       attachmentId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
       type: NexusGenEnums["PetitionAttachmentType"]; // PetitionAttachmentType!
+    };
+    updatePetitionAttachmentVisibility: {
+      // args
+      attachmentId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      visibility?: NexusGenScalars["JSONObject"] | null; // JSONObject
     };
     updatePetitionComment: {
       // args

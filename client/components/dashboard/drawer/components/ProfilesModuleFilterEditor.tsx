@@ -260,10 +260,7 @@ function FilterGroupComponent({
             onClick={() => append({ profileTypeFieldId: null, operator: "CONTAIN", value: "" })}
             fontWeight={400}
           >
-            <FormattedMessage
-              id="component.profiles-module-filter-editor.add-condition"
-              defaultMessage="Add condition"
-            />
+            <FormattedMessage id="generic.add-condition" defaultMessage="Add condition" />
           </Button>
         </HStack>
       </Stack>

@@ -57,10 +57,7 @@ export const PetitionFieldLogicAddConditionButton = chakraForwardRef<
       }}
       {...props}
     >
-      <FormattedMessage
-        id="component.petition-field-logic-add-condition-button.add-condition"
-        defaultMessage="Add condition"
-      />
+      <FormattedMessage id="generic.add-condition" defaultMessage="Add condition" />
     </Button>
   );
 });

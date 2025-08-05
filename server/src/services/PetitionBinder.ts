@@ -3,7 +3,7 @@ import { stat, writeFile } from "fs/promises";
 import { inject, injectable } from "inversify";
 import pMap from "p-map";
 import { resolve } from "path";
-import { isNonNullish, isNullish } from "remeda";
+import { isNonNullish, isNullish, zip } from "remeda";
 import sanitizeFilename from "sanitize-filename";
 import { Readable } from "stream";
 import {
@@ -16,7 +16,7 @@ import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository"
 import { FileRepository } from "../db/repositories/FileRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
-import { applyFieldVisibility } from "../util/fieldLogic";
+import { applyFieldVisibility, evaluateVisibilityArray } from "../util/fieldLogic";
 import { isFileTypeField } from "../util/isFileTypeField";
 import { removePasswordFromPdf } from "../util/pdf";
 import { pFlatMap } from "../util/promises/pFlatMap";
@@ -91,7 +91,7 @@ export class PetitionBinder implements IPetitionBinder {
 
     this.info(petitionId, `Temporary directory created at ${tempDir.path}`);
 
-    const [petition, fieldsWithFiles, attachments] = await Promise.all([
+    const [petition, fieldsWithFiles, allAttachments] = await Promise.all([
       this.petitions.loadPetition(petitionId, { refresh: true }), // refresh to get the correct petition.locale in case it has been recently updated
       this.getPrintableFiles(petitionId),
       this.petitions.loadPetitionAttachmentsByPetitionId(petitionId),
@@ -100,6 +100,24 @@ export class PetitionBinder implements IPetitionBinder {
     if (!petition) {
       throw new Error(`Petition:${petitionId} not found`);
     }
+
+    // Get petition data for visibility evaluation
+    const [composedPetition] = await this.petitions.getComposedPetitionFieldsAndVariables([
+      petitionId,
+    ]);
+
+    // Apply attachment visibility filtering
+    const visibleAttachments = zip(
+      allAttachments,
+      evaluateVisibilityArray(composedPetition, allAttachments),
+    )
+      .filter(([_, v]) => v.isVisible)
+      .map(([a]) => a);
+
+    this.info(
+      petitionId,
+      `Filtered ${allAttachments.length} attachments to ${visibleAttachments.length} visible attachments`,
+    );
 
     const documentTheme = await this.organizations.loadOrganizationTheme(
       petition.document_organization_theme_id,
@@ -194,7 +212,7 @@ export class PetitionBinder implements IPetitionBinder {
             tempDir.path,
             (
               await this.files.loadFileUpload(
-                attachments.filter((a) => a.type === type).map((a) => a.file_upload_id),
+                visibleAttachments.filter((a) => a.type === type).map((a) => a.file_upload_id),
               )
             ).filter(isNonNullish),
             userId,

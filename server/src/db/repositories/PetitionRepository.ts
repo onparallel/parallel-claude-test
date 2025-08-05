@@ -38,7 +38,12 @@ import {
 import { QUEUES_SERVICE, QueuesService } from "../../services/QueuesService";
 import { average } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
-import { applyFieldVisibility, evaluateFieldLogic, mapFieldLogic } from "../../util/fieldLogic";
+import {
+  PetitionFieldVisibility,
+  applyFieldVisibility,
+  evaluateFieldLogic,
+  mapFieldLogic,
+} from "../../util/fieldLogic";
 import { fromGlobalId, fromGlobalIds, isGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { isValueCompatible } from "../../util/isValueCompatible";
@@ -6849,6 +6854,30 @@ export class PetitionRepository extends BaseRepository {
         .where({ deleted_at: null, type: target.type, petition_id: petitionId })
         .whereRaw(`"position" > ?`, [target.position])
         .update({ position: this.knex.raw(`"position" - 1`) });
+
+      return result;
+    });
+  }
+
+  async updatePetitionAttachmentVisibility(
+    attachmentId: number,
+    visibility: PetitionFieldVisibility | null,
+    updatedBy: string,
+  ) {
+    return await this.withTransaction(async (t) => {
+      const [result] = await this.raw<PetitionAttachment>(
+        /* sql */ `
+            update petition_attachment set
+              visibility = ?,
+              updated_at = NOW(),
+              updated_by = ?
+              where id = ?
+              and deleted_at is null
+              returning *;
+        `,
+        [visibility, updatedBy, attachmentId],
+        t,
+      );
 
       return result;
     });

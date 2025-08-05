@@ -711,3 +711,28 @@ function applyMathOperation(
   }
   currentVariables[operation.variable] = result;
 }
+
+export function evaluateVisibilityArray<T extends { visibility?: any | null }>(
+  petition: FieldLogicPetitionInput,
+  data: T[],
+) {
+  // at least 1 item is required for this to work
+  assert(data.length > 0, "At least 1 item is required");
+
+  return evaluateFieldLogic({
+    ...petition,
+    // add 1 mock field for each item in data array, to be able to evaluate their visibilities based on previous fields
+    fields: petition.fields.concat(
+      data.map(({ visibility }) => ({
+        id: 0, // ID does not matter, as this "fields" will never be referenced
+        type: "HEADING" as const,
+        visibility: visibility ?? null,
+        options: {},
+        replies: [],
+        math: null,
+      })),
+    ),
+  }).slice(
+    -data.length, // only return the last N items, which are the logic results for the data array
+  );
+}

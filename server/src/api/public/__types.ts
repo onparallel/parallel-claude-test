@@ -1673,6 +1673,8 @@ export type Mutation = {
   updatePetition: PetitionBase;
   /** Updates the type of a petition attachment and sets it in the final position */
   updatePetitionAttachmentType: PetitionAttachment;
+  /** Updates the visibility of a petition attachment. Pass null to remove visibility. */
+  updatePetitionAttachmentVisibility: PetitionAttachment;
   /** Update a petition comment. */
   updatePetitionComment: PetitionFieldComment;
   /** Updates an existing event subscription for the user's petitions */
@@ -3183,6 +3185,12 @@ export type MutationupdatePetitionAttachmentTypeArgs = {
   type: PetitionAttachmentType;
 };
 
+export type MutationupdatePetitionAttachmentVisibilityArgs = {
+  attachmentId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  visibility?: InputMaybe<Scalars["JSONObject"]["input"]>;
+};
+
 export type MutationupdatePetitionCommentArgs = {
   content: Scalars["JSON"]["input"];
   petitionFieldCommentId: Scalars["GID"]["input"];
@@ -4011,6 +4019,7 @@ export type PetitionAttachment = {
   id: Scalars["GID"]["output"];
   petition: PetitionBase;
   type: PetitionAttachmentType;
+  visibility: Scalars["JSON"]["output"];
 };
 
 export type PetitionAttachmentType = "ANNEX" | "BACK" | "FRONT";

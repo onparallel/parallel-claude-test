@@ -92,7 +92,9 @@ import {
   PetitionFieldOptionsListEditorRef,
 } from "./PetitionFieldOptionsListEditor";
 import { PetitionFieldMathEditor } from "./logic/PetitionFieldMathEditor";
-import { PetitionFieldVisibilityEditor } from "./logic/PetitionFieldVisibilityEditor";
+
+import { PetitionComposeVisibilityAccordion } from "../petition-common/PetitionComposeVisibilityAccordion";
+import { PetitionVisibilityEditor } from "./logic/PetitionVisibilityEditor";
 
 export type PetitionComposeFieldSelection =
   | PetitionComposeField_PetitionFieldFragment
@@ -1115,15 +1117,33 @@ const _PetitionComposeFieldInner = chakraForwardRef<
 
       {field.visibility ? (
         <Box paddingTop={1}>
-          <PetitionComposeFieldVisibilityAccordion isOpen={previousVisibility === null}>
-            <PetitionFieldVisibilityEditor
-              field={field}
+          <PetitionComposeVisibilityAccordion
+            isOpen={previousVisibility === null}
+            popoverContent={
+              <>
+                <Text fontSize="sm">
+                  <FormattedMessage
+                    id="component.petition-compose-field.visibility-help"
+                    defaultMessage="This field will only be shown or hidden when the conditions are met."
+                  />
+                </Text>
+                <Text fontSize="sm">
+                  <HelpCenterLink articleId={6076369}>
+                    <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
+                  </HelpCenterLink>
+                </Text>
+              </>
+            }
+          >
+            <PetitionVisibilityEditor
               petition={petition}
+              fieldId={field.id}
               showErrors={showError}
-              onVisibilityEdit={(visibility) => onFieldEdit({ visibility })}
+              onChange={(visibility) => onFieldEdit({ visibility })}
               isReadOnly={isReadOnly}
+              visibilityOn="FIELD"
             />
-          </PetitionComposeFieldVisibilityAccordion>
+          </PetitionComposeVisibilityAccordion>
         </Box>
       ) : null}
       {field.math ? (
@@ -1207,7 +1227,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
                     defaultMessage: "Remove condition",
                   })
                 : intl.formatMessage({
-                    id: "component.petition-compose-field.add-condition",
+                    id: "generic.add-condition",
                     defaultMessage: "Add condition",
                   })
             }
@@ -1244,7 +1264,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
               as="div"
               icon={<ConditionIcon />}
               aria-label={intl.formatMessage({
-                id: "component.petition-compose-field.add-condition",
+                id: "generic.add-condition",
                 defaultMessage: "Add condition",
               })}
             />
@@ -1429,11 +1449,11 @@ const fragments = {
           id
           isReadOnly
         }
-        ...PetitionFieldVisibilityEditor_PetitionBase
         ...PetitionFieldMathEditor_PetitionBase
+        ...PetitionVisibilityEditor_PetitionBase
       }
-      ${PetitionFieldVisibilityEditor.fragments.PetitionBase}
       ${PetitionFieldMathEditor.fragments.PetitionBase}
+      ${PetitionVisibilityEditor.fragments.PetitionBase}
     `;
   },
   get BasePetitionField() {
@@ -1455,11 +1475,11 @@ const fragments = {
           ...PetitionComposeField_PetitionFieldAttachment
         }
         ...PetitionFieldOptionsListEditor_PetitionField
-        ...PetitionFieldVisibilityEditor_PetitionField
+        ...PetitionVisibilityEditor_PetitionField
       }
       ${this.PetitionFieldAttachment}
       ${PetitionFieldOptionsListEditor.fragments.PetitionField}
-      ${PetitionFieldVisibilityEditor.fragments.PetitionField}
+      ${PetitionVisibilityEditor.fragments.PetitionField}
     `;
   },
   get PetitionField() {
@@ -1711,69 +1731,6 @@ function useDragAndDrop(
   drop(elementRef);
   return { elementRef, dragRef, previewRef, isDragging, isOverCurrent };
 }
-
-interface PetitionComposeFieldVisibilityAccordionProps {
-  isOpen: boolean;
-}
-
-const PetitionComposeFieldVisibilityAccordion = chakraForwardRef<
-  "div",
-  PetitionComposeFieldVisibilityAccordionProps
->(function PetitionComposeFieldVisibilityAccordion({ isOpen, children }, ref) {
-  return (
-    <Accordion.Root
-      defaultValue={isOpen ? ["0"] : undefined}
-      collapsible
-      reduceMotion
-      borderRadius="md"
-      backgroundColor="gray.100"
-      border="none"
-      ref={ref}
-    >
-      <Accordion.Item border="none">
-        {({ isExpanded }) => {
-          return (
-            <>
-              <Heading>
-                <Accordion.ItemTrigger borderRadius="md" paddingY={3}>
-                  <HStack as="span" flex="1" textAlign="left" fontSize="sm" spacing={1}>
-                    <ChevronFilledIcon
-                      color="gray.500"
-                      fontSize="xs"
-                      transform={isExpanded ? "rotate(90deg)" : undefined}
-                      marginEnd={2}
-                    />
-                    <ConditionIcon />
-                    <FormattedMessage
-                      id="component.petition-compose-field.visibility-title"
-                      defaultMessage="Visibility conditions"
-                    />
-                    <HelpPopover marginStart={1}>
-                      <Text fontSize="sm">
-                        <FormattedMessage
-                          id="component.petition-compose-field.visibility-help"
-                          defaultMessage="This field will only be shown or hidden when the conditions are met."
-                        />
-                      </Text>
-                      <Text fontSize="sm">
-                        <HelpCenterLink articleId={6076369}>
-                          <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
-                        </HelpCenterLink>
-                      </Text>
-                    </HelpPopover>
-                  </HStack>
-                </Accordion.ItemTrigger>
-              </Heading>
-              <Accordion.ItemContent padding={0}>
-                {isExpanded ? children : null}
-              </Accordion.ItemContent>
-            </>
-          );
-        }}
-      </Accordion.Item>
-    </Accordion.Root>
-  );
-});
 
 interface PetitionComposeFieldVariablesAccordionProps {
   isOpen: boolean;

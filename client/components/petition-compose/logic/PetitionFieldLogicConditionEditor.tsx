@@ -1119,7 +1119,7 @@ function ConditionPredicateValueSelect({
           option: (styles) => ({
             ...styles,
             WebkitLineClamp: "3",
-            padding: "4px 8px",
+            padding: "5px 8px",
           }),
         }}
       />

@@ -18,6 +18,7 @@ import {
   AddIcon,
   BackCoverIcon,
   ChevronDownIcon,
+  ConditionIcon,
   DeleteIcon,
   DownloadIcon,
   DragHandleIcon,
@@ -39,8 +40,10 @@ import {
   PetitionComposeAttachments_PetitionBaseFragmentDoc,
   PetitionComposeAttachments_reorderPetitionAttachmentsDocument,
   PetitionComposeAttachments_updatePetitionAttachmentTypeDocument,
+  PetitionComposeAttachments_updatePetitionAttachmentVisibilityDocument,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
+import { PetitionFieldVisibility } from "@parallel/utils/fieldLogic/types";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
@@ -56,14 +59,17 @@ import pMap from "p-map";
 import { useEffect, useRef, useState } from "react";
 import { DropEvent, FileRejection, useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-import { omit, sumBy, uniqueBy, zip } from "remeda";
+import { isNonNullish, omit, sumBy, uniqueBy, zip } from "remeda";
 import { noop } from "ts-essentials";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { Divider } from "../common/Divider";
 import { FileName } from "../common/FileName";
+import { HelpCenterLink } from "../common/HelpCenterLink";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { RestrictedFeaturePopover } from "../common/RestrictedFeaturePopover";
+import { PetitionComposeVisibilityAccordion } from "../petition-common/PetitionComposeVisibilityAccordion";
+import { PetitionVisibilityEditor } from "./logic/PetitionVisibilityEditor";
 import { PetitionComposeDragActiveIndicator } from "./PetitionComposeDragActiveIndicator";
 
 const MAX_FILE_SIZE = 1024 * 1024 * 50;
@@ -192,6 +198,19 @@ export const PetitionComposeAttachments = Object.assign(
           variables: { petitionId, attachmentId, type: toType },
         });
       }
+    };
+
+    const [updatePetitionAttachmentVisibility] = useMutation(
+      PetitionComposeAttachments_updatePetitionAttachmentVisibilityDocument,
+    );
+
+    const handleVisibilityChange = async (
+      attachmentId: string,
+      visibility: PetitionFieldVisibility | null,
+    ) => {
+      await updatePetitionAttachmentVisibility({
+        variables: { petitionId, attachmentId, visibility },
+      });
     };
 
     const showErrorDialog = useErrorDialog();
@@ -420,6 +439,8 @@ export const PetitionComposeAttachments = Object.assign(
                             progress={attachmentUploadProgress[item.id]}
                             isDraggable={list.length > 1}
                             isDisabled={isReadOnly}
+                            petition={petition}
+                            visibility={item.visibility}
                             onRemove={handleRemoveAttachment}
                             onPreview={handleDownloadAttachment}
                             onChangeType={handleChangeType}
@@ -429,6 +450,9 @@ export const PetitionComposeAttachments = Object.assign(
                                 list.map((item) => item.id),
                               )
                             }
+                            onVisibilityChange={async (id, visibility) => {
+                              await handleVisibilityChange(id, visibility);
+                            }}
                           />
                         );
                       })}
@@ -490,6 +514,7 @@ export const PetitionComposeAttachments = Object.assign(
               isComplete
             }
             isUploading @client
+            visibility
           }
         `;
       },
@@ -517,13 +542,24 @@ export const PetitionComposeAttachments = Object.assign(
               id
               type
               options
+              visibility
+              ...PetitionVisibilityEditor_PetitionField
+              children {
+                id
+                type
+                visibility
+                ...PetitionVisibilityEditor_PetitionField
+              }
             }
             attachmentsList {
               ...PetitionComposeAttachments_PetitionAttachmentsList
             }
             lastChangeAt
+            ...PetitionVisibilityEditor_PetitionBase
           }
           ${this.PetitionAttachmentsList}
+          ${PetitionVisibilityEditor.fragments.PetitionBase}
+          ${PetitionVisibilityEditor.fragments.PetitionField}
         `;
       },
     },
@@ -630,6 +666,22 @@ const _mutations = [
       }
     }
   `,
+  gql`
+    mutation PetitionComposeAttachments_updatePetitionAttachmentVisibility(
+      $petitionId: GID!
+      $attachmentId: GID!
+      $visibility: JSONObject
+    ) {
+      updatePetitionAttachmentVisibility(
+        petitionId: $petitionId
+        attachmentId: $attachmentId
+        visibility: $visibility
+      ) {
+        id
+        visibility
+      }
+    }
+  `,
 ];
 
 interface AttachmentItemProps {
@@ -638,6 +690,9 @@ interface AttachmentItemProps {
   progress: number;
   isDraggable: boolean;
   isDisabled?: boolean;
+  petition: PetitionComposeAttachments_PetitionBaseFragment;
+  visibility?: PetitionFieldVisibility;
+  isEditingVisibility?: boolean;
   onRemove: (id: string) => Promise<void>;
   onPreview: (id: string, preview: boolean) => void;
   onChangeType: (
@@ -646,6 +701,7 @@ interface AttachmentItemProps {
     toType: PetitionAttachmentType,
   ) => void;
   onDragEnd: () => void;
+  onVisibilityChange: (id: string, visibility: PetitionFieldVisibility | null) => void;
 }
 
 const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function AttachmentItem(
@@ -655,10 +711,13 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
     progress,
     isDraggable,
     isDisabled,
+    petition,
+    visibility,
     onRemove,
     onPreview,
     onChangeType,
     onDragEnd,
+    onVisibilityChange,
     ...props
   },
   ref,
@@ -672,6 +731,12 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
   const previewRef = useRef<HTMLButtonElement>(null);
   const isMouseOver = useIsMouseOver(previewRef);
   const isShiftDown = useIsGlobalKeyDown("Shift");
+
+  const [hasVisibilityConditions, setHasVisibilityConditions] = useState(isNonNullish(visibility));
+
+  useEffect(() => {
+    setHasVisibilityConditions(isNonNullish(visibility));
+  }, [visibility]);
 
   const { type, file, isUploading, id } = item;
   const { filename, size, isComplete } = file;
@@ -713,188 +778,249 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
       style={{ y }}
       onDragEnd={onDragEnd}
     >
-      <HStack
-        ref={ref}
-        paddingStart={5}
-        paddingEnd={3}
+      <Stack
+        shadow={isAnimated ? "short" : undefined}
+        spacing={0}
+        backgroundColor="white"
         _hover={{ backgroundColor: "gray.50" }}
         borderRadius="md"
-        backgroundColor="white"
-        shadow={isAnimated ? "short" : undefined}
-        transitionProperty="all"
-        transitionDuration="320ms"
-        sx={{
-          ".drag-handle": {
-            opacity: isAnimated ? 1 : 0,
-            transition: "opacity 150ms",
-          },
-          "&:hover .drag-handle": {
-            opacity: 1,
-          },
-        }}
-        position="relative"
-        userSelect={isDisabled ? undefined : "none"}
-        {...props}
       >
-        <Box
-          className="drag-handle"
-          position="absolute"
-          insetStart={1}
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          cursor={isDraggable && !isDisabled ? "grab" : "not-allowed"}
-          color="gray.400"
-          _hover={{
-            color: isDraggable && !isDisabled ? "gray.700" : "gray.400",
+        <HStack
+          ref={ref}
+          paddingStart={5}
+          paddingEnd={3}
+          transitionProperty="all"
+          transitionDuration="320ms"
+          sx={{
+            ".drag-handle": {
+              opacity: isAnimated ? 1 : 0,
+              transition: "opacity 150ms",
+            },
+            "&:hover .drag-handle": {
+              opacity: 1,
+            },
           }}
-          aria-label={intl.formatMessage({
-            id: "component.petition-compose-attachments.drag-to-sort-label",
-            defaultMessage: "Drag to sort this attachment",
-          })}
-          onPointerDown={(event) => (isDraggable && !isDisabled ? dragControls.start(event) : noop)}
+          position="relative"
+          userSelect={isDisabled ? undefined : "none"}
+          {...props}
         >
-          <DragHandleIcon role="presentation" pointerEvents="none" boxSize={3} />
-        </Box>
-        <Menu>
-          <Box>
-            <MenuButton
-              as={Button}
-              backgroundColor={buttonColor}
-              _hover={{
-                backgroundColor: buttonColor,
-              }}
-              _active={{
-                backgroundColor: buttonColor,
-              }}
-              size="xs"
-              aria-label={menuButtonLabel}
-              leftIcon={menuIcon}
-              rightIcon={<ChevronDownIcon marginStart={-2} />}
-              isDisabled={isDisabled}
-            />
-          </Box>
-          <Portal>
-            <MenuList>
-              <MenuItem
-                icon={<FrontCoverIcon />}
-                onClick={() => onChangeType(id, item.type, "FRONT")}
-              >
-                <FormattedMessage
-                  id="component.petition-compose-attachments.cover"
-                  defaultMessage="Cover"
-                />
-              </MenuItem>
-              <MenuItem
-                icon={<PaperclipIcon />}
-                onClick={() => onChangeType(id, item.type, "ANNEX")}
-              >
-                <FormattedMessage
-                  id="component.petition-compose-attachments.annex"
-                  defaultMessage="Annex"
-                />
-              </MenuItem>
-              <MenuItem
-                icon={<BackCoverIcon />}
-                onClick={() => onChangeType(id, item.type, "BACK")}
-              >
-                <FormattedMessage
-                  id="component.petition-compose-attachments.back-cover"
-                  defaultMessage="Back cover"
-                />
-              </MenuItem>
-            </MenuList>
-          </Portal>
-        </Menu>
-        <HStack flex="1" minWidth="0px">
-          <Text as="span" fontSize="sm" fontWeight={500} whiteSpace="nowrap">
-            {type === "FRONT" ? (
-              <FormattedMessage
-                id="component.petition-compose-attachments.prefix-cover"
-                defaultMessage="Cover {index}:"
-                values={{ index: index + 1 }}
-              />
-            ) : type === "BACK" ? (
-              <FormattedMessage
-                id="component.petition-compose-attachments.prefix-back-cover"
-                defaultMessage="Back cover {index}:"
-                values={{ index: index + 1 }}
-              />
-            ) : (
-              <FormattedMessage
-                id="component.petition-compose-attachments.prefix-annex"
-                defaultMessage="Annex {index}:"
-                values={{ index: index + 1 }}
-              />
-            )}
-          </Text>
-          <FileName value={filename} fontSize="sm" fontWeight="400" />
-          <Text as="span" marginX={2}>
-            -
-          </Text>
-          <Text as="span" fontSize="sm" color="gray.500" marginStart={1} whiteSpace="nowrap">
-            <FileSize value={size} />
-          </Text>
-          {!isComplete && progress ? (
-            <Progress
-              flex="1"
-              borderRadius="full"
-              minWidth="40px"
-              isIndeterminate={progress === 1}
-              value={progress * 100}
-              size="sm"
-              colorScheme="green"
-            />
-          ) : uploadHasFailed ? (
-            <Text color="red.600" fontSize="sm">
-              <FormattedMessage
-                id="component.petition-compose-attachments.file-incomplete"
-                defaultMessage="There was an error uploading the file. Please try again."
-              />
-            </Text>
-          ) : null}
-        </HStack>
-
-        <HStack>
-          <IconButtonWithTooltip
-            ref={previewRef}
-            size="sm"
-            fontSize="md"
-            icon={userHasRemovePreviewFiles ? <DownloadIcon /> : <EyeIcon />}
-            label={
-              userHasRemovePreviewFiles
-                ? intl.formatMessage({
-                    id: "generic.download-file",
-                    defaultMessage: "Download file",
-                  })
-                : intl.formatMessage({
-                    id: "component.petition-compose-attachments.preview",
-                    defaultMessage: "Preview file. ⇧ + click to download",
-                  })
-            }
-            variant="ghost"
-            isDisabled={!isComplete}
-            onClick={() =>
-              onPreview(
-                id,
-                userHasRemovePreviewFiles ? false : isMouseOver && isShiftDown ? false : true,
-              )
-            }
-          />
-          <IconButtonWithTooltip
-            size="sm"
-            fontSize="md"
-            icon={<DeleteIcon />}
-            label={intl.formatMessage({
-              id: "component.petition-compose-attachments.remove",
-              defaultMessage: "Remove attachment",
+          <Box
+            className="drag-handle"
+            position="absolute"
+            insetStart={1}
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            cursor={isDraggable && !isDisabled ? "grab" : "not-allowed"}
+            color="gray.400"
+            _hover={{
+              color: isDraggable && !isDisabled ? "gray.700" : "gray.400",
+            }}
+            aria-label={intl.formatMessage({
+              id: "component.petition-compose-attachments.drag-to-sort-label",
+              defaultMessage: "Drag to sort this attachment",
             })}
-            variant="ghost"
-            isDisabled={isDisabled}
-            onClick={() => onRemove(id)}
-          />
+            onPointerDown={(event) =>
+              isDraggable && !isDisabled ? dragControls.start(event) : noop
+            }
+          >
+            <DragHandleIcon role="presentation" pointerEvents="none" boxSize={3} />
+          </Box>
+          <Menu>
+            <Box>
+              <MenuButton
+                as={Button}
+                backgroundColor={buttonColor}
+                _hover={{
+                  backgroundColor: buttonColor,
+                }}
+                _active={{
+                  backgroundColor: buttonColor,
+                }}
+                size="xs"
+                aria-label={menuButtonLabel}
+                leftIcon={menuIcon}
+                rightIcon={<ChevronDownIcon marginStart={-2} />}
+                isDisabled={isDisabled}
+              />
+            </Box>
+            <Portal>
+              <MenuList>
+                <MenuItem
+                  icon={<FrontCoverIcon />}
+                  onClick={() => onChangeType(id, item.type, "FRONT")}
+                >
+                  <FormattedMessage
+                    id="component.petition-compose-attachments.cover"
+                    defaultMessage="Cover"
+                  />
+                </MenuItem>
+                <MenuItem
+                  icon={<PaperclipIcon />}
+                  onClick={() => onChangeType(id, item.type, "ANNEX")}
+                >
+                  <FormattedMessage
+                    id="component.petition-compose-attachments.annex"
+                    defaultMessage="Annex"
+                  />
+                </MenuItem>
+                <MenuItem
+                  icon={<BackCoverIcon />}
+                  onClick={() => onChangeType(id, item.type, "BACK")}
+                >
+                  <FormattedMessage
+                    id="component.petition-compose-attachments.back-cover"
+                    defaultMessage="Back cover"
+                  />
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+          <HStack flex="1" minWidth="0px">
+            <Text as="span" fontSize="sm" fontWeight={500} whiteSpace="nowrap">
+              {type === "FRONT" ? (
+                <FormattedMessage
+                  id="component.petition-compose-attachments.prefix-cover"
+                  defaultMessage="Cover {index}:"
+                  values={{ index: index + 1 }}
+                />
+              ) : type === "BACK" ? (
+                <FormattedMessage
+                  id="component.petition-compose-attachments.prefix-back-cover"
+                  defaultMessage="Back cover {index}:"
+                  values={{ index: index + 1 }}
+                />
+              ) : (
+                <FormattedMessage
+                  id="component.petition-compose-attachments.prefix-annex"
+                  defaultMessage="Annex {index}:"
+                  values={{ index: index + 1 }}
+                />
+              )}
+            </Text>
+            <FileName value={filename} fontSize="sm" fontWeight="400" />
+            <Text as="span" marginX={2}>
+              -
+            </Text>
+            <Text as="span" fontSize="sm" color="gray.500" marginStart={1} whiteSpace="nowrap">
+              <FileSize value={size} />
+            </Text>
+            {!isComplete && progress ? (
+              <Progress
+                flex="1"
+                borderRadius="full"
+                minWidth="40px"
+                isIndeterminate={progress === 1}
+                value={progress * 100}
+                size="sm"
+                colorScheme="green"
+              />
+            ) : uploadHasFailed ? (
+              <Text color="red.600" fontSize="sm">
+                <FormattedMessage
+                  id="component.petition-compose-attachments.file-incomplete"
+                  defaultMessage="There was an error uploading the file. Please try again."
+                />
+              </Text>
+            ) : null}
+          </HStack>
+
+          <HStack>
+            <IconButtonWithTooltip
+              icon={<ConditionIcon />}
+              label={
+                hasVisibilityConditions
+                  ? intl.formatMessage({
+                      id: "generic.remove-condition",
+                      defaultMessage: "Remove condition",
+                    })
+                  : intl.formatMessage({
+                      id: "generic.add-condition",
+                      defaultMessage: "Add condition",
+                    })
+              }
+              onClick={() => {
+                setHasVisibilityConditions((prev) => !prev);
+                if (hasVisibilityConditions) {
+                  onVisibilityChange(id, null);
+                }
+              }}
+              isDisabled={isDisabled}
+              color={hasVisibilityConditions ? "primary.500" : "gray.600"}
+              size="sm"
+              variant="ghost"
+            />
+            <IconButtonWithTooltip
+              ref={previewRef}
+              size="sm"
+              fontSize="md"
+              icon={userHasRemovePreviewFiles ? <DownloadIcon /> : <EyeIcon />}
+              label={
+                userHasRemovePreviewFiles
+                  ? intl.formatMessage({
+                      id: "generic.download-file",
+                      defaultMessage: "Download file",
+                    })
+                  : intl.formatMessage({
+                      id: "component.petition-compose-attachments.preview",
+                      defaultMessage: "Preview file. ⇧ + click to download",
+                    })
+              }
+              variant="ghost"
+              isDisabled={!isComplete}
+              onClick={() =>
+                onPreview(
+                  id,
+                  userHasRemovePreviewFiles ? false : isMouseOver && isShiftDown ? false : true,
+                )
+              }
+            />
+            <IconButtonWithTooltip
+              size="sm"
+              fontSize="md"
+              icon={<DeleteIcon />}
+              label={intl.formatMessage({
+                id: "component.petition-compose-attachments.remove",
+                defaultMessage: "Remove attachment",
+              })}
+              variant="ghost"
+              isDisabled={isDisabled}
+              onClick={() => onRemove(id)}
+            />
+          </HStack>
         </HStack>
-      </HStack>
+        {hasVisibilityConditions ? (
+          <Box paddingX={5} paddingY={1}>
+            <PetitionComposeVisibilityAccordion
+              isOpen={false}
+              popoverContent={
+                <>
+                  <Text fontSize="sm">
+                    <FormattedMessage
+                      id="component.petition-compose-attachments.visibility-popover"
+                      defaultMessage="This attachment will only be shown or hidden when the conditions are met."
+                    />
+                  </Text>
+                  <Text fontSize="sm">
+                    <HelpCenterLink articleId={6076369}>
+                      <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
+                    </HelpCenterLink>
+                  </Text>
+                </>
+              }
+            >
+              <PetitionVisibilityEditor
+                petition={petition}
+                value={visibility}
+                onChange={(newVisibility) => onVisibilityChange(id, newVisibility)}
+                showErrors={false}
+                isReadOnly={isDisabled}
+                visibilityOn="ATTACHMENT"
+              />
+            </PetitionComposeVisibilityAccordion>
+          </Box>
+        ) : null}
+      </Stack>
     </Reorder.Item>
   );
 });

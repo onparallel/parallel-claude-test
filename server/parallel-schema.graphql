@@ -3472,6 +3472,15 @@ type Mutation {
   ): PetitionAttachment!
 
   """
+  Updates the visibility of a petition attachment. Pass null to remove visibility.
+  """
+  updatePetitionAttachmentVisibility(
+    attachmentId: GID!
+    petitionId: GID!
+    visibility: JSONObject
+  ): PetitionAttachment!
+
+  """
   Update a petition comment.
   """
   updatePetitionComment(
@@ -4666,6 +4675,11 @@ type PetitionAttachment {
   id: GID!
   petition: PetitionBase!
   type: PetitionAttachmentType!
+
+  """
+  A JSON object representing the conditions for the attachment to be visible
+  """
+  visibility: JSONObject
 }
 
 enum PetitionAttachmentType {

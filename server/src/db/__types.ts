@@ -1689,11 +1689,18 @@ export interface PetitionAttachment {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  visibility: Maybe<any>; // jsonb
 }
 
 export type CreatePetitionAttachment = PartialProps<
   Omit<PetitionAttachment, "id">,
-  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+  | "visibility"
 >;
 
 export interface PetitionCommentAttachment {

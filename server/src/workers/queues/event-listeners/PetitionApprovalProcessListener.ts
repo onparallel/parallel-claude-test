@@ -1,15 +1,11 @@
 import { inject, injectable } from "inversify";
 import { unique, zip } from "remeda";
-import { assert } from "ts-essentials";
 import { PetitionCompletedEvent } from "../../../db/events/PetitionEvent";
 import { FeatureFlagRepository } from "../../../db/repositories/FeatureFlagRepository";
-import {
-  ApprovalRequestStepConfig,
-  PetitionApprovalRequestRepository,
-} from "../../../db/repositories/PetitionApprovalRequestRepository";
+import { PetitionApprovalRequestRepository } from "../../../db/repositories/PetitionApprovalRequestRepository";
 import { PetitionRepository } from "../../../db/repositories/PetitionRepository";
 import { UserGroupRepository } from "../../../db/repositories/UserGroupRepository";
-import { evaluateFieldLogic, FieldLogicPetitionInput } from "../../../util/fieldLogic";
+import { evaluateVisibilityArray } from "../../../util/fieldLogic";
 import { EventListener } from "../EventProcessorQueue";
 
 export const PETITION_APPROVAL_PROCESS_LISTENER = Symbol.for("PETITION_APPROVAL_PROCESS_LISTENER");
@@ -46,10 +42,7 @@ export class PetitionApprovalProcessListener implements EventListener<"PETITION_
       petition.id,
     ]);
 
-    const approvalLogic = this.evaluateApprovalStepsVisibility(
-      composedPetition,
-      petition.approval_flow_config,
-    );
+    const approvalLogic = evaluateVisibilityArray(composedPetition, petition.approval_flow_config);
 
     const createdBy = event.data.user_id
       ? `User:${event.data.user_id}`
@@ -88,30 +81,5 @@ export class PetitionApprovalProcessListener implements EventListener<"PETITION_
         createdBy,
       );
     }
-  }
-
-  private evaluateApprovalStepsVisibility(
-    petition: FieldLogicPetitionInput,
-    approvalFlowConfig: ApprovalRequestStepConfig[],
-  ) {
-    // at least 1 step is required for this to work
-    assert(approvalFlowConfig.length > 0, "At least 1 step is required");
-
-    return evaluateFieldLogic({
-      ...petition,
-      // add 1 mock field for each step in the approval flow, to be able to evaluate their visibilities based on previous fields
-      fields: petition.fields.concat(
-        approvalFlowConfig.map((step) => ({
-          id: 0, // ID does not matter, as this "fields" will never be referenced
-          type: "HEADING" as const,
-          visibility: step.visibility ?? null,
-          options: {},
-          replies: [],
-          math: null,
-        })),
-      ),
-    }).slice(
-      -approvalFlowConfig.length, // only return the last N items, which are the logic results for the approval steps
-    );
   }
 }

@@ -1,5 +1,9 @@
 import { enumType, objectType } from "nexus";
+import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { PetitionAttachmentTypeValues } from "../../../db/__types";
+import { mapFieldLogic, PetitionFieldVisibility } from "../../../util/fieldLogic";
+import { toGlobalId } from "../../../util/globalId";
 
 export const PetitionFieldAttachment = objectType({
   name: "PetitionFieldAttachment",
@@ -47,6 +51,24 @@ export const PetitionAttachment = objectType({
       type: "PetitionBase",
       resolve: async (o, _, ctx) => {
         return (await ctx.petitions.loadPetition(o.petition_id))!;
+      },
+    });
+    t.nullable.field("visibility", {
+      type: "JSONObject",
+      description: "A JSON object representing the conditions for the attachment to be visible",
+      resolve: (o) => {
+        if (isNonNullish(o.visibility)) {
+          // map numeric IDs to GlobalId
+          const visibility = o.visibility as PetitionFieldVisibility;
+          return (
+            mapFieldLogic<number>({ visibility }, (fieldId) => {
+              assert(typeof fieldId === "number", "Expected fieldId to be a number");
+              return toGlobalId("PetitionField", fieldId);
+            }).field.visibility ?? null
+          );
+        }
+
+        return null;
       },
     });
   },

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Flex, Grid, HStack, IconButton, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
-import { PetitionApprovalStepsVisibilityEditor_PetitionBaseFragment } from "@parallel/graphql/__types";
+import { PetitionVisibilityEditor_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { defaultFieldCondition } from "@parallel/utils/fieldLogic/conditions";
 import {
   PetitionFieldLogicCondition,
@@ -11,43 +11,82 @@ import {
 } from "@parallel/utils/fieldLogic/types";
 import { Fragment, SetStateAction, useEffect, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { PetitionFieldLogicAddConditionButton } from "./PetitionFieldLogicAddConditionButton";
 import { PetitionFieldLogicConditionEditor } from "./PetitionFieldLogicConditionEditor";
 import { PetitionFieldLogicConditionLogicalJoinSelect } from "./PetitionFieldLogicConditionLogicalJoinSelect";
 import { PetitionFieldLogicContext } from "./PetitionFieldLogicContext";
 import { PetitionFieldVisibilityTypeSelect } from "./PetitionFieldVisibilityTypeSelect";
 
-export interface PetitionApprovalStepsVisibilityEditorProps {
-  petition: PetitionApprovalStepsVisibilityEditor_PetitionBaseFragment;
+export interface PetitionVisibilityEditorProps {
+  petition: PetitionVisibilityEditor_PetitionBaseFragment;
   showErrors?: boolean;
-  value: PetitionFieldVisibility;
+  value?: PetitionFieldVisibility;
   onChange: (visibility: PetitionFieldVisibility) => void;
-  onRemove: () => void;
+  onRemove?: () => void;
   isReadOnly?: boolean;
+  visibilityOn: "FIELD" | "APPROVAL" | "ATTACHMENT";
+  fieldId?: string; // Required for FIELD visibility
 }
 
-export function PetitionApprovalStepsVisibilityEditor({
+export function PetitionVisibilityEditor({
   petition,
   value,
   onChange,
   onRemove,
   showErrors,
   isReadOnly,
-}: PetitionApprovalStepsVisibilityEditorProps) {
+  visibilityOn,
+  fieldId,
+}: PetitionVisibilityEditorProps) {
   const intl = useIntl();
 
   const allFields = useMemo(
     () => petition.fields.flatMap((f) => [f, ...(f.children ?? [])]),
     [petition.fields],
   );
-  const field = allFields.at(-1)!;
-  const visibility =
-    value ??
-    ({
-      type: "SHOW",
-      operator: "AND",
-      conditions: field && field.type !== "HEADING" ? [defaultFieldCondition(field)] : [{}],
-    } as PetitionFieldVisibility);
+
+  // Determine reference field based on visibilityOn
+  const referenceField = useMemo(() => {
+    switch (visibilityOn) {
+      case "FIELD":
+        assert(isNonNullish(fieldId), "fieldId is required for FIELD visibility");
+        return allFields.find((f) => f.id === fieldId)!;
+      case "APPROVAL":
+      case "ATTACHMENT":
+        return allFields.filter((f) => f.type !== "HEADING").at(-1)!; // Use last non-heading field
+      default:
+        throw new Error(`Unknown mode: ${visibilityOn}`);
+    }
+  }, [visibilityOn, fieldId, allFields]);
+
+  // Get visibility value based on visibilityOn
+  const visibility = useMemo(() => {
+    if (visibilityOn === "FIELD") {
+      return (
+        (referenceField.visibility as PetitionFieldVisibility) || {
+          type: "SHOW" as PetitionFieldVisibilityType,
+          operator: "AND" as PetitionFieldLogicConditionLogicalJoin,
+          conditions:
+            referenceField && referenceField.type !== "HEADING"
+              ? [defaultFieldCondition(referenceField)]
+              : ([{}] as PetitionFieldLogicCondition[]),
+        }
+      );
+    }
+
+    return (
+      value ?? {
+        type: "SHOW" as PetitionFieldVisibilityType,
+        operator: "AND" as PetitionFieldLogicConditionLogicalJoin,
+        conditions:
+          referenceField && referenceField.type !== "HEADING"
+            ? [defaultFieldCondition(referenceField)]
+            : ([{}] as PetitionFieldLogicCondition[]),
+      }
+    );
+  }, [visibilityOn, value, referenceField]);
 
   useEffect(() => {
     // This is a workaround to ensure that the visibility is always set when the component is mounted and the value is not provided
@@ -59,24 +98,28 @@ export function PetitionApprovalStepsVisibilityEditor({
   function setVisibility(dispatch: (prev: PetitionFieldVisibility) => PetitionFieldVisibility) {
     onChange(dispatch(visibility));
   }
+
   function setConditions(value: SetStateAction<PetitionFieldLogicCondition[]>) {
     return setVisibility((visibility) => ({
       ...visibility,
       conditions: typeof value === "function" ? value(visibility.conditions) : value,
     }));
   }
+
   function setVisibilityOperator(value: SetStateAction<PetitionFieldLogicConditionLogicalJoin>) {
     return setVisibility((visibility) => ({
       ...visibility,
       operator: typeof value === "function" ? value(visibility.operator) : value,
     }));
   }
+
   function setVisibilityType(value: SetStateAction<PetitionFieldVisibilityType>) {
     return setVisibility((visibility) => ({
       ...visibility,
       type: typeof value === "function" ? value(visibility.type) : value,
     }));
   }
+
   const updateCondition = function (index: number, condition: PetitionFieldLogicCondition) {
     setConditions((conditions) => conditions.map((c, i) => (i === index ? condition : c)));
   };
@@ -85,8 +128,11 @@ export function PetitionApprovalStepsVisibilityEditor({
   const lastConditionFieldId = "fieldId" in lastCondition ? lastCondition.fieldId : null;
   const lastConditionField = allFields.find((f) => f.id === lastConditionFieldId);
 
+  // Determine includeSelf based on visibilityOn
+  const includeSelf = visibilityOn === "APPROVAL" || visibilityOn === "ATTACHMENT";
+
   return (
-    <PetitionFieldLogicContext petition={petition} field={field} includeSelf>
+    <PetitionFieldLogicContext petition={petition} field={referenceField} includeSelf={includeSelf}>
       <Stack spacing={2} padding={2} borderRadius="md" backgroundColor="gray.100">
         <Grid
           templateColumns={
@@ -209,32 +255,38 @@ export function PetitionApprovalStepsVisibilityEditor({
             ) : null}
           </Box>
 
-          <Button
-            variant="ghost"
-            colorScheme="red"
-            onClick={onRemove}
-            size="sm"
-            fontSize="md"
-            fontWeight={400}
-          >
-            <FormattedMessage id="generic.remove-condition" defaultMessage="Remove condition" />
-          </Button>
+          {onRemove && visibilityOn === "APPROVAL" ? (
+            <Button
+              variant="ghost"
+              colorScheme="red"
+              onClick={onRemove}
+              size="sm"
+              fontSize="md"
+              fontWeight={400}
+            >
+              <FormattedMessage id="generic.remove-condition" defaultMessage="Remove condition" />
+            </Button>
+          ) : null}
         </HStack>
       </Stack>
     </PetitionFieldLogicContext>
   );
 }
 
-PetitionApprovalStepsVisibilityEditor.fragments = {
+PetitionVisibilityEditor.fragments = {
   get PetitionBase() {
     return gql`
-      fragment PetitionApprovalStepsVisibilityEditor_PetitionBase on PetitionBase {
+      fragment PetitionVisibilityEditor_PetitionBase on PetitionBase {
         fields {
           id
-          ...PetitionApprovalStepsVisibilityEditor_PetitionField
+          type
+          visibility
+          ...PetitionVisibilityEditor_PetitionField
           children {
             id
-            ...PetitionApprovalStepsVisibilityEditor_PetitionField
+            type
+            visibility
+            ...PetitionVisibilityEditor_PetitionField
           }
         }
         ...PetitionFieldLogicContext_PetitionBase
@@ -244,8 +296,9 @@ PetitionApprovalStepsVisibilityEditor.fragments = {
     `;
   },
   PetitionField: gql`
-    fragment PetitionApprovalStepsVisibilityEditor_PetitionField on PetitionField {
+    fragment PetitionVisibilityEditor_PetitionField on PetitionField {
       id
+      type
       visibility
     }
   `,
