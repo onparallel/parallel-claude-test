@@ -49,6 +49,7 @@ import { ApolloError, ForbiddenError } from "../graphql/helpers/errors";
 import { awsLogger } from "../util/awsLogger";
 import { fullName } from "../util/fullName";
 import { withError } from "../util/promises/withError";
+import { withForcedDelay } from "../util/promises/withForcedDelay";
 import { random } from "../util/token";
 import { Maybe, MaybePromise } from "../util/types";
 import { EmailPayload } from "../workers/email-sender";
@@ -570,13 +571,18 @@ export class Auth implements IAuth {
   async confirmForgotPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, verificationCode, newPassword } = req.body;
-      await this.cognitoIdP.send(
-        new ConfirmForgotPasswordCommand({
-          ClientId: this.config.cognito.clientId,
-          Username: email,
-          Password: newPassword,
-          ConfirmationCode: verificationCode,
-        }),
+      this.logger.info(`Confirming forgot password for ${email}`);
+      await withForcedDelay(
+        async () =>
+          await this.cognitoIdP.send(
+            new ConfirmForgotPasswordCommand({
+              ClientId: this.config.cognito.clientId,
+              Username: email,
+              Password: newPassword,
+              ConfirmationCode: verificationCode,
+            }),
+          ),
+        { minDelay: 2000, maxDelay: 3000 },
       );
       res.status(204).send();
     } catch (error: any) {
