@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
 import { DashboardPetitionsRatioModule_DashboardPetitionsRatioModuleFragment } from "@parallel/graphql/__types";
+import { removeTypenames } from "@parallel/utils/apollo/removeTypenames";
 import { buildPetitionsQueryStateUrl } from "@parallel/utils/petitionsQueryState";
 import { forwardRef, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-import { cleanDashboardModulePetitionFilter } from "../../drawer/utils/moduleUtils";
+import { fullDashboardModulePetitionFilter } from "../../drawer/utils/moduleUtils";
 import { DashboardLinkToResults } from "../../shared/DashboardLinkToResults";
 import { DashboardRatio } from "../../shared/DashboardRatio";
 import { DashboardSimpleModuleCard } from "../../shared/DashboardSimpleModuleCard";
@@ -23,9 +24,7 @@ export const DashboardPetitionsRatioModule = Object.assign(
     const intl = useIntl();
 
     const resultsUrls = useMemo(() => {
-      const { tags, ...filters } = cleanDashboardModulePetitionFilter(
-        module.petitionsRatioSettings.filters[0],
-      );
+      const { tags, ...filters } = removeTypenames(module.petitionsRatioSettings.filters[0]);
       return buildPetitionsQueryStateUrl(
         {
           view: "-ALL", // this forces ALL instead of the default view
@@ -83,34 +82,12 @@ export const DashboardPetitionsRatioModule = Object.assign(
           petitionsRatioSettings: settings {
             graphicType
             filters {
-              approvals {
-                filters {
-                  operator
-                  value
-                }
-                operator
-              }
-              fromTemplateId
-              sharedWith {
-                filters {
-                  operator
-                  value
-                }
-                operator
-              }
-              signature
-              status
-              tags {
-                operator
-                filters {
-                  value
-                  operator
-                }
-              }
+              ...fullDashboardModulePetitionFilter
             }
           }
         }
         ${DashboardSimpleModuleCard.fragments.DashboardModule}
+        ${fullDashboardModulePetitionFilter}
       `,
     },
   },

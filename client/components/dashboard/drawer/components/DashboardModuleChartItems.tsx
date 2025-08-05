@@ -11,36 +11,42 @@ import {
 } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
+import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { DashboardModuleChartItems_ProfileTypeFragment } from "@parallel/graphql/__types";
 import { useRerender } from "@parallel/utils/useRerender";
-import { Fragment, useCallback, useState } from "react";
+import { Fragment, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { DashboardModuleDrawerFormData } from "../DashboardModuleDrawer";
-import { PetitionsFiltersModuleSettings } from "../modules/petitions/PetitionsFiltersModuleSettings";
-import { ProfilesFiltersModuleSettings } from "../modules/profiles/ProfilesFiltersModuleSettings";
+import type { DashboardModuleFormData } from "../DashboardModuleForm";
+import {
+  defaultDashboardModulePetitionFilter,
+  defaultDashboardModuleProfileFilter,
+} from "../utils/moduleUtils";
 import { DashboardModuleFormLabel } from "./DashboardModuleFormLabel";
+import { PetitionsModuleFilterEditor } from "./PetitionsModuleFilterEditor";
+import { ProfilesModuleFilterEditor } from "./ProfilesModuleFilterEditor";
 
 export function DashboardModuleChartItems({
   isProfileTypeModule,
   profileType,
   isDisabled,
+  isUpdating,
 }: {
   isProfileTypeModule?: boolean;
   profileType?: DashboardModuleChartItems_ProfileTypeFragment;
   isDisabled?: boolean;
+  isUpdating?: boolean;
 }) {
   const intl = useIntl();
   const {
     control,
     register,
-    formState: { errors },
     getValues,
+    formState: { errors },
     trigger,
-  } = useFormContext<DashboardModuleDrawerFormData>();
+  } = useFormContext<DashboardModuleFormData>();
 
-  const [selectedFieldIndex, setSelectedFieldIndex] = useState(0);
+  const [selectedIndex, setSelectedFieldIndex] = useState(0);
   const [key, rerenderSelect] = useRerender();
 
   const { fields, append, remove } = useFieldArray({
@@ -50,23 +56,17 @@ export function DashboardModuleChartItems({
     shouldUnregister: true,
   });
 
-  const chartItemsOptions = useSimpleSelectOptions(() => {
-    return fields.map((field, index) => ({
-      label: getValues(`settings.items.${index}.label`),
-      value: field.id,
-    }));
-  }, [fields, key, getValues]);
-
-  const handleAddNewChartItem = useCallback(async () => {
+  const handleAddNewChartItem = async () => {
     // No validation needed if there are no items yet
     if (fields.length > 0) {
-      const isValid = await trigger(`settings.items.${selectedFieldIndex}.filters.0`, {
+      const isValid = await trigger(`settings.items.${selectedIndex}.filters.0`, {
         shouldFocus: true,
       });
-      if (!isValid) return;
+      if (!isValid) {
+        return;
+      }
     }
-
-    const newItem = {
+    append({
       label: intl.formatMessage(
         {
           id: "component.petitions-chart-module-settings.item-default-label",
@@ -74,40 +74,23 @@ export function DashboardModuleChartItems({
         },
         { index: fields.length + 1 },
       ),
-      filters: [],
+      filters: [
+        isProfileTypeModule
+          ? defaultDashboardModuleProfileFilter()
+          : defaultDashboardModulePetitionFilter(),
+      ],
       color: "#000000",
-    };
-
-    append(newItem);
+    });
     if (fields.length >= 0) {
       setSelectedFieldIndex(fields.length);
     }
-  }, [fields.length, selectedFieldIndex, trigger, intl, append]);
+  };
 
-  const handleItemChange = useCallback(
-    async (value: string) => {
-      const isValid = await trigger(`settings.items.${selectedFieldIndex}.filters.0`, {
-        shouldFocus: true,
-      });
-      if (!isValid) return;
-
-      const index = fields.findIndex((field) => field.id === value);
-      setSelectedFieldIndex(index);
-    },
-    [fields, selectedFieldIndex, trigger],
-  );
-
-  const handleRemoveChartItem = useCallback(async () => {
-    remove(selectedFieldIndex);
-    setSelectedFieldIndex(Math.max(0, selectedFieldIndex - 1));
-  }, [remove, selectedFieldIndex]);
-
-  const selectedField = getValues(`settings.items.${selectedFieldIndex}`);
   const profileTypeFields = profileType?.fields ?? [];
   return (
     <>
       <FormControl>
-        <DashboardModuleFormLabel>
+        <DashboardModuleFormLabel field="settings.items" isUpdating={isUpdating}>
           <FormattedMessage
             id="component.petitions-chart-module-settings.chart-items-label"
             defaultMessage="Chart items"
@@ -118,9 +101,18 @@ export function DashboardModuleChartItems({
           <HStack spacing={2}>
             <Box flex="1">
               <SimpleSelect
-                options={chartItemsOptions}
-                value={fields[selectedFieldIndex]?.id}
-                onChange={async (value) => await handleItemChange(value ?? "")}
+                key={key}
+                options={fields.map((_, index) => ({
+                  label: getValues(`settings.items.${index}.label`),
+                  value: `${index}`,
+                }))}
+                value={`${selectedIndex}`}
+                onChange={async (value) => {
+                  const isValid = await trigger("settings.items", { shouldFocus: true });
+                  if (isValid) {
+                    setSelectedFieldIndex(parseInt(value!));
+                  }
+                }}
               />
             </Box>
             <IconButtonWithTooltip
@@ -133,12 +125,12 @@ export function DashboardModuleChartItems({
               isDisabled={isDisabled}
             />
             <IconButtonWithTooltip
-              label={intl.formatMessage({
-                id: "component.petitions-chart-module-settings.remove-item-button",
-                defaultMessage: "Remove item",
-              })}
+              label={intl.formatMessage({ id: "generic.delete", defaultMessage: "Delete" })}
               icon={<DeleteIcon />}
-              onClick={handleRemoveChartItem}
+              onClick={() => {
+                remove(selectedIndex);
+                setSelectedFieldIndex(Math.max(0, selectedIndex - 1));
+              }}
               isDisabled={isDisabled || fields.length <= 1}
               placement="bottom-end"
             />
@@ -180,58 +172,70 @@ export function DashboardModuleChartItems({
           </FormControl>
         )}
       </FormControl>
-      {fields.length > 0 && selectedField ? (
-        <Fragment key={selectedFieldIndex}>
-          <FormControl isInvalid={!!errors.settings?.items?.[selectedFieldIndex]?.label}>
-            <DashboardModuleFormLabel field={`settings.items.${selectedFieldIndex}.label`}>
-              <FormattedMessage
-                id="component.petitions-chart-module-settings.item-label"
-                defaultMessage="Label"
+      {fields.map((field, index) =>
+        index === selectedIndex ? (
+          <Fragment key={field.id}>
+            <HStack alignItems="flex-start">
+              <FormControl width="auto">
+                <DashboardModuleFormLabel field={[]}>
+                  <FormattedMessage
+                    id="component.petitions-chart-module-settings.item-color"
+                    defaultMessage="Color"
+                  />
+                </DashboardModuleFormLabel>
+                <Input
+                  type="color"
+                  padding={1}
+                  {...register(`settings.items.${selectedIndex}.color`)}
+                />
+              </FormControl>
+              <FormControl flex={1} isInvalid={!!errors.settings?.items?.[selectedIndex]?.label}>
+                <DashboardModuleFormLabel
+                  field={[
+                    `settings.items.${selectedIndex}.label`,
+                    `settings.items.${selectedIndex}.color`,
+                  ]}
+                  isUpdating={isUpdating}
+                >
+                  <FormattedMessage
+                    id="component.petitions-chart-module-settings.item-label"
+                    defaultMessage="Label"
+                  />
+                </DashboardModuleFormLabel>
+                <Input
+                  {...register(`settings.items.${selectedIndex}.label`, {
+                    required: true,
+                  })}
+                  onBlur={() => rerenderSelect()}
+                />
+                <FormErrorMessage>
+                  <FormattedMessage
+                    id="generic.required-field-error"
+                    defaultMessage="The field is required"
+                  />
+                </FormErrorMessage>
+              </FormControl>
+            </HStack>
+            <Text textTransform="uppercase" color="gray.600" fontSize="sm" fontWeight={500}>
+              <FormattedMessage id="generic.dashboard-module-filters" defaultMessage="Filters" />:
+            </Text>
+            {isProfileTypeModule ? (
+              <ProfilesModuleFilterEditor
+                profileTypeFields={profileTypeFields}
+                field={`settings.items.${selectedIndex}.filters.0`}
+                isUpdating={isUpdating}
               />
-            </DashboardModuleFormLabel>
-
-            <Input
-              {...register(`settings.items.${selectedFieldIndex}.label`, {
-                required: true,
-              })}
-              onBlur={rerenderSelect}
-            />
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.required-field-error"
-                defaultMessage="The field is required"
+            ) : (
+              <PetitionsModuleFilterEditor
+                field={`settings.items.${selectedIndex}.filters.0`}
+                isUpdating={isUpdating}
               />
-            </FormErrorMessage>
-          </FormControl>
-          <FormControl>
-            <DashboardModuleFormLabel field={`settings.items.${selectedFieldIndex}.color`}>
-              <FormattedMessage
-                id="component.petitions-chart-module-settings.item-color"
-                defaultMessage="Color"
-              />
-            </DashboardModuleFormLabel>
-            <Input type="color" {...register(`settings.items.${selectedFieldIndex}.color`)} />
-          </FormControl>
-
-          <Text fontWeight={600}>
-            <FormattedMessage
-              id="component.dashboard-module-form.filters-of"
-              defaultMessage="Filters of {name}:"
-              values={{ name: selectedField?.label ?? "" }}
-            />
-          </Text>
-          {isProfileTypeModule ? (
-            <ProfilesFiltersModuleSettings
-              profileTypeFields={profileTypeFields}
-              path={`settings.items.${selectedFieldIndex}.filters.0`}
-            />
-          ) : (
-            <PetitionsFiltersModuleSettings
-              path={`settings.items.${selectedFieldIndex}.filters.0`}
-            />
-          )}
-        </Fragment>
-      ) : null}
+            )}
+          </Fragment>
+        ) : (
+          <Fragment key={field.id}></Fragment>
+        ),
+      )}
     </>
   );
 }
@@ -245,9 +249,9 @@ DashboardModuleChartItems.fragments = {
         name
         options
         type
-        ...ProfilesFiltersModuleSettings_ProfileTypeField
+        ...ProfilesModuleFilterEditor_ProfileTypeField
       }
     }
-    ${ProfilesFiltersModuleSettings.fragments.ProfileTypeField}
+    ${ProfilesModuleFilterEditor.fragments.ProfileTypeField}
   `,
 };

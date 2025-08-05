@@ -1,16 +1,14 @@
 import { Text } from "@chakra-ui/react";
-import { Divider } from "@parallel/components/common/Divider";
 import { FormattedMessage } from "react-intl";
-import { PetitionsFiltersModuleSettings } from "./PetitionsFiltersModuleSettings";
+import { PetitionsModuleFilterEditor } from "../../components/PetitionsModuleFilterEditor";
 
-export function PetitionsNumberModuleSettings() {
+export function PetitionsNumberModuleSettings({ isUpdating }: { isUpdating?: boolean }) {
   return (
     <>
-      <Divider />
-      <Text fontWeight={600}>
-        <FormattedMessage id="component.dashboard-module-form.filters" defaultMessage="Filters" />:
+      <Text textTransform="uppercase" color="gray.600" fontSize="sm" fontWeight={500}>
+        <FormattedMessage id="generic.dashboard-module-filters" defaultMessage="Filters" />:
       </Text>
-      <PetitionsFiltersModuleSettings />
+      <PetitionsModuleFilterEditor field="settings.filters.0" isUpdating={isUpdating} />
     </>
   );
 }

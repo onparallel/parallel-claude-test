@@ -3,13 +3,14 @@ import { Box, Center, Grid, GridItem, Square, Stack, Text } from "@chakra-ui/rea
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
 import { DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment } from "@parallel/graphql/__types";
+import { removeTypenames } from "@parallel/utils/apollo/removeTypenames";
 import { buildPetitionsQueryStateUrl } from "@parallel/utils/petitionsQueryState";
 import { forwardRef, Fragment, useMemo } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { isNonNullish, sumBy, zip } from "remeda";
 import { DashboardDoughnutChart } from "../../charts/DashboardDoughnutChart";
 import { DashboardPieChart } from "../../charts/DashboardPieChart";
-import { cleanDashboardModulePetitionFilter } from "../../drawer/utils/moduleUtils";
+import { fullDashboardModulePetitionFilter } from "../../drawer/utils/moduleUtils";
 import { DashboardLinkToResults } from "../../shared/DashboardLinkToResults";
 import { DashboardModuleAlertIncongruent } from "../../shared/DashboardModuleAlertIncongruent";
 import { DashboardModuleCard } from "../../shared/DashboardModuleCard";
@@ -48,7 +49,7 @@ export const DashboardPetitionsPieChartModule = Object.assign(
     const totalCount = sumBy(module.petitionsPieChartResult?.items ?? [], (item) => item.count);
     const resultsUrls = useMemo(() => {
       return module.petitionsPieChartSettings.items.map((item) => {
-        const { tags, ...filters } = cleanDashboardModulePetitionFilter(item.filter);
+        const { tags, ...filters } = removeTypenames(item.filter);
         return buildPetitionsQueryStateUrl(
           {
             view: "-ALL", // this forces ALL instead of the default view
@@ -194,34 +195,12 @@ export const DashboardPetitionsPieChartModule = Object.assign(
               graphicType
               items {
                 filter {
-                  tags {
-                    operator
-                    filters {
-                      value
-                      operator
-                    }
-                  }
-                  status
-                  signature
-                  sharedWith {
-                    operator
-                    filters {
-                      value
-                      operator
-                    }
-                  }
-                  fromTemplateId
-                  approvals {
-                    operator
-                    filters {
-                      value
-                      operator
-                    }
-                  }
+                  ...fullDashboardModulePetitionFilter
                 }
               }
             }
           }
+          ${fullDashboardModulePetitionFilter}
         `;
       },
     },

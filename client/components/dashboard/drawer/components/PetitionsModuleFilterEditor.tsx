@@ -12,25 +12,23 @@ import { usePetitionStatusLabels } from "@parallel/utils/usePetitionStatusLabels
 import { ReactNode, useCallback, useMemo } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { DashboardModuleFilterContainer } from "../../components/DashboardModuleFilterContainer";
-import { DashboardModuleDrawerFormData } from "../../DashboardModuleDrawer";
+import { DashboardModuleFilterContainer } from "./DashboardModuleFilterContainer";
 
-interface PetitionsFiltersModuleSettingsProps {
-  index?: number;
-  path?: string;
+interface PetitionsModuleFilterEditorProps {
+  field: string;
+  isUpdating?: boolean;
 }
 
-export function PetitionsFiltersModuleSettings({
-  index = 0,
-  path,
-}: PetitionsFiltersModuleSettingsProps) {
-  const { control } = useFormContext<DashboardModuleDrawerFormData>();
-  const basePath = path ?? `settings.filters.${index}`;
+export function PetitionsModuleFilterEditor({
+  field,
+  isUpdating,
+}: PetitionsModuleFilterEditorProps) {
+  const { control } = useFormContext();
   return (
     <>
       <Controller
         control={control}
-        name={`${basePath}.status` as any}
+        name={`${field}.status` as any}
         render={({ field: { value, onChange } }) => (
           <DashboardModuleFilterContainer
             label={
@@ -39,7 +37,8 @@ export function PetitionsFiltersModuleSettings({
                 defaultMessage="Status"
               />
             }
-            field={`${basePath}.status`}
+            field={`${field}.status`}
+            isUpdating={isUpdating}
           >
             <PetitionStatusFilter value={value} onChange={onChange} />
           </DashboardModuleFilterContainer>
@@ -48,7 +47,7 @@ export function PetitionsFiltersModuleSettings({
 
       <Controller
         control={control}
-        name={`${basePath}.signature` as any}
+        name={`${field}.signature` as any}
         render={({ field: { value, onChange } }) => (
           <DashboardModuleFilterContainer
             label={
@@ -57,7 +56,8 @@ export function PetitionsFiltersModuleSettings({
                 defaultMessage="eSignature status"
               />
             }
-            field={`${basePath}.signature`}
+            field={`${field}.signature`}
+            isUpdating={isUpdating}
           >
             <SignatureStatusFilter value={value} onChange={onChange} />
           </DashboardModuleFilterContainer>
@@ -66,7 +66,7 @@ export function PetitionsFiltersModuleSettings({
 
       <Controller
         control={control}
-        name={`${basePath}.fromTemplateId` as any}
+        name={`${field}.fromTemplateId` as any}
         render={({ field: { value, onChange } }) => (
           <DashboardModuleFilterContainer
             label={
@@ -75,7 +75,8 @@ export function PetitionsFiltersModuleSettings({
                 defaultMessage="Template"
               />
             }
-            field={`${basePath}.fromTemplateId`}
+            field={`${field}.fromTemplateId`}
+            isUpdating={isUpdating}
           >
             <TemplateFilter value={value} onChange={onChange} />
           </DashboardModuleFilterContainer>
@@ -89,10 +90,11 @@ export function PetitionsFiltersModuleSettings({
             defaultMessage="Tags"
           />
         }
-        field={`${basePath}.tags`}
+        field={`${field}.tags`}
+        isUpdating={isUpdating}
       >
         <BaseLogicalFilter
-          rootPath={`${basePath}.tags`}
+          rootPath={`${field}.tags`}
           renderFilterLine={({ key, ...rest }) => <PetitionListTagFilterLine key={key} {...rest} />}
           createEmptyFilter={() => ({ value: [], operator: "CONTAINS" })}
         />
@@ -105,10 +107,11 @@ export function PetitionsFiltersModuleSettings({
             defaultMessage="Approvals"
           />
         }
-        field={`${basePath}.approvals`}
+        field={`${field}.approvals`}
+        isUpdating={isUpdating}
       >
         <BaseLogicalFilter
-          rootPath={`${basePath}.approvals`}
+          rootPath={`${field}.approvals`}
           renderFilterLine={({ key, ...rest }) => (
             <PetitionListApprovalsFilterLine key={key} {...rest} />
           )}
@@ -123,10 +126,11 @@ export function PetitionsFiltersModuleSettings({
             defaultMessage="Shared"
           />
         }
-        field={`${basePath}.sharedWith`}
+        field={`${field}.sharedWith`}
+        isUpdating={isUpdating}
       >
         <BaseLogicalFilter
-          rootPath={`${basePath}.sharedWith`}
+          rootPath={`${field}.sharedWith`}
           renderFilterLine={({ key, ...rest }) => (
             <PetitionListSharedWithFilterLine key={key} {...rest} />
           )}
@@ -285,7 +289,6 @@ function LogicalOperatorFilterContainer({
           <Controller
             control={control}
             name={`${rootPath}.operator`}
-            defaultValue="AND"
             render={({ field }) => (
               <SimpleSelect size="sm" isSearchable={false} options={logicalOperators} {...field} />
             )}

@@ -1,28 +1,30 @@
 import { gql } from "@apollo/client";
 import { Text } from "@chakra-ui/react";
-import { Divider } from "@parallel/components/common/Divider";
 import { ProfilesNumberModuleSettings_ProfileTypeFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { ProfilesFiltersModuleSettings } from "./ProfilesFiltersModuleSettings";
+import { ProfilesModuleFilterEditor } from "../../components/ProfilesModuleFilterEditor";
 
 export function ProfilesNumberModuleSettings({
   profileType,
   isDisabled,
+  isUpdating,
 }: {
   profileType?: ProfilesNumberModuleSettings_ProfileTypeFragment;
   isDisabled?: boolean;
+  isUpdating?: boolean;
 }) {
   const profileTypeFields = profileType?.fields ?? [];
 
   return (
     <>
-      <Divider />
-      <Text fontWeight={600}>
-        <FormattedMessage id="component.dashboard-module-form.filters" defaultMessage="Filters" />:
+      <Text textTransform="uppercase" color="gray.600" fontSize="sm" fontWeight={500}>
+        <FormattedMessage id="generic.dashboard-module-filters" defaultMessage="Filters" />:
       </Text>
-      <ProfilesFiltersModuleSettings
+      <ProfilesModuleFilterEditor
+        field="settings.filters.0"
         profileTypeFields={profileTypeFields}
         isDisabled={isDisabled}
+        isUpdating={isUpdating}
       />
     </>
   );
@@ -34,9 +36,9 @@ ProfilesNumberModuleSettings.fragments = {
       id
       fields {
         id
-        ...ProfilesFiltersModuleSettings_ProfileTypeField
+        ...ProfilesModuleFilterEditor_ProfileTypeField
       }
     }
-    ${ProfilesFiltersModuleSettings.fragments.ProfileTypeField}
+    ${ProfilesModuleFilterEditor.fragments.ProfileTypeField}
   `,
 };

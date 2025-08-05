@@ -1,47 +1,54 @@
 import { gql } from "@apollo/client";
-import { Box, Button, FormControl, Grid, HStack, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  Grid,
+  HStack,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { AddIcon, CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { MultiCheckboxSimpleSelect } from "@parallel/components/common/MultiCheckboxSimpleSelect";
 import { ProfileTypeFieldSelect } from "@parallel/components/common/ProfileTypeFieldSelect";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { ProfilesFiltersModuleSettings_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
+import { ProfilesModuleFilterEditor_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
+import { ProfileFieldValuesFilterCondition } from "@parallel/utils/ProfileFieldValuesFilter";
 import { useLogicalOperators } from "@parallel/utils/useLogicalOperators";
 import { useProfileStatusOptions } from "@parallel/utils/useProfileStatusOptions";
 import { ProfileValueFilterLine } from "@parallel/utils/useProfileTableColumns";
 import { format, startOfMonth } from "date-fns";
 import { useCallback } from "react";
-import { Controller, useFieldArray, useFormContext } from "react-hook-form";
+import { Controller, get, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-import { DashboardModuleFilterContainer } from "../../components/DashboardModuleFilterContainer";
-import { DashboardModuleDrawerFormData } from "../../DashboardModuleDrawer";
+import { DashboardModuleFilterContainer } from "./DashboardModuleFilterContainer";
 
 const MAX_GROUP_DEPTH = 2;
 
-interface ProfilesFiltersModuleSettingsProps {
-  index?: number;
-  path?: string;
-  profileTypeFields: ProfilesFiltersModuleSettings_ProfileTypeFieldFragment[];
+interface ProfilesModuleFilterEditorProps {
+  field: string;
+  profileTypeFields: ProfilesModuleFilterEditor_ProfileTypeFieldFragment[];
   isDisabled?: boolean;
+  isUpdating?: boolean;
 }
 
-export function ProfilesFiltersModuleSettings({
-  index = 0,
-  path,
+export function ProfilesModuleFilterEditor({
+  field,
   profileTypeFields,
   isDisabled,
-}: ProfilesFiltersModuleSettingsProps) {
-  const { control } = useFormContext<DashboardModuleDrawerFormData>();
-  const basePath = path ?? `settings.filters.${index}`;
+  isUpdating,
+}: ProfilesModuleFilterEditorProps) {
+  const { control } = useFormContext();
   return (
     <Stack spacing={4}>
       <Controller
         control={control}
-        name={`${basePath}.status` as any}
-        defaultValue={["OPEN"]}
+        name={`${field}.status` as any}
         rules={{ required: true }}
         render={({ field: { value, onChange }, fieldState: { error } }) => (
           <DashboardModuleFilterContainer
@@ -52,7 +59,8 @@ export function ProfilesFiltersModuleSettings({
               />
             }
             isInvalid={isNonNullish(error)}
-            field={`${basePath}.status`}
+            field={`${field}.status`}
+            isUpdating={isUpdating}
           >
             <ProfileStatusFilter value={value} onChange={onChange} isDisabled={isDisabled} />
           </DashboardModuleFilterContainer>
@@ -61,14 +69,15 @@ export function ProfilesFiltersModuleSettings({
       <DashboardModuleFilterContainer
         label={
           <FormattedMessage
-            id="component.profiles-filters-module-settings.properties"
+            id="component.profiles-module-filter-editor.properties"
             defaultMessage="Properties"
           />
         }
-        field={`${basePath}.values`}
+        field={`${field}.values`}
+        isUpdating={isUpdating}
       >
         <FilterGroupComponent
-          path={path ? path + ".values" : `settings.filters.${index}.values`}
+          path={`${field}.values`}
           profileTypeFields={profileTypeFields}
           isDisabled={isDisabled}
         />
@@ -103,7 +112,7 @@ function ProfileStatusFilter({
       isClearable
       isSearchable
       placeholder={intl.formatMessage({
-        id: "component.profiles-filters-module-settings.all-profile-status-placeholder",
+        id: "component.profiles-module-filter-editor.all-profile-status-placeholder",
         defaultMessage: "Select a status...",
       })}
       onChange={handleChange}
@@ -114,7 +123,7 @@ function ProfileStatusFilter({
 
 interface FilterGroupComponentProps {
   path: string;
-  profileTypeFields: ProfilesFiltersModuleSettings_ProfileTypeFieldFragment[];
+  profileTypeFields: ProfilesModuleFilterEditor_ProfileTypeFieldFragment[];
   depth?: number;
   onRemove?: () => void;
   isDisabled?: boolean;
@@ -128,111 +137,103 @@ function FilterGroupComponent({
   isDisabled,
 }: FilterGroupComponentProps) {
   const intl = useIntl();
-  const { control, setValue } = useFormContext();
+  const isRoot = depth === 0;
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext();
   const logicalOperators = useLogicalOperators();
   const { fields, append, remove } = useFieldArray({
     control,
     name: `${path}.conditions`,
+    rules: isRoot ? undefined : { required: true, minLength: 1 },
   });
 
-  const handleAddGroup = () => {
-    append({
-      conditions: [],
-      logicalOperator: "AND",
-    });
-    if (fields.length === 0) {
-      setValue(`${path}.logicalOperator`, "AND");
-    }
-  };
-
-  const handleAddCondition = () => {
-    append({
-      profileTypeFieldId: null,
-      operator: "CONTAIN",
-      value: "",
-    });
-    if (fields.length === 0) {
-      setValue(`${path}.logicalOperator`, "AND");
-    }
-  };
-
-  const handleRemoveCondition = (index: number) => {
-    remove(index);
-    if (fields.length === 1) {
-      setValue(path, null);
-    }
-  };
-
   return (
-    <Box
-      border={depth === 0 ? undefined : "1px"}
-      borderColor="gray.200"
-      p={depth === 0 ? 0 : 4}
-      borderRadius="md"
+    <FormControl
+      isInvalid={get(errors, `${path}.conditions`)?.root}
+      {...(isRoot
+        ? {}
+        : {
+            border: "1px",
+            borderColor: "gray.200",
+            padding: 4,
+            borderRadius: "md",
+          })}
+      _invalid={{
+        borderColor: "red.500",
+        boxShadow: "error",
+      }}
       flex="1"
       width="100%"
     >
       <Stack spacing={4}>
-        <HStack justify="space-between">
-          {fields.length > 1 ? (
-            <Controller
-              control={control}
-              name={`${path}.logicalOperator`}
-              defaultValue="AND"
-              render={({ field }) => (
-                <SimpleSelect
-                  size="sm"
-                  isDisabled={isDisabled}
-                  isSearchable={false}
-                  options={logicalOperators}
-                  {...field}
-                />
-              )}
-            />
-          ) : (
+        {fields.length > 1 || depth > 0 ? (
+          <HStack>
+            {fields.length > 1 ? (
+              <Controller
+                control={control}
+                name={`${path}.logicalOperator`}
+                render={({ field }) => (
+                  <SimpleSelect
+                    size="sm"
+                    isDisabled={isDisabled}
+                    isSearchable={false}
+                    options={logicalOperators}
+                    {...field}
+                  />
+                )}
+              />
+            ) : null}
             <Spacer />
-          )}
-
-          {depth > 0 ? (
-            <IconButtonWithTooltip
-              variant="ghost"
-              icon={<CloseIcon boxSize={3} />}
-              label={intl.formatMessage({
-                id: "generic.remove",
-                defaultMessage: "Remove",
-              })}
-              size="sm"
-              onClick={onRemove}
-            />
-          ) : null}
-        </HStack>
-
+            {depth > 0 ? (
+              <IconButtonWithTooltip
+                variant="ghost"
+                icon={<CloseIcon boxSize={3} />}
+                label={intl.formatMessage({
+                  id: "generic.remove",
+                  defaultMessage: "Remove",
+                })}
+                size="sm"
+                onClick={onRemove}
+              />
+            ) : null}
+          </HStack>
+        ) : null}
         {fields.length > 0 ? (
           fields.map((field, index) => (
             <Stack key={field.id} align="flex-start" spacing={2} width="100%">
-              {"conditions" in field ? (
+              {"logicalOperator" in field ? (
                 <FilterGroupComponent
                   path={`${path}.conditions.${index}`}
                   depth={depth + 1}
-                  onRemove={() => handleRemoveCondition(index)}
+                  onRemove={() => remove(index)}
                   profileTypeFields={profileTypeFields}
                 />
               ) : (
                 <ConditionComponent
                   path={`${path}.conditions.${index}`}
-                  onRemove={() => handleRemoveCondition(index)}
+                  onRemove={() => remove(index)}
                   profileTypeFields={profileTypeFields}
                 />
               )}
             </Stack>
           ))
         ) : (
-          <Text textStyle="hint" textAlign="center">
-            <FormattedMessage
-              id="generic.no-filter-applied"
-              defaultMessage="No filter is being applied."
-            />
-          </Text>
+          <Box>
+            <Text textStyle="hint" textAlign="center">
+              <FormattedMessage
+                id="generic.no-filter-applied"
+                defaultMessage="No filter is being applied."
+              />
+            </Text>
+            <FormErrorMessage display="block" textAlign="center">
+              <FormattedMessage
+                id="component.profiles-module-filter-editor.filter-group-required-condition"
+                defaultMessage="At least one condition is required."
+              />
+            </FormErrorMessage>
+          </Box>
         )}
         <HStack>
           {depth < MAX_GROUP_DEPTH ? (
@@ -241,11 +242,11 @@ function FilterGroupComponent({
               variant="outline"
               leftIcon={<AddIcon boxSize={3} />}
               size="sm"
-              onClick={handleAddGroup}
+              onClick={() => append({ conditions: [], logicalOperator: "AND" })}
               fontWeight={400}
             >
               <FormattedMessage
-                id="component.profiles-filters-module-settings.add-group"
+                id="component.profiles-module-filter-editor.add-group"
                 defaultMessage="Add group"
               />
             </Button>
@@ -256,64 +257,59 @@ function FilterGroupComponent({
             variant="outline"
             leftIcon={<PlusCircleFilledIcon color="primary.500" boxSize={5} />}
             size="sm"
-            onClick={handleAddCondition}
+            onClick={() => append({ profileTypeFieldId: null, operator: "CONTAIN", value: "" })}
             fontWeight={400}
           >
             <FormattedMessage
-              id="component.profiles-filters-module-settings.add-condition"
+              id="component.profiles-module-filter-editor.add-condition"
               defaultMessage="Add condition"
             />
           </Button>
         </HStack>
       </Stack>
-    </Box>
+    </FormControl>
   );
 }
 
-interface DefaultValueConfig {
-  operator: string;
-  value: any;
-}
-
-const DEFAULT_VALUE_MAP: Record<
-  string,
-  (field: ProfilesFiltersModuleSettings_ProfileTypeFieldFragment) => DefaultValueConfig
-> = {
-  TEXT: () => ({ operator: "CONTAIN", value: "" }),
-  SHORT_TEXT: () => ({ operator: "CONTAIN", value: "" }),
-  NUMBER: () => ({ operator: "GREATER_THAN", value: 0 }),
-  DATE: () => ({
-    operator: "GREATER_THAN_OR_EQUAL",
-    value: format(startOfMonth(new Date()), "yyyy-MM-dd"),
-  }),
-  PHONE: () => ({ operator: "EQUAL", value: "" }),
-  SELECT: (field) => ({
-    operator: "EQUAL",
-    value: (field.options as ProfileTypeFieldOptions<"SELECT">).values?.at(0)?.value ?? null,
-  }),
-  CHECKBOX: (field) => ({
-    operator: "CONTAIN",
-    value: [],
-  }),
-  BACKGROUND_CHECK: () => ({ operator: "HAS_BG_CHECK_RESULTS", value: null }),
-};
-
-const getDefaultValuesForField = (
-  field: ProfilesFiltersModuleSettings_ProfileTypeFieldFragment,
-): DefaultValueConfig => {
-  const getDefaultValue = DEFAULT_VALUE_MAP[field.type];
-  return getDefaultValue ? getDefaultValue(field) : { operator: "HAS_VALUE", value: null };
+const defaultConditionForField = (
+  field: ProfilesModuleFilterEditor_ProfileTypeFieldFragment,
+): ProfileFieldValuesFilterCondition => {
+  if (field.type === "TEXT" || field.type === "SHORT_TEXT") {
+    return { profileTypeFieldId: field.id, operator: "CONTAIN", value: "" };
+  } else if (field.type === "NUMBER") {
+    return { profileTypeFieldId: field.id, operator: "GREATER_THAN", value: 0 };
+  } else if (field.type === "DATE") {
+    return {
+      profileTypeFieldId: field.id,
+      operator: "GREATER_THAN_OR_EQUAL",
+      value: format(startOfMonth(new Date()), "yyyy-MM-dd"),
+    };
+  } else if (field.type === "PHONE") {
+    return { profileTypeFieldId: field.id, operator: "EQUAL", value: "" };
+  } else if (field.type === "SELECT") {
+    return {
+      profileTypeFieldId: field.id,
+      operator: "EQUAL",
+      value: (field.options as ProfileTypeFieldOptions<"SELECT">).values?.at(0)?.value ?? null,
+    };
+  } else if (field.type === "CHECKBOX") {
+    return { profileTypeFieldId: field.id, operator: "CONTAIN", value: [] };
+  } else if (field.type === "BACKGROUND_CHECK") {
+    return { profileTypeFieldId: field.id, operator: "HAS_BG_CHECK_RESULTS", value: null };
+  } else {
+    return { profileTypeFieldId: field.id, operator: "HAS_VALUE", value: null };
+  }
 };
 
 interface ConditionComponentProps {
   path: string;
   onRemove: () => void;
-  profileTypeFields: ProfilesFiltersModuleSettings_ProfileTypeFieldFragment[];
+  profileTypeFields: ProfilesModuleFilterEditor_ProfileTypeFieldFragment[];
 }
 
 function ConditionComponent({ path, onRemove, profileTypeFields }: ConditionComponentProps) {
   const intl = useIntl();
-  const { control, setValue, watch } = useFormContext();
+  const { control, setValue, watch, clearErrors } = useFormContext();
   const profileTypeFieldId = watch(`${path}.profileTypeFieldId`);
   const profileTypeField = profileTypeFields.find((f) => f.id === profileTypeFieldId);
 
@@ -334,30 +330,22 @@ function ConditionComponent({ path, onRemove, profileTypeFields }: ConditionComp
           control={control}
           name={`${path}.profileTypeFieldId`}
           rules={{ required: true }}
-          render={({ field: { value, onChange }, fieldState: { error } }) => (
+          render={({ field: { value, onChange, ref, ...rest }, fieldState: { error } }) => (
             <FormControl isInvalid={isNonNullish(error)}>
               <ProfileTypeFieldSelect
                 size="sm"
                 value={profileTypeFields.find((f) => f.id === value) ?? null}
                 fields={profileTypeFields}
+                {...rest}
                 onChange={(v) => {
-                  onChange(v?.id);
-
-                  if (v) {
-                    const selectedField = profileTypeFields.find((f) => f.id === v.id);
-                    if (selectedField) {
-                      const defaultValues = getDefaultValuesForField(selectedField);
-                      setValue(`${path}.operator`, defaultValues.operator);
-                      setValue(`${path}.value`, defaultValues.value);
-                    }
-                  }
+                  setValue(path, defaultConditionForField(v!));
+                  clearErrors(`${path}.profileTypeFieldId`);
                 }}
               />
             </FormControl>
           )}
         />
       </HStack>
-
       {profileTypeField ? (
         <Grid templateColumns="0px auto" alignItems="center" columnGap={2} rowGap={2}>
           <ProfileValueFilterLine profileTypeField={profileTypeField} path={path} />
@@ -367,9 +355,9 @@ function ConditionComponent({ path, onRemove, profileTypeFields }: ConditionComp
   );
 }
 
-ProfilesFiltersModuleSettings.fragments = {
+ProfilesModuleFilterEditor.fragments = {
   ProfileTypeField: gql`
-    fragment ProfilesFiltersModuleSettings_ProfileTypeField on ProfileTypeField {
+    fragment ProfilesModuleFilterEditor_ProfileTypeField on ProfileTypeField {
       id
       type
       options

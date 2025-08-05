@@ -1,36 +1,22 @@
-import { Badge, FormLabel } from "@chakra-ui/react";
-import { useFormContext } from "react-hook-form";
-import { FormattedMessage } from "react-intl";
-import { isNonNullish } from "remeda";
-import { useIsDirtyField } from "../hooks/useIsDirtyField";
+import { FormLabel } from "@chakra-ui/react";
+import { EditedBadge } from "@parallel/components/common/EditedBadge";
+import { HStack } from "@parallel/components/ui";
 
 export function DashboardModuleFormLabel({
   children,
   field,
+  isUpdating,
 }: {
   children: React.ReactNode;
-  field?: string;
+  field: string | string[];
+  isUpdating?: boolean;
 }) {
-  const { watch } = useFormContext();
-  const selectedModule = watch("selectedModule");
-  const isEditing = isNonNullish(selectedModule?.id);
-  const isDirty = useIsDirtyField(isEditing ? field : undefined);
-
   return (
-    <FormLabel
-      display="flex"
-      gap={2}
-      alignItems="center"
-      textTransform="uppercase"
-      color="gray.600"
-      fontSize="sm"
-    >
-      {children}
-      {isDirty && isEditing ? (
-        <Badge colorScheme="blue">
-          <FormattedMessage id="generic.edited-indicator" defaultMessage="Edited" />
-        </Badge>
-      ) : null}
-    </FormLabel>
+    <HStack gap={2} marginBottom={2}>
+      <FormLabel textTransform="uppercase" color="gray.600" fontSize="sm" margin={0}>
+        {children}
+      </FormLabel>
+      {isUpdating ? <EditedBadge field={field} /> : null}
+    </HStack>
   );
 }

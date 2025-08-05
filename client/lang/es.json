@@ -3060,29 +3060,9 @@
     "context": "Untitled module"
   },
   {
-    "term": "component.dashboard-module-form.chart-filters",
-    "definition": "Filtros del gráfico",
-    "context": "Chart filters"
-  },
-  {
     "term": "component.dashboard-module-form.error-chart-items-required",
     "definition": "Los elementos del gráfico son obligatorios",
     "context": "Chart items are required"
-  },
-  {
-    "term": "component.dashboard-module-form.filters",
-    "definition": "Filtros",
-    "context": "Filters"
-  },
-  {
-    "term": "component.dashboard-module-form.filters-of",
-    "definition": "Filtros de {name}",
-    "context": "Filters of {name}:"
-  },
-  {
-    "term": "component.dashboard-module-form.module-field-to-aggregate",
-    "definition": "Campo a agregar",
-    "context": "Field to aggregate"
   },
   {
     "term": "component.dashboard-module-form.module-name",
@@ -3093,41 +3073,6 @@
     "term": "component.dashboard-module-form.module-name-placeholder",
     "definition": "Nombre del módulo",
     "context": "Module name"
-  },
-  {
-    "term": "component.dashboard-module-form.module-profile-type",
-    "definition": "Tipo de perfil",
-    "context": "Profile type"
-  },
-  {
-    "term": "component.dashboard-module-form.module-result-type",
-    "definition": "Tipo de resultado",
-    "context": "Result type"
-  },
-  {
-    "term": "component.dashboard-module-form.module-result-type-average",
-    "definition": "Media",
-    "context": "Average"
-  },
-  {
-    "term": "component.dashboard-module-form.module-result-type-count",
-    "definition": "Contar",
-    "context": "Count"
-  },
-  {
-    "term": "component.dashboard-module-form.module-result-type-max",
-    "definition": "Máximo",
-    "context": "Maximum"
-  },
-  {
-    "term": "component.dashboard-module-form.module-result-type-min",
-    "definition": "Mínimo",
-    "context": "Minimum"
-  },
-  {
-    "term": "component.dashboard-module-form.module-result-type-sum",
-    "definition": "Sumar",
-    "context": "Sum"
   },
   {
     "term": "component.dashboard-module-form.module-size",
@@ -3163,6 +3108,21 @@
     "term": "component.dashboard-module-form.sizes-small",
     "definition": "Pequeño",
     "context": "Small"
+  },
+  {
+    "term": "component.dashboard-module-profile-form.aggregate-by-label",
+    "definition": "Campo a agregar",
+    "context": "Field to aggregate"
+  },
+  {
+    "term": "component.dashboard-module-profile-form.profile-type-label",
+    "definition": "Tipo de perfil",
+    "context": "Profile type"
+  },
+  {
+    "term": "component.dashboard-module-profile-form.result-type-label",
+    "definition": "Tipo de resultado",
+    "context": "Result type"
   },
   {
     "term": "component.dashboard-module-ratio-filters.denominator",
@@ -5158,26 +5118,6 @@
     "term": "component.message-events-indicator.opened-explanation",
     "definition": "El correo electrónico fue abierto el {date}",
     "context": "The email was opened on {date}"
-  },
-  {
-    "term": "component.module-tabs.button-module",
-    "definition": "Botón de acción",
-    "context": "Action button"
-  },
-  {
-    "term": "component.module-tabs.numeric-module",
-    "definition": "Numérico",
-    "context": "Numeric"
-  },
-  {
-    "term": "component.module-tabs.pie-chart-module",
-    "definition": "Gráfico circular",
-    "context": "Pie chart"
-  },
-  {
-    "term": "component.module-tabs.ratio-module",
-    "definition": "Porcentaje / ratio",
-    "context": "Percentage / ratio"
   },
   {
     "term": "component.more-liquid-references-button.and",
@@ -8700,11 +8640,6 @@
     "context": "No chart items added"
   },
   {
-    "term": "component.petitions-chart-module-settings.remove-item-button",
-    "definition": "Eliminar elemento",
-    "context": "Remove item"
-  },
-  {
     "term": "component.petitions-chart-module-settings.source-chart-items-label",
     "definition": "Origen de los elementos del gráfico",
     "context": "Source of chart items"
@@ -9820,6 +9755,11 @@
     "context": "There's no profile types matching your criteria"
   },
   {
+    "term": "component.profiles-chart-module-settings.global-filter",
+    "definition": "Filtros globales",
+    "context": "Global filters"
+  },
+  {
     "term": "component.profiles-contact-us-dialog.body-1",
     "definition": "Saca el máximo rendimiento a la gestión de tus datos legales, creando bases de datos a medida.",
     "context": "Get the most out of your legal data management by creating customized databases."
@@ -9860,22 +9800,27 @@
     "context": "Importing profiles..."
   },
   {
-    "term": "component.profiles-filters-module-settings.add-condition",
+    "term": "component.profiles-module-filter-editor.add-condition",
     "definition": "Añadir condición",
     "context": "Add condition"
   },
   {
-    "term": "component.profiles-filters-module-settings.add-group",
+    "term": "component.profiles-module-filter-editor.add-group",
     "definition": "Añadir grupo",
     "context": "Add group"
   },
   {
-    "term": "component.profiles-filters-module-settings.all-profile-status-placeholder",
+    "term": "component.profiles-module-filter-editor.all-profile-status-placeholder",
     "definition": "Todos los estados",
     "context": "Select a status..."
   },
   {
-    "term": "component.profiles-filters-module-settings.properties",
+    "term": "component.profiles-module-filter-editor.filter-group-required-condition",
+    "definition": "Se requiere al menos una condición.",
+    "context": "At least one condition is required."
+  },
+  {
+    "term": "component.profiles-module-filter-editor.properties",
     "definition": "Propiedades",
     "context": "Properties"
   },
@@ -13625,6 +13570,31 @@
     "context": "After"
   },
   {
+    "term": "generic.aggregate-average",
+    "definition": "Media",
+    "context": "Average"
+  },
+  {
+    "term": "generic.aggregate-count",
+    "definition": "Contar",
+    "context": "Count"
+  },
+  {
+    "term": "generic.aggregate-max",
+    "definition": "Máximo",
+    "context": "Maximum"
+  },
+  {
+    "term": "generic.aggregate-min",
+    "definition": "Mínimo",
+    "context": "Minimum"
+  },
+  {
+    "term": "generic.aggregate-sum",
+    "definition": "Sumar",
+    "context": "Sum"
+  },
+  {
     "term": "generic.all-categories",
     "definition": "Todas las categorías",
     "context": "All categories"
@@ -13898,6 +13868,11 @@
     "term": "generic.current-year",
     "definition": "Año en curso",
     "context": "Current year"
+  },
+  {
+    "term": "generic.dashboard-module-filters",
+    "definition": "Filtros",
+    "context": "Filters"
   },
   {
     "term": "generic.days",
@@ -19548,6 +19523,26 @@
     "term": "util.recipient-view-delegate-access.toast-header",
     "definition": "Acceso delegado",
     "context": "Access delegated"
+  },
+  {
+    "term": "util.use-dashboard-modules.button-module",
+    "definition": "Botón de acción",
+    "context": "Action button"
+  },
+  {
+    "term": "util.use-dashboard-modules.numeric-module",
+    "definition": "Numérico",
+    "context": "Numeric"
+  },
+  {
+    "term": "util.use-dashboard-modules.pie-chart-module",
+    "definition": "Gráfico circular",
+    "context": "Pie chart"
+  },
+  {
+    "term": "util.use-dashboard-modules.ratio-module",
+    "definition": "Porcentaje / ratio",
+    "context": "Percentage / ratio"
   },
   {
     "term": "util.use-delete-contact.confirm-delete-alert-multiple-text",

@@ -28,6 +28,7 @@ export const theme = extendTheme({
     short:
       "0 2px 3px rgba(203, 213, 224, 0.18), 0 5px 10px rgba(203, 213, 224, 0.16), 0 8px 16px rgba(112, 144, 176, 0.08)",
     long: "0 3px 6px rgba(203, 213, 224, 0.3), 0 8px 14px rgba(203, 213, 224, 0.22), 0 11px 22px rgba(112, 144, 176, 0.12)",
+    error: "0 0 0 1px #E53E3E",
   },
   fontSizes: {
     "2xs": "0.6rem",

@@ -392,7 +392,7 @@ export function ProfileValueFilterLine({
       <Controller
         control={control}
         name={`${basePath}.operator`}
-        render={({ field: { onChange: _, ...field } }) => (
+        render={({ field: { onChange, ...field } }) => (
           <SimpleSelect
             size="sm"
             isSearchable={false}
@@ -440,7 +440,7 @@ export function ProfileValueFilterLine({
               } else {
                 never();
               }
-              setValue(`${basePath}.operator`, op!);
+              onChange(op!);
               setValue(`${basePath}.value`, _value);
 
               if (!["HAS_VALUE", "NOT_HAS_VALUE"].includes(op!)) {

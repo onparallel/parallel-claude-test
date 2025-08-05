@@ -9714,8 +9714,8 @@ export type DashboardModule_DashboardModule_DashboardPetitionsNumberModule_Fragm
     filters: {
       __typename?: "DashboardModulePetitionFilter";
       fromTemplateId?: Array<string> | null;
-      signature?: Array<PetitionSignatureStatusFilter> | null;
       status?: Array<PetitionStatus> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
       approvals?: {
         __typename?: "DashboardModulePetitionFilterApprovals";
         operator: PetitionApprovalsFilterLogicalOperator;
@@ -9730,8 +9730,8 @@ export type DashboardModule_DashboardModule_DashboardPetitionsNumberModule_Fragm
         operator: FilterSharedWithLogicalOperator;
         filters: Array<{
           __typename?: "DashboardModulePetitionFilterSharedWithFilters";
-          operator: FilterSharedWithOperator;
           value: string;
+          operator: FilterSharedWithOperator;
         }>;
       } | null;
       tags?: {
@@ -9769,16 +9769,16 @@ export type DashboardModule_DashboardModule_DashboardPetitionsPieChartModule_Fra
       __typename?: "DashboardPetitionsPieChartModuleItem";
       filter: {
         __typename?: "DashboardModulePetitionFilter";
+        fromTemplateId?: Array<string> | null;
         status?: Array<PetitionStatus> | null;
         signature?: Array<PetitionSignatureStatusFilter> | null;
-        fromTemplateId?: Array<string> | null;
-        tags?: {
-          __typename?: "DashboardModulePetitionFilterTags";
-          operator: PetitionTagFilterLogicalOperator;
+        approvals?: {
+          __typename?: "DashboardModulePetitionFilterApprovals";
+          operator: PetitionApprovalsFilterLogicalOperator;
           filters: Array<{
-            __typename?: "DashboardModulePetitionFilterTagsFilters";
-            value: Array<string>;
-            operator: PetitionTagFilterLineOperator;
+            __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+            value: string;
+            operator: PetitionApprovalsFilterOperator;
           }>;
         } | null;
         sharedWith?: {
@@ -9790,13 +9790,13 @@ export type DashboardModule_DashboardModule_DashboardPetitionsPieChartModule_Fra
             operator: FilterSharedWithOperator;
           }>;
         } | null;
-        approvals?: {
-          __typename?: "DashboardModulePetitionFilterApprovals";
-          operator: PetitionApprovalsFilterLogicalOperator;
+        tags?: {
+          __typename?: "DashboardModulePetitionFilterTags";
+          operator: PetitionTagFilterLogicalOperator;
           filters: Array<{
-            __typename?: "DashboardModulePetitionFilterApprovalsFilters";
-            value: string;
-            operator: PetitionApprovalsFilterOperator;
+            __typename?: "DashboardModulePetitionFilterTagsFilters";
+            value: Array<string>;
+            operator: PetitionTagFilterLineOperator;
           }>;
         } | null;
       };
@@ -9820,15 +9820,15 @@ export type DashboardModule_DashboardModule_DashboardPetitionsRatioModule_Fragme
     filters: Array<{
       __typename?: "DashboardModulePetitionFilter";
       fromTemplateId?: Array<string> | null;
-      signature?: Array<PetitionSignatureStatusFilter> | null;
       status?: Array<PetitionStatus> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
       approvals?: {
         __typename?: "DashboardModulePetitionFilterApprovals";
         operator: PetitionApprovalsFilterLogicalOperator;
         filters: Array<{
           __typename?: "DashboardModulePetitionFilterApprovalsFilters";
-          operator: PetitionApprovalsFilterOperator;
           value: string;
+          operator: PetitionApprovalsFilterOperator;
         }>;
       } | null;
       sharedWith?: {
@@ -9836,8 +9836,8 @@ export type DashboardModule_DashboardModule_DashboardPetitionsRatioModule_Fragme
         operator: FilterSharedWithLogicalOperator;
         filters: Array<{
           __typename?: "DashboardModulePetitionFilterSharedWithFilters";
-          operator: FilterSharedWithOperator;
           value: string;
+          operator: FilterSharedWithOperator;
         }>;
       } | null;
       tags?: {
@@ -10066,40 +10066,6 @@ export type DashboardTabs_DashboardFragment = {
   name: string;
 };
 
-export type DashboardModuleDrawer_DashboardModulePetitionFilterFragment = {
-  __typename?: "DashboardModulePetitionFilter";
-  fromTemplateId?: Array<string> | null;
-  signature?: Array<PetitionSignatureStatusFilter> | null;
-  status?: Array<PetitionStatus> | null;
-  approvals?: {
-    __typename?: "DashboardModulePetitionFilterApprovals";
-    operator: PetitionApprovalsFilterLogicalOperator;
-    filters: Array<{
-      __typename?: "DashboardModulePetitionFilterApprovalsFilters";
-      value: string;
-      operator: PetitionApprovalsFilterOperator;
-    }>;
-  } | null;
-  sharedWith?: {
-    __typename?: "DashboardModulePetitionFilterSharedWith";
-    operator: FilterSharedWithLogicalOperator;
-    filters: Array<{
-      __typename?: "DashboardModulePetitionFilterSharedWithFilters";
-      value: string;
-      operator: FilterSharedWithOperator;
-    }>;
-  } | null;
-  tags?: {
-    __typename?: "DashboardModulePetitionFilterTags";
-    operator: PetitionTagFilterLogicalOperator;
-    filters: Array<{
-      __typename?: "DashboardModulePetitionFilterTagsFilters";
-      value: Array<string>;
-      operator: PetitionTagFilterLineOperator;
-    }>;
-  } | null;
-};
-
 export type DashboardModuleDrawer_DashboardModule_DashboardCreatePetitionButtonModule_Fragment = {
   __typename?: "DashboardCreatePetitionButtonModule";
   id: string;
@@ -10122,8 +10088,8 @@ export type DashboardModuleDrawer_DashboardModule_DashboardPetitionsNumberModule
     filters: {
       __typename?: "DashboardModulePetitionFilter";
       fromTemplateId?: Array<string> | null;
-      signature?: Array<PetitionSignatureStatusFilter> | null;
       status?: Array<PetitionStatus> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
       approvals?: {
         __typename?: "DashboardModulePetitionFilterApprovals";
         operator: PetitionApprovalsFilterLogicalOperator;
@@ -10170,8 +10136,8 @@ export type DashboardModuleDrawer_DashboardModule_DashboardPetitionsPieChartModu
       filter: {
         __typename?: "DashboardModulePetitionFilter";
         fromTemplateId?: Array<string> | null;
-        signature?: Array<PetitionSignatureStatusFilter> | null;
         status?: Array<PetitionStatus> | null;
+        signature?: Array<PetitionSignatureStatusFilter> | null;
         approvals?: {
           __typename?: "DashboardModulePetitionFilterApprovals";
           operator: PetitionApprovalsFilterLogicalOperator;
@@ -10215,8 +10181,8 @@ export type DashboardModuleDrawer_DashboardModule_DashboardPetitionsRatioModule_
     filters: Array<{
       __typename?: "DashboardModulePetitionFilter";
       fromTemplateId?: Array<string> | null;
-      signature?: Array<PetitionSignatureStatusFilter> | null;
       status?: Array<PetitionStatus> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
       approvals?: {
         __typename?: "DashboardModulePetitionFilterApprovals";
         operator: PetitionApprovalsFilterLogicalOperator;
@@ -10435,15 +10401,349 @@ export type DashboardModuleDrawer_DashboardModuleFragment =
   | DashboardModuleDrawer_DashboardModule_DashboardProfilesPieChartModule_Fragment
   | DashboardModuleDrawer_DashboardModule_DashboardProfilesRatioModule_Fragment;
 
-export type DashboardModuleDrawer_createCreatePetitionButtonDashboardModuleMutationVariables =
-  Exact<{
-    dashboardId: Scalars["GID"]["input"];
-    size: DashboardModuleSize;
-    settings: CreatePetitionButtonDashboardModuleSettingsInput;
-    title?: InputMaybe<Scalars["String"]["input"]>;
-  }>;
+export type DashboardModuleForm_DashboardModule_DashboardCreatePetitionButtonModule_Fragment = {
+  __typename?: "DashboardCreatePetitionButtonModule";
+  id: string;
+  size: DashboardModuleSize;
+  title?: string | null;
+  createPetitionButtonSettings: {
+    __typename?: "DashboardCreatePetitionButtonModuleSettings";
+    label: string;
+    template?: { __typename?: "PetitionBaseMini"; id: string } | null;
+  };
+};
 
-export type DashboardModuleDrawer_createCreatePetitionButtonDashboardModuleMutation = {
+export type DashboardModuleForm_DashboardModule_DashboardPetitionsNumberModule_Fragment = {
+  __typename?: "DashboardPetitionsNumberModule";
+  id: string;
+  size: DashboardModuleSize;
+  title?: string | null;
+  petitionsNumberSettings: {
+    __typename?: "DashboardPetitionsNumberModuleSettings";
+    filters: {
+      __typename?: "DashboardModulePetitionFilter";
+      fromTemplateId?: Array<string> | null;
+      status?: Array<PetitionStatus> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
+      approvals?: {
+        __typename?: "DashboardModulePetitionFilterApprovals";
+        operator: PetitionApprovalsFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+          value: string;
+          operator: PetitionApprovalsFilterOperator;
+        }>;
+      } | null;
+      sharedWith?: {
+        __typename?: "DashboardModulePetitionFilterSharedWith";
+        operator: FilterSharedWithLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterSharedWithFilters";
+          value: string;
+          operator: FilterSharedWithOperator;
+        }>;
+      } | null;
+      tags?: {
+        __typename?: "DashboardModulePetitionFilterTags";
+        operator: PetitionTagFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
+        }>;
+      } | null;
+    };
+  };
+};
+
+export type DashboardModuleForm_DashboardModule_DashboardPetitionsPieChartModule_Fragment = {
+  __typename?: "DashboardPetitionsPieChartModule";
+  id: string;
+  size: DashboardModuleSize;
+  title?: string | null;
+  petitionsPieChartSettings: {
+    __typename?: "DashboardPetitionsPieChartModuleSettings";
+    graphicType: DashboardPieChartModuleSettingsType;
+    items: Array<{
+      __typename?: "DashboardPetitionsPieChartModuleItem";
+      color: string;
+      label: string;
+      filter: {
+        __typename?: "DashboardModulePetitionFilter";
+        fromTemplateId?: Array<string> | null;
+        status?: Array<PetitionStatus> | null;
+        signature?: Array<PetitionSignatureStatusFilter> | null;
+        approvals?: {
+          __typename?: "DashboardModulePetitionFilterApprovals";
+          operator: PetitionApprovalsFilterLogicalOperator;
+          filters: Array<{
+            __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+            value: string;
+            operator: PetitionApprovalsFilterOperator;
+          }>;
+        } | null;
+        sharedWith?: {
+          __typename?: "DashboardModulePetitionFilterSharedWith";
+          operator: FilterSharedWithLogicalOperator;
+          filters: Array<{
+            __typename?: "DashboardModulePetitionFilterSharedWithFilters";
+            value: string;
+            operator: FilterSharedWithOperator;
+          }>;
+        } | null;
+        tags?: {
+          __typename?: "DashboardModulePetitionFilterTags";
+          operator: PetitionTagFilterLogicalOperator;
+          filters: Array<{
+            __typename?: "DashboardModulePetitionFilterTagsFilters";
+            value: Array<string>;
+            operator: PetitionTagFilterLineOperator;
+          }>;
+        } | null;
+      };
+    }>;
+  };
+};
+
+export type DashboardModuleForm_DashboardModule_DashboardPetitionsRatioModule_Fragment = {
+  __typename?: "DashboardPetitionsRatioModule";
+  id: string;
+  size: DashboardModuleSize;
+  title?: string | null;
+  petitionsRatioSettings: {
+    __typename?: "DashboardPetitionsRatioModuleSettings";
+    graphicType: DashboardRatioModuleSettingsType;
+    filters: Array<{
+      __typename?: "DashboardModulePetitionFilter";
+      fromTemplateId?: Array<string> | null;
+      status?: Array<PetitionStatus> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
+      approvals?: {
+        __typename?: "DashboardModulePetitionFilterApprovals";
+        operator: PetitionApprovalsFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+          value: string;
+          operator: PetitionApprovalsFilterOperator;
+        }>;
+      } | null;
+      sharedWith?: {
+        __typename?: "DashboardModulePetitionFilterSharedWith";
+        operator: FilterSharedWithLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterSharedWithFilters";
+          value: string;
+          operator: FilterSharedWithOperator;
+        }>;
+      } | null;
+      tags?: {
+        __typename?: "DashboardModulePetitionFilterTags";
+        operator: PetitionTagFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "DashboardModulePetitionFilterTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
+        }>;
+      } | null;
+    }>;
+  };
+};
+
+export type DashboardModuleForm_DashboardModule_DashboardProfilesNumberModule_Fragment = {
+  __typename?: "DashboardProfilesNumberModule";
+  id: string;
+  size: DashboardModuleSize;
+  title?: string | null;
+  profilesNumberSettings: {
+    __typename?: "DashboardProfilesNumberModuleSettings";
+    type: ModuleResultType;
+    profileTypeId: string;
+    profileTypeFieldId?: string | null;
+    aggregate?: ModuleResultAggregateType | null;
+    filters: {
+      __typename?: "DashboardModuleProfileFilter";
+      status?: Array<ProfileStatus> | null;
+      values?: {
+        __typename?: "DashboardModuleProfileFieldValuesFilter";
+        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        profileTypeFieldId?: string | null;
+        value?: any | null;
+        conditions?: Array<{
+          __typename?: "DashboardModuleProfileFieldValuesFilter";
+          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          profileTypeFieldId?: string | null;
+          value?: any | null;
+          conditions?: Array<{
+            __typename?: "DashboardModuleProfileFieldValuesFilter";
+            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            profileTypeFieldId?: string | null;
+            value?: any | null;
+            conditions?: Array<{
+              __typename?: "DashboardModuleProfileFieldValuesFilter";
+              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              profileTypeFieldId?: string | null;
+              value?: any | null;
+            }> | null;
+          }> | null;
+        }> | null;
+      } | null;
+    };
+  };
+};
+
+export type DashboardModuleForm_DashboardModule_DashboardProfilesPieChartModule_Fragment = {
+  __typename?: "DashboardProfilesPieChartModule";
+  id: string;
+  size: DashboardModuleSize;
+  title?: string | null;
+  profilesPieChartSettings: {
+    __typename?: "DashboardProfilesPieChartModuleSettings";
+    type: ModuleResultType;
+    graphicType: DashboardPieChartModuleSettingsType;
+    profileTypeId: string;
+    profileTypeFieldId?: string | null;
+    groupByProfileTypeFieldId?: string | null;
+    aggregate?: ModuleResultAggregateType | null;
+    items: Array<{
+      __typename?: "DashboardProfilesPieChartModuleItem";
+      color: string;
+      label: string;
+      filter: {
+        __typename?: "DashboardModuleProfileFilter";
+        status?: Array<ProfileStatus> | null;
+        values?: {
+          __typename?: "DashboardModuleProfileFieldValuesFilter";
+          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          profileTypeFieldId?: string | null;
+          value?: any | null;
+          conditions?: Array<{
+            __typename?: "DashboardModuleProfileFieldValuesFilter";
+            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            profileTypeFieldId?: string | null;
+            value?: any | null;
+            conditions?: Array<{
+              __typename?: "DashboardModuleProfileFieldValuesFilter";
+              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              profileTypeFieldId?: string | null;
+              value?: any | null;
+              conditions?: Array<{
+                __typename?: "DashboardModuleProfileFieldValuesFilter";
+                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                profileTypeFieldId?: string | null;
+                value?: any | null;
+              }> | null;
+            }> | null;
+          }> | null;
+        } | null;
+      };
+    }>;
+    groupByFilter?: {
+      __typename?: "DashboardModuleProfileFilter";
+      status?: Array<ProfileStatus> | null;
+      values?: {
+        __typename?: "DashboardModuleProfileFieldValuesFilter";
+        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        profileTypeFieldId?: string | null;
+        value?: any | null;
+        conditions?: Array<{
+          __typename?: "DashboardModuleProfileFieldValuesFilter";
+          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          profileTypeFieldId?: string | null;
+          value?: any | null;
+          conditions?: Array<{
+            __typename?: "DashboardModuleProfileFieldValuesFilter";
+            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            profileTypeFieldId?: string | null;
+            value?: any | null;
+            conditions?: Array<{
+              __typename?: "DashboardModuleProfileFieldValuesFilter";
+              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              profileTypeFieldId?: string | null;
+              value?: any | null;
+            }> | null;
+          }> | null;
+        }> | null;
+      } | null;
+    } | null;
+  };
+};
+
+export type DashboardModuleForm_DashboardModule_DashboardProfilesRatioModule_Fragment = {
+  __typename?: "DashboardProfilesRatioModule";
+  id: string;
+  size: DashboardModuleSize;
+  title?: string | null;
+  profilesRatioSettings: {
+    __typename?: "DashboardProfilesRatioModuleSettings";
+    type: ModuleResultType;
+    graphicType: DashboardRatioModuleSettingsType;
+    profileTypeId: string;
+    profileTypeFieldId?: string | null;
+    aggregate?: ModuleResultAggregateType | null;
+    filters: Array<{
+      __typename?: "DashboardModuleProfileFilter";
+      status?: Array<ProfileStatus> | null;
+      values?: {
+        __typename?: "DashboardModuleProfileFieldValuesFilter";
+        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        profileTypeFieldId?: string | null;
+        value?: any | null;
+        conditions?: Array<{
+          __typename?: "DashboardModuleProfileFieldValuesFilter";
+          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          profileTypeFieldId?: string | null;
+          value?: any | null;
+          conditions?: Array<{
+            __typename?: "DashboardModuleProfileFieldValuesFilter";
+            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            profileTypeFieldId?: string | null;
+            value?: any | null;
+            conditions?: Array<{
+              __typename?: "DashboardModuleProfileFieldValuesFilter";
+              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
+              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              profileTypeFieldId?: string | null;
+              value?: any | null;
+            }> | null;
+          }> | null;
+        }> | null;
+      } | null;
+    }>;
+  };
+};
+
+export type DashboardModuleForm_DashboardModuleFragment =
+  | DashboardModuleForm_DashboardModule_DashboardCreatePetitionButtonModule_Fragment
+  | DashboardModuleForm_DashboardModule_DashboardPetitionsNumberModule_Fragment
+  | DashboardModuleForm_DashboardModule_DashboardPetitionsPieChartModule_Fragment
+  | DashboardModuleForm_DashboardModule_DashboardPetitionsRatioModule_Fragment
+  | DashboardModuleForm_DashboardModule_DashboardProfilesNumberModule_Fragment
+  | DashboardModuleForm_DashboardModule_DashboardProfilesPieChartModule_Fragment
+  | DashboardModuleForm_DashboardModule_DashboardProfilesRatioModule_Fragment;
+
+export type DashboardModuleForm_createCreatePetitionButtonDashboardModuleMutationVariables = Exact<{
+  dashboardId: Scalars["GID"]["input"];
+  size: DashboardModuleSize;
+  settings: CreatePetitionButtonDashboardModuleSettingsInput;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type DashboardModuleForm_createCreatePetitionButtonDashboardModuleMutation = {
   createCreatePetitionButtonDashboardModule: {
     __typename?: "Dashboard";
     id: string;
@@ -10494,14 +10794,14 @@ export type DashboardModuleDrawer_createCreatePetitionButtonDashboardModuleMutat
   };
 };
 
-export type DashboardModuleDrawer_createPetitionsNumberDashboardModuleMutationVariables = Exact<{
+export type DashboardModuleForm_createPetitionsNumberDashboardModuleMutationVariables = Exact<{
   dashboardId: Scalars["GID"]["input"];
   size: DashboardModuleSize;
   settings: PetitionsNumberDashboardModuleSettingsInput;
   title?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
-export type DashboardModuleDrawer_createPetitionsNumberDashboardModuleMutation = {
+export type DashboardModuleForm_createPetitionsNumberDashboardModuleMutation = {
   createPetitionsNumberDashboardModule: {
     __typename?: "Dashboard";
     id: string;
@@ -10552,14 +10852,14 @@ export type DashboardModuleDrawer_createPetitionsNumberDashboardModuleMutation =
   };
 };
 
-export type DashboardModuleDrawer_createPetitionsRatioDashboardModuleMutationVariables = Exact<{
+export type DashboardModuleForm_createPetitionsRatioDashboardModuleMutationVariables = Exact<{
   dashboardId: Scalars["GID"]["input"];
   size: DashboardModuleSize;
   settings: PetitionsRatioDashboardModuleSettingsInput;
   title?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
-export type DashboardModuleDrawer_createPetitionsRatioDashboardModuleMutation = {
+export type DashboardModuleForm_createPetitionsRatioDashboardModuleMutation = {
   createPetitionsRatioDashboardModule: {
     __typename?: "Dashboard";
     id: string;
@@ -10610,14 +10910,14 @@ export type DashboardModuleDrawer_createPetitionsRatioDashboardModuleMutation = 
   };
 };
 
-export type DashboardModuleDrawer_createPetitionsPieChartDashboardModuleMutationVariables = Exact<{
+export type DashboardModuleForm_createPetitionsPieChartDashboardModuleMutationVariables = Exact<{
   dashboardId: Scalars["GID"]["input"];
   size: DashboardModuleSize;
   settings: PetitionsPieChartDashboardModuleSettingsInput;
   title?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
-export type DashboardModuleDrawer_createPetitionsPieChartDashboardModuleMutation = {
+export type DashboardModuleForm_createPetitionsPieChartDashboardModuleMutation = {
   createPetitionsPieChartDashboardModule: {
     __typename?: "Dashboard";
     id: string;
@@ -10668,14 +10968,14 @@ export type DashboardModuleDrawer_createPetitionsPieChartDashboardModuleMutation
   };
 };
 
-export type DashboardModuleDrawer_createProfilesNumberDashboardModuleMutationVariables = Exact<{
+export type DashboardModuleForm_createProfilesNumberDashboardModuleMutationVariables = Exact<{
   dashboardId: Scalars["GID"]["input"];
   size: DashboardModuleSize;
   settings: ProfilesNumberDashboardModuleSettingsInput;
   title?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
-export type DashboardModuleDrawer_createProfilesNumberDashboardModuleMutation = {
+export type DashboardModuleForm_createProfilesNumberDashboardModuleMutation = {
   createProfilesNumberDashboardModule: {
     __typename?: "Dashboard";
     id: string;
@@ -10726,14 +11026,14 @@ export type DashboardModuleDrawer_createProfilesNumberDashboardModuleMutation = 
   };
 };
 
-export type DashboardModuleDrawer_createProfilesPieChartDashboardModuleMutationVariables = Exact<{
+export type DashboardModuleForm_createProfilesPieChartDashboardModuleMutationVariables = Exact<{
   dashboardId: Scalars["GID"]["input"];
   size: DashboardModuleSize;
   settings: ProfilesPieChartDashboardModuleSettingsInput;
   title?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
-export type DashboardModuleDrawer_createProfilesPieChartDashboardModuleMutation = {
+export type DashboardModuleForm_createProfilesPieChartDashboardModuleMutation = {
   createProfilesPieChartDashboardModule: {
     __typename?: "Dashboard";
     id: string;
@@ -10784,14 +11084,14 @@ export type DashboardModuleDrawer_createProfilesPieChartDashboardModuleMutation 
   };
 };
 
-export type DashboardModuleDrawer_createProfilesRatioDashboardModuleMutationVariables = Exact<{
+export type DashboardModuleForm_createProfilesRatioDashboardModuleMutationVariables = Exact<{
   dashboardId: Scalars["GID"]["input"];
   size: DashboardModuleSize;
   settings: ProfilesRatioDashboardModuleSettingsInput;
   title?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
-export type DashboardModuleDrawer_createProfilesRatioDashboardModuleMutation = {
+export type DashboardModuleForm_createProfilesRatioDashboardModuleMutation = {
   createProfilesRatioDashboardModule: {
     __typename?: "Dashboard";
     id: string;
@@ -10842,13 +11142,13 @@ export type DashboardModuleDrawer_createProfilesRatioDashboardModuleMutation = {
   };
 };
 
-export type DashboardModuleDrawer_updateProfilesRatioDashboardModuleMutationVariables = Exact<{
+export type DashboardModuleForm_updateProfilesRatioDashboardModuleMutationVariables = Exact<{
   dashboardId: Scalars["GID"]["input"];
   moduleId: Scalars["GID"]["input"];
   data: UpdateProfilesRatioDashboardModuleInput;
 }>;
 
-export type DashboardModuleDrawer_updateProfilesRatioDashboardModuleMutation = {
+export type DashboardModuleForm_updateProfilesRatioDashboardModuleMutation = {
   updateProfilesRatioDashboardModule:
     | {
         __typename?: "DashboardCreatePetitionButtonModule";
@@ -10871,8 +11171,8 @@ export type DashboardModuleDrawer_updateProfilesRatioDashboardModuleMutation = {
           filters: {
             __typename?: "DashboardModulePetitionFilter";
             fromTemplateId?: Array<string> | null;
-            signature?: Array<PetitionSignatureStatusFilter> | null;
             status?: Array<PetitionStatus> | null;
+            signature?: Array<PetitionSignatureStatusFilter> | null;
             approvals?: {
               __typename?: "DashboardModulePetitionFilterApprovals";
               operator: PetitionApprovalsFilterLogicalOperator;
@@ -10918,8 +11218,8 @@ export type DashboardModuleDrawer_updateProfilesRatioDashboardModuleMutation = {
             filter: {
               __typename?: "DashboardModulePetitionFilter";
               fromTemplateId?: Array<string> | null;
-              signature?: Array<PetitionSignatureStatusFilter> | null;
               status?: Array<PetitionStatus> | null;
+              signature?: Array<PetitionSignatureStatusFilter> | null;
               approvals?: {
                 __typename?: "DashboardModulePetitionFilterApprovals";
                 operator: PetitionApprovalsFilterLogicalOperator;
@@ -10962,8 +11262,8 @@ export type DashboardModuleDrawer_updateProfilesRatioDashboardModuleMutation = {
           filters: Array<{
             __typename?: "DashboardModulePetitionFilter";
             fromTemplateId?: Array<string> | null;
-            signature?: Array<PetitionSignatureStatusFilter> | null;
             status?: Array<PetitionStatus> | null;
+            signature?: Array<PetitionSignatureStatusFilter> | null;
             approvals?: {
               __typename?: "DashboardModulePetitionFilterApprovals";
               operator: PetitionApprovalsFilterLogicalOperator;
@@ -11171,13 +11471,13 @@ export type DashboardModuleDrawer_updateProfilesRatioDashboardModuleMutation = {
       };
 };
 
-export type DashboardModuleDrawer_updateProfilesPieChartDashboardModuleMutationVariables = Exact<{
+export type DashboardModuleForm_updateProfilesPieChartDashboardModuleMutationVariables = Exact<{
   dashboardId: Scalars["GID"]["input"];
   moduleId: Scalars["GID"]["input"];
   data: UpdateProfilesPieChartDashboardModuleInput;
 }>;
 
-export type DashboardModuleDrawer_updateProfilesPieChartDashboardModuleMutation = {
+export type DashboardModuleForm_updateProfilesPieChartDashboardModuleMutation = {
   updateProfilesPieChartDashboardModule:
     | {
         __typename?: "DashboardCreatePetitionButtonModule";
@@ -11200,8 +11500,8 @@ export type DashboardModuleDrawer_updateProfilesPieChartDashboardModuleMutation 
           filters: {
             __typename?: "DashboardModulePetitionFilter";
             fromTemplateId?: Array<string> | null;
-            signature?: Array<PetitionSignatureStatusFilter> | null;
             status?: Array<PetitionStatus> | null;
+            signature?: Array<PetitionSignatureStatusFilter> | null;
             approvals?: {
               __typename?: "DashboardModulePetitionFilterApprovals";
               operator: PetitionApprovalsFilterLogicalOperator;
@@ -11247,8 +11547,8 @@ export type DashboardModuleDrawer_updateProfilesPieChartDashboardModuleMutation 
             filter: {
               __typename?: "DashboardModulePetitionFilter";
               fromTemplateId?: Array<string> | null;
-              signature?: Array<PetitionSignatureStatusFilter> | null;
               status?: Array<PetitionStatus> | null;
+              signature?: Array<PetitionSignatureStatusFilter> | null;
               approvals?: {
                 __typename?: "DashboardModulePetitionFilterApprovals";
                 operator: PetitionApprovalsFilterLogicalOperator;
@@ -11291,8 +11591,8 @@ export type DashboardModuleDrawer_updateProfilesPieChartDashboardModuleMutation 
           filters: Array<{
             __typename?: "DashboardModulePetitionFilter";
             fromTemplateId?: Array<string> | null;
-            signature?: Array<PetitionSignatureStatusFilter> | null;
             status?: Array<PetitionStatus> | null;
+            signature?: Array<PetitionSignatureStatusFilter> | null;
             approvals?: {
               __typename?: "DashboardModulePetitionFilterApprovals";
               operator: PetitionApprovalsFilterLogicalOperator;
@@ -11500,13 +11800,13 @@ export type DashboardModuleDrawer_updateProfilesPieChartDashboardModuleMutation 
       };
 };
 
-export type DashboardModuleDrawer_updateProfilesNumberDashboardModuleMutationVariables = Exact<{
+export type DashboardModuleForm_updateProfilesNumberDashboardModuleMutationVariables = Exact<{
   dashboardId: Scalars["GID"]["input"];
   moduleId: Scalars["GID"]["input"];
   data: UpdateProfilesNumberDashboardModuleInput;
 }>;
 
-export type DashboardModuleDrawer_updateProfilesNumberDashboardModuleMutation = {
+export type DashboardModuleForm_updateProfilesNumberDashboardModuleMutation = {
   updateProfilesNumberDashboardModule:
     | {
         __typename?: "DashboardCreatePetitionButtonModule";
@@ -11529,8 +11829,8 @@ export type DashboardModuleDrawer_updateProfilesNumberDashboardModuleMutation = 
           filters: {
             __typename?: "DashboardModulePetitionFilter";
             fromTemplateId?: Array<string> | null;
-            signature?: Array<PetitionSignatureStatusFilter> | null;
             status?: Array<PetitionStatus> | null;
+            signature?: Array<PetitionSignatureStatusFilter> | null;
             approvals?: {
               __typename?: "DashboardModulePetitionFilterApprovals";
               operator: PetitionApprovalsFilterLogicalOperator;
@@ -11576,8 +11876,8 @@ export type DashboardModuleDrawer_updateProfilesNumberDashboardModuleMutation = 
             filter: {
               __typename?: "DashboardModulePetitionFilter";
               fromTemplateId?: Array<string> | null;
-              signature?: Array<PetitionSignatureStatusFilter> | null;
               status?: Array<PetitionStatus> | null;
+              signature?: Array<PetitionSignatureStatusFilter> | null;
               approvals?: {
                 __typename?: "DashboardModulePetitionFilterApprovals";
                 operator: PetitionApprovalsFilterLogicalOperator;
@@ -11620,8 +11920,8 @@ export type DashboardModuleDrawer_updateProfilesNumberDashboardModuleMutation = 
           filters: Array<{
             __typename?: "DashboardModulePetitionFilter";
             fromTemplateId?: Array<string> | null;
-            signature?: Array<PetitionSignatureStatusFilter> | null;
             status?: Array<PetitionStatus> | null;
+            signature?: Array<PetitionSignatureStatusFilter> | null;
             approvals?: {
               __typename?: "DashboardModulePetitionFilterApprovals";
               operator: PetitionApprovalsFilterLogicalOperator;
@@ -11829,13 +12129,13 @@ export type DashboardModuleDrawer_updateProfilesNumberDashboardModuleMutation = 
       };
 };
 
-export type DashboardModuleDrawer_updatePetitionsPieChartDashboardModuleMutationVariables = Exact<{
+export type DashboardModuleForm_updatePetitionsPieChartDashboardModuleMutationVariables = Exact<{
   dashboardId: Scalars["GID"]["input"];
   moduleId: Scalars["GID"]["input"];
   data: UpdatePetitionsPieChartDashboardModuleInput;
 }>;
 
-export type DashboardModuleDrawer_updatePetitionsPieChartDashboardModuleMutation = {
+export type DashboardModuleForm_updatePetitionsPieChartDashboardModuleMutation = {
   updatePetitionsPieChartDashboardModule:
     | {
         __typename?: "DashboardCreatePetitionButtonModule";
@@ -11858,8 +12158,8 @@ export type DashboardModuleDrawer_updatePetitionsPieChartDashboardModuleMutation
           filters: {
             __typename?: "DashboardModulePetitionFilter";
             fromTemplateId?: Array<string> | null;
-            signature?: Array<PetitionSignatureStatusFilter> | null;
             status?: Array<PetitionStatus> | null;
+            signature?: Array<PetitionSignatureStatusFilter> | null;
             approvals?: {
               __typename?: "DashboardModulePetitionFilterApprovals";
               operator: PetitionApprovalsFilterLogicalOperator;
@@ -11905,8 +12205,8 @@ export type DashboardModuleDrawer_updatePetitionsPieChartDashboardModuleMutation
             filter: {
               __typename?: "DashboardModulePetitionFilter";
               fromTemplateId?: Array<string> | null;
-              signature?: Array<PetitionSignatureStatusFilter> | null;
               status?: Array<PetitionStatus> | null;
+              signature?: Array<PetitionSignatureStatusFilter> | null;
               approvals?: {
                 __typename?: "DashboardModulePetitionFilterApprovals";
                 operator: PetitionApprovalsFilterLogicalOperator;
@@ -11949,8 +12249,8 @@ export type DashboardModuleDrawer_updatePetitionsPieChartDashboardModuleMutation
           filters: Array<{
             __typename?: "DashboardModulePetitionFilter";
             fromTemplateId?: Array<string> | null;
-            signature?: Array<PetitionSignatureStatusFilter> | null;
             status?: Array<PetitionStatus> | null;
+            signature?: Array<PetitionSignatureStatusFilter> | null;
             approvals?: {
               __typename?: "DashboardModulePetitionFilterApprovals";
               operator: PetitionApprovalsFilterLogicalOperator;
@@ -12158,13 +12458,13 @@ export type DashboardModuleDrawer_updatePetitionsPieChartDashboardModuleMutation
       };
 };
 
-export type DashboardModuleDrawer_updatePetitionsRatioDashboardModuleMutationVariables = Exact<{
+export type DashboardModuleForm_updatePetitionsRatioDashboardModuleMutationVariables = Exact<{
   dashboardId: Scalars["GID"]["input"];
   moduleId: Scalars["GID"]["input"];
   data: UpdatePetitionsRatioDashboardModuleInput;
 }>;
 
-export type DashboardModuleDrawer_updatePetitionsRatioDashboardModuleMutation = {
+export type DashboardModuleForm_updatePetitionsRatioDashboardModuleMutation = {
   updatePetitionsRatioDashboardModule:
     | {
         __typename?: "DashboardCreatePetitionButtonModule";
@@ -12187,8 +12487,8 @@ export type DashboardModuleDrawer_updatePetitionsRatioDashboardModuleMutation = 
           filters: {
             __typename?: "DashboardModulePetitionFilter";
             fromTemplateId?: Array<string> | null;
-            signature?: Array<PetitionSignatureStatusFilter> | null;
             status?: Array<PetitionStatus> | null;
+            signature?: Array<PetitionSignatureStatusFilter> | null;
             approvals?: {
               __typename?: "DashboardModulePetitionFilterApprovals";
               operator: PetitionApprovalsFilterLogicalOperator;
@@ -12234,8 +12534,8 @@ export type DashboardModuleDrawer_updatePetitionsRatioDashboardModuleMutation = 
             filter: {
               __typename?: "DashboardModulePetitionFilter";
               fromTemplateId?: Array<string> | null;
-              signature?: Array<PetitionSignatureStatusFilter> | null;
               status?: Array<PetitionStatus> | null;
+              signature?: Array<PetitionSignatureStatusFilter> | null;
               approvals?: {
                 __typename?: "DashboardModulePetitionFilterApprovals";
                 operator: PetitionApprovalsFilterLogicalOperator;
@@ -12278,8 +12578,8 @@ export type DashboardModuleDrawer_updatePetitionsRatioDashboardModuleMutation = 
           filters: Array<{
             __typename?: "DashboardModulePetitionFilter";
             fromTemplateId?: Array<string> | null;
-            signature?: Array<PetitionSignatureStatusFilter> | null;
             status?: Array<PetitionStatus> | null;
+            signature?: Array<PetitionSignatureStatusFilter> | null;
             approvals?: {
               __typename?: "DashboardModulePetitionFilterApprovals";
               operator: PetitionApprovalsFilterLogicalOperator;
@@ -12487,14 +12787,13 @@ export type DashboardModuleDrawer_updatePetitionsRatioDashboardModuleMutation = 
       };
 };
 
-export type DashboardModuleDrawer_updateCreatePetitionButtonDashboardModuleMutationVariables =
-  Exact<{
-    dashboardId: Scalars["GID"]["input"];
-    moduleId: Scalars["GID"]["input"];
-    data: UpdateCreatePetitionButtonDashboardModuleInput;
-  }>;
+export type DashboardModuleForm_updateCreatePetitionButtonDashboardModuleMutationVariables = Exact<{
+  dashboardId: Scalars["GID"]["input"];
+  moduleId: Scalars["GID"]["input"];
+  data: UpdateCreatePetitionButtonDashboardModuleInput;
+}>;
 
-export type DashboardModuleDrawer_updateCreatePetitionButtonDashboardModuleMutation = {
+export type DashboardModuleForm_updateCreatePetitionButtonDashboardModuleMutation = {
   updateCreatePetitionButtonDashboardModule:
     | {
         __typename?: "DashboardCreatePetitionButtonModule";
@@ -12517,8 +12816,8 @@ export type DashboardModuleDrawer_updateCreatePetitionButtonDashboardModuleMutat
           filters: {
             __typename?: "DashboardModulePetitionFilter";
             fromTemplateId?: Array<string> | null;
-            signature?: Array<PetitionSignatureStatusFilter> | null;
             status?: Array<PetitionStatus> | null;
+            signature?: Array<PetitionSignatureStatusFilter> | null;
             approvals?: {
               __typename?: "DashboardModulePetitionFilterApprovals";
               operator: PetitionApprovalsFilterLogicalOperator;
@@ -12564,8 +12863,8 @@ export type DashboardModuleDrawer_updateCreatePetitionButtonDashboardModuleMutat
             filter: {
               __typename?: "DashboardModulePetitionFilter";
               fromTemplateId?: Array<string> | null;
-              signature?: Array<PetitionSignatureStatusFilter> | null;
               status?: Array<PetitionStatus> | null;
+              signature?: Array<PetitionSignatureStatusFilter> | null;
               approvals?: {
                 __typename?: "DashboardModulePetitionFilterApprovals";
                 operator: PetitionApprovalsFilterLogicalOperator;
@@ -12608,8 +12907,8 @@ export type DashboardModuleDrawer_updateCreatePetitionButtonDashboardModuleMutat
           filters: Array<{
             __typename?: "DashboardModulePetitionFilter";
             fromTemplateId?: Array<string> | null;
-            signature?: Array<PetitionSignatureStatusFilter> | null;
             status?: Array<PetitionStatus> | null;
+            signature?: Array<PetitionSignatureStatusFilter> | null;
             approvals?: {
               __typename?: "DashboardModulePetitionFilterApprovals";
               operator: PetitionApprovalsFilterLogicalOperator;
@@ -12817,13 +13116,13 @@ export type DashboardModuleDrawer_updateCreatePetitionButtonDashboardModuleMutat
       };
 };
 
-export type DashboardModuleDrawer_updatePetitionsNumberDashboardModuleMutationVariables = Exact<{
+export type DashboardModuleForm_updatePetitionsNumberDashboardModuleMutationVariables = Exact<{
   dashboardId: Scalars["GID"]["input"];
   moduleId: Scalars["GID"]["input"];
   data: UpdatePetitionsNumberDashboardModuleInput;
 }>;
 
-export type DashboardModuleDrawer_updatePetitionsNumberDashboardModuleMutation = {
+export type DashboardModuleForm_updatePetitionsNumberDashboardModuleMutation = {
   updatePetitionsNumberDashboardModule:
     | {
         __typename?: "DashboardCreatePetitionButtonModule";
@@ -12846,8 +13145,8 @@ export type DashboardModuleDrawer_updatePetitionsNumberDashboardModuleMutation =
           filters: {
             __typename?: "DashboardModulePetitionFilter";
             fromTemplateId?: Array<string> | null;
-            signature?: Array<PetitionSignatureStatusFilter> | null;
             status?: Array<PetitionStatus> | null;
+            signature?: Array<PetitionSignatureStatusFilter> | null;
             approvals?: {
               __typename?: "DashboardModulePetitionFilterApprovals";
               operator: PetitionApprovalsFilterLogicalOperator;
@@ -12893,8 +13192,8 @@ export type DashboardModuleDrawer_updatePetitionsNumberDashboardModuleMutation =
             filter: {
               __typename?: "DashboardModulePetitionFilter";
               fromTemplateId?: Array<string> | null;
-              signature?: Array<PetitionSignatureStatusFilter> | null;
               status?: Array<PetitionStatus> | null;
+              signature?: Array<PetitionSignatureStatusFilter> | null;
               approvals?: {
                 __typename?: "DashboardModulePetitionFilterApprovals";
                 operator: PetitionApprovalsFilterLogicalOperator;
@@ -12937,8 +13236,8 @@ export type DashboardModuleDrawer_updatePetitionsNumberDashboardModuleMutation =
           filters: Array<{
             __typename?: "DashboardModulePetitionFilter";
             fromTemplateId?: Array<string> | null;
-            signature?: Array<PetitionSignatureStatusFilter> | null;
             status?: Array<PetitionStatus> | null;
+            signature?: Array<PetitionSignatureStatusFilter> | null;
             approvals?: {
               __typename?: "DashboardModulePetitionFilterApprovals";
               operator: PetitionApprovalsFilterLogicalOperator;
@@ -13159,6 +13458,15 @@ export type DashboardModuleChartItems_ProfileTypeFragment = {
   }>;
 };
 
+export type ProfilesModuleFilterEditor_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  type: ProfileTypeFieldType;
+  options: { [key: string]: any };
+  name: { [locale in UserLocale]?: string };
+  isExpirable: boolean;
+};
+
 export type DashboardModuleProfileForm_profileTypeQueryVariables = Exact<{
   profileTypeId: Scalars["GID"]["input"];
 }>;
@@ -13192,15 +13500,6 @@ export type ProfilesChartModuleSettings_ProfileTypeFragment = {
   }>;
 };
 
-export type ProfilesFiltersModuleSettings_ProfileTypeFieldFragment = {
-  __typename?: "ProfileTypeField";
-  id: string;
-  type: ProfileTypeFieldType;
-  options: { [key: string]: any };
-  name: { [locale in UserLocale]?: string };
-  isExpirable: boolean;
-};
-
 export type ProfilesNumberModuleSettings_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
@@ -13225,6 +13524,40 @@ export type ProfilesRatioModuleSettings_ProfileTypeFragment = {
     name: { [locale in UserLocale]?: string };
     isExpirable: boolean;
   }>;
+};
+
+export type fullDashboardModulePetitionFilterFragment = {
+  __typename?: "DashboardModulePetitionFilter";
+  fromTemplateId?: Array<string> | null;
+  status?: Array<PetitionStatus> | null;
+  signature?: Array<PetitionSignatureStatusFilter> | null;
+  approvals?: {
+    __typename?: "DashboardModulePetitionFilterApprovals";
+    operator: PetitionApprovalsFilterLogicalOperator;
+    filters: Array<{
+      __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+      value: string;
+      operator: PetitionApprovalsFilterOperator;
+    }>;
+  } | null;
+  sharedWith?: {
+    __typename?: "DashboardModulePetitionFilterSharedWith";
+    operator: FilterSharedWithLogicalOperator;
+    filters: Array<{
+      __typename?: "DashboardModulePetitionFilterSharedWithFilters";
+      value: string;
+      operator: FilterSharedWithOperator;
+    }>;
+  } | null;
+  tags?: {
+    __typename?: "DashboardModulePetitionFilterTags";
+    operator: PetitionTagFilterLogicalOperator;
+    filters: Array<{
+      __typename?: "DashboardModulePetitionFilterTagsFilters";
+      value: Array<string>;
+      operator: PetitionTagFilterLineOperator;
+    }>;
+  } | null;
 };
 
 export type fullDashboardModuleProfileFilterFragment = {
@@ -13290,8 +13623,8 @@ export type DashboardPetitionsNumberModule_DashboardPetitionsNumberModuleFragmen
     filters: {
       __typename?: "DashboardModulePetitionFilter";
       fromTemplateId?: Array<string> | null;
-      signature?: Array<PetitionSignatureStatusFilter> | null;
       status?: Array<PetitionStatus> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
       approvals?: {
         __typename?: "DashboardModulePetitionFilterApprovals";
         operator: PetitionApprovalsFilterLogicalOperator;
@@ -13306,8 +13639,8 @@ export type DashboardPetitionsNumberModule_DashboardPetitionsNumberModuleFragmen
         operator: FilterSharedWithLogicalOperator;
         filters: Array<{
           __typename?: "DashboardModulePetitionFilterSharedWithFilters";
-          operator: FilterSharedWithOperator;
           value: string;
+          operator: FilterSharedWithOperator;
         }>;
       } | null;
       tags?: {
@@ -13345,16 +13678,16 @@ export type DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFra
       __typename?: "DashboardPetitionsPieChartModuleItem";
       filter: {
         __typename?: "DashboardModulePetitionFilter";
+        fromTemplateId?: Array<string> | null;
         status?: Array<PetitionStatus> | null;
         signature?: Array<PetitionSignatureStatusFilter> | null;
-        fromTemplateId?: Array<string> | null;
-        tags?: {
-          __typename?: "DashboardModulePetitionFilterTags";
-          operator: PetitionTagFilterLogicalOperator;
+        approvals?: {
+          __typename?: "DashboardModulePetitionFilterApprovals";
+          operator: PetitionApprovalsFilterLogicalOperator;
           filters: Array<{
-            __typename?: "DashboardModulePetitionFilterTagsFilters";
-            value: Array<string>;
-            operator: PetitionTagFilterLineOperator;
+            __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+            value: string;
+            operator: PetitionApprovalsFilterOperator;
           }>;
         } | null;
         sharedWith?: {
@@ -13366,13 +13699,13 @@ export type DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFra
             operator: FilterSharedWithOperator;
           }>;
         } | null;
-        approvals?: {
-          __typename?: "DashboardModulePetitionFilterApprovals";
-          operator: PetitionApprovalsFilterLogicalOperator;
+        tags?: {
+          __typename?: "DashboardModulePetitionFilterTags";
+          operator: PetitionTagFilterLogicalOperator;
           filters: Array<{
-            __typename?: "DashboardModulePetitionFilterApprovalsFilters";
-            value: string;
-            operator: PetitionApprovalsFilterOperator;
+            __typename?: "DashboardModulePetitionFilterTagsFilters";
+            value: Array<string>;
+            operator: PetitionTagFilterLineOperator;
           }>;
         } | null;
       };
@@ -13396,15 +13729,15 @@ export type DashboardPetitionsRatioModule_DashboardPetitionsRatioModuleFragment 
     filters: Array<{
       __typename?: "DashboardModulePetitionFilter";
       fromTemplateId?: Array<string> | null;
-      signature?: Array<PetitionSignatureStatusFilter> | null;
       status?: Array<PetitionStatus> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
       approvals?: {
         __typename?: "DashboardModulePetitionFilterApprovals";
         operator: PetitionApprovalsFilterLogicalOperator;
         filters: Array<{
           __typename?: "DashboardModulePetitionFilterApprovalsFilters";
-          operator: PetitionApprovalsFilterOperator;
           value: string;
+          operator: PetitionApprovalsFilterOperator;
         }>;
       } | null;
       sharedWith?: {
@@ -13412,8 +13745,8 @@ export type DashboardPetitionsRatioModule_DashboardPetitionsRatioModuleFragment 
         operator: FilterSharedWithLogicalOperator;
         filters: Array<{
           __typename?: "DashboardModulePetitionFilterSharedWithFilters";
-          operator: FilterSharedWithOperator;
           value: string;
+          operator: FilterSharedWithOperator;
         }>;
       } | null;
       tags?: {
@@ -45504,11 +45837,6 @@ export type Home_DashboardModule_DashboardCreatePetitionButtonModule_Fragment = 
   id: string;
   title?: string | null;
   size: DashboardModuleSize;
-  createPetitionButtonSettings: {
-    __typename?: "DashboardCreatePetitionButtonModuleSettings";
-    label: string;
-    template?: { __typename?: "PetitionBaseMini"; id: string } | null;
-  };
   petitionButtonSettings: {
     __typename?: "DashboardCreatePetitionButtonModuleSettings";
     label: string;
@@ -45521,6 +45849,11 @@ export type Home_DashboardModule_DashboardCreatePetitionButtonModule_Fragment = 
       } | null;
     } | null;
   };
+  createPetitionButtonSettings: {
+    __typename?: "DashboardCreatePetitionButtonModuleSettings";
+    label: string;
+    template?: { __typename?: "PetitionBaseMini"; id: string } | null;
+  };
 };
 
 export type Home_DashboardModule_DashboardPetitionsNumberModule_Fragment = {
@@ -45528,13 +45861,14 @@ export type Home_DashboardModule_DashboardPetitionsNumberModule_Fragment = {
   id: string;
   title?: string | null;
   size: DashboardModuleSize;
-  petitionsNumberSettings: {
+  petitionsNumberResult?: { __typename?: "DashboardModuleResultItem"; count: number } | null;
+  settings: {
     __typename?: "DashboardPetitionsNumberModuleSettings";
     filters: {
       __typename?: "DashboardModulePetitionFilter";
       fromTemplateId?: Array<string> | null;
-      signature?: Array<PetitionSignatureStatusFilter> | null;
       status?: Array<PetitionStatus> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
       approvals?: {
         __typename?: "DashboardModulePetitionFilterApprovals";
         operator: PetitionApprovalsFilterLogicalOperator;
@@ -45564,14 +45898,13 @@ export type Home_DashboardModule_DashboardPetitionsNumberModule_Fragment = {
       } | null;
     };
   };
-  petitionsNumberResult?: { __typename?: "DashboardModuleResultItem"; count: number } | null;
-  settings: {
+  petitionsNumberSettings: {
     __typename?: "DashboardPetitionsNumberModuleSettings";
     filters: {
       __typename?: "DashboardModulePetitionFilter";
       fromTemplateId?: Array<string> | null;
-      signature?: Array<PetitionSignatureStatusFilter> | null;
       status?: Array<PetitionStatus> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
       approvals?: {
         __typename?: "DashboardModulePetitionFilterApprovals";
         operator: PetitionApprovalsFilterLogicalOperator;
@@ -45586,8 +45919,8 @@ export type Home_DashboardModule_DashboardPetitionsNumberModule_Fragment = {
         operator: FilterSharedWithLogicalOperator;
         filters: Array<{
           __typename?: "DashboardModulePetitionFilterSharedWithFilters";
-          operator: FilterSharedWithOperator;
           value: string;
+          operator: FilterSharedWithOperator;
         }>;
       } | null;
       tags?: {
@@ -45608,6 +45941,16 @@ export type Home_DashboardModule_DashboardPetitionsPieChartModule_Fragment = {
   id: string;
   title?: string | null;
   size: DashboardModuleSize;
+  petitionsPieChartResult?: {
+    __typename?: "DashboardModuleResultMultiItem";
+    isIncongruent: boolean;
+    items: Array<{
+      __typename?: "DashboardModuleResultItem";
+      count: number;
+      label?: any | null;
+      color?: string | null;
+    }>;
+  } | null;
   petitionsPieChartSettings: {
     __typename?: "DashboardPetitionsPieChartModuleSettings";
     graphicType: DashboardPieChartModuleSettingsType;
@@ -45617,16 +45960,16 @@ export type Home_DashboardModule_DashboardPetitionsPieChartModule_Fragment = {
       label: string;
       filter: {
         __typename?: "DashboardModulePetitionFilter";
+        fromTemplateId?: Array<string> | null;
         status?: Array<PetitionStatus> | null;
         signature?: Array<PetitionSignatureStatusFilter> | null;
-        fromTemplateId?: Array<string> | null;
-        tags?: {
-          __typename?: "DashboardModulePetitionFilterTags";
-          operator: PetitionTagFilterLogicalOperator;
+        approvals?: {
+          __typename?: "DashboardModulePetitionFilterApprovals";
+          operator: PetitionApprovalsFilterLogicalOperator;
           filters: Array<{
-            __typename?: "DashboardModulePetitionFilterTagsFilters";
-            value: Array<string>;
-            operator: PetitionTagFilterLineOperator;
+            __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+            value: string;
+            operator: PetitionApprovalsFilterOperator;
           }>;
         } | null;
         sharedWith?: {
@@ -45638,28 +45981,18 @@ export type Home_DashboardModule_DashboardPetitionsPieChartModule_Fragment = {
             operator: FilterSharedWithOperator;
           }>;
         } | null;
-        approvals?: {
-          __typename?: "DashboardModulePetitionFilterApprovals";
-          operator: PetitionApprovalsFilterLogicalOperator;
+        tags?: {
+          __typename?: "DashboardModulePetitionFilterTags";
+          operator: PetitionTagFilterLogicalOperator;
           filters: Array<{
-            __typename?: "DashboardModulePetitionFilterApprovalsFilters";
-            value: string;
-            operator: PetitionApprovalsFilterOperator;
+            __typename?: "DashboardModulePetitionFilterTagsFilters";
+            value: Array<string>;
+            operator: PetitionTagFilterLineOperator;
           }>;
         } | null;
       };
     }>;
   };
-  petitionsPieChartResult?: {
-    __typename?: "DashboardModuleResultMultiItem";
-    isIncongruent: boolean;
-    items: Array<{
-      __typename?: "DashboardModuleResultItem";
-      count: number;
-      label?: any | null;
-      color?: string | null;
-    }>;
-  } | null;
 };
 
 export type Home_DashboardModule_DashboardPetitionsRatioModule_Fragment = {
@@ -45667,21 +46000,26 @@ export type Home_DashboardModule_DashboardPetitionsRatioModule_Fragment = {
   id: string;
   title?: string | null;
   size: DashboardModuleSize;
+  petitionsRatioResult?: {
+    __typename?: "DashboardModuleResultMultiItem";
+    isIncongruent: boolean;
+    items: Array<{ __typename?: "DashboardModuleResultItem"; count: number }>;
+  } | null;
   petitionsRatioSettings: {
     __typename?: "DashboardPetitionsRatioModuleSettings";
     graphicType: DashboardRatioModuleSettingsType;
     filters: Array<{
       __typename?: "DashboardModulePetitionFilter";
+      fromTemplateId?: Array<string> | null;
       status?: Array<PetitionStatus> | null;
       signature?: Array<PetitionSignatureStatusFilter> | null;
-      fromTemplateId?: Array<string> | null;
-      tags?: {
-        __typename?: "DashboardModulePetitionFilterTags";
-        operator: PetitionTagFilterLogicalOperator;
+      approvals?: {
+        __typename?: "DashboardModulePetitionFilterApprovals";
+        operator: PetitionApprovalsFilterLogicalOperator;
         filters: Array<{
-          __typename?: "DashboardModulePetitionFilterTagsFilters";
-          value: Array<string>;
-          operator: PetitionTagFilterLineOperator;
+          __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+          value: string;
+          operator: PetitionApprovalsFilterOperator;
         }>;
       } | null;
       sharedWith?: {
@@ -45693,22 +46031,17 @@ export type Home_DashboardModule_DashboardPetitionsRatioModule_Fragment = {
           operator: FilterSharedWithOperator;
         }>;
       } | null;
-      approvals?: {
-        __typename?: "DashboardModulePetitionFilterApprovals";
-        operator: PetitionApprovalsFilterLogicalOperator;
+      tags?: {
+        __typename?: "DashboardModulePetitionFilterTags";
+        operator: PetitionTagFilterLogicalOperator;
         filters: Array<{
-          __typename?: "DashboardModulePetitionFilterApprovalsFilters";
-          value: string;
-          operator: PetitionApprovalsFilterOperator;
+          __typename?: "DashboardModulePetitionFilterTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
         }>;
       } | null;
     }>;
   };
-  petitionsRatioResult?: {
-    __typename?: "DashboardModuleResultMultiItem";
-    isIncongruent: boolean;
-    items: Array<{ __typename?: "DashboardModuleResultItem"; count: number }>;
-  } | null;
 };
 
 export type Home_DashboardModule_DashboardProfilesNumberModule_Fragment = {
@@ -45716,6 +46049,11 @@ export type Home_DashboardModule_DashboardProfilesNumberModule_Fragment = {
   id: string;
   title?: string | null;
   size: DashboardModuleSize;
+  profilesNumberResult?: {
+    __typename?: "DashboardModuleResultItem";
+    count: number;
+    aggr?: number | null;
+  } | null;
   profilesNumberSettings: {
     __typename?: "DashboardProfilesNumberModuleSettings";
     type: ModuleResultType;
@@ -45755,11 +46093,6 @@ export type Home_DashboardModule_DashboardProfilesNumberModule_Fragment = {
       } | null;
     };
   };
-  profilesNumberResult?: {
-    __typename?: "DashboardModuleResultItem";
-    count: number;
-    aggr?: number | null;
-  } | null;
 };
 
 export type Home_DashboardModule_DashboardProfilesPieChartModule_Fragment = {
@@ -45767,10 +46100,22 @@ export type Home_DashboardModule_DashboardProfilesPieChartModule_Fragment = {
   id: string;
   title?: string | null;
   size: DashboardModuleSize;
+  profilesPieChartResult?: {
+    __typename?: "DashboardModuleResultMultiItem";
+    isIncongruent: boolean;
+    items: Array<{
+      __typename?: "DashboardModuleResultItem";
+      count: number;
+      aggr?: number | null;
+      label?: any | null;
+      color?: string | null;
+      value?: string | null;
+    }>;
+  } | null;
   profilesPieChartSettings: {
     __typename?: "DashboardProfilesPieChartModuleSettings";
-    type: ModuleResultType;
     graphicType: DashboardPieChartModuleSettingsType;
+    type: ModuleResultType;
     profileTypeId: string;
     profileTypeFieldId?: string | null;
     groupByProfileTypeFieldId?: string | null;
@@ -45845,18 +46190,6 @@ export type Home_DashboardModule_DashboardProfilesPieChartModule_Fragment = {
       } | null;
     } | null;
   };
-  profilesPieChartResult?: {
-    __typename?: "DashboardModuleResultMultiItem";
-    isIncongruent: boolean;
-    items: Array<{
-      __typename?: "DashboardModuleResultItem";
-      count: number;
-      aggr?: number | null;
-      label?: any | null;
-      color?: string | null;
-      value?: string | null;
-    }>;
-  } | null;
 };
 
 export type Home_DashboardModule_DashboardProfilesRatioModule_Fragment = {
@@ -45864,10 +46197,15 @@ export type Home_DashboardModule_DashboardProfilesRatioModule_Fragment = {
   id: string;
   title?: string | null;
   size: DashboardModuleSize;
+  profilesRatioResult?: {
+    __typename?: "DashboardModuleResultMultiItem";
+    isIncongruent: boolean;
+    items: Array<{ __typename?: "DashboardModuleResultItem"; count: number; aggr?: number | null }>;
+  } | null;
   profilesRatioSettings: {
     __typename?: "DashboardProfilesRatioModuleSettings";
-    type: ModuleResultType;
     graphicType: DashboardRatioModuleSettingsType;
+    type: ModuleResultType;
     profileTypeId: string;
     profileTypeFieldId?: string | null;
     aggregate?: ModuleResultAggregateType | null;
@@ -45904,11 +46242,6 @@ export type Home_DashboardModule_DashboardProfilesRatioModule_Fragment = {
       } | null;
     }>;
   };
-  profilesRatioResult?: {
-    __typename?: "DashboardModuleResultMultiItem";
-    isIncongruent: boolean;
-    items: Array<{ __typename?: "DashboardModuleResultItem"; count: number; aggr?: number | null }>;
-  } | null;
 };
 
 export type Home_DashboardModuleFragment =
@@ -46020,11 +46353,6 @@ export type Home_dashboardQuery = {
           id: string;
           title?: string | null;
           size: DashboardModuleSize;
-          createPetitionButtonSettings: {
-            __typename?: "DashboardCreatePetitionButtonModuleSettings";
-            label: string;
-            template?: { __typename?: "PetitionBaseMini"; id: string } | null;
-          };
           petitionButtonSettings: {
             __typename?: "DashboardCreatePetitionButtonModuleSettings";
             label: string;
@@ -46037,19 +46365,28 @@ export type Home_dashboardQuery = {
               } | null;
             } | null;
           };
+          createPetitionButtonSettings: {
+            __typename?: "DashboardCreatePetitionButtonModuleSettings";
+            label: string;
+            template?: { __typename?: "PetitionBaseMini"; id: string } | null;
+          };
         }
       | {
           __typename?: "DashboardPetitionsNumberModule";
           id: string;
           title?: string | null;
           size: DashboardModuleSize;
-          petitionsNumberSettings: {
+          petitionsNumberResult?: {
+            __typename?: "DashboardModuleResultItem";
+            count: number;
+          } | null;
+          settings: {
             __typename?: "DashboardPetitionsNumberModuleSettings";
             filters: {
               __typename?: "DashboardModulePetitionFilter";
               fromTemplateId?: Array<string> | null;
-              signature?: Array<PetitionSignatureStatusFilter> | null;
               status?: Array<PetitionStatus> | null;
+              signature?: Array<PetitionSignatureStatusFilter> | null;
               approvals?: {
                 __typename?: "DashboardModulePetitionFilterApprovals";
                 operator: PetitionApprovalsFilterLogicalOperator;
@@ -46079,17 +46416,13 @@ export type Home_dashboardQuery = {
               } | null;
             };
           };
-          petitionsNumberResult?: {
-            __typename?: "DashboardModuleResultItem";
-            count: number;
-          } | null;
-          settings: {
+          petitionsNumberSettings: {
             __typename?: "DashboardPetitionsNumberModuleSettings";
             filters: {
               __typename?: "DashboardModulePetitionFilter";
               fromTemplateId?: Array<string> | null;
-              signature?: Array<PetitionSignatureStatusFilter> | null;
               status?: Array<PetitionStatus> | null;
+              signature?: Array<PetitionSignatureStatusFilter> | null;
               approvals?: {
                 __typename?: "DashboardModulePetitionFilterApprovals";
                 operator: PetitionApprovalsFilterLogicalOperator;
@@ -46104,8 +46437,8 @@ export type Home_dashboardQuery = {
                 operator: FilterSharedWithLogicalOperator;
                 filters: Array<{
                   __typename?: "DashboardModulePetitionFilterSharedWithFilters";
-                  operator: FilterSharedWithOperator;
                   value: string;
+                  operator: FilterSharedWithOperator;
                 }>;
               } | null;
               tags?: {
@@ -46125,6 +46458,16 @@ export type Home_dashboardQuery = {
           id: string;
           title?: string | null;
           size: DashboardModuleSize;
+          petitionsPieChartResult?: {
+            __typename?: "DashboardModuleResultMultiItem";
+            isIncongruent: boolean;
+            items: Array<{
+              __typename?: "DashboardModuleResultItem";
+              count: number;
+              label?: any | null;
+              color?: string | null;
+            }>;
+          } | null;
           petitionsPieChartSettings: {
             __typename?: "DashboardPetitionsPieChartModuleSettings";
             graphicType: DashboardPieChartModuleSettingsType;
@@ -46134,16 +46477,16 @@ export type Home_dashboardQuery = {
               label: string;
               filter: {
                 __typename?: "DashboardModulePetitionFilter";
+                fromTemplateId?: Array<string> | null;
                 status?: Array<PetitionStatus> | null;
                 signature?: Array<PetitionSignatureStatusFilter> | null;
-                fromTemplateId?: Array<string> | null;
-                tags?: {
-                  __typename?: "DashboardModulePetitionFilterTags";
-                  operator: PetitionTagFilterLogicalOperator;
+                approvals?: {
+                  __typename?: "DashboardModulePetitionFilterApprovals";
+                  operator: PetitionApprovalsFilterLogicalOperator;
                   filters: Array<{
-                    __typename?: "DashboardModulePetitionFilterTagsFilters";
-                    value: Array<string>;
-                    operator: PetitionTagFilterLineOperator;
+                    __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+                    value: string;
+                    operator: PetitionApprovalsFilterOperator;
                   }>;
                 } | null;
                 sharedWith?: {
@@ -46155,49 +46498,44 @@ export type Home_dashboardQuery = {
                     operator: FilterSharedWithOperator;
                   }>;
                 } | null;
-                approvals?: {
-                  __typename?: "DashboardModulePetitionFilterApprovals";
-                  operator: PetitionApprovalsFilterLogicalOperator;
+                tags?: {
+                  __typename?: "DashboardModulePetitionFilterTags";
+                  operator: PetitionTagFilterLogicalOperator;
                   filters: Array<{
-                    __typename?: "DashboardModulePetitionFilterApprovalsFilters";
-                    value: string;
-                    operator: PetitionApprovalsFilterOperator;
+                    __typename?: "DashboardModulePetitionFilterTagsFilters";
+                    value: Array<string>;
+                    operator: PetitionTagFilterLineOperator;
                   }>;
                 } | null;
               };
             }>;
           };
-          petitionsPieChartResult?: {
-            __typename?: "DashboardModuleResultMultiItem";
-            isIncongruent: boolean;
-            items: Array<{
-              __typename?: "DashboardModuleResultItem";
-              count: number;
-              label?: any | null;
-              color?: string | null;
-            }>;
-          } | null;
         }
       | {
           __typename?: "DashboardPetitionsRatioModule";
           id: string;
           title?: string | null;
           size: DashboardModuleSize;
+          petitionsRatioResult?: {
+            __typename?: "DashboardModuleResultMultiItem";
+            isIncongruent: boolean;
+            items: Array<{ __typename?: "DashboardModuleResultItem"; count: number }>;
+          } | null;
           petitionsRatioSettings: {
             __typename?: "DashboardPetitionsRatioModuleSettings";
             graphicType: DashboardRatioModuleSettingsType;
             filters: Array<{
               __typename?: "DashboardModulePetitionFilter";
+              fromTemplateId?: Array<string> | null;
               status?: Array<PetitionStatus> | null;
               signature?: Array<PetitionSignatureStatusFilter> | null;
-              fromTemplateId?: Array<string> | null;
-              tags?: {
-                __typename?: "DashboardModulePetitionFilterTags";
-                operator: PetitionTagFilterLogicalOperator;
+              approvals?: {
+                __typename?: "DashboardModulePetitionFilterApprovals";
+                operator: PetitionApprovalsFilterLogicalOperator;
                 filters: Array<{
-                  __typename?: "DashboardModulePetitionFilterTagsFilters";
-                  value: Array<string>;
-                  operator: PetitionTagFilterLineOperator;
+                  __typename?: "DashboardModulePetitionFilterApprovalsFilters";
+                  value: string;
+                  operator: PetitionApprovalsFilterOperator;
                 }>;
               } | null;
               sharedWith?: {
@@ -46209,28 +46547,28 @@ export type Home_dashboardQuery = {
                   operator: FilterSharedWithOperator;
                 }>;
               } | null;
-              approvals?: {
-                __typename?: "DashboardModulePetitionFilterApprovals";
-                operator: PetitionApprovalsFilterLogicalOperator;
+              tags?: {
+                __typename?: "DashboardModulePetitionFilterTags";
+                operator: PetitionTagFilterLogicalOperator;
                 filters: Array<{
-                  __typename?: "DashboardModulePetitionFilterApprovalsFilters";
-                  value: string;
-                  operator: PetitionApprovalsFilterOperator;
+                  __typename?: "DashboardModulePetitionFilterTagsFilters";
+                  value: Array<string>;
+                  operator: PetitionTagFilterLineOperator;
                 }>;
               } | null;
             }>;
           };
-          petitionsRatioResult?: {
-            __typename?: "DashboardModuleResultMultiItem";
-            isIncongruent: boolean;
-            items: Array<{ __typename?: "DashboardModuleResultItem"; count: number }>;
-          } | null;
         }
       | {
           __typename?: "DashboardProfilesNumberModule";
           id: string;
           title?: string | null;
           size: DashboardModuleSize;
+          profilesNumberResult?: {
+            __typename?: "DashboardModuleResultItem";
+            count: number;
+            aggr?: number | null;
+          } | null;
           profilesNumberSettings: {
             __typename?: "DashboardProfilesNumberModuleSettings";
             type: ModuleResultType;
@@ -46270,21 +46608,28 @@ export type Home_dashboardQuery = {
               } | null;
             };
           };
-          profilesNumberResult?: {
-            __typename?: "DashboardModuleResultItem";
-            count: number;
-            aggr?: number | null;
-          } | null;
         }
       | {
           __typename?: "DashboardProfilesPieChartModule";
           id: string;
           title?: string | null;
           size: DashboardModuleSize;
+          profilesPieChartResult?: {
+            __typename?: "DashboardModuleResultMultiItem";
+            isIncongruent: boolean;
+            items: Array<{
+              __typename?: "DashboardModuleResultItem";
+              count: number;
+              aggr?: number | null;
+              label?: any | null;
+              color?: string | null;
+              value?: string | null;
+            }>;
+          } | null;
           profilesPieChartSettings: {
             __typename?: "DashboardProfilesPieChartModuleSettings";
-            type: ModuleResultType;
             graphicType: DashboardPieChartModuleSettingsType;
+            type: ModuleResultType;
             profileTypeId: string;
             profileTypeFieldId?: string | null;
             groupByProfileTypeFieldId?: string | null;
@@ -46359,28 +46704,25 @@ export type Home_dashboardQuery = {
               } | null;
             } | null;
           };
-          profilesPieChartResult?: {
-            __typename?: "DashboardModuleResultMultiItem";
-            isIncongruent: boolean;
-            items: Array<{
-              __typename?: "DashboardModuleResultItem";
-              count: number;
-              aggr?: number | null;
-              label?: any | null;
-              color?: string | null;
-              value?: string | null;
-            }>;
-          } | null;
         }
       | {
           __typename?: "DashboardProfilesRatioModule";
           id: string;
           title?: string | null;
           size: DashboardModuleSize;
+          profilesRatioResult?: {
+            __typename?: "DashboardModuleResultMultiItem";
+            isIncongruent: boolean;
+            items: Array<{
+              __typename?: "DashboardModuleResultItem";
+              count: number;
+              aggr?: number | null;
+            }>;
+          } | null;
           profilesRatioSettings: {
             __typename?: "DashboardProfilesRatioModuleSettings";
-            type: ModuleResultType;
             graphicType: DashboardRatioModuleSettingsType;
+            type: ModuleResultType;
             profileTypeId: string;
             profileTypeFieldId?: string | null;
             aggregate?: ModuleResultAggregateType | null;
@@ -46417,15 +46759,6 @@ export type Home_dashboardQuery = {
               } | null;
             }>;
           };
-          profilesRatioResult?: {
-            __typename?: "DashboardModuleResultMultiItem";
-            isIncongruent: boolean;
-            items: Array<{
-              __typename?: "DashboardModuleResultItem";
-              count: number;
-              aggr?: number | null;
-            }>;
-          } | null;
         }
     >;
   };
@@ -69237,8 +69570,8 @@ export const ProfileValueFilterLine_ProfileTypeFieldFragmentDoc = gql`
   }
   ${useProfileFieldValueFilterOperators_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<ProfileValueFilterLine_ProfileTypeFieldFragment, unknown>;
-export const ProfilesFiltersModuleSettings_ProfileTypeFieldFragmentDoc = gql`
-  fragment ProfilesFiltersModuleSettings_ProfileTypeField on ProfileTypeField {
+export const ProfilesModuleFilterEditor_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfilesModuleFilterEditor_ProfileTypeField on ProfileTypeField {
     id
     type
     options
@@ -69247,7 +69580,7 @@ export const ProfilesFiltersModuleSettings_ProfileTypeFieldFragmentDoc = gql`
   }
   ${ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc}
   ${ProfileValueFilterLine_ProfileTypeFieldFragmentDoc}
-` as unknown as DocumentNode<ProfilesFiltersModuleSettings_ProfileTypeFieldFragment, unknown>;
+` as unknown as DocumentNode<ProfilesModuleFilterEditor_ProfileTypeFieldFragment, unknown>;
 export const DashboardModuleChartItems_ProfileTypeFragmentDoc = gql`
   fragment DashboardModuleChartItems_ProfileType on ProfileType {
     id
@@ -69256,10 +69589,10 @@ export const DashboardModuleChartItems_ProfileTypeFragmentDoc = gql`
       name
       options
       type
-      ...ProfilesFiltersModuleSettings_ProfileTypeField
+      ...ProfilesModuleFilterEditor_ProfileTypeField
     }
   }
-  ${ProfilesFiltersModuleSettings_ProfileTypeFieldFragmentDoc}
+  ${ProfilesModuleFilterEditor_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<DashboardModuleChartItems_ProfileTypeFragment, unknown>;
 export const ProfilesChartModuleSettings_ProfileTypeFragmentDoc = gql`
   fragment ProfilesChartModuleSettings_ProfileType on ProfileType {
@@ -69267,12 +69600,12 @@ export const ProfilesChartModuleSettings_ProfileTypeFragmentDoc = gql`
     fields {
       id
       ...ProfileTypeFieldSelect_ProfileTypeField
-      ...ProfilesFiltersModuleSettings_ProfileTypeField
+      ...ProfilesModuleFilterEditor_ProfileTypeField
     }
     ...DashboardModuleChartItems_ProfileType
   }
   ${ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc}
-  ${ProfilesFiltersModuleSettings_ProfileTypeFieldFragmentDoc}
+  ${ProfilesModuleFilterEditor_ProfileTypeFieldFragmentDoc}
   ${DashboardModuleChartItems_ProfileTypeFragmentDoc}
 ` as unknown as DocumentNode<ProfilesChartModuleSettings_ProfileTypeFragment, unknown>;
 export const ProfilesNumberModuleSettings_ProfileTypeFragmentDoc = gql`
@@ -69280,20 +69613,20 @@ export const ProfilesNumberModuleSettings_ProfileTypeFragmentDoc = gql`
     id
     fields {
       id
-      ...ProfilesFiltersModuleSettings_ProfileTypeField
+      ...ProfilesModuleFilterEditor_ProfileTypeField
     }
   }
-  ${ProfilesFiltersModuleSettings_ProfileTypeFieldFragmentDoc}
+  ${ProfilesModuleFilterEditor_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<ProfilesNumberModuleSettings_ProfileTypeFragment, unknown>;
 export const ProfilesRatioModuleSettings_ProfileTypeFragmentDoc = gql`
   fragment ProfilesRatioModuleSettings_ProfileType on ProfileType {
     id
     fields {
       id
-      ...ProfilesFiltersModuleSettings_ProfileTypeField
+      ...ProfilesModuleFilterEditor_ProfileTypeField
     }
   }
-  ${ProfilesFiltersModuleSettings_ProfileTypeFieldFragmentDoc}
+  ${ProfilesModuleFilterEditor_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<ProfilesRatioModuleSettings_ProfileTypeFragment, unknown>;
 export const UserSettingsLayout_QueryFragmentDoc = gql`
   fragment UserSettingsLayout_Query on Query {
@@ -74639,6 +74972,34 @@ export const DashboardSimpleModuleCard_DashboardModuleFragmentDoc = gql`
   }
   ${DashboardModuleCard_DashboardModuleFragmentDoc}
 ` as unknown as DocumentNode<DashboardSimpleModuleCard_DashboardModuleFragment, unknown>;
+export const fullDashboardModulePetitionFilterFragmentDoc = gql`
+  fragment fullDashboardModulePetitionFilter on DashboardModulePetitionFilter {
+    fromTemplateId
+    status
+    signature
+    approvals {
+      filters {
+        value
+        operator
+      }
+      operator
+    }
+    sharedWith {
+      filters {
+        value
+        operator
+      }
+      operator
+    }
+    tags {
+      operator
+      filters {
+        value
+        operator
+      }
+    }
+  }
+` as unknown as DocumentNode<fullDashboardModulePetitionFilterFragment, unknown>;
 export const DashboardPetitionsNumberModule_DashboardPetitionsNumberModuleFragmentDoc = gql`
   fragment DashboardPetitionsNumberModule_DashboardPetitionsNumberModule on DashboardPetitionsNumberModule {
     ...DashboardSimpleModuleCard_DashboardModule
@@ -74647,34 +75008,12 @@ export const DashboardPetitionsNumberModule_DashboardPetitionsNumberModuleFragme
     }
     settings {
       filters {
-        approvals {
-          filters {
-            value
-            operator
-          }
-          operator
-        }
-        fromTemplateId
-        sharedWith {
-          filters {
-            operator
-            value
-          }
-          operator
-        }
-        signature
-        status
-        tags {
-          operator
-          filters {
-            value
-            operator
-          }
-        }
+        ...fullDashboardModulePetitionFilter
       }
     }
   }
   ${DashboardSimpleModuleCard_DashboardModuleFragmentDoc}
+  ${fullDashboardModulePetitionFilterFragmentDoc}
 ` as unknown as DocumentNode<
   DashboardPetitionsNumberModule_DashboardPetitionsNumberModuleFragment,
   unknown
@@ -74742,34 +75081,12 @@ export const DashboardPetitionsRatioModule_DashboardPetitionsRatioModuleFragment
     petitionsRatioSettings: settings {
       graphicType
       filters {
-        approvals {
-          filters {
-            operator
-            value
-          }
-          operator
-        }
-        fromTemplateId
-        sharedWith {
-          filters {
-            operator
-            value
-          }
-          operator
-        }
-        signature
-        status
-        tags {
-          operator
-          filters {
-            value
-            operator
-          }
-        }
+        ...fullDashboardModulePetitionFilter
       }
     }
   }
   ${DashboardSimpleModuleCard_DashboardModuleFragmentDoc}
+  ${fullDashboardModulePetitionFilterFragmentDoc}
 ` as unknown as DocumentNode<
   DashboardPetitionsRatioModule_DashboardPetitionsRatioModuleFragment,
   unknown
@@ -74817,34 +75134,12 @@ export const DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFr
       graphicType
       items {
         filter {
-          tags {
-            operator
-            filters {
-              value
-              operator
-            }
-          }
-          status
-          signature
-          sharedWith {
-            operator
-            filters {
-              value
-              operator
-            }
-          }
-          fromTemplateId
-          approvals {
-            operator
-            filters {
-              value
-              operator
-            }
-          }
+          ...fullDashboardModulePetitionFilter
         }
       }
     }
   }
+  ${fullDashboardModulePetitionFilterFragmentDoc}
 ` as unknown as DocumentNode<
   DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment,
   unknown
@@ -74937,36 +75232,8 @@ export const DashboardModule_DashboardModuleFragmentDoc = gql`
   ${DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragmentDoc}
   ${DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragmentDoc}
 ` as unknown as DocumentNode<DashboardModule_DashboardModuleFragment, unknown>;
-export const DashboardModuleDrawer_DashboardModulePetitionFilterFragmentDoc = gql`
-  fragment DashboardModuleDrawer_DashboardModulePetitionFilter on DashboardModulePetitionFilter {
-    approvals {
-      filters {
-        value
-        operator
-      }
-      operator
-    }
-    fromTemplateId
-    sharedWith {
-      filters {
-        value
-        operator
-      }
-      operator
-    }
-    signature
-    status
-    tags {
-      operator
-      filters {
-        value
-        operator
-      }
-    }
-  }
-` as unknown as DocumentNode<DashboardModuleDrawer_DashboardModulePetitionFilterFragment, unknown>;
-export const DashboardModuleDrawer_DashboardModuleFragmentDoc = gql`
-  fragment DashboardModuleDrawer_DashboardModule on DashboardModule {
+export const DashboardModuleForm_DashboardModuleFragmentDoc = gql`
+  fragment DashboardModuleForm_DashboardModule on DashboardModule {
     id
     size
     title
@@ -74985,7 +75252,7 @@ export const DashboardModuleDrawer_DashboardModuleFragmentDoc = gql`
       petitionsRatioSettings: settings {
         graphicType
         filters {
-          ...DashboardModuleDrawer_DashboardModulePetitionFilter
+          ...fullDashboardModulePetitionFilter
         }
       }
     }
@@ -75006,7 +75273,7 @@ export const DashboardModuleDrawer_DashboardModuleFragmentDoc = gql`
         graphicType
         items {
           filter {
-            ...DashboardModuleDrawer_DashboardModulePetitionFilter
+            ...fullDashboardModulePetitionFilter
           }
           color
           label
@@ -75044,13 +75311,19 @@ export const DashboardModuleDrawer_DashboardModuleFragmentDoc = gql`
     ... on DashboardPetitionsNumberModule {
       petitionsNumberSettings: settings {
         filters {
-          ...DashboardModuleDrawer_DashboardModulePetitionFilter
+          ...fullDashboardModulePetitionFilter
         }
       }
     }
   }
   ${fullDashboardModuleProfileFilterFragmentDoc}
-  ${DashboardModuleDrawer_DashboardModulePetitionFilterFragmentDoc}
+  ${fullDashboardModulePetitionFilterFragmentDoc}
+` as unknown as DocumentNode<DashboardModuleForm_DashboardModuleFragment, unknown>;
+export const DashboardModuleDrawer_DashboardModuleFragmentDoc = gql`
+  fragment DashboardModuleDrawer_DashboardModule on DashboardModule {
+    ...DashboardModuleForm_DashboardModule
+  }
+  ${DashboardModuleForm_DashboardModuleFragmentDoc}
 ` as unknown as DocumentNode<DashboardModuleDrawer_DashboardModuleFragment, unknown>;
 export const Home_DashboardModuleFragmentDoc = gql`
   fragment Home_DashboardModule on DashboardModule {
@@ -80622,8 +80895,8 @@ export const ImportContactsDialog_bulkCreateContactsDocument = gql`
   ImportContactsDialog_bulkCreateContactsMutation,
   ImportContactsDialog_bulkCreateContactsMutationVariables
 >;
-export const DashboardModuleDrawer_createCreatePetitionButtonDashboardModuleDocument = gql`
-  mutation DashboardModuleDrawer_createCreatePetitionButtonDashboardModule(
+export const DashboardModuleForm_createCreatePetitionButtonDashboardModuleDocument = gql`
+  mutation DashboardModuleForm_createCreatePetitionButtonDashboardModule(
     $dashboardId: GID!
     $size: DashboardModuleSize!
     $settings: CreatePetitionButtonDashboardModuleSettingsInput!
@@ -80644,11 +80917,11 @@ export const DashboardModuleDrawer_createCreatePetitionButtonDashboardModuleDocu
     }
   }
 ` as unknown as DocumentNode<
-  DashboardModuleDrawer_createCreatePetitionButtonDashboardModuleMutation,
-  DashboardModuleDrawer_createCreatePetitionButtonDashboardModuleMutationVariables
+  DashboardModuleForm_createCreatePetitionButtonDashboardModuleMutation,
+  DashboardModuleForm_createCreatePetitionButtonDashboardModuleMutationVariables
 >;
-export const DashboardModuleDrawer_createPetitionsNumberDashboardModuleDocument = gql`
-  mutation DashboardModuleDrawer_createPetitionsNumberDashboardModule(
+export const DashboardModuleForm_createPetitionsNumberDashboardModuleDocument = gql`
+  mutation DashboardModuleForm_createPetitionsNumberDashboardModule(
     $dashboardId: GID!
     $size: DashboardModuleSize!
     $settings: PetitionsNumberDashboardModuleSettingsInput!
@@ -80669,11 +80942,11 @@ export const DashboardModuleDrawer_createPetitionsNumberDashboardModuleDocument 
     }
   }
 ` as unknown as DocumentNode<
-  DashboardModuleDrawer_createPetitionsNumberDashboardModuleMutation,
-  DashboardModuleDrawer_createPetitionsNumberDashboardModuleMutationVariables
+  DashboardModuleForm_createPetitionsNumberDashboardModuleMutation,
+  DashboardModuleForm_createPetitionsNumberDashboardModuleMutationVariables
 >;
-export const DashboardModuleDrawer_createPetitionsRatioDashboardModuleDocument = gql`
-  mutation DashboardModuleDrawer_createPetitionsRatioDashboardModule(
+export const DashboardModuleForm_createPetitionsRatioDashboardModuleDocument = gql`
+  mutation DashboardModuleForm_createPetitionsRatioDashboardModule(
     $dashboardId: GID!
     $size: DashboardModuleSize!
     $settings: PetitionsRatioDashboardModuleSettingsInput!
@@ -80694,11 +80967,11 @@ export const DashboardModuleDrawer_createPetitionsRatioDashboardModuleDocument =
     }
   }
 ` as unknown as DocumentNode<
-  DashboardModuleDrawer_createPetitionsRatioDashboardModuleMutation,
-  DashboardModuleDrawer_createPetitionsRatioDashboardModuleMutationVariables
+  DashboardModuleForm_createPetitionsRatioDashboardModuleMutation,
+  DashboardModuleForm_createPetitionsRatioDashboardModuleMutationVariables
 >;
-export const DashboardModuleDrawer_createPetitionsPieChartDashboardModuleDocument = gql`
-  mutation DashboardModuleDrawer_createPetitionsPieChartDashboardModule(
+export const DashboardModuleForm_createPetitionsPieChartDashboardModuleDocument = gql`
+  mutation DashboardModuleForm_createPetitionsPieChartDashboardModule(
     $dashboardId: GID!
     $size: DashboardModuleSize!
     $settings: PetitionsPieChartDashboardModuleSettingsInput!
@@ -80719,11 +80992,11 @@ export const DashboardModuleDrawer_createPetitionsPieChartDashboardModuleDocumen
     }
   }
 ` as unknown as DocumentNode<
-  DashboardModuleDrawer_createPetitionsPieChartDashboardModuleMutation,
-  DashboardModuleDrawer_createPetitionsPieChartDashboardModuleMutationVariables
+  DashboardModuleForm_createPetitionsPieChartDashboardModuleMutation,
+  DashboardModuleForm_createPetitionsPieChartDashboardModuleMutationVariables
 >;
-export const DashboardModuleDrawer_createProfilesNumberDashboardModuleDocument = gql`
-  mutation DashboardModuleDrawer_createProfilesNumberDashboardModule(
+export const DashboardModuleForm_createProfilesNumberDashboardModuleDocument = gql`
+  mutation DashboardModuleForm_createProfilesNumberDashboardModule(
     $dashboardId: GID!
     $size: DashboardModuleSize!
     $settings: ProfilesNumberDashboardModuleSettingsInput!
@@ -80744,11 +81017,11 @@ export const DashboardModuleDrawer_createProfilesNumberDashboardModuleDocument =
     }
   }
 ` as unknown as DocumentNode<
-  DashboardModuleDrawer_createProfilesNumberDashboardModuleMutation,
-  DashboardModuleDrawer_createProfilesNumberDashboardModuleMutationVariables
+  DashboardModuleForm_createProfilesNumberDashboardModuleMutation,
+  DashboardModuleForm_createProfilesNumberDashboardModuleMutationVariables
 >;
-export const DashboardModuleDrawer_createProfilesPieChartDashboardModuleDocument = gql`
-  mutation DashboardModuleDrawer_createProfilesPieChartDashboardModule(
+export const DashboardModuleForm_createProfilesPieChartDashboardModuleDocument = gql`
+  mutation DashboardModuleForm_createProfilesPieChartDashboardModule(
     $dashboardId: GID!
     $size: DashboardModuleSize!
     $settings: ProfilesPieChartDashboardModuleSettingsInput!
@@ -80769,11 +81042,11 @@ export const DashboardModuleDrawer_createProfilesPieChartDashboardModuleDocument
     }
   }
 ` as unknown as DocumentNode<
-  DashboardModuleDrawer_createProfilesPieChartDashboardModuleMutation,
-  DashboardModuleDrawer_createProfilesPieChartDashboardModuleMutationVariables
+  DashboardModuleForm_createProfilesPieChartDashboardModuleMutation,
+  DashboardModuleForm_createProfilesPieChartDashboardModuleMutationVariables
 >;
-export const DashboardModuleDrawer_createProfilesRatioDashboardModuleDocument = gql`
-  mutation DashboardModuleDrawer_createProfilesRatioDashboardModule(
+export const DashboardModuleForm_createProfilesRatioDashboardModuleDocument = gql`
+  mutation DashboardModuleForm_createProfilesRatioDashboardModule(
     $dashboardId: GID!
     $size: DashboardModuleSize!
     $settings: ProfilesRatioDashboardModuleSettingsInput!
@@ -80794,11 +81067,11 @@ export const DashboardModuleDrawer_createProfilesRatioDashboardModuleDocument = 
     }
   }
 ` as unknown as DocumentNode<
-  DashboardModuleDrawer_createProfilesRatioDashboardModuleMutation,
-  DashboardModuleDrawer_createProfilesRatioDashboardModuleMutationVariables
+  DashboardModuleForm_createProfilesRatioDashboardModuleMutation,
+  DashboardModuleForm_createProfilesRatioDashboardModuleMutationVariables
 >;
-export const DashboardModuleDrawer_updateProfilesRatioDashboardModuleDocument = gql`
-  mutation DashboardModuleDrawer_updateProfilesRatioDashboardModule(
+export const DashboardModuleForm_updateProfilesRatioDashboardModuleDocument = gql`
+  mutation DashboardModuleForm_updateProfilesRatioDashboardModule(
     $dashboardId: GID!
     $moduleId: GID!
     $data: UpdateProfilesRatioDashboardModuleInput!
@@ -80809,16 +81082,16 @@ export const DashboardModuleDrawer_updateProfilesRatioDashboardModuleDocument = 
       data: $data
     ) {
       id
-      ...DashboardModuleDrawer_DashboardModule
+      ...DashboardModuleForm_DashboardModule
     }
   }
-  ${DashboardModuleDrawer_DashboardModuleFragmentDoc}
+  ${DashboardModuleForm_DashboardModuleFragmentDoc}
 ` as unknown as DocumentNode<
-  DashboardModuleDrawer_updateProfilesRatioDashboardModuleMutation,
-  DashboardModuleDrawer_updateProfilesRatioDashboardModuleMutationVariables
+  DashboardModuleForm_updateProfilesRatioDashboardModuleMutation,
+  DashboardModuleForm_updateProfilesRatioDashboardModuleMutationVariables
 >;
-export const DashboardModuleDrawer_updateProfilesPieChartDashboardModuleDocument = gql`
-  mutation DashboardModuleDrawer_updateProfilesPieChartDashboardModule(
+export const DashboardModuleForm_updateProfilesPieChartDashboardModuleDocument = gql`
+  mutation DashboardModuleForm_updateProfilesPieChartDashboardModule(
     $dashboardId: GID!
     $moduleId: GID!
     $data: UpdateProfilesPieChartDashboardModuleInput!
@@ -80829,16 +81102,16 @@ export const DashboardModuleDrawer_updateProfilesPieChartDashboardModuleDocument
       data: $data
     ) {
       id
-      ...DashboardModuleDrawer_DashboardModule
+      ...DashboardModuleForm_DashboardModule
     }
   }
-  ${DashboardModuleDrawer_DashboardModuleFragmentDoc}
+  ${DashboardModuleForm_DashboardModuleFragmentDoc}
 ` as unknown as DocumentNode<
-  DashboardModuleDrawer_updateProfilesPieChartDashboardModuleMutation,
-  DashboardModuleDrawer_updateProfilesPieChartDashboardModuleMutationVariables
+  DashboardModuleForm_updateProfilesPieChartDashboardModuleMutation,
+  DashboardModuleForm_updateProfilesPieChartDashboardModuleMutationVariables
 >;
-export const DashboardModuleDrawer_updateProfilesNumberDashboardModuleDocument = gql`
-  mutation DashboardModuleDrawer_updateProfilesNumberDashboardModule(
+export const DashboardModuleForm_updateProfilesNumberDashboardModuleDocument = gql`
+  mutation DashboardModuleForm_updateProfilesNumberDashboardModule(
     $dashboardId: GID!
     $moduleId: GID!
     $data: UpdateProfilesNumberDashboardModuleInput!
@@ -80849,16 +81122,16 @@ export const DashboardModuleDrawer_updateProfilesNumberDashboardModuleDocument =
       data: $data
     ) {
       id
-      ...DashboardModuleDrawer_DashboardModule
+      ...DashboardModuleForm_DashboardModule
     }
   }
-  ${DashboardModuleDrawer_DashboardModuleFragmentDoc}
+  ${DashboardModuleForm_DashboardModuleFragmentDoc}
 ` as unknown as DocumentNode<
-  DashboardModuleDrawer_updateProfilesNumberDashboardModuleMutation,
-  DashboardModuleDrawer_updateProfilesNumberDashboardModuleMutationVariables
+  DashboardModuleForm_updateProfilesNumberDashboardModuleMutation,
+  DashboardModuleForm_updateProfilesNumberDashboardModuleMutationVariables
 >;
-export const DashboardModuleDrawer_updatePetitionsPieChartDashboardModuleDocument = gql`
-  mutation DashboardModuleDrawer_updatePetitionsPieChartDashboardModule(
+export const DashboardModuleForm_updatePetitionsPieChartDashboardModuleDocument = gql`
+  mutation DashboardModuleForm_updatePetitionsPieChartDashboardModule(
     $dashboardId: GID!
     $moduleId: GID!
     $data: UpdatePetitionsPieChartDashboardModuleInput!
@@ -80869,16 +81142,16 @@ export const DashboardModuleDrawer_updatePetitionsPieChartDashboardModuleDocumen
       data: $data
     ) {
       id
-      ...DashboardModuleDrawer_DashboardModule
+      ...DashboardModuleForm_DashboardModule
     }
   }
-  ${DashboardModuleDrawer_DashboardModuleFragmentDoc}
+  ${DashboardModuleForm_DashboardModuleFragmentDoc}
 ` as unknown as DocumentNode<
-  DashboardModuleDrawer_updatePetitionsPieChartDashboardModuleMutation,
-  DashboardModuleDrawer_updatePetitionsPieChartDashboardModuleMutationVariables
+  DashboardModuleForm_updatePetitionsPieChartDashboardModuleMutation,
+  DashboardModuleForm_updatePetitionsPieChartDashboardModuleMutationVariables
 >;
-export const DashboardModuleDrawer_updatePetitionsRatioDashboardModuleDocument = gql`
-  mutation DashboardModuleDrawer_updatePetitionsRatioDashboardModule(
+export const DashboardModuleForm_updatePetitionsRatioDashboardModuleDocument = gql`
+  mutation DashboardModuleForm_updatePetitionsRatioDashboardModule(
     $dashboardId: GID!
     $moduleId: GID!
     $data: UpdatePetitionsRatioDashboardModuleInput!
@@ -80889,16 +81162,16 @@ export const DashboardModuleDrawer_updatePetitionsRatioDashboardModuleDocument =
       data: $data
     ) {
       id
-      ...DashboardModuleDrawer_DashboardModule
+      ...DashboardModuleForm_DashboardModule
     }
   }
-  ${DashboardModuleDrawer_DashboardModuleFragmentDoc}
+  ${DashboardModuleForm_DashboardModuleFragmentDoc}
 ` as unknown as DocumentNode<
-  DashboardModuleDrawer_updatePetitionsRatioDashboardModuleMutation,
-  DashboardModuleDrawer_updatePetitionsRatioDashboardModuleMutationVariables
+  DashboardModuleForm_updatePetitionsRatioDashboardModuleMutation,
+  DashboardModuleForm_updatePetitionsRatioDashboardModuleMutationVariables
 >;
-export const DashboardModuleDrawer_updateCreatePetitionButtonDashboardModuleDocument = gql`
-  mutation DashboardModuleDrawer_updateCreatePetitionButtonDashboardModule(
+export const DashboardModuleForm_updateCreatePetitionButtonDashboardModuleDocument = gql`
+  mutation DashboardModuleForm_updateCreatePetitionButtonDashboardModule(
     $dashboardId: GID!
     $moduleId: GID!
     $data: UpdateCreatePetitionButtonDashboardModuleInput!
@@ -80909,16 +81182,16 @@ export const DashboardModuleDrawer_updateCreatePetitionButtonDashboardModuleDocu
       data: $data
     ) {
       id
-      ...DashboardModuleDrawer_DashboardModule
+      ...DashboardModuleForm_DashboardModule
     }
   }
-  ${DashboardModuleDrawer_DashboardModuleFragmentDoc}
+  ${DashboardModuleForm_DashboardModuleFragmentDoc}
 ` as unknown as DocumentNode<
-  DashboardModuleDrawer_updateCreatePetitionButtonDashboardModuleMutation,
-  DashboardModuleDrawer_updateCreatePetitionButtonDashboardModuleMutationVariables
+  DashboardModuleForm_updateCreatePetitionButtonDashboardModuleMutation,
+  DashboardModuleForm_updateCreatePetitionButtonDashboardModuleMutationVariables
 >;
-export const DashboardModuleDrawer_updatePetitionsNumberDashboardModuleDocument = gql`
-  mutation DashboardModuleDrawer_updatePetitionsNumberDashboardModule(
+export const DashboardModuleForm_updatePetitionsNumberDashboardModuleDocument = gql`
+  mutation DashboardModuleForm_updatePetitionsNumberDashboardModule(
     $dashboardId: GID!
     $moduleId: GID!
     $data: UpdatePetitionsNumberDashboardModuleInput!
@@ -80929,13 +81202,13 @@ export const DashboardModuleDrawer_updatePetitionsNumberDashboardModuleDocument 
       data: $data
     ) {
       id
-      ...DashboardModuleDrawer_DashboardModule
+      ...DashboardModuleForm_DashboardModule
     }
   }
-  ${DashboardModuleDrawer_DashboardModuleFragmentDoc}
+  ${DashboardModuleForm_DashboardModuleFragmentDoc}
 ` as unknown as DocumentNode<
-  DashboardModuleDrawer_updatePetitionsNumberDashboardModuleMutation,
-  DashboardModuleDrawer_updatePetitionsNumberDashboardModuleMutationVariables
+  DashboardModuleForm_updatePetitionsNumberDashboardModuleMutation,
+  DashboardModuleForm_updatePetitionsNumberDashboardModuleMutationVariables
 >;
 export const DashboardModuleProfileForm_profileTypeDocument = gql`
   query DashboardModuleProfileForm_profileType($profileTypeId: GID!) {

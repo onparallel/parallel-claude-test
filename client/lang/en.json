@@ -3060,29 +3060,9 @@
     "context": "Untitled module"
   },
   {
-    "term": "component.dashboard-module-form.chart-filters",
-    "definition": "Chart filters",
-    "context": "Chart filters"
-  },
-  {
     "term": "component.dashboard-module-form.error-chart-items-required",
     "definition": "Chart items are required",
     "context": "Chart items are required"
-  },
-  {
-    "term": "component.dashboard-module-form.filters",
-    "definition": "Filters",
-    "context": "Filters"
-  },
-  {
-    "term": "component.dashboard-module-form.filters-of",
-    "definition": "Filters of {name}:",
-    "context": "Filters of {name}:"
-  },
-  {
-    "term": "component.dashboard-module-form.module-field-to-aggregate",
-    "definition": "Field to aggregate",
-    "context": "Field to aggregate"
   },
   {
     "term": "component.dashboard-module-form.module-name",
@@ -3093,41 +3073,6 @@
     "term": "component.dashboard-module-form.module-name-placeholder",
     "definition": "Module name",
     "context": "Module name"
-  },
-  {
-    "term": "component.dashboard-module-form.module-profile-type",
-    "definition": "Profile type",
-    "context": "Profile type"
-  },
-  {
-    "term": "component.dashboard-module-form.module-result-type",
-    "definition": "Result type",
-    "context": "Result type"
-  },
-  {
-    "term": "component.dashboard-module-form.module-result-type-average",
-    "definition": "Average",
-    "context": "Average"
-  },
-  {
-    "term": "component.dashboard-module-form.module-result-type-count",
-    "definition": "Count",
-    "context": "Count"
-  },
-  {
-    "term": "component.dashboard-module-form.module-result-type-max",
-    "definition": "Maximum",
-    "context": "Maximum"
-  },
-  {
-    "term": "component.dashboard-module-form.module-result-type-min",
-    "definition": "Minimum",
-    "context": "Minimum"
-  },
-  {
-    "term": "component.dashboard-module-form.module-result-type-sum",
-    "definition": "Sum",
-    "context": "Sum"
   },
   {
     "term": "component.dashboard-module-form.module-size",
@@ -3163,6 +3108,21 @@
     "term": "component.dashboard-module-form.sizes-small",
     "definition": "Small",
     "context": "Small"
+  },
+  {
+    "term": "component.dashboard-module-profile-form.aggregate-by-label",
+    "definition": "Field to aggregate",
+    "context": "Field to aggregate"
+  },
+  {
+    "term": "component.dashboard-module-profile-form.profile-type-label",
+    "definition": "Profile type",
+    "context": "Profile type"
+  },
+  {
+    "term": "component.dashboard-module-profile-form.result-type-label",
+    "definition": "Result type",
+    "context": "Result type"
   },
   {
     "term": "component.dashboard-module-ratio-filters.denominator",
@@ -5158,26 +5118,6 @@
     "term": "component.message-events-indicator.opened-explanation",
     "definition": "The email was opened on {date}",
     "context": "The email was opened on {date}"
-  },
-  {
-    "term": "component.module-tabs.button-module",
-    "definition": "Action button",
-    "context": "Action button"
-  },
-  {
-    "term": "component.module-tabs.numeric-module",
-    "definition": "Numeric",
-    "context": "Numeric"
-  },
-  {
-    "term": "component.module-tabs.pie-chart-module",
-    "definition": "Pie chart",
-    "context": "Pie chart"
-  },
-  {
-    "term": "component.module-tabs.ratio-module",
-    "definition": "Percentage / ratio",
-    "context": "Percentage / ratio"
   },
   {
     "term": "component.more-liquid-references-button.and",
@@ -8700,11 +8640,6 @@
     "context": "No chart items added"
   },
   {
-    "term": "component.petitions-chart-module-settings.remove-item-button",
-    "definition": "Remove item",
-    "context": "Remove item"
-  },
-  {
     "term": "component.petitions-chart-module-settings.source-chart-items-label",
     "definition": "Source of chart items",
     "context": "Source of chart items"
@@ -9820,6 +9755,11 @@
     "context": "There's no profile types matching your criteria"
   },
   {
+    "term": "component.profiles-chart-module-settings.global-filter",
+    "definition": "Global filters",
+    "context": "Global filters"
+  },
+  {
     "term": "component.profiles-contact-us-dialog.body-1",
     "definition": "Get the most out of your legal data management by creating customized databases.",
     "context": "Get the most out of your legal data management by creating customized databases."
@@ -9860,22 +9800,27 @@
     "context": "Importing profiles..."
   },
   {
-    "term": "component.profiles-filters-module-settings.add-condition",
+    "term": "component.profiles-module-filter-editor.add-condition",
     "definition": "Add condition",
     "context": "Add condition"
   },
   {
-    "term": "component.profiles-filters-module-settings.add-group",
+    "term": "component.profiles-module-filter-editor.add-group",
     "definition": "Add group",
     "context": "Add group"
   },
   {
-    "term": "component.profiles-filters-module-settings.all-profile-status-placeholder",
+    "term": "component.profiles-module-filter-editor.all-profile-status-placeholder",
     "definition": "Select a status...",
     "context": "Select a status..."
   },
   {
-    "term": "component.profiles-filters-module-settings.properties",
+    "term": "component.profiles-module-filter-editor.filter-group-required-condition",
+    "definition": "At least one condition is required.",
+    "context": "At least one condition is required."
+  },
+  {
+    "term": "component.profiles-module-filter-editor.properties",
     "definition": "Properties",
     "context": "Properties"
   },
@@ -13625,6 +13570,31 @@
     "context": "After"
   },
   {
+    "term": "generic.aggregate-average",
+    "definition": "Average",
+    "context": "Average"
+  },
+  {
+    "term": "generic.aggregate-count",
+    "definition": "Count",
+    "context": "Count"
+  },
+  {
+    "term": "generic.aggregate-max",
+    "definition": "Maximum",
+    "context": "Maximum"
+  },
+  {
+    "term": "generic.aggregate-min",
+    "definition": "Minimum",
+    "context": "Minimum"
+  },
+  {
+    "term": "generic.aggregate-sum",
+    "definition": "Sum",
+    "context": "Sum"
+  },
+  {
     "term": "generic.all-categories",
     "definition": "All categories",
     "context": "All categories"
@@ -13898,6 +13868,11 @@
     "term": "generic.current-year",
     "definition": "Current year",
     "context": "Current year"
+  },
+  {
+    "term": "generic.dashboard-module-filters",
+    "definition": "Filters",
+    "context": "Filters"
   },
   {
     "term": "generic.days",
@@ -19548,6 +19523,26 @@
     "term": "util.recipient-view-delegate-access.toast-header",
     "definition": "Access delegated",
     "context": "Access delegated"
+  },
+  {
+    "term": "util.use-dashboard-modules.button-module",
+    "definition": "Action button",
+    "context": "Action button"
+  },
+  {
+    "term": "util.use-dashboard-modules.numeric-module",
+    "definition": "Numeric",
+    "context": "Numeric"
+  },
+  {
+    "term": "util.use-dashboard-modules.pie-chart-module",
+    "definition": "Pie chart",
+    "context": "Pie chart"
+  },
+  {
+    "term": "util.use-dashboard-modules.ratio-module",
+    "definition": "Percentage / ratio",
+    "context": "Percentage / ratio"
   },
   {
     "term": "util.use-delete-contact.confirm-delete-alert-multiple-text",

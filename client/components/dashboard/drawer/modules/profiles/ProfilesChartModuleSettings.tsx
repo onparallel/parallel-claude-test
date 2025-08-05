@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { FormControl, Radio, RadioGroup, Stack, Text } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, Radio, RadioGroup, Stack, Text } from "@chakra-ui/react";
 import { Divider } from "@parallel/components/common/Divider";
 import { ProfileTypeFieldSelect } from "@parallel/components/common/ProfileTypeFieldSelect";
 import { ProfilesChartModuleSettings_ProfileTypeFragment } from "@parallel/graphql/__types";
@@ -10,21 +10,25 @@ import { isNonNullish } from "remeda";
 import { DashboardModuleChartItems } from "../../components/DashboardModuleChartItems";
 import { DashboardModuleChartType } from "../../components/DashboardModuleChartType";
 import { DashboardModuleFormLabel } from "../../components/DashboardModuleFormLabel";
-import { DashboardModuleDrawerFormData } from "../../DashboardModuleDrawer";
-import { ProfilesFiltersModuleSettings } from "./ProfilesFiltersModuleSettings";
+import { ProfilesModuleFilterEditor } from "../../components/ProfilesModuleFilterEditor";
+import { defaultDashboardModuleProfileFilter } from "../../utils/moduleUtils";
 
 export function ProfilesChartModuleSettings({
   profileType,
   isDisabled,
+  isUpdating,
 }: {
   profileType?: ProfilesChartModuleSettings_ProfileTypeFragment;
   isDisabled?: boolean;
+  isUpdating?: boolean;
 }) {
   const profileTypeFields = profileType?.fields ?? [];
-  const { control, watch } = useFormContext<DashboardModuleDrawerFormData>();
+  const { control, watch, resetField } = useFormContext();
 
   const groupByProfileTypeFieldId = watch("settings.groupByProfileTypeFieldId");
-  const [radioValue, setRadioValue] = useState(isNonNullish(groupByProfileTypeFieldId) ? "2" : "1");
+  const [radioValue, setRadioValue] = useState(
+    isNonNullish(groupByProfileTypeFieldId) ? "GROUP_BY_PROFILE_TYPE_FIELD" : "CUSTOM_ITEMS",
+  );
   return (
     <>
       <FormControl>
@@ -44,22 +48,39 @@ export function ProfilesChartModuleSettings({
         />
       </FormControl>
       <FormControl>
-        <DashboardModuleFormLabel>
+        <DashboardModuleFormLabel
+          field="settings.groupByProfileTypeFieldId"
+          isUpdating={isUpdating}
+        >
           <FormattedMessage
             id="component.petitions-chart-module-settings.source-chart-items-label"
             defaultMessage="Source of chart items"
           />
         </DashboardModuleFormLabel>
 
-        <RadioGroup onChange={setRadioValue} value={radioValue} isDisabled={isDisabled}>
+        <RadioGroup
+          onChange={(value) => {
+            if (value === "CUSTOM_ITEMS") {
+              resetField("settings.groupByProfileTypeFieldId", { defaultValue: null });
+              resetField("settings.groupByFilter", {
+                defaultValue: defaultDashboardModuleProfileFilter(),
+              });
+            } else {
+              resetField("settings.items", { defaultValue: [] });
+            }
+            setRadioValue(value);
+          }}
+          value={radioValue}
+          isDisabled={isDisabled}
+        >
           <Stack>
-            <Radio value="1">
+            <Radio value="CUSTOM_ITEMS">
               <FormattedMessage
                 id="component.petitions-chart-module-settings.custom-chart-items"
                 defaultMessage="Custom chart items"
               />
             </Radio>
-            <Radio value="2">
+            <Radio value="GROUP_BY_PROFILE_TYPE_FIELD">
               <FormattedMessage
                 id="component.petitions-chart-module-settings.from-profile-type-field-chart-items"
                 defaultMessage="From profile property"
@@ -68,44 +89,49 @@ export function ProfilesChartModuleSettings({
           </Stack>
         </RadioGroup>
       </FormControl>
-      {radioValue === "1" ? (
+      {radioValue === "CUSTOM_ITEMS" ? (
         <DashboardModuleChartItems
-          key="1"
           isProfileTypeModule
           profileType={profileType}
           isDisabled={isDisabled}
+          isUpdating={isUpdating}
         />
       ) : (
         <>
-          <FormControl>
-            <Controller
-              name="settings.groupByProfileTypeFieldId"
-              control={control}
-              rules={{
-                required: radioValue === "2",
-              }}
-              shouldUnregister
-              render={({ field: { onChange, value } }) => (
+          <Controller
+            name="settings.groupByProfileTypeFieldId"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <FormControl isInvalid={isNonNullish(error)}>
                 <ProfileTypeFieldSelect
                   value={profileTypeFields.find((f) => f.id === value) as any}
                   fields={profileTypeFields}
                   filterFields={(f) => f.type === "SELECT"}
                   onChange={(v) => onChange(v?.id)}
                 />
-              )}
-            />
-          </FormControl>
+                <FormErrorMessage>
+                  <FormattedMessage
+                    id="generic.required-field-error"
+                    defaultMessage="The field is required"
+                  />
+                </FormErrorMessage>
+              </FormControl>
+            )}
+          />
           <Divider />
-          <Text fontWeight={600}>
+          <Text textTransform="uppercase" color="gray.600" fontSize="sm" fontWeight={500}>
             <FormattedMessage
-              id="component.dashboard-module-form.chart-filters"
-              defaultMessage="Chart filters"
+              id="component.profiles-chart-module-settings.global-filter"
+              defaultMessage="Global filters"
             />
             :
           </Text>
-          <ProfilesFiltersModuleSettings
+          <ProfilesModuleFilterEditor
+            field="settings.groupByFilter"
             profileTypeFields={profileTypeFields}
             isDisabled={isDisabled}
+            isUpdating={isUpdating}
           />
         </>
       )}
@@ -120,12 +146,12 @@ ProfilesChartModuleSettings.fragments = {
       fields {
         id
         ...ProfileTypeFieldSelect_ProfileTypeField
-        ...ProfilesFiltersModuleSettings_ProfileTypeField
+        ...ProfilesModuleFilterEditor_ProfileTypeField
       }
       ...DashboardModuleChartItems_ProfileType
     }
     ${ProfileTypeFieldSelect.fragments.ProfileTypeField}
     ${DashboardModuleChartItems.fragments.ProfileType}
-    ${ProfilesFiltersModuleSettings.fragments.ProfileTypeField}
+    ${ProfilesModuleFilterEditor.fragments.ProfileTypeField}
   `,
 };
