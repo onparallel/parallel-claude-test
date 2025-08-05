@@ -1288,6 +1288,8 @@ export type Mutation = {
   createAddPetitionPermissionMaybeTask: MaybeTask;
   /** Creates a new Anthropic AI Completion integration on the provided organization */
   createAnthropicCompletionIntegration: SupportMethodResponse;
+  /** Creates a new AWS Bedrock AI Completion integration on the provided organization */
+  createAwsBedrockCompletionIntegration: SupportMethodResponse;
   /** Creates a new Azure OpenAI integration on the provided organization */
   createAzureOpenAiIntegration: SupportMethodResponse;
   createBackgroundCheckProfilePdfTask: Task;
@@ -1960,6 +1962,10 @@ export type MutationcreateAddPetitionPermissionMaybeTaskArgs = {
 
 export type MutationcreateAnthropicCompletionIntegrationArgs = {
   model: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
+};
+
+export type MutationcreateAwsBedrockCompletionIntegrationArgs = {
   orgId: Scalars["GID"]["input"];
 };
 

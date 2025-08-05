@@ -4,7 +4,10 @@ import { CONFIG, Config } from "../../../config";
 import { ReplyCreatedEvent, ReplyUpdatedEvent } from "../../../db/events/PetitionEvent";
 import { FeatureFlagRepository } from "../../../db/repositories/FeatureFlagRepository";
 import { FileRepository } from "../../../db/repositories/FileRepository";
-import { IntegrationRepository } from "../../../db/repositories/IntegrationRepository";
+import {
+  EnhancedOrgIntegration,
+  IntegrationRepository,
+} from "../../../db/repositories/IntegrationRepository";
 import { PetitionRepository } from "../../../db/repositories/PetitionRepository";
 import { TaskRepository } from "../../../db/repositories/TaskRepository";
 import { UserRepository } from "../../../db/repositories/UserRepository";
@@ -110,13 +113,20 @@ export class DocumentProcessingListener
         return;
       }
 
-      const [anthropicIntegration] = await this.integrations.loadIntegrationsByOrgId(
+      const completionIntegrations = await this.integrations.loadIntegrationsByOrgId(
         petition.org_id,
         "AI_COMPLETION",
-        "ANTHROPIC",
       );
 
-      if (!anthropicIntegration) {
+      const awsBedrockIntegration = completionIntegrations.find(
+        (i) => i.provider === "AWS_BEDROCK",
+      );
+      const anthropicIntegration = completionIntegrations.find((i) => i.provider === "ANTHROPIC");
+      const completionIntegration = (awsBedrockIntegration ?? anthropicIntegration) as
+        | EnhancedOrgIntegration<"AI_COMPLETION", "AWS_BEDROCK" | "ANTHROPIC">
+        | undefined;
+
+      if (!completionIntegration) {
         return;
       }
 
@@ -147,8 +157,8 @@ export class DocumentProcessingListener
           input: {
             petition_field_reply_id: reply.id,
             file_upload_id: reply.content.file_upload_id,
-            integration_id: anthropicIntegration.id,
-            model: anthropicIntegration.settings.MODEL,
+            integration_id: completionIntegration.id,
+            model: completionIntegration.settings.MODEL,
           },
           user_id: user?.id ?? null,
           petition_access_id: access?.id ?? null,

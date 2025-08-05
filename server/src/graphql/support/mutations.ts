@@ -1,6 +1,6 @@
 import Ajv from "ajv";
 import { booleanArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
-import { indexBy, isNonNullish, isNullish, unique } from "remeda";
+import { indexBy, isNonNullish, isNullish, round, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { UserGroupPermissionName } from "../../db/__types";
 import { toBytes } from "../../util/fileSize";
@@ -1568,8 +1568,7 @@ export const updateBackgroundCheckOrganizationCutoff = mutationField(
         };
       }
 
-      let cutoff = parseFloat(args.cutoff);
-      cutoff = Math.floor(cutoff * 100) / 100; // Keep only first 2 decimals
+      const cutoff = round(parseFloat(args.cutoff), 2);
       if (isNullish(cutoff) || Number.isNaN(cutoff) || cutoff < 0 || cutoff > 1) {
         return {
           result: RESULT.FAILURE,
@@ -1594,6 +1593,54 @@ export const updateBackgroundCheckOrganizationCutoff = mutationField(
         result: RESULT.SUCCESS,
         message: "Background Check cutoff updated successfully",
       };
+    },
+  },
+);
+
+export const createAwsBedrockCompletionIntegration = mutationField(
+  "createAwsBedrockCompletionIntegration",
+  {
+    description: "Creates a new AWS Bedrock AI Completion integration on the provided organization",
+    type: "SupportMethodResponse",
+    authorize: superAdminAccess(),
+    args: {
+      orgId: nonNull(globalIdArg("Organization")),
+    },
+    resolve: async (_, args, ctx) => {
+      try {
+        const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
+          args.orgId,
+          "AI_COMPLETION",
+          "AWS_BEDROCK",
+        );
+
+        if (isNullish(integration)) {
+          await ctx.integrationsSetup.createAwsBedrockIntegration(
+            {
+              org_id: args.orgId,
+              name: "AWS Bedrock AI",
+              is_default: true,
+              settings: {
+                IS_PARALLEL_MANAGED: true,
+                MODEL:
+                  "arn:aws:bedrock:eu-central-1:749273139513:inference-profile/eu.anthropic.claude-sonnet-4-20250514-v1:0",
+                CREDENTIALS: {},
+              },
+            },
+            `User:${ctx.user!.id}`,
+          );
+        }
+
+        return {
+          result: RESULT.SUCCESS,
+          message: `Integration created successfully`,
+        };
+      } catch (error) {
+        return {
+          result: RESULT.FAILURE,
+          message: error instanceof Error ? error.message : "Unknown error",
+        };
+      }
     },
   },
 );

@@ -1386,6 +1386,8 @@ export interface Mutation {
   createAddPetitionPermissionMaybeTask: MaybeTask;
   /** Creates a new Anthropic AI Completion integration on the provided organization */
   createAnthropicCompletionIntegration: SupportMethodResponse;
+  /** Creates a new AWS Bedrock AI Completion integration on the provided organization */
+  createAwsBedrockCompletionIntegration: SupportMethodResponse;
   /** Creates a new Azure OpenAI integration on the provided organization */
   createAzureOpenAiIntegration: SupportMethodResponse;
   createBackgroundCheckProfilePdfTask: Task;
@@ -2058,6 +2060,10 @@ export interface MutationcreateAddPetitionPermissionMaybeTaskArgs {
 
 export interface MutationcreateAnthropicCompletionIntegrationArgs {
   model: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
+}
+
+export interface MutationcreateAwsBedrockCompletionIntegrationArgs {
   orgId: Scalars["GID"]["input"];
 }
 
@@ -28192,7 +28198,7 @@ export type PetitionComposeFieldSettings_UserFragment = {
   organization: {
     __typename?: "Organization";
     hasDocumentProcessingIntegration: boolean;
-    hasAnthropicCompletionIntegration: boolean;
+    hasAiCompletionIntegration: boolean;
   };
 };
 
@@ -28353,7 +28359,7 @@ export type PetitionComposeFileUploadSettings_UserFragment = {
   organization: {
     __typename?: "Organization";
     hasDocumentProcessingIntegration: boolean;
-    hasAnthropicCompletionIntegration: boolean;
+    hasAiCompletionIntegration: boolean;
   };
 };
 
@@ -52502,7 +52508,7 @@ export type PetitionCompose_QueryFragment = {
       hasIdVerification: boolean;
       iconUrl80?: string | null;
       hasDocumentProcessingIntegration: boolean;
-      hasAnthropicCompletionIntegration: boolean;
+      hasAiCompletionIntegration: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -54622,7 +54628,7 @@ export type PetitionCompose_userQuery = {
       hasIdVerification: boolean;
       iconUrl80?: string | null;
       hasDocumentProcessingIntegration: boolean;
-      hasAnthropicCompletionIntegration: boolean;
+      hasAiCompletionIntegration: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -77370,10 +77376,7 @@ export const PetitionComposeFileUploadSettings_UserFragmentDoc = gql`
     hasDocumentProcessingAccess: hasFeatureFlag(featureFlag: DOCUMENT_PROCESSING)
     organization {
       hasDocumentProcessingIntegration: hasIntegration(integration: DOCUMENT_PROCESSING)
-      hasAnthropicCompletionIntegration: hasIntegration(
-        integration: AI_COMPLETION
-        provider: "ANTHROPIC"
-      )
+      hasAiCompletionIntegration: hasIntegration(integration: AI_COMPLETION)
     }
   }
 ` as unknown as DocumentNode<PetitionComposeFileUploadSettings_UserFragment, unknown>;

@@ -39,7 +39,7 @@ export function PetitionComposeFileUploadSettings({
   );
 
   const isAiDocumentProcessingActive =
-    user.organization.hasAnthropicCompletionIntegration && user.hasDocumentProcessingAccess;
+    user.organization.hasAiCompletionIntegration && user.hasDocumentProcessingAccess;
   return (
     <>
       {user.organization.hasDocumentProcessingIntegration ? (
@@ -229,10 +229,7 @@ PetitionComposeFileUploadSettings.fragments = {
       hasDocumentProcessingAccess: hasFeatureFlag(featureFlag: DOCUMENT_PROCESSING)
       organization {
         hasDocumentProcessingIntegration: hasIntegration(integration: DOCUMENT_PROCESSING)
-        hasAnthropicCompletionIntegration: hasIntegration(
-          integration: AI_COMPLETION
-          provider: "ANTHROPIC"
-        )
+        hasAiCompletionIntegration: hasIntegration(integration: AI_COMPLETION)
       }
     }
   `,

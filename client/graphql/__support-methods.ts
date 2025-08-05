@@ -145,6 +145,35 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "createAwsBedrockCompletionIntegration",
+      description:
+        "Creates a new AWS Bedrock AI Completion integration on the provided organization",
+      args: [
+        {
+          name: "orgId",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "createAzureOpenAiIntegration",
       description: "Creates a new Azure OpenAI integration on the provided organization",
       args: [

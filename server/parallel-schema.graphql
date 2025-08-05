@@ -1703,6 +1703,11 @@ type Mutation {
   ): SupportMethodResponse!
 
   """
+  Creates a new AWS Bedrock AI Completion integration on the provided organization
+  """
+  createAwsBedrockCompletionIntegration(orgId: GID!): SupportMethodResponse!
+
+  """
   Creates a new Azure OpenAI integration on the provided organization
   """
   createAzureOpenAiIntegration(

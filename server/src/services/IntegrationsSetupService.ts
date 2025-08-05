@@ -7,6 +7,7 @@ import {
   IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
 import { AnthropicIntegration } from "../integrations/ai-completion/AnthropicIntegration";
+import { AwsBedrockIntegration } from "../integrations/ai-completion/AwsBedrockIntegration";
 import { AzureOpenAiIntegration } from "../integrations/ai-completion/AzureOpenAiIntegration";
 import {
   BANKFLIP_DOCUMENT_PROCESSING_INTEGRATION,
@@ -76,6 +77,13 @@ export interface IIntegrationsSetupService {
     >,
     t?: Knex.Transaction,
   ): Promise<void>;
+  createAwsBedrockIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "is_default" | "name"> & {
+      settings: IntegrationSettings<"AI_COMPLETION", "AWS_BEDROCK">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<EnhancedOrgIntegration<"AI_COMPLETION", "AWS_BEDROCK">>;
   createBankflipIdVerificationIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
       settings: IntegrationSettings<"ID_VERIFICATION", "BANKFLIP">;
@@ -137,6 +145,8 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     @inject(AzureOpenAiIntegration) private azureOpenAiIntegration: AzureOpenAiIntegration,
     @inject(AnthropicIntegration)
     private anthropicIntegration: AnthropicIntegration,
+    @inject(AwsBedrockIntegration)
+    private awsBedrockIntegration: AwsBedrockIntegration,
     @inject(BANKFLIP_ID_VERIFICATION_INTEGRATION)
     private bankflipIdVerificationIntegration: BankflipIdVerificationIntegration,
     @inject(BANKFLIP_DOCUMENT_PROCESSING_INTEGRATION)
@@ -325,5 +335,15 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
       data,
       t,
     );
+  }
+
+  async createAwsBedrockIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "is_default" | "name"> & {
+      settings: IntegrationSettings<"AI_COMPLETION", "AWS_BEDROCK">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction<any, any[]> | undefined,
+  ): Promise<EnhancedOrgIntegration<"AI_COMPLETION", "AWS_BEDROCK">> {
+    return await this.awsBedrockIntegration.createOrgIntegration(data, createdBy, t);
   }
 }
