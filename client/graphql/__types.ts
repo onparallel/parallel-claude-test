@@ -238,7 +238,12 @@ export type AutomaticNumberingType = "LETTERS" | "NUMBERS" | "ROMAN_NUMERALS";
 export interface BackgroundCheckEntityDetails {
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
   datasets?: Maybe<Array<BackgroundCheckEntityDetailsDataset>>;
+  hasPendingReview?: Maybe<Scalars["Boolean"]["output"]>;
+  /** Whether if user is fetching entity details with an already stored entity */
+  hasStoredEntity?: Maybe<Scalars["Boolean"]["output"]>;
   id: Scalars["String"]["output"];
+  /** Whether this entity is the one stored in the reply */
+  isStoredEntity?: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   type: Scalars["String"]["output"];
 }
@@ -247,7 +252,12 @@ export interface BackgroundCheckEntityDetailsCompany extends BackgroundCheckEnti
   __typename?: "BackgroundCheckEntityDetailsCompany";
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
   datasets?: Maybe<Array<BackgroundCheckEntityDetailsDataset>>;
+  hasPendingReview?: Maybe<Scalars["Boolean"]["output"]>;
+  /** Whether if user is fetching entity details with an already stored entity */
+  hasStoredEntity?: Maybe<Scalars["Boolean"]["output"]>;
   id: Scalars["String"]["output"];
+  /** Whether this entity is the one stored in the reply */
+  isStoredEntity?: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntityDetailsCompanyProperties;
   type: Scalars["String"]["output"];
@@ -278,7 +288,12 @@ export interface BackgroundCheckEntityDetailsPerson extends BackgroundCheckEntit
   __typename?: "BackgroundCheckEntityDetailsPerson";
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
   datasets?: Maybe<Array<BackgroundCheckEntityDetailsDataset>>;
+  hasPendingReview?: Maybe<Scalars["Boolean"]["output"]>;
+  /** Whether if user is fetching entity details with an already stored entity */
+  hasStoredEntity?: Maybe<Scalars["Boolean"]["output"]>;
   id: Scalars["String"]["output"];
+  /** Whether this entity is the one stored in the reply */
+  isStoredEntity?: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntityDetailsPersonProperties;
   type: Scalars["String"]["output"];
@@ -346,6 +361,7 @@ export interface BackgroundCheckEntityDetailsSanctionProperties {
 export interface BackgroundCheckEntitySearch {
   __typename?: "BackgroundCheckEntitySearch";
   createdAt: Scalars["DateTime"]["output"];
+  /** If this result is a draft, this will be true if it also has a stored value */
   hasStoredValue?: Maybe<Scalars["Boolean"]["output"]>;
   isDraft?: Maybe<Scalars["Boolean"]["output"]>;
   items: Array<BackgroundCheckEntitySearchSchema>;
@@ -355,7 +371,10 @@ export interface BackgroundCheckEntitySearch {
 export interface BackgroundCheckEntitySearchCompany extends BackgroundCheckEntitySearchSchema {
   __typename?: "BackgroundCheckEntitySearchCompany";
   id: Scalars["String"]["output"];
-  isFalsePositive?: Maybe<Scalars["Boolean"]["output"]>;
+  /** Whether this item is saved as a false positive */
+  isFalsePositive: Scalars["Boolean"]["output"];
+  /** Whether this item is saved as a match */
+  isMatch: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntitySearchCompanyProperties;
   score?: Maybe<Scalars["Float"]["output"]>;
@@ -372,7 +391,10 @@ export interface BackgroundCheckEntitySearchCompanyProperties {
 export interface BackgroundCheckEntitySearchPerson extends BackgroundCheckEntitySearchSchema {
   __typename?: "BackgroundCheckEntitySearchPerson";
   id: Scalars["String"]["output"];
-  isFalsePositive?: Maybe<Scalars["Boolean"]["output"]>;
+  /** Whether this item is saved as a false positive */
+  isFalsePositive: Scalars["Boolean"]["output"];
+  /** Whether this item is saved as a match */
+  isMatch: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntitySearchPersonProperties;
   score?: Maybe<Scalars["Float"]["output"]>;
@@ -390,7 +412,10 @@ export interface BackgroundCheckEntitySearchPersonProperties {
 
 export interface BackgroundCheckEntitySearchSchema {
   id: Scalars["String"]["output"];
-  isFalsePositive?: Maybe<Scalars["Boolean"]["output"]>;
+  /** Whether this item is saved as a false positive */
+  isFalsePositive: Scalars["Boolean"]["output"];
+  /** Whether this item is saved as a match */
+  isMatch: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
   score?: Maybe<Scalars["Float"]["output"]>;
   type: Scalars["String"]["output"];
@@ -8625,7 +8650,6 @@ export type ProfilePropertyContent_ProfileTypeFieldFragment = {
 export type ProfilePropertyContent_ProfileFieldValueFragment = {
   __typename?: "ProfileFieldValue";
   content?: { [key: string]: any } | null;
-  hasPendingReview: boolean;
 };
 
 export type ProfilePropertyContent_ProfileFieldFileFragment = {
@@ -45094,6 +45118,9 @@ export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetails_Backgroun
     type: string;
     name: string;
     createdAt?: string | null;
+    hasStoredEntity?: boolean | null;
+    isStoredEntity?: boolean | null;
+    hasPendingReview?: boolean | null;
     datasets?: Array<{
       __typename?: "BackgroundCheckEntityDetailsDataset";
       name: string;
@@ -45176,6 +45203,9 @@ export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetails_Backgroun
     type: string;
     name: string;
     createdAt?: string | null;
+    hasStoredEntity?: boolean | null;
+    isStoredEntity?: boolean | null;
+    hasPendingReview?: boolean | null;
     datasets?: Array<{
       __typename?: "BackgroundCheckEntityDetailsDataset";
       name: string;
@@ -45277,6 +45307,9 @@ export type BackgroundCheckProfileDetails_backgroundCheckEntityDetailsQuery = {
         type: string;
         name: string;
         createdAt?: string | null;
+        hasStoredEntity?: boolean | null;
+        isStoredEntity?: boolean | null;
+        hasPendingReview?: boolean | null;
         datasets?: Array<{
           __typename?: "BackgroundCheckEntityDetailsDataset";
           name: string;
@@ -45357,6 +45390,9 @@ export type BackgroundCheckProfileDetails_backgroundCheckEntityDetailsQuery = {
         type: string;
         name: string;
         createdAt?: string | null;
+        hasStoredEntity?: boolean | null;
+        isStoredEntity?: boolean | null;
+        hasPendingReview?: boolean | null;
         datasets?: Array<{
           __typename?: "BackgroundCheckEntityDetailsDataset";
           name: string;
@@ -45487,7 +45523,8 @@ export type BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_
     type: string;
     name: string;
     score?: number | null;
-    isFalsePositive?: boolean | null;
+    isFalsePositive: boolean;
+    isMatch: boolean;
     properties: {
       __typename?: "BackgroundCheckEntitySearchCompanyProperties";
       incorporationDate?: Array<string> | null;
@@ -45503,7 +45540,8 @@ export type BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_
     type: string;
     name: string;
     score?: number | null;
-    isFalsePositive?: boolean | null;
+    isFalsePositive: boolean;
+    isMatch: boolean;
     properties: {
       __typename?: "BackgroundCheckEntitySearchPersonProperties";
       countryOfBirth?: Array<string> | null;
@@ -45580,7 +45618,8 @@ export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQuery =
           type: string;
           name: string;
           score?: number | null;
-          isFalsePositive?: boolean | null;
+          isFalsePositive: boolean;
+          isMatch: boolean;
           properties: {
             __typename?: "BackgroundCheckEntitySearchCompanyProperties";
             incorporationDate?: Array<string> | null;
@@ -45594,7 +45633,8 @@ export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQuery =
           type: string;
           name: string;
           score?: number | null;
-          isFalsePositive?: boolean | null;
+          isFalsePositive: boolean;
+          isMatch: boolean;
           properties: {
             __typename?: "BackgroundCheckEntitySearchPersonProperties";
             countryOfBirth?: Array<string> | null;
@@ -61838,7 +61878,6 @@ export type ProfileSearch_ProfileFragment = {
       __typename?: "ProfileFieldValue";
       id: string;
       content?: { [key: string]: any } | null;
-      hasPendingReview: boolean;
     } | null;
     files?: Array<{
       __typename?: "ProfileFieldFile";
@@ -61912,7 +61951,6 @@ export type ProfileSearch_conflictCheckProfileSearchQuery = {
         __typename?: "ProfileFieldValue";
         id: string;
         content?: { [key: string]: any } | null;
-        hasPendingReview: boolean;
       } | null;
       files?: Array<{
         __typename?: "ProfileFieldFile";
@@ -62377,7 +62415,6 @@ export type Profiles_profilesQuery = {
         value?: {
           __typename?: "ProfileFieldValue";
           content?: { [key: string]: any } | null;
-          hasPendingReview: boolean;
         } | null;
       }>;
       profileType: {
@@ -68695,11 +68732,7 @@ export type useProfileTableColumns_ProfileFieldPropertyFragment = {
     id?: string;
     file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
   }> | null;
-  value?: {
-    __typename?: "ProfileFieldValue";
-    content?: { [key: string]: any } | null;
-    hasPendingReview: boolean;
-  } | null;
+  value?: { __typename?: "ProfileFieldValue"; content?: { [key: string]: any } | null } | null;
 };
 
 export type useProfileTableColumns_ProfileWithPropertiesFragment = {
@@ -68721,11 +68754,7 @@ export type useProfileTableColumns_ProfileWithPropertiesFragment = {
       id?: string;
       file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
     }> | null;
-    value?: {
-      __typename?: "ProfileFieldValue";
-      content?: { [key: string]: any } | null;
-      hasPendingReview: boolean;
-    } | null;
+    value?: { __typename?: "ProfileFieldValue"; content?: { [key: string]: any } | null } | null;
   }>;
   subscribers: Array<{
     __typename?: "ProfileSubscription";
@@ -75118,6 +75147,9 @@ export const BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragmentD
       ...BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDataset
     }
     createdAt
+    hasStoredEntity
+    isStoredEntity
+    hasPendingReview
   }
   ${BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPersonFragmentDoc}
   ${BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompanyFragmentDoc}
@@ -75133,6 +75165,7 @@ export const BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema
     name
     score
     isFalsePositive
+    isMatch
     ... on BackgroundCheckEntitySearchPerson {
       properties {
         countryOfBirth
@@ -79141,7 +79174,6 @@ export const ProfileSearch_ProfileTypeFragmentDoc = gql`
 export const ProfilePropertyContent_ProfileFieldValueFragmentDoc = gql`
   fragment ProfilePropertyContent_ProfileFieldValue on ProfileFieldValue {
     content
-    hasPendingReview
   }
 ` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldValueFragment, unknown>;
 export const ProfilePropertyContent_ProfileFieldFileFragmentDoc = gql`

@@ -7,7 +7,12 @@ export const BackgroundCheckEntitySearchSchema = interfaceType({
     t.nonNull.string("type");
     t.nonNull.string("name");
     t.nullable.float("score");
-    t.nullable.boolean("isFalsePositive");
+    t.nonNull.boolean("isFalsePositive", {
+      description: "Whether this item is saved as a false positive",
+    });
+    t.nonNull.boolean("isMatch", {
+      description: "Whether this item is saved as a match",
+    });
   },
   resolveType: (o) => {
     if (o.type === "Person") {
@@ -64,7 +69,9 @@ export const BackgroundCheckEntitySearch = objectType({
     });
     t.nonNull.datetime("createdAt");
     t.nullable.boolean("isDraft");
-    t.nullable.boolean("hasStoredValue");
+    t.nullable.boolean("hasStoredValue", {
+      description: "If this result is a draft, this will be true if it also has a stored value",
+    });
   },
 });
 
@@ -203,6 +210,13 @@ export const BackgroundCheckEntityDetails = interfaceType({
       type: "BackgroundCheckEntityDetailsDataset",
     });
     t.nullable.datetime("createdAt");
+    t.nullable.boolean("hasStoredEntity", {
+      description: "Whether if user is fetching entity details with an already stored entity",
+    });
+    t.nullable.boolean("isStoredEntity", {
+      description: "Whether this entity is the one stored in the reply",
+    });
+    t.nullable.boolean("hasPendingReview");
   },
   resolveType: (o) => {
     if (o.type === "Person") {

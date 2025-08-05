@@ -86,12 +86,11 @@ export function ProfileFormFieldBackgroundCheck({
     }),
   );
 
-  const { state, browserTabRef, openWindow, closeWindow } = useManagedWindow({
+  const { state, openWindow, closeWindow } = useManagedWindow({
     onRefreshField,
   });
 
   const hasReply = isNonNullish(props.value?.content);
-  const hasPendingReview = props.value?.hasPendingReview ?? false;
 
   useEffect(() => {
     if (showSuggestions && hasReply) {
@@ -134,32 +133,6 @@ export function ProfileFormFieldBackgroundCheck({
       entityButtonRef.current?.focus();
     }
   }, [router.query.profileTypeField]);
-
-  useEffect(() => {
-    const handleMessage = (e: MessageEvent) => {
-      const browserTab = browserTabRef.current;
-      if (isNullish(browserTab) || e.source !== browserTab) {
-        return;
-      }
-      if (e.data.event === "update-info") {
-        const token = e.data.token;
-        if (token !== tokenBase64) {
-          return;
-        }
-
-        browserTab.postMessage(
-          {
-            event: "info-updated",
-            entityIds: [entity?.id].filter(isNonNullish),
-          },
-          browserTab.origin,
-        );
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [entity?.id, tokenBase64]);
 
   const { monitoring } = field.options as ProfileTypeFieldOptions<"BACKGROUND_CHECK">;
 
@@ -250,7 +223,6 @@ export function ProfileFormFieldBackgroundCheck({
         ...(country ? { country } : {}),
         ...(birthCountry ? { birthCountry } : {}),
         ...(isDisabled ? { readonly: "true" } : {}),
-        ...(hasPendingReview ? { pendingReview: "true" } : {}),
       });
 
       if (entity) {

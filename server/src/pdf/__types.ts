@@ -221,7 +221,12 @@ export type AutomaticNumberingType = "LETTERS" | "NUMBERS" | "ROMAN_NUMERALS";
 export type BackgroundCheckEntityDetails = {
   createdAt: Maybe<Scalars["DateTime"]["output"]>;
   datasets: Maybe<Array<BackgroundCheckEntityDetailsDataset>>;
+  hasPendingReview: Maybe<Scalars["Boolean"]["output"]>;
+  /** Whether if user is fetching entity details with an already stored entity */
+  hasStoredEntity: Maybe<Scalars["Boolean"]["output"]>;
   id: Scalars["String"]["output"];
+  /** Whether this entity is the one stored in the reply */
+  isStoredEntity: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   type: Scalars["String"]["output"];
 };
@@ -229,7 +234,12 @@ export type BackgroundCheckEntityDetails = {
 export type BackgroundCheckEntityDetailsCompany = BackgroundCheckEntityDetails & {
   createdAt: Maybe<Scalars["DateTime"]["output"]>;
   datasets: Maybe<Array<BackgroundCheckEntityDetailsDataset>>;
+  hasPendingReview: Maybe<Scalars["Boolean"]["output"]>;
+  /** Whether if user is fetching entity details with an already stored entity */
+  hasStoredEntity: Maybe<Scalars["Boolean"]["output"]>;
   id: Scalars["String"]["output"];
+  /** Whether this entity is the one stored in the reply */
+  isStoredEntity: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntityDetailsCompanyProperties;
   type: Scalars["String"]["output"];
@@ -257,7 +267,12 @@ export type BackgroundCheckEntityDetailsDataset = {
 export type BackgroundCheckEntityDetailsPerson = BackgroundCheckEntityDetails & {
   createdAt: Maybe<Scalars["DateTime"]["output"]>;
   datasets: Maybe<Array<BackgroundCheckEntityDetailsDataset>>;
+  hasPendingReview: Maybe<Scalars["Boolean"]["output"]>;
+  /** Whether if user is fetching entity details with an already stored entity */
+  hasStoredEntity: Maybe<Scalars["Boolean"]["output"]>;
   id: Scalars["String"]["output"];
+  /** Whether this entity is the one stored in the reply */
+  isStoredEntity: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntityDetailsPersonProperties;
   type: Scalars["String"]["output"];
@@ -318,6 +333,7 @@ export type BackgroundCheckEntityDetailsSanctionProperties = {
 
 export type BackgroundCheckEntitySearch = {
   createdAt: Scalars["DateTime"]["output"];
+  /** If this result is a draft, this will be true if it also has a stored value */
   hasStoredValue: Maybe<Scalars["Boolean"]["output"]>;
   isDraft: Maybe<Scalars["Boolean"]["output"]>;
   items: Array<BackgroundCheckEntitySearchSchema>;
@@ -326,7 +342,10 @@ export type BackgroundCheckEntitySearch = {
 
 export type BackgroundCheckEntitySearchCompany = BackgroundCheckEntitySearchSchema & {
   id: Scalars["String"]["output"];
-  isFalsePositive: Maybe<Scalars["Boolean"]["output"]>;
+  /** Whether this item is saved as a false positive */
+  isFalsePositive: Scalars["Boolean"]["output"];
+  /** Whether this item is saved as a match */
+  isMatch: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntitySearchCompanyProperties;
   score: Maybe<Scalars["Float"]["output"]>;
@@ -341,7 +360,10 @@ export type BackgroundCheckEntitySearchCompanyProperties = {
 
 export type BackgroundCheckEntitySearchPerson = BackgroundCheckEntitySearchSchema & {
   id: Scalars["String"]["output"];
-  isFalsePositive: Maybe<Scalars["Boolean"]["output"]>;
+  /** Whether this item is saved as a false positive */
+  isFalsePositive: Scalars["Boolean"]["output"];
+  /** Whether this item is saved as a match */
+  isMatch: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntitySearchPersonProperties;
   score: Maybe<Scalars["Float"]["output"]>;
@@ -358,7 +380,10 @@ export type BackgroundCheckEntitySearchPersonProperties = {
 
 export type BackgroundCheckEntitySearchSchema = {
   id: Scalars["String"]["output"];
-  isFalsePositive: Maybe<Scalars["Boolean"]["output"]>;
+  /** Whether this item is saved as a false positive */
+  isFalsePositive: Scalars["Boolean"]["output"];
+  /** Whether this item is saved as a match */
+  isMatch: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
   score: Maybe<Scalars["Float"]["output"]>;
   type: Scalars["String"]["output"];

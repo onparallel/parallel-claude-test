@@ -35,7 +35,6 @@ import { FORMATS } from "@parallel/utils/dates";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
-import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { isAfter } from "date-fns";
 import Head from "next/head";
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -113,16 +112,6 @@ function AdverseMediaSearch({
   }, [articles]);
 
   const [activeTab, setActiveTab] = useState(defaultTabIndex ?? 0);
-
-  useWindowEvent(
-    "message",
-    async (e) => {
-      if (e.data.event === "info-updated") {
-        await refetch();
-      }
-    },
-    [],
-  );
 
   const form = useForm<AdverseMediaSearchData>({
     defaultValues: {

@@ -55,11 +55,10 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { useLoadOpenSanctionsCountryNames } from "@parallel/utils/useLoadOpenSanctionsCountryNames";
-import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { createHash } from "crypto";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, pick } from "remeda";
 type BackgroundCheckFieldSearchResults_Selection =
@@ -71,7 +70,7 @@ type BackgroundCheckFieldSearchResults_Selection =
     } & BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_BackgroundCheckEntitySearchCompany_Fragment);
 
 interface BackgroundCheckFieldSearchResultsTableContext {
-  savedEntityIds: string[];
+  savedEntityId: string | null;
   onDeleteEntity: (entityId: string) => void;
   onSaveEntity: (entityId: string) => void;
   isDeletingEntity: Record<string, boolean>;
@@ -97,7 +96,6 @@ function BackgroundCheckFieldSearchResults({
   const { query } = router;
   const intl = useIntl();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
-  const [savedEntityIds, setSavedEntityIds] = useState<string[]>([]);
   const [isDeletingEntity, setIsDeletingEntity] = useState<Record<string, boolean>>({});
   const [isSavingEntity, setIsSavingEntity] = useState<Record<string, boolean>>({});
   const isReadOnly = query.readonly === "true";
@@ -134,30 +132,7 @@ function BackgroundCheckFieldSearchResults({
 
   const result = data?.backgroundCheckEntitySearch;
 
-  const [hasStoredValue, setHasStoredValue] = useState(result?.hasStoredValue ?? false);
-  useEffect(() => {
-    setHasStoredValue(result?.hasStoredValue ?? false);
-  }, [result?.hasStoredValue]);
-
-  useEffect(() => {
-    window.opener?.postMessage(
-      {
-        event: "update-info",
-        token,
-      },
-      window.origin,
-    );
-  }, []);
-
-  useWindowEvent(
-    "message",
-    (e) => {
-      if (e.data.event === "info-updated") {
-        setSavedEntityIds(e.data.entityIds);
-      }
-    },
-    [],
-  );
+  const savedEntityId = result?.items.find((i) => i.isMatch)?.id ?? null;
 
   const showGenericErrorToast = useGenericErrorToast();
   if (isNonNullish(error)) {
@@ -176,7 +151,7 @@ function BackgroundCheckFieldSearchResults({
       setIsSavingEntity((curr) => ({ ...curr, [entityId]: true }));
 
       try {
-        if (savedEntityIds.length) {
+        if (savedEntityId) {
           await showPetitionFieldBackgroundCheckReplaceReplyDialog();
         }
         await updateBackgroundCheckEntity({
@@ -185,15 +160,14 @@ function BackgroundCheckFieldSearchResults({
             entityId,
           },
         });
-        setSavedEntityIds([entityId]);
-        setHasStoredValue(true);
+        await refetch({ force: false });
         window.opener?.postMessage("refresh");
       } catch {
       } finally {
         setIsSavingEntity(({ [entityId]: _, ...curr }) => curr);
       }
     },
-    [token, name, date, savedEntityIds.length],
+    [token, name, date, savedEntityId, refetch],
   );
 
   const handleDelete = useCallback(
@@ -207,14 +181,14 @@ function BackgroundCheckFieldSearchResults({
             entityId: null,
           },
         });
-        setSavedEntityIds([]);
+        await refetch({ force: false });
         window.opener?.postMessage("refresh");
       } catch {
       } finally {
         setIsDeletingEntity(({ [entityId]: _, ...curr }) => curr);
       }
     },
-    [token],
+    [token, refetch],
   );
 
   const columns = useBackgroundCheckDataColumns({ type });
@@ -244,7 +218,7 @@ function BackgroundCheckFieldSearchResults({
   const handleResetClick = async () => {
     try {
       const tokenData = JSON.parse(atob(token));
-      if (hasStoredValue && "profileId" in tokenData) {
+      if (result?.hasStoredValue && "profileId" in tokenData) {
         await showConfirmModifySearchDialog({ hasMonitoring: true });
         await updateProfileFieldValue({
           variables: {
@@ -292,20 +266,19 @@ function BackgroundCheckFieldSearchResults({
       await refetch({ force: false });
       window.opener?.postMessage("refresh");
     },
-    [token, savedEntityIds.length],
+    [token, refetch],
   );
 
   const handleFalsePositivesButtonClick = async () => {
     try {
       await showPreviewPetitionFieldBackgroundCheckFalsePositivesDialog();
       await handleSetFalsePositives(result?.items.map((i) => i.id) ?? [], true);
-      setHasStoredValue(true);
     } catch {}
   };
 
   const context = useMemo(
     () => ({
-      savedEntityIds,
+      savedEntityId,
       isDeletingEntity,
       isSavingEntity,
       onDeleteEntity: handleDelete,
@@ -313,7 +286,7 @@ function BackgroundCheckFieldSearchResults({
       isReadOnly: isTemplate || isReadOnly,
       onFalsePositiveClick: handleSetFalsePositives,
     }),
-    [savedEntityIds, isDeletingEntity, isSavingEntity],
+    [savedEntityId, isDeletingEntity, isSavingEntity],
   );
 
   const { page, items } = state;
@@ -327,10 +300,6 @@ function BackgroundCheckFieldSearchResults({
   }, [result, page, items]);
 
   const isProfile = "profileId" in JSON.parse(atob(token));
-  const [isDraft, setIsDraft] = useState(result?.isDraft ?? false);
-  useEffect(() => {
-    setIsDraft(result?.isDraft ?? false);
-  }, [result]);
 
   const [saveProfileFieldValueDraft] = useMutation(
     BackgroundCheckFieldSearchResults_saveProfileFieldValueDraftDocument,
@@ -348,8 +317,7 @@ function BackgroundCheckFieldSearchResults({
           profileTypeFieldId: data.profileTypeFieldId,
         },
       });
-      setIsDraft(false);
-      setHasStoredValue(true);
+      await refetch({ force: false });
       window.opener?.postMessage("refresh");
     } catch {}
   };
@@ -491,7 +459,7 @@ function BackgroundCheckFieldSearchResults({
                     defaultMessage="Modify search"
                   />
                 </Button>
-                {isProfile && isDraft && totalCount === 0 ? (
+                {isProfile && result?.isDraft && totalCount === 0 ? (
                   <ResponsiveButtonIcon
                     colorScheme="purple"
                     icon={<SaveIcon boxSize={5} />}
@@ -512,7 +480,7 @@ function BackgroundCheckFieldSearchResults({
                     isDisabled={
                       query.readonly === "true" ||
                       totalCount === 0 ||
-                      savedEntityIds.length > 0 ||
+                      isNonNullish(savedEntityId) ||
                       result?.items.every((i) => i.isFalsePositive)
                     }
                   >
@@ -542,7 +510,7 @@ function BackgroundCheckFieldSearchResults({
                     />
                   </Text>
                   <Text>
-                    {isProfile && isDraft ? (
+                    {isProfile && result.isDraft ? (
                       <FormattedMessage
                         id="component.background-check-search-result.manual-save-search-profile-text"
                         defaultMessage="<b>Save the search to the profile</b> to preserve the evidence for a future audit."
@@ -771,7 +739,6 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
         key: "actions",
         label: "",
         CellContent: ({ row, context }) => {
-          const rowEntityIsSaved = context.savedEntityIds.includes(row.id);
           const handleSaveClick = async () => {
             context.onSaveEntity(row.id);
           };
@@ -780,7 +747,7 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
           };
           return (
             <Flex justifyContent="end">
-              {rowEntityIsSaved ? (
+              {row.id === context.savedEntityId ? (
                 <HStack>
                   <CheckIcon color="green.500" />
                   <Text fontWeight={500}>
@@ -822,7 +789,7 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                     isDisabled={
                       context.isSavingEntity[row.id] ||
                       context.isReadOnly ||
-                      context.savedEntityIds.length > 0
+                      isNonNullish(context.savedEntityId)
                     }
                     variant="outline"
                     onClick={(e) => {
@@ -856,7 +823,7 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                     size="sm"
                     fontSize="md"
                     leftIcon={<UserXIcon />}
-                    isDisabled={context.isReadOnly || context.savedEntityIds.length > 0}
+                    isDisabled={context.isReadOnly || isNonNullish(context.savedEntityId)}
                     onClick={(e) => {
                       e.stopPropagation();
                       context.onFalsePositiveClick([row.id], true);
@@ -886,6 +853,7 @@ const _fragments = {
       name
       score
       isFalsePositive
+      isMatch
       ... on BackgroundCheckEntitySearchPerson {
         properties {
           countryOfBirth

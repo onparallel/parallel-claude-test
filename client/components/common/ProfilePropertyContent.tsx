@@ -35,7 +35,7 @@ export interface ProfilePropertyContentProps {
   profileId?: string;
   field: ProfilePropertyContent_ProfileTypeFieldFragment;
   files?: ProfilePropertyContent_ProfileFieldFileFragment[] | null;
-  value?: Partial<ProfilePropertyContent_ProfileFieldValueFragment> | null;
+  value?: ProfilePropertyContent_ProfileFieldValueFragment | null;
   singleLine?: boolean;
 }
 
@@ -61,7 +61,6 @@ export const ProfilePropertyContent = Object.assign(
       ProfileFieldValue: gql`
         fragment ProfilePropertyContent_ProfileFieldValue on ProfileFieldValue {
           content
-          hasPendingReview
         }
       `,
       // make id optional so "fake" values can be passed
@@ -357,7 +356,6 @@ const ProfileFieldBackgroundCheckValue = chakraForwardRef<"div", ProfileProperty
             ...(type ? { type } : {}),
             ...(country ? { country } : {}),
             ...(birthCountry ? { birthCountry } : {}),
-            ...(value?.hasPendingReview ? { pendingReview: "true" } : {}),
           },
         )}`;
         await openNewWindow(url);

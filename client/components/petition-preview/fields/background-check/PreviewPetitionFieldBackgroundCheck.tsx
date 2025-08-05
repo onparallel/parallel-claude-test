@@ -27,11 +27,10 @@ import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { useManagedWindow } from "@parallel/utils/hooks/useManagedWindow";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
-import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, isNullish, zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
 import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
@@ -68,7 +67,7 @@ export function PreviewPetitionFieldBackgroundCheck({
 }: PreviewPetitionFieldBackgroundCheckProps) {
   const intl = useIntl();
 
-  const { state, setState, browserTabRef, openWindow, closeWindow } = useManagedWindow({
+  const { state, setState, openWindow, closeWindow } = useManagedWindow({
     onRefreshField,
   });
 
@@ -112,33 +111,6 @@ export function PreviewPetitionFieldBackgroundCheck({
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
     },
     [onDeleteReply],
-  );
-
-  useWindowEvent(
-    "message",
-    async (e) => {
-      const browserTab = browserTabRef.current;
-      if (isNullish(browserTab) || e.source !== browserTab) {
-        return;
-      }
-      if (e.data === "refresh") {
-        onRefreshField();
-      } else if (e.data.event === "update-info") {
-        const token = e.data.token;
-        if (token !== tokenBase64) {
-          return;
-        }
-
-        browserTab.postMessage(
-          {
-            event: "info-updated",
-            entityIds: field.replies.map((r) => r?.content?.entity?.id).filter(isNonNullish),
-          },
-          browserTab.origin,
-        );
-      }
-    },
-    [onRefreshField, tokenBase64, field.replies.map((r) => r?.content?.entity?.id).join(",")],
   );
 
   const handleViewReply = useCallback(

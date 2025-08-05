@@ -942,7 +942,10 @@ export interface NexusGenObjects {
     // root type
     createdAt?: NexusGenScalars["DateTime"] | null; // DateTime
     datasets?: NexusGenRootTypes["BackgroundCheckEntityDetailsDataset"][] | null; // [BackgroundCheckEntityDetailsDataset!]
+    hasPendingReview?: boolean | null; // Boolean
+    hasStoredEntity?: boolean | null; // Boolean
     id: string; // String!
+    isStoredEntity?: boolean | null; // Boolean
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntityDetailsCompanyProperties"]; // BackgroundCheckEntityDetailsCompanyProperties!
     type: string; // String!
@@ -970,7 +973,10 @@ export interface NexusGenObjects {
     // root type
     createdAt?: NexusGenScalars["DateTime"] | null; // DateTime
     datasets?: NexusGenRootTypes["BackgroundCheckEntityDetailsDataset"][] | null; // [BackgroundCheckEntityDetailsDataset!]
+    hasPendingReview?: boolean | null; // Boolean
+    hasStoredEntity?: boolean | null; // Boolean
     id: string; // String!
+    isStoredEntity?: boolean | null; // Boolean
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntityDetailsPersonProperties"]; // BackgroundCheckEntityDetailsPersonProperties!
     type: string; // String!
@@ -1039,7 +1045,8 @@ export interface NexusGenObjects {
   BackgroundCheckEntitySearchCompany: {
     // root type
     id: string; // String!
-    isFalsePositive?: boolean | null; // Boolean
+    isFalsePositive: boolean; // Boolean!
+    isMatch: boolean; // Boolean!
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntitySearchCompanyProperties"]; // BackgroundCheckEntitySearchCompanyProperties!
     score?: number | null; // Float
@@ -1054,7 +1061,8 @@ export interface NexusGenObjects {
   BackgroundCheckEntitySearchPerson: {
     // root type
     id: string; // String!
-    isFalsePositive?: boolean | null; // Boolean
+    isFalsePositive: boolean; // Boolean!
+    isMatch: boolean; // Boolean!
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntitySearchPersonProperties"]; // BackgroundCheckEntitySearchPersonProperties!
     score?: number | null; // Float
@@ -2123,7 +2131,10 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"] | null; // DateTime
     datasets: NexusGenRootTypes["BackgroundCheckEntityDetailsDataset"][] | null; // [BackgroundCheckEntityDetailsDataset!]
+    hasPendingReview: boolean | null; // Boolean
+    hasStoredEntity: boolean | null; // Boolean
     id: string; // String!
+    isStoredEntity: boolean | null; // Boolean
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntityDetailsCompanyProperties"]; // BackgroundCheckEntityDetailsCompanyProperties!
     type: string; // String!
@@ -2151,7 +2162,10 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"] | null; // DateTime
     datasets: NexusGenRootTypes["BackgroundCheckEntityDetailsDataset"][] | null; // [BackgroundCheckEntityDetailsDataset!]
+    hasPendingReview: boolean | null; // Boolean
+    hasStoredEntity: boolean | null; // Boolean
     id: string; // String!
+    isStoredEntity: boolean | null; // Boolean
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntityDetailsPersonProperties"]; // BackgroundCheckEntityDetailsPersonProperties!
     type: string; // String!
@@ -2220,7 +2234,8 @@ export interface NexusGenFieldTypes {
   BackgroundCheckEntitySearchCompany: {
     // field return type
     id: string; // String!
-    isFalsePositive: boolean | null; // Boolean
+    isFalsePositive: boolean; // Boolean!
+    isMatch: boolean; // Boolean!
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntitySearchCompanyProperties"]; // BackgroundCheckEntitySearchCompanyProperties!
     score: number | null; // Float
@@ -2235,7 +2250,8 @@ export interface NexusGenFieldTypes {
   BackgroundCheckEntitySearchPerson: {
     // field return type
     id: string; // String!
-    isFalsePositive: boolean | null; // Boolean
+    isFalsePositive: boolean; // Boolean!
+    isMatch: boolean; // Boolean!
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntitySearchPersonProperties"]; // BackgroundCheckEntitySearchPersonProperties!
     score: number | null; // Float
@@ -5016,14 +5032,18 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"] | null; // DateTime
     datasets: NexusGenRootTypes["BackgroundCheckEntityDetailsDataset"][] | null; // [BackgroundCheckEntityDetailsDataset!]
+    hasPendingReview: boolean | null; // Boolean
+    hasStoredEntity: boolean | null; // Boolean
     id: string; // String!
+    isStoredEntity: boolean | null; // Boolean
     name: string; // String!
     type: string; // String!
   };
   BackgroundCheckEntitySearchSchema: {
     // field return type
     id: string; // String!
-    isFalsePositive: boolean | null; // Boolean
+    isFalsePositive: boolean; // Boolean!
+    isMatch: boolean; // Boolean!
     name: string; // String!
     score: number | null; // Float
     type: string; // String!
@@ -5329,7 +5349,10 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     datasets: "BackgroundCheckEntityDetailsDataset";
+    hasPendingReview: "Boolean";
+    hasStoredEntity: "Boolean";
     id: "String";
+    isStoredEntity: "Boolean";
     name: "String";
     properties: "BackgroundCheckEntityDetailsCompanyProperties";
     type: "String";
@@ -5357,7 +5380,10 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     datasets: "BackgroundCheckEntityDetailsDataset";
+    hasPendingReview: "Boolean";
+    hasStoredEntity: "Boolean";
     id: "String";
+    isStoredEntity: "Boolean";
     name: "String";
     properties: "BackgroundCheckEntityDetailsPersonProperties";
     type: "String";
@@ -5427,6 +5453,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     id: "String";
     isFalsePositive: "Boolean";
+    isMatch: "Boolean";
     name: "String";
     properties: "BackgroundCheckEntitySearchCompanyProperties";
     score: "Float";
@@ -5442,6 +5469,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     id: "String";
     isFalsePositive: "Boolean";
+    isMatch: "Boolean";
     name: "String";
     properties: "BackgroundCheckEntitySearchPersonProperties";
     score: "Float";
@@ -8220,7 +8248,10 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     datasets: "BackgroundCheckEntityDetailsDataset";
+    hasPendingReview: "Boolean";
+    hasStoredEntity: "Boolean";
     id: "String";
+    isStoredEntity: "Boolean";
     name: "String";
     type: "String";
   };
@@ -8228,6 +8259,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     id: "String";
     isFalsePositive: "Boolean";
+    isMatch: "Boolean";
     name: "String";
     score: "Float";
     type: "String";

@@ -1,11 +1,7 @@
 import { booleanArg, nonNull, nullable, queryField, stringArg } from "nexus";
 import { isNonNullish, isNullish } from "remeda";
 import { ProfileFieldValue } from "../../db/__types";
-import {
-  BackgroundCheckContent,
-  EntityDetailsResponse,
-  EntitySearchRequest,
-} from "../../services/BackgroundCheckService";
+import { BackgroundCheckContent, EntitySearchRequest } from "../../services/BackgroundCheckService";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../helpers/errors";
 import { dateArg } from "../helpers/scalars/DateTime";
@@ -351,11 +347,7 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
   args: {
     token: nonNull(stringArg()),
     entityId: nonNull(stringArg()),
-    force: nullable(
-      booleanArg({
-        description: "Force an entity refresh",
-      }),
-    ),
+    force: nullable(booleanArg({ description: "Force an entity refresh" })),
   },
   resolve: async (_, args, ctx) => {
     async function petitionParamsResolver(params: NumericParams<PetitionReplyParams>) {
@@ -372,12 +364,18 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
         reply.content.entity.id !== args.entityId
       ) {
         // this entity is not saved as match, fetch details without saving
-        return await ctx.backgroundCheck.entityProfileDetails(args.entityId, ctx.user!.id);
+        return ctx.backgroundCheck.mapBackgroundCheckEntity(
+          await ctx.backgroundCheck.entityProfileDetails(args.entityId, ctx.user!.id),
+          reply?.content?.entity?.id ?? null,
+        );
       }
 
       if (!args.force) {
         // i found a reply and it matches the entity, return it
-        return reply.content.entity as EntityDetailsResponse;
+        return ctx.backgroundCheck.mapBackgroundCheckEntity(
+          reply.content.entity,
+          reply.content.entity.id,
+        );
       }
 
       // from this point on, we are forcing details refresh (reply is stored and entity is the same as the one we are looking for)
@@ -395,20 +393,22 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
         { skipCache: true },
       );
 
-      const content = reply.content as BackgroundCheckContent;
-      const newContent = {
-        ...content,
-        entity: newDetails,
-      } as BackgroundCheckContent;
-
       await ctx.petitions.updatePetitionFieldRepliesContent(
         params.petitionId,
-        [{ id: reply.id, content: newContent }],
+        [
+          {
+            id: reply.id,
+            content: {
+              ...reply.content,
+              entity: newDetails,
+            } as BackgroundCheckContent,
+          },
+        ],
         "User",
         ctx.user!.id,
       );
 
-      return newDetails;
+      return ctx.backgroundCheck.mapBackgroundCheckEntity(newDetails, newDetails.id);
     }
 
     async function profileParamsResolver(params: NumericParams<ProfileReplyParams>) {
@@ -421,11 +421,23 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
         currentValue.content.entity.id !== args.entityId
       ) {
         // this entity is not saved as match, fetch details without saving
-        return await ctx.backgroundCheck.entityProfileDetails(args.entityId, ctx.user!.id);
+        return {
+          ...ctx.backgroundCheck.mapBackgroundCheckEntity(
+            await ctx.backgroundCheck.entityProfileDetails(args.entityId, ctx.user!.id),
+            currentValue?.content?.entity?.id ?? null,
+          ),
+          hasPendingReview: currentValue?.pending_review ?? false,
+        };
       }
 
       if (!args.force) {
-        return currentValue.content.entity as EntityDetailsResponse;
+        return {
+          ...ctx.backgroundCheck.mapBackgroundCheckEntity(
+            currentValue.content.entity,
+            currentValue.content.entity.id,
+          ),
+          hasPendingReview: currentValue.pending_review,
+        };
       }
 
       // from this point on, we are forcing details refresh (reply is stored and entity is the same as the one we are looking for)
@@ -441,12 +453,6 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
         { skipCache: true },
       );
 
-      const content = currentValue.content as BackgroundCheckContent;
-      const newContent = {
-        ...content,
-        entity: newDetails,
-      } as BackgroundCheckContent;
-
       // update the value and trigger events even if nothing has changed
       await ctx.profiles.updateProfileFieldValues(
         [
@@ -454,14 +460,20 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
             profileId: params.profileId,
             profileTypeFieldId: params.profileTypeFieldId,
             type: "BACKGROUND_CHECK",
-            content: newContent,
+            content: {
+              ...currentValue.content,
+              entity: newDetails,
+            } as BackgroundCheckContent,
           },
         ],
         ctx.user!.id,
         ctx.user!.org_id,
       );
 
-      return newDetails;
+      return {
+        ...ctx.backgroundCheck.mapBackgroundCheckEntity(newDetails, newDetails.id),
+        hasPendingReview: false,
+      };
     }
 
     try {

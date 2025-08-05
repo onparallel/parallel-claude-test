@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { isNullish } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { Readable } from "stream";
 import { assert } from "ts-essentials";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
@@ -22,7 +22,7 @@ export interface EntitySearchRequest {
   birthCountry?: string | null;
   type: "PERSON" | "COMPANY" | null;
 }
-export interface EntitySearchPerson<IncludeFalsePositives extends boolean = false> {
+export type EntitySearchPerson<ExtendedInfo extends boolean = false> = {
   id: string;
   type: "Person";
   name: string;
@@ -34,10 +34,9 @@ export interface EntitySearchPerson<IncludeFalsePositives extends boolean = fals
     country?: string[];
     topics?: string[];
   };
-  isFalsePositive?: IncludeFalsePositives extends true ? boolean : never;
-}
+} & (ExtendedInfo extends true ? { isFalsePositive: boolean; isMatch: boolean } : {});
 
-export interface EntitySearchCompany<IncludeFalsePositives extends boolean = false> {
+export type EntitySearchCompany<ExtendedInfo extends boolean = false> = {
   id: string;
   type: "Company";
   name: string;
@@ -47,12 +46,11 @@ export interface EntitySearchCompany<IncludeFalsePositives extends boolean = fal
     jurisdiction?: string[];
     topics?: string[];
   };
-  isFalsePositive?: IncludeFalsePositives extends true ? boolean : never;
-}
+} & (ExtendedInfo extends true ? { isFalsePositive: boolean; isMatch: boolean } : {});
 
-export interface EntitySearchResponse<IncludeFalsePositives extends boolean = false> {
+export interface EntitySearchResponse<ExtendedInfo extends boolean = false> {
   totalCount: number;
-  items: (EntitySearchPerson<IncludeFalsePositives> | EntitySearchCompany<IncludeFalsePositives>)[];
+  items: (EntitySearchPerson<ExtendedInfo> | EntitySearchCompany<ExtendedInfo>)[];
   createdAt: Date;
 }
 
@@ -135,9 +133,12 @@ export interface EntityDetailsCompany {
   datasets?: DatasetDetails[];
 }
 
-export type EntityDetailsResponse = (EntityDetailsPerson | EntityDetailsCompany) & {
+export type EntityDetailsResponse<ExtendedInfo extends boolean = false> = (
+  | EntityDetailsPerson
+  | EntityDetailsCompany
+) & {
   createdAt: Date;
-};
+} & (ExtendedInfo extends true ? { hasStoredEntity: boolean; isStoredEntity: boolean } : {});
 
 interface EntityDetailsPdfResponse {
   mime_type: string;
@@ -164,6 +165,10 @@ export interface IBackgroundCheckService {
     props: Omit<BackgroundCheckProfileProps, "assetsUrl">,
   ): Promise<EntityDetailsPdfResponse>;
   mapBackgroundCheckSearch(content: BackgroundCheckContent): EntitySearchResponse<true>;
+  mapBackgroundCheckEntity(
+    entity: EntityDetailsResponse,
+    storedEntityId: string | null,
+  ): EntityDetailsResponse<true>;
 }
 
 export const BACKGROUND_CHECK_SERVICE = Symbol.for("BACKGROUND_CHECK_SERVICE");
@@ -235,7 +240,16 @@ export class BackgroundCheckService implements IBackgroundCheckService {
       items: content.search.items.map((item) => ({
         ...item,
         isFalsePositive: falsePositiveIds.includes(item.id),
+        isMatch: item.id === content.entity?.id,
       })),
+    };
+  }
+
+  public mapBackgroundCheckEntity(entity: EntityDetailsResponse, storedEntityId: string | null) {
+    return {
+      ...entity,
+      hasStoredEntity: isNonNullish(storedEntityId),
+      isStoredEntity: storedEntityId === entity.id,
     };
   }
 }

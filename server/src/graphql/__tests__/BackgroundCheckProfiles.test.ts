@@ -1825,6 +1825,8 @@ describe("Background Check - Profiles", () => {
               id
               type
               name
+              hasStoredEntity
+              isStoredEntity
             }
           }
         `,
@@ -1839,6 +1841,8 @@ describe("Background Check - Profiles", () => {
         id: "Q7747",
         type: "Person",
         name: "Vladimir Vladimirovich PUTIN",
+        hasStoredEntity: false,
+        isStoredEntity: false,
       });
 
       expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith("Q7747", user.id);
@@ -1875,6 +1879,7 @@ describe("Background Check - Profiles", () => {
           },
           type: "BACKGROUND_CHECK",
           created_by_user_id: user.id,
+          pending_review: true,
         },
       ]);
 
@@ -1885,6 +1890,9 @@ describe("Background Check - Profiles", () => {
               id
               type
               name
+              hasPendingReview
+              hasStoredEntity
+              isStoredEntity
             }
           }
         `,
@@ -1899,6 +1907,9 @@ describe("Background Check - Profiles", () => {
         id: "Q7747",
         type: "Person",
         name: "Vladimir Vladimirovich PUTIN",
+        hasPendingReview: true,
+        hasStoredEntity: true,
+        isStoredEntity: true,
       });
 
       expect(backgroundCheckServiceSpy).not.toHaveBeenCalled();
@@ -1945,23 +1956,30 @@ describe("Background Check - Profiles", () => {
               id
               type
               name
+              hasStoredEntity
+              isStoredEntity
             }
           }
         `,
         {
           token: buildToken({ profileId: profile.id, profileTypeFieldId: profileTypeField.id }),
-          entityId: "Q7747",
+          entityId: "rupep-company-718",
         },
       );
 
       expect(errors).toBeUndefined();
       expect(data?.backgroundCheckEntityDetails).toEqual({
-        id: "Q7747",
-        type: "Person",
-        name: "Vladimir Vladimirovich PUTIN",
+        id: "rupep-company-718",
+        type: "Company",
+        name: "Putin Consulting LLC",
+        hasStoredEntity: true,
+        isStoredEntity: false,
       });
 
-      expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith("Q7747", user.id);
+      expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
+        "rupep-company-718",
+        user.id,
+      );
     });
 
     it("trigger events even if forcing a refresh and entity details are the same", async () => {

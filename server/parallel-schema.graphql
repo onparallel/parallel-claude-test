@@ -236,7 +236,18 @@ enum AutomaticNumberingType {
 interface BackgroundCheckEntityDetails {
   createdAt: DateTime
   datasets: [BackgroundCheckEntityDetailsDataset!]
+  hasPendingReview: Boolean
+
+  """
+  Whether if user is fetching entity details with an already stored entity
+  """
+  hasStoredEntity: Boolean
   id: String!
+
+  """
+  Whether this entity is the one stored in the reply
+  """
+  isStoredEntity: Boolean
   name: String!
   type: String!
 }
@@ -244,7 +255,18 @@ interface BackgroundCheckEntityDetails {
 type BackgroundCheckEntityDetailsCompany implements BackgroundCheckEntityDetails {
   createdAt: DateTime
   datasets: [BackgroundCheckEntityDetailsDataset!]
+  hasPendingReview: Boolean
+
+  """
+  Whether if user is fetching entity details with an already stored entity
+  """
+  hasStoredEntity: Boolean
   id: String!
+
+  """
+  Whether this entity is the one stored in the reply
+  """
+  isStoredEntity: Boolean
   name: String!
   properties: BackgroundCheckEntityDetailsCompanyProperties!
   type: String!
@@ -272,7 +294,18 @@ type BackgroundCheckEntityDetailsDataset {
 type BackgroundCheckEntityDetailsPerson implements BackgroundCheckEntityDetails {
   createdAt: DateTime
   datasets: [BackgroundCheckEntityDetailsDataset!]
+  hasPendingReview: Boolean
+
+  """
+  Whether if user is fetching entity details with an already stored entity
+  """
+  hasStoredEntity: Boolean
   id: String!
+
+  """
+  Whether this entity is the one stored in the reply
+  """
+  isStoredEntity: Boolean
   name: String!
   properties: BackgroundCheckEntityDetailsPersonProperties!
   type: String!
@@ -333,6 +366,10 @@ type BackgroundCheckEntityDetailsSanctionProperties {
 
 type BackgroundCheckEntitySearch {
   createdAt: DateTime!
+
+  """
+  If this result is a draft, this will be true if it also has a stored value
+  """
   hasStoredValue: Boolean
   isDraft: Boolean
   items: [BackgroundCheckEntitySearchSchema!]!
@@ -341,7 +378,16 @@ type BackgroundCheckEntitySearch {
 
 type BackgroundCheckEntitySearchCompany implements BackgroundCheckEntitySearchSchema {
   id: String!
-  isFalsePositive: Boolean
+
+  """
+  Whether this item is saved as a false positive
+  """
+  isFalsePositive: Boolean!
+
+  """
+  Whether this item is saved as a match
+  """
+  isMatch: Boolean!
   name: String!
   properties: BackgroundCheckEntitySearchCompanyProperties!
   score: Float
@@ -356,7 +402,16 @@ type BackgroundCheckEntitySearchCompanyProperties {
 
 type BackgroundCheckEntitySearchPerson implements BackgroundCheckEntitySearchSchema {
   id: String!
-  isFalsePositive: Boolean
+
+  """
+  Whether this item is saved as a false positive
+  """
+  isFalsePositive: Boolean!
+
+  """
+  Whether this item is saved as a match
+  """
+  isMatch: Boolean!
   name: String!
   properties: BackgroundCheckEntitySearchPersonProperties!
   score: Float
@@ -373,7 +428,16 @@ type BackgroundCheckEntitySearchPersonProperties {
 
 interface BackgroundCheckEntitySearchSchema {
   id: String!
-  isFalsePositive: Boolean
+
+  """
+  Whether this item is saved as a false positive
+  """
+  isFalsePositive: Boolean!
+
+  """
+  Whether this item is saved as a match
+  """
+  isMatch: Boolean!
   name: String!
   score: Float
   type: String!

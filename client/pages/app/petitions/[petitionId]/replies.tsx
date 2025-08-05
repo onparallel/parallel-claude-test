@@ -80,7 +80,6 @@ import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFil
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
-import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -209,40 +208,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const { openWindow } = useManagedWindow({
     onRefreshField: refetch,
   });
-
-  // Handle communication with opened windows for background checks and adverse media
-  useWindowEvent(
-    "message",
-    async (e: MessageEvent) => {
-      if (e.data.event === "update-info") {
-        const token = e.data.token;
-
-        // Parse token to get field and petition info
-        try {
-          const tokenData = JSON.parse(atob(token));
-          if (tokenData.petitionId === petition.id) {
-            // Find the reply
-            const field = allFields.find((field) => field.id === tokenData.fieldId);
-
-            const reply = field?.replies.find((r) => r.parent?.id === tokenData.parentReplyId);
-
-            if (reply && e.source) {
-              (e.source as Window).postMessage(
-                {
-                  event: "info-updated",
-                  entityIds: [reply?.content?.entity?.id].filter(isNonNullish),
-                },
-                (e.source as Window).origin,
-              );
-            }
-          }
-        } catch {
-          // Invalid token, ignore
-        }
-      }
-    },
-    [petition.id, allFields],
-  );
 
   const handleAction: PetitionRepliesFieldProps["onAction"] = async function (action, reply) {
     const petitionStatus = petition.__typename === "Petition" && petition.status;

@@ -41,11 +41,10 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useInterval } from "@parallel/utils/useInterval";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
-import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { createHash } from "crypto";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, pick } from "remeda";
 
@@ -57,15 +56,12 @@ function BackgroundCheckProfileDetails({
   type,
   country,
   birthCountry,
-  pendingReview,
 }: UnwrapPromise<ReturnType<typeof BackgroundCheckProfileDetails.getInitialProps>>) {
   const intl = useIntl();
   const router = useRouter();
   const { query } = router;
-  const [savedEntityIds, setSavedEntityIds] = useState<string[]>([]);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isDeletingReply, setIsDeletingReply] = useState(false);
-  const isSaved = savedEntityIds.includes(entityId);
   const isReadOnly = query.readonly === "true";
   const isTemplate = query.template === "true";
 
@@ -99,8 +95,9 @@ function BackgroundCheckProfileDetails({
     showGenericErrorToast();
   }
 
-  const details =
-    data?.backgroundCheckEntityDetails as BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragment;
+  const details = data?.backgroundCheckEntityDetails as
+    | BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragment
+    | undefined;
 
   useInterval(
     () => {
@@ -110,26 +107,6 @@ function BackgroundCheckProfileDetails({
     },
     1000,
     [],
-  );
-
-  useEffect(() => {
-    window.opener?.postMessage(
-      {
-        event: "update-info",
-        token,
-      },
-      window.origin,
-    );
-  }, [entityId]);
-
-  useWindowEvent(
-    "message",
-    (e) => {
-      if (e.data.event === "info-updated") {
-        setSavedEntityIds(e.data.entityIds);
-      }
-    },
-    [entityId],
   );
 
   const [updateBackgroundCheckEntity] = useMutation(
@@ -142,7 +119,7 @@ function BackgroundCheckProfileDetails({
   const handleSaveClick = async () => {
     setIsSavingProfile(true);
     try {
-      if (savedEntityIds.length && !isSaved) {
+      if (details?.hasStoredEntity && !details?.isStoredEntity) {
         await showPetitionFieldBackgroundCheckReplaceReplyDialog();
       }
       await updateBackgroundCheckEntity({
@@ -151,8 +128,8 @@ function BackgroundCheckProfileDetails({
           entityId,
         },
       });
-      setSavedEntityIds((curr) => [...curr, entityId]);
       window.opener?.postMessage("refresh");
+      await refetch({ force: false });
     } catch {
     } finally {
       setIsSavingProfile(false);
@@ -168,8 +145,8 @@ function BackgroundCheckProfileDetails({
           entityId: null,
         },
       });
-      setSavedEntityIds((curr) => curr.filter((id) => id !== entityId));
       window.opener?.postMessage("refresh");
+      await refetch({ force: false });
     } catch {
     } finally {
       setIsDeletingReply(false);
@@ -201,7 +178,6 @@ function BackgroundCheckProfileDetails({
     } catch {}
   };
 
-  const [isPendingReview, setIsPendingReview] = useState(pendingReview);
   const [updateProfileFieldValueOptions] = useMutation(
     BackgroundCheckProfileDetails_updateProfileFieldValueOptionsDocument,
   );
@@ -222,8 +198,7 @@ function BackgroundCheckProfileDetails({
       });
 
       window.opener?.postMessage("refresh");
-
-      setIsPendingReview(false);
+      await refetch({ force: false });
     } catch {}
   };
 
@@ -317,7 +292,7 @@ function BackgroundCheckProfileDetails({
                 />
               </Text>
             )}
-            {isPendingReview ? (
+            {details?.hasPendingReview ? (
               <Button
                 colorScheme="primary"
                 leftIcon={<CheckIcon />}
@@ -328,7 +303,7 @@ function BackgroundCheckProfileDetails({
                   defaultMessage="Mark as reviewed"
                 />
               </Button>
-            ) : isSaved && !isReadOnly ? (
+            ) : details?.isStoredEntity && !isReadOnly ? (
               <IconButtonWithTooltip
                 variant="outline"
                 label={intl.formatMessage({
@@ -414,7 +389,7 @@ function BackgroundCheckProfileDetails({
             {details.__typename === "BackgroundCheckEntityDetailsCompany" ? (
               <>
                 <BackgroundCheckEntityDetailsCompanyBasic
-                  hasReply={isSaved}
+                  hasReply={details.isStoredEntity ?? false}
                   isReadOnly={isReadOnly || isTemplate}
                   isDeleting={isDeletingReply}
                   isSaving={isSavingProfile}
@@ -428,7 +403,7 @@ function BackgroundCheckProfileDetails({
             ) : details.__typename === "BackgroundCheckEntityDetailsPerson" ? (
               <>
                 <BackgroundCheckEntityDetailsPersonBasic
-                  hasReply={isSaved}
+                  hasReply={details.isStoredEntity ?? false}
                   isReadOnly={isReadOnly || isTemplate}
                   isDeleting={isDeletingReply}
                   isSaving={isSavingProfile}
@@ -527,6 +502,9 @@ const _fragments = {
           ...BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDataset
         }
         createdAt
+        hasStoredEntity
+        isStoredEntity
+        hasPendingReview
       }
       ${BackgroundCheckEntityDetailsDatasets.fragments.BackgroundCheckEntityDetailsDataset}
       ${this.BackgroundCheckEntityDetailsPerson}
@@ -585,9 +563,8 @@ BackgroundCheckProfileDetails.getInitialProps = async ({ query }: WithApolloData
   const type = query.type as BackgroundCheckEntitySearchType | null;
   const country = query.country as string | null;
   const birthCountry = query.birthCountry as string | null;
-  const pendingReview = query.pendingReview === "true";
 
-  return { entityId, token, name, date, type, country, birthCountry, pendingReview };
+  return { entityId, token, name, date, type, country, birthCountry };
 };
 
 export default compose(
