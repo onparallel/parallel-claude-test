@@ -68,7 +68,7 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
       // no reply is saved, create a new one if coming from a petition, return search if coming from a template
       if (isNullish(reply)) {
         const petition = (await ctx.petitions.loadPetition(params.petitionId))!;
-        const search = await ctx.backgroundCheck.entitySearch(query);
+        const search = await ctx.backgroundCheck.entitySearch(query, ctx.user!.org_id);
         const newContent = {
           query,
           search,
@@ -116,7 +116,7 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
           ctx.user!.id,
         );
 
-        const search = await ctx.backgroundCheck.entitySearch(query);
+        const search = await ctx.backgroundCheck.entitySearch(query, ctx.user!.org_id);
         const newContent = {
           query,
           search,
@@ -150,7 +150,7 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
       );
 
       const content = reply.content as BackgroundCheckContent;
-      const newSearch = await ctx.backgroundCheck.entitySearch(query);
+      const newSearch = await ctx.backgroundCheck.entitySearch(query, ctx.user!.org_id);
       const newContent = {
         ...content,
         search: newSearch,
@@ -180,7 +180,7 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
           ctx.user!.id,
         );
 
-        const search = await ctx.backgroundCheck.entitySearch(query);
+        const search = await ctx.backgroundCheck.entitySearch(query, ctx.user!.org_id);
         const newContent = {
           query,
           search,
@@ -215,7 +215,7 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
 
         const content = currentValue.content as BackgroundCheckContent;
 
-        const newSearch = await ctx.backgroundCheck.entitySearch(query);
+        const newSearch = await ctx.backgroundCheck.entitySearch(query, ctx.user!.org_id);
         const newContent = {
           ...content,
           search: newSearch,

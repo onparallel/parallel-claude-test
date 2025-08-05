@@ -127,10 +127,6 @@ export const servicesModule = new ContainerModule((options) => {
   options.bind<II18nService>(I18N_SERVICE).to(I18nService).inSingletonScope();
   options.bind<IEncryptionService>(ENCRYPTION_SERVICE).to(EncryptionService).inSingletonScope();
   options.bind<IJwtService>(JWT_SERVICE).to(JwtService).inSingletonScope();
-  options
-    .bind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE)
-    .to(BackgroundCheckService)
-    .inSingletonScope();
   options.bind<IAiAssistantService>(AI_ASSISTANT_SERVICE).to(AiAssistantService).inSingletonScope();
   options.bind<ICorsService>(CORS_SERVICE).to(CorsService).inSingletonScope();
   options
@@ -139,6 +135,7 @@ export const servicesModule = new ContainerModule((options) => {
     .inSingletonScope();
 
   // Request Scope
+  options.bind<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE).to(BackgroundCheckService);
   options
     .bind<IOrganizationCreditsService>(ORGANIZATION_CREDITS_SERVICE)
     .to(OrganizationCreditsService);

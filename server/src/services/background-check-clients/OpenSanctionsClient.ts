@@ -1,5 +1,6 @@
 import { inject, injectable } from "inversify";
 import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { CONFIG, Config } from "../../config";
 import {
   DatasetDetails,
@@ -9,6 +10,7 @@ import {
   EntityDetailsResponse,
   EntityDetailsSanction,
   EntitySearchCompany,
+  EntitySearchOptions,
   EntitySearchPerson,
   EntitySearchRequest,
   EntitySearchResponse,
@@ -218,7 +220,10 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
     throw new Error(`OpenSanctions API call failed: ${response.status} ${response.statusText}`);
   }
 
-  async entitySearch(query: EntitySearchRequest): Promise<EntitySearchResponse> {
+  async entitySearch(
+    query: EntitySearchRequest,
+    opts?: EntitySearchOptions,
+  ): Promise<EntitySearchResponse> {
     const queries: Record<string, any> = {};
     if (!query.type || query.type === "PERSON") {
       queries.person = {
@@ -244,9 +249,13 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
       };
     }
 
-    const data = await this.apiCall<OpenSanctionsMatchResponse>("POST", "match/default", {
-      queries,
-    });
+    let url = "match/default";
+    if (opts?.cutoff) {
+      assert(opts.cutoff >= 0 && opts.cutoff <= 1, "Invalid cutoff");
+      url += `?${new URLSearchParams({ cutoff: opts.cutoff.toString() })}`;
+    }
+
+    const data = await this.apiCall<OpenSanctionsMatchResponse>("POST", url, { queries });
 
     const items: EntitySearchResponse["items"] = [];
 

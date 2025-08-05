@@ -1730,6 +1730,8 @@ export interface Mutation {
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
   updateBackgroundCheckEntity: Success;
+  /** Updates the cutoff for the background check service */
+  updateBackgroundCheckOrganizationCutoff: SupportMethodResponse;
   updateBackgroundCheckSearchFalsePositives: Success;
   updateCompaniesHouseCustomProperties: SupportMethodResponse;
   /** Updates a contact. */
@@ -3148,6 +3150,11 @@ export interface MutationuntagPetitionArgs {
 export interface MutationupdateBackgroundCheckEntityArgs {
   entityId?: InputMaybe<Scalars["String"]["input"]>;
   token: Scalars["String"]["input"];
+}
+
+export interface MutationupdateBackgroundCheckOrganizationCutoffArgs {
+  cutoff: Scalars["String"]["input"];
+  orgId: Scalars["GID"]["input"];
 }
 
 export interface MutationupdateBackgroundCheckSearchFalsePositivesArgs {

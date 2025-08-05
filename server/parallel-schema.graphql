@@ -3262,6 +3262,17 @@ type Mutation {
   """
   untagPetition(petitionId: GID!, tagId: GID!): PetitionBase!
   updateBackgroundCheckEntity(entityId: String, token: String!): Success!
+
+  """
+  Updates the cutoff for the background check service
+  """
+  updateBackgroundCheckOrganizationCutoff(
+    """
+    Cutoff value between 0 and 1
+    """
+    cutoff: String!
+    orgId: GID!
+  ): SupportMethodResponse!
   updateBackgroundCheckSearchFalsePositives(
     entityIds: [String!]!
     isFalsePositive: Boolean!

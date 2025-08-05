@@ -970,6 +970,46 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "updateBackgroundCheckOrganizationCutoff",
+      description: "Updates the cutoff for the background check service",
+      args: [
+        {
+          name: "cutoff",
+          description: "Cutoff value between 0 and 1",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "orgId",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "updateCompaniesHouseCustomProperties",
       description: null,
       args: [

@@ -1,6 +1,8 @@
 import { inject, injectable } from "inversify";
 import { isNullish } from "remeda";
 import { Readable } from "stream";
+import { assert } from "ts-essentials";
+import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { BackgroundCheckProfileProps } from "../pdf/documents/BackgroundCheckProfile";
 import { IPrinter, PRINTER } from "./Printer";
 import { IRedis, REDIS } from "./Redis";
@@ -8,6 +10,10 @@ import {
   BACKGROUND_CHECK_CLIENT_FACTORY,
   BackgroundCheckClientFactory,
 } from "./background-check-clients/BackgroundCheckClient";
+
+export interface EntitySearchOptions {
+  cutoff?: number;
+}
 
 export interface EntitySearchRequest {
   name: string;
@@ -147,7 +153,7 @@ export interface BackgroundCheckContent {
 }
 
 export interface IBackgroundCheckService {
-  entitySearch(query: EntitySearchRequest): Promise<EntitySearchResponse>;
+  entitySearch(query: EntitySearchRequest, orgId: number): Promise<EntitySearchResponse>;
   entityProfileDetails(
     entityId: string,
     userId?: number,
@@ -169,14 +175,20 @@ export class BackgroundCheckService implements IBackgroundCheckService {
     @inject(REDIS) private redis: IRedis,
     @inject(BACKGROUND_CHECK_CLIENT_FACTORY)
     private backgroundCheckClientFactory: BackgroundCheckClientFactory,
+    @inject(OrganizationRepository) private organizations: OrganizationRepository,
   ) {}
 
   private getClient() {
     return this.backgroundCheckClientFactory("OPEN_SANCTIONS");
   }
 
-  async entitySearch(query: EntitySearchRequest): Promise<EntitySearchResponse> {
-    return await this.getClient().entitySearch(query);
+  async entitySearch(query: EntitySearchRequest, orgId: number): Promise<EntitySearchResponse> {
+    const org = await this.organizations.loadOrg(orgId);
+    assert(org, "Organization not found");
+
+    return await this.getClient().entitySearch(query, {
+      cutoff: org.preferences["BACKGROUND_CHECK"]?.cutoff,
+    });
   }
 
   async entityProfileDetails(

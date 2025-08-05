@@ -1,6 +1,7 @@
 import { ResolutionContext } from "inversify";
 import {
   EntityDetailsResponse,
+  EntitySearchOptions,
   EntitySearchRequest,
   EntitySearchResponse,
 } from "../BackgroundCheckService";
@@ -8,7 +9,10 @@ import {
 export const BACKGROUND_CHECK_CLIENT = Symbol.for("BACKGROUND_CHECK_CLIENT");
 
 export interface IBackgroundCheckClient {
-  entitySearch(query: EntitySearchRequest): Promise<EntitySearchResponse>;
+  entitySearch(
+    query: EntitySearchRequest,
+    opts?: EntitySearchOptions,
+  ): Promise<EntitySearchResponse>;
   entityProfileDetails(entityId: string): Promise<EntityDetailsResponse>;
 }
 

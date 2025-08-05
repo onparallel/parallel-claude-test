@@ -2981,6 +2981,7 @@ export interface NexusGenFieldTypes {
     unsubscribeFromProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateBackgroundCheckEntity: NexusGenEnums["Success"]; // Success!
+    updateBackgroundCheckOrganizationCutoff: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateBackgroundCheckSearchFalsePositives: NexusGenEnums["Success"]; // Success!
     updateCompaniesHouseCustomProperties: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
@@ -6182,6 +6183,7 @@ export interface NexusGenFieldTypeNames {
     unsubscribeFromProfile: "Profile";
     untagPetition: "PetitionBase";
     updateBackgroundCheckEntity: "Success";
+    updateBackgroundCheckOrganizationCutoff: "SupportMethodResponse";
     updateBackgroundCheckSearchFalsePositives: "Success";
     updateCompaniesHouseCustomProperties: "SupportMethodResponse";
     updateContact: "Contact";
@@ -9718,6 +9720,11 @@ export interface NexusGenArgTypes {
       // args
       entityId?: string | null; // String
       token: string; // String!
+    };
+    updateBackgroundCheckOrganizationCutoff: {
+      // args
+      cutoff: string; // String!
+      orgId: NexusGenScalars["GID"]; // GID!
     };
     updateBackgroundCheckSearchFalsePositives: {
       // args

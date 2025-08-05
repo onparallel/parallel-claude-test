@@ -182,7 +182,7 @@ async function refreshSearch(
   orgId: number,
   ctx: WorkerContext,
 ) {
-  const newSearch = await ctx.backgroundCheck.entitySearch(content.query);
+  const newSearch = await ctx.backgroundCheck.entitySearch(content.query, orgId);
 
   const newContent = {
     ...content,

@@ -138,13 +138,16 @@ describe("Background Check - Petitions", () => {
         },
       });
 
-      expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
-        name: "Vladimir Putin",
-        date: null,
-        type: null,
-        country: null,
-        birthCountry: null,
-      });
+      expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
+        {
+          name: "Vladimir Putin",
+          date: null,
+          type: null,
+          country: null,
+          birthCountry: null,
+        },
+        organization.id,
+      );
     });
 
     it("returns reply content if reply is found with same search query", async () => {
@@ -277,13 +280,16 @@ describe("Background Check - Petitions", () => {
       expect(errors).toBeUndefined();
       expect(data?.backgroundCheckEntitySearch).toEqual({ totalCount: 1 });
 
-      expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
-        name: "Vladimir Putin",
-        date: null,
-        country: null,
-        type: "COMPANY",
-        birthCountry: null,
-      });
+      expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
+        {
+          name: "Vladimir Putin",
+          date: null,
+          country: null,
+          type: "COMPANY",
+          birthCountry: null,
+        },
+        organization.id,
+      );
 
       const replies = await mocks.knex
         .from("petition_field_reply")
@@ -488,20 +494,28 @@ describe("Background Check - Petitions", () => {
       expect(errors).toBeUndefined();
       expect(data).not.toBeNull();
       expect(backgroundCheckServiceSpy).toHaveBeenCalledTimes(2);
-      expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(1, {
-        name: "Vladimir Putin",
-        date: null,
-        type: null,
-        country: null,
-        birthCountry: null,
-      });
-      expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(2, {
-        name: "Vladimir Putin",
-        date: null,
-        type: null,
-        country: null,
-        birthCountry: null,
-      });
+      expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(
+        1,
+        {
+          name: "Vladimir Putin",
+          date: null,
+          type: null,
+          country: null,
+          birthCountry: null,
+        },
+        organization.id,
+      );
+      expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(
+        2,
+        {
+          name: "Vladimir Putin",
+          date: null,
+          type: null,
+          country: null,
+          birthCountry: null,
+        },
+        organization.id,
+      );
     });
 
     it("forcing a search update should remove false positives that are no longer found in results", async () => {

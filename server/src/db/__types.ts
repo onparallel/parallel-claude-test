@@ -1371,6 +1371,7 @@ export interface Organization {
   anonymize_petitions_after_months: Maybe<number>; // int4
   default_timezone: string; // varchar
   last_profile_digest_at: Maybe<Date>; // timestamptz
+  preferences: any; // jsonb
 }
 
 export type CreateOrganization = PartialProps<
@@ -1390,6 +1391,7 @@ export type CreateOrganization = PartialProps<
   | "anonymize_petitions_after_months"
   | "default_timezone"
   | "last_profile_digest_at"
+  | "preferences"
 >;
 
 export interface OrganizationTheme {

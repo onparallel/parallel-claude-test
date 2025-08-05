@@ -205,13 +205,16 @@ describe("Worker - Automatic Background Check Listener", () => {
       ],
     });
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
-      name: "Simpson",
-      date: null,
-      type: "PERSON",
-      country: null,
-      birthCountry: null,
-    });
+    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
+      {
+        name: "Simpson",
+        date: null,
+        type: "PERSON",
+        country: null,
+        birthCountry: null,
+      },
+      organization.id,
+    );
 
     const [dbReply] = await mocks.knex
       .from("petition_field_reply")
@@ -879,6 +882,7 @@ describe("Worker - Automatic Background Check Listener", () => {
           country: null,
           birthCountry: null,
         },
+        organization.id,
       ],
       [
         {
@@ -888,6 +892,7 @@ describe("Worker - Automatic Background Check Listener", () => {
           country: null,
           birthCountry: null,
         },
+        organization.id,
       ],
       [
         {
@@ -897,6 +902,7 @@ describe("Worker - Automatic Background Check Listener", () => {
           country: null,
           birthCountry: null,
         },
+        organization.id,
       ],
       [
         {
@@ -906,6 +912,7 @@ describe("Worker - Automatic Background Check Listener", () => {
           country: null,
           birthCountry: null,
         },
+        organization.id,
       ],
     ]);
   });
@@ -1012,13 +1019,16 @@ describe("Worker - Automatic Background Check Listener", () => {
       ],
     });
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
-      name: "Simpson, Homer J",
-      date: null,
-      type: "PERSON",
-      country: null,
-      birthCountry: null,
-    });
+    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
+      {
+        name: "Simpson, Homer J",
+        date: null,
+        type: "PERSON",
+        country: null,
+        birthCountry: null,
+      },
+      organization.id,
+    );
 
     const [dbReply] = await mocks.knex
       .from("petition_field_reply")

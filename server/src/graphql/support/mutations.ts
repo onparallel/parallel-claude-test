@@ -1548,3 +1548,52 @@ export const createAnthropicCompletionIntegration = mutationField(
     },
   },
 );
+
+export const updateBackgroundCheckOrganizationCutoff = mutationField(
+  "updateBackgroundCheckOrganizationCutoff",
+  {
+    type: "SupportMethodResponse",
+    description: "Updates the cutoff for the background check service",
+    authorize: superAdminAccess(),
+    args: {
+      orgId: nonNull(globalIdArg("Organization")),
+      cutoff: nonNull(stringArg({ description: "Cutoff value between 0 and 1" })),
+    },
+    resolve: async (_, args, ctx) => {
+      const org = await ctx.organizations.loadOrg(args.orgId);
+      if (!org) {
+        return {
+          result: RESULT.FAILURE,
+          message: "Organization not found",
+        };
+      }
+
+      let cutoff = parseFloat(args.cutoff);
+      cutoff = Math.floor(cutoff * 100) / 100; // Keep only first 2 decimals
+      if (isNullish(cutoff) || Number.isNaN(cutoff) || cutoff < 0 || cutoff > 1) {
+        return {
+          result: RESULT.FAILURE,
+          message: "Cutoff must be between 0 and 1",
+        };
+      }
+
+      await ctx.organizations.updateOrganization(
+        args.orgId,
+        {
+          preferences: {
+            ...org.preferences,
+            BACKGROUND_CHECK: {
+              cutoff,
+            },
+          },
+        },
+        `User:${ctx.user!.id}`,
+      );
+
+      return {
+        result: RESULT.SUCCESS,
+        message: "Background Check cutoff updated successfully",
+      };
+    },
+  },
+);

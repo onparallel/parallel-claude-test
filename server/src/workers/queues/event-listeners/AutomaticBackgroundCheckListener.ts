@@ -63,7 +63,7 @@ export class AutomaticBackgroundCheckListener implements EventListener<"PETITION
                 id: data.petitionFieldReplyId,
                 content: {
                   query: data.query,
-                  search: await this.backgroundCheck.entitySearch(data.query),
+                  search: await this.backgroundCheck.entitySearch(data.query, petition.org_id),
                   entity: null,
                 },
               },
@@ -78,7 +78,7 @@ export class AutomaticBackgroundCheckListener implements EventListener<"PETITION
               type: "BACKGROUND_CHECK",
               content: {
                 query: data.query,
-                search: await this.backgroundCheck.entitySearch(data.query),
+                search: await this.backgroundCheck.entitySearch(data.query, petition.org_id),
                 entity: null,
               },
               ...("user_id" in event.data ? { user_id: event.data.user_id } : {}),

@@ -122,13 +122,16 @@ describe("Background Check - Profiles", () => {
         ],
       });
 
-      expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
-        name: "Vladimir Putin",
-        date: null,
-        type: null,
-        country: null,
-        birthCountry: null,
-      });
+      expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
+        {
+          name: "Vladimir Putin",
+          date: null,
+          type: null,
+          country: null,
+          birthCountry: null,
+        },
+        organization.id,
+      );
 
       const pfvs = await mocks.knex
         .from("profile_field_value")
@@ -256,13 +259,16 @@ describe("Background Check - Profiles", () => {
 
       expect(errors).toBeUndefined();
 
-      expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
-        name: "Vladimir Putin",
-        date: null,
-        type: null,
-        country: null,
-        birthCountry: null,
-      });
+      expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
+        {
+          name: "Vladimir Putin",
+          date: null,
+          type: null,
+          country: null,
+          birthCountry: null,
+        },
+        organization.id,
+      );
 
       const pfvs = await mocks.knex
         .from("profile_field_value")
@@ -398,21 +404,29 @@ describe("Background Check - Profiles", () => {
 
       expect(backgroundCheckServiceSpy).toHaveBeenCalledTimes(2);
 
-      expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(1, {
-        name: "Vladimir Putin",
-        date: null,
-        type: null,
-        country: null,
-        birthCountry: null,
-      });
+      expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(
+        1,
+        {
+          name: "Vladimir Putin",
+          date: null,
+          type: null,
+          country: null,
+          birthCountry: null,
+        },
+        organization.id,
+      );
 
-      expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(2, {
-        name: "Vladimir Putin",
-        date: null,
-        type: "COMPANY",
-        country: "RU",
-        birthCountry: "GB",
-      });
+      expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(
+        2,
+        {
+          name: "Vladimir Putin",
+          date: null,
+          type: "COMPANY",
+          country: "RU",
+          birthCountry: "GB",
+        },
+        organization.id,
+      );
 
       const pfvs = await mocks.knex
         .from("profile_field_value")
@@ -527,13 +541,16 @@ describe("Background Check - Profiles", () => {
 
       expect(errors).toBeUndefined();
 
-      expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
-        name: "Vladimir Putin",
-        date: null,
-        type: "PERSON",
-        country: null,
-        birthCountry: null,
-      });
+      expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
+        {
+          name: "Vladimir Putin",
+          date: null,
+          type: "PERSON",
+          country: null,
+          birthCountry: null,
+        },
+        organization.id,
+      );
 
       const pfvs = await mocks.knex
         .from("profile_field_value")
@@ -670,20 +687,28 @@ describe("Background Check - Profiles", () => {
       expect(errors).toBeUndefined();
 
       expect(backgroundCheckServiceSpy).toHaveBeenCalledTimes(2);
-      expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(1, {
-        name: "Vladimir Putin",
-        date: null,
-        type: "PERSON",
-        country: null,
-        birthCountry: null,
-      });
-      expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(2, {
-        name: "Vladimir Putin",
-        date: null,
-        type: "PERSON",
-        country: null,
-        birthCountry: null,
-      });
+      expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(
+        1,
+        {
+          name: "Vladimir Putin",
+          date: null,
+          type: "PERSON",
+          country: null,
+          birthCountry: null,
+        },
+        organization.id,
+      );
+      expect(backgroundCheckServiceSpy).toHaveBeenNthCalledWith(
+        2,
+        {
+          name: "Vladimir Putin",
+          date: null,
+          type: "PERSON",
+          country: null,
+          birthCountry: null,
+        },
+        organization.id,
+      );
 
       const pfvs = await mocks.knex
         .from("profile_field_value")
@@ -922,13 +947,16 @@ describe("Background Check - Profiles", () => {
 
       expect(errors).toBeUndefined();
 
-      expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
-        name: "UNKNOWN",
-        date: null,
-        type: "PERSON",
-        country: null,
-        birthCountry: null,
-      });
+      expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
+        {
+          name: "UNKNOWN",
+          date: null,
+          type: "PERSON",
+          country: null,
+          birthCountry: null,
+        },
+        organization.id,
+      );
 
       const pfvs = await mocks.knex
         .from("profile_field_value")
