@@ -1425,6 +1425,96 @@
     "context": "Configure expirations date"
   },
   {
+    "term": "component.configure-profile-automate-search-dialog.activate-when",
+    "definition": "Activate when",
+    "context": "Activate when"
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.activation-conditions-help",
+    "definition": "Add conditions to enable or disable the search based on replies in another property. For instance, depending on the type of relationship with the customer.",
+    "context": "Add conditions to enable or disable the search based on replies in another property. For instance, depending on the type of relationship with the customer."
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.activation-conditions-label",
+    "definition": "Add activation conditions",
+    "context": "Add activation conditions"
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.body",
+    "definition": "Select the properties to be used to automate the list search.",
+    "context": "Select the properties to be used to automate the list search."
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.country-helper-text",
+    "definition": "There are no compatible properties in the profile type.",
+    "context": "There are no compatible properties in the profile type."
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.country-label",
+    "definition": "Country (nationality / jurisdiction)",
+    "context": "Country (nationality / jurisdiction)"
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.country-of-birth-label",
+    "definition": "Country of birth",
+    "context": "Country of birth"
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.country-of-jurisdiction-label",
+    "definition": "Country of jurisdiction",
+    "context": "Country of jurisdiction"
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.date-of-birth-helper-text",
+    "definition": "There are no date properties in the profile type.",
+    "context": "There are no date properties in the profile type."
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.date-of-birth-label",
+    "definition": "Date of birth",
+    "context": "Date of birth"
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.date-of-birth-or-registration-label",
+    "definition": "Date of birth / registration",
+    "context": "Date of birth / registration"
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.date-of-registration-label",
+    "definition": "Date of registration",
+    "context": "Date of registration"
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.header",
+    "definition": "Automate search",
+    "context": "Automate search"
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.is-one-of",
+    "definition": "is one of",
+    "context": "is one of"
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.name-entity-label",
+    "definition": "Name of entity",
+    "context": "Name of entity"
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.name-helper-text",
+    "definition": "There are no short text properties in the profile type.",
+    "context": "There are no short text properties in the profile type."
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.name-person-label",
+    "definition": "Name of person",
+    "context": "Name of person"
+  },
+  {
+    "term": "component.configure-profile-automate-search-dialog.nationality-label",
+    "definition": "Nationality",
+    "context": "Nationality"
+  },
+  {
     "term": "component.configure-reminder-settings-dialog.header",
     "definition": "Configure automatic reminders",
     "context": "Configure automatic reminders"
@@ -2728,6 +2818,16 @@
     "term": "component.create-or-update-property-dialog.add-option-button",
     "definition": "Add option",
     "context": "Add option"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.automate-search",
+    "definition": "Automate search",
+    "context": "Automate search"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.automate-search-help",
+    "definition": "Add this option to automate <b>the first search</b> using values from the profile.",
+    "context": "Add this option to automate <b>the first search</b> using values from the profile."
   },
   {
     "term": "component.create-or-update-property-dialog.custom-list",
@@ -9071,8 +9171,8 @@
   },
   {
     "term": "component.profile-field-monitoring-settings.activation-conditions-help",
-    "definition": "Add conditionts to enable or disable monitoring based on replies in another property. For instance, depending on the type of relationship with the customer.",
-    "context": "Add conditionts to enable or disable monitoring based on replies in another property. For instance, depending on the type of relationship with the customer."
+    "definition": "Add conditions to enable or disable monitoring based on replies in another property. For instance, depending on the type of relationship with the customer.",
+    "context": "Add conditions to enable or disable monitoring based on replies in another property. For instance, depending on the type of relationship with the customer."
   },
   {
     "term": "component.profile-field-monitoring-settings.activation-conditions-label",
@@ -9635,6 +9735,21 @@
     "context": "Unarchive profile type"
   },
   {
+    "term": "component.profile-type-referenced-auto-search-config-dialog.body",
+    "definition": "This property is used in automate search configuration in {properties} {count, plural, =1 {property} other {properties}}. To continue, please update the {count, plural, =1 {configuration first} other {configuration of each property}}.",
+    "context": "This property is used in automate search configuration in {properties} {count, plural, =1 {property} other {properties}}. To continue, please update the {count, plural, =1 {configuration first} other {configuration of each property}}."
+  },
+  {
+    "term": "component.profile-type-referenced-auto-search-config-dialog.body-multiple-selection",
+    "definition": "Some selected property is used in automate search configuration in a {propertyType} property. To continue, please update the configuration first.",
+    "context": "Some selected property is used in automate search configuration in a {propertyType} property. To continue, please update the configuration first."
+  },
+  {
+    "term": "component.profile-type-referenced-auto-search-config-dialog.header",
+    "definition": "Property used in auto search configuration",
+    "context": "Property used in auto search configuration"
+  },
+  {
     "term": "component.profile-type-referenced-monitoring-dialog.body",
     "definition": "This property is used for monitoring in {properties} {count, plural, =1 {property} other {properties}}. To continue, please update the {count, plural, =1 {configuration first} other {configuration of each property}}.",
     "context": "This property is used for monitoring in {properties} {count, plural, =1 {property} other {properties}}. To continue, please update the {count, plural, =1 {configuration first} other {configuration of each property}}."
@@ -9808,6 +9923,16 @@
     "term": "component.profiles-module-filter-editor.properties",
     "definition": "Properties",
     "context": "Properties"
+  },
+  {
+    "term": "component.property-referenced-alert.referenced-by-auto-search-config-1",
+    "definition": "This options of this property cannot be changed as it is currently referenced by the auto search configuration of the following {count, plural, =1{property} other {properties}}:",
+    "context": "This options of this property cannot be changed as it is currently referenced by the auto search configuration of the following {count, plural, =1{property} other {properties}}:"
+  },
+  {
+    "term": "component.property-referenced-alert.referenced-by-auto-search-config-2",
+    "definition": "To make changes, you must first remove it from the auto search configuration.",
+    "context": "To make changes, you must first remove it from the auto search configuration."
   },
   {
     "term": "component.property-referenced-alert.referenced-by-monitored-fields-1",

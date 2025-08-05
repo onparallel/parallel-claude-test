@@ -45,25 +45,28 @@ const STANDARD_LIST_NAMES = [
   "SIC",
 ] as const;
 
+const ACTIVATION_CONDITION_SCHEMA = {
+  type: ["object", "null"],
+  additionalProperties: false,
+  required: ["profileTypeFieldId", "values"],
+  properties: {
+    profileTypeFieldId: { type: "number" },
+    values: {
+      type: "array",
+      minItems: 1,
+      items: {
+        type: "string",
+      },
+    },
+  },
+} as const;
+
 const FIELD_MONITORING_SCHEMA = {
   type: ["object", "null"],
   required: ["searchFrequency"],
   additionalProperties: false,
   properties: {
-    activationCondition: {
-      type: ["object", "null"],
-      required: ["profileTypeFieldId", "values"],
-      properties: {
-        profileTypeFieldId: { type: "number" },
-        values: {
-          type: "array",
-          minItems: 1,
-          items: {
-            type: "string",
-          },
-        },
-      },
-    },
+    activationCondition: ACTIVATION_CONDITION_SCHEMA,
     searchFrequency: {
       type: "object",
       oneOf: [
@@ -103,6 +106,29 @@ const FIELD_MONITORING_SCHEMA = {
         },
       ],
     },
+  },
+} as const;
+
+const AUTO_SEARCH_CONFIG_SCHEMA = {
+  type: ["object", "null"],
+  required: ["type", "name", "date", "country"],
+  additionalProperties: false,
+  properties: {
+    type: {
+      type: ["string", "null"],
+      enum: ["PERSON", "COMPANY", null],
+    },
+    name: {
+      type: "array",
+      items: {
+        type: "number",
+      },
+      minItems: 1,
+    },
+    date: { type: ["number", "null"] },
+    country: { type: ["number", "null"] },
+    birthCountry: { type: ["number", "null"] },
+    activationCondition: ACTIVATION_CONDITION_SCHEMA,
   },
 } as const;
 
@@ -216,6 +242,7 @@ export const SCHEMAS = {
     required: [],
     properties: {
       monitoring: FIELD_MONITORING_SCHEMA,
+      autoSearchConfig: AUTO_SEARCH_CONFIG_SCHEMA,
     },
   },
   ADVERSE_MEDIA_SEARCH: {
@@ -233,6 +260,10 @@ export type ProfileTypeFieldOptions = {
 };
 
 export type ProfileTypeFieldMonitoring = NonNullable<FromSchema<typeof FIELD_MONITORING_SCHEMA>>;
+
+export type ProfileTypeFieldActivationCondition = NonNullable<
+  FromSchema<typeof ACTIVATION_CONDITION_SCHEMA>
+>;
 
 export const PROFILE_TYPE_FIELD_SERVICE = Symbol.for("PROFILE_TYPE_FIELD_SERVICE");
 
@@ -267,11 +298,25 @@ export class ProfileTypeFieldService {
     // create a copy of options object to not alter data by reference
     // Create a deep copy of the options object and transform profileTypeFieldId values
     const result = structuredClone(_options);
+
     // Walk through the object and transform profileTypeFieldId values
     walkObject(result, (key, value, node) => {
       if (key === "profileTypeFieldId" && value !== undefined) {
         // Replace the value in-place with the mapped ID
         node[key] = globalIdMap("ProfileTypeField", value);
+      }
+
+      if (key === "autoSearchConfig" && isNonNullish(value)) {
+        if (isNonNullish(value.name) && Array.isArray(value.name)) {
+          value.name = value.name.map((id: any) => globalIdMap("ProfileTypeField", id));
+        }
+        value.date = isNonNullish(value.date) ? globalIdMap("ProfileTypeField", value.date) : null;
+        value.country = isNonNullish(value.country)
+          ? globalIdMap("ProfileTypeField", value.country)
+          : null;
+        value.birthCountry = isNonNullish(value.birthCountry)
+          ? globalIdMap("ProfileTypeField", value.birthCountry)
+          : null;
       }
     });
 

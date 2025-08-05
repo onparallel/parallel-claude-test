@@ -15,9 +15,13 @@ import {
   AnalyticsEventListener,
 } from "./event-listeners/AnalyticsEventListener";
 import {
-  AUTOMATIC_BACKGROUND_CHECK_LISTENER,
-  AutomaticBackgroundCheckListener,
-} from "./event-listeners/AutomaticBackgroundCheckListener";
+  AUTOMATIC_BACKGROUND_CHECK_PETITION_LISTENER,
+  AutomaticBackgroundCheckPetitionListener,
+} from "./event-listeners/AutomaticBackgroundCheckPetitionListener";
+import {
+  AUTOMATIC_BACKGROUND_CHECK_PROFILE_LISTENER,
+  AutomaticBackgroundCheckProfileListener,
+} from "./event-listeners/AutomaticBackgroundCheckProfileListener";
 import {
   DOCUMENT_PROCESSING_LISTENER,
   DocumentProcessingListener,
@@ -86,8 +90,10 @@ export class EventProcessor extends QueueWorker<EventProcessorPayload> {
     documentProcessingListener: DocumentProcessingListener,
     @inject(USER_NOTIFICATIONS_LISTENER)
     userNotificationsListener: UserNotificationsListener,
-    @inject(AUTOMATIC_BACKGROUND_CHECK_LISTENER)
-    automaticBackgroundCheckListener: AutomaticBackgroundCheckListener,
+    @inject(AUTOMATIC_BACKGROUND_CHECK_PETITION_LISTENER)
+    automaticBackgroundCheckPetitionListener: AutomaticBackgroundCheckPetitionListener,
+    @inject(AUTOMATIC_BACKGROUND_CHECK_PROFILE_LISTENER)
+    automaticBackgroundCheckProfileListener: AutomaticBackgroundCheckProfileListener,
     @inject(PETITION_APPROVAL_PROCESS_LISTENER)
     petitionApprovalProcessListener: PetitionApprovalProcessListener,
   ) {
@@ -99,7 +105,8 @@ export class EventProcessor extends QueueWorker<EventProcessorPayload> {
       .register(petitionActivityListener)
       .register(documentProcessingListener)
       .register(userNotificationsListener)
-      .register(automaticBackgroundCheckListener)
+      .register(automaticBackgroundCheckPetitionListener)
+      .register(automaticBackgroundCheckProfileListener)
       // approvals listener should always run last, as the approval process can have activation conditions that depend on replies created by other listeners
       .register(petitionApprovalProcessListener);
   }

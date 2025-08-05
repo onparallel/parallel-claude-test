@@ -1,9 +1,13 @@
 import { ContainerModule } from "inversify";
 import { ANALYTICS_EVENT_LISTENER, AnalyticsEventListener } from "./AnalyticsEventListener";
 import {
-  AUTOMATIC_BACKGROUND_CHECK_LISTENER,
-  AutomaticBackgroundCheckListener,
-} from "./AutomaticBackgroundCheckListener";
+  AUTOMATIC_BACKGROUND_CHECK_PETITION_LISTENER,
+  AutomaticBackgroundCheckPetitionListener,
+} from "./AutomaticBackgroundCheckPetitionListener";
+import {
+  AUTOMATIC_BACKGROUND_CHECK_PROFILE_LISTENER,
+  AutomaticBackgroundCheckProfileListener,
+} from "./AutomaticBackgroundCheckProfileListener";
 import {
   DOCUMENT_PROCESSING_LISTENER,
   DocumentProcessingListener,
@@ -33,6 +37,11 @@ export const eventListenersModule = new ContainerModule((options) => {
   options.bind(PETITION_ACTIVITY_LISTENER).to(PetitionActivityListener);
   options.bind(DOCUMENT_PROCESSING_LISTENER).to(DocumentProcessingListener);
   options.bind(USER_NOTIFICATIONS_LISTENER).to(UserNotificationsListener);
-  options.bind(AUTOMATIC_BACKGROUND_CHECK_LISTENER).to(AutomaticBackgroundCheckListener);
+  options
+    .bind(AUTOMATIC_BACKGROUND_CHECK_PETITION_LISTENER)
+    .to(AutomaticBackgroundCheckPetitionListener);
+  options
+    .bind(AUTOMATIC_BACKGROUND_CHECK_PROFILE_LISTENER)
+    .to(AutomaticBackgroundCheckProfileListener);
   options.bind(PETITION_APPROVAL_PROCESS_LISTENER).to(PetitionApprovalProcessListener);
 });

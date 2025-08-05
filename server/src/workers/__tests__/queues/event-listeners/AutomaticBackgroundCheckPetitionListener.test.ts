@@ -19,11 +19,11 @@ import {
 } from "../../../../services/BackgroundCheckService";
 import { fromGlobalId, toGlobalId } from "../../../../util/globalId";
 import {
-  AUTOMATIC_BACKGROUND_CHECK_LISTENER,
-  AutomaticBackgroundCheckListener,
-} from "../../../queues/event-listeners/AutomaticBackgroundCheckListener";
+  AUTOMATIC_BACKGROUND_CHECK_PETITION_LISTENER,
+  AutomaticBackgroundCheckPetitionListener,
+} from "../../../queues/event-listeners/AutomaticBackgroundCheckPetitionListener";
 
-describe("Worker - Automatic Background Check Listener", () => {
+describe("Worker - Automatic Background Check Petition Listener", () => {
   let knex: Knex;
   let mocks: Mocks;
 
@@ -31,7 +31,7 @@ describe("Worker - Automatic Background Check Listener", () => {
   let organization: Organization;
   let sessionUser: User;
 
-  let backgroundCheckListener: AutomaticBackgroundCheckListener;
+  let backgroundCheckListener: AutomaticBackgroundCheckPetitionListener;
 
   let petition: Petition;
   let fields: PetitionField[];
@@ -65,8 +65,8 @@ describe("Worker - Automatic Background Check Listener", () => {
   });
 
   beforeEach(async () => {
-    backgroundCheckListener = testClient.container.get<AutomaticBackgroundCheckListener>(
-      AUTOMATIC_BACKGROUND_CHECK_LISTENER,
+    backgroundCheckListener = testClient.container.get<AutomaticBackgroundCheckPetitionListener>(
+      AUTOMATIC_BACKGROUND_CHECK_PETITION_LISTENER,
     );
 
     backgroundCheckServiceSpy = jest.spyOn(

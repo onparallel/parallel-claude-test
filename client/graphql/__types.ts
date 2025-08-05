@@ -16697,6 +16697,43 @@ export type ProfileTypeSettings_updateProfileTypeProcessPositionsMutation = {
   };
 };
 
+export type ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  fields: Array<{
+    __typename?: "ProfileTypeField";
+    id: string;
+    type: ProfileTypeFieldType;
+    options: { [key: string]: any };
+    name: { [locale in UserLocale]?: string };
+  }>;
+};
+
+export type ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  type: ProfileTypeFieldType;
+  options: { [key: string]: any };
+};
+
+export type ConfigureProfileBackgroundCheckAutomateSearchDialog_profileTypeQueryVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type ConfigureProfileBackgroundCheckAutomateSearchDialog_profileTypeQuery = {
+  profileType: {
+    __typename?: "ProfileType";
+    id: string;
+    fields: Array<{
+      __typename?: "ProfileTypeField";
+      id: string;
+      type: ProfileTypeFieldType;
+      options: { [key: string]: any };
+      name: { [locale in UserLocale]?: string };
+    }>;
+  };
+};
+
 export type useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment = {
   __typename?: "ProfileTypeField";
   id: string;
@@ -40850,6 +40887,12 @@ export type useProfileSubscribersDialog_unsubscribeFromProfileMutation = {
       };
     }>;
   }>;
+};
+
+export type useProfileTypeFieldReferencedAutoSearchConfigDialog_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  name: { [locale in UserLocale]?: string };
 };
 
 export type useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeFieldFragment = {
@@ -65764,6 +65807,14 @@ export type focusPetitionField_PublicPetitionFieldFragment = {
   }>;
 };
 
+export type getFieldsReferencedInAutoSearchConfig_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  type: ProfileTypeFieldType;
+  options: { [key: string]: any };
+  name: { [locale in UserLocale]?: string };
+};
+
 export type getFieldsReferencedInMonitoring_ProfileTypeFieldFragment = {
   __typename?: "ProfileTypeField";
   id: string;
@@ -70604,6 +70655,31 @@ export const OrganizationProfilesLayout_QueryFragmentDoc = gql`
   }
   ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<OrganizationProfilesLayout_QueryFragment, unknown>;
+export const ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileTypeFieldFragmentDoc = gql`
+  fragment ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileTypeField on ProfileTypeField {
+    id
+    type
+    options
+  }
+` as unknown as DocumentNode<
+  ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileTypeFieldFragment,
+  unknown
+>;
+export const ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileTypeFragmentDoc = gql`
+  fragment ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileType on ProfileType {
+    id
+    fields {
+      id
+      ...ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileTypeField
+      ...ProfileTypeFieldSelect_ProfileTypeField
+    }
+  }
+  ${ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileTypeFieldFragmentDoc}
+  ${ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<
+  ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileTypeFragment,
+  unknown
+>;
 export const getFieldsReferencedInMonitoring_ProfileTypeFieldFragmentDoc = gql`
   fragment getFieldsReferencedInMonitoring_ProfileTypeField on ProfileTypeField {
     id
@@ -70612,14 +70688,27 @@ export const getFieldsReferencedInMonitoring_ProfileTypeFieldFragmentDoc = gql`
     name
   }
 ` as unknown as DocumentNode<getFieldsReferencedInMonitoring_ProfileTypeFieldFragment, unknown>;
+export const getFieldsReferencedInAutoSearchConfig_ProfileTypeFieldFragmentDoc = gql`
+  fragment getFieldsReferencedInAutoSearchConfig_ProfileTypeField on ProfileTypeField {
+    id
+    type
+    options
+    name
+  }
+` as unknown as DocumentNode<
+  getFieldsReferencedInAutoSearchConfig_ProfileTypeFieldFragment,
+  unknown
+>;
 export const ProfileFieldSelectSettings_ProfileTypeFragmentDoc = gql`
   fragment ProfileFieldSelectSettings_ProfileType on ProfileType {
     id
     fields {
       ...getFieldsReferencedInMonitoring_ProfileTypeField
+      ...getFieldsReferencedInAutoSearchConfig_ProfileTypeField
     }
   }
   ${getFieldsReferencedInMonitoring_ProfileTypeFieldFragmentDoc}
+  ${getFieldsReferencedInAutoSearchConfig_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<ProfileFieldSelectSettings_ProfileTypeFragment, unknown>;
 export const ProfileFieldMonitoringSettings_ProfileTypeFieldFragmentDoc = gql`
   fragment ProfileFieldMonitoringSettings_ProfileTypeField on ProfileTypeField {
@@ -75890,6 +75979,15 @@ export const useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeFieldFragm
   useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeFieldFragment,
   unknown
 >;
+export const useProfileTypeFieldReferencedAutoSearchConfigDialog_ProfileTypeFieldFragmentDoc = gql`
+  fragment useProfileTypeFieldReferencedAutoSearchConfigDialog_ProfileTypeField on ProfileTypeField {
+    id
+    name
+  }
+` as unknown as DocumentNode<
+  useProfileTypeFieldReferencedAutoSearchConfigDialog_ProfileTypeFieldFragment,
+  unknown
+>;
 export const OrganizationProfileType_ProfileTypeFieldFragmentDoc = gql`
   fragment OrganizationProfileType_ProfileTypeField on ProfileTypeField {
     id
@@ -75901,14 +75999,18 @@ export const OrganizationProfileType_ProfileTypeFieldFragmentDoc = gql`
     ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
     ...ProfileTypeSettings_ProfileTypeField
     ...useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeField
+    ...useProfileTypeFieldReferencedAutoSearchConfigDialog_ProfileTypeField
     ...getFieldsReferencedInMonitoring_ProfileTypeField
+    ...getFieldsReferencedInAutoSearchConfig_ProfileTypeField
   }
   ${useProfileTypeFieldPermissionDialog_ProfileTypeFieldFragmentDoc}
   ${useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc}
   ${useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc}
   ${ProfileTypeSettings_ProfileTypeFieldFragmentDoc}
   ${useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeFieldFragmentDoc}
+  ${useProfileTypeFieldReferencedAutoSearchConfigDialog_ProfileTypeFieldFragmentDoc}
   ${getFieldsReferencedInMonitoring_ProfileTypeFieldFragmentDoc}
+  ${getFieldsReferencedInAutoSearchConfig_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<OrganizationProfileType_ProfileTypeFieldFragment, unknown>;
 export const ProfileTypeSettings_ProfileTypeProcessFragmentDoc = gql`
   fragment ProfileTypeSettings_ProfileTypeProcess on ProfileTypeProcess {
@@ -81902,6 +82004,18 @@ export const ProfileTypeSettings_updateProfileTypeProcessPositionsDocument = gql
 ` as unknown as DocumentNode<
   ProfileTypeSettings_updateProfileTypeProcessPositionsMutation,
   ProfileTypeSettings_updateProfileTypeProcessPositionsMutationVariables
+>;
+export const ConfigureProfileBackgroundCheckAutomateSearchDialog_profileTypeDocument = gql`
+  query ConfigureProfileBackgroundCheckAutomateSearchDialog_profileType($profileTypeId: GID!) {
+    profileType(profileTypeId: $profileTypeId) {
+      id
+      ...ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileType
+    }
+  }
+  ${ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<
+  ConfigureProfileBackgroundCheckAutomateSearchDialog_profileTypeQuery,
+  ConfigureProfileBackgroundCheckAutomateSearchDialog_profileTypeQueryVariables
 >;
 export const useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldDocument = gql`
   mutation useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeField(

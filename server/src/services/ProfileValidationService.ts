@@ -2,13 +2,14 @@ import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { inject, injectable } from "inversify";
 import { isPossiblePhoneNumber } from "libphonenumber-js";
-import { difference, isNonNullish, unique } from "remeda";
+import { difference, isNonNullish, isNullish, unique } from "remeda";
 import { ProfileTypeField, ProfileTypeFieldType } from "../db/__types";
 import { ProfileRepository } from "../db/repositories/ProfileRepository";
 import { isValidDate } from "../util/time";
 import { validateShortTextFormat } from "../util/validateShortTextFormat";
 import {
   PROFILE_TYPE_FIELD_SERVICE,
+  ProfileTypeFieldActivationCondition,
   ProfileTypeFieldOptions,
   ProfileTypeFieldService,
   SCHEMAS,
@@ -111,45 +112,61 @@ export class ProfileValidationService {
       throw new Error(ajv.errorsText());
     }
 
-    if (type === "BACKGROUND_CHECK" || type === "ADVERSE_MEDIA_SEARCH") {
-      await this.validateMonitoringOptions(options, profileTypeId);
+    if (
+      isNonNullish(options.monitoring) &&
+      (type === "BACKGROUND_CHECK" || type === "ADVERSE_MEDIA_SEARCH")
+    ) {
+      await this.validateMonitoringOptions(options.monitoring, profileTypeId);
+    }
+
+    if (isNonNullish(options.autoSearchConfig) && type === "BACKGROUND_CHECK") {
+      await this.validateAutoSearchConfig(options.autoSearchConfig, profileTypeId);
+    }
+  }
+
+  private async validateActivationCondition(
+    activationCondition: ProfileTypeFieldActivationCondition,
+    profileTypeId: number,
+  ) {
+    const profileTypeField = await this.profiles.loadProfileTypeField(
+      activationCondition.profileTypeFieldId,
+    );
+    if (
+      !profileTypeField ||
+      profileTypeField.type !== "SELECT" ||
+      profileTypeField.profile_type_id !== profileTypeId
+    ) {
+      throw new Error("Invalid profileTypeFieldId");
+    }
+
+    // make sure every value in activation conditions is a valid option on SELECT field
+    const selectValues = unique(
+      (await this.profileTypeFields.loadProfileTypeFieldSelectValues(profileTypeField.options)).map(
+        (v) => v.value,
+      ),
+    );
+    if (
+      !unique(activationCondition.values).every((activationValue) =>
+        selectValues.includes(activationValue),
+      )
+    ) {
+      throw new Error("Invalid activation values");
     }
   }
 
   private async validateMonitoringOptions(
-    options: ProfileTypeFieldOptions["BACKGROUND_CHECK" | "ADVERSE_MEDIA_SEARCH"],
+    monitoring: NonNullable<
+      ProfileTypeFieldOptions["BACKGROUND_CHECK" | "ADVERSE_MEDIA_SEARCH"]["monitoring"]
+    >,
     profileTypeId: number,
   ) {
-    if (isNonNullish(options.monitoring?.activationCondition?.profileTypeFieldId)) {
-      const profileTypeField = await this.profiles.loadProfileTypeField(
-        options.monitoring.activationCondition.profileTypeFieldId,
-      );
-      if (
-        !profileTypeField ||
-        profileTypeField.type !== "SELECT" ||
-        profileTypeField.profile_type_id !== profileTypeId
-      ) {
-        throw new Error("Invalid profileTypeFieldId");
-      }
-
-      // make sure every value in activation conditions is a valid option on SELECT field
-      const selectValues = unique(
-        (
-          await this.profileTypeFields.loadProfileTypeFieldSelectValues(profileTypeField.options)
-        ).map((v) => v.value),
-      );
-      if (
-        !unique(options.monitoring.activationCondition.values).every((activationValue) =>
-          selectValues.includes(activationValue),
-        )
-      ) {
-        throw new Error("Invalid activation values");
-      }
+    if (isNonNullish(monitoring.activationCondition)) {
+      await this.validateActivationCondition(monitoring.activationCondition, profileTypeId);
     }
 
-    if (options.monitoring?.searchFrequency.type === "VARIABLE") {
+    if (monitoring?.searchFrequency.type === "VARIABLE") {
       const profileTypeField = await this.profiles.loadProfileTypeField(
-        options.monitoring.searchFrequency.profileTypeFieldId,
+        monitoring.searchFrequency.profileTypeFieldId,
       );
       if (
         !profileTypeField ||
@@ -167,15 +184,77 @@ export class ProfileValidationService {
           )
         ).map((v) => v.value),
       );
-      const searchFrequencyValues = unique(
-        options.monitoring.searchFrequency.options.map((o) => o.value),
-      );
+      const searchFrequencyValues = unique(monitoring.searchFrequency.options.map((o) => o.value));
       if (
         selectValues.length !== searchFrequencyValues.length ||
         difference(selectValues, searchFrequencyValues).length !== 0
       ) {
         throw new Error("Invalid variable searchFrequency options");
       }
+    }
+  }
+
+  private async validateAutoSearchConfig(
+    config: NonNullable<ProfileTypeFieldOptions["BACKGROUND_CHECK"]["autoSearchConfig"]>,
+    profileTypeId: number,
+  ) {
+    if (isNonNullish(config.birthCountry) && config.type !== "PERSON") {
+      throw new Error("Invalid autoSearchConfig");
+    }
+
+    const allUsedFieldsIds = [
+      ...config.name,
+      config.date,
+      config.country,
+      config.birthCountry,
+    ].filter(isNonNullish);
+
+    if (allUsedFieldsIds.length === 0) {
+      throw new Error("Invalid autoSearchConfig");
+    }
+    const fields = await this.profiles.loadProfileTypeField(allUsedFieldsIds);
+
+    if (fields.some((f) => isNullish(f) || f.profile_type_id !== profileTypeId)) {
+      throw new Error("Invalid autoSearchConfig");
+    }
+
+    const isValidNameField = config.name.every((id) =>
+      fields.some((f) => f!.id === id && f!.type === "SHORT_TEXT"),
+    );
+
+    const isValidDateField = isNonNullish(config.date)
+      ? fields.some((f) => f!.id === config.date && f!.type === "DATE")
+      : true;
+
+    const isValidCountryField = isNonNullish(config.country)
+      ? fields.some(
+          (f) =>
+            f!.id === config.country &&
+            f!.type === "SELECT" &&
+            ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES"].includes(f!.options.standardList),
+        )
+      : true;
+
+    const isValidBirthCountryField = isNonNullish(config.birthCountry)
+      ? fields.some(
+          (f) =>
+            f!.id === config.birthCountry &&
+            f!.type === "SELECT" &&
+            ["COUNTRIES", "EU_COUNTRIES", "NON_EU_COUNTRIES"].includes(f!.options.standardList),
+        )
+      : true;
+
+    if (
+      !isValidNameField ||
+      !isValidDateField ||
+      !isValidCountryField ||
+      !isValidBirthCountryField
+    ) {
+      throw new Error("Invalid autoSearchConfig");
+    }
+
+    if (isNonNullish(config.activationCondition)) {
+      await this.validateActivationCondition(config.activationCondition, profileTypeId);
     }
   }
 

@@ -67,6 +67,7 @@ import {
 import { PetitionEvent } from "../events/PetitionEvent";
 import {
   CreateProfileEvent,
+  GenericProfileEvent,
   ProfileEvent,
   ProfileFieldExpiryUpdatedEvent,
   ProfileFieldFileAddedEvent,
@@ -130,6 +131,7 @@ export class ProfileRepository extends BaseRepository {
       filter: {
         alias?: string | null;
         profileTypeFieldId?: number | null;
+        type?: ProfileTypeFieldType | null;
       }[];
     },
     ProfileTypeField[],
@@ -143,6 +145,8 @@ export class ProfileRepository extends BaseRepository {
       const profileTypeFieldIds = unique(
         keys.flatMap((k) => k.filter.map((f) => f.profileTypeFieldId)).filter(isNonNullish),
       );
+      const types = unique(keys.flatMap((k) => k.filter.map((f) => f.type)).filter(isNonNullish));
+
       const rows = await this.from("profile_type_field", t)
         .whereIn("profile_type_id", profileTypeIds)
         .where((q) => {
@@ -151,6 +155,9 @@ export class ProfileRepository extends BaseRepository {
           }
           if (profileTypeFieldIds.length > 0) {
             q.orWhereIn("id", profileTypeFieldIds);
+          }
+          if (types.length > 0) {
+            q.orWhereIn("type", types);
           }
         })
         .whereNull("deleted_at")
@@ -167,6 +174,10 @@ export class ProfileRepository extends BaseRepository {
             if (filter.profileTypeFieldId && field.id !== filter.profileTypeFieldId) {
               return false;
             }
+            if (filter.type && field.type !== filter.type) {
+              return false;
+            }
+
             return true;
           });
         });
@@ -177,22 +188,6 @@ export class ProfileRepository extends BaseRepository {
         "profileTypeId",
         (k) => k.filter.map((f) => `${f.alias}-${f.profileTypeFieldId}`).join(";"),
       ]),
-    },
-  );
-
-  private readonly loadProfileTypeForProfileId = this.buildLoader<number, ProfileType | null>(
-    async (keys, t) => {
-      const profileTypes = await this.raw<ProfileType & { profile_id: number }>(
-        /* sql */ `
-        select pt.*, p.id as profile_id
-        from "profile" p join profile_type pt on p.profile_type_id = pt.id
-        where p.id in ? and p.deleted_at is null and pt.deleted_at is null
-      `,
-        [this.sqlIn(keys)],
-        t,
-      );
-      const byId = indexBy(profileTypes, (pt) => pt.profile_id);
-      return keys.map((id) => (isNonNullish(byId[id]) ? omit(byId[id], ["profile_id"]) : null));
     },
   );
 
@@ -1237,7 +1232,9 @@ export class ProfileRepository extends BaseRepository {
               from removed_previous_values rpv
               left join with_previous_values wpv on wpv.profile_type_field_id = rpv.profile_type_field_id and wpv.profile_id = rpv.profile_id
               join profile_type_field ptf on rpv.profile_type_field_id = ptf.id
-              where wpv.id is not null or not profile_field_value_content_is_equal(wpv.type, rpv.content,  wpv.content)
+              where 
+                wpv.id is null -- explicitly removed
+                or not profile_field_value_content_is_equal(wpv.type, rpv.content,  wpv.content) -- updated with different content
               union all
               -- expiry events for values that existed before and were updated
               select
@@ -1585,6 +1582,37 @@ export class ProfileRepository extends BaseRepository {
     const profileEvents = await this.insert("profile_event", eventsArray, t);
     await this.queues.enqueueEvents(profileEvents, "profile_event", undefined, t);
     return profileEvents;
+  }
+
+  async getProfileEvents<T extends ProfileEventType>(
+    profileId: number,
+    opts: {
+      type: T;
+      before: { eventId: number };
+      after: { type: ProfileEventType };
+    },
+  ): Promise<GenericProfileEvent<T>[]> {
+    return await this.raw<GenericProfileEvent<T>>(
+      /* sql */ `
+        SELECT *
+        FROM profile_event pe
+        WHERE pe.profile_id = ?
+          AND pe.type = ?
+          AND pe.id < ?
+          AND pe.id > COALESCE(
+            (
+              SELECT MAX(pe2.id)
+              FROM profile_event pe2
+              WHERE pe2.profile_id = ?
+                AND pe2.type = ?
+                AND pe2.id < ?
+            ),
+            0
+          )
+        ORDER BY pe.created_at DESC, pe.id DESC
+      `,
+      [profileId, opts.type, opts.before.eventId, profileId, opts.after.type, opts.before.eventId],
+    );
   }
 
   async createProfileUpdatedEvents(

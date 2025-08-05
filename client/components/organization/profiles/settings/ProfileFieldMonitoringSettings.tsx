@@ -74,7 +74,7 @@ export interface IProfileFieldMonitoringSettings {
   }>;
 }
 
-const SUGESTED_BUSINESS_RELATIONSHIP = {
+const SUGGESTED_BUSINESS_RELATIONSHIP = {
   type: "SELECT",
   name: {
     es: "Relación de negocio",
@@ -326,7 +326,7 @@ export function ProfileFieldMonitoringSettings({
                   <HelpPopover>
                     <FormattedMessage
                       id="component.profile-field-monitoring-settings.activation-conditions-help"
-                      defaultMessage="Add conditionts to enable or disable monitoring based on replies in another property. For instance, depending on the type of relationship with the customer."
+                      defaultMessage="Add conditions to enable or disable monitoring based on replies in another property. For instance, depending on the type of relationship with the customer."
                     />
                   </HelpPopover>
                 </HStack>
@@ -360,7 +360,7 @@ export function ProfileFieldMonitoringSettings({
                                 await showCreateOrUpdateProfileTypeFieldDialog({
                                   profileType: profileType as any,
                                   profileTypeField: isSuggested
-                                    ? SUGESTED_BUSINESS_RELATIONSHIP
+                                    ? SUGGESTED_BUSINESS_RELATIONSHIP
                                     : getDefaultSelectProfileField(name),
                                   disableFieldTypeSelect: true,
                                 });

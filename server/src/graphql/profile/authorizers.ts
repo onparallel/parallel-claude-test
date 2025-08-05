@@ -368,6 +368,67 @@ export function profileTypeFieldIsNotUsedInMonitoringRules<
   };
 }
 
+export function profileTypeFieldIsNotUsedInAutoSearchConfig<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileTypeId extends Arg<TypeName, FieldName, number>,
+  TProfileTypeFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(
+  profileTypeIdArg: TProfileTypeId,
+  profileTypeFieldIdArg: TProfileTypeFieldId,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const profileTypeId = getArg(args, profileTypeIdArg);
+    const profileTypeFieldIds = unMaybeArray(getArg(args, profileTypeFieldIdArg));
+    const usedInProfileTypeFields = (
+      await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId)
+    ).filter((ptf) => {
+      // check if the profile type has other properties of this types that are referencing profileTypeFieldIds in monitoring options
+      if (ptf.type === "BACKGROUND_CHECK") {
+        const options = ptf.options as ProfileTypeFieldOptions["BACKGROUND_CHECK"];
+
+        if (
+          (isNonNullish(options.autoSearchConfig?.name) &&
+            options.autoSearchConfig.name.some((name) => profileTypeFieldIds.includes(name))) ||
+          (isNonNullish(options.autoSearchConfig?.date) &&
+            profileTypeFieldIds.includes(options.autoSearchConfig.date)) ||
+          (isNonNullish(options.autoSearchConfig?.country) &&
+            profileTypeFieldIds.includes(options.autoSearchConfig.country)) ||
+          (isNonNullish(options.autoSearchConfig?.birthCountry) &&
+            profileTypeFieldIds.includes(options.autoSearchConfig.birthCountry))
+        ) {
+          return true;
+        }
+
+        if (
+          isNonNullish(options.autoSearchConfig?.activationCondition?.profileTypeFieldId) &&
+          profileTypeFieldIds.includes(
+            options.autoSearchConfig.activationCondition.profileTypeFieldId,
+          )
+        ) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+
+    if (usedInProfileTypeFields.length > 0) {
+      throw new ApolloError(
+        "This field is being used in an auto search config.",
+        "FIELD_USED_IN_AUTO_SEARCH_CONFIG",
+        {
+          profileTypeFieldIds: usedInProfileTypeFields.map((ptf) =>
+            toGlobalId("ProfileTypeField", ptf.id),
+          ),
+        },
+      );
+    }
+
+    return true;
+  };
+}
+
 export function userHasAccessToProfileRelationshipsInput<
   TypeName extends string,
   FieldName extends string,

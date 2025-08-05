@@ -53,6 +53,7 @@ import { Controller, FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { isNonNullish, omit, pick } from "remeda";
 import { ProfileTypeFieldTypeSelect } from "../ProfileTypeFieldTypeSelect";
+import { ProfileFieldAutoSearchSettings } from "../settings/ProfileFieldAutoSearchSettings";
 import {
   IProfileFieldMonitoringSettings,
   ProfileFieldMonitoringSettings,
@@ -92,6 +93,7 @@ export interface CreateOrUpdateProfileTypeFieldDialogData {
     }[];
     showOptionsWithColors?: boolean;
     standardList?: string | null;
+    autoSearchConfig?: ProfileTypeFieldOptions<"BACKGROUND_CHECK">["autoSearchConfig"];
   } & IProfileFieldMonitoringSettings;
 }
 
@@ -136,6 +138,7 @@ function defaultOptions(
       monitoring: options.monitoring ?? {
         searchFrequency: { type: "FIXED", frequency: "3_YEARS" },
       },
+      autoSearchConfig: options.autoSearchConfig ?? null,
     };
   } else if (type === "ADVERSE_MEDIA_SEARCH") {
     assertType<ProfileTypeFieldOptions<"ADVERSE_MEDIA_SEARCH">>(options);
@@ -164,7 +167,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
   const isUpdating = isNonNullish(profileTypeField) && "id" in profileTypeField;
   const hasBackgroundCheck = useHasBackgroundCheck();
   const hasAdverseMediaSearch = useHasAdverseMediaSearch();
-  const isStandard = isUpdating ? profileTypeField.isStandard : false;
+  const isStandard = isUpdating ? profileTypeField!.isStandard : false;
 
   const form = useForm<CreateOrUpdateProfileTypeFieldDialogData>({
     mode: "onSubmit",
@@ -382,6 +385,8 @@ function CreateOrUpdateProfileTypeFieldDialog({
                     }
                   }
                 } else {
+                  // All other properties types that are not SELECT or CHECKBOX
+
                   try {
                     props.onResolve(
                       await updateProfileTypeField({
@@ -396,12 +401,18 @@ function CreateOrUpdateProfileTypeFieldDialog({
                             options:
                               formData.type === "DATE"
                                 ? pick(formData.options, ["useReplyAsExpiryDate"])
-                                : formData.type === "BACKGROUND_CHECK" ||
-                                    formData.type === "ADVERSE_MEDIA_SEARCH"
-                                  ? formData.options.hasMonitoring
-                                    ? pick(formData.options, ["monitoring"])
-                                    : { monitoring: null }
-                                  : {},
+                                : formData.type === "BACKGROUND_CHECK"
+                                  ? {
+                                      monitoring: formData.options.hasMonitoring
+                                        ? formData.options.monitoring
+                                        : null,
+                                      autoSearchConfig: formData.options.autoSearchConfig,
+                                    }
+                                  : formData.type === "ADVERSE_MEDIA_SEARCH"
+                                    ? formData.options.hasMonitoring
+                                      ? pick(formData.options, ["monitoring"])
+                                      : { monitoring: null }
+                                    : {},
                             isExpirable: formData.isExpirable,
                             expiryAlertAheadTime,
                           },
@@ -428,12 +439,18 @@ function CreateOrUpdateProfileTypeFieldDialog({
                                 options:
                                   formData.type === "DATE"
                                     ? pick(formData.options, ["useReplyAsExpiryDate"])
-                                    : formData.type === "BACKGROUND_CHECK" ||
-                                        formData.type === "ADVERSE_MEDIA_SEARCH"
-                                      ? formData.options.hasMonitoring
-                                        ? pick(formData.options, ["monitoring"])
-                                        : { monitoring: null }
-                                      : {},
+                                    : formData.type === "BACKGROUND_CHECK"
+                                      ? {
+                                          monitoring: formData.options.hasMonitoring
+                                            ? formData.options.monitoring
+                                            : null,
+                                          autoSearchConfig: formData.options.autoSearchConfig,
+                                        }
+                                      : formData.type === "ADVERSE_MEDIA_SEARCH"
+                                        ? formData.options.hasMonitoring
+                                          ? pick(formData.options, ["monitoring"])
+                                          : { monitoring: null }
+                                        : {},
                               },
                               force: true,
                             },
@@ -444,6 +461,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                   }
                 }
               } else {
+                // Create new property
                 const hasStandardList =
                   formData.options.listingType === "STANDARD" && formData.options.standardList;
 
@@ -473,7 +491,15 @@ function CreateOrUpdateProfileTypeFieldDialog({
                   case "DATE":
                     options = pick(formData.options, ["useReplyAsExpiryDate"]);
                     break;
-                  case "BACKGROUND_CHECK":
+                  case "BACKGROUND_CHECK": {
+                    options = {
+                      monitoring: formData.options.hasMonitoring
+                        ? formData.options.monitoring
+                        : null,
+                      autoSearchConfig: formData.options.autoSearchConfig,
+                    };
+                    break;
+                  }
                   case "ADVERSE_MEDIA_SEARCH":
                     options = formData.options.hasMonitoring
                       ? pick(formData.options, ["monitoring"])
@@ -546,7 +572,6 @@ function CreateOrUpdateProfileTypeFieldDialog({
           (!hasAdverseMediaSearch && selectedType === "ADVERSE_MEDIA_SEARCH") ? (
             <RestrictedPetitionFieldAlert fieldType={selectedType} />
           ) : null}
-
           <FormControl isInvalid={!!errors.name} isDisabled={isStandard}>
             <FormLabel fontWeight={400}>
               <FormattedMessage
@@ -682,7 +707,11 @@ function CreateOrUpdateProfileTypeFieldDialog({
                 profileType={profileType}
               />
             ) : null}
+            {selectedType === "BACKGROUND_CHECK" ? (
+              <ProfileFieldAutoSearchSettings profileTypeId={profileType.id} />
+            ) : null}
           </FormProvider>
+
           <Stack spacing={2}>
             <FormControl as={HStack} isInvalid={!!errors.isExpirable}>
               <Stack flex={1} spacing={1}>

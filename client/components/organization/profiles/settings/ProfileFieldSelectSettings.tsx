@@ -42,6 +42,7 @@ import {
   ProfileTypeFieldType,
 } from "@parallel/graphql/__types";
 import { generateExcel } from "@parallel/utils/generateExcel";
+import { getFieldsReferencedInAutoSearchConfig } from "@parallel/utils/getFieldsReferencedInAutoSearchConfig";
 import { getFieldsReferencedInMonitoring } from "@parallel/utils/getFieldsReferencedInMonitoring";
 import { parseProfileSelectOptionsFromExcel } from "@parallel/utils/parseProfileSelectOptionsFromExcel";
 import { useFieldArrayReorder } from "@parallel/utils/react-form-hook/useFieldArrayReorder";
@@ -85,7 +86,16 @@ export function ProfileFieldSelectSettings({
           profileTypeFieldId: profileTypeField.id,
         })
       : [];
-  const isReferenced = referencedByFields.length > 0;
+
+  const referencedInAutoSearchConfig =
+    isUpdating && profileTypeField.type === "SELECT"
+      ? getFieldsReferencedInAutoSearchConfig({
+          profileTypeFields: profileType.fields,
+          profileTypeFieldId: profileTypeField.id,
+        })
+      : [];
+
+  const isReferenced = referencedByFields.length > 0 || referencedInAutoSearchConfig.length > 0;
 
   const {
     control,
@@ -200,6 +210,31 @@ export function ProfileFieldSelectSettings({
                 <FormattedMessage
                   id="component.property-referenced-alert.referenced-by-monitored-fields-2"
                   defaultMessage="To make changes, you must first remove it from the monitoring configuration."
+                />
+              </Stack>
+            </AlertDescription>
+          </Alert>
+        ) : null}
+        {referencedInAutoSearchConfig.length ? (
+          <Alert status="warning" rounded="md" marginBottom={2}>
+            <AlertIcon />
+            <AlertDescription>
+              <Stack spacing={2}>
+                <FormattedMessage
+                  id="component.property-referenced-alert.referenced-by-auto-search-config-1"
+                  defaultMessage="This options of this property cannot be changed as it is currently referenced by the auto search configuration of the following {count, plural, =1{property} other {properties}}:"
+                  values={{ count: fields.length }}
+                />
+                <List paddingInlineStart={5} listStyleType="disc">
+                  {referencedInAutoSearchConfig.map((field) => (
+                    <ListItem key={field.id} fontWeight="bold">
+                      <LocalizableUserTextRender value={field.name} default={null} />
+                    </ListItem>
+                  ))}
+                </List>
+                <FormattedMessage
+                  id="component.property-referenced-alert.referenced-by-auto-search-config-2"
+                  defaultMessage="To make changes, you must first remove it from the auto search configuration."
                 />
               </Stack>
             </AlertDescription>
@@ -370,9 +405,11 @@ ProfileFieldSelectSettings.fragments = {
       id
       fields {
         ...getFieldsReferencedInMonitoring_ProfileTypeField
+        ...getFieldsReferencedInAutoSearchConfig_ProfileTypeField
       }
     }
     ${getFieldsReferencedInMonitoring.fragments.ProfileTypeField}
+    ${getFieldsReferencedInAutoSearchConfig.fragments.ProfileTypeField}
   `,
   ProfileTypeField: gql`
     fragment ProfileFieldSelectSettings_ProfileTypeField on ProfileTypeField {

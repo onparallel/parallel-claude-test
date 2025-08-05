@@ -617,13 +617,14 @@ describe("ProfileExcelImportService", () => {
       );
 
       // 50 SELECT updates (removed)
-      // 50 DATE updates (removed + updated)
       // 50 TEXT updates (removed + updated)
-      expect(profileFieldValueUpdated).toHaveLength(150);
+      expect(profileFieldValueUpdated).toHaveLength(100);
 
       const profileFieldExpiryUpdated = dbEvents.filter(
         (e) => e.type === "PROFILE_FIELD_EXPIRY_UPDATED",
       );
+
+      // 50 DATE expiry updates
       expect(profileFieldExpiryUpdated).toHaveLength(50);
 
       expect(dbEvents).toHaveLength(

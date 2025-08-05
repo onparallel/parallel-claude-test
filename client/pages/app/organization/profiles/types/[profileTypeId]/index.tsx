@@ -57,6 +57,7 @@ import { useCreateOrUpdateProfileTypeFieldDialog } from "@parallel/components/or
 import { useProfileTypeFieldPermissionDialog } from "@parallel/components/organization/profiles/dialogs/ProfileTypeFieldPermissionDialog";
 import { useProfileTypeFieldsInPatternDialog } from "@parallel/components/organization/profiles/dialogs/ProfileTypeFieldsInPatternDialog";
 import { useUpdateProfileTypeFieldDialog } from "@parallel/components/organization/profiles/dialogs/UpdateProfileTypeFieldDialog";
+import { useProfileTypeFieldReferencedAutoSearchConfigDialog } from "@parallel/components/profiles/dialogs/ProfileTypeFieldReferencedAutoSearchConfigDialog";
 import { useProfileTypeFieldReferencedMonitoringDialog } from "@parallel/components/profiles/dialogs/ProfileTypeFieldReferencedMonitoringDialog";
 import {
   OrganizationProfileType_ProfileTypeFieldFragment,
@@ -73,6 +74,7 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { getFieldsReferencedInAutoSearchConfig } from "@parallel/utils/getFieldsReferencedInAutoSearchConfig";
 import { getFieldsReferencedInMonitoring } from "@parallel/utils/getFieldsReferencedInMonitoring";
 import { KeyProp, getKey } from "@parallel/utils/keyProp";
 import { useArchiveProfileType } from "@parallel/utils/mutations/useArchiveProfileType";
@@ -256,6 +258,9 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
   const showConfirmDeleteProfileTypeFieldDialog = useConfirmDeleteProfileTypeFieldDialog();
   const showProfileTypeFieldReferencedMonitoringDialog =
     useProfileTypeFieldReferencedMonitoringDialog();
+  const showProfileTypeFieldReferencedAutoSearchConfigDialog =
+    useProfileTypeFieldReferencedAutoSearchConfigDialog();
+
   const handleDeleteProperty = async (profileTypeFieldIds: string[]) => {
     try {
       await deleteProfileTypeField({
@@ -300,6 +305,17 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
             profileTypeFieldId: profileTypeFieldIds[0],
           });
           await showProfileTypeFieldReferencedMonitoringDialog({
+            properties,
+            profileTypeFieldIds,
+          });
+        } catch {}
+      } else if (isApolloError(e, "FIELD_USED_IN_AUTO_SEARCH_CONFIG")) {
+        try {
+          const properties = getFieldsReferencedInAutoSearchConfig({
+            profileTypeFields: profileType.fields,
+            profileTypeFieldId: profileTypeFieldIds[0],
+          });
+          await showProfileTypeFieldReferencedAutoSearchConfigDialog({
             properties,
             profileTypeFieldIds,
           });
@@ -967,14 +983,18 @@ const _fragments = {
         ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
         ...ProfileTypeSettings_ProfileTypeField
         ...useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeField
+        ...useProfileTypeFieldReferencedAutoSearchConfigDialog_ProfileTypeField
         ...getFieldsReferencedInMonitoring_ProfileTypeField
+        ...getFieldsReferencedInAutoSearchConfig_ProfileTypeField
       }
       ${useProfileTypeFieldPermissionDialog.fragments.ProfileTypeField}
       ${useUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
       ${useCreateOrUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
       ${ProfileTypeSettings.fragments.ProfileTypeField}
       ${useProfileTypeFieldReferencedMonitoringDialog.fragments.ProfileTypeField}
+      ${useProfileTypeFieldReferencedAutoSearchConfigDialog.fragments.ProfileTypeField}
       ${getFieldsReferencedInMonitoring.fragments.ProfileTypeField}
+      ${getFieldsReferencedInAutoSearchConfig.fragments.ProfileTypeField}
     `;
   },
   get ProfileType() {

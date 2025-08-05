@@ -13,12 +13,14 @@ import {
 import { applyFieldVisibility } from "../../../util/fieldLogic";
 import { EventListener } from "../EventProcessorQueue";
 
-export const AUTOMATIC_BACKGROUND_CHECK_LISTENER = Symbol.for(
-  "AUTOMATIC_BACKGROUND_CHECK_LISTENER",
+export const AUTOMATIC_BACKGROUND_CHECK_PETITION_LISTENER = Symbol.for(
+  "AUTOMATIC_BACKGROUND_CHECK_PETITION_LISTENER",
 );
 
 @injectable()
-export class AutomaticBackgroundCheckListener implements EventListener<"PETITION_COMPLETED"> {
+export class AutomaticBackgroundCheckPetitionListener
+  implements EventListener<"PETITION_COMPLETED">
+{
   public readonly types: "PETITION_COMPLETED"[] = ["PETITION_COMPLETED"];
 
   constructor(

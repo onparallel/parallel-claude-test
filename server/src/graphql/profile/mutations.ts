@@ -86,6 +86,7 @@ import {
   profileMatchesProfileType,
   profileTypeFieldBelongsToProfileType,
   profileTypeFieldIsNotStandard,
+  profileTypeFieldIsNotUsedInAutoSearchConfig,
   profileTypeFieldIsNotUsedInMonitoringRules,
   profileTypeFieldIsOfType,
   profileTypeIsArchived,
@@ -379,7 +380,10 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     profileTypeFieldBelongsToProfileType("profileTypeFieldId", "profileTypeId"),
     ifArgDefined(
       (args) => args.data.options,
-      profileTypeFieldIsNotUsedInMonitoringRules("profileTypeId", "profileTypeFieldId"),
+      and(
+        profileTypeFieldIsNotUsedInMonitoringRules("profileTypeId", "profileTypeFieldId"),
+        profileTypeFieldIsNotUsedInAutoSearchConfig("profileTypeId", "profileTypeFieldId"),
+      ),
     ),
     ifArgDefined(
       (args) => args.data.name || args.data.alias,
@@ -747,6 +751,7 @@ export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
     userHasAccessToProfileType("profileTypeId"),
     profileTypeFieldIsNotStandard("profileTypeFieldIds"),
     profileTypeFieldIsNotUsedInMonitoringRules("profileTypeId", "profileTypeFieldIds"),
+    profileTypeFieldIsNotUsedInAutoSearchConfig("profileTypeId", "profileTypeFieldIds"),
     profileTypeFieldBelongsToProfileType("profileTypeFieldIds", "profileTypeId"),
   ),
   args: {

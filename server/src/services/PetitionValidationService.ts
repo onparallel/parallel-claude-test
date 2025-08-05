@@ -491,9 +491,17 @@ export class PetitionValidationService {
         throw new Error("Invalid autoSearchConfig");
       }
 
-      const fields = await loadFields(
-        [...config.name, config.date, config.country, config.birthCountry].filter(isNonNullish),
-      );
+      const allUsedFieldsIds = [
+        ...config.name,
+        config.date,
+        config.country,
+        config.birthCountry,
+      ].filter(isNonNullish);
+
+      if (allUsedFieldsIds.length === 0) {
+        throw new Error("Invalid autoSearchConfig");
+      }
+      const fields = await loadFields(allUsedFieldsIds);
 
       const isValidNameField = config.name.every((id) => {
         const nameField = fields.find((f) => f?.id === id);

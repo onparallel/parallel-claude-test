@@ -13,7 +13,7 @@ import {
 } from "@parallel/chakra/icons";
 import { LocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
 import type { IProfileFieldMonitoringSettings } from "@parallel/components/organization/profiles/settings/ProfileFieldMonitoringSettings";
-import { ProfileTypeFieldType } from "@parallel/graphql/__types";
+import { BackgroundCheckEntitySearchType, ProfileTypeFieldType } from "@parallel/graphql/__types";
 import { IntlShape } from "react-intl";
 import { Maybe } from "./types";
 
@@ -43,7 +43,20 @@ export type ProfileTypeFieldOptions<TType extends ProfileTypeFieldType> = {
     }[];
     standardList?: Maybe<string>;
   };
-  BACKGROUND_CHECK: IProfileFieldMonitoringSettings;
+  BACKGROUND_CHECK: IProfileFieldMonitoringSettings & {
+    autoSearchConfig?: {
+      // name and date are globalIds pointing to SHORT_TEXT and DATE fields on the profile type
+      name: string[];
+      date: string | null;
+      type: BackgroundCheckEntitySearchType | null;
+      country: string | null;
+      birthCountry: string | null;
+      activationCondition: {
+        profileTypeFieldId: string;
+        values: string[];
+      } | null;
+    } | null;
+  };
   ADVERSE_MEDIA_SEARCH: IProfileFieldMonitoringSettings;
 }[TType];
 

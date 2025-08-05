@@ -31,6 +31,28 @@ const STANDARD_LIST_NAMES = [
   "SIC",
 ] as const;
 
+const AUTO_SEARCH_CONFIG_SCHEMA = {
+  type: ["object", "null"],
+  required: ["type", "name", "date", "country"],
+  additionalProperties: false,
+  properties: {
+    type: {
+      type: ["string", "null"],
+      enum: ["PERSON", "COMPANY", null],
+    },
+    name: {
+      type: "array",
+      items: {
+        type: "number",
+      },
+      minItems: 1,
+    },
+    date: { type: ["number", "null"] },
+    country: { type: ["number", "null"] },
+    birthCountry: { type: ["number", "null"] },
+  },
+} as const;
+
 export const SCHEMAS = {
   NUMBER: {
     type: "object",
@@ -314,27 +336,7 @@ export const SCHEMAS = {
     type: "object",
     additionalProperties: false,
     properties: {
-      autoSearchConfig: {
-        type: ["object", "null"],
-        additionalProperties: false,
-        required: ["type", "name", "date", "country"],
-        properties: {
-          type: {
-            type: ["string", "null"],
-            enum: ["PERSON", "COMPANY", null],
-          },
-          name: {
-            type: "array",
-            items: {
-              type: "number",
-            },
-            minItems: 1,
-          },
-          date: { type: ["number", "null"] },
-          country: { type: ["number", "null"] },
-          birthCountry: { type: ["number", "null"] },
-        },
-      },
+      autoSearchConfig: AUTO_SEARCH_CONFIG_SCHEMA,
       replyOnlyFromProfile: { type: ["boolean", "null"] },
       integrationId: { type: ["number", "null"] },
     },
