@@ -1095,6 +1095,7 @@ export class ProfileRepository extends BaseRepository {
       content?: Record<string, any> | null;
       expiryDate?: string | null;
       pendingReview?: boolean;
+      reviewReason?: any;
       petitionFieldReplyId?: number | null;
     }[],
     userId: number | null,
@@ -1112,11 +1113,11 @@ export class ProfileRepository extends BaseRepository {
       const events = await this.raw<ProfileEvent>(
         /* sql */ `
           with new_values as (
-            select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date, pending_review, petition_field_reply_id)
+            select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date, pending_review, review_reason, petition_field_reply_id)
           ),
           with_no_previous_values as (
             -- insert values where a profile_field_value does not exist yet
-            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review, petition_field_reply_id)
+            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review, review_reason, petition_field_reply_id)
             select 
               nv.profile_id, 
               nv.profile_type_field_id, 
@@ -1127,6 +1128,7 @@ export class ProfileRepository extends BaseRepository {
               ?,
               case when nv.type in ('BACKGROUND_CHECK', 'ADVERSE_MEDIA_SEARCH') then true else false end, -- this fields are monitored by default
               nv.pending_review,
+              nv.review_reason,
               nv.petition_field_reply_id
             from new_values nv
             left join profile_field_value pfv2 
@@ -1167,7 +1169,7 @@ export class ProfileRepository extends BaseRepository {
           ),
           with_previous_values as (
             -- insert values where a profile_field_value existed already
-            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review, petition_field_reply_id)
+            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review, review_reason, petition_field_reply_id)
             select 
               nv.profile_id,
               nv.profile_type_field_id, 
@@ -1178,6 +1180,7 @@ export class ProfileRepository extends BaseRepository {
               ?,
               rpv.active_monitoring, -- active_monitoring is always inherited from previous values
               nv.pending_review, -- pending_review is always set explicitly, not inherited
+              nv.review_reason,
               nv.petition_field_reply_id
             from removed_previous_values rpv
             join new_values nv on nv.profile_id = rpv.profile_id and rpv.profile_type_field_id = nv.profile_type_field_id
@@ -1313,16 +1316,15 @@ export class ProfileRepository extends BaseRepository {
               f.content === undefined
                 ? "null"
                 : f.content
-                  ? JSON.stringify(
-                      this.profileTypeFields.mapValueContentToDatabase(f.type, f.content),
-                    )
+                  ? this.json(this.profileTypeFields.mapValueContentToDatabase(f.type, f.content))
                   : null,
               // undefined ('-infinity'::date) uses previous value, null removes
               f.expiryDate === undefined ? "-infinity" : (f.expiryDate ?? null),
               f.pendingReview ?? false,
+              f.reviewReason ? this.json(f.reviewReason) : null,
               f.petitionFieldReplyId ?? null,
             ]),
-            ["int", "int", "profile_type_field_type", "jsonb", "date", "boolean", "int"],
+            ["int", "int", "profile_type_field_type", "jsonb", "date", "boolean", "jsonb", "int"],
           ),
           // with_no_previous_values
           ...[userId, externalSourceIntegrationId ?? null],
@@ -1385,7 +1387,6 @@ export class ProfileRepository extends BaseRepository {
       type: ProfileTypeFieldType;
       content?: Record<string, any> | null;
       expiryDate?: string | null;
-      pendingReview?: boolean;
     }[],
     userId: number | null,
   ) {
@@ -1398,16 +1399,15 @@ export class ProfileRepository extends BaseRepository {
     await this.raw(
       /* sql */ `
         with new_values as (
-          select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date, pending_review)
+          select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date)
         )
-        insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, pending_review, active_monitoring, created_by_user_id, is_draft)
+        insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, active_monitoring, created_by_user_id, is_draft)
         select
           nv.profile_id,
           nv.profile_type_field_id,
           nv.type,
           nv.content,
           nv.expiry_date,
-          nv.pending_review,
           case when nv.type in ('BACKGROUND_CHECK', 'ADVERSE_MEDIA_SEARCH') then true else false end, -- this fields are monitored by default
           ?,
           true
@@ -1415,8 +1415,7 @@ export class ProfileRepository extends BaseRepository {
         on conflict ("profile_id", "profile_type_field_id") where ((removed_at is null) and (deleted_at is null) and (is_draft = true))
         do update
         set
-          content = EXCLUDED.content,
-          pending_review = EXCLUDED.pending_review
+          content = EXCLUDED.content
         returning *;
       `,
       [
@@ -1429,9 +1428,8 @@ export class ProfileRepository extends BaseRepository {
               ? JSON.stringify(this.profileTypeFields.mapValueContentToDatabase(f.type, f.content))
               : null,
             f.expiryDate ?? null,
-            f.pendingReview ?? false,
           ]),
-          ["int", "int", "profile_type_field_type", "jsonb", "date", "boolean"],
+          ["int", "int", "profile_type_field_type", "jsonb", "date"],
         ),
         userId,
       ],

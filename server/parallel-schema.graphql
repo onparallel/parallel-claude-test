@@ -249,6 +249,7 @@ interface BackgroundCheckEntityDetails {
   """
   isStoredEntity: Boolean
   name: String!
+  reviewDiff: BackgroundCheckEntityDetailsReviewDiff
   type: String!
 }
 
@@ -269,6 +270,7 @@ type BackgroundCheckEntityDetailsCompany implements BackgroundCheckEntityDetails
   isStoredEntity: Boolean
   name: String!
   properties: BackgroundCheckEntityDetailsCompanyProperties!
+  reviewDiff: BackgroundCheckEntityDetailsReviewDiff
   type: String!
 }
 
@@ -308,6 +310,7 @@ type BackgroundCheckEntityDetailsPerson implements BackgroundCheckEntityDetails 
   isStoredEntity: Boolean
   name: String!
   properties: BackgroundCheckEntityDetailsPersonProperties!
+  reviewDiff: BackgroundCheckEntityDetailsReviewDiff
   type: String!
 }
 
@@ -345,6 +348,25 @@ type BackgroundCheckEntityDetailsRelationshipProperties {
   startDate: [String!]
 }
 
+type BackgroundCheckEntityDetailsReviewDiff {
+  properties: BackgroundCheckEntityDetailsReviewDiffProperties
+}
+
+type BackgroundCheckEntityDetailsReviewDiffProperties {
+  sanctions: BackgroundCheckEntityDetailsReviewDiffSanctions
+  topics: BackgroundCheckEntityDetailsReviewDiffTopics
+}
+
+type BackgroundCheckEntityDetailsReviewDiffSanctions {
+  added: [BackgroundCheckEntityDetailsSanction!]!
+  removed: [BackgroundCheckEntityDetailsSanction!]!
+}
+
+type BackgroundCheckEntityDetailsReviewDiffTopics {
+  added: [String!]!
+  removed: [String!]!
+}
+
 type BackgroundCheckEntityDetailsSanction {
   datasets: [BackgroundCheckEntityDetailsSanctionDatasets!]
   id: String!
@@ -366,6 +388,7 @@ type BackgroundCheckEntityDetailsSanctionProperties {
 
 type BackgroundCheckEntitySearch {
   createdAt: DateTime!
+  hasPendingReview: Boolean
 
   """
   If this result is a draft, this will be true if it also has a stored value
@@ -373,6 +396,7 @@ type BackgroundCheckEntitySearch {
   hasStoredValue: Boolean
   isDraft: Boolean
   items: [BackgroundCheckEntitySearchSchema!]!
+  reviewDiff: BackgroundCheckEntitySearchReviewDiff
   totalCount: Int!
 }
 
@@ -424,6 +448,15 @@ type BackgroundCheckEntitySearchPersonProperties {
   countryOfBirth: [String!]
   gender: [String!]
   topics: [String!]
+}
+
+type BackgroundCheckEntitySearchReviewDiff {
+  items: BackgroundCheckEntitySearchReviewDiffItems
+}
+
+type BackgroundCheckEntitySearchReviewDiffItems {
+  added: [BackgroundCheckEntitySearchSchema!]
+  removed: [BackgroundCheckEntitySearchSchema!]
 }
 
 interface BackgroundCheckEntitySearchSchema {

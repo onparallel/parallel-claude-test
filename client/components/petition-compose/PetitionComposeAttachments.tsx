@@ -440,7 +440,7 @@ export const PetitionComposeAttachments = Object.assign(
                             isDraggable={list.length > 1}
                             isDisabled={isReadOnly}
                             petition={petition}
-                            visibility={item.visibility}
+                            visibility={item.visibility as any}
                             onRemove={handleRemoveAttachment}
                             onPreview={handleDownloadAttachment}
                             onChangeType={handleChangeType}
@@ -691,7 +691,7 @@ interface AttachmentItemProps {
   isDraggable: boolean;
   isDisabled?: boolean;
   petition: PetitionComposeAttachments_PetitionBaseFragment;
-  visibility?: PetitionFieldVisibility;
+  visibility?: PetitionFieldVisibility | null;
   isEditingVisibility?: boolean;
   onRemove: (id: string) => Promise<void>;
   onPreview: (id: string, preview: boolean) => void;
@@ -1011,7 +1011,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
             >
               <PetitionVisibilityEditor
                 petition={petition}
-                value={visibility}
+                value={visibility as any}
                 onChange={(newVisibility) => onVisibilityChange(id, newVisibility)}
                 showErrors={false}
                 isReadOnly={isDisabled}

@@ -1,7 +1,27 @@
 import { Badge, BadgeProps } from "@chakra-ui/react";
-import { FormattedMessage } from "react-intl";
-import { Text } from "../ui";
+import { FormattedMessage, useIntl } from "react-intl";
+import { Text, Tooltip } from "../ui";
 import { SmallPopover } from "./SmallPopover";
+
+export function NewResultItemBadge({ ...props }: BadgeProps) {
+  const intl = useIntl();
+  return (
+    <Tooltip
+      placement="bottom-end"
+      label={intl.formatMessage({
+        id: "component.background-check-badges.new-result-item-tooltip",
+        defaultMessage: "New result found",
+      })}
+    >
+      <Badge colorScheme="green" width="fit-content" {...props}>
+        <FormattedMessage
+          id="component.background-check-badges.new-result-item-badge"
+          defaultMessage="New"
+        />
+      </Badge>
+    </Tooltip>
+  );
+}
 
 export function FalsePositivesBadge({ ...props }: BadgeProps) {
   return (

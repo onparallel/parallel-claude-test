@@ -162,7 +162,7 @@ export class AutomaticBackgroundCheckProfileListener implements EventListener<"P
         birthCountry: birthCountryValue?.content.value ?? null,
       } as EntitySearchRequest;
 
-      const search = await this.backgroundCheck.entitySearch(query);
+      const search = await this.backgroundCheck.entitySearch(query, orgId);
       await this.profiles.updateProfileFieldValues(
         [
           {

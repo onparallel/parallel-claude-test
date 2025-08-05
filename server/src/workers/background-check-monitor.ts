@@ -4,7 +4,7 @@ import { WorkerContext } from "../context";
 import { ProfileFieldValue } from "../db/__types";
 import { BackgroundCheckContent } from "../services/BackgroundCheckService";
 import { createCronWorker } from "./helpers/createCronWorker";
-import { isRelevantEntityDifference, requiresRefresh } from "./helpers/monitoringUtils";
+import { requiresRefresh } from "./helpers/monitoringUtils";
 
 createCronWorker("background-check-monitor", async (ctx) => {
   const now = new Date();
@@ -23,29 +23,15 @@ createCronWorker("background-check-monitor", async (ctx) => {
     const profileFieldValuesForNotification: ProfileFieldValue[] = [];
 
     for (const value of valuesForRefresh) {
-      const content = value.content as BackgroundCheckContent;
-      if (isNonNullish(content.entity)) {
+      if (isNonNullish(value.content.entity)) {
         // we are monitoring an entity details
-        const pendingReview = await refreshEntityDetails(
-          value.profile_id,
-          value.profile_type_field_id,
-          content,
-          org.id,
-          ctx,
-        );
-
+        const pendingReview = await refreshEntityDetails(value, org.id, ctx);
         if (pendingReview) {
           profileFieldValuesForNotification.push(value);
         }
-      } else if (isNonNullish(content.query) && isNonNullish(content.search)) {
+      } else {
         // we are monitoring a search
-        const pendingReview = await refreshSearch(
-          value.profile_id,
-          value.profile_type_field_id,
-          content,
-          org.id,
-          ctx,
-        );
+        const pendingReview = await refreshSearch(value, org.id, ctx);
 
         if (pendingReview) {
           profileFieldValuesForNotification.push(value);
@@ -71,13 +57,8 @@ createCronWorker("background-check-monitor", async (ctx) => {
 /**
  * @returns `true` if some relevant property has been updated on the value.
  */
-async function refreshEntityDetails(
-  profileId: number,
-  profileTypeFieldId: number,
-  content: BackgroundCheckContent,
-  orgId: number,
-  ctx: WorkerContext,
-) {
+async function refreshEntityDetails(value: ProfileFieldValue, orgId: number, ctx: WorkerContext) {
+  const content = value.content as BackgroundCheckContent;
   assert(isNonNullish(content.entity), "Entity is required");
 
   try {
@@ -88,47 +69,37 @@ async function refreshEntityDetails(
       entity: newDetails,
     } as BackgroundCheckContent;
 
-    if (
-      ctx.petitionsHelper.contentsAreEqual(
-        { type: "BACKGROUND_CHECK", content },
-        { type: "BACKGROUND_CHECK", content: newContent },
-      )
-    ) {
-      // no changes, no need to update the value
+    const contentsAreEqual = ctx.petitionsHelper.contentsAreEqual(
+      { type: "BACKGROUND_CHECK", content },
+      { type: "BACKGROUND_CHECK", content: newContent },
+    );
+    const differences = ctx.backgroundCheck.extractRelevantDifferences(content, newContent);
+
+    if (contentsAreEqual || !differences.entity) {
+      // no changes or no relevant differences since last execution, no need to update the value
       // create an event to keep track that the monitor has run and there are no changes
       await ctx.profiles.createEvent({
         type: "PROFILE_FIELD_VALUE_MONITORED",
         data: {
-          profile_type_field_id: profileTypeFieldId,
+          profile_type_field_id: value.profile_type_field_id,
         },
-        profile_id: profileId,
+        profile_id: value.profile_id,
         org_id: orgId,
       });
-      return false;
-    }
 
-    const isRelevantDifference = isRelevantEntityDifference(content.entity, newDetails);
-    if (!isRelevantDifference) {
-      // if difference is not important, we will leave the value as it is
-      await ctx.profiles.createEvent({
-        type: "PROFILE_FIELD_VALUE_MONITORED",
-        data: {
-          profile_type_field_id: profileTypeFieldId,
-        },
-        profile_id: profileId,
-        org_id: orgId,
-      });
       return false;
     }
 
     await ctx.profiles.updateProfileFieldValues(
       [
         {
-          profileId,
-          profileTypeFieldId,
+          profileId: value.profile_id,
+          profileTypeFieldId: value.profile_type_field_id,
           type: "BACKGROUND_CHECK",
           content: newContent,
           pendingReview: true,
+          // a value could have multiple changes before it is marked as reviewed, so we need to keep them all to correctly show every difference since last reviewed version.
+          reviewReason: [...(value.review_reason ?? []), { reviewedAt: new Date(), differences }],
         },
       ],
       null,
@@ -155,8 +126,8 @@ async function refreshEntityDetails(
       await ctx.profiles.updateProfileFieldValues(
         [
           {
-            profileId,
-            profileTypeFieldId,
+            profileId: value.profile_id,
+            profileTypeFieldId: value.profile_type_field_id,
             type: "BACKGROUND_CHECK",
             content: newContent,
           },
@@ -166,24 +137,19 @@ async function refreshEntityDetails(
       );
 
       return false;
-    } else {
-      throw error;
     }
+
+    throw error;
   }
 }
 
 /**
  * @returns `true` if some relevant property has been updated on the value.
  */
-async function refreshSearch(
-  profileId: number,
-  profileTypeFieldId: number,
-  content: BackgroundCheckContent,
-  orgId: number,
-  ctx: WorkerContext,
-) {
-  const newSearch = await ctx.backgroundCheck.entitySearch(content.query, orgId);
 
+async function refreshSearch(value: ProfileFieldValue, orgId: number, ctx: WorkerContext) {
+  const content = value.content as BackgroundCheckContent;
+  const newSearch = await ctx.backgroundCheck.entitySearch(content.query, orgId);
   const newContent = {
     ...content,
     search: newSearch,
@@ -198,31 +164,37 @@ async function refreshSearch(
     { type: "BACKGROUND_CHECK", content: newContent },
   );
 
-  if (contentsAreEqual) {
+  const differences = ctx.backgroundCheck.extractRelevantDifferences(content, newContent);
+
+  if (contentsAreEqual || !differences.search) {
     await ctx.profiles.createEvent({
       type: "PROFILE_FIELD_VALUE_MONITORED",
       data: {
-        profile_type_field_id: profileTypeFieldId,
+        profile_type_field_id: value.profile_type_field_id,
       },
-      profile_id: profileId,
+      profile_id: value.profile_id,
       org_id: orgId,
     });
-  } else {
-    // any difference in search means search items have changed, so we need to mark it for review
-    await ctx.profiles.updateProfileFieldValues(
-      [
-        {
-          profileId,
-          profileTypeFieldId,
-          type: "BACKGROUND_CHECK",
-          content: newContent,
-          pendingReview: true,
-        },
-      ],
-      null,
-      orgId,
-    );
+
+    return false;
   }
 
-  return contentsAreEqual ? false : true;
+  // any difference in search means search items have changed, so we need to mark it for review
+  await ctx.profiles.updateProfileFieldValues(
+    [
+      {
+        profileId: value.profile_id,
+        profileTypeFieldId: value.profile_type_field_id,
+        type: "BACKGROUND_CHECK",
+        content: newContent,
+        pendingReview: true,
+        // a value could have multiple changes before it is marked as reviewed, so we need to keep them all to correctly show every difference since last reviewed version.
+        reviewReason: [...(value.review_reason ?? []), { reviewedAt: new Date(), differences }],
+      },
+    ],
+    null,
+    orgId,
+  );
+
+  return true;
 }

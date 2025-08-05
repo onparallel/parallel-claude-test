@@ -245,6 +245,7 @@ export interface BackgroundCheckEntityDetails {
   /** Whether this entity is the one stored in the reply */
   isStoredEntity?: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
+  reviewDiff?: Maybe<BackgroundCheckEntityDetailsReviewDiff>;
   type: Scalars["String"]["output"];
 }
 
@@ -260,6 +261,7 @@ export interface BackgroundCheckEntityDetailsCompany extends BackgroundCheckEnti
   isStoredEntity?: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntityDetailsCompanyProperties;
+  reviewDiff?: Maybe<BackgroundCheckEntityDetailsReviewDiff>;
   type: Scalars["String"]["output"];
 }
 
@@ -296,6 +298,7 @@ export interface BackgroundCheckEntityDetailsPerson extends BackgroundCheckEntit
   isStoredEntity?: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntityDetailsPersonProperties;
+  reviewDiff?: Maybe<BackgroundCheckEntityDetailsReviewDiff>;
   type: Scalars["String"]["output"];
 }
 
@@ -336,6 +339,29 @@ export interface BackgroundCheckEntityDetailsRelationshipProperties {
   startDate?: Maybe<Array<Scalars["String"]["output"]>>;
 }
 
+export interface BackgroundCheckEntityDetailsReviewDiff {
+  __typename?: "BackgroundCheckEntityDetailsReviewDiff";
+  properties?: Maybe<BackgroundCheckEntityDetailsReviewDiffProperties>;
+}
+
+export interface BackgroundCheckEntityDetailsReviewDiffProperties {
+  __typename?: "BackgroundCheckEntityDetailsReviewDiffProperties";
+  sanctions?: Maybe<BackgroundCheckEntityDetailsReviewDiffSanctions>;
+  topics?: Maybe<BackgroundCheckEntityDetailsReviewDiffTopics>;
+}
+
+export interface BackgroundCheckEntityDetailsReviewDiffSanctions {
+  __typename?: "BackgroundCheckEntityDetailsReviewDiffSanctions";
+  added: Array<BackgroundCheckEntityDetailsSanction>;
+  removed: Array<BackgroundCheckEntityDetailsSanction>;
+}
+
+export interface BackgroundCheckEntityDetailsReviewDiffTopics {
+  __typename?: "BackgroundCheckEntityDetailsReviewDiffTopics";
+  added: Array<Scalars["String"]["output"]>;
+  removed: Array<Scalars["String"]["output"]>;
+}
+
 export interface BackgroundCheckEntityDetailsSanction {
   __typename?: "BackgroundCheckEntityDetailsSanction";
   datasets?: Maybe<Array<BackgroundCheckEntityDetailsSanctionDatasets>>;
@@ -361,10 +387,12 @@ export interface BackgroundCheckEntityDetailsSanctionProperties {
 export interface BackgroundCheckEntitySearch {
   __typename?: "BackgroundCheckEntitySearch";
   createdAt: Scalars["DateTime"]["output"];
+  hasPendingReview?: Maybe<Scalars["Boolean"]["output"]>;
   /** If this result is a draft, this will be true if it also has a stored value */
   hasStoredValue?: Maybe<Scalars["Boolean"]["output"]>;
   isDraft?: Maybe<Scalars["Boolean"]["output"]>;
   items: Array<BackgroundCheckEntitySearchSchema>;
+  reviewDiff?: Maybe<BackgroundCheckEntitySearchReviewDiff>;
   totalCount: Scalars["Int"]["output"];
 }
 
@@ -408,6 +436,17 @@ export interface BackgroundCheckEntitySearchPersonProperties {
   countryOfBirth?: Maybe<Array<Scalars["String"]["output"]>>;
   gender?: Maybe<Array<Scalars["String"]["output"]>>;
   topics?: Maybe<Array<Scalars["String"]["output"]>>;
+}
+
+export interface BackgroundCheckEntitySearchReviewDiff {
+  __typename?: "BackgroundCheckEntitySearchReviewDiff";
+  items?: Maybe<BackgroundCheckEntitySearchReviewDiffItems>;
+}
+
+export interface BackgroundCheckEntitySearchReviewDiffItems {
+  __typename?: "BackgroundCheckEntitySearchReviewDiffItems";
+  added?: Maybe<Array<BackgroundCheckEntitySearchSchema>>;
+  removed?: Maybe<Array<BackgroundCheckEntitySearchSchema>>;
 }
 
 export interface BackgroundCheckEntitySearchSchema {
@@ -4173,7 +4212,8 @@ export interface PetitionAttachment {
   isUploading: Scalars["Boolean"]["output"];
   petition: PetitionBase;
   type: PetitionAttachmentType;
-  visibility: Scalars["JSON"]["output"];
+  /** A JSON object representing the conditions for the attachment to be visible */
+  visibility?: Maybe<Scalars["JSONObject"]["output"]>;
 }
 
 export type PetitionAttachmentType = "ANNEX" | "BACK" | "FRONT";
@@ -23162,7 +23202,7 @@ export type PetitionComposeAttachments_PetitionAttachmentFragment = {
   id: string;
   type: PetitionAttachmentType;
   isUploading: boolean;
-  visibility: any;
+  visibility?: { [key: string]: any } | null;
   file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
 };
 
@@ -23173,7 +23213,7 @@ export type PetitionComposeAttachments_PetitionAttachmentsListFragment = {
     id: string;
     type: PetitionAttachmentType;
     isUploading: boolean;
-    visibility: any;
+    visibility?: { [key: string]: any } | null;
     file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
   }>;
   ANNEX: Array<{
@@ -23181,7 +23221,7 @@ export type PetitionComposeAttachments_PetitionAttachmentsListFragment = {
     id: string;
     type: PetitionAttachmentType;
     isUploading: boolean;
-    visibility: any;
+    visibility?: { [key: string]: any } | null;
     file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
   }>;
   BACK: Array<{
@@ -23189,7 +23229,7 @@ export type PetitionComposeAttachments_PetitionAttachmentsListFragment = {
     id: string;
     type: PetitionAttachmentType;
     isUploading: boolean;
-    visibility: any;
+    visibility?: { [key: string]: any } | null;
     file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
   }>;
 };
@@ -23229,7 +23269,7 @@ export type PetitionComposeAttachments_PetitionBase_Petition_Fragment = {
       id: string;
       type: PetitionAttachmentType;
       isUploading: boolean;
-      visibility: any;
+      visibility?: { [key: string]: any } | null;
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     }>;
     ANNEX: Array<{
@@ -23237,7 +23277,7 @@ export type PetitionComposeAttachments_PetitionBase_Petition_Fragment = {
       id: string;
       type: PetitionAttachmentType;
       isUploading: boolean;
-      visibility: any;
+      visibility?: { [key: string]: any } | null;
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     }>;
     BACK: Array<{
@@ -23245,7 +23285,7 @@ export type PetitionComposeAttachments_PetitionBase_Petition_Fragment = {
       id: string;
       type: PetitionAttachmentType;
       isUploading: boolean;
-      visibility: any;
+      visibility?: { [key: string]: any } | null;
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     }>;
   };
@@ -23297,7 +23337,7 @@ export type PetitionComposeAttachments_PetitionBase_PetitionTemplate_Fragment = 
       id: string;
       type: PetitionAttachmentType;
       isUploading: boolean;
-      visibility: any;
+      visibility?: { [key: string]: any } | null;
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     }>;
     ANNEX: Array<{
@@ -23305,7 +23345,7 @@ export type PetitionComposeAttachments_PetitionBase_PetitionTemplate_Fragment = 
       id: string;
       type: PetitionAttachmentType;
       isUploading: boolean;
-      visibility: any;
+      visibility?: { [key: string]: any } | null;
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     }>;
     BACK: Array<{
@@ -23313,7 +23353,7 @@ export type PetitionComposeAttachments_PetitionBase_PetitionTemplate_Fragment = 
       id: string;
       type: PetitionAttachmentType;
       isUploading: boolean;
-      visibility: any;
+      visibility?: { [key: string]: any } | null;
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     }>;
   };
@@ -23377,7 +23417,7 @@ export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -23390,7 +23430,7 @@ export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -23403,7 +23443,7 @@ export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -23463,7 +23503,7 @@ export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -23476,7 +23516,7 @@ export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -23489,7 +23529,7 @@ export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -23535,7 +23575,7 @@ export type PetitionComposeAttachments_createPetitionAttachmentUploadLinkMutatio
       id: string;
       type: PetitionAttachmentType;
       isUploading: boolean;
-      visibility: any;
+      visibility?: { [key: string]: any } | null;
       petition:
         | { __typename?: "Petition"; id: string; lastChangeAt: string }
         | { __typename?: "PetitionTemplate"; id: string; lastChangeAt: string };
@@ -23556,7 +23596,7 @@ export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
     id: string;
     type: PetitionAttachmentType;
     isUploading: boolean;
-    visibility: any;
+    visibility?: { [key: string]: any } | null;
     petition:
       | {
           __typename?: "Petition";
@@ -23593,7 +23633,7 @@ export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
               id: string;
               type: PetitionAttachmentType;
               isUploading: boolean;
-              visibility: any;
+              visibility?: { [key: string]: any } | null;
               file: {
                 __typename?: "FileUpload";
                 filename: string;
@@ -23606,7 +23646,7 @@ export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
               id: string;
               type: PetitionAttachmentType;
               isUploading: boolean;
-              visibility: any;
+              visibility?: { [key: string]: any } | null;
               file: {
                 __typename?: "FileUpload";
                 filename: string;
@@ -23619,7 +23659,7 @@ export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
               id: string;
               type: PetitionAttachmentType;
               isUploading: boolean;
-              visibility: any;
+              visibility?: { [key: string]: any } | null;
               file: {
                 __typename?: "FileUpload";
                 filename: string;
@@ -23679,7 +23719,7 @@ export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
               id: string;
               type: PetitionAttachmentType;
               isUploading: boolean;
-              visibility: any;
+              visibility?: { [key: string]: any } | null;
               file: {
                 __typename?: "FileUpload";
                 filename: string;
@@ -23692,7 +23732,7 @@ export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
               id: string;
               type: PetitionAttachmentType;
               isUploading: boolean;
-              visibility: any;
+              visibility?: { [key: string]: any } | null;
               file: {
                 __typename?: "FileUpload";
                 filename: string;
@@ -23705,7 +23745,7 @@ export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
               id: string;
               type: PetitionAttachmentType;
               isUploading: boolean;
-              visibility: any;
+              visibility?: { [key: string]: any } | null;
               file: {
                 __typename?: "FileUpload";
                 filename: string;
@@ -23745,7 +23785,7 @@ export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation 
     id: string;
     type: PetitionAttachmentType;
     isUploading: boolean;
-    visibility: any;
+    visibility?: { [key: string]: any } | null;
     petition:
       | {
           __typename?: "Petition";
@@ -23782,7 +23822,7 @@ export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation 
               id: string;
               type: PetitionAttachmentType;
               isUploading: boolean;
-              visibility: any;
+              visibility?: { [key: string]: any } | null;
               file: {
                 __typename?: "FileUpload";
                 filename: string;
@@ -23795,7 +23835,7 @@ export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation 
               id: string;
               type: PetitionAttachmentType;
               isUploading: boolean;
-              visibility: any;
+              visibility?: { [key: string]: any } | null;
               file: {
                 __typename?: "FileUpload";
                 filename: string;
@@ -23808,7 +23848,7 @@ export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation 
               id: string;
               type: PetitionAttachmentType;
               isUploading: boolean;
-              visibility: any;
+              visibility?: { [key: string]: any } | null;
               file: {
                 __typename?: "FileUpload";
                 filename: string;
@@ -23868,7 +23908,7 @@ export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation 
               id: string;
               type: PetitionAttachmentType;
               isUploading: boolean;
-              visibility: any;
+              visibility?: { [key: string]: any } | null;
               file: {
                 __typename?: "FileUpload";
                 filename: string;
@@ -23881,7 +23921,7 @@ export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation 
               id: string;
               type: PetitionAttachmentType;
               isUploading: boolean;
-              visibility: any;
+              visibility?: { [key: string]: any } | null;
               file: {
                 __typename?: "FileUpload";
                 filename: string;
@@ -23894,7 +23934,7 @@ export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation 
               id: string;
               type: PetitionAttachmentType;
               isUploading: boolean;
-              visibility: any;
+              visibility?: { [key: string]: any } | null;
               file: {
                 __typename?: "FileUpload";
                 filename: string;
@@ -23965,7 +24005,7 @@ export type PetitionComposeAttachments_deletePetitionAttachmentMutation = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -23978,7 +24018,7 @@ export type PetitionComposeAttachments_deletePetitionAttachmentMutation = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -23991,7 +24031,7 @@ export type PetitionComposeAttachments_deletePetitionAttachmentMutation = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -24051,7 +24091,7 @@ export type PetitionComposeAttachments_deletePetitionAttachmentMutation = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -24064,7 +24104,7 @@ export type PetitionComposeAttachments_deletePetitionAttachmentMutation = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -24077,7 +24117,7 @@ export type PetitionComposeAttachments_deletePetitionAttachmentMutation = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -24127,7 +24167,7 @@ export type PetitionComposeAttachments_updatePetitionAttachmentVisibilityMutatio
   updatePetitionAttachmentVisibility: {
     __typename?: "PetitionAttachment";
     id: string;
-    visibility: any;
+    visibility?: { [key: string]: any } | null;
   };
 };
 
@@ -31951,6 +31991,58 @@ export type BackgroundCheckEntityDetailsSanctions_BackgroundCheckEntityDetailsSa
     program?: Array<string> | null;
     sourceUrl?: Array<string> | null;
   };
+};
+
+export type BackgroundCheckEntityDifferencesAlert_BackgroundCheckEntityDetailsReviewDiffFragment = {
+  __typename?: "BackgroundCheckEntityDetailsReviewDiff";
+  properties?: {
+    __typename?: "BackgroundCheckEntityDetailsReviewDiffProperties";
+    topics?: {
+      __typename?: "BackgroundCheckEntityDetailsReviewDiffTopics";
+      added: Array<string>;
+      removed: Array<string>;
+    } | null;
+    sanctions?: {
+      __typename?: "BackgroundCheckEntityDetailsReviewDiffSanctions";
+      added: Array<{
+        __typename?: "BackgroundCheckEntityDetailsSanction";
+        id: string;
+        datasets?: Array<{
+          __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+          title: string;
+        }> | null;
+        properties: {
+          __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
+          authority?: Array<string> | null;
+          program?: Array<string> | null;
+        };
+      }>;
+      removed: Array<{
+        __typename?: "BackgroundCheckEntityDetailsSanction";
+        id: string;
+        datasets?: Array<{
+          __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+          title: string;
+        }> | null;
+        properties: {
+          __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
+          authority?: Array<string> | null;
+          program?: Array<string> | null;
+        };
+      }>;
+    } | null;
+  } | null;
+};
+
+export type BackgroundCheckSearchDifferencesAlert_BackgroundCheckEntitySearchReviewDiffFragment = {
+  __typename?: "BackgroundCheckEntitySearchReviewDiff";
+  items?: {
+    __typename?: "BackgroundCheckEntitySearchReviewDiffItems";
+    added?: Array<
+      | { __typename?: "BackgroundCheckEntitySearchCompany"; id: string }
+      | { __typename?: "BackgroundCheckEntitySearchPerson"; id: string }
+    > | null;
+  } | null;
 };
 
 export type PreviewPetitionFieldBackgroundCheck_UserFragment = {
@@ -45177,6 +45269,46 @@ export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetails_Backgroun
       summary?: string | null;
       url?: string | null;
     }> | null;
+    reviewDiff?: {
+      __typename?: "BackgroundCheckEntityDetailsReviewDiff";
+      properties?: {
+        __typename?: "BackgroundCheckEntityDetailsReviewDiffProperties";
+        topics?: {
+          __typename?: "BackgroundCheckEntityDetailsReviewDiffTopics";
+          added: Array<string>;
+          removed: Array<string>;
+        } | null;
+        sanctions?: {
+          __typename?: "BackgroundCheckEntityDetailsReviewDiffSanctions";
+          added: Array<{
+            __typename?: "BackgroundCheckEntityDetailsSanction";
+            id: string;
+            datasets?: Array<{
+              __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+              title: string;
+            }> | null;
+            properties: {
+              __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
+              authority?: Array<string> | null;
+              program?: Array<string> | null;
+            };
+          }>;
+          removed: Array<{
+            __typename?: "BackgroundCheckEntityDetailsSanction";
+            id: string;
+            datasets?: Array<{
+              __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+              title: string;
+            }> | null;
+            properties: {
+              __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
+              authority?: Array<string> | null;
+              program?: Array<string> | null;
+            };
+          }>;
+        } | null;
+      } | null;
+    } | null;
     properties: {
       __typename?: "BackgroundCheckEntityDetailsCompanyProperties";
       dateOfRegistration?: Array<string> | null;
@@ -45262,6 +45394,46 @@ export type BackgroundCheckProfileDetails_BackgroundCheckEntityDetails_Backgroun
       summary?: string | null;
       url?: string | null;
     }> | null;
+    reviewDiff?: {
+      __typename?: "BackgroundCheckEntityDetailsReviewDiff";
+      properties?: {
+        __typename?: "BackgroundCheckEntityDetailsReviewDiffProperties";
+        topics?: {
+          __typename?: "BackgroundCheckEntityDetailsReviewDiffTopics";
+          added: Array<string>;
+          removed: Array<string>;
+        } | null;
+        sanctions?: {
+          __typename?: "BackgroundCheckEntityDetailsReviewDiffSanctions";
+          added: Array<{
+            __typename?: "BackgroundCheckEntityDetailsSanction";
+            id: string;
+            datasets?: Array<{
+              __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+              title: string;
+            }> | null;
+            properties: {
+              __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
+              authority?: Array<string> | null;
+              program?: Array<string> | null;
+            };
+          }>;
+          removed: Array<{
+            __typename?: "BackgroundCheckEntityDetailsSanction";
+            id: string;
+            datasets?: Array<{
+              __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+              title: string;
+            }> | null;
+            properties: {
+              __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
+              authority?: Array<string> | null;
+              program?: Array<string> | null;
+            };
+          }>;
+        } | null;
+      } | null;
+    } | null;
     properties: {
       __typename?: "BackgroundCheckEntityDetailsPersonProperties";
       country?: Array<string> | null;
@@ -45366,6 +45538,46 @@ export type BackgroundCheckProfileDetails_backgroundCheckEntityDetailsQuery = {
           summary?: string | null;
           url?: string | null;
         }> | null;
+        reviewDiff?: {
+          __typename?: "BackgroundCheckEntityDetailsReviewDiff";
+          properties?: {
+            __typename?: "BackgroundCheckEntityDetailsReviewDiffProperties";
+            topics?: {
+              __typename?: "BackgroundCheckEntityDetailsReviewDiffTopics";
+              added: Array<string>;
+              removed: Array<string>;
+            } | null;
+            sanctions?: {
+              __typename?: "BackgroundCheckEntityDetailsReviewDiffSanctions";
+              added: Array<{
+                __typename?: "BackgroundCheckEntityDetailsSanction";
+                id: string;
+                datasets?: Array<{
+                  __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+                  title: string;
+                }> | null;
+                properties: {
+                  __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
+                  authority?: Array<string> | null;
+                  program?: Array<string> | null;
+                };
+              }>;
+              removed: Array<{
+                __typename?: "BackgroundCheckEntityDetailsSanction";
+                id: string;
+                datasets?: Array<{
+                  __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+                  title: string;
+                }> | null;
+                properties: {
+                  __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
+                  authority?: Array<string> | null;
+                  program?: Array<string> | null;
+                };
+              }>;
+            } | null;
+          } | null;
+        } | null;
         properties: {
           __typename?: "BackgroundCheckEntityDetailsCompanyProperties";
           dateOfRegistration?: Array<string> | null;
@@ -45449,6 +45661,46 @@ export type BackgroundCheckProfileDetails_backgroundCheckEntityDetailsQuery = {
           summary?: string | null;
           url?: string | null;
         }> | null;
+        reviewDiff?: {
+          __typename?: "BackgroundCheckEntityDetailsReviewDiff";
+          properties?: {
+            __typename?: "BackgroundCheckEntityDetailsReviewDiffProperties";
+            topics?: {
+              __typename?: "BackgroundCheckEntityDetailsReviewDiffTopics";
+              added: Array<string>;
+              removed: Array<string>;
+            } | null;
+            sanctions?: {
+              __typename?: "BackgroundCheckEntityDetailsReviewDiffSanctions";
+              added: Array<{
+                __typename?: "BackgroundCheckEntityDetailsSanction";
+                id: string;
+                datasets?: Array<{
+                  __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+                  title: string;
+                }> | null;
+                properties: {
+                  __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
+                  authority?: Array<string> | null;
+                  program?: Array<string> | null;
+                };
+              }>;
+              removed: Array<{
+                __typename?: "BackgroundCheckEntityDetailsSanction";
+                id: string;
+                datasets?: Array<{
+                  __typename?: "BackgroundCheckEntityDetailsSanctionDatasets";
+                  title: string;
+                }> | null;
+                properties: {
+                  __typename?: "BackgroundCheckEntityDetailsSanctionProperties";
+                  authority?: Array<string> | null;
+                  program?: Array<string> | null;
+                };
+              }>;
+            } | null;
+          } | null;
+        } | null;
         properties: {
           __typename?: "BackgroundCheckEntityDetailsPersonProperties";
           country?: Array<string> | null;
@@ -45643,6 +45895,17 @@ export type BackgroundCheckFieldSearchResults_updateProfileFieldValueMutation = 
   updateProfileFieldValue: { __typename?: "Profile"; id: string };
 };
 
+export type BackgroundCheckFieldSearchResults_updateProfileFieldValueOptionsMutationVariables =
+  Exact<{
+    profileId: Scalars["GID"]["input"];
+    profileTypeFieldId: Scalars["GID"]["input"];
+    data: UpdateProfileFieldValueOptionsDataInput;
+  }>;
+
+export type BackgroundCheckFieldSearchResults_updateProfileFieldValueOptionsMutation = {
+  updateProfileFieldValueOptions: { __typename?: "ProfileFieldValue"; id: string };
+};
+
 export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQueryVariables = Exact<{
   token: Scalars["String"]["input"];
   name: Scalars["String"]["input"];
@@ -45660,6 +45923,7 @@ export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQuery =
     createdAt: string;
     isDraft?: boolean | null;
     hasStoredValue?: boolean | null;
+    hasPendingReview?: boolean | null;
     items: Array<
       | {
           __typename?: "BackgroundCheckEntitySearchCompany";
@@ -45694,6 +45958,16 @@ export type BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQuery =
           };
         }
     >;
+    reviewDiff?: {
+      __typename?: "BackgroundCheckEntitySearchReviewDiff";
+      items?: {
+        __typename?: "BackgroundCheckEntitySearchReviewDiffItems";
+        added?: Array<
+          | { __typename?: "BackgroundCheckEntitySearchCompany"; id: string }
+          | { __typename?: "BackgroundCheckEntitySearchPerson"; id: string }
+        > | null;
+      } | null;
+    } | null;
   };
 };
 
@@ -51895,7 +52169,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       id: string;
       type: PetitionAttachmentType;
       isUploading: boolean;
-      visibility: any;
+      visibility?: { [key: string]: any } | null;
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     }>;
     ANNEX: Array<{
@@ -51903,7 +52177,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       id: string;
       type: PetitionAttachmentType;
       isUploading: boolean;
-      visibility: any;
+      visibility?: { [key: string]: any } | null;
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     }>;
     BACK: Array<{
@@ -51911,7 +52185,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       id: string;
       type: PetitionAttachmentType;
       isUploading: boolean;
-      visibility: any;
+      visibility?: { [key: string]: any } | null;
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     }>;
   };
@@ -52137,7 +52411,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       id: string;
       type: PetitionAttachmentType;
       isUploading: boolean;
-      visibility: any;
+      visibility?: { [key: string]: any } | null;
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     }>;
     ANNEX: Array<{
@@ -52145,7 +52419,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       id: string;
       type: PetitionAttachmentType;
       isUploading: boolean;
-      visibility: any;
+      visibility?: { [key: string]: any } | null;
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     }>;
     BACK: Array<{
@@ -52153,7 +52427,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       id: string;
       type: PetitionAttachmentType;
       isUploading: boolean;
-      visibility: any;
+      visibility?: { [key: string]: any } | null;
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     }>;
   };
@@ -54989,7 +55263,7 @@ export type PetitionCompose_petitionQuery = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -55002,7 +55276,7 @@ export type PetitionCompose_petitionQuery = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -55015,7 +55289,7 @@ export type PetitionCompose_petitionQuery = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -55253,7 +55527,7 @@ export type PetitionCompose_petitionQuery = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -55266,7 +55540,7 @@ export type PetitionCompose_petitionQuery = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -55279,7 +55553,7 @@ export type PetitionCompose_petitionQuery = {
             id: string;
             type: PetitionAttachmentType;
             isUploading: boolean;
-            visibility: any;
+            visibility?: { [key: string]: any } | null;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -73663,6 +73937,19 @@ export const PreviewPetitionFieldAdverseMediaSearch_PetitionBaseFragmentDoc = gq
   ${PreviewPetitionFieldAdverseMediaSearch_PetitionFieldFragmentDoc}
   ${useFieldLogic_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionFieldAdverseMediaSearch_PetitionBaseFragment, unknown>;
+export const BackgroundCheckSearchDifferencesAlert_BackgroundCheckEntitySearchReviewDiffFragmentDoc =
+  gql`
+    fragment BackgroundCheckSearchDifferencesAlert_BackgroundCheckEntitySearchReviewDiff on BackgroundCheckEntitySearchReviewDiff {
+      items {
+        added {
+          id
+        }
+      }
+    }
+  ` as unknown as DocumentNode<
+    BackgroundCheckSearchDifferencesAlert_BackgroundCheckEntitySearchReviewDiffFragment,
+    unknown
+  >;
 export const PetitionApprovalsCard_PetitionApprovalRequestStepApproverFragmentDoc = gql`
   fragment PetitionApprovalsCard_PetitionApprovalRequestStepApprover on PetitionApprovalRequestStepApprover {
     id
@@ -75227,6 +75514,42 @@ export const BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDa
     BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDatasetFragment,
     unknown
   >;
+export const BackgroundCheckEntityDifferencesAlert_BackgroundCheckEntityDetailsReviewDiffFragmentDoc =
+  gql`
+    fragment BackgroundCheckEntityDifferencesAlert_BackgroundCheckEntityDetailsReviewDiff on BackgroundCheckEntityDetailsReviewDiff {
+      properties {
+        topics {
+          added
+          removed
+        }
+        sanctions {
+          added {
+            id
+            datasets {
+              title
+            }
+            properties {
+              authority
+              program
+            }
+          }
+          removed {
+            id
+            datasets {
+              title
+            }
+            properties {
+              authority
+              program
+            }
+          }
+        }
+      }
+    }
+  ` as unknown as DocumentNode<
+    BackgroundCheckEntityDifferencesAlert_BackgroundCheckEntityDetailsReviewDiffFragment,
+    unknown
+  >;
 export const BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragmentDoc = gql`
   fragment BackgroundCheckProfileDetails_BackgroundCheckEntityDetails on BackgroundCheckEntityDetails {
     id
@@ -75245,10 +75568,14 @@ export const BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragmentD
     hasStoredEntity
     isStoredEntity
     hasPendingReview
+    reviewDiff {
+      ...BackgroundCheckEntityDifferencesAlert_BackgroundCheckEntityDetailsReviewDiff
+    }
   }
   ${BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPersonFragmentDoc}
   ${BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompanyFragmentDoc}
   ${BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDatasetFragmentDoc}
+  ${BackgroundCheckEntityDifferencesAlert_BackgroundCheckEntityDetailsReviewDiffFragmentDoc}
 ` as unknown as DocumentNode<
   BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragment,
   unknown
@@ -85613,6 +85940,24 @@ export const BackgroundCheckFieldSearchResults_updateProfileFieldValueDocument =
   BackgroundCheckFieldSearchResults_updateProfileFieldValueMutation,
   BackgroundCheckFieldSearchResults_updateProfileFieldValueMutationVariables
 >;
+export const BackgroundCheckFieldSearchResults_updateProfileFieldValueOptionsDocument = gql`
+  mutation BackgroundCheckFieldSearchResults_updateProfileFieldValueOptions(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $data: UpdateProfileFieldValueOptionsDataInput!
+  ) {
+    updateProfileFieldValueOptions(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      data: $data
+    ) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  BackgroundCheckFieldSearchResults_updateProfileFieldValueOptionsMutation,
+  BackgroundCheckFieldSearchResults_updateProfileFieldValueOptionsMutationVariables
+>;
 export const BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocument = gql`
   query BackgroundCheckFieldSearchResults_backgroundCheckEntitySearch(
     $token: String!
@@ -85639,9 +85984,14 @@ export const BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocume
       }
       isDraft
       hasStoredValue
+      hasPendingReview
+      reviewDiff {
+        ...BackgroundCheckSearchDifferencesAlert_BackgroundCheckEntitySearchReviewDiff
+      }
     }
   }
   ${BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchemaFragmentDoc}
+  ${BackgroundCheckSearchDifferencesAlert_BackgroundCheckEntitySearchReviewDiffFragmentDoc}
 ` as unknown as DocumentNode<
   BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQuery,
   BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchQueryVariables

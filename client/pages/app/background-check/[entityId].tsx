@@ -1,16 +1,6 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Center,
-  HStack,
-  Skeleton,
-  Spinner,
-  Stack,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
-import { CheckIcon, RepeatIcon, ShortSearchIcon } from "@parallel/chakra/icons";
+import { Box, Center, HStack, Skeleton, Spinner, Stack, Text, useToast } from "@chakra-ui/react";
+import { RepeatIcon, ShortSearchIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -24,6 +14,7 @@ import { BackgroundCheckEntityDetailsPersonBasic } from "@parallel/components/pe
 import { BackgroundCheckEntityDetailsPersonOverview } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsPersonOverview";
 import { BackgroundCheckEntityDetailsRelationships } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsRelationships";
 import { BackgroundCheckEntityDetailsSanctions } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsSanctions";
+import { BackgroundCheckEntityDifferencesAlert } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDifferencesAlert";
 import { useBackgroundCheckContentsNotUpdatedDialog } from "@parallel/components/profiles/dialogs/BackgroundCheckContentsNotUpdatedDialog";
 import {
   BackgroundCheckEntitySearchType,
@@ -199,6 +190,20 @@ function BackgroundCheckProfileDetails({
 
       window.opener?.postMessage("refresh");
       await refetch({ force: false });
+
+      toast({
+        title: intl.formatMessage({
+          id: "component.background-check-search-result.search-refreshed-toast-title",
+          defaultMessage: "Search refreshed",
+        }),
+        description: intl.formatMessage({
+          id: "component.background-check-search-result.search-refreshed-toast-description",
+          defaultMessage: "The search results have been refreshed.",
+        }),
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
     } catch {}
   };
 
@@ -292,18 +297,7 @@ function BackgroundCheckProfileDetails({
                 />
               </Text>
             )}
-            {details?.hasPendingReview ? (
-              <Button
-                colorScheme="primary"
-                leftIcon={<CheckIcon />}
-                onClick={handleConfirmChangesClick}
-              >
-                <FormattedMessage
-                  id="component.background-check-profile-details.mark-as-reviewed"
-                  defaultMessage="Mark as reviewed"
-                />
-              </Button>
-            ) : details?.isStoredEntity && !isReadOnly ? (
+            {details?.isStoredEntity && !isReadOnly ? (
               <IconButtonWithTooltip
                 variant="outline"
                 label={intl.formatMessage({
@@ -386,6 +380,12 @@ function BackgroundCheckProfileDetails({
           </>
         ) : (
           <>
+            {details.hasPendingReview && details?.reviewDiff ? (
+              <BackgroundCheckEntityDifferencesAlert
+                onConfirmChangesClick={handleConfirmChangesClick}
+                diff={details.reviewDiff}
+              />
+            ) : null}
             {details.__typename === "BackgroundCheckEntityDetailsCompany" ? (
               <>
                 <BackgroundCheckEntityDetailsCompanyBasic
@@ -505,10 +505,14 @@ const _fragments = {
         hasStoredEntity
         isStoredEntity
         hasPendingReview
+        reviewDiff {
+          ...BackgroundCheckEntityDifferencesAlert_BackgroundCheckEntityDetailsReviewDiff
+        }
       }
       ${BackgroundCheckEntityDetailsDatasets.fragments.BackgroundCheckEntityDetailsDataset}
       ${this.BackgroundCheckEntityDetailsPerson}
       ${this.BackgroundCheckEntityDetailsCompany}
+      ${BackgroundCheckEntityDifferencesAlert.fragments.BackgroundCheckEntityDetailsReviewDiff}
     `;
   },
 };

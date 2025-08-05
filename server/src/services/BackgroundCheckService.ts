@@ -1,8 +1,10 @@
 import { inject, injectable } from "inversify";
-import { isNonNullish, isNullish } from "remeda";
+import { difference, isNonNullish, isNullish } from "remeda";
 import { Readable } from "stream";
 import { assert } from "ts-essentials";
+
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
+
 import { BackgroundCheckProfileProps } from "../pdf/documents/BackgroundCheckProfile";
 import { IPrinter, PRINTER } from "./Printer";
 import { IRedis, REDIS } from "./Redis";
@@ -153,6 +155,27 @@ export interface BackgroundCheckContent {
   falsePositives?: { id: string; addedAt: Date; addedByUserId: number }[];
 }
 
+interface BackgroundCheckContentDifferences {
+  search: {
+    items?: {
+      added: (EntitySearchPerson | EntitySearchCompany)[];
+      removed: (EntitySearchPerson | EntitySearchCompany)[];
+    };
+  } | null;
+  entity: {
+    properties?: {
+      topics?: {
+        added: string[];
+        removed: string[];
+      };
+      sanctions?: {
+        added: EntityDetailsSanction[];
+        removed: EntityDetailsSanction[];
+      };
+    };
+  } | null;
+}
+
 export interface IBackgroundCheckService {
   entitySearch(query: EntitySearchRequest, orgId: number): Promise<EntitySearchResponse>;
   entityProfileDetails(
@@ -169,6 +192,13 @@ export interface IBackgroundCheckService {
     entity: EntityDetailsResponse,
     storedEntityId: string | null,
   ): EntityDetailsResponse<true>;
+  extractRelevantDifferences(
+    before: BackgroundCheckContent,
+    after: BackgroundCheckContent,
+  ): BackgroundCheckContentDifferences;
+  mergeReviewReasons(
+    reviewReason: { differences: BackgroundCheckContentDifferences }[],
+  ): BackgroundCheckContentDifferences;
 }
 
 export const BACKGROUND_CHECK_SERVICE = Symbol.for("BACKGROUND_CHECK_SERVICE");
@@ -250,6 +280,156 @@ export class BackgroundCheckService implements IBackgroundCheckService {
       ...entity,
       hasStoredEntity: isNonNullish(storedEntityId),
       isStoredEntity: storedEntityId === entity.id,
+    };
+  }
+
+  public extractRelevantDifferences(before: BackgroundCheckContent, after: BackgroundCheckContent) {
+    return {
+      search: (() => {
+        let searchDiff: BackgroundCheckContentDifferences["search"] | null = null;
+
+        const itemsAdded = after.search.items.filter(
+          (item) => !before.search.items.some((i) => i.id === item.id),
+        );
+        const itemsRemoved = before.search.items.filter(
+          (item) => !after.search.items.some((i) => i.id === item.id),
+        );
+
+        if (itemsAdded.length > 0 || itemsRemoved.length > 0) {
+          searchDiff ??= {
+            items: {
+              added: itemsAdded,
+              removed: itemsRemoved,
+            },
+          };
+        }
+
+        return searchDiff;
+      })(),
+      entity: (() => {
+        if (!before.entity || !after.entity) {
+          return null;
+        }
+
+        assert(before.entity.id === after.entity.id, "Entities must have the same id");
+        assert(before.entity.type === after.entity.type, "Entities must have the same type");
+
+        let entityDiff: BackgroundCheckContentDifferences["entity"] | null = null;
+
+        const topicsBefore = before.entity.properties.topics ?? [];
+        const topicsAfter = after.entity.properties.topics ?? [];
+
+        // Extract differences for Topics
+        const topicsAdded = topicsAfter.filter((topic) => !topicsBefore.includes(topic));
+        const topicsRemoved = topicsBefore.filter((topic) => !topicsAfter.includes(topic));
+
+        if (topicsAdded.length > 0 || topicsRemoved.length > 0) {
+          entityDiff ??= { properties: {} };
+          entityDiff.properties!.topics = {
+            added: topicsAdded,
+            removed: topicsRemoved,
+          };
+        }
+
+        const sanctionsBefore = before.entity.properties.sanctions ?? [];
+        const sanctionsAfter = after.entity.properties.sanctions ?? [];
+
+        // Extract differences for Sanctions
+        const sanctionsBeforeIds = new Set(sanctionsBefore.map((sanction) => sanction.id));
+        const sanctionsAfterIds = new Set(sanctionsAfter.map((sanction) => sanction.id));
+
+        const sanctionsAdded = sanctionsAfter.filter(
+          (sanction) => !sanctionsBeforeIds.has(sanction.id),
+        );
+        const sanctionsRemoved = sanctionsBefore.filter(
+          (sanction) => !sanctionsAfterIds.has(sanction.id),
+        );
+
+        if (sanctionsAdded.length > 0 || sanctionsRemoved.length > 0) {
+          entityDiff ??= { properties: {} };
+          entityDiff.properties!.sanctions = {
+            added: sanctionsAdded,
+            removed: sanctionsRemoved,
+          };
+        }
+
+        return entityDiff;
+      })(),
+    };
+  }
+
+  public mergeReviewReasons(reviewReason: { differences: BackgroundCheckContentDifferences }[]) {
+    const differences = reviewReason.map(({ differences }) => differences);
+
+    return {
+      entity: (() => {
+        // Extract all topics from all differences
+        const allAddedTopics = differences.flatMap(
+          (diff) => diff.entity?.properties?.topics?.added ?? [],
+        );
+        const allRemovedTopics = differences.flatMap(
+          (diff) => diff.entity?.properties?.topics?.removed ?? [],
+        );
+
+        // Calculate final differences
+        const finalTopicsDiff = {
+          added: difference.multiset(allAddedTopics, allRemovedTopics),
+          removed: difference.multiset(allRemovedTopics, allAddedTopics),
+        };
+
+        // Extract all sanctions from all differences
+        const allAddedSanctions = differences.flatMap(
+          (diff) => diff.entity?.properties?.sanctions?.added ?? [],
+        );
+        const allRemovedSanctions = differences.flatMap(
+          (diff) => diff.entity?.properties?.sanctions?.removed ?? [],
+        );
+
+        // For sanctions, we need to handle by ID since they're objects
+        const addedSanctionIds = new Set(allAddedSanctions.map((s) => s.id));
+        const removedSanctionIds = new Set(allRemovedSanctions.map((s) => s.id));
+
+        const finalSanctionsDiff = {
+          added: allAddedSanctions.filter((s) => !removedSanctionIds.has(s.id)),
+          removed: allRemovedSanctions.filter((s) => !addedSanctionIds.has(s.id)),
+        };
+
+        // Build properties object only if there are actual differences
+        const properties: any = {};
+
+        if (finalTopicsDiff.added.length > 0 || finalTopicsDiff.removed.length > 0) {
+          properties.topics = finalTopicsDiff;
+        }
+
+        if (finalSanctionsDiff.added.length > 0 || finalSanctionsDiff.removed.length > 0) {
+          properties.sanctions = finalSanctionsDiff;
+        }
+
+        return Object.keys(properties).length > 0 ? { properties } : null;
+      })(),
+      search: (() => {
+        // Extract all items from all differences
+        const allAddedItems = differences.flatMap((diff) => diff.search?.items?.added ?? []);
+        const allRemovedItems = differences.flatMap((diff) => diff.search?.items?.removed ?? []);
+
+        // For search items, we need to handle by ID since they're objects
+        const addedItemIds = new Set(allAddedItems.map((s) => s.id));
+        const removedItemIds = new Set(allRemovedItems.map((s) => s.id));
+
+        const finalItemsDiff = {
+          added: allAddedItems.filter((s) => !removedItemIds.has(s.id)),
+          removed: allRemovedItems.filter((s) => !addedItemIds.has(s.id)),
+        };
+
+        // Build properties object only if there are actual differences
+        const searchDiff: any = {};
+
+        if (finalItemsDiff.added.length > 0 || finalItemsDiff.removed.length > 0) {
+          searchDiff.items = finalItemsDiff;
+        }
+
+        return Object.keys(searchDiff).length > 0 ? searchDiff : null;
+      })(),
     };
   }
 }

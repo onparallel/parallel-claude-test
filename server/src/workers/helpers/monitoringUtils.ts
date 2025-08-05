@@ -1,7 +1,6 @@
 import { subDays, subMonths, subYears } from "date-fns";
 import { isNonNullish } from "remeda";
 import { ProfileFieldValue } from "../../db/__types";
-import { EntityDetailsResponse } from "../../services/BackgroundCheckService";
 import { ProfileTypeFieldMonitoring } from "../../services/ProfileTypeFieldService";
 
 /**
@@ -80,40 +79,4 @@ export function requiresRefresh(currentDate: Date) {
       throw new Error("Invalid search frequency type");
     }
   };
-}
-
-/**
- * a difference between two entities is relevant if:
- *  - the entity id or type has changed (its another entity)
- *  - the topics have changed in any way (more, less or different)
- *  - the sanctions have changed in any way (more, less or different)
- */
-export function isRelevantEntityDifference(a: EntityDetailsResponse, b: EntityDetailsResponse) {
-  if (a.id !== b.id) {
-    return true;
-  }
-
-  if (a.type !== b.type) {
-    return true;
-  }
-
-  const topicsA = (a.properties.topics ?? []).sort().join(",");
-  const topicsB = (b.properties.topics ?? []).sort().join(",");
-  if (topicsA !== topicsB) {
-    return true;
-  }
-
-  const sanctionsA = (a.properties.sanctions ?? [])
-    .map((s) => s.id)
-    .sort()
-    .join(",");
-  const sanctionsB = (b.properties.sanctions ?? [])
-    .map((s) => s.id)
-    .sort()
-    .join(",");
-  if (sanctionsA !== sanctionsB) {
-    return true;
-  }
-
-  return false;
 }

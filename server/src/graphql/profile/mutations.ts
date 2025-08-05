@@ -2662,6 +2662,9 @@ export const updateProfileFieldValueOptions = mutationField("updateProfileFieldV
 
     if (isNonNullish(args.data.pendingReview)) {
       data.pending_review = args.data.pendingReview;
+      if (args.data.pendingReview === false) {
+        data.review_reason = null;
+      }
     }
 
     await ctx.profiles.updateProfileFieldValueOptionsByProfileId(

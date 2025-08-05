@@ -948,6 +948,7 @@ export interface NexusGenObjects {
     isStoredEntity?: boolean | null; // Boolean
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntityDetailsCompanyProperties"]; // BackgroundCheckEntityDetailsCompanyProperties!
+    reviewDiff?: NexusGenRootTypes["BackgroundCheckEntityDetailsReviewDiff"] | null; // BackgroundCheckEntityDetailsReviewDiff
     type: string; // String!
   };
   BackgroundCheckEntityDetailsCompanyProperties: {
@@ -979,6 +980,7 @@ export interface NexusGenObjects {
     isStoredEntity?: boolean | null; // Boolean
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntityDetailsPersonProperties"]; // BackgroundCheckEntityDetailsPersonProperties!
+    reviewDiff?: NexusGenRootTypes["BackgroundCheckEntityDetailsReviewDiff"] | null; // BackgroundCheckEntityDetailsReviewDiff
     type: string; // String!
   };
   BackgroundCheckEntityDetailsPersonProperties: {
@@ -1015,6 +1017,25 @@ export interface NexusGenObjects {
     relationship?: string[] | null; // [String!]
     startDate?: string[] | null; // [String!]
   };
+  BackgroundCheckEntityDetailsReviewDiff: {
+    // root type
+    properties?: NexusGenRootTypes["BackgroundCheckEntityDetailsReviewDiffProperties"] | null; // BackgroundCheckEntityDetailsReviewDiffProperties
+  };
+  BackgroundCheckEntityDetailsReviewDiffProperties: {
+    // root type
+    sanctions?: NexusGenRootTypes["BackgroundCheckEntityDetailsReviewDiffSanctions"] | null; // BackgroundCheckEntityDetailsReviewDiffSanctions
+    topics?: NexusGenRootTypes["BackgroundCheckEntityDetailsReviewDiffTopics"] | null; // BackgroundCheckEntityDetailsReviewDiffTopics
+  };
+  BackgroundCheckEntityDetailsReviewDiffSanctions: {
+    // root type
+    added: NexusGenRootTypes["BackgroundCheckEntityDetailsSanction"][]; // [BackgroundCheckEntityDetailsSanction!]!
+    removed: NexusGenRootTypes["BackgroundCheckEntityDetailsSanction"][]; // [BackgroundCheckEntityDetailsSanction!]!
+  };
+  BackgroundCheckEntityDetailsReviewDiffTopics: {
+    // root type
+    added: string[]; // [String!]!
+    removed: string[]; // [String!]!
+  };
   BackgroundCheckEntityDetailsSanction: {
     // root type
     datasets?: NexusGenRootTypes["BackgroundCheckEntityDetailsSanctionDatasets"][] | null; // [BackgroundCheckEntityDetailsSanctionDatasets!]
@@ -1037,9 +1058,11 @@ export interface NexusGenObjects {
   BackgroundCheckEntitySearch: {
     // root type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    hasPendingReview?: boolean | null; // Boolean
     hasStoredValue?: boolean | null; // Boolean
     isDraft?: boolean | null; // Boolean
     items: NexusGenRootTypes["BackgroundCheckEntitySearchSchema"][]; // [BackgroundCheckEntitySearchSchema!]!
+    reviewDiff?: NexusGenRootTypes["BackgroundCheckEntitySearchReviewDiff"] | null; // BackgroundCheckEntitySearchReviewDiff
     totalCount: number; // Int!
   };
   BackgroundCheckEntitySearchCompany: {
@@ -1075,6 +1098,15 @@ export interface NexusGenObjects {
     countryOfBirth?: string[] | null; // [String!]
     gender?: string[] | null; // [String!]
     topics?: string[] | null; // [String!]
+  };
+  BackgroundCheckEntitySearchReviewDiff: {
+    // root type
+    items?: NexusGenRootTypes["BackgroundCheckEntitySearchReviewDiffItems"] | null; // BackgroundCheckEntitySearchReviewDiffItems
+  };
+  BackgroundCheckEntitySearchReviewDiffItems: {
+    // root type
+    added?: NexusGenRootTypes["BackgroundCheckEntitySearchSchema"][] | null; // [BackgroundCheckEntitySearchSchema!]
+    removed?: NexusGenRootTypes["BackgroundCheckEntitySearchSchema"][] | null; // [BackgroundCheckEntitySearchSchema!]
   };
   BulkCreateContactsReturnType: {
     // root type
@@ -2137,6 +2169,7 @@ export interface NexusGenFieldTypes {
     isStoredEntity: boolean | null; // Boolean
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntityDetailsCompanyProperties"]; // BackgroundCheckEntityDetailsCompanyProperties!
+    reviewDiff: NexusGenRootTypes["BackgroundCheckEntityDetailsReviewDiff"] | null; // BackgroundCheckEntityDetailsReviewDiff
     type: string; // String!
   };
   BackgroundCheckEntityDetailsCompanyProperties: {
@@ -2168,6 +2201,7 @@ export interface NexusGenFieldTypes {
     isStoredEntity: boolean | null; // Boolean
     name: string; // String!
     properties: NexusGenRootTypes["BackgroundCheckEntityDetailsPersonProperties"]; // BackgroundCheckEntityDetailsPersonProperties!
+    reviewDiff: NexusGenRootTypes["BackgroundCheckEntityDetailsReviewDiff"] | null; // BackgroundCheckEntityDetailsReviewDiff
     type: string; // String!
   };
   BackgroundCheckEntityDetailsPersonProperties: {
@@ -2204,6 +2238,25 @@ export interface NexusGenFieldTypes {
     relationship: string[] | null; // [String!]
     startDate: string[] | null; // [String!]
   };
+  BackgroundCheckEntityDetailsReviewDiff: {
+    // field return type
+    properties: NexusGenRootTypes["BackgroundCheckEntityDetailsReviewDiffProperties"] | null; // BackgroundCheckEntityDetailsReviewDiffProperties
+  };
+  BackgroundCheckEntityDetailsReviewDiffProperties: {
+    // field return type
+    sanctions: NexusGenRootTypes["BackgroundCheckEntityDetailsReviewDiffSanctions"] | null; // BackgroundCheckEntityDetailsReviewDiffSanctions
+    topics: NexusGenRootTypes["BackgroundCheckEntityDetailsReviewDiffTopics"] | null; // BackgroundCheckEntityDetailsReviewDiffTopics
+  };
+  BackgroundCheckEntityDetailsReviewDiffSanctions: {
+    // field return type
+    added: NexusGenRootTypes["BackgroundCheckEntityDetailsSanction"][]; // [BackgroundCheckEntityDetailsSanction!]!
+    removed: NexusGenRootTypes["BackgroundCheckEntityDetailsSanction"][]; // [BackgroundCheckEntityDetailsSanction!]!
+  };
+  BackgroundCheckEntityDetailsReviewDiffTopics: {
+    // field return type
+    added: string[]; // [String!]!
+    removed: string[]; // [String!]!
+  };
   BackgroundCheckEntityDetailsSanction: {
     // field return type
     datasets: NexusGenRootTypes["BackgroundCheckEntityDetailsSanctionDatasets"][] | null; // [BackgroundCheckEntityDetailsSanctionDatasets!]
@@ -2226,9 +2279,11 @@ export interface NexusGenFieldTypes {
   BackgroundCheckEntitySearch: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    hasPendingReview: boolean | null; // Boolean
     hasStoredValue: boolean | null; // Boolean
     isDraft: boolean | null; // Boolean
     items: NexusGenRootTypes["BackgroundCheckEntitySearchSchema"][]; // [BackgroundCheckEntitySearchSchema!]!
+    reviewDiff: NexusGenRootTypes["BackgroundCheckEntitySearchReviewDiff"] | null; // BackgroundCheckEntitySearchReviewDiff
     totalCount: number; // Int!
   };
   BackgroundCheckEntitySearchCompany: {
@@ -2264,6 +2319,15 @@ export interface NexusGenFieldTypes {
     countryOfBirth: string[] | null; // [String!]
     gender: string[] | null; // [String!]
     topics: string[] | null; // [String!]
+  };
+  BackgroundCheckEntitySearchReviewDiff: {
+    // field return type
+    items: NexusGenRootTypes["BackgroundCheckEntitySearchReviewDiffItems"] | null; // BackgroundCheckEntitySearchReviewDiffItems
+  };
+  BackgroundCheckEntitySearchReviewDiffItems: {
+    // field return type
+    added: NexusGenRootTypes["BackgroundCheckEntitySearchSchema"][] | null; // [BackgroundCheckEntitySearchSchema!]
+    removed: NexusGenRootTypes["BackgroundCheckEntitySearchSchema"][] | null; // [BackgroundCheckEntitySearchSchema!]
   };
   BulkCreateContactsReturnType: {
     // field return type
@@ -5038,6 +5102,7 @@ export interface NexusGenFieldTypes {
     id: string; // String!
     isStoredEntity: boolean | null; // Boolean
     name: string; // String!
+    reviewDiff: NexusGenRootTypes["BackgroundCheckEntityDetailsReviewDiff"] | null; // BackgroundCheckEntityDetailsReviewDiff
     type: string; // String!
   };
   BackgroundCheckEntitySearchSchema: {
@@ -5356,6 +5421,7 @@ export interface NexusGenFieldTypeNames {
     isStoredEntity: "Boolean";
     name: "String";
     properties: "BackgroundCheckEntityDetailsCompanyProperties";
+    reviewDiff: "BackgroundCheckEntityDetailsReviewDiff";
     type: "String";
   };
   BackgroundCheckEntityDetailsCompanyProperties: {
@@ -5387,6 +5453,7 @@ export interface NexusGenFieldTypeNames {
     isStoredEntity: "Boolean";
     name: "String";
     properties: "BackgroundCheckEntityDetailsPersonProperties";
+    reviewDiff: "BackgroundCheckEntityDetailsReviewDiff";
     type: "String";
   };
   BackgroundCheckEntityDetailsPersonProperties: {
@@ -5423,6 +5490,25 @@ export interface NexusGenFieldTypeNames {
     relationship: "String";
     startDate: "String";
   };
+  BackgroundCheckEntityDetailsReviewDiff: {
+    // field return type name
+    properties: "BackgroundCheckEntityDetailsReviewDiffProperties";
+  };
+  BackgroundCheckEntityDetailsReviewDiffProperties: {
+    // field return type name
+    sanctions: "BackgroundCheckEntityDetailsReviewDiffSanctions";
+    topics: "BackgroundCheckEntityDetailsReviewDiffTopics";
+  };
+  BackgroundCheckEntityDetailsReviewDiffSanctions: {
+    // field return type name
+    added: "BackgroundCheckEntityDetailsSanction";
+    removed: "BackgroundCheckEntityDetailsSanction";
+  };
+  BackgroundCheckEntityDetailsReviewDiffTopics: {
+    // field return type name
+    added: "String";
+    removed: "String";
+  };
   BackgroundCheckEntityDetailsSanction: {
     // field return type name
     datasets: "BackgroundCheckEntityDetailsSanctionDatasets";
@@ -5445,9 +5531,11 @@ export interface NexusGenFieldTypeNames {
   BackgroundCheckEntitySearch: {
     // field return type name
     createdAt: "DateTime";
+    hasPendingReview: "Boolean";
     hasStoredValue: "Boolean";
     isDraft: "Boolean";
     items: "BackgroundCheckEntitySearchSchema";
+    reviewDiff: "BackgroundCheckEntitySearchReviewDiff";
     totalCount: "Int";
   };
   BackgroundCheckEntitySearchCompany: {
@@ -5483,6 +5571,15 @@ export interface NexusGenFieldTypeNames {
     countryOfBirth: "String";
     gender: "String";
     topics: "String";
+  };
+  BackgroundCheckEntitySearchReviewDiff: {
+    // field return type name
+    items: "BackgroundCheckEntitySearchReviewDiffItems";
+  };
+  BackgroundCheckEntitySearchReviewDiffItems: {
+    // field return type name
+    added: "BackgroundCheckEntitySearchSchema";
+    removed: "BackgroundCheckEntitySearchSchema";
   };
   BulkCreateContactsReturnType: {
     // field return type name
@@ -8255,6 +8352,7 @@ export interface NexusGenFieldTypeNames {
     id: "String";
     isStoredEntity: "Boolean";
     name: "String";
+    reviewDiff: "BackgroundCheckEntityDetailsReviewDiff";
     type: "String";
   };
   BackgroundCheckEntitySearchSchema: {

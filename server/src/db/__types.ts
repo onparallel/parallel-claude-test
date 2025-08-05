@@ -2219,6 +2219,7 @@ export interface ProfileFieldValue {
   pending_review: boolean; // bool
   active_monitoring: boolean; // bool
   petition_field_reply_id: Maybe<number>; // int4
+  review_reason: Maybe<any>; // jsonb
 }
 
 export type CreateProfileFieldValue = PartialProps<
@@ -2237,6 +2238,7 @@ export type CreateProfileFieldValue = PartialProps<
   | "pending_review"
   | "active_monitoring"
   | "petition_field_reply_id"
+  | "review_reason"
 >;
 
 export interface ProfileListView {

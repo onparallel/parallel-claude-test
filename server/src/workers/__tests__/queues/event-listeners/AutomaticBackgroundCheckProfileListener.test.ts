@@ -255,13 +255,16 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
-      name: "John Doe",
-      date: null,
-      country: "AR",
-      type: "PERSON",
-      birthCountry: "AR",
-    });
+    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
+      {
+        name: "John Doe",
+        date: null,
+        country: "AR",
+        type: "PERSON",
+        birthCountry: "AR",
+      },
+      organization.id,
+    );
 
     const { errors: queryErrors, data: queryData } = await testClient.execute(
       gql`
@@ -526,13 +529,16 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
-      name: "John Doe",
-      date: "1990-01-01",
-      country: "UY",
-      type: "PERSON",
-      birthCountry: "UY",
-    });
+    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
+      {
+        name: "John Doe",
+        date: "1990-01-01",
+        country: "UY",
+        type: "PERSON",
+        birthCountry: "UY",
+      },
+      organization.id,
+    );
 
     const { errors: queryErrors, data: queryData } = await testClient.execute(
       gql`
@@ -1218,13 +1224,16 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
-      name: "John Doe",
-      date: null,
-      country: "AR",
-      birthCountry: "AR",
-      type: "PERSON",
-    });
+    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
+      {
+        name: "John Doe",
+        date: null,
+        country: "AR",
+        birthCountry: "AR",
+        type: "PERSON",
+      },
+      organization.id,
+    );
 
     const { errors: updateErrors, data: updateData } = await testClient.execute(
       gql`
@@ -1436,13 +1445,16 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
     // run first search
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledWith({
-      name: "John Doe",
-      date: null,
-      country: "AR",
-      birthCountry: "AR",
-      type: "PERSON",
-    });
+    expect(backgroundCheckServiceSpy).toHaveBeenCalledWith(
+      {
+        name: "John Doe",
+        date: null,
+        country: "AR",
+        birthCountry: "AR",
+        type: "PERSON",
+      },
+      organization.id,
+    );
 
     const { errors: removeErrors, data: removeData } = await testClient.execute(
       gql`
@@ -1727,13 +1739,16 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith({
-      name: "Harvey Doe",
-      date: null,
-      country: "AR",
-      birthCountry: "AR",
-      type: "PERSON",
-    });
+    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
+      {
+        name: "Harvey Doe",
+        date: null,
+        country: "AR",
+        birthCountry: "AR",
+        type: "PERSON",
+      },
+      organization.id,
+    );
 
     const { errors: queryErrors, data: queryData } = await testClient.execute(
       gql`
@@ -1915,13 +1930,16 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
     // run first search
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledWith({
-      name: "John Doe",
-      date: null,
-      country: "AR",
-      birthCountry: "AR",
-      type: "PERSON",
-    });
+    expect(backgroundCheckServiceSpy).toHaveBeenCalledWith(
+      {
+        name: "John Doe",
+        date: null,
+        country: "AR",
+        birthCountry: "AR",
+        type: "PERSON",
+      },
+      organization.id,
+    );
 
     await testClient.execute(
       gql`

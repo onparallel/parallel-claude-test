@@ -72,6 +72,27 @@ export const BackgroundCheckEntitySearch = objectType({
     t.nullable.boolean("hasStoredValue", {
       description: "If this result is a draft, this will be true if it also has a stored value",
     });
+    t.nullable.boolean("hasPendingReview");
+    t.nullable.field("reviewDiff", {
+      type: objectType({
+        name: "BackgroundCheckEntitySearchReviewDiff",
+        definition(t) {
+          t.nullable.field("items", {
+            type: objectType({
+              name: "BackgroundCheckEntitySearchReviewDiffItems",
+              definition(t) {
+                t.nullable.list.nonNull.field("added", {
+                  type: "BackgroundCheckEntitySearchSchema",
+                });
+                t.nullable.list.nonNull.field("removed", {
+                  type: "BackgroundCheckEntitySearchSchema",
+                });
+              },
+            }),
+          });
+        },
+      }),
+    });
   },
 });
 
@@ -217,6 +238,42 @@ export const BackgroundCheckEntityDetails = interfaceType({
       description: "Whether this entity is the one stored in the reply",
     });
     t.nullable.boolean("hasPendingReview");
+    t.nullable.field("reviewDiff", {
+      type: objectType({
+        name: "BackgroundCheckEntityDetailsReviewDiff",
+        definition(t) {
+          t.nullable.field("properties", {
+            type: objectType({
+              name: "BackgroundCheckEntityDetailsReviewDiffProperties",
+              definition(t) {
+                t.nullable.field("topics", {
+                  type: objectType({
+                    name: "BackgroundCheckEntityDetailsReviewDiffTopics",
+                    definition(t) {
+                      t.nonNull.list.nonNull.string("added");
+                      t.nonNull.list.nonNull.string("removed");
+                    },
+                  }),
+                });
+                t.nullable.field("sanctions", {
+                  type: objectType({
+                    name: "BackgroundCheckEntityDetailsReviewDiffSanctions",
+                    definition(t) {
+                      t.nonNull.list.nonNull.field("added", {
+                        type: "BackgroundCheckEntityDetailsSanction",
+                      });
+                      t.nonNull.list.nonNull.field("removed", {
+                        type: "BackgroundCheckEntityDetailsSanction",
+                      });
+                    },
+                  }),
+                });
+              },
+            }),
+          });
+        },
+      }),
+    });
   },
   resolveType: (o) => {
     if (o.type === "Person") {

@@ -300,6 +300,8 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
         ...ctx.backgroundCheck.mapBackgroundCheckSearch(content),
         isDraft: currentValue.is_draft,
         hasStoredValue: isNonNullish(value),
+        hasPendingReview: currentValue.pending_review,
+        reviewDiff: ctx.backgroundCheck.mergeReviewReasons(currentValue.review_reason ?? []).search,
       };
     }
 
@@ -429,7 +431,6 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
           hasPendingReview: currentValue?.pending_review ?? false,
         };
       }
-
       if (!args.force) {
         return {
           ...ctx.backgroundCheck.mapBackgroundCheckEntity(
@@ -437,6 +438,8 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
             currentValue.content.entity.id,
           ),
           hasPendingReview: currentValue.pending_review,
+          reviewDiff: ctx.backgroundCheck.mergeReviewReasons(currentValue.review_reason ?? [])
+            .entity,
         };
       }
 

@@ -1,5 +1,5 @@
-import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
 import { Duration } from "date-fns";
+import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
 import gql from "graphql-tag";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = T | null;
@@ -228,6 +228,7 @@ export type BackgroundCheckEntityDetails = {
   /** Whether this entity is the one stored in the reply */
   isStoredEntity: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
+  reviewDiff: Maybe<BackgroundCheckEntityDetailsReviewDiff>;
   type: Scalars["String"]["output"];
 };
 
@@ -242,6 +243,7 @@ export type BackgroundCheckEntityDetailsCompany = BackgroundCheckEntityDetails &
   isStoredEntity: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntityDetailsCompanyProperties;
+  reviewDiff: Maybe<BackgroundCheckEntityDetailsReviewDiff>;
   type: Scalars["String"]["output"];
 };
 
@@ -275,6 +277,7 @@ export type BackgroundCheckEntityDetailsPerson = BackgroundCheckEntityDetails & 
   isStoredEntity: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   properties: BackgroundCheckEntityDetailsPersonProperties;
+  reviewDiff: Maybe<BackgroundCheckEntityDetailsReviewDiff>;
   type: Scalars["String"]["output"];
 };
 
@@ -312,6 +315,25 @@ export type BackgroundCheckEntityDetailsRelationshipProperties = {
   startDate: Maybe<Array<Scalars["String"]["output"]>>;
 };
 
+export type BackgroundCheckEntityDetailsReviewDiff = {
+  properties: Maybe<BackgroundCheckEntityDetailsReviewDiffProperties>;
+};
+
+export type BackgroundCheckEntityDetailsReviewDiffProperties = {
+  sanctions: Maybe<BackgroundCheckEntityDetailsReviewDiffSanctions>;
+  topics: Maybe<BackgroundCheckEntityDetailsReviewDiffTopics>;
+};
+
+export type BackgroundCheckEntityDetailsReviewDiffSanctions = {
+  added: Array<BackgroundCheckEntityDetailsSanction>;
+  removed: Array<BackgroundCheckEntityDetailsSanction>;
+};
+
+export type BackgroundCheckEntityDetailsReviewDiffTopics = {
+  added: Array<Scalars["String"]["output"]>;
+  removed: Array<Scalars["String"]["output"]>;
+};
+
 export type BackgroundCheckEntityDetailsSanction = {
   datasets: Maybe<Array<BackgroundCheckEntityDetailsSanctionDatasets>>;
   id: Scalars["String"]["output"];
@@ -333,10 +355,12 @@ export type BackgroundCheckEntityDetailsSanctionProperties = {
 
 export type BackgroundCheckEntitySearch = {
   createdAt: Scalars["DateTime"]["output"];
+  hasPendingReview: Maybe<Scalars["Boolean"]["output"]>;
   /** If this result is a draft, this will be true if it also has a stored value */
   hasStoredValue: Maybe<Scalars["Boolean"]["output"]>;
   isDraft: Maybe<Scalars["Boolean"]["output"]>;
   items: Array<BackgroundCheckEntitySearchSchema>;
+  reviewDiff: Maybe<BackgroundCheckEntitySearchReviewDiff>;
   totalCount: Scalars["Int"]["output"];
 };
 
@@ -376,6 +400,15 @@ export type BackgroundCheckEntitySearchPersonProperties = {
   countryOfBirth: Maybe<Array<Scalars["String"]["output"]>>;
   gender: Maybe<Array<Scalars["String"]["output"]>>;
   topics: Maybe<Array<Scalars["String"]["output"]>>;
+};
+
+export type BackgroundCheckEntitySearchReviewDiff = {
+  items: Maybe<BackgroundCheckEntitySearchReviewDiffItems>;
+};
+
+export type BackgroundCheckEntitySearchReviewDiffItems = {
+  added: Maybe<Array<BackgroundCheckEntitySearchSchema>>;
+  removed: Maybe<Array<BackgroundCheckEntitySearchSchema>>;
 };
 
 export type BackgroundCheckEntitySearchSchema = {
@@ -4050,7 +4083,8 @@ export type PetitionAttachment = {
   id: Scalars["GID"]["output"];
   petition: PetitionBase;
   type: PetitionAttachmentType;
-  visibility: Scalars["JSON"]["output"];
+  /** A JSON object representing the conditions for the attachment to be visible */
+  visibility: Maybe<Scalars["JSONObject"]["output"]>;
 };
 
 export type PetitionAttachmentType = "ANNEX" | "BACK" | "FRONT";

@@ -22,6 +22,7 @@ import {
   UserXIcon,
   XCircleIcon,
 } from "@parallel/chakra/icons";
+import { NewResultItemBadge } from "@parallel/components/common/BackgroundCheckBadges";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
@@ -32,6 +33,7 @@ import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
 import { usePreviewPetitionFieldBackgroundCheckFalsePositivesDialog } from "@parallel/components/petition-preview/dialogs/PreviewPetitionFieldBackgroundCheckFalsePositivesDialog";
 import { usePreviewPetitionFieldBackgroundCheckReplaceReplyDialog } from "@parallel/components/petition-preview/dialogs/PreviewPetitionFieldBackgroundCheckReplaceReplyDialog";
+import { BackgroundCheckSearchDifferencesAlert } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckSearchDifferencesAlert";
 import { useBackgroundCheckContentsNotUpdatedDialog } from "@parallel/components/profiles/dialogs/BackgroundCheckContentsNotUpdatedDialog";
 import { useConfirmModifyBackgroundCheckSearch } from "@parallel/components/profiles/dialogs/ConfirmModifyBackgroundCheckSearchDialog";
 import { Tooltip } from "@parallel/components/ui";
@@ -44,6 +46,7 @@ import {
   BackgroundCheckFieldSearchResults_updateBackgroundCheckEntityDocument,
   BackgroundCheckFieldSearchResults_updateBackgroundCheckSearchFalsePositivesDocument,
   BackgroundCheckFieldSearchResults_updateProfileFieldValueDocument,
+  BackgroundCheckFieldSearchResults_updateProfileFieldValueOptionsDocument,
 } from "@parallel/graphql/__types";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
@@ -61,14 +64,14 @@ import { useRouter } from "next/router";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, pick } from "remeda";
-type BackgroundCheckFieldSearchResults_Selection =
+type BackgroundCheckFieldSearchResults_Selection = { isNew: boolean } & (
   | ({
       type: "Person";
     } & BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_BackgroundCheckEntitySearchPerson_Fragment)
   | ({
       type: "Company";
-    } & BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_BackgroundCheckEntitySearchCompany_Fragment);
-
+    } & BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_BackgroundCheckEntitySearchCompany_Fragment)
+);
 interface BackgroundCheckFieldSearchResultsTableContext {
   savedEntityId: string | null;
   onDeleteEntity: (entityId: string) => void;
@@ -292,7 +295,10 @@ function BackgroundCheckFieldSearchResults({
   const { page, items } = state;
 
   const [tableRows, totalCount] = useMemo(() => {
-    const rows = result?.items as BackgroundCheckFieldSearchResults_Selection[] | undefined;
+    const rows = result?.items.map((i) => ({
+      ...i,
+      isNew: result.reviewDiff?.items?.added?.some((addedItem) => addedItem.id === i.id) ?? false,
+    })) as BackgroundCheckFieldSearchResults_Selection[] | undefined;
     if (!rows) {
       return [[], 0];
     }
@@ -353,6 +359,45 @@ function BackgroundCheckFieldSearchResults({
     } catch {}
   }, [result, refetch]);
 
+  const [updateProfileFieldValueOptions] = useMutation(
+    BackgroundCheckFieldSearchResults_updateProfileFieldValueOptionsDocument,
+  );
+
+  const handleConfirmChangesClick = async () => {
+    try {
+      const data = JSON.parse(atob(token));
+      if (!("profileId" in data)) {
+        return;
+      }
+
+      await updateProfileFieldValueOptions({
+        variables: {
+          profileId: data.profileId,
+          profileTypeFieldId: data.profileTypeFieldId,
+          data: { pendingReview: false },
+        },
+      });
+
+      window.opener?.postMessage("refresh");
+
+      await refetch();
+
+      toast({
+        title: intl.formatMessage({
+          id: "component.background-check-search-result.search-refreshed-toast-title",
+          defaultMessage: "Search refreshed",
+        }),
+        description: intl.formatMessage({
+          id: "component.background-check-search-result.search-refreshed-toast-description",
+          defaultMessage: "The search results have been refreshed.",
+        }),
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch {}
+  };
+
   return (
     <>
       <Head>
@@ -408,6 +453,12 @@ function BackgroundCheckFieldSearchResults({
               <Skeleton height="24px" width="100%" maxWidth="260px" />
             </>
           )}
+          {result?.hasPendingReview && result?.reviewDiff?.items?.added ? (
+            <BackgroundCheckSearchDifferencesAlert
+              diff={result.reviewDiff}
+              onConfirmChangesClick={handleConfirmChangesClick}
+            />
+          ) : null}
         </HStack>
         <TablePage
           isHighlightable
@@ -415,6 +466,9 @@ function BackgroundCheckFieldSearchResults({
           context={context}
           rows={tableRows}
           rowKeyProp="id"
+          rowProps={(row) => ({
+            backgroundColor: row.isNew ? "green.50" : undefined,
+          })}
           page={state.page}
           pageSize={state.items}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
@@ -573,6 +627,7 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                 </Tooltip>
               )}
               {row.name}
+              {row.isNew ? <NewResultItemBadge /> : null}
             </Flex>
           );
         },
@@ -914,6 +969,21 @@ const _mutations = [
       }
     }
   `,
+  gql`
+    mutation BackgroundCheckFieldSearchResults_updateProfileFieldValueOptions(
+      $profileId: GID!
+      $profileTypeFieldId: GID!
+      $data: UpdateProfileFieldValueOptionsDataInput!
+    ) {
+      updateProfileFieldValueOptions(
+        profileId: $profileId
+        profileTypeFieldId: $profileTypeFieldId
+        data: $data
+      ) {
+        id
+      }
+    }
+  `,
 ];
 
 const _queries = [
@@ -943,9 +1013,14 @@ const _queries = [
         }
         isDraft
         hasStoredValue
+        hasPendingReview
+        reviewDiff {
+          ...BackgroundCheckSearchDifferencesAlert_BackgroundCheckEntitySearchReviewDiff
+        }
       }
     }
     ${_fragments.BackgroundCheckEntitySearchSchema}
+    ${BackgroundCheckSearchDifferencesAlert.fragments.BackgroundCheckEntitySearchReviewDiff}
   `,
 ];
 

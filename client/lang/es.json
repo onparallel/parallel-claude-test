@@ -615,6 +615,16 @@
     "context": "False positives"
   },
   {
+    "term": "component.background-check-badges.new-result-item-badge",
+    "definition": "Nuevo",
+    "context": "New"
+  },
+  {
+    "term": "component.background-check-badges.new-result-item-tooltip",
+    "definition": "Nuevo resultado encontrado",
+    "context": "New result found"
+  },
+  {
     "term": "component.background-check-badges.pending-resolution-popover",
     "definition": "Marca una coincidencia si la hay, o indica que todos los resultados son falsos positivos para marcar esta propiedad como resuelta.",
     "context": "Save a match if there is one, or indicate that all results are false positives to mark this field as resolved."
@@ -825,6 +835,36 @@
     "context": "Sanction lists"
   },
   {
+    "term": "component.background-check-entity-differences-alert.mark-as-reviewed",
+    "definition": "Marcar como revisado",
+    "context": "Mark as reviewed"
+  },
+  {
+    "term": "component.background-check-entity-differences-alert.sanctions-added",
+    "definition": "<b>Las siguientes sanciones han sido añadidas:</b>",
+    "context": "<b>The following sanctions have been added:</b>"
+  },
+  {
+    "term": "component.background-check-entity-differences-alert.sanctions-removed",
+    "definition": "<b>Las siguientes sanciones han sido eliminadas:</b>",
+    "context": "<b>The following sanctions have been removed:</b>"
+  },
+  {
+    "term": "component.background-check-entity-differences-alert.title",
+    "definition": "Se han detectado cambios",
+    "context": "Changes detected"
+  },
+  {
+    "term": "component.background-check-entity-differences-alert.topics-added",
+    "definition": "<b>Los siguientes topics han sido añadidos:</b> {topics}",
+    "context": "<b>The following topics have been added:</b> {topics}"
+  },
+  {
+    "term": "component.background-check-entity-differences-alert.topics-removed",
+    "definition": "<b>Los siguientes topics han sido eliminados:</b> {topics}",
+    "context": "<b>The following topics have been removed:</b> {topics}"
+  },
+  {
     "term": "component.background-check-entity-type-select.entity-type-any",
     "definition": "Todos los resultados",
     "context": "All results"
@@ -840,9 +880,14 @@
     "context": "Individuals"
   },
   {
-    "term": "component.background-check-profile-details.mark-as-reviewed",
-    "definition": "Marcar como revisado",
-    "context": "Mark as reviewed"
+    "term": "component.background-check-search-differences-alert.new-items-found-description",
+    "definition": "Hemos encontrado {n, plural, =1 {# nuevo resultado} other {# nuevos resultados}} para tu búsqueda.",
+    "context": "We have found {n, plural, =1 {# new result} other {# new results}} for your search."
+  },
+  {
+    "term": "component.background-check-search-differences-alert.title",
+    "definition": "Se han detectado cambios",
+    "context": "Changes detected"
   },
   {
     "term": "component.background-check-search-result.automatically-saved-search-text",
@@ -893,6 +938,11 @@
     "term": "component.background-check-search-result.mark-as-false-positives",
     "definition": "Marcar como falsos positivos",
     "context": "Mark as false positives"
+  },
+  {
+    "term": "component.background-check-search-result.mark-as-reviewed",
+    "definition": "Marcar como revisado",
+    "context": "Mark as reviewed"
   },
   {
     "term": "component.background-check-search-result.modify-search",
