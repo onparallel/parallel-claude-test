@@ -44,6 +44,7 @@
     "@types/react": "^18.3.4",
     "@types/express": "^4.17.21",
     "@typescript-eslint/typescript-estree": "^7.10.0",
-    "postgres-interval": "^4.0.2"
+    "postgres-interval": "^4.0.2",
+    "tmp": "0.2.4"
   }
 }
