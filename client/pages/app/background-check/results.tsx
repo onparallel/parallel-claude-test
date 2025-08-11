@@ -19,6 +19,7 @@ import {
   RepeatIcon,
   SaveIcon,
   StarEmptyIcon,
+  UndoIcon,
   UserIcon,
   UserXIcon,
   XCircleIcon,
@@ -847,7 +848,7 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                       id: "component.background-check-search-result.unmark-as-false-positive",
                       defaultMessage: "Unmark as false positive",
                     })}
-                    icon={<DeleteIcon />}
+                    icon={<UndoIcon />}
                     isLoading={context.isDeletingEntity[row.id]}
                     isDisabled={
                       context.isSavingEntity[row.id] ||

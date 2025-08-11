@@ -3160,3 +3160,20 @@ export const MessageSquareIcon = createIcon({
     </g>
   ),
 });
+
+export const UndoIcon = createIcon({
+  displayName: "UndoIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      stroke="currentColor"
+      fill="none"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M8 4L4 8l4 4" />
+      <path d="M4 8h10a6 6 0 1 1 0 12H10" />
+    </g>
+  ),
+});
