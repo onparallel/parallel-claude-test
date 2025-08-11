@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Flex,
+  Grid,
   Heading,
   HStack,
   Image,
@@ -827,10 +828,17 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                 <HStack>
                   <XCircleIcon color="red.500" />
                   <Text fontWeight={500}>
-                    <FormattedMessage
-                      id="component.background-check-search-result.false-positive"
-                      defaultMessage="False positive"
-                    />
+                    {row.type === "Person" ? (
+                      <FormattedMessage
+                        id="component.background-check-search-result.not-the-person"
+                        defaultMessage="Not the person"
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="component.background-check-search-result.not-the-entity"
+                        defaultMessage="Not the entity"
+                      />
+                    )}
                   </Text>
                   <IconButtonWithTooltip
                     size="sm"
@@ -855,41 +863,46 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                   />
                 </HStack>
               ) : (
-                <HStack>
-                  <Button
+                <Grid gridTemplateColumns="1fr 1fr" gap={2}>
+                  <ResponsiveButtonIcon
+                    label={intl.formatMessage({
+                      id: "component.background-check-search-result.save-match",
+                      defaultMessage: "Save match",
+                    })}
                     size="sm"
                     fontSize="md"
                     isLoading={context.isSavingEntity[row.id]}
                     isDisabled={context.isReadOnly}
                     variant="solid"
                     colorScheme="primary"
-                    leftIcon={<StarEmptyIcon />}
+                    icon={<StarEmptyIcon />}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleSaveClick();
                     }}
-                  >
-                    <FormattedMessage
-                      id="component.background-check-search-result.save-match"
-                      defaultMessage="Save match"
-                    />
-                  </Button>
-                  <Button
+                  />
+                  <ResponsiveButtonIcon
+                    label={
+                      row.type === "Person"
+                        ? intl.formatMessage({
+                            id: "component.background-check-search-result.not-the-person",
+                            defaultMessage: "Not the person",
+                          })
+                        : intl.formatMessage({
+                            id: "component.background-check-search-result.not-the-entity",
+                            defaultMessage: "Not the entity",
+                          })
+                    }
                     size="sm"
                     fontSize="md"
-                    leftIcon={<UserXIcon />}
+                    icon={<UserXIcon />}
                     isDisabled={context.isReadOnly || isNonNullish(context.savedEntityId)}
                     onClick={(e) => {
                       e.stopPropagation();
                       context.onFalsePositiveClick([row.id], true);
                     }}
-                  >
-                    <FormattedMessage
-                      id="component.background-check-search-result.false-positive"
-                      defaultMessage="False positive"
-                    />
-                  </Button>
-                </HStack>
+                  />
+                </Grid>
               )}
             </Flex>
           );

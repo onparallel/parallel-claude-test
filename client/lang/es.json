@@ -960,6 +960,16 @@
     "context": "It seems that the entity you are looking for is not listed anywhere!"
   },
   {
+    "term": "component.background-check-search-result.not-the-entity",
+    "definition": "No es la entidad",
+    "context": "Not the entity"
+  },
+  {
+    "term": "component.background-check-search-result.not-the-person",
+    "definition": "No es la persona",
+    "context": "Not the person"
+  },
+  {
     "term": "component.background-check-search-result.person",
     "definition": "Persona",
     "context": "Person"
