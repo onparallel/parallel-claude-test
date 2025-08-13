@@ -6,7 +6,7 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import { differenceInMinutes } from "date-fns";
 import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
-import { difference, isNonNullish, isNullish, omitBy, partition, unique } from "remeda";
+import { difference, isNonNullish, isNullish, omitBy, unique } from "remeda";
 import { LicenseCode, PublicFileUpload } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { random } from "../../util/token";
@@ -260,21 +260,21 @@ export const deactivateUser = mutationField("deactivateUser", {
     includeDrafts: booleanArg(),
   },
   resolve: async (_, { userIds, transferToUserId, tagIds, includeDrafts }, ctx) => {
-    const rows = await ctx.petitions.transferUserPetitionPermissions(
+    if (!includeDrafts) {
+      const deletedDrafts = await ctx.petitions.deleteDraftsByUserId(
+        userIds,
+        `User:${ctx.user!.id}`,
+      );
+      await ctx.petitions.deletePetitionAttachmentByPetitionId(
+        deletedDrafts.map((d) => d.id),
+        ctx.user!,
+      );
+    }
+
+    const transferredPetitions = await ctx.petitions.transferUserPetitionPermissions(
       userIds,
       transferToUserId,
-      includeDrafts ?? false,
       `User:${ctx.user!.id}`,
-    );
-
-    const [transferredPetitions, deletedDrafts] = partition(
-      rows,
-      (r) => r.source === "transferred_petitions",
-    );
-
-    await ctx.petitions.deletePetitionAttachmentByPetitionId(
-      deletedDrafts.map((r) => r.petition_id),
-      ctx.user!,
     );
 
     await ctx.petitions.createEvent(

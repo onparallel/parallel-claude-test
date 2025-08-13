@@ -9235,23 +9235,15 @@ export class PetitionRepository extends BaseRepository {
   async transferUserPetitionPermissions(
     userIds: number[],
     transferToUserId: number,
-    includeDrafts: boolean,
     transferredBy: string,
   ) {
     return await pMapChunk(
       userIds,
       async (userIdsChunk) => {
-        return await this.raw<
-          {
-            petition_id: number;
-          } & (
-            | {
-                source: "transferred_petitions";
-                previous_owner_id: number;
-              }
-            | { source: "deleted_drafts" }
-          )
-        >(
+        return await this.raw<{
+          petition_id: number;
+          previous_owner_id: number;
+        }>(
           /* sql */ `
           with 
           -- permissions directly assigned to userIds (not assigned to userIds via an user_group)
@@ -9271,12 +9263,6 @@ export class PetitionRepository extends BaseRepository {
               from directly_assigned_petition_permissions dapp
               where dapp.type != 'OWNER'
           ),
-          -- owner permissions for userIds on petition DRAFTs will be deleted or transferred to the new owner, based on the includeDrafts arg
-          owner_draft_petition_permissions as (
-            select * from directly_assigned_petition_permissions dapp
-              where dapp.type = 'OWNER'
-              and dapp.petition_status = 'DRAFT'
-          ),
           -- owner permissions for userIds will be transferred to the new owner
           -- here we will delete those permissions so we can assign new OWNERs later.
           previous_owner_petition_permissions as (
@@ -9287,7 +9273,6 @@ export class PetitionRepository extends BaseRepository {
             from directly_assigned_petition_permissions dapp
             where dapp.id = pp.id
             and dapp.type = 'OWNER'
-            and (:includeDrafts or dapp.petition_status is null or dapp.petition_status != 'DRAFT')
             returning pp.*
           ),
           new_owner_petition_permissions as (
@@ -9295,43 +9280,22 @@ export class PetitionRepository extends BaseRepository {
             select popp.petition_id, :transferToUserId, 'OWNER', :transferredBy, :transferredBy, now()
             from previous_owner_petition_permissions popp
             on conflict (petition_id, user_id) where deleted_at is null and from_user_group_id is null and user_group_id is null
-            do nothing
+            do update
+            set 
+              "type" = 'OWNER',
+              updated_at = now(),
+              updated_by = :transferredBy
             returning *
           ),
           -- delete non-owner permissions for userIds
           deleted_non_owner_petition_permissions as (
             update petition_permission pp
             set
-              updated_at = now(),
-              updated_by = :transferredBy,
               deleted_at = now(),
               deleted_by = :transferredBy
             from non_owner_petition_permissions nopp
             where pp.id = nopp.id
             and pp.deleted_at is null
-          ),
-          -- delete permissions on DRAFT petitions if includeDrafts=true
-          deleted_owner_draft_petition_permissions as (
-            update petition_permission pp
-            set
-              updated_at = now(),
-              updated_by = :transferredBy,
-              deleted_at = now(),
-              deleted_by = :transferredBy
-            from owner_draft_petition_permissions dodpp
-            where pp.id = dodpp.id
-            and not :includeDrafts
-            returning pp.*
-          ),
-          -- delete DRAFT petitions if those permissions were deleted
-          deleted_draft_petitions as (
-            update petition p
-            set
-              deleted_at = now(),
-              deleted_by = :transferredBy
-            from deleted_owner_draft_petition_permissions dodpp
-            where dodpp.petition_id = p.id
-            returning p.*
           ),
           -- delete template default permissions for userIds
           deleted_template_default_permissions as (
@@ -9351,20 +9315,61 @@ export class PetitionRepository extends BaseRepository {
             on conflict (template_id, user_id) where deleted_at is null
             do update
             -- if the new owner already has a permission, we keep the highest one
-            set "type" = least(EXCLUDED.type, template_default_permission.type)
+            set 
+              "type" = least(EXCLUDED.type, template_default_permission.type),
+              updated_at = now(),
+              updated_by = :transferredBy
           )
-          -- every transferred petition
-          select popp.petition_id, popp.user_id as previous_owner_id, 'transferred_petitions' as source from previous_owner_petition_permissions popp
-          union all
-          -- every deleted DRAFT petition
-          select ddp.id as petition_id, null as previous_owner_id, 'deleted_drafts' as source from deleted_draft_petitions ddp
+          select popp.petition_id, popp.user_id as previous_owner_id from previous_owner_petition_permissions popp
         `,
           {
             userIds: this.sqlIn(userIdsChunk),
-            includeDrafts,
             transferToUserId,
             transferredBy,
           },
+        );
+      },
+      { concurrency: 1, chunkSize: 1000 },
+    );
+  }
+
+  async deleteDraftsByUserId(userIds: number[], deletedBy: string) {
+    return await pMapChunk(
+      userIds,
+      async (userIdsChunk) => {
+        return await this.raw<{ id: number }>(
+          /* sql */ `
+          with draft_permissions as (
+            select pp.*
+            from petition_permission pp
+            join petition p on pp.petition_id = p.id
+            where pp.user_id in :userIds
+            and pp.deleted_at is null
+            and pp.user_group_id is null
+            and pp.from_user_group_id is null
+            and p.status = 'DRAFT'
+            and p.deleted_at is null
+          ),
+          deleted_draft_permissions as (
+            update petition_permission pp
+            set
+              deleted_at = now(),
+              deleted_by = :deletedBy
+            from draft_permissions dp
+            where dp.id = pp.id
+            and pp.deleted_at is null
+            returning dp.*
+          )
+          update petition p
+          set 
+            deleted_at = now(),
+            deleted_by = :deletedBy
+          from deleted_draft_permissions ddp
+          where ddp.petition_id = p.id
+          and p.deleted_at is null
+          returning p.id
+          `,
+          { userIds: this.sqlIn(userIdsChunk), deletedBy },
         );
       },
       { concurrency: 1, chunkSize: 1000 },

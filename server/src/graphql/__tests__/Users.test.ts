@@ -978,6 +978,45 @@ describe("GraphQL/Users", () => {
         deleted_at: null,
       });
     });
+
+    it("increases permission if the user to transfer to has a lower petition permission on the template than the user to deactivate", async () => {
+      const [user0Permission] = await mocks.knex.from("petition_permission").insert(
+        {
+          user_id: activeUsers[0].id,
+          type: "WRITE",
+          petition_id: user1Template.id,
+        },
+        "*",
+      );
+
+      const { errors } = await testClient.execute(
+        gql`
+          mutation ($userIds: [GID!]!, $transferToUserId: GID!) {
+            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
+              id
+            }
+          }
+        `,
+        {
+          userIds: [toGlobalId("User", activeUsers[1].id)],
+          transferToUserId: toGlobalId("User", activeUsers[0].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+
+      const [updatedPetitionPermission] = await mocks.knex
+        .from("petition_permission")
+        .where("id", user0Permission.id)
+        .select("*");
+
+      expect(updatedPetitionPermission).toMatchObject({
+        user_id: activeUsers[0].id,
+        petition_id: user1Template.id,
+        type: "OWNER",
+        deleted_at: null,
+      });
+    });
   });
 
   describe("inviteUserToOrganization", () => {
