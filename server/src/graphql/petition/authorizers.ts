@@ -14,11 +14,12 @@ import {
   PetitionSignatureStatus,
   PetitionStatus,
 } from "../../db/__types";
+import { PetitionFieldLogicCondition } from "../../util/fieldLogic";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { collectMentionsFromSlate } from "../../util/slate/mentions";
 import { MaybeArray, unMaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
-import { Arg, ArgAuthorizer, getArg } from "../helpers/authorize";
+import { and, Arg, ArgAuthorizer, getArg } from "../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../helpers/errors";
 
 function createPetitionAuthorizer<TRest extends any[] = []>(
@@ -966,7 +967,7 @@ export function firstChildHasType<
   };
 }
 
-export function fieldIsNotBeingReferencedByAnotherFieldLogic<
+function fieldIsNotBeingReferencedByAnotherFieldLogic<
   TypeName extends string,
   FieldName extends string,
   TArgPetitionId extends Arg<TypeName, FieldName, number>,
@@ -999,7 +1000,11 @@ export function fieldIsNotBeingReferencedByAnotherFieldLogic<
           f.math?.some(
             (math) =>
               math.conditions.some(
-                (c) => "fieldId" in c && fieldIds.includes(c.fieldId) && c.fieldId !== f.id,
+                (c) =>
+                  "fieldId" in c &&
+                  fieldIds.includes(c.fieldId) &&
+                  // field could reference itself in math operations, so exclude it
+                  c.fieldId !== f.id,
               ) ||
               math.operations.some(
                 (op) =>
@@ -1548,16 +1553,16 @@ export function petitionDoesNotHaveStartedProcess<
   };
 }
 
-export function fieldIsNotReferencedInApprovalFlowConfig<
+function fieldIsNotReferencedInApprovalFlowConfig<
   TypeName extends string,
   FieldName extends string,
 >(
   petitionIdArg: Arg<TypeName, FieldName, number>,
-  fieldIdArg: Arg<TypeName, FieldName, number>,
+  fieldIdArg: Arg<TypeName, FieldName, MaybeArray<number>>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const petitionId = getArg(args, petitionIdArg);
-    const fieldId = getArg(args, fieldIdArg);
+    const fieldIds = unMaybeArray(getArg(args, fieldIdArg));
 
     const petition = await ctx.petitions.loadPetition(petitionId);
     assert(petition, "petition expected to be defined");
@@ -1566,20 +1571,70 @@ export function fieldIsNotReferencedInApprovalFlowConfig<
       return true;
     }
 
-    if (
-      petition.approval_flow_config.some((config) =>
+    const referencedFieldId = fieldIds.find((id) =>
+      petition.approval_flow_config?.some((config) =>
         config.visibility?.conditions.some(
-          (condition) => "fieldId" in condition && condition.fieldId === fieldId,
+          (condition) => "fieldId" in condition && condition.fieldId === id,
         ),
-      )
-    ) {
+      ),
+    );
+
+    if (isNonNullish(referencedFieldId)) {
       throw new ApolloError(
         `The petition has an approval flow step that references this field`,
         "FIELD_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG",
-        { fieldId: toGlobalId("PetitionField", fieldId) },
+        { fieldId: toGlobalId("PetitionField", referencedFieldId) },
       );
     }
 
     return true;
   };
+}
+
+function fieldIsNotReferencedInPetitionAttachmentsVisibility<
+  TypeName extends string,
+  FieldName extends string,
+>(
+  petitionIdArg: Arg<TypeName, FieldName, number>,
+  fieldIdArg: Arg<TypeName, FieldName, MaybeArray<number>>,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = getArg(args, petitionIdArg);
+    const fieldIds = unMaybeArray(getArg(args, fieldIdArg));
+
+    const petitionAttachments = await ctx.petitions.loadPetitionAttachmentsByPetitionId(petitionId);
+
+    const referencedFieldId = fieldIds.find((id) =>
+      petitionAttachments.find((a) =>
+        a.visibility?.conditions.some(
+          (c: PetitionFieldLogicCondition) => "fieldId" in c && c.fieldId === id,
+        ),
+      ),
+    );
+
+    if (isNonNullish(referencedFieldId)) {
+      throw new ApolloError(
+        `The petition has an attachment that references this field`,
+        "FIELD_IS_REFERENCED_IN_PETITION_ATTACHMENTS_VISIBILITY",
+        { fieldId: toGlobalId("PetitionField", referencedFieldId) },
+      );
+    }
+    return true;
+  };
+}
+
+export function fieldIsNotReferencedOnLogicConditions<
+  TypeName extends string,
+  FieldName extends string,
+  TArgPetitionId extends Arg<TypeName, FieldName, number>,
+  TArgFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(
+  petitionIdArg: TArgPetitionId,
+  fieldIdArg: TArgFieldId,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return and(
+    fieldIsNotBeingReferencedByAnotherFieldLogic(petitionIdArg, fieldIdArg),
+    fieldIsNotReferencedInApprovalFlowConfig(petitionIdArg, fieldIdArg),
+    fieldIsNotReferencedInPetitionAttachmentsVisibility(petitionIdArg, fieldIdArg),
+  );
 }

@@ -2,7 +2,13 @@ import { randomInt } from "crypto";
 import gql from "graphql-tag";
 import { Knex } from "knex";
 import { range, sortBy } from "remeda";
-import { Organization, Petition, PetitionAttachment, User } from "../../db/__types";
+import {
+  Organization,
+  Petition,
+  PetitionAttachment,
+  PetitionFieldType,
+  User,
+} from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { toGlobalId } from "../../util/globalId";
@@ -1046,13 +1052,39 @@ describe("GraphQL/PetitionAttachments", () => {
       const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
         is_template: true,
       }));
+
+      const [_, shortText, fileUpload] = await mocks.createRandomPetitionFields(
+        template.id,
+        3,
+        (i) => ({ type: ["HEADING", "SHORT_TEXT", "FILE_UPLOAD"][i] as PetitionFieldType }),
+      );
+
       const front = await mocks.createPetitionAttachment(
         template.id,
         "FRONT",
         1,
-        undefined,
+        () => ({
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: shortText.id,
+                operator: "EQUAL",
+                value: "1",
+              },
+              {
+                fieldId: fileUpload.id,
+                modifier: "NUMBER_OF_REPLIES",
+                operator: "EQUAL",
+                value: 4,
+              },
+            ],
+          },
+        }),
         (i) => ({ filename: `front ${i}.pdf` }),
       );
+
       const annex = await mocks.createPetitionAttachment(
         template.id,
         "ANNEX",
@@ -1060,26 +1092,52 @@ describe("GraphQL/PetitionAttachments", () => {
         undefined,
         (i) => ({ filename: `annex ${i}.pdf` }),
       );
-      const back = await mocks.createPetitionAttachment(template.id, "BACK", 1, undefined, (i) => ({
-        filename: `back ${i}.pdf`,
-      }));
+
+      const back = await mocks.createPetitionAttachment(
+        template.id,
+        "BACK",
+        1,
+        () => ({
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: shortText.id,
+                operator: "CONTAIN",
+                value: "A",
+              },
+            ],
+          },
+        }),
+        (i) => ({
+          filename: `back ${i}.pdf`,
+        }),
+      );
 
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!) {
             clonePetitions(petitionIds: $petitionIds) {
+              fields {
+                id
+                type
+              }
               attachmentsList {
                 FRONT {
+                  visibility
                   file {
                     filename
                   }
                 }
                 ANNEX {
+                  visibility
                   file {
                     filename
                   }
                 }
                 BACK {
+                  visibility
                   file {
                     filename
                   }
@@ -1092,23 +1150,70 @@ describe("GraphQL/PetitionAttachments", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data!.clonePetitions[0].attachmentsList).toEqual({
-        FRONT: sortBy(front, (a) => a.position).map((_, i) => ({
-          file: {
-            filename: `front ${i}.pdf`,
+      expect(data?.clonePetitions).toEqual([
+        {
+          fields: [
+            {
+              id: expect.any(String),
+              type: "HEADING",
+            },
+            {
+              id: expect.any(String),
+              type: "SHORT_TEXT",
+            },
+            {
+              id: expect.any(String),
+              type: "FILE_UPLOAD",
+            },
+          ],
+          attachmentsList: {
+            FRONT: sortBy(front, (a) => a.position).map((_, i) => ({
+              file: {
+                filename: `front ${i}.pdf`,
+              },
+              visibility: {
+                type: "SHOW",
+                operator: "AND",
+                conditions: [
+                  {
+                    fieldId: data!.clonePetitions[0].fields[1].id,
+                    operator: "EQUAL",
+                    value: "1",
+                  },
+                  {
+                    fieldId: data!.clonePetitions[0].fields[2].id,
+                    modifier: "NUMBER_OF_REPLIES",
+                    operator: "EQUAL",
+                    value: 4,
+                  },
+                ],
+              },
+            })),
+            ANNEX: sortBy(annex, (a) => a.position).map((_, i) => ({
+              file: {
+                filename: `annex ${i}.pdf`,
+              },
+              visibility: null,
+            })),
+            BACK: sortBy(back, (a) => a.position).map((_, i) => ({
+              file: {
+                filename: `back ${i}.pdf`,
+              },
+              visibility: {
+                type: "SHOW",
+                operator: "AND",
+                conditions: [
+                  {
+                    fieldId: data!.clonePetitions[0].fields[1].id,
+                    operator: "CONTAIN",
+                    value: "A",
+                  },
+                ],
+              },
+            })),
           },
-        })),
-        ANNEX: sortBy(annex, (a) => a.position).map((_, i) => ({
-          file: {
-            filename: `annex ${i}.pdf`,
-          },
-        })),
-        BACK: sortBy(back, (a) => a.position).map((_, i) => ({
-          file: {
-            filename: `back ${i}.pdf`,
-          },
-        })),
-      });
+        },
+      ]);
     });
   });
 });

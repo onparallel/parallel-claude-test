@@ -253,46 +253,6 @@ export function variableIsNotBeingReferencedByFieldLogic<
   };
 }
 
-export function fieldIsNotBeingUsedInMathOperation<
-  TypeName extends string,
-  FieldName extends string,
-  TArgPetitionId extends Arg<TypeName, FieldName, number>,
-  TArgFieldId extends Arg<TypeName, FieldName, number>,
->(
-  petitionIdArg: TArgPetitionId,
-  fieldIdArg: TArgFieldId,
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    const petitionId = getArg(args, petitionIdArg);
-    const fieldId = getArg(args, fieldIdArg);
-
-    const petitionFields = await ctx.petitions.loadAllFieldsByPetitionId(petitionId);
-
-    const field = petitionFields.find((f) => f.id === fieldId);
-    if (!field || field.type !== "NUMBER") {
-      return true;
-    }
-
-    const referencingFields = petitionFields.filter((f) =>
-      f.math?.some((m) =>
-        m.operations.some((op) => op.operand.type === "FIELD" && op.operand.fieldId === fieldId),
-      ),
-    );
-
-    if (referencingFields.length > 0) {
-      throw new ApolloError(
-        "The petition field is being referenced on math operations of another field.",
-        "FIELD_IS_REFERENCED_ERROR",
-        {
-          referencingFieldIds: referencingFields.map((f) => toGlobalId("PetitionField", f.id)),
-        },
-      );
-    }
-
-    return true;
-  };
-}
-
 export function fieldIsNotBeingUsedInAutoSearchConfig<
   TypeName extends string,
   FieldName extends string,
@@ -336,6 +296,7 @@ export function fieldIsNotBeingUsedInAutoSearchConfig<
               throw new ApolloError(
                 `PetitionField ${toGlobalId("PetitionField", fieldId)} is being referenced on an autoSearchConfig`,
                 "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG",
+                { fieldId: toGlobalId("PetitionField", fieldId) },
               );
             }
           } else if (f.type === "ADVERSE_MEDIA_SEARCH") {
@@ -347,6 +308,7 @@ export function fieldIsNotBeingUsedInAutoSearchConfig<
               throw new ApolloError(
                 `PetitionField ${toGlobalId("PetitionField", fieldId)} is being referenced on an autoSearchConfig`,
                 "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG",
+                { fieldId: toGlobalId("PetitionField", fieldId) },
               );
             }
           } else {

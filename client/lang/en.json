@@ -915,11 +915,6 @@
     "context": "Date of birth"
   },
   {
-    "term": "component.background-check-search-result.false-positive",
-    "definition": "False positive",
-    "context": "False positive"
-  },
-  {
     "term": "component.background-check-search-result.gender",
     "definition": "Gender",
     "context": "Gender"
@@ -17503,6 +17498,11 @@
     "term": "page.petition-compose.field-referenced-in-message",
     "definition": "This field is referenced in <b>{configurationName}</b> and cannot be removed or modified.",
     "context": "This field is referenced in <b>{configurationName}</b> and cannot be removed or modified."
+  },
+  {
+    "term": "page.petition-compose.field-referenced-in-petition-attachments-visibility",
+    "definition": "This field is referenced in the visibility conditions of a document attachment. To continue, first remove the referencing conditions.",
+    "context": "This field is referenced in the visibility conditions of a document attachment. To continue, first remove the referencing conditions."
   },
   {
     "term": "page.petition-compose.first-child-is-internal-error",

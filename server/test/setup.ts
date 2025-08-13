@@ -6,8 +6,14 @@ const SETUP_POSTGRES_TIME = "postgres ok";
 const SETUP_MIGRATIONS_TIME = "migrations ok";
 const SETUP_SEEDS_TIME = "seeds ok";
 const SETUP_TOTAL_TIME = "Setup done!";
+let SETUP_DONE = false;
 
 export default async function () {
+  // this is for the --watch flag to work properly. (this function is called every time a file changes)
+  if (SETUP_DONE) {
+    return;
+  }
+
   console.time(SETUP_TOTAL_TIME);
 
   console.log("starting postgres...");
@@ -34,4 +40,5 @@ export default async function () {
   console.timeEnd(SETUP_SEEDS_TIME);
 
   console.timeEnd(SETUP_TOTAL_TIME);
+  SETUP_DONE = true;
 }

@@ -23242,11 +23242,11 @@ export type PetitionComposeAttachments_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
+    isReadOnly: boolean;
     options: { [key: string]: any };
     visibility?: { [key: string]: any } | null;
     title?: string | null;
     multiple: boolean;
-    isReadOnly: boolean;
     isChild: boolean;
     children?: Array<{
       __typename?: "PetitionField";
@@ -23310,11 +23310,11 @@ export type PetitionComposeAttachments_PetitionBase_PetitionTemplate_Fragment = 
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
+    isReadOnly: boolean;
     options: { [key: string]: any };
     visibility?: { [key: string]: any } | null;
     title?: string | null;
     multiple: boolean;
-    isReadOnly: boolean;
     isChild: boolean;
     children?: Array<{
       __typename?: "PetitionField";
@@ -23390,11 +23390,11 @@ export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          isReadOnly: boolean;
           options: { [key: string]: any };
           visibility?: { [key: string]: any } | null;
           title?: string | null;
           multiple: boolean;
-          isReadOnly: boolean;
           isChild: boolean;
           children?: Array<{
             __typename?: "PetitionField";
@@ -23476,11 +23476,11 @@ export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          isReadOnly: boolean;
           options: { [key: string]: any };
           visibility?: { [key: string]: any } | null;
           title?: string | null;
           multiple: boolean;
-          isReadOnly: boolean;
           isChild: boolean;
           children?: Array<{
             __typename?: "PetitionField";
@@ -23606,11 +23606,11 @@ export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
             __typename?: "PetitionField";
             id: string;
             type: PetitionFieldType;
+            isReadOnly: boolean;
             options: { [key: string]: any };
             visibility?: { [key: string]: any } | null;
             title?: string | null;
             multiple: boolean;
-            isReadOnly: boolean;
             isChild: boolean;
             children?: Array<{
               __typename?: "PetitionField";
@@ -23692,11 +23692,11 @@ export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
             __typename?: "PetitionField";
             id: string;
             type: PetitionFieldType;
+            isReadOnly: boolean;
             options: { [key: string]: any };
             visibility?: { [key: string]: any } | null;
             title?: string | null;
             multiple: boolean;
-            isReadOnly: boolean;
             isChild: boolean;
             children?: Array<{
               __typename?: "PetitionField";
@@ -23795,11 +23795,11 @@ export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation 
             __typename?: "PetitionField";
             id: string;
             type: PetitionFieldType;
+            isReadOnly: boolean;
             options: { [key: string]: any };
             visibility?: { [key: string]: any } | null;
             title?: string | null;
             multiple: boolean;
-            isReadOnly: boolean;
             isChild: boolean;
             children?: Array<{
               __typename?: "PetitionField";
@@ -23881,11 +23881,11 @@ export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation 
             __typename?: "PetitionField";
             id: string;
             type: PetitionFieldType;
+            isReadOnly: boolean;
             options: { [key: string]: any };
             visibility?: { [key: string]: any } | null;
             title?: string | null;
             multiple: boolean;
-            isReadOnly: boolean;
             isChild: boolean;
             children?: Array<{
               __typename?: "PetitionField";
@@ -23978,11 +23978,11 @@ export type PetitionComposeAttachments_deletePetitionAttachmentMutation = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          isReadOnly: boolean;
           options: { [key: string]: any };
           visibility?: { [key: string]: any } | null;
           title?: string | null;
           multiple: boolean;
-          isReadOnly: boolean;
           isChild: boolean;
           children?: Array<{
             __typename?: "PetitionField";
@@ -24064,11 +24064,11 @@ export type PetitionComposeAttachments_deletePetitionAttachmentMutation = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          isReadOnly: boolean;
           options: { [key: string]: any };
           visibility?: { [key: string]: any } | null;
           title?: string | null;
           multiple: boolean;
-          isReadOnly: boolean;
           isChild: boolean;
           children?: Array<{
             __typename?: "PetitionField";
@@ -26050,11 +26050,11 @@ export type ConfigureApprovalStepsDialog_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
+    isReadOnly: boolean;
     options: { [key: string]: any };
     visibility?: { [key: string]: any } | null;
     title?: string | null;
     multiple: boolean;
-    isReadOnly: boolean;
     isChild: boolean;
     children?: Array<{
       __typename?: "PetitionField";
@@ -26097,11 +26097,11 @@ export type ConfigureApprovalStepsDialog_PetitionBase_PetitionTemplate_Fragment 
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
+    isReadOnly: boolean;
     options: { [key: string]: any };
     visibility?: { [key: string]: any } | null;
     title?: string | null;
     multiple: boolean;
-    isReadOnly: boolean;
     isChild: boolean;
     children?: Array<{
       __typename?: "PetitionField";
@@ -26154,11 +26154,11 @@ export type ConfigureApprovalStepsDialog_petitionQuery = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          isReadOnly: boolean;
           options: { [key: string]: any };
           visibility?: { [key: string]: any } | null;
           title?: string | null;
           multiple: boolean;
-          isReadOnly: boolean;
           isChild: boolean;
           children?: Array<{
             __typename?: "PetitionField";
@@ -26204,11 +26204,11 @@ export type ConfigureApprovalStepsDialog_petitionQuery = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          isReadOnly: boolean;
           options: { [key: string]: any };
           visibility?: { [key: string]: any } | null;
           title?: string | null;
           multiple: boolean;
-          isReadOnly: boolean;
           isChild: boolean;
           children?: Array<{
             __typename?: "PetitionField";
@@ -27434,11 +27434,11 @@ export type HiddenFieldDialog_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
+    isReadOnly: boolean;
     options: { [key: string]: any };
     visibility?: { [key: string]: any } | null;
     title?: string | null;
     multiple: boolean;
-    isReadOnly: boolean;
     isChild: boolean;
     children?: Array<{
       __typename?: "PetitionField";
@@ -27474,11 +27474,11 @@ export type HiddenFieldDialog_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
+    isReadOnly: boolean;
     options: { [key: string]: any };
     visibility?: { [key: string]: any } | null;
     title?: string | null;
     multiple: boolean;
-    isReadOnly: boolean;
     isChild: boolean;
     children?: Array<{
       __typename?: "PetitionField";
@@ -28180,11 +28180,11 @@ export type PetitionVisibilityEditor_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
+    isReadOnly: boolean;
     options: { [key: string]: any };
     visibility?: { [key: string]: any } | null;
     title?: string | null;
     multiple: boolean;
-    isReadOnly: boolean;
     isChild: boolean;
     children?: Array<{
       __typename?: "PetitionField";
@@ -28220,11 +28220,11 @@ export type PetitionVisibilityEditor_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
+    isReadOnly: boolean;
     options: { [key: string]: any };
     visibility?: { [key: string]: any } | null;
     title?: string | null;
     multiple: boolean;
-    isReadOnly: boolean;
     isChild: boolean;
     children?: Array<{
       __typename?: "PetitionField";
@@ -52013,10 +52013,10 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
+    isReadOnly: boolean;
     options: { [key: string]: any };
     visibility?: { [key: string]: any } | null;
     title?: string | null;
-    isReadOnly: boolean;
     math?: Array<{ [key: string]: any }> | null;
     isFixed: boolean;
     multiple: boolean;
@@ -52256,10 +52256,10 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
+    isReadOnly: boolean;
     options: { [key: string]: any };
     visibility?: { [key: string]: any } | null;
     title?: string | null;
-    isReadOnly: boolean;
     math?: Array<{ [key: string]: any }> | null;
     isFixed: boolean;
     multiple: boolean;
@@ -55107,10 +55107,10 @@ export type PetitionCompose_petitionQuery = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          isReadOnly: boolean;
           options: { [key: string]: any };
           visibility?: { [key: string]: any } | null;
           title?: string | null;
-          isReadOnly: boolean;
           math?: Array<{ [key: string]: any }> | null;
           isFixed: boolean;
           multiple: boolean;
@@ -55372,10 +55372,10 @@ export type PetitionCompose_petitionQuery = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          isReadOnly: boolean;
           options: { [key: string]: any };
           visibility?: { [key: string]: any } | null;
           title?: string | null;
-          isReadOnly: boolean;
           math?: Array<{ [key: string]: any }> | null;
           isFixed: boolean;
           multiple: boolean;
@@ -77440,6 +77440,7 @@ export const PetitionComposeAttachments_PetitionBaseFragmentDoc = gql`
     fields {
       id
       type
+      isReadOnly
       options
       visibility
       ...PetitionVisibilityEditor_PetitionField

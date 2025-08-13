@@ -114,8 +114,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("creates an empty Text field with default options", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $type: PetitionFieldType!) {
             createPetitionField(petitionId: $petitionId, type: $type) {
               petition {
@@ -143,11 +143,11 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           type: "TEXT",
         },
-      });
+      );
 
       expect(errors).toBeUndefined();
       expect(data!.createPetitionField).toEqual({
@@ -179,8 +179,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("creates an empty Heading field with default options", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $type: PetitionFieldType!) {
             createPetitionField(petitionId: $petitionId, type: $type) {
               petition {
@@ -208,11 +208,11 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           type: "HEADING",
         },
-      });
+      );
 
       expect(errors).toBeUndefined();
       expect(data!.createPetitionField).toEqual({
@@ -243,8 +243,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("creates an empty FileUpload field with default options", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $type: PetitionFieldType!) {
             createPetitionField(petitionId: $petitionId, type: $type) {
               petition {
@@ -272,11 +272,11 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           type: "FILE_UPLOAD",
         },
-      });
+      );
 
       expect(errors).toBeUndefined();
       expect(data!.createPetitionField).toEqual({
@@ -312,8 +312,8 @@ describe("GraphQL/Petition Fields", () => {
 
     it("creates fields on custom positions", async () => {
       const createFieldOnPosition = async (type: string, position?: number) => {
-        return await testClient.mutate({
-          mutation: gql`
+        return await testClient.execute(
+          gql`
             mutation ($petitionId: GID!, $type: PetitionFieldType!, $position: Int) {
               createPetitionField(petitionId: $petitionId, type: $type, position: $position) {
                 id
@@ -327,12 +327,12 @@ describe("GraphQL/Petition Fields", () => {
               }
             }
           `,
-          variables: {
+          {
             petitionId: toGlobalId("Petition", userPetition.id),
             type,
             position,
           },
-        });
+        );
       };
 
       const { data: f1Data } = await createFieldOnPosition("HEADING", 0);
@@ -367,8 +367,8 @@ describe("GraphQL/Petition Fields", () => {
         }),
       );
 
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $type: PetitionFieldType!) {
             createPetitionField(petitionId: $petitionId, type: $type) {
               petition {
@@ -379,11 +379,11 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", closedPetition.id),
           type: "TEXT",
         },
-      });
+      );
 
       expect(errors).toBeUndefined();
       expect(data!.createPetitionField).toEqual({
@@ -394,8 +394,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("sends error when position argument is less than zero", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $type: PetitionFieldType!, $position: Int) {
             createPetitionField(petitionId: $petitionId, type: $type, position: $position) {
               petition {
@@ -404,19 +404,19 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           type: "TEXT",
           position: -1,
         },
-      });
+      );
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to create a field on a private petition", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $type: PetitionFieldType!) {
             createPetitionField(petitionId: $petitionId, type: $type) {
               petition {
@@ -425,11 +425,11 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", privatePetition.id),
           type: "TEXT",
         },
-      });
+      );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
@@ -643,8 +643,8 @@ describe("GraphQL/Petition Fields", () => {
 
     it("clones a field and sets the new one after it", async () => {
       const fieldToClone = fields[3];
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!) {
             clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
               petition {
@@ -656,11 +656,11 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", fieldToClone.id),
         },
-      });
+      );
 
       const fieldTypes: { type: string }[] = fields.map((f) => pick(f, ["type"]));
       expect(errors).toBeUndefined();
@@ -680,8 +680,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("sends error when field doesn't belong to petition", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!) {
             clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
               petition {
@@ -690,19 +690,19 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", 1234),
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to clone a field on a private petition", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!) {
             clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
               petition {
@@ -711,11 +711,11 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", privatePetition.id),
           fieldId: toGlobalId("PetitionField", privateField.id),
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -1371,8 +1371,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("deletes a field and updates the position of the remaining fields", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!) {
             deletePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
               fields {
@@ -1381,11 +1381,11 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", fields[2].id),
         },
-      });
+      );
 
       const gIds = fields.map((f) => toGlobalId("PetitionField", f.id));
       expect(errors).toBeUndefined();
@@ -1402,8 +1402,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("deletes a field with replies using force flag", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $force: Boolean) {
             deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: $force) {
               fields {
@@ -1415,12 +1415,12 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", fields[1].id),
           force: true,
         },
-      });
+      );
       const gIds = fields.map((f) => toGlobalId("PetitionField", f.id));
 
       expect(errors).toBeUndefined();
@@ -1437,8 +1437,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("should not change petition status when deleting fields on a DRAFT petition", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $force: Boolean) {
             deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: $force) {
               ... on Petition {
@@ -1447,12 +1447,12 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", fields[4].id),
           force: true,
         },
-      });
+      );
 
       expect(errors).toBeUndefined();
       expect(data!.deletePetitionField).toEqual({
@@ -1461,8 +1461,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("sends error when trying to delete a fixed field", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $force: Boolean) {
             deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: $force) {
               fields {
@@ -1471,20 +1471,20 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", fields[0].id), // fields[0] is a fixed HEADING
           force: true,
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to delete a field on a private petition", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $force: Boolean) {
             deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: $force) {
               fields {
@@ -1493,20 +1493,20 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", privatePetition.id),
           fieldId: toGlobalId("PetitionField", privateField.id),
           force: true,
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to delete a field that doesn't belong to petition", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!) {
             deletePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
               fields {
@@ -1515,19 +1515,19 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", privateField.id),
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to delete a field containing replies without using force flag", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!) {
             deletePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
               fields {
@@ -1536,19 +1536,19 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", fields[1].id),
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("FIELD_HAS_REPLIES_ERROR");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to delete a field that is being referenced in the visibility conditions of another field", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!) {
             deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: true) {
               fields {
@@ -1557,11 +1557,11 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", fields[5].id),
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_ERROR");
       expect(data).toBeNull();
@@ -1788,8 +1788,8 @@ describe("GraphQL/Petition Fields", () => {
 
       const [attachment] = await mocks.createPetitionFieldAttachment(newField.id, 1);
 
-      const { errors } = await testClient.mutate({
-        mutation: gql`
+      const { errors } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!) {
             deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: true) {
               fields {
@@ -1798,11 +1798,11 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", newField.id),
         },
-      });
+      );
 
       expect(errors).toBeUndefined();
       const attachments = await mocks
@@ -1831,8 +1831,8 @@ describe("GraphQL/Petition Fields", () => {
         files[1],
       ]);
 
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!) {
             deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: true) {
               fields {
@@ -1844,11 +1844,11 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", petition.id),
           fieldId: toGlobalId("PetitionField", newFields[0].id),
         },
-      });
+      );
       expect(errors).toBeUndefined();
       expect(data?.deletePetitionField).toEqual({
         fields: [
@@ -2547,7 +2547,9 @@ describe("GraphQL/Petition Fields", () => {
         },
       );
 
-      expect(errors1).toContainGraphQLError("FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG");
+      expect(errors1).toContainGraphQLError("FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG", {
+        fieldId: toGlobalId("PetitionField", bgCheck.id),
+      });
       expect(data1).toBeNull();
 
       const { errors: errors2, data: data2 } = await testClient.execute(
@@ -2564,8 +2566,104 @@ describe("GraphQL/Petition Fields", () => {
         },
       );
 
-      expect(errors2).toContainGraphQLError("FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG");
+      expect(errors2).toContainGraphQLError("FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG", {
+        fieldId: toGlobalId("PetitionField", shortText.id),
+      });
       expect(data2).toBeNull();
+    });
+
+    it("sends error when trying to delete a field referenced in approval flow config", async () => {
+      await mocks.knex
+        .from("petition")
+        .where("id", userPetition.id)
+        .update({
+          approval_flow_config: JSON.stringify([
+            {
+              name: "Step 1",
+              type: "ANY",
+              values: [{ type: "User", id: user.id }],
+              visibility: {
+                type: "SHOW",
+                operator: "AND",
+                conditions: [
+                  {
+                    fieldId: fields[2].id,
+                    modifier: "ANY",
+                    operator: "EQUAL",
+                    value: "X",
+                  },
+                ],
+              },
+            },
+          ]),
+        });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
+              fields {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[2].id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG", {
+        fieldId: toGlobalId("PetitionField", fields[2].id),
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to delete a field referenced in petition attachments visibility", async () => {
+      const [fileUpload] = await mocks.createRandomFileUpload(1);
+      await mocks.knex.from("petition_attachment").insert({
+        file_upload_id: fileUpload.id,
+        petition_id: userPetition.id,
+        position: 0,
+        type: "ANNEX",
+        visibility: {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              fieldId: fields[2].id,
+              modifier: "ANY",
+              operator: "EQUAL",
+              value: "X",
+            },
+          ],
+        },
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
+              fields {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[2].id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError(
+        "FIELD_IS_REFERENCED_IN_PETITION_ATTACHMENTS_VISIBILITY",
+        {
+          fieldId: toGlobalId("PetitionField", fields[2].id),
+        },
+      );
+      expect(data).toBeNull();
     });
   });
 
@@ -2635,8 +2733,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("updates the position of the fields", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldIds: [GID!]!) {
             updateFieldPositions(fieldIds: $fieldIds, petitionId: $petitionId) {
               fields {
@@ -2646,11 +2744,11 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", petition.id),
           fieldIds: [fieldGIDs[0], fieldGIDs[2], fieldGIDs[1], fieldGIDs[4], fieldGIDs[3]],
         },
-      });
+      );
 
       expect(errors).toBeUndefined();
       expect(data!.updateFieldPositions).toEqual({
@@ -2809,8 +2907,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("sends error when passing an incomplete fieldIds argument", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldIds: [GID!]!) {
             updateFieldPositions(fieldIds: $fieldIds, petitionId: $petitionId) {
               fields {
@@ -2819,19 +2917,19 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", petition.id),
           fieldIds: [fieldGIDs[0], fieldGIDs[2], fieldGIDs[4]],
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("INVALID_PETITION_FIELD_IDS");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to update the field positions of a private petition", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldIds: [GID!]!) {
             updateFieldPositions(fieldIds: $fieldIds, petitionId: $petitionId) {
               fields {
@@ -2840,19 +2938,19 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", privatePetition.id),
           fieldIds: [],
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to update the position of a fixed field", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldIds: [GID!]!) {
             updateFieldPositions(fieldIds: $fieldIds, petitionId: $petitionId) {
               fields {
@@ -2861,19 +2959,19 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", petition.id),
           fieldIds: [fieldGIDs[1], fieldGIDs[2], fieldGIDs[3], fieldGIDs[4], fieldGIDs[0]],
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("INVALID_PETITION_FIELD_IDS");
       expect(data).toBeNull();
     });
 
     it("sends error when updating a field position leaves a visibility condition referring to a next field", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldIds: [GID!]!) {
             updateFieldPositions(fieldIds: $fieldIds, petitionId: $petitionId) {
               fields {
@@ -2882,11 +2980,11 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", petition.id),
           fieldIds: [fieldGIDs[0], fieldGIDs[4], fieldGIDs[1], fieldGIDs[2], fieldGIDs[3]],
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("INVALID_FIELD_CONDITIONS_ORDER");
       expect(data).toBeNull();
@@ -3281,8 +3379,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("updates the petition field with given values", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               id
@@ -3296,7 +3394,7 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: fieldGIDs[4],
           data: {
@@ -3323,7 +3421,7 @@ describe("GraphQL/Petition Fields", () => {
             },
           },
         },
-      });
+      );
       expect(errors).toBeUndefined();
       expect(data!.updatePetitionField).toEqual({
         id: fieldGIDs[4],
@@ -3532,8 +3630,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("should allow updating the petition field with a null condition value", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               id
@@ -3541,7 +3639,7 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: fieldGIDs[4],
           data: {
@@ -3559,7 +3657,7 @@ describe("GraphQL/Petition Fields", () => {
             },
           },
         },
-      });
+      );
       expect(errors).toBeUndefined();
       expect(data!.updatePetitionField).toEqual({
         id: fieldGIDs[4],
@@ -3579,8 +3677,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("sends error when updating petition field with invalid visibility json", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               id
@@ -3588,7 +3686,7 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: fieldGIDs[1],
           data: {
@@ -3606,14 +3704,14 @@ describe("GraphQL/Petition Fields", () => {
             },
           },
         },
-      });
+      );
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
     it("sends error when adding visibility conditions refering to a next field", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               id
@@ -3621,7 +3719,7 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: fieldGIDs[1],
           data: {
@@ -3639,14 +3737,14 @@ describe("GraphQL/Petition Fields", () => {
             },
           },
         },
-      });
+      );
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to add visibility conditions on a heading with page break", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               id
@@ -3654,7 +3752,7 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: fieldGIDs[0],
           data: {
@@ -3672,14 +3770,14 @@ describe("GraphQL/Petition Fields", () => {
             },
           },
         },
-      });
+      );
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
     it("trims title and description of field before writing to database", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               title
@@ -3687,7 +3785,7 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: fieldGIDs[1],
           data: {
@@ -3697,7 +3795,7 @@ describe("GraphQL/Petition Fields", () => {
             title: "    new title        ",
           },
         },
-      });
+      );
       expect(errors).toBeUndefined();
       expect(data!.updatePetitionField).toEqual({
         title: "new title",
@@ -3707,25 +3805,25 @@ describe("GraphQL/Petition Fields", () => {
 
     it("sets petition status to pending when updating a field from optional to required", async () => {
       // first set petition to closed
-      const { data: pre } = await testClient.mutate({
-        mutation: gql`
+      const { data: pre } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!) {
             closePetition(petitionId: $petitionId) {
               status
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
         },
-      });
+      );
       expect(pre!.closePetition).toEqual({
         status: "CLOSED",
       });
 
       // then update field to required, petition status should change
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               petition {
@@ -3738,14 +3836,14 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: fieldGIDs[4],
           data: {
             optional: false,
           },
         },
-      });
+      );
       expect(errors).toBeUndefined();
       expect(data!.updatePetitionField).toEqual({
         petition: {
@@ -3757,147 +3855,147 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("sends error when field title is longer than 500 chars", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               id
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: fieldGIDs[1],
           data: { title: "x".repeat(501) },
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to update a field on a private petition", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               id
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", privatePetition.id),
           fieldId: toGlobalId("PetitionField", privateField.id),
           data: {
             title: "new title",
           },
         },
-      });
+      );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to update a field that doesn't belong to petition", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               id
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", privateField.id),
           data: {
             title: "new title",
           },
         },
-      });
+      );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to update a field with empty data object", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               id
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: fieldGIDs[2],
           data: {},
         },
-      });
+      );
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to update a field with unknown key on options", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               id
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: fieldGIDs[0],
           data: {
             options: { unknown_key: "foo", hasPageBreak: false },
           },
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to update a field with an additional unknown key on options", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               id
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: fieldGIDs[1],
           data: {
             options: { placeholder: "foo", extra: false },
           },
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to update a field with invalid type values on options", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
             updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
               id
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: fieldGIDs[2],
           data: {
             options: { accepts: false },
           },
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
@@ -5040,6 +5138,57 @@ describe("GraphQL/Petition Fields", () => {
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
+
+    it.each(["BACKGROUND_CHECK", "ADVERSE_MEDIA_SEARCH"] as const)(
+      "sends error if passing multiple:true on a field referenced in %s autoSearchConfig",
+      async (type) => {
+        const [shortText, autoSearchField] = await mocks.createRandomPetitionFields(
+          userPetition.id,
+          2,
+          (i) => ({
+            type: ["SHORT_TEXT" as const, type][i],
+            multiple: false,
+          }),
+        );
+
+        await mocks.knex
+          .from("petition_field")
+          .where("id", autoSearchField.id)
+          .update({
+            options: JSON.stringify({
+              autoSearchConfig: {
+                name: [shortText.id],
+                type: "PERSON",
+                date: null,
+                country: null,
+                birthCountry: null,
+              },
+            }),
+          });
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", userPetition.id),
+            fieldId: toGlobalId("PetitionField", shortText.id),
+            data: {
+              multiple: true,
+            },
+          },
+        );
+
+        expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG", {
+          fieldId: toGlobalId("PetitionField", shortText.id),
+        });
+        expect(data).toBeNull();
+      },
+    );
   });
 
   describe("changePetitionFieldType", () => {
@@ -5099,8 +5248,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("changes field type to SHORT_TEXT and sets its default options merging with existents", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
             changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
               id
@@ -5112,12 +5261,12 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", field.id),
           type: "SHORT_TEXT",
         },
-      });
+      );
 
       expect(errors).toBeUndefined();
       expect(data!.changePetitionFieldType).toEqual({
@@ -5136,8 +5285,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("changes field type to HEADING and sets its default options", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
             changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
               id
@@ -5149,12 +5298,12 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", field.id),
           type: "HEADING",
         },
-      });
+      );
 
       expect(errors).toBeUndefined();
       expect(data!.changePetitionFieldType).toEqual({
@@ -5171,8 +5320,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("changes field type to FILE_UPLOAD and sets its default options", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
             changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
               id
@@ -5184,12 +5333,12 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", field.id),
           type: "FILE_UPLOAD",
         },
-      });
+      );
 
       expect(errors).toBeUndefined();
       expect(data!.changePetitionFieldType).toEqual({
@@ -5210,8 +5359,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("changes field type and persists its replies", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!, $force: Boolean) {
             changePetitionFieldType(
               fieldId: $fieldId
@@ -5227,13 +5376,13 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", fieldWithReply.id),
           type: "SHORT_TEXT",
           force: true,
         },
-      });
+      );
 
       expect(errors).toBeUndefined();
       expect(data!.changePetitionFieldType).toEqual({
@@ -5244,8 +5393,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("changes field type and deletes its replies", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!, $force: Boolean) {
             changePetitionFieldType(
               fieldId: $fieldId
@@ -5261,13 +5410,13 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", fieldWithReply.id),
           type: "FILE_UPLOAD",
           force: true,
         },
-      });
+      );
 
       expect(errors).toBeUndefined();
       expect(data!.changePetitionFieldType).toEqual({
@@ -5278,8 +5427,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("sends error when trying to change a field on a private petition", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!, $force: Boolean) {
             changePetitionFieldType(
               fieldId: $fieldId
@@ -5291,21 +5440,21 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", privatePetition.id),
           fieldId: toGlobalId("PetitionField", privateField.id),
           type: "FILE_UPLOAD",
           force: true,
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to change a field that doesn't belong to petition", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!, $force: Boolean) {
             changePetitionFieldType(
               fieldId: $fieldId
@@ -5317,53 +5466,53 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", privateField.id),
           type: "FILE_UPLOAD",
           force: true,
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to change a field containing replies without using force flag", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
             changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
               id
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", fieldWithReply.id),
           type: "FILE_UPLOAD",
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("FIELD_HAS_REPLIES_ERROR");
       expect(data).toBeNull();
     });
 
     it("sends error when trying to change the type of a fixed field", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
             changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
               id
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", fixedHeadingField.id),
           type: "FILE_UPLOAD",
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("UPDATE_FIXED_FIELD_ERROR");
       expect(data).toBeNull();
@@ -5505,6 +5654,237 @@ describe("GraphQL/Petition Fields", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("sends error when trying to change type of a field referenced in visibility conditions", async () => {
+      const [referencingField] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "SHORT_TEXT",
+        visibility: {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              fieldId: field.id,
+              modifier: "ANY",
+              operator: "EQUAL",
+            },
+          ],
+        },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
+            changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
+              id
+              type
+              optional
+              multiple
+              options
+              hasCommentsEnabled
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", field.id),
+          type: "DATE",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_ERROR", {
+        referencingFieldIds: [toGlobalId("PetitionField", referencingField.id)],
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to change type of a field referenced in math conditions", async () => {
+      const [referencingField] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "SHORT_TEXT",
+        math: JSON.stringify([
+          {
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: field.id,
+                modifier: "NUMBER_OF_REPLIES",
+                operator: "EQUAL",
+                value: 1,
+              },
+            ],
+            operations: [
+              {
+                operator: "ASSIGNATION",
+                operand: { type: "NUMBER", value: 10 },
+                variable: "score",
+              },
+            ],
+          },
+        ]),
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
+            changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
+              id
+              type
+              optional
+              multiple
+              options
+              hasCommentsEnabled
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", field.id),
+          type: "DATE",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_ERROR", {
+        referencingFieldIds: [toGlobalId("PetitionField", referencingField.id)],
+      });
+      expect(data).toBeNull();
+    });
+
+    it.each(["BACKGROUND_CHECK", "ADVERSE_MEDIA_SEARCH"] as const)(
+      "sends error when trying to change type of a field referenced in %s autoSearchConfig",
+      async (type) => {
+        const [shortText] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+          type: "SHORT_TEXT",
+          multiple: false,
+        }));
+
+        await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+          type,
+          multiple: false,
+          options: JSON.stringify({
+            autoSearchConfig: {
+              name: [shortText.id],
+              date: null,
+              country: null,
+              birthCountry: null,
+            },
+          }),
+        }));
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
+              changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
+                id
+                type
+                optional
+                multiple
+                options
+                hasCommentsEnabled
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", userPetition.id),
+            fieldId: toGlobalId("PetitionField", shortText.id),
+            type: "DATE",
+          },
+        );
+
+        expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG", {
+          fieldId: toGlobalId("PetitionField", shortText.id),
+        });
+        expect(data).toBeNull();
+      },
+    );
+
+    it("sends error when trying to change type of a field referenced in approval flow config", async () => {
+      await mocks.knex
+        .from("petition")
+        .where({ id: userPetition.id })
+        .update({
+          approval_flow_config: JSON.stringify([
+            {
+              name: "Step 1",
+              type: "ANY",
+              values: [{ id: user.id, type: "User" }],
+              visibility: {
+                type: "SHOW",
+                operator: "AND",
+                conditions: [
+                  { modifier: "ANY", fieldId: field.id, operator: "EQUAL", value: "HELLO" },
+                ],
+              },
+            },
+          ]),
+        });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
+            changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
+              id
+              type
+              optional
+              multiple
+              options
+              hasCommentsEnabled
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", field.id),
+          type: "DATE",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG", {
+        fieldId: toGlobalId("PetitionField", field.id),
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to change type of a field referenced in petition attachments visibility", async () => {
+      const [fileUpload] = await mocks.createRandomFileUpload();
+      await mocks.knex.from("petition_attachment").insert({
+        file_upload_id: fileUpload.id,
+        petition_id: userPetition.id,
+        position: 0,
+        type: "FRONT",
+        visibility: JSON.stringify({
+          type: "SHOW",
+          operator: "AND",
+          conditions: [{ modifier: "ANY", fieldId: field.id, operator: "EQUAL", value: "HELLO" }],
+        }),
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
+            changePetitionFieldType(fieldId: $fieldId, petitionId: $petitionId, type: $type) {
+              id
+              type
+              optional
+              multiple
+              options
+              hasCommentsEnabled
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", field.id),
+          type: "DATE",
+        },
+      );
+
+      expect(errors).toContainGraphQLError(
+        "FIELD_IS_REFERENCED_IN_PETITION_ATTACHMENTS_VISIBILITY",
+        {
+          fieldId: toGlobalId("PetitionField", field.id),
+        },
+      );
+      expect(data).toBeNull();
+    });
   });
 
   describe("updatePetitionFieldRepliesStatus", () => {
@@ -5588,8 +5968,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("updates status of a petition field reply", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation (
             $petitionId: GID!
             $petitionFieldId: GID!
@@ -5609,13 +5989,13 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", fields[2].id),
           petitionFieldReplyIds: [toGlobalId("PetitionFieldReply", field2Replies[0].id)],
           status: "APPROVED",
         },
-      });
+      );
 
       expect(errors).toBeUndefined();
       expect(data!.updatePetitionFieldRepliesStatus).toEqual({
@@ -5633,8 +6013,8 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("sends error when passing invalid petitionId", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation (
             $petitionId: GID!
             $petitionFieldId: GID!
@@ -5651,21 +6031,21 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", privatePetition.id),
           petitionFieldId: toGlobalId("PetitionField", fields[2].id),
           petitionFieldReplyIds: field2Replies.map((r) => toGlobalId("PetitionFieldReply", r.id)),
           status: "APPROVED",
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
     it("sends error when passing invalid petitionFieldId", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation (
             $petitionId: GID!
             $petitionFieldId: GID!
@@ -5682,21 +6062,21 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", 123123),
           petitionFieldReplyIds: field2Replies.map((r) => toGlobalId("PetitionFieldReply", r.id)),
           status: "APPROVED",
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
     it("sends error when passing invalid petitionFieldReplyIds", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation (
             $petitionId: GID!
             $petitionFieldId: GID!
@@ -5713,7 +6093,7 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", privatePetition.id),
           petitionFieldId: toGlobalId("PetitionField", fields[2].id),
           petitionFieldReplyIds: field2Replies.map((r) =>
@@ -5721,7 +6101,7 @@ describe("GraphQL/Petition Fields", () => {
           ),
           status: "APPROVED",
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -5855,8 +6235,8 @@ describe("GraphQL/Petition Fields", () => {
     it("sends error if petition is CLOSED", async () => {
       await mocks.knex.from("petition").where("id", petition.id).update("status", "CLOSED");
 
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation (
             $petitionId: GID!
             $petitionFieldId: GID!
@@ -5876,13 +6256,13 @@ describe("GraphQL/Petition Fields", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", fields[2].id),
           petitionFieldReplyIds: [toGlobalId("PetitionFieldReply", field2Replies[0].id)],
           status: "APPROVED",
         },
-      });
+      );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -6696,6 +7076,69 @@ describe("GraphQL/Petition Fields", () => {
         { id: fields[5].id, updated_by: expect.any(String) }, // moved position
       ]);
     });
+
+    it.each(["BACKGROUND_CHECK", "ADVERSE_MEDIA_SEARCH"] as const)(
+      "sends error when trying to link a field referenced in %s autoSearchConfig",
+      async (type) => {
+        const [shortText] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+          type: "SHORT_TEXT",
+          multiple: false,
+        }));
+
+        await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+          type,
+          multiple: false,
+          options: JSON.stringify({
+            autoSearchConfig: {
+              name: [shortText.id],
+              date: null,
+              country: null,
+              birthCountry: null,
+            },
+          }),
+        }));
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $parentFieldId: GID!, $childrenFieldIds: [GID!]!) {
+              linkPetitionFieldChildren(
+                petitionId: $petitionId
+                parentFieldId: $parentFieldId
+                childrenFieldIds: $childrenFieldIds
+              ) {
+                type
+                position
+                children {
+                  type
+                  position
+                }
+                petition {
+                  fields {
+                    type
+                    position
+                    children {
+                      type
+                      position
+                    }
+                  }
+                  fieldCount
+                }
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            parentFieldId: toGlobalId("PetitionField", fields[1].id),
+            childrenFieldIds: [toGlobalId("PetitionField", shortText.id)],
+          },
+        );
+
+        expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG", {
+          fieldId: toGlobalId("PetitionField", shortText.id),
+        });
+        expect(data).toBeNull();
+      },
+    );
   });
 
   describe("unlinkPetitionFieldChildren", () => {
@@ -6712,7 +7155,7 @@ describe("GraphQL/Petition Fields", () => {
       children = await mocks.createRandomPetitionFields(petition.id, 6, (i) => ({
         position: i,
         parent_petition_field_id: fields[1].id,
-        type: ["PHONE", "NUMBER", "TEXT", "TEXT", "TEXT", "TEXT"][i] as PetitionFieldType,
+        type: ["PHONE", "NUMBER", "TEXT", "TEXT", "TEXT", "SHORT_TEXT"][i] as PetitionFieldType,
       }));
     });
 
@@ -6792,7 +7235,7 @@ describe("GraphQL/Petition Fields", () => {
                 },
                 {
                   id: toGlobalId("PetitionField", children[5].id),
-                  type: "TEXT",
+                  type: "SHORT_TEXT",
                   position: 4,
                   children: null,
                 },
@@ -7285,6 +7728,228 @@ describe("GraphQL/Petition Fields", () => {
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to unlink a field referenced in visibility conditions", async () => {
+      const [referencingField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "SHORT_TEXT",
+        multiple: false,
+        visibility: JSON.stringify({
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            { modifier: "ANY", fieldId: children[5].id, operator: "EQUAL", value: "HELLO" },
+          ],
+        }),
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $parentFieldId: GID!, $childrenFieldIds: [GID!]!) {
+            unlinkPetitionFieldChildren(
+              petitionId: $petitionId
+              parentFieldId: $parentFieldId
+              childrenFieldIds: $childrenFieldIds
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          parentFieldId: toGlobalId("PetitionField", fields[1].id),
+          childrenFieldIds: [toGlobalId("PetitionField", children[5].id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_ERROR", {
+        referencingFieldIds: [toGlobalId("PetitionField", referencingField.id)],
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to unlink a field referenced in math conditions", async () => {
+      const [referencingField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "SHORT_TEXT",
+        multiple: false,
+        math: JSON.stringify([
+          {
+            operator: "AND",
+            conditions: [
+              {
+                operator: "EQUAL",
+                value: 10,
+                modifier: "NUMBER_OF_REPLIES",
+                fieldId: children[5].id,
+              },
+            ],
+            operations: [
+              {
+                variable: "price",
+                operand: {
+                  type: "NUMBER",
+                  value: 10,
+                },
+                operator: "ADDITION",
+              },
+            ],
+          },
+        ]),
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $parentFieldId: GID!, $childrenFieldIds: [GID!]!) {
+            unlinkPetitionFieldChildren(
+              petitionId: $petitionId
+              parentFieldId: $parentFieldId
+              childrenFieldIds: $childrenFieldIds
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          parentFieldId: toGlobalId("PetitionField", fields[1].id),
+          childrenFieldIds: [toGlobalId("PetitionField", children[5].id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_ERROR", {
+        referencingFieldIds: [toGlobalId("PetitionField", referencingField.id)],
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to unlink a field referenced in auto search config", async () => {
+      await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "BACKGROUND_CHECK",
+        multiple: false,
+        parent_petition_field_id: fields[1].id,
+        options: JSON.stringify({
+          autoSearchConfig: {
+            name: [children[5].id],
+            date: null,
+            country: null,
+            birthCountry: null,
+          },
+        }),
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $parentFieldId: GID!, $childrenFieldIds: [GID!]!) {
+            unlinkPetitionFieldChildren(
+              petitionId: $petitionId
+              parentFieldId: $parentFieldId
+              childrenFieldIds: $childrenFieldIds
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          parentFieldId: toGlobalId("PetitionField", fields[1].id),
+          childrenFieldIds: [toGlobalId("PetitionField", children[5].id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG", {
+        fieldId: toGlobalId("PetitionField", children[5].id),
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to unlink a field referenced in approval flow config", async () => {
+      await mocks.knex
+        .from("petition")
+        .where({ id: petition.id })
+        .update({
+          approval_flow_config: JSON.stringify([
+            {
+              name: "Step 1",
+              type: "ANY",
+              values: [{ id: user.id, type: "User" }],
+              visibility: {
+                type: "SHOW",
+                operator: "AND",
+                conditions: [
+                  { modifier: "ANY", fieldId: children[5].id, operator: "EQUAL", value: "HELLO" },
+                ],
+              },
+            },
+          ]),
+        });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $parentFieldId: GID!, $childrenFieldIds: [GID!]!) {
+            unlinkPetitionFieldChildren(
+              petitionId: $petitionId
+              parentFieldId: $parentFieldId
+              childrenFieldIds: $childrenFieldIds
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          parentFieldId: toGlobalId("PetitionField", fields[1].id),
+          childrenFieldIds: [toGlobalId("PetitionField", children[5].id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG", {
+        fieldId: toGlobalId("PetitionField", children[5].id),
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to unlink a field referenced in petition attachments visibility", async () => {
+      const [fileUpload] = await mocks.createRandomFileUpload(1);
+      await mocks.knex.from("petition_attachment").insert({
+        file_upload_id: fileUpload.id,
+        petition_id: petition.id,
+        position: 0,
+        type: "FRONT",
+        visibility: JSON.stringify({
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            { modifier: "ANY", fieldId: children[5].id, operator: "EQUAL", value: "HELLO" },
+          ],
+        }),
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $parentFieldId: GID!, $childrenFieldIds: [GID!]!) {
+            unlinkPetitionFieldChildren(
+              petitionId: $petitionId
+              parentFieldId: $parentFieldId
+              childrenFieldIds: $childrenFieldIds
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          parentFieldId: toGlobalId("PetitionField", fields[1].id),
+          childrenFieldIds: [toGlobalId("PetitionField", children[5].id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError(
+        "FIELD_IS_REFERENCED_IN_PETITION_ATTACHMENTS_VISIBILITY",
+        {
+          fieldId: toGlobalId("PetitionField", children[5].id),
+        },
+      );
       expect(data).toBeNull();
     });
   });

@@ -3580,7 +3580,7 @@ export class PetitionRepository extends BaseRepository {
         );
       }
 
-      await this.clonePetitionAttachments(petitionId, cloned.id, createdBy, t);
+      await this.clonePetitionAttachments(petitionId, cloned.id, newFieldIds, createdBy, t);
 
       if (sourcePetition.is_template && cloned.is_template) {
         await this.clonePublicPetitionLinks(petitionId, cloned.id, createdBy, t);
@@ -3683,6 +3683,7 @@ export class PetitionRepository extends BaseRepository {
   private async clonePetitionAttachments(
     fromPetitionId: number,
     toPetitionId: number,
+    fieldIdMap: Record<number, number>,
     createdBy: string,
     t?: Knex.Transaction,
   ) {
@@ -3701,30 +3702,22 @@ export class PetitionRepository extends BaseRepository {
         t,
       );
 
-      await this.raw(
-        /* sql */ `
-      with nfus as (
-        select * from (?) as t(file_upload_id, new_file_upload_id)
-      )
-      insert into petition_attachment (petition_id, file_upload_id, type, position, created_by)
-      select ?, nfus.new_file_upload_id, pa.type, pa.position, ?
-      from petition_attachment pa
-      join nfus on nfus.file_upload_id = pa.file_upload_id
-      where pa.petition_id = ? and pa.deleted_at is null;
-    `,
-        [
-          this.sqlValues(
-            zip(
-              petitionAttachments.map((a) => a.file_upload_id),
-              clonedFileUploads.map((f) => f.id),
-            ),
-            ["int", "int"],
-          ),
-          toPetitionId,
-          createdBy,
-          fromPetitionId,
-        ],
-        t,
+      await this.from("petition_attachment", t).insert(
+        zip(petitionAttachments, clonedFileUploads).map(
+          ([attachment, clonedFileUpload]) =>
+            ({
+              petition_id: toPetitionId,
+              file_upload_id: clonedFileUpload.id,
+              position: attachment.position,
+              type: attachment.type,
+              visibility:
+                mapFieldLogic<number, number>(
+                  { visibility: attachment.visibility },
+                  (id) => fieldIdMap[id],
+                ).field.visibility ?? null,
+              created_by: createdBy,
+            }) as CreatePetitionAttachment,
+        ),
       );
     }, t);
   }

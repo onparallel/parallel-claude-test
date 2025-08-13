@@ -1,4 +1,4 @@
-import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { ApolloError, gql, useApolloClient, useMutation } from "@apollo/client";
 import { Box, Stack, Text } from "@chakra-ui/react";
 import { AlertCircleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
@@ -435,6 +435,77 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     return false;
   };
 
+  const isFieldIsReferencedError = (error: unknown): error is ApolloError => {
+    return (
+      isApolloError(error) &&
+      (error.graphQLErrors[0].extensions?.code as string)?.startsWith("FIELD_IS_REFERENCED_")
+    );
+  };
+
+  const handleFieldIsReferencedError = async (
+    error: ApolloError,
+    activeFieldId: string,
+    onAction?: () => Promise<void>,
+  ) => {
+    if (isApolloError(error, "FIELD_IS_REFERENCED_ERROR")) {
+      if (await tryFixReferencingFields(activeFieldId)) {
+        await onAction?.();
+      }
+    } else if (isApolloError(error, "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
+      if (await checkReferencedFieldInAutoSearchConfig(activeFieldId)) {
+        return;
+      }
+    } else if (isApolloError(error, "FIELD_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG")) {
+      await showErrorDialog.ignoringDialogErrors({
+        header: (
+          <Stack direction="row" spacing={2} align="center">
+            <AlertCircleIcon role="presentation" />
+            <Text>
+              <FormattedMessage
+                id="page.petition-compose.field-referenced-in-header"
+                defaultMessage="Field referenced"
+              />
+            </Text>
+          </Stack>
+        ),
+        message: (
+          <FormattedMessage
+            id="page.petition-compose.field-referenced-in-message"
+            defaultMessage="This field is referenced in <b>{configurationName}</b> and cannot be removed or modified."
+            values={{
+              configurationName: intl
+                .formatMessage({
+                  id: "component.petition-settings.approval-steps",
+                  defaultMessage: "Approval steps",
+                })
+                .toLowerCase(),
+            }}
+          />
+        ),
+      });
+    } else if (isApolloError(error, "FIELD_IS_REFERENCED_IN_PETITION_ATTACHMENTS_VISIBILITY")) {
+      await showErrorDialog.ignoringDialogErrors({
+        header: (
+          <Stack direction="row" spacing={2} align="center">
+            <AlertCircleIcon role="presentation" />
+            <Text>
+              <FormattedMessage
+                id="page.petition-compose.field-referenced-in-header"
+                defaultMessage="Field referenced"
+              />
+            </Text>
+          </Stack>
+        ),
+        message: (
+          <FormattedMessage
+            id="page.petition-compose.field-referenced-in-petition-attachments-visibility"
+            defaultMessage="This field is referenced in the visibility conditions of a document attachment. To continue, first remove the referencing conditions."
+          />
+        ),
+      });
+    }
+  };
+
   const handleDeleteField = useCallback(
     wrapper(async function (fieldId: string) {
       setActiveFieldId((activeFieldId) => (activeFieldId === fieldId ? null : activeFieldId));
@@ -482,10 +553,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             setAddFieldAfterId([_afterFieldId, _inParentFieldId]);
           }
         } catch (e) {
-          if (isApolloError(e, "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
-            if (await checkReferencedFieldInAutoSearchConfig(fieldId)) {
-              return;
-            }
+          if (isFieldIsReferencedError(e)) {
+            await handleFieldIsReferencedError(e, fieldId, () => deleteField(false));
           } else if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
             try {
               await confirmDelete();
@@ -493,38 +562,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               return;
             }
             await deleteField(true);
-          } else if (isApolloError(e, "FIELD_IS_REFERENCED_ERROR")) {
-            if (await tryFixReferencingFields(fieldId)) {
-              await deleteField(false);
-            }
-          } else if (isApolloError(e, "FIELD_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG")) {
-            await showErrorDialog.ignoringDialogErrors({
-              header: (
-                <Stack direction="row" spacing={2} align="center">
-                  <AlertCircleIcon role="presentation" />
-                  <Text>
-                    <FormattedMessage
-                      id="page.petition-compose.field-referenced-in-header"
-                      defaultMessage="Field referenced"
-                    />
-                  </Text>
-                </Stack>
-              ),
-              message: (
-                <FormattedMessage
-                  id="page.petition-compose.field-referenced-in-message"
-                  defaultMessage="This field is referenced in <b>{configurationName}</b> and cannot be removed or modified."
-                  values={{
-                    configurationName: intl
-                      .formatMessage({
-                        id: "component.petition-settings.approval-steps",
-                        defaultMessage: "Approval steps",
-                      })
-                      .toLowerCase(),
-                  }}
-                />
-              ),
-            });
           } else if (isApolloError(e, "FIRST_CHILD_HAS_VISIBILITY_CONDITIONS_ERROR")) {
             await showErrorDialog.ignoringDialogErrors({
               message: (
@@ -725,13 +762,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           },
         });
       } catch (e) {
-        if (isApolloError(e, "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
-          await checkReferencedFieldInAutoSearchConfig(fieldId);
-        }
-        if (isApolloError(e, "ALIAS_ALREADY_EXISTS")) {
+        if (isFieldIsReferencedError(e)) {
+          await handleFieldIsReferencedError(e, fieldId);
+          return;
+        } else if (isApolloError(e, "ALIAS_ALREADY_EXISTS")) {
           throw e;
-        }
-        if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
+        } else if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
           try {
             await confirmChangeFormat();
             await updatePetitionField({
@@ -754,86 +790,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const [changePetitionFieldType] = useMutation(PetitionCompose_changePetitionFieldTypeDocument);
   const handleFieldTypeChange = useCallback(
     wrapper(async function (fieldId: string, type: PetitionFieldType) {
-      const { allFieldsWithIndices } = fieldsRef.current!;
-
-      const field = allFieldsWithIndices.find(([f]) => f.id === fieldId)![0];
-      const referencingVisibility = allFieldsWithIndices.filter(([f]) =>
-        (f.visibility as PetitionFieldVisibility)?.conditions.some(
-          (c) => "fieldId" in c && c.fieldId === fieldId,
-        ),
-      );
-
-      const referencingMath = allFieldsWithIndices.filter(([f]) =>
-        (f.math as PetitionFieldMath)?.some(
-          (calc) =>
-            calc.conditions.some((c) => "fieldId" in c && c.fieldId === fieldId) ||
-            calc.operations.some(
-              (o) => o.operand.type === "FIELD" && o.operand.fieldId === fieldId,
-            ),
-        ),
-      );
-
-      if (referencingVisibility.length || referencingMath.length) {
-        // valid field types changes
-        if (type === "TEXT" && field.type === "SELECT") {
-          // pass
-        } else {
-          try {
-            await showReferencedFieldDialog({
-              fieldsWithIndices: uniqueBy(
-                [...referencingMath, ...referencingVisibility],
-                ([_, fieldIndex]) => fieldIndex,
-              ),
-              referencedInMath: referencingMath.length > 0,
-              referencesInVisibility: referencingVisibility.length > 0,
-            });
-            for (const [field] of referencingVisibility) {
-              const visibility = field.visibility! as PetitionFieldVisibility;
-              const conditions = visibility.conditions.filter(
-                (c) => !("fieldId" in c && c.fieldId === fieldId),
-              );
-              await _handleFieldEdit(field.id, {
-                visibility: conditions.length > 0 ? { ...visibility, conditions } : null,
-              });
-            }
-
-            for (const [field] of referencingMath) {
-              const newMath = (field.math! as PetitionFieldMath)
-                .map((calc) => {
-                  const conditions = calc.conditions.filter(
-                    (c) => !("fieldId" in c && c.fieldId === fieldId),
-                  );
-
-                  const operations = calc.operations.filter(
-                    (o) =>
-                      !(
-                        o.operand.type === "FIELD" &&
-                        "fieldId" in o.operand &&
-                        o.operand.fieldId === fieldId
-                      ),
-                  );
-
-                  if (!conditions.length || !operations.length) {
-                    return null;
-                  }
-
-                  return {
-                    ...calc,
-                    conditions,
-                    operations,
-                  };
-                })
-                .filter(isNonNullish);
-
-              await _handleFieldEdit(field.id, {
-                math: newMath.length > 0 ? newMath : null,
-              });
-            }
-          } catch {
-            return;
-          }
-        }
-      }
       try {
         await changePetitionFieldType({
           variables: { petitionId, fieldId, type },
@@ -841,38 +797,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         cleanPreviewFieldReplies(apollo, fieldId);
         return;
       } catch (e) {
-        if (isApolloError(e, "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
-          if (await checkReferencedFieldInAutoSearchConfig(fieldId)) {
-            return;
-          }
-        } else if (isApolloError(e, "FIELD_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG")) {
-          await showErrorDialog.ignoringDialogErrors({
-            header: (
-              <Stack direction="row" spacing={2} align="center">
-                <AlertCircleIcon role="presentation" />
-                <Text>
-                  <FormattedMessage
-                    id="page.petition-compose.field-referenced-in-header"
-                    defaultMessage="Field referenced"
-                  />
-                </Text>
-              </Stack>
-            ),
-            message: (
-              <FormattedMessage
-                id="page.petition-compose.field-referenced-in-message"
-                defaultMessage="This field is referenced in <b>{configurationName}</b> and cannot be removed or modified."
-                values={{
-                  configurationName: intl
-                    .formatMessage({
-                      id: "component.petition-settings.approval-steps",
-                      defaultMessage: "Approval steps",
-                    })
-                    .toLowerCase(),
-                }}
-              />
-            ),
-          });
+        if (isFieldIsReferencedError(e)) {
+          await handleFieldIsReferencedError(e, fieldId);
           return;
         }
       }
@@ -1109,13 +1035,15 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     return true;
   };
 
-  const [linkPetitionFieldChild] = useMutation(PetitionCompose_linkPetitionFieldChildrenDocument);
+  const [linkPetitionFieldChildren] = useMutation(
+    PetitionCompose_linkPetitionFieldChildrenDocument,
+  );
   const showConfirmLinkDialog = useConfirmLinkFieldDialog();
   const handleLinkField = useCallback(
     wrapper(async function (parentFieldId: string, childrenFieldIds: string[]) {
       const fieldId = childrenFieldIds[0];
       const linkField = async (force?: boolean) => {
-        await linkPetitionFieldChild({
+        await linkPetitionFieldChildren({
           variables: {
             petitionId,
             parentFieldId,
@@ -1158,10 +1086,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       try {
         await linkField();
       } catch (error) {
-        if (isApolloError(error, "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG")) {
-          await checkReferencedFieldInAutoSearchConfig(
-            (error.graphQLErrors[0]!.extensions?.fieldId ?? "") as string,
-          );
+        if (isFieldIsReferencedError(error)) {
+          await handleFieldIsReferencedError(error, fieldId);
+          return;
         } else if (isApolloError(error, "FIELD_HAS_REPLIES_ERROR")) {
           try {
             await showConfirmLinkDialog();
@@ -1202,7 +1129,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId, afterFieldId],
   );
 
-  const [unlinkPetitionFieldChild] = useMutation(
+  const [unlinkPetitionFieldChildren] = useMutation(
     PetitionCompose_unlinkPetitionFieldChildrenDocument,
   );
   const showConfirmUnlinkFieldDialog = useConfirmUnlinkFieldDialog();
@@ -1210,7 +1137,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     wrapper(async function (parentFieldId: string, childrenFieldIds: string[]) {
       const fieldId = childrenFieldIds[0];
       const unlinkChild = async (force?: boolean) => {
-        await unlinkPetitionFieldChild({
+        await unlinkPetitionFieldChildren({
           variables: {
             petitionId,
             parentFieldId,
@@ -1240,7 +1167,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       try {
         await unlinkChild();
       } catch (error) {
-        if (isApolloError(error, "FIELD_HAS_REPLIES_ERROR")) {
+        if (isFieldIsReferencedError(error)) {
+          await handleFieldIsReferencedError(error, fieldId, () => unlinkChild());
+          return;
+        } else if (isApolloError(error, "FIELD_HAS_REPLIES_ERROR")) {
           try {
             await showConfirmUnlinkFieldDialog();
             await unlinkChild(true);
@@ -1278,13 +1208,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               />
             ),
           });
-        } else if (isApolloError(error, "FIELD_IS_REFERENCED_ERROR")) {
-          if (await tryFixReferencingFields(fieldId)) {
-            await unlinkChild();
-          }
-        } else {
-          throw error;
         }
+
+        throw error;
       }
     }),
     [petitionId, afterFieldId],

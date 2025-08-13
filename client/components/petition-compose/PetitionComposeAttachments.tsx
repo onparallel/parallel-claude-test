@@ -541,6 +541,7 @@ export const PetitionComposeAttachments = Object.assign(
             fields {
               id
               type
+              isReadOnly
               options
               visibility
               ...PetitionVisibilityEditor_PetitionField
@@ -769,6 +770,9 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
             defaultMessage: "Back cover",
           });
 
+  // only allow visibility changes when there at least one field where conditions can be applied
+  const canChangeVisibility = petition.fields.filter((f) => !f.isReadOnly).length > 0;
+
   return (
     <Reorder.Item
       key={item.id}
@@ -945,7 +949,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
                   onVisibilityChange(id, null);
                 }
               }}
-              isDisabled={isDisabled}
+              isDisabled={isDisabled || !canChangeVisibility}
               color={hasVisibilityConditions ? "primary.500" : "gray.600"}
               size="sm"
               variant="ghost"
