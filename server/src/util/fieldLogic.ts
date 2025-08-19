@@ -716,8 +716,10 @@ export function evaluateVisibilityArray<T extends { visibility?: any | null }>(
   petition: FieldLogicPetitionInput,
   data: T[],
 ) {
-  // at least 1 item is required for this to work
-  assert(data.length > 0, "At least 1 item is required");
+  if (data.length === 0) {
+    // early return as slice(0) is a no-op and will give incorrect result
+    return [];
+  }
 
   return evaluateFieldLogic({
     ...petition,
