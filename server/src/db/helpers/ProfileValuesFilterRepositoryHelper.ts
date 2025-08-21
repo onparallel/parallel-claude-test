@@ -42,7 +42,9 @@ export class ProfileValuesFilterRepositoryHelper {
         this.applyProfileValuesFilterJoins(q, condition, joins, profileTypeFieldsById);
       }
     } else {
-      this.applyProfileTypeFieldJoin(q, joins, profileTypeFieldsById[filter.profileTypeFieldId]);
+      const profileTypeField = profileTypeFieldsById[filter.profileTypeFieldId];
+      assert(profileTypeField, `ProfileTypeField:${filter.profileTypeFieldId} not found`);
+      this.applyProfileTypeFieldJoin(q, joins, profileTypeField);
     }
   }
 
@@ -85,7 +87,6 @@ export class ProfileValuesFilterRepositoryHelper {
     joins: Record<number, string>,
     profileTypeField: ProfileTypeField,
   ) {
-    assert(profileTypeField, `Profile type field ${profileTypeField.id} not found`);
     if (isNullish(joins[profileTypeField.id])) {
       const alias = (joins[profileTypeField.id] = `pfv${profileTypeField.id}`);
       if (profileTypeField.type === "FILE") {

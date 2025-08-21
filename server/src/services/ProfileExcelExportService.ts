@@ -53,25 +53,28 @@ export class ProfileExcelExportService extends ProfileExcelService {
     const profileType = await this.profiles.loadProfileType(profileTypeId);
     assert(profileType, `Profile type with id ${profileTypeId} not found`);
 
-    const profileTypeFields = (
-      await this.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId)
-    ).filter((ptf) => ptf && EXPORTABLE_FIELD_TYPES.includes(ptf.type));
+    const profileTypeFields =
+      await this.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);
 
     const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
 
+    const exportableFields = profileTypeFields.filter((ptf) =>
+      EXPORTABLE_FIELD_TYPES.includes(ptf.type),
+    );
+
     // columns in excel will be all fields other than FILE and BACKGROUND_CHECK
     // fields that have HIDDEN permission will not be included in excel
-    const fieldsWithPermissions = zip(
-      profileTypeFields,
+    const exportableFieldsWithPermissions = zip(
+      exportableFields,
       await this.profiles.loadProfileTypeFieldUserEffectivePermission(
-        profileTypeFields.map(({ id }) => ({ profileTypeFieldId: id, userId })),
+        exportableFields.map(({ id }) => ({ profileTypeFieldId: id, userId })),
       ),
     )
       .filter(([_, permission]) => isAtLeast(permission, "READ"))
       .map(([field]) => field);
 
     const workbook = await this.initializeExcelWorkbook(
-      unique(["profile-id", ...fieldsWithPermissions.map((f) => f.id)]),
+      unique(["profile-id", ...exportableFieldsWithPermissions.map((f) => f.id)]),
       profileTypeFieldsById,
       intl,
     );
@@ -105,7 +108,12 @@ export class ProfileExcelExportService extends ProfileExcelService {
       const items = await pagination.items;
 
       // write profiles into worksheet in chunks
-      await this.writeProfilesData(items, fieldsWithPermissions, workbook.worksheets[0], offset);
+      await this.writeProfilesData(
+        items,
+        exportableFieldsWithPermissions,
+        workbook.worksheets[0],
+        offset,
+      );
 
       offset += items.length;
       await onProgress?.(offset, totalCount);

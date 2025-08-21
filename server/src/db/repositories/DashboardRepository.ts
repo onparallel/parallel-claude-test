@@ -326,6 +326,7 @@ export class DashboardRepository extends BaseRepository {
 
         if (settings.type === "AGGREGATE") {
           const profileTypeField = profileTypeFieldsById[settings.profileTypeFieldId];
+          assert(profileTypeField, `ProfileTypeField:${settings.profileTypeFieldId} not found`);
           this.profileValuesFilter.applyProfileTypeFieldJoin(q, joins, profileTypeField);
           const content = this.profileValuesFilter.getProfileTypeFieldContent(
             joins,
@@ -338,6 +339,10 @@ export class DashboardRepository extends BaseRepository {
 
         if (settings.groupByProfileTypeFieldId) {
           const profileTypeField = profileTypeFieldsById[settings.groupByProfileTypeFieldId];
+          assert(
+            profileTypeField,
+            `ProfileTypeField:${settings.groupByProfileTypeFieldId} not found`,
+          );
           this.profileValuesFilter.applyProfileTypeFieldJoin(q, joins, profileTypeField);
           const content = this.profileValuesFilter.getProfileTypeFieldContent(
             joins,
