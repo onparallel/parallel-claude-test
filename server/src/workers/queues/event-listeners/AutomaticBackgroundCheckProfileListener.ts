@@ -80,8 +80,9 @@ export class AutomaticBackgroundCheckProfileListener implements EventListener<"P
       const bgCheckValue = profileValues.find(
         (v) => v.profile_type_field_id === bgCheckProperty.id,
       );
-      if (bgCheckValue) {
-        // if background check is already replied, skip as we only need to trigger it once
+
+      if (isNonNullish(bgCheckValue?.content?.entity)) {
+        // skip if this value already has a entity match
         continue;
       }
 

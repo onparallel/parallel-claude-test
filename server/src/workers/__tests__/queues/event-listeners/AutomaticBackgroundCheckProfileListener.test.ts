@@ -920,7 +920,7 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
     expect(backgroundCheckServiceSpy).not.toHaveBeenCalled();
   });
 
-  it("does not trigger background check search if field is already replied", async () => {
+  it("triggers background check search if field is already replied but does not have a match", async () => {
     await mocks.knex.from("profile_field_value").insert({
       profile_id: profile.id,
       profile_type_field_id: backgroundCheckField.id,
@@ -1062,6 +1062,313 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
                 createdAt: expect.any(String),
               },
               entity: null,
+            },
+          },
+        },
+      ],
+      events: {
+        totalCount: 5,
+        items: [
+          { type: "PROFILE_UPDATED" },
+          { type: "PROFILE_FIELD_VALUE_UPDATED" },
+          { type: "PROFILE_FIELD_VALUE_UPDATED" },
+          { type: "PROFILE_FIELD_VALUE_UPDATED" },
+          { type: "PROFILE_FIELD_VALUE_UPDATED" },
+        ],
+      },
+    });
+
+    const events = await knex.from("profile_event").where("profile_id", profile.id).select("*");
+
+    const profileUpdatedEvent = events.find((e) => e.type === "PROFILE_UPDATED");
+
+    expect(profileUpdatedEvent).toBeDefined();
+
+    await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
+
+    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
+      {
+        name: "John Doe",
+        date: null,
+        country: "AR",
+        birthCountry: "AR",
+        type: "PERSON",
+      },
+      organization.id,
+    );
+
+    const { errors: queryErrors, data: queryData } = await testClient.execute(
+      gql`
+        query ($profileId: GID!) {
+          profile(profileId: $profileId) {
+            id
+            properties {
+              field {
+                id
+                type
+              }
+              value {
+                id
+                content
+              }
+            }
+            events(limit: 100, offset: 0) {
+              totalCount
+              items {
+                type
+              }
+            }
+          }
+        }
+      `,
+      { profileId: toGlobalId("Profile", profile.id) },
+    );
+
+    expect(queryErrors).toBeUndefined();
+    expect(queryData?.profile).toEqual({
+      id: toGlobalId("Profile", profile.id),
+      properties: [
+        {
+          field: {
+            id: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
+            type: "SHORT_TEXT",
+          },
+          value: {
+            id: expect.any(String),
+            content: { value: "John" },
+          },
+        },
+        {
+          field: {
+            id: toGlobalId("ProfileTypeField", profileTypeFields[1].id),
+            type: "SHORT_TEXT",
+          },
+          value: {
+            id: expect.any(String),
+            content: { value: "Doe" },
+          },
+        },
+        {
+          field: {
+            id: toGlobalId("ProfileTypeField", profileTypeFields[2].id),
+            type: "DATE",
+          },
+          value: {
+            id: expect.any(String),
+            content: { value: "1990-01-01" },
+          },
+        },
+        {
+          field: {
+            id: toGlobalId("ProfileTypeField", profileTypeFields[3].id),
+            type: "SELECT",
+          },
+          value: {
+            id: expect.any(String),
+            content: { value: "AR" },
+          },
+        },
+        {
+          field: {
+            id: toGlobalId("ProfileTypeField", profileTypeFields[4].id),
+            type: "SHORT_TEXT",
+          },
+          value: null,
+        },
+        {
+          field: {
+            id: toGlobalId("ProfileTypeField", backgroundCheckField.id),
+            type: "BACKGROUND_CHECK",
+          },
+          value: {
+            id: expect.any(String),
+            content: {
+              query: {
+                name: "John Doe",
+                date: null,
+                country: "AR",
+                birthCountry: "AR",
+                type: "PERSON",
+              },
+              search: {
+                totalCount: 1,
+                falsePositivesCount: 0,
+                createdAt: expect.any(String),
+              },
+              entity: null,
+            },
+          },
+        },
+      ],
+      events: {
+        totalCount: 7,
+        items: [
+          // ----- background check update -----
+          { type: "PROFILE_UPDATED" },
+          { type: "PROFILE_FIELD_VALUE_UPDATED" },
+          // -----------------------------------
+          { type: "PROFILE_UPDATED" },
+          { type: "PROFILE_FIELD_VALUE_UPDATED" },
+          { type: "PROFILE_FIELD_VALUE_UPDATED" },
+          { type: "PROFILE_FIELD_VALUE_UPDATED" },
+          { type: "PROFILE_FIELD_VALUE_UPDATED" },
+        ],
+      },
+    });
+  });
+
+  it("does not trigger background check search if field is already replied and has a match", async () => {
+    await mocks.knex.from("profile_field_value").insert({
+      profile_id: profile.id,
+      profile_type_field_id: backgroundCheckField.id,
+      type: "BACKGROUND_CHECK",
+      content: {
+        query: {
+          name: "Mike Ross",
+          date: "1992-01-01",
+          country: "US",
+          birthCountry: "US",
+          type: "PERSON",
+        },
+        search: {
+          totalCount: 1,
+          items: [],
+          createdAt: new Date(),
+        },
+        entity: {
+          id: "Q7747",
+          type: "Person",
+          name: "Vladimir Vladimirovich PUTIN",
+          properties: {},
+        },
+      },
+      created_by_user_id: user.id,
+    });
+
+    const { errors, data } = await testClient.execute(
+      gql`
+        mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+          updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+            id
+            properties {
+              field {
+                id
+                type
+              }
+              value {
+                id
+                content
+              }
+            }
+            events(limit: 100, offset: 0) {
+              totalCount
+              items {
+                type
+              }
+            }
+          }
+        }
+      `,
+      {
+        profileId: toGlobalId("Profile", profile.id),
+        fields: [
+          {
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
+            content: { value: "John" },
+          },
+          {
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[1].id),
+            content: { value: "Doe" },
+          },
+          {
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[2].id),
+            content: { value: "1990-01-01" },
+          },
+          {
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[3].id),
+            content: { value: "AR" },
+          },
+        ],
+      },
+    );
+
+    expect(errors).toBeUndefined();
+    expect(data?.updateProfileFieldValue).toEqual({
+      id: toGlobalId("Profile", profile.id),
+      properties: [
+        {
+          field: {
+            id: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
+            type: "SHORT_TEXT",
+          },
+          value: {
+            id: expect.any(String),
+            content: { value: "John" },
+          },
+        },
+        {
+          field: {
+            id: toGlobalId("ProfileTypeField", profileTypeFields[1].id),
+            type: "SHORT_TEXT",
+          },
+          value: {
+            id: expect.any(String),
+            content: { value: "Doe" },
+          },
+        },
+        {
+          field: {
+            id: toGlobalId("ProfileTypeField", profileTypeFields[2].id),
+            type: "DATE",
+          },
+          value: {
+            id: expect.any(String),
+            content: { value: "1990-01-01" },
+          },
+        },
+        {
+          field: {
+            id: toGlobalId("ProfileTypeField", profileTypeFields[3].id),
+            type: "SELECT",
+          },
+          value: {
+            id: expect.any(String),
+            content: { value: "AR" },
+          },
+        },
+        {
+          field: {
+            id: toGlobalId("ProfileTypeField", profileTypeFields[4].id),
+            type: "SHORT_TEXT",
+          },
+          value: null,
+        },
+        {
+          field: {
+            id: toGlobalId("ProfileTypeField", backgroundCheckField.id),
+            type: "BACKGROUND_CHECK",
+          },
+          value: {
+            id: expect.any(String),
+            content: {
+              query: {
+                name: "Mike Ross",
+                date: "1992-01-01",
+                country: "US",
+                birthCountry: "US",
+                type: "PERSON",
+              },
+              search: {
+                totalCount: 1,
+                falsePositivesCount: 0,
+                createdAt: expect.any(String),
+              },
+              entity: {
+                id: "Q7747",
+                type: "Person",
+                name: "Vladimir Vladimirovich PUTIN",
+                properties: {},
+              },
             },
           },
         },
