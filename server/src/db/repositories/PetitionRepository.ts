@@ -6610,9 +6610,15 @@ export class PetitionRepository extends BaseRepository {
         .where("user.status", "ACTIVE")
         .whereNull("user.deleted_at")
         .distinctOn("user.id", "petition_permission.petition_id")
-        .select<
-          (User & { is_subscribed: boolean; petition_id: number })[]
-        >("user.*", "petition_permission.is_subscribed", "petition_permission.petition_id");
+        .orderBy("user.id", "asc")
+        .orderBy("petition_permission.petition_id", "asc")
+        // prioritize permissions subscribed to notifications
+        .orderBy("petition_permission.is_subscribed", "desc")
+        .select<(User & { is_subscribed: boolean; petition_id: number })[]>(
+          "user.*",
+          "petition_permission.is_subscribed",
+          "petition_permission.petition_id",
+        );
 
       const byPetitionId = groupBy(rows, (r) => r.petition_id);
       return petitionIds.map((petitionId) => byPetitionId[petitionId] ?? []);

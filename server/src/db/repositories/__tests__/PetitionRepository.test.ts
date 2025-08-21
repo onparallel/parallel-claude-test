@@ -3420,4 +3420,71 @@ describe("repositories/PetitionRepository", () => {
       ]);
     });
   });
+
+  describe("loadUsersOnPetition", () => {
+    let petition: Petition;
+    let users: User[];
+    beforeAll(async () => {
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+
+      users = await mocks.createRandomUsers(organization.id, 3);
+      const [subscribedGroup, unsubscribedGroup] = await mocks.createUserGroups(2, organization.id);
+      await mocks.insertUserGroupMembers(subscribedGroup.id, [user.id, users[2].id]);
+      await mocks.insertUserGroupMembers(unsubscribedGroup.id, [user.id, users[0].id, users[1].id]);
+
+      await petitions.addPetitionPermissions(
+        [petition.id],
+        [
+          {
+            type: "UserGroup",
+            id: unsubscribedGroup.id,
+            isSubscribed: false,
+            permissionType: "READ",
+          },
+          {
+            type: "UserGroup",
+            id: subscribedGroup.id,
+            isSubscribed: true,
+            permissionType: "READ",
+          },
+          {
+            type: "User",
+            id: users[1].id,
+            isSubscribed: true,
+            permissionType: "READ",
+          },
+          {
+            type: "User",
+            id: users[2].id,
+            isSubscribed: false,
+            permissionType: "READ",
+          },
+        ],
+        "User",
+        user.id,
+      );
+    });
+
+    it("returns all users on the petition with their effective subscription status", async () => {
+      const petitionUsers = await petitions.loadUsersOnPetition(petition.id);
+      expect(petitionUsers.map(pick(["id", "is_subscribed"]))).toIncludeSameMembers([
+        {
+          id: user.id,
+          is_subscribed: true, // user is subscribed through a group
+        },
+        {
+          id: users[0].id,
+          is_subscribed: false, // not subscribed through a group, no direct permission
+        },
+        {
+          id: users[1].id,
+          is_subscribed: true, // subscribed through direct permission, not subscribed through a group
+        },
+        {
+          id: users[2].id,
+          is_subscribed: true, // subscribed through a group, not subscribed through direct permission
+        },
+      ]);
+    });
+  });
 });
