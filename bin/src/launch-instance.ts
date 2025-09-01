@@ -26,7 +26,7 @@ const INSTANCE_TYPES = {
   staging: "t3.large",
 } satisfies Record<Environment, _InstanceType>;
 const KEY_NAME = "ops";
-const IMAGE_ID = "ami-0656a4c2f92e25837";
+const IMAGE_ID = "ami-07c5a0584c7e2b2a4";
 const KMS_KEY_ID = "acf1d245-abe5-4ff8-a490-09dba3834c45";
 const SECURITY_GROUP_IDS = {
   production: ["sg-078abc8a772035e7a"],
