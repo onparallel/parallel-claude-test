@@ -181,6 +181,7 @@ export const ProfileTypeField = objectType({
     t.nullable.string("alias");
     t.boolean("isExpirable", { resolve: (o) => o.is_expirable });
     t.nullable.duration("expiryAlertAheadTime", { resolve: (o) => o.expiry_alert_ahead_time });
+    t.boolean("isUnique", { resolve: (o) => o.is_unique });
     t.nonNull.boolean("isStandard", {
       resolve: (o) => o.alias?.startsWith("p_") ?? false,
     });

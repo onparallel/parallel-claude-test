@@ -61,6 +61,13 @@ export function validCreateProfileTypeFieldData<
     (async (_, args, ctx, info) => {
       const profileTypeId = getArg(args, profileTypeIdArg);
       const [data, argName] = getArgWithPath(args, dataArg);
+      if (isNonNullish(data.isUnique) && data.isUnique && data.type !== "SHORT_TEXT") {
+        throw new ArgValidationError(
+          info,
+          argName,
+          "Unique fields are only supported for short text fields",
+        );
+      }
       if (isNonNullish(data.options)) {
         try {
           const options = await ctx.profileTypeFields.mapProfileTypeFieldOptions(
@@ -96,7 +103,18 @@ export function validUpdateProfileTypeFieldData<
     maxLength(mapArgWithPath(dataArg, "alias"), 100),
     validateRegex(mapArgWithPath(dataArg, "alias"), /^(?!p_)[A-Za-z0-9_]+$/),
     async (_, args, ctx, info) => {
+      const profileTypeFieldId = getArg(args, profileTypeFieldIdArg);
       const [data, argName] = getArgWithPath(args, dataArg);
+      if (isNonNullish(data.isUnique)) {
+        const profileTypeField = (await ctx.profiles.loadProfileTypeField(profileTypeFieldId))!;
+        if (profileTypeField.type !== "SHORT_TEXT") {
+          throw new ArgValidationError(
+            info,
+            argName,
+            "Unique fields are only supported for short text fields",
+          );
+        }
+      }
 
       if (isNonNullish(data.substitutions) && isNonNullish(data.options?.values)) {
         const values = await ctx.profileTypeFields.loadProfileTypeFieldSelectValues(

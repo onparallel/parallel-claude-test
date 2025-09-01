@@ -36,7 +36,7 @@ function UpdateProfileTypeFieldDialog({
   const uniqueExpiryAlertAheadTimes = unique(
     fields.map((f) =>
       f.isExpirable && f.expiryAlertAheadTime === null
-        ? "DO_NOT_REMEMBER"
+        ? "DO_NOT_REMIND"
         : f.expiryAlertAheadTime
           ? durationToExpiration(f.expiryAlertAheadTime)
           : null,

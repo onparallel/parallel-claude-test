@@ -18,6 +18,7 @@ import { DatabaseError } from "pg";
 import {
   filter,
   groupBy,
+  indexBy,
   isNonNullish,
   isNullish,
   map,
@@ -3404,6 +3405,8 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           ctx.profiles.loadProfileFieldFilesByProfileId(args.profileId),
         ]);
 
+      assert(profile, "Profile not found");
+
       const effectivePermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
         groupReplies.map((r) => ({
           profileTypeFieldId: r.field.profile_type_field_id!,
@@ -3483,7 +3486,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
               ctx.profilesHelper.isDraftContent(profileFieldValue.type, profileFieldValue.content))
           ) {
             updateProfileFieldValues.push({
-              profileId: profile!.id,
+              profileId: profile.id,
               ...ctx.petitionsHelper.mapPetitionFieldReplyToProfileFieldValue(reply),
               profileTypeFieldId: field.profile_type_field_id!,
               expiryDate:
@@ -3515,7 +3518,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                * IGNORE/APPEND: will keep the current profile field value and ignore the reply
                */
               updateProfileFieldValues.push({
-                profileId: profile!.id,
+                profileId: profile.id,
                 ...ctx.petitionsHelper.mapPetitionFieldReplyToProfileFieldValue(
                   reply ?? { type: field.type, content: null },
                 ),
@@ -3540,7 +3543,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           }
 
           updateProfileFieldValues.push({
-            profileId: profile!.id,
+            profileId: profile.id,
             ...ctx.petitionsHelper.mapPetitionFieldReplyToProfileFieldValue(reply),
             profileTypeFieldId: field.profile_type_field_id!,
             expiryDate:
@@ -3549,6 +3552,35 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                 : expiration?.expiryDate,
           });
         }
+      }
+
+      // check value uniqueness on unique fields
+      const possibleConflictingFields = updateProfileFieldValues
+        .filter((v) => profileTypeFields.find((f) => f.id === v.profileTypeFieldId)?.is_unique)
+        .map((v) => ({
+          profileTypeFieldId: v.profileTypeFieldId,
+          content: v.content,
+        }));
+      const conflicts = await ctx.profilesHelper.getProfileFieldValueUniqueConflicts(
+        possibleConflictingFields,
+        indexBy(profileTypeFields, (f) => f.id),
+        profile.profile_type_id,
+        ctx.user!.org_id,
+      );
+      if (conflicts.length > 0) {
+        throw new ApolloError(
+          "Duplicate profile field value",
+          "PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT",
+          {
+            conflicts: conflicts.map((c) => ({
+              profileTypeFieldId: toGlobalId("ProfileTypeField", c.profileTypeFieldId),
+              profileTypeFieldName: c.profileTypeFieldName,
+              profileId: toGlobalId("Profile", c.profileId),
+              profileName: c.profileName,
+              profileStatus: c.profileStatus,
+            })),
+          },
+        );
       }
 
       const deleteProfileFieldFileIds: number[] = [];
@@ -3710,7 +3742,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
             (f) =>
               ({
                 type: "PROFILE_FIELD_FILE_REMOVED",
-                profile_id: profile!.id,
+                profile_id: profile.id,
                 org_id: ctx.user!.org_id,
                 data: {
                   user_id: ctx.user!.id,
@@ -3744,7 +3776,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
             (e) => e.profileTypeFieldId === profileTypeField.id,
           );
           const profileFieldFiles = await ctx.profiles.createProfileFieldFiles(
-            profile!.id,
+            profile.id,
             profileTypeField.id,
             clonedFileUploads.map(([{ petitionFieldReplyId }, fileUpload]) => ({
               petitionFieldReplyId,
@@ -3773,7 +3805,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
               ? [
                   {
                     org_id: ctx.user!.org_id,
-                    profile_id: profile!.id,
+                    profile_id: profile.id,
                     type: "PROFILE_FIELD_EXPIRY_UPDATED",
                     data: {
                       user_id: ctx.user!.id,
@@ -3789,7 +3821,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
       }
 
       await ctx.profiles.associateProfilesToPetition(
-        [{ petition_id: args.petitionId, profile_id: profile!.id }],
+        [{ petition_id: args.petitionId, profile_id: args.profileId }],
         ctx.user!,
       );
 
@@ -3845,7 +3877,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
 
                   if (relationshipType.is_reciprocal) {
                     const [leftSideId, rightSideId] = [
-                      profile!.id,
+                      profile.id,
                       reply.associated_profile_id!,
                     ].sort();
                     return {
@@ -3859,12 +3891,12 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                     return {
                       left_side_profile_id:
                         relationship.left_side_petition_field_id === args.petitionFieldId
-                          ? profile!.id
+                          ? profile.id
                           : reply.associated_profile_id!,
                       right_side_profile_id:
                         relationship.left_side_petition_field_id === args.petitionFieldId
                           ? reply.associated_profile_id!
-                          : profile!.id,
+                          : profile.id,
                       profile_relationship_type_id: relationship.profile_relationship_type_id,
                     };
                   } else {
@@ -3872,10 +3904,10 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                       left_side_profile_id:
                         relationship.left_side_petition_field_id === args.petitionFieldId
                           ? reply.associated_profile_id!
-                          : profile!.id,
+                          : profile.id,
                       right_side_profile_id:
                         relationship.left_side_petition_field_id === args.petitionFieldId
-                          ? profile!.id
+                          ? profile.id
                           : reply.associated_profile_id!,
                       profile_relationship_type_id: relationship.profile_relationship_type_id,
                     };
@@ -3899,7 +3931,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
 
       return await ctx.petitions.updatePetitionFieldReply(
         args.parentReplyId,
-        { associated_profile_id: profile!.id },
+        { associated_profile_id: profile.id },
         `User:${ctx.user!.id}`,
       );
     },

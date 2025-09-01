@@ -1131,9 +1131,8 @@ describe("repositories/ProfileRepository", () => {
         user.id,
       );
 
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(profile.id, [
         {
-          profile_id: profile.id,
           profile_type_field_id: fields[0].id,
           type: "SHORT_TEXT",
           content: { value: "Original Content" },
@@ -1141,7 +1140,6 @@ describe("repositories/ProfileRepository", () => {
           created_by_user_id: user.id,
         },
         {
-          profile_id: profile.id,
           profile_type_field_id: fields[0].id,
           type: "SHORT_TEXT",
           content: { value: "my edited content" },
@@ -1279,9 +1277,8 @@ describe("repositories/ProfileRepository", () => {
         user.id,
       );
 
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(profile.id, [
         {
-          profile_id: profile.id,
           profile_type_field_id: fields[0].id,
           type: "SHORT_TEXT",
           content: { value: "Original Content" },
@@ -1330,9 +1327,8 @@ describe("repositories/ProfileRepository", () => {
         user.id,
       );
 
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(profile.id, [
         {
-          profile_id: profile.id,
           profile_type_field_id: fields[0].id,
           type: "SHORT_TEXT",
           content: { value: "Original Content" },

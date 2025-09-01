@@ -325,6 +325,7 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
           t.nullable.string("alias");
           t.nullable.boolean("isExpirable");
           t.nullable.duration("expiryAlertAheadTime");
+          t.nullable.boolean("isUnique");
         },
       }),
     ),
@@ -351,6 +352,7 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
           is_expirable: args.data.isExpirable ?? false,
           expiry_alert_ahead_time: args.data.isExpirable ? args.data.expiryAlertAheadTime : null,
           options,
+          is_unique: args.data.isUnique ?? false,
         },
         `User:${ctx.user!.id}`,
       );
@@ -401,6 +403,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
           t.nullable.string("alias");
           t.nullable.boolean("isExpirable");
           t.nullable.duration("expiryAlertAheadTime");
+          t.nullable.boolean("isUnique");
           t.nullable.jsonObject("options");
           t.nullable.list.nonNull.field("substitutions", {
             type: inputObjectType({
@@ -437,6 +440,9 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
       updateData.expiry_alert_ahead_time = args.data.isExpirable
         ? args.data.expiryAlertAheadTime
         : null;
+    }
+    if (isNonNullish(args.data.isUnique) && profileTypeField.is_unique !== args.data.isUnique) {
+      updateData.is_unique = args.data.isUnique;
     }
 
     if (isNonNullish(args.data.options)) {
@@ -569,6 +575,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     try {
       const { updatedProfileTypeField, isProfileNamePatternUpdated } =
         await ctx.profiles.withTransaction(async (t) => {
+          // If replacing SELECT or CHECKBOX options, update the profile field values content
           if (
             (profileTypeField.type === "SELECT" || profileTypeField.type === "CHECKBOX") &&
             isNonNullish(args.data.substitutions) &&
@@ -583,6 +590,16 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
               t,
             );
           }
+
+          // If setting is_unique to profile type field, update the value on profile_field_value
+          if (isNonNullish(updateData.is_unique)) {
+            await ctx.profiles.updateProfileFieldValuesIsUnique(
+              profileTypeField.id,
+              updateData.is_unique,
+              t,
+            );
+          }
+
           if (updateData.is_expirable === false) {
             const repliesHaveExpirySet = await ctx.profiles.profileFieldRepliesHaveExpiryDateSet(
               args.profileTypeFieldId,
@@ -671,9 +688,17 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
           "The alias for this field already exists in this profile type",
           "ALIAS_ALREADY_EXISTS",
         );
-      } else {
-        throw e;
+      } else if (
+        e instanceof DatabaseError &&
+        e.constraint === "profile_field_value__unique_values_uniq"
+      ) {
+        throw new ApolloError(
+          "Duplicate values already exist for this profile type field",
+          "DUPLICATE_VALUES_EXIST",
+        );
       }
+
+      throw e;
     }
   },
 });
@@ -852,7 +877,22 @@ export const createProfile = mutationField("createProfile", {
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
     subscribe: booleanArg({ description: "Subscribe the context user to profile notifications" }),
-    fields: list(nonNull("UpdateProfileFieldValueInput")),
+    fields: nonNull(
+      list(
+        nonNull(
+          arg({
+            type: inputObjectType({
+              name: "CreateProfileFieldValueInput",
+              definition(t) {
+                t.nonNull.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
+                t.nonNull.jsonObject("content");
+                t.nullable.date("expiryDate");
+              },
+            }),
+          }),
+        ),
+      ),
+    ),
   },
   resolve: async (_, args, ctx) => {
     const profileTypeFields =
@@ -867,7 +907,7 @@ export const createProfile = mutationField("createProfile", {
       alias: string | null;
     }[] = [];
     const fields = await pMap(
-      args.fields ?? [],
+      args.fields,
       async (field) => {
         const profileTypeField = profileTypeFields.find(
           (ptf) => ptf!.id === field.profileTypeFieldId,
@@ -892,23 +932,21 @@ export const createProfile = mutationField("createProfile", {
           );
         }
 
-        if (isNonNullish(field.content)) {
-          try {
-            // validate fields content before creating the profile.
-            // this way we can avoid creating the profile if the content is invalid
-            await ctx.profileValidation.validateProfileFieldValueContent(
-              profileTypeField,
-              field.content,
-            );
-          } catch (e) {
-            if (e instanceof Error) {
-              aggregatedErrors.push({
-                code: "INVALID_PROFILE_FIELD_VALUE",
-                profileTypeFieldId: toGlobalId("ProfileTypeField", field.profileTypeFieldId),
-                alias: profileTypeField.alias,
-                message: e.message,
-              });
-            }
+        try {
+          // validate fields content before creating the profile.
+          // this way we can avoid creating the profile if the content is invalid
+          await ctx.profileValidation.validateProfileFieldValueContent(
+            profileTypeField,
+            field.content,
+          );
+        } catch (e) {
+          if (e instanceof Error) {
+            aggregatedErrors.push({
+              code: "INVALID_PROFILE_FIELD_VALUE",
+              profileTypeFieldId: toGlobalId("ProfileTypeField", field.profileTypeFieldId),
+              alias: profileTypeField.alias,
+              message: e.message,
+            });
           }
         }
 
@@ -935,34 +973,58 @@ export const createProfile = mutationField("createProfile", {
         aggregatedErrors,
       });
     }
-
-    const [profile] = await ctx.profiles.createProfiles(
-      {
-        localizable_name: { en: "", es: "" },
-        org_id: ctx.user!.org_id,
-        profile_type_id: args.profileTypeId,
-      },
-      ctx.user!.id,
-    );
-
-    if (args.subscribe) {
-      await ctx.profiles.subscribeUsersToProfiles(
-        [profile.id],
-        [ctx.user!.id],
-        `User:${ctx.user!.id}`,
-      );
-    }
-
-    if (fields.length > 0) {
-      await ctx.profiles.updateProfileFieldValues(
-        fields.map((f) => ({ ...f, profileId: profile.id })),
-        ctx.user!.id,
+    try {
+      const profile = await ctx.profiles.createProfileWithValues(
         ctx.user!.org_id,
+        args.profileTypeId,
+        ctx.user!.id,
+        fields,
       );
+      if (args.subscribe) {
+        await ctx.profiles.subscribeUsersToProfiles(
+          [profile.id],
+          [ctx.user!.id],
+          `User:${ctx.user!.id}`,
+        );
+      }
       return (await ctx.profiles.loadProfile(profile.id))!;
+    } catch (e) {
+      if (
+        e instanceof DatabaseError &&
+        e.constraint === "profile_field_value__unique_values_uniq"
+      ) {
+        const profileTypeFields = await ctx.profiles.loadProfileTypeField(
+          fields.map((f) => f.profileTypeFieldId),
+        );
+        assert(profileTypeFields.every(isNonNullish), "ProfileTypeField not found");
+        const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
+        const possibleConflictingFields = fields.filter(
+          (f) => isNonNullish(f.content) && profileTypeFieldsById[f.profileTypeFieldId].is_unique,
+        );
+        const conflicts = await ctx.profilesHelper.getProfileFieldValueUniqueConflicts(
+          possibleConflictingFields,
+          profileTypeFieldsById,
+          args.profileTypeId,
+          ctx.user!.org_id,
+        );
+        if (conflicts.length > 0) {
+          throw new ApolloError(
+            "Duplicate profile field value",
+            "PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT",
+            {
+              conflicts: conflicts.map((c) => ({
+                profileTypeFieldId: toGlobalId("ProfileTypeField", c.profileTypeFieldId),
+                profileTypeFieldName: c.profileTypeFieldName,
+                profileId: toGlobalId("Profile", c.profileId),
+                profileName: c.profileName,
+                profileStatus: c.profileStatus,
+              })),
+            },
+          );
+        }
+      }
+      throw e;
     }
-
-    return profile;
   },
 });
 
@@ -1116,7 +1178,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
       alias: string | null;
     }[] = [];
 
-    const fieldsWithZonedExpires = await pMap(
+    const updateFieldsData = await pMap(
       fields,
       async (field) => {
         const profileTypeField = profileTypeFieldsById[field.profileTypeFieldId];
@@ -1189,15 +1251,50 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
       });
     }
 
-    await ctx.profiles.updateProfileFieldValues(
-      fieldsWithZonedExpires,
-      ctx.user!.id,
-      ctx.user!.org_id,
-    );
+    try {
+      await ctx.profiles.updateProfileFieldValues(updateFieldsData, ctx.user!.id, ctx.user!.org_id);
+      ctx.profiles.loadProfileFieldValuesAndDraftsByProfileId.dataloader.clear(profileId);
+    } catch (e) {
+      if (
+        e instanceof DatabaseError &&
+        e.constraint === "profile_field_value__unique_values_uniq"
+      ) {
+        const possibleConflictingFields = fields
+          .filter(
+            (f) => isNonNullish(f.content) && profileTypeFieldsById[f.profileTypeFieldId].is_unique,
+          )
+          .map((f) => ({
+            content: f.content!,
+            profileTypeFieldId: f.profileTypeFieldId,
+          }));
 
-    ctx.profiles.loadProfileFieldValuesAndDraftsByProfileId.dataloader.clear(profileId);
+        const conflicts = await ctx.profilesHelper.getProfileFieldValueUniqueConflicts(
+          possibleConflictingFields,
+          profileTypeFieldsById,
+          profile.profile_type_id,
+          ctx.user!.org_id,
+        );
+        if (conflicts.length > 0) {
+          throw new ApolloError(
+            "Duplicate profile field value",
+            "PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT",
+            {
+              conflicts: conflicts.map((c) => ({
+                profileTypeFieldId: toGlobalId("ProfileTypeField", c.profileTypeFieldId),
+                profileTypeFieldName: c.profileTypeFieldName,
+                profileId: toGlobalId("Profile", c.profileId),
+                profileName: c.profileName,
+                profileStatus: c.profileStatus,
+              })),
+            },
+          );
+        }
+      }
 
-    // reload profile again to get possible name updates
+      throw e;
+    }
+    ctx.profiles.loadProfileFieldValueWithDraft.dataloader.clearAll();
+    ctx.profiles.loadProfileFieldValuesByProfileId.dataloader.clear(profileId);
     return (await ctx.profiles.loadProfile(profileId, { refresh: true }))!;
   },
 });
@@ -2346,36 +2443,75 @@ export const completeProfileFromExternalSource = mutationField(
         });
       }
 
-      const [profile] = args.profileId
-        ? [await ctx.profiles.loadProfile(args.profileId)]
-        : await ctx.profiles.createProfiles(
-            [
-              {
-                localizable_name: { en: "", es: "" },
-                org_id: ctx.user!.org_id,
-                profile_type_id: args.profileTypeId,
-              },
-            ],
+      try {
+        if (args.profileId) {
+          await ctx.profiles.updateProfileFieldValues(
+            fields.map((f) => ({
+              profileId: args.profileId!,
+              profileTypeFieldId: f.profileTypeField.id,
+              type: f.profileTypeField.type,
+              content: f.content,
+            })),
             ctx.user!.id,
+            ctx.user!.org_id,
+            entity.integration_id,
           );
-      assert(profile, "Profile not found");
 
-      if (fields.length > 0) {
-        await ctx.profiles.updateProfileFieldValues(
-          fields.map((f) => ({
-            profileId: profile.id,
-            profileTypeFieldId: f.profileTypeField.id,
-            type: f.profileTypeField.type,
-            content: f.content,
-          })),
-          ctx.user!.id,
-          ctx.user!.org_id,
-          entity.integration_id,
-        );
-        return (await ctx.profiles.loadProfile(profile.id))!;
+          return (await ctx.profiles.loadProfile.raw(args.profileId))!;
+        } else {
+          return await ctx.profiles.createProfileWithValues(
+            ctx.user!.org_id,
+            args.profileTypeId,
+            ctx.user!.id,
+            fields.map((f) => ({
+              profileTypeFieldId: f.profileTypeField.id,
+              type: f.profileTypeField.type,
+              content: f.content,
+            })),
+            entity.integration_id,
+          );
+        }
+      } catch (error) {
+        if (
+          error instanceof DatabaseError &&
+          error.constraint === "profile_field_value__unique_values_uniq"
+        ) {
+          const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
+          const possibleConflictingFields = fields
+            .filter(
+              (f) =>
+                isNonNullish(f.content) && profileTypeFieldsById[f.profileTypeField.id].is_unique,
+            )
+            .map((f) => ({
+              profileTypeFieldId: f.profileTypeField.id,
+              content: f.content,
+            }));
+
+          const conflicts = await ctx.profilesHelper.getProfileFieldValueUniqueConflicts(
+            possibleConflictingFields,
+            profileTypeFieldsById,
+            args.profileTypeId,
+            ctx.user!.org_id,
+          );
+          if (conflicts.length > 0) {
+            throw new ApolloError(
+              "Duplicate profile field value",
+              "PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT",
+              {
+                conflicts: conflicts.map((c) => ({
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", c.profileTypeFieldId),
+                  profileTypeFieldName: c.profileTypeFieldName,
+                  profileId: toGlobalId("Profile", c.profileId),
+                  profileName: c.profileName,
+                  profileStatus: c.profileStatus,
+                })),
+              },
+            );
+          }
+        }
+
+        throw error;
       }
-
-      return profile;
     },
   },
 );

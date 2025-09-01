@@ -4,6 +4,7 @@ import { indexBy, pick } from "remeda";
 import {
   Organization,
   OrgIntegration,
+  Profile,
   ProfileExternalSourceEntity,
   ProfileType,
   ProfileTypeField,
@@ -1896,6 +1897,421 @@ describe("Profile External Sources", () => {
 
         expect(errors).toContainGraphQLError("MISSING_CONFLICT_RESOLUTIONS");
         expect(data).toBeNull();
+      });
+
+      describe("with unique properties", () => {
+        let entity: ProfileExternalSourceEntity;
+        let profileType: ProfileType;
+        let idField: ProfileTypeField;
+        let nameField: ProfileTypeField;
+
+        let profile: Profile;
+        let otherProfile: Profile;
+
+        beforeAll(async () => {
+          [profileType] = await mocks.createRandomProfileTypes(organization.id, 1, () => ({
+            standard_type: "INDIVIDUAL",
+          }));
+
+          [idField, nameField] = await mocks.createRandomProfileTypeFields(
+            organization.id,
+            profileType.id,
+            2,
+            (i) => ({
+              name: [
+                { en: "ID", es: "ID" },
+                { en: "Name", es: "Nombre" },
+              ][i],
+              type: "SHORT_TEXT",
+              alias: ["id", "name"][i],
+              is_unique: [true, false][i],
+            }),
+          );
+
+          await mocks.knex
+            .from("profile_type")
+            .where("id", profileType.id)
+            .update({
+              profile_name_pattern: JSON.stringify([nameField.id]),
+            });
+
+          [profile, otherProfile] = await mocks.createRandomProfiles(
+            organization.id,
+            profileType.id,
+            2,
+            (i) => ({
+              status: "OPEN",
+              localizable_name: [
+                { en: "Pedro Paramo", es: "Pedro Paramo" },
+                { en: "", es: "" },
+              ][i],
+            }),
+          );
+          await mocks.createProfileFieldValues(profile.id, [
+            {
+              profile_type_field_id: idField.id,
+              type: "SHORT_TEXT",
+              content: { value: "123456789" },
+              created_by_user_id: user.id,
+            },
+            {
+              profile_type_field_id: nameField.id,
+              type: "SHORT_TEXT",
+              content: { value: "Pedro Paramo" },
+              created_by_user_id: user.id,
+            },
+          ]);
+
+          await mocks.createProfileFieldValues(otherProfile.id, [
+            {
+              profile_type_field_id: idField.id,
+              type: "SHORT_TEXT",
+              content: { value: "XXXX" },
+              created_by_user_id: user.id,
+            },
+          ]);
+
+          [entity] = await mocks.knex
+            .from("profile_external_source_entity")
+            .insert([
+              {
+                created_by_user_id: user.id,
+                integration_id: orgIntegration.id,
+                standard_type: "INDIVIDUAL",
+                data: {},
+                parsed_data: {
+                  id: { value: "123456789" },
+                  name: { value: "John Doe" },
+                },
+              },
+            ])
+            .returning("*");
+        });
+
+        afterAll(async () => {
+          await mocks.knex.from("profile_type").where("id", profileType.id).update({
+            deleted_at: new Date(),
+            deleted_by: "TEST",
+            archived_at: new Date(),
+            archived_by_user_id: user.id,
+          });
+          await mocks.knex
+            .from("profile_type_field")
+            .where("profile_type_id", profileType.id)
+            .update({ deleted_at: new Date(), deleted_by: "TEST" });
+          await mocks.knex
+            .from("profile")
+            .where("profile_type_id", profileType.id)
+            .update({ deleted_at: new Date(), deleted_by: "TEST" });
+        });
+
+        it("sends error if trying to create a profile with a duplicated value on a UNIQUE field", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation (
+                $profileExternalSourceEntityId: GID!
+                $profileTypeId: GID!
+                $profileId: GID
+                $conflictResolutions: [ProfileExternalSourceConflictResolution!]!
+              ) {
+                completeProfileFromExternalSource(
+                  profileExternalSourceEntityId: $profileExternalSourceEntityId
+                  profileTypeId: $profileTypeId
+                  profileId: $profileId
+                  conflictResolutions: $conflictResolutions
+                ) {
+                  id
+                  events(limit: 100, offset: 0) {
+                    totalCount
+                    items {
+                      type
+                      data
+                    }
+                  }
+                  properties {
+                    field {
+                      alias
+                    }
+                    value {
+                      content
+                    }
+                  }
+                }
+              }
+            `,
+            {
+              profileExternalSourceEntityId: toGlobalId("ProfileExternalSourceEntity", entity.id),
+              profileTypeId: toGlobalId("ProfileType", profileType.id),
+              profileId: null,
+              conflictResolutions: [
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", idField.id),
+                  action: "OVERWRITE",
+                },
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", nameField.id),
+                  action: "OVERWRITE",
+                },
+              ],
+            },
+          );
+
+          expect(errors).toContainGraphQLError("PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT", {
+            conflicts: [
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", idField.id),
+                profileTypeFieldName: { en: "ID", es: "ID" },
+                profileId: toGlobalId("Profile", profile.id),
+                profileName: { en: "Pedro Paramo", es: "Pedro Paramo" },
+                profileStatus: "OPEN",
+              },
+            ],
+          });
+          expect(data).toBeNull();
+        });
+
+        it("creates a profile when ignoring a duplicated value on a UNIQUE field", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation (
+                $profileExternalSourceEntityId: GID!
+                $profileTypeId: GID!
+                $profileId: GID
+                $conflictResolutions: [ProfileExternalSourceConflictResolution!]!
+              ) {
+                completeProfileFromExternalSource(
+                  profileExternalSourceEntityId: $profileExternalSourceEntityId
+                  profileTypeId: $profileTypeId
+                  profileId: $profileId
+                  conflictResolutions: $conflictResolutions
+                ) {
+                  id
+                  events(limit: 100, offset: 0) {
+                    totalCount
+                    items {
+                      type
+                      data
+                    }
+                  }
+                  properties {
+                    field {
+                      alias
+                    }
+                    value {
+                      content
+                    }
+                  }
+                }
+              }
+            `,
+            {
+              profileExternalSourceEntityId: toGlobalId("ProfileExternalSourceEntity", entity.id),
+              profileTypeId: toGlobalId("ProfileType", profileType.id),
+              profileId: null,
+              conflictResolutions: [
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", idField.id),
+                  action: "IGNORE",
+                },
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", nameField.id),
+                  action: "OVERWRITE",
+                },
+              ],
+            },
+          );
+
+          expect(errors).toBeUndefined();
+          expect(data?.completeProfileFromExternalSource).toEqual({
+            id: expect.any(String),
+            events: {
+              totalCount: 3,
+              items: [
+                {
+                  type: "PROFILE_UPDATED",
+                  data: {
+                    userId: toGlobalId("User", user.id),
+                  },
+                },
+                {
+                  type: "PROFILE_FIELD_VALUE_UPDATED",
+                  data: {
+                    alias: "name",
+                    profileTypeFieldId: toGlobalId("ProfileTypeField", nameField.id),
+                    userId: toGlobalId("User", user.id),
+                  },
+                },
+                {
+                  type: "PROFILE_CREATED",
+                  data: {
+                    userId: toGlobalId("User", user.id),
+                  },
+                },
+              ],
+            },
+            properties: [
+              {
+                field: { alias: "id" },
+                value: null,
+              },
+              {
+                field: { alias: "name" },
+                value: { content: { value: "John Doe" } },
+              },
+            ],
+          });
+        });
+
+        it("sends error if trying to update a profile with a duplicated value on a UNIQUE field", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation (
+                $profileExternalSourceEntityId: GID!
+                $profileTypeId: GID!
+                $profileId: GID
+                $conflictResolutions: [ProfileExternalSourceConflictResolution!]!
+              ) {
+                completeProfileFromExternalSource(
+                  profileExternalSourceEntityId: $profileExternalSourceEntityId
+                  profileTypeId: $profileTypeId
+                  profileId: $profileId
+                  conflictResolutions: $conflictResolutions
+                ) {
+                  id
+                  events(limit: 100, offset: 0) {
+                    totalCount
+                    items {
+                      type
+                      data
+                    }
+                  }
+                  properties {
+                    field {
+                      alias
+                    }
+                    value {
+                      content
+                    }
+                  }
+                }
+              }
+            `,
+            {
+              profileExternalSourceEntityId: toGlobalId("ProfileExternalSourceEntity", entity.id),
+              profileTypeId: toGlobalId("ProfileType", profileType.id),
+              profileId: toGlobalId("Profile", otherProfile.id),
+              conflictResolutions: [
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", idField.id),
+                  action: "OVERWRITE",
+                },
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", nameField.id),
+                  action: "OVERWRITE",
+                },
+              ],
+            },
+          );
+
+          expect(errors).toContainGraphQLError("PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT", {
+            conflicts: [
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", idField.id),
+                profileTypeFieldName: { en: "ID", es: "ID" },
+                profileId: toGlobalId("Profile", profile.id),
+                profileName: { en: "Pedro Paramo", es: "Pedro Paramo" },
+                profileStatus: "OPEN",
+              },
+            ],
+          });
+          expect(data).toBeNull();
+        });
+
+        it("allows to update a profile with the same UNIQUE field value", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation (
+                $profileExternalSourceEntityId: GID!
+                $profileTypeId: GID!
+                $profileId: GID
+                $conflictResolutions: [ProfileExternalSourceConflictResolution!]!
+              ) {
+                completeProfileFromExternalSource(
+                  profileExternalSourceEntityId: $profileExternalSourceEntityId
+                  profileTypeId: $profileTypeId
+                  profileId: $profileId
+                  conflictResolutions: $conflictResolutions
+                ) {
+                  id
+                  events(limit: 100, offset: 0) {
+                    totalCount
+                    items {
+                      type
+                      data
+                    }
+                  }
+                  properties {
+                    field {
+                      alias
+                    }
+                    value {
+                      content
+                    }
+                  }
+                }
+              }
+            `,
+            {
+              profileExternalSourceEntityId: toGlobalId("ProfileExternalSourceEntity", entity.id),
+              profileTypeId: toGlobalId("ProfileType", profileType.id),
+              profileId: toGlobalId("Profile", profile.id),
+              conflictResolutions: [
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", idField.id),
+                  action: "OVERWRITE",
+                },
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", nameField.id),
+                  action: "OVERWRITE",
+                },
+              ],
+            },
+          );
+
+          expect(errors).toBeUndefined();
+          expect(data?.completeProfileFromExternalSource).toEqual({
+            id: toGlobalId("Profile", profile.id),
+            events: {
+              totalCount: 2,
+              items: [
+                {
+                  type: "PROFILE_UPDATED",
+                  data: {
+                    userId: toGlobalId("User", user.id),
+                  },
+                },
+                {
+                  type: "PROFILE_FIELD_VALUE_UPDATED",
+                  data: {
+                    alias: "name",
+                    profileTypeFieldId: toGlobalId("ProfileTypeField", nameField.id),
+                    userId: toGlobalId("User", user.id),
+                  },
+                },
+              ],
+            },
+            properties: [
+              {
+                field: { alias: "id" },
+                value: { content: { value: "123456789" } },
+              },
+              {
+                field: { alias: "name" },
+                value: { content: { value: "John Doe" } },
+              },
+            ],
+          });
+        });
       });
     });
 

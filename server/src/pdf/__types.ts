@@ -566,6 +566,12 @@ export type CreatePetitionVariableInput = {
   name: Scalars["String"]["input"];
 };
 
+export type CreateProfileFieldValueInput = {
+  content: Scalars["JSONObject"]["input"];
+  expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
+  profileTypeFieldId: Scalars["GID"]["input"];
+};
+
 export type CreateProfileRelationshipInput = {
   direction: ProfileRelationshipDirection;
   profileId: Scalars["GID"]["input"];
@@ -576,6 +582,7 @@ export type CreateProfileTypeFieldInput = {
   alias?: InputMaybe<Scalars["String"]["input"]>;
   expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]["input"]>;
   isExpirable?: InputMaybe<Scalars["Boolean"]["input"]>;
+  isUnique?: InputMaybe<Scalars["Boolean"]["input"]>;
   name: Scalars["LocalizableUserText"]["input"];
   options?: InputMaybe<Scalars["JSONObject"]["input"]>;
   type: ProfileTypeFieldType;
@@ -2264,7 +2271,7 @@ export type MutationcreatePrintPdfTaskArgs = {
 };
 
 export type MutationcreateProfileArgs = {
-  fields?: InputMaybe<Array<UpdateProfileFieldValueInput>>;
+  fields: Array<CreateProfileFieldValueInput>;
   profileTypeId: Scalars["GID"]["input"];
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
@@ -5790,6 +5797,7 @@ export type ProfileTypeField = {
   id: Scalars["GID"]["output"];
   isExpirable: Scalars["Boolean"]["output"];
   isStandard: Scalars["Boolean"]["output"];
+  isUnique: Scalars["Boolean"]["output"];
   isUsedInProfileName: Scalars["Boolean"]["output"];
   myPermission: ProfileTypeFieldPermissionType;
   name: Scalars["LocalizableUserText"]["output"];
@@ -5914,6 +5922,11 @@ export type ProfilesRatioDashboardModuleSettingsInput = {
   profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
   type: ModuleResultType;
+};
+
+export type ProfilesWithContent = {
+  content: Scalars["JSONObject"]["output"];
+  profiles: Array<Profile>;
 };
 
 export type PublicAccessVerification = {
@@ -6321,6 +6334,7 @@ export type Query = {
   profileType: ProfileType;
   profileTypes: ProfileTypePagination;
   profiles: ProfilePagination;
+  profilesWithSameContent: Array<ProfilesWithContent>;
   publicLicenseCode: Maybe<PublicLicenseCode>;
   publicOrg: Maybe<PublicOrganization>;
   /** The comments for this field. */
@@ -6575,6 +6589,11 @@ export type QueryprofilesArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<QueryProfiles_OrderBy>>;
+};
+
+export type QueryprofilesWithSameContentArgs = {
+  profileTypeFieldId: Scalars["GID"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
 };
 
 export type QuerypublicLicenseCodeArgs = {
@@ -7258,6 +7277,7 @@ export type UpdateProfileTypeFieldInput = {
   alias?: InputMaybe<Scalars["String"]["input"]>;
   expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]["input"]>;
   isExpirable?: InputMaybe<Scalars["Boolean"]["input"]>;
+  isUnique?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
   options?: InputMaybe<Scalars["JSONObject"]["input"]>;
   substitutions?: InputMaybe<Array<UpdateProfileTypeFieldSelectOptionsSubstitution>>;

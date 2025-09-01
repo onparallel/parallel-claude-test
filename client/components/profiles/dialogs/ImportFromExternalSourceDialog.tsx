@@ -32,7 +32,10 @@ import {
 } from "@parallel/components/common/dialogs/WizardDialog";
 import { Divider } from "@parallel/components/common/Divider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
-import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import {
+  LocalizableUserText,
+  LocalizableUserTextRender,
+} from "@parallel/components/common/LocalizableUserTextRender";
 import { ProfilePropertyContent } from "@parallel/components/common/ProfilePropertyContent";
 import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import { ProfileTypeFieldReference } from "@parallel/components/common/ProfileTypeFieldReference";
@@ -50,9 +53,11 @@ import {
   ImportFromExternalSourceDialog_ProfileExternalSourceSearchMultipleResultsDetailFragment,
   ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResultFragment,
   ProfileExternalSourceConflictResolutionAction,
+  ProfileStatus,
   useImportFromExternalSourceDialog_ProfileTypeFragment,
   UserLocale,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { never } from "@parallel/utils/never";
@@ -70,18 +75,18 @@ type ImportFromExternalSourceDialogResult = {
 type ImportFromExternalSourceDialogSteps = {
   SELECT_SOURCE: {
     profileType: useImportFromExternalSourceDialog_ProfileTypeFragment;
-    profileId?: string;
+    profileId: string;
     orgIntegrationId?: string;
   };
   SEARCH: {
     profileType: useImportFromExternalSourceDialog_ProfileTypeFragment;
-    profileId?: string;
+    profileId: string;
     orgIntegration: ImportFromExternalSourceDialog_ProfileExternalSourceOrgIntegrationFragment;
     data?: Record<string, string | null>;
   };
   SEARCH_RESULTS: {
     profileType: useImportFromExternalSourceDialog_ProfileTypeFragment;
-    profileId?: string;
+    profileId: string;
     orgIntegration: ImportFromExternalSourceDialog_ProfileExternalSourceOrgIntegrationFragment;
     searchResults: ImportFromExternalSourceDialog_ProfileExternalSourceSearchMultipleResultsDetailFragment;
     data: Record<string, string | null>;
@@ -90,11 +95,6 @@ type ImportFromExternalSourceDialogSteps = {
   UPDATE_PROFILE: {
     profileType: useImportFromExternalSourceDialog_ProfileTypeFragment;
     profileId: string;
-    orgIntegration: ImportFromExternalSourceDialog_ProfileExternalSourceOrgIntegrationFragment;
-    result: ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResultFragment;
-  };
-  CREATE_PROFILE: {
-    profileType: useImportFromExternalSourceDialog_ProfileTypeFragment;
     orgIntegration: ImportFromExternalSourceDialog_ProfileExternalSourceOrgIntegrationFragment;
     result: ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResultFragment;
   };
@@ -298,15 +298,11 @@ function ImportFromExternalSourceDialogSearch({
                   setNoResults(true);
                 }
               } else if (result.__typename === "ProfileExternalSourceSearchSingleResult") {
-                if (isNonNullish(profileId)) {
-                  onStep(
-                    "UPDATE_PROFILE",
-                    { profileType, profileId, orgIntegration, result },
-                    { data },
-                  );
-                } else {
-                  onStep("CREATE_PROFILE", { profileType, orgIntegration, result }, { data });
-                }
+                onStep(
+                  "UPDATE_PROFILE",
+                  { profileType, profileId, orgIntegration, result },
+                  { data },
+                );
               }
             }
           }),
@@ -451,19 +447,11 @@ function ImportFromExternalSourceDialogSearchResults({
               });
               if (isNonNullish(res.data)) {
                 const result = res.data.profileExternalSourceDetails;
-                if (isNonNullish(profileId)) {
-                  onStep(
-                    "UPDATE_PROFILE",
-                    { profileType, profileId, orgIntegration, result },
-                    { selectedResult },
-                  );
-                } else {
-                  onStep(
-                    "CREATE_PROFILE",
-                    { profileType, orgIntegration, result },
-                    { selectedResult },
-                  );
-                }
+                onStep(
+                  "UPDATE_PROFILE",
+                  { profileType, profileId, orgIntegration, result },
+                  { selectedResult },
+                );
               }
             } catch (e: any) {
               showGenericErrorToast(e);
@@ -600,8 +588,17 @@ function ImportFromExternalSourceDialogUpdateProfile({
     ),
   );
 
+  const [uniqueValueConflicts, setUniqueValueConflicts] = useState<
+    {
+      profileId: string;
+      profileName: LocalizableUserText;
+      profileStatus: ProfileStatus;
+      profileTypeFieldId: string;
+    }[]
+  >([]);
+
   const confirmRef = useRef<HTMLButtonElement>(null);
-  const [updateProfile, { loading }] = useMutation(
+  const [completeProfileFromExternalSource, { loading }] = useMutation(
     ImportFromExternalSourceDialog_completeProfileFromExternalSourceDocument,
   );
   const showGenericError = useGenericErrorToast();
@@ -622,7 +619,7 @@ function ImportFromExternalSourceDialogUpdateProfile({
             e.preventDefault();
             e.persist();
             try {
-              const res = await updateProfile({
+              const res = await completeProfileFromExternalSource({
                 variables: {
                   profileExternalSourceEntityId: result.id,
                   profileTypeId: profileType.id,
@@ -636,8 +633,29 @@ function ImportFromExternalSourceDialogUpdateProfile({
               if (isNonNullish(res.data)) {
                 return props.onResolve();
               }
-            } catch {}
-            showGenericError();
+            } catch (error) {
+              if (isApolloError(error, "PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT")) {
+                const conflicts =
+                  (error.graphQLErrors[0].extensions?.conflicts as {
+                    profileId: string;
+                    profileName: LocalizableUserText;
+                    profileStatus: ProfileStatus;
+                    profileTypeFieldId: string;
+                  }[]) ?? [];
+
+                setUniqueValueConflicts(conflicts);
+                setResolutions((curr) => ({
+                  ...curr,
+                  ...Object.fromEntries(
+                    conflicts
+                      .filter((c) => c.profileId !== profileId)
+                      .map(({ profileTypeFieldId }) => [profileTypeFieldId, "IGNORE" as const]),
+                  ),
+                }));
+              } else {
+                showGenericError();
+              }
+            }
           },
         },
       }}
@@ -765,6 +783,11 @@ function ImportFromExternalSourceDialogUpdateProfile({
 
                   const canWriteValue = field.myPermission === "WRITE";
                   const canReadValue = field.myPermission !== "HIDDEN";
+
+                  const uniqueConflict = uniqueValueConflicts.find(
+                    (c) => c.profileTypeFieldId === field.id && c.profileId !== profileId,
+                  );
+
                   return (
                     <SelectableTr
                       key={field.id}
@@ -795,7 +818,7 @@ function ImportFromExternalSourceDialogUpdateProfile({
                       </SelectableTd>
                       <SelectableTd
                         value="OVERWRITE"
-                        isDisabled={!canWriteValue}
+                        isDisabled={!canWriteValue || !!uniqueConflict}
                         _content={{ opacity: isSameContent || !canWriteValue ? 0.4 : undefined }}
                       >
                         {canReadValue ? (
@@ -831,7 +854,8 @@ function ImportFromExternalSourceDialogUpdateProfile({
                           </Center>
                         ) : !canReadValue ||
                           !canWriteValue ||
-                          isNonNullish(currentValue?.content) ? (
+                          isNonNullish(currentValue?.content) ||
+                          !!uniqueConflict ? (
                           <Center>
                             <SmallPopover
                               placement="right"
@@ -846,6 +870,24 @@ function ImportFromExternalSourceDialogUpdateProfile({
                                     <FormattedMessage
                                       id="component.import-from-external-source-dialog.no-write-permission"
                                       defaultMessage="You don't have permission to edit this field"
+                                    />
+                                  ) : !!uniqueConflict ? (
+                                    <FormattedMessage
+                                      id="component.import-from-external-source-dialog.unique-value-conflict"
+                                      defaultMessage="The value in {providerName} is already used by {profileName}."
+                                      values={{
+                                        providerName: <Text as="em">{orgIntegration.name}</Text>,
+                                        profileName: (
+                                          <ProfileReference
+                                            profile={{
+                                              id: uniqueConflict.profileId,
+                                              status: uniqueConflict.profileStatus,
+                                              localizableName: uniqueConflict.profileName,
+                                            }}
+                                            asLink
+                                          />
+                                        ),
+                                      }}
                                     />
                                   ) : isNonNullish(currentValue?.content) ? (
                                     <FormattedMessage
@@ -902,211 +944,6 @@ function ImportFromExternalSourceDialogUpdateProfile({
           <FormattedMessage
             id="component.import-from-external-source-dialog.update-profile-button"
             defaultMessage="Update profile"
-          />
-        </Button>
-      }
-      {...props}
-    />
-  );
-}
-
-function ImportFromExternalSourceDialogCreateProfile({
-  orgIntegration,
-  profileType,
-  result,
-  onStep,
-  onBack,
-  fromStep,
-  ...props
-}: WizardStepDialogProps<
-  ImportFromExternalSourceDialogSteps,
-  "CREATE_PROFILE",
-  ImportFromExternalSourceDialogResult
->) {
-  const intl = useIntl();
-  const confirmRef = useRef<HTMLButtonElement>(null);
-  const [createProfile, { loading }] = useMutation(
-    ImportFromExternalSourceDialog_completeProfileFromExternalSourceDocument,
-  );
-  const showGenericError = useGenericErrorToast();
-  const fieldsWithoutWrite = result.data
-    .filter(({ profileTypeField: field }) => field.myPermission !== "WRITE")
-    .map(({ profileTypeField: field }) => field);
-  return (
-    <ConfirmDialog
-      size="4xl"
-      content={{
-        containerProps: {
-          as: "form",
-          onSubmit: async (e) => {
-            e.preventDefault();
-            e.persist();
-            try {
-              const res = await createProfile({
-                variables: {
-                  profileExternalSourceEntityId: result.id,
-                  profileTypeId: profileType.id,
-                  conflictResolutions: [],
-                },
-              });
-              if (isNonNullish(res.data)) {
-                return props.onResolve({
-                  profileId: res.data.completeProfileFromExternalSource.id,
-                });
-              }
-            } catch {}
-            showGenericError();
-          },
-        },
-      }}
-      initialFocusRef={confirmRef}
-      hasCloseButton
-      header={
-        <HeaderWithOrgIntegrationLogo orgIntegration={orgIntegration}>
-          <FormattedMessage
-            id="component.import-from-external-source-dialog.header-create-profile"
-            defaultMessage="New profile"
-          />
-        </HeaderWithOrgIntegrationLogo>
-      }
-      scrollBehavior="inside"
-      bodyProps={{ as: "div", display: "flex", flexDirection: "column" }}
-      body={
-        <Stack minHeight={0}>
-          <Text>
-            <FormattedMessage
-              id="component.import-from-external-source-dialog.create-profile-description"
-              defaultMessage="A new profile will be created with the following properties."
-            />
-          </Text>
-          {fieldsWithoutWrite.length > 0 ? (
-            <Box>
-              <CloseableAlert status="warning" rounded="md">
-                <AlertIcon />
-                <AlertDescription flex={1}>
-                  <Text>
-                    <FormattedMessage
-                      id="component.import-from-external-source-dialog.fields-without-write"
-                      defaultMessage="You don't have write permission on some of the fields for which {providerName} is reporting information:"
-                      values={{ providerName: orgIntegration.name }}
-                    />{" "}
-                    <EnumerateList
-                      values={fieldsWithoutWrite}
-                      maxItems={10}
-                      renderItem={({ value }, i) => (
-                        <Text as="strong" key={i}>
-                          <LocalizableUserTextRender
-                            value={value.name}
-                            default={intl.formatMessage({
-                              id: "generic.unnamed-profile-type-field",
-                              defaultMessage: "Unnamed property",
-                            })}
-                          />
-                        </Text>
-                      )}
-                    />
-                  </Text>
-                </AlertDescription>
-              </CloseableAlert>
-            </Box>
-          ) : null}
-          <ScrollTableContainer>
-            <Table variant="parallel" layout="fixed">
-              <Thead>
-                <Tr>
-                  <Th width="50%">
-                    <FormattedMessage id="generic.profile-property" defaultMessage="Property" />
-                  </Th>
-                  <Th width="50%">
-                    <FormattedMessage
-                      id="component.import-from-external-source-dialog.value"
-                      defaultMessage="Value"
-                    />
-                  </Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {result.data.map(({ profileTypeField: field, content }) => {
-                  const canWriteValue = field.myPermission === "WRITE";
-                  const canReadValue = field.myPermission !== "HIDDEN";
-                  return (
-                    <Tr key={field.id}>
-                      <Td>
-                        <ProfileTypeFieldReference field={field} />
-                      </Td>
-                      <Td>
-                        <HStack>
-                          <Box flex={1} opacity={!canWriteValue || !canReadValue ? 0.4 : undefined}>
-                            {canReadValue ? (
-                              <ProfilePropertyContent field={field} value={{ content }} />
-                            ) : (
-                              "•".repeat(20)
-                            )}
-                          </Box>
-                          {!canReadValue || !canWriteValue ? (
-                            <Center>
-                              <SmallPopover
-                                placement="right"
-                                content={
-                                  <Text fontSize="sm">
-                                    {!canReadValue ? (
-                                      <FormattedMessage
-                                        id="component.import-from-external-source-dialog.no-read-permission"
-                                        defaultMessage="You don't have permission to view this field"
-                                      />
-                                    ) : !canWriteValue ? (
-                                      <FormattedMessage
-                                        id="component.import-from-external-source-dialog.no-write-permission"
-                                        defaultMessage="You don't have permission to edit this field"
-                                      />
-                                    ) : null}
-                                  </Text>
-                                }
-                              >
-                                <AlertCircleFilledIcon
-                                  color="yellow.500"
-                                  _hover={{ color: "yellow.600" }}
-                                  _focus={{ color: "yellow.600" }}
-                                  tabIndex={0}
-                                />
-                              </SmallPopover>
-                            </Center>
-                          ) : null}
-                        </HStack>
-                      </Td>
-                    </Tr>
-                  );
-                })}
-              </Tbody>
-            </Table>
-          </ScrollTableContainer>
-        </Stack>
-      }
-      cancel={
-        <Button onClick={() => onBack()}>
-          {fromStep === "SEARCH" ? (
-            <FormattedMessage
-              id="component.import-from-external-source-dialog.modify-search-button"
-              defaultMessage="Modify search"
-            />
-          ) : fromStep === "SEARCH_RESULTS" ? (
-            <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
-          ) : (
-            never()
-          )}
-        </Button>
-      }
-      confirm={
-        <Button
-          ref={confirmRef}
-          type="submit"
-          colorScheme="primary"
-          isDisabled={loading}
-          isLoading={loading}
-        >
-          <FormattedMessage
-            id="component.import-from-external-source-dialog.create-profile-button"
-            defaultMessage="Create profile"
           />
         </Button>
       }
@@ -1272,7 +1109,7 @@ const _mutations = [
     mutation ImportFromExternalSourceDialog_completeProfileFromExternalSource(
       $profileExternalSourceEntityId: GID!
       $profileTypeId: GID!
-      $profileId: GID
+      $profileId: GID!
       $conflictResolutions: [ProfileExternalSourceConflictResolution!]!
     ) {
       completeProfileFromExternalSource(
@@ -1305,7 +1142,6 @@ export function useImportFromExternalSourceDialog() {
       SEARCH: ImportFromExternalSourceDialogSearch,
       SEARCH_RESULTS: ImportFromExternalSourceDialogSearchResults,
       UPDATE_PROFILE: ImportFromExternalSourceDialogUpdateProfile,
-      CREATE_PROFILE: ImportFromExternalSourceDialogCreateProfile,
     },
     "SELECT_SOURCE",
   );

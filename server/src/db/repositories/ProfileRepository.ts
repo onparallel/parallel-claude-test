@@ -806,7 +806,7 @@ export class ProfileRepository extends BaseRepository {
     );
   }
 
-  async createProfiles(data: MaybeArray<CreateProfile>, userId: number) {
+  async createProfiles(data: MaybeArray<CreateProfile>, userId: number, t?: Knex.Transaction) {
     const dataArr = unMaybeArray(data);
     if (dataArr.length === 0) {
       return [];
@@ -834,7 +834,7 @@ export class ProfileRepository extends BaseRepository {
         t,
       );
       return profiles;
-    });
+    }, t);
   }
 
   async updateProfileStatus(profileIds: number[], status: ProfileStatus, updatedBy: string) {
@@ -1087,6 +1087,66 @@ export class ProfileRepository extends BaseRepository {
     });
   }
 
+  async updateProfileFieldValuesIsUnique(
+    profileTypeFieldId: number,
+    isUnique: boolean,
+    t?: Knex.Transaction,
+  ) {
+    await this.from("profile_field_value", t)
+      .where("profile_type_field_id", profileTypeFieldId)
+      .whereNull("deleted_at")
+      .update({ profile_type_field_is_unique: isUnique });
+  }
+
+  async findProfileFieldValuesWithSameContent(profileTypeFieldId: number, t?: Knex.Transaction) {
+    return await this.from("profile_field_value", t)
+      .where("profile_type_field_id", profileTypeFieldId)
+      .whereNull("deleted_at")
+      .whereNull("removed_at")
+      .groupBy(this.knex.raw("content->>'value'"))
+      .having(this.knex.raw("count(*) > 1"))
+      .select<
+        { value: string; ids: number[] }[]
+      >(this.knex.raw("content->>'value' as value"), this.knex.raw("array_agg(profile_id) as ids"));
+  }
+
+  async createProfileWithValues(
+    orgId: number,
+    profileTypeId: number,
+    userId: number,
+    fields: {
+      profileTypeFieldId: number;
+      type: ProfileTypeFieldType;
+      content: Record<string, any>;
+      expiryDate?: string | null;
+      petitionFieldReplyId?: number | null;
+    }[],
+    externalSourceIntegrationId?: number,
+    t?: Knex.Transaction,
+  ) {
+    return await this.withTransaction(async (t) => {
+      const [profile] = await this.createProfiles(
+        {
+          localizable_name: { en: "", es: "" },
+          org_id: orgId,
+          profile_type_id: profileTypeId,
+        },
+        userId,
+        t,
+      );
+      if (fields.length > 0) {
+        await this.updateProfileFieldValues(
+          fields.map((f) => ({ ...f, profileId: profile.id })),
+          userId,
+          orgId,
+          externalSourceIntegrationId,
+          t,
+        );
+      }
+      return profile;
+    }, t);
+  }
+
   async updateProfileFieldValues(
     fields: {
       profileId: number;
@@ -1115,9 +1175,14 @@ export class ProfileRepository extends BaseRepository {
           with new_values as (
             select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date, pending_review, review_reason, petition_field_reply_id)
           ),
+          profile_type_fields as (
+            select id, is_unique from profile_type_field
+            where id in (select distinct profile_type_field_id from new_values)
+              and type = 'SHORT_TEXT'
+          ),
           with_no_previous_values as (
             -- insert values where a profile_field_value does not exist yet
-            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review, review_reason, petition_field_reply_id)
+            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review, review_reason,petition_field_reply_id, profile_type_field_is_unique)
             select 
               nv.profile_id, 
               nv.profile_type_field_id, 
@@ -1129,7 +1194,8 @@ export class ProfileRepository extends BaseRepository {
               case when nv.type in ('BACKGROUND_CHECK', 'ADVERSE_MEDIA_SEARCH') then true else false end, -- this fields are monitored by default
               nv.pending_review,
               nv.review_reason,
-              nv.petition_field_reply_id
+              nv.petition_field_reply_id,
+              coalesce(ptf.is_unique, false)
             from new_values nv
             left join profile_field_value pfv2 
               on pfv2.profile_id = nv.profile_id
@@ -1137,6 +1203,7 @@ export class ProfileRepository extends BaseRepository {
               and pfv2.deleted_at is null
               and pfv2.removed_at is null
               and pfv2.is_draft = false
+            left join profile_type_fields ptf on ptf.id = nv.profile_type_field_id
             where pfv2.id is null and nv.content is not null
             returning *
           ),
@@ -1169,7 +1236,7 @@ export class ProfileRepository extends BaseRepository {
           ),
           with_previous_values as (
             -- insert values where a profile_field_value existed already
-            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review, review_reason, petition_field_reply_id)
+            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review, review_reason, petition_field_reply_id, profile_type_field_is_unique)
             select 
               nv.profile_id,
               nv.profile_type_field_id, 
@@ -1181,9 +1248,11 @@ export class ProfileRepository extends BaseRepository {
               rpv.active_monitoring, -- active_monitoring is always inherited from previous values
               nv.pending_review, -- pending_review is always set explicitly, not inherited
               nv.review_reason,
-              nv.petition_field_reply_id
+              nv.petition_field_reply_id,
+              coalesce(ptf.is_unique, false)
             from removed_previous_values rpv
             join new_values nv on nv.profile_id = rpv.profile_id and rpv.profile_type_field_id = nv.profile_type_field_id
+            left join profile_type_fields ptf on ptf.id = nv.profile_type_field_id
             where nv.content is not null
             returning *
           ),
@@ -1390,6 +1459,12 @@ export class ProfileRepository extends BaseRepository {
     }[],
     userId: number | null,
   ) {
+    if (!fields.every((f) => ["ADVERSE_MEDIA_SEARCH", "BACKGROUND_CHECK"].includes(f.type))) {
+      throw new Error(
+        "Draft values are reserved for ADVERSE_MEDIA_SEARCH and BACKGROUND_CHECK fields",
+      );
+    }
+
     //ignore fields that have no content and no expiry date
     const _fields = fields.filter((f) => f.content !== undefined || f.expiryDate !== undefined);
     if (_fields.length === 0) {

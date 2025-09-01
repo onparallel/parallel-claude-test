@@ -1,8 +1,19 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { Box, Button, FormControl, Grid, HStack, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  FormControl,
+  Grid,
+  HStack,
+  List,
+  ListItem,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { CheckIcon, CloseIcon, EditIcon, RepeatIcon, SaveIcon } from "@parallel/chakra/icons";
 import { AlertPopover } from "@parallel/components/common/AlertPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { LocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
 import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import {
   ProfileSelect,
@@ -10,6 +21,7 @@ import {
   ProfileSelectRerenderProvider,
   ProfileSelectSelection,
 } from "@parallel/components/common/ProfileSelect";
+import { ProfileTypeFieldReference } from "@parallel/components/common/ProfileTypeFieldReference";
 import { RestrictedFeatureAlert } from "@parallel/components/common/RestrictedFeatureAlert";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
@@ -17,6 +29,7 @@ import {
   isDialogError,
   useDialog,
 } from "@parallel/components/common/dialogs/DialogProvider";
+import { ErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/CreateProfileDialog";
 import {
   AdverseMediaArticle,
@@ -239,6 +252,8 @@ function ArchiveFieldGroupReplyIntoProfileRow({
     }
   }, [selectedProfile?.id, isSaved, isEditing, savedProfile.current?.id]);
 
+  const showUniqueValueConflictDialog = useDialog(UniqueValueConflictDialog);
+
   const showRestrictedProfilePropertiesDialog = useRestrictedProfilePropertiesDialog();
   const showCreateProfileDialog = useCreateProfileDialog();
   async function archiveProfile(profile: ProfileSelectSelection, ignoreFieldsInName?: boolean) {
@@ -292,7 +307,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
       setIsEditing(false);
       onRefetch();
       savedProfile.current = profile;
-    } catch (error: any) {
+    } catch (error) {
       if (isApolloError(error, "CONFLICT_RESOLUTION_REQUIRED_ERROR")) {
         try {
           const conflicts =
@@ -336,17 +351,32 @@ function ArchiveFieldGroupReplyIntoProfileRow({
               profileTypeFieldsWithReplies,
             });
           }
-
-          await archiveFieldGroupReplyIntoProfile({
-            variables: {
-              petitionId,
-              petitionFieldId: field.id,
-              parentReplyId: reply.id,
-              profileId: profile!.id,
-              conflictResolutions,
-              expirations,
-            },
-          });
+          try {
+            await archiveFieldGroupReplyIntoProfile({
+              variables: {
+                petitionId,
+                petitionFieldId: field.id,
+                parentReplyId: reply.id,
+                profileId: profile!.id,
+                conflictResolutions,
+                expirations,
+              },
+            });
+          } catch (error) {
+            if (isApolloError(error, "PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT")) {
+              const conflicts =
+                (error.graphQLErrors[0].extensions?.conflicts as {
+                  profileTypeFieldName: LocalizableUserText;
+                  profileTypeFieldId: string;
+                }[]) ?? [];
+              await showUniqueValueConflictDialog.ignoringDialogErrors({
+                fields: conflicts.map(({ profileTypeFieldId: id, profileTypeFieldName: name }) => {
+                  return { id, name };
+                }),
+              });
+            }
+            throw error;
+          }
 
           setIsSaved(true);
           setIsEditing(false);
@@ -369,6 +399,17 @@ function ArchiveFieldGroupReplyIntoProfileRow({
             } catch {}
           }
         }
+      } else if (isApolloError(error, "PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT")) {
+        const conflicts =
+          (error.graphQLErrors[0].extensions?.conflicts as {
+            profileTypeFieldName: LocalizableUserText;
+            profileTypeFieldId: string;
+          }[]) ?? [];
+        await showUniqueValueConflictDialog.ignoringDialogErrors({
+          fields: conflicts.map(({ profileTypeFieldId: id, profileTypeFieldName: name }) => {
+            return { id, name };
+          }),
+        });
       }
     }
   }
@@ -855,6 +896,42 @@ function DialogHeader({
       id="component.associate-and-fill-profile-to-parallel-dialog.header"
       defaultMessage="Associate {count, plural, =1{profile} other{profiles}}"
       values={{ count: groupsWithProfileTypesCount }}
+    />
+  );
+}
+
+function UniqueValueConflictDialog({
+  fields,
+  ...props
+}: DialogProps<{
+  fields: { id: string; name: LocalizableUserText }[];
+}>) {
+  return (
+    <ErrorDialog
+      {...props}
+      header={
+        <FormattedMessage
+          id="component.unique-value-conflict-dialog.header"
+          defaultMessage="Unique value conflict"
+        />
+      }
+      message={
+        <Stack spacing={2}>
+          <FormattedMessage
+            id="component.unique-value-conflict-dialog.body"
+            defaultMessage="Can't save to the profile because the value in the following properties already exists in another profile."
+          />
+          <List>
+            {fields.map((field) => {
+              return (
+                <ListItem key={field.id}>
+                  <ProfileTypeFieldReference field={{ ...field, type: "SHORT_TEXT" as const }} />
+                </ListItem>
+              );
+            })}
+          </List>
+        </Stack>
+      }
     />
   );
 }

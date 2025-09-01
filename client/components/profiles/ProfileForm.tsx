@@ -256,14 +256,14 @@ export const ProfileForm = Object.assign(
         flex={1}
         {...props}
         onSubmit={handleSubmit(async (formData) => {
-          try {
-            const editedFields = Object.entries(formData.fields)
-              .filter(([fieldId, _]) => formState.dirtyFields.fields?.[fieldId])
-              .map(([_, field]) => field);
+          const editedFields = Object.entries(formData.fields)
+            .filter(([fieldId, _]) => formState.dirtyFields.fields?.[fieldId])
+            .map(([_, field]) => field);
 
-            const [fileFields, fields] = partition(editedFields, (field) => field.type === "FILE");
+          const [fileFields, fields] = partition(editedFields, (field) => field.type === "FILE");
 
-            if (fields.length) {
+          if (fields.length) {
+            try {
               await updateProfileFieldValue({
                 variables: {
                   profileId: profile.id,
@@ -305,8 +305,42 @@ export const ProfileForm = Object.assign(
                     .filter(isNonNullish),
                 },
               });
-            }
+            } catch (e) {
+              if (isApolloError(e, "PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT")) {
+                const { conflicts } = e.graphQLErrors[0].extensions as {
+                  conflicts: { profileTypeFieldId: string; profileId: string }[];
+                };
+                for (const conflict of conflicts) {
+                  setError(
+                    `fields.${conflict.profileTypeFieldId}.content.value`,
+                    { type: "unique" },
+                    { shouldFocus: true },
+                  );
+                }
+                return;
+              } else if (isApolloError(e, "INVALID_PROFILE_FIELD_VALUE")) {
+                if (isApolloError(e, "INVALID_PROFILE_FIELD_VALUE")) {
+                  const aggregatedErrors =
+                    (e.graphQLErrors[0].extensions!.aggregatedErrors as {
+                      profileTypeFieldId: string;
+                      code: string;
+                    }[]) ?? [];
 
+                  for (const err of aggregatedErrors) {
+                    setError(
+                      `fields.${err.profileTypeFieldId}.content.value`,
+                      { type: "validate" },
+                      { shouldFocus: true },
+                    );
+                  }
+                  return;
+                } else {
+                  throw e;
+                }
+              }
+            }
+          }
+          try {
             await pMap(
               fileFields,
               async (fileField) => {
@@ -409,11 +443,8 @@ export const ProfileForm = Object.assign(
 
                 return { ...fileField, content: { value: [] } };
               },
-              {
-                concurrency: 1,
-              },
+              { concurrency: 1 },
             );
-
             const currentValues = getValues();
             reset(currentValues, {
               keepDirty: false,
@@ -431,16 +462,6 @@ export const ProfileForm = Object.assign(
                   }),
                 }),
               );
-            } else if (isApolloError(e, "INVALID_PROFILE_FIELD_VALUE")) {
-              const aggregatedErrors =
-                (e.graphQLErrors[0].extensions!.aggregatedErrors as {
-                  profileTypeFieldId: string;
-                  code: string;
-                }[]) ?? [];
-
-              for (const err of aggregatedErrors) {
-                setError(`fields.${err.profileTypeFieldId}.content.value`, { type: "validate" });
-              }
             } else {
               throw e;
             }

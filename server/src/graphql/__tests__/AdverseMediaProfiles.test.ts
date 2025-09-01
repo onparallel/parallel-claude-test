@@ -85,36 +85,37 @@ describe("Adverse Media - Profiles", () => {
     });
 
     it("returns stored profile value if no search term is provided and there is no draft value", async () => {
-      await mocks.knex.from("profile_field_value").insert({
-        profile_id: profile.id,
-        profile_type_field_id: profileTypeField.id,
-        content: {
-          search: [{ wikiDataId: "Q7747", label: "Vladimir Putin" }],
-          articles: {
-            totalCount: 2,
-            items: [
-              {
-                id: "1",
-                header: "Vladimir Putin does something",
-                timestamp: 1600000000,
-                source: "Google News",
-              },
-              {
-                id: "2",
-                header: "Vladimir Putin does something else",
-                timestamp: 1600000001,
-                source: "Google News",
-              },
-            ],
-            createdAt: new Date(),
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeField.id,
+          content: {
+            search: [{ wikiDataId: "Q7747", label: "Vladimir Putin" }],
+            articles: {
+              totalCount: 2,
+              items: [
+                {
+                  id: "1",
+                  header: "Vladimir Putin does something",
+                  timestamp: 1600000000,
+                  source: "Google News",
+                },
+                {
+                  id: "2",
+                  header: "Vladimir Putin does something else",
+                  timestamp: 1600000001,
+                  source: "Google News",
+                },
+              ],
+              createdAt: new Date(),
+            },
+            relevant_articles: [{ id: "1", added_at: new Date(), added_by_user_id: user.id }],
+            irrelevant_articles: [],
+            dismissed_articles: [],
           },
-          relevant_articles: [{ id: "1", added_at: new Date(), added_by_user_id: user.id }],
-          irrelevant_articles: [],
-          dismissed_articles: [],
+          type: "ADVERSE_MEDIA_SEARCH",
+          created_by_user_id: user.id,
         },
-        type: "ADVERSE_MEDIA_SEARCH",
-        created_by_user_id: user.id,
-      });
+      ]);
 
       const { errors, data } = await testClient.execute(
         gql`
@@ -187,9 +188,8 @@ describe("Adverse Media - Profiles", () => {
     });
 
     it("returns stored draft value if no search term is provided and there is a draft value", async () => {
-      await mocks.knex.from("profile_field_value").insert([
+      await mocks.createProfileFieldValues(profile.id, [
         {
-          profile_id: profile.id,
           profile_type_field_id: profileTypeField.id,
           content: {
             search: [{ wikiDataId: "Q7747", label: "Vladimir Putin" }],
@@ -219,7 +219,6 @@ describe("Adverse Media - Profiles", () => {
           created_by_user_id: user.id,
         },
         {
-          profile_id: profile.id,
           profile_type_field_id: profileTypeField.id,
           content: {
             search: [{ wikiDataId: "Q7747", label: "Vladimir Putin" }, { term: "Donald Trump" }],
@@ -535,36 +534,37 @@ describe("Adverse Media - Profiles", () => {
     });
 
     it("sends error if user does not have permission on the property", async () => {
-      await mocks.knex.from("profile_field_value").insert({
-        profile_id: profile.id,
-        profile_type_field_id: profileTypeField.id,
-        content: {
-          search: [{ wikiDataId: "Q7747", label: "Vladimir Putin" }],
-          articles: {
-            totalCount: 2,
-            items: [
-              {
-                id: "1",
-                header: "Vladimir Putin does something",
-                timestamp: 1600000000,
-                source: "Google News",
-              },
-              {
-                id: "2",
-                header: "Vladimir Putin does something else",
-                timestamp: 1600000001,
-                source: "Google News",
-              },
-            ],
-            createdAt: new Date(),
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          profile_type_field_id: profileTypeField.id,
+          content: {
+            search: [{ wikiDataId: "Q7747", label: "Vladimir Putin" }],
+            articles: {
+              totalCount: 2,
+              items: [
+                {
+                  id: "1",
+                  header: "Vladimir Putin does something",
+                  timestamp: 1600000000,
+                  source: "Google News",
+                },
+                {
+                  id: "2",
+                  header: "Vladimir Putin does something else",
+                  timestamp: 1600000001,
+                  source: "Google News",
+                },
+              ],
+              createdAt: new Date(),
+            },
+            relevant_articles: [{ id: "1", added_at: new Date(), added_by_user_id: user.id }],
+            irrelevant_articles: [],
+            dismissed_articles: [],
           },
-          relevant_articles: [{ id: "1", added_at: new Date(), added_by_user_id: user.id }],
-          irrelevant_articles: [],
-          dismissed_articles: [],
+          type: "ADVERSE_MEDIA_SEARCH",
+          created_by_user_id: user.id,
         },
-        type: "ADVERSE_MEDIA_SEARCH",
-        created_by_user_id: user.id,
-      });
+      ]);
 
       await mocks.knex.from("profile_type_field").where("id", profileTypeField.id).update({
         permission: "HIDDEN",
@@ -934,14 +934,15 @@ describe("Adverse Media - Profiles", () => {
     beforeEach(async () => {
       const { data } = await testClient.execute(
         gql`
-          mutation ($profileTypeId: GID!) {
-            createProfile(profileTypeId: $profileTypeId) {
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
               id
             }
           }
         `,
         {
           profileTypeId: toGlobalId("ProfileType", profileType.id),
+          fields: [],
         },
       );
 

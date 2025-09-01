@@ -1,14 +1,16 @@
-import { FormControl, FormLabel } from "@chakra-ui/react";
+import { Center, FormControl, FormHelperText, FormLabel, HStack } from "@chakra-ui/react";
 import { ShortTextFormatSelect } from "@parallel/components/common/ShortTextFormatSelect";
+import { Stack, Switch } from "@parallel/components/ui";
 import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import { CreateOrUpdateProfileTypeFieldDialogData } from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";
+import { CreateOrUpdateProfileTypeFieldDialogFormData } from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";
 
 export function ProfileFieldShortTextSettings({ isDisabled }: { isDisabled?: boolean }) {
   const {
     control,
+    register,
     formState: { errors },
-  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
+  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogFormData>();
 
   return (
     <>
@@ -26,6 +28,25 @@ export function ProfileFieldShortTextSettings({ isDisabled }: { isDisabled?: boo
             <ShortTextFormatSelect onChange={onChange} value={value ?? null} />
           )}
         />
+      </FormControl>
+      <FormControl as={HStack} isInvalid={!!errors.isUnique}>
+        <Stack flex={1} gap={1}>
+          <FormLabel margin={0}>
+            <FormattedMessage
+              id="component.create-or-update-property-dialog.unique"
+              defaultMessage="Unique"
+            />
+          </FormLabel>
+          <FormHelperText margin={0}>
+            <FormattedMessage
+              id="component.profile-field-short-text-settings.unique-description"
+              defaultMessage="Ensure that the value is unique across all profiles. Example: Tax IDs, external system IDs, etc."
+            />
+          </FormHelperText>
+        </Stack>
+        <Center>
+          <Switch {...register("isUnique")} />
+        </Center>
       </FormControl>
     </>
   );

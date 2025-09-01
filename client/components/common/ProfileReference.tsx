@@ -10,6 +10,7 @@ import { Link } from "./Link";
 interface ProfileReferenceProps {
   profile?: ProfileReference_ProfileFragment | null;
   asLink?: boolean;
+  target?: HTMLChakraProps<any>["target"];
   _notDeleted?: HTMLChakraProps<any>["_active"];
   showNameEvenIfDeleted?: boolean;
 }

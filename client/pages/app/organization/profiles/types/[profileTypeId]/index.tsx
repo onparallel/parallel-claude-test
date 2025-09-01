@@ -372,7 +372,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
               data: {
                 isExpirable,
                 expiryAlertAheadTime: isExpirable
-                  ? expiryAlertAheadTime === "DO_NOT_REMEMBER"
+                  ? expiryAlertAheadTime === "DO_NOT_REMIND"
                     ? null
                     : expirationToDuration(expiryAlertAheadTime)
                   : undefined,

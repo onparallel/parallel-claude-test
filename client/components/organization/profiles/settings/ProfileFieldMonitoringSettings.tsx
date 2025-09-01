@@ -36,7 +36,7 @@ import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import {
-  CreateOrUpdateProfileTypeFieldDialogData,
+  CreateOrUpdateProfileTypeFieldDialogFormData,
   useCreateOrUpdateProfileTypeFieldDialog,
 } from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";
 
@@ -168,7 +168,7 @@ export function ProfileFieldMonitoringSettings({
     control,
     formState: { errors },
     setValue,
-  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
+  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogFormData>();
   const hasMonitoring = watch("options.hasMonitoring");
   const monitoring = watch("options.monitoring");
   const hasActivationCondition = isNonNullish(monitoring?.activationCondition);
@@ -563,7 +563,7 @@ function SearchFrequencyOptions({
   const {
     control,
     formState: { errors },
-  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
+  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogFormData>();
 
   const { fields: searchFrequencyOptions, replace } = useFieldArray({
     name: "options.monitoring.searchFrequency.options",

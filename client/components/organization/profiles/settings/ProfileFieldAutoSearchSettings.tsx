@@ -8,12 +8,12 @@ import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { useConfigureProfileBackgroundCheckAutomateSearchDialog } from "../dialogs/ConfigureProfileBackgroundCheckAutomateSearchDialog";
-import { CreateOrUpdateProfileTypeFieldDialogData } from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";
+import { CreateOrUpdateProfileTypeFieldDialogFormData } from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";
 
 export function ProfileFieldAutoSearchSettings({ profileTypeId }: { profileTypeId: string }) {
   const intl = useIntl();
 
-  const { control } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
+  const { control } = useFormContext<CreateOrUpdateProfileTypeFieldDialogFormData>();
 
   const showConfigureProfileBackgroundCheckAutomateSearchDialog =
     useConfigureProfileBackgroundCheckAutomateSearchDialog();

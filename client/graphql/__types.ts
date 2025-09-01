@@ -612,6 +612,12 @@ export interface CreatePetitionVariableInput {
   name: Scalars["String"]["input"];
 }
 
+export interface CreateProfileFieldValueInput {
+  content: Scalars["JSONObject"]["input"];
+  expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
+  profileTypeFieldId: Scalars["GID"]["input"];
+}
+
 export interface CreateProfileRelationshipInput {
   direction: ProfileRelationshipDirection;
   profileId: Scalars["GID"]["input"];
@@ -622,6 +628,7 @@ export interface CreateProfileTypeFieldInput {
   alias?: InputMaybe<Scalars["String"]["input"]>;
   expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]["input"]>;
   isExpirable?: InputMaybe<Scalars["Boolean"]["input"]>;
+  isUnique?: InputMaybe<Scalars["Boolean"]["input"]>;
   name: Scalars["LocalizableUserText"]["input"];
   options?: InputMaybe<Scalars["JSONObject"]["input"]>;
   type: ProfileTypeFieldType;
@@ -2368,7 +2375,7 @@ export interface MutationcreatePrintPdfTaskArgs {
 }
 
 export interface MutationcreateProfileArgs {
-  fields?: InputMaybe<Array<UpdateProfileFieldValueInput>>;
+  fields: Array<CreateProfileFieldValueInput>;
   profileTypeId: Scalars["GID"]["input"];
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
 }
@@ -6018,6 +6025,7 @@ export interface ProfileTypeField {
   id: Scalars["GID"]["output"];
   isExpirable: Scalars["Boolean"]["output"];
   isStandard: Scalars["Boolean"]["output"];
+  isUnique: Scalars["Boolean"]["output"];
   isUsedInProfileName: Scalars["Boolean"]["output"];
   myPermission: ProfileTypeFieldPermissionType;
   name: Scalars["LocalizableUserText"]["output"];
@@ -6146,6 +6154,12 @@ export interface ProfilesRatioDashboardModuleSettingsInput {
   profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
   type: ModuleResultType;
+}
+
+export interface ProfilesWithContent {
+  __typename?: "ProfilesWithContent";
+  content: Scalars["JSONObject"]["output"];
+  profiles: Array<Profile>;
 }
 
 export interface PublicAccessVerification {
@@ -6576,6 +6590,7 @@ export interface Query {
   profileType: ProfileType;
   profileTypes: ProfileTypePagination;
   profiles: ProfilePagination;
+  profilesWithSameContent: Array<ProfilesWithContent>;
   publicLicenseCode?: Maybe<PublicLicenseCode>;
   publicOrg?: Maybe<PublicOrganization>;
   /** The comments for this field. */
@@ -6830,6 +6845,11 @@ export interface QueryprofilesArgs {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<QueryProfiles_OrderBy>>;
+}
+
+export interface QueryprofilesWithSameContentArgs {
+  profileTypeFieldId: Scalars["GID"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
 }
 
 export interface QuerypublicLicenseCodeArgs {
@@ -7542,6 +7562,7 @@ export interface UpdateProfileTypeFieldInput {
   alias?: InputMaybe<Scalars["String"]["input"]>;
   expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]["input"]>;
   isExpirable?: InputMaybe<Scalars["Boolean"]["input"]>;
+  isUnique?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
   options?: InputMaybe<Scalars["JSONObject"]["input"]>;
   substitutions?: InputMaybe<Array<UpdateProfileTypeFieldSelectOptionsSubstitution>>;
@@ -16784,6 +16805,7 @@ export type useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment = {
   isExpirable: boolean;
   expiryAlertAheadTime?: Duration | null;
   isStandard: boolean;
+  isUnique: boolean;
 };
 
 export type useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment = {
@@ -16816,6 +16838,7 @@ export type useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldMutati
     isExpirable: boolean;
     expiryAlertAheadTime?: Duration | null;
     isStandard: boolean;
+    isUnique: boolean;
   };
 };
 
@@ -16838,7 +16861,26 @@ export type useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldMutati
     isExpirable: boolean;
     expiryAlertAheadTime?: Duration | null;
     isStandard: boolean;
+    isUnique: boolean;
   };
+};
+
+export type useCreateOrUpdateProfileTypeFieldDialog_profilesWithSameContentQueryVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+}>;
+
+export type useCreateOrUpdateProfileTypeFieldDialog_profilesWithSameContentQuery = {
+  profilesWithSameContent: Array<{
+    __typename?: "ProfilesWithContent";
+    content: { [key: string]: any };
+    profiles: Array<{
+      __typename?: "Profile";
+      id: string;
+      localizableName: { [locale in UserLocale]?: string };
+      status: ProfileStatus;
+    }>;
+  }>;
 };
 
 export type useProfileTypeFieldPermissionDialog_UserFragment = {
@@ -40580,7 +40622,7 @@ export type useCreateProfileDialog_profileTypeQuery = {
 
 export type useCreateProfileDialog_createProfileMutationVariables = Exact<{
   profileTypeId: Scalars["GID"]["input"];
-  fields?: InputMaybe<Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput>;
+  fields: Array<CreateProfileFieldValueInput> | CreateProfileFieldValueInput;
 }>;
 
 export type useCreateProfileDialog_createProfileMutation = {
@@ -40867,7 +40909,7 @@ export type ImportFromExternalSourceDialog_completeProfileFromExternalSourceMuta
   Exact<{
     profileExternalSourceEntityId: Scalars["GID"]["input"];
     profileTypeId: Scalars["GID"]["input"];
-    profileId?: InputMaybe<Scalars["GID"]["input"]>;
+    profileId: Scalars["GID"]["input"];
     conflictResolutions:
       | Array<ProfileExternalSourceConflictResolution>
       | ProfileExternalSourceConflictResolution;
@@ -48671,6 +48713,7 @@ export type OrganizationProfileType_ProfileTypeFieldFragment = {
   expiryAlertAheadTime?: Duration | null;
   alias?: string | null;
   options: { [key: string]: any };
+  isUnique: boolean;
   permissions: Array<{
     __typename?: "ProfileTypeFieldPermission";
     id: string;
@@ -48720,6 +48763,7 @@ export type OrganizationProfileType_ProfileTypeFragment = {
     expiryAlertAheadTime?: Duration | null;
     alias?: string | null;
     options: { [key: string]: any };
+    isUnique: boolean;
     permissions: Array<{
       __typename?: "ProfileTypeFieldPermission";
       id: string;
@@ -48782,6 +48826,7 @@ export type OrganizationProfileType_profileTypeQuery = {
       expiryAlertAheadTime?: Duration | null;
       alias?: string | null;
       options: { [key: string]: any };
+      isUnique: boolean;
       permissions: Array<{
         __typename?: "ProfileTypeFieldPermission";
         id: string;
@@ -48965,6 +49010,7 @@ export type OrganizationProfileType_updateProfileTypeMutation = {
       expiryAlertAheadTime?: Duration | null;
       alias?: string | null;
       options: { [key: string]: any };
+      isUnique: boolean;
       permissions: Array<{
         __typename?: "ProfileTypeFieldPermission";
         id: string;
@@ -49030,6 +49076,7 @@ export type OrganizationProfileType_cloneProfileTypeMutation = {
       expiryAlertAheadTime?: Duration | null;
       alias?: string | null;
       options: { [key: string]: any };
+      isUnique: boolean;
       permissions: Array<{
         __typename?: "ProfileTypeFieldPermission";
         id: string;
@@ -49094,6 +49141,7 @@ export type OrganizationProfileType_updateProfileTypeFieldPositionsMutation = {
       expiryAlertAheadTime?: Duration | null;
       alias?: string | null;
       options: { [key: string]: any };
+      isUnique: boolean;
       permissions: Array<{
         __typename?: "ProfileTypeFieldPermission";
         id: string;
@@ -49149,6 +49197,7 @@ export type OrganizationProfileType_updateProfileTypeFieldMutation = {
     expiryAlertAheadTime?: Duration | null;
     alias?: string | null;
     options: { [key: string]: any };
+    isUnique: boolean;
     permissions: Array<{
       __typename?: "ProfileTypeFieldPermission";
       id: string;
@@ -49206,6 +49255,7 @@ export type OrganizationProfileType_deleteProfileTypeFieldMutation = {
       expiryAlertAheadTime?: Duration | null;
       alias?: string | null;
       options: { [key: string]: any };
+      isUnique: boolean;
       permissions: Array<{
         __typename?: "ProfileTypeFieldPermission";
         id: string;
@@ -49413,6 +49463,7 @@ export type OrganizationProfileTypes_cloneProfileTypeMutation = {
       expiryAlertAheadTime?: Duration | null;
       alias?: string | null;
       options: { [key: string]: any };
+      isUnique: boolean;
       permissions: Array<{
         __typename?: "ProfileTypeFieldPermission";
         id: string;
@@ -76282,6 +76333,7 @@ export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc
     expiryAlertAheadTime
     options
     isStandard
+    isUnique
     ...ProfileFieldSelectSettings_ProfileTypeField
   }
   ${ProfileFieldSelectSettings_ProfileTypeFieldFragmentDoc}
@@ -82380,6 +82432,26 @@ export const useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocum
   useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldMutation,
   useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldMutationVariables
 >;
+export const useCreateOrUpdateProfileTypeFieldDialog_profilesWithSameContentDocument = gql`
+  query useCreateOrUpdateProfileTypeFieldDialog_profilesWithSameContent(
+    $profileTypeId: GID!
+    $profileTypeFieldId: GID!
+  ) {
+    profilesWithSameContent(
+      profileTypeId: $profileTypeId
+      profileTypeFieldId: $profileTypeFieldId
+    ) {
+      content
+      profiles {
+        ...ProfileReference_Profile
+      }
+    }
+  }
+  ${ProfileReference_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  useCreateOrUpdateProfileTypeFieldDialog_profilesWithSameContentQuery,
+  useCreateOrUpdateProfileTypeFieldDialog_profilesWithSameContentQueryVariables
+>;
 export const useProfileTypeFieldPermissionDialog_usersDocument = gql`
   query useProfileTypeFieldPermissionDialog_users($search: String!, $excludeIds: [GID!]) {
     me {
@@ -84567,7 +84639,7 @@ export const useCreateProfileDialog_profileTypeDocument = gql`
 export const useCreateProfileDialog_createProfileDocument = gql`
   mutation useCreateProfileDialog_createProfile(
     $profileTypeId: GID!
-    $fields: [UpdateProfileFieldValueInput!]
+    $fields: [CreateProfileFieldValueInput!]!
   ) {
     createProfile(profileTypeId: $profileTypeId, fields: $fields, subscribe: true) {
       ...useCreateProfileDialog_Profile
@@ -84673,7 +84745,7 @@ export const ImportFromExternalSourceDialog_completeProfileFromExternalSourceDoc
   mutation ImportFromExternalSourceDialog_completeProfileFromExternalSource(
     $profileExternalSourceEntityId: GID!
     $profileTypeId: GID!
-    $profileId: GID
+    $profileId: GID!
     $conflictResolutions: [ProfileExternalSourceConflictResolution!]!
   ) {
     completeProfileFromExternalSource(

@@ -48,6 +48,7 @@ import {
   CreatePetitionRecipients_sendPetitionDocument,
   CreatePetitionRecipients_userByEmailDocument,
   CreatePetition_petitionDocument,
+  CreateProfileFieldValueInput,
   CreateProfileRelationship_createProfileRelationshipDocument,
   CreateProfileRelationship_profileRelationshipTypesDocument,
   CreateProfile_createProfileDocument,
@@ -4534,7 +4535,7 @@ export function publicApi(container: Container) {
             mutation CreateProfile_createProfile(
               $profileTypeId: GID!
               $subscribe: Boolean
-              $fields: [UpdateProfileFieldValueInput!]
+              $fields: [CreateProfileFieldValueInput!]!
               $includeFieldOptions: Boolean!
               $includeRelationships: Boolean!
               $includeSubscribers: Boolean!
@@ -4599,7 +4600,7 @@ export function publicApi(container: Container) {
 
           const profileTypeFields = profileType.fields.filter((f) => isNonNullish(f.alias));
 
-          const createFields: UpdateProfileFieldValueInput[] = [];
+          const createFields: CreateProfileFieldValueInput[] = [];
           const uploadFiles: {
             alias: string;
             expiryDate?: string;
@@ -4619,11 +4620,13 @@ export function publicApi(container: Container) {
                     expiryDate,
                   });
                 } else {
-                  createFields.push({
-                    profileTypeFieldId: field.id,
-                    content,
-                    expiryDate,
-                  });
+                  if (content) {
+                    createFields.push({
+                      profileTypeFieldId: field.id,
+                      content,
+                      expiryDate,
+                    });
+                  }
                 }
               }
             }

@@ -21,12 +21,6 @@ import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
-interface UpdateProfileFieldValueInput {
-  profileTypeFieldId: string;
-  content?: Record<string, any> | null;
-  expiryDate?: string | null;
-}
-
 describe("GraphQL/Profiles", () => {
   let testClient: TestClient;
 
@@ -39,6 +33,7 @@ describe("GraphQL/Profiles", () => {
   let profileType1Fields: ProfileTypeField[] = [];
   let profileType2Fields: ProfileTypeField[] = [];
   let profileType3Fields: ProfileTypeField[] = [];
+  let profileType4Fields: ProfileTypeField[] = [];
 
   let normalUserApiKey = "";
 
@@ -46,11 +41,14 @@ describe("GraphQL/Profiles", () => {
     return mocks.knex.raw("?::jsonb", JSON.stringify(value));
   }
 
-  async function createProfile(profileTypeId: string, fields?: UpdateProfileFieldValueInput[]) {
+  async function createProfile(
+    profileTypeId: string,
+    fields: { content: any; expiryDate?: string | null; profileTypeFieldId: string }[] = [],
+  ) {
     const { data } = await testClient.execute(
       gql`
-        mutation ($profileTypeId: GID!) {
-          createProfile(profileTypeId: $profileTypeId) {
+        mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+          createProfile(profileTypeId: $profileTypeId, fields: $fields) {
             id
             name
             status
@@ -68,16 +66,16 @@ describe("GraphQL/Profiles", () => {
           }
         }
       `,
-      { profileTypeId },
+      { profileTypeId, fields },
     );
-    if (isNonNullish(fields) && fields.length > 0) {
-      return await updateProfileValue(data.createProfile.id, fields);
-    } else {
-      return data.createProfile;
-    }
+
+    return data.createProfile;
   }
 
-  async function updateProfileValue(profileId: string, fields: UpdateProfileFieldValueInput[]) {
+  async function updateProfileValue(
+    profileId: string,
+    fields: { content?: any | null; expiryDate?: string | null; profileTypeFieldId: string }[] = [],
+  ) {
     const { data, errors } = await testClient.execute(
       gql`
         mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
@@ -147,7 +145,7 @@ describe("GraphQL/Profiles", () => {
 
     profileTypes = await mocks.createRandomProfileTypes(
       organization.id,
-      4,
+      5,
       (i) =>
         [
           { name: json({ en: "Individual", es: "Persona física" }), icon: "PERSON" },
@@ -155,6 +153,10 @@ describe("GraphQL/Profiles", () => {
           { name: json({ en: "Contract", es: "Contrato" }), icon: "DOCUMENT" },
           {
             name: json({ en: "Expirable fields", es: "Campos con expiración" }),
+            icon: "DATABASE",
+          },
+          {
+            name: json({ en: "Unique fields", es: "Campos únicos" }),
             icon: "DATABASE",
           },
         ][i],
@@ -301,6 +303,13 @@ describe("GraphQL/Profiles", () => {
         ][i],
     );
 
+    await mocks.knex
+      .from("profile_type")
+      .where("id", profileTypes[1].id)
+      .update({
+        profile_name_pattern: json([profileType1Fields[0].id]),
+      });
+
     profileType2Fields = await mocks.createRandomProfileTypeFields(
       organization.id,
       profileTypes[2].id,
@@ -415,11 +424,37 @@ describe("GraphQL/Profiles", () => {
         ][i],
     );
 
+    profileType4Fields = await mocks.createRandomProfileTypeFields(
+      organization.id,
+      profileTypes[4].id,
+      3,
+      (i) =>
+        [
+          {
+            name: json({ en: "ID", es: "ID" }),
+            type: "SHORT_TEXT" as const,
+            alias: "ID",
+            is_unique: true,
+          },
+          {
+            name: json({ en: "Name", es: "Nombre" }),
+            type: "SHORT_TEXT" as const,
+            alias: "NAME",
+          },
+          {
+            name: json({ en: "Tax ID", es: "Tax ID" }),
+            type: "SHORT_TEXT" as const,
+            alias: "TAX_ID",
+            is_unique: true,
+          },
+        ][i],
+    );
+
     await mocks.knex
       .from("profile_type")
-      .where("id", profileTypes[1].id)
+      .where("id", profileTypes[4].id)
       .update({
-        profile_name_pattern: json([profileType1Fields[0].id]),
+        profile_name_pattern: json([profileType4Fields[0].id, " ", profileType4Fields[1].id]),
       });
   });
 
@@ -1723,8 +1758,16 @@ describe("GraphQL/Profiles", () => {
 
       expect(errors).toBeUndefined();
       expect(data?.profileTypes).toEqual({
-        totalCount: 4,
+        totalCount: 5,
         items: [
+          {
+            id: toGlobalId("ProfileType", profileTypes[4].id),
+            name: { en: "Unique fields", es: "Campos únicos" },
+            fields: times(3, (i) => ({
+              position: i,
+              name: { es: expect.any(String), en: expect.any(String) },
+            })),
+          },
           {
             id: toGlobalId("ProfileType", profileTypes[1].id),
             name: { en: "Legal entity", es: "Persona jurídica" },
@@ -2382,11 +2425,22 @@ describe("GraphQL/Profiles", () => {
   });
 
   describe("createProfile", () => {
+    afterEach(async () => {
+      await mocks.knex.from("profile_event").delete();
+      await mocks.knex.from("profile_field_value").delete();
+      await mocks.knex.from("profile_subscription").delete();
+      await mocks.knex.from("profile").delete();
+    });
+
     it("creates a profile and subscribes the user", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($profileTypeId: GID!, $subscribe: Boolean) {
-            createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe) {
+          mutation (
+            $profileTypeId: GID!
+            $subscribe: Boolean
+            $fields: [CreateProfileFieldValueInput!]!
+          ) {
+            createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe, fields: $fields) {
               id
               profileType {
                 id
@@ -2402,6 +2456,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           subscribe: true,
+          fields: [],
         },
       );
 
@@ -2433,14 +2488,19 @@ describe("GraphQL/Profiles", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($profileTypeId: GID!, $subscribe: Boolean) {
-            createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe) {
+          mutation (
+            $profileTypeId: GID!
+            $subscribe: Boolean
+            $fields: [CreateProfileFieldValueInput!]!
+          ) {
+            createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe, fields: $fields) {
               id
             }
           }
         `,
         {
           profileTypeId: toGlobalId("ProfileType", archivedProfileType.id),
+          fields: [],
         },
       );
 
@@ -2451,7 +2511,7 @@ describe("GraphQL/Profiles", () => {
     it("creates a profile and completes fields", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($profileTypeId: GID!, $fields: [UpdateProfileFieldValueInput!]) {
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
             createProfile(profileTypeId: $profileTypeId, fields: $fields) {
               id
               profileType {
@@ -2551,7 +2611,7 @@ describe("GraphQL/Profiles", () => {
     it("sends error if passing invalid values on fields input", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($profileTypeId: GID!, $fields: [UpdateProfileFieldValueInput!]) {
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
             createProfile(profileTypeId: $profileTypeId, fields: $fields) {
               id
             }
@@ -2570,6 +2630,211 @@ describe("GraphQL/Profiles", () => {
 
       expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
       expect(data).toBeNull();
+    });
+
+    it("sends error if creating a profile with duplicated values on a UNIQUE field", async () => {
+      const { errors: errors1, data: data1 } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[4].id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+              content: { value: "1" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+              content: { value: "Mike Ross" },
+            },
+          ],
+        },
+      );
+
+      expect(errors1).toBeUndefined();
+      expect(data1.createProfile).toEqual({
+        id: expect.any(String),
+      });
+
+      const { errors: errors2, data: data2 } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[4].id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+              content: { value: "2" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+              content: { value: "Harvey Specter" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[2].id),
+              content: { value: "HS_2" },
+            },
+          ],
+        },
+      );
+
+      expect(errors2).toBeUndefined();
+      expect(data2.createProfile).toEqual({
+        id: expect.any(String),
+      });
+
+      const { errors: errors3 } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[4].id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+              content: { value: "Mike Specter" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[2].id),
+              content: { value: "HS_2" },
+            },
+          ],
+        },
+      );
+
+      expect(errors3).toContainGraphQLError("PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT", {
+        conflicts: [
+          {
+            profileId: data2.createProfile.id,
+            profileName: { en: "2 Harvey Specter", es: "2 Harvey Specter" },
+            profileStatus: "OPEN",
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[2].id),
+            profileTypeFieldName: { en: "Tax ID", es: "Tax ID" },
+          },
+        ],
+      });
+    });
+
+    it("sends error if creating a profile with duplicated values on multiple UNIQUE fields", async () => {
+      const { errors: errors1, data: data1 } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[4].id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+              content: { value: "1" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+              content: { value: "Mike Ross" },
+            },
+          ],
+        },
+      );
+
+      expect(errors1).toBeUndefined();
+      expect(data1.createProfile).toEqual({
+        id: expect.any(String),
+      });
+
+      const { errors: errors2, data: data2 } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[4].id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+              content: { value: "2" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+              content: { value: "Harvey Specter" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[2].id),
+              content: { value: "HS_2" },
+            },
+          ],
+        },
+      );
+
+      expect(errors2).toBeUndefined();
+      expect(data2.createProfile).toEqual({
+        id: expect.any(String),
+      });
+
+      const { errors: errors3 } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[4].id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+              content: { value: "1" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+              content: { value: "Mike Specter" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[2].id),
+              content: { value: "HS_2" },
+            },
+          ],
+        },
+      );
+
+      expect(errors3).toContainGraphQLError("PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT", {
+        conflicts: [
+          {
+            profileId: data1.createProfile.id,
+            profileName: { en: "1 Mike Ross", es: "1 Mike Ross" },
+            profileStatus: "OPEN",
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+            profileTypeFieldName: { en: "ID", es: "ID" },
+          },
+          {
+            profileId: data2.createProfile.id,
+            profileName: { en: "2 Harvey Specter", es: "2 Harvey Specter" },
+            profileStatus: "OPEN",
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[2].id),
+            profileTypeFieldName: { en: "Tax ID", es: "Tax ID" },
+          },
+        ],
+      });
     });
   });
 
@@ -2736,41 +3001,41 @@ describe("GraphQL/Profiles", () => {
 
     it("creates a task to update profile names when changing the profile name pattern", async () => {
       async function createIndividualProfile(firstName?: string, lastName?: string, risk?: string) {
-        const { data } = await testClient.execute(
+        await testClient.execute(
           gql`
-            mutation ($profileTypeId: GID!) {
-              createProfile(profileTypeId: $profileTypeId) {
+            mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+              createProfile(profileTypeId: $profileTypeId, fields: $fields) {
                 id
               }
             }
           `,
           {
             profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-          },
-        );
-        await testClient.execute(
-          gql`
-            mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
-              updateProfileFieldValue(profileId: $profileId, fields: $fields) {
-                id
-              }
-            }
-          `,
-          {
-            profileId: data.createProfile.id,
             fields: [
-              {
-                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
-                content: { value: firstName },
-              },
-              {
-                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
-                content: { value: lastName },
-              },
-              {
-                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
-                content: { value: risk },
-              },
+              ...(firstName
+                ? [
+                    {
+                      profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+                      content: { value: firstName },
+                    },
+                  ]
+                : []),
+              ...(lastName
+                ? [
+                    {
+                      profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+                      content: { value: lastName },
+                    },
+                  ]
+                : []),
+              ...(risk
+                ? [
+                    {
+                      profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[6].id),
+                      content: { value: risk },
+                    },
+                  ]
+                : []),
             ],
           },
         );
@@ -3026,6 +3291,7 @@ describe("GraphQL/Profiles", () => {
   });
 
   describe("cloneProfileType", () => {
+    // TODO UNIQUE
     it("clones a profile type", async () => {
       const { errors, data } = await testClient.execute(
         gql`
@@ -3455,7 +3721,7 @@ describe("GraphQL/Profiles", () => {
 
       expect(queryErrors).toBeUndefined();
       expect(queryData?.profileTypes).toEqual({
-        totalCount: 2,
+        totalCount: 3,
         items: [
           {
             id: toGlobalId("ProfileType", profileTypes[0].id),
@@ -3466,6 +3732,11 @@ describe("GraphQL/Profiles", () => {
             id: toGlobalId("ProfileType", profileTypes[3].id),
             name: { en: "Expirable fields", es: "Campos con expiración" },
             fields: profileType3Fields.map((f, i) => ({ position: i })),
+          },
+          {
+            id: toGlobalId("ProfileType", profileTypes[4].id),
+            name: { en: "Unique fields", es: "Campos únicos" },
+            fields: profileType4Fields.map((f, i) => ({ position: i })),
           },
         ],
       });
@@ -4026,6 +4297,63 @@ describe("GraphQL/Profiles", () => {
 
       expect(errors).toBeUndefined();
       expect(data?.createProfileTypeField.options.values).toBeArrayOfSize(250);
+    });
+
+    it("creates a UNIQUE SHORT_TEXT field on the profile type", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $data: CreateProfileTypeFieldInput!) {
+            createProfileTypeField(profileTypeId: $profileTypeId, data: $data) {
+              id
+              type
+              isUnique
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          data: {
+            isUnique: true,
+            name: { en: "ID" },
+            type: "SHORT_TEXT",
+            options: {},
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createProfileTypeField).toEqual({
+        id: expect.any(String),
+        type: "SHORT_TEXT",
+        isUnique: true,
+      });
+    });
+
+    it("sends error if new UNIQUE field is not SHORT_TEXT", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $data: CreateProfileTypeFieldInput!) {
+            createProfileTypeField(profileTypeId: $profileTypeId, data: $data) {
+              id
+              type
+              isUnique
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          data: {
+            isUnique: true,
+            name: { en: "Date" },
+            type: "DATE",
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        message: "Unique fields are only supported for short text fields",
+      });
+      expect(data).toBeNull();
     });
   });
 
@@ -5885,6 +6213,147 @@ describe("GraphQL/Profiles", () => {
         },
       });
     });
+
+    it("allows to update UNIQUE property of a field if there are no duplicated profiles", async () => {
+      for (const value of ["1", "2", "3", "4", "5"]) {
+        const { errors } = await testClient.execute(
+          gql`
+            mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+              createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+                id
+              }
+            }
+          `,
+          {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[4].id),
+            fields: [
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+                content: { value },
+              },
+            ],
+          },
+        );
+
+        expect(errors).toBeUndefined();
+      }
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+              isUnique
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[4].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+          data: {
+            isUnique: false,
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileTypeField).toEqual({
+        id: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+        isUnique: false,
+      });
+
+      const pfvs = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_type_field_id", profileType4Fields[0].id)
+        .whereNull("removed_at")
+        .whereNull("deleted_at")
+        .select("*");
+
+      expect(pfvs).toBeArrayOfSize(5);
+      expect(pfvs.map(pick(["profile_type_field_is_unique"]))).toEqual([
+        { profile_type_field_is_unique: false },
+        { profile_type_field_is_unique: false },
+        { profile_type_field_is_unique: false },
+        { profile_type_field_is_unique: false },
+        { profile_type_field_is_unique: false },
+      ]);
+    });
+
+    it("sends error if updating UNIQUE property and there are duplicated profiles", async () => {
+      const profileIds = [];
+      for (const [index, value] of [
+        "Mike",
+        "Harvey",
+        "Peter",
+        "Mike",
+        "Peter",
+        "Harvey",
+      ].entries()) {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+              createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+                id
+              }
+            }
+          `,
+          {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[4].id),
+            fields: [
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+                content: { value: index.toString() },
+              },
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+                content: { value },
+              },
+            ],
+          },
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data.createProfile.id).toBeDefined();
+        profileIds.push(data.createProfile.id);
+      }
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+              isUnique
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[4].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+          data: {
+            isUnique: true,
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("DUPLICATE_VALUES_EXIST");
+      expect(data).toBeNull();
+    });
   });
 
   describe("updateProfileTypeFieldPositions", () => {
@@ -7352,6 +7821,146 @@ describe("GraphQL/Profiles", () => {
           content: { value: "medium" },
         },
       });
+    });
+
+    it("sends error if updating a UNIQUE field with a value that already exists", async () => {
+      const profileA = await createProfile(toGlobalId("ProfileType", profileTypes[4].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+          content: { value: "A" },
+        },
+      ]);
+      const profileB = await createProfile(toGlobalId("ProfileType", profileTypes[4].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+          content: { value: "B" },
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileId: profileA.id,
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+              content: { value: "B" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+              content: { value: "Harvey" },
+            },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT", {
+        conflicts: [
+          {
+            profileId: profileB.id,
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+            profileTypeFieldName: { en: "ID", es: "ID" },
+            profileName: { en: "B", es: "B" },
+            profileStatus: "OPEN",
+          },
+        ],
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error if updating multiple UNIQUE fields with values that already exist", async () => {
+      const profileA = await createProfile(toGlobalId("ProfileType", profileTypes[4].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+          content: { value: "A" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+          content: { value: "Harvey" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[2].id),
+          content: { value: "A_HARVEY" },
+        },
+      ]);
+
+      const profileB = await createProfile(toGlobalId("ProfileType", profileTypes[4].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+          content: { value: "B" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+          content: { value: "Mike" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[2].id),
+          content: { value: "B_MIKE" },
+        },
+      ]);
+      const profileC = await createProfile(toGlobalId("ProfileType", profileTypes[4].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+          content: { value: "C" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+          content: { value: "Peter" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[2].id),
+          content: { value: "C_PETER" },
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileId: profileC.id,
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+              content: { value: "B" },
+            },
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[2].id),
+              content: { value: "A_HARVEY" },
+            },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT", {
+        conflicts: [
+          {
+            profileId: profileA.id,
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[2].id),
+            profileTypeFieldName: { en: "Tax ID", es: "Tax ID" },
+            profileName: { en: "A Harvey", es: "A Harvey" },
+            profileStatus: "OPEN",
+          },
+          {
+            profileId: profileB.id,
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+            profileTypeFieldName: { en: "ID", es: "ID" },
+            profileName: { en: "B Mike", es: "B Mike" },
+            profileStatus: "OPEN",
+          },
+        ],
+      });
+      expect(data).toBeNull();
     });
   });
 

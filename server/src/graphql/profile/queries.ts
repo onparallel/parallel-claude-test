@@ -1,4 +1,14 @@
-import { arg, enumType, inputObjectType, list, nonNull, nullable, queryField } from "nexus";
+import {
+  arg,
+  enumType,
+  inputObjectType,
+  list,
+  nonNull,
+  nullable,
+  objectType,
+  queryField,
+} from "nexus";
+import pMap from "p-map";
 import { indexBy, isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { ProfileTypeField } from "../../db/__types";
@@ -9,7 +19,12 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
-import { userHasAccessToProfile, userHasAccessToProfileType } from "./authorizers";
+import {
+  profileTypeFieldBelongsToProfileType,
+  profileTypeFieldIsOfType,
+  userHasAccessToProfile,
+  userHasAccessToProfileType,
+} from "./authorizers";
 
 export const profileTypes = queryField((t) => {
   t.paginationField("profileTypes", {
@@ -290,3 +305,44 @@ export const profileRelationshipTypesWithDirection = queryField(
     },
   },
 );
+
+export const profilesWithSameContent = queryField("profilesWithSameContent", {
+  type: nonNull(
+    list(
+      nonNull(
+        objectType({
+          name: "ProfilesWithContent",
+          definition(t) {
+            t.nonNull.jsonObject("content", {
+              resolve: (root, _, ctx) => ctx.profilesHelper.mapValueContentFromDatabase(root),
+            });
+            t.nonNull.list.nonNull.field("profiles", { type: "Profile" });
+          },
+        }),
+      ),
+    ),
+  ),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    contextUserHasPermission("PROFILES:LIST_PROFILES"),
+    userHasAccessToProfileType("profileTypeId"),
+    profileTypeFieldBelongsToProfileType("profileTypeFieldId", "profileTypeId"),
+    profileTypeFieldIsOfType("profileTypeFieldId", ["SHORT_TEXT"]),
+  ),
+  args: {
+    profileTypeId: nonNull(globalIdArg("ProfileType")),
+    profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
+  },
+  resolve: async (_, { profileTypeFieldId }, ctx) => {
+    const results = await ctx.profiles.findProfileFieldValuesWithSameContent(profileTypeFieldId);
+
+    return await pMap(results, async (result) => {
+      const profiles = await ctx.profiles.loadProfile(result.ids);
+      assert(profiles.every(isNonNullish), "No profile should be null");
+      return {
+        content: { value: result.value },
+        profiles: profiles,
+      };
+    });
+  },
+});

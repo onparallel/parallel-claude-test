@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Alert,
   AlertDescription,
@@ -13,6 +13,9 @@ import {
   FormLabel,
   HStack,
   Input,
+  List,
+  ListItem,
+  Spinner,
   Stack,
   Switch,
   Text,
@@ -20,6 +23,7 @@ import {
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { LocalizableUserTextInput } from "@parallel/components/common/LocalizableUserTextInput";
 import { isValidLocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
+import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -29,9 +33,11 @@ import {
   CreateProfileTypeFieldInput,
   ProfileTypeFieldType,
   Scalars,
+  UpdateProfileTypeFieldInput,
   useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment,
   useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment,
   useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldDocument,
+  useCreateOrUpdateProfileTypeFieldDialog_profilesWithSameContentDocument,
   useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -51,7 +57,7 @@ import { nanoid } from "nanoid";
 import { useCallback } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
-import { isNonNullish, omit, pick } from "remeda";
+import { isNonNullish, omit } from "remeda";
 import { ProfileTypeFieldTypeSelect } from "../ProfileTypeFieldTypeSelect";
 import { ProfileFieldAutoSearchSettings } from "../settings/ProfileFieldAutoSearchSettings";
 import {
@@ -73,11 +79,12 @@ export interface CreateOrUpdateProfileTypeFieldDialogProps {
   disableFieldTypeSelect?: boolean;
 }
 
-export interface CreateOrUpdateProfileTypeFieldDialogData {
+export interface CreateOrUpdateProfileTypeFieldDialogFormData {
   type: ProfileTypeFieldType;
   alias: string;
   expiryAlertAheadTime: ExpirationOption;
   isExpirable: boolean;
+  isUnique: boolean;
   name: Scalars["LocalizableUserText"]["input"];
   options: {
     format?: string | null;
@@ -101,7 +108,7 @@ function defaultOptions(
   intl: IntlShape,
   type: ProfileTypeFieldType,
   options: any,
-): CreateOrUpdateProfileTypeFieldDialogData["options"] {
+): CreateOrUpdateProfileTypeFieldDialogFormData["options"] {
   if (type === "SELECT") {
     assertType<ProfileTypeFieldOptions<"SELECT">>(options);
     return {
@@ -169,7 +176,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
   const hasAdverseMediaSearch = useHasAdverseMediaSearch();
   const isStandard = isUpdating ? profileTypeField!.isStandard : false;
 
-  const form = useForm<CreateOrUpdateProfileTypeFieldDialogData>({
+  const form = useForm<CreateOrUpdateProfileTypeFieldDialogFormData>({
     mode: "onSubmit",
     defaultValues: {
       name: profileTypeField?.name ?? { [intl.locale]: "" },
@@ -185,8 +192,9 @@ function CreateOrUpdateProfileTypeFieldDialog({
         isNonNullish(profileTypeField) &&
         profileTypeField.isExpirable &&
         profileTypeField.expiryAlertAheadTime === null
-          ? "DO_NOT_REMEMBER"
+          ? "DO_NOT_REMIND"
           : durationToExpiration(profileTypeField?.expiryAlertAheadTime ?? { months: 1 }),
+      isUnique: profileTypeField?.isUnique ?? false,
     },
   });
   const {
@@ -205,79 +213,83 @@ function CreateOrUpdateProfileTypeFieldDialog({
 
   const showConfirmRemovedSelectOptionsReplacementDialog =
     useConfirmRemovedSelectOptionsReplacementDialog();
+  const showProfilesWithSameContentDialog = useDialog(ProfilesWithSameContentDialog);
 
   const expirationOptions = useExpirationOptions();
+
+  function getDirtyFields(formData: CreateOrUpdateProfileTypeFieldDialogFormData) {
+    const dirtyData: Partial<UpdateProfileTypeFieldInput> = {};
+
+    // Only include fields that are dirty
+    if (dirtyFields.name) {
+      dirtyData.name = formData.name;
+    }
+    if (dirtyFields.alias) {
+      dirtyData.alias = formData.alias === "" ? null : formData.alias;
+    }
+    if (dirtyFields.isExpirable) {
+      dirtyData.isExpirable = formData.isExpirable;
+    }
+    if (dirtyFields.expiryAlertAheadTime) {
+      dirtyData.expiryAlertAheadTime =
+        formData.isExpirable && formData.expiryAlertAheadTime !== "DO_NOT_REMIND"
+          ? expirationToDuration(formData.expiryAlertAheadTime)
+          : null;
+    }
+    if (dirtyFields.isUnique) {
+      dirtyData.isUnique = formData.isUnique;
+    }
+    if (dirtyFields.options) {
+      if (formData.type === "SELECT" || formData.type === "CHECKBOX") {
+        dirtyData.options = {
+          standardList:
+            formData.options.listingType === "STANDARD" ? formData.options.standardList : null,
+          values:
+            formData.options.listingType === "STANDARD"
+              ? []
+              : formData.options.values!.map((value: any) => omit(value, ["id", "existing"])),
+        };
+        if (formData.type === "SELECT") {
+          dirtyData.options.showOptionsWithColors = formData.options.showOptionsWithColors ?? false;
+        }
+      } else if (formData.type === "DATE") {
+        dirtyData.options = {
+          useReplyAsExpiryDate:
+            formData.isExpirable && formData.options.useReplyAsExpiryDate ? true : false,
+        };
+      } else if (formData.type === "BACKGROUND_CHECK") {
+        dirtyData.options = {
+          monitoring: formData.options.hasMonitoring ? formData.options.monitoring : null,
+          autoSearchConfig: formData.options.autoSearchConfig,
+        };
+      } else if (formData.type === "ADVERSE_MEDIA_SEARCH") {
+        dirtyData.options = formData.options.hasMonitoring
+          ? { monitoring: formData.options.monitoring }
+          : { monitoring: null };
+      }
+    }
+
+    return dirtyData;
+  }
 
   const [createProfileTypeField] = useMutation(
     useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldDocument,
   );
-
-  const [updateProfileTypeFieldMutation] = useMutation(
+  const [updateProfileTypeField] = useMutation(
     useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocument,
   );
-  const showRemoveProfileTypeFieldIsExpirableErrorDialog = useConfirmDeleteDialog();
-
-  async function updateProfileTypeField(
-    options: Parameters<typeof updateProfileTypeFieldMutation>[0],
-  ) {
-    try {
-      const { data } = await updateProfileTypeFieldMutation(options);
-      return data!.updateProfileTypeField;
-    } catch (e) {
-      if (isApolloError(e, "REMOVE_PROFILE_TYPE_FIELD_IS_EXPIRABLE_ERROR")) {
-        await showRemoveProfileTypeFieldIsExpirableErrorDialog({
-          header: intl.formatMessage({
-            id: "component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog-header",
-            defaultMessage: "Remove expiration dates",
-          }),
-          description: (
-            <FormattedMessage
-              id="component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog-description"
-              defaultMessage="There are some properties with expiration dates set. If you remove the expiration from this field, these dates will be removed. Would you like to continue?"
-            />
-          ),
-          confirmation: intl
-            .formatMessage({
-              id: "generic.confirm",
-              defaultMessage: "Confirm",
-            })
-            .toLocaleLowerCase(),
-          cancel: (
-            <Button onClick={() => props.onReject("CANCEL")}>
-              <FormattedMessage id="generic.no-go-back" defaultMessage="No, go back" />
-            </Button>
-          ),
-          confirm: (
-            <Button colorScheme="red" type="submit">
-              <FormattedMessage id="generic.yes-continue" defaultMessage="Yes, continue" />
-            </Button>
-          ),
-        });
-        const { data } = await updateProfileTypeFieldMutation({
-          ...options,
-          variables: {
-            ...options!.variables!,
-            force: true,
-          },
-        });
-        return data!.updateProfileTypeField;
-      } else {
-        throw e;
+  const showConfirmDeleteDialog = useConfirmDeleteDialog();
+  const showConfirmDialog = useCallback(
+    async (...args: Parameters<typeof showConfirmDeleteDialog>) => {
+      try {
+        await showConfirmDeleteDialog(...args);
+        return true;
+      } catch {
+        return false;
       }
-    }
-  }
-
-  const showConfirmDisableMonitoringDialog = useConfirmDisableMonitoringDialog();
-
-  function getDirtyFieldsKeys(obj: Record<string, any>): string[] {
-    return Object.entries(obj)
-      .filter(
-        ([, value]) =>
-          (typeof value === "boolean" && value) ||
-          (typeof value === "object" && value !== null && getDirtyFieldsKeys(value).length > 0),
-      )
-      .map(([key]) => key);
-  }
+    },
+    [showConfirmDeleteDialog],
+  );
 
   return (
     <ConfirmDialog
@@ -291,252 +303,187 @@ function CreateOrUpdateProfileTypeFieldDialog({
         containerProps: {
           as: "form",
           onSubmit: handleSubmit(async (formData) => {
-            try {
-              const dirtyFieldsKeys = getDirtyFieldsKeys(omit(dirtyFields, ["type"]));
-              const dirtyData = pick(
-                formData,
-                dirtyFieldsKeys as (keyof CreateOrUpdateProfileTypeFieldDialogData)[],
-              );
+            if (isUpdating) {
+              const data = getDirtyFields(formData);
+              let force = false;
 
-              const expiryAlertAheadTime =
-                formData.isExpirable && formData.expiryAlertAheadTime !== "DO_NOT_REMEMBER"
-                  ? expirationToDuration(formData.expiryAlertAheadTime)
-                  : null;
-
-              if (isUpdating) {
-                if (formData.type === "SELECT" || formData.type === "CHECKBOX") {
-                  const hasStandardList =
-                    formData.options.listingType === "STANDARD" && formData.options.standardList;
-
-                  const options = isNonNullish(dirtyData.options)
-                    ? {
-                        ...(formData.type === "SELECT"
-                          ? {
-                              showOptionsWithColors:
-                                dirtyData.options.showOptionsWithColors ?? false,
-                            }
-                          : {}),
-                        standardList: hasStandardList ? dirtyData.options.standardList : null,
-                        values: hasStandardList
-                          ? []
-                          : dirtyData.options.values!.map((value: any) =>
-                              omit(value, ["id", "existing"]),
-                            ),
-                      }
-                    : undefined;
-                  try {
-                    props.onResolve(
-                      await updateProfileTypeField({
-                        variables: {
-                          profileTypeId: profileType.id,
-                          profileTypeFieldId: profileTypeField.id,
-                          data: {
-                            ...(isStandard
-                              ? {}
-                              : {
-                                  ...dirtyData,
-                                  ...(isNonNullish(dirtyData.alias)
-                                    ? { alias: dirtyData.alias || null }
-                                    : {}),
-                                }),
-
-                            options,
-                            isExpirable: formData.isExpirable,
-                            expiryAlertAheadTime,
-                          },
-                        },
-                      }),
-                    );
-                  } catch (error) {
-                    if (isApolloError(error, "REMOVE_PROFILE_TYPE_FIELD_SELECT_OPTIONS_ERROR")) {
-                      const removedOptions = error.graphQLErrors[0].extensions
-                        ?.removedOptions as (SelectOptionValue & { count: number })[];
-
-                      const currentOptions = error.graphQLErrors[0].extensions
-                        ?.currentOptions as SelectOptionValue[];
-
-                      const optionValuesToUpdate =
-                        await showConfirmRemovedSelectOptionsReplacementDialog({
-                          currentOptions,
-                          removedOptions,
-                          showOptionsWithColors: dirtyData.options.showOptionsWithColors ?? false,
-                        });
-
-                      props.onResolve(
-                        await updateProfileTypeField({
-                          variables: {
-                            profileTypeId: profileType.id,
-                            profileTypeFieldId: profileTypeField.id,
-                            data: {
-                              ...(isStandard ? {} : dirtyData),
-                              ...(isNonNullish(dirtyData.alias)
-                                ? { alias: dirtyData.alias || null }
-                                : {}),
-                              options,
-                              isExpirable: formData.isExpirable,
-                              expiryAlertAheadTime,
-                              substitutions: optionValuesToUpdate,
-                            },
-                          },
+              do {
+                try {
+                  const result = await updateProfileTypeField({
+                    variables: {
+                      profileTypeId: profileType.id,
+                      profileTypeFieldId: profileTypeField.id,
+                      data,
+                      force,
+                    },
+                  });
+                  return props.onResolve(result.data!.updateProfileTypeField);
+                } catch (e) {
+                  if (isApolloError(e, "ALIAS_ALREADY_EXISTS")) {
+                    setError("alias", { type: "unavailable" });
+                    return;
+                  } else if (isApolloError(e, "REMOVE_PROFILE_TYPE_FIELD_IS_EXPIRABLE_ERROR")) {
+                    if (
+                      await showConfirmDialog({
+                        header: intl.formatMessage({
+                          id: "component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog-header",
+                          defaultMessage: "Remove expiration dates",
                         }),
-                      );
+                        description: (
+                          <FormattedMessage
+                            id="component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog-description"
+                            defaultMessage="There are some properties with expiration dates set. If you remove the expiration from this field, these dates will be removed. Would you like to continue?"
+                          />
+                        ),
+                        confirmation: intl
+                          .formatMessage({
+                            id: "generic.confirm",
+                            defaultMessage: "Confirm",
+                          })
+                          .toLocaleLowerCase(),
+                        cancel: (
+                          <Button onClick={() => props.onReject("CANCEL")}>
+                            <FormattedMessage
+                              id="generic.no-go-back"
+                              defaultMessage="No, go back"
+                            />
+                          </Button>
+                        ),
+                        confirm: (
+                          <Button colorScheme="red" type="submit">
+                            <FormattedMessage
+                              id="generic.yes-continue"
+                              defaultMessage="Yes, continue"
+                            />
+                          </Button>
+                        ),
+                      })
+                    ) {
+                      force = true;
                     } else {
-                      throw error;
+                      return;
                     }
-                  }
-                } else {
-                  // All other properties types that are not SELECT or CHECKBOX
-
-                  try {
-                    props.onResolve(
-                      await updateProfileTypeField({
-                        variables: {
-                          profileTypeId: profileType.id,
-                          profileTypeFieldId: profileTypeField.id,
-                          data: {
-                            ...dirtyData,
-                            ...(isNonNullish(dirtyData.alias)
-                              ? { alias: dirtyData.alias || null }
-                              : {}),
-                            options:
-                              formData.type === "DATE"
-                                ? pick(formData.options, ["useReplyAsExpiryDate"])
-                                : formData.type === "BACKGROUND_CHECK"
-                                  ? {
-                                      monitoring: formData.options.hasMonitoring
-                                        ? formData.options.monitoring
-                                        : null,
-                                      autoSearchConfig: formData.options.autoSearchConfig,
-                                    }
-                                  : formData.type === "ADVERSE_MEDIA_SEARCH"
-                                    ? formData.options.hasMonitoring
-                                      ? pick(formData.options, ["monitoring"])
-                                      : { monitoring: null }
-                                    : {},
-                            isExpirable: formData.isExpirable,
-                            expiryAlertAheadTime,
-                          },
-                        },
+                  } else if (isApolloError(e, "REMOVE_PROFILE_TYPE_FIELD_SELECT_OPTIONS_ERROR")) {
+                    data.substitutions = await showConfirmRemovedSelectOptionsReplacementDialog({
+                      ...(e.graphQLErrors[0].extensions as {
+                        removedOptions: (SelectOptionValue & { count: number })[];
+                        currentOptions: SelectOptionValue[];
                       }),
-                    );
-                  } catch (error) {
-                    if (isApolloError(error, "REMOVE_PROFILE_TYPE_FIELD_MONITORING_ERROR")) {
-                      try {
-                        const profileIds = error.graphQLErrors[0]?.extensions
-                          ?.profileIds as string[];
-                        await showConfirmDisableMonitoringDialog({
-                          profileCount: profileIds?.length ?? 1,
-                        });
-                        props.onResolve(
-                          await updateProfileTypeField({
-                            variables: {
-                              profileTypeId: profileType.id,
-                              profileTypeFieldId: profileTypeField.id,
-                              data: {
-                                ...omit(formData, ["expiryAlertAheadTime", "type", "alias"]),
-                                alias: formData.alias || null,
-                                expiryAlertAheadTime,
-                                options:
-                                  formData.type === "DATE"
-                                    ? pick(formData.options, ["useReplyAsExpiryDate"])
-                                    : formData.type === "BACKGROUND_CHECK"
-                                      ? {
-                                          monitoring: formData.options.hasMonitoring
-                                            ? formData.options.monitoring
-                                            : null,
-                                          autoSearchConfig: formData.options.autoSearchConfig,
-                                        }
-                                      : formData.type === "ADVERSE_MEDIA_SEARCH"
-                                        ? formData.options.hasMonitoring
-                                          ? pick(formData.options, ["monitoring"])
-                                          : { monitoring: null }
-                                        : {},
-                              },
-                              force: true,
-                            },
-                          }),
-                        );
-                      } catch {}
+                      showOptionsWithColors: data.options!.showOptionsWithColors,
+                    });
+                  } else if (isApolloError(e, "REMOVE_PROFILE_TYPE_FIELD_MONITORING_ERROR")) {
+                    const { profileIds } = e.graphQLErrors[0]?.extensions as {
+                      profileIds: string[];
+                    };
+                    if (
+                      await showConfirmDialog({
+                        size: "lg",
+                        header: (
+                          <FormattedMessage
+                            id="component.use-confirm-disable-monitoring-dialog.header"
+                            defaultMessage="Deactivate ongoing monitoring"
+                          />
+                        ),
+                        description: (
+                          <Text>
+                            <FormattedMessage
+                              id="component.use-confirm-disable-monitoring-dialog.description"
+                              defaultMessage="There are <b>{profileCount, plural, =1 {1 profile} other {# profiles}}</b> with active monitoring. If you continue, it will be deactivated and you will not be notified if there are any changes in your searches. Would you like to continue?"
+                              values={{
+                                profileCount: profileIds.length,
+                              }}
+                            />
+                          </Text>
+                        ),
+                        confirmation: intl.formatMessage({
+                          id: "component.use-confirm-disable-monitoring-dialog.confirm",
+                          defaultMessage: "confirm",
+                        }),
+                        confirm: (
+                          <Button colorScheme="red" type="submit">
+                            <FormattedMessage id="generic.deactivate" defaultMessage="Deactivate" />
+                          </Button>
+                        ),
+                      })
+                    ) {
+                      force = true;
+                    } else {
+                      return;
                     }
+                  } else if (isApolloError(e, "DUPLICATE_VALUES_EXIST")) {
+                    await showProfilesWithSameContentDialog.ignoringDialogErrors({
+                      profileTypeId: profileType.id,
+                      profileTypeFieldId: profileTypeField.id,
+                    });
+                    return;
+                  } else {
+                    throw e;
                   }
                 }
-              } else {
-                // Create new property
-                const hasStandardList =
-                  formData.options.listingType === "STANDARD" && formData.options.standardList;
-
-                let options = {};
-                switch (formData.type) {
-                  case "SELECT":
-                    options = {
-                      showOptionsWithColors: formData.options.showOptionsWithColors ?? false,
-                      standardList: hasStandardList ? formData.options.standardList : null,
-                      values: hasStandardList
-                        ? []
-                        : formData.options.values!.map((value: any) =>
-                            omit(value, ["id", "existing"]),
-                          ),
-                    };
-                    break;
-                  case "CHECKBOX":
-                    options = {
-                      standardList: hasStandardList ? formData.options.standardList : null,
-                      values: hasStandardList
-                        ? []
-                        : formData.options.values!.map((value: any) =>
-                            omit(value, ["id", "existing"]),
-                          ),
-                    };
-                    break;
-                  case "DATE":
-                    options = pick(formData.options, ["useReplyAsExpiryDate"]);
-                    break;
-                  case "BACKGROUND_CHECK": {
-                    options = {
-                      monitoring: formData.options.hasMonitoring
-                        ? formData.options.monitoring
-                        : null,
-                      autoSearchConfig: formData.options.autoSearchConfig,
-                    };
-                    break;
-                  }
-                  case "ADVERSE_MEDIA_SEARCH":
-                    options = formData.options.hasMonitoring
-                      ? pick(formData.options, ["monitoring"])
-                      : { monitoring: null };
-                    break;
-                  case "SHORT_TEXT":
-                    options = pick(formData.options, ["format"]);
-                    break;
-                  default:
-                    break;
+              } while (true);
+            } else {
+              const data: CreateProfileTypeFieldInput = {
+                name: formData.name,
+                type: formData.type,
+                alias: formData.alias === "" ? null : formData.alias,
+                expiryAlertAheadTime:
+                  formData.isExpirable && formData.expiryAlertAheadTime !== "DO_NOT_REMIND"
+                    ? expirationToDuration(formData.expiryAlertAheadTime)
+                    : null,
+              };
+              if (formData.type === "SELECT" || formData.type === "CHECKBOX") {
+                data.options = {
+                  ...(formData.options.listingType === "STANDARD"
+                    ? {
+                        standardList: formData.options.standardList,
+                        values: [],
+                      }
+                    : {
+                        standardList: null,
+                        values: formData.options.values!.map((value) =>
+                          omit(value, ["id", "existing"]),
+                        ),
+                      }),
+                };
+                if (formData.type === "SELECT") {
+                  data.options.showOptionsWithColors =
+                    formData.options.showOptionsWithColors ?? false;
                 }
+              } else if (formData.type === "DATE") {
+                data.options = {
+                  useReplyAsExpiryDate:
+                    formData.isExpirable && formData.options.useReplyAsExpiryDate ? true : false,
+                };
+              } else if (formData.type === "BACKGROUND_CHECK") {
+                data.options = {
+                  monitoring: formData.options.hasMonitoring ? formData.options.monitoring : null,
+                  autoSearchConfig: formData.options.autoSearchConfig ?? null,
+                };
+              } else if (formData.type === "ADVERSE_MEDIA_SEARCH") {
+                data.options = formData.options.hasMonitoring
+                  ? { monitoring: formData.options.monitoring }
+                  : { monitoring: null };
+              } else if (formData.type === "SHORT_TEXT") {
+                data.options = {
+                  format: formData.options.format ?? null,
+                };
+                data.isUnique = formData.isUnique ?? false;
+              }
 
-                const { data } = await createProfileTypeField({
+              try {
+                const result = await createProfileTypeField({
                   variables: {
                     profileTypeId: profileType.id,
-                    data: {
-                      ...omit(formData, ["expiryAlertAheadTime", "alias"]),
-                      alias: formData.alias || null,
-                      options,
-                      expiryAlertAheadTime,
-                    },
+                    data,
                   },
                 });
-                if (data?.createProfileTypeField) {
-                  props.onResolve(data.createProfileTypeField);
+                return props.onResolve(result.data!.createProfileTypeField);
+              } catch (error) {
+                if (isApolloError(error, "ALIAS_ALREADY_EXISTS")) {
+                  setError("alias", { type: "unavailable" });
+                } else {
+                  throw error;
                 }
-              }
-            } catch (e) {
-              if (isApolloError(e, "ALIAS_ALREADY_EXISTS")) {
-                setError("alias", { type: "unavailable" });
-              }
-              if (
-                isApolloError(e, "ARG_VALIDATION_ERROR") &&
-                (e.graphQLErrors[0].extensions?.extra as any)?.code ===
-                  "REMOVE_STANDARD_OPTIONS_ERROR"
-              ) {
-                setError("options.values", { type: "validate" });
               }
             }
           }),
@@ -755,9 +702,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                     <Controller
                       name="expiryAlertAheadTime"
                       control={control}
-                      rules={{
-                        required: isExpirable ? true : false,
-                      }}
+                      rules={{ required: isExpirable ? true : false }}
                       render={({ field }) => (
                         <SimpleSelect size="sm" options={expirationOptions} {...field} />
                       )}
@@ -771,7 +716,11 @@ function CreateOrUpdateProfileTypeFieldDialog({
       }
       confirm={
         <Button colorScheme="primary" type="submit">
-          <FormattedMessage id="generic.accept" defaultMessage="Accept" />
+          {isUpdating ? (
+            <FormattedMessage id="generic.save" defaultMessage="Save" />
+          ) : (
+            <FormattedMessage id="generic.create" defaultMessage="Create" />
+          )}
         </Button>
       }
     />
@@ -795,6 +744,7 @@ useCreateOrUpdateProfileTypeFieldDialog.fragments = {
         expiryAlertAheadTime
         options
         isStandard
+        isUnique
         ...ProfileFieldSelectSettings_ProfileTypeField
       }
       ${ProfileFieldSelectSettings.fragments.ProfileTypeField}
@@ -848,38 +798,99 @@ const _mutations = [
   `,
 ];
 
-function useConfirmDisableMonitoringDialog() {
-  const showDialog = useConfirmDeleteDialog();
+const _queries = [
+  gql`
+    query useCreateOrUpdateProfileTypeFieldDialog_profilesWithSameContent(
+      $profileTypeId: GID!
+      $profileTypeFieldId: GID!
+    ) {
+      profilesWithSameContent(
+        profileTypeId: $profileTypeId
+        profileTypeFieldId: $profileTypeFieldId
+      ) {
+        content
+        profiles {
+          ...ProfileReference_Profile
+        }
+      }
+    }
+    ${ProfileReference.fragments.Profile}
+  `,
+];
+
+function ProfilesWithSameContentDialog({
+  profileTypeId,
+  profileTypeFieldId,
+  ...props
+}: DialogProps<{
+  profileTypeId: string;
+  profileTypeFieldId: string;
+}>) {
   const intl = useIntl();
-  return useCallback(async ({ profileCount }: { profileCount: number }) => {
-    return await showDialog({
-      size: "lg",
-      header: (
-        <FormattedMessage
-          id="component.use-confirm-disable-monitoring-dialog.header"
-          defaultMessage="Deactivate ongoing monitoring"
-        />
-      ),
-      description: (
-        <Text>
-          <FormattedMessage
-            id="component.use-confirm-disable-monitoring-dialog.description"
-            defaultMessage="There are <b>{profileCount, plural, =1 {1 profile} other {# profiles}}</b> with active monitoring. If you continue, it will be deactivated and you will not be notified if there are any changes in your searches. Would you like to continue?"
-            values={{
-              profileCount,
-            }}
-          />
-        </Text>
-      ),
-      confirmation: intl.formatMessage({
-        id: "component.use-confirm-disable-monitoring-dialog.confirm",
-        defaultMessage: "confirm",
-      }),
-      confirm: (
-        <Button colorScheme="red" type="submit">
-          <FormattedMessage id="generic.deactivate" defaultMessage="Deactivate" />
+
+  const { data, loading } = useQuery(
+    useCreateOrUpdateProfileTypeFieldDialog_profilesWithSameContentDocument,
+    {
+      variables: {
+        profileTypeId,
+        profileTypeFieldId,
+      },
+      fetchPolicy: "network-only",
+    },
+  );
+  return (
+    <ConfirmDialog
+      header={intl.formatMessage({
+        id: "component.create-or-update-profile-type-field-dialog.profiles-with-same-content-dialog-header",
+        defaultMessage: "Profiles with same content",
+      })}
+      body={
+        <Stack>
+          <Text>
+            <FormattedMessage
+              id="component.create-or-update-profile-type-field-dialog.profiles-with-same-content-dialog-body-1"
+              defaultMessage="The following groups of profiles have the same content for this field."
+            />
+          </Text>
+          <Text>
+            <FormattedMessage
+              id="component.create-or-update-profile-type-field-dialog.profiles-with-same-content-dialog-body-2"
+              defaultMessage="Please remove the duplicate values to enable the field to be unique."
+            />
+          </Text>
+          {loading ? (
+            <Center>
+              <Spinner />
+            </Center>
+          ) : (
+            <List spacing={2}>
+              {data!.profilesWithSameContent.map((item, i) => (
+                <ListItem key={i}>
+                  <List listStyleType="disc" paddingInlineStart={5}>
+                    {item.profiles.map((profile) => (
+                      <ListItem key={profile.id}>
+                        <ProfileReference
+                          profile={profile}
+                          showNameEvenIfDeleted
+                          asLink
+                          target="_blank"
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </ListItem>
+              ))}
+            </List>
+          )}
+        </Stack>
+      }
+      cancel={<></>}
+      confirm={
+        <Button colorScheme="primary" onClick={() => props.onResolve()}>
+          <FormattedMessage id="generic.ok" defaultMessage="OK" />
         </Button>
-      ),
-    });
-  }, []);
+      }
+      {...props}
+    />
+  );
 }

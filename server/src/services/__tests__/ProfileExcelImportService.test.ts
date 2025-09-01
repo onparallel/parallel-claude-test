@@ -2,6 +2,7 @@ import { faker } from "@faker-js/faker";
 import { Container } from "inversify";
 import { Knex } from "knex";
 import { groupBy, partition, range } from "remeda";
+import { assert } from "ts-essentials";
 import { createTestContainer } from "../../../test/testContainer";
 import {
   Organization,
@@ -12,11 +13,13 @@ import {
 } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
+import { toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
 import {
   PROFILE_EXCEL_IMPORT_SERVICE,
   ProfileExcelImportService,
 } from "../ProfileExcelImportService";
+import { CellError } from "../ProfileExcelService";
 
 describe("ProfileExcelImportService", () => {
   let container: Container;
@@ -49,6 +52,7 @@ describe("ProfileExcelImportService", () => {
             {
               alias: "p_short_text",
               type: "SHORT_TEXT",
+              is_unique: true,
             },
             {
               alias: "p_select_countries",
@@ -107,14 +111,14 @@ describe("ProfileExcelImportService", () => {
       await importService.importDataIntoProfiles(
         profileType.id,
         // insert 100 new profiles with the provided data
-        range(0, 100).map(() => ({
+        range(0, 100).map((i) => ({
           profileId: null,
           values: [
             {
               profileTypeFieldId: profileTypeFields[0].id,
               alias: "p_short_text",
               type: "SHORT_TEXT" as const,
-              content: { value: faker.lorem.words(3) },
+              content: { value: `unique_${i}` },
               expiryDate: null,
             },
             {
@@ -415,13 +419,13 @@ describe("ProfileExcelImportService", () => {
     it("should not update values that are not provided or contents are equal to previous", async () => {
       const profiles = await mocks.createRandomProfiles(organization.id, profileType.id, 100);
       const valuesById: Record<number, ProfileFieldValue[]> = {};
-      for (const profile of profiles) {
+      for (const [index, profile] of profiles.entries()) {
         const values = await mocks.createProfileFieldValues(profile.id, [
           {
             type: "SHORT_TEXT",
             created_by_user_id: user.id,
             profile_type_field_id: profileTypeFields[0].id,
-            content: { value: "Harvey Specter" },
+            content: { value: `Harvey Specter ${index}` },
           },
           {
             type: "SELECT",
@@ -475,14 +479,14 @@ describe("ProfileExcelImportService", () => {
             })),
           })),
           // last 50 profiles will have some values updated or removed
-          ...profiles.slice(50, 100).map((profile) => ({
+          ...profiles.slice(50, 100).map((profile, index) => ({
             profileId: profile.id,
             values: [
               {
                 profileTypeFieldId: profileTypeFields[0].id,
                 alias: "p_short_text",
                 type: "SHORT_TEXT" as const,
-                content: { value: "Harvey Specter" },
+                content: { value: `Harvey Specter ${index + 50}` },
                 expiryDate: null,
               },
               {
@@ -630,6 +634,190 @@ describe("ProfileExcelImportService", () => {
       expect(dbEvents).toHaveLength(
         profileUpdated.length + profileFieldValueUpdated.length + profileFieldExpiryUpdated.length,
       );
+    });
+
+    it("should send error when trying to create profiles with duplicated values on a UNIQUE field", async () => {
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      const [uniqueValue] = await mocks.createProfileFieldValues(profile.id, [
+        {
+          type: "SHORT_TEXT",
+          created_by_user_id: user.id,
+          profile_type_field_id: profileTypeFields[0].id,
+          content: { value: "unique" },
+        },
+      ]);
+
+      await expect(
+        importService.importDataIntoProfiles(
+          profileType.id,
+          [
+            {
+              profileId: null,
+              values: [
+                {
+                  profileTypeFieldId: profileTypeFields[0].id,
+                  alias: "p_short_text",
+                  type: "SHORT_TEXT" as const,
+                  content: { value: uniqueValue.content.value },
+                  expiryDate: null,
+                },
+              ],
+            },
+          ],
+          user,
+        ),
+      ).rejects.toThrow();
+    });
+
+    it("should send error when trying to update profiles with duplicated values on a UNIQUE field", async () => {
+      const profiles = await mocks.createRandomProfiles(organization.id, profileType.id, 2);
+      await mocks.createProfileFieldValues(profiles[0].id, [
+        {
+          type: "SHORT_TEXT",
+          created_by_user_id: user.id,
+          profile_type_field_id: profileTypeFields[0].id,
+          content: { value: "A" },
+        },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[1].id, [
+        {
+          type: "SHORT_TEXT",
+          created_by_user_id: user.id,
+          profile_type_field_id: profileTypeFields[0].id,
+          content: { value: "B" },
+        },
+      ]);
+
+      await expect(
+        importService.importDataIntoProfiles(
+          profileType.id,
+          [
+            {
+              profileId: profiles[0].id,
+              values: [
+                {
+                  profileTypeFieldId: profileTypeFields[0].id,
+                  alias: "p_short_text",
+                  type: "SHORT_TEXT" as const,
+                  content: { value: "B" },
+                  expiryDate: null,
+                },
+              ],
+            },
+          ],
+          user,
+        ),
+      ).rejects.toThrow();
+    });
+
+    it("should allow to update profiles with duplicated values on a UNIQUE field if using the same value", async () => {
+      const profiles = await mocks.createRandomProfiles(organization.id, profileType.id, 2);
+      await mocks.createProfileFieldValues(profiles[0].id, [
+        {
+          type: "SHORT_TEXT",
+          created_by_user_id: user.id,
+          profile_type_field_id: profileTypeFields[0].id,
+          content: { value: "A" },
+        },
+      ]);
+
+      await mocks.createProfileFieldValues(profiles[1].id, [
+        {
+          type: "SHORT_TEXT",
+          created_by_user_id: user.id,
+          profile_type_field_id: profileTypeFields[0].id,
+          content: { value: "B" },
+        },
+      ]);
+
+      await expect(
+        importService.importDataIntoProfiles(
+          profileType.id,
+          [
+            {
+              profileId: profiles[1].id,
+              values: [
+                {
+                  profileTypeFieldId: profileTypeFields[0].id,
+                  alias: "p_short_text",
+                  type: "SHORT_TEXT" as const,
+                  content: { value: "B" },
+                  expiryDate: null,
+                },
+              ],
+            },
+          ],
+          user,
+        ),
+      ).resolves.not.toThrow();
+    });
+  });
+
+  describe("parseExcelData", () => {
+    it("sends error when parsing data that contains duplicated values on a UNIQUE field", async () => {
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.createProfileFieldValues(profile.id, [
+        {
+          type: "SHORT_TEXT",
+          created_by_user_id: user.id,
+          profile_type_field_id: profileTypeFields[0].id,
+          content: { value: "UNIQUE_VALUE" },
+        },
+      ]);
+
+      try {
+        await importService.parseExcelData(
+          profileType.id,
+          [
+            ["profile ID", "UNIQUE VALUE"],
+            ["profile-id", toGlobalId("ProfileTypeField", profileTypeFields[0].id)],
+            ["", "UNIQUE_VALUE"],
+          ],
+          user.id,
+        );
+
+        // If we reach here, no error was thrown so the test should fail
+        throw new Error("Expected CellError to be thrown");
+      } catch (error) {
+        expect(error).toBeInstanceOf(CellError);
+        assert(error instanceof CellError);
+
+        expect(error.cell).toBeDefined();
+        expect(error.cell.value).toBe("UNIQUE_VALUE");
+        expect(error.cell.row).toBe(3); // Row 3 (1-indexed) contains the duplicate value
+        expect(error.cell.col).toBe(2); // Column 2 (1-indexed) contains the UNIQUE VALUE
+        expect(error.message).toBe("Duplicate value found in other profiles.");
+      }
+    });
+
+    it("sends error when parsing data that contains duplicated values on a UNIQUE field / no profiles", async () => {
+      try {
+        await importService.parseExcelData(
+          profileType.id,
+          [
+            ["profile ID", "UNIQUE VALUE"],
+            ["profile-id", toGlobalId("ProfileTypeField", profileTypeFields[0].id)],
+            ["", "UNIQUE_VALUE_1"],
+            ["", "UNIQUE_VALUE_2"],
+            ["", "UNIQUE_VALUE_3"],
+            ["", "UNIQUE_VALUE_2"], // duplicated!
+          ],
+          user.id,
+        );
+
+        // If we reach here, no error was thrown so the test should fail
+        throw new Error("Expected CellError to be thrown");
+      } catch (error) {
+        expect(error).toBeInstanceOf(CellError);
+        assert(error instanceof CellError);
+
+        expect(error.cell).toBeDefined();
+        expect(error.cell.value).toBe("UNIQUE_VALUE_2");
+        expect(error.cell.row).toBe(6);
+        expect(error.cell.col).toBe(2);
+        expect(error.message).toBe("Duplicate value found in file.");
+      }
     });
   });
 });

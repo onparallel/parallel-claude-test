@@ -9,7 +9,7 @@ import {
 } from "@parallel/components/common/LocalizableUserTextRender";
 import { ProfileTypeSelect } from "@parallel/components/common/ProfileTypeSelect";
 import {
-  UpdateProfileFieldValueInput,
+  CreateProfileFieldValueInput,
   useCreateProfileDialog_createProfileDocument,
   useCreateProfileDialog_ProfileFragment,
   useCreateProfileDialog_profileTypeDocument,
@@ -25,7 +25,7 @@ import { ProfileFormFieldShortText } from "../form-fields/ProfileFormFieldShortT
 
 interface CreateProfileFormData {
   profileTypeId: string | null;
-  fields: Record<string, UpdateProfileFieldValueInput>;
+  fields: Record<string, CreateProfileFieldValueInput>;
 }
 
 interface CreateProfileDialogResult {
@@ -85,7 +85,7 @@ function CreateProfileDialog({
 
   useEffect(() => {
     if (isNonNullish(profileTypeData) && fieldsForProfileName.length > 0) {
-      const fieldsData: Record<string, UpdateProfileFieldValueInput> = {};
+      const fieldsData: Record<string, CreateProfileFieldValueInput> = {};
 
       if (profileFieldValues) {
         fieldsForProfileName.forEach((field) => {
@@ -151,10 +151,22 @@ function CreateProfileDialog({
                 profile: profile.data!.createProfile,
                 hasValues: Object.keys(fields).length > 0,
               });
-            } catch (error) {
-              if (isApolloError(error, "INVALID_PROFILE_FIELD_VALUE")) {
+            } catch (e) {
+              if (isApolloError(e, "PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT")) {
+                const { conflicts } = e.graphQLErrors[0].extensions as {
+                  conflicts: { profileTypeFieldId: string; profileId: string }[];
+                };
+                for (const conflict of conflicts) {
+                  setError(
+                    `fields.${conflict.profileTypeFieldId}.content.value`,
+                    { type: "unique" },
+                    { shouldFocus: true },
+                  );
+                }
+                return;
+              } else if (isApolloError(e, "INVALID_PROFILE_FIELD_VALUE")) {
                 const aggregatedErrors =
-                  (error.graphQLErrors[0].extensions!.aggregatedErrors as {
+                  (e.graphQLErrors[0].extensions!.aggregatedErrors as {
                     profileTypeFieldId: string;
                     code: string;
                   }[]) ?? [];
@@ -256,12 +268,14 @@ function CreateProfileDialog({
                       isRequired
                     />
                   )}
-                  <FormErrorMessage>
-                    <FormattedMessage
-                      id="generic.field-required-error"
-                      defaultMessage="This field is required"
-                    />
-                  </FormErrorMessage>
+                  {errors.fields?.[profileTypeField.id]?.content?.value?.type === "required" ? (
+                    <FormErrorMessage>
+                      <FormattedMessage
+                        id="generic.field-required-error"
+                        defaultMessage="This field is required"
+                      />
+                    </FormErrorMessage>
+                  ) : null}
                 </FormControl>
               );
             })}
@@ -339,7 +353,7 @@ const _mutations = [
   gql`
     mutation useCreateProfileDialog_createProfile(
       $profileTypeId: GID!
-      $fields: [UpdateProfileFieldValueInput!]
+      $fields: [CreateProfileFieldValueInput!]!
     ) {
       createProfile(profileTypeId: $profileTypeId, fields: $fields, subscribe: true) {
         ...useCreateProfileDialog_Profile

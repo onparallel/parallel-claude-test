@@ -1,7 +1,13 @@
 import { inject, injectable } from "inversify";
 import { format as formatPhoneNumber } from "libphonenumber-js";
 import { isNonNullish, pick } from "remeda";
-import { PetitionFieldType, ProfileFieldValue, ProfileTypeFieldType } from "../db/__types";
+import { assert } from "ts-essentials";
+import {
+  PetitionFieldType,
+  ProfileFieldValue,
+  ProfileTypeField,
+  ProfileTypeFieldType,
+} from "../db/__types";
 import { ProfileRepository } from "../db/repositories/ProfileRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { ForbiddenError } from "../graphql/helpers/errors";
@@ -120,5 +126,80 @@ export class ProfilesHelperService {
 
     // Every other field type will never be a draft
     return false;
+  }
+
+  public async getProfileFieldValueUniqueConflicts(
+    possibleConflictingFields: { content: any; profileTypeFieldId: number }[],
+    profileTypeFieldsById: Record<number, ProfileTypeField>,
+    profileTypeId: number,
+    orgId: number,
+  ) {
+    if (possibleConflictingFields.length === 0) {
+      return [];
+    }
+
+    const profiles = await this.profiles.getPaginatedProfileForOrg(
+      orgId,
+      {
+        offset: 0,
+        // at most, we will have as much conflicting profiles as there are conflicting fields
+        // so we can limit the query to that number of profiles
+        limit: possibleConflictingFields.length,
+        filter: {
+          profileTypeId: [profileTypeId],
+          values: {
+            logicalOperator: "OR",
+            conditions: possibleConflictingFields.map((f) => ({
+              profileTypeFieldId: f.profileTypeFieldId,
+              operator: "EQUAL" as const,
+              value: f.content.value,
+            })),
+          },
+        },
+      },
+      profileTypeFieldsById,
+    ).items;
+
+    if (profiles.length === 0) {
+      return [];
+    }
+
+    const profileFieldValues = (
+      await this.profiles.loadProfileFieldValueWithDraft(
+        profiles.flatMap((p) =>
+          possibleConflictingFields.map((f) => ({
+            profileId: p.id,
+            profileTypeFieldId: f.profileTypeFieldId,
+          })),
+        ),
+      )
+    ).filter(isNonNullish);
+
+    if (profileFieldValues.length === 0) {
+      return [];
+    }
+
+    return profileFieldValues
+      .filter(
+        ({ value }) =>
+          isNonNullish(value) &&
+          possibleConflictingFields.some(
+            (f) =>
+              value.profile_type_field_id === f.profileTypeFieldId &&
+              value.content.value === f.content!.value,
+          ),
+      )
+      .map(({ value }) => {
+        const profile = profiles.find((p) => p.id === value!.profile_id);
+        assert(profile, "Profile not found");
+        return {
+          profileTypeFieldId: value!.profile_type_field_id,
+          profileTypeFieldName: profileTypeFieldsById[value!.profile_type_field_id].name,
+          profileId: value!.profile_id,
+          profileName: profile.localizable_name,
+          profileStatus: profile.status,
+          content: value!.content,
+        };
+      });
   }
 }

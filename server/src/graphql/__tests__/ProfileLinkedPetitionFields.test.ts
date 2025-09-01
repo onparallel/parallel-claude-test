@@ -8,6 +8,7 @@ import {
   PetitionField,
   PetitionFieldReply,
   PetitionFieldType,
+  Profile,
   ProfileRelationshipType,
   ProfileType,
   ProfileTypeField,
@@ -3005,7 +3006,7 @@ describe("ProfileLinkedPetitionFields", () => {
     it("sends error when a conflict exists with a current value in the profile and conflictResolution is not provided", async () => {
       const { errors: createProfileErrors, data: createProfileData } = await testClient.execute(
         gql`
-          mutation ($profileTypeId: GID!, $fields: [UpdateProfileFieldValueInput!]) {
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
             createProfile(profileTypeId: $profileTypeId, fields: $fields) {
               id
             }
@@ -3084,7 +3085,7 @@ describe("ProfileLinkedPetitionFields", () => {
     it("skips value if it already exists on the profile and its the same content", async () => {
       const { errors: createProfileErrors, data: createProfileData } = await testClient.execute(
         gql`
-          mutation ($profileTypeId: GID!, $fields: [UpdateProfileFieldValueInput!]) {
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
             createProfile(profileTypeId: $profileTypeId, fields: $fields) {
               id
               events(limit: 100, offset: 0) {
@@ -3364,13 +3365,16 @@ describe("ProfileLinkedPetitionFields", () => {
     it("skips file if it already exists on the profile and it has the same path", async () => {
       const { errors: createProfileErrors, data: createProfileData } = await testClient.execute(
         gql`
-          mutation ($profileTypeId: GID!) {
-            createProfile(profileTypeId: $profileTypeId) {
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
               id
             }
           }
         `,
-        { profileTypeId: toGlobalId("ProfileType", individual.id) },
+        {
+          profileTypeId: toGlobalId("ProfileType", individual.id),
+          fields: [],
+        },
       );
 
       expect(createProfileErrors).toBeUndefined();
@@ -3596,7 +3600,7 @@ describe("ProfileLinkedPetitionFields", () => {
 
       const { errors: createProfileErrors, data: createProfileData } = await testClient.execute(
         gql`
-          mutation ($profileTypeId: GID!, $fields: [UpdateProfileFieldValueInput!]) {
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
             createProfile(profileTypeId: $profileTypeId, fields: $fields) {
               id
             }
@@ -3689,13 +3693,16 @@ describe("ProfileLinkedPetitionFields", () => {
 
       const { errors: createProfileErrors, data: createProfileData } = await testClient.execute(
         gql`
-          mutation ($profileTypeId: GID!) {
-            createProfile(profileTypeId: $profileTypeId) {
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
               id
             }
           }
         `,
-        { profileTypeId: toGlobalId("ProfileType", individual.id) },
+        {
+          profileTypeId: toGlobalId("ProfileType", individual.id),
+          fields: [],
+        },
       );
 
       expect(createProfileErrors).toBeUndefined();
@@ -3777,13 +3784,16 @@ describe("ProfileLinkedPetitionFields", () => {
     it("appends new files to the profile when passing APPEND resolution", async () => {
       const { errors: createProfileErrors, data: createProfileData } = await testClient.execute(
         gql`
-          mutation ($profileTypeId: GID!) {
-            createProfile(profileTypeId: $profileTypeId) {
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
               id
             }
           }
         `,
-        { profileTypeId: toGlobalId("ProfileType", legalEntity.id) },
+        {
+          profileTypeId: toGlobalId("ProfileType", legalEntity.id),
+          fields: [],
+        },
       );
 
       expect(createProfileErrors).toBeUndefined();
@@ -3990,13 +4000,16 @@ describe("ProfileLinkedPetitionFields", () => {
     it("replaces all distinct files from field when passing OVERWRITE resolution", async () => {
       const { errors: createProfileErrors, data: createProfileData } = await testClient.execute(
         gql`
-          mutation ($profileTypeId: GID!) {
-            createProfile(profileTypeId: $profileTypeId) {
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
               id
             }
           }
         `,
-        { profileTypeId: toGlobalId("ProfileType", legalEntity.id) },
+        {
+          profileTypeId: toGlobalId("ProfileType", legalEntity.id),
+          fields: [],
+        },
       );
 
       expect(createProfileErrors).toBeUndefined();
@@ -5386,7 +5399,7 @@ describe("ProfileLinkedPetitionFields", () => {
     it("removes values and files from profile if overwriting with empty replies", async () => {
       const { errors: createProfileErrors, data: createProfileData } = await testClient.execute(
         gql`
-          mutation ($profileTypeId: GID!, $fields: [UpdateProfileFieldValueInput!]) {
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
             createProfile(profileTypeId: $profileTypeId, fields: $fields) {
               id
             }
@@ -7210,6 +7223,303 @@ describe("ProfileLinkedPetitionFields", () => {
             },
           ]),
         },
+      });
+    });
+
+    describe("with unique properties", () => {
+      let profileType: ProfileType;
+      let idField: ProfileTypeField;
+      let nameField: ProfileTypeField;
+
+      let profile: Profile;
+      let otherProfile: Profile;
+
+      let petition: Petition;
+      let fieldGroup: PetitionField;
+      let fieldGroupReply: PetitionFieldReply;
+
+      beforeAll(async () => {
+        [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+
+        [idField, nameField] = await mocks.createRandomProfileTypeFields(
+          organization.id,
+          profileType.id,
+          2,
+          (i) => ({
+            name: [
+              { en: "ID", es: "ID" },
+              { en: "Name", es: "Nombre" },
+            ][i],
+            type: "SHORT_TEXT",
+            alias: ["id", "name"][i],
+            is_unique: [true, false][i],
+          }),
+        );
+
+        await mocks.knex
+          .from("profile_type")
+          .where("id", profileType.id)
+          .update({
+            profile_name_pattern: JSON.stringify([nameField.id]),
+          });
+
+        [profile, otherProfile] = await mocks.createRandomProfiles(
+          organization.id,
+          profileType.id,
+          2,
+          (i) => ({
+            status: "OPEN",
+            localizable_name: [
+              { en: "Pedro Paramo", es: "Pedro Paramo" },
+              { en: "Jose Paramo", es: "Jose Paramo" },
+            ][i],
+          }),
+        );
+        await mocks.createProfileFieldValues(profile.id, [
+          {
+            profile_type_field_id: idField.id,
+            type: "SHORT_TEXT",
+            content: { value: "123456789" },
+            created_by_user_id: user.id,
+          },
+          {
+            profile_type_field_id: nameField.id,
+            type: "SHORT_TEXT",
+            content: { value: "Pedro Paramo" },
+            created_by_user_id: user.id,
+          },
+        ]);
+
+        await mocks.createProfileFieldValues(otherProfile.id, [
+          {
+            profile_type_field_id: idField.id,
+            type: "SHORT_TEXT",
+            content: { value: "ABCDEFGHI" },
+            created_by_user_id: user.id,
+          },
+          {
+            profile_type_field_id: nameField.id,
+            type: "SHORT_TEXT",
+            content: { value: "Jose Paramo" },
+            created_by_user_id: user.id,
+          },
+        ]);
+
+        [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+          status: "CLOSED",
+        }));
+
+        [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+          type: "FIELD_GROUP",
+          profile_type_id: profileType.id,
+        }));
+        const [idChild, nameChild] = await mocks.createRandomPetitionFields(
+          petition.id,
+          2,
+          (i) => ({
+            type: "SHORT_TEXT",
+            parent_petition_field_id: fieldGroup.id,
+            profile_type_field_id: [idField.id, nameField.id][i],
+          }),
+        );
+
+        [fieldGroupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+          user_id: user.id,
+        }));
+
+        await mocks.createPetitionFieldReply(idChild.id, 1, () => ({
+          content: { value: "123456789" },
+          type: "SHORT_TEXT",
+          parent_petition_field_reply_id: fieldGroupReply.id,
+          user_id: user.id,
+        }));
+
+        await mocks.createPetitionFieldReply(nameChild.id, 1, () => ({
+          content: { value: "Peter Frampton" },
+          type: "SHORT_TEXT",
+          parent_petition_field_reply_id: fieldGroupReply.id,
+          user_id: user.id,
+        }));
+      });
+
+      afterAll(async () => {
+        await mocks.knex.from("profile_type").where("id", profileType.id).update({
+          deleted_at: new Date(),
+          deleted_by: "TEST",
+          archived_at: new Date(),
+          archived_by_user_id: user.id,
+        });
+        await mocks.knex
+          .from("profile_type_field")
+          .where("profile_type_id", profileType.id)
+          .update({ deleted_at: new Date(), deleted_by: "TEST" });
+        await mocks.knex
+          .from("profile")
+          .where("profile_type_id", profileType.id)
+          .update({ deleted_at: new Date(), deleted_by: "TEST" });
+      });
+
+      it("sends error if archiving a FIELD_GROUP reply results on a duplicated value on a UNIQUE field", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation (
+              $petitionId: GID!
+              $petitionFieldId: GID!
+              $parentReplyId: GID!
+              $profileId: GID!
+              $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+              $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            ) {
+              archiveFieldGroupReplyIntoProfile(
+                petitionId: $petitionId
+                petitionFieldId: $petitionFieldId
+                parentReplyId: $parentReplyId
+                profileId: $profileId
+                conflictResolutions: $conflictResolutions
+                expirations: $expirations
+              ) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+            parentReplyId: toGlobalId("PetitionFieldReply", fieldGroupReply.id),
+            profileId: toGlobalId("Profile", otherProfile.id),
+            conflictResolutions: [
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", idField.id),
+                action: "OVERWRITE",
+              },
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", nameField.id),
+                action: "OVERWRITE",
+              },
+            ],
+            expirations: [],
+          },
+        );
+
+        expect(errors).toContainGraphQLError("PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT", {
+          conflicts: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", idField.id),
+              profileTypeFieldName: { en: "ID", es: "ID" },
+              profileId: toGlobalId("Profile", profile.id),
+              profileName: { en: "Pedro Paramo", es: "Pedro Paramo" },
+              profileStatus: "OPEN",
+            },
+          ],
+        });
+        expect(data).toBeNull();
+      });
+
+      it("allows to archive a FIELD_GROUP reply results on a profile with the same UNIQUE value", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation (
+              $petitionId: GID!
+              $petitionFieldId: GID!
+              $parentReplyId: GID!
+              $profileId: GID!
+              $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+              $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            ) {
+              archiveFieldGroupReplyIntoProfile(
+                petitionId: $petitionId
+                petitionFieldId: $petitionFieldId
+                parentReplyId: $parentReplyId
+                profileId: $profileId
+                conflictResolutions: $conflictResolutions
+                expirations: $expirations
+              ) {
+                id
+                associatedProfile {
+                  id
+                  events(limit: 10, offset: 0) {
+                    totalCount
+                    items {
+                      type
+                      data
+                    }
+                  }
+                  properties {
+                    field {
+                      id
+                    }
+                    value {
+                      id
+                      content
+                    }
+                  }
+                }
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+            parentReplyId: toGlobalId("PetitionFieldReply", fieldGroupReply.id),
+            profileId: toGlobalId("Profile", profile.id),
+            conflictResolutions: [
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", idField.id),
+                action: "OVERWRITE",
+              },
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", nameField.id),
+                action: "OVERWRITE",
+              },
+            ],
+            expirations: [],
+          },
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+          id: toGlobalId("PetitionFieldReply", fieldGroupReply.id),
+          associatedProfile: {
+            id: toGlobalId("Profile", profile.id),
+            properties: [
+              {
+                field: { id: toGlobalId("ProfileTypeField", idField.id) },
+                value: {
+                  id: expect.any(String),
+                  content: { value: "123456789" },
+                },
+              },
+              {
+                field: { id: toGlobalId("ProfileTypeField", nameField.id) },
+                value: {
+                  id: expect.any(String),
+                  content: { value: "Peter Frampton" },
+                },
+              },
+            ],
+            events: {
+              totalCount: 3,
+              items: [
+                { type: "PROFILE_UPDATED", data: { userId: toGlobalId("User", user.id) } },
+                {
+                  type: "PROFILE_FIELD_VALUE_UPDATED",
+                  data: {
+                    userId: toGlobalId("User", user.id),
+                    profileTypeFieldId: toGlobalId("ProfileTypeField", nameField.id),
+                    alias: "name",
+                  },
+                },
+                {
+                  type: "PETITION_ASSOCIATED",
+                  data: {
+                    userId: toGlobalId("User", user.id),
+                    petitionId: toGlobalId("Petition", petition.id),
+                  },
+                },
+              ],
+            },
+          },
+        });
       });
     });
   });

@@ -34,7 +34,7 @@ export type ExpirationOption =
   | "1_DAYS_BEFORE"
   | "7_DAYS_AFTER"
   | "1_MONTHS_AFTER"
-  | "DO_NOT_REMEMBER";
+  | "DO_NOT_REMIND";
 
 export function useExpirationOptions() {
   return useSimpleSelectOptions(
@@ -80,10 +80,10 @@ export function useExpirationOptions() {
         ),
       },
       {
-        value: "DO_NOT_REMEMBER",
+        value: "DO_NOT_REMIND",
         label: intl.formatMessage({
-          id: "component.use-expiration-options.do-not-remember",
-          defaultMessage: "Do not remember",
+          id: "component.use-expiration-options.do-not-remind",
+          defaultMessage: "Do not remind",
         }),
       },
     ],

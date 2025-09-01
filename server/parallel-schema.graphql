@@ -676,6 +676,12 @@ input CreatePetitionVariableInput {
   name: String!
 }
 
+input CreateProfileFieldValueInput {
+  content: JSONObject!
+  expiryDate: Date
+  profileTypeFieldId: GID!
+}
+
 input CreateProfileRelationshipInput {
   direction: ProfileRelationshipDirection!
   profileId: GID!
@@ -686,6 +692,7 @@ input CreateProfileTypeFieldInput {
   alias: String
   expiryAlertAheadTime: Duration
   isExpirable: Boolean
+  isUnique: Boolean
   name: LocalizableUserText!
   options: JSONObject
   type: ProfileTypeFieldType!
@@ -2219,7 +2226,7 @@ type Mutation {
     skipAttachments: Boolean
   ): Task!
   createProfile(
-    fields: [UpdateProfileFieldValueInput!]
+    fields: [CreateProfileFieldValueInput!]!
     profileTypeId: GID!
 
     """
@@ -7304,6 +7311,7 @@ type ProfileTypeField {
   id: GID!
   isExpirable: Boolean!
   isStandard: Boolean!
+  isUnique: Boolean!
   isUsedInProfileName: Boolean!
   myPermission: ProfileTypeFieldPermissionType!
   name: LocalizableUserText!
@@ -7460,6 +7468,11 @@ input ProfilesRatioDashboardModuleSettingsInput {
   profileTypeFieldId: GID
   profileTypeId: GID!
   type: ModuleResultType!
+}
+
+type ProfilesWithContent {
+  content: JSONObject!
+  profiles: [Profile!]!
 }
 
 type PublicAccessVerification {
@@ -8457,6 +8470,7 @@ type Query {
     """
     sortBy: [QueryProfiles_OrderBy!]
   ): ProfilePagination!
+  profilesWithSameContent(profileTypeFieldId: GID!, profileTypeId: GID!): [ProfilesWithContent!]!
   publicLicenseCode(code: String!, token: ID!): PublicLicenseCode
   publicOrg(id: GID!): PublicOrganization
 
@@ -9403,6 +9417,7 @@ input UpdateProfileTypeFieldInput {
   alias: String
   expiryAlertAheadTime: Duration
   isExpirable: Boolean
+  isUnique: Boolean
   name: LocalizableUserText
   options: JSONObject
   substitutions: [UpdateProfileTypeFieldSelectOptionsSubstitution!]

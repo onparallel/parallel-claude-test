@@ -178,6 +178,12 @@ export interface NexusGenInputs {
     defaultValue: number; // Float!
     name: string; // String!
   };
+  CreateProfileFieldValueInput: {
+    // input type
+    content: NexusGenScalars["JSONObject"]; // JSONObject!
+    expiryDate?: NexusGenScalars["Date"] | null; // Date
+    profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+  };
   CreateProfileRelationshipInput: {
     // input type
     direction: NexusGenEnums["ProfileRelationshipDirection"]; // ProfileRelationshipDirection!
@@ -189,6 +195,7 @@ export interface NexusGenInputs {
     alias?: string | null; // String
     expiryAlertAheadTime?: NexusGenScalars["Duration"] | null; // Duration
     isExpirable?: boolean | null; // Boolean
+    isUnique?: boolean | null; // Boolean
     name: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
     options?: NexusGenScalars["JSONObject"] | null; // JSONObject
     type: NexusGenEnums["ProfileTypeFieldType"]; // ProfileTypeFieldType!
@@ -559,6 +566,7 @@ export interface NexusGenInputs {
     alias?: string | null; // String
     expiryAlertAheadTime?: NexusGenScalars["Duration"] | null; // Duration
     isExpirable?: boolean | null; // Boolean
+    isUnique?: boolean | null; // Boolean
     name?: NexusGenScalars["LocalizableUserText"] | null; // LocalizableUserText
     options?: NexusGenScalars["JSONObject"] | null; // JSONObject
     substitutions?: NexusGenInputs["UpdateProfileTypeFieldSelectOptionsSubstitution"][] | null; // [UpdateProfileTypeFieldSelectOptionsSubstitution!]
@@ -1777,6 +1785,10 @@ export interface NexusGenObjects {
   };
   ProfileTypeProcess: db.ProfileTypeProcess;
   ProfileUpdatedEvent: profileEvents.ProfileUpdatedEvent;
+  ProfilesWithContent: {
+    // root type
+    profiles: NexusGenRootTypes["Profile"][]; // [Profile!]!
+  };
   PublicAccessVerification: {
     // root type
     cookieName?: string | null; // String
@@ -4351,6 +4363,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isExpirable: boolean; // Boolean!
     isStandard: boolean; // Boolean!
+    isUnique: boolean; // Boolean!
     isUsedInProfileName: boolean; // Boolean!
     myPermission: NexusGenEnums["ProfileTypeFieldPermissionType"]; // ProfileTypeFieldPermissionType!
     name: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
@@ -4387,6 +4400,11 @@ export interface NexusGenFieldTypes {
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
     user: NexusGenRootTypes["User"] | null; // User
+  };
+  ProfilesWithContent: {
+    // field return type
+    content: NexusGenScalars["JSONObject"]; // JSONObject!
+    profiles: NexusGenRootTypes["Profile"][]; // [Profile!]!
   };
   PublicAccessVerification: {
     // field return type
@@ -4659,6 +4677,7 @@ export interface NexusGenFieldTypes {
     profileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     profileTypes: NexusGenRootTypes["ProfileTypePagination"]; // ProfileTypePagination!
     profiles: NexusGenRootTypes["ProfilePagination"]; // ProfilePagination!
+    profilesWithSameContent: NexusGenRootTypes["ProfilesWithContent"][]; // [ProfilesWithContent!]!
     publicLicenseCode: NexusGenRootTypes["PublicLicenseCode"] | null; // PublicLicenseCode
     publicOrg: NexusGenRootTypes["PublicOrganization"] | null; // PublicOrganization
     publicPetitionField: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
@@ -7601,6 +7620,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isExpirable: "Boolean";
     isStandard: "Boolean";
+    isUnique: "Boolean";
     isUsedInProfileName: "Boolean";
     myPermission: "ProfileTypeFieldPermissionType";
     name: "LocalizableUserText";
@@ -7637,6 +7657,11 @@ export interface NexusGenFieldTypeNames {
     profile: "Profile";
     type: "ProfileEventType";
     user: "User";
+  };
+  ProfilesWithContent: {
+    // field return type name
+    content: "JSONObject";
+    profiles: "Profile";
   };
   PublicAccessVerification: {
     // field return type name
@@ -7909,6 +7934,7 @@ export interface NexusGenFieldTypeNames {
     profileType: "ProfileType";
     profileTypes: "ProfileTypePagination";
     profiles: "ProfilePagination";
+    profilesWithSameContent: "ProfilesWithContent";
     publicLicenseCode: "PublicLicenseCode";
     publicOrg: "PublicOrganization";
     publicPetitionField: "PublicPetitionField";
@@ -9006,7 +9032,7 @@ export interface NexusGenArgTypes {
     };
     createProfile: {
       // args
-      fields?: NexusGenInputs["UpdateProfileFieldValueInput"][] | null; // [UpdateProfileFieldValueInput!]
+      fields: NexusGenInputs["CreateProfileFieldValueInput"][]; // [CreateProfileFieldValueInput!]!
       profileTypeId: NexusGenScalars["GID"]; // GID!
       subscribe?: boolean | null; // Boolean
     };
@@ -10630,6 +10656,11 @@ export interface NexusGenArgTypes {
       offset?: number | null; // Int
       search?: string | null; // String
       sortBy?: NexusGenEnums["QueryProfiles_OrderBy"][] | null; // [QueryProfiles_OrderBy!]
+    };
+    profilesWithSameContent: {
+      // args
+      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+      profileTypeId: NexusGenScalars["GID"]; // GID!
     };
     publicLicenseCode: {
       // args

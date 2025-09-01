@@ -2835,6 +2835,21 @@
     "context": "Select a group..."
   },
   {
+    "term": "component.create-or-update-profile-type-field-dialog.profiles-with-same-content-dialog-body-1",
+    "definition": "Los siguientes perfiles tienen el mismo contenido para esta propiedad.",
+    "context": "The following groups of profiles have the same content for this field."
+  },
+  {
+    "term": "component.create-or-update-profile-type-field-dialog.profiles-with-same-content-dialog-body-2",
+    "definition": "Por favor, elimina los valores duplicados para habilitar la propiedad como única.",
+    "context": "Please remove the duplicate values to enable the field to be unique."
+  },
+  {
+    "term": "component.create-or-update-profile-type-field-dialog.profiles-with-same-content-dialog-header",
+    "definition": "Perfiles con el mismo contenido",
+    "context": "Profiles with same content"
+  },
+  {
     "term": "component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog-description",
     "definition": "Hay algunas propiedades con fechas de caducidad asignadas. Si eliminas la caducidad de este campo, estas fechas se eliminarán. ¿Estás seguro de que quieres continuar?",
     "context": "There are some properties with expiration dates set. If you remove the expiration from this field, these dates will be removed. Would you like to continue?"
@@ -2988,6 +3003,11 @@
     "term": "component.create-or-update-property-dialog.type-of-property",
     "definition": "Tipo de propiedad",
     "context": "Type of property"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.unique",
+    "definition": "Único",
+    "context": "Unique"
   },
   {
     "term": "component.create-or-update-property-dialog.unique-identifier",
@@ -4720,16 +4740,6 @@
     "context": "Show column"
   },
   {
-    "term": "component.import-from-external-source-dialog.create-profile-button",
-    "definition": "Crear perfil",
-    "context": "Create profile"
-  },
-  {
-    "term": "component.import-from-external-source-dialog.create-profile-description",
-    "definition": "Se creará un nuevo perfil con las siguientes propiedades.",
-    "context": "A new profile will be created with the following properties."
-  },
-  {
     "term": "component.import-from-external-source-dialog.current-value",
     "definition": "Valor actual",
     "context": "Current value"
@@ -4748,11 +4758,6 @@
     "term": "component.import-from-external-source-dialog.header",
     "definition": "Selecciona una fuente externa",
     "context": "Select an external data source"
-  },
-  {
-    "term": "component.import-from-external-source-dialog.header-create-profile",
-    "definition": "Nuevo perfil",
-    "context": "New profile"
   },
   {
     "term": "component.import-from-external-source-dialog.header-search",
@@ -4805,6 +4810,11 @@
     "context": "Searching by"
   },
   {
+    "term": "component.import-from-external-source-dialog.unique-value-conflict",
+    "definition": "El valor en {providerName} ya está utilizado por {profileName}.",
+    "context": "The value in {providerName} is already used by {profileName}."
+  },
+  {
     "term": "component.import-from-external-source-dialog.update-profile-button",
     "definition": "Actualizar perfil",
     "context": "Update profile"
@@ -4818,11 +4828,6 @@
     "term": "component.import-from-external-source-dialog.update-profile-description-2",
     "definition": "Selecciona el valor que quieras conservar:",
     "context": "Select the value you want to keep:"
-  },
-  {
-    "term": "component.import-from-external-source-dialog.value",
-    "definition": "Valor",
-    "context": "Value"
   },
   {
     "term": "component.import-from-external-source-dialog.value-differs-external-source",
@@ -9300,6 +9305,11 @@
     "context": "Format"
   },
   {
+    "term": "component.profile-field-short-text-settings.unique-description",
+    "definition": "Asegura que el valor es único en todos los perfiles. Por ejemplo: DNIs, IDs en sistemas externos, etc.",
+    "context": "Ensure that the value is unique across all profiles. Example: Tax IDs, external system IDs, etc."
+  },
+  {
     "term": "component.profile-field-suggestion.popover",
     "definition": "Respuesta sugerida de:",
     "context": "Suggested reply from:"
@@ -9353,6 +9363,11 @@
     "term": "component.profile-form-field-adverse-media-search.wait-perform-search",
     "definition": "Por favor, espera mientras realizamos la búsqueda...",
     "context": "Please wait while we run the adverse media search..."
+  },
+  {
+    "term": "component.profile-form-field-short-text.unique-value-error",
+    "definition": "Ya existe otro perfil con este valor",
+    "context": "A profile with this value already exists"
   },
   {
     "term": "component.profile-form.associated-profiles-count",
@@ -13075,6 +13090,16 @@
     "context": "Unarchive profile type"
   },
   {
+    "term": "component.unique-value-conflict-dialog.body",
+    "definition": "No se puede guardar en el perfil ya que el valor en las siguientes propiedades ya existe en otro perfil.",
+    "context": "Can't save to the profile because the value in the following properties already exists in another profile."
+  },
+  {
+    "term": "component.unique-value-conflict-dialog.header",
+    "definition": "Conflicto de valor único",
+    "context": "Unique value conflict"
+  },
+  {
     "term": "component.update-organization-current-usage-period-dialog.limit-label",
     "definition": "Límite",
     "context": "Limit"
@@ -13335,9 +13360,9 @@
     "context": "{count, plural, =1 {# view} other {# views}}"
   },
   {
-    "term": "component.use-expiration-options.do-not-remember",
+    "term": "component.use-expiration-options.do-not-remind",
     "definition": "No recordar",
-    "context": "Do not remember"
+    "context": "Do not remind"
   },
   {
     "term": "component.use-profile-properties-columns.current-value",

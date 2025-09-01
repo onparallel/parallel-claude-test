@@ -56,12 +56,12 @@ import { KeyboardEvent, useCallback } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { isNonNullish, times, zip } from "remeda";
-import { CreateOrUpdateProfileTypeFieldDialogData } from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";
+import { CreateOrUpdateProfileTypeFieldDialogFormData } from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";
 
 const DEFAULT_TAG_COLOR = "#E2E8F0";
 
 export type SelectOptionValue = UnwrapArray<
-  CreateOrUpdateProfileTypeFieldDialogData["options"]["values"]
+  CreateOrUpdateProfileTypeFieldDialogFormData["options"]["values"]
 >;
 
 interface ProfileFieldSelectSettingsProps {
@@ -104,7 +104,7 @@ export function ProfileFieldSelectSettings({
     setFocus,
     getValues,
     formState: { errors },
-  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
+  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogFormData>();
 
   const { fields, append, remove, reorder, replace } = useFieldArrayReorder({
     name: "options.values",
@@ -446,7 +446,7 @@ function ProfileFieldSelectOption({
     register,
     setValue,
     setFocus,
-  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogData>();
+  } = useFormContext<CreateOrUpdateProfileTypeFieldDialogFormData>();
 
   const controls = useDragControls();
 

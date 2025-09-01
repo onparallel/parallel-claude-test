@@ -1,9 +1,10 @@
 import { inject, injectable } from "inversify";
-import { indexBy, isNonNullish, partition, unique, zip } from "remeda";
+import { groupBy, indexBy, isNonNullish, partition, unique, zip } from "remeda";
 import { Readable } from "stream";
 import { assert } from "ts-essentials";
 import { ProfileTypeFieldType, User, UserLocale } from "../db/__types";
 import { ProfileRepository } from "../db/repositories/ProfileRepository";
+import { UserRepository } from "../db/repositories/UserRepository";
 import { fromGlobalId, isGlobalId, toGlobalId } from "../util/globalId";
 import { isAtLeast } from "../util/profileTypeFieldPermission";
 import { pMapChunk } from "../util/promises/pMapChunk";
@@ -21,6 +22,7 @@ import {
 } from "./ProfileExcelService";
 import { PROFILE_TYPE_FIELD_SERVICE, ProfileTypeFieldService } from "./ProfileTypeFieldService";
 import { PROFILE_VALIDATION_SERVICE, ProfileValidationService } from "./ProfileValidationService";
+import { PROFILES_HELPER_SERVICE, ProfilesHelperService } from "./ProfilesHelperService";
 
 export const PROFILE_EXCEL_IMPORT_SERVICE = Symbol.for("PROFILE_EXCEL_IMPORT_SERVICE");
 
@@ -36,9 +38,11 @@ interface ParsedProfileFieldValue {
 export class ProfileExcelImportService extends ProfileExcelService {
   constructor(
     @inject(I18N_SERVICE) private i18n: II18nService,
+    @inject(PROFILES_HELPER_SERVICE) private profilesHelper: ProfilesHelperService,
     @inject(PROFILE_VALIDATION_SERVICE) private profileValidation: ProfileValidationService,
-    @inject(ProfileRepository) private profiles: ProfileRepository,
     @inject(PROFILE_TYPE_FIELD_SERVICE) profileTypeFields: ProfileTypeFieldService,
+    @inject(UserRepository) private users: UserRepository,
+    @inject(ProfileRepository) private profiles: ProfileRepository,
   ) {
     super(profileTypeFields);
   }
@@ -157,6 +161,8 @@ export class ProfileExcelImportService extends ProfileExcelService {
       throw new InvalidDataError("Data must have at least 2 rows");
     }
 
+    const user = await this.users.loadUser(userId);
+    assert(user, "User not found");
     const fields = await this.loadImportableFields(profileTypeId, userId);
 
     const requiredFieldIds = fields
@@ -187,6 +193,13 @@ export class ProfileExcelImportService extends ProfileExcelService {
       profileId: number | null;
       profileIdCell: CellData | undefined;
       values: ParsedProfileFieldValue[];
+    }[] = [];
+
+    // keep track of fields that should have unique content so we can check it all at once for every unique field
+    const possibleConflictingCells: {
+      profileId: number | null;
+      cell: CellData;
+      profileTypeFieldId: number;
     }[] = [];
 
     for (const contentById of cellRows) {
@@ -226,6 +239,14 @@ export class ProfileExcelImportService extends ProfileExcelService {
 
         try {
           await this.profileValidation.validateProfileFieldValueContent(field, content);
+
+          if (field.is_unique && content?.value && typeof content.value === "string") {
+            possibleConflictingCells.push({
+              profileTypeFieldId: field.id,
+              cell,
+              profileId,
+            });
+          }
         } catch (error) {
           throw new CellError(cell, error instanceof Error ? error.message : "UNKNOWN");
         }
@@ -283,6 +304,47 @@ export class ProfileExcelImportService extends ProfileExcelService {
 
     if (invalidProfileCell) {
       throw new CellError(invalidProfileCell, "Invalid profile ID");
+    }
+
+    // before checking for duplicates in DDBB, check if we are trying to insert duplicated values on excel file
+    for (const uniqueCells of Object.values(
+      groupBy(possibleConflictingCells, (c) => c.profileTypeFieldId),
+    )) {
+      const duplicatedCell = this.findSecondDuplicatedCell(uniqueCells.map((c) => c.cell));
+      if (duplicatedCell) {
+        throw new CellError(duplicatedCell, "Duplicate value found in file.");
+      }
+    }
+
+    // check for duplicates on existing profiles
+    const possibleConflictingFields = possibleConflictingCells.map((c) => ({
+      profileId: c.profileId,
+      profileTypeFieldId: c.profileTypeFieldId,
+      content: { value: c.cell.value },
+    }));
+
+    const conflicts = await this.profilesHelper.getProfileFieldValueUniqueConflicts(
+      possibleConflictingFields,
+      indexBy(
+        fields.map(({ field }) => field),
+        (f) => f.id,
+      ),
+      profileTypeId,
+      user.org_id,
+    );
+
+    // if value already exists on a profile, it must be the same profile we are trying to update
+    // otherwise, it's a duplicate value and we need to throw an error
+    const firstConflictCell = possibleConflictingCells.find((c) =>
+      conflicts.find(
+        (conflict) =>
+          conflict.content.value === c.cell.value &&
+          conflict.profileId !== c.profileId &&
+          conflict.profileTypeFieldId === c.profileTypeFieldId,
+      ),
+    )?.cell;
+    if (firstConflictCell) {
+      throw new CellError(firstConflictCell, "Duplicate value found in other profiles.");
     }
 
     return createOrUpdateData;
@@ -352,5 +414,24 @@ export class ProfileExcelImportService extends ProfileExcelService {
         permission,
         field,
       }));
+  }
+
+  private findSecondDuplicatedCell(uniqueCells: CellData[]): CellData | null {
+    const valueCounts = new Map<string, number>();
+
+    // Count occurrences of each value and map values to their cells
+    for (const cell of uniqueCells) {
+      if (!cell.value) continue;
+
+      const count = valueCounts.get(cell.value) || 0;
+      if (count === 1) {
+        // return cell if it has already been found once
+        return cell;
+      }
+
+      valueCounts.set(cell.value, count + 1);
+    }
+
+    return null;
   }
 }

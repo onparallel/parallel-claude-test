@@ -1397,10 +1397,22 @@ export class Mocks {
     profileId: number,
     values: Omit<CreateProfileFieldValue, "profile_id">[],
   ) {
+    const ptfs =
+      values.length === 0
+        ? []
+        : await this.knex
+            .from("profile_type_field")
+            .whereIn(
+              "id",
+              values.map((v) => v.profile_type_field_id),
+            )
+            .select("*");
+
     const rows = await this.knex<ProfileFieldValue>("profile_field_value").insert(
       values.map((v) => ({
         ...v,
         profile_id: profileId,
+        profile_type_field_is_unique: ptfs.find((p) => p.id === v.profile_type_field_id)?.is_unique,
       })),
       "*",
     );

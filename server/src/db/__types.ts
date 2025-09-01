@@ -2220,6 +2220,7 @@ export interface ProfileFieldValue {
   active_monitoring: boolean; // bool
   petition_field_reply_id: Maybe<number>; // int4
   review_reason: Maybe<any>; // jsonb
+  profile_type_field_is_unique: boolean; // bool
 }
 
 export type CreateProfileFieldValue = PartialProps<
@@ -2239,6 +2240,7 @@ export type CreateProfileFieldValue = PartialProps<
   | "active_monitoring"
   | "petition_field_reply_id"
   | "review_reason"
+  | "profile_type_field_is_unique"
 >;
 
 export interface ProfileListView {
@@ -2404,6 +2406,7 @@ export interface ProfileTypeField {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  is_unique: boolean; // bool
 }
 
 export type CreateProfileTypeField = PartialProps<
@@ -2420,6 +2423,7 @@ export type CreateProfileTypeField = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
+  | "is_unique"
 >;
 
 export interface ProfileTypeFieldPermission {
