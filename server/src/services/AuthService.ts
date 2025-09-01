@@ -54,6 +54,7 @@ import { random } from "../util/token";
 import { Maybe, MaybePromise } from "../util/types";
 import { EmailPayload } from "../workers/email-sender";
 import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./AccountSetupService";
+import { FETCH_SERVICE, IFetchService } from "./FetchService";
 import { IJwtService, JWT_SERVICE } from "./JwtService";
 import { ILogger, LOGGER } from "./Logger";
 import { IQueuesService, QUEUES_SERVICE } from "./QueuesService";
@@ -137,6 +138,7 @@ export class Auth implements IAuth {
     @inject(UserRepository) private users: UserRepository,
     @inject(UserAuthenticationRepository) private userAuthentication: UserAuthenticationRepository,
     @inject(SystemRepository) private system: SystemRepository,
+    @inject(FETCH_SERVICE) private fetchService: IFetchService,
   ) {}
 
   @Memoize() private get cognitoIdP() {
@@ -246,7 +248,7 @@ export class Auth implements IAuth {
       response: captcha,
       remoteip: ip,
     })}`;
-    const response = await fetch(url);
+    const response = await this.fetchService.fetch(url);
     const body = await response.json();
     return body.success ?? false;
   }
@@ -314,7 +316,7 @@ export class Auth implements IAuth {
         redirect_uri: `${this.config.misc.parallelUrl}/api/auth/callback`,
         code: req.query.code as string,
       })}`;
-      const response = await fetch(url, {
+      const response = await this.fetchService.fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });

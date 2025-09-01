@@ -30,7 +30,6 @@ import {
 import { SIGNATURE, SignatureService } from "../../services/SignatureService";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
-import { downloadImageBase64 } from "../../util/images";
 import { retry } from "../../util/retry";
 import { BaseClient } from "../helpers/BaseClient";
 import { InvalidCredentialsError } from "../helpers/GenericIntegration";
@@ -295,7 +294,7 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
         async ({ locale, brandingId }) => {
           await sdk.updateBranding(brandingId, {
             show_csv: context.showCsv ? 1 : 0,
-            logo: await downloadImageBase64(templateData.logoUrl),
+            logo: await this.downloadImageBase64(templateData.logoUrl),
             layout_color: templateData.theme.color,
             templates: await this.buildSignaturitBrandingTemplates(locale, templateData),
           });
@@ -314,7 +313,9 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
         show_welcome_page: 0,
         show_csv: context.showCsv ? 1 : 0,
         layout_color: templateData.theme.color ?? "#6059F7",
-        logo: templateData.logoUrl ? await downloadImageBase64(templateData.logoUrl) : undefined,
+        logo: templateData.logoUrl
+          ? await this.downloadImageBase64(templateData.logoUrl)
+          : undefined,
         application_texts: {
           open_sign_button: intl.formatMessage({
             id: "signature-client.open-document",
@@ -326,6 +327,11 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
 
       return branding.id;
     });
+  }
+
+  private async downloadImageBase64(url: string) {
+    const response = await this.fetchService.fetch(url);
+    return Buffer.from(await response.arrayBuffer()).toString("base64");
   }
 
   private async buildSignaturitBrandingTemplates(
