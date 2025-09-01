@@ -92,7 +92,6 @@ export function ProfileFormFieldShortText({
           }}
         />
       </ProfileFormFieldInputGroup>
-      {isNonNullish(format) ? <FormatFormErrorMessage format={format} /> : null}
       {errors.fields?.[field.id]?.content?.value?.type === "unique" ? (
         <FormErrorMessage>
           <FormattedMessage
@@ -100,6 +99,8 @@ export function ProfileFormFieldShortText({
             defaultMessage="A profile with this value already exists"
           />
         </FormErrorMessage>
+      ) : isNonNullish(format) ? (
+        <FormatFormErrorMessage format={format} />
       ) : null}
     </Stack>
   );
