@@ -2156,8 +2156,8 @@
   },
   {
     "term": "public-petition-link.text-1",
-    "definition": "We send you the requested access to {petitionTitle}.",
-    "context": "We send you the requested access to {petitionTitle}."
+    "definition": "We are sharing with you the requested access to {petitionTitle}.",
+    "context": "We are sharing with you the requested access to {petitionTitle}."
   },
   {
     "term": "public-petition-link.text-2",

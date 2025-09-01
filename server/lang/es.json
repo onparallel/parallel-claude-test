@@ -2157,7 +2157,7 @@
   {
     "term": "public-petition-link.text-1",
     "definition": "{tone, select, INFORMAL{Te enviamos el acceso que has solicitado al formulario de {petitionTitle}.} other{Le enviamos el acceso solicitado al formulario de {petitionTitle}.}}",
-    "context": "We send you the requested access to {petitionTitle}."
+    "context": "We are sharing with you the requested access to {petitionTitle}."
   },
   {
     "term": "public-petition-link.text-2",

@@ -282,7 +282,7 @@
   {
     "term": "public-petition-link.text-1",
     "definition": "{tone, select, INFORMAL{T'enviem l'accés que has sol·licitat al formulari de {petitionTitle}.} other{Li enviem l'accés sol·licitat al formulari de {petitionTitle}.}}",
-    "context": "We send you the requested access to {petitionTitle}."
+    "context": "We are sharing with you the requested access to {petitionTitle}."
   },
   {
     "term": "public-petition-link.text-2",
