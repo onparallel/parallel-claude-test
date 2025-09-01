@@ -164,7 +164,7 @@ else
 fi
 
 echo "Installing exiftool"
-download_and_untar image-exiftool https://exiftool.org/Image-ExifTool-${image_exiftool_version}.tar.gz
+download_and_untar image-exiftool https://netix.dl.sourceforge.net/project/exiftool/Image-ExifTool-${image_exiftool_version}.tar.gz?viasf=1
 pushd image-exiftool
 perl Makefile.PL
 make test
