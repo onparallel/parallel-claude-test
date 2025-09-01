@@ -156,7 +156,7 @@
   },
   {
     "term": "component.add-signature-credentials-dialog.name-help",
-    "definition": "No podrás cambiar este valor despues de crearse.",
+    "definition": "No podrás cambiar este valor después de crearse.",
     "context": "You will not be able to change this value after it is created."
   },
   {
@@ -1775,13 +1775,18 @@
     "context": "Delete adverse media search"
   },
   {
-    "term": "component.confirm-delete-dashboard-dialog.body",
-    "definition": "Si continúas, el panel será eliminado permanentemente.",
-    "context": "If continue, the dashboard will be permanently deleted."
+    "term": "component.confirm-delete-dashboard-dialog.body-not-owner",
+    "definition": "Si continúas, perderás el acceso al dashboard. Otros usuarios seguirán teniendo acceso.",
+    "context": "If you continue, you will lose access to the dashboard. Other users will still have access."
+  },
+  {
+    "term": "component.confirm-delete-dashboard-dialog.body-owner",
+    "definition": "Si continúas, el dashboard será eliminado permanentemente para ti y para todos los usuarios que tengan acceso.",
+    "context": "If you continue, the dashboard will be permanently deleted for you and for every user that has access to it."
   },
   {
     "term": "component.confirm-delete-dashboard-dialog.header",
-    "definition": "Eliminar panel",
+    "definition": "Eliminar dashboard",
     "context": "Delete dashboard"
   },
   {
@@ -2095,6 +2100,11 @@
     "context": "Reactivate contact access"
   },
   {
+    "term": "component.confirm-remove-dashboard-permission-dialog.message-own",
+    "definition": "¿Estás seguro de que quieres quitar tus permisos? Al hacerlo perderás el acceso.",
+    "context": "Are you sure you want to remove your own permission? Doing so will cause you to lose access."
+  },
+  {
     "term": "component.confirm-remove-entity-dialog.body-with-monitoring",
     "definition": "Si continúas, se borrará la entidad guardada, lo que afectará tanto al monitoreo como al historial de búsqueda almacenado, en caso de existir. ¿Estás seguro de querer descartar esta entidad?",
     "context": "If you proceed, the saved entity will be deleted, interrupting monitoring and erasing the search history, if any. Are you sure you want to remove this entity?"
@@ -2395,6 +2405,16 @@
     "context": "Write the reason for forcing the approval"
   },
   {
+    "term": "component.confirm-stop-sharing-dashboard-dialog.header",
+    "definition": "Dejar de compartir",
+    "context": "Stop sharing"
+  },
+  {
+    "term": "component.confirm-stop-sharing-dashboard-dialog.message",
+    "definition": "¿Estás seguro de que quieres dejar de compartir este dashboard con {name}?",
+    "context": "Are you sure you want to stop sharing this dashboard with {name}?"
+  },
+  {
     "term": "component.confirm-transfer-petition-ownership-dialog.confirm-button",
     "definition": "Sí, transferir",
     "context": "Yes, transfer"
@@ -2443,6 +2463,16 @@
     "term": "component.confirm-update-adverse-media-dialog.yes-modify",
     "definition": "Si, modificar",
     "context": "Yes, modify"
+  },
+  {
+    "term": "component.confirm-update-dashboard-permission-dialog.header",
+    "definition": "Editar permisos",
+    "context": "Edit permissions"
+  },
+  {
+    "term": "component.confirm-update-dashboard-permission-dialog.message",
+    "definition": "¿Estás seguro de que quieres modificar tus permisos? Si lo haces perderás la capacidad de editar.",
+    "context": "Are you sure you want to modify your own permission? If you do you will lose the ability to edit."
   },
   {
     "term": "component.confirm-update-entity-dialog.body",
@@ -3313,6 +3343,21 @@
     "term": "component.dashboard-profiles-pie-chart-module.view-profiles",
     "definition": "Ver perfiles para: {segment}",
     "context": "View profiles for: {segment}"
+  },
+  {
+    "term": "component.dashboard-sharing-dialog.header",
+    "definition": "Compartir con personas y equipos",
+    "context": "Share with people and teams"
+  },
+  {
+    "term": "component.dashboard-sharing-dialog.input-placeholder-not-allowed",
+    "definition": "Solamente los editores del dashboard pueden compartirlo",
+    "context": "Only the dashboard editors can share it"
+  },
+  {
+    "term": "component.dashboard-sharing-dialog.sharing-success-title",
+    "definition": "Dashboard compartido correctamente",
+    "context": "Dashboard shared successfully"
   },
   {
     "term": "component.dashboard-tabs.clone-dashboard-header",
@@ -14070,6 +14115,21 @@
     "context": "Filters"
   },
   {
+    "term": "generic.dashboard-permission-type-owner",
+    "definition": "Propietario",
+    "context": "Owner"
+  },
+  {
+    "term": "generic.dashboard-permission-type-reader",
+    "definition": "Lector",
+    "context": "Reader"
+  },
+  {
+    "term": "generic.dashboard-permission-type-write",
+    "definition": "Editor",
+    "context": "Editor"
+  },
+  {
     "term": "generic.days",
     "definition": "días",
     "context": "days"
@@ -17145,14 +17205,24 @@
     "context": "Grants users in this team permissions to view the list of contacts on the organization."
   },
   {
-    "term": "page.permissions-group.dashboards-crud",
-    "definition": "Crear y gestionar dashboards",
-    "context": "Create and manage dashboards"
+    "term": "page.permissions-group.dashboards-create",
+    "definition": "Crear dashboards",
+    "context": "Create dashboards"
   },
   {
-    "term": "page.permissions-group.dashboards-crud-description",
-    "definition": "Concede a los usuarios en este equipo permisos para crear y gestionar dashboards.",
-    "context": "Grants users in this team permissions to create and manage dashboards."
+    "term": "page.permissions-group.dashboards-list",
+    "definition": "Ver dashboards",
+    "context": "View dashboards"
+  },
+  {
+    "term": "page.permissions-group.dashboards-list-description",
+    "definition": "Concede a los usuarios en este equipo permisos para acceder a la página de dashboards.",
+    "context": "Grants users in this team permissions to access the dashboards page."
+  },
+  {
+    "term": "page.permissions-group.dashboards-update-description",
+    "definition": "Concede a los usuarios en este equipo permisos para crear y gestionar nuevos dashboards.",
+    "context": "Grants users in this team permissions to create and manage new dashboards."
   },
   {
     "term": "page.permissions-group.delete-contacts",

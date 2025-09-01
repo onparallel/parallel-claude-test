@@ -17,6 +17,7 @@ export const DashboardPetitionsRatioModule = Object.assign(
       module: DashboardPetitionsRatioModule_DashboardPetitionsRatioModuleFragment;
       isEditing: boolean;
       isDragging: boolean;
+      isReadOnly: boolean;
       onEdit: () => void;
       onDelete: () => void;
     }

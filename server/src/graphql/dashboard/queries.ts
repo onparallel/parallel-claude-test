@@ -3,6 +3,7 @@ import { omit } from "remeda";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { userHasFeatureFlag } from "../petition/authorizers";
+import { contextUserHasPermission } from "../users/authorizers";
 import { userHasAccessToDashboard } from "./authorizers";
 
 export const dashboard = queryField("dashboard", {
@@ -10,7 +11,11 @@ export const dashboard = queryField("dashboard", {
   args: {
     id: nonNull(globalIdArg("Dashboard")),
   },
-  authorize: authenticateAnd(userHasFeatureFlag("DASHBOARDS"), userHasAccessToDashboard("id")),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("DASHBOARDS"),
+    contextUserHasPermission("DASHBOARDS:LIST_DASHBOARDS"),
+    userHasAccessToDashboard("id", "READ"),
+  ),
   resolve: async (_, { id }, ctx) => {
     const dashboard = await ctx.dashboards.getRefreshedDashboard(id, `User:${ctx.user!.id}`);
     if (dashboard.requires_refresh) {

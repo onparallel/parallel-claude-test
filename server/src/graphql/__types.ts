@@ -669,6 +669,7 @@ export interface NexusGenEnums {
     | "NOT_IS_ONE_OF"
     | "START_WITH";
   DashboardModuleSize: db.DashboardModuleSize;
+  DashboardPermissionType: db.DashboardPermissionType;
   DashboardPieChartModuleSettingsType: "DOUGHNUT" | "PIE";
   DashboardRatioModuleSettingsType: "PERCENTAGE" | "RATIO";
   DocumentProcessingType: db.DocumentProcessingType;
@@ -1216,6 +1217,7 @@ export interface NexusGenObjects {
     isIncongruent: boolean; // Boolean!
     items: NexusGenRootTypes["DashboardModuleResultItem"][]; // [DashboardModuleResultItem!]!
   };
+  DashboardPermission: db.DashboardPermission;
   DashboardPetitionsNumberModule: {
     // root type
     id: NexusGenScalars["GID"]; // GID!
@@ -2422,7 +2424,9 @@ export interface NexusGenFieldTypes {
     isRefreshing: boolean; // Boolean!
     lastRefreshAt: NexusGenScalars["DateTime"] | null; // DateTime
     modules: NexusGenRootTypes["DashboardModule"][]; // [DashboardModule!]!
+    myEffectivePermission: NexusGenEnums["DashboardPermissionType"]; // DashboardPermissionType!
     name: string; // String!
+    permissions: NexusGenRootTypes["DashboardPermission"][]; // [DashboardPermission!]!
   };
   DashboardCreatePetitionButtonModule: {
     // field return type
@@ -2502,6 +2506,13 @@ export interface NexusGenFieldTypes {
     // field return type
     isIncongruent: boolean; // Boolean!
     items: NexusGenRootTypes["DashboardModuleResultItem"][]; // [DashboardModuleResultItem!]!
+  };
+  DashboardPermission: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    type: NexusGenEnums["DashboardPermissionType"]; // DashboardPermissionType!
+    user: NexusGenRootTypes["User"] | null; // User
+    userGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
   };
   DashboardPetitionsNumberModule: {
     // field return type
@@ -2891,6 +2902,7 @@ export interface NexusGenFieldTypes {
     createCreatePetitionButtonDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
     createCustomSignatureDocumentUploadLink: NexusGenScalars["JSONObject"]; // JSONObject!
     createDashboard: NexusGenRootTypes["Dashboard"]; // Dashboard!
+    createDashboardPermissions: NexusGenRootTypes["Dashboard"]; // Dashboard!
     createDowJonesKycIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     createDowJonesKycReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createDowJonesProfileDownloadTask: NexusGenRootTypes["Task"]; // Task!
@@ -2952,6 +2964,7 @@ export interface NexusGenFieldTypes {
     deleteContacts: NexusGenEnums["Result"]; // Result!
     deleteDashboard: NexusGenEnums["Success"]; // Success!
     deleteDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
+    deleteDashboardPermission: NexusGenRootTypes["Dashboard"]; // Dashboard!
     deleteDowJonesKycIntegration: NexusGenRootTypes["Organization"]; // Organization!
     deleteEventSubscriptionSignatureKeys: NexusGenEnums["Result"]; // Result!
     deleteEventSubscriptions: NexusGenEnums["Result"]; // Result!
@@ -3035,6 +3048,7 @@ export interface NexusGenFieldTypes {
     renameFolder: NexusGenEnums["Success"]; // Success!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
     reopenProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
+    reorderDashboards: NexusGenRootTypes["User"]; // User!
     reorderPetitionAttachments: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     reorderPetitionListViews: NexusGenRootTypes["User"]; // User!
     reorderProfileListViews: NexusGenRootTypes["User"]; // User!
@@ -3081,6 +3095,7 @@ export interface NexusGenFieldTypes {
     updateCreatePetitionButtonDashboardModule: NexusGenRootTypes["DashboardModule"]; // DashboardModule!
     updateDashboard: NexusGenRootTypes["Dashboard"]; // Dashboard!
     updateDashboardModulePositions: NexusGenRootTypes["Dashboard"]; // Dashboard!
+    updateDashboardPermission: NexusGenRootTypes["DashboardPermission"]; // DashboardPermission!
     updateEinformaCustomProperties: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateFeatureFlags: NexusGenRootTypes["Organization"]; // Organization!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -5681,7 +5696,9 @@ export interface NexusGenFieldTypeNames {
     isRefreshing: "Boolean";
     lastRefreshAt: "DateTime";
     modules: "DashboardModule";
+    myEffectivePermission: "DashboardPermissionType";
     name: "String";
+    permissions: "DashboardPermission";
   };
   DashboardCreatePetitionButtonModule: {
     // field return type name
@@ -5759,6 +5776,13 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     isIncongruent: "Boolean";
     items: "DashboardModuleResultItem";
+  };
+  DashboardPermission: {
+    // field return type name
+    id: "GID";
+    type: "DashboardPermissionType";
+    user: "User";
+    userGroup: "UserGroup";
   };
   DashboardPetitionsNumberModule: {
     // field return type name
@@ -6148,6 +6172,7 @@ export interface NexusGenFieldTypeNames {
     createCreatePetitionButtonDashboardModule: "Dashboard";
     createCustomSignatureDocumentUploadLink: "JSONObject";
     createDashboard: "Dashboard";
+    createDashboardPermissions: "Dashboard";
     createDowJonesKycIntegration: "OrgIntegration";
     createDowJonesKycReply: "PetitionFieldReply";
     createDowJonesProfileDownloadTask: "Task";
@@ -6209,6 +6234,7 @@ export interface NexusGenFieldTypeNames {
     deleteContacts: "Result";
     deleteDashboard: "Success";
     deleteDashboardModule: "Dashboard";
+    deleteDashboardPermission: "Dashboard";
     deleteDowJonesKycIntegration: "Organization";
     deleteEventSubscriptionSignatureKeys: "Result";
     deleteEventSubscriptions: "Result";
@@ -6292,6 +6318,7 @@ export interface NexusGenFieldTypeNames {
     renameFolder: "Success";
     reopenPetition: "Petition";
     reopenProfile: "Profile";
+    reorderDashboards: "User";
     reorderPetitionAttachments: "PetitionBase";
     reorderPetitionListViews: "User";
     reorderProfileListViews: "User";
@@ -6338,6 +6365,7 @@ export interface NexusGenFieldTypeNames {
     updateCreatePetitionButtonDashboardModule: "DashboardModule";
     updateDashboard: "Dashboard";
     updateDashboardModulePositions: "Dashboard";
+    updateDashboardPermission: "DashboardPermission";
     updateEinformaCustomProperties: "SupportMethodResponse";
     updateFeatureFlags: "Organization";
     updateFieldPositions: "PetitionBase";
@@ -8830,6 +8858,13 @@ export interface NexusGenArgTypes {
       // args
       name: string; // String!
     };
+    createDashboardPermissions: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      permissionType: NexusGenEnums["DashboardPermissionType"]; // DashboardPermissionType!
+      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
+      userIds?: NexusGenScalars["GID"][] | null; // [GID!]
+    };
     createDowJonesKycIntegration: {
       // args
       clientId: string; // String!
@@ -9216,6 +9251,11 @@ export interface NexusGenArgTypes {
       // args
       dashboardId: NexusGenScalars["GID"]; // GID!
       moduleId: NexusGenScalars["GID"]; // GID!
+    };
+    deleteDashboardPermission: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      permissionId: NexusGenScalars["GID"]; // GID!
     };
     deleteEventSubscriptionSignatureKeys: {
       // args
@@ -9672,6 +9712,10 @@ export interface NexusGenArgTypes {
       // args
       profileIds: NexusGenScalars["GID"][]; // [GID!]!
     };
+    reorderDashboards: {
+      // args
+      ids: NexusGenScalars["GID"][]; // [GID!]!
+    };
     reorderPetitionAttachments: {
       // args
       attachmentIds: NexusGenScalars["GID"][]; // [GID!]!
@@ -9923,6 +9967,12 @@ export interface NexusGenArgTypes {
       // args
       dashboardId: NexusGenScalars["GID"]; // GID!
       moduleIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    updateDashboardPermission: {
+      // args
+      dashboardId: NexusGenScalars["GID"]; // GID!
+      newPermissionType: NexusGenEnums["DashboardPermissionType"]; // DashboardPermissionType!
+      permissionId: NexusGenScalars["GID"]; // GID!
     };
     updateEinformaCustomProperties: {
       // args

@@ -642,11 +642,14 @@ export interface CreatedAt {
 export interface Dashboard {
   __typename?: "Dashboard";
   id: Scalars["GID"]["output"];
+  /** @deprecated remove! */
   isDefault: Scalars["Boolean"]["output"];
   isRefreshing: Scalars["Boolean"]["output"];
   lastRefreshAt?: Maybe<Scalars["DateTime"]["output"]>;
   modules: Array<DashboardModule>;
+  myEffectivePermission: DashboardPermissionType;
   name: Scalars["String"]["output"];
+  permissions: Array<DashboardPermission>;
 }
 
 export interface DashboardCreatePetitionButtonModule extends DashboardModule {
@@ -778,6 +781,16 @@ export interface DashboardModuleResultMultiItem {
 }
 
 export type DashboardModuleSize = "LARGE" | "MEDIUM" | "SMALL";
+
+export interface DashboardPermission {
+  __typename?: "DashboardPermission";
+  id: Scalars["GID"]["output"];
+  type: DashboardPermissionType;
+  user?: Maybe<User>;
+  userGroup?: Maybe<UserGroup>;
+}
+
+export type DashboardPermissionType = "OWNER" | "READ" | "WRITE";
 
 export interface DashboardPetitionsNumberModule extends DashboardModule {
   __typename?: "DashboardPetitionsNumberModule";
@@ -1453,6 +1466,7 @@ export interface Mutation {
   createCustomSignatureDocumentUploadLink: Scalars["JSONObject"]["output"];
   /** Creates a new empty dashboard in the organization */
   createDashboard: Dashboard;
+  createDashboardPermissions: Dashboard;
   /** Creates a new Dow Jones KYC integration on the user's organization */
   createDowJonesKycIntegration: OrgIntegration;
   /** Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document */
@@ -1576,6 +1590,7 @@ export interface Mutation {
   /** Deletes a dashboard */
   deleteDashboard: Success;
   deleteDashboardModule: Dashboard;
+  deleteDashboardPermission: Dashboard;
   /** Removes the DOW JONES integration of the user's organization */
   deleteDowJonesKycIntegration: Organization;
   /** Deletes a subscription signature key */
@@ -1732,6 +1747,7 @@ export interface Mutation {
   reopenPetition: Petition;
   /** Reopens a profile that is in CLOSED or DELETION_SCHEDULED status */
   reopenProfile: Array<Profile>;
+  reorderDashboards: User;
   /** Reorders the positions of attachments in the petition */
   reorderPetitionAttachments: PetitionBase;
   /** Changes the ordering of a user's petition list views */
@@ -1813,6 +1829,7 @@ export interface Mutation {
   /** Updates a dashboard */
   updateDashboard: Dashboard;
   updateDashboardModulePositions: Dashboard;
+  updateDashboardPermission: DashboardPermission;
   updateEinformaCustomProperties: SupportMethodResponse;
   /** Activate or deactivate a list of organization feature flag */
   updateFeatureFlags: Organization;
@@ -2172,6 +2189,13 @@ export interface MutationcreateCustomSignatureDocumentUploadLinkArgs {
 
 export interface MutationcreateDashboardArgs {
   name: Scalars["String"]["input"];
+}
+
+export interface MutationcreateDashboardPermissionsArgs {
+  dashboardId: Scalars["GID"]["input"];
+  permissionType: DashboardPermissionType;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 }
 
 export interface MutationcreateDowJonesKycIntegrationArgs {
@@ -2559,6 +2583,11 @@ export interface MutationdeleteDashboardArgs {
 export interface MutationdeleteDashboardModuleArgs {
   dashboardId: Scalars["GID"]["input"];
   moduleId: Scalars["GID"]["input"];
+}
+
+export interface MutationdeleteDashboardPermissionArgs {
+  dashboardId: Scalars["GID"]["input"];
+  permissionId: Scalars["GID"]["input"];
 }
 
 export interface MutationdeleteEventSubscriptionSignatureKeysArgs {
@@ -3016,6 +3045,10 @@ export interface MutationreopenProfileArgs {
   profileIds: Array<Scalars["GID"]["input"]>;
 }
 
+export interface MutationreorderDashboardsArgs {
+  ids: Array<Scalars["GID"]["input"]>;
+}
+
 export interface MutationreorderPetitionAttachmentsArgs {
   attachmentIds: Array<Scalars["GID"]["input"]>;
   attachmentType: PetitionAttachmentType;
@@ -3266,6 +3299,12 @@ export interface MutationupdateDashboardArgs {
 export interface MutationupdateDashboardModulePositionsArgs {
   dashboardId: Scalars["GID"]["input"];
   moduleIds: Array<Scalars["GID"]["input"]>;
+}
+
+export interface MutationupdateDashboardPermissionArgs {
+  dashboardId: Scalars["GID"]["input"];
+  newPermissionType: DashboardPermissionType;
+  permissionId: Scalars["GID"]["input"];
 }
 
 export interface MutationupdateEinformaCustomPropertiesArgs {
@@ -10167,10 +10206,243 @@ export type DashboardModule_DashboardModuleFragment =
 export type DashboardTabs_DashboardFragment = {
   __typename?: "Dashboard";
   id: string;
-  isDefault: boolean;
   isRefreshing: boolean;
   lastRefreshAt?: string | null;
   name: string;
+  myEffectivePermission: DashboardPermissionType;
+  permissions: Array<{
+    __typename?: "DashboardPermission";
+    id: string;
+    userGroup?: { __typename?: "UserGroup"; id: string; imMember: boolean } | null;
+  }>;
+};
+
+export type DashboardSharingDialog_UserFragment = {
+  __typename?: "User";
+  id: string;
+  email: string;
+  fullName?: string | null;
+  avatarUrl?: string | null;
+  initials?: string | null;
+  status: UserStatus;
+  isMe: boolean;
+};
+
+export type DashboardSharingDialog_UserGroupFragment = {
+  __typename?: "UserGroup";
+  id: string;
+  name: string;
+  initials: string;
+  memberCount: number;
+  imMember: boolean;
+  localizableName: { [locale in UserLocale]?: string };
+  type: UserGroupType;
+};
+
+export type DashboardSharingDialog_DashboardPermissionFragment = {
+  __typename?: "DashboardPermission";
+  id: string;
+  type: DashboardPermissionType;
+  user?: {
+    __typename?: "User";
+    id: string;
+    email: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    status: UserStatus;
+    isMe: boolean;
+  } | null;
+  userGroup?: {
+    __typename?: "UserGroup";
+    id: string;
+    name: string;
+    initials: string;
+    memberCount: number;
+    imMember: boolean;
+    localizableName: { [locale in UserLocale]?: string };
+    type: UserGroupType;
+  } | null;
+};
+
+export type DashboardSharingDialog_DashboardFragment = {
+  __typename?: "Dashboard";
+  id: string;
+  myEffectivePermission: DashboardPermissionType;
+  permissions: Array<{
+    __typename?: "DashboardPermission";
+    id: string;
+    type: DashboardPermissionType;
+    user?: {
+      __typename?: "User";
+      id: string;
+      email: string;
+      fullName?: string | null;
+      avatarUrl?: string | null;
+      initials?: string | null;
+      status: UserStatus;
+      isMe: boolean;
+    } | null;
+    userGroup?: {
+      __typename?: "UserGroup";
+      id: string;
+      name: string;
+      initials: string;
+      memberCount: number;
+      imMember: boolean;
+      localizableName: { [locale in UserLocale]?: string };
+      type: UserGroupType;
+    } | null;
+  }>;
+};
+
+export type DashboardSharingDialog_DashboardQueryQueryVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type DashboardSharingDialog_DashboardQueryQuery = {
+  dashboard: {
+    __typename?: "Dashboard";
+    id: string;
+    myEffectivePermission: DashboardPermissionType;
+    permissions: Array<{
+      __typename?: "DashboardPermission";
+      id: string;
+      type: DashboardPermissionType;
+      user?: {
+        __typename?: "User";
+        id: string;
+        email: string;
+        fullName?: string | null;
+        avatarUrl?: string | null;
+        initials?: string | null;
+        status: UserStatus;
+        isMe: boolean;
+      } | null;
+      userGroup?: {
+        __typename?: "UserGroup";
+        id: string;
+        name: string;
+        initials: string;
+        memberCount: number;
+        imMember: boolean;
+        localizableName: { [locale in UserLocale]?: string };
+        type: UserGroupType;
+      } | null;
+    }>;
+  };
+};
+
+export type DashboardSharingDialog_createDashboardPermissionsMutationVariables = Exact<{
+  dashboardId: Scalars["GID"]["input"];
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  permissionType: DashboardPermissionType;
+}>;
+
+export type DashboardSharingDialog_createDashboardPermissionsMutation = {
+  createDashboardPermissions: {
+    __typename?: "Dashboard";
+    id: string;
+    myEffectivePermission: DashboardPermissionType;
+    permissions: Array<{
+      __typename?: "DashboardPermission";
+      id: string;
+      type: DashboardPermissionType;
+      user?: {
+        __typename?: "User";
+        id: string;
+        email: string;
+        fullName?: string | null;
+        avatarUrl?: string | null;
+        initials?: string | null;
+        status: UserStatus;
+        isMe: boolean;
+      } | null;
+      userGroup?: {
+        __typename?: "UserGroup";
+        id: string;
+        name: string;
+        initials: string;
+        memberCount: number;
+        imMember: boolean;
+        localizableName: { [locale in UserLocale]?: string };
+        type: UserGroupType;
+      } | null;
+    }>;
+  };
+};
+
+export type DashboardSharingDialog_updateDashboardPermissionMutationVariables = Exact<{
+  dashboardId: Scalars["GID"]["input"];
+  permissionId: Scalars["GID"]["input"];
+  newPermissionType: DashboardPermissionType;
+}>;
+
+export type DashboardSharingDialog_updateDashboardPermissionMutation = {
+  updateDashboardPermission: {
+    __typename?: "DashboardPermission";
+    id: string;
+    type: DashboardPermissionType;
+    user?: {
+      __typename?: "User";
+      id: string;
+      email: string;
+      fullName?: string | null;
+      avatarUrl?: string | null;
+      initials?: string | null;
+      status: UserStatus;
+      isMe: boolean;
+    } | null;
+    userGroup?: {
+      __typename?: "UserGroup";
+      id: string;
+      name: string;
+      initials: string;
+      memberCount: number;
+      imMember: boolean;
+      localizableName: { [locale in UserLocale]?: string };
+      type: UserGroupType;
+    } | null;
+  };
+};
+
+export type DashboardSharingDialog_deleteDashboardPermissionMutationVariables = Exact<{
+  dashboardId: Scalars["GID"]["input"];
+  permissionId: Scalars["GID"]["input"];
+}>;
+
+export type DashboardSharingDialog_deleteDashboardPermissionMutation = {
+  deleteDashboardPermission: {
+    __typename?: "Dashboard";
+    id: string;
+    myEffectivePermission: DashboardPermissionType;
+    permissions: Array<{
+      __typename?: "DashboardPermission";
+      id: string;
+      type: DashboardPermissionType;
+      user?: {
+        __typename?: "User";
+        id: string;
+        email: string;
+        fullName?: string | null;
+        avatarUrl?: string | null;
+        initials?: string | null;
+        status: UserStatus;
+        isMe: boolean;
+      } | null;
+      userGroup?: {
+        __typename?: "UserGroup";
+        id: string;
+        name: string;
+        initials: string;
+        memberCount: number;
+        imMember: boolean;
+        localizableName: { [locale in UserLocale]?: string };
+        type: UserGroupType;
+      } | null;
+    }>;
+  };
 };
 
 export type DashboardModuleDrawer_DashboardModule_DashboardCreatePetitionButtonModule_Fragment = {
@@ -46531,10 +46803,15 @@ export type Home_UserFragment = {
   dashboards: Array<{
     __typename?: "Dashboard";
     id: string;
-    isDefault: boolean;
     isRefreshing: boolean;
     lastRefreshAt?: string | null;
     name: string;
+    myEffectivePermission: DashboardPermissionType;
+    permissions: Array<{
+      __typename?: "DashboardPermission";
+      id: string;
+      userGroup?: { __typename?: "UserGroup"; id: string; imMember: boolean } | null;
+    }>;
   }>;
 };
 
@@ -47004,10 +47281,15 @@ export type Home_userQuery = {
     dashboards: Array<{
       __typename?: "Dashboard";
       id: string;
-      isDefault: boolean;
       isRefreshing: boolean;
       lastRefreshAt?: string | null;
       name: string;
+      myEffectivePermission: DashboardPermissionType;
+      permissions: Array<{
+        __typename?: "DashboardPermission";
+        id: string;
+        userGroup?: { __typename?: "UserGroup"; id: string; imMember: boolean } | null;
+      }>;
     }>;
     pinnedProfileTypes: Array<{
       __typename?: "ProfileType";
@@ -47053,6 +47335,7 @@ export type Home_dashboardQuery = {
     isRefreshing: boolean;
     lastRefreshAt?: string | null;
     name: string;
+    myEffectivePermission: DashboardPermissionType;
     modules: Array<
       | {
           __typename?: "DashboardCreatePetitionButtonModule";
@@ -47478,10 +47761,15 @@ export type Home_createDashboardMutation = {
   createDashboard: {
     __typename?: "Dashboard";
     id: string;
-    isDefault: boolean;
     isRefreshing: boolean;
     lastRefreshAt?: string | null;
     name: string;
+    myEffectivePermission: DashboardPermissionType;
+    permissions: Array<{
+      __typename?: "DashboardPermission";
+      id: string;
+      userGroup?: { __typename?: "UserGroup"; id: string; imMember: boolean } | null;
+    }>;
   };
 };
 
@@ -47549,6 +47837,14 @@ export type Home_updateDashboardModulePositionsMutation = {
       | { __typename?: "DashboardProfilesRatioModule"; id: string }
     >;
   };
+};
+
+export type Home_reorderDashboardsMutationVariables = Exact<{
+  ids: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type Home_reorderDashboardsMutation = {
+  reorderDashboards: { __typename?: "User"; id: string };
 };
 
 export type ChooseOrg_OrganizationFragment = {
@@ -70269,6 +70565,78 @@ export const TaskProgressDialog_TaskFragmentDoc = gql`
     error
   }
 ` as unknown as DocumentNode<TaskProgressDialog_TaskFragment, unknown>;
+export const UserSelectOption_UserFragmentDoc = gql`
+  fragment UserSelectOption_User on User {
+    id
+    fullName
+    email
+  }
+` as unknown as DocumentNode<UserSelectOption_UserFragment, unknown>;
+export const UserSelect_UserFragmentDoc = gql`
+  fragment UserSelect_User on User {
+    id
+    fullName
+    email
+    ...UserSelectOption_User
+  }
+  ${UserSelectOption_UserFragmentDoc}
+` as unknown as DocumentNode<UserSelect_UserFragment, unknown>;
+export const UserReference_UserFragmentDoc = gql`
+  fragment UserReference_User on User {
+    id
+    fullName
+    status
+    isMe
+  }
+` as unknown as DocumentNode<UserReference_UserFragment, unknown>;
+export const DashboardSharingDialog_UserFragmentDoc = gql`
+  fragment DashboardSharingDialog_User on User {
+    id
+    email
+    fullName
+    ...UserAvatar_User
+    ...UserSelect_User
+    ...UserReference_User
+  }
+  ${UserAvatar_UserFragmentDoc}
+  ${UserSelect_UserFragmentDoc}
+  ${UserReference_UserFragmentDoc}
+` as unknown as DocumentNode<DashboardSharingDialog_UserFragment, unknown>;
+export const DashboardSharingDialog_UserGroupFragmentDoc = gql`
+  fragment DashboardSharingDialog_UserGroup on UserGroup {
+    id
+    name
+    initials
+    memberCount
+    imMember
+    ...UserGroupReference_UserGroup
+  }
+  ${UserGroupReference_UserGroupFragmentDoc}
+` as unknown as DocumentNode<DashboardSharingDialog_UserGroupFragment, unknown>;
+export const DashboardSharingDialog_DashboardPermissionFragmentDoc = gql`
+  fragment DashboardSharingDialog_DashboardPermission on DashboardPermission {
+    id
+    type
+    user {
+      ...DashboardSharingDialog_User
+    }
+    userGroup {
+      ...DashboardSharingDialog_UserGroup
+    }
+  }
+  ${DashboardSharingDialog_UserFragmentDoc}
+  ${DashboardSharingDialog_UserGroupFragmentDoc}
+` as unknown as DocumentNode<DashboardSharingDialog_DashboardPermissionFragment, unknown>;
+export const DashboardSharingDialog_DashboardFragmentDoc = gql`
+  fragment DashboardSharingDialog_Dashboard on Dashboard {
+    id
+    myEffectivePermission
+    permissions {
+      ...DashboardSharingDialog_DashboardPermission
+    }
+  }
+  ${DashboardSharingDialog_DashboardPermissionFragmentDoc}
+` as unknown as DocumentNode<DashboardSharingDialog_DashboardFragment, unknown>;
 export const ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc = gql`
   fragment ProfileTypeFieldSelect_ProfileTypeField on ProfileTypeField {
     id
@@ -70640,14 +71008,6 @@ export const PetitionFieldReference_PetitionFieldFragmentDoc = gql`
     title
   }
 ` as unknown as DocumentNode<PetitionFieldReference_PetitionFieldFragment, unknown>;
-export const UserReference_UserFragmentDoc = gql`
-  fragment UserReference_User on User {
-    id
-    fullName
-    status
-    isMe
-  }
-` as unknown as DocumentNode<UserReference_UserFragment, unknown>;
 export const ContactReference_ContactFragmentDoc = gql`
   fragment ContactReference_Contact on Contact {
     id
@@ -72828,22 +73188,6 @@ export const ImportRepliesDialog_PetitionFieldFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<ImportRepliesDialog_PetitionFieldFragment, unknown>;
-export const UserSelectOption_UserFragmentDoc = gql`
-  fragment UserSelectOption_User on User {
-    id
-    fullName
-    email
-  }
-` as unknown as DocumentNode<UserSelectOption_UserFragment, unknown>;
-export const UserSelect_UserFragmentDoc = gql`
-  fragment UserSelect_User on User {
-    id
-    fullName
-    email
-    ...UserSelectOption_User
-  }
-  ${UserSelectOption_UserFragmentDoc}
-` as unknown as DocumentNode<UserSelect_UserFragment, unknown>;
 export const PetitionSharingModal_UserFragmentDoc = gql`
   fragment PetitionSharingModal_User on User {
     id
@@ -75745,10 +76089,17 @@ export const Contacts_ContactsListFragmentDoc = gql`
 export const DashboardTabs_DashboardFragmentDoc = gql`
   fragment DashboardTabs_Dashboard on Dashboard {
     id
-    isDefault
     isRefreshing
     lastRefreshAt
     name
+    myEffectivePermission
+    permissions {
+      id
+      userGroup {
+        id
+        imMember
+      }
+    }
   }
 ` as unknown as DocumentNode<DashboardTabs_DashboardFragment, unknown>;
 export const Home_UserFragmentDoc = gql`
@@ -75756,7 +76107,6 @@ export const Home_UserFragmentDoc = gql`
     id
     dashboards {
       id
-      isDefault
       ...DashboardTabs_Dashboard
     }
   }
@@ -81722,6 +82072,71 @@ export const ImportContactsDialog_bulkCreateContactsDocument = gql`
   ImportContactsDialog_bulkCreateContactsMutation,
   ImportContactsDialog_bulkCreateContactsMutationVariables
 >;
+export const DashboardSharingDialog_DashboardQueryDocument = gql`
+  query DashboardSharingDialog_DashboardQuery($id: GID!) {
+    dashboard(id: $id) {
+      ...DashboardSharingDialog_Dashboard
+    }
+  }
+  ${DashboardSharingDialog_DashboardFragmentDoc}
+` as unknown as DocumentNode<
+  DashboardSharingDialog_DashboardQueryQuery,
+  DashboardSharingDialog_DashboardQueryQueryVariables
+>;
+export const DashboardSharingDialog_createDashboardPermissionsDocument = gql`
+  mutation DashboardSharingDialog_createDashboardPermissions(
+    $dashboardId: GID!
+    $userIds: [GID!]
+    $userGroupIds: [GID!]
+    $permissionType: DashboardPermissionType!
+  ) {
+    createDashboardPermissions(
+      dashboardId: $dashboardId
+      userIds: $userIds
+      userGroupIds: $userGroupIds
+      permissionType: $permissionType
+    ) {
+      ...DashboardSharingDialog_Dashboard
+    }
+  }
+  ${DashboardSharingDialog_DashboardFragmentDoc}
+` as unknown as DocumentNode<
+  DashboardSharingDialog_createDashboardPermissionsMutation,
+  DashboardSharingDialog_createDashboardPermissionsMutationVariables
+>;
+export const DashboardSharingDialog_updateDashboardPermissionDocument = gql`
+  mutation DashboardSharingDialog_updateDashboardPermission(
+    $dashboardId: GID!
+    $permissionId: GID!
+    $newPermissionType: DashboardPermissionType!
+  ) {
+    updateDashboardPermission(
+      dashboardId: $dashboardId
+      permissionId: $permissionId
+      newPermissionType: $newPermissionType
+    ) {
+      ...DashboardSharingDialog_DashboardPermission
+    }
+  }
+  ${DashboardSharingDialog_DashboardPermissionFragmentDoc}
+` as unknown as DocumentNode<
+  DashboardSharingDialog_updateDashboardPermissionMutation,
+  DashboardSharingDialog_updateDashboardPermissionMutationVariables
+>;
+export const DashboardSharingDialog_deleteDashboardPermissionDocument = gql`
+  mutation DashboardSharingDialog_deleteDashboardPermission(
+    $dashboardId: GID!
+    $permissionId: GID!
+  ) {
+    deleteDashboardPermission(dashboardId: $dashboardId, permissionId: $permissionId) {
+      ...DashboardSharingDialog_Dashboard
+    }
+  }
+  ${DashboardSharingDialog_DashboardFragmentDoc}
+` as unknown as DocumentNode<
+  DashboardSharingDialog_deleteDashboardPermissionMutation,
+  DashboardSharingDialog_deleteDashboardPermissionMutationVariables
+>;
 export const DashboardModuleForm_createCreatePetitionButtonDashboardModuleDocument = gql`
   mutation DashboardModuleForm_createCreatePetitionButtonDashboardModule(
     $dashboardId: GID!
@@ -86133,6 +86548,7 @@ export const Home_dashboardDocument = gql`
       isRefreshing
       lastRefreshAt
       name
+      myEffectivePermission
       modules {
         id
         ...Home_DashboardModule
@@ -86196,6 +86612,16 @@ export const Home_updateDashboardModulePositionsDocument = gql`
 ` as unknown as DocumentNode<
   Home_updateDashboardModulePositionsMutation,
   Home_updateDashboardModulePositionsMutationVariables
+>;
+export const Home_reorderDashboardsDocument = gql`
+  mutation Home_reorderDashboards($ids: [GID!]!) {
+    reorderDashboards(ids: $ids) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  Home_reorderDashboardsMutation,
+  Home_reorderDashboardsMutationVariables
 >;
 export const ChooseOrg_organizationsDocument = gql`
   query ChooseOrg_organizations {

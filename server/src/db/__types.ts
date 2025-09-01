@@ -51,6 +51,14 @@ export const DashboardModuleTypeValues = [
   "CREATE_PETITION_BUTTON",
 ] as DashboardModuleType[];
 
+export type DashboardPermissionType = "READ" | "WRITE" | "OWNER";
+
+export const DashboardPermissionTypeValues = [
+  "READ",
+  "WRITE",
+  "OWNER",
+] as DashboardPermissionType[];
+
 export type DocumentProcessingType = "PAYSLIP";
 
 export const DocumentProcessingTypeValues = ["PAYSLIP"] as DocumentProcessingType[];
@@ -682,7 +690,9 @@ export type UserGroupPermissionName =
   | "TEAMS:UPDATE_PERMISSIONS"
   | "PETITIONS:LIST_PUBLIC_TEMPLATES"
   | "DASHBOARDS:CRUD_DASHBOARDS"
-  | "PROFILES:IMPORT_EXPORT_PROFILES";
+  | "PROFILES:IMPORT_EXPORT_PROFILES"
+  | "DASHBOARDS:LIST_DASHBOARDS"
+  | "DASHBOARDS:CREATE_DASHBOARDS";
 
 export const UserGroupPermissionNameValues = [
   "SUPERADMIN",
@@ -719,6 +729,8 @@ export const UserGroupPermissionNameValues = [
   "PETITIONS:LIST_PUBLIC_TEMPLATES",
   "DASHBOARDS:CRUD_DASHBOARDS",
   "PROFILES:IMPORT_EXPORT_PROFILES",
+  "DASHBOARDS:LIST_DASHBOARDS",
+  "DASHBOARDS:CREATE_DASHBOARDS",
 ] as UserGroupPermissionName[];
 
 export type UserGroupType = "NORMAL" | "ALL_USERS" | "INITIAL";
@@ -740,6 +752,7 @@ export interface TableTypes {
   contact_authentication_request: ContactAuthenticationRequest;
   dashboard: Dashboard;
   dashboard_module: DashboardModule;
+  dashboard_permission: DashboardPermission;
   document_processing_log: DocumentProcessingLog;
   email_attachment: EmailAttachment;
   email_event: EmailEvent;
@@ -819,6 +832,7 @@ export interface TableCreateTypes {
   contact_authentication_request: CreateContactAuthenticationRequest;
   dashboard: CreateDashboard;
   dashboard_module: CreateDashboardModule;
+  dashboard_permission: CreateDashboardPermission;
   document_processing_log: CreateDocumentProcessingLog;
   email_attachment: CreateEmailAttachment;
   email_event: CreateEmailEvent;
@@ -898,6 +912,7 @@ export interface TablePrimaryKeys {
   contact_authentication_request: "id";
   dashboard: "id";
   dashboard_module: "id";
+  dashboard_permission: "id";
   document_processing_log: "id";
   email_attachment: "id";
   email_event: "id";
@@ -1077,8 +1092,14 @@ export interface Dashboard {
   id: number; // int4
   org_id: number; // int4
   name: string; // varchar
-  position: number; // int4
-  is_default: boolean; // bool
+  /**
+   * @deprecated
+   */
+  position: Maybe<number>; // int4
+  /**
+   * @deprecated
+   */
+  is_default: Maybe<boolean>; // bool
   is_refreshing: boolean; // bool
   last_refresh_at: Maybe<Date>; // timestamptz
   created_at: Date; // timestamptz
@@ -1091,6 +1112,7 @@ export interface Dashboard {
 
 export type CreateDashboard = PartialProps<
   Omit<Dashboard, "id">,
+  | "position"
   | "is_default"
   | "is_refreshing"
   | "last_refresh_at"
@@ -1123,6 +1145,32 @@ export type CreateDashboardModule = PartialProps<
   Omit<DashboardModule, "id">,
   | "title"
   | "result"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+>;
+
+export interface DashboardPermission {
+  id: number; // int4
+  dashboard_id: number; // int4
+  user_id: Maybe<number>; // int4
+  user_group_id: Maybe<number>; // int4
+  type: DashboardPermissionType; // dashboard_permission_type
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateDashboardPermission = PartialProps<
+  Omit<DashboardPermission, "id">,
+  | "user_id"
+  | "user_group_id"
   | "created_at"
   | "created_by"
   | "updated_at"
@@ -2711,6 +2759,7 @@ export interface User {
   external_id: Maybe<string>; // varchar
   user_data_id: number; // int4
   is_org_owner: boolean; // bool
+  preferences: any; // jsonb
 }
 
 export type CreateUser = PartialProps<
@@ -2725,6 +2774,7 @@ export type CreateUser = PartialProps<
   | "status"
   | "external_id"
   | "is_org_owner"
+  | "preferences"
 >;
 
 export interface UserAuthenticationToken {

@@ -481,6 +481,7 @@ function SectionsAndProfilesList({
   const userCanViewProfiles = useHasPermission("PROFILES:LIST_PROFILES");
   const userCanViewAlerts = useHasPermission("PROFILE_ALERTS:LIST_ALERTS");
   const userCanViewContacts = useHasPermission("CONTACTS:LIST_CONTACTS");
+  const userCanViewDashboards = useHasPermission("DASHBOARDS:LIST_DASHBOARDS");
 
   const showProfilesContactUsDialog = useProfilesContactUsDialog();
   const handleProfilesClick = async (e: MouseEvent) => {
@@ -496,7 +497,7 @@ function SectionsAndProfilesList({
 
   const items = useMemo(
     () => [
-      ...(me.hasDashboardsAccess
+      ...(me.hasDashboardsAccess && userCanViewDashboards
         ? [
             {
               section: "home",

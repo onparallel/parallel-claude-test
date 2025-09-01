@@ -17,6 +17,7 @@ export interface DashboardModuleCardProps extends CardProps {
   module: DashboardModuleCard_DashboardModuleFragment;
   isEditing: boolean;
   isDragging: boolean;
+  isReadOnly: boolean;
   onEdit: () => void;
   onDelete: () => void;
   headerAddon?: ReactNode;
@@ -34,6 +35,7 @@ export const DashboardModuleCard = Object.assign(
       headerAddon,
       linkToResults,
       isEditing,
+      isReadOnly,
       onEdit,
       onDelete,
       isDragging,
@@ -69,7 +71,7 @@ export const DashboardModuleCard = Object.assign(
         zIndex={isDragging ? 10 : 1}
         {...props}
       >
-        {isEditing && (
+        {isEditing && !isReadOnly && (
           <Box
             className="dashboard-module-card-drag-handle"
             data-testid="dashboard-module-card-drag-handle"
@@ -120,6 +122,7 @@ export const DashboardModuleCard = Object.assign(
                   bgColor="white"
                   icon={<SettingsIcon boxSize={4} />}
                   onClick={onEdit}
+                  isDisabled={isReadOnly}
                   label={intl.formatMessage({
                     id: "generic.edit",
                     defaultMessage: "Edit",
@@ -143,6 +146,7 @@ export const DashboardModuleCard = Object.assign(
                     variant="ghost"
                     bgColor="white"
                     icon={<DeleteIcon boxSize={4} />}
+                    isDisabled={isReadOnly}
                     label={intl.formatMessage({
                       id: "generic.delete",
                       defaultMessage: "Delete",

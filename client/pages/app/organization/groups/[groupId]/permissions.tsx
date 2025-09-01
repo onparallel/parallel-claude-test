@@ -564,15 +564,27 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
         }),
         permissions: [
           {
-            name: "DASHBOARDS:CRUD_DASHBOARDS",
+            name: "DASHBOARDS:LIST_DASHBOARDS",
             title: intl.formatMessage({
-              id: "page.permissions-group.dashboards-crud",
-              defaultMessage: "Create and manage dashboards",
+              id: "page.permissions-group.dashboards-list",
+              defaultMessage: "View dashboards",
             }),
             description: intl.formatMessage({
-              id: "page.permissions-group.dashboards-crud-description",
+              id: "page.permissions-group.dashboards-list-description",
               defaultMessage:
-                "Grants users in this team permissions to create and manage dashboards.",
+                "Grants users in this team permissions to access the dashboards page.",
+            }),
+          },
+          {
+            name: "DASHBOARDS:CREATE_DASHBOARDS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.dashboards-create",
+              defaultMessage: "Create dashboards",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.dashboards-update-description",
+              defaultMessage:
+                "Grants users in this team permissions to create and manage new dashboards.",
             }),
           },
         ],
@@ -796,7 +808,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
         <Card flex={1} position={{ xl: "sticky" }} top={{ xl: 4 }}>
           <CardHeader
             rightAction={
-              <HelpCenterLink articleId={5935983}>
+              <HelpCenterLink articleId={8395447}>
                 <FormattedMessage id="generic.help" defaultMessage="Help" />
               </HelpCenterLink>
             }

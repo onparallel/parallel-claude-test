@@ -203,6 +203,11 @@ export class UserGroupRepository extends BaseRepository {
           .where("type", "PETITION_SHARED")
           .whereRaw(`("data"->>'user_group_id')::int in ?`, [this.sqlIn(userGroupIds)])
           .delete(),
+        // stop sharing dashboards with this group
+        this.from("dashboard_permission", t)
+          .whereNull("deleted_at")
+          .whereIn("user_group_id", userGroupIds)
+          .update({ deleted_at: this.now(), deleted_by: deletedBy }),
       ]);
       await this.from("user_group", t)
         .where({

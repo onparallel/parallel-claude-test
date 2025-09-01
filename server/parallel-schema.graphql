@@ -707,11 +707,13 @@ interface CreatedAt {
 
 type Dashboard {
   id: GID!
-  isDefault: Boolean!
+  isDefault: Boolean! @deprecated(reason: "remove!")
   isRefreshing: Boolean!
   lastRefreshAt: DateTime
   modules: [DashboardModule!]!
+  myEffectivePermission: DashboardPermissionType!
   name: String!
+  permissions: [DashboardPermission!]!
 }
 
 type DashboardCreatePetitionButtonModule implements DashboardModule {
@@ -843,6 +845,19 @@ enum DashboardModuleSize {
   LARGE
   MEDIUM
   SMALL
+}
+
+type DashboardPermission {
+  id: GID!
+  type: DashboardPermissionType!
+  user: User
+  userGroup: UserGroup
+}
+
+enum DashboardPermissionType {
+  OWNER
+  READ
+  WRITE
 }
 
 type DashboardPetitionsNumberModule implements DashboardModule {
@@ -1859,6 +1874,12 @@ type Mutation {
   Creates a new empty dashboard in the organization
   """
   createDashboard(name: String!): Dashboard!
+  createDashboardPermissions(
+    dashboardId: GID!
+    permissionType: DashboardPermissionType!
+    userGroupIds: [GID!]
+    userIds: [GID!]
+  ): Dashboard!
 
   """
   Creates a new Dow Jones KYC integration on the user's organization
@@ -2458,6 +2479,7 @@ type Mutation {
   """
   deleteDashboard(id: GID!): Success!
   deleteDashboardModule(dashboardId: GID!, moduleId: GID!): Dashboard!
+  deleteDashboardPermission(dashboardId: GID!, permissionId: GID!): Dashboard!
 
   """
   Removes the DOW JONES integration of the user's organization
@@ -3096,6 +3118,7 @@ type Mutation {
   Reopens a profile that is in CLOSED or DELETION_SCHEDULED status
   """
   reopenProfile(profileIds: [GID!]!): [Profile!]!
+  reorderDashboards(ids: [GID!]!): User!
 
   """
   Reorders the positions of attachments in the petition
@@ -3414,6 +3437,11 @@ type Mutation {
   """
   updateDashboard(id: GID!, name: String!): Dashboard!
   updateDashboardModulePositions(dashboardId: GID!, moduleIds: [GID!]!): Dashboard!
+  updateDashboardPermission(
+    dashboardId: GID!
+    newPermissionType: DashboardPermissionType!
+    permissionId: GID!
+  ): DashboardPermission!
   updateEinformaCustomProperties(
     """
     {[profileTypeId: number]: {[profileTypeFieldId: number]: string }} @form:type=textarea

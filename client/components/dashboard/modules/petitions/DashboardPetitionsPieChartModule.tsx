@@ -23,6 +23,7 @@ export const DashboardPetitionsPieChartModule = Object.assign(
       module: DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment;
       isEditing: boolean;
       isDragging: boolean;
+      isReadOnly: boolean;
       onEdit: () => void;
       onDelete: () => void;
     }

@@ -15,6 +15,7 @@ export const DashboardCreatePetitionButtonModule = Object.assign(
       module: DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragment;
       isEditing: boolean;
       isDragging: boolean;
+      isReadOnly: boolean;
       onEdit: () => void;
       onDelete: () => void;
     }

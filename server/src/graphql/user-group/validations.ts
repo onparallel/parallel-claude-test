@@ -67,13 +67,14 @@ export function validUserGroupPermissionsInput<TypeName extends string, FieldNam
       }
     }
 
-    if (permissions.some((p) => p.name === "DASHBOARDS:CRUD_DASHBOARDS")) {
+    const dashboardPermissions = permissions.filter((p) => p.name.startsWith("DASHBOARDS:"));
+    if (dashboardPermissions.length > 0) {
       const hasDashboardsAccess = await ctx.featureFlags.userHasFeatureFlag(
         ctx.user!.id,
         "DASHBOARDS",
       );
       if (!hasDashboardsAccess) {
-        unknownNames.push("DASHBOARDS:CRUD_DASHBOARDS");
+        unknownNames.push(...dashboardPermissions.map((p) => p.name));
       }
     }
 

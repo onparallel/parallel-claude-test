@@ -280,7 +280,12 @@ export const User = objectType({
           return [];
         }
 
-        return await ctx.dashboards.loadDashboardsByOrgId(o.org_id);
+        const permissions = await ctx.users.loadUserPermissions(o.id);
+        if (!permissions.find((p) => p === "DASHBOARDS:LIST_DASHBOARDS")) {
+          return [];
+        }
+
+        return await ctx.dashboards.loadDashboardsByUserId(o.id);
       },
     });
   },

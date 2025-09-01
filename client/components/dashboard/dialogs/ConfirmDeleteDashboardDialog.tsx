@@ -3,7 +3,10 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FormattedMessage } from "react-intl";
 
-export function ConfirmDeleteDashboardDialog({ ...props }: DialogProps) {
+export function ConfirmDeleteDashboardDialog({
+  isOwner,
+  ...props
+}: DialogProps<{ isOwner: boolean }>) {
   return (
     <ConfirmDialog
       size="lg"
@@ -16,10 +19,17 @@ export function ConfirmDeleteDashboardDialog({ ...props }: DialogProps) {
       body={
         <Stack>
           <Text>
-            <FormattedMessage
-              id="component.confirm-delete-dashboard-dialog.body"
-              defaultMessage="If continue, the dashboard will be permanently deleted."
-            />
+            {isOwner ? (
+              <FormattedMessage
+                id="component.confirm-delete-dashboard-dialog.body-owner"
+                defaultMessage="If you continue, the dashboard will be permanently deleted for you and for every user that has access to it."
+              />
+            ) : (
+              <FormattedMessage
+                id="component.confirm-delete-dashboard-dialog.body-not-owner"
+                defaultMessage="If you continue, you will lose access to the dashboard. Other users will still have access."
+              />
+            )}
           </Text>
           <Text>
             <FormattedMessage

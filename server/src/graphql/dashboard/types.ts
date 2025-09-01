@@ -1,6 +1,39 @@
 import { enumType, interfaceType, objectType } from "nexus";
-import { DashboardModuleSizeValues } from "../../db/__types";
+import { assert } from "ts-essentials";
+import { DashboardModuleSizeValues, DashboardPermissionTypeValues } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
+
+export const DashboardPermission = objectType({
+  name: "DashboardPermission",
+  definition(t) {
+    t.nonNull.globalId("id", { prefixName: "DashboardPermission" });
+    t.nonNull.field("type", { type: "DashboardPermissionType" });
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async (o, _, ctx) => {
+        if (!o.user_id) {
+          return null;
+        }
+        return await ctx.users.loadUser(o.user_id);
+      },
+    });
+    t.nullable.field("userGroup", {
+      type: "UserGroup",
+      resolve: async (o, _, ctx) => {
+        if (!o.user_group_id) {
+          return null;
+        }
+
+        return await ctx.userGroups.loadUserGroup(o.user_group_id);
+      },
+    });
+  },
+});
+
+export const DashboardPermissionType = enumType({
+  name: "DashboardPermissionType",
+  members: DashboardPermissionTypeValues,
+});
 
 export const Dashboard = objectType({
   name: "Dashboard",
@@ -11,9 +44,23 @@ export const Dashboard = objectType({
       type: "DashboardModule",
       resolve: async (o, _, ctx) => await ctx.dashboards.loadModulesByDashboardId(o.id),
     });
-    t.nonNull.boolean("isDefault", { resolve: (o) => o.is_default });
+    t.nonNull.boolean("isDefault", { resolve: () => false, deprecation: "remove!" });
     t.nonNull.boolean("isRefreshing", { resolve: (o) => o.is_refreshing });
     t.nullable.datetime("lastRefreshAt", { resolve: (o) => o.last_refresh_at });
+    t.nonNull.field("myEffectivePermission", {
+      type: "DashboardPermissionType",
+      resolve: async (o, _, ctx) => {
+        const permissions = await ctx.dashboards.loadDashboardEffectivePermissions(o.id);
+        const myPermission = permissions.find((p) => p.user_id === ctx.user!.id);
+        assert(myPermission, "My permission not found");
+        return myPermission.type;
+      },
+    });
+    t.nonNull.list.nonNull.field("permissions", {
+      type: "DashboardPermission",
+      resolve: async (o, _, ctx) =>
+        await ctx.dashboards.loadDashboardPermissionsByDashboardId(o.id),
+    });
   },
 });
 

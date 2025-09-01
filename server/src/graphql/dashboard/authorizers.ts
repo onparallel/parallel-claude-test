@@ -1,5 +1,10 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { DashboardModuleType } from "../../db/__types";
+import { isNonNullish } from "remeda";
+import {
+  DashboardModuleType,
+  DashboardPermissionType,
+  DashboardPermissionTypeValues,
+} from "../../db/__types";
 import { MaybeArray, unMaybeArray } from "../../util/types";
 import { Arg, getArg } from "../helpers/authorize";
 import { ForbiddenError } from "../helpers/errors";
@@ -7,17 +12,46 @@ import { ForbiddenError } from "../helpers/errors";
 export function userHasAccessToDashboard<
   TypeName extends string,
   FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(
+  argName: TArg,
+  minPermission: DashboardPermissionType,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const ids = unMaybeArray(getArg(args, argName));
+    const allPermissions = await ctx.dashboards.loadDashboardEffectivePermissions(ids);
+
+    for (const permissions of allPermissions) {
+      const myPermission = permissions.find((p) => p.user_id === ctx.user!.id);
+      if (
+        !myPermission ||
+        DashboardPermissionTypeValues.indexOf(myPermission.type) <
+          DashboardPermissionTypeValues.indexOf(minPermission)
+      ) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+}
+
+export function dashboardIsNotGroupSharedToContextUser<
+  TypeName extends string,
+  FieldName extends string,
   TArg extends Arg<TypeName, FieldName, number>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const id = getArg(args, argName);
-    const dashboard = await ctx.dashboards.loadDashboard(id);
+    const permissions = await ctx.dashboards.loadDashboardPermissionsByDashboardId(id);
+    const groupIds = permissions.map((p) => p.user_group_id).filter(isNonNullish);
 
-    if (!dashboard || dashboard.org_id !== ctx.user!.org_id) {
-      throw new ForbiddenError("Dashboard not found");
+    if (groupIds.length === 0) {
+      return true;
     }
 
-    return true;
+    const members = (await ctx.userGroups.loadUserGroupMembers(groupIds)).flat();
+    return !members.some((m) => m.user_id === ctx.user!.id);
   };
 }
 

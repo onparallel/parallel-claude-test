@@ -1,20 +1,23 @@
 import { subMinutes } from "date-fns";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
+import { pick, shuffle } from "remeda";
 import {
   CreateDashboardModule,
   Dashboard,
   DashboardModule,
+  DashboardPermission,
   Organization,
   Petition,
   ProfileType,
   ProfileTypeField,
   ProfileTypeFieldType,
   User,
+  UserGroup,
 } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { toGlobalId } from "../../util/globalId";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
 function modulesBuilder(dashboards: Dashboard[], templateId: number): CreateDashboardModule[] {
@@ -68,6 +71,30 @@ function modulesBuilder(dashboards: Dashboard[], templateId: number): CreateDash
       type: "PROFILES_PIE_CHART",
       size: "LARGE",
       title: "Profiles by status",
+      settings: JSON.stringify({}),
+    },
+    {
+      dashboard_id: dashboards[1].id,
+      position: 4,
+      type: "PETITIONS_RATIO",
+      size: "SMALL",
+      title: "Petitions ratio",
+      settings: JSON.stringify({}),
+    },
+    {
+      dashboard_id: dashboards[1].id,
+      position: 5,
+      type: "PETITIONS_PIE_CHART",
+      size: "SMALL",
+      title: "Petitions pie chart",
+      settings: JSON.stringify({}),
+    },
+    {
+      dashboard_id: dashboards[1].id,
+      position: 6,
+      type: "PROFILES_NUMBER",
+      size: "SMALL",
+      title: "Profiles number",
       settings: JSON.stringify({}),
     },
     {
@@ -133,7 +160,8 @@ describe("GraphQL / Dashboards", () => {
     await mocks.createFeatureFlags([{ name: "DASHBOARDS", default_value: true }]);
 
     const [userGroup] = await mocks.createUserGroups(1, organization.id, [
-      { name: "DASHBOARDS:CRUD_DASHBOARDS", effect: "GRANT" },
+      { name: "DASHBOARDS:LIST_DASHBOARDS", effect: "GRANT" },
+      { name: "DASHBOARDS:CREATE_DASHBOARDS", effect: "GRANT" },
     ]);
     await mocks.insertUserGroupMembers(userGroup.id, [user.id]);
 
@@ -152,11 +180,46 @@ describe("GraphQL / Dashboards", () => {
     dashboards = await mocks.knex
       .from("dashboard")
       .insert([
-        { org_id: organization.id, name: "Dashboard 1", position: 0 },
-        { org_id: organization.id, name: "Dashboard 2", position: 1 },
-        { org_id: organization.id, name: "Dashboard 3", position: 2 },
+        { org_id: organization.id, name: "Dashboard 1" },
+        { org_id: organization.id, name: "Dashboard 2" },
+        { org_id: organization.id, name: "Dashboard 3" },
+        { org_id: organization.id, name: "Dashboard 4" },
+        { org_id: organization.id, name: "Dashboard 5" },
       ])
       .returning("*");
+
+    await mocks.knex.from("dashboard_permission").insert([
+      {
+        dashboard_id: dashboards[0].id,
+        user_id: user.id,
+        type: "OWNER",
+      },
+      {
+        dashboard_id: dashboards[0].id,
+        user_group_id: userGroup.id,
+        type: "READ",
+      },
+      {
+        dashboard_id: dashboards[1].id,
+        user_id: user.id,
+        type: "READ",
+      },
+      {
+        dashboard_id: dashboards[1].id,
+        user_group_id: userGroup.id,
+        type: "WRITE",
+      },
+      {
+        dashboard_id: dashboards[2].id,
+        user_id: user.id,
+        type: "READ",
+      },
+      {
+        dashboard_id: dashboards[3].id,
+        user_id: userNoPermission.id,
+        type: "READ",
+      },
+    ]);
 
     modules = await mocks.knex
       .from("dashboard_module")
@@ -210,6 +273,11 @@ describe("GraphQL / Dashboards", () => {
       .from("dashboard_module")
       .insert(modulesBuilder(dashboards, userTemplate.id))
       .returning("*");
+
+    await mocks.knex
+      .from("user")
+      .where("id", user.id)
+      .update({ preferences: JSON.stringify({}) });
   });
 
   describe("dashboards", () => {
@@ -219,7 +287,7 @@ describe("GraphQL / Dashboards", () => {
           me {
             dashboards {
               id
-              isDefault
+              myEffectivePermission
               isRefreshing
               lastRefreshAt
               modules {
@@ -238,7 +306,7 @@ describe("GraphQL / Dashboards", () => {
         dashboards: [
           {
             id: toGlobalId("Dashboard", dashboards[0].id),
-            isDefault: false,
+            myEffectivePermission: "OWNER",
             isRefreshing: false,
             lastRefreshAt: null,
             modules: [
@@ -258,7 +326,7 @@ describe("GraphQL / Dashboards", () => {
           },
           {
             id: toGlobalId("Dashboard", dashboards[1].id),
-            isDefault: false,
+            myEffectivePermission: "WRITE",
             isRefreshing: false,
             lastRefreshAt: null,
             modules: [
@@ -286,14 +354,6 @@ describe("GraphQL / Dashboards", () => {
                 size: "LARGE",
                 title: "Profiles by status",
               },
-            ],
-          },
-          {
-            id: toGlobalId("Dashboard", dashboards[2].id),
-            isDefault: false,
-            isRefreshing: false,
-            lastRefreshAt: null,
-            modules: [
               {
                 __typename: "DashboardPetitionsRatioModule",
                 id: toGlobalId("DashboardModule", modules[6].id),
@@ -314,11 +374,92 @@ describe("GraphQL / Dashboards", () => {
               },
             ],
           },
+          {
+            id: toGlobalId("Dashboard", dashboards[2].id),
+            myEffectivePermission: "READ",
+            isRefreshing: false,
+            lastRefreshAt: null,
+            modules: [
+              {
+                __typename: "DashboardPetitionsRatioModule",
+                id: toGlobalId("DashboardModule", modules[9].id),
+                size: "SMALL",
+                title: "Petitions ratio",
+              },
+              {
+                __typename: "DashboardPetitionsPieChartModule",
+                id: toGlobalId("DashboardModule", modules[10].id),
+                size: "SMALL",
+                title: "Petitions pie chart",
+              },
+              {
+                __typename: "DashboardProfilesNumberModule",
+                id: toGlobalId("DashboardModule", modules[11].id),
+                size: "SMALL",
+                title: "Profiles number",
+              },
+            ],
+          },
         ],
       });
 
       const dbTasks = await mocks.knex.from("task").where("name", "DASHBOARD_REFRESH").select("*");
       expect(dbTasks).toHaveLength(0);
+    });
+
+    it("returns user dashboards with custom order preferences", async () => {
+      await mocks.knex
+        .from("user")
+        .where("id", user.id)
+        .update({
+          preferences: JSON.stringify({
+            DASHBOARDS: {
+              tab_order: [dashboards[1].id, dashboards[0].id],
+            },
+          }),
+        });
+
+      const { errors, data } = await testClient.execute(gql`
+        query {
+          me {
+            dashboards {
+              id
+            }
+          }
+        }
+      `);
+
+      expect(errors).toBeUndefined();
+      expect(data?.me).toEqual({
+        dashboards: [
+          {
+            id: toGlobalId("Dashboard", dashboards[1].id),
+          },
+          {
+            id: toGlobalId("Dashboard", dashboards[0].id),
+          },
+          {
+            id: toGlobalId("Dashboard", dashboards[2].id),
+          },
+        ],
+      });
+    });
+
+    it("does not return dashboards list if user does not have DASHBOARDS:LIST_DASHBOARDS permission", async () => {
+      const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(gql`
+        query {
+          me {
+            dashboards {
+              id
+            }
+          }
+        }
+      `);
+
+      expect(errors).toBeUndefined();
+      expect(data?.me).toEqual({
+        dashboards: [],
+      });
     });
   });
 
@@ -341,6 +482,7 @@ describe("GraphQL / Dashboards", () => {
           query ($id: GID!) {
             dashboard(id: $id) {
               id
+              myEffectivePermission
               isRefreshing
               modules {
                 id
@@ -356,6 +498,7 @@ describe("GraphQL / Dashboards", () => {
       expect(errors).toBeUndefined();
       expect(data?.dashboard).toEqual({
         id: toGlobalId("Dashboard", dashboards[0].id),
+        myEffectivePermission: "OWNER",
         isRefreshing: false,
         modules: [
           { id: toGlobalId("DashboardModule", modules[0].id) },
@@ -502,6 +645,7 @@ describe("GraphQL / Dashboards", () => {
           me {
             dashboards {
               id
+              myEffectivePermission
             }
           }
         }
@@ -509,10 +653,10 @@ describe("GraphQL / Dashboards", () => {
 
       expect(queryErrors).toBeUndefined();
       expect(queryData?.me.dashboards).toEqual([
-        { id: toGlobalId("Dashboard", dashboards[0].id) },
-        { id: toGlobalId("Dashboard", dashboards[1].id) },
-        { id: toGlobalId("Dashboard", dashboards[2].id) },
-        { id: data?.createDashboard.id },
+        { id: toGlobalId("Dashboard", dashboards[0].id), myEffectivePermission: "OWNER" },
+        { id: toGlobalId("Dashboard", dashboards[1].id), myEffectivePermission: "WRITE" },
+        { id: toGlobalId("Dashboard", dashboards[2].id), myEffectivePermission: "READ" },
+        { id: data?.createDashboard.id, myEffectivePermission: "OWNER" },
       ]);
     });
 
@@ -612,7 +756,7 @@ describe("GraphQL / Dashboards", () => {
       });
     });
 
-    it("sends error if user does not have permission", async () => {
+    it("sends error if user does not have group permission", async () => {
       const [template] = await mocks.createRandomTemplates(organization.id, user.id, 1);
       const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
         gql`
@@ -634,6 +778,41 @@ describe("GraphQL / Dashboards", () => {
         `,
         {
           dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "KYC",
+          size: "SMALL",
+          settings: {
+            templateId: toGlobalId("Petition", template.id),
+            buttonLabel: "Start KYC...",
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if user does not have WRITE permission on the dashboard", async () => {
+      const [template] = await mocks.createRandomTemplates(organization.id, user.id, 1);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: CreatePetitionButtonDashboardModuleSettingsInput!
+          ) {
+            createCreatePetitionButtonDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[2].id),
           title: "KYC",
           size: "SMALL",
           settings: {
@@ -677,6 +856,47 @@ describe("GraphQL / Dashboards", () => {
           settings: {
             templateId: toGlobalId("Petition", otherTemplate.id),
             buttonLabel: "Start KYC...",
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if user does not have any permissions on the dashboard", async () => {
+      const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: PetitionsNumberDashboardModuleSettingsInput!
+          ) {
+            createPetitionsNumberDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[3].id),
+          title: "Number of petitions",
+          size: "SMALL",
+          settings: {
+            filters: {
+              locale: "es",
+              path: "/",
+              status: ["DRAFT", "COMPLETED"],
+              signature: ["NO_SIGNATURE"],
+            },
           },
         },
       );
@@ -1184,7 +1404,7 @@ describe("GraphQL / Dashboards", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error if user does not have permissions", async () => {
+    it("sends error if user does not have group permissions", async () => {
       const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
         gql`
           mutation (
@@ -1208,6 +1428,47 @@ describe("GraphQL / Dashboards", () => {
         `,
         {
           dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Number of petitions",
+          size: "SMALL",
+          settings: {
+            filters: {
+              locale: "es",
+              path: "/",
+              status: ["DRAFT", "COMPLETED"],
+              signature: ["NO_SIGNATURE"],
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if user does not have WRITE permissions on the dashboard", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: PetitionsNumberDashboardModuleSettingsInput!
+          ) {
+            createPetitionsNumberDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[2].id),
           title: "Number of petitions",
           size: "SMALL",
           settings: {
@@ -1280,7 +1541,7 @@ describe("GraphQL / Dashboards", () => {
       });
     });
 
-    it("sends error if user does not have permissions", async () => {
+    it("sends error if user does not have group permissions", async () => {
       const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
         gql`
           mutation (
@@ -1422,7 +1683,7 @@ describe("GraphQL / Dashboards", () => {
       });
     });
 
-    it("sends error if user does not have permissions", async () => {
+    it("sends error if user does not have group permissions", async () => {
       const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
         gql`
           mutation (
@@ -1446,6 +1707,47 @@ describe("GraphQL / Dashboards", () => {
         `,
         {
           dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Pie chart of petitions",
+          size: "LARGE",
+          settings: {
+            graphicType: "DOUGHNUT",
+            items: [
+              { label: "Draft", color: "#00FF00", filter: { status: ["DRAFT"] } },
+              { label: "Completed", color: "#FF0000", filter: { status: ["COMPLETED"] } },
+              { label: "Closed", color: "#0000FF", filter: { status: ["CLOSED"] } },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if user does not have WRITE permissions on the dashboard", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: PetitionsPieChartDashboardModuleSettingsInput!
+          ) {
+            createPetitionsPieChartDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[2].id),
           title: "Pie chart of petitions",
           size: "LARGE",
           settings: {
@@ -1615,7 +1917,7 @@ describe("GraphQL / Dashboards", () => {
       });
     });
 
-    it("sends error if user does not have permissions", async () => {
+    it("sends error if user does not have group permissions", async () => {
       const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
         gql`
           mutation (
@@ -1639,6 +1941,59 @@ describe("GraphQL / Dashboards", () => {
         `,
         {
           dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Number of open profiles",
+          size: "SMALL",
+          settings: {
+            type: "COUNT",
+            profileTypeId: toGlobalId("ProfileType", profileType.id),
+            filter: {
+              status: ["OPEN"],
+              values: {
+                logicalOperator: "AND",
+                conditions: [
+                  {
+                    profileTypeFieldId: toGlobalId(
+                      "ProfileTypeField",
+                      shortTextProfileTypeField.id,
+                    ),
+                    operator: "EQUAL",
+                    value: "Mike",
+                  },
+                ],
+              },
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if user does not have WRITE permissions on the dashboard", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: ProfilesNumberDashboardModuleSettingsInput!
+          ) {
+            createProfilesNumberDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[2].id),
           title: "Number of open profiles",
           size: "SMALL",
           settings: {
@@ -2076,7 +2431,7 @@ describe("GraphQL / Dashboards", () => {
       });
     });
 
-    it("sends error if user does not have permissions", async () => {
+    it("sends error if user does not have group permissions", async () => {
       const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
         gql`
           mutation (
@@ -2097,6 +2452,42 @@ describe("GraphQL / Dashboards", () => {
         `,
         {
           dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Ratio of profiles",
+          size: "SMALL",
+          settings: {
+            graphicType: "RATIO",
+            type: "COUNT",
+            profileTypeId: toGlobalId("ProfileType", profileType.id),
+            filters: [{ status: ["OPEN"] }, { status: ["OPEN", "CLOSED"] }],
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if user does not have WRITE permissions on the dashboard", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: ProfilesRatioDashboardModuleSettingsInput!
+          ) {
+            createProfilesRatioDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[2].id),
           title: "Ratio of profiles",
           size: "SMALL",
           settings: {
@@ -2517,7 +2908,7 @@ describe("GraphQL / Dashboards", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error if user does not have permissions", async () => {
+    it("sends error if user does not have group permissions", async () => {
       const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
         gql`
           mutation (
@@ -2538,6 +2929,45 @@ describe("GraphQL / Dashboards", () => {
         `,
         {
           dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Profiles pie chart",
+          size: "SMALL",
+          settings: {
+            graphicType: "PIE",
+            type: "COUNT",
+            profileTypeId: toGlobalId("ProfileType", profileType.id),
+            items: [
+              { label: "Open", color: "#00ff00", filter: { status: ["OPEN"] } },
+              { label: "Closed", color: "#ff0000", filter: { status: ["CLOSED"] } },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if user does not have WRITE permissions on the dashboard", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: ProfilesPieChartDashboardModuleSettingsInput!
+          ) {
+            createProfilesPieChartDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[2].id),
           title: "Profiles pie chart",
           size: "SMALL",
           settings: {
@@ -3198,7 +3628,7 @@ describe("GraphQL / Dashboards", () => {
           }
         `,
         {
-          dashboardId: toGlobalId("Dashboard", dashboards[2].id),
+          dashboardId: toGlobalId("Dashboard", dashboards[1].id),
           moduleId: toGlobalId("DashboardModule", modules[6].id),
           data: {
             title: "Updated Ratio",
@@ -3257,7 +3687,7 @@ describe("GraphQL / Dashboards", () => {
           }
         `,
         {
-          dashboardId: toGlobalId("Dashboard", dashboards[2].id),
+          dashboardId: toGlobalId("Dashboard", dashboards[1].id),
           moduleId: toGlobalId("DashboardModule", modules[7].id),
           data: {
             title: "Updated Pie Chart",
@@ -3335,7 +3765,7 @@ describe("GraphQL / Dashboards", () => {
           }
         `,
         {
-          dashboardId: toGlobalId("Dashboard", dashboards[2].id),
+          dashboardId: toGlobalId("Dashboard", dashboards[1].id),
           moduleId: toGlobalId("DashboardModule", modules[8].id),
           data: {
             title: "Updated Number",
@@ -3547,6 +3977,15 @@ describe("GraphQL / Dashboards", () => {
           {
             id: toGlobalId("DashboardModule", modules[5].id),
           },
+          {
+            id: toGlobalId("DashboardModule", modules[6].id),
+          },
+          {
+            id: toGlobalId("DashboardModule", modules[7].id),
+          },
+          {
+            id: toGlobalId("DashboardModule", modules[8].id),
+          },
         ],
       });
 
@@ -3573,10 +4012,25 @@ describe("GraphQL / Dashboards", () => {
           position: 2,
           updated_by: `User:${user.id}`,
         },
+        {
+          id: modules[6].id,
+          position: 3,
+          updated_by: `User:${user.id}`,
+        },
+        {
+          id: modules[7].id,
+          position: 4,
+          updated_by: `User:${user.id}`,
+        },
+        {
+          id: modules[8].id,
+          position: 5,
+          updated_by: `User:${user.id}`,
+        },
       ]);
     });
 
-    it("sends error if user does not have permission", async () => {
+    it("sends error if user does not have group permissions", async () => {
       const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
         gql`
           mutation ($dashboardId: GID!, $moduleId: GID!) {
@@ -3591,6 +4045,28 @@ describe("GraphQL / Dashboards", () => {
         {
           dashboardId: toGlobalId("Dashboard", dashboards[1].id),
           moduleId: toGlobalId("DashboardModule", modules[3].id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if user does not have WRITE permissions on the dashboard", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($dashboardId: GID!, $moduleId: GID!) {
+            deleteDashboardModule(dashboardId: $dashboardId, moduleId: $moduleId) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[2].id),
+          moduleId: toGlobalId("DashboardModule", modules[6].id),
         },
       );
 
@@ -3619,6 +4095,9 @@ describe("GraphQL / Dashboards", () => {
             toGlobalId("DashboardModule", modules[4].id),
             toGlobalId("DashboardModule", modules[3].id),
             toGlobalId("DashboardModule", modules[5].id),
+            toGlobalId("DashboardModule", modules[7].id),
+            toGlobalId("DashboardModule", modules[6].id),
+            toGlobalId("DashboardModule", modules[8].id),
           ],
         },
       );
@@ -3638,6 +4117,15 @@ describe("GraphQL / Dashboards", () => {
           },
           {
             id: toGlobalId("DashboardModule", modules[5].id),
+          },
+          {
+            id: toGlobalId("DashboardModule", modules[7].id),
+          },
+          {
+            id: toGlobalId("DashboardModule", modules[6].id),
+          },
+          {
+            id: toGlobalId("DashboardModule", modules[8].id),
           },
         ],
       });
@@ -3670,10 +4158,25 @@ describe("GraphQL / Dashboards", () => {
           position: 3,
           updated_by: null,
         },
+        {
+          id: modules[7].id,
+          position: 4,
+          updated_by: `User:${user.id}`,
+        },
+        {
+          id: modules[6].id,
+          position: 5,
+          updated_by: `User:${user.id}`,
+        },
+        {
+          id: modules[8].id,
+          position: 6,
+          updated_by: null,
+        },
       ]);
     });
 
-    it("sends error if user does not have permissions", async () => {
+    it("sends error if user does not have group permissions", async () => {
       const { errors, data } = await testClient.withApiKey(noPermissionsApiKey).execute(
         gql`
           mutation ($dashboardId: GID!, $moduleIds: [GID!]!) {
@@ -3692,6 +4195,33 @@ describe("GraphQL / Dashboards", () => {
             toGlobalId("DashboardModule", modules[4].id),
             toGlobalId("DashboardModule", modules[3].id),
             toGlobalId("DashboardModule", modules[5].id),
+            toGlobalId("DashboardModule", modules[6].id),
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if user does not have WRITE permissions on the dashboard", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($dashboardId: GID!, $moduleIds: [GID!]!) {
+            updateDashboardModulePositions(dashboardId: $dashboardId, moduleIds: $moduleIds) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[2].id),
+          moduleIds: [
+            toGlobalId("DashboardModule", modules[10].id),
+            toGlobalId("DashboardModule", modules[11].id),
+            toGlobalId("DashboardModule", modules[9].id),
           ],
         },
       );
@@ -3774,6 +4304,26 @@ describe("GraphQL / Dashboards", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("sends error if user does not have WRITE permissions on dashboard", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($id: GID!, $name: String!) {
+            updateDashboard(id: $id, name: $name) {
+              id
+              name
+            }
+          }
+        `,
+        {
+          id: toGlobalId("Dashboard", dashboards[2].id),
+          name: "Updated dashboard name",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("cloneDashboard", () => {
@@ -3784,8 +4334,8 @@ describe("GraphQL / Dashboards", () => {
             cloneDashboard(id: $id, name: $name) {
               id
               name
+              myEffectivePermission
               isRefreshing
-              isDefault
               lastRefreshAt
               modules {
                 __typename
@@ -3796,7 +4346,7 @@ describe("GraphQL / Dashboards", () => {
           }
         `,
         {
-          id: toGlobalId("Dashboard", dashboards[1].id),
+          id: toGlobalId("Dashboard", dashboards[2].id),
           name: "Cloned dashboard",
         },
       );
@@ -3805,37 +4355,41 @@ describe("GraphQL / Dashboards", () => {
       expect(data?.cloneDashboard).toEqual({
         id: expect.any(String),
         name: "Cloned dashboard",
+        myEffectivePermission: "OWNER",
         isRefreshing: false,
-        isDefault: false,
         lastRefreshAt: null,
         modules: [
           {
-            __typename: "DashboardProfilesRatioModule",
-            size: "MEDIUM",
-            title: "Open profiles percentage",
+            __typename: "DashboardPetitionsRatioModule",
+            size: "SMALL",
+            title: "Petitions ratio",
           },
           {
-            __typename: "DashboardProfilesPieChartModule",
-            size: "LARGE",
-            title: "Profiles by status",
+            __typename: "DashboardPetitionsPieChartModule",
+            size: "SMALL",
+            title: "Petitions pie chart",
           },
           {
-            __typename: "DashboardPetitionsNumberModule",
-            size: "LARGE",
-            title: "Petitions",
-          },
-          {
-            __typename: "DashboardProfilesPieChartModule",
-            size: "LARGE",
-            title: "Profiles by status",
+            __typename: "DashboardProfilesNumberModule",
+            size: "SMALL",
+            title: "Profiles number",
           },
         ],
       });
+
+      const dbPermissions = await mocks.knex
+        .from("dashboard_permission")
+        .where("dashboard_id", fromGlobalId(data.cloneDashboard.id).id)
+        .select("*");
+
+      expect(dbPermissions.map(pick(["user_id", "type", "deleted_at"]))).toEqual([
+        { user_id: user.id, type: "OWNER", deleted_at: null },
+      ]);
     });
   });
 
   describe("deleteDashboard", () => {
-    it("deletes a dashboard and all modules inside it", async () => {
+    it("deletes a dashboard and all modules inside it if user is OWNER", async () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($id: GID!) {
@@ -3843,7 +4397,7 @@ describe("GraphQL / Dashboards", () => {
           }
         `,
         {
-          id: toGlobalId("Dashboard", dashboards[1].id),
+          id: toGlobalId("Dashboard", dashboards[0].id),
         },
       );
 
@@ -3852,20 +4406,29 @@ describe("GraphQL / Dashboards", () => {
 
       const dbDashboard = await mocks.knex
         .from("dashboard")
-        .where("id", dashboards[1].id)
+        .where("id", dashboards[0].id)
         .select("deleted_at");
 
       expect(dbDashboard[0].deleted_at).not.toBeNull();
 
       const dbModules = await mocks.knex
         .from("dashboard_module")
-        .where("dashboard_id", dashboards[1].id)
+        .where("dashboard_id", dashboards[0].id)
         .select("deleted_at");
 
-      expect(dbModules).toHaveLength(4);
-      dbModules.forEach((module) => {
+      expect(dbModules).toHaveLength(2);
+      for (const module of dbModules) {
         expect(module.deleted_at).not.toBeNull();
-      });
+      }
+
+      const dbPermissions = await mocks.knex
+        .from("dashboard_permission")
+        .where("dashboard_id", dashboards[0].id)
+        .select("*");
+
+      for (const permission of dbPermissions) {
+        expect(permission.deleted_at).not.toBeNull();
+      }
     });
 
     it("sends error if user does not have permission", async () => {
@@ -3882,6 +4445,1075 @@ describe("GraphQL / Dashboards", () => {
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
+    });
+
+    it("only deletes dashboard permissions if user has READ access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($id: GID!) {
+            deleteDashboard(id: $id)
+          }
+        `,
+        {
+          id: toGlobalId("Dashboard", dashboards[2].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deleteDashboard).toEqual("SUCCESS");
+
+      const dbDashboard = await mocks.knex
+        .from("dashboard")
+        .where("id", dashboards[2].id)
+        .select("deleted_at");
+
+      expect(dbDashboard[0].deleted_at).toBeNull();
+
+      const dbModules = await mocks.knex
+        .from("dashboard_module")
+        .where("dashboard_id", dashboards[2].id)
+        .select("deleted_at");
+
+      expect(dbModules).toHaveLength(3);
+      for (const module of dbModules) {
+        expect(module.deleted_at).toBeNull();
+      }
+
+      const dbPermissions = await mocks.knex
+        .from("dashboard_permission")
+        .where("dashboard_id", dashboards[2].id)
+        .where("user_id", user.id)
+        .select("*");
+
+      for (const permission of dbPermissions) {
+        expect(permission.deleted_at).not.toBeNull();
+      }
+    });
+
+    it("sends error if user tries to delete a dashboard shared to them through a user group", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($id: GID!) {
+            deleteDashboard(id: $id)
+          }
+        `,
+        {
+          id: toGlobalId("Dashboard", dashboards[1].id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("createDashboardPermissions", () => {
+    let dashboard: Dashboard;
+    let ownerPermission: DashboardPermission;
+
+    let users: User[];
+    let userGroups: UserGroup[];
+
+    beforeAll(async () => {
+      users = await mocks.createRandomUsers(organization.id, 3);
+      userGroups = await mocks.createUserGroups(3, organization.id);
+
+      await mocks.insertUserGroupMembers(userGroups[0].id, [user.id, users[0].id]);
+    });
+
+    beforeEach(async () => {
+      [dashboard] = await mocks.knex
+        .from("dashboard")
+        .insert({
+          org_id: organization.id,
+          name: "My dashboard",
+        })
+        .returning("*");
+
+      [ownerPermission] = await mocks.knex.from("dashboard_permission").insert(
+        {
+          dashboard_id: dashboard.id,
+          user_id: user.id,
+          type: "OWNER",
+        },
+        "*",
+      );
+    });
+
+    it("creates a permission for a user", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $userIds: [GID!]
+            $permissionType: DashboardPermissionType!
+          ) {
+            createDashboardPermissions(
+              dashboardId: $dashboardId
+              userIds: $userIds
+              permissionType: $permissionType
+            ) {
+              id
+              myEffectivePermission
+              permissions {
+                id
+                user {
+                  id
+                }
+                type
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          userIds: [toGlobalId("User", users[0].id)],
+          permissionType: "READ",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createDashboardPermissions).toEqual({
+        id: toGlobalId("Dashboard", dashboard.id),
+        myEffectivePermission: "OWNER",
+        permissions: expect.toIncludeSameMembers([
+          {
+            id: expect.any(String),
+            user: { id: toGlobalId("User", user.id) },
+            type: "OWNER",
+          },
+          {
+            id: expect.any(String),
+            user: { id: toGlobalId("User", users[0].id) },
+            type: "READ",
+          },
+        ]),
+      });
+    });
+
+    it("ignores duplicated ids", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $userIds: [GID!]
+            $permissionType: DashboardPermissionType!
+          ) {
+            createDashboardPermissions(
+              dashboardId: $dashboardId
+              userIds: $userIds
+              permissionType: $permissionType
+            ) {
+              id
+              myEffectivePermission
+              permissions {
+                id
+                user {
+                  id
+                }
+                type
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          userIds: [
+            toGlobalId("User", users[0].id),
+            toGlobalId("User", users[0].id),
+            toGlobalId("User", users[0].id),
+          ],
+          permissionType: "READ",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createDashboardPermissions).toEqual({
+        id: toGlobalId("Dashboard", dashboard.id),
+        myEffectivePermission: "OWNER",
+        permissions: expect.toIncludeSameMembers([
+          {
+            id: expect.any(String),
+            user: { id: toGlobalId("User", user.id) },
+            type: "OWNER",
+          },
+          {
+            id: expect.any(String),
+            user: { id: toGlobalId("User", users[0].id) },
+            type: "READ",
+          },
+        ]),
+      });
+
+      const { errors: errors2, data: data2 } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $userIds: [GID!]
+            $permissionType: DashboardPermissionType!
+          ) {
+            createDashboardPermissions(
+              dashboardId: $dashboardId
+              userIds: $userIds
+              permissionType: $permissionType
+            ) {
+              id
+              myEffectivePermission
+              permissions {
+                id
+                user {
+                  id
+                }
+                type
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          userIds: [
+            toGlobalId("User", users[0].id),
+            toGlobalId("User", users[0].id),
+            toGlobalId("User", users[0].id),
+          ],
+          permissionType: "WRITE",
+        },
+      );
+
+      expect(errors2).toBeUndefined();
+      expect(data2?.createDashboardPermissions).toEqual({
+        id: toGlobalId("Dashboard", dashboard.id),
+        myEffectivePermission: "OWNER",
+        permissions: expect.toIncludeSameMembers([
+          {
+            id: expect.any(String),
+            user: { id: toGlobalId("User", user.id) },
+            type: "OWNER",
+          },
+          {
+            id: expect.any(String),
+            user: { id: toGlobalId("User", users[0].id) },
+            type: "READ",
+          },
+        ]),
+      });
+    });
+
+    it("creates a permission for a group", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $userGroupIds: [GID!]
+            $permissionType: DashboardPermissionType!
+          ) {
+            createDashboardPermissions(
+              dashboardId: $dashboardId
+              userGroupIds: $userGroupIds
+              permissionType: $permissionType
+            ) {
+              id
+              myEffectivePermission
+              permissions {
+                id
+                user {
+                  id
+                }
+                userGroup {
+                  id
+                  members {
+                    user {
+                      id
+                    }
+                  }
+                }
+                type
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          userGroupIds: [toGlobalId("UserGroup", userGroups[0].id)],
+          permissionType: "WRITE",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createDashboardPermissions).toEqual({
+        id: toGlobalId("Dashboard", dashboard.id),
+        myEffectivePermission: "OWNER",
+        permissions: expect.toIncludeSameMembers([
+          {
+            id: expect.any(String),
+            user: { id: toGlobalId("User", user.id) },
+            userGroup: null,
+            type: "OWNER",
+          },
+          {
+            id: expect.any(String),
+            user: null,
+            userGroup: {
+              id: toGlobalId("UserGroup", userGroups[0].id),
+              members: [
+                { user: { id: toGlobalId("User", user.id) } },
+                { user: { id: toGlobalId("User", users[0].id) } },
+              ],
+            },
+            type: "WRITE",
+          },
+        ]),
+      });
+    });
+
+    it("creates permissions for multiple users and groups", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $userIds: [GID!]
+            $userGroupIds: [GID!]
+            $permissionType: DashboardPermissionType!
+          ) {
+            createDashboardPermissions(
+              dashboardId: $dashboardId
+              userIds: $userIds
+              userGroupIds: $userGroupIds
+              permissionType: $permissionType
+            ) {
+              id
+              myEffectivePermission
+              permissions {
+                id
+                user {
+                  id
+                }
+                userGroup {
+                  id
+                }
+                type
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          userIds: users.map((u) => toGlobalId("User", u.id)),
+          userGroupIds: userGroups.map((g) => toGlobalId("UserGroup", g.id)),
+          permissionType: "READ",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createDashboardPermissions).toEqual({
+        id: toGlobalId("Dashboard", dashboard.id),
+        myEffectivePermission: "OWNER",
+        permissions: expect.toIncludeSameMembers([
+          {
+            id: expect.any(String),
+            user: { id: toGlobalId("User", user.id) },
+            userGroup: null,
+            type: "OWNER",
+          },
+          {
+            id: expect.any(String),
+            user: { id: toGlobalId("User", users[0].id) },
+            userGroup: null,
+            type: "READ",
+          },
+          {
+            id: expect.any(String),
+            user: { id: toGlobalId("User", users[1].id) },
+            userGroup: null,
+            type: "READ",
+          },
+          {
+            id: expect.any(String),
+            user: { id: toGlobalId("User", users[2].id) },
+            userGroup: null,
+            type: "READ",
+          },
+          {
+            id: expect.any(String),
+            user: null,
+            userGroup: { id: toGlobalId("UserGroup", userGroups[0].id) },
+            type: "READ",
+          },
+          {
+            id: expect.any(String),
+            user: null,
+            userGroup: { id: toGlobalId("UserGroup", userGroups[1].id) },
+            type: "READ",
+          },
+          {
+            id: expect.any(String),
+            user: null,
+            userGroup: { id: toGlobalId("UserGroup", userGroups[2].id) },
+            type: "READ",
+          },
+        ]),
+      });
+    });
+
+    it("sends error if not passing userIds or userGroupIds", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($dashboardId: GID!, $permissionType: DashboardPermissionType!) {
+            createDashboardPermissions(dashboardId: $dashboardId, permissionType: $permissionType) {
+              id
+              myEffectivePermission
+              permissions {
+                id
+                user {
+                  id
+                }
+                type
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          permissionType: "READ",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        argName: "userIds, userGroupIds",
+        message: "Must pass at least one user or user group",
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error if user is not editor of the dashboard", async () => {
+      await mocks.knex
+        .from("dashboard_permission")
+        .where("id", ownerPermission.id)
+        .update({ type: "READ" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $userIds: [GID!]
+            $permissionType: DashboardPermissionType!
+          ) {
+            createDashboardPermissions(
+              dashboardId: $dashboardId
+              userIds: $userIds
+              permissionType: $permissionType
+            ) {
+              id
+              myEffectivePermission
+              permissions {
+                id
+                user {
+                  id
+                }
+                type
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          userIds: [toGlobalId("User", users[0].id)],
+          permissionType: "WRITE",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if trying to create OWNER permission", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $userIds: [GID!]
+            $permissionType: DashboardPermissionType!
+          ) {
+            createDashboardPermissions(
+              dashboardId: $dashboardId
+              userIds: $userIds
+              permissionType: $permissionType
+            ) {
+              id
+              myEffectivePermission
+              permissions {
+                id
+                user {
+                  id
+                }
+                type
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          userIds: [toGlobalId("User", users[0].id)],
+          permissionType: "OWNER",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        argName: "permissionType",
+        message: "Cannot create OWNER permission",
+      });
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("updateDashboardPermission", () => {
+    let dashboard: Dashboard;
+    let permissions: DashboardPermission[];
+
+    let users: User[];
+
+    let userGroups: UserGroup[];
+
+    let user0ApiKey: string;
+
+    beforeAll(async () => {
+      users = await mocks.createRandomUsers(organization.id, 3);
+      userGroups = await mocks.createUserGroups(3, organization.id, [
+        { name: "DASHBOARDS:LIST_DASHBOARDS", effect: "GRANT" },
+        { name: "DASHBOARDS:CREATE_DASHBOARDS", effect: "GRANT" },
+      ]);
+
+      ({ apiKey: user0ApiKey } = await mocks.createUserAuthToken("user0-apikey", users[0].id));
+
+      await mocks.insertUserGroupMembers(userGroups[0].id, [user.id, users[0].id]);
+    });
+
+    beforeEach(async () => {
+      [dashboard] = await mocks.knex
+        .from("dashboard")
+        .insert({
+          org_id: organization.id,
+          name: "My dashboard",
+        })
+        .returning("*");
+
+      permissions = await mocks.knex.from("dashboard_permission").insert(
+        [
+          {
+            dashboard_id: dashboard.id,
+            user_id: user.id,
+            type: "OWNER",
+          },
+          {
+            dashboard_id: dashboard.id,
+            user_id: users[0].id,
+            type: "WRITE",
+          },
+          {
+            dashboard_id: dashboard.id,
+            user_group_id: userGroups[0].id,
+            type: "READ",
+          },
+        ],
+        "*",
+      );
+    });
+
+    it("edits a permission for a user", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $permissionId: GID!
+            $newPermissionType: DashboardPermissionType!
+          ) {
+            updateDashboardPermission(
+              dashboardId: $dashboardId
+              permissionId: $permissionId
+              newPermissionType: $newPermissionType
+            ) {
+              id
+              user {
+                id
+              }
+              type
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          permissionId: toGlobalId("DashboardPermission", permissions[1].id),
+          newPermissionType: "READ",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateDashboardPermission).toEqual({
+        id: toGlobalId("DashboardPermission", permissions[1].id),
+        user: {
+          id: toGlobalId("User", users[0].id),
+        },
+        type: "READ",
+      });
+    });
+
+    it("edits a permission for a group", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $permissionId: GID!
+            $newPermissionType: DashboardPermissionType!
+          ) {
+            updateDashboardPermission(
+              dashboardId: $dashboardId
+              permissionId: $permissionId
+              newPermissionType: $newPermissionType
+            ) {
+              id
+              userGroup {
+                id
+              }
+              type
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          permissionId: toGlobalId("DashboardPermission", permissions[2].id),
+          newPermissionType: "WRITE",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateDashboardPermission).toEqual({
+        id: toGlobalId("DashboardPermission", permissions[2].id),
+        userGroup: {
+          id: toGlobalId("UserGroup", userGroups[0].id),
+        },
+        type: "WRITE",
+      });
+    });
+
+    it("sends error if user is not editor of the dashboard", async () => {
+      await mocks.knex
+        .from("dashboard_permission")
+        .where("id", permissions[1].id)
+        .update("type", "READ");
+
+      const { errors, data } = await testClient.withApiKey(user0ApiKey).execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $permissionId: GID!
+            $newPermissionType: DashboardPermissionType!
+          ) {
+            updateDashboardPermission(
+              dashboardId: $dashboardId
+              permissionId: $permissionId
+              newPermissionType: $newPermissionType
+            ) {
+              id
+              userGroup {
+                id
+              }
+              type
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          permissionId: toGlobalId("DashboardPermission", permissions[2].id),
+          newPermissionType: "WRITE",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if trying to edit the OWNER permission", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $permissionId: GID!
+            $newPermissionType: DashboardPermissionType!
+          ) {
+            updateDashboardPermission(
+              dashboardId: $dashboardId
+              permissionId: $permissionId
+              newPermissionType: $newPermissionType
+            ) {
+              id
+              userGroup {
+                id
+              }
+              type
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          permissionId: toGlobalId("DashboardPermission", permissions[0].id),
+          newPermissionType: "WRITE",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if trying to upgrade a permission to OWNER", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $permissionId: GID!
+            $newPermissionType: DashboardPermissionType!
+          ) {
+            updateDashboardPermission(
+              dashboardId: $dashboardId
+              permissionId: $permissionId
+              newPermissionType: $newPermissionType
+            ) {
+              id
+              userGroup {
+                id
+              }
+              type
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          permissionId: toGlobalId("DashboardPermission", permissions[1].id),
+          newPermissionType: "OWNER",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        argName: "newPermissionType",
+        message: "Cannot set permission to OWNER",
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error if target permission does not exist on the dashboard", async () => {
+      const [newDashboard] = await mocks.knex
+        .from("dashboard")
+        .insert({
+          org_id: organization.id,
+          name: "My dashboard",
+        })
+        .returning("*");
+
+      const [newPermission] = await mocks.knex.from("dashboard_permission").insert(
+        {
+          dashboard_id: newDashboard.id,
+          user_id: users[0].id,
+          type: "READ",
+        },
+        "*",
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $permissionId: GID!
+            $newPermissionType: DashboardPermissionType!
+          ) {
+            updateDashboardPermission(
+              dashboardId: $dashboardId
+              permissionId: $permissionId
+              newPermissionType: $newPermissionType
+            ) {
+              id
+              userGroup {
+                id
+              }
+              type
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          permissionId: toGlobalId("DashboardPermission", newPermission.id),
+          newPermissionType: "READ",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("deleteDashboardPermission", () => {
+    let dashboard: Dashboard;
+    let permissions: DashboardPermission[];
+
+    let users: User[];
+    let userGroups: UserGroup[];
+
+    let user0ApiKey: string;
+
+    beforeAll(async () => {
+      users = await mocks.createRandomUsers(organization.id, 3);
+      userGroups = await mocks.createUserGroups(3, organization.id, [
+        { name: "DASHBOARDS:LIST_DASHBOARDS", effect: "GRANT" },
+        { name: "DASHBOARDS:CREATE_DASHBOARDS", effect: "GRANT" },
+      ]);
+
+      await mocks.insertUserGroupMembers(userGroups[0].id, [user.id, users[0].id]);
+
+      ({ apiKey: user0ApiKey } = await mocks.createUserAuthToken("user0-apikey", users[0].id));
+    });
+
+    beforeEach(async () => {
+      [dashboard] = await mocks.knex
+        .from("dashboard")
+        .insert({
+          org_id: organization.id,
+          name: "My dashboard",
+        })
+        .returning("*");
+
+      permissions = await mocks.knex.from("dashboard_permission").insert(
+        [
+          {
+            dashboard_id: dashboard.id,
+            user_id: user.id,
+            type: "OWNER",
+          },
+          {
+            dashboard_id: dashboard.id,
+            user_id: users[0].id,
+            type: "WRITE",
+          },
+          {
+            dashboard_id: dashboard.id,
+            user_group_id: userGroups[0].id,
+            type: "READ",
+          },
+        ],
+        "*",
+      );
+    });
+    it("deletes a permission for a user", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($dashboardId: GID!, $permissionId: GID!) {
+            deleteDashboardPermission(dashboardId: $dashboardId, permissionId: $permissionId) {
+              id
+              myEffectivePermission
+              permissions {
+                user {
+                  id
+                }
+                userGroup {
+                  id
+                }
+                type
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          permissionId: toGlobalId("DashboardPermission", permissions[1].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deleteDashboardPermission).toEqual({
+        id: toGlobalId("Dashboard", dashboard.id),
+        myEffectivePermission: "OWNER",
+        permissions: expect.toIncludeSameMembers([
+          {
+            user: { id: toGlobalId("User", user.id) },
+            userGroup: null,
+            type: "OWNER",
+          },
+          {
+            user: null,
+            userGroup: { id: toGlobalId("UserGroup", userGroups[0].id) },
+            type: "READ",
+          },
+        ]),
+      });
+    });
+
+    it("deletes a permission for a group", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($dashboardId: GID!, $permissionId: GID!) {
+            deleteDashboardPermission(dashboardId: $dashboardId, permissionId: $permissionId) {
+              id
+              myEffectivePermission
+              permissions {
+                user {
+                  id
+                }
+                userGroup {
+                  id
+                }
+                type
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          permissionId: toGlobalId("DashboardPermission", permissions[2].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deleteDashboardPermission).toEqual({
+        id: toGlobalId("Dashboard", dashboard.id),
+        myEffectivePermission: "OWNER",
+        permissions: expect.toIncludeSameMembers([
+          {
+            user: { id: toGlobalId("User", user.id) },
+            userGroup: null,
+            type: "OWNER",
+          },
+          {
+            user: { id: toGlobalId("User", users[0].id) },
+            userGroup: null,
+            type: "WRITE",
+          },
+        ]),
+      });
+    });
+
+    it("sends error if trying to delete an OWNER permission", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($dashboardId: GID!, $permissionId: GID!) {
+            deleteDashboardPermission(dashboardId: $dashboardId, permissionId: $permissionId) {
+              id
+              myEffectivePermission
+              permissions {
+                user {
+                  id
+                }
+                userGroup {
+                  id
+                }
+                type
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          permissionId: toGlobalId("DashboardPermission", permissions[0].id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if user is not OWNER of the permission", async () => {
+      await mocks.knex
+        .from("dashboard_permission")
+        .where("id", permissions[1].id)
+        .update("type", "READ");
+
+      const { errors, data } = await testClient.withApiKey(user0ApiKey).execute(
+        gql`
+          mutation ($dashboardId: GID!, $permissionId: GID!) {
+            deleteDashboardPermission(dashboardId: $dashboardId, permissionId: $permissionId) {
+              id
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          permissionId: toGlobalId("DashboardPermission", permissions[1].id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if target permission does not exist on the dashboard", async () => {
+      const [newDashboard] = await mocks.knex
+        .from("dashboard")
+        .insert({
+          org_id: organization.id,
+          name: "My dashboard",
+        })
+        .returning("*");
+
+      const [newPermission] = await mocks.knex.from("dashboard_permission").insert(
+        {
+          dashboard_id: newDashboard.id,
+          user_id: users[0].id,
+          type: "READ",
+        },
+        "*",
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($dashboardId: GID!, $permissionId: GID!) {
+            deleteDashboardPermission(dashboardId: $dashboardId, permissionId: $permissionId) {
+              id
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboard.id),
+          permissionId: toGlobalId("DashboardPermission", newPermission.id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("reorderDashboards", () => {
+    it("reorders user dashboards", async () => {
+      const { data: queryData } = await testClient.execute(gql`
+        query {
+          me {
+            dashboards {
+              id
+            }
+          }
+        }
+      `);
+
+      const dashboards = queryData.me.dashboards as { id: string }[];
+      const randomReorder = shuffle(dashboards);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($ids: [GID!]!) {
+            reorderDashboards(ids: $ids) {
+              id
+              dashboards {
+                id
+              }
+            }
+          }
+        `,
+        {
+          ids: randomReorder.map((d) => d.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.reorderDashboards).toEqual({
+        id: toGlobalId("User", user.id),
+        dashboards: randomReorder,
+      });
     });
   });
 });

@@ -1,6 +1,6 @@
 import { inject } from "inversify";
 import { Knex } from "knex";
-import { indexBy, isNonNullish, isNullish, sumBy, unique } from "remeda";
+import { groupBy, indexBy, isNonNullish, isNullish, omit, sumBy, unique } from "remeda";
 import { assert } from "ts-essentials";
 import {
   PROFILE_TYPE_FIELD_SERVICE,
@@ -11,9 +11,12 @@ import { Replace } from "../../util/types";
 import {
   CreateDashboard,
   CreateDashboardModule,
+  CreateDashboardPermission,
   Dashboard,
   DashboardModule,
   DashboardModuleType,
+  DashboardPermission,
+  DashboardPermissionType,
   ProfileTypeField,
   User,
 } from "../__types";
@@ -29,6 +32,10 @@ import {
 import { KNEX } from "../knex";
 import { PetitionFilter } from "./PetitionRepository";
 import { ProfileFilter } from "./ProfileRepository";
+
+type UserDashboardPreferences = {
+  tab_order: number[];
+};
 
 type ModuleResultType =
   | {
@@ -109,9 +116,86 @@ export class DashboardRepository extends BaseRepository {
     q.whereNull("deleted_at"),
   );
 
-  public readonly loadDashboardsByOrgId = this.buildLoadMultipleBy("dashboard", "org_id", (q) =>
-    q.whereNull("deleted_at").orderBy("position", "asc"),
+  readonly loadDashboardsByUserId = this.buildLoader<number, Dashboard[]>(async (userIds, t) => {
+    if (userIds.length === 0) {
+      return [];
+    }
+
+    const rows = await this.raw<Dashboard & { user_id: number }>(
+      /* sql */ `
+        select 
+          d.*,
+          coalesce(dp.user_id, ugm.user_id) as user_id
+        from dashboard d
+        join dashboard_permission dp on dp.dashboard_id = d.id
+        left join user_group_member ugm on ugm.user_group_id = dp.user_group_id and ugm.user_id in :userIds and ugm.deleted_at is null
+        join "user" u on u.id = coalesce(dp.user_id, ugm.user_id)
+        where coalesce(dp.user_id, ugm.user_id) in :userIds
+        and d.deleted_at is null
+        and dp.deleted_at is null
+        and u.deleted_at is null
+        group by d.id, coalesce(dp.user_id, ugm.user_id), u.preferences
+        order by 
+          coalesce(dp.user_id, ugm.user_id),
+          case 
+            when u.preferences->'DASHBOARDS'->>'tab_order' is not null 
+            and jsonb_array_length(u.preferences->'DASHBOARDS'->'tab_order') > 0
+            then (
+              select position 
+              from jsonb_array_elements_text(u.preferences->'DASHBOARDS'->'tab_order') 
+              with ordinality as arr(element, position)
+              where element = d.id::text
+              limit 1
+            )
+            else null
+          end nulls last,
+          d.created_at
+      `,
+      { userIds: this.sqlIn(userIds) },
+      t,
+    );
+
+    const byUserId = groupBy(rows, (r) => r.user_id);
+    return userIds.map((id) => byUserId[id]?.map((u) => omit(u, ["user_id"])) ?? []);
+  });
+
+  readonly loadDashboardPermissionsByDashboardId = this.buildLoadMultipleBy(
+    "dashboard_permission",
+    "dashboard_id",
+    (q) => q.whereNull("deleted_at").orderBy("created_at", "asc"),
   );
+
+  readonly loadDashboardEffectivePermissions = this.buildLoader<
+    number,
+    { user_id: number; type: DashboardPermissionType }[]
+  >(async (ids, t) => {
+    if (ids.length === 0) {
+      return [];
+    }
+
+    const rows = await this.raw<{
+      dashboard_id: number;
+      user_id: number;
+      type: DashboardPermissionType;
+    }>(
+      /* sql */ `
+      select
+        dashboard_id, 
+        coalesce(dp.user_id, ugm.user_id) as user_id,
+        max(dp.type) as type
+        from dashboard_permission dp
+        left join user_group_member ugm on ugm.user_group_id = dp.user_group_id and ugm.deleted_at is null
+        where dp.dashboard_id in ?
+        and dp.deleted_at is null
+        group by dp.dashboard_id, coalesce(dp.user_id, ugm.user_id)
+      `,
+      [this.sqlIn(ids)],
+      t,
+    );
+
+    const byDashboardId = groupBy(rows, (r) => r.dashboard_id);
+    return ids.map((id) => byDashboardId[id] ?? []);
+  });
 
   public readonly loadModulesByDashboardId = this.buildLoadMultipleBy(
     "dashboard_module",
@@ -123,14 +207,10 @@ export class DashboardRepository extends BaseRepository {
     q.whereNull("deleted_at"),
   );
 
-  async createDashboard(data: Omit<CreateDashboard, "position">, createdBy: string) {
-    const orgDashboards = await this.loadDashboardsByOrgId.raw(data.org_id);
-    const lastDashboard = orgDashboards.at(-1);
-
+  async createDashboard(data: CreateDashboard, createdBy: string) {
     const [dashboard] = await this.from("dashboard").insert(
       {
         ...data,
-        position: lastDashboard ? lastDashboard.position + 1 : 0,
         created_at: this.now(),
         created_by: createdBy,
       },
@@ -138,6 +218,72 @@ export class DashboardRepository extends BaseRepository {
     );
 
     return dashboard;
+  }
+
+  async createDashboardPermissions(data: CreateDashboardPermission[], createdBy: string) {
+    if (data.length === 0) {
+      return [];
+    }
+
+    return await this.from("dashboard_permission")
+      .insert(
+        data.map((d) => ({
+          ...d,
+          created_by: createdBy,
+          created_at: this.now(),
+        })),
+        "*",
+      )
+      .onConflict()
+      .ignore();
+  }
+
+  async updateDashboardPermissionType(
+    dashboardId: number,
+    permissionId: number,
+    newType: DashboardPermissionType,
+    updatedBy: string,
+  ): Promise<DashboardPermission | undefined> {
+    const [permission] = await this.from("dashboard_permission")
+      .where({
+        id: permissionId,
+        dashboard_id: dashboardId,
+        deleted_at: null,
+      })
+      .whereNotIn("type", ["OWNER", newType])
+      .update(
+        {
+          type: newType,
+          updated_by: updatedBy,
+          updated_at: this.now(),
+        },
+        "*",
+      );
+
+    return permission;
+  }
+
+  async deleteDashboardPermission(
+    dashboardId: number,
+    permissionId: number,
+    deletedBy: string,
+  ): Promise<DashboardPermission | undefined> {
+    const [permission] = await this.from("dashboard_permission")
+      .where({
+        id: permissionId,
+        dashboard_id: dashboardId,
+        deleted_at: null,
+      })
+      .whereNot("type", "OWNER")
+      .update(
+        {
+          deleted_at: this.now(),
+          deleted_by: deletedBy,
+        },
+        "*",
+      );
+
+    return permission;
   }
 
   async updateDashboard(dashboardId: number, data: Partial<Dashboard>, updatedBy: string) {
@@ -176,14 +322,35 @@ export class DashboardRepository extends BaseRepository {
         deleted_at: this.now(),
         deleted_by: deletedBy,
       });
+
+    await this.from("dashboard_permission")
+      .where({
+        dashboard_id: dashboardId,
+        deleted_at: null,
+      })
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
+      });
+  }
+
+  async deleteDashboardPermissionByUserId(dashboardId: number, userId: number, deletedBy: string) {
+    await this.from("dashboard_permission")
+      .where({
+        dashboard_id: dashboardId,
+        user_id: userId,
+        deleted_at: null,
+      })
+      .whereNot("type", "OWNER")
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
+      });
   }
 
   async cloneDashboard(dashboardId: number, name: string, user: User) {
     const newDashboard = await this.createDashboard(
-      {
-        org_id: user.org_id,
-        name,
-      },
+      { org_id: user.org_id, name },
       `User:${user.id}`,
     );
 
@@ -731,6 +898,7 @@ export class DashboardRepository extends BaseRepository {
     await this.from("dashboard_module")
       .where("dashboard_id", dashboardId)
       .where("position", ">", module.position)
+      .whereNull("deleted_at")
       .update({
         updated_at: this.now(),
         updated_by: deletedBy,
@@ -789,5 +957,27 @@ export class DashboardRepository extends BaseRepository {
     ) {
       throw new Error("INVALID_MODULE_IDS");
     }
+  }
+
+  async updateUserDashboardPreferences(
+    userId: number,
+    dashboardPreferences: UserDashboardPreferences,
+    updatedBy: string,
+  ) {
+    const [user] = await this.raw<User>(
+      /* sql */ `
+      update "user" u
+      set 
+        "preferences" = u.preferences || ?,
+        "updated_at" = now(),
+        "updated_by" = ?
+      where u.id = ?
+      and u.deleted_at is null
+      returning *
+    `,
+      [this.json({ DASHBOARDS: dashboardPreferences }), updatedBy, userId],
+    );
+
+    return user;
   }
 }

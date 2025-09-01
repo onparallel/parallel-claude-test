@@ -24,6 +24,7 @@ export const DashboardProfilesRatioModule = Object.assign(
       module: DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragment;
       isEditing: boolean;
       isDragging: boolean;
+      isReadOnly: boolean;
       onEdit: () => void;
       onDelete: () => void;
     }

@@ -28,7 +28,7 @@ import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { Tooltip } from "@parallel/chakra/components";
 import { AddIcon, EditIcon, HomeIcon, PlusCircleIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { DialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import {
   RedirectError,
@@ -36,6 +36,7 @@ import {
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
+import { withPermission } from "@parallel/components/common/withPermission";
 import {
   DashboardModule,
   DashboardModule as DashboardModuleComponent,
@@ -52,6 +53,7 @@ import {
   Home_DashboardModuleFragment,
   Home_deleteDashboardDocument,
   Home_deleteDashboardModuleDocument,
+  Home_reorderDashboardsDocument,
   Home_updateDashboardDocument,
   Home_updateDashboardModulePositionsDocument,
   Home_userDocument,
@@ -73,6 +75,7 @@ import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { usePageVisibility } from "@parallel/utils/usePageVisibility";
 import { withMetadata } from "@parallel/utils/withMetadata";
+import { MotionConfig } from "framer-motion";
 import { memo, RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -102,7 +105,7 @@ function Home() {
   const { data: queryObject, refetch: refetchUser } = useAssertQuery(Home_userDocument);
   const { me } = queryObject;
 
-  const hasCrudPermissions = useHasPermission("DASHBOARDS:CRUD_DASHBOARDS");
+  const userCanCreateDashboards = useHasPermission("DASHBOARDS:CREATE_DASHBOARDS");
 
   const selectedDashboardId = state.dashboard || me.dashboards[0]?.id;
 
@@ -244,28 +247,31 @@ function Home() {
 
   const showConfirmDeleteDashboardDialog = useConfirmDeleteDashboardDialog();
   const [deleteDashboard] = useMutation(Home_deleteDashboardDocument);
-  const handleDeleteDashboard = useCallback(
-    async (dashboardId: string) => {
-      try {
-        await showConfirmDeleteDashboardDialog();
-        await deleteDashboard({ variables: { id: dashboardId } });
-        const { data: userData } = await refetchUser();
-        if (selectedDashboardId === dashboardId) {
-          setQueryState({ dashboard: userData?.me.dashboards[0]?.id ?? null });
-        }
-      } catch (error) {
-        showGenericErrorToast(error);
+  const handleDeleteDashboard = async (dashboardId: string) => {
+    try {
+      await showConfirmDeleteDashboardDialog({
+        isOwner: dashboard?.myEffectivePermission === "OWNER",
+      });
+      await deleteDashboard({ variables: { id: dashboardId } });
+      const { data: userData } = await refetchUser();
+      if (selectedDashboardId === dashboardId) {
+        setQueryState({ dashboard: userData?.me.dashboards[0]?.id ?? null });
       }
-    },
-    [
-      showConfirmDeleteDashboardDialog,
-      deleteDashboard,
-      refetchUser,
-      selectedDashboardId,
-      setQueryState,
-      showGenericErrorToast,
-    ],
-  );
+    } catch (error) {
+      if (error instanceof DialogError) {
+        return;
+      }
+      showGenericErrorToast(error);
+    }
+  };
+
+  const [reorderDashboards] = useMutation(Home_reorderDashboardsDocument);
+
+  const handleReorderDashboards = async (dashboardIds: string[]) => {
+    try {
+      await reorderDashboards({ variables: { ids: dashboardIds } });
+    } catch {}
+  };
 
   return (
     <AppLayout
@@ -321,50 +327,62 @@ function Home() {
             </HStack>
           </HStack>
           <Flex data-section="dashboards" minHeight="42px">
-            <DashboardTabs
-              onStateChange={setQueryState}
-              state={state}
-              dashboards={me.dashboards}
-              onCreateDashboard={handleCreateNewDashboard}
-              canCreateDashboard={hasCrudPermissions}
-              onRenameDashboard={handleRenameDashboard}
-              onCloneDashboard={handleCloneDashboard}
-              onDeleteDashboard={handleDeleteDashboard}
-              isEditing={isEditing}
-            />
-
-            {hasCrudPermissions ? (
-              <HStack padding={0.5}>
-                {isEditing && isNonNullish(dashboard) ? (
-                  <Button
-                    variant="outline"
-                    bg="white"
-                    ref={topAddModuleButtonRef}
-                    leftIcon={<AddIcon boxSize={3.5} />}
-                    onClick={() => handleAddModule(topAddModuleButtonRef)}
-                    fontWeight={500}
-                    isDisabled={dashboard.modules.length >= 20}
-                  >
-                    <FormattedMessage id="page.home.add-module" defaultMessage="Add module" />
-                  </Button>
-                ) : null}
-                <IconButtonWithTooltip
-                  colorScheme={isEditing ? "primary" : undefined}
-                  variant={isEditing ? "solid" : "outline"}
-                  backgroundColor={isEditing ? undefined : "white"}
-                  icon={<EditIcon />}
-                  label={
-                    isEditing
-                      ? intl.formatMessage({
-                          id: "page.home.exit-editing",
-                          defaultMessage: "Exit editing",
-                        })
-                      : intl.formatMessage({ id: "generic.edit", defaultMessage: "Edit" })
+            <MotionConfig reducedMotion="always">
+              <DashboardTabs
+                onStateChange={setQueryState}
+                state={state}
+                dashboards={me.dashboards}
+                onCreateDashboard={handleCreateNewDashboard}
+                canCreateDashboard={userCanCreateDashboards}
+                onRenameDashboard={handleRenameDashboard}
+                onCloneDashboard={handleCloneDashboard}
+                onDeleteDashboard={handleDeleteDashboard}
+                onReorder={handleReorderDashboards}
+                onRefetchDashboards={(resetState?: boolean) => {
+                  if (resetState) {
+                    setQueryState({
+                      dashboard: null,
+                    });
                   }
-                  onClick={handleEditDashboard}
-                />
-              </HStack>
-            ) : null}
+                  refetchUser();
+                }}
+                isEditing={isEditing}
+                userId={me.id}
+              />
+            </MotionConfig>
+
+            <HStack padding={0.5} alignItems="flex-end">
+              {isEditing && isNonNullish(dashboard) ? (
+                <Button
+                  variant="outline"
+                  bg="white"
+                  ref={topAddModuleButtonRef}
+                  leftIcon={<AddIcon boxSize={3.5} />}
+                  onClick={() => handleAddModule(topAddModuleButtonRef)}
+                  fontWeight={500}
+                  isDisabled={
+                    dashboard.modules.length >= 20 || dashboard.myEffectivePermission === "READ"
+                  }
+                >
+                  <FormattedMessage id="page.home.add-module" defaultMessage="Add module" />
+                </Button>
+              ) : null}
+              <IconButtonWithTooltip
+                colorScheme={isEditing ? "primary" : undefined}
+                variant={isEditing ? "solid" : "outline"}
+                backgroundColor={isEditing ? undefined : "white"}
+                icon={<EditIcon />}
+                label={
+                  isEditing
+                    ? intl.formatMessage({
+                        id: "page.home.exit-editing",
+                        defaultMessage: "Exit editing",
+                      })
+                    : intl.formatMessage({ id: "generic.edit", defaultMessage: "Edit" })
+                }
+                onClick={handleEditDashboard}
+              />
+            </HStack>
           </Flex>
         </Stack>
 
@@ -377,6 +395,7 @@ function Home() {
                 isEditing={isEditing}
                 onEditModule={handleEditModule}
                 onDeleteModule={handleDeleteModule}
+                isReadOnly={dashboard.myEffectivePermission === "READ"}
               />
               {isEditing && isNonNullish(dashboard) ? (
                 <Box>
@@ -386,7 +405,9 @@ function Home() {
                     leftIcon={<PlusCircleIcon />}
                     onClick={() => handleAddModule(bottomAddModuleButtonRef)}
                     fontWeight={500}
-                    isDisabled={dashboard.modules.length >= 20}
+                    isDisabled={
+                      dashboard.modules.length >= 20 || dashboard.myEffectivePermission === "READ"
+                    }
                   >
                     <FormattedMessage id="page.home.add-module" defaultMessage="Add module" />
                   </Button>
@@ -414,6 +435,9 @@ function Home() {
                     leftIcon={<AddIcon />}
                     onClick={() => handleAddModule(bottomAddModuleButtonRef)}
                     fontWeight={500}
+                    isDisabled={
+                      dashboard.modules.length >= 20 || dashboard.myEffectivePermission === "READ"
+                    }
                   >
                     <FormattedMessage id="page.home.add-module" defaultMessage="Add module" />
                   </Button>
@@ -423,7 +447,7 @@ function Home() {
           )}
         </Stack>
       </Stack>
-      {hasCrudPermissions && isNonNullish(dashboard) ? (
+      {isNonNullish(dashboard) ? (
         <DashboardModuleDrawer
           key={selectedModule?.id}
           finalFocusRef={addModuleButtonRef}
@@ -444,7 +468,6 @@ Home.fragments = {
         id
         dashboards {
           id
-          isDefault
           ...DashboardTabs_Dashboard
         }
       }
@@ -490,6 +513,7 @@ const _queries = [
         isRefreshing
         lastRefreshAt
         name
+        myEffectivePermission
         modules {
           id
           ...Home_DashboardModule
@@ -551,14 +575,19 @@ const _mutations = [
       }
     }
   `,
+  gql`
+    mutation Home_reorderDashboards($ids: [GID!]!) {
+      reorderDashboards(ids: $ids) {
+        id
+      }
+    }
+  `,
 ];
 
 Home.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDataContext) => {
   const state = parseQuery(query, QUERY_STATE);
   const { data } = await fetchQuery(Home_userDocument);
-  const dashboardId =
-    data.me.dashboards.find((d) => d.id === state.dashboard)?.id ??
-    data.me.dashboards.find((d) => d.isDefault)?.id;
+  const dashboardId = data.me.dashboards.find((d) => d.id === state.dashboard)?.id;
 
   if (isNonNullish(dashboardId ?? data.me.dashboards[0]?.id)) {
     await fetchQuery(Home_dashboardDocument, {
@@ -586,6 +615,7 @@ export default compose(
   withMetadata,
   withDialogs,
   withFeatureFlag("DASHBOARDS", "/app/petitions"),
+  withPermission("DASHBOARDS:LIST_DASHBOARDS", { orPath: "/app/petitions" }),
   withApolloData,
 )(Home);
 
@@ -593,6 +623,7 @@ interface DashboardGridProps {
   initialModules: Home_DashboardModuleFragment[];
   dashboardId: string | null | undefined;
   isEditing: boolean;
+  isReadOnly: boolean;
   onEditModule: (module: Home_DashboardModuleFragment) => void;
   onDeleteModule: (moduleId: string) => void;
 }
@@ -602,6 +633,7 @@ const DashboardGrid = memo(
     initialModules,
     dashboardId,
     isEditing,
+    isReadOnly,
     onEditModule,
     onDeleteModule,
   }: DashboardGridProps) => {
@@ -678,7 +710,11 @@ const DashboardGrid = memo(
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
       >
-        <SortableContext items={moduleIds} disabled={!isEditing} strategy={() => null}>
+        <SortableContext
+          items={moduleIds}
+          disabled={!isEditing || isReadOnly}
+          strategy={() => null}
+        >
           <Grid
             gridGap={4}
             templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }}
@@ -693,6 +729,7 @@ const DashboardGrid = memo(
                 onDelete={() => onDeleteModule(module.id)}
                 onEdit={() => onEditModule(module)}
                 isDragging={false}
+                isReadOnly={isReadOnly}
               />
             ))}
           </Grid>
@@ -706,6 +743,7 @@ const DashboardGrid = memo(
               isEditing={isEditing}
               onEdit={noop}
               onDelete={noop}
+              isReadOnly={isReadOnly}
             />
           ) : null}
         </DragOverlay>

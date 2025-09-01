@@ -1775,9 +1775,14 @@
     "context": "Delete adverse media search"
   },
   {
-    "term": "component.confirm-delete-dashboard-dialog.body",
-    "definition": "If continue, the dashboard will be permanently deleted.",
-    "context": "If continue, the dashboard will be permanently deleted."
+    "term": "component.confirm-delete-dashboard-dialog.body-not-owner",
+    "definition": "If you continue, you will lose access to the dashboard. Other users will still have access.",
+    "context": "If you continue, you will lose access to the dashboard. Other users will still have access."
+  },
+  {
+    "term": "component.confirm-delete-dashboard-dialog.body-owner",
+    "definition": "If you continue, the dashboard will be permanently deleted for you and for every user that has access to it.",
+    "context": "If you continue, the dashboard will be permanently deleted for you and for every user that has access to it."
   },
   {
     "term": "component.confirm-delete-dashboard-dialog.header",
@@ -2095,6 +2100,11 @@
     "context": "Reactivate contact access"
   },
   {
+    "term": "component.confirm-remove-dashboard-permission-dialog.message-own",
+    "definition": "Are you sure you want to remove your own permission? Doing so will cause you to lose access.",
+    "context": "Are you sure you want to remove your own permission? Doing so will cause you to lose access."
+  },
+  {
     "term": "component.confirm-remove-entity-dialog.body-with-monitoring",
     "definition": "If you proceed, the saved entity will be deleted, interrupting monitoring and erasing the search history, if any. Are you sure you want to remove this entity?",
     "context": "If you proceed, the saved entity will be deleted, interrupting monitoring and erasing the search history, if any. Are you sure you want to remove this entity?"
@@ -2395,6 +2405,16 @@
     "context": "Write the reason for forcing the approval"
   },
   {
+    "term": "component.confirm-stop-sharing-dashboard-dialog.header",
+    "definition": "Stop sharing",
+    "context": "Stop sharing"
+  },
+  {
+    "term": "component.confirm-stop-sharing-dashboard-dialog.message",
+    "definition": "Are you sure you want to stop sharing this dashboard with {name}?",
+    "context": "Are you sure you want to stop sharing this dashboard with {name}?"
+  },
+  {
     "term": "component.confirm-transfer-petition-ownership-dialog.confirm-button",
     "definition": "Yes, transfer",
     "context": "Yes, transfer"
@@ -2443,6 +2463,16 @@
     "term": "component.confirm-update-adverse-media-dialog.yes-modify",
     "definition": "Yes, modify",
     "context": "Yes, modify"
+  },
+  {
+    "term": "component.confirm-update-dashboard-permission-dialog.header",
+    "definition": "Edit permissions",
+    "context": "Edit permissions"
+  },
+  {
+    "term": "component.confirm-update-dashboard-permission-dialog.message",
+    "definition": "Are you sure you want to modify your own permission? If you do you will lose the ability to edit.",
+    "context": "Are you sure you want to modify your own permission? If you do you will lose the ability to edit."
   },
   {
     "term": "component.confirm-update-entity-dialog.body",
@@ -3313,6 +3343,21 @@
     "term": "component.dashboard-profiles-pie-chart-module.view-profiles",
     "definition": "View profiles for: {segment}",
     "context": "View profiles for: {segment}"
+  },
+  {
+    "term": "component.dashboard-sharing-dialog.header",
+    "definition": "Share with people and teams",
+    "context": "Share with people and teams"
+  },
+  {
+    "term": "component.dashboard-sharing-dialog.input-placeholder-not-allowed",
+    "definition": "Only the dashboard editors can share it",
+    "context": "Only the dashboard editors can share it"
+  },
+  {
+    "term": "component.dashboard-sharing-dialog.sharing-success-title",
+    "definition": "Dashboard shared successfully",
+    "context": "Dashboard shared successfully"
   },
   {
     "term": "component.dashboard-tabs.clone-dashboard-header",
@@ -14070,6 +14115,21 @@
     "context": "Filters"
   },
   {
+    "term": "generic.dashboard-permission-type-owner",
+    "definition": "Owner",
+    "context": "Owner"
+  },
+  {
+    "term": "generic.dashboard-permission-type-reader",
+    "definition": "Reader",
+    "context": "Reader"
+  },
+  {
+    "term": "generic.dashboard-permission-type-write",
+    "definition": "Editor",
+    "context": "Editor"
+  },
+  {
     "term": "generic.days",
     "definition": "days",
     "context": "days"
@@ -17145,14 +17205,24 @@
     "context": "Grants users in this team permissions to view the list of contacts on the organization."
   },
   {
-    "term": "page.permissions-group.dashboards-crud",
-    "definition": "Create and manage dashboards",
-    "context": "Create and manage dashboards"
+    "term": "page.permissions-group.dashboards-create",
+    "definition": "Create dashboards",
+    "context": "Create dashboards"
   },
   {
-    "term": "page.permissions-group.dashboards-crud-description",
-    "definition": "Grants users in this team permissions to create and manage dashboards.",
-    "context": "Grants users in this team permissions to create and manage dashboards."
+    "term": "page.permissions-group.dashboards-list",
+    "definition": "View dashboards",
+    "context": "View dashboards"
+  },
+  {
+    "term": "page.permissions-group.dashboards-list-description",
+    "definition": "Grants users in this team permissions to access the dashboards page.",
+    "context": "Grants users in this team permissions to access the dashboards page."
+  },
+  {
+    "term": "page.permissions-group.dashboards-update-description",
+    "definition": "Grants users in this team permissions to create and manage new dashboards.",
+    "context": "Grants users in this team permissions to create and manage new dashboards."
   },
   {
     "term": "page.permissions-group.delete-contacts",

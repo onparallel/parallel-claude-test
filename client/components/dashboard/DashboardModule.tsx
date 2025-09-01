@@ -16,6 +16,7 @@ export interface DashboardModuleProps extends BoxProps {
   module: DashboardModule_DashboardModuleFragment;
   isEditing: boolean;
   isDragging: boolean;
+  isReadOnly: boolean;
   onEdit: () => void;
   onDelete: () => void;
   attributes?: DraggableAttributes;

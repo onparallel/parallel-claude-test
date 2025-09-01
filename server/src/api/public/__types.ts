@@ -595,11 +595,14 @@ export type CreatedAt = {
 
 export type Dashboard = {
   id: Scalars["GID"]["output"];
+  /** @deprecated remove! */
   isDefault: Scalars["Boolean"]["output"];
   isRefreshing: Scalars["Boolean"]["output"];
   lastRefreshAt: Maybe<Scalars["DateTime"]["output"]>;
   modules: Array<DashboardModule>;
+  myEffectivePermission: DashboardPermissionType;
   name: Scalars["String"]["output"];
+  permissions: Array<DashboardPermission>;
 };
 
 export type DashboardCreatePetitionButtonModule = DashboardModule & {
@@ -718,6 +721,15 @@ export type DashboardModuleResultMultiItem = {
 };
 
 export type DashboardModuleSize = "LARGE" | "MEDIUM" | "SMALL";
+
+export type DashboardPermission = {
+  id: Scalars["GID"]["output"];
+  type: DashboardPermissionType;
+  user: Maybe<User>;
+  userGroup: Maybe<UserGroup>;
+};
+
+export type DashboardPermissionType = "OWNER" | "READ" | "WRITE";
 
 export type DashboardPetitionsNumberModule = DashboardModule & {
   id: Scalars["GID"]["output"];
@@ -1349,6 +1361,7 @@ export type Mutation = {
   createCustomSignatureDocumentUploadLink: Scalars["JSONObject"]["output"];
   /** Creates a new empty dashboard in the organization */
   createDashboard: Dashboard;
+  createDashboardPermissions: Dashboard;
   /** Creates a new Dow Jones KYC integration on the user's organization */
   createDowJonesKycIntegration: OrgIntegration;
   /** Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document */
@@ -1472,6 +1485,7 @@ export type Mutation = {
   /** Deletes a dashboard */
   deleteDashboard: Success;
   deleteDashboardModule: Dashboard;
+  deleteDashboardPermission: Dashboard;
   /** Removes the DOW JONES integration of the user's organization */
   deleteDowJonesKycIntegration: Organization;
   /** Deletes a subscription signature key */
@@ -1628,6 +1642,7 @@ export type Mutation = {
   reopenPetition: Petition;
   /** Reopens a profile that is in CLOSED or DELETION_SCHEDULED status */
   reopenProfile: Array<Profile>;
+  reorderDashboards: User;
   /** Reorders the positions of attachments in the petition */
   reorderPetitionAttachments: PetitionBase;
   /** Changes the ordering of a user's petition list views */
@@ -1709,6 +1724,7 @@ export type Mutation = {
   /** Updates a dashboard */
   updateDashboard: Dashboard;
   updateDashboardModulePositions: Dashboard;
+  updateDashboardPermission: DashboardPermission;
   updateEinformaCustomProperties: SupportMethodResponse;
   /** Activate or deactivate a list of organization feature flag */
   updateFeatureFlags: Organization;
@@ -2068,6 +2084,13 @@ export type MutationcreateCustomSignatureDocumentUploadLinkArgs = {
 
 export type MutationcreateDashboardArgs = {
   name: Scalars["String"]["input"];
+};
+
+export type MutationcreateDashboardPermissionsArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  permissionType: DashboardPermissionType;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationcreateDowJonesKycIntegrationArgs = {
@@ -2455,6 +2478,11 @@ export type MutationdeleteDashboardArgs = {
 export type MutationdeleteDashboardModuleArgs = {
   dashboardId: Scalars["GID"]["input"];
   moduleId: Scalars["GID"]["input"];
+};
+
+export type MutationdeleteDashboardPermissionArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  permissionId: Scalars["GID"]["input"];
 };
 
 export type MutationdeleteEventSubscriptionSignatureKeysArgs = {
@@ -2912,6 +2940,10 @@ export type MutationreopenProfileArgs = {
   profileIds: Array<Scalars["GID"]["input"]>;
 };
 
+export type MutationreorderDashboardsArgs = {
+  ids: Array<Scalars["GID"]["input"]>;
+};
+
 export type MutationreorderPetitionAttachmentsArgs = {
   attachmentIds: Array<Scalars["GID"]["input"]>;
   attachmentType: PetitionAttachmentType;
@@ -3162,6 +3194,12 @@ export type MutationupdateDashboardArgs = {
 export type MutationupdateDashboardModulePositionsArgs = {
   dashboardId: Scalars["GID"]["input"];
   moduleIds: Array<Scalars["GID"]["input"]>;
+};
+
+export type MutationupdateDashboardPermissionArgs = {
+  dashboardId: Scalars["GID"]["input"];
+  newPermissionType: DashboardPermissionType;
+  permissionId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateEinformaCustomPropertiesArgs = {

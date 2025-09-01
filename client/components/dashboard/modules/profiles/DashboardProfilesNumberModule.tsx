@@ -23,6 +23,7 @@ export const DashboardProfilesNumberModule = Object.assign(
       module: DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragment;
       isEditing: boolean;
       isDragging: boolean;
+      isReadOnly: boolean;
       onEdit: () => void;
       onDelete: () => void;
     }

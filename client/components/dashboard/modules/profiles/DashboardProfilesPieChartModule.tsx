@@ -30,6 +30,7 @@ export const DashboardProfilesPieChartModule = Object.assign(
       module: DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragment;
       isEditing: boolean;
       isDragging: boolean;
+      isReadOnly: boolean;
       onEdit: () => void;
       onDelete: () => void;
     }
