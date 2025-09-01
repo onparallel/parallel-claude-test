@@ -6612,7 +6612,7 @@ export class PetitionRepository extends BaseRepository {
         .distinctOn("user.id", "petition_permission.petition_id")
         .orderBy("user.id", "asc")
         .orderBy("petition_permission.petition_id", "asc")
-        // prioritize permissions subscribed to notifications
+        // make sure distinct on picks any subscribed permission as any subscribed row means user is subscribed to the petition
         .orderBy("petition_permission.is_subscribed", "desc")
         .select<(User & { is_subscribed: boolean; petition_id: number })[]>(
           "user.*",
