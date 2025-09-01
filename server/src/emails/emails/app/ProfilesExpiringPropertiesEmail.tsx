@@ -3,7 +3,8 @@ import { outdent } from "outdent";
 import { FormattedDate, FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { groupBy } from "remeda";
 import { FORMATS } from "../../../util/dates";
-import { ExpiringProperty } from "../../../workers/emails/profiles-expiring-properties";
+
+import { ExpiringProperty } from "../../../workers/queues/email-builders/ProfilesExpiringPropertiesEmailBuilder";
 import { Email } from "../../buildEmail";
 import { Button } from "../../components/Button";
 import { Layout, LayoutProps } from "../../components/Layout";

@@ -5,7 +5,7 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import pMap from "p-map";
 import { assert } from "ts-essentials";
-import { OrganizationUsageLimitName } from "../db/__types";
+import { OrganizationUsageLimitName, UserLocale } from "../db/__types";
 import {
   PetitionRepository,
   type PetitionSignatureConfigSigner,
@@ -13,7 +13,7 @@ import {
 import { ProfilesExpiringPropertiesEmailProps } from "../emails/emails/app/ProfilesExpiringPropertiesEmail";
 import { isValidEmail } from "../graphql/helpers/validators/validEmail";
 import { Maybe, MaybeArray, unMaybeArray } from "../util/types";
-import { EmailPayload } from "../workers/email-sender";
+import { EmailPayload } from "../workers/queues/EmailSenderQueue";
 import { QUEUES_SERVICE, QueuesService } from "./QueuesService";
 
 export interface IEmailsService {
@@ -118,6 +118,13 @@ export interface IEmailsService {
   sendPetitionApprovalRequestStepCanceledEmail(
     approvalRequestStepId: number,
     userId: number,
+  ): Promise<void>;
+  sendInvitationEmail(
+    userCognitoId: string,
+    isNewUser: boolean,
+    locale: UserLocale,
+    orgName: string,
+    orgUser: string,
   ): Promise<void>;
   onPetitionMessageBounced(petitionMessageId: number, updatedBy: string): Promise<void>;
   onPetitionReminderBounced(petitionReminderId: number, updatedBy: string): Promise<void>;
@@ -471,6 +478,23 @@ export class EmailsService implements IEmailsService {
       id: this.buildQueueId("PetitionApprovalRequestStepCanceled", [approvalRequestStepId, userId]),
       petition_approval_request_step_id: approvalRequestStepId,
       user_id: userId,
+    });
+  }
+
+  async sendInvitationEmail(
+    userCognitoId: string,
+    isNewUser: boolean,
+    locale: UserLocale,
+    orgName: string,
+    orgUser: string,
+  ): Promise<void> {
+    return await this.enqueueEmail("invitation", {
+      id: this.buildQueueId("Invitation", userCognitoId),
+      is_new_user: isNewUser,
+      locale,
+      org_name: orgName,
+      org_user: orgUser,
+      user_cognito_id: userCognitoId,
     });
   }
 

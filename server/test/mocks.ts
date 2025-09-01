@@ -163,6 +163,7 @@ export class MockEmailsService implements IEmailsService {
   async sendPetitionApprovalRequestStepApprovedEmail() {}
   async sendPetitionApprovalRequestStepRejectedEmail() {}
   async sendPetitionApprovalRequestStepCanceledEmail() {}
+  async sendInvitationEmail() {}
   async validateEmail(email: string) {
     return isValidEmail(email);
   }

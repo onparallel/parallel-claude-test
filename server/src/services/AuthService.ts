@@ -52,12 +52,11 @@ import { withError } from "../util/promises/withError";
 import { withForcedDelay } from "../util/promises/withForcedDelay";
 import { random } from "../util/token";
 import { Maybe, MaybePromise } from "../util/types";
-import { EmailPayload } from "../workers/email-sender";
 import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./AccountSetupService";
+import { EMAILS, IEmailsService } from "./EmailsService";
 import { FETCH_SERVICE, IFetchService } from "./FetchService";
 import { IJwtService, JWT_SERVICE } from "./JwtService";
 import { ILogger, LOGGER } from "./Logger";
-import { IQueuesService, QUEUES_SERVICE } from "./QueuesService";
 import { IRedis, REDIS } from "./Redis";
 
 export interface IAuth {
@@ -129,10 +128,10 @@ export class Auth implements IAuth {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(REDIS) private redis: IRedis,
-    @inject(QUEUES_SERVICE) private queues: IQueuesService,
     @inject(LOGGER) private logger: ILogger,
     @inject(ACCOUNT_SETUP_SERVICE) public readonly accountSetup: IAccountSetupService,
     @inject(JWT_SERVICE) private jwt: IJwtService,
+    @inject(EMAILS) private emails: IEmailsService,
     @inject(OrganizationRepository) private orgs: OrganizationRepository,
     @inject(IntegrationRepository) private integrations: IntegrationRepository,
     @inject(UserRepository) private users: UserRepository,
@@ -166,13 +165,13 @@ export class Auth implements IAuth {
     try {
       const user = await this.getUser(email);
       if (sendInviteEmail) {
-        await this.sendInvitationEmail({
-          user_cognito_id: user.Username!,
-          is_new_user: false,
-          locale: clientMetadata.locale,
-          org_name: clientMetadata.organizationName,
-          org_user: clientMetadata.organizationUser,
-        });
+        await this.emails.sendInvitationEmail(
+          user.Username!,
+          false,
+          clientMetadata.locale,
+          clientMetadata.organizationName,
+          clientMetadata.organizationUser,
+        );
       }
       return user.Username!;
     } catch (error: any) {
@@ -1138,16 +1137,6 @@ export class Auth implements IAuth {
         ContextData: contextData,
       }),
     );
-  }
-
-  private async sendInvitationEmail(payload: EmailPayload["invitation"]) {
-    await this.queues.enqueueMessages("email-sender", {
-      groupId: `user-invite-${payload.user_cognito_id}`,
-      body: {
-        type: "invitation",
-        payload,
-      },
-    });
   }
 
   private asUserLocale(locale: Maybe<string>): UserLocale {
