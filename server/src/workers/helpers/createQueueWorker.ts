@@ -8,6 +8,7 @@ import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
 import { WorkerContext } from "../../context";
 import { ILogger, LOGGER } from "../../services/Logger";
+import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { awsLogger } from "../../util/awsLogger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
@@ -106,6 +107,8 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
         const worker = container.get<QueueWorker<QueueWorkerPayload<Q>>>(workerImplementation);
         try {
           await worker.handler(parser(payload));
+          const queuesService = container.get<IQueuesService>(QUEUES_SERVICE);
+          await queuesService.waitForPendingMessages(30_000);
         } catch (e) {
           if (e instanceof Error) {
             logger.error(e.message, { stack: e.stack });
@@ -172,6 +175,8 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                     },
                     { concurrency: processBatchWithConcurrency },
                   );
+                  const queuesService = container.get<IQueuesService>(QUEUES_SERVICE);
+                  await queuesService.waitForPendingMessages(30_000);
                 },
               }
             : {
@@ -228,6 +233,8 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                           }
                           throw e;
                         }
+                        const queuesService = container.get<IQueuesService>(QUEUES_SERVICE);
+                        await queuesService.waitForPendingMessages(30_000);
                       }
                     });
                     logger.info(`Queue ${name}: Successfully processed message in ${duration}ms`, {

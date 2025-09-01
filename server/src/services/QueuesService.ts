@@ -2,16 +2,19 @@ import { SendMessageBatchCommand, SendMessageCommand, SQSClient } from "@aws-sdk
 import { createHash } from "crypto";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { chunk, isNonNullish } from "remeda";
+import { isNonNullish } from "remeda";
 import { Memoize } from "typescript-memoize";
 import { CONFIG, Config } from "../config";
 import { TableTypes } from "../db/helpers/BaseRepository";
 import { awsLogger } from "../util/awsLogger";
+import { pMapChunk } from "../util/promises/pMapChunk";
+import { waitFor } from "../util/promises/waitFor";
 import { MaybeArray, unMaybeArray } from "../util/types";
 import { QueueWorkerPayload_OLD } from "../workers/helpers/createQueueWorker_OLD";
 import { ILogger, LOGGER } from "./Logger";
 
 export interface IQueuesService {
+  waitForPendingMessages(maxWaitTime?: number): Promise<void>;
   enqueueMessages<Q extends keyof Config["queueWorkers"]>(
     queue: Q,
     messages:
@@ -50,6 +53,8 @@ export class QueuesService implements IQueuesService {
     });
   }
 
+  private pending: Promise<void>[] = [];
+
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(LOGGER) private logger: ILogger,
@@ -59,6 +64,14 @@ export class QueuesService implements IQueuesService {
     return createHash("md5").update(value).digest("hex");
   }
 
+  public async waitForPendingMessages(maxWaitTime?: number) {
+    if (isNonNullish(maxWaitTime)) {
+      await Promise.race([Promise.all(this.pending), waitFor(maxWaitTime)]);
+    } else {
+      await Promise.all(this.pending);
+    }
+  }
+
   async enqueueMessages<Q extends keyof Config["queueWorkers"]>(
     queue: Q,
     messages:
@@ -66,18 +79,16 @@ export class QueuesService implements IQueuesService {
       | { body: QueueWorkerPayload_OLD<Q>; groupId?: string; delaySeconds?: number },
     t?: Knex.Transaction,
   ) {
-    if (isNonNullish(t)) {
-      if (!t.isCompleted()) {
-        t.executionPromise
-          .then(() => this.sendSQSMessage(queue, messages))
-          .catch((error) => {
-            this.logger.error(error);
-          });
-      } else {
-        this.sendSQSMessage(queue, messages).catch((error) => {
+    if (isNonNullish(t) && t.isCompleted()) {
+      const promise = t.executionPromise
+        .then(() => this.sendSQSMessage(queue, messages))
+        .catch((error) => {
           this.logger.error(error);
+        })
+        .finally(() => {
+          this.pending.splice(this.pending.indexOf(promise), 1);
         });
-      }
+      this.pending.push(promise);
     } else {
       await this.sendSQSMessage(queue, messages);
     }
@@ -102,20 +113,24 @@ export class QueuesService implements IQueuesService {
   ) {
     const queueUrl = this.config.queueWorkers[queue].queueUrl;
     if (Array.isArray(messages)) {
-      for (const batch of chunk(messages, 10)) {
-        await this.sqs.send(
-          new SendMessageBatchCommand({
-            QueueUrl: queueUrl,
-            Entries: batch.map(({ id, body, groupId, deduplicationId, delaySeconds }) => ({
-              Id: this.hash(id),
-              MessageBody: JSON.stringify(body),
-              MessageGroupId: groupId ? this.hash(groupId) : undefined,
-              MessageDeduplicationId: deduplicationId,
-              DelaySeconds: delaySeconds,
-            })),
-          }),
-        );
-      }
+      await pMapChunk(
+        messages,
+        async (batch) => {
+          await this.sqs.send(
+            new SendMessageBatchCommand({
+              QueueUrl: queueUrl,
+              Entries: batch.map(({ id, body, groupId, deduplicationId, delaySeconds }) => ({
+                Id: this.hash(id),
+                MessageBody: JSON.stringify(body),
+                MessageGroupId: groupId ? this.hash(groupId) : undefined,
+                MessageDeduplicationId: deduplicationId,
+                DelaySeconds: delaySeconds,
+              })),
+            }),
+          );
+        },
+        { chunkSize: 10, concurrency: 100 },
+      );
     } else {
       await this.sqs.send(
         new SendMessageCommand({

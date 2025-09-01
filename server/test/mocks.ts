@@ -173,6 +173,7 @@ export class MockQueuesService implements IQueuesService {
   constructor() {}
   async enqueueMessages() {}
   async enqueueEvents() {}
+  async waitForPendingMessages() {}
 }
 
 class MockStorageImpl implements IStorageImpl {
