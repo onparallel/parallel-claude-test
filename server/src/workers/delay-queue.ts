@@ -1,19 +1,8 @@
-import { Config } from "../config";
-import { createQueueWorker_OLD, QueueWorkerPayload_OLD } from "./helpers/createQueueWorker_OLD";
+import { createQueueWorker } from "./helpers/createQueueWorker";
+import { DelayQueue } from "./queues/DelayQueue";
 
-type OtherQueues = Exclude<keyof Config["queueWorkers"], "delay-queue">;
-
-export type DelayQueuePayload = {
-  [Q in OtherQueues]: {
-    queue: Q;
-    body: QueueWorkerPayload_OLD<Q>;
-    groupId: string;
-  };
-}[OtherQueues];
-
-createQueueWorker_OLD("delay-queue", async ({ queue, body, groupId }, ctx) => {
-  await ctx.queues.enqueueMessages(queue, {
-    body,
-    groupId,
-  });
+createQueueWorker("delay-queue", DelayQueue, {
+  pollingBatchSize: 10,
+  processBatchConcurrently: true,
+  processBatchWithConcurrency: 10,
 });

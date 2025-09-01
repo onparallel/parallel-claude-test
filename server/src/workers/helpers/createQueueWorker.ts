@@ -1,5 +1,6 @@
 import { SQSClient } from "@aws-sdk/client-sqs";
 import { fork } from "child_process";
+import DataLoader from "dataloader";
 import { ContainerModule, injectable } from "inversify";
 import pMap from "p-map";
 import { Consumer } from "sqs-consumer";
@@ -13,9 +14,9 @@ import { awsLogger } from "../../util/awsLogger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
 import { MaybePromise } from "../../util/types";
-import { DelayQueuePayload } from "../delay-queue";
 import { EmailEventsWorkerPayload } from "../email-events";
 import { EmailSenderWorkerPayload } from "../email-sender";
+import { DelayQueuePayload } from "../queues/DelayQueue";
 import { EventProcessorPayload } from "../queues/EventProcessorQueue";
 import { WebhooksWorkerPayload } from "../queues/WebhooksWorkerQueue";
 import { SignatureWorkerPayload } from "../signature-worker";
@@ -55,6 +56,23 @@ export interface QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> {
 @injectable()
 export abstract class QueueWorker<T> {
   abstract handler(payload: T): Promise<void>;
+}
+
+@injectable()
+export abstract class BatchQueueWorker<T> extends QueueWorker<T> {
+  private _dataloader = new DataLoader<T, null>(
+    async (keys) => {
+      await this.handleBatch(keys as T[]);
+      return keys.map(() => null);
+    },
+    { cache: false },
+  );
+
+  abstract handleBatch(payload: T[]): Promise<void>;
+
+  override async handler(payload: T) {
+    await this._dataloader.load(payload);
+  }
 }
 
 export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
