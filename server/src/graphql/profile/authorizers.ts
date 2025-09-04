@@ -1,5 +1,6 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { groupBy, indexBy, isNonNullish, isNullish, pick, unique, zip } from "remeda";
+import { isDeepStrictEqual } from "util";
 import {
   Profile,
   ProfileStatus,
@@ -816,6 +817,40 @@ export function profileTypeProcessBelongsToProfileType<
     );
     if (!processesBelongToProfileType) {
       throw new ForbiddenError("Profile type process does not belong to profile type");
+    }
+
+    return true;
+  };
+}
+
+export function ifProfileTypeFieldPropertyChanged<
+  TypeName extends string,
+  FieldName extends string,
+  TIdArg extends Arg<TypeName, FieldName, number>,
+  TPropArg extends Arg<TypeName, FieldName, NexusGenInputs["UpdateProfileTypeFieldInput"]>,
+>(
+  idProfileTypeFieldArg: TIdArg,
+  dataArg: TPropArg,
+  dataKey: MaybeArray<"name" | "alias" | "options">,
+  thenAuthorizer: FieldAuthorizeResolver<TypeName, FieldName>,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (root, args, ctx, info) => {
+    const profileTypeFieldId = getArg(args, idProfileTypeFieldArg);
+    const profileTypeField = await ctx.profiles.loadProfileTypeField(profileTypeFieldId);
+
+    if (isNullish(profileTypeField)) {
+      return false;
+    }
+
+    const data = getArg(args, dataArg);
+    for (const key of unMaybeArray(dataKey)) {
+      if (data[key] === undefined) {
+        continue;
+      }
+
+      if (!isDeepStrictEqual(data[key], profileTypeField[key])) {
+        return await thenAuthorizer(root, args, ctx, info);
+      }
     }
 
     return true;

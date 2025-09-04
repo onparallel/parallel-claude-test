@@ -199,7 +199,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
   });
   const {
     control,
-    formState: { errors, dirtyFields },
+    formState: { errors },
     register,
     handleSubmit,
     watch,
@@ -216,61 +216,6 @@ function CreateOrUpdateProfileTypeFieldDialog({
   const showProfilesWithSameContentDialog = useDialog(ProfilesWithSameContentDialog);
 
   const expirationOptions = useExpirationOptions();
-
-  function getDirtyFields(formData: CreateOrUpdateProfileTypeFieldDialogFormData) {
-    const dirtyData: Partial<UpdateProfileTypeFieldInput> = {};
-
-    // Only include fields that are dirty
-    if (dirtyFields.name) {
-      dirtyData.name = formData.name;
-    }
-    if (dirtyFields.alias) {
-      dirtyData.alias = formData.alias === "" ? null : formData.alias;
-    }
-    if (dirtyFields.isExpirable) {
-      dirtyData.isExpirable = formData.isExpirable;
-    }
-    if (dirtyFields.expiryAlertAheadTime) {
-      dirtyData.expiryAlertAheadTime =
-        formData.isExpirable && formData.expiryAlertAheadTime !== "DO_NOT_REMIND"
-          ? expirationToDuration(formData.expiryAlertAheadTime)
-          : null;
-    }
-    if (dirtyFields.isUnique) {
-      dirtyData.isUnique = formData.isUnique;
-    }
-    if (dirtyFields.options) {
-      if (formData.type === "SELECT" || formData.type === "CHECKBOX") {
-        dirtyData.options = {
-          standardList:
-            formData.options.listingType === "STANDARD" ? formData.options.standardList : null,
-          values:
-            formData.options.listingType === "STANDARD"
-              ? []
-              : formData.options.values!.map((value: any) => omit(value, ["id", "existing"])),
-        };
-        if (formData.type === "SELECT") {
-          dirtyData.options.showOptionsWithColors = formData.options.showOptionsWithColors ?? false;
-        }
-      } else if (formData.type === "DATE") {
-        dirtyData.options = {
-          useReplyAsExpiryDate:
-            formData.isExpirable && formData.options.useReplyAsExpiryDate ? true : false,
-        };
-      } else if (formData.type === "BACKGROUND_CHECK") {
-        dirtyData.options = {
-          monitoring: formData.options.hasMonitoring ? formData.options.monitoring : null,
-          autoSearchConfig: formData.options.autoSearchConfig,
-        };
-      } else if (formData.type === "ADVERSE_MEDIA_SEARCH") {
-        dirtyData.options = formData.options.hasMonitoring
-          ? { monitoring: formData.options.monitoring }
-          : { monitoring: null };
-      }
-    }
-
-    return dirtyData;
-  }
 
   const [createProfileTypeField] = useMutation(
     useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldDocument,
@@ -304,7 +249,52 @@ function CreateOrUpdateProfileTypeFieldDialog({
           as: "form",
           onSubmit: handleSubmit(async (formData) => {
             if (isUpdating) {
-              const data = getDirtyFields(formData);
+              const data: UpdateProfileTypeFieldInput = {
+                ...omit(formData, ["type", "expiryAlertAheadTime", "alias"]),
+                expiryAlertAheadTime:
+                  formData.isExpirable && formData.expiryAlertAheadTime !== "DO_NOT_REMIND"
+                    ? expirationToDuration(formData.expiryAlertAheadTime)
+                    : null,
+              };
+
+              if (!formData.alias.startsWith("p_")) {
+                data.alias = formData.alias === "" ? null : formData.alias;
+              }
+
+              if (formData.type === "SELECT" || formData.type === "CHECKBOX") {
+                data.options = {
+                  standardList:
+                    formData.options.listingType === "STANDARD"
+                      ? formData.options.standardList
+                      : null,
+                  values:
+                    formData.options.listingType === "STANDARD"
+                      ? []
+                      : formData.options.values!.map((value) => omit(value, ["id", "existing"])),
+                };
+                if (formData.type === "SELECT") {
+                  data.options.showOptionsWithColors =
+                    formData.options.showOptionsWithColors ?? false;
+                }
+              } else if (formData.type === "DATE") {
+                data.options = {
+                  useReplyAsExpiryDate:
+                    formData.isExpirable && formData.options.useReplyAsExpiryDate ? true : false,
+                };
+              } else if (formData.type === "BACKGROUND_CHECK") {
+                data.options = {
+                  monitoring: formData.options.hasMonitoring ? formData.options.monitoring : null,
+                  autoSearchConfig: formData.options.autoSearchConfig,
+                };
+              } else if (formData.type === "ADVERSE_MEDIA_SEARCH") {
+                data.options = formData.options.hasMonitoring
+                  ? { monitoring: formData.options.monitoring }
+                  : { monitoring: null };
+              } else if (formData.type === "SHORT_TEXT") {
+                // options.format is not allowed to be changed
+                data.isUnique = formData.isUnique ?? false;
+              }
+
               let force = false;
 
               do {

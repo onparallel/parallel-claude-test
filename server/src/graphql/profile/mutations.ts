@@ -78,6 +78,7 @@ import {
   contextUserCanSubscribeUsersToProfile,
   externalSourceEntityMatchesProfileTypeStandardType,
   fileUploadCanBeAttachedToProfileTypeField,
+  ifProfileTypeFieldPropertyChanged,
   profileFieldFileHasProfileTypeFieldId,
   profileHasProfileTypeFieldId,
   profileHasStatus,
@@ -380,15 +381,19 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
     userHasAccessToProfileType("profileTypeId"),
     profileTypeFieldBelongsToProfileType("profileTypeFieldId", "profileTypeId"),
-    ifArgDefined(
-      (args) => args.data.options,
+    ifProfileTypeFieldPropertyChanged(
+      "profileTypeFieldId",
+      "data",
+      "options",
       and(
         profileTypeFieldIsNotUsedInMonitoringRules("profileTypeId", "profileTypeFieldId"),
         profileTypeFieldIsNotUsedInAutoSearchConfig("profileTypeId", "profileTypeFieldId"),
       ),
     ),
-    ifArgDefined(
-      (args) => args.data.name || args.data.alias,
+    ifProfileTypeFieldPropertyChanged(
+      "profileTypeFieldId",
+      "data",
+      ["name", "alias"],
       profileTypeFieldIsNotStandard("profileTypeFieldId"),
     ),
   ),
@@ -446,7 +451,11 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     }
 
     if (isNonNullish(args.data.options)) {
-      if (profileTypeField.type === "SHORT_TEXT" && args.data.options.format !== undefined) {
+      if (
+        profileTypeField.type === "SHORT_TEXT" &&
+        args.data.options.format !== undefined &&
+        profileTypeField.options.format !== args.data.options.format
+      ) {
         throw new ArgValidationError(
           info,
           "data.options.format",

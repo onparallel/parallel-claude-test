@@ -105,7 +105,7 @@ export function validUpdateProfileTypeFieldData<
     async (_, args, ctx, info) => {
       const profileTypeFieldId = getArg(args, profileTypeFieldIdArg);
       const [data, argName] = getArgWithPath(args, dataArg);
-      if (isNonNullish(data.isUnique)) {
+      if (isNonNullish(data.isUnique) && data.isUnique) {
         const profileTypeField = (await ctx.profiles.loadProfileTypeField(profileTypeFieldId))!;
         if (profileTypeField.type !== "SHORT_TEXT") {
           throw new ArgValidationError(
