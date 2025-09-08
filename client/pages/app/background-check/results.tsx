@@ -455,7 +455,7 @@ function BackgroundCheckFieldSearchResults({
               <Skeleton height="24px" width="100%" maxWidth="260px" />
             </>
           )}
-          {result?.hasPendingReview ? (
+          {result?.hasPendingReview && (totalCount === 0 || result.reviewDiff?.items?.added) ? (
             <BackgroundCheckSearchDifferencesAlert
               diff={result.reviewDiff}
               onConfirmChangesClick={handleConfirmChangesClick}
