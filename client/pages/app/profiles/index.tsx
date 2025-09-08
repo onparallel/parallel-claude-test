@@ -55,7 +55,6 @@ import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/Cr
 import { useImportProfilesFromExcelDialog } from "@parallel/components/profiles/dialogs/ImportProfilesFromExcelDialog";
 import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
 import {
-  ConnectionMetadata,
   ProfileListViewDataInput,
   ProfileStatus,
   Profiles_ProfileFragment,
@@ -104,7 +103,6 @@ import {
 } from "@parallel/utils/useProfileTableColumns";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useUnpinProfileType } from "@parallel/utils/useUnpinProfileType";
-import { withMetadata } from "@parallel/utils/withMetadata";
 import {
   ChangeEvent,
   MouseEvent,
@@ -1134,10 +1132,6 @@ const _queries = [
           ...Profiles_ProfileListView
         }
       }
-      metadata {
-        browserName
-        country
-      }
     }
     ${AppLayout.fragments.Query}
     ${useProfileSubscribersDialog.fragments.User}
@@ -1222,14 +1216,12 @@ Profiles.getInitialProps = async ({ query, pathname, fetchQuery }: WithApolloDat
     throw new RedirectError("/app");
   }
   let views: Profiles_ProfileListViewFragment[];
-  let metadata: ConnectionMetadata;
   try {
     const [{ data }] = await Promise.all([
       fetchQuery(Profiles_userDocument, { variables: { profileTypeId: state.type } }),
       fetchQuery(Profiles_profileTypeDocument, { variables: { profileTypeId: state.type } }),
     ]);
     views = data.me.profileListViews;
-    metadata = data.metadata;
   } catch {
     throw new RedirectError("/app");
   }
@@ -1255,12 +1247,11 @@ Profiles.getInitialProps = async ({ query, pathname, fetchQuery }: WithApolloDat
       ),
     );
   }
-  return { metadata };
+  return {};
 };
 
 export default compose(
   withDialogs,
-  withMetadata,
   withPermission("PROFILES:LIST_PROFILES"),
   withFeatureFlag("PROFILES", "/app/petitions"),
   withApolloData,

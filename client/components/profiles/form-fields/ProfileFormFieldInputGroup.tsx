@@ -6,7 +6,7 @@ import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { SuggestionsButton } from "@parallel/components/common/SuggestionsButton";
 import { ProfileFormFieldInputGroup_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { useMetadata } from "@parallel/utils/withMetadata";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { Duration, isPast, sub } from "date-fns";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -31,7 +31,7 @@ export function ProfileFormFieldInputGroup({
   children,
   isDisabled,
 }: ProfileFormFieldInputGroupProps) {
-  const { browserName } = useMetadata();
+  const { browserName } = useBrowserMetadata();
 
   // If all the props are nullish, we don't need to render the input group
   if (

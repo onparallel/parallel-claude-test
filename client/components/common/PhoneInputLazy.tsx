@@ -2,8 +2,8 @@ import { Input, InputGroup, InputLeftElement, PropsOf } from "@chakra-ui/react";
 import { FieldPhoneIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { phoneCodes } from "@parallel/utils/phoneCodes";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { withDynamicLoadingProps } from "@parallel/utils/withDynamicLoadingProps";
-import { useMetadata } from "@parallel/utils/withMetadata";
 import useMergedRef from "@react-hook/merged-ref";
 import dynamic from "next/dynamic";
 import { ChangeEvent, FocusEvent, useRef } from "react";
@@ -23,7 +23,7 @@ export const PhoneInputLazy = withDynamicLoadingProps<PropsOf<typeof FakeInputPh
 const FakeInputPhone = chakraForwardRef<"input", PhoneInputProps>(
   ({ value, placeholder, defaultCountry, onChange, onBlur, inputRef, ...props }, ref) => {
     const _ref = useRef<HTMLInputElement>(null);
-    const metadata = useMetadata();
+    const metadata = useBrowserMetadata();
     const _defaultCountry = defaultCountry ?? metadata.country ?? undefined;
     const mergedRef = useMergedRef(ref, _ref, ...(inputRef ? [inputRef] : []));
     const handleChange =

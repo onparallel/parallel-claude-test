@@ -9,9 +9,9 @@ import {
 import { FieldPhoneIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { phoneCodes } from "@parallel/utils/phoneCodes";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useConstant } from "@parallel/utils/useConstant";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
-import { useMetadata } from "@parallel/utils/withMetadata";
 import useMergedRef from "@react-hook/merged-ref";
 import { AsYouType } from "libphonenumber-js";
 import { ChangeEvent, FocusEvent, Ref, useEffect, useRef, useState } from "react";
@@ -40,7 +40,7 @@ const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInpu
   const intl = useIntl();
   const { countries } = useLoadCountryNames(intl.locale);
   const mergedRef = useMergedRef(ref, _ref, ...(inputRef ? [inputRef] : []));
-  const metadata = useMetadata();
+  const metadata = useBrowserMetadata();
   const _defaultCountry = defaultCountry ?? metadata.country ?? undefined;
 
   const formatter = useConstant(() => new AsYouType({ defaultCountry: _defaultCountry as any }));

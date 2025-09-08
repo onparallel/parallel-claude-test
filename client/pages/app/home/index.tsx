@@ -74,7 +74,6 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { usePageVisibility } from "@parallel/utils/usePageVisibility";
-import { withMetadata } from "@parallel/utils/withMetadata";
 import { MotionConfig } from "framer-motion";
 import { memo, RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -492,9 +491,6 @@ Home.fragments = {
 const _queries = [
   gql`
     query Home_user {
-      metadata {
-        browserName
-      }
       ...AppLayout_Query
       me {
         ...Home_User
@@ -608,11 +604,10 @@ Home.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDataCon
     }
   }
 
-  return { metadata: data.metadata };
+  return {};
 };
 
 export default compose(
-  withMetadata,
   withDialogs,
   withFeatureFlag("DASHBOARDS", "/app/petitions"),
   withPermission("DASHBOARDS:LIST_DASHBOARDS", { orPath: "/app/petitions" }),

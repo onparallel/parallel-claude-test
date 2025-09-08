@@ -61,6 +61,7 @@ import { generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
 import { parseQuery, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import Head from "next/head";
 import { Fragment, useCallback, useRef, useState } from "react";
@@ -607,8 +608,10 @@ const _queries = [
         hasClientPortalAccess
         ...RecipientPortal_PublicPetitionAccess
       }
+      ...useBrowserMetadata_Query
     }
     ${_fragments.PublicPetitionAccess}
+    ${useBrowserMetadata.fragments.Query}
   `,
   gql`
     query RecipientPortal_stats($keycode: ID!, $search: String) {

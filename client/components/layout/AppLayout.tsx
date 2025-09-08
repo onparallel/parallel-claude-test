@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { AppLayout_QueryFragment } from "@parallel/graphql/__types";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useCheckForNewVersion } from "@parallel/utils/useCheckForNewVersion";
 import { useCookie } from "@parallel/utils/useCookie";
 import { useOnMediaQueryChange } from "@parallel/utils/useOnMediaQueryChange";
@@ -326,8 +327,10 @@ export const AppLayout = Object.assign(
           realMe {
             id
           }
+          ...useBrowserMetadata_Query
           ...AppLayoutNavBar_Query
         }
+        ${useBrowserMetadata.fragments.Query}
         ${AppLayoutNavBar.fragments.Query}
       `,
     },

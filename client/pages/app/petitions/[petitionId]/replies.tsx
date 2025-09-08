@@ -80,7 +80,6 @@ import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFil
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
-import { withMetadata } from "@parallel/utils/withMetadata";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -948,10 +947,6 @@ PetitionReplies.queries = [
         ...PetitionApprovalsCard_User
         ...PetitionRepliesRightPaneTabs_User
       }
-      metadata {
-        country
-        browserName
-      }
     }
     ${PetitionLayout.fragments.Query}
     ${PetitionSignaturesCard.fragments.User}
@@ -971,21 +966,14 @@ PetitionReplies.queries = [
 
 PetitionReplies.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const petitionId = query.petitionId as string;
-  const {
-    data: { metadata },
-  } = await fetchQuery(PetitionReplies_userDocument);
+  await fetchQuery(PetitionReplies_userDocument);
   await fetchQuery(PetitionReplies_petitionDocument, {
     variables: {
       id: petitionId,
     },
   });
 
-  return { petitionId, metadata };
+  return { petitionId };
 };
 
-export default compose(
-  withPetitionLayoutContext,
-  withDialogs,
-  withMetadata,
-  withApolloData,
-)(PetitionReplies);
+export default compose(withPetitionLayoutContext, withDialogs, withApolloData)(PetitionReplies);

@@ -1,7 +1,7 @@
 import { useBreakpointValue } from "@chakra-ui/react";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
-import { useMetadata } from "@parallel/utils/withMetadata";
 import { createContext, ReactNode, useContext, useMemo, useState } from "react";
 import { isNonNullish } from "remeda";
 
@@ -23,7 +23,7 @@ export function RecipientViewSidebarContextProvider({
   children,
 }: RecipientViewSidebarContextProps) {
   const [fieldId, setFieldId] = useFieldCommentsQueryState();
-  const { deviceType } = useMetadata();
+  const { deviceType } = useBrowserMetadata();
   const initialState = useBreakpointValue<SidebarState>(
     { base: "CLOSED", lg: "CONTENTS" },
     { fallback: deviceType === null ? "lg" : "md" },

@@ -2,7 +2,7 @@ import { Center, Flex } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { DateInput } from "@parallel/components/common/DateInput";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
-import { useMetadata } from "@parallel/utils/withMetadata";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { isPast, sub } from "date-fns";
 import { useFormContext } from "react-hook-form";
 import { isNonNullish } from "remeda";
@@ -28,7 +28,7 @@ export function ProfileFormFieldDate({
   areSuggestionsVisible,
   onToggleSuggestions,
 }: ProfileFormFieldDateProps) {
-  const { browserName } = useMetadata();
+  const { browserName } = useBrowserMetadata();
   const { register } = useFormContext<ProfileFormData>();
   const alertIsActive =
     isNonNullish(expiryDate) &&

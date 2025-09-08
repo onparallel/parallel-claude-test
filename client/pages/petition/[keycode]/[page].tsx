@@ -57,12 +57,12 @@ import { LiquidPetitionScopeProvider } from "@parallel/utils/liquid/LiquidPetiti
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useGetPetitionPages } from "@parallel/utils/useGetPetitionPages";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
-import { withMetadata } from "@parallel/utils/withMetadata";
 import { AnimatePresence } from "framer-motion";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -563,13 +563,6 @@ const _fragments = {
       ${RecipientViewContents.fragments.PublicUser}
     `;
   },
-  ConnectionMetadata: gql`
-    fragment RecipientView_ConnectionMetadata on ConnectionMetadata {
-      country
-      browserName
-      deviceType
-    }
-  `,
 };
 
 const _mutations = [
@@ -600,12 +593,10 @@ const _queries = [
         hasClientPortalAccess
         ...RecipientView_PublicPetitionAccess
       }
-      metadata(keycode: $keycode) {
-        ...RecipientView_ConnectionMetadata
-      }
+      ...useBrowserMetadata_Query
     }
     ${_fragments.PublicPetitionAccess}
-    ${_fragments.ConnectionMetadata}
+    ${useBrowserMetadata.fragments.Query}
   `,
   gql`
     query RecipientView_accesses($keycode: ID!) {
@@ -641,7 +632,6 @@ RecipientView.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCont
     return {
       keycode,
       currentPage: page,
-      metadata: data.metadata,
     };
   } catch (error) {
     if (error instanceof RedirectError) {
@@ -768,7 +758,6 @@ export default compose(
       </Stack>
     ),
   }),
-  withMetadata,
   withDialogs,
   withApolloData,
 )(RecipientView);

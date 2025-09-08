@@ -5,11 +5,11 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { waitFor } from "@parallel/utils/promises/waitFor";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { isValidDateString } from "@parallel/utils/validation";
-import { useMetadata } from "@parallel/utils/withMetadata";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ChangeEvent,
@@ -68,7 +68,7 @@ export function RecipientViewPetitionFieldDate({
   const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
 
-  const { browserName } = useMetadata();
+  const { browserName } = useBrowserMetadata();
 
   useEffect(() => {
     if (hasAlreadyRepliedError) {
@@ -286,7 +286,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
   const [value, setValue] = useState(reply.content.value ?? "");
   const [isSaving, setIsSaving] = useState(false);
 
-  const { browserName } = useMetadata();
+  const { browserName } = useBrowserMetadata();
 
   const debouncedUpdateReply = useDebouncedCallback(
     async (value: string) => {

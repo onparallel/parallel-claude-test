@@ -89,7 +89,6 @@ import { useStartSignatureRequest } from "@parallel/utils/useStartSignatureReque
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { waitForElement } from "@parallel/utils/waitForElement";
-import { withMetadata } from "@parallel/utils/withMetadata";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -1093,10 +1092,6 @@ const _queries = [
         id
         hasPublicLinkPrefill: hasFeatureFlag(featureFlag: PUBLIC_PETITION_LINK_PREFILL_DATA)
       }
-      metadata {
-        country
-        browserName
-      }
     }
     ${_fragments.Query}
   `,
@@ -1104,23 +1099,14 @@ const _queries = [
 
 PetitionPreview.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const petitionId = query.petitionId as string;
-  const [
-    {
-      data: { metadata },
-    },
-  ] = await Promise.all([
+  await Promise.all([
     fetchQuery(PetitionPreview_userDocument),
     fetchQuery(PetitionPreview_petitionDocument, {
       variables: { id: petitionId },
       ignoreCache: true,
     }),
   ]);
-  return { petitionId, metadata };
+  return { petitionId };
 };
 
-export default compose(
-  withMetadata,
-  withPetitionLayoutContext,
-  withDialogs,
-  withApolloData,
-)(PetitionPreview);
+export default compose(withPetitionLayoutContext, withDialogs, withApolloData)(PetitionPreview);

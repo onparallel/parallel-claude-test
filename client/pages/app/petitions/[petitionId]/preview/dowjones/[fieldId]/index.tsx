@@ -27,7 +27,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { withMetadata } from "@parallel/utils/withMetadata";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
@@ -189,14 +189,13 @@ const _queries = [
   `,
   gql`
     query DowJonesFieldSearch_user {
-      metadata {
-        browserName
-      }
       me {
         id
         hasDowJonesFeatureFlag: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
       }
+      ...useBrowserMetadata_Query
     }
+    ${useBrowserMetadata.fragments.Query}
   `,
 ];
 
@@ -204,9 +203,7 @@ DowJonesFieldSearch.getInitialProps = async ({ query, fetchQuery }: WithApolloDa
   const petitionId = query.petitionId as string;
   const petitionFieldId = query.fieldId as string;
   const [
-    {
-      data: { metadata },
-    },
+    ,
     {
       data: { petitionField },
     },
@@ -222,7 +219,7 @@ DowJonesFieldSearch.getInitialProps = async ({ query, fetchQuery }: WithApolloDa
     throw new Error("FORBIDDEN");
   }
 
-  return { metadata };
+  return {};
 };
 
-export default compose(withMetadata, withDialogs, withApolloData)(DowJonesFieldSearch);
+export default compose(withDialogs, withApolloData)(DowJonesFieldSearch);

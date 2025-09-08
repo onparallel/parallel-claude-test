@@ -7,11 +7,11 @@ import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { prettifyTimezone } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { waitFor } from "@parallel/utils/promises/waitFor";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { isValidDateString } from "@parallel/utils/validation";
-import { useMetadata } from "@parallel/utils/withMetadata";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ChangeEvent,
@@ -76,7 +76,7 @@ export function RecipientViewPetitionFieldDateTime({
   const replyRefs = useMultipleRefs<HTMLInputElement>();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const { browserName } = useMetadata();
+  const { browserName } = useBrowserMetadata();
 
   useEffect(() => {
     if (hasAlreadyRepliedError) {
@@ -297,7 +297,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
   const [timezone, setTimezone] = useState(reply.content.timezone);
   const [showTimezone, setShowTimezone] = useState(false);
 
-  const { browserName } = useMetadata();
+  const { browserName } = useBrowserMetadata();
 
   const debouncedUpdateReply = useDebouncedCallback(
     async (value: string, timezone: string) => {

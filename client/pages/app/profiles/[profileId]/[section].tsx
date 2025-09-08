@@ -15,7 +15,6 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { withMetadata } from "@parallel/utils/withMetadata";
 type ProfileDetailProps = UnwrapPromise<ReturnType<typeof ProfileDetail.getInitialProps>>;
 
 function ProfileDetail({ profileId, section }: ProfileDetailProps) {
@@ -55,10 +54,6 @@ const _queries = [
   gql`
     query ProfileDetail_user {
       ...ProfileLayout_Query
-      metadata {
-        country
-        browserName
-      }
       me {
         id
         hasKeyProcessesFeature: hasFeatureFlag(featureFlag: KEY_PROCESSES)
@@ -87,21 +82,16 @@ ProfileDetail.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCont
     ? (query.section as ProfilesSection)
     : "general";
 
-  const [
-    {
-      data: { metadata },
-    },
-  ] = await Promise.all([
+  await Promise.all([
     fetchQuery(ProfileDetail_userDocument),
     fetchQuery(ProfileDetail_profileDocument, { variables: { profileId } }),
   ]);
 
-  return { profileId, metadata, section };
+  return { profileId, section };
 };
 
 export default compose(
   withDialogs,
-  withMetadata,
   withPermission("PROFILES:LIST_PROFILES"),
   withFeatureFlag("PROFILES", "/app/petitions"),
   withApolloData,

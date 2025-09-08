@@ -7928,6 +7928,14 @@ export type AdminOrganizationsLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -7941,7 +7949,6 @@ export type AdminOrganizationsLayout_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AdminOrganizationsLayout_updateOrganizationMutationVariables = Exact<{
@@ -14506,6 +14513,14 @@ export type AdminSettingsLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -14519,7 +14534,6 @@ export type AdminSettingsLayout_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AppLayout_QueryFragment = {
@@ -14575,6 +14589,14 @@ export type AppLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -14588,7 +14610,6 @@ export type AppLayout_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AppLayoutNavBar_ProfileTypeFragment = {
@@ -14685,7 +14706,6 @@ export type AppLayoutNavBar_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type DevelopersLayout_QueryFragment = {
@@ -14741,6 +14761,14 @@ export type DevelopersLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -14754,7 +14782,6 @@ export type DevelopersLayout_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type HeaderNameEditable_PetitionBase_Petition_Fragment = {
@@ -14839,6 +14866,14 @@ export type OrganizationSettingsLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -14852,7 +14887,6 @@ export type OrganizationSettingsLayout_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionHeader_PetitionFragment = {
@@ -15088,6 +15122,14 @@ export type PetitionLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -15101,7 +15143,6 @@ export type PetitionLayout_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type ProfileLayout_QueryFragment = {
@@ -15157,6 +15198,14 @@ export type ProfileLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -15170,7 +15219,6 @@ export type ProfileLayout_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type ProfileLayout_ProfileSubscriptionFragment = {
@@ -15455,6 +15503,14 @@ export type ReportsSidebarLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -15468,7 +15524,6 @@ export type ReportsSidebarLayout_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type SidebarLayout_QueryFragment = {
@@ -15524,6 +15579,14 @@ export type SidebarLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -15537,7 +15600,6 @@ export type SidebarLayout_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type UserGroupLayout_QueryFragment = {
@@ -15594,6 +15656,14 @@ export type UserGroupLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -15607,7 +15677,6 @@ export type UserGroupLayout_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type UserGroupLayout_UserGroupFragment = {
@@ -15726,6 +15795,14 @@ export type UserSettingsLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -15739,7 +15816,6 @@ export type UserSettingsLayout_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type NotificationsButton_UserFragment = {
@@ -16920,6 +16996,14 @@ export type OrganizationProfilesLayout_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -16933,7 +17017,6 @@ export type OrganizationProfilesLayout_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type ProfileTypeSettings_ProfileTypeFieldFragment = {
@@ -44302,6 +44385,14 @@ export type Admin_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -44315,7 +44406,6 @@ export type Admin_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AdminOrganizationsFeatures_OrganizationFragment = {
@@ -44391,6 +44481,14 @@ export type AdminOrganizationsFeatures_queryQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -44404,7 +44502,6 @@ export type AdminOrganizationsFeatures_queryQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AdminOrganizationsFeatures_updateFeatureFlagsMutationVariables = Exact<{
@@ -44553,6 +44650,14 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -44566,7 +44671,6 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AdminOrganizationsSubscriptions_organizationUsagePeriodsQueryQueryVariables = Exact<{
@@ -44842,6 +44946,14 @@ export type AdminOrganizationsMembers_queryQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -44855,7 +44967,6 @@ export type AdminOrganizationsMembers_queryQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AdminOrganizationsMembers_organizationQueryVariables = Exact<{
@@ -45044,6 +45155,14 @@ export type AdminOrganizations_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -45057,7 +45176,6 @@ export type AdminOrganizations_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AdminOrganizations_createOrganizationMutationVariables = Exact<{
@@ -45142,6 +45260,14 @@ export type AdminSupportMethods_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -45155,7 +45281,6 @@ export type AdminSupportMethods_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type AdverseMediaSearch_AdverseMediaArticleFragment = {
@@ -45340,6 +45465,14 @@ export type Alerts_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -45353,7 +45486,6 @@ export type Alerts_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Alerts_expiringProfilePropertiesQueryVariables = Exact<{
@@ -46127,8 +46259,15 @@ export type BackgroundCheckFieldSearch_petitionFieldQuery = {
 export type BackgroundCheckFieldSearch_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type BackgroundCheckFieldSearch_userQuery = {
-  metadata: { __typename?: "ConnectionMetadata"; browserName?: string | null };
   me: { __typename?: "User"; id: string; hasBackgroundCheck: boolean };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
 };
 
 export type BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_BackgroundCheckEntitySearchCompany_Fragment =
@@ -46585,6 +46724,14 @@ export type Contact_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -46598,7 +46745,6 @@ export type Contact_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Contact_contactQueryVariables = Exact<{
@@ -46781,6 +46927,14 @@ export type Contacts_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -46794,7 +46948,6 @@ export type Contacts_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Home_UserFragment = {
@@ -47239,11 +47392,6 @@ export type Home_DashboardModuleFragment =
 export type Home_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type Home_userQuery = {
-  metadata: {
-    __typename?: "ConnectionMetadata";
-    browserName?: string | null;
-    deviceType?: string | null;
-  };
   me: {
     __typename?: "User";
     id: string;
@@ -47308,6 +47456,14 @@ export type Home_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
   };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
@@ -47957,6 +48113,14 @@ export type OrganizationBranding_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -47970,7 +48134,6 @@ export type OrganizationBranding_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationCompliance_OrganizationFragment = {
@@ -48048,6 +48211,14 @@ export type OrganizationCompliance_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -48061,7 +48232,6 @@ export type OrganizationCompliance_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationGeneral_updateOrgLogoMutationVariables = Exact<{
@@ -48136,6 +48306,14 @@ export type OrganizationGeneral_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -48149,7 +48327,6 @@ export type OrganizationGeneral_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationGroup_UserGroupFragment = {
@@ -48330,6 +48507,14 @@ export type OrganizationGroup_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -48343,7 +48528,6 @@ export type OrganizationGroup_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PermissionsGroup_UserGroupFragment = {
@@ -48439,6 +48623,14 @@ export type PermissionsGroup_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -48452,7 +48644,6 @@ export type PermissionsGroup_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PermissionsGroup_updateUserGroupPermissionsMutationVariables = Exact<{
@@ -48669,6 +48860,14 @@ export type OrganizationGroups_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -48682,7 +48881,6 @@ export type OrganizationGroups_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationSettings_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -48740,6 +48938,14 @@ export type OrganizationSettings_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -48753,7 +48959,6 @@ export type OrganizationSettings_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationIntegrations_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -48841,6 +49046,14 @@ export type OrganizationIntegrations_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -48854,7 +49067,6 @@ export type OrganizationIntegrations_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationIntegrations_deleteDowJonesKycIntegrationMutationVariables = Exact<{
@@ -48980,6 +49192,14 @@ export type IntegrationsSignature_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -48993,7 +49213,6 @@ export type IntegrationsSignature_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationProfileType_ProfileTypeFieldFragment = {
@@ -49213,6 +49432,14 @@ export type OrganizationProfileType_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -49226,7 +49453,6 @@ export type OrganizationProfileType_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationProfileType_updateProfileTypeFieldPermissionsMutationVariables = Exact<{
@@ -49694,6 +49920,14 @@ export type OrganizationProfileTypes_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -49707,7 +49941,6 @@ export type OrganizationProfileTypes_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationProfileTypes_createProfileTypeMutationVariables = Exact<{
@@ -49869,6 +50102,14 @@ export type OrganizationUsage_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -49882,7 +50123,6 @@ export type OrganizationUsage_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationUsers_UserFragment = {
@@ -50060,6 +50300,14 @@ export type OrganizationUsers_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -50073,7 +50321,6 @@ export type OrganizationUsers_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type OrganizationUsers_orgUsersQueryVariables = Exact<{
@@ -50440,6 +50687,14 @@ export type PetitionActivity_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -50453,7 +50708,6 @@ export type PetitionActivity_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionActivity_updatePetitionMutationVariables = Exact<{
@@ -52267,6 +52521,14 @@ export type PetitionActivity_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -52280,7 +52542,6 @@ export type PetitionActivity_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionCompose_PetitionBase_Petition_Fragment = {
@@ -53231,6 +53492,14 @@ export type PetitionCompose_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -53244,7 +53513,6 @@ export type PetitionCompose_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionCompose_updatePetitionMutationVariables = Exact<{
@@ -55351,6 +55619,14 @@ export type PetitionCompose_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -55364,7 +55640,6 @@ export type PetitionCompose_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionCompose_petitionQueryVariables = Exact<{
@@ -56143,6 +56418,14 @@ export type PetitionMessages_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -56156,7 +56439,6 @@ export type PetitionMessages_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionMessages_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -56215,6 +56497,14 @@ export type PetitionMessages_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -56228,7 +56518,6 @@ export type PetitionMessages_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionMessages_petitionQueryVariables = Exact<{
@@ -56687,8 +56976,15 @@ export type DowJonesFieldSearch_petitionFieldQuery = {
 export type DowJonesFieldSearch_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type DowJonesFieldSearch_userQuery = {
-  metadata: { __typename?: "ConnectionMetadata"; browserName?: string | null };
   me: { __typename?: "User"; id: string; hasDowJonesFeatureFlag: boolean };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
 };
 
 export type DowJonesFieldSearchResults_DowJonesKycEntitySearchResult_DowJonesKycEntitySearchResultEntity_Fragment =
@@ -57678,6 +57974,14 @@ export type PetitionPreview_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -57691,7 +57995,6 @@ export type PetitionPreview_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type PetitionPreview_updatePetitionMutationVariables = Exact<{
@@ -59817,12 +60120,6 @@ export type PetitionPreview_userQuery = {
     }>;
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
-  metadata: {
-    __typename?: "ConnectionMetadata";
-    country?: string | null;
-    browserName?: string | null;
-    deviceType?: string | null;
-  };
   realMe: {
     __typename?: "User";
     id: string;
@@ -59830,6 +60127,14 @@ export type PetitionPreview_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
   };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
@@ -60803,12 +61108,6 @@ export type PetitionReplies_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: {
-    __typename?: "ConnectionMetadata";
-    country?: string | null;
-    browserName?: string | null;
-    deviceType?: string | null;
-  };
   realMe: {
     __typename?: "User";
     id: string;
@@ -60816,6 +61115,14 @@ export type PetitionReplies_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
   };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
@@ -61865,6 +62172,14 @@ export type Petitions_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -61878,7 +62193,6 @@ export type Petitions_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Petitions_petitionsQueryVariables = Exact<{
@@ -62394,6 +62708,14 @@ export type NewPetition_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -62407,7 +62729,6 @@ export type NewPetition_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type NewPetition_templateQueryVariables = Exact<{
@@ -62650,12 +62971,6 @@ export type ProfileSearch_createPetitionFieldRepliesMutation = {
 export type ProfileDetail_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ProfileDetail_userQuery = {
-  metadata: {
-    __typename?: "ConnectionMetadata";
-    country?: string | null;
-    browserName?: string | null;
-    deviceType?: string | null;
-  };
   me: {
     __typename?: "User";
     id: string;
@@ -62708,6 +63023,14 @@ export type ProfileDetail_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
   };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
@@ -62996,12 +63319,6 @@ export type Profiles_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: {
-    __typename?: "ConnectionMetadata";
-    country?: string | null;
-    browserName?: string | null;
-    deviceType?: string | null;
-  };
   realMe: {
     __typename?: "User";
     id: string;
@@ -63009,6 +63326,14 @@ export type Profiles_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
   };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
@@ -63224,6 +63549,14 @@ export type Reports_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -63237,7 +63570,6 @@ export type Reports_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Overview_PetitionTemplateFragment = {
@@ -63301,6 +63633,14 @@ export type Overview_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -63314,7 +63654,6 @@ export type Overview_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type ReportsReplies_PetitionTemplateFragment = {
@@ -63378,6 +63717,14 @@ export type ReportsReplies_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -63391,7 +63738,6 @@ export type ReportsReplies_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type ReportsTemplates_PetitionTemplateFragment = {
@@ -63455,6 +63801,14 @@ export type ReportsTemplates_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -63468,7 +63822,6 @@ export type ReportsTemplates_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Account_QueryFragment = {
@@ -63528,6 +63881,14 @@ export type Account_QueryFragment = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -63541,7 +63902,6 @@ export type Account_QueryFragment = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Account_updateAccountMutationVariables = Exact<{
@@ -63640,6 +64000,14 @@ export type Account_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -63653,7 +64021,6 @@ export type Account_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Subscriptions_PetitionEventSubscriptionFragment = {
@@ -63997,6 +64364,14 @@ export type Subscriptions_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -64010,7 +64385,6 @@ export type Subscriptions_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Tokens_UserAuthenticationTokenFragment = {
@@ -64100,6 +64474,14 @@ export type Tokens_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -64113,7 +64495,6 @@ export type Tokens_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Settings_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -64171,6 +64552,14 @@ export type Settings_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -64184,7 +64573,6 @@ export type Settings_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Security_updatePasswordMutationVariables = Exact<{
@@ -64250,6 +64638,14 @@ export type Security_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
   appLayoutNavBarProfileTypes: {
     __typename?: "ProfileTypePagination";
     totalCount: number;
@@ -64263,7 +64659,6 @@ export type Security_userQuery = {
       pluralName: { [locale in UserLocale]?: string };
     }>;
   };
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
 };
 
 export type Forgot_resendVerificationEmailMutationVariables = Exact<{
@@ -64762,13 +65157,6 @@ export type RecipientView_PublicUserFragment = {
   firstName?: string | null;
 };
 
-export type RecipientView_ConnectionMetadataFragment = {
-  __typename?: "ConnectionMetadata";
-  country?: string | null;
-  browserName?: string | null;
-  deviceType?: string | null;
-};
-
 export type RecipientView_publicCompletePetitionMutationVariables = Exact<{
   keycode: Scalars["ID"]["input"];
   additionalSigners?: InputMaybe<
@@ -65240,9 +65628,11 @@ export type RecipientView_accessQuery = {
   };
   metadata: {
     __typename?: "ConnectionMetadata";
-    country?: string | null;
     browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
     deviceType?: string | null;
+    ip?: string | null;
   };
 };
 
@@ -65389,6 +65779,14 @@ export type RecipientPortal_accessQuery = {
       subject?: string | null;
       sentAt?: string | null;
     } | null;
+  };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
   };
 };
 
@@ -68258,8 +68656,15 @@ export type useAddNewSignature_updatePetitionSignatureConfigMutation = {
     | { __typename?: "PetitionTemplate" };
 };
 
-export type useDeviceType_QueryFragment = {
-  metadata: { __typename?: "ConnectionMetadata"; deviceType?: string | null };
+export type useBrowserMetadata_QueryFragment = {
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
 };
 
 export type useDownloadProfileFieldFile_profileFieldFileDownloadLinkMutationVariables = Exact<{
@@ -70144,6 +70549,17 @@ export type validatePetitionFields_PetitionBaseFragment =
   | validatePetitionFields_PetitionBase_Petition_Fragment
   | validatePetitionFields_PetitionBase_PetitionTemplate_Fragment;
 
+export const useBrowserMetadata_QueryFragmentDoc = gql`
+  fragment useBrowserMetadata_Query on Query {
+    metadata {
+      browserName
+      browserVersion
+      country
+      deviceType
+      ip
+    }
+  }
+` as unknown as DocumentNode<useBrowserMetadata_QueryFragment, unknown>;
 export const ProfileTypeReference_ProfileTypeFragmentDoc = gql`
   fragment ProfileTypeReference_ProfileType on ProfileType {
     id
@@ -70207,13 +70623,6 @@ export const UserMenu_QueryFragmentDoc = gql`
   }
   ${UserAvatar_UserFragmentDoc}
 ` as unknown as DocumentNode<UserMenu_QueryFragment, unknown>;
-export const useDeviceType_QueryFragmentDoc = gql`
-  fragment useDeviceType_Query on Query {
-    metadata {
-      deviceType
-    }
-  }
-` as unknown as DocumentNode<useDeviceType_QueryFragment, unknown>;
 export const AppLayoutNavBar_QueryFragmentDoc = gql`
   fragment AppLayoutNavBar_Query on Query {
     realMe {
@@ -70237,12 +70646,10 @@ export const AppLayoutNavBar_QueryFragmentDoc = gql`
       }
     }
     ...UserMenu_Query
-    ...useDeviceType_Query
   }
   ${AppLayoutNavBar_UserFragmentDoc}
   ${AppLayoutNavBar_ProfileTypeFragmentDoc}
   ${UserMenu_QueryFragmentDoc}
-  ${useDeviceType_QueryFragmentDoc}
 ` as unknown as DocumentNode<AppLayoutNavBar_QueryFragment, unknown>;
 export const AppLayout_QueryFragmentDoc = gql`
   fragment AppLayout_Query on Query {
@@ -70269,8 +70676,10 @@ export const AppLayout_QueryFragmentDoc = gql`
     realMe {
       id
     }
+    ...useBrowserMetadata_Query
     ...AppLayoutNavBar_Query
   }
+  ${useBrowserMetadata_QueryFragmentDoc}
   ${AppLayoutNavBar_QueryFragmentDoc}
 ` as unknown as DocumentNode<AppLayout_QueryFragment, unknown>;
 export const SidebarLayout_QueryFragmentDoc = gql`
@@ -81201,13 +81610,6 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
   ${RecipientViewHeader_PublicPetitionAccessFragmentDoc}
   ${useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_PublicPetitionAccessFragment, unknown>;
-export const RecipientView_ConnectionMetadataFragmentDoc = gql`
-  fragment RecipientView_ConnectionMetadata on ConnectionMetadata {
-    country
-    browserName
-    deviceType
-  }
-` as unknown as DocumentNode<RecipientView_ConnectionMetadataFragment, unknown>;
 export const RecipientPortalHeader_PublicOrganizationFragmentDoc = gql`
   fragment RecipientPortalHeader_PublicOrganization on PublicOrganization {
     name
@@ -86364,14 +86766,13 @@ export const BackgroundCheckFieldSearch_petitionFieldDocument = gql`
 >;
 export const BackgroundCheckFieldSearch_userDocument = gql`
   query BackgroundCheckFieldSearch_user {
-    metadata {
-      browserName
-    }
     me {
       id
       hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
     }
+    ...useBrowserMetadata_Query
   }
+  ${useBrowserMetadata_QueryFragmentDoc}
 ` as unknown as DocumentNode<
   BackgroundCheckFieldSearch_userQuery,
   BackgroundCheckFieldSearch_userQueryVariables
@@ -86527,9 +86928,6 @@ export const Contacts_userDocument = gql`
 ` as unknown as DocumentNode<Contacts_userQuery, Contacts_userQueryVariables>;
 export const Home_userDocument = gql`
   query Home_user {
-    metadata {
-      browserName
-    }
     ...AppLayout_Query
     me {
       ...Home_User
@@ -87866,14 +88264,13 @@ export const DowJonesFieldSearch_petitionFieldDocument = gql`
 >;
 export const DowJonesFieldSearch_userDocument = gql`
   query DowJonesFieldSearch_user {
-    metadata {
-      browserName
-    }
     me {
       id
       hasDowJonesFeatureFlag: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
     }
+    ...useBrowserMetadata_Query
   }
+  ${useBrowserMetadata_QueryFragmentDoc}
 ` as unknown as DocumentNode<DowJonesFieldSearch_userQuery, DowJonesFieldSearch_userQueryVariables>;
 export const DowJonesFieldSearchResults_createDowJonesKycReplyDocument = gql`
   mutation DowJonesFieldSearchResults_createDowJonesKycReply(
@@ -87998,10 +88395,6 @@ export const PetitionPreview_userDocument = gql`
       id
       hasPublicLinkPrefill: hasFeatureFlag(featureFlag: PUBLIC_PETITION_LINK_PREFILL_DATA)
     }
-    metadata {
-      country
-      browserName
-    }
   }
   ${PetitionPreview_QueryFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_userQuery, PetitionPreview_userQueryVariables>;
@@ -88088,10 +88481,6 @@ export const PetitionReplies_userDocument = gql`
       ...useUpdateIsReadNotification_User
       ...PetitionApprovalsCard_User
       ...PetitionRepliesRightPaneTabs_User
-    }
-    metadata {
-      country
-      browserName
     }
   }
   ${PetitionLayout_QueryFragmentDoc}
@@ -88296,10 +88685,6 @@ export const ProfileSearch_createPetitionFieldRepliesDocument = gql`
 export const ProfileDetail_userDocument = gql`
   query ProfileDetail_user {
     ...ProfileLayout_Query
-    metadata {
-      country
-      browserName
-    }
     me {
       id
       hasKeyProcessesFeature: hasFeatureFlag(featureFlag: KEY_PROCESSES)
@@ -88327,10 +88712,6 @@ export const Profiles_userDocument = gql`
       profileListViews(profileTypeId: $profileTypeId) {
         ...Profiles_ProfileListView
       }
-    }
-    metadata {
-      browserName
-      country
     }
   }
   ${AppLayout_QueryFragmentDoc}
@@ -88744,12 +89125,10 @@ export const RecipientView_accessDocument = gql`
       hasClientPortalAccess
       ...RecipientView_PublicPetitionAccess
     }
-    metadata(keycode: $keycode) {
-      ...RecipientView_ConnectionMetadata
-    }
+    ...useBrowserMetadata_Query
   }
   ${RecipientView_PublicPetitionAccessFragmentDoc}
-  ${RecipientView_ConnectionMetadataFragmentDoc}
+  ${useBrowserMetadata_QueryFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_accessQuery, RecipientView_accessQueryVariables>;
 export const RecipientView_accessesDocument = gql`
   query RecipientView_accesses($keycode: ID!) {
@@ -88765,8 +89144,10 @@ export const RecipientPortal_accessDocument = gql`
       hasClientPortalAccess
       ...RecipientPortal_PublicPetitionAccess
     }
+    ...useBrowserMetadata_Query
   }
   ${RecipientPortal_PublicPetitionAccessFragmentDoc}
+  ${useBrowserMetadata_QueryFragmentDoc}
 ` as unknown as DocumentNode<RecipientPortal_accessQuery, RecipientPortal_accessQueryVariables>;
 export const RecipientPortal_statsDocument = gql`
   query RecipientPortal_stats($keycode: ID!, $search: String) {

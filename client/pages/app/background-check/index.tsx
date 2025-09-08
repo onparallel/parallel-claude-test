@@ -31,8 +31,8 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
-import { withMetadata } from "@parallel/utils/withMetadata";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
@@ -315,14 +315,13 @@ const _queries = [
   `,
   gql`
     query BackgroundCheckFieldSearch_user {
-      metadata {
-        browserName
-      }
       me {
         id
         hasBackgroundCheck: hasFeatureFlag(featureFlag: BACKGROUND_CHECK)
       }
+      ...useBrowserMetadata_Query
     }
+    ${useBrowserMetadata.fragments.Query}
   `,
 ];
 
@@ -336,15 +335,12 @@ BackgroundCheckFieldSearch.getInitialProps = async ({
   const country = query.country as string | null | undefined;
   const birthCountry = query.birthCountry as string | null | undefined;
 
-  const {
-    data: { metadata },
-  } = await fetchQuery(BackgroundCheckFieldSearch_userDocument);
+  await fetchQuery(BackgroundCheckFieldSearch_userDocument);
 
-  return { metadata, name, date, type, country, birthCountry };
+  return { name, date, type, country, birthCountry };
 };
 
 export default compose(
-  withMetadata,
   withDialogs,
   withFeatureFlag("BACKGROUND_CHECK"),
   withApolloData,

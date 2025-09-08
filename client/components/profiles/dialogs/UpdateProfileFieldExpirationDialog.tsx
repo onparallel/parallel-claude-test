@@ -21,7 +21,7 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FORMATS } from "@parallel/utils/dates";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { useMetadata } from "@parallel/utils/withMetadata";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { Duration, isPast, sub } from "date-fns";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -50,7 +50,7 @@ function UpdateProfileFieldExpirationDialog({
       expiryDate,
     },
   });
-  const { browserName } = useMetadata();
+  const { browserName } = useBrowserMetadata();
 
   const expirationDate = watch("expiryDate");
 

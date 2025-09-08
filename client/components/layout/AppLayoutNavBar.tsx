@@ -49,8 +49,8 @@ import {
 } from "@parallel/graphql/__types";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import { untranslated } from "@parallel/utils/untranslated";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useCookie } from "@parallel/utils/useCookie";
-import { useDeviceType } from "@parallel/utils/useDeviceType";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useIsFocusWithin } from "@parallel/utils/useIsFocusWithin";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
@@ -124,7 +124,7 @@ export const AppLayoutNavBar = Object.assign(
         });
       }
     }
-    const deviceType = useDeviceType();
+    const { deviceType } = useBrowserMetadata();
     const isMobile = useBreakpointValue(
       { base: true, sm: false },
       { fallback: deviceType === "mobile" ? "base" : "sm" },
@@ -444,12 +444,10 @@ export const AppLayoutNavBar = Object.assign(
               }
             }
             ...UserMenu_Query
-            ...useDeviceType_Query
           }
           ${this.ProfileType}
           ${this.User}
           ${UserMenu.fragments.Query}
-          ${useDeviceType.fragments.Query}
         `;
       },
     },

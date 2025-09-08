@@ -1,13 +1,13 @@
 import { Input, InputProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { useMetadata } from "@parallel/utils/withMetadata";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { ChangeEvent } from "react";
 
 export const DateInput = chakraForwardRef<"input", InputProps>(function DateInput(
   { sx, onChange, ...props },
   ref,
 ) {
-  const { browserName } = useMetadata();
+  const { browserName } = useBrowserMetadata();
 
   return (
     <Input

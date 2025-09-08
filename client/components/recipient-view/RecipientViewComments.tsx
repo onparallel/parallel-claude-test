@@ -28,9 +28,9 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { useTimeoutEffect } from "@parallel/utils/useTimeoutEffect";
-import { useMetadata } from "@parallel/utils/withMetadata";
 import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
@@ -221,7 +221,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
     }
   }, [fieldId, commentsRef.current]);
 
-  const { deviceType } = useMetadata();
+  const { deviceType } = useBrowserMetadata();
 
   const hasGeneralComments = isNonNullish(petition?.lastGeneralComment);
 

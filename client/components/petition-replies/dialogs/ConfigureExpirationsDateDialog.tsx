@@ -25,9 +25,9 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
+import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
 import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
-import { useMetadata } from "@parallel/utils/withMetadata";
 import { isPast, sub } from "date-fns";
 import { useEffect, useState } from "react";
 
@@ -166,7 +166,7 @@ function ExpirationDateRow({
     formState: { errors },
   } = useFormContext<ConfigureExpirationsDateDialogData>();
 
-  const { browserName } = useMetadata();
+  const { browserName } = useBrowserMetadata();
   const downloadReplyFile = useDownloadReplyFile();
   const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
   const { name, expiryAlertAheadTime } = field.profileTypeField!;
