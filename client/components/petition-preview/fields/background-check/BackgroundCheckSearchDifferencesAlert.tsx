@@ -14,7 +14,10 @@ import { FormattedMessage } from "react-intl";
 
 interface BackgroundCheckSearchDifferencesAlertProps {
   onConfirmChangesClick: () => void;
-  diff: BackgroundCheckSearchDifferencesAlert_BackgroundCheckEntitySearchReviewDiffFragment;
+  diff:
+    | BackgroundCheckSearchDifferencesAlert_BackgroundCheckEntitySearchReviewDiffFragment
+    | null
+    | undefined;
 }
 
 export function BackgroundCheckSearchDifferencesAlert({
@@ -33,15 +36,13 @@ export function BackgroundCheckSearchDifferencesAlert({
             />
           </AlertTitle>
           <AlertDescription>
-            {(diff.items?.added ?? []).length > 0 ? (
-              <FormattedMessage
-                id="component.background-check-search-differences-alert.new-items-found-description"
-                defaultMessage="We have found {n, plural, =1 {# new result} other {# new results}} for your search."
-                values={{
-                  n: (diff.items?.added ?? []).length,
-                }}
-              />
-            ) : null}
+            <FormattedMessage
+              id="component.background-check-search-differences-alert.new-items-found-description"
+              defaultMessage="We have found {n, plural, =1 {# new result} other {# new results}} for your search."
+              values={{
+                n: (diff?.items?.added ?? []).length,
+              }}
+            />
           </AlertDescription>
         </Stack>
       </HStack>
