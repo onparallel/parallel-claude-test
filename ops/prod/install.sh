@@ -63,6 +63,8 @@ else
 fi
 sudo systemctl enable parallel-delay-queue.service
 sudo systemctl enable parallel-webhooks-worker-queue.service
+sudo systemctl enable parallel-background-check-profile-search-queue.service
+sudo systemctl enable parallel-background-check-petition-search-queue.service
 
 if [[ "$INSTANCE_NUMBER" == "1" ]]; then
   sudo systemctl enable parallel-reminder-trigger-cron.service

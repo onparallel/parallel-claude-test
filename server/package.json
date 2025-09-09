@@ -48,6 +48,8 @@
     "worker:expiring-properties": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/expiring-properties.ts",
     "worker:background-check-monitor": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/background-check-monitor.ts",
     "worker:adverse-media-monitor": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/adverse-media-monitor.ts",
+    "worker:background-check-profile-search": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/background-check-profile-search.ts",
+    "worker:background-check-petition-search": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/background-check-petition-search.ts",
     "localtunnel": "ts-node ./bin/launch-localtunnel.ts",
     "storybook": "concurrently \"yarn storybook:server\" \"yarn storybook:client\"",
     "storybook:server": "SERVER_STORIES_PORT=5001 ts-node-dev --watch ./stories.tsx --ignore-watch ./src --files ./stories.tsx --transpile-only --respawn",

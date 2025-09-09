@@ -7,15 +7,12 @@ import {
 } from "../../../db/events/ProfileEvent";
 import { FeatureFlagRepository } from "../../../db/repositories/FeatureFlagRepository";
 import { ProfileRepository } from "../../../db/repositories/ProfileRepository";
-import {
-  BACKGROUND_CHECK_SERVICE,
-  EntitySearchRequest,
-  IBackgroundCheckService,
-} from "../../../services/BackgroundCheckService";
+import { EntitySearchRequest } from "../../../services/BackgroundCheckService";
 import {
   ProfileTypeFieldActivationCondition,
   ProfileTypeFieldOptions,
 } from "../../../services/ProfileTypeFieldService";
+import { IQueuesService, QUEUES_SERVICE } from "../../../services/QueuesService";
 import { EventListener } from "../EventProcessorQueue";
 
 export const AUTOMATIC_BACKGROUND_CHECK_PROFILE_LISTENER = Symbol.for(
@@ -27,8 +24,8 @@ export class AutomaticBackgroundCheckProfileListener implements EventListener<"P
   public readonly types: "PROFILE_UPDATED"[] = ["PROFILE_UPDATED"];
 
   constructor(
+    @inject(QUEUES_SERVICE) private queues: IQueuesService,
     @inject(ProfileRepository) private readonly profiles: ProfileRepository,
-    @inject(BACKGROUND_CHECK_SERVICE) private readonly backgroundCheck: IBackgroundCheckService,
     @inject(FeatureFlagRepository) private readonly featureFlags: FeatureFlagRepository,
   ) {}
 
@@ -163,24 +160,14 @@ export class AutomaticBackgroundCheckProfileListener implements EventListener<"P
         birthCountry: birthCountryValue?.content.value ?? null,
       } as EntitySearchRequest;
 
-      const search = await this.backgroundCheck.entitySearch(query, orgId);
-      await this.profiles.updateProfileFieldValues(
-        [
-          {
-            profileId,
-            type: "BACKGROUND_CHECK",
-            profileTypeFieldId,
-            content: {
-              query,
-              search,
-              entity: null,
-            },
-            pendingReview: true,
-          },
-        ],
-        null,
-        orgId,
-      );
+      await this.queues.enqueueMessages("background-check-profile-search", {
+        body: {
+          orgId,
+          profileId,
+          profileTypeFieldId,
+          query,
+        },
+      });
     }
   }
 

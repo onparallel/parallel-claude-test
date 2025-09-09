@@ -13,11 +13,9 @@ import {
 import { KNEX } from "../../../../db/knex";
 import { Mocks } from "../../../../db/repositories/__tests__/mocks";
 import { initServer, TestClient } from "../../../../graphql/__tests__/server";
-import {
-  BACKGROUND_CHECK_SERVICE,
-  IBackgroundCheckService,
-} from "../../../../services/BackgroundCheckService";
+import { IQueuesService, QUEUES_SERVICE } from "../../../../services/QueuesService";
 import { fromGlobalId, toGlobalId } from "../../../../util/globalId";
+import { BackgroundCheckPetitionSearchQueue } from "../../../queues/BackgroundCheckPetitionSearchQueue";
 import {
   AUTOMATIC_BACKGROUND_CHECK_PETITION_LISTENER,
   AutomaticBackgroundCheckPetitionListener,
@@ -33,14 +31,19 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
 
   let backgroundCheckListener: AutomaticBackgroundCheckPetitionListener;
 
+  let queueSpy: jest.SpyInstance<
+    ReturnType<IQueuesService["enqueueMessages"]>,
+    Parameters<IQueuesService["enqueueMessages"]>
+  >;
+
+  let backgroundCheckPetitionQueue: BackgroundCheckPetitionSearchQueue;
+
   let petition: Petition;
   let fields: PetitionField[];
   let childFields: PetitionField[];
 
   let access: PetitionAccess;
   let contact: Contact;
-
-  let backgroundCheckServiceSpy: jest.SpyInstance;
 
   beforeAll(async () => {
     testClient = await initServer();
@@ -58,6 +61,8 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
     ]);
 
     [contact] = await mocks.createRandomContacts(organization.id, 1);
+
+    backgroundCheckPetitionQueue = testClient.container.get(BackgroundCheckPetitionSearchQueue);
   });
 
   afterAll(async () => {
@@ -65,13 +70,13 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
   });
 
   beforeEach(async () => {
-    backgroundCheckListener = testClient.container.get<AutomaticBackgroundCheckPetitionListener>(
-      AUTOMATIC_BACKGROUND_CHECK_PETITION_LISTENER,
+    queueSpy = jest.spyOn(
+      testClient.container.get<IQueuesService>(QUEUES_SERVICE),
+      "enqueueMessages",
     );
 
-    backgroundCheckServiceSpy = jest.spyOn(
-      testClient.container.get<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE),
-      "entitySearch",
+    backgroundCheckListener = testClient.container.get<AutomaticBackgroundCheckPetitionListener>(
+      AUTOMATIC_BACKGROUND_CHECK_PETITION_LISTENER,
     );
 
     [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
@@ -119,7 +124,7 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
   });
 
   afterEach(() => {
-    backgroundCheckServiceSpy.mockClear();
+    queueSpy.mockClear();
   });
 
   it("triggers background check search if field is automated and not replied when completing the petition", async () => {
@@ -136,6 +141,33 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
       data: { petition_access_id: access.id },
       processed_at: null,
       processed_by: null,
+    });
+
+    expect(queueSpy).toHaveBeenCalledExactlyOnceWith("background-check-petition-search", [
+      {
+        id: "background-check-petition-search-1-0",
+        body: {
+          petitionId: petition.id,
+          petitionFieldId: fields[1].id,
+          parentPetitionFieldReplyId: null,
+          petitionFieldReplyId: null,
+          orgId: organization.id,
+          query: { name: "Simpson", date: null, type: "PERSON", country: null, birthCountry: null },
+          userId: null,
+          petitionAccessId: access.id,
+        },
+      },
+    ]);
+
+    await backgroundCheckPetitionQueue.handler({
+      petitionId: petition.id,
+      petitionFieldId: fields[1].id,
+      parentPetitionFieldReplyId: null,
+      petitionFieldReplyId: null,
+      orgId: organization.id,
+      query: { name: "Simpson", date: null, type: "PERSON", country: null, birthCountry: null },
+      userId: null,
+      petitionAccessId: access.id,
     });
 
     const { errors, data } = await testClient.execute(
@@ -204,17 +236,6 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
         },
       ],
     });
-
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
-      {
-        name: "Simpson",
-        date: null,
-        type: "PERSON",
-        country: null,
-        birthCountry: null,
-      },
-      organization.id,
-    );
 
     const [dbReply] = await mocks.knex
       .from("petition_field_reply")
@@ -304,7 +325,7 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
       ],
     });
 
-    expect(backgroundCheckServiceSpy).not.toHaveBeenCalled();
+    expect(queueSpy).not.toHaveBeenCalled();
   });
 
   it("does not trigger background check search if field already has an entity stored", async () => {
@@ -417,7 +438,7 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
       ],
     });
 
-    expect(backgroundCheckServiceSpy).not.toHaveBeenCalled();
+    expect(queueSpy).not.toHaveBeenCalled();
   });
 
   it("does not trigger background check search if search query is the same as stored", async () => {
@@ -522,7 +543,7 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
       ],
     });
 
-    expect(backgroundCheckServiceSpy).not.toHaveBeenCalled();
+    expect(queueSpy).not.toHaveBeenCalled();
   });
 
   it("does not trigger background check search if reply is already approved", async () => {
@@ -626,7 +647,7 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
       ],
     });
 
-    expect(backgroundCheckServiceSpy).not.toHaveBeenCalled();
+    expect(queueSpy).not.toHaveBeenCalled();
   });
 
   it("triggers a background check search where name field is composed of multiple replies inside and outside the field group", async () => {
@@ -681,6 +702,141 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
       data: { petition_access_id: access.id },
       processed_at: null,
       processed_by: null,
+    });
+
+    expect(queueSpy).toHaveBeenCalledExactlyOnceWith("background-check-petition-search", [
+      {
+        id: "background-check-petition-search-1-0",
+        body: {
+          petitionId: petition.id,
+          petitionFieldId: fields[1].id,
+          parentPetitionFieldReplyId: null,
+          petitionFieldReplyId: null,
+          orgId: organization.id,
+          query: { name: "Simpson", date: null, type: "PERSON", country: null, birthCountry: null },
+          userId: null,
+          petitionAccessId: access.id,
+        },
+      },
+      {
+        id: "background-check-petition-search-1-1",
+        body: {
+          petitionId: petition.id,
+          petitionFieldId: childFields[2].id,
+          parentPetitionFieldReplyId: groupReplies[0].id,
+          petitionFieldReplyId: null,
+          orgId: organization.id,
+          query: {
+            name: "Homer Simpson",
+            date: "1980-01-01",
+            type: "PERSON",
+            country: null,
+            birthCountry: null,
+          },
+          userId: null,
+          petitionAccessId: access.id,
+        },
+      },
+      {
+        id: "background-check-petition-search-1-2",
+        body: {
+          petitionId: petition.id,
+          petitionFieldId: childFields[2].id,
+          parentPetitionFieldReplyId: groupReplies[1].id,
+          petitionFieldReplyId: null,
+          orgId: organization.id,
+          query: {
+            name: "Bart Simpson",
+            date: "1985-01-01",
+            type: "PERSON",
+            country: null,
+            birthCountry: null,
+          },
+          userId: null,
+          petitionAccessId: access.id,
+        },
+      },
+      {
+        id: "background-check-petition-search-1-3",
+        body: {
+          petitionId: petition.id,
+          petitionFieldId: childFields[2].id,
+          parentPetitionFieldReplyId: groupReplies[2].id,
+          petitionFieldReplyId: null,
+          orgId: organization.id,
+          query: {
+            name: "Lisa Simpson",
+            date: "1990-01-01",
+            type: "PERSON",
+            country: null,
+            birthCountry: null,
+          },
+          userId: null,
+          petitionAccessId: access.id,
+        },
+      },
+    ]);
+
+    await backgroundCheckPetitionQueue.handler({
+      petitionId: petition.id,
+      petitionFieldId: fields[1].id,
+      parentPetitionFieldReplyId: null,
+      petitionFieldReplyId: null,
+      orgId: organization.id,
+      query: { name: "Simpson", date: null, type: "PERSON", country: null, birthCountry: null },
+      userId: null,
+      petitionAccessId: access.id,
+    });
+
+    await backgroundCheckPetitionQueue.handler({
+      petitionId: petition.id,
+      petitionFieldId: childFields[2].id,
+      parentPetitionFieldReplyId: groupReplies[0].id,
+      petitionFieldReplyId: null,
+      orgId: organization.id,
+      query: {
+        name: "Homer Simpson",
+        date: "1980-01-01",
+        type: "PERSON",
+        country: null,
+        birthCountry: null,
+      },
+      userId: null,
+      petitionAccessId: access.id,
+    });
+
+    await backgroundCheckPetitionQueue.handler({
+      petitionId: petition.id,
+      petitionFieldId: childFields[2].id,
+      parentPetitionFieldReplyId: groupReplies[1].id,
+      petitionFieldReplyId: null,
+      orgId: organization.id,
+      query: {
+        name: "Bart Simpson",
+        date: "1985-01-01",
+        type: "PERSON",
+        country: null,
+        birthCountry: null,
+      },
+      userId: null,
+      petitionAccessId: access.id,
+    });
+
+    await backgroundCheckPetitionQueue.handler({
+      petitionId: petition.id,
+      petitionFieldId: childFields[2].id,
+      parentPetitionFieldReplyId: groupReplies[2].id,
+      petitionFieldReplyId: null,
+      orgId: organization.id,
+      userId: null,
+      petitionAccessId: access.id,
+      query: {
+        name: "Lisa Simpson",
+        date: "1990-01-01",
+        type: "PERSON",
+        country: null,
+        birthCountry: null,
+      },
     });
 
     const { errors, data } = await testClient.execute(
@@ -872,49 +1028,6 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
         },
       ],
     });
-
-    expect(backgroundCheckServiceSpy.mock.calls).toIncludeSameMembers([
-      [
-        {
-          name: "Simpson",
-          date: null,
-          type: "PERSON",
-          country: null,
-          birthCountry: null,
-        },
-        organization.id,
-      ],
-      [
-        {
-          name: "Homer Simpson",
-          date: "1980-01-01",
-          type: "PERSON",
-          country: null,
-          birthCountry: null,
-        },
-        organization.id,
-      ],
-      [
-        {
-          name: "Bart Simpson",
-          date: "1985-01-01",
-          type: "PERSON",
-          country: null,
-          birthCountry: null,
-        },
-        organization.id,
-      ],
-      [
-        {
-          name: "Lisa Simpson",
-          date: "1990-01-01",
-          type: "PERSON",
-          country: null,
-          birthCountry: null,
-        },
-        organization.id,
-      ],
-    ]);
   });
 
   it("updates background check search if petition is completed again with different query", async () => {
@@ -923,25 +1036,28 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
       content: { value: "Simpson, Homer J" },
     }));
 
-    await mocks.knex.from("petition_field_reply").insert({
-      petition_field_id: fields[1].id,
-      petition_access_id: access.id,
-      content: {
-        query: {
-          name: "Simpson",
-          date: null,
-          type: "PERSON",
-          country: null,
-          birthCountry: null,
+    const [reply] = await mocks.knex.from("petition_field_reply").insert(
+      {
+        petition_field_id: fields[1].id,
+        petition_access_id: access.id,
+        content: {
+          query: {
+            name: "Simpson",
+            date: null,
+            type: "PERSON",
+            country: null,
+            birthCountry: null,
+          },
+          search: {
+            totalCount: 100,
+            items: [],
+          },
+          entity: null,
         },
-        search: {
-          totalCount: 100,
-          items: [],
-        },
-        entity: null,
+        type: "BACKGROUND_CHECK",
       },
-      type: "BACKGROUND_CHECK",
-    });
+      "*",
+    );
 
     await backgroundCheckListener.handle({
       id: 1,
@@ -951,6 +1067,45 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
       data: { petition_access_id: access.id },
       processed_at: null,
       processed_by: null,
+    });
+
+    expect(queueSpy).toHaveBeenCalledExactlyOnceWith("background-check-petition-search", [
+      {
+        id: "background-check-petition-search-1-0",
+        body: {
+          petitionId: petition.id,
+          petitionFieldId: fields[1].id,
+          parentPetitionFieldReplyId: null,
+          petitionFieldReplyId: reply.id,
+          orgId: organization.id,
+          query: {
+            name: "Simpson, Homer J",
+            date: null,
+            type: "PERSON",
+            country: null,
+            birthCountry: null,
+          },
+          userId: null,
+          petitionAccessId: access.id,
+        },
+      },
+    ]);
+
+    await backgroundCheckPetitionQueue.handler({
+      petitionId: petition.id,
+      petitionFieldId: fields[1].id,
+      parentPetitionFieldReplyId: null,
+      petitionFieldReplyId: reply.id,
+      orgId: organization.id,
+      query: {
+        name: "Simpson, Homer J",
+        date: null,
+        type: "PERSON",
+        country: null,
+        birthCountry: null,
+      },
+      userId: null,
+      petitionAccessId: access.id,
     });
 
     const { errors, data } = await testClient.execute(
@@ -1018,17 +1173,6 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
         },
       ],
     });
-
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
-      {
-        name: "Simpson, Homer J",
-        date: null,
-        type: "PERSON",
-        country: null,
-        birthCountry: null,
-      },
-      organization.id,
-    );
 
     const [dbReply] = await mocks.knex
       .from("petition_field_reply")

@@ -19,6 +19,8 @@ import { ILogger, LOGGER } from "../src/services/Logger";
 import { IQueuesService, QUEUES_SERVICE } from "../src/services/QueuesService";
 import { IRedis, REDIS } from "../src/services/Redis";
 import { IStorageService, STORAGE_SERVICE } from "../src/services/StorageService";
+import { BackgroundCheckPetitionSearchQueue } from "../src/workers/queues/BackgroundCheckPetitionSearchQueue";
+import { BackgroundCheckProfileSearchQueue } from "../src/workers/queues/BackgroundCheckProfileSearchQueue";
 import { eventListenersModule } from "../src/workers/queues/event-listeners/module";
 import { WebhooksWorker } from "../src/workers/queues/WebhooksWorkerQueue";
 import {
@@ -92,5 +94,7 @@ export async function createTestContainer() {
   container.bind(WebhooksWorker).toSelf();
   container.load(eventListenersModule);
 
+  container.bind(BackgroundCheckProfileSearchQueue).toSelf();
+  container.bind(BackgroundCheckPetitionSearchQueue).toSelf();
   return container;
 }

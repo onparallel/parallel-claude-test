@@ -114,6 +114,24 @@ export function buildConfig() {
         visibilityTimeout: parseInt(process.env.WORKERS_WEBHOOKS_VISIBILITY_TIMEOUT!),
         heartbeatInterval: parseInt(process.env.WORKERS_WEBHOOKS_HEARTBEAT_INTERVAL!),
       },
+      "background-check-profile-search": {
+        queueUrl: process.env.WORKERS_BACKGROUND_CHECK_PROFILE_SEARCH_ENDPOINT!,
+        visibilityTimeout: parseInt(
+          process.env.WORKERS_BACKGROUND_CHECK_PROFILE_SEARCH_VISIBILITY_TIMEOUT!,
+        ),
+        heartbeatInterval: parseInt(
+          process.env.WORKERS_BACKGROUND_CHECK_PROFILE_SEARCH_HEARTBEAT_INTERVAL!,
+        ),
+      },
+      "background-check-petition-search": {
+        queueUrl: process.env.WORKERS_BACKGROUND_CHECK_PETITION_SEARCH_ENDPOINT!,
+        visibilityTimeout: parseInt(
+          process.env.WORKERS_BACKGROUND_CHECK_PETITION_SEARCH_VISIBILITY_TIMEOUT!,
+        ),
+        heartbeatInterval: parseInt(
+          process.env.WORKERS_BACKGROUND_CHECK_PETITION_SEARCH_HEARTBEAT_INTERVAL!,
+        ),
+      },
     },
     cronWorkers: {
       "scheduled-trigger": {

@@ -14,6 +14,8 @@ import { awsLogger } from "../../util/awsLogger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
 import { MaybePromise } from "../../util/types";
+import { BackgroundCheckPetitionSearchQueuePayload } from "../queues/BackgroundCheckPetitionSearchQueue";
+import { BackgroundCheckProfileSearchQueuePayload } from "../queues/BackgroundCheckProfileSearchQueue";
 import { DelayQueuePayload } from "../queues/DelayQueue";
 import { EmailEventsWorkerPayload } from "../queues/EmailEventsQueue";
 import { EmailSenderWorkerPayload } from "../queues/EmailSenderQueue";
@@ -30,6 +32,8 @@ export type QueueWorkerPayload_OLD<Q extends keyof Config["queueWorkers"]> = {
   "task-worker": TaskWorkerPayload;
   "delay-queue": DelayQueuePayload;
   "webhooks-worker": WebhooksWorkerPayload;
+  "background-check-profile-search": BackgroundCheckProfileSearchQueuePayload;
+  "background-check-petition-search": BackgroundCheckPetitionSearchQueuePayload;
 }[Q];
 
 export interface QueueWorkerOptions_OLD<Q extends keyof Config["queueWorkers"]> {

@@ -12,11 +12,9 @@ import { ProfileUpdatedEvent } from "../../../../db/events/ProfileEvent";
 import { KNEX } from "../../../../db/knex";
 import { Mocks } from "../../../../db/repositories/__tests__/mocks";
 import { initServer, TestClient } from "../../../../graphql/__tests__/server";
-import {
-  BACKGROUND_CHECK_SERVICE,
-  IBackgroundCheckService,
-} from "../../../../services/BackgroundCheckService";
+import { IQueuesService, QUEUES_SERVICE } from "../../../../services/QueuesService";
 import { toGlobalId } from "../../../../util/globalId";
+import { BackgroundCheckProfileSearchQueue } from "../../../queues/BackgroundCheckProfileSearchQueue";
 import {
   AUTOMATIC_BACKGROUND_CHECK_PROFILE_LISTENER,
   AutomaticBackgroundCheckProfileListener,
@@ -30,7 +28,12 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
   let organization: Organization;
   let user: User;
 
-  let backgroundCheckServiceSpy: jest.SpyInstance;
+  let queueSpy: jest.SpyInstance<
+    ReturnType<IQueuesService["enqueueMessages"]>,
+    Parameters<IQueuesService["enqueueMessages"]>
+  >;
+
+  let backgroundCheckProfileQueue: BackgroundCheckProfileSearchQueue;
 
   let profileType: ProfileType;
   let profileTypeFields: ProfileTypeField[];
@@ -92,6 +95,8 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
         },
       }),
     );
+
+    backgroundCheckProfileQueue = testClient.container.get(BackgroundCheckProfileSearchQueue);
   });
 
   afterAll(async () => {
@@ -99,16 +104,16 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
   });
 
   beforeEach(async () => {
-    backgroundCheckServiceSpy = jest.spyOn(
-      testClient.container.get<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE),
-      "entitySearch",
+    queueSpy = jest.spyOn(
+      testClient.container.get<IQueuesService>(QUEUES_SERVICE),
+      "enqueueMessages",
     );
 
     [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
   });
 
   afterEach(async () => {
-    backgroundCheckServiceSpy.mockClear();
+    queueSpy.mockClear();
 
     await mocks.knex
       .from("profile_type_field")
@@ -255,16 +260,21 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
-      {
-        name: "John Doe",
-        date: null,
-        country: "AR",
-        type: "PERSON",
-        birthCountry: "AR",
+    expect(queueSpy).toHaveBeenCalledExactlyOnceWith("background-check-profile-search", {
+      body: {
+        orgId: organization.id,
+        profileId: profile.id,
+        profileTypeFieldId: backgroundCheckField.id,
+        query: { name: "John Doe", date: null, country: "AR", type: "PERSON", birthCountry: "AR" },
       },
-      organization.id,
-    );
+    });
+
+    await backgroundCheckProfileQueue.handler({
+      orgId: organization.id,
+      profileId: profile.id,
+      profileTypeFieldId: backgroundCheckField.id,
+      query: { name: "John Doe", date: null, country: "AR", type: "PERSON", birthCountry: "AR" },
+    });
 
     const { errors: queryErrors, data: queryData } = await testClient.execute(
       gql`
@@ -529,16 +539,33 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
-      {
+    expect(queueSpy).toHaveBeenCalledExactlyOnceWith("background-check-profile-search", {
+      body: {
+        orgId: organization.id,
+        profileId: profile.id,
+        profileTypeFieldId: backgroundCheckField.id,
+        query: {
+          name: "John Doe",
+          date: "1990-01-01",
+          country: "UY",
+          type: "PERSON",
+          birthCountry: "UY",
+        },
+      },
+    });
+
+    await backgroundCheckProfileQueue.handler({
+      orgId: organization.id,
+      profileId: profile.id,
+      profileTypeFieldId: backgroundCheckField.id,
+      query: {
         name: "John Doe",
         date: "1990-01-01",
         country: "UY",
         type: "PERSON",
         birthCountry: "UY",
       },
-      organization.id,
-    );
+    });
 
     const { errors: queryErrors, data: queryData } = await testClient.execute(
       gql`
@@ -787,7 +814,7 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).not.toHaveBeenCalled();
+    expect(queueSpy).not.toHaveBeenCalled();
   });
 
   it("does not trigger background check search if activation condition is not met", async () => {
@@ -917,7 +944,7 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).not.toHaveBeenCalled();
+    expect(queueSpy).not.toHaveBeenCalled();
   });
 
   it("triggers background check search if field is already replied but does not have a match", async () => {
@@ -1086,16 +1113,21 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
-      {
-        name: "John Doe",
-        date: null,
-        country: "AR",
-        birthCountry: "AR",
-        type: "PERSON",
+    expect(queueSpy).toHaveBeenCalledExactlyOnceWith("background-check-profile-search", {
+      body: {
+        orgId: organization.id,
+        profileId: profile.id,
+        profileTypeFieldId: backgroundCheckField.id,
+        query: { name: "John Doe", date: null, country: "AR", type: "PERSON", birthCountry: "AR" },
       },
-      organization.id,
-    );
+    });
+
+    await backgroundCheckProfileQueue.handler({
+      orgId: organization.id,
+      profileId: profile.id,
+      profileTypeFieldId: backgroundCheckField.id,
+      query: { name: "John Doe", date: null, country: "AR", type: "PERSON", birthCountry: "AR" },
+    });
 
     const { errors: queryErrors, data: queryData } = await testClient.execute(
       gql`
@@ -1393,7 +1425,7 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).not.toHaveBeenCalled();
+    expect(queueSpy).not.toHaveBeenCalled();
   });
 
   it("does not update background check search if profile is updated with new values", async () => {
@@ -1531,16 +1563,21 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
-      {
-        name: "John Doe",
-        date: null,
-        country: "AR",
-        birthCountry: "AR",
-        type: "PERSON",
+    expect(queueSpy).toHaveBeenCalledExactlyOnceWith("background-check-profile-search", {
+      body: {
+        orgId: organization.id,
+        profileId: profile.id,
+        profileTypeFieldId: backgroundCheckField.id,
+        query: { name: "John Doe", date: null, country: "AR", type: "PERSON", birthCountry: "AR" },
       },
-      organization.id,
-    );
+    });
+
+    await backgroundCheckProfileQueue.handler({
+      orgId: organization.id,
+      profileId: profile.id,
+      profileTypeFieldId: backgroundCheckField.id,
+      query: { name: "John Doe", date: null, country: "AR", type: "PERSON", birthCountry: "AR" },
+    });
 
     const { errors: updateErrors, data: updateData } = await testClient.execute(
       gql`
@@ -1692,7 +1729,7 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledTimes(1);
+    expect(queueSpy).toHaveBeenCalledTimes(1);
   });
 
   it("does not trigger background check search if its current background_check value is removed", async () => {
@@ -1752,16 +1789,21 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
     // run first search
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledWith(
-      {
-        name: "John Doe",
-        date: null,
-        country: "AR",
-        birthCountry: "AR",
-        type: "PERSON",
+    expect(queueSpy).toHaveBeenCalledExactlyOnceWith("background-check-profile-search", {
+      body: {
+        orgId: organization.id,
+        profileId: profile.id,
+        profileTypeFieldId: backgroundCheckField.id,
+        query: { name: "John Doe", date: null, country: "AR", type: "PERSON", birthCountry: "AR" },
       },
-      organization.id,
-    );
+    });
+
+    await backgroundCheckProfileQueue.handler({
+      orgId: organization.id,
+      profileId: profile.id,
+      profileTypeFieldId: backgroundCheckField.id,
+      query: { name: "John Doe", date: null, country: "AR", type: "PERSON", birthCountry: "AR" },
+    });
 
     const { errors: removeErrors, data: removeData } = await testClient.execute(
       gql`
@@ -1887,7 +1929,7 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     //this should not trigger a new search
     await handleListenerEvent(latestProfileUpdatedEvent as ProfileUpdatedEvent);
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledTimes(1);
+    expect(queueSpy).toHaveBeenCalledTimes(1);
   });
 
   it("triggers background check search if its current background_check value is removed but any of its other fields are updated", async () => {
@@ -2046,16 +2088,27 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledExactlyOnceWith(
-      {
-        name: "Harvey Doe",
-        date: null,
-        country: "AR",
-        birthCountry: "AR",
-        type: "PERSON",
+    expect(queueSpy).toHaveBeenCalledExactlyOnceWith("background-check-profile-search", {
+      body: {
+        orgId: organization.id,
+        profileId: profile.id,
+        profileTypeFieldId: backgroundCheckField.id,
+        query: {
+          name: "Harvey Doe",
+          date: null,
+          country: "AR",
+          type: "PERSON",
+          birthCountry: "AR",
+        },
       },
-      organization.id,
-    );
+    });
+
+    await backgroundCheckProfileQueue.handler({
+      orgId: organization.id,
+      profileId: profile.id,
+      profileTypeFieldId: backgroundCheckField.id,
+      query: { name: "Harvey Doe", date: null, country: "AR", type: "PERSON", birthCountry: "AR" },
+    });
 
     const { errors: queryErrors, data: queryData } = await testClient.execute(
       gql`
@@ -2237,16 +2290,21 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
     // run first search
     await handleListenerEvent(profileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledWith(
-      {
-        name: "John Doe",
-        date: null,
-        country: "AR",
-        birthCountry: "AR",
-        type: "PERSON",
+    expect(queueSpy).toHaveBeenCalledExactlyOnceWith("background-check-profile-search", {
+      body: {
+        orgId: organization.id,
+        profileId: profile.id,
+        profileTypeFieldId: backgroundCheckField.id,
+        query: { name: "John Doe", date: null, country: "AR", type: "PERSON", birthCountry: "AR" },
       },
-      organization.id,
-    );
+    });
+
+    await backgroundCheckProfileQueue.handler({
+      orgId: organization.id,
+      profileId: profile.id,
+      profileTypeFieldId: backgroundCheckField.id,
+      query: { name: "John Doe", date: null, country: "AR", type: "PERSON", birthCountry: "AR" },
+    });
 
     await testClient.execute(
       gql`
@@ -2293,7 +2351,7 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     // this should not trigger a new search
     await handleListenerEvent(latestProfileUpdatedEvent as ProfileUpdatedEvent);
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledTimes(1);
+    expect(queueSpy).toHaveBeenCalledTimes(1);
 
     // updating an unrelated field should not trigger a new search
     const { errors } = await testClient.execute(
@@ -2345,6 +2403,6 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
 
     await handleListenerEvent(latestProfileUpdatedEvent as ProfileUpdatedEvent);
 
-    expect(backgroundCheckServiceSpy).toHaveBeenCalledTimes(1);
+    expect(queueSpy).toHaveBeenCalledTimes(1);
   });
 });
