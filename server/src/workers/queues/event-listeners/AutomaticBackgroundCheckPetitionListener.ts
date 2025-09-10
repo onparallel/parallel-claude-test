@@ -1,11 +1,15 @@
 import { inject, injectable } from "inversify";
+import pMap from "p-map";
 import { isNonNullish, isNullish } from "remeda";
 import { PetitionFieldReply } from "../../../db/__types";
 import { PetitionCompletedEvent } from "../../../db/events/PetitionEvent";
 import { FeatureFlagRepository } from "../../../db/repositories/FeatureFlagRepository";
 import { PetitionRepository } from "../../../db/repositories/PetitionRepository";
-import { EntitySearchRequest } from "../../../services/BackgroundCheckService";
-import { IQueuesService, QUEUES_SERVICE } from "../../../services/QueuesService";
+import {
+  BACKGROUND_CHECK_SERVICE,
+  EntitySearchRequest,
+  IBackgroundCheckService,
+} from "../../../services/BackgroundCheckService";
 import { applyFieldVisibility } from "../../../util/fieldLogic";
 import { EventListener } from "../EventProcessorQueue";
 
@@ -20,8 +24,8 @@ export class AutomaticBackgroundCheckPetitionListener
   public readonly types: "PETITION_COMPLETED"[] = ["PETITION_COMPLETED"];
 
   constructor(
-    @inject(QUEUES_SERVICE) private readonly queues: IQueuesService,
     @inject(PetitionRepository) private readonly petitions: PetitionRepository,
+    @inject(BACKGROUND_CHECK_SERVICE) private readonly backgroundCheck: IBackgroundCheckService,
     @inject(FeatureFlagRepository) private readonly featureFlags: FeatureFlagRepository,
   ) {}
 
@@ -50,24 +54,49 @@ export class AutomaticBackgroundCheckPetitionListener
     const backgroundCheckAutoSearchQueries =
       await this.buildAutomatedBackgroundCheckPetitionQueries(event.petition_id);
 
-    if (backgroundCheckAutoSearchQueries.length > 0) {
-      await this.queues.enqueueMessages(
-        "background-check-petition-search",
-        backgroundCheckAutoSearchQueries.map((data, index) => ({
-          id: `background-check-petition-search-${event.id}-${index}`,
-          body: {
-            petitionId: event.petition_id,
-            petitionFieldId: data.petitionFieldId,
-            parentPetitionFieldReplyId: data.parentPetitionFieldReplyId,
-            petitionFieldReplyId: data.petitionFieldReplyId,
-            orgId: petition.org_id,
-            query: data.query,
-            userId: userId ?? null,
-            petitionAccessId: petitionAccessId ?? null,
-          },
-        })),
-      );
-    }
+    await pMap(
+      backgroundCheckAutoSearchQueries,
+      async (data) => {
+        if (isNonNullish(data.petitionFieldReplyId)) {
+          await this.petitions.updatePetitionFieldRepliesContent(
+            event.petition_id,
+            [
+              {
+                id: data.petitionFieldReplyId,
+                content: {
+                  query: data.query,
+                  search: await this.backgroundCheck.entitySearch(data.query, petition.org_id),
+                  entity: null,
+                },
+              },
+            ],
+            userId ? "User" : "PetitionAccess",
+            userId ?? petitionAccessId!,
+          );
+        } else {
+          await this.petitions.createPetitionFieldReply(
+            event.petition_id,
+            {
+              type: "BACKGROUND_CHECK",
+              content: {
+                query: data.query,
+                search: await this.backgroundCheck.entitySearch(data.query, petition.org_id),
+                entity: null,
+              },
+              ...("user_id" in event.data ? { user_id: event.data.user_id } : {}),
+              ...("petition_access_id" in event.data
+                ? { petition_access_id: event.data.petition_access_id }
+                : {}),
+              petition_field_id: data.petitionFieldId,
+              parent_petition_field_reply_id: data.parentPetitionFieldReplyId,
+              status: "PENDING",
+            },
+            userId ? `User:${userId}` : `PetitionAccess:${petitionAccessId}`,
+          );
+        }
+      },
+      { concurrency: 10 },
+    );
   }
 
   private async buildAutomatedBackgroundCheckPetitionQueries(petitionId: number): Promise<

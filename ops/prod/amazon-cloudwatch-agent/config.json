@@ -207,6 +207,28 @@
           }
         },
         {
+          "pid_file": "/var/run/parallel-webhooks-worker-queue.pid",
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
+          "metrics_collection_interval": 10,
+          "append_dimensions": {
+            "Process": "parallel-webhooks-worker-queue"
+          }
+        },
+        {
+          "pid_file": "/var/run/parallel-background-check-profile-search-queue.pid",
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
+          "metrics_collection_interval": 10,
+          "append_dimensions": {
+            "Process": "parallel-background-check-profile-search-queue"
+          }
+        },
+        {
           "pid_file": "/var/run/parallel-reminder-trigger-cron.pid",
           "measurement": [
             "cpu_usage",

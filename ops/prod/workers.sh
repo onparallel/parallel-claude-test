@@ -9,7 +9,6 @@ if [[ "$COMMAND" == "start" ]]; then
   sudo systemctl ${COMMAND} parallel-delay-queue.service
   sudo systemctl ${COMMAND} parallel-webhooks-worker-queue.service
   sudo systemctl ${COMMAND} parallel-background-check-profile-search-queue.service
-  sudo systemctl ${COMMAND} parallel-background-check-petition-search-queue.service
 
   if [[ "#INSTANCE_NUMBER#" == "1" ]]; then
     sudo systemctl ${COMMAND} parallel-reminder-trigger-cron.service
