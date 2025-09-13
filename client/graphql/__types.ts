@@ -68656,6 +68656,26 @@ export type useAddNewSignature_updatePetitionSignatureConfigMutation = {
     | { __typename?: "PetitionTemplate" };
 };
 
+export type useBrowserMetadata_ConnectionMetadataFragment = {
+  __typename?: "ConnectionMetadata";
+  browserName?: string | null;
+  browserVersion?: string | null;
+  country?: string | null;
+  deviceType?: string | null;
+  ip?: string | null;
+};
+
+export type useBrowserMetadata_PublicQueryFragment = {
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    browserName?: string | null;
+    browserVersion?: string | null;
+    country?: string | null;
+    deviceType?: string | null;
+    ip?: string | null;
+  };
+};
+
 export type useBrowserMetadata_QueryFragment = {
   metadata: {
     __typename?: "ConnectionMetadata";
@@ -70549,16 +70569,22 @@ export type validatePetitionFields_PetitionBaseFragment =
   | validatePetitionFields_PetitionBase_Petition_Fragment
   | validatePetitionFields_PetitionBase_PetitionTemplate_Fragment;
 
+export const useBrowserMetadata_ConnectionMetadataFragmentDoc = gql`
+  fragment useBrowserMetadata_ConnectionMetadata on ConnectionMetadata {
+    browserName
+    browserVersion
+    country
+    deviceType
+    ip
+  }
+` as unknown as DocumentNode<useBrowserMetadata_ConnectionMetadataFragment, unknown>;
 export const useBrowserMetadata_QueryFragmentDoc = gql`
   fragment useBrowserMetadata_Query on Query {
     metadata {
-      browserName
-      browserVersion
-      country
-      deviceType
-      ip
+      ...useBrowserMetadata_ConnectionMetadata
     }
   }
+  ${useBrowserMetadata_ConnectionMetadataFragmentDoc}
 ` as unknown as DocumentNode<useBrowserMetadata_QueryFragment, unknown>;
 export const ProfileTypeReference_ProfileTypeFragmentDoc = gql`
   fragment ProfileTypeReference_ProfileType on ProfileType {
@@ -81963,6 +81989,14 @@ export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
     fields
   }
 ` as unknown as DocumentNode<uploadFile_AWSPresignedPostDataFragment, unknown>;
+export const useBrowserMetadata_PublicQueryFragmentDoc = gql`
+  fragment useBrowserMetadata_PublicQuery on Query {
+    metadata(keycode: $keycode) {
+      ...useBrowserMetadata_ConnectionMetadata
+    }
+  }
+  ${useBrowserMetadata_ConnectionMetadataFragmentDoc}
+` as unknown as DocumentNode<useBrowserMetadata_PublicQueryFragment, unknown>;
 export const usePinProfileType_ProfileTypeFragmentDoc = gql`
   fragment usePinProfileType_ProfileType on ProfileType {
     id
@@ -89125,10 +89159,10 @@ export const RecipientView_accessDocument = gql`
       hasClientPortalAccess
       ...RecipientView_PublicPetitionAccess
     }
-    ...useBrowserMetadata_Query
+    ...useBrowserMetadata_PublicQuery
   }
   ${RecipientView_PublicPetitionAccessFragmentDoc}
-  ${useBrowserMetadata_QueryFragmentDoc}
+  ${useBrowserMetadata_PublicQueryFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_accessQuery, RecipientView_accessQueryVariables>;
 export const RecipientView_accessesDocument = gql`
   query RecipientView_accesses($keycode: ID!) {
@@ -89144,10 +89178,10 @@ export const RecipientPortal_accessDocument = gql`
       hasClientPortalAccess
       ...RecipientPortal_PublicPetitionAccess
     }
-    ...useBrowserMetadata_Query
+    ...useBrowserMetadata_PublicQuery
   }
   ${RecipientPortal_PublicPetitionAccessFragmentDoc}
-  ${useBrowserMetadata_QueryFragmentDoc}
+  ${useBrowserMetadata_PublicQueryFragmentDoc}
 ` as unknown as DocumentNode<RecipientPortal_accessQuery, RecipientPortal_accessQueryVariables>;
 export const RecipientPortal_statsDocument = gql`
   query RecipientPortal_stats($keycode: ID!, $search: String) {

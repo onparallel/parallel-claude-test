@@ -593,10 +593,10 @@ const _queries = [
         hasClientPortalAccess
         ...RecipientView_PublicPetitionAccess
       }
-      ...useBrowserMetadata_Query
+      ...useBrowserMetadata_PublicQuery
     }
     ${_fragments.PublicPetitionAccess}
-    ${useBrowserMetadata.fragments.Query}
+    ${useBrowserMetadata.fragments.PublicQuery}
   `,
   gql`
     query RecipientView_accesses($keycode: ID!) {

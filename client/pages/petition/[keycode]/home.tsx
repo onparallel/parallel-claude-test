@@ -608,10 +608,10 @@ const _queries = [
         hasClientPortalAccess
         ...RecipientPortal_PublicPetitionAccess
       }
-      ...useBrowserMetadata_Query
+      ...useBrowserMetadata_PublicQuery
     }
     ${_fragments.PublicPetitionAccess}
-    ${useBrowserMetadata.fragments.Query}
+    ${useBrowserMetadata.fragments.PublicQuery}
   `,
   gql`
     query RecipientPortal_stats($keycode: ID!, $search: String) {
