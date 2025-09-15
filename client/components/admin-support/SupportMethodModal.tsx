@@ -141,11 +141,6 @@ export function SupportMethodModal({ field, queryType, schemaTypes, onClose }: M
             <Text fontSize="sm" fontWeight="normal">
               {field.description}
             </Text>
-            <Text fontSize="xs" color={queryType === "mutation" ? "red.500" : ""}>
-              {queryType === "query"
-                ? "This method has no impact on the database."
-                : "This method will write into the database."}
-            </Text>
           </ModalHeader>
           <ModalBody>
             <Grid templateColumns="minmax(100px, auto) 1fr" rowGap={2} columnGap={2}>

@@ -3041,6 +3041,7 @@ export interface NexusGenFieldTypes {
     publicUpdatePetitionFieldReplies: NexusGenRootTypes["PublicPetitionFieldReply"][]; // [PublicPetitionFieldReply!]!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     rejectPetitionApprovalRequestStep: NexusGenRootTypes["PetitionApprovalRequestStep"]; // PetitionApprovalRequestStep!
+    removeEmailFromSuppressionList: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     removePetitionPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     removeProfileRelationship: NexusGenEnums["Success"]; // Success!
     removeProfileTypeProcess: NexusGenRootTypes["ProfileType"]; // ProfileType!
@@ -6311,6 +6312,7 @@ export interface NexusGenFieldTypeNames {
     publicUpdatePetitionFieldReplies: "PublicPetitionFieldReply";
     reactivateAccesses: "PetitionAccess";
     rejectPetitionApprovalRequestStep: "PetitionApprovalRequestStep";
+    removeEmailFromSuppressionList: "SupportMethodResponse";
     removePetitionPassword: "SupportMethodResponse";
     removeProfileRelationship: "Success";
     removeProfileTypeProcess: "ProfileType";
@@ -9679,6 +9681,10 @@ export interface NexusGenArgTypes {
       message: string; // String!
       petitionId: NexusGenScalars["GID"]; // GID!
       rejectionType: NexusGenEnums["PetitionApprovalRequestStepRejectionType"]; // PetitionApprovalRequestStepRejectionType!
+    };
+    removeEmailFromSuppressionList: {
+      // args
+      email: string; // String!
     };
     removePetitionPassword: {
       // args

@@ -3082,6 +3082,11 @@ type Mutation {
   ): PetitionApprovalRequestStep!
 
   """
+  Removes an email from AWS SES suppression list
+  """
+  removeEmailFromSuppressionList(email: String!): SupportMethodResponse!
+
+  """
   Removes the password on a petition or template
   """
   removePetitionPassword(petitionId: GID!): SupportMethodResponse!

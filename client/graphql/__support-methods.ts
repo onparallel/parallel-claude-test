@@ -793,6 +793,34 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "removeEmailFromSuppressionList",
+      description: "Removes an email from AWS SES suppression list",
+      args: [
+        {
+          name: "email",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "removePetitionPassword",
       description: "Removes the password on a petition or template",
       args: [

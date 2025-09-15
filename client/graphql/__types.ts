@@ -1734,6 +1734,8 @@ export interface Mutation {
   reactivateAccesses: Array<PetitionAccess>;
   /** Rejects the current approval request step. Step must be in PENDING status. */
   rejectPetitionApprovalRequestStep: PetitionApprovalRequestStep;
+  /** Removes an email from AWS SES suppression list */
+  removeEmailFromSuppressionList: SupportMethodResponse;
   /** Removes the password on a petition or template */
   removePetitionPassword: SupportMethodResponse;
   /** Disassociates two profiles with a relationship. */
@@ -3011,6 +3013,10 @@ export interface MutationrejectPetitionApprovalRequestStepArgs {
   message: Scalars["String"]["input"];
   petitionId: Scalars["GID"]["input"];
   rejectionType: PetitionApprovalRequestStepRejectionType;
+}
+
+export interface MutationremoveEmailFromSuppressionListArgs {
+  email: Scalars["String"]["input"];
 }
 
 export interface MutationremovePetitionPasswordArgs {

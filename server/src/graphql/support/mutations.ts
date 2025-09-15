@@ -1,8 +1,10 @@
+import { DeleteSuppressedDestinationCommand, SESv2Client } from "@aws-sdk/client-sesv2";
 import Ajv from "ajv";
 import { booleanArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { indexBy, isNonNullish, isNullish, round, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { UserGroupPermissionName } from "../../db/__types";
+import { awsLogger } from "../../util/awsLogger";
 import { toBytes } from "../../util/fileSize";
 import { fullName } from "../../util/fullName";
 import { fromGlobalId, isGlobalId, toGlobalId } from "../../util/globalId";
@@ -1644,3 +1646,29 @@ export const createAwsBedrockCompletionIntegration = mutationField(
     },
   },
 );
+
+export const removeEmailFromSuppressionList = mutationField("removeEmailFromSuppressionList", {
+  type: "SupportMethodResponse",
+  description: "Removes an email from AWS SES suppression list",
+  authorize: superAdminAccess(),
+  args: {
+    email: nonNull(stringArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      const client = new SESv2Client({
+        ...ctx.config.aws,
+        logger: awsLogger(ctx.logger),
+      });
+
+      await client.send(new DeleteSuppressedDestinationCommand({ EmailAddress: args.email }));
+
+      return { result: RESULT.SUCCESS, message: "Email removed from suppression list" };
+    } catch (error) {
+      return {
+        result: RESULT.FAILURE,
+        message: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  },
+});
