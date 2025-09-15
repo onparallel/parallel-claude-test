@@ -1099,7 +1099,13 @@ describe("GraphQL/Users", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("USER_ALREADY_IN_ORG_ERROR");
+      expect(errors).toContainGraphQLError("USER_ALREADY_IN_ORG_ERROR", {
+        user: {
+          id: toGlobalId("User", sessionUser.id),
+          status: "ACTIVE",
+          fullName: "Bond, James Bond",
+        },
+      });
       expect(data).toBeNull();
     });
 

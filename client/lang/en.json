@@ -2100,6 +2100,26 @@
     "context": "Reactivate contact access"
   },
   {
+    "term": "component.confirm-reactivate-invited-user-dialog.body-1",
+    "definition": "{fullName} is already registered in your organization, but has been previously deactivated and does not have access to Parallel.",
+    "context": "{fullName} is already registered in your organization, but has been previously deactivated and does not have access to Parallel."
+  },
+  {
+    "term": "component.confirm-reactivate-invited-user-dialog.body-2",
+    "definition": "Do you want to reactivate this user?",
+    "context": "Do you want to reactivate this user?"
+  },
+  {
+    "term": "component.confirm-reactivate-invited-user-dialog.confirm",
+    "definition": "Yes, reactivate",
+    "context": "Yes, reactivate"
+  },
+  {
+    "term": "component.confirm-reactivate-invited-user-dialog.header",
+    "definition": "User is already registered",
+    "context": "User is already registered"
+  },
+  {
     "term": "component.confirm-remove-dashboard-permission-dialog.message-own",
     "definition": "Are you sure you want to remove your own permission? Doing so will cause you to lose access.",
     "context": "Are you sure you want to remove your own permission? Doing so will cause you to lose access."
@@ -18703,6 +18723,16 @@
     "term": "page.users.user-limit-reached-toast-title",
     "definition": "User limit reached",
     "context": "User limit reached"
+  },
+  {
+    "term": "page.users.user-reactivated-toast-description",
+    "definition": "The user has been successfully reactivated.",
+    "context": "The user has been successfully reactivated."
+  },
+  {
+    "term": "page.users.user-reactivated-toast-title",
+    "definition": "User reactivated",
+    "context": "User reactivated"
   },
   {
     "term": "page.users.user-updated-success-toast-title",

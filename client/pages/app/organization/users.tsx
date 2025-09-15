@@ -28,6 +28,7 @@ import { OrganizationUsersListTableHeader } from "@parallel/components/organizat
 import { UserLimitReachedAlert } from "@parallel/components/organization/UserLimitReachedAlert";
 import { useConfirmActivateUsersDialog } from "@parallel/components/organization/dialogs/ConfirmActivateUsersDialog";
 import { useConfirmDeactivateUserDialog } from "@parallel/components/organization/dialogs/ConfirmDeactivateUserDialog";
+import { useConfirmReactivateInvitedUserDialog } from "@parallel/components/organization/dialogs/ConfirmReactivateInvitedUserDialog";
 import { useConfirmResendInvitationDialog } from "@parallel/components/organization/dialogs/ConfirmResendInvitationDialog";
 import { useCreateOrUpdateUserDialog } from "@parallel/components/organization/dialogs/CreateOrUpdateUserDialog";
 import {
@@ -173,6 +174,7 @@ function OrganizationUsers() {
     OrganizationUsers_inviteUserToOrganizationDocument,
   );
   const showCreateOrUpdateUserDialog = useCreateOrUpdateUserDialog();
+  const showConfirmReactivateInvitedUserDialog = useConfirmReactivateInvitedUserDialog();
   const handleCreateUser = async () => {
     try {
       const data = await showCreateOrUpdateUserDialog({});
@@ -208,18 +210,47 @@ function OrganizationUsers() {
       if (isDialogError(error)) {
         return;
       } else if (isApolloError(error, "USER_ALREADY_IN_ORG_ERROR")) {
-        toast({
-          status: "info",
-          title: intl.formatMessage({
-            id: "page.users.user-already-registered-toast-title",
-            defaultMessage: "User already registered",
-          }),
-          description: intl.formatMessage({
-            id: "page.users.user-already-registered-toast-description",
-            defaultMessage: "The provided email is already registered on the organization.",
-          }),
-          isClosable: true,
-        });
+        const user = error.graphQLErrors[0]?.extensions?.user as {
+          id: string;
+          status: UserStatus;
+          fullName: string;
+        };
+        if (user.status === "ACTIVE") {
+          toast({
+            status: "info",
+            title: intl.formatMessage({
+              id: "page.users.user-already-registered-toast-title",
+              defaultMessage: "User already registered",
+            }),
+            description: intl.formatMessage({
+              id: "page.users.user-already-registered-toast-description",
+              defaultMessage: "The provided email is already registered on the organization.",
+            }),
+            isClosable: true,
+          });
+        } else if (user.status === "INACTIVE") {
+          try {
+            await showConfirmReactivateInvitedUserDialog({
+              fullName: user.fullName,
+            });
+            await activateUser({
+              variables: { userIds: [user.id] },
+            });
+            refetch();
+            toast({
+              status: "success",
+              title: intl.formatMessage({
+                id: "page.users.user-reactivated-toast-title",
+                defaultMessage: "User reactivated",
+              }),
+              description: intl.formatMessage({
+                id: "page.users.user-reactivated-toast-description",
+                defaultMessage: "The user has been successfully reactivated.",
+              }),
+              isClosable: true,
+            });
+          } catch {}
+        }
       } else if (isApolloError(error, "USER_LIMIT_ERROR")) {
         toast({
           status: "error",

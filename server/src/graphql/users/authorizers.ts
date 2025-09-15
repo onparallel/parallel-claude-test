@@ -1,5 +1,7 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { UserGroupPermissionName, UserStatus } from "../../db/__types";
+import { fullName } from "../../util/fullName";
+import { toGlobalId } from "../../util/globalId";
 import { Maybe, MaybeArray, unMaybeArray } from "../../util/types";
 import { Arg, getArg } from "../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../helpers/errors";
@@ -74,10 +76,20 @@ export function emailIsNotRegisteredInTargetOrg<
     const email = getArg(args, emailArg);
     const targetOrgId = getArg(args, orgIdArg) ?? ctx.user!.org_id;
     const users = await ctx.users.loadUsersByEmail(email);
-    if (users.some((user) => user.org_id === targetOrgId)) {
+
+    const orgUser = users.find((u) => u.org_id === targetOrgId);
+    if (orgUser) {
+      const userData = await ctx.users.loadUserData(orgUser.user_data_id);
       throw new ApolloError(
         "The provided email is already registered on the organization",
         "USER_ALREADY_IN_ORG_ERROR",
+        {
+          user: {
+            id: toGlobalId("User", orgUser.id),
+            status: orgUser.status,
+            fullName: fullName(userData!.first_name, userData!.last_name),
+          },
+        },
       );
     }
 
