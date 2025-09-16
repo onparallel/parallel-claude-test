@@ -13,7 +13,7 @@ const CONFIG =
         {
           // PARALLEL
           orgId: 1,
-          riskValues: ["LOW", "MEDIUM", "HIGH", "VERY_HIGH"] as const,
+          riskValues: ["LOW", "MEDIUM", "HIGH"] as const,
           individual: {
             profileTypeId: 64,
             riskProfileTypeFieldId: 4380,
