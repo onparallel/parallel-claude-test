@@ -23,6 +23,10 @@ import {
   AutomaticBackgroundCheckProfileListener,
 } from "./event-listeners/AutomaticBackgroundCheckProfileListener";
 import {
+  CLIENT_RISK_UPDATE_LISTENER,
+  ClientRiskUpdateListener,
+} from "./event-listeners/ClientRiskUpdateListener";
+import {
   DOCUMENT_PROCESSING_LISTENER,
   DocumentProcessingListener,
 } from "./event-listeners/DocumentProcessingListener";
@@ -96,12 +100,15 @@ export class EventProcessor extends QueueWorker<EventProcessorPayload> {
     automaticBackgroundCheckProfileListener: AutomaticBackgroundCheckProfileListener,
     @inject(PETITION_APPROVAL_PROCESS_LISTENER)
     petitionApprovalProcessListener: PetitionApprovalProcessListener,
+    @inject(CLIENT_RISK_UPDATE_LISTENER)
+    clientRiskUpdateListener: ClientRiskUpdateListener,
   ) {
     super();
 
     this.register(analyticsEventListener)
       .register(petitionEventSubscriptionsListener)
       .register(profileEventSubscriptionsListener)
+      .register(clientRiskUpdateListener)
       .register(petitionActivityListener)
       .register(documentProcessingListener)
       .register(userNotificationsListener)

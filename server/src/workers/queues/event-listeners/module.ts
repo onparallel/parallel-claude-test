@@ -8,6 +8,7 @@ import {
   AUTOMATIC_BACKGROUND_CHECK_PROFILE_LISTENER,
   AutomaticBackgroundCheckProfileListener,
 } from "./AutomaticBackgroundCheckProfileListener";
+import { CLIENT_RISK_UPDATE_LISTENER, ClientRiskUpdateListener } from "./ClientRiskUpdateListener";
 import {
   DOCUMENT_PROCESSING_LISTENER,
   DocumentProcessingListener,
@@ -44,4 +45,5 @@ export const eventListenersModule = new ContainerModule((options) => {
     .bind(AUTOMATIC_BACKGROUND_CHECK_PROFILE_LISTENER)
     .to(AutomaticBackgroundCheckProfileListener);
   options.bind(PETITION_APPROVAL_PROCESS_LISTENER).to(PetitionApprovalProcessListener);
+  options.bind(CLIENT_RISK_UPDATE_LISTENER).to(ClientRiskUpdateListener);
 });

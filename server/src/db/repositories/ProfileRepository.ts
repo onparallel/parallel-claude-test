@@ -634,6 +634,27 @@ export class ProfileRepository extends BaseRepository {
       }),
   );
 
+  readonly loadProfileFieldValue = this.buildLoader<
+    { profileId: number; profileTypeFieldId: number },
+    ProfileFieldValue | null,
+    string
+  >(
+    async (keys, t) => {
+      const values = await this.from("profile_field_value", t)
+        .whereIn("profile_id", unique(keys.map((k) => k.profileId)))
+        .whereIn("profile_type_field_id", unique(keys.map((k) => k.profileTypeFieldId)))
+        .where({
+          removed_at: null,
+          deleted_at: null,
+          is_draft: false,
+        });
+
+      const byKey = indexBy(values, keyBuilder(["profile_id", "profile_type_field_id"]));
+      return keys.map(keyBuilder(["profileId", "profileTypeFieldId"])).map((k) => byKey[k] ?? null);
+    },
+    { cacheKeyFn: keyBuilder(["profileId", "profileTypeFieldId"]) },
+  );
+
   readonly loadProfileFieldValueWithDraft = this.buildLoader<
     {
       profileId: number;
