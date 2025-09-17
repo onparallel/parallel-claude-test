@@ -6146,6 +6146,10 @@ describe("ProfileLinkedPetitionFields", () => {
                 data: {
                   userId: toGlobalId("User", user.id),
                   profileRelationshipId: expect.any(String),
+                  profileRelationshipTypeId: toGlobalId(
+                    "ProfileRelationshipType",
+                    relationshipTypes.find((rt) => rt.alias === "p_director__managed_by")!.id,
+                  ),
                   relationshipAlias: "p_director__managed_by",
                 },
               },
@@ -6154,6 +6158,12 @@ describe("ProfileLinkedPetitionFields", () => {
                 data: {
                   userId: toGlobalId("User", user.id),
                   profileRelationshipId: expect.any(String),
+                  profileRelationshipTypeId: toGlobalId(
+                    "ProfileRelationshipType",
+                    relationshipTypes.find(
+                      (rt) => rt.alias === "p_legal_representative__legally_represented",
+                    )!.id,
+                  ),
                   relationshipAlias: "p_legal_representative__legally_represented",
                 },
               },

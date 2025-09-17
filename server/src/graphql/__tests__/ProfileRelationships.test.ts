@@ -1995,6 +1995,10 @@ describe("GraphQL/Profile Relationships", () => {
                     data: {
                       userId: toGlobalId("User", user.id),
                       profileRelationshipId: expect.any(String),
+                      profileRelationshipTypeId: toGlobalId(
+                        "ProfileRelationshipType",
+                        relationshipTypes.find((type) => type.alias === "p_parent__child")!.id,
+                      ),
                       relationshipAlias: "p_parent__child",
                     },
                   },
@@ -2014,6 +2018,10 @@ describe("GraphQL/Profile Relationships", () => {
                     data: {
                       userId: toGlobalId("User", user.id),
                       profileRelationshipId: expect.any(String),
+                      profileRelationshipTypeId: toGlobalId(
+                        "ProfileRelationshipType",
+                        relationshipTypes.find((type) => type.alias === "p_parent__child")!.id,
+                      ),
                       relationshipAlias: "p_parent__child",
                     },
                   },
@@ -2295,6 +2303,12 @@ describe("GraphQL/Profile Relationships", () => {
                   "ProfileRelationship",
                   legalRepresentativeRelationship.id,
                 ),
+                profileRelationshipTypeId: toGlobalId(
+                  "ProfileRelationshipType",
+                  relationshipTypes.find(
+                    (type) => type.alias === "p_legal_representative__legally_represented",
+                  )!.id,
+                ),
                 relationshipAlias: "p_legal_representative__legally_represented",
                 reason: "REMOVED_BY_USER",
               },
@@ -2342,6 +2356,12 @@ describe("GraphQL/Profile Relationships", () => {
                 profileRelationshipId: toGlobalId(
                   "ProfileRelationship",
                   legalRepresentativeRelationship.id,
+                ),
+                profileRelationshipTypeId: toGlobalId(
+                  "ProfileRelationshipType",
+                  relationshipTypes.find(
+                    (type) => type.alias === "p_legal_representative__legally_represented",
+                  )!.id,
                 ),
                 relationshipAlias: "p_legal_representative__legally_represented",
                 reason: "REMOVED_BY_USER",
@@ -2453,6 +2473,10 @@ describe("GraphQL/Profile Relationships", () => {
               data: {
                 userId: toGlobalId("User", user.id),
                 profileRelationshipId: toGlobalId("ProfileRelationship", parentRelationship.id),
+                profileRelationshipTypeId: toGlobalId(
+                  "ProfileRelationshipType",
+                  relationshipTypes.find((type) => type.alias === "p_parent__child")!.id,
+                ),
                 relationshipAlias: "p_parent__child",
                 reason: "PROFILE_DELETED",
               },

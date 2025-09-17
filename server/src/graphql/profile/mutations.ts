@@ -1081,6 +1081,7 @@ export const deleteProfile = mutationField("deleteProfile", {
             ? null
             : {
                 profileId: r.left_side_profile_id,
+                deletedProfileId: r.right_side_profile_id,
                 profileRelationshipId: r.id,
                 profileRelationshipTypeId: r.profile_relationship_type_id,
               },
@@ -1088,6 +1089,7 @@ export const deleteProfile = mutationField("deleteProfile", {
             ? null
             : {
                 profileId: r.right_side_profile_id,
+                deletedProfileId: r.left_side_profile_id,
                 profileRelationshipId: r.id,
                 profileRelationshipTypeId: r.profile_relationship_type_id,
               },
@@ -1095,19 +1097,24 @@ export const deleteProfile = mutationField("deleteProfile", {
         .filter(isNonNullish);
 
       await ctx.profiles.createEvent(
-        eventsData.map((d) => ({
-          type: "PROFILE_RELATIONSHIP_REMOVED",
-          org_id: ctx.user!.org_id,
-          profile_id: d.profileId,
-          data: {
-            user_id: ctx.user!.id,
-            profile_relationship_id: d.profileRelationshipId,
-            reason: "PROFILE_DELETED",
-            profile_relationship_type_alias: relationshipTypes.find(
-              (rt) => rt!.id === d.profileRelationshipTypeId,
-            )!.alias,
-          },
-        })),
+        eventsData.map((d) => {
+          const relationshipType = relationshipTypes.find(
+            (rt) => rt!.id === d.profileRelationshipTypeId,
+          );
+          return {
+            type: "PROFILE_RELATIONSHIP_REMOVED",
+            org_id: ctx.user!.org_id,
+            profile_id: d.profileId,
+            data: {
+              user_id: ctx.user!.id,
+              other_side_profile_id: d.deletedProfileId,
+              profile_relationship_id: d.profileRelationshipId,
+              profile_relationship_type_id: d.profileRelationshipTypeId,
+              profile_relationship_type_alias: relationshipType?.alias ?? null,
+              reason: "PROFILE_DELETED",
+            },
+          };
+        }),
       );
     }
 
@@ -2110,37 +2117,39 @@ export const removeProfileRelationship = mutationField("removeProfileRelationshi
     );
 
     await ctx.profiles.createEvent(
-      relationships.flatMap(
-        (r) =>
-          [
-            {
-              org_id: ctx.user!.org_id,
-              profile_id: r.left_side_profile_id,
-              type: "PROFILE_RELATIONSHIP_REMOVED",
-              data: {
-                user_id: ctx.user!.id,
-                profile_relationship_id: r.id,
-                profile_relationship_type_alias: relationshipTypes.find(
-                  (rt) => rt!.id === r.profile_relationship_type_id,
-                )!.alias,
-                reason: "REMOVED_BY_USER",
-              },
+      relationships.flatMap((r) => {
+        const relationshipType = relationshipTypes.find(
+          (rt) => rt!.id === r.profile_relationship_type_id,
+        );
+        return [
+          {
+            org_id: ctx.user!.org_id,
+            profile_id: r.left_side_profile_id,
+            type: "PROFILE_RELATIONSHIP_REMOVED",
+            data: {
+              user_id: ctx.user!.id,
+              profile_relationship_id: r.id,
+              other_side_profile_id: r.right_side_profile_id,
+              profile_relationship_type_id: r.profile_relationship_type_id,
+              profile_relationship_type_alias: relationshipType?.alias ?? null,
+              reason: "REMOVED_BY_USER",
             },
-            {
-              org_id: ctx.user!.org_id,
-              profile_id: r.right_side_profile_id,
-              type: "PROFILE_RELATIONSHIP_REMOVED",
-              data: {
-                user_id: ctx.user!.id,
-                profile_relationship_id: r.id,
-                profile_relationship_type_alias: relationshipTypes.find(
-                  (rt) => rt!.id === r.profile_relationship_type_id,
-                )!.alias,
-                reason: "REMOVED_BY_USER",
-              },
+          },
+          {
+            org_id: ctx.user!.org_id,
+            profile_id: r.right_side_profile_id,
+            type: "PROFILE_RELATIONSHIP_REMOVED",
+            data: {
+              user_id: ctx.user!.id,
+              profile_relationship_id: r.id,
+              other_side_profile_id: r.left_side_profile_id,
+              profile_relationship_type_id: r.profile_relationship_type_id,
+              profile_relationship_type_alias: relationshipType?.alias ?? null,
+              reason: "REMOVED_BY_USER",
             },
-          ] satisfies ProfileRelationshipRemovedEvent<true>[],
-      ),
+          },
+        ] satisfies ProfileRelationshipRemovedEvent<true>[];
+      }),
     );
 
     return RESULT.SUCCESS;

@@ -122,6 +122,7 @@ async function deleteProfilesScheduledForDeletion(
             ? null
             : {
                 profileId: r.left_side_profile_id,
+                deletedProfileId: r.right_side_profile_id,
                 profileRelationshipId: r.id,
                 profileRelationshipTypeId: r.profile_relationship_type_id,
                 orgId: r.org_id,
@@ -130,6 +131,7 @@ async function deleteProfilesScheduledForDeletion(
             ? null
             : {
                 profileId: r.right_side_profile_id,
+                deletedProfileId: r.left_side_profile_id,
                 profileRelationshipId: r.id,
                 profileRelationshipTypeId: r.profile_relationship_type_id,
                 orgId: r.org_id,
@@ -138,19 +140,24 @@ async function deleteProfilesScheduledForDeletion(
         .filter(isNonNullish);
 
       await ctx.profiles.createEvent(
-        eventsData.map((d) => ({
-          type: "PROFILE_RELATIONSHIP_REMOVED",
-          org_id: d.orgId,
-          profile_id: d.profileId,
-          data: {
-            user_id: null,
-            profile_relationship_id: d.profileRelationshipId,
-            reason: "PROFILE_DELETED",
-            profile_relationship_type_alias: relationshipTypes.find(
-              (rt) => rt!.id === d.profileRelationshipTypeId,
-            )!.alias,
-          },
-        })),
+        eventsData.map((d) => {
+          const relationshipType = relationshipTypes.find(
+            (rt) => rt!.id === d.profileRelationshipTypeId,
+          );
+          return {
+            type: "PROFILE_RELATIONSHIP_REMOVED",
+            org_id: d.orgId,
+            profile_id: d.profileId,
+            data: {
+              user_id: null,
+              profile_relationship_id: d.profileRelationshipId,
+              reason: "PROFILE_DELETED",
+              profile_relationship_type_alias: relationshipType?.alias ?? null,
+              profile_relationship_type_id: d.profileRelationshipTypeId,
+              other_side_profile_id: d.deletedProfileId,
+            },
+          };
+        }),
       );
     }
   }

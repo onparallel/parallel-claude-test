@@ -1204,8 +1204,13 @@ const ProfileEventSchemas = {
         type: "string",
         example: toGlobalId("ProfileRelationship", 1),
       },
+      profileRelationshipTypeId: {
+        description: "The ID of the relationship type",
+        type: "string",
+        example: toGlobalId("ProfileRelationshipType", 1),
+      },
       relationshipAlias: {
-        description: "The alias of the relationship",
+        description: "The alias of the relationship type",
         type: ["string", "null"],
         example: "parent",
       },
@@ -1225,8 +1230,13 @@ const ProfileEventSchemas = {
         type: "string",
         example: toGlobalId("ProfileRelationship", 1),
       },
+      profileRelationshipTypeId: {
+        description: "The ID of the relationship type",
+        type: "string",
+        example: toGlobalId("ProfileRelationshipType", 1),
+      },
       relationshipAlias: {
-        description: "The alias of the relationship",
+        description: "The alias of the relationship type",
         type: ["string", "null"],
         example: "parent",
       },

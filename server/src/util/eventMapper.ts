@@ -483,6 +483,10 @@ export function mapProfileEventPayload(event: ProfileEvent) {
           "ProfileRelationship",
           event.data.profile_relationship_id,
         ),
+        profileRelationshipTypeId: toGlobalId(
+          "ProfileRelationshipType",
+          event.data.profile_relationship_type_id,
+        ),
         relationshipAlias: event.data.profile_relationship_type_alias,
       };
     }
@@ -492,6 +496,10 @@ export function mapProfileEventPayload(event: ProfileEvent) {
         profileRelationshipId: toGlobalId(
           "ProfileRelationship",
           event.data.profile_relationship_id,
+        ),
+        profileRelationshipTypeId: toGlobalId(
+          "ProfileRelationshipType",
+          event.data.profile_relationship_type_id,
         ),
         relationshipAlias: event.data.profile_relationship_type_alias,
         reason: event.data.reason,

@@ -56,11 +56,15 @@ export type ProfileEventPayload<TType extends ProfileEventType> = {
   PROFILE_RELATIONSHIP_CREATED: {
     user_id: number;
     profile_relationship_id: number;
+    profile_relationship_type_id: number;
+    other_side_profile_id: number;
     profile_relationship_type_alias: string | null;
   };
   PROFILE_RELATIONSHIP_REMOVED: {
     user_id: number | null;
     profile_relationship_id: number;
+    profile_relationship_type_id: number;
+    other_side_profile_id: number;
     profile_relationship_type_alias: string | null;
     reason: string;
   };

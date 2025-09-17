@@ -2965,6 +2965,7 @@ export class ProfileRepository extends BaseRepository {
             'PROFILE_RELATIONSHIP_CREATED'::profile_event_type,
             jsonb_build_object(
               'user_id', ?::int,
+              'other_side_profile_id', pr.right_side_profile_id,
               'profile_relationship_id', pr.id,
               'profile_relationship_type_id', pr.profile_relationship_type_id,
               'profile_relationship_type_alias', prt.alias
@@ -2977,6 +2978,7 @@ export class ProfileRepository extends BaseRepository {
             'PROFILE_RELATIONSHIP_CREATED'::profile_event_type,
             jsonb_build_object(
               'user_id', ?::int,
+              'other_side_profile_id', pr.left_side_profile_id,
               'profile_relationship_id', pr.id,
               'profile_relationship_type_id', pr.profile_relationship_type_id,
               'profile_relationship_type_alias', prt.alias
