@@ -2367,7 +2367,7 @@
   {
     "term": "component.confirm-signer-info-dialog.is-preset",
     "definition": "Firmantes requeridos",
-    "context": "Required signed"
+    "context": "Required signer"
   },
   {
     "term": "component.confirm-signer-info-dialog.is-preset-popover",

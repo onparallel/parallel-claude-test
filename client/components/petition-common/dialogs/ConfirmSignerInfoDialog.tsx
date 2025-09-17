@@ -226,7 +226,7 @@ function ConfirmSignerInfoDialog({
                   <FormLabel fontWeight={400} margin="auto">
                     <FormattedMessage
                       id="component.confirm-signer-info-dialog.is-preset"
-                      defaultMessage="Required signed"
+                      defaultMessage="Required signer"
                     />
                   </FormLabel>
                   <HelpPopover>

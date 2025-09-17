@@ -2366,8 +2366,8 @@
   },
   {
     "term": "component.confirm-signer-info-dialog.is-preset",
-    "definition": "Required signed",
-    "context": "Required signed"
+    "definition": "Required signer",
+    "context": "Required signer"
   },
   {
     "term": "component.confirm-signer-info-dialog.is-preset-popover",
