@@ -21,7 +21,6 @@ async function request(path, { query, method = "GET", body, }) {
     return await res.json();
 }
 async function main() {
-    var _a, _b, _c;
     const petitions = await request("/petitions", {
         query: new URLSearchParams({
             fromTemplateId: TEMPLATE_ID,
@@ -32,7 +31,7 @@ async function main() {
     });
     for (const petition of petitions.items) {
         const field = petition.fields.find((f) => f.fromPetitionFieldId === TEMPLATE_FIELD_ID);
-        const replies = (_c = (_b = (_a = field.replies) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.content) === null || _c === void 0 ? void 0 : _c.map((r) => r.replace(/^[\d_]+/, "").replace(/: .*$/, ""));
+        const replies = field.replies?.[0]?.content?.map((r) => r.replace(/^[\d_]+/, "").replace(/: .*$/, ""));
         if (replies && replies.length > 0) {
             const tags = (0, remeda_1.difference)(replies, petition.tags);
             if (tags.length > 0) {

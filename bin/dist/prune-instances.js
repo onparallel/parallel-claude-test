@@ -14,7 +14,6 @@ const ec2 = new client_ec2_1.EC2Client({});
 const elb = new client_elastic_load_balancing_1.ElasticLoadBalancingClient({});
 const cw = new client_cloudwatch_1.CloudWatchClient({});
 async function main() {
-    var _a, _b;
     const { env, "dry-run": dryRun } = await yargs_1.default
         .usage("Usage: $0 --env [env]")
         .option("dry-run", {
@@ -42,7 +41,7 @@ async function main() {
     for (const instance of instances) {
         const instanceId = instance.InstanceId;
         if (!liveInstances.includes(instanceId)) {
-            const instanceName = (_a = instance.Tags.find((t) => t.Key === "Name")) === null || _a === void 0 ? void 0 : _a.Value;
+            const instanceName = instance.Tags.find((t) => t.Key === "Name")?.Value;
             const instanceState = instance.State.Name;
             if (instanceState === "running") {
                 console.log((0, chalk_1.default) `Stopping instance {bold ${instanceId}} {yellow {bold ${instanceName}}}`);
@@ -55,7 +54,7 @@ async function main() {
                 }
             }
             else if (instanceState === "stopped" || instanceState === "stopping") {
-                const match = (_b = instance.StateTransitionReason) === null || _b === void 0 ? void 0 : _b.match(/^User initiated \((.*)\)$/);
+                const match = instance.StateTransitionReason?.match(/^User initiated \((.*)\)$/);
                 if (match) {
                     const transitionDate = new Date(match[1]);
                     // terminate instance that were stopped more than 7 days ago, so we can keep the instance data for a while

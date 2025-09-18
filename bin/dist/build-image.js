@@ -89,11 +89,10 @@ async function main() {
         const imageId = createImageResult.ImageId;
         console.log(chalk_1.default.green `Image created: ${imageId}`);
         await (0, wait_1.waitForResult)(async () => {
-            var _a;
             const result = await ec2.send(new client_ec2_1.DescribeImagesCommand({
                 ImageIds: [imageId],
             }));
-            const imageState = (_a = result.Images) === null || _a === void 0 ? void 0 : _a[0].State;
+            const imageState = result.Images?.[0].State;
             if ([client_ec2_1.ImageState.available, client_ec2_1.ImageState.pending].includes(imageState)) {
                 return imageState === client_ec2_1.ImageState.available;
             }

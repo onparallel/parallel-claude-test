@@ -22,8 +22,8 @@ async function main() {
     bar.start(flags.length, 0);
     await (0, p_map_1.default)(flags, async (element) => {
         const match = element.tags.match(/^([A-Z]{2}),/);
-        if (match === null || match === void 0 ? void 0 : match[1]) {
-            const code = match === null || match === void 0 ? void 0 : match[1];
+        if (match?.[1]) {
+            const code = match?.[1];
             const url = `https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/72x72/${element.hexcode}.png`;
             await (0, fetchToFile_1.fetchToFile)(url, path_1.default.join(output, `${code.toLowerCase()}.png`));
             bar.increment(1);

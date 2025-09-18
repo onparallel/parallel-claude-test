@@ -74,9 +74,8 @@ async function main() {
         }));
     });
     await (0, p_map_1.default)(newInstances, async (instance) => {
-        var _a;
         const ipAddress = instance.PrivateIpAddress;
-        const instanceName = (_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value;
+        const instanceName = instance.Tags?.find((t) => t.Key === "Name").Value;
         await (0, ssh_1.executeRemoteCommand)(ipAddress, `${OPS_DIR}/server.sh start`);
         console.log(chalk_1.default.green `Server started in ${instance.InstanceId} ${instanceName}`);
     });
@@ -86,10 +85,9 @@ async function main() {
             .then((r) => r.Reservations.flatMap((r) => r.Instances))
         : [];
     await (0, p_map_1.default)(oldInstancesFull, async (instance) => {
-        var _a, _b;
-        if (((_a = instance.State) === null || _a === void 0 ? void 0 : _a.Name) === client_ec2_1.InstanceStateName.running) {
+        if (instance.State?.Name === client_ec2_1.InstanceStateName.running) {
             const ipAddress = instance.PrivateIpAddress;
-            const instanceName = (_b = instance.Tags) === null || _b === void 0 ? void 0 : _b.find((t) => t.Key === "Name").Value;
+            const instanceName = instance.Tags?.find((t) => t.Key === "Name").Value;
             console.log(chalk_1.default.yellow `Stopping workers on ${instance.InstanceId} ${instanceName}`);
             await (0, ssh_1.executeRemoteCommand)(ipAddress, `${OPS_DIR}/workers.sh stop`);
             console.log(chalk_1.default.green.bold `Workers stopped on ${instance.InstanceId} ${instanceName}`);
@@ -158,18 +156,16 @@ async function main() {
         console.log(chalk_1.default.green.bold `Old instances deregistered`);
     }
     await (0, p_map_1.default)(newInstances, async (instance) => {
-        var _a;
         const ipAddress = instance.PrivateIpAddress;
-        const instanceName = (_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value;
+        const instanceName = instance.Tags?.find((t) => t.Key === "Name").Value;
         console.log(chalk_1.default.yellow `Starting workers on ${instance.InstanceId} ${instanceName}`);
         await (0, ssh_1.executeRemoteCommand)(ipAddress, `${OPS_DIR}/workers.sh start`);
         console.log(chalk_1.default.green.bold `Workers started on ${instance.InstanceId} ${instanceName}`);
     });
     await (0, p_map_1.default)(oldInstancesFull, async (instance) => {
-        var _a, _b;
-        if (((_a = instance.State) === null || _a === void 0 ? void 0 : _a.Name) === client_ec2_1.InstanceStateName.running) {
+        if (instance.State?.Name === client_ec2_1.InstanceStateName.running) {
             const ipAddress = instance.PrivateIpAddress;
-            const instanceName = (_b = instance.Tags) === null || _b === void 0 ? void 0 : _b.find((t) => t.Key === "Name").Value;
+            const instanceName = instance.Tags?.find((t) => t.Key === "Name").Value;
             await (0, ssh_1.executeRemoteCommand)(ipAddress, `${OPS_DIR}/server.sh stop`);
             console.log(chalk_1.default.green `Server stopped in ${instance.InstanceId} ${instanceName}`);
         }

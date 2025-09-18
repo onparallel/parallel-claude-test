@@ -33,7 +33,6 @@ async function main() {
     }
 }
 async function addRecord(domain, challenge) {
-    var _a, _b, _c;
     const hostedZoneId = ZONE_MAP[domain];
     const recordName = `_acme-challenge.${domain}`;
     const response = await route53.send(new client_route_53_1.ListResourceRecordSetsCommand({
@@ -54,7 +53,7 @@ async function addRecord(domain, challenge) {
                         Type: "TXT",
                         TTL: 300,
                         ResourceRecords: [
-                            ...((_c = (_b = (_a = response.ResourceRecordSets) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.ResourceRecords) !== null && _c !== void 0 ? _c : []),
+                            ...(response.ResourceRecordSets?.[0]?.ResourceRecords ?? []),
                             { Value: `"${challenge}"` },
                         ],
                     },
@@ -65,7 +64,6 @@ async function addRecord(domain, challenge) {
     await waitForChange(response2.ChangeInfo.Id);
 }
 async function removeRecord(domain, challenge) {
-    var _a, _b, _c, _d, _e;
     const hostedZoneId = ZONE_MAP[domain];
     const recordName = `_acme-challenge.${domain}`;
     const response = await route53.send(new client_route_53_1.ListResourceRecordSetsCommand({
@@ -74,7 +72,7 @@ async function removeRecord(domain, challenge) {
         StartRecordType: "TXT",
     }));
     if ((0, remeda_1.isNonNullish)(response.ResourceRecordSets)) {
-        if (((_b = (_a = response.ResourceRecordSets[0]) === null || _a === void 0 ? void 0 : _a.ResourceRecords) === null || _b === void 0 ? void 0 : _b.length) === 1 &&
+        if (response.ResourceRecordSets[0]?.ResourceRecords?.length === 1 &&
             response.ResourceRecordSets[0].ResourceRecords[0].Value === `"${challenge}"`) {
             console.log(`Removing TXT record from ${recordName}`);
             const response2 = await route53.send(new client_route_53_1.ChangeResourceRecordSetsCommand({
@@ -110,7 +108,7 @@ async function removeRecord(domain, challenge) {
                                 Type: "TXT",
                                 TTL: 300,
                                 ResourceRecords: [
-                                    ...((_e = (_d = (_c = response.ResourceRecordSets) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.ResourceRecords) !== null && _e !== void 0 ? _e : []).filter((r) => r.Value !== `"${challenge}"`),
+                                    ...(response.ResourceRecordSets?.[0]?.ResourceRecords ?? []).filter((r) => r.Value !== `"${challenge}"`),
                                 ],
                             },
                         },
@@ -123,9 +121,8 @@ async function removeRecord(domain, challenge) {
 }
 async function waitForChange(changeId) {
     await (0, wait_1.waitForResult)(async () => {
-        var _a;
         const response = await route53.send(new client_route_53_1.GetChangeCommand({ Id: changeId }));
-        return ((_a = response.ChangeInfo) === null || _a === void 0 ? void 0 : _a.Status) === "INSYNC";
+        return response.ChangeInfo?.Status === "INSYNC";
     }, { delay: 3000 });
 }
 (0, run_1.run)(main);

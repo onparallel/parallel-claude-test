@@ -1,3 +1,5 @@
+import { RateLimitGuard } from "../utils/RateLimitGuard";
+
 /**
  * fetches all items of a paginated endpoint
  */
@@ -33,11 +35,14 @@ export async function* paginatedRequest<T>(
   } while (index < totalCount);
 }
 
+const guard = new RateLimitGuard(90 / 60);
+
 export async function request<T = any>(
   path: string,
   options?: { query?: URLSearchParams; method?: string; body?: Record<string, any> },
 ): Promise<T> {
   const { query, method = "GET", body } = options ?? {};
+  await guard.waitUntilAllowed();
   const res = await fetch(
     `https://www.onparallel.com/api/v1/${path.startsWith("/") ? path.slice(1) : path}${
       query && query.size > 0 ? `?${query}` : ""
@@ -51,5 +56,5 @@ export async function request<T = any>(
       },
     },
   );
-  return (await res.json()) as T;
+  return res.ok && res.status !== 204 ? ((await res.json()) as T) : (null as T);
 }

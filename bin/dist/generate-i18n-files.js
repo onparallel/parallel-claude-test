@@ -14,7 +14,6 @@ const json_1 = require("./utils/json");
 const log_1 = require("./utils/log");
 const run_1 = require("./utils/run");
 async function generate(locales, input, pickMissingFrom, rawOutput, compiledOutput) {
-    var _a;
     // store the values used in the default (first) locale to make sure they
     // are used in all the other locales
     const values = {};
@@ -34,7 +33,7 @@ async function generate(locales, input, pickMissingFrom, rawOutput, compiledOutp
         const compiled = {};
         let missing = 0;
         for (const { term, definition: _definition } of terms) {
-            const definition = _definition === "" ? ((_a = extendedTranslations[term]) !== null && _a !== void 0 ? _a : "") : _definition;
+            const definition = _definition === "" ? (extendedTranslations[term] ?? "") : _definition;
             if (definition === "") {
                 missing += 1;
             }

@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const promises_1 = require("fs/promises");
 const remeda_1 = require("remeda");
 const run_1 = require("../utils/run");
-const wait_1 = require("../utils/wait");
 /**
  * This script sends reminders to every PENDING petition coming from the passed template
  */
@@ -78,7 +77,6 @@ async function main() {
                 });
             }
         }
-        await (0, wait_1.waitFor)(1000);
     }
     if (errorLog.length > 0) {
         await (0, promises_1.writeFile)("errorLog.json", JSON.stringify(errorLog, null, 2));

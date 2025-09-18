@@ -16,7 +16,6 @@ async function request(path, { query, method = "GET", body, }) {
     return await res.json();
 }
 async function main() {
-    var _a, _b;
     const petitions = await request("/petitions", {
         query: new URLSearchParams({
             fromTemplateId: TEMPLATE_IDS.join(","),
@@ -25,7 +24,7 @@ async function main() {
         }),
     });
     for (const petition of petitions.items) {
-        const recipient = (_b = (_a = petition.recipients) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.contact.fullName;
+        const recipient = petition.recipients?.[0]?.contact.fullName;
         if (!recipient || petition.name !== "Saldados - Expediente")
             continue;
         const name = `Formulario - ${recipient}`;

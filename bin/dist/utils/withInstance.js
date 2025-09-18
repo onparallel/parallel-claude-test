@@ -30,10 +30,9 @@ async function withInstance(ec2, runInstanceCommandInput, fn, options = {}) {
     try {
         await (0, wait_1.waitFor)(5000, { signal: abortController.signal });
         await (0, wait_1.waitForResult)(async () => {
-            var _a, _b, _c;
             const result = await ec2.send(new client_ec2_1.DescribeInstancesCommand({ InstanceIds: [instanceId] }));
-            const instance = (_b = (_a = result.Reservations) === null || _a === void 0 ? void 0 : _a[0].Instances) === null || _b === void 0 ? void 0 : _b[0];
-            return ((_c = instance === null || instance === void 0 ? void 0 : instance.State) === null || _c === void 0 ? void 0 : _c.Name) === client_ec2_1.InstanceStateName.running;
+            const instance = result.Reservations?.[0].Instances?.[0];
+            return instance?.State?.Name === client_ec2_1.InstanceStateName.running;
         }, {
             message: chalk_1.default.italic `Instance {yellow pending}. Waiting 5 more seconds...`,
             delay: 5000,

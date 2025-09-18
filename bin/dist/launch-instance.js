@@ -171,7 +171,7 @@ async function main() {
                 throw e;
             }
         }
-        throw new Error("No AZ available");
+        throw new Error("No instance capacity in any AZ available");
     }, { concurrency: 4 });
 }
 (0, run_1.run)(main);

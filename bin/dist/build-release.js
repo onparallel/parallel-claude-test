@@ -161,9 +161,8 @@ async function main() {
                     throw new Error("All yarn cache volumes are in use");
                 }
                 await (0, wait_1.waitForResult)(async () => {
-                    var _a, _b, _c;
                     const result = await ec2.send(new client_ec2_1.DescribeVolumesCommand({ VolumeIds: [volumeId] }));
-                    return (((_c = (_b = (_a = result.Volumes) === null || _a === void 0 ? void 0 : _a[0].Attachments) === null || _b === void 0 ? void 0 : _b.find((a) => a.InstanceId === instanceId)) === null || _c === void 0 ? void 0 : _c.State) ===
+                    return (result.Volumes?.[0].Attachments?.find((a) => a.InstanceId === instanceId)?.State ===
                         client_ec2_1.VolumeAttachmentState.attached);
                 }, {
                     message: chalk_1.default.italic `Volume attaching {yellow pending}. Waiting 3 more seconds...`,
