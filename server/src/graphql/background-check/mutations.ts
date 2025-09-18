@@ -113,6 +113,7 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
           ],
           ctx.user!.id,
           ctx.user!.org_id,
+          "MANUAL",
         );
       } else {
         // when removing entity go back to draft without removing value
@@ -129,6 +130,7 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
             },
           ],
           ctx.user!.id,
+          "MANUAL",
         );
       }
     }
@@ -283,6 +285,7 @@ export const updateBackgroundCheckSearchFalsePositives = mutationField(
               },
             ],
             ctx.user!.id,
+            "MANUAL",
           );
         } else {
           // when adding a false positive, we need to check if every item in search is now a false positive
@@ -303,6 +306,7 @@ export const updateBackgroundCheckSearchFalsePositives = mutationField(
               ],
               ctx.user!.id,
               ctx.user!.org_id,
+              "MANUAL",
             );
           } else {
             await ctx.profiles.upsertDraftProfileFieldValues(
@@ -318,6 +322,7 @@ export const updateBackgroundCheckSearchFalsePositives = mutationField(
                 },
               ],
               ctx.user!.id,
+              "MANUAL",
             );
           }
         }

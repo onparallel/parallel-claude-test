@@ -58,6 +58,7 @@ createCronWorker("adverse-media-monitor", async (ctx) => {
           ],
           null,
           org.id,
+          "PARALLEL_MONITORING",
         );
       },
       { concurrency: 10 },

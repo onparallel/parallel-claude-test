@@ -1769,8 +1769,6 @@ export interface Mutation {
   retryAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
-  /** @deprecated use saveProfileFieldValueDraft instead */
-  saveAdverseMediaChanges: AdverseMediaArticleSearchResult;
   /** Saves a draft of a profile field value */
   saveProfileFieldValueDraft: Success;
   /** Moves a profile to DELETION_SCHEDULED status */
@@ -2403,6 +2401,7 @@ export interface MutationcreatePrintPdfTaskArgs {
 export interface MutationcreateProfileArgs {
   fields: Array<CreateProfileFieldValueInput>;
   profileTypeId: Scalars["GID"]["input"];
+  source?: InputMaybe<ProfileFieldValueSource>;
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
 }
 
@@ -2421,6 +2420,7 @@ export interface MutationcreateProfileFieldFileUploadLinkArgs {
   expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
+  source?: InputMaybe<ProfileFieldValueSource>;
 }
 
 export interface MutationcreateProfileLinkedPetitionFieldArgs {
@@ -3099,10 +3099,6 @@ export interface MutationrevokeUserAuthTokenArgs {
   authTokenIds: Array<Scalars["GID"]["input"]>;
 }
 
-export interface MutationsaveAdverseMediaChangesArgs {
-  token: Scalars["String"]["input"];
-}
-
 export interface MutationsaveProfileFieldValueDraftArgs {
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
@@ -3530,6 +3526,7 @@ export interface MutationupdateProfileEventSubscriptionArgs {
 export interface MutationupdateProfileFieldValueArgs {
   fields: Array<UpdateProfileFieldValueInput>;
   profileId: Scalars["GID"]["input"];
+  source?: InputMaybe<ProfileFieldValueSource>;
 }
 
 export interface MutationupdateProfileFieldValueMonitoringStatusArgs {
@@ -3564,6 +3561,7 @@ export interface MutationupdateProfileTypeFieldArgs {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   profileTypeFieldId: Scalars["GID"]["input"];
   profileTypeId: Scalars["GID"]["input"];
+  source?: InputMaybe<ProfileFieldValueSource>;
 }
 
 export interface MutationupdateProfileTypeFieldPermissionsArgs {
@@ -5842,6 +5840,14 @@ export interface ProfileFieldValueMonitoredEvent extends ProfileEvent {
   profile?: Maybe<Profile>;
   type: ProfileEventType;
 }
+
+export type ProfileFieldValueSource =
+  | "EXCEL_IMPORT"
+  | "EXTERNAL"
+  | "MANUAL"
+  | "PARALLEL_API"
+  | "PARALLEL_MONITORING"
+  | "PETITION_FIELD_REPLY";
 
 export interface ProfileFieldValueUpdatedEvent extends ProfileEvent {
   __typename?: "ProfileFieldValueUpdatedEvent";

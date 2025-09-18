@@ -501,6 +501,7 @@ describe("repositories/ProfileRepository", () => {
         ],
         user.id,
         organization.id,
+        "MANUAL",
       );
 
       const [profileBefore] = await mocks.knex.from("profile").where("id", profile.id).select("*");
@@ -586,6 +587,7 @@ describe("repositories/ProfileRepository", () => {
         ],
         user.id,
         organization.id,
+        "MANUAL",
       );
 
       const dbEvents2 = await mocks.knex
@@ -611,6 +613,7 @@ describe("repositories/ProfileRepository", () => {
         ],
         user.id,
         organization.id,
+        "MANUAL",
       );
 
       const dbEvents3 = await mocks.knex
@@ -658,6 +661,7 @@ describe("repositories/ProfileRepository", () => {
         ],
         user.id,
         organization.id,
+        "MANUAL",
       );
 
       const dbEvents2 = await mocks.knex
@@ -683,6 +687,7 @@ describe("repositories/ProfileRepository", () => {
         ],
         user.id,
         organization.id,
+        "MANUAL",
       );
 
       const dbEvents3 = await mocks.knex
@@ -755,6 +760,7 @@ describe("repositories/ProfileRepository", () => {
         ],
         user.id,
         organization.id,
+        "MANUAL",
       );
 
       const dbEvents2 = await mocks.knex
@@ -805,6 +811,7 @@ describe("repositories/ProfileRepository", () => {
         ],
         user.id,
         organization.id,
+        "MANUAL",
       );
 
       const dbEvents3 = await mocks.knex
@@ -955,6 +962,7 @@ describe("repositories/ProfileRepository", () => {
         ],
         user.id,
         organization.id,
+        "MANUAL",
       );
 
       const dbEvents2 = await mocks.knex
@@ -1015,6 +1023,7 @@ describe("repositories/ProfileRepository", () => {
         ],
         user.id,
         organization.id,
+        "MANUAL",
       );
 
       const dbEvents3 = await mocks.knex
@@ -1159,6 +1168,7 @@ describe("repositories/ProfileRepository", () => {
         ],
         user.id,
         organization.id,
+        "MANUAL",
       );
 
       const pfvs = await mocks.knex
@@ -1247,6 +1257,7 @@ describe("repositories/ProfileRepository", () => {
         ],
         user.id,
         organization.id,
+        "MANUAL",
       );
 
       const pfvs = await mocks.knex
@@ -1299,6 +1310,7 @@ describe("repositories/ProfileRepository", () => {
         ],
         user.id,
         organization.id,
+        "MANUAL",
       );
 
       const pfvs = await mocks.knex
@@ -1350,6 +1362,7 @@ describe("repositories/ProfileRepository", () => {
         ],
         user.id,
         organization.id,
+        "MANUAL",
       );
 
       const pfvs = await mocks.knex
@@ -1390,6 +1403,7 @@ describe("repositories/ProfileRepository", () => {
         ],
         user.id,
         organization.id,
+        "MANUAL",
       );
 
       const pfvs = await mocks.knex

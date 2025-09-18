@@ -128,6 +128,7 @@ export class ProfileExcelImportService extends ProfileExcelService {
           ],
           user.id,
           user.org_id,
+          "EXCEL_IMPORT",
         );
         await onProgress?.((count = count + chunk.length), data.length);
       },

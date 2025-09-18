@@ -104,6 +104,7 @@ async function refreshEntityDetails(value: ProfileFieldValue, orgId: number, ctx
       ],
       null,
       orgId,
+      "PARALLEL_MONITORING",
     );
 
     return true;
@@ -134,6 +135,7 @@ async function refreshEntityDetails(value: ProfileFieldValue, orgId: number, ctx
         ],
         null,
         orgId,
+        "PARALLEL_MONITORING",
       );
 
       return false;
@@ -194,6 +196,7 @@ async function refreshSearch(value: ProfileFieldValue, orgId: number, ctx: Worke
     ],
     null,
     orgId,
+    "PARALLEL_MONITORING",
   );
 
   return true;

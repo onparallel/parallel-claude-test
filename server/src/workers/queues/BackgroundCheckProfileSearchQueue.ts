@@ -42,6 +42,7 @@ export class BackgroundCheckProfileSearchQueue extends QueueWorker<BackgroundChe
       ],
       null,
       payload.orgId,
+      "PARALLEL_MONITORING",
     );
   }
 }

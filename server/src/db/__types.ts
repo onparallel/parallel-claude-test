@@ -2233,6 +2233,7 @@ export interface ProfileFieldFile {
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
   petition_field_reply_id: Maybe<number>; // int4
+  source: Maybe<string>; // varchar
 }
 
 export type CreateProfileFieldFile = PartialProps<
@@ -2246,6 +2247,7 @@ export type CreateProfileFieldFile = PartialProps<
   | "deleted_at"
   | "deleted_by"
   | "petition_field_reply_id"
+  | "source"
 >;
 
 export interface ProfileFieldValue {
@@ -2269,6 +2271,7 @@ export interface ProfileFieldValue {
   petition_field_reply_id: Maybe<number>; // int4
   review_reason: Maybe<any>; // jsonb
   profile_type_field_is_unique: boolean; // bool
+  source: Maybe<string>; // varchar
 }
 
 export type CreateProfileFieldValue = PartialProps<
@@ -2289,6 +2292,7 @@ export type CreateProfileFieldValue = PartialProps<
   | "petition_field_reply_id"
   | "review_reason"
   | "profile_type_field_is_unique"
+  | "source"
 >;
 
 export interface ProfileListView {

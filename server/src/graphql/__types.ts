@@ -765,6 +765,13 @@ export interface NexusGenEnums {
   ProfileEventType: db.ProfileEventType;
   ProfileExternalSourceConflictResolutionAction: "IGNORE" | "OVERWRITE";
   ProfileExternalSourceSearchParamType: "SELECT" | "TEXT";
+  ProfileFieldValueSource:
+    | "EXCEL_IMPORT"
+    | "EXTERNAL"
+    | "MANUAL"
+    | "PARALLEL_API"
+    | "PARALLEL_MONITORING"
+    | "PETITION_FIELD_REPLY";
   ProfileFieldValuesFilterGroupLogicalOperator: "AND" | "OR";
   ProfileFieldValuesFilterOperator:
     | "CONTAIN"
@@ -3060,7 +3067,6 @@ export interface NexusGenFieldTypes {
     restoreLogin: NexusGenEnums["Result"]; // Result!
     retryAsyncFieldCompletion: NexusGenRootTypes["AsyncFieldCompletionResponse"]; // AsyncFieldCompletionResponse!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
-    saveAdverseMediaChanges: NexusGenRootTypes["AdverseMediaArticleSearchResult"]; // AdverseMediaArticleSearchResult!
     saveProfileFieldValueDraft: NexusGenEnums["Success"]; // Success!
     scheduleProfileForDeletion: NexusGenRootTypes["Profile"][]; // [Profile!]!
     sendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
@@ -6331,7 +6337,6 @@ export interface NexusGenFieldTypeNames {
     restoreLogin: "Result";
     retryAsyncFieldCompletion: "AsyncFieldCompletionResponse";
     revokeUserAuthToken: "Result";
-    saveAdverseMediaChanges: "AdverseMediaArticleSearchResult";
     saveProfileFieldValueDraft: "Success";
     scheduleProfileForDeletion: "Profile";
     sendPetition: "SendPetitionResult";
@@ -9071,6 +9076,7 @@ export interface NexusGenArgTypes {
       // args
       fields: NexusGenInputs["CreateProfileFieldValueInput"][]; // [CreateProfileFieldValueInput!]!
       profileTypeId: NexusGenScalars["GID"]; // GID!
+      source?: NexusGenEnums["ProfileFieldValueSource"] | null; // ProfileFieldValueSource
       subscribe?: boolean | null; // Boolean
     };
     createProfileEventSubscription: {
@@ -9089,6 +9095,7 @@ export interface NexusGenArgTypes {
       expiryDate?: NexusGenScalars["Date"] | null; // Date
       profileId: NexusGenScalars["GID"]; // GID!
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+      source?: NexusGenEnums["ProfileFieldValueSource"] | null; // ProfileFieldValueSource
     };
     createProfileLinkedPetitionField: {
       // args
@@ -9766,10 +9773,6 @@ export interface NexusGenArgTypes {
       // args
       authTokenIds: NexusGenScalars["GID"][]; // [GID!]!
     };
-    saveAdverseMediaChanges: {
-      // args
-      token: string; // String!
-    };
     saveProfileFieldValueDraft: {
       // args
       profileId: NexusGenScalars["GID"]; // GID!
@@ -10198,6 +10201,7 @@ export interface NexusGenArgTypes {
       // args
       fields: NexusGenInputs["UpdateProfileFieldValueInput"][]; // [UpdateProfileFieldValueInput!]!
       profileId: NexusGenScalars["GID"]; // GID!
+      source?: NexusGenEnums["ProfileFieldValueSource"] | null; // ProfileFieldValueSource
     };
     updateProfileFieldValueMonitoringStatus: {
       // args
@@ -10232,6 +10236,7 @@ export interface NexusGenArgTypes {
       force?: boolean | null; // Boolean
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
       profileTypeId: NexusGenScalars["GID"]; // GID!
+      source?: NexusGenEnums["ProfileFieldValueSource"] | null; // ProfileFieldValueSource
     };
     updateProfileTypeFieldPermissions: {
       // args

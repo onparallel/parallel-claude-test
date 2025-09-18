@@ -16,6 +16,20 @@ import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { userHasAccessToProfile } from "./authorizers";
 
+export const ProfileFieldValueSourceValues = [
+  "MANUAL",
+  "EXTERNAL",
+  "EXCEL_IMPORT",
+  "PARALLEL_API",
+  "PARALLEL_MONITORING",
+  "PETITION_FIELD_REPLY",
+] as const;
+
+export const ProfileFieldValueSource = enumType({
+  name: "ProfileFieldValueSource",
+  members: ProfileFieldValueSourceValues,
+});
+
 export const ProfileTypeStandardType = enumType({
   name: "ProfileTypeStandardType",
   members: ProfileTypeStandardTypeValues,

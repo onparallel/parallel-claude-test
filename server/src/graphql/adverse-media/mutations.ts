@@ -152,6 +152,7 @@ export const classifyAdverseMediaArticle = mutationField("classifyAdverseMediaAr
           },
         ],
         ctx.user!.id,
+        "MANUAL",
       );
     }
 
@@ -168,61 +169,5 @@ export const classifyAdverseMediaArticle = mutationField("classifyAdverseMediaAr
       classification: args.classification,
       classifiedAt: args.classification ? addedAt : null,
     };
-  },
-});
-
-/** @deprecated */
-export const saveAdverseMediaChanges = mutationField("saveAdverseMediaChanges", {
-  deprecation: "use saveProfileFieldValueDraft instead",
-  type: "AdverseMediaArticleSearchResult",
-  args: {
-    token: nonNull(stringArg()),
-  },
-  authorize: authenticateAnd(
-    userHasFeatureFlag("ADVERSE_MEDIA_SEARCH"),
-    authenticatePetitionOrProfileReplyToken("token", "ADVERSE_MEDIA_SEARCH"),
-  ),
-  resolve: async (_, args, ctx) => {
-    async function profileParamsResolver(params: NumericParams<ProfileReplyParams>) {
-      const { draftValue } = await ctx.profiles.loadProfileFieldValueWithDraft(params);
-
-      if (!draftValue) {
-        throw new ForbiddenError("Expected a profile field value");
-      }
-
-      // run checks before updating DB
-      await ctx.profilesHelper.userCanWriteOnProfile(
-        params.profileId,
-        params.profileTypeFieldId,
-        ctx.user!.id,
-      );
-
-      await ctx.profiles.updateProfileFieldValues(
-        [
-          {
-            profileId: params.profileId,
-            profileTypeFieldId: params.profileTypeFieldId,
-            type: "ADVERSE_MEDIA_SEARCH",
-            content: draftValue.content,
-          },
-        ],
-        ctx.user!.id,
-        ctx.user!.org_id,
-      );
-
-      return ctx.profilesHelper.mapValueContentFromDatabase({
-        type: "ADVERSE_MEDIA_SEARCH",
-        content: draftValue.content,
-        is_draft: false,
-      });
-    }
-
-    const params = parseReplyToken(args.token);
-    if ("profileId" in params) {
-      return await profileParamsResolver(params);
-    } else {
-      // this feature is only intended for profiles
-      throw new ForbiddenError("FORBIDDEN");
-    }
   },
 });

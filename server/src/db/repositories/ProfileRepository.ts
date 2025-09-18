@@ -18,7 +18,7 @@ import {
   zip,
 } from "remeda";
 import { assert } from "ts-essentials";
-import { LocalizableUserText } from "../../graphql";
+import { LocalizableUserText, ProfileFieldValueSourceValues } from "../../graphql";
 import {
   PROFILE_TYPE_FIELD_SERVICE,
   ProfileTypeFieldMonitoring,
@@ -81,6 +81,8 @@ import {
 } from "../helpers/ProfileValuesFilterRepositoryHelper";
 import { SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
+
+type ProfileFieldValueSource = (typeof ProfileFieldValueSourceValues)[number];
 
 export interface ProfileFilter {
   profileId?: number[] | null;
@@ -1142,6 +1144,7 @@ export class ProfileRepository extends BaseRepository {
       expiryDate?: string | null;
       petitionFieldReplyId?: number | null;
     }[],
+    source: ProfileFieldValueSource,
     externalSourceIntegrationId?: number,
     t?: Knex.Transaction,
   ) {
@@ -1160,6 +1163,7 @@ export class ProfileRepository extends BaseRepository {
           fields.map((f) => ({ ...f, profileId: profile.id })),
           userId,
           orgId,
+          source,
           externalSourceIntegrationId,
           t,
         );
@@ -1181,6 +1185,7 @@ export class ProfileRepository extends BaseRepository {
     }[],
     userId: number | null,
     orgId: number,
+    source: ProfileFieldValueSource,
     externalSourceIntegrationId?: number,
     t?: Knex.Transaction,
   ) {
@@ -1203,15 +1208,16 @@ export class ProfileRepository extends BaseRepository {
           ),
           with_no_previous_values as (
             -- insert values where a profile_field_value does not exist yet
-            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review, review_reason,petition_field_reply_id, profile_type_field_is_unique)
+            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, source, external_source_integration_id, active_monitoring, pending_review, review_reason,petition_field_reply_id, profile_type_field_is_unique)
             select 
               nv.profile_id, 
               nv.profile_type_field_id, 
               nv.type, 
               nv.content,
               case(nv.expiry_date) when '-infinity'::date then null else nv.expiry_date end,
-              ?,
-              ?,
+              ?, -- created_by_user_id
+              ?, -- source
+              ?, -- external_source_integration_id
               case when nv.type in ('BACKGROUND_CHECK', 'ADVERSE_MEDIA_SEARCH') then true else false end, -- this fields are monitored by default
               nv.pending_review,
               nv.review_reason,
@@ -1257,15 +1263,16 @@ export class ProfileRepository extends BaseRepository {
           ),
           with_previous_values as (
             -- insert values where a profile_field_value existed already
-            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, external_source_integration_id, active_monitoring, pending_review, review_reason, petition_field_reply_id, profile_type_field_is_unique)
+            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, source, external_source_integration_id, active_monitoring, pending_review, review_reason, petition_field_reply_id, profile_type_field_is_unique)
             select 
               nv.profile_id,
               nv.profile_type_field_id, 
               nv.type,
               case(nv.content) when 'null'::jsonb then rpv.content else nv.content end,
               case(nv.expiry_date) when '-infinity'::date then rpv.expiry_date else nv.expiry_date end,
-              ?,
-              ?,
+              ?, -- created_by_user_id
+              ?, -- source
+              ?, -- external_source_integration_id
               rpv.active_monitoring, -- active_monitoring is always inherited from previous values
               nv.pending_review, -- pending_review is always set explicitly, not inherited
               nv.review_reason,
@@ -1417,11 +1424,11 @@ export class ProfileRepository extends BaseRepository {
             ["int", "int", "profile_type_field_type", "jsonb", "date", "boolean", "jsonb", "int"],
           ),
           // with_no_previous_values
-          ...[userId, externalSourceIntegrationId ?? null],
+          ...[userId, source, externalSourceIntegrationId ?? null],
           // removed_previous_values
           ...[userId],
           // with_previous_values
-          ...[userId, externalSourceIntegrationId ?? null],
+          ...[userId, source, externalSourceIntegrationId ?? null],
           // events
           orgId,
           orgId,
@@ -1479,6 +1486,7 @@ export class ProfileRepository extends BaseRepository {
       expiryDate?: string | null;
     }[],
     userId: number | null,
+    source: ProfileFieldValueSource,
   ) {
     if (!fields.every((f) => ["ADVERSE_MEDIA_SEARCH", "BACKGROUND_CHECK"].includes(f.type))) {
       throw new Error(
@@ -1497,7 +1505,7 @@ export class ProfileRepository extends BaseRepository {
         with new_values as (
           select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date)
         )
-        insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, active_monitoring, created_by_user_id, is_draft)
+        insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, active_monitoring, created_by_user_id, source, is_draft)
         select
           nv.profile_id,
           nv.profile_type_field_id,
@@ -1505,7 +1513,8 @@ export class ProfileRepository extends BaseRepository {
           nv.content,
           nv.expiry_date,
           case when nv.type in ('BACKGROUND_CHECK', 'ADVERSE_MEDIA_SEARCH') then true else false end, -- this fields are monitored by default
-          ?,
+          ?, -- created_by_user_id
+          ?, -- source
           true
         from new_values nv
         on conflict ("profile_id", "profile_type_field_id") where ((removed_at is null) and (deleted_at is null) and (is_draft = true))
@@ -1528,6 +1537,7 @@ export class ProfileRepository extends BaseRepository {
           ["int", "int", "profile_type_field_type", "jsonb", "date"],
         ),
         userId,
+        source,
       ],
     );
   }
@@ -1604,6 +1614,7 @@ export class ProfileRepository extends BaseRepository {
     files: { fileUploadId: number; petitionFieldReplyId?: number | null }[],
     expiryDate: string | null | undefined,
     userId: number,
+    source: ProfileFieldValueSource,
   ) {
     if (files.length === 0) {
       return [];
@@ -1634,6 +1645,7 @@ export class ProfileRepository extends BaseRepository {
           expiry_date: previousFiles[0]?.expiry_date ?? expiryDate ?? null,
           created_by_user_id: userId,
           petition_field_reply_id: file.petitionFieldReplyId ?? null,
+          source,
         })),
         t,
       );
@@ -2562,6 +2574,7 @@ export class ProfileRepository extends BaseRepository {
       new?: string | null;
     }[],
     userId: number,
+    source: ProfileFieldValueSource,
     orgId: number,
     t?: Knex.Transaction,
   ) {
@@ -2616,7 +2629,7 @@ export class ProfileRepository extends BaseRepository {
           content: isNonNullish(value) ? { value } : null,
         };
       });
-      await this.updateProfileFieldValues(updates, userId, orgId, undefined, t);
+      await this.updateProfileFieldValues(updates, userId, orgId, source, undefined, t);
     }, t);
   }
 

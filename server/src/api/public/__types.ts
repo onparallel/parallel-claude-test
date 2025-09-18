@@ -1664,8 +1664,6 @@ export type Mutation = {
   retryAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
-  /** @deprecated use saveProfileFieldValueDraft instead */
-  saveAdverseMediaChanges: AdverseMediaArticleSearchResult;
   /** Saves a draft of a profile field value */
   saveProfileFieldValueDraft: Success;
   /** Moves a profile to DELETION_SCHEDULED status */
@@ -2298,6 +2296,7 @@ export type MutationcreatePrintPdfTaskArgs = {
 export type MutationcreateProfileArgs = {
   fields: Array<CreateProfileFieldValueInput>;
   profileTypeId: Scalars["GID"]["input"];
+  source?: InputMaybe<ProfileFieldValueSource>;
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
@@ -2316,6 +2315,7 @@ export type MutationcreateProfileFieldFileUploadLinkArgs = {
   expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
+  source?: InputMaybe<ProfileFieldValueSource>;
 };
 
 export type MutationcreateProfileLinkedPetitionFieldArgs = {
@@ -2994,10 +2994,6 @@ export type MutationrevokeUserAuthTokenArgs = {
   authTokenIds: Array<Scalars["GID"]["input"]>;
 };
 
-export type MutationsaveAdverseMediaChangesArgs = {
-  token: Scalars["String"]["input"];
-};
-
 export type MutationsaveProfileFieldValueDraftArgs = {
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
@@ -3425,6 +3421,7 @@ export type MutationupdateProfileEventSubscriptionArgs = {
 export type MutationupdateProfileFieldValueArgs = {
   fields: Array<UpdateProfileFieldValueInput>;
   profileId: Scalars["GID"]["input"];
+  source?: InputMaybe<ProfileFieldValueSource>;
 };
 
 export type MutationupdateProfileFieldValueMonitoringStatusArgs = {
@@ -3459,6 +3456,7 @@ export type MutationupdateProfileTypeFieldArgs = {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   profileTypeFieldId: Scalars["GID"]["input"];
   profileTypeId: Scalars["GID"]["input"];
+  source?: InputMaybe<ProfileFieldValueSource>;
 };
 
 export type MutationupdateProfileTypeFieldPermissionsArgs = {
@@ -5628,6 +5626,14 @@ export type ProfileFieldValueMonitoredEvent = ProfileEvent & {
   profile: Maybe<Profile>;
   type: ProfileEventType;
 };
+
+export type ProfileFieldValueSource =
+  | "EXCEL_IMPORT"
+  | "EXTERNAL"
+  | "MANUAL"
+  | "PARALLEL_API"
+  | "PARALLEL_MONITORING"
+  | "PETITION_FIELD_REPLY";
 
 export type ProfileFieldValueUpdatedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
@@ -14867,7 +14873,12 @@ export const CreateProfile_createProfileDocument = gql`
     $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
-    createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe, fields: $fields) {
+    createProfile(
+      profileTypeId: $profileTypeId
+      subscribe: $subscribe
+      fields: $fields
+      source: PARALLEL_API
+    ) {
       ...Profile
     }
   }
@@ -14888,6 +14899,7 @@ export const CreateProfile_createProfileFieldFileUploadLinkDocument = gql`
       profileTypeFieldId: $profileTypeFieldId
       expiryDate: $expiryDate
       data: $data
+      source: PARALLEL_API
     ) {
       uploads {
         file {
@@ -14962,7 +14974,7 @@ export const UpdateProfileFieldValue_updateProfileFieldValueDocument = gql`
     $profileId: GID!
     $fields: [UpdateProfileFieldValueInput!]!
   ) {
-    updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+    updateProfileFieldValue(profileId: $profileId, fields: $fields, source: PARALLEL_API) {
       id
     }
   }
@@ -14982,6 +14994,7 @@ export const UpdateProfileFieldValue_createProfileFieldFileUploadLinkDocument = 
       profileTypeFieldId: $profileTypeFieldId
       data: $data
       expiryDate: $expiryDate
+      source: PARALLEL_API
     ) {
       uploads {
         file {

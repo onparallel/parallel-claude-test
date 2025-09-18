@@ -428,6 +428,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
           "Pass force=true to remove expirations from values and files when setting isExpirable to false",
       }),
     ),
+    source: nullable("ProfileFieldValueSource"),
   },
   validateArgs: validUpdateProfileTypeFieldData("profileTypeFieldId", "data"),
   resolve: async (_, args, ctx, info) => {
@@ -595,6 +596,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
               profileTypeField.type,
               args.data.substitutions,
               ctx.user!.id,
+              args.source ?? "MANUAL",
               ctx.user!.org_id,
               t,
             );
@@ -902,6 +904,7 @@ export const createProfile = mutationField("createProfile", {
         ),
       ),
     ),
+    source: nullable("ProfileFieldValueSource"),
   },
   resolve: async (_, args, ctx) => {
     const profileTypeFields =
@@ -988,6 +991,7 @@ export const createProfile = mutationField("createProfile", {
         args.profileTypeId,
         ctx.user!.id,
         fields,
+        args.source ?? "MANUAL",
       );
       if (args.subscribe) {
         await ctx.profiles.subscribeUsersToProfiles(
@@ -1153,8 +1157,9 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
         ),
       ),
     ),
+    source: nullable("ProfileFieldValueSource"),
   },
-  resolve: async (_, { profileId, fields }, ctx) => {
+  resolve: async (_, { profileId, fields, source }, ctx) => {
     const [profileTypeFields, profile] = await Promise.all([
       ctx.profiles.loadProfileTypeField(fields.map((f) => f.profileTypeFieldId)),
       ctx.profiles.loadProfile(profileId),
@@ -1268,7 +1273,12 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
     }
 
     try {
-      await ctx.profiles.updateProfileFieldValues(updateFieldsData, ctx.user!.id, ctx.user!.org_id);
+      await ctx.profiles.updateProfileFieldValues(
+        updateFieldsData,
+        ctx.user!.id,
+        ctx.user!.org_id,
+        source ?? "MANUAL",
+      );
       ctx.profiles.loadProfileFieldValuesAndDraftsByProfileId.dataloader.clear(profileId);
     } catch (e) {
       if (
@@ -1333,12 +1343,13 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
     profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
     data: nonNull(list(nonNull("FileUploadInput"))),
     expiryDate: dateArg(),
+    source: nullable("ProfileFieldValueSource"),
   },
   validateArgs: validateAnd(
     validFileUploadInput("data", { maxSizeBytes: toBytes(100, "MB") }),
     validateOr(notEmptyArray("data"), validIsNotUndefined("expiryDate")),
   ),
-  resolve: async (_, { profileId, profileTypeFieldId, data, expiryDate }, ctx) => {
+  resolve: async (_, { profileId, profileTypeFieldId, data, expiryDate, source }, ctx) => {
     let fileUploads: FileUpload[] = [];
     let presignedPostDatas: PresignedPost[] = [];
     let files: ProfileFieldFile[] = [];
@@ -1380,6 +1391,7 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
         fileUploads.map((f) => ({ fileUploadId: f.id })),
         expiryDate,
         ctx.user!.id,
+        source ?? "MANUAL",
       );
 
       await ctx.profiles.createProfileUpdatedEvents(
@@ -1619,6 +1631,7 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
       })),
       expiryDate,
       ctx.user!.id,
+      "PETITION_FIELD_REPLY",
     );
 
     const profileTypeField = await ctx.profiles.loadProfileTypeField(profileTypeFieldId);
@@ -1715,6 +1728,7 @@ export const copyReplyContentToProfileFieldValue = mutationField(
             },
           ],
           ctx.user!.id,
+          "PETITION_FIELD_REPLY",
         );
       } else {
         await ctx.profiles.updateProfileFieldValues(
@@ -1725,10 +1739,12 @@ export const copyReplyContentToProfileFieldValue = mutationField(
               type: reply!.type as "BACKGROUND_CHECK" | "ADVERSE_MEDIA_SEARCH",
               content: reply!.content,
               expiryDate,
+              petitionFieldReplyId: reply!.id,
             },
           ],
           ctx.user!.id,
           ctx.user!.org_id,
+          "PETITION_FIELD_REPLY",
         );
       }
 
@@ -2472,6 +2488,7 @@ export const completeProfileFromExternalSource = mutationField(
             })),
             ctx.user!.id,
             ctx.user!.org_id,
+            "EXTERNAL",
             entity.integration_id,
           );
 
@@ -2486,6 +2503,7 @@ export const completeProfileFromExternalSource = mutationField(
               type: f.profileTypeField.type,
               content: f.content,
             })),
+            "EXTERNAL",
             entity.integration_id,
           );
         }
@@ -2879,6 +2897,7 @@ export const saveProfileFieldValueDraft = mutationField("saveProfileFieldValueDr
       ],
       ctx.user!.id,
       ctx.user!.org_id,
+      (draftValue.source as any) ?? "MANUAL",
     );
 
     return RESULT.SUCCESS;

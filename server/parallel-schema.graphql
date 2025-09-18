@@ -2249,6 +2249,7 @@ type Mutation {
   createProfile(
     fields: [CreateProfileFieldValueInput!]!
     profileTypeId: GID!
+    source: ProfileFieldValueSource
 
     """
     Subscribe the context user to profile notifications
@@ -2273,6 +2274,7 @@ type Mutation {
     expiryDate: Date
     profileId: GID!
     profileTypeFieldId: GID!
+    source: ProfileFieldValueSource
   ): ProfileFieldPropertyAndFileWithUploadData!
 
   """
@@ -3178,8 +3180,6 @@ type Mutation {
   Soft-deletes a given auth token, making it permanently unusable.
   """
   revokeUserAuthToken(authTokenIds: [GID!]!): Result!
-  saveAdverseMediaChanges(token: String!): AdverseMediaArticleSearchResult!
-    @deprecated(reason: "use saveProfileFieldValueDraft instead")
 
   """
   Saves a draft of a profile field value
@@ -3786,7 +3786,11 @@ type Mutation {
     isEnabled: Boolean
     name: String
   ): ProfileEventSubscription!
-  updateProfileFieldValue(fields: [UpdateProfileFieldValueInput!]!, profileId: GID!): Profile!
+  updateProfileFieldValue(
+    fields: [UpdateProfileFieldValueInput!]!
+    profileId: GID!
+    source: ProfileFieldValueSource
+  ): Profile!
   updateProfileFieldValueMonitoringStatus(
     enabled: Boolean!
     profileId: GID!
@@ -3823,6 +3827,7 @@ type Mutation {
     force: Boolean
     profileTypeFieldId: GID!
     profileTypeId: GID!
+    source: ProfileFieldValueSource
   ): ProfileTypeField!
 
   """
@@ -7098,6 +7103,15 @@ type ProfileFieldValueMonitoredEvent implements ProfileEvent {
   id: GID!
   profile: Profile
   type: ProfileEventType!
+}
+
+enum ProfileFieldValueSource {
+  EXCEL_IMPORT
+  EXTERNAL
+  MANUAL
+  PARALLEL_API
+  PARALLEL_MONITORING
+  PETITION_FIELD_REPLY
 }
 
 type ProfileFieldValueUpdatedEvent implements ProfileEvent {

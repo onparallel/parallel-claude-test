@@ -3784,6 +3784,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
             })),
             expiration?.expiryDate,
             ctx.user!.id,
+            "PETITION_FIELD_REPLY",
           );
 
           profileFileEvents.push(
@@ -3926,8 +3927,17 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         ctx.profilesHelper.isDraftContent(p.type, p.content),
       );
 
-      await ctx.profiles.updateProfileFieldValues(valueUpdates, ctx.user!.id, ctx.user!.org_id);
-      await ctx.profiles.upsertDraftProfileFieldValues(draftUpdates, ctx.user!.id);
+      await ctx.profiles.updateProfileFieldValues(
+        valueUpdates,
+        ctx.user!.id,
+        ctx.user!.org_id,
+        "PETITION_FIELD_REPLY",
+      );
+      await ctx.profiles.upsertDraftProfileFieldValues(
+        draftUpdates,
+        ctx.user!.id,
+        "PETITION_FIELD_REPLY",
+      );
 
       return await ctx.petitions.updatePetitionFieldReply(
         args.parentReplyId,

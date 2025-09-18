@@ -193,6 +193,7 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
             },
           ],
           ctx.user!.id,
+          "MANUAL",
         );
 
         return {
@@ -237,6 +238,7 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
               },
             ],
             ctx.user!.id,
+            "MANUAL",
           );
 
           return {
@@ -256,6 +258,7 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
             ],
             ctx.user!.id,
             ctx.user!.org_id,
+            "MANUAL",
           );
 
           return {
@@ -471,6 +474,7 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
         ],
         ctx.user!.id,
         ctx.user!.org_id,
+        "MANUAL",
       );
 
       return {

@@ -4540,7 +4540,12 @@ export function publicApi(container: Container) {
               $includeRelationships: Boolean!
               $includeSubscribers: Boolean!
             ) {
-              createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe, fields: $fields) {
+              createProfile(
+                profileTypeId: $profileTypeId
+                subscribe: $subscribe
+                fields: $fields
+                source: PARALLEL_API
+              ) {
                 ...Profile
               }
             }
@@ -4558,6 +4563,7 @@ export function publicApi(container: Container) {
                 profileTypeFieldId: $profileTypeFieldId
                 expiryDate: $expiryDate
                 data: $data
+                source: PARALLEL_API
               ) {
                 uploads {
                   file {
@@ -4837,7 +4843,11 @@ export function publicApi(container: Container) {
               $profileId: GID!
               $fields: [UpdateProfileFieldValueInput!]!
             ) {
-              updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              updateProfileFieldValue(
+                profileId: $profileId
+                fields: $fields
+                source: PARALLEL_API
+              ) {
                 id
               }
             }
@@ -4854,6 +4864,7 @@ export function publicApi(container: Container) {
                 profileTypeFieldId: $profileTypeFieldId
                 data: $data
                 expiryDate: $expiryDate
+                source: PARALLEL_API
               ) {
                 uploads {
                   file {

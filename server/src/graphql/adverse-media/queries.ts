@@ -214,6 +214,7 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
           ],
           ctx.user!.id,
           ctx.user!.org_id,
+          "MANUAL",
         );
 
         return await ctx.profilesHelper.mapValueContentFromDatabase({
@@ -233,6 +234,7 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
             },
           ],
           ctx.user!.id,
+          "MANUAL",
         );
         return await ctx.profilesHelper.mapValueContentFromDatabase({
           type: "ADVERSE_MEDIA_SEARCH",
