@@ -6,11 +6,7 @@ import {
   WizardStepDialogProps,
 } from "@parallel/components/common/dialogs/WizardDialog";
 import { ProfileSelect, ProfileSelectInstance } from "@parallel/components/common/ProfileSelect";
-import {
-  calculateCompatibleFieldGroups,
-  calculateRelatedFieldGroupsWithCompatibleProfiles,
-  ProfileRelationshipsAssociationTable,
-} from "@parallel/components/profiles/ProfileRelationshipsAssociationTable";
+import { ProfileRelationshipsAssociationTable } from "@parallel/components/profiles/ProfileRelationshipsAssociationTable";
 import {
   CreatePetitionFromProfilePrefillInput,
   usePreviewImportFromProfileDialog_PetitionBaseFragment,
@@ -18,6 +14,10 @@ import {
   usePreviewImportFromProfileDialog_profileDocument,
   usePreviewImportFromProfileDialog_ProfileFragment,
 } from "@parallel/graphql/__types";
+import {
+  calculateCompatibleFieldGroups,
+  calculateRelatedFieldGroupsWithCompatibleProfiles,
+} from "@parallel/utils/petitions/profilePrefill";
 import { useRef } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
@@ -259,8 +259,12 @@ usePreviewImportFromProfileDialog.fragments = {
     return gql`
       fragment usePreviewImportFromProfileDialog_PetitionBase on PetitionBase {
         id
+        ...calculateCompatibleFieldGroups_PetitionBase
+        ...calculateRelatedFieldGroupsWithCompatibleProfiles_PetitionBase
         ...ProfileRelationshipsAssociationTable_PetitionBase
       }
+      ${calculateCompatibleFieldGroups.fragments.PetitionBase}
+      ${calculateRelatedFieldGroupsWithCompatibleProfiles.fragments.PetitionBase}
       ${ProfileRelationshipsAssociationTable.fragments.PetitionBase}
     `;
   },
@@ -268,8 +272,12 @@ usePreviewImportFromProfileDialog.fragments = {
     return gql`
       fragment usePreviewImportFromProfileDialog_Profile on Profile {
         id
+        ...calculateCompatibleFieldGroups_Profile
+        ...calculateRelatedFieldGroupsWithCompatibleProfiles_Profile
         ...ProfileRelationshipsAssociationTable_Profile
       }
+      ${calculateCompatibleFieldGroups.fragments.Profile}
+      ${calculateRelatedFieldGroupsWithCompatibleProfiles.fragments.Profile}
       ${ProfileRelationshipsAssociationTable.fragments.Profile}
     `;
   },
