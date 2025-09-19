@@ -41,7 +41,7 @@ export class PetitionEventSubscriptionsListener implements EventListener<Petitio
       return;
     }
     try {
-      await this.petitions.attachPetitionEventsToUsers(event.id, userIds);
+      await this.petitions.attachPetitionEventsToUsers({ petitionEventId: event.id, userIds });
     } catch (error) {
       if (
         error instanceof DatabaseError &&

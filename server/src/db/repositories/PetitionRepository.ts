@@ -108,6 +108,7 @@ import {
   StandardListDefinition,
   TemplateDefaultPermission,
   User,
+  UserPetitionEventLog,
 } from "../__types";
 import {
   CreatePetitionEvent,
@@ -4075,15 +4076,25 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async attachPetitionEventsToUsers(petitionEventId: number, userIds: number[]) {
-    await this.insert(
+  readonly attachPetitionEventsToUsers = this.buildBatchProcessor<
+    { petitionEventId: number; userIds: number[] },
+    UserPetitionEventLog
+  >(async (keys, t) => {
+    if (keys.length === 0) {
+      return [];
+    }
+
+    return await this.insert(
       "user_petition_event_log",
-      userIds.map((userId) => ({
-        petition_event_id: petitionEventId,
-        user_id: userId,
-      })),
-    );
-  }
+      keys.flatMap((key) =>
+        key.userIds.map((userId) => ({
+          petition_event_id: key.petitionEventId,
+          user_id: userId,
+        })),
+      ),
+      t,
+    ).returning("*");
+  });
 
   async shouldNotifyPetitionClosed(petitionId: number) {
     const [lastEvent] = await this.from("petition_event")

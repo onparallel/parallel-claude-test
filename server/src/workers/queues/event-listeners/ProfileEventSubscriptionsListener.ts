@@ -42,7 +42,7 @@ export class ProfileEventSubscriptionsListener implements EventListener<ProfileE
 
     try {
       if (userIds.length > 0) {
-        await this.profiles.attachProfileEventsToUsers(event.id, userIds);
+        await this.profiles.attachProfileEventsToUsers({ profileEventId: event.id, userIds });
       }
     } catch (error) {
       if (

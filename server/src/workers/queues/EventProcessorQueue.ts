@@ -105,17 +105,17 @@ export class EventProcessor extends QueueWorker<EventProcessorPayload> {
   ) {
     super();
 
-    this.register(analyticsEventListener)
+    this.register(clientRiskUpdateListener)
+      .register(automaticBackgroundCheckProfileListener)
+      .register(automaticBackgroundCheckPetitionListener)
+      .register(documentProcessingListener)
+      // the approval process can have activation conditions that depend on replies created by previous listeners
+      .register(petitionApprovalProcessListener)
       .register(petitionEventSubscriptionsListener)
       .register(profileEventSubscriptionsListener)
-      .register(clientRiskUpdateListener)
-      .register(petitionActivityListener)
-      .register(documentProcessingListener)
       .register(userNotificationsListener)
-      .register(automaticBackgroundCheckPetitionListener)
-      .register(automaticBackgroundCheckProfileListener)
-      // approvals listener should always run last, as the approval process can have activation conditions that depend on replies created by other listeners
-      .register(petitionApprovalProcessListener);
+      .register(petitionActivityListener)
+      .register(analyticsEventListener);
   }
 
   override async handler(payload: EventProcessorPayload): Promise<void> {
@@ -141,7 +141,10 @@ export class EventProcessor extends QueueWorker<EventProcessorPayload> {
           }
         }
 
-        await this.events.markEventAsProcessed(event.id, payload.table_name);
+        await this.events.markEventAsProcessed({
+          id: event.id,
+          tableName: payload.table_name,
+        });
       }
     }
   }

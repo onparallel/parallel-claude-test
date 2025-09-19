@@ -6,6 +6,7 @@ import PostgresInterval from "postgres-interval";
 import { groupBy, indexBy } from "remeda";
 import { LocalizableUserText } from "../../graphql";
 import { FileExport } from "../../integrations/file-export/FileExportIntegration";
+import { BatchProcessor } from "../../util/BatchProcessor";
 import { PetitionFieldMath, PetitionFieldVisibility } from "../../util/fieldLogic";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
@@ -129,6 +130,15 @@ export interface Loader<K, V, C = K> {
   };
 }
 
+export interface Processor<K, V> {
+  (key: K): Promise<V>;
+  (keys: ReadonlyArray<K>): Promise<V[]>;
+  raw: {
+    (key: K, t?: Knex.Transaction): Promise<V>;
+    (keys: ReadonlyArray<K>, t?: Knex.Transaction): Promise<V[]>;
+  };
+}
+
 export interface Pagination<T> {
   items: Promise<T[]>;
   totalCount: Promise<number>;
@@ -236,6 +246,35 @@ export class BaseRepository {
         dataloader,
         raw: async function raw(keys: MaybeArray<K>, t?: Knex.Transaction) {
           const result = await loadFn(unMaybeArray(keys), t);
+          return Array.isArray(keys) ? result : result[0];
+        },
+      },
+    ) as any;
+  }
+
+  protected buildBatchProcessor<K, V>(
+    batchProcessFn: (keys: ReadonlyArray<K>, t?: Knex.Transaction) => Promise<V[]>,
+  ): Processor<K, V> {
+    const batchProcessor = new BatchProcessor<K, V>(async (keys) =>
+      pMapChunk(keys, (chunk) => batchProcessFn(chunk), { concurrency: 1, chunkSize: 10_000 }),
+    );
+    return Object.assign(
+      async function (keys: MaybeArray<K>) {
+        const result = await batchProcessor.processMany(unMaybeArray(keys));
+        if (Array.isArray(keys)) {
+          if (result.some((r) => r instanceof Error)) {
+            throw new AggregateError(result.filter((r) => r instanceof Error));
+          }
+          return result;
+        } else if (result[0] instanceof Error) {
+          throw result[0];
+        } else {
+          return result[0];
+        }
+      },
+      {
+        raw: async function raw(keys: MaybeArray<K>, t?: Knex.Transaction) {
+          const result = await batchProcessFn(unMaybeArray(keys), t);
           return Array.isArray(keys) ? result : result[0];
         },
       },
