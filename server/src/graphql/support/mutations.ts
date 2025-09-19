@@ -73,7 +73,7 @@ export const resetUserPassword = mutationField("resetUserPassword", {
         // the ForgotPassword email will come from the organization of the user selected here
         const [user] = users;
         const [userData, organization] = await Promise.all([
-          ctx.users.loadUserData(ctx.user!.user_data_id),
+          ctx.users.loadUserData(ctx.realUser!.user_data_id),
           ctx.organizations.loadOrg(user.org_id),
         ]);
 
@@ -129,9 +129,9 @@ export const transferOrganizationOwnership = mutationField("transferOrganization
     await ctx.users.updateUserById(
       currentOwner.id,
       { is_org_owner: false },
-      `User:${ctx.user!.id}`,
+      `User:${ctx.realUser!.id}`,
     );
-    await ctx.users.updateUserById(userId, { is_org_owner: true }, `User:${ctx.user!.id}`);
+    await ctx.users.updateUserById(userId, { is_org_owner: true }, `User:${ctx.realUser!.id}`);
 
     return {
       result: RESULT.SUCCESS,
@@ -208,7 +208,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
             content_type: mimetype,
             size: res["ContentLength"]!.toString(),
           },
-          `User:${ctx.user!.id}`,
+          `User:${ctx.realUser!.id}`,
         );
 
         newMetadata.image_public_file_id = file.id;
@@ -219,7 +219,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
       await ctx.petitions.updatePetition(
         template.id,
         { public_metadata: newMetadata },
-        `User:${ctx.user!.id}`,
+        `User:${ctx.realUser!.id}`,
       );
 
       return {
@@ -269,13 +269,13 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
           content_type: mimetype,
           size: res["ContentLength"]!.toString(),
         },
-        `User:${ctx.user!.id}`,
+        `User:${ctx.realUser!.id}`,
       );
 
       await ctx.users.updateUserData(
         userData.id,
         { avatar_public_file_id: file.id },
-        `User:${ctx.user!.id}`,
+        `User:${ctx.realUser!.id}`,
       );
       return {
         result: RESULT.SUCCESS,
@@ -308,7 +308,7 @@ export const updatePublicTemplateVisibility = mutationField("updatePublicTemplat
       await ctx.petitions.updatePetition(
         templateId,
         { template_public: isPublic },
-        `User:${ctx.user!.id}`,
+        `User:${ctx.realUser!.id}`,
       );
 
       return {
@@ -335,7 +335,7 @@ export const updateOrganizationTier = mutationField("updateOrganizationTier", {
       const tier = await ctx.orgLimits.updateOrganizationTier(
         org!,
         args.tier,
-        `User:${ctx.user!.id}`,
+        `User:${ctx.realUser!.id}`,
       );
 
       return {
@@ -448,7 +448,7 @@ export const signaturitIntegrationShowSecurityStamp = mutationField(
         await ctx.integrations.updateOrgIntegration(
           integrationId,
           { settings: { ...integration.settings, SHOW_CSV: showCsv } },
-          `User:${ctx.user!.id}`,
+          `User:${ctx.realUser!.id}`,
         );
 
         await ctx.signature.onOrganizationBrandChange(integration.org_id, {
@@ -481,7 +481,7 @@ export const removePetitionPassword = mutationField("removePetitionPassword", {
           restricted_password_hash: null,
           restricted_password_salt: null,
         },
-        `User:${ctx.user!.id}`,
+        `User:${ctx.realUser!.id}`,
       );
       return { result: RESULT.SUCCESS, message: "Password removed" };
     } catch (e) {
@@ -516,7 +516,7 @@ export const createAzureOpenAiIntegration = mutationField("createAzureOpenAiInte
             ENDPOINT: args.endpoint,
           },
         },
-        `User:${ctx.user!.id}`,
+        `User:${ctx.realUser!.id}`,
       );
 
       return {
@@ -543,9 +543,9 @@ export const deleteAzureOpenAiIntegration = mutationField("deleteAzureOpenAiInte
     try {
       await ctx.petitions.clearPetitionSummaryConfigWithIntegration(
         args.id,
-        `User:${ctx.user!.id}`,
+        `User:${ctx.realUser!.id}`,
       );
-      await ctx.integrations.deleteOrgIntegration(args.id, `User:${ctx.user!.id}`);
+      await ctx.integrations.deleteOrgIntegration(args.id, `User:${ctx.realUser!.id}`);
 
       return {
         result: RESULT.SUCCESS,
@@ -576,7 +576,7 @@ export const transferAdminPermissions = mutationField("transferAdminPermissions"
           type: "INITIAL",
           org_id: organizationId,
         },
-        `User:${ctx.user!.id}`,
+        `User:${ctx.realUser!.id}`,
       );
 
       // grant every permission for Admins group
@@ -617,12 +617,12 @@ export const transferAdminPermissions = mutationField("transferAdminPermissions"
             "PETITIONS:LIST_PUBLIC_TEMPLATES",
           ] as UserGroupPermissionName[]
         ).map((name) => ({ effect: "GRANT", name })),
-        `User:${ctx.user!.id}`,
+        `User:${ctx.realUser!.id}`,
       );
 
       // add org owner to Admins group
       const orgOwner = (await ctx.organizations.loadOrgOwner(organizationId))!;
-      await ctx.userGroups.addUsersToGroups(admins.id, [orgOwner.id], `User:${ctx.user!.id}`);
+      await ctx.userGroups.addUsersToGroups(admins.id, [orgOwner.id], `User:${ctx.realUser!.id}`);
 
       const allUsersGroups = await ctx.userGroups.loadAllUsersGroupsByOrgId(organizationId);
 
@@ -652,7 +652,7 @@ export const transferAdminPermissions = mutationField("transferAdminPermissions"
               "TEAMS:UPDATE_PERMISSIONS",
             ] as UserGroupPermissionName[]
           ).map((name) => ({ name, effect: "NONE" })),
-          `User:${ctx.user!.id}`,
+          `User:${ctx.realUser!.id}`,
         );
       }
 
@@ -697,7 +697,7 @@ export const createBankflipIdVerificationIntegration = mutationField(
               },
             },
           },
-          `User:${ctx.user!.id}`,
+          `User:${ctx.realUser!.id}`,
         );
 
         return {
@@ -743,7 +743,7 @@ export const createBankflipDocumentProcessingIntegration = mutationField(
               },
             },
           },
-          `User:${ctx.user!.id}`,
+          `User:${ctx.realUser!.id}`,
         );
 
         return {
@@ -816,7 +816,7 @@ export const createEInformaProfileExternalSourceIntegration = mutationField(
                 ENVIRONMENT: args.isPaidSubscription ? "production" : "test",
               },
             },
-            `User:${ctx.user!.id}`,
+            `User:${ctx.realUser!.id}`,
           );
 
           return {
@@ -881,7 +881,7 @@ export const createCompaniesHouseProfileExternalSourceIntegration = mutationFiel
                   },
                 },
               },
-              `User:${ctx.user!.id}`,
+              `User:${ctx.realUser!.id}`,
             );
 
           return {
@@ -931,7 +931,7 @@ export const createIManageFileExportIntegration = mutationField(
               CLIENT_ID: args.clientId,
             },
           },
-          `User:${ctx.user!.id}`,
+          `User:${ctx.realUser!.id}`,
         );
 
         return {
@@ -1052,7 +1052,7 @@ export const updateEinformaCustomProperties = mutationField("updateEinformaCusto
             CUSTOM_PROPERTIES_MAP: parsed,
           },
         },
-        `User:${ctx.user!.id}`,
+        `User:${ctx.realUser!.id}`,
       );
 
       return {
@@ -1166,7 +1166,7 @@ export const updateCompaniesHouseCustomProperties = mutationField(
               CUSTOM_PROPERTIES_MAP: parsed,
             },
           },
-          `User:${ctx.user!.id}`,
+          `User:${ctx.realUser!.id}`,
         );
 
         return {
@@ -1202,10 +1202,10 @@ export const closePetitionsFromTemplate = mutationField("closePetitionsFromTempl
       await ctx.tasks.createTask(
         {
           name: "CLOSE_PETITIONS",
-          user_id: ctx.user!.id,
+          user_id: ctx.realUser!.id,
           input: { template_id: templateId },
         },
-        `User:${ctx.user!.id}`,
+        `User:${ctx.realUser!.id}`,
       );
       return {
         result: RESULT.SUCCESS,
@@ -1244,7 +1244,7 @@ export const updateStandardListDefinitions = mutationField("updateStandardListDe
 
       const result = await ctx.petitions.upsertStandardListDefinitions(
         lists,
-        `User:${ctx.user!.id}`,
+        `User:${ctx.realUser!.id}`,
       );
 
       return {
@@ -1320,7 +1320,7 @@ export const associateProfilesToPetitionsExcel = mutationField(
           throw new Error(`[Error in cell B${rowIndex + 1}]: Invalid Petition ID`);
         }
 
-        await ctx.profiles.associateProfilesToPetition(createData, ctx.user!);
+        await ctx.profiles.associateProfilesToPetition(createData, ctx.realUser!);
 
         return {
           result: RESULT.SUCCESS,
@@ -1461,7 +1461,7 @@ export const createProfileRelationshipsExcel = mutationField("createProfileRelat
             profile_relationship_type_id: profileRelationshipType.id,
           };
         }),
-        ctx.user!.id,
+        ctx.realUser!.id,
         args.orgId,
       );
 
@@ -1520,7 +1520,7 @@ export const createAnthropicCompletionIntegration = mutationField(
                 },
               },
             },
-            `User:${ctx.user!.id}`,
+            `User:${ctx.realUser!.id}`,
           );
           return {
             result: RESULT.SUCCESS,
@@ -1588,7 +1588,7 @@ export const updateBackgroundCheckOrganizationCutoff = mutationField(
             },
           },
         },
-        `User:${ctx.user!.id}`,
+        `User:${ctx.realUser!.id}`,
       );
 
       return {
@@ -1629,7 +1629,7 @@ export const createAwsBedrockCompletionIntegration = mutationField(
                 CREDENTIALS: {},
               },
             },
-            `User:${ctx.user!.id}`,
+            `User:${ctx.realUser!.id}`,
           );
         }
 

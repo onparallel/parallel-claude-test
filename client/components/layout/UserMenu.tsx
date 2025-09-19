@@ -226,7 +226,7 @@ export function UserMenu({ extended, placement, me, realMe, onToggle }: UserMenu
             </MenuItem>
           </NakedLink>
 
-          {me.isSuperAdmin ? (
+          {realMe.isSuperAdmin ? (
             <NakedLink href="/app/admin">
               <MenuItem as="a" icon={<KeyIcon display="block" boxSize={4} />}>
                 <FormattedMessage id="admin.title" defaultMessage="Admin panel" />
@@ -262,12 +262,12 @@ UserMenu.fragments = {
     fragment UserMenu_Query on Query {
       me {
         id
-        isSuperAdmin
         email
         ...UserAvatar_User
       }
       realMe {
         id
+        isSuperAdmin
         ...UserAvatar_User
       }
     }

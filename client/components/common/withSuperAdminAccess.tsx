@@ -6,7 +6,7 @@ import { RedirectError, WithApolloDataContext } from "./withApolloData";
 const _queries = [
   gql`
     query WithSuperAdminAccess {
-      me {
+      realMe {
         id
         isSuperAdmin
       }
@@ -28,7 +28,7 @@ export function withSuperAdminAccess<P = {}>(
         );
       }
       const { data } = await context.fetchQuery(WithSuperAdminAccessDocument);
-      if (data?.me?.isSuperAdmin) {
+      if (data?.realMe?.isSuperAdmin) {
         return await getInitialProps?.(context);
       } else {
         throw new RedirectError("/app");

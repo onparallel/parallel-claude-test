@@ -287,8 +287,8 @@ export function userIsSuperAdmin<
   return async (_, args, ctx) => {
     try {
       const [org, permissions] = await Promise.all([
-        ctx.organizations.loadOrg(ctx.user!.org_id),
-        ctx.users.loadUserPermissions(ctx.user!.id),
+        ctx.organizations.loadOrg(ctx.realUser!.org_id),
+        ctx.users.loadUserPermissions(ctx.realUser!.id),
       ]);
 
       return org?.status === "ROOT" && permissions.includes("SUPERADMIN");

@@ -7925,7 +7925,6 @@ export type AdminOrganizationsLayout_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -7962,6 +7961,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -9864,7 +9864,7 @@ export type WithPermissionQuery = {
 export type WithSuperAdminAccessQueryVariables = Exact<{ [key: string]: never }>;
 
 export type WithSuperAdminAccessQuery = {
-  me: { __typename?: "User"; id: string; isSuperAdmin: boolean };
+  realMe: { __typename?: "User"; id: string; isSuperAdmin: boolean };
 };
 
 export type ImportContactsDialog_bulkCreateContactsMutationVariables = Exact<{
@@ -14515,7 +14515,6 @@ export type AdminSettingsLayout_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -14551,6 +14550,7 @@ export type AdminSettingsLayout_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -14591,7 +14591,6 @@ export type AppLayout_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -14627,6 +14626,7 @@ export type AppLayout_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -14698,6 +14698,7 @@ export type AppLayoutNavBar_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -14706,7 +14707,6 @@ export type AppLayoutNavBar_QueryFragment = {
   me: {
     __typename?: "User";
     id: string;
-    isSuperAdmin: boolean;
     email: string;
     fullName?: string | null;
     avatarUrl?: string | null;
@@ -14763,7 +14763,6 @@ export type DevelopersLayout_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -14799,6 +14798,7 @@ export type DevelopersLayout_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -14868,7 +14868,6 @@ export type OrganizationSettingsLayout_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -14904,6 +14903,7 @@ export type OrganizationSettingsLayout_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -15128,7 +15128,6 @@ export type PetitionLayout_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -15164,6 +15163,7 @@ export type PetitionLayout_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -15204,7 +15204,6 @@ export type ProfileLayout_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -15240,6 +15239,7 @@ export type ProfileLayout_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -15509,7 +15509,6 @@ export type ReportsSidebarLayout_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -15545,6 +15544,7 @@ export type ReportsSidebarLayout_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -15585,7 +15585,6 @@ export type SidebarLayout_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -15621,6 +15620,7 @@ export type SidebarLayout_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -15661,7 +15661,6 @@ export type UserGroupLayout_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasPermissionManagement: boolean;
@@ -15698,6 +15697,7 @@ export type UserGroupLayout_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -15774,7 +15774,6 @@ export type UserMenu_QueryFragment = {
   me: {
     __typename?: "User";
     id: string;
-    isSuperAdmin: boolean;
     email: string;
     fullName?: string | null;
     avatarUrl?: string | null;
@@ -15783,6 +15782,7 @@ export type UserMenu_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -15801,7 +15801,6 @@ export type UserSettingsLayout_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -15837,6 +15836,7 @@ export type UserSettingsLayout_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -17002,7 +17002,6 @@ export type OrganizationProfilesLayout_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -17038,6 +17037,7 @@ export type OrganizationProfilesLayout_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -45202,7 +45202,6 @@ export type Admin_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -45238,6 +45237,7 @@ export type Admin_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -45297,7 +45297,6 @@ export type AdminOrganizationsFeatures_queryQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -45334,6 +45333,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -45466,7 +45466,6 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -45503,6 +45502,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -45762,7 +45762,6 @@ export type AdminOrganizationsMembers_queryQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -45799,6 +45798,7 @@ export type AdminOrganizationsMembers_queryQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -45972,7 +45972,6 @@ export type AdminOrganizations_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -46008,6 +46007,7 @@ export type AdminOrganizations_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -46077,7 +46077,6 @@ export type AdminSupportMethods_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -46113,6 +46112,7 @@ export type AdminSupportMethods_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -46282,7 +46282,6 @@ export type Alerts_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -46318,6 +46317,7 @@ export type Alerts_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -47541,7 +47541,6 @@ export type Contact_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -47577,6 +47576,7 @@ export type Contact_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -47744,7 +47744,6 @@ export type Contacts_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -47780,6 +47779,7 @@ export type Contacts_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -48261,7 +48261,6 @@ export type Home_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -48310,6 +48309,7 @@ export type Home_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -48911,7 +48911,6 @@ export type OrganizationBranding_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -48966,6 +48965,7 @@ export type OrganizationBranding_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -49026,7 +49026,6 @@ export type OrganizationCompliance_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasAutoAnonymize: boolean;
@@ -49064,6 +49063,7 @@ export type OrganizationCompliance_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -49120,7 +49120,6 @@ export type OrganizationGeneral_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasCustomHost: boolean;
@@ -49159,6 +49158,7 @@ export type OrganizationGeneral_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -49323,7 +49323,6 @@ export type OrganizationGroup_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasPermissionManagement: boolean;
@@ -49360,6 +49359,7 @@ export type OrganizationGroup_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -49436,7 +49436,6 @@ export type PermissionsGroup_userQuery = {
     createdAt: string;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasOnBehalfOfAccess: boolean;
@@ -49476,6 +49475,7 @@ export type PermissionsGroup_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -49676,7 +49676,6 @@ export type OrganizationGroups_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasPermissionManagement: boolean;
@@ -49713,6 +49712,7 @@ export type OrganizationGroups_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -49755,7 +49755,6 @@ export type OrganizationSettings_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -49791,6 +49790,7 @@ export type OrganizationSettings_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -49833,7 +49833,6 @@ export type OrganizationIntegrations_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasPetitionSignature: boolean;
@@ -49899,6 +49898,7 @@ export type OrganizationIntegrations_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -49990,7 +49990,6 @@ export type IntegrationsSignature_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasPetitionSignature: boolean;
@@ -50045,6 +50044,7 @@ export type IntegrationsSignature_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -50248,7 +50248,6 @@ export type OrganizationProfileType_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasKeyProcessesFeature: boolean;
@@ -50285,6 +50284,7 @@ export type OrganizationProfileType_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -50736,7 +50736,6 @@ export type OrganizationProfileTypes_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasCreateProfileType: boolean;
@@ -50773,6 +50772,7 @@ export type OrganizationProfileTypes_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -50899,7 +50899,6 @@ export type OrganizationUsage_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -50955,6 +50954,7 @@ export type OrganizationUsage_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -51112,7 +51112,6 @@ export type OrganizationUsers_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasGhostLogin: boolean;
@@ -51153,6 +51152,7 @@ export type OrganizationUsers_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -51500,7 +51500,6 @@ export type PetitionActivity_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
     unreadNotificationCount: number;
     avatarUrl?: string | null;
@@ -51541,6 +51540,7 @@ export type PetitionActivity_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -53360,7 +53360,6 @@ export type PetitionActivity_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
     unreadNotificationCount: number;
     avatarUrl?: string | null;
@@ -53401,6 +53400,7 @@ export type PetitionActivity_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -54285,7 +54285,6 @@ export type PetitionCompose_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
     unreadNotificationCount: number;
     avatarUrl?: string | null;
@@ -54374,6 +54373,7 @@ export type PetitionCompose_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -56424,7 +56424,6 @@ export type PetitionCompose_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
     unreadNotificationCount: number;
     avatarUrl?: string | null;
@@ -56513,6 +56512,7 @@ export type PetitionCompose_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -57279,7 +57279,6 @@ export type PetitionMessages_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -57316,6 +57315,7 @@ export type PetitionMessages_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -57358,7 +57358,6 @@ export type PetitionMessages_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -57395,6 +57394,7 @@ export type PetitionMessages_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -58831,7 +58831,6 @@ export type PetitionPreview_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -58878,6 +58877,7 @@ export type PetitionPreview_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -60989,7 +60989,6 @@ export type PetitionPreview_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasPublicLinkPrefill: boolean;
@@ -61037,6 +61036,7 @@ export type PetitionPreview_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -61966,7 +61966,6 @@ export type PetitionReplies_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
     unreadNotificationCount: number;
     avatarUrl?: string | null;
@@ -62028,6 +62027,7 @@ export type PetitionReplies_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -63000,7 +63000,6 @@ export type Petitions_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -63087,6 +63086,7 @@ export type Petitions_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -63585,7 +63585,6 @@ export type NewPetition_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -63624,6 +63623,7 @@ export type NewPetition_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -63903,7 +63903,6 @@ export type ProfileDetail_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasKeyProcessesFeature: boolean;
@@ -63940,6 +63939,7 @@ export type ProfileDetail_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -64242,7 +64242,6 @@ export type Profiles_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -64297,6 +64296,7 @@ export type Profiles_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -64483,7 +64483,6 @@ export type Reports_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -64519,6 +64518,7 @@ export type Reports_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -64567,7 +64567,6 @@ export type Overview_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -64603,6 +64602,7 @@ export type Overview_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -64651,7 +64651,6 @@ export type ReportsReplies_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -64687,6 +64686,7 @@ export type ReportsReplies_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -64735,7 +64735,6 @@ export type ReportsTemplates_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -64771,6 +64770,7 @@ export type ReportsTemplates_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -64811,7 +64811,6 @@ export type Account_QueryFragment = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     isSsoUser: boolean;
     preferredLocale: UserLocale;
     avatarUrl?: string | null;
@@ -64851,6 +64850,7 @@ export type Account_QueryFragment = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -64930,7 +64930,6 @@ export type Account_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     isSsoUser: boolean;
     preferredLocale: UserLocale;
     avatarUrl?: string | null;
@@ -64970,6 +64969,7 @@ export type Account_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -65298,7 +65298,6 @@ export type Subscriptions_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -65334,6 +65333,7 @@ export type Subscriptions_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -65408,7 +65408,6 @@ export type Tokens_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -65444,6 +65443,7 @@ export type Tokens_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -65486,7 +65486,6 @@ export type Settings_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -65522,6 +65521,7 @@ export type Settings_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -65572,7 +65572,6 @@ export type Security_userQuery = {
     permissions: Array<string>;
     isOrgOwner: boolean;
     lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasBackgroundCheck: boolean;
@@ -65608,6 +65607,7 @@ export type Security_userQuery = {
   realMe: {
     __typename?: "User";
     id: string;
+    isSuperAdmin: boolean;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -71980,12 +71980,12 @@ export const UserMenu_QueryFragmentDoc = gql`
   fragment UserMenu_Query on Query {
     me {
       id
-      isSuperAdmin
       email
       ...UserAvatar_User
     }
     realMe {
       id
+      isSuperAdmin
       ...UserAvatar_User
     }
   }
@@ -84048,7 +84048,7 @@ export const WithPermissionDocument = gql`
 ` as unknown as DocumentNode<WithPermissionQuery, WithPermissionQueryVariables>;
 export const WithSuperAdminAccessDocument = gql`
   query WithSuperAdminAccess {
-    me {
+    realMe {
       id
       isSuperAdmin
     }
