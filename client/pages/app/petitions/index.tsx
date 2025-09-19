@@ -205,7 +205,9 @@ function Petitions() {
         const templateId = await showNewTemplateDialog();
         if (!templateId) {
           const id = await createPetition({ type: "TEMPLATE", path: queryState.path });
-          goToPetition(id, "compose", { query: { new: "" } });
+          if (id) {
+            goToPetition(id, "compose", { query: { new: "" } });
+          }
         } else {
           const petitionIds = await clonePetitions({
             petitionIds: [templateId],
@@ -279,7 +281,9 @@ function Petitions() {
         petitionId: selectedIdsRef.current[0],
         type: "TEMPLATE",
       });
-      goToPetition(templateId, "compose", { query: { new: "" } });
+      if (templateId) {
+        goToPetition(templateId, "compose", { query: { new: "" } });
+      }
     } catch {}
   }, []);
 
@@ -288,9 +292,11 @@ function Petitions() {
       const petitionId = await createPetition({
         petitionId: selectedIdsRef.current[0],
       });
-      goToPetition(petitionId, "preview", {
-        query: { new: "", fromTemplate: "" },
-      });
+      if (petitionId) {
+        goToPetition(petitionId, "preview", {
+          query: { new: "", fromTemplate: "" },
+        });
+      }
     } catch {}
   }, []);
 

@@ -28,7 +28,9 @@ export const DashboardCreatePetitionButtonModule = Object.assign(
       const petitionId = await createPetition({
         petitionId: template!.id,
       });
-      goToPetition(petitionId, "preview", { query: { new: "", fromTemplate: "" } });
+      if (petitionId) {
+        goToPetition(petitionId, "preview", { query: { new: "", fromTemplate: "" } });
+      }
     };
     return (
       <DashboardSimpleModuleCard ref={ref} module={module} {...rest} alignment="center">

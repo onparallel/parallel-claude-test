@@ -35,16 +35,16 @@ import {
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
-import { useMemo, useRef } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
-import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish } from "remeda";
 import {
   calculateCompatibleFieldGroups,
   calculateRelatedFieldGroupsWithCompatibleProfiles,
   generatePrefillData,
-  ProfileRelationshipsAssociationTable,
-} from "../ProfileRelationshipsAssociationTable";
+} from "@parallel/utils/petitions/profilePrefill";
+import { useMemo, useRef } from "react";
+import { Controller, FormProvider, useForm } from "react-hook-form";
+import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
+import { ProfileRelationshipsAssociationTable } from "../ProfileRelationshipsAssociationTable";
 
 type AssociateNewPetitionToProfileDialogSteps = {
   SELECT_TEMPLATE: {
@@ -499,7 +499,7 @@ function AssociateNewPetitionToProfileDialogSelectFieldGroup({
   );
 }
 
-function AssociateNewPetitionToProfileDialogPrefillFieldGroups({
+export function AssociateNewPetitionToProfileDialogPrefillFieldGroups({
   profile,
   template,
   groupId,

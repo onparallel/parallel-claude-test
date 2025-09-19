@@ -194,7 +194,9 @@ function NewPetition() {
   const handleCreateTemplate = useCallback(async () => {
     try {
       const id = await createPetition({ type: "TEMPLATE", path: state.path });
-      goToPetition(id, "compose", { query: { new: "" } });
+      if (id) {
+        goToPetition(id, "compose", { query: { new: "" } });
+      }
     } catch {}
   }, [goToPetition, createPetition, state.path]);
 

@@ -24,11 +24,16 @@ import {
   ProfileRelationshipsAssociationTable_ProfileInnerFragment,
 } from "@parallel/graphql/__types";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
+import {
+  calculateCompatibleFieldGroups,
+  calculateRelatedFieldGroupsWithCompatibleProfiles,
+  generatePrefillData,
+} from "@parallel/utils/petitions/profilePrefill";
 import { Assert, UnwrapArray } from "@parallel/utils/types";
 import { useEffect, useMemo } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, isNullish, uniqueBy } from "remeda";
+import { isNullish } from "remeda";
 
 type PetitionFieldSelection = UnwrapArray<
   Assert<ProfileRelationshipsAssociationTable_PetitionBaseFragment["fields"]>
@@ -202,72 +207,49 @@ ProfileRelationshipsAssociationTable.fragments = {
     return gql`
       fragment ProfileRelationshipsAssociationTable_PetitionBase on PetitionBase {
         id
-        name
         fields {
           id
           type
           multiple
-          isLinkedToProfileType
           options
-          profileType {
-            id
-          }
           ...PetitionFieldReference_PetitionField
         }
-        fieldRelationships {
-          id
-          leftSidePetitionField {
-            id
-            profileType {
-              id
-            }
-          }
-          rightSidePetitionField {
-            id
-            profileType {
-              id
-            }
-          }
-          relationshipTypeWithDirection {
-            direction
-            profileRelationshipType {
-              id
-              isReciprocal
-            }
-          }
-        }
         ...useFieldsWithIndices_PetitionBase
+        ...calculateCompatibleFieldGroups_PetitionBase
+        ...calculateRelatedFieldGroupsWithCompatibleProfiles_PetitionBase
       }
       ${PetitionFieldReference.fragments.PetitionField}
       ${useFieldsWithIndices.fragments.PetitionBase}
+      ${calculateCompatibleFieldGroups.fragments.PetitionBase}
+      ${calculateRelatedFieldGroupsWithCompatibleProfiles.fragments.PetitionBase}
     `;
   },
   get ProfileInner() {
     return gql`
       fragment ProfileRelationshipsAssociationTable_ProfileInner on Profile {
         id
-        status
         localizableName
-        profileType {
-          id
-        }
+        ...calculateCompatibleFieldGroups_Profile
+        ...calculateRelatedFieldGroupsWithCompatibleProfiles_Profile
       }
+      ${calculateCompatibleFieldGroups.fragments.Profile}
+      ${calculateRelatedFieldGroupsWithCompatibleProfiles.fragments.Profile}
     `;
   },
   get Profile() {
     return gql`
       fragment ProfileRelationshipsAssociationTable_Profile on Profile {
         ...ProfileRelationshipsAssociationTable_ProfileInner
-        profileType {
-          id
-          name
-        }
+        ...calculateRelatedFieldGroupsWithCompatibleProfiles_Profile
         relationships {
           ...ProfileRelationshipsAssociationTable_ProfileRelationship
+          ...calculateRelatedFieldGroupsWithCompatibleProfiles_ProfileRelationship
         }
       }
       ${this.ProfileInner}
       ${this.ProfileRelationship}
+      ${calculateRelatedFieldGroupsWithCompatibleProfiles.fragments.Profile}
+      ${calculateRelatedFieldGroupsWithCompatibleProfiles.fragments.ProfileRelationship}
     `;
   },
   get ProfileRelationship() {
@@ -288,145 +270,4 @@ ProfileRelationshipsAssociationTable.fragments = {
       ${this.ProfileInner}
     `;
   },
-};
-
-export const calculateCompatibleFieldGroups = ({
-  profile,
-  petition,
-}: {
-  profile: ProfileRelationshipsAssociationTable_ProfileFragment;
-  petition?: ProfileRelationshipsAssociationTable_PetitionBaseFragment | null;
-}) => {
-  if (!petition) return [];
-
-  const allFieldGroups =
-    petition.fields.filter(
-      (f) => isNonNullish(f) && f.type === "FIELD_GROUP" && f.isLinkedToProfileType,
-    ) ?? [];
-
-  return allFieldGroups.filter((f) => f.profileType?.id === profile.profileType.id);
-};
-
-export const calculateRelatedFieldGroupsWithCompatibleProfiles = ({
-  profile,
-  petition,
-  compatibleFieldGroups,
-  groupId,
-}: {
-  profile: ProfileRelationshipsAssociationTable_ProfileFragment;
-  petition?: ProfileRelationshipsAssociationTable_PetitionBaseFragment | null;
-  compatibleFieldGroups: PetitionFieldSelection[];
-  groupId?: string;
-}): [PetitionFieldSelection, ProfileRelationshipsAssociationTable_ProfileInnerFragment[]][] => {
-  if (!petition || !compatibleFieldGroups.length) return [];
-
-  const allFieldGroups =
-    petition.fields.filter(
-      (f) => isNonNullish(f) && f.type === "FIELD_GROUP" && f.isLinkedToProfileType,
-    ) ?? [];
-
-  const selectedGroup = groupId
-    ? compatibleFieldGroups.find((f) => f.id === groupId)
-    : compatibleFieldGroups[0];
-  const selectedGroupId = selectedGroup?.id;
-
-  // Filter the compatible relationships that the petition has configured with the selected group, by default the first one.
-  const petitionRelationships = petition.fieldRelationships.filter(
-    (r) =>
-      selectedGroupId === r.rightSidePetitionField.id ||
-      selectedGroupId === r.leftSidePetitionField.id,
-  );
-
-  const relatedFieldGroupsWithCompatibleProfiles =
-    profile.relationships.length === 0
-      ? isNonNullish(selectedGroup)
-        ? ([[selectedGroup, [profile]]] as [
-            PetitionFieldSelection,
-            ProfileRelationshipsAssociationTable_ProfileInnerFragment[],
-          ][])
-        : []
-      : (allFieldGroups
-          .map((f) => {
-            const profiles = uniqueBy(
-              [
-                ...(selectedGroupId === f.id ? [profile] : []),
-                // filter the available relationships in the profile to suggest the "prefill" in step 3
-                ...profile.relationships
-                  .filter((pr) =>
-                    petitionRelationships
-                      .filter(
-                        // relationships of the same type
-                        (tr) =>
-                          tr.relationshipTypeWithDirection.profileRelationshipType.id ===
-                          pr.relationshipType.id,
-                      )
-                      .some((tr) => {
-                        let [leftId, rightId] = [
-                          tr.leftSidePetitionField.id,
-                          tr.rightSidePetitionField.id,
-                        ];
-                        if (tr.relationshipTypeWithDirection.profileRelationshipType.isReciprocal) {
-                          return (
-                            (leftId === selectedGroupId && rightId === f.id) ||
-                            (leftId === f.id && rightId === selectedGroupId)
-                          );
-                        }
-                        if (pr.rightSideProfile.id === profile.id) {
-                          [leftId, rightId] = [rightId, leftId];
-                        }
-                        if (tr.relationshipTypeWithDirection.direction === "RIGHT_LEFT") {
-                          [leftId, rightId] = [rightId, leftId];
-                        }
-                        return leftId === selectedGroupId && rightId === f.id;
-                      }),
-                  )
-                  .map((r) =>
-                    r.leftSideProfile.id === profile.id ? r.rightSideProfile : r.leftSideProfile,
-                  ),
-              ],
-              (p) => p.id,
-            ).filter((p) => ["OPEN", "CLOSED"].includes(p.status));
-
-            const filteredProfiles = profiles.filter((p) => p.profileType.id === f.profileType?.id);
-
-            return filteredProfiles.length > 0 ? [f, filteredProfiles] : null;
-          })
-          .filter(isNonNullish) as [
-          PetitionFieldSelection,
-          ProfileRelationshipsAssociationTable_ProfileInnerFragment[],
-        ][]);
-
-  return relatedFieldGroupsWithCompatibleProfiles;
-};
-
-export const generatePrefillData = (
-  relatedGroups: [
-    PetitionFieldSelection,
-    ProfileRelationshipsAssociationTable_ProfileInnerFragment[],
-  ][],
-  selectedGroupId: string,
-  isDefaultChecked?: boolean,
-): CreatePetitionFromProfilePrefillInput[] => {
-  return relatedGroups
-    .map(([field, profiles]) => {
-      const shouldIncludeIds = selectedGroupId === field.id || isDefaultChecked;
-      const profileIds = shouldIncludeIds ? getProfileIds(field, profiles, isDefaultChecked) : [];
-
-      return {
-        petitionFieldId: field.id,
-        profileIds,
-      };
-    })
-    .sort((a, b) => (a.petitionFieldId === selectedGroupId ? -1 : 1));
-};
-
-const getProfileIds = (
-  field: PetitionFieldSelection,
-  profiles: ProfileRelationshipsAssociationTable_ProfileInnerFragment[],
-  isDefaultChecked?: boolean,
-): string[] => {
-  if (!field.multiple) {
-    return profiles[0]?.id ? [profiles[0].id] : [];
-  }
-  return isDefaultChecked ? profiles.map((p) => p.id) : profiles[0]?.id ? [profiles[0].id] : [];
 };

@@ -155,7 +155,9 @@ export const PetitionHeader = Object.assign(
           petitionId: petition.id,
           type: "TEMPLATE",
         });
-        goToPetition(templateId, "compose", { query: { new: "" } });
+        if (templateId) {
+          goToPetition(templateId, "compose", { query: { new: "" } });
+        }
       } catch {}
     };
 
@@ -164,9 +166,11 @@ export const PetitionHeader = Object.assign(
         const petitionId = await createPetition({
           petitionId: petition.id,
         });
-        goToPetition(petitionId, "preview", {
-          query: { new: "", fromTemplate: "" },
-        });
+        if (petitionId) {
+          goToPetition(petitionId, "preview", {
+            query: { new: "", fromTemplate: "" },
+          });
+        }
       } catch {}
     };
 

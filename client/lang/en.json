@@ -3180,6 +3180,56 @@
     "context": "Contract"
   },
   {
+    "term": "component.create-petition-from-template-with-prefill-dialog.create-empty",
+    "definition": "Create empty parallel",
+    "context": "Create empty parallel"
+  },
+  {
+    "term": "component.create-petition-from-template-with-prefill-dialog.group-of-fields-description",
+    "definition": "This template can be prefilled with profile information. Select which group of fields you would like to prefill.",
+    "context": "This template can be prefilled with profile information. Select which group of fields you would like to prefill."
+  },
+  {
+    "term": "component.create-petition-from-template-with-prefill-dialog.group-of-fields-error",
+    "definition": "Select a group of fields",
+    "context": "Select a group of fields"
+  },
+  {
+    "term": "component.create-petition-from-template-with-prefill-dialog.group-of-fields-label",
+    "definition": "Group of fields",
+    "context": "Group of fields"
+  },
+  {
+    "term": "component.create-petition-from-template-with-prefill-dialog.header-1",
+    "definition": "Prefill parallel",
+    "context": "Prefill parallel"
+  },
+  {
+    "term": "component.create-petition-from-template-with-prefill-dialog.profile-error",
+    "definition": "Please, select a profile",
+    "context": "Please, select a profile"
+  },
+  {
+    "term": "component.create-petition-from-template-with-prefill-dialog.profile-label",
+    "definition": "Profile",
+    "context": "Profile"
+  },
+  {
+    "term": "component.create-petition-from-template-with-prefill-dialog.profile-not-found-help",
+    "definition": "Can't find the profile? It may not exist yet.",
+    "context": "Can't find the profile? It may not exist yet."
+  },
+  {
+    "term": "component.create-petition-from-template-with-prefill-dialog.profile-not-found-help-2",
+    "definition": "You can create an empty parallel and then save the collected information in a profile.",
+    "context": "You can create an empty parallel and then save the collected information in a profile."
+  },
+  {
+    "term": "component.create-petition-from-template-with-prefill-dialog.select-profile-description",
+    "definition": "Select the profile with which to prefill the parallel",
+    "context": "Select the profile with which to prefill the parallel"
+  },
+  {
     "term": "component.create-profile-dialog.new-profile",
     "definition": "New profile",
     "context": "New profile"
