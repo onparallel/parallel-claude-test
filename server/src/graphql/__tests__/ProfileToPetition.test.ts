@@ -5757,6 +5757,41 @@ describe("GraphQL/Profiles to Petitions", () => {
         ],
       });
     });
+
+    it("sends error if the template is scheduled for deletion", async () => {
+      const [template] = await mocks.createRandomTemplates(organization.id, user.id, 1, () => ({
+        deletion_scheduled_at: new Date(),
+      }));
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation (
+            $templateId: GID!
+            $profileId: GID!
+            $petitionFieldId: GID
+            $prefill: [CreatePetitionFromProfilePrefillInput!]!
+          ) {
+            createPetitionFromProfile(
+              templateId: $templateId
+              petitionFieldId: $petitionFieldId
+              profileId: $profileId
+              prefill: $prefill
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          templateId: toGlobalId("Petition", template.id),
+          profileId: toGlobalId("Profile", mainProfile.id),
+          petitionFieldId: null,
+          prefill: [],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("createPetitionFromProfile / custom profile types", () => {
@@ -8368,6 +8403,46 @@ describe("GraphQL/Profiles to Petitions", () => {
           },
         ],
       });
+    });
+
+    it("sends error if the petition is scheduled for deletion", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        deletion_scheduled_at: new Date(),
+      }));
+
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileType.id,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $profileIds: [GID!]!
+            $force: Boolean
+          ) {
+            createFieldGroupRepliesFromProfiles(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              profileIds: $profileIds
+              force: $force
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          profileIds: [toGlobalId("Profile", mikeRoss.id)],
+          force: true,
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 });

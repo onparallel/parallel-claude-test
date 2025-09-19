@@ -515,10 +515,6 @@ export const ProfileFieldValue = objectType({
     t.nullable.jsonObject("content", {
       resolve: (root, _, ctx) => ctx.profilesHelper.mapValueContentFromDatabase(root),
     });
-    t.nonNull.boolean("hasDraft", {
-      deprecation: "don't use!",
-      resolve: () => false,
-    });
     t.nonNull.boolean("isDraft", {
       resolve: (o) => o.is_draft,
     });

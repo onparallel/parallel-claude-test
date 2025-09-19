@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import gql from "graphql-tag";
 import { Knex } from "knex";
-import { range, sortBy } from "remeda";
+import { pick, range, sortBy } from "remeda";
 import {
   Contact,
   OrgIntegration,
@@ -10,6 +10,7 @@ import {
   Petition,
   PetitionAccess,
   PetitionField,
+  PetitionFieldReply,
   PetitionFieldType,
   PetitionPermission,
   PetitionStatus,
@@ -65,6 +66,7 @@ function petitionsBuilder(orgId: number, signatureIntegrationId: number) {
             title: "Signature",
           }
         : null,
+    deletion_scheduled_at: index > 9 ? new Date() : null,
   });
 }
 
@@ -161,7 +163,7 @@ describe("GraphQL/Petitions", () => {
     petitions = await mocks.createRandomPetitions(
       organization.id,
       sessionUser.id,
-      10,
+      15,
       petitionsBuilder(organization.id, signatureIntegrations[0].id),
     );
 
@@ -344,7 +346,7 @@ describe("GraphQL/Petitions", () => {
   });
 
   describe("petitions", () => {
-    it("fetches all user petitions", async () => {
+    it("fetches all user petitions that are not scheduled for deletion", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
           query ($limit: Int) {
@@ -357,6 +359,21 @@ describe("GraphQL/Petitions", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.petitions.totalCount).toBe(6);
+    });
+
+    it("fetches only petitions scheduled for deletion", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query ($limit: Int) {
+            petitions(limit: $limit, isScheduledForDeletion: true, filters: { type: TEMPLATE }) {
+              totalCount
+            }
+          }
+        `,
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.petitions.totalCount).toBe(5);
     });
 
     it("filters petition by single tag", async () => {
@@ -2454,11 +2471,11 @@ describe("GraphQL/Petitions", () => {
           }
         `,
         variables: {
-          petitionIds: petitions.map((p) => toGlobalId("Petition", p.id)),
+          petitionIds: petitions.slice(0, 10).map((p) => toGlobalId("Petition", p.id)),
         },
       });
       expect(errors).toBeUndefined();
-      expect(data!.clonePetitions).toHaveLength(petitions.length);
+      expect(data!.clonePetitions).toHaveLength(petitions.slice(0, 10).length);
     });
 
     it("clones a public template and saves it as private", async () => {
@@ -3225,8 +3242,8 @@ describe("GraphQL/Petitions", () => {
     it("deletes a user petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($ids: [GID!]!, $force: Boolean) {
-            deletePetitions(ids: $ids, force: $force)
+          mutation ($ids: [GID!]!) {
+            deletePetitions(ids: $ids, deletePermanently: true)
           }
         `,
         variables: { ids: [toGlobalId("Petition", petitionsToDelete[1].id)] },
@@ -3234,35 +3251,169 @@ describe("GraphQL/Petitions", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.deletePetitions).toEqual("SUCCESS");
+
+      const [petition] = await mocks.knex
+        .from("petition")
+        .where("id", petitionsToDelete[1].id)
+        .select("*");
+      expect(petition.deleted_at).toBeDefined();
     });
+
+    it("sends a petition to bin, deactivating accesses and public links", async () => {
+      const contacts = await mocks.createRandomContacts(organization.id, 3);
+      await mocks.createPetitionAccess(
+        petitionsToDelete[1].id,
+        sessionUser.id,
+        contacts.map((c) => c.id),
+        sessionUser.id,
+      );
+
+      const publicLink = await mocks.createRandomPublicPetitionLink(petitionsToDelete[1].id);
+
+      const { errors: deleteErrors, data: deleteData } = await testClient.execute(
+        gql`
+          mutation ($ids: [GID!]!) {
+            deletePetitions(ids: $ids, deletePermanently: false)
+          }
+        `,
+        {
+          ids: [toGlobalId("Petition", petitionsToDelete[1].id)],
+        },
+      );
+
+      expect(deleteErrors).toBeUndefined();
+      expect(deleteData?.deletePetitions).toEqual("SUCCESS");
+
+      const dbAccesses = await mocks.knex
+        .from("petition_access")
+        .where("petition_id", petitionsToDelete[1].id)
+        .select("*");
+
+      expect(dbAccesses.map(pick(["id", "status", "contact_id", "petition_id"]))).toMatchObject(
+        contacts.map((c) => ({
+          id: expect.any(Number),
+          status: "INACTIVE",
+          contact_id: c.id,
+          petition_id: petitionsToDelete[1].id,
+        })),
+      );
+
+      const dbPublicLink = await mocks.knex
+        .from("public_petition_link")
+        .where("id", publicLink.id)
+        .select("*");
+
+      expect(dbPublicLink.map(pick(["id", "is_active"]))).toMatchObject([
+        {
+          id: publicLink.id,
+          is_active: false,
+        },
+      ]);
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($id: GID!) {
+            petition(id: $id) {
+              id
+              ... on Petition {
+                accesses {
+                  id
+                  status
+                  contact {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          id: toGlobalId("Petition", petitionsToDelete[1].id),
+        },
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData?.petition).toEqual({
+        id: toGlobalId("Petition", petitionsToDelete[1].id),
+        accesses: contacts.map((c) => ({
+          id: expect.any(String),
+          status: "INACTIVE",
+          contact: { id: toGlobalId("Contact", c.id) },
+        })),
+      });
+    });
+
+    it.each([false, true])(
+      "cancels pending signature and approvals when deleting petition, deletePermanently=%s",
+      async (deletePermanently) => {
+        await mocks.createRandomPetitionSignatureRequest(petitionsToDelete[1].id, () => ({
+          status: "ENQUEUED",
+        }));
+        await mocks.knex.from("petition_approval_request_step").insert({
+          petition_id: petitionsToDelete[1].id,
+          step_number: 0,
+          step_name: "Step 1",
+          status: "PENDING",
+          approval_type: "ANY",
+        });
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($ids: [GID!]!, $deletePermanently: Boolean) {
+              deletePetitions(ids: $ids, deletePermanently: $deletePermanently)
+            }
+          `,
+          {
+            ids: [toGlobalId("Petition", petitionsToDelete[1].id)],
+            deletePermanently,
+          },
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.deletePetitions).toEqual("SUCCESS");
+
+        const signatureRequests = await mocks.knex
+          .from("petition_signature_request")
+          .where("petition_id", petitionsToDelete[1].id)
+          .select("*");
+
+        expect(signatureRequests.map(pick(["status", "cancel_reason"]))).toEqual([
+          { status: "CANCELLED", cancel_reason: "CANCELLED_BY_USER" },
+        ]);
+
+        const approvalRequests = await mocks.knex
+          .from("petition_approval_request_step")
+          .where("petition_id", petitionsToDelete[1].id)
+          .select("*");
+
+        expect(approvalRequests.map(pick(["status"]))).toEqual([{ status: "CANCELED" }]);
+      },
+    );
 
     it("deletes an owned shared petition when passing the force flag", async () => {
       const sharedByMe = petitionsToDelete[0];
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($ids: [GID!]!, $force: Boolean) {
-            deletePetitions(ids: $ids, force: $force)
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($ids: [GID!]!) {
+            deletePetitions(ids: $ids, force: true)
           }
         `,
-        variables: {
-          ids: [toGlobalId("Petition", sharedByMe.id)],
-          force: true,
-        },
-      });
+        { ids: [toGlobalId("Petition", sharedByMe.id)] },
+      );
       expect(errors).toBeUndefined();
       expect(data!.deletePetitions).toEqual("SUCCESS");
     });
 
-    it("removes the petition and every permission when deleting an owned shared petition", async () => {
+    it("removes the petition and every permission when permanently deleting an owned shared petition", async () => {
       const sharedByMe = petitionsToDelete[0];
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($ids: [GID!]!, $force: Boolean) {
-            deletePetitions(ids: $ids, force: $force)
+          mutation ($ids: [GID!]!, $deletePermanently: Boolean, $force: Boolean) {
+            deletePetitions(ids: $ids, deletePermanently: $deletePermanently, force: $force)
           }
         `,
         variables: {
           ids: [toGlobalId("Petition", sharedByMe.id)],
+          deletePermanently: true,
           force: true,
         },
       });
@@ -3290,13 +3441,13 @@ describe("GraphQL/Petitions", () => {
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($ids: [GID!]!, $force: Boolean) {
-            deletePetitions(ids: $ids, force: $force)
+          mutation ($ids: [GID!]!, $deletePermanently: Boolean) {
+            deletePetitions(ids: $ids, deletePermanently: $deletePermanently)
           }
         `,
         variables: {
           ids: [toGlobalId("Petition", sharedToMe.id)],
-          force: true,
+          deletePermanently: true,
         },
       });
       expect(errors).toBeUndefined();
@@ -3318,13 +3469,13 @@ describe("GraphQL/Petitions", () => {
     it("sends error when trying to delete a private petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($ids: [GID!]!, $force: Boolean) {
-            deletePetitions(ids: $ids, force: $force)
+          mutation ($ids: [GID!]!, $deletePermanently: Boolean) {
+            deletePetitions(ids: $ids, deletePermanently: $deletePermanently)
           }
         `,
         variables: {
           ids: [toGlobalId("Petition", otherPetition.id)],
-          force: true,
+          deletePermanently: true,
         },
       });
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -3334,8 +3485,8 @@ describe("GraphQL/Petitions", () => {
     it("sends error if passing an empty array of ids", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($ids: [GID!]!, $force: Boolean) {
-            deletePetitions(ids: $ids, force: $force)
+          mutation ($ids: [GID!]!, $deletePermanently: Boolean) {
+            deletePetitions(ids: $ids, deletePermanently: $deletePermanently)
           }
         `,
         variables: { ids: [] },
@@ -3348,8 +3499,8 @@ describe("GraphQL/Petitions", () => {
       const shared = petitionsToDelete[0];
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($ids: [GID!]!, $force: Boolean) {
-            deletePetitions(ids: $ids, force: $force)
+          mutation ($ids: [GID!]!) {
+            deletePetitions(ids: $ids)
           }
         `,
         variables: { ids: [toGlobalId("Petition", shared.id)] },
@@ -3361,11 +3512,15 @@ describe("GraphQL/Petitions", () => {
     it("will not delete any petition if passing dryrun=true", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($ids: [GID!]!, $force: Boolean, $dryrun: Boolean) {
-            deletePetitions(ids: $ids, force: $force, dryrun: $dryrun)
+          mutation ($ids: [GID!]!, $deletePermanently: Boolean, $dryrun: Boolean) {
+            deletePetitions(ids: $ids, deletePermanently: $deletePermanently, dryrun: $dryrun)
           }
         `,
-        { ids: [toGlobalId("Petition", petitionsToDelete[1].id)], force: true, dryrun: true },
+        {
+          ids: [toGlobalId("Petition", petitionsToDelete[1].id)],
+          deletePermanently: true,
+          dryrun: true,
+        },
       );
 
       expect(errors).toBeUndefined();
@@ -3377,6 +3532,148 @@ describe("GraphQL/Petitions", () => {
         .select("*");
 
       expect(petition.deleted_at).toBeNull();
+    });
+
+    it("disables public link when sending a template to bin", async () => {
+      const [template] = await mocks.createRandomTemplates(organization.id, sessionUser.id, 1);
+
+      const publicLink = await mocks.createRandomPublicPetitionLink(template.id, () => ({
+        is_active: true,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($ids: [GID!]!, $deletePermanently: Boolean) {
+            deletePetitions(ids: $ids, deletePermanently: $deletePermanently)
+          }
+        `,
+        {
+          ids: [toGlobalId("Petition", template.id)],
+          deletePermanently: false,
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deletePetitions).toEqual("SUCCESS");
+
+      const [dbPublicLink] = await mocks.knex
+        .from("public_petition_link")
+        .where("id", publicLink.id)
+        .select("*");
+      expect(dbPublicLink.is_active).toEqual(false);
+    });
+
+    it("deletes only my notifications when permanently deleting a petition shared to me", async () => {
+      const [sharedToMe] = await mocks.createRandomPetitions(
+        organization.id,
+        sameOrgUser.id,
+        1,
+        petitionsBuilder(organization.id, signatureIntegrations[0].id),
+      );
+
+      //share the petition with the logged user
+      await mocks.sharePetitions([sharedToMe.id], sessionUser.id, "WRITE");
+
+      await mocks.knex.from("petition_user_notification").insert([
+        {
+          petition_id: sharedToMe.id,
+          user_id: sessionUser.id,
+          type: "PETITION_COMPLETED",
+          data: {
+            user_id: sameOrgUser.id,
+          },
+        },
+        {
+          petition_id: sharedToMe.id,
+          user_id: sameOrgUser.id,
+          type: "PETITION_COMPLETED",
+          data: {
+            user_id: sameOrgUser.id,
+          },
+        },
+      ]);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($ids: [GID!]!, $deletePermanently: Boolean) {
+            deletePetitions(ids: $ids, deletePermanently: $deletePermanently)
+          }
+        `,
+        variables: {
+          ids: [toGlobalId("Petition", sharedToMe.id)],
+          deletePermanently: true,
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data!.deletePetitions).toEqual("SUCCESS");
+
+      const notifications = await mocks.knex
+        .from("petition_user_notification")
+        .where("petition_id", sharedToMe.id)
+        .select("*");
+
+      expect(notifications.map(pick(["petition_id", "user_id", "type", "data"]))).toEqual([
+        {
+          petition_id: sharedToMe.id,
+          user_id: sameOrgUser.id,
+          type: "PETITION_COMPLETED",
+          data: {
+            user_id: sameOrgUser.id,
+          },
+        },
+      ]);
+    });
+
+    it("deletes every notification when permanently deleting a petition that I own", async () => {
+      const [sharedToOther] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        petitionsBuilder(organization.id, signatureIntegrations[0].id),
+      );
+
+      //share the petition with the logged user
+      await mocks.sharePetitions([sharedToOther.id], sameOrgUser.id, "WRITE");
+
+      await mocks.knex.from("petition_user_notification").insert([
+        {
+          petition_id: sharedToOther.id,
+          user_id: sessionUser.id,
+          type: "PETITION_COMPLETED",
+          data: {
+            user_id: sameOrgUser.id,
+          },
+        },
+        {
+          petition_id: sharedToOther.id,
+          user_id: sameOrgUser.id,
+          type: "PETITION_COMPLETED",
+          data: {
+            user_id: sameOrgUser.id,
+          },
+        },
+      ]);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($ids: [GID!]!, $deletePermanently: Boolean) {
+            deletePetitions(ids: $ids, force: true, deletePermanently: $deletePermanently)
+          }
+        `,
+        variables: {
+          ids: [toGlobalId("Petition", sharedToOther.id)],
+          deletePermanently: true,
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data!.deletePetitions).toEqual("SUCCESS");
+
+      const notifications = await mocks.knex
+        .from("petition_user_notification")
+        .where("petition_id", sharedToOther.id)
+        .select("*");
+
+      expect(notifications).toHaveLength(0);
     });
   });
 
@@ -3401,42 +3698,48 @@ describe("GraphQL/Petitions", () => {
       jest.clearAllMocks();
     });
 
-    it("R/W user with group permissions should not be able to delete", async () => {
-      const { apiKey } = await mocks.createUserAuthToken("user[0]", users[0].id);
-      const { errors, data } = await testClient.withApiKey(apiKey).execute(
-        gql`
-          mutation ($ids: [GID!]!) {
-            deletePetitions(ids: $ids, force: true)
-          }
-        `,
-        { ids: [toGlobalId("Petition", petition.id)] },
-      );
+    it.each([true, false])(
+      "R/W user with group permissions should not be able to delete, deletePermanently=%s",
+      async (deletePermanently) => {
+        const { apiKey } = await mocks.createUserAuthToken(faker.word.words(2), users[0].id);
+        const { errors, data } = await testClient.withApiKey(apiKey).execute(
+          gql`
+            mutation ($ids: [GID!]!, $deletePermanently: Boolean) {
+              deletePetitions(ids: $ids, deletePermanently: $deletePermanently)
+            }
+          `,
+          { ids: [toGlobalId("Petition", petition.id)], deletePermanently },
+        );
 
-      expect(errors).toContainGraphQLError("DELETE_GROUP_PETITION_ERROR");
-      expect(data).toBeNull();
-    });
+        expect(errors).toContainGraphQLError("DELETE_GROUP_PETITION_ERROR");
+        expect(data).toBeNull();
+      },
+    );
 
-    it("R/W user with directly assigned and group permissions should not be able to delete", async () => {
-      const { apiKey } = await mocks.createUserAuthToken("user[1]", users[1].id);
+    it.each([true, false])(
+      "R/W user with directly assigned and group permissions should not be able to delete, deletePermanently=%s",
+      async (deletePermanently) => {
+        const { apiKey } = await mocks.createUserAuthToken(faker.word.words(2), users[1].id);
 
-      const { errors, data } = await testClient.withApiKey(apiKey).execute(
-        gql`
-          mutation ($ids: [GID!]!) {
-            deletePetitions(ids: $ids, force: true)
-          }
-        `,
-        { ids: [toGlobalId("Petition", petition.id)] },
-      );
+        const { errors, data } = await testClient.withApiKey(apiKey).execute(
+          gql`
+            mutation ($ids: [GID!]!, $deletePermanently: Boolean) {
+              deletePetitions(ids: $ids, deletePermanently: $deletePermanently)
+            }
+          `,
+          { ids: [toGlobalId("Petition", petition.id)], deletePermanently },
+        );
 
-      expect(errors).toContainGraphQLError("DELETE_GROUP_PETITION_ERROR");
-      expect(data).toBeNull();
-    });
+        expect(errors).toContainGraphQLError("DELETE_GROUP_PETITION_ERROR");
+        expect(data).toBeNull();
+      },
+    );
 
     it("petition owner with group access should be able to delete it", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($ids: [GID!]!) {
-            deletePetitions(ids: $ids, force: true)
+            deletePetitions(ids: $ids, force: true, deletePermanently: true)
           }
         `,
         variables: { ids: [toGlobalId("Petition", petition.id)] },
@@ -5584,7 +5887,7 @@ describe("GraphQL/Petitions", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+      expect(errors).toContainGraphQLError("ONGOING_PROCESS_ERROR", { processType: "SIGNATURE" });
       expect(data).toBeNull();
     });
 
@@ -6036,6 +6339,39 @@ describe("GraphQL/Petitions", () => {
     });
 
     describe("reactivateAccesses", () => {
+      it("reactivates a petition access", async () => {
+        const [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id);
+        const [access] = await mocks.createPetitionAccess(
+          petition.id,
+          sessionUser.id,
+          [contact.id],
+          sessionUser.id,
+          () => ({ status: "INACTIVE" }),
+        );
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $accessIds: [GID!]!) {
+              reactivateAccesses(petitionId: $petitionId, accessIds: $accessIds) {
+                id
+                status
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            accessIds: [toGlobalId("PetitionAccess", access.id)],
+          },
+        );
+        expect(errors).toBeUndefined();
+        expect(data?.reactivateAccesses).toEqual([
+          {
+            id: toGlobalId("PetitionAccess", access.id),
+            status: "ACTIVE",
+          },
+        ]);
+      });
+
       it("sends error when trying to reactivate accesses on a petition with read access", async () => {
         const { errors, data } = await testClient.execute(
           gql`
@@ -6047,6 +6383,38 @@ describe("GraphQL/Petitions", () => {
           `,
           {
             petitionId: toGlobalId("Petition", readPetition.id),
+            accessIds: [toGlobalId("PetitionAccess", access.id)],
+          },
+        );
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
+      });
+
+      it("fails to reactivate access if petition is scheduled for deletion", async () => {
+        const [scheduledPetition] = await mocks.createRandomPetitions(
+          organization.id,
+          sessionUser.id,
+          1,
+          () => ({ deletion_scheduled_at: new Date() }),
+        );
+        const [access] = await mocks.createPetitionAccess(
+          scheduledPetition.id,
+          sessionUser.id,
+          [contact.id],
+          sessionUser.id,
+          () => ({ status: "INACTIVE" }),
+        );
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $accessIds: [GID!]!) {
+              reactivateAccesses(petitionId: $petitionId, accessIds: $accessIds) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", scheduledPetition.id),
             accessIds: [toGlobalId("PetitionAccess", access.id)],
           },
         );
@@ -6591,6 +6959,192 @@ describe("GraphQL/Petitions", () => {
           },
         },
       ]);
+    });
+  });
+
+  describe("recoverPetitionsFromDeletion", () => {
+    let petition: Petition;
+
+    let fields: PetitionField[];
+    let replies: PetitionFieldReply[];
+    let contacts: Contact[];
+    let accesses: PetitionAccess[];
+
+    let contactless: PetitionAccess;
+    let otherUser: User;
+
+    beforeAll(async () => {
+      [otherUser] = await mocks.createRandomUsers(organization.id, 1);
+      contacts = await mocks.createRandomContacts(organization.id, 4);
+      [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+
+      await mocks.sharePetitions([petition.id], otherUser.id, "READ");
+
+      accesses = await mocks.createPetitionAccess(
+        petition.id,
+        sessionUser.id,
+        contacts.map((c) => c.id),
+        sessionUser.id,
+      );
+
+      [contactless] = await mocks.createPetitionAccess(
+        petition.id,
+        sessionUser.id,
+        [null],
+        sessionUser.id,
+      );
+
+      fields = await mocks.createRandomPetitionFields(petition.id, 3, () => ({ type: "TEXT" }));
+      replies = await mocks.createRandomTextReply(fields[0].id, undefined, 2, () => ({
+        user_id: sessionUser.id,
+      }));
+    });
+
+    it("recovers petitions from deletion with its original permissions, accesses and field replies", async () => {
+      const { errors: deleteErrors, data: deleteData } = await testClient.execute(
+        gql`
+          mutation ($ids: [GID!]!) {
+            deletePetitions(deletePermanently: false, force: true, ids: $ids)
+          }
+        `,
+        {
+          ids: [toGlobalId("Petition", petition.id)],
+        },
+      );
+
+      expect(deleteErrors).toBeUndefined();
+      expect(deleteData?.deletePetitions).toEqual("SUCCESS");
+
+      const { errors: recoverErrors, data: recoverData } = await testClient.execute(
+        gql`
+          mutation ($ids: [GID!]!) {
+            recoverPetitionsFromDeletion(ids: $ids)
+          }
+        `,
+        {
+          ids: [toGlobalId("Petition", petition.id)],
+        },
+      );
+
+      expect(recoverErrors).toBeUndefined();
+      expect(recoverData?.recoverPetitionsFromDeletion).toEqual("SUCCESS");
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($id: GID!) {
+            petition(id: $id) {
+              id
+              permissions {
+                permissionType
+                ... on PetitionUserPermission {
+                  user {
+                    id
+                  }
+                }
+                ... on PetitionUserGroupPermission {
+                  group {
+                    id
+                  }
+                }
+              }
+              fields {
+                id
+                type
+                replies {
+                  id
+                  content
+                }
+              }
+              ... on Petition {
+                accesses {
+                  id
+                  status
+                  contact {
+                    id
+                  }
+                }
+                events(limit: 100, offset: 0) {
+                  totalCount
+                  items {
+                    type
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          id: toGlobalId("Petition", petition.id),
+        },
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData?.petition).toEqual({
+        id: toGlobalId("Petition", petition.id),
+        permissions: [
+          { permissionType: "OWNER", user: { id: toGlobalId("User", sessionUser.id) } },
+          { permissionType: "READ", user: { id: toGlobalId("User", otherUser.id) } },
+        ],
+        accesses: [
+          {
+            id: toGlobalId("PetitionAccess", accesses[0].id),
+            status: "INACTIVE",
+            contact: { id: toGlobalId("Contact", contacts[0].id) },
+          },
+          {
+            id: toGlobalId("PetitionAccess", accesses[1].id),
+            status: "INACTIVE",
+            contact: { id: toGlobalId("Contact", contacts[1].id) },
+          },
+          {
+            id: toGlobalId("PetitionAccess", accesses[2].id),
+            status: "INACTIVE",
+            contact: { id: toGlobalId("Contact", contacts[2].id) },
+          },
+          {
+            id: toGlobalId("PetitionAccess", accesses[3].id),
+            status: "INACTIVE",
+            contact: { id: toGlobalId("Contact", contacts[3].id) },
+          },
+          {
+            id: toGlobalId("PetitionAccess", contactless.id),
+            status: "INACTIVE",
+            contact: null,
+          },
+        ],
+        fields: [
+          {
+            id: toGlobalId("PetitionField", fields[0].id),
+            type: "TEXT",
+            replies: replies.map((r) => ({
+              id: toGlobalId("PetitionFieldReply", r.id),
+              content: r.content,
+            })),
+          },
+          {
+            id: toGlobalId("PetitionField", fields[1].id),
+            type: "TEXT",
+            replies: [],
+          },
+          {
+            id: toGlobalId("PetitionField", fields[2].id),
+            type: "TEXT",
+            replies: [],
+          },
+        ],
+        events: {
+          totalCount: 7,
+          items: [
+            { type: "PETITION_RECOVERED_FROM_DELETION" },
+            { type: "PETITION_SCHEDULED_FOR_DELETION" },
+            { type: "ACCESS_DEACTIVATED" },
+            { type: "ACCESS_DEACTIVATED" },
+            { type: "ACCESS_DEACTIVATED" },
+            { type: "ACCESS_DEACTIVATED" },
+            { type: "ACCESS_DEACTIVATED" },
+          ],
+        },
+      });
     });
   });
 });

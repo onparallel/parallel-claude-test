@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import { arg, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
 import { findLast, firstBy, isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
@@ -430,6 +431,15 @@ export const PetitionBase = interfaceType({
     t.nullable.list.nonNull.field("approvalFlowConfig", {
       type: "ApprovalFlowConfig",
       resolve: (o) => o.approval_flow_config,
+    });
+    t.nullable.datetime("permanentDeletionAt", {
+      resolve: (o, _, ctx) =>
+        o.deletion_scheduled_at
+          ? addDays(
+              o.deletion_scheduled_at,
+              ctx.config.cronWorkers.anonymizer.deleteScheduledPetitionsAfterDays,
+            )
+          : null,
     });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),

@@ -1173,161 +1173,165 @@ describe("Petition Folders", () => {
       );
     });
 
-    it("deletes a folder with my petitions", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($folders: FoldersInput) {
-            deletePetitions(folders: $folders)
-          }
-        `,
-        {
-          folders: {
-            folderIds: [
-              toGlobalId("PetitionFolder", "/common/"),
-              toGlobalId("PetitionFolder", "/A/B/"),
-            ],
-            type: "PETITION",
+    it.each([true, false])(
+      "deletes a folder with my petitions, deletePermanently=%s",
+      async (deletePermanently) => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($folders: FoldersInput, $deletePermanently: Boolean) {
+              deletePetitions(folders: $folders, deletePermanently: $deletePermanently)
+            }
+          `,
+          {
+            folders: {
+              folderIds: [
+                toGlobalId("PetitionFolder", "/common/"),
+                toGlobalId("PetitionFolder", "/A/B/"),
+              ],
+              type: "PETITION",
+            },
+            deletePermanently,
           },
-        },
-      );
+        );
 
-      expect(errors).toBeUndefined();
-      expect(data!.deletePetitions).toEqual("SUCCESS");
+        expect(errors).toBeUndefined();
+        expect(data!.deletePetitions).toEqual("SUCCESS");
 
-      // my petitions and permissions should be deleted
-      const myPermissionsAfter = (await mocks.knex
-        .from("petition_permission")
-        .whereIn(
-          "petition_id",
-          petitions.map((p) => p.id),
-        )
-        .orderBy("petition_id", "asc")
-        .select("petition_id", "user_id", "type", "deleted_at")) as Pick<
-        PetitionPermission,
-        "petition_id" | "user_id" | "type" | "deleted_at"
-      >[];
+        // my petitions and permissions should be deleted
+        const myPermissionsAfter = (await mocks.knex
+          .from("petition_permission")
+          .whereIn(
+            "petition_id",
+            petitions.map((p) => p.id),
+          )
+          .orderBy("petition_id", "asc")
+          .select("petition_id", "user_id", "type", "deleted_at")) as Pick<
+          PetitionPermission,
+          "petition_id" | "user_id" | "type" | "deleted_at"
+        >[];
 
-      expect(myPermissionsAfter).toEqual([
-        {
-          petition_id: petitions.find((p) => p.path === "/")!.id,
-          user_id: user.id,
-          type: "OWNER",
-          deleted_at: null,
-        },
-        {
-          petition_id: petitions.find((p) => p.path === "/common/")!.id,
-          user_id: user.id,
-          type: "OWNER",
-          deleted_at: expect.any(Date),
-        },
-        {
-          petition_id: petitions.find((p) => p.path === "/A/B/C/")!.id,
-          user_id: user.id,
-          type: "OWNER",
-          deleted_at: expect.any(Date),
-        },
-        {
-          petition_id: petitions.find((p) => p.path === "/A/B/C/D/E/")!.id,
-          user_id: user.id,
-          type: "OWNER",
-          deleted_at: expect.any(Date),
-        },
-        {
-          petition_id: petitions.find((p) => p.path === "/templates/")!.id,
-          user_id: user.id,
-          type: "OWNER",
-          deleted_at: null,
-        },
-      ]);
+        expect(myPermissionsAfter).toEqual([
+          {
+            petition_id: petitions.find((p) => p.path === "/")!.id,
+            user_id: user.id,
+            type: "OWNER",
+            deleted_at: null,
+          },
+          {
+            petition_id: petitions.find((p) => p.path === "/common/")!.id,
+            user_id: user.id,
+            type: "OWNER",
+            deleted_at: deletePermanently ? expect.any(Date) : null,
+          },
+          {
+            petition_id: petitions.find((p) => p.path === "/A/B/C/")!.id,
+            user_id: user.id,
+            type: "OWNER",
+            deleted_at: deletePermanently ? expect.any(Date) : null,
+          },
+          {
+            petition_id: petitions.find((p) => p.path === "/A/B/C/D/E/")!.id,
+            user_id: user.id,
+            type: "OWNER",
+            deleted_at: deletePermanently ? expect.any(Date) : null,
+          },
+          {
+            petition_id: petitions.find((p) => p.path === "/templates/")!.id,
+            user_id: user.id,
+            type: "OWNER",
+            deleted_at: null,
+          },
+        ]);
 
-      const myPetitionsAfter = (await mocks.knex
-        .from("petition")
-        .whereIn(
-          "id",
-          petitions.map((p) => p.id),
-        )
-        .orderBy("path", "asc")
-        .select("path", "deleted_at")) as Pick<Petition, "id" | "path" | "deleted_at">[];
+        const myPetitionsAfter = (await mocks.knex
+          .from("petition")
+          .whereIn(
+            "id",
+            petitions.map((p) => p.id),
+          )
+          .orderBy("path", "asc")
+          .select("path", "deleted_at")) as Pick<Petition, "id" | "path" | "deleted_at">[];
 
-      expect(myPetitionsAfter).toEqual([
-        { path: "/", deleted_at: null },
-        { path: "/A/B/C/", deleted_at: expect.any(Date) },
-        { path: "/A/B/C/D/E/", deleted_at: expect.any(Date) },
-        { path: "/common/", deleted_at: expect.any(Date) },
-        { path: "/templates/", deleted_at: null },
-      ]);
+        expect(myPetitionsAfter).toEqual([
+          { path: "/", deleted_at: null },
+          { path: "/A/B/C/", deleted_at: deletePermanently ? expect.any(Date) : null },
+          { path: "/A/B/C/D/E/", deleted_at: deletePermanently ? expect.any(Date) : null },
+          { path: "/common/", deleted_at: deletePermanently ? expect.any(Date) : null },
+          { path: "/templates/", deleted_at: null },
+        ]);
 
-      // 'orgUser' and 'otherOrgUser' petitions and permissions on those folders should be intact
-      const orgUserPermissionsAfter = (await mocks.knex
-        .from("petition_permission")
-        .whereIn(
-          "petition_id",
-          orgUserPetitions.map((p) => p.id),
-        )
-        .orderBy("petition_id", "asc")
-        .select("petition_id", "user_id", "type", "deleted_at")) as Pick<
-        PetitionPermission,
-        "petition_id" | "user_id" | "type" | "deleted_at"
-      >[];
+        // 'orgUser' and 'otherOrgUser' petitions and permissions on those folders should be intact
+        const orgUserPermissionsAfter = (await mocks.knex
+          .from("petition_permission")
+          .whereIn(
+            "petition_id",
+            orgUserPetitions.map((p) => p.id),
+          )
+          .orderBy("petition_id", "asc")
+          .select("petition_id", "user_id", "type", "deleted_at")) as Pick<
+          PetitionPermission,
+          "petition_id" | "user_id" | "type" | "deleted_at"
+        >[];
 
-      expect(orgUserPermissionsAfter).toEqual([
-        {
-          petition_id: orgUserPetitions[0].id,
-          user_id: orgUser.id,
-          type: "OWNER",
-          deleted_at: null,
-        },
-      ]);
+        expect(orgUserPermissionsAfter).toEqual([
+          {
+            petition_id: orgUserPetitions[0].id,
+            user_id: orgUser.id,
+            type: "OWNER",
+            deleted_at: null,
+          },
+        ]);
 
-      const orgUserPetitionsAfter = (await mocks.knex
-        .from("petition")
-        .whereIn(
-          "id",
-          orgUserPetitions.map((p) => p.id),
-        )
-        .orderBy("path", "asc")
-        .select("path", "deleted_at")) as Pick<Petition, "id" | "path" | "deleted_at">[];
+        const orgUserPetitionsAfter = (await mocks.knex
+          .from("petition")
+          .whereIn(
+            "id",
+            orgUserPetitions.map((p) => p.id),
+          )
+          .orderBy("path", "asc")
+          .select("path", "deleted_at")) as Pick<Petition, "id" | "path" | "deleted_at">[];
 
-      expect(orgUserPetitionsAfter).toEqual([{ path: "/common/", deleted_at: null }]);
+        expect(orgUserPetitionsAfter).toEqual([{ path: "/common/", deleted_at: null }]);
 
-      const otherOrgUserPermissionsAfter = (await mocks.knex
-        .from("petition_permission")
-        .whereIn(
-          "petition_id",
-          otherOrgUserPetitions.map((p) => p.id),
-        )
-        .orderBy("petition_id", "asc")
-        .select("petition_id", "user_id", "type", "deleted_at")) as Pick<
-        PetitionPermission,
-        "petition_id" | "user_id" | "type" | "deleted_at"
-      >[];
+        const otherOrgUserPermissionsAfter = (await mocks.knex
+          .from("petition_permission")
+          .whereIn(
+            "petition_id",
+            otherOrgUserPetitions.map((p) => p.id),
+          )
+          .orderBy("petition_id", "asc")
+          .select("petition_id", "user_id", "type", "deleted_at")) as Pick<
+          PetitionPermission,
+          "petition_id" | "user_id" | "type" | "deleted_at"
+        >[];
 
-      expect(otherOrgUserPermissionsAfter).toEqual([
-        {
-          petition_id: otherOrgUserPetitions[0].id,
-          user_id: otherOrgUser.id,
-          type: "OWNER",
-          deleted_at: null,
-        },
-      ]);
+        expect(otherOrgUserPermissionsAfter).toEqual([
+          {
+            petition_id: otherOrgUserPetitions[0].id,
+            user_id: otherOrgUser.id,
+            type: "OWNER",
+            deleted_at: null,
+          },
+        ]);
 
-      const otherOrgUserPetitionsAfter = (await mocks.knex
-        .from("petition")
-        .whereIn(
-          "id",
-          otherOrgUserPetitions.map((p) => p.id),
-        )
-        .orderBy("path", "asc")
-        .select("path", "deleted_at")) as Pick<Petition, "id" | "path" | "deleted_at">[];
+        const otherOrgUserPetitionsAfter = (await mocks.knex
+          .from("petition")
+          .whereIn(
+            "id",
+            otherOrgUserPetitions.map((p) => p.id),
+          )
+          .orderBy("path", "asc")
+          .select("path", "deleted_at")) as Pick<Petition, "id" | "path" | "deleted_at">[];
 
-      expect(otherOrgUserPetitionsAfter).toEqual([{ path: "/common/", deleted_at: null }]);
-    });
+        expect(otherOrgUserPetitionsAfter).toEqual([{ path: "/common/", deleted_at: null }]);
+      },
+    );
 
     it("don't delete templates folders if passing type PETITION", async () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($folders: FoldersInput) {
-            deletePetitions(folders: $folders)
+            deletePetitions(folders: $folders, deletePermanently: true)
           }
         `,
         {

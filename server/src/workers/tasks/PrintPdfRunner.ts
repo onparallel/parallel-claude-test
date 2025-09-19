@@ -30,7 +30,7 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
       this.ctx.petitions.loadPetition(petitionId),
       this.ctx.petitions.loadPetitionOwner(petitionId),
     ]);
-    if (isNullish(petition)) {
+    if (isNullish(petition) || petition.deletion_scheduled_at !== null) {
       throw new Error(`Petition:${petitionId} not found`);
     }
     if (isNullish(owner)) {

@@ -1,6 +1,6 @@
 import { enumType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
-import { findLast, isNonNullish, unique, zip } from "remeda";
+import { isNonNullish, unique, zip } from "remeda";
 import { assert } from "ts-essentials";
 import { PetitionFieldComment } from "../../db/__types";
 import { toBytes } from "../../util/fileSize";
@@ -16,6 +16,7 @@ import { maxFileSize } from "../helpers/validators/maxFileSize";
 import { maxLength } from "../helpers/validators/maxLength";
 import {
   petitionHasStatus,
+  petitionsAreNotScheduledForDeletion,
   petitionsAreOfTypePetition,
   userHasAccessToPetitions,
   userHasFeatureFlag,
@@ -32,101 +33,27 @@ export const cancelPetitionApprovalRequestFlow = mutationField(
       userHasFeatureFlag("PETITION_APPROVAL_FLOW"),
       petitionsAreOfTypePetition("petitionId"),
       userHasAccessToPetitions("petitionId"),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       petitionHasStatus("petitionId", "COMPLETED"),
     ),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
     },
     resolve: async (_, args, ctx) => {
-      const approvalRequestSteps =
-        await ctx.approvalRequests.loadCurrentPetitionApprovalRequestStepsByPetitionId(
-          args.petitionId,
-        );
+      const [canceledStep] = await ctx.approvals.cancelApprovalRequestFlowByPetitionId(
+        args.petitionId,
+        ctx.user!.id,
+      );
 
-      let currentStep = approvalRequestSteps.find((s) => s.status === "PENDING");
-
-      if (!currentStep) {
-        // no pending steps, get latest approved or skipped
-        currentStep = findLast(
-          approvalRequestSteps,
-          (s) => s.status === "APPROVED" || s.status === "SKIPPED",
-        );
-      }
-
-      if (!currentStep) {
+      if (!canceledStep) {
         throw new ForbiddenError("No pending or approved steps found");
       }
 
-      const canceledStep = await ctx.approvalRequests.updatePetitionApprovalRequestStep(
-        currentStep.id,
-        { status: "CANCELED" },
-        `User:${ctx.user!.id}`,
-      );
-
-      assert(canceledStep, "Approval request step not found");
-
-      const approvers = await ctx.approvalRequests.loadPetitionApprovalRequestStepApproversByStepId(
-        canceledStep.id,
-      );
-      const stepApprover = approvers.find((a) => a.user_id === ctx.user!.id);
-      if (stepApprover) {
-        await ctx.approvalRequests.updatePetitionApprovalRequestStepApproverTimestamps(
-          stepApprover.id,
-          { canceled: true },
-          `User:${ctx.user!.id}`,
-        );
-      } else {
-        // insert context user as a new approver, so it can be marked as the approver who canceled this step
-        await ctx.approvalRequests.createPetitionApprovalRequestStepApprovers(
-          canceledStep.id,
-          [{ id: ctx.user!.id, canceled: true }],
-          `User:${ctx.user!.id}`,
-        );
-      }
-
-      await ctx.emails.sendPetitionApprovalRequestStepCanceledEmail(canceledStep.id, ctx.user!.id);
-
-      await ctx.petitions.createEvent({
-        type: "PETITION_APPROVAL_REQUEST_STEP_CANCELED",
-        petition_id: args.petitionId,
-        data: {
-          petition_approval_request_step_id: canceledStep.id,
-          user_id: ctx.user!.id,
-        },
-      });
-
-      const deprecatedSteps =
-        await ctx.approvalRequests.updatePetitionApprovalRequestStepsAsDeprecated(args.petitionId);
-
       // after canceling current request, we need to recreate the steps in initial state, so user is able to start again
-      const newSteps = await ctx.approvalRequests.createPetitionApprovalRequestSteps(
-        deprecatedSteps.map((s) => ({
-          approval_type: s.approval_type,
-          step_name: s.step_name,
-          petition_id: s.petition_id,
-          status: s.status === "NOT_APPLICABLE" ? "NOT_APPLICABLE" : "NOT_STARTED",
-          step_number: s.step_number,
-        })),
+      await ctx.approvals.startApprovalRequestFlowByPetitionId(
+        args.petitionId,
         `User:${ctx.user!.id}`,
       );
-
-      // on each step, insert its approvers
-      const petition = await ctx.petitions.loadPetition(args.petitionId);
-      assert(petition?.approval_flow_config);
-      for (const [step, config] of zip(newSteps, petition.approval_flow_config)) {
-        const userGroupsIds = config.values.filter((v) => v.type === "UserGroup").map((v) => v.id);
-        const groupMembers = (await ctx.userGroups.loadUserGroupMembers(userGroupsIds)).flat();
-        const userIds = unique([
-          ...config.values.filter((v) => v.type === "User").map((v) => v.id),
-          ...groupMembers.map((m) => m.user_id),
-        ]);
-
-        await ctx.approvalRequests.createPetitionApprovalRequestStepApprovers(
-          step.id,
-          userIds.map((id) => ({ id })),
-          `User:${ctx.user!.id}`,
-        );
-      }
 
       ctx.approvalRequests.loadCurrentPetitionApprovalRequestStepsByPetitionId.dataloader.clear(
         args.petitionId,
@@ -149,6 +76,7 @@ export const startPetitionApprovalRequestStep = mutationField("startPetitionAppr
     userHasFeatureFlag("PETITION_APPROVAL_FLOW"),
     petitionsAreOfTypePetition("petitionId"),
     userHasAccessToPetitions("petitionId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionHasStatus("petitionId", "COMPLETED"),
     approvalRequestStepIsNextWithStatus("petitionId", "approvalRequestStepId", "NOT_STARTED"),
   ),
@@ -280,6 +208,7 @@ export const skipPetitionApprovalRequestStep = mutationField("skipPetitionApprov
     userHasFeatureFlag("PETITION_APPROVAL_FLOW"),
     petitionsAreOfTypePetition("petitionId"),
     userHasAccessToPetitions("petitionId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionHasStatus("petitionId", "COMPLETED"),
     approvalRequestStepIsNextWithStatus("petitionId", "approvalRequestStepId", [
       "NOT_STARTED",
@@ -364,6 +293,7 @@ export const cancelPetitionApprovalRequestStep = mutationField(
       userHasFeatureFlag("PETITION_APPROVAL_FLOW"),
       petitionsAreOfTypePetition("petitionId"),
       userHasAccessToPetitions("petitionId"),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       petitionHasStatus("petitionId", "COMPLETED"),
       approvalRequestStepIsNextWithStatus("petitionId", "approvalRequestStepId", ["PENDING"]),
     ),
@@ -417,6 +347,7 @@ export const sendPetitionApprovalRequestStepReminder = mutationField(
       userHasFeatureFlag("PETITION_APPROVAL_FLOW"),
       petitionsAreOfTypePetition("petitionId"),
       userHasAccessToPetitions("petitionId"),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       petitionHasStatus("petitionId", "COMPLETED"),
       approvalRequestStepIsNextWithStatus("petitionId", "approvalRequestStepId", "PENDING"),
     ),
@@ -458,6 +389,7 @@ export const approvePetitionApprovalRequestStep = mutationField(
       userHasFeatureFlag("PETITION_APPROVAL_FLOW"),
       petitionsAreOfTypePetition("petitionId"),
       userHasAccessToPetitions("petitionId"),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       petitionHasStatus("petitionId", "COMPLETED"),
       approvalRequestStepIsNextWithStatus("petitionId", "approvalRequestStepId", "PENDING"),
     ),
@@ -594,6 +526,7 @@ export const rejectPetitionApprovalRequestStep = mutationField(
       userHasFeatureFlag("PETITION_APPROVAL_FLOW"),
       petitionsAreOfTypePetition("petitionId"),
       userHasAccessToPetitions("petitionId"),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       petitionHasStatus("petitionId", "COMPLETED"),
       approvalRequestStepIsNextWithStatus("petitionId", "approvalRequestStepId", "PENDING"),
     ),
@@ -710,7 +643,7 @@ export const rejectPetitionApprovalRequestStep = mutationField(
       });
 
       if (args.rejectionType === "TEMPORARY") {
-        const deprecatedSteps =
+        const [deprecatedSteps] =
           await ctx.approvalRequests.updatePetitionApprovalRequestStepsAsDeprecated(
             args.petitionId,
           );

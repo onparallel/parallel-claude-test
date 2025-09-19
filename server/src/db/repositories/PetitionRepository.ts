@@ -318,6 +318,7 @@ export class PetitionRepository extends BaseRepository {
       .where({
         from_template_id: templateId,
         deleted_at: null,
+        deletion_scheduled_at: null,
         anonymized_at: null,
       })
       .whereNot("status", "DRAFT")
@@ -524,6 +525,7 @@ export class PetitionRepository extends BaseRepository {
         searchByNameOnly?: boolean;
         excludeAnonymized?: boolean;
         excludePublicTemplates?: boolean;
+        isScheduledForDeletion?: boolean;
         sortBy?: SortBy<
           | "name"
           | "lastUsedAt"
@@ -627,6 +629,12 @@ export class PetitionRepository extends BaseRepository {
           opts.minEffectivePermission,
         ),
       );
+    }
+
+    if (opts.isScheduledForDeletion) {
+      builders.push((q) => q.whereNotNull("p.deletion_scheduled_at"));
+    } else {
+      builders.push((q) => q.whereNull("p.deletion_scheduled_at"));
     }
 
     const needsLastUsedAt =
@@ -841,6 +849,7 @@ export class PetitionRepository extends BaseRepository {
           )
           .where("p.org_id", orgId)
           .whereNull("p.deleted_at")
+          .whereNull("p.deletion_scheduled_at")
           .whereNull("p.anonymized_at")
           .where("p.is_template", false),
     ];
@@ -1321,6 +1330,49 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
+  async deactivateAllAccessesByPetitionId(
+    petitionIds: number[],
+    userId: number,
+    t?: Knex.Transaction,
+  ) {
+    if (petitionIds.length === 0) {
+      return;
+    }
+
+    const accesses = await this.from("petition_access", t)
+      .whereIn("petition_id", petitionIds)
+      .where("status", "ACTIVE")
+      .update(
+        {
+          reminders_active: false,
+          next_reminder_at: null,
+          status: "INACTIVE",
+          updated_at: this.now(),
+          updated_by: `User:${userId}`,
+        },
+        "*",
+      );
+
+    this.cancelScheduledMessagesByAccessIds(
+      accesses.map((a) => a.id),
+      userId,
+      t,
+    );
+
+    await this.createEvent(
+      accesses.map((access) => ({
+        type: "ACCESS_DEACTIVATED" as const,
+        petition_id: access.petition_id,
+        data: {
+          petition_access_id: access.id,
+          user_id: userId,
+          reason: isNonNullish(userId) ? "DEACTIVATED_BY_USER" : "EMAIL_BOUNCED",
+        },
+      })),
+      t,
+    );
+  }
+
   private async anonymizeAccesses(
     petitionId: number,
     accessIds: number[],
@@ -1576,6 +1628,9 @@ export class PetitionRepository extends BaseRepository {
     deletedBy: string,
     t?: Knex.Transaction,
   ) {
+    if (petitionIds.length === 0) {
+      return [];
+    }
     return await pMapChunk(
       petitionIds,
       async (idsChunk) =>
@@ -1694,7 +1749,7 @@ export class PetitionRepository extends BaseRepository {
     if (ids.length === 0) {
       return [];
     }
-    return await this.from("petition", t)
+    const petitions = await this.from("petition", t)
       .whereIn("id", ids)
       .update(
         {
@@ -1705,6 +1760,8 @@ export class PetitionRepository extends BaseRepository {
         },
         "*",
       );
+
+    return ids.map((id) => petitions.find((p) => p.id === id)).filter(isNonNullish);
   }
 
   async updatePetitionLastActivityDates(
@@ -1715,6 +1772,7 @@ export class PetitionRepository extends BaseRepository {
       .where("id", petitionId)
       .where("status", "<>", "CLOSED")
       .whereNull("deleted_at")
+      .whereNull("deletion_scheduled_at")
       .update(
         {
           ...data,
@@ -2838,7 +2896,14 @@ export class PetitionRepository extends BaseRepository {
     const properties = await this.from("petition")
       .whereIn("id", petitionIds)
       .whereNull("deleted_at")
-      .select(["id", "variables", "custom_lists", "automatic_numbering_config", "metadata"]);
+      .select([
+        "id",
+        "variables",
+        "custom_lists",
+        "automatic_numbering_config",
+        "metadata",
+        "approval_flow_config",
+      ]);
 
     const propertiesByPetitionId = indexBy(properties, (p) => p.id);
 
@@ -2866,6 +2931,7 @@ export class PetitionRepository extends BaseRepository {
           values: l.values,
         })),
         metadata: petitionProperties?.metadata ?? {},
+        approvalFlowConfig: petitionProperties?.approval_flow_config ?? null,
       };
     });
   }
@@ -2918,6 +2984,7 @@ export class PetitionRepository extends BaseRepository {
             "automaticNumberingConfig",
             "standardListDefinitions",
             "metadata",
+            "approvalFlowConfig",
           ]),
           fields: sortBy(fields, [(f) => f.position, "asc"]).map((field) => {
             const fieldChildren =
@@ -5969,58 +6036,6 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  private async removePetitionPermissionsById(
-    petitionUserPermissionIds: number[],
-    user: User,
-    t?: Knex.Transaction,
-  ) {
-    return this.withTransaction(async (t) => {
-      const removedPermissions = await pMapChunk(
-        petitionUserPermissionIds,
-        async (ids) =>
-          await this.from("petition_permission", t)
-            .whereIn("id", ids)
-            .update(
-              {
-                deleted_at: this.now(),
-                deleted_by: `User:${user.id}`,
-              },
-              "*",
-            ),
-        { chunkSize: 100, concurrency: 1 },
-      );
-
-      const [directlyAssigned, groupAssigned] = partition(
-        removedPermissions.filter((p) => p.from_user_group_id === null),
-        (p) => p.user_group_id === null,
-      );
-
-      await this.createEvent(
-        [
-          ...directlyAssigned.map((p) => ({
-            petition_id: p.petition_id,
-            type: "USER_PERMISSION_REMOVED" as const,
-            data: {
-              user_id: user.id,
-              permission_user_id: p.user_id!,
-            },
-          })),
-          ...groupAssigned.map((p) => ({
-            petition_id: p.petition_id,
-            type: "GROUP_PERMISSION_REMOVED" as const,
-            data: {
-              user_id: user.id,
-              user_group_id: p.user_group_id!,
-            },
-          })),
-        ],
-        t,
-      );
-
-      return removedPermissions;
-    }, t);
-  }
-
   /**
    * Update the owner of the petition links owned by one of the given ownerIds
    */
@@ -6277,6 +6292,7 @@ export class PetitionRepository extends BaseRepository {
         .where({
           template_public: true,
           deleted_at: null,
+          deletion_scheduled_at: null,
         })
         .mmodify((q) => {
           const { search, locale, categories } = opts;
@@ -6304,10 +6320,12 @@ export class PetitionRepository extends BaseRepository {
                   .where({
                     template_public: true,
                     deleted_at: null,
+                    deletion_scheduled_at: null,
                   })
                   .select("id"),
               )
               .whereNull("deleted_at")
+              .whereNull("deletion_scheduled_at")
               .groupBy("from_template_id")
               .select<{ template_id: number; used_count: number }[]>(
                 this.knex.raw(`"from_template_id" as template_id`),
@@ -6336,6 +6354,7 @@ export class PetitionRepository extends BaseRepository {
         is_template: true,
         template_public: true,
         deleted_at: null,
+        deletion_scheduled_at: null,
       })
       .whereRaw(
         /* sql */ `
@@ -6349,9 +6368,15 @@ export class PetitionRepository extends BaseRepository {
 
   async getPublicTemplatesCategories() {
     const rows = await this.raw<{ category: string }>(/* sql */ `
-      select distinct jsonb_array_elements(public_metadata->'categories') as category
-      from petition
-      where is_template and template_public and deleted_at is null
+      select 
+        distinct jsonb_array_elements(public_metadata->'categories') as category
+      from 
+        petition
+      where 
+        is_template 
+        and template_public 
+        and deleted_at is null 
+        and deletion_scheduled_at is null
     `);
     return rows.map((r) => r.category);
   }
@@ -6972,6 +6997,26 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
+  async deactivatePublicPetitionLinksByTemplateId(
+    templateIds: number[],
+    userId: number,
+    t?: Knex.Transaction,
+  ) {
+    if (templateIds.length === 0) {
+      return [];
+    }
+    return await this.from("public_petition_link", t)
+      .whereIn("template_id", templateIds)
+      .update(
+        {
+          is_active: false,
+          updated_at: this.now(),
+          updated_by: `User:${userId}`,
+        },
+        "*",
+      );
+  }
+
   async contactHasAccessFromPublicPetitionLink(contactEmail: string, publicPetitionLinkId: number) {
     const [{ count }] = await this.knex
       .from("petition_access")
@@ -7014,6 +7059,7 @@ export class PetitionRepository extends BaseRepository {
       join petition_access pa on pa.petition_id = p.id
       where p.is_template = false
       and p.deleted_at is null
+      and p.deletion_scheduled_at is null
       and pp."type" = 'OWNER' 
       and pp.deleted_at is null
       and pp.user_id = ?;
@@ -7411,6 +7457,7 @@ export class PetitionRepository extends BaseRepository {
         and p.is_template = false
         and p.status != 'DRAFT' 
         and p.deleted_at is null
+        and p.deletion_scheduled_at is null
         and (?::timestamptz is null or ?::timestamptz is null or p.created_at between ? and ?)
     `,
       [
@@ -7444,6 +7491,7 @@ export class PetitionRepository extends BaseRepository {
           and p.is_template = false
           and p.status != 'DRAFT' 
           and p.deleted_at is null 
+          and p.deletion_scheduled_at is null
           and (?::timestamptz is null or ?::timestamptz is null or created_at between ? and ?)
       `,
       [orgId, startDate ?? null, endDate ?? null, startDate ?? null, endDate ?? null],
@@ -7465,7 +7513,7 @@ export class PetitionRepository extends BaseRepository {
                 p.id, p.name, coalesce(pp.id::bool, false) as has_access
               from petition p
               left join petition_permission pp on p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null
-              where p.id in ? and p.deleted_at is null
+              where p.id in ? and p.deleted_at is null and p.deletion_scheduled_at is null
             `,
             [userId, this.sqlIn(fromTemplateIds)],
           )
@@ -8582,6 +8630,7 @@ export class PetitionRepository extends BaseRepository {
     const [petition] = await this.from("petition")
       .where("id", petitionId)
       .whereNull("deleted_at")
+      .whereNull("deletion_scheduled_at")
       .update({ last_change_at: this.now() }, "*");
 
     this.loadPetition.dataloader.clear(petitionId);
@@ -9012,6 +9061,7 @@ export class PetitionRepository extends BaseRepository {
   async getPetitionIdsFromTemplateReadyToClose(templateId: number) {
     const petitions = await this.from("petition")
       .whereNull("deleted_at")
+      .whereNull("deletion_scheduled_at")
       .whereNull("anonymized_at")
       .where("template_public", false)
       .where("from_template_id", templateId)
@@ -9179,23 +9229,29 @@ export class PetitionRepository extends BaseRepository {
       });
   }
 
-  async getPetitionStartedProcesses(petitionId: number) {
+  async getPetitionStartedProcesses(petitionIds: MaybeArray<number>) {
+    const ids = unMaybeArray(petitionIds);
+    if (ids.length === 0) {
+      return [];
+    }
     const processes: ("SIGNATURE" | "APPROVAL")[] = [];
-    const currentSignature = await this.loadLatestPetitionSignatureByPetitionId.raw(petitionId);
+    const currentSignature = await this.loadLatestPetitionSignatureByPetitionId.raw(ids);
+
     if (
-      currentSignature &&
-      ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(currentSignature.status)
+      currentSignature.some(
+        (s) => isNonNullish(s) && ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(s.status),
+      )
     ) {
       processes.push("SIGNATURE");
     }
 
-    const currentApprovalRequest = await this.from("petition_approval_request_step")
-      .where("petition_id", petitionId)
+    const currentApprovalRequests = await this.from("petition_approval_request_step")
+      .whereIn("petition_id", ids)
       .whereNull("deprecated_at")
       .whereIn("status", ["PENDING", "SKIPPED", "APPROVED", "REJECTED"])
       .select("*");
 
-    if (currentApprovalRequest.length > 0) {
+    if (currentApprovalRequests.length > 0) {
       processes.push("APPROVAL");
     }
 
@@ -9216,7 +9272,7 @@ export class PetitionRepository extends BaseRepository {
         select * from (?) as t(id)
       )
       select i.id from ids i
-      left join petition p on p.id = i.id and p.deleted_at is null and p.org_id = ?
+      left join petition p on p.id = i.id and p.deleted_at is null and p.deletion_scheduled_at is null and p.org_id = ?
       where p.id is null
     `,
       [
@@ -9372,6 +9428,74 @@ export class PetitionRepository extends BaseRepository {
         );
       },
       { concurrency: 1, chunkSize: 1000 },
+    );
+  }
+
+  async schedulePetitionForDeletion(
+    petitionId: MaybeArray<number>,
+    updatedBy: string,
+    t?: Knex.Transaction,
+  ) {
+    const ids = unMaybeArray(petitionId);
+    if (ids.length === 0) {
+      return [];
+    }
+    return await this.from("petition", t)
+      .whereIn("id", ids)
+      .whereNull("deletion_scheduled_at")
+      .whereNull("deleted_at")
+      .update(
+        {
+          deletion_scheduled_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*",
+      );
+  }
+
+  async deletePetitionsScheduledForDeletion(daysAfterScheduling: number, deletedBy: string) {
+    return await this.raw<Petition>(
+      /* sql */ `
+      with deleted_petitions as (
+        update petition p
+        set
+          deleted_at = now(),
+          deleted_by = ?
+        where p.deletion_scheduled_at is not null
+        and p.deleted_at is null
+        and p.deletion_scheduled_at <= NOW() - make_interval(days => ?)
+        returning p.*
+      ),
+      deleted_user_notifications as (
+        delete from petition_user_notification
+        where petition_id in (select id from deleted_petitions)
+      ),
+      deleted_contact_notifications as (
+        delete from petition_contact_notification
+        where petition_id in (select id from deleted_petitions)
+      ),
+      deleted_permissions as (
+        update petition_permission pp
+        set
+          deleted_at = now(),
+          deleted_by = ?
+        where pp.petition_id in (select id from deleted_petitions)
+        and pp.deleted_at is null
+      ), 
+      petition_deleted_events as (
+        insert into petition_event (petition_id, type, data)
+        select 
+          id, 
+          'PETITION_DELETED', 
+          jsonb_build_object(
+            'user_id', null, 
+            'status', "status"
+          )
+        from deleted_petitions
+      )
+      select * from deleted_petitions;
+    `,
+      [deletedBy, daysAfterScheduling, deletedBy],
     );
   }
 }

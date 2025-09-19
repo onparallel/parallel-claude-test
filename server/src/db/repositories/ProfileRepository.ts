@@ -3253,6 +3253,7 @@ export class ProfileRepository extends BaseRepository {
       const rows = await this.from("profile_type_process_template")
         .join("petition", "profile_type_process_template.template_id", "petition.id")
         .whereNull("petition.deleted_at")
+        .whereNull("petition.deletion_scheduled_at")
         .whereIn("profile_type_process_template.profile_type_process_id", keys)
         .orderBy("profile_type_process_template.created_at", "asc")
         .select("petition.*", "profile_type_process_id");
@@ -3414,6 +3415,7 @@ export class ProfileRepository extends BaseRepository {
           join profile_type_process_template ptpt on ptpt.template_id = p.from_template_id and ptpt.profile_type_process_id in ?
           join petition_profile pp on pp.petition_id = p.id and pp.profile_id in ?
           where p.deleted_at is null
+          and p.deletion_scheduled_at is null
           and p.is_template = false
           order by p.created_at desc;
         `,

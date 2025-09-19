@@ -30,8 +30,10 @@ import { TimelinePetitionClosedNotifiedEvent } from "./timeline/events/TimelineP
 import { TimelinePetitionCompletedEvent } from "./timeline/events/TimelinePetitionCompletedEvent";
 import { TimelinePetitionCreatedEvent } from "./timeline/events/TimelinePetitionCreatedEvent";
 import { TimelinePetitionMessageBouncedEvent } from "./timeline/events/TimelinePetitionMessageBouncedEvent";
+import { TimelinePetitionRecoveredFromDeletionEvent } from "./timeline/events/TimelinePetitionRecoveredFromDeletionEvent";
 import { TimelinePetitionReminderBouncedEvent } from "./timeline/events/TimelinePetitionReminderBouncedEvent";
 import { TimelinePetitionReopenedEvent } from "./timeline/events/TimelinePetitionReopenedEvent";
+import { TimelinePetitionScheduledForDeletionEvent } from "./timeline/events/TimelinePetitionScheduledForDeletionEvent";
 import { TimelinePetitionTaggedEvent } from "./timeline/events/TimelinePetitionTaggedEvent";
 import { TimelinePetitionUntaggedEvent } from "./timeline/events/TimelinePetitionUntaggedEvent";
 import { TimelineProfileAssociatedEvent } from "./timeline/events/TimelineProfileAssociatedEvent";
@@ -164,6 +166,10 @@ export function PetitionActivityTimeline({ events }: PetitionActivityTimelinePro
             <TimelinePetitionApprovalRequestStepFinishedEvent event={event} />
           ) : event.__typename === "PetitionApprovalRequestStepCanceledEvent" ? (
             <TimelinePetitionApprovalRequestStepCanceledEvent event={event} />
+          ) : event.__typename === "PetitionScheduledForDeletionEvent" ? (
+            <TimelinePetitionScheduledForDeletionEvent event={event} />
+          ) : event.__typename === "PetitionRecoveredFromDeletionEvent" ? (
+            <TimelinePetitionRecoveredFromDeletionEvent event={event} />
           ) : null}
         </Box>
       ))}
@@ -328,6 +334,12 @@ PetitionActivityTimeline.fragments = {
       ... on PetitionApprovalRequestStepCanceledEvent {
         ...TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEvent
       }
+      ... on PetitionScheduledForDeletionEvent {
+        ...TimelinePetitionScheduledForDeletionEvent_PetitionScheduledForDeletionEvent
+      }
+      ... on PetitionRecoveredFromDeletionEvent {
+        ...TimelinePetitionRecoveredFromDeletionEvent_PetitionRecoveredFromDeletionEvent
+      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -387,5 +399,7 @@ PetitionActivityTimeline.fragments = {
       .PetitionApprovalRequestStepFinishedEvent}
     ${TimelinePetitionApprovalRequestStepCanceledEvent.fragments
       .PetitionApprovalRequestStepCanceledEvent}
+    ${TimelinePetitionScheduledForDeletionEvent.fragments.PetitionScheduledForDeletionEvent}
+    ${TimelinePetitionRecoveredFromDeletionEvent.fragments.PetitionRecoveredFromDeletionEvent}
   `,
 };

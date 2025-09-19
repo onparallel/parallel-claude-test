@@ -1,5 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import {
+  Alert,
   AlertDescription,
   AlertIcon,
   Box,
@@ -18,6 +19,7 @@ import {
 import { Menu } from "@parallel/chakra/components";
 import {
   AddIcon,
+  ArchiveIcon,
   ChevronDownIcon,
   CopyIcon,
   DeleteIcon,
@@ -29,6 +31,8 @@ import {
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
+import { SimpleMenuSelect } from "@parallel/components/common/SimpleMenuSelect";
+import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -50,6 +54,7 @@ import {
   PetitionBaseType,
   PetitionPermissionType,
   Petitions_PetitionBaseOrFolderFragment,
+  Petitions_UserFragment,
   Petitions_movePetitionsDocument,
   Petitions_petitionsDocument,
   Petitions_renameFolderDocument,
@@ -65,6 +70,7 @@ import { useUpdatePetitionName } from "@parallel/utils/hooks/useUpdatePetitionNa
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
+import { useRecoverPetition } from "@parallel/utils/mutations/useRecoverPetition";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import {
   buildPetitionsQueryStateUrl,
@@ -82,12 +88,19 @@ import {
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import { MouseEvent, ReactNode, useCallback, useMemo, useState } from "react";
+import { MotionConfig } from "framer-motion";
+import { MouseEvent, PropsWithChildren, ReactNode, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { firstBy, isNonNullish, isNullish, map, omit, pick, pipe } from "remeda";
 
 function rowKeyProp(row: Petitions_PetitionBaseOrFolderFragment) {
   return row.__typename === "PetitionFolder" ? row.folderId : (row as any).id;
+}
+
+interface PetitionsTableContext {
+  user: Petitions_UserFragment;
+  isScheduledForDeletion: boolean;
+  setIsScheduledForDeletion: (isScheduledForDeletion: boolean) => void;
 }
 
 function Petitions() {
@@ -123,6 +136,7 @@ function Petitions() {
         offset: queryState.items * (queryState.page - 1),
         limit: queryState.items,
         search: queryState.search,
+        isScheduledForDeletion: queryState.scheduledForDeletion,
         filters: {
           path: queryState.search && queryState.searchIn === "EVERYWHERE" ? null : queryState.path,
           status: queryState.status,
@@ -170,13 +184,14 @@ function Petitions() {
         setQueryState({
           type,
           view: defaultView.id,
-          ...omit(defaultView.data, ["__typename"]),
+          ...omit(defaultView.data, ["__typename", "scheduledForDeletion"]),
+          scheduledForDeletion: defaultView.data.scheduledForDeletion ?? undefined,
         });
       } else {
-        setQueryState({ type });
+        setQueryState({ type, scheduledForDeletion: queryState.scheduledForDeletion });
       }
     } else {
-      setQueryState({ type });
+      setQueryState({ type, scheduledForDeletion: queryState.scheduledForDeletion });
     }
   }
 
@@ -224,11 +239,34 @@ function Petitions() {
   };
 
   const deletePetitions = useDeletePetitions();
-  const handleDeleteClick = useCallback(async () => {
+  const handleDeleteClick = useCallback(async (deletePermanently: boolean) => {
     try {
-      await deletePetitions(selectedRowsRef.current, stateRef.current.type, stateRef.current.path);
+      await deletePetitions(
+        selectedRowsRef.current,
+        stateRef.current.type,
+        stateRef.current.path,
+        undefined,
+        deletePermanently,
+      );
+      refetch();
     } catch {}
-    refetch();
+  }, []);
+
+  const recoverPetition = useRecoverPetition();
+  const handleRecoverClick = useCallback(async () => {
+    try {
+      const needRefetch = await recoverPetition(
+        selectedRowsRef.current,
+        stateRef.current.type,
+        selectedRowsRef.current[0]?.__typename === "Petition" ||
+          selectedRowsRef.current[0]?.__typename === "PetitionTemplate"
+          ? (selectedRowsRef.current[0]?.name ?? null)
+          : null,
+      );
+      if (needRefetch) {
+        refetch();
+      }
+    } catch {}
   }, []);
 
   const goToPetition = useGoToPetition();
@@ -395,7 +433,21 @@ function Petitions() {
     }
   }, [selection.join(","), queryState.type]);
 
-  const context = useMemo(() => ({ user: me! }), [me]);
+  const context = useMemo(
+    () =>
+      ({
+        user: me!,
+        isScheduledForDeletion: queryState.scheduledForDeletion,
+        setIsScheduledForDeletion: (isScheduledForDeletion) => {
+          onChangeSelectedIds([]);
+          setQueryState((current) => ({
+            ...current,
+            scheduledForDeletion: isScheduledForDeletion,
+          }));
+        },
+      }) as PetitionsTableContext,
+    [me, queryState.scheduledForDeletion],
+  );
 
   const minimumPermission = useMemo(() => {
     return pipe(
@@ -416,6 +468,7 @@ function Petitions() {
   );
 
   const actions = usePetitionListActions({
+    showDeleted: queryState.scheduledForDeletion,
     userCanChangePath,
     userCanCreateTemplate: userCanCreateTemplate && !selectedPetitionIsAnonymized,
     userCanCreatePetition,
@@ -424,12 +477,14 @@ function Petitions() {
     hasSelectedFolders: selectedRows.some((c) => c.__typename === "PetitionFolder"),
     minimumPermission,
     onRenameClick: handleRenameClick,
-    onDeleteClick: handleDeleteClick,
+    onDeleteClick: () => handleDeleteClick(true),
     onCloneAsTemplateClick: handleCloneAsTemplate,
     onUseTemplateClick: handleUseTemplateClick,
     onCloneClick: handleCloneClick,
     onShareClick: handlePetitionSharingClick,
     onMoveToClick: handleMoveToClick,
+    onScheduleForDeletionClick: () => handleDeleteClick(false),
+    onRecoverClick: handleRecoverClick,
   });
 
   return (
@@ -577,6 +632,18 @@ function Petitions() {
             </AlertDescription>
           </CloseableAlert>
         )}
+        {queryState.scheduledForDeletion && (
+          <Alert status="info" variant="subtle" borderRadius="md" padding={4}>
+            <AlertIcon />
+            <AlertDescription flex={1}>
+              <FormattedMessage
+                id="page.petitions.scheduled-for-deletion-alert"
+                defaultMessage="All {type, select, PETITION {parallels} other {templates}} in the bin will be permanently deleted 90 days after being deleted."
+                values={{ type: queryState.type }}
+              />
+            </AlertDescription>
+          </Alert>
+        )}
         <Flex direction="column" flex={1} minHeight={0} paddingBottom={16}>
           <TablePage
             flex="0 1 auto"
@@ -611,7 +678,9 @@ function Petitions() {
             header={
               <>
                 {queryState.type === "PETITION" ? (
-                  <PetitionViewTabs views={me.petitionListViews} />
+                  <MotionConfig reducedMotion="always">
+                    <PetitionViewTabs views={me.petitionListViews} />
+                  </MotionConfig>
                 ) : null}
                 <PetitionListHeader
                   columns={columns}
@@ -662,10 +731,46 @@ function Petitions() {
                 )
               ) : null
             }
+            Footer={CustomFooter}
           />
         </Flex>
       </Stack>
     </AppLayout>
+  );
+}
+
+function CustomFooter({
+  isScheduledForDeletion,
+  setIsScheduledForDeletion,
+  children,
+}: PropsWithChildren<PetitionsTableContext>) {
+  const options = useSimpleSelectOptions<"OPEN" | "DELETION_SCHEDULED">(
+    (intl) => [
+      {
+        label: intl.formatMessage({ id: "generic.open", defaultMessage: "Open" }),
+        value: "OPEN",
+      },
+      {
+        label: intl.formatMessage({
+          id: "generic.bin",
+          defaultMessage: "Bin",
+        }),
+        value: "DELETION_SCHEDULED",
+      },
+    ],
+    [],
+  );
+  return (
+    <>
+      <SimpleMenuSelect
+        options={options}
+        value={isScheduledForDeletion ? "DELETION_SCHEDULED" : "OPEN"}
+        onChange={(value) => setIsScheduledForDeletion(value === "DELETION_SCHEDULED")}
+        size="sm"
+        variant="ghost"
+      />
+      {children}
+    </>
   );
 }
 
@@ -747,6 +852,7 @@ const _queries = [
       $includeLastActivityAt: Boolean!
       $includeLastRecipientActivityAt: Boolean!
       $includeApprovals: Boolean!
+      $isScheduledForDeletion: Boolean!
     ) {
       petitions(
         offset: $offset
@@ -754,6 +860,7 @@ const _queries = [
         search: $search
         sortBy: $sortBy
         filters: $filters
+        isScheduledForDeletion: $isScheduledForDeletion
       ) {
         items {
           ...Petitions_PetitionBaseOrFolder
@@ -791,6 +898,7 @@ const _mutations = [
 ];
 
 function usePetitionListActions({
+  showDeleted,
   userCanChangePath,
   userCanCreateTemplate,
   userCanCreatePetition,
@@ -805,7 +913,10 @@ function usePetitionListActions({
   onUseTemplateClick,
   onDeleteClick,
   onMoveToClick,
+  onRecoverClick,
+  onScheduleForDeletionClick,
 }: {
+  showDeleted: boolean;
   userCanChangePath: boolean;
   userCanCreateTemplate: boolean;
   userCanCreatePetition: boolean;
@@ -820,6 +931,8 @@ function usePetitionListActions({
   onUseTemplateClick: () => void;
   onDeleteClick: () => void;
   onMoveToClick: () => void;
+  onRecoverClick: () => void;
+  onScheduleForDeletionClick: () => void;
 }) {
   const restrictWhenCantChangePath = (button: ReactNode) => (
     <RestrictedFeaturePopover isRestricted={!userCanChangePath}>{button}</RestrictedFeaturePopover>
@@ -834,6 +947,28 @@ function usePetitionListActions({
       {button}
     </RestrictedFeaturePopover>
   );
+
+  if (showDeleted) {
+    return [
+      {
+        key: "recover",
+        onClick: onRecoverClick,
+        leftIcon: <ArchiveIcon />,
+        isDisabled: minimumPermission !== "OWNER",
+        children: <FormattedMessage id="generic.recover" defaultMessage="Recover" />,
+      },
+      {
+        key: "delete",
+        onClick: onDeleteClick,
+        leftIcon: <DeleteIcon />,
+        children: (
+          <FormattedMessage id="generic.delete-permanently" defaultMessage="Delete permanently" />
+        ),
+        colorScheme: "red",
+      },
+    ];
+  }
+
   return [
     {
       key: "rename",
@@ -894,8 +1029,8 @@ function usePetitionListActions({
           wrap: restrictWhenCantCreatePetition,
         },
     {
-      key: "delete",
-      onClick: onDeleteClick,
+      key: "scheduleForDeletion",
+      onClick: onScheduleForDeletionClick,
       leftIcon: <DeleteIcon />,
       children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
       colorScheme: "red",

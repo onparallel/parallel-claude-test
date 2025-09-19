@@ -26,6 +26,7 @@ import { PetitionComposeFieldList } from "@parallel/components/petition-compose/
 import { PetitionComposeNewFieldDrawer } from "@parallel/components/petition-compose/PetitionComposeNewFieldDrawer";
 import { PetitionComposeRightPaneTabs } from "@parallel/components/petition-compose/PetitionComposeRightPaneTabs";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
+import { PetitionPermanentDeletionAlert } from "@parallel/components/petition-compose/PetitionPermanentDeletionAlert";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
 import { useConfigureAdverseMediaAutomateSearchDialog } from "@parallel/components/petition-compose/dialogs/ConfigureAdverseMediaAutomateSearchDialog";
 import { useConfigureBackgroundCheckAutomateSearchDialog } from "@parallel/components/petition-compose/dialogs/ConfigureBackgroundCheckAutomateSearchDialog";
@@ -1254,7 +1255,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     isPublicTemplate ||
     petition.isAnonymized ||
     myEffectivePermission === "READ" ||
-    (petition.__typename === "Petition" && petition.hasStartedProcess);
+    (petition.__typename === "Petition" && petition.hasStartedProcess) ||
+    isNonNullish(petition.permanentDeletionAt);
 
   return (
     <ToneProvider value={petition.organization.brandTheme.preferredTone}>
@@ -1262,7 +1264,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         key={petition.id}
         queryObject={queryObject}
         petition={petition}
-        onUpdatePetition={handleUpdatePetition}
         onRefetch={() => refetch()}
         section="compose"
         headerActions={
@@ -1284,7 +1285,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             />
           ) : null
         }
-        hasLeftPane
         isLeftPaneActive={isAddFieldDrawerOpen}
         leftPane={
           <PetitionComposeNewFieldDrawer
@@ -1334,10 +1334,24 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         }
       >
         <Box position="sticky" top={0} zIndex={2}>
-          {showPetitionLimitReachedAlert ? <PetitionLimitReachedAlert limit={limitValue} /> : null}
-          {petition.__typename === "Petition" ? (
-            <PetitionComposeAlertsContainer petitionId={petitionId} onRefetch={() => refetch()} />
-          ) : null}
+          {isNonNullish(petition.permanentDeletionAt) ? (
+            <PetitionPermanentDeletionAlert
+              date={petition.permanentDeletionAt}
+              isTemplate={petition.__typename === "PetitionTemplate"}
+            />
+          ) : (
+            <>
+              {showPetitionLimitReachedAlert ? (
+                <PetitionLimitReachedAlert limit={limitValue} />
+              ) : null}
+              {petition.__typename === "Petition" ? (
+                <PetitionComposeAlertsContainer
+                  petitionId={petitionId}
+                  onRefetch={() => refetch()}
+                />
+              ) : null}
+            </>
+          )}
         </Box>
         <Box
           padding={4}
@@ -1424,6 +1438,7 @@ const _fragments = {
           permissionType
         }
         isAnonymized
+        permanentDeletionAt
         ... on Petition {
           status
           hasStartedProcess

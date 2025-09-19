@@ -607,15 +607,16 @@ const PetitionEventSchemas = {
     },
   },
   PETITION_DELETED: {
-    description: "The user deleted a parallel",
+    description: "A parallel was permanently deleted.",
     properties: {
       userId: {
-        description: "The ID of the user that deleted the parallel",
-        type: "string",
+        description:
+          "If set, the ID of the user that deleted the parallel. If null, the parallel was automatically deleted by the system because it was scheduled for deletion.",
+        type: ["string", "null"],
         example: toGlobalId("User", 10),
       },
       status: {
-        description: "The status of the parallel in the moment it was deleted",
+        description: "The status of the parallel at the moment it was deleted",
         enum: ["CLOSED", "COMPLETED", "DRAFT", "PENDING"],
         example: "COMPLETED",
       },
@@ -933,6 +934,26 @@ const PetitionEventSchemas = {
         description: "The ID of the approval request step",
         type: "string",
         example: toGlobalId("PetitionApprovalRequestStep", 5),
+      },
+    },
+  },
+  PETITION_SCHEDULED_FOR_DELETION: {
+    description: "A petition was scheduled for deletion",
+    properties: {
+      userId: {
+        description: "The ID of the user that scheduled the petition for deletion",
+        type: "string",
+        example: toGlobalId("User", 5),
+      },
+    },
+  },
+  PETITION_RECOVERED_FROM_DELETION: {
+    description: "A petition was recovered from deletion",
+    properties: {
+      userId: {
+        description: "The ID of the user that recovered the petition from deletion",
+        type: "string",
+        example: toGlobalId("User", 5),
       },
     },
   },

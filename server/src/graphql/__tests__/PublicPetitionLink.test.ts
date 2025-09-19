@@ -38,7 +38,7 @@ describe("GraphQL/PublicPetitionLink", () => {
 
     [contact] = await mocks.createRandomContacts(organization.id, 1);
 
-    templates = await mocks.createRandomPetitions(organization.id, user.id, 2, () => ({
+    templates = await mocks.createRandomPetitions(organization.id, user.id, 3, (i) => ({
       is_template: true,
       status: null,
       reminders_config: {
@@ -47,6 +47,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         timezone: "Europe/Madrid",
         weekdaysOnly: true,
       },
+      deletion_scheduled_at: i === 2 ? new Date() : null,
     }));
 
     await mocks.createRandomPetitionFields(templates[0].id, 1, () => ({ type: "TEXT" }));
@@ -210,6 +211,24 @@ describe("GraphQL/PublicPetitionLink", () => {
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data?.publicPetitionLinkBySlug).toBeNull();
+    });
+
+    it("should return null if the petition is scheduled for deletion", async () => {
+      const link = await mocks.createRandomPublicPetitionLink(templates[2].id);
+
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query ($slug: ID!) {
+            publicPetitionLinkBySlug(slug: $slug) {
+              isAvailable
+            }
+          }
+        `,
+        variables: { slug: link.slug },
+      });
+
+      expect(errors).toBeUndefined();
       expect(data?.publicPetitionLinkBySlug).toBeNull();
     });
   });
@@ -993,6 +1012,27 @@ describe("GraphQL/PublicPetitionLink", () => {
       expect(errors2).toContainGraphQLError("FORBIDDEN");
       expect(data2).toBeNull();
     });
+
+    it("sends error if the template is scheduled for deletion", async () => {
+      const link = await mocks.createRandomPublicPetitionLink(templates[2].id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($slug: ID!) {
+            publicCreateAndSendPetitionFromPublicLink(
+              slug: $slug
+              contactFirstName: "John"
+              contactLastName: "Doe"
+              contactEmail: "john.doe@example.com"
+            )
+          }
+        `,
+        { slug: link.slug },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("publicSendReminder", () => {
@@ -1143,6 +1183,25 @@ describe("GraphQL/PublicPetitionLink", () => {
       });
 
       expect(errors).toContainGraphQLError("REMINDER_ALREADY_SENT_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if the template is scheduled for deletion", async () => {
+      const link = await mocks.createRandomPublicPetitionLink(templates[2].id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($slug: ID!, $contactEmail: String!) {
+            publicSendReminder(slug: $slug, contactEmail: $contactEmail)
+          }
+        `,
+        {
+          slug: link.slug,
+          contactEmail: "rogerwaters@rogerwaters.com",
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
   });
@@ -1440,6 +1499,37 @@ describe("GraphQL/PublicPetitionLink", () => {
       });
       expect(data).toBeNull();
     });
+
+    it("sends error if the template is scheduled for deletion", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $templateId: GID!
+            $title: String!
+            $description: String!
+            $allowMultiplePetitions: Boolean!
+          ) {
+            createPublicPetitionLink(
+              templateId: $templateId
+              title: $title
+              description: $description
+              allowMultiplePetitions: $allowMultiplePetitions
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          templateId: toGlobalId("Petition", templates[2].id),
+          title: "link title",
+          description: "link description",
+          allowMultiplePetitions: false,
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("updatePublicPetitionLink", () => {
@@ -1594,6 +1684,30 @@ describe("GraphQL/PublicPetitionLink", () => {
       });
       expect(data).toBeNull();
     });
+
+    it("sends error if the template is scheduled for deletion", async () => {
+      const link = await mocks.createRandomPublicPetitionLink(templates[2].id);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($publicPetitionLinkId: GID!, $isActive: Boolean) {
+            updatePublicPetitionLink(
+              publicPetitionLinkId: $publicPetitionLinkId
+              isActive: $isActive
+            ) {
+              id
+              isActive
+            }
+          }
+        `,
+        {
+          publicPetitionLinkId: toGlobalId("PublicPetitionLink", link.id),
+          isActive: false,
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("createPublicPetitionLinkPrefillData", () => {
@@ -1695,6 +1809,27 @@ describe("GraphQL/PublicPetitionLink", () => {
           pk: prefillData.keycode,
         })}`,
       );
+    });
+
+    it("sends error if the template is scheduled for deletion", async () => {
+      const link = await mocks.createRandomPublicPetitionLink(templates[2].id);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($publicPetitionLinkId: GID!, $data: JSONObject!) {
+            createPublicPetitionLinkPrefillData(
+              publicPetitionLinkId: $publicPetitionLinkId
+              data: $data
+            )
+          }
+        `,
+        {
+          publicPetitionLinkId: toGlobalId("PublicPetitionLink", link.id),
+          data: { abc: 1 },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 });

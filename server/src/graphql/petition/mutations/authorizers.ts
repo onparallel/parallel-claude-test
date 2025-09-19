@@ -123,6 +123,22 @@ export function userHasAccessToPublicPetitionLink<
   };
 }
 
+export function publicPetitionLinkIsNotScheduledForDeletion<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>,
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const publicPetitionLinkId = getArg(args, argName);
+    const link = await ctx.petitions.loadPublicPetitionLink(publicPetitionLinkId);
+    if (!link) {
+      return false;
+    }
+    const template = await ctx.petitions.loadPetition(link.template_id);
+    return template?.deletion_scheduled_at === null;
+  };
+}
+
 export function userCanSendAs<
   TypeName extends string,
   FieldName extends string,

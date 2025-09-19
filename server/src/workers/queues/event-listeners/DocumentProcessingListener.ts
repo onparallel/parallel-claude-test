@@ -57,7 +57,7 @@ export class DocumentProcessingListener
     const petition = await this.petitions.loadPetition(event.petition_id);
     const field = await this.petitions.loadField(reply.petition_field_id);
 
-    if (!petition || !field) {
+    if (!petition || !field || petition.deletion_scheduled_at !== null) {
       return;
     }
 

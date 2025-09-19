@@ -37,6 +37,7 @@ import {
 import { AI_ASSISTANT_SERVICE, IAiAssistantService } from "./services/AiAssistantService";
 import { AI_COMPLETION_SERVICE, IAiCompletionService } from "./services/AiCompletionService";
 import { ANALYTICS, IAnalyticsService } from "./services/AnalyticsService";
+import { APPROVALS_SERVICE, IApprovalsService } from "./services/ApprovalsService";
 import { AUTH, IAuth } from "./services/AuthService";
 import {
   BACKGROUND_CHECK_SERVICE,
@@ -164,6 +165,7 @@ export class ApiContext {
     public readonly profileExcelImport: ProfileExcelImportService,
     @inject(ADVERSE_MEDIA_SEARCH_SERVICE) public readonly adverseMedia: IAdverseMediaSearchService,
     @inject(AI_ASSISTANT_SERVICE) public readonly aiAssistant: IAiAssistantService,
+    @inject(APPROVALS_SERVICE) public readonly approvals: IApprovalsService,
 
     // Petition helper services
     @inject(PETITIONS_HELPER_SERVICE) public readonly petitionsHelper: PetitionsHelperService,

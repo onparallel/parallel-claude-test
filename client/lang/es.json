@@ -1791,18 +1791,38 @@
   },
   {
     "term": "component.confirm-delete-petitions-dialog.body",
-    "definition": "¿Estás seguro de que quieres eliminar {list}?",
-    "context": "Are you sure you want to delete {list}?"
+    "definition": "¿Estás seguro de que quieres eliminar {list}? Cualquier proceso de firma o aprobación pendiente se cancelará.",
+    "context": "Are you sure you want to delete {list}? Any pending signature or approval requests will be cancelled."
   },
   {
-    "term": "component.confirm-delete-petitions-dialog.part-petitions",
-    "definition": "{count, plural, =1{<b>{name}</b>} other {{type, select, TEMPLATE {las <b>{count}</b> plantillas seleccionadas} other {los <b>{count}</b> parallels seleccionados}}}}",
-    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected {type, select, TEMPLATE {templates} other {parallels}}}}"
+    "term": "component.confirm-delete-petitions-dialog.body-part-folders",
+    "definition": "{count, plural, =1{<b>{name}</b>} other {las <b>{count}</b> carpetas seleccionadas}} ({petitionCount, plural, =1{# parallel} other {# parallels}})",
+    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected folders}} ({petitionCount, plural, =1{# parallel} other {# parallels}})"
+  },
+  {
+    "term": "component.confirm-delete-petitions-dialog.body-part-petitions",
+    "definition": "{count, plural, =1{<b>{name}</b>} other {los <b>{count}</b> parallels seleccionados}}",
+    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected parallels}}"
   },
   {
     "term": "component.confirm-delete-petitions-dialog.petition-header",
     "definition": "Eliminar {count, plural, =1 {parallel} other {parallels}}",
     "context": "Delete {count, plural, =1 {parallel} other {parallels}}"
+  },
+  {
+    "term": "component.confirm-delete-petitions-dialog.shared-to-me-body",
+    "definition": "{type, select, TEMPLATE {Esta plantilla ha sido compartida} other {Este parallel ha sido compartido}} contigo. Al quitar tu acceso, ya no podrás ver o editarlo. Otros usuarios seguirán teniendo acceso.",
+    "context": "This {type, select, TEMPLATE {template} other {parallel}} has been shared with you. By removing your access, you will no longer be able to view or edit it. Other users will still have access."
+  },
+  {
+    "term": "component.confirm-delete-petitions-dialog.shared-to-me-body-2",
+    "definition": "¿Estás seguro de que quieres quitar tu acceso a {type, select, TEMPLATE {esta plantilla} other {este parallel}}?",
+    "context": "Are you sure you want to remove your access to this {type, select, TEMPLATE {template} other {parallel}}?"
+  },
+  {
+    "term": "component.confirm-delete-petitions-dialog.shared-to-me-header",
+    "definition": "Quitar acceso",
+    "context": "Remove access"
   },
   {
     "term": "component.confirm-delete-petitions-dialog.template-header",
@@ -1828,6 +1848,21 @@
     "term": "component.confirm-delete-profile-type.want-delete-profile-types",
     "definition": "Para poder eliminar {count, plural, =1 {este tipo} other {estos tipos}} de perfil, elimina primero todos los perfiles de {count, plural, =1 {este tipo} other {estos tipos}}.",
     "context": "To be able to delete {count, plural, =1 {this profile type} other {these profile types}}, first delete all profiles using {count, plural, =1 {this type} other {these types}}."
+  },
+  {
+    "term": "component.confirm-delete-templates-dialog.body",
+    "definition": "¿Estás seguro de que quieres eliminar {list}?",
+    "context": "Are you sure you want to delete {list}?"
+  },
+  {
+    "term": "component.confirm-delete-templates-dialog.body-part-folders",
+    "definition": "{count, plural, =1{<b>{name}</b>} other {las <b>{count}</b> carpetas seleccionadas}} ({petitionCount, plural, =1{# plantilla} other {# plantillas}})",
+    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected folders}} ({petitionCount, plural, =1{# template} other {# templates}})"
+  },
+  {
+    "term": "component.confirm-delete-templates-dialog.body-part-templates",
+    "definition": "{count, plural, =1{<b>{name}</b>} other {las <b>{count}</b> plantillas seleccionadas}}",
+    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected templates}}"
   },
   {
     "term": "component.confirm-delete-variable-dialog.body",
@@ -3480,9 +3515,14 @@
     "context": "Invite a collaborator to complete or review the missing information."
   },
   {
-    "term": "component.delete-petitions.confirm-delete-folders.part-folders",
-    "definition": "{count, plural, =1{<b>{name}</b>} other {las <b>{count}</b> carpetas seleccionadas}} ({petitionCount, plural, =1{# {type, select, TEMPLATE {plantilla} other {parallel}}} other {# {type, select, TEMPLATE {plantillas} other {parallels}}}})",
-    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected folders}} ({petitionCount, plural, =1{# {type, select, TEMPLATE {template} other {parallel}}} other {# {type, select, TEMPLATE {templates} other {parallels}}}})"
+    "term": "component.delete-petitions-dialog.delete-permanently-petition",
+    "definition": "Esta acción eliminará {count, plural, =1 {el parallel} other {los parallels}} permanentemente y no se podrá deshacer.",
+    "context": "This action will delete the {count, plural, =1 {parallel} other {parallels}} permanently and cannot be undone."
+  },
+  {
+    "term": "component.delete-petitions-dialog.delete-permanently-template",
+    "definition": "Esta acción eliminará {count, plural, =1 {la plantilla} other {las plantillas}} permanentemente y no se podrá deshacer.",
+    "context": "This action will delete the {count, plural, =1 {template} other {templates}} permanently and cannot be undone."
   },
   {
     "term": "component.delete-petitions.error-header",
@@ -3516,8 +3556,8 @@
   },
   {
     "term": "component.delete-shared-petitions-dialog.petition-body-1",
-    "definition": "Has compartido {count, plural, =1{este parallel} other{estos parallels}} con otros usuarios. Al {count, plural, =1{eliminarlo} other{eliminarlos}}, les quitarás el acceso {count, plural, =1{al parallel} other{a los parallels}}.",
-    "context": "You shared {count, plural, =1{this parallel} other{these parallels}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{parallel} other{parallels}}."
+    "definition": "Has compartido {count, plural, =1{este parallel} other{estos parallels}} con otros usuarios. Al {count, plural, =1{eliminarlo} other{eliminarlos}}, les quitarás el acceso {count, plural, =1{al parallel} other{a los parallels}}. Cualquier proceso de firma o aprobación pendiente se cancelará.",
+    "context": "You shared {count, plural, =1{this parallel} other{these parallels}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{parallel} other{parallels}}. Any pending signature or approval requests will be cancelled."
   },
   {
     "term": "component.delete-shared-petitions-dialog.petition-header",
@@ -7615,11 +7655,6 @@
     "context": "Edition restricted. To make changes, you can disable the protection on the Settings tab."
   },
   {
-    "term": "component.petition-header.delete-label",
-    "definition": "Eliminar parallel",
-    "context": "Delete parallel"
-  },
-  {
     "term": "component.petition-header.download-results",
     "definition": "Descargar resultados",
     "context": "Download results"
@@ -7853,6 +7888,11 @@
     "term": "component.petition-list-tag-filter.is-empty",
     "definition": "está vacío",
     "context": "is empty"
+  },
+  {
+    "term": "component.petition-permanent-deletion-alert.title",
+    "definition": "{isTemplate, select, true {Esta plantilla será eliminada} other {Este parallel será eliminado}} permanentemente el {date}.",
+    "context": "This {isTemplate, select, true {template} other {parallel}} will be permanently deleted on {date}."
   },
   {
     "term": "component.petition-permission-row.default-owner",
@@ -8768,11 +8808,6 @@
     "term": "component.petition-template-request-message.send-as-help",
     "definition": "Opción predeterminada. Si el usuario no tiene delegado el envío por el usuario elegido, se enviará por defecto desde su propio correo.",
     "context": "Default option. If the user cannot send on behalf of the chosen user, the user's own email would be used by default."
-  },
-  {
-    "term": "component.petition-template.delete-label",
-    "definition": "Eliminar plantilla",
-    "context": "Delete template"
   },
   {
     "term": "component.petition-user-notification.instructions",
@@ -11110,6 +11145,21 @@
     "context": "Check status"
   },
   {
+    "term": "component.recover-petition-dialog.body",
+    "definition": "Cuando recuperes un parallel, podrás editar su contenido de nuevo. Los datos ya anonimizados no podrán recuperarse.",
+    "context": "When you recover a parallel, you will be able to edit its content again. Any data already anonymized cannot be recovered."
+  },
+  {
+    "term": "component.recover-petition-dialog.body-question",
+    "definition": "¿Quieres recuperar {count, plural, =1 {el parallel de {petitionName}} other {los parallels seleccionados}}?",
+    "context": "Do you want to recover {count, plural, =1 {the parallel of {petitionName}} other {the selected parallels}}?"
+  },
+  {
+    "term": "component.recover-petition-dialog.header",
+    "definition": "Recuperar {count, plural, =1 {parallel} other {# parallels}}",
+    "context": "Recover {count, plural, =1 {parallel} other {parallels}}"
+  },
+  {
     "term": "component.recover-profile-dialog.body",
     "definition": "Recupera {count, plural, =1 {el perfil <b>{profileName}</b>} other {# perfiles}} para evitar eliminar sus datos.",
     "context": "Recover {count, plural, =1 {the profile <b>{profileName}</b>} other {# profiles}} and its content."
@@ -12870,6 +12920,11 @@
     "context": "We could not deliver the parallel to {contact} {timeAgo}"
   },
   {
+    "term": "component.timeline-petition-recovered-from-deletion-event.description",
+    "definition": "{user} recuperó este parallel de la papelera {timeAgo}",
+    "context": "{user} recovered this parallel from deletion {timeAgo}"
+  },
+  {
     "term": "component.timeline-petition-reminder-bounced-event.description",
     "definition": "No hemos podido enviar un recordatorio a {contact} {timeAgo}",
     "context": "We could not send a reminder to {contact} {timeAgo}"
@@ -12878,6 +12933,11 @@
     "term": "component.timeline-petition-reopened-event.description",
     "definition": "{user} reabrió este parallel {timeAgo}",
     "context": "{user} reopened the parallel {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-scheduled-for-deletion-event.description",
+    "definition": "{user} programó este parallel para eliminación {timeAgo}",
+    "context": "{user} scheduled this parallel for deletion {timeAgo}"
   },
   {
     "term": "component.timeline-petition-tagged-event.description",
@@ -13920,6 +13980,11 @@
     "context": "Before"
   },
   {
+    "term": "generic.bin",
+    "definition": "Papelera",
+    "context": "Bin"
+  },
+  {
     "term": "generic.cancel",
     "definition": "Cancelar",
     "context": "Cancel"
@@ -14050,6 +14115,11 @@
     "context": "Yes, remove"
   },
   {
+    "term": "generic.confirm-remove-my-access-button",
+    "definition": "Si, quitar mi acceso",
+    "context": "Yes, remove my access"
+  },
+  {
     "term": "generic.confirm-send",
     "definition": "Si, enviar",
     "context": "Yes, send"
@@ -14178,6 +14248,11 @@
     "term": "generic.delete",
     "definition": "Eliminar",
     "context": "Delete"
+  },
+  {
+    "term": "generic.delete-permanently",
+    "definition": "Eliminar permanentemente",
+    "context": "Delete permanently"
   },
   {
     "term": "generic.deleted-contact",
@@ -14980,6 +15055,11 @@
     "context": "Omit"
   },
   {
+    "term": "generic.open",
+    "definition": "Abierto",
+    "context": "Open"
+  },
+  {
     "term": "generic.optional",
     "definition": "Opcional",
     "context": "Optional"
@@ -15408,6 +15488,11 @@
     "term": "generic.recipient-view-guide-me",
     "definition": "Guíame",
     "context": "Guide me"
+  },
+  {
+    "term": "generic.recover",
+    "definition": "Recuperar",
+    "context": "Recover"
   },
   {
     "term": "generic.reject",
@@ -17678,6 +17763,11 @@
     "term": "page.petitions.no-templates",
     "definition": "No tienes ninguna plantilla todavía. ¡Empieza creando una nueva!",
     "context": "You have no templates yet. Start by creating one now!"
+  },
+  {
+    "term": "page.petitions.scheduled-for-deletion-alert",
+    "definition": "Todos los {type, select, PETITION {parallels} other {plantillas}} en la papelera serán eliminados definitivamente 90 días después de ser eliminados.",
+    "context": "All {type, select, PETITION {parallels} other {templates}} in the bin will be permanently deleted 90 days after being deleted."
   },
   {
     "term": "page.preview.edit-field",

@@ -97,7 +97,7 @@ export class PetitionBinder implements IPetitionBinder {
       this.petitions.loadPetitionAttachmentsByPetitionId(petitionId),
     ]);
 
-    if (!petition) {
+    if (!petition || petition.deletion_scheduled_at !== null) {
       throw new Error(`Petition:${petitionId} not found`);
     }
 

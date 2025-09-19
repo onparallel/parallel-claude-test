@@ -20,6 +20,7 @@ import {
   IAiCompletionService,
 } from "./AiCompletionService";
 import { ANALYTICS, AnalyticsService, IAnalyticsService } from "./AnalyticsService";
+import { APPROVALS_SERVICE, ApprovalsService } from "./ApprovalsService";
 import { AUTH, Auth, IAuth } from "./AuthService";
 import {
   BACKGROUND_CHECK_SERVICE,
@@ -168,6 +169,7 @@ export const servicesModule = new ContainerModule((options) => {
   options.bind<PetitionFilesService>(PETITION_FILES_SERVICE).to(PetitionFilesService);
   options.bind(PROFILE_EXCEL_IMPORT_SERVICE).to(ProfileExcelImportService);
   options.bind(PROFILE_EXCEL_EXPORT_SERVICE).to(ProfileExcelExportService);
+  options.bind(APPROVALS_SERVICE).to(ApprovalsService);
 
   // Petition helper services
   options.bind(PETITIONS_HELPER_SERVICE).to(PetitionsHelperService);

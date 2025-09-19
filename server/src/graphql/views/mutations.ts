@@ -4,10 +4,14 @@ import { assert } from "ts-essentials";
 import { PetitionListView, ProfileListView } from "../../db/__types";
 import { fromGlobalId } from "../../util/globalId";
 import { NexusGenInputs } from "../__types";
-import { authenticate, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
+import { and, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validateAnd } from "../helpers/validateArgs";
+import {
+  petitionsAreNotScheduledForDeletion,
+  userHasAccessToPetitions,
+} from "../petition/authorizers";
 import {
   validApprovalsFilter,
   validPetitionSharedWithFilter,
@@ -51,6 +55,7 @@ function mapPetitionListViewData(input: NexusGenInputs["PetitionListViewDataInpu
       : null,
     sort: input.sort ?? null,
     columns: input.columns ?? null,
+    scheduledForDeletion: input.scheduledForDeletion ?? null,
   };
 }
 
@@ -60,7 +65,15 @@ function mapPetitionListViewData(input: NexusGenInputs["PetitionListViewDataInpu
 export const createPetitionListView = mutationField("createPetitionListView", {
   description: "Creates a view with custom filters and ordering on the user's petitions list",
   type: "PetitionListView",
-  authorize: authenticate(),
+  authorize: authenticateAnd(
+    ifArgDefined(
+      "data.fromTemplateId",
+      and(
+        userHasAccessToPetitions("data.fromTemplateId" as never),
+        petitionsAreNotScheduledForDeletion("data.fromTemplateId" as never),
+      ),
+    ),
+  ),
   args: {
     name: nonNull(stringArg()),
     data: nonNull("PetitionListViewDataInput"),
@@ -118,6 +131,13 @@ export const updatePetitionListView = mutationField("updatePetitionListView", {
         args.data?.tagsFilters ??
         args.data?.approvals,
       petitionListViewHasType("petitionListViewId", "CUSTOM"),
+    ),
+    ifArgDefined(
+      "data.fromTemplateId",
+      and(
+        userHasAccessToPetitions("data.fromTemplateId" as never),
+        petitionsAreNotScheduledForDeletion("data.fromTemplateId" as never),
+      ),
     ),
   ),
   args: {

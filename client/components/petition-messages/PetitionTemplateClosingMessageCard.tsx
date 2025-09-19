@@ -20,6 +20,7 @@ import { MessageClosingEmailEditor } from "../petition-common/MessageClosingEmai
 interface PetitionTemplateClosingMessageCardProps {
   petition: PetitionTemplateClosingMessageCard_PetitionTemplateFragment;
   onUpdatePetition: (data: UpdatePetitionInput) => void;
+  isDisabled: boolean;
 }
 
 export const PETITION_CLOSING_DEFAULT_MESSAGE: Record<PetitionLocale, string> = {
@@ -72,7 +73,10 @@ export const PETITION_CLOSING_DEFAULT_MESSAGE: Record<PetitionLocale, string> = 
 
 export const PetitionTemplateClosingMessageCard = Object.assign(
   chakraForwardRef<"section", PetitionTemplateClosingMessageCardProps>(
-    function PetitionTemplateClosingMessageCard({ petition, onUpdatePetition, ...props }, ref) {
+    function PetitionTemplateClosingMessageCard(
+      { petition, onUpdatePetition, isDisabled, ...props },
+      ref,
+    ) {
       const placeholders = usePetitionMessagePlaceholderOptions({ petition });
       const [closingEmailBody, setClosingEmailBody] = useState<RichTextEditorValue>(
         petition.closingEmailBody ??
@@ -86,8 +90,6 @@ export const PetitionTemplateClosingMessageCard = Object.assign(
         setClosingEmailBody(value);
         onUpdatePetition({ closingEmailBody: isEmptyRTEValue(value) ? null : value });
       };
-
-      const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
       return (
         <Card ref={ref} {...props}>
@@ -110,9 +112,7 @@ export const PetitionTemplateClosingMessageCard = Object.assign(
               body={closingEmailBody}
               onBodyChange={handleclosingEmailBodyChange}
               petition={petition}
-              isReadOnly={
-                petition.isRestricted || petition.isPublic || myEffectivePermission === "READ"
-              }
+              isReadOnly={isDisabled}
             />
           </Box>
         </Card>
@@ -125,12 +125,7 @@ export const PetitionTemplateClosingMessageCard = Object.assign(
         fragment PetitionTemplateClosingMessageCard_PetitionTemplate on PetitionTemplate {
           id
           closingEmailBody
-          isRestricted
-          isPublic
           locale
-          myEffectivePermission {
-            permissionType
-          }
           ...usePetitionMessagePlaceholderOptions_PetitionBase
         }
         ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}

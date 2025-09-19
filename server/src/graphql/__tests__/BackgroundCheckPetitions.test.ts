@@ -399,7 +399,7 @@ describe("Background Check - Petitions", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+      expect(errors).toContainGraphQLError("ONGOING_PROCESS_ERROR", { processType: "SIGNATURE" });
       expect(data).toBeNull();
     });
 
@@ -426,7 +426,7 @@ describe("Background Check - Petitions", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+      expect(errors).toContainGraphQLError("ONGOING_PROCESS_ERROR", { processType: "APPROVAL" });
       expect(data).toBeNull();
     });
 
@@ -1011,7 +1011,7 @@ describe("Background Check - Petitions", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+      expect(errors).toContainGraphQLError("ONGOING_PROCESS_ERROR", { processType: "SIGNATURE" });
       expect(data).toBeNull();
     });
 
@@ -1036,7 +1036,7 @@ describe("Background Check - Petitions", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+      expect(errors).toContainGraphQLError("ONGOING_PROCESS_ERROR", { processType: "APPROVAL" });
       expect(data).toBeNull();
     });
   });

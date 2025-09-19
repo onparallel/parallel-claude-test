@@ -19,7 +19,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
   let readPetition: Petition;
   let user: User;
   let organization: Organization;
-  let signature: PetitionSignatureRequest;
+  let readSignature: PetitionSignatureRequest;
 
   let orgIntegration: OrgIntegration;
 
@@ -47,7 +47,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
       is_enabled: true,
     });
 
-    [signature] = await mocks.createRandomPetitionSignatureRequest(readPetition.id);
+    [readSignature] = await mocks.createRandomPetitionSignatureRequest(readPetition.id);
   });
 
   afterAll(async () => {
@@ -103,6 +103,24 @@ describe("GraphQL/PetitionSignatureRequest", () => {
         });
 
       await mocks.createRandomTextReply(field.id, undefined, 1, () => ({ user_id: user.id }));
+    });
+
+    it("starts a signature request", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!) {
+            startSignatureRequest(petitionId: $petitionId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.startSignatureRequest).not.toBeNull();
     });
 
     it("sends error when trying to start a signature with read access", async () => {
@@ -279,10 +297,55 @@ describe("GraphQL/PetitionSignatureRequest", () => {
       // does not create PETITION_CREATED event, as it is already completed when signature starts
       expect(petitionEvents).toHaveLength(0);
     });
+
+    it("sends error when trying to start a signature on a petition scheduled for deletion", async () => {
+      await mocks.knex.from("petition").where("id", petition.id).update({
+        deletion_scheduled_at: new Date(),
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!) {
+            startSignatureRequest(petitionId: $petitionId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("cancelSignatureRequest", () => {
-    it("sends error when trying to cancel a signature with read access", async () => {
+    let petition: Petition;
+    let signature: PetitionSignatureRequest;
+    beforeEach(async () => {
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        status: "COMPLETED",
+        signature_config: JSON.stringify({
+          isEnabled: true,
+          orgIntegrationId: orgIntegration.id,
+          signersInfo: [{ firstName: "Mike", lastName: "Ross", email: "mike@onparallel.com" }],
+          timezone: "Europe/Madrid",
+          title: "sign this parallel",
+          review: true,
+          reviewAfterApproval: false,
+          minSigners: 1,
+          signingMode: "PARALLEL",
+        }),
+      }));
+
+      [signature] = await mocks.createRandomPetitionSignatureRequest(petition.id, () => ({
+        status: "ENQUEUED",
+      }));
+    });
+
+    it("cancels a signature request", async () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionSignatureRequestId: GID!) {
@@ -295,13 +358,100 @@ describe("GraphQL/PetitionSignatureRequest", () => {
           petitionSignatureRequestId: toGlobalId("PetitionSignatureRequest", signature.id),
         },
       );
+
+      expect(errors).toBeUndefined();
+      expect(data?.cancelSignatureRequest).not.toBeNull();
+    });
+
+    it("sends error when trying to cancel a signature with read access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionSignatureRequestId: GID!) {
+            cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionSignatureRequestId: toGlobalId("PetitionSignatureRequest", readSignature.id),
+        },
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to cancel a signature on a petition scheduled for deletion", async () => {
+      await mocks.knex.from("petition").where("id", signature.petition_id).update({
+        deletion_scheduled_at: new Date(),
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionSignatureRequestId: GID!) {
+            cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionSignatureRequestId: toGlobalId("PetitionSignatureRequest", signature.id),
+        },
+      );
+
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
   });
 
   describe("updateSignatureRequestMetadata", () => {
+    let petition: Petition;
+    let signature: PetitionSignatureRequest;
+    beforeEach(async () => {
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        status: "COMPLETED",
+        signature_config: JSON.stringify({
+          isEnabled: true,
+          orgIntegrationId: orgIntegration.id,
+          signersInfo: [{ firstName: "Mike", lastName: "Ross", email: "mike@onparallel.com" }],
+          timezone: "Europe/Madrid",
+          title: "sign this parallel",
+          review: true,
+          reviewAfterApproval: false,
+          minSigners: 1,
+          signingMode: "PARALLEL",
+        }),
+      }));
+      [signature] = await mocks.createRandomPetitionSignatureRequest(petition.id, () => ({
+        status: "ENQUEUED",
+      }));
+    });
+
     it("sends error when trying to update a signature metadata with read access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionSignatureRequestId: GID!, $metadata: JSONObject!) {
+            updateSignatureRequestMetadata(
+              petitionSignatureRequestId: $petitionSignatureRequestId
+              metadata: $metadata
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionSignatureRequestId: toGlobalId("PetitionSignatureRequest", readSignature.id),
+          metadata: { a: "b" },
+        },
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to update a signature metadata on a petition scheduled for deletion", async () => {
+      await mocks.knex.from("petition").where("id", signature.petition_id).update({
+        deletion_scheduled_at: new Date(),
+      });
+
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionSignatureRequestId: GID!, $metadata: JSONObject!) {
@@ -324,7 +474,38 @@ describe("GraphQL/PetitionSignatureRequest", () => {
   });
 
   describe("sendSignatureRequestReminders", () => {
+    let petition: Petition;
+    let signature: PetitionSignatureRequest;
+    beforeEach(async () => {
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        status: "COMPLETED",
+      }));
+
+      [signature] = await mocks.createRandomPetitionSignatureRequest(petition.id, () => ({
+        status: "ENQUEUED",
+      }));
+    });
+
     it("sends error when trying to send a signature reminder with read access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionSignatureRequestId: GID!) {
+            sendSignatureRequestReminders(petitionSignatureRequestId: $petitionSignatureRequestId)
+          }
+        `,
+        {
+          petitionSignatureRequestId: toGlobalId("PetitionSignatureRequest", readSignature.id),
+        },
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to send a signature reminder on a petition scheduled for deletion", async () => {
+      await mocks.knex.from("petition").where("id", signature.petition_id).update({
+        deletion_scheduled_at: new Date(),
+      });
+
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionSignatureRequestId: GID!) {

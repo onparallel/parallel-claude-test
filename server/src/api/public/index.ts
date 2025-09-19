@@ -876,6 +876,7 @@ export function publicApi(container: Container) {
           ) {
             petition(id: $petitionId) {
               ...Petition
+              permanentDeletionAt
             }
           }
           ${PetitionFragment}
@@ -886,10 +887,11 @@ export function publicApi(container: Container) {
         });
         try {
           assert("id" in result.petition!);
+          assert(isNullish(result.petition.permanentDeletionAt));
         } catch {
           throw new ForbiddenError("You don't have access to this resource");
         }
-        return Ok(mapPetition(result.petition!));
+        return Ok(mapPetition(omit(result.petition, ["permanentDeletionAt"])));
       },
     )
     .put(
@@ -1011,16 +1013,14 @@ export function publicApi(container: Container) {
           force: booleanParam({
             required: false,
             description: outdent`
-            If the parallel is shared with other users this method will fail
-            unless passing \`true\` to this parameter
+            If the parallel is shared with other users this method will fail unless passing \`true\` to this parameter.
           `,
           }),
         },
         description: outdent`
         Delete the specified parallel.
 
-        If the parallel is shared with other users this method will fail unless
-        passing \`true\` to the \`force\` parameter"
+        If the parallel is shared with other users this method will fail unless passing \`true\` to the \`force\` parameter.
       `,
         responses: {
           204: SuccessResponse(),
@@ -1099,10 +1099,7 @@ export function publicApi(container: Container) {
         assert("id" in result.closePetition!);
         return Ok(mapPetition(result.closePetition!));
       } catch (error) {
-        if (
-          containsGraphQLError(error, "ONGOING_SIGNATURE_REQUEST_ERROR") ||
-          containsGraphQLError(error, "ONGOING_APPROVAL_REQUEST_ERROR")
-        ) {
+        if (containsGraphQLError(error, "ONGOING_PROCESS_ERROR")) {
           throw new ForbiddenError(error.message);
         }
         throw error;
@@ -1879,10 +1876,7 @@ export function publicApi(container: Container) {
           if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
             throw new BadRequestError("Invalid request body");
           }
-          if (
-            containsGraphQLError(error, "ONGOING_SIGNATURE_REQUEST_ERROR") ||
-            containsGraphQLError(error, "ONGOING_APPROVAL_REQUEST_ERROR")
-          ) {
+          if (containsGraphQLError(error, "ONGOING_PROCESS_ERROR")) {
             throw new ForbiddenError(error.message);
           }
 
@@ -2310,10 +2304,7 @@ export function publicApi(container: Container) {
             );
           } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
             throw new ForbiddenError("You don't have enough credits to submit a reply");
-          } else if (
-            containsGraphQLError(error, "ONGOING_SIGNATURE_REQUEST_ERROR") ||
-            containsGraphQLError(error, "ONGOING_APPROVAL_REQUEST_ERROR")
-          ) {
+          } else if (containsGraphQLError(error, "ONGOING_PROCESS_ERROR")) {
             throw new ForbiddenError(error.message);
           } else if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
             throw new BadRequestError(error.message);
@@ -2446,10 +2437,7 @@ export function publicApi(container: Container) {
             );
           } else if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
             throw new BadRequestError("The reply is already approved and cannot be modified.");
-          } else if (
-            containsGraphQLError(error, "ONGOING_SIGNATURE_REQUEST_ERROR") ||
-            containsGraphQLError(error, "ONGOING_APPROVAL_REQUEST_ERROR")
-          ) {
+          } else if (containsGraphQLError(error, "ONGOING_PROCESS_ERROR")) {
             throw new ForbiddenError(error.message);
           } else if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
             throw new BadRequestError(error.message);
@@ -2495,10 +2483,7 @@ export function publicApi(container: Container) {
             throw new ConflictError(
               "You can't delete the last reply of a required FIELD_GROUP field",
             );
-          } else if (
-            containsGraphQLError(error, "ONGOING_SIGNATURE_REQUEST_ERROR") ||
-            containsGraphQLError(error, "ONGOING_APPROVAL_REQUEST_ERROR")
-          ) {
+          } else if (containsGraphQLError(error, "ONGOING_PROCESS_ERROR")) {
             throw new ForbiddenError(error.message);
           }
 
@@ -2608,10 +2593,7 @@ export function publicApi(container: Container) {
         } catch (error) {
           if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
             throw new ForbiddenError("You don't have enough credits to submit a reply");
-          } else if (
-            containsGraphQLError(error, "ONGOING_SIGNATURE_REQUEST_ERROR") ||
-            containsGraphQLError(error, "ONGOING_APPROVAL_REQUEST_ERROR")
-          ) {
+          } else if (containsGraphQLError(error, "ONGOING_PROCESS_ERROR")) {
             throw new ForbiddenError(error.message);
           }
           throw error;
@@ -3787,6 +3769,7 @@ export function publicApi(container: Container) {
           ) {
             template: petition(id: $templateId) {
               ...Template
+              permanentDeletionAt
             }
           }
           ${TemplateFragment}
@@ -3798,10 +3781,11 @@ export function publicApi(container: Container) {
         });
         try {
           assert("id" in result.template!);
+          assert(isNullish(result.template.permanentDeletionAt));
         } catch {
           throw new ForbiddenError("You don't have access to this resource");
         }
-        return Ok(mapTemplate(result.template!));
+        return Ok(mapTemplate(omit(result.template, ["permanentDeletionAt"])));
       },
     )
     .delete(

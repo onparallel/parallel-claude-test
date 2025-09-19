@@ -240,6 +240,17 @@ describe("GraphQL/Petition Approval Request", () => {
             name: "Step 2",
             type: "ANY",
             values: [],
+            visibility: {
+              type: "SHOW",
+              operator: "OR",
+              conditions: [
+                {
+                  operator: "EQUAL",
+                  value: 10,
+                  variableName: "price",
+                },
+              ],
+            },
           },
           {
             name: "Step 3",
@@ -255,6 +266,7 @@ describe("GraphQL/Petition Approval Request", () => {
             values: [],
           },
         ]),
+        variables: [{ name: "price", default_value: 0 }],
       }));
 
       steps = await mocks.knex.from("petition_approval_request_step").insert(

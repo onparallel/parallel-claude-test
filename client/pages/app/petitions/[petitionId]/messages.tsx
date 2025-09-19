@@ -7,6 +7,7 @@ import {
   usePetitionStateWrapper,
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
+import { PetitionPermanentDeletionAlert } from "@parallel/components/petition-compose/PetitionPermanentDeletionAlert";
 import { PetitionTemplateClosingMessageCard } from "@parallel/components/petition-messages/PetitionTemplateClosingMessageCard";
 import { PetitionTemplateCompletingMessageCard } from "@parallel/components/petition-messages/PetitionTemplateCompletingMessageCard";
 import { PetitionTemplateRequestMessageCard } from "@parallel/components/petition-messages/PetitionTemplateRequestMessageCard";
@@ -20,6 +21,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { isNonNullish } from "remeda";
 
 type PetitionMessagesProps = UnwrapPromise<ReturnType<typeof PetitionMessages.getInitialProps>>;
 
@@ -52,6 +54,11 @@ function PetitionMessages({ petitionId }: PetitionMessagesProps) {
   const cardCommonProps = {
     petition,
     onUpdatePetition: updatePetition,
+    isDisabled:
+      petition.isRestricted ||
+      petition.isPublic ||
+      petition.myEffectivePermission!.permissionType === "READ" ||
+      isNonNullish(petition.permanentDeletionAt),
   };
 
   return (
@@ -59,10 +66,14 @@ function PetitionMessages({ petitionId }: PetitionMessagesProps) {
       key={petition.id}
       queryObject={queryObject}
       petition={petition}
-      onUpdatePetition={updatePetition}
       section="messages"
     >
-      <Box paddingX={4} backgroundColor="primary.50">
+      <Box position="sticky" top={0} zIndex={2}>
+        {isNonNullish(petition.permanentDeletionAt) ? (
+          <PetitionPermanentDeletionAlert date={petition.permanentDeletionAt} isTemplate={true} />
+        ) : null}
+      </Box>
+      <Box paddingX={4} backgroundColor="primary.50" height="100%">
         <Stack spacing={4} paddingY={4} maxWidth="container.md" margin="auto">
           <PetitionTemplateRequestMessageCard {...cardCommonProps} user={queryObject.me} />
           <PetitionTemplateCompletingMessageCard {...cardCommonProps} />
@@ -77,8 +88,14 @@ const _fragments = {
   PetitionBase: gql`
     fragment PetitionMessages_PetitionBase on PetitionBase {
       id
+      isRestricted
+      permanentDeletionAt
+      myEffectivePermission {
+        permissionType
+      }
       ...PetitionLayout_PetitionBase
       ... on PetitionTemplate {
+        isPublic
         ...PetitionTemplateRequestMessageCard_PetitionTemplate
         ...PetitionTemplateCompletingMessageCard_PetitionTemplate
         ...PetitionTemplateClosingMessageCard_PetitionTemplate

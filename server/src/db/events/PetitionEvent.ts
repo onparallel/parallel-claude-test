@@ -161,7 +161,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     type: "PETITION" | "TEMPLATE";
   };
   PETITION_DELETED: {
-    user_id: number;
+    user_id: number | null;
     status: PetitionStatus;
   };
   REMINDERS_OPT_OUT: {
@@ -235,6 +235,12 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   };
   PETITION_APPROVAL_REQUEST_STEP_CANCELED: {
     petition_approval_request_step_id: number;
+    user_id: number;
+  };
+  PETITION_SCHEDULED_FOR_DELETION: {
+    user_id: number;
+  };
+  PETITION_RECOVERED_FROM_DELETION: {
     user_id: number;
   };
 }[TType];
@@ -465,6 +471,12 @@ export type PetitionApprovalRequestStepFinishedEvent<IsCreate extends boolean = 
 export type PetitionApprovalRequestStepCanceledEvent<IsCreate extends boolean = false> =
   GenericPetitionEvent<"PETITION_APPROVAL_REQUEST_STEP_CANCELED", IsCreate>;
 
+export type PetitionScheduledForDeletionEvent<IsCreate extends boolean = false> =
+  GenericPetitionEvent<"PETITION_SCHEDULED_FOR_DELETION", IsCreate>;
+
+export type PetitionRecoveredFromDeletionEvent<IsCreate extends boolean = false> =
+  GenericPetitionEvent<"PETITION_RECOVERED_FROM_DELETION", IsCreate>;
+
 export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionCreatedEvent<IsCreate>
   | PetitionCompletedEvent<IsCreate>
@@ -518,6 +530,8 @@ export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionApprovalRequestStepSkippedEvent<IsCreate>
   | PetitionApprovalRequestStepReminderEvent<IsCreate>
   | PetitionApprovalRequestStepFinishedEvent<IsCreate>
-  | PetitionApprovalRequestStepCanceledEvent<IsCreate>;
+  | PetitionApprovalRequestStepCanceledEvent<IsCreate>
+  | PetitionScheduledForDeletionEvent<IsCreate>
+  | PetitionRecoveredFromDeletionEvent<IsCreate>;
 
 export type CreatePetitionEvent = PetitionEvent<true>;

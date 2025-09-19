@@ -474,7 +474,7 @@ export const PetitionComposeAttachments = Object.assign(
               {totalMaxFilesSizeExceeded ? (
                 <CloseableAlert status="warning" rounded="md" marginTop={4}>
                   <AlertIcon />
-                  <AlertDescription>
+                  <AlertDescription flex={1}>
                     <FormattedMessage
                       id="component.petition-compose-attachments.large-files-alert"
                       defaultMessage="<b>Heavy files.</b> Large files may cause problems when starting the signature. We recommend to compress the uploaded files and not to exceed {size}."
@@ -486,7 +486,7 @@ export const PetitionComposeAttachments = Object.assign(
               {hasDocumentFieldsWithAttachments ? (
                 <CloseableAlert status="info" rounded="md" marginTop={4}>
                   <AlertIcon />
-                  <AlertDescription>
+                  <AlertDescription flex={1}>
                     <FormattedMessage
                       id="component.petition-compose-attachments.petition-with-document-fields-alert"
                       defaultMessage="{type, select, TEMPLATE {This template} other {This parallel}} has document fields set up to attach your responses to the pdf. They will be included in the final document after the attachments."

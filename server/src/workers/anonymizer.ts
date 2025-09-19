@@ -63,6 +63,11 @@ createCronWorker("anonymizer", async (ctx, config) => {
   ctx.logger.debug(`Anonymizing old tasks`);
   await ctx.tasks.anonymizeOldTasks(DAYS);
 
+  await ctx.petitions.deletePetitionsScheduledForDeletion(
+    config.deleteScheduledPetitionsAfterDays,
+    "AnonymizerWorker",
+  );
+
   await profilesAnonymizer(ctx, config);
 });
 

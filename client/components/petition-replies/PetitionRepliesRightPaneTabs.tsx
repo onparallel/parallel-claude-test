@@ -35,6 +35,7 @@ interface PetitionRepliesRightPaneTabsProps {
   onUpdateComment: (petitionFieldCommentId: string, content: string, isNote: boolean) => void;
   onDeleteComment: (petitionFieldCommentId: string) => void;
   onMarkAsUnread: (petitionFieldCommentId: string) => void;
+  isDisabled: boolean;
 }
 
 export function PetitionRepliesRightPaneTabs({
@@ -53,6 +54,7 @@ export function PetitionRepliesRightPaneTabs({
   onUpdateComment,
   onDeleteComment,
   onMarkAsUnread,
+  isDisabled,
 }: PetitionRepliesRightPaneTabsProps) {
   const [tabIndex, setTabIndex] = useState(activeFieldId ? 1 : 0);
 
@@ -169,7 +171,7 @@ export function PetitionRepliesRightPaneTabs({
               key={activeFieldId}
               petition={petition}
               field={activeField}
-              isDisabled={petition.isAnonymized}
+              isDisabled={isDisabled}
               onClose={() => setActiveFieldId(null)}
               onAddComment={onAddComment}
               onUpdateComment={onUpdateComment}
@@ -209,7 +211,6 @@ PetitionRepliesRightPaneTabs.fragments = {
       myEffectivePermission {
         permissionType
       }
-      isAnonymized
       isDocumentGenerationEnabled
       unreadGeneralCommentCount
       fields {

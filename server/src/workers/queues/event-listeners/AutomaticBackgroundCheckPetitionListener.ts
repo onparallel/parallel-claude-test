@@ -32,7 +32,7 @@ export class AutomaticBackgroundCheckPetitionListener
   public async handle(event: PetitionCompletedEvent) {
     const petition = await this.petitions.loadPetition(event.petition_id);
 
-    if (!petition) {
+    if (!petition || petition.deletion_scheduled_at !== null) {
       return;
     }
 

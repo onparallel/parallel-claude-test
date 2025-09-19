@@ -24,7 +24,7 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
       ? await this.ctx.users.loadUser(this.task.user_id)
       : null;
 
-    if (!template || isNullish(user)) {
+    if (!template || template.deletion_scheduled_at !== null || isNullish(user)) {
       // should not happen, just in case
       return {
         status: "FAILED" as const,

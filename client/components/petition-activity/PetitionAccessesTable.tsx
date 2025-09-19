@@ -81,7 +81,8 @@ export function PetitionAccessesTable({
     myEffectivePermission !== "READ" &&
     !petition.isAnonymized &&
     selection.length > 0 &&
-    selected.every((a) => a.status === "ACTIVE");
+    selected.every((a) => a.status === "ACTIVE") &&
+    isNullish(petition.permanentDeletionAt);
 
   const columns = usePetitionAccessesColumns();
   const context = useMemo(
@@ -144,7 +145,11 @@ export function PetitionAccessesTable({
             <Button
               leftIcon={<UserPlusIcon fontSize="18px" />}
               onClick={onAddPetitionAccess}
-              isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+              isDisabled={
+                petition.isAnonymized ||
+                myEffectivePermission === "READ" ||
+                isNonNullish(petition.permanentDeletionAt)
+              }
             >
               {intl.formatMessage({
                 id: "petition.add-recipient-button",
@@ -163,7 +168,7 @@ export function PetitionAccessesTable({
             context={context}
             rows={petition.accesses}
             rowKeyProp="id"
-            isSelectable
+            isSelectable={isNullish(petition.permanentDeletionAt)}
             onSelectionChange={setSelection}
             marginBottom={2}
           />
@@ -176,7 +181,9 @@ export function PetitionAccessesTable({
                   defaultMessage="You haven't sent this parallel yet."
                 />
               </Text>
-              {!petition.isAnonymized && myEffectivePermission !== "READ" ? (
+              {!petition.isAnonymized &&
+              !petition.permanentDeletionAt &&
+              myEffectivePermission !== "READ" ? (
                 <Text>
                   <FormattedMessage
                     id="petition-access.click-here-to-send"
@@ -349,7 +356,8 @@ function usePetitionAccessesColumns(): TableColumn<
           const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
           // if the contact is deleted have no actions
-          if (!isContactless && isNullish(contact)) return null;
+          if ((!isContactless && isNullish(contact)) || isNonNullish(petition.permanentDeletionAt))
+            return null;
 
           if (status === "INACTIVE") {
             const contactHasActiveAccess = petition.accesses.some(
@@ -450,6 +458,7 @@ PetitionAccessesTable.fragments = {
         ...PetitionAccessTable_PetitionAccess
       }
       isAnonymized
+      permanentDeletionAt
       myEffectivePermission {
         permissionType
       }

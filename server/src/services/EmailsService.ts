@@ -116,8 +116,9 @@ export interface IEmailsService {
     userId: number,
   ): Promise<void>;
   sendPetitionApprovalRequestStepCanceledEmail(
-    approvalRequestStepId: number,
+    approvalRequestStepId: MaybeArray<number>,
     userId: number,
+    t?: Knex.Transaction,
   ): Promise<void>;
   sendInvitationEmail(
     userCognitoId: string,
@@ -471,14 +472,23 @@ export class EmailsService implements IEmailsService {
   }
 
   async sendPetitionApprovalRequestStepCanceledEmail(
-    approvalRequestStepId: number,
+    approvalRequestStepId: MaybeArray<number>,
     userId: number,
+    t?: Knex.Transaction,
   ) {
-    return await this.enqueueEmail("petition-approval-request-step-canceled", {
-      id: this.buildQueueId("PetitionApprovalRequestStepCanceled", [approvalRequestStepId, userId]),
-      petition_approval_request_step_id: approvalRequestStepId,
-      user_id: userId,
-    });
+    const ids = unMaybeArray(approvalRequestStepId);
+    if (ids.length === 0) {
+      return;
+    }
+    return await this.enqueueEmail(
+      "petition-approval-request-step-canceled",
+      ids.map((id) => ({
+        id: this.buildQueueId("PetitionApprovalRequestStepCanceled", [id, userId]),
+        petition_approval_request_step_id: id,
+        user_id: userId,
+      })),
+      t,
+    );
   }
 
   async sendInvitationEmail(

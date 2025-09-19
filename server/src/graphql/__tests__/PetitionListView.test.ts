@@ -263,6 +263,31 @@ describe("GraphQL/PetitionListView", () => {
         },
       });
     });
+
+    it("sends error when creating a view filtered by a template scheduled for deletion", async () => {
+      const [template] = await mocks.createRandomTemplates(organization.id, user.id, 1, () => ({
+        deletion_scheduled_at: new Date(),
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($name: String!, $data: PetitionListViewDataInput!) {
+            createPetitionListView(name: $name, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          name: "my first view",
+          data: {
+            fromTemplateId: toGlobalId("Petition", template.id),
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("updatePetitionListView", () => {
@@ -435,6 +460,35 @@ describe("GraphQL/PetitionListView", () => {
           columns: ["name", "recipients", "reminders", "sentAt"],
         },
       });
+    });
+
+    it("sends error when updating a view filtered by a template scheduled for deletion", async () => {
+      const [template] = await mocks.createRandomTemplates(organization.id, user.id, 1, () => ({
+        deletion_scheduled_at: new Date(),
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionListViewId: GID!, $data: PetitionListViewDataInput) {
+            updatePetitionListView(
+              petitionListViewId: $petitionListViewId
+
+              data: $data
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionListViewId: toGlobalId("PetitionListView", customView.id),
+          data: {
+            fromTemplateId: toGlobalId("Petition", template.id),
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 

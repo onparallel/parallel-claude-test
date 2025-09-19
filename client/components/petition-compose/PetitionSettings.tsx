@@ -488,7 +488,12 @@ function _PetitionSettings({
         />
       </Heading>
       <SettingsRowSwitch
-        isDisabled={isPublicTemplate || petition.isAnonymized || myEffectivePermission === "READ"}
+        isDisabled={
+          isPublicTemplate ||
+          petition.isAnonymized ||
+          myEffectivePermission === "READ" ||
+          isNonNullish(petition.permanentDeletionAt)
+        }
         icon={petition.isRestricted ? <LockClosedIcon /> : <LockOpenIcon />}
         label={
           <FormattedMessage
@@ -633,7 +638,10 @@ function _PetitionSettings({
               icon={<MoreIcon />}
               onClick={handleChangeDefaultPath}
               isDisabled={
-                petition.isRestricted || isPublicTemplate || myEffectivePermission === "READ"
+                petition.isRestricted ||
+                isPublicTemplate ||
+                myEffectivePermission === "READ" ||
+                isNonNullish(petition.permanentDeletionAt)
               }
             />
           </HStack>
@@ -1171,6 +1179,7 @@ const fragments = {
         isRecipientViewContentsHidden
         isRestricted
         isRestrictedWithPassword
+        permanentDeletionAt
         approvalFlowConfig {
           ...Fragments_FullApprovalFlowConfig
         }

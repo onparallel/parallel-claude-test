@@ -276,7 +276,9 @@ export function PreviewPetitionFieldBackgroundCheck({
                   isDisabled={isDisabled || isDeletingReply[reply.id] || reply.isAnonymized}
                   onRemove={() => handleDeletePetitionReply({ replyId: reply.id })}
                   onViewReply={handleViewReply}
-                  isViewDisabled={isCacheOnly || reply.isAnonymized}
+                  isViewDisabled={
+                    isCacheOnly || reply.isAnonymized || !!petition.permanentDeletionAt
+                  }
                 />
               </motion.li>
             ))}
@@ -545,6 +547,7 @@ PreviewPetitionFieldBackgroundCheck.fragments = {
           ...PreviewPetitionFieldBackgroundCheck_PetitionField
         }
       }
+      permanentDeletionAt
       ...useFieldLogic_PetitionBase
     }
     ${useFieldLogic.fragments.PetitionBase}

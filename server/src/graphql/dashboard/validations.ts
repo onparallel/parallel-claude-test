@@ -19,7 +19,9 @@ async function validatePetitionFilter(
 ) {
   if (isNonNullish(filter.fromTemplateId)) {
     const templates = await ctx.petitions.loadPetition(filter.fromTemplateId);
-    const invalidTemplateIndex = templates.findIndex((t) => !t || t.org_id !== orgId);
+    const invalidTemplateIndex = templates.findIndex(
+      (t) => !t || t.org_id !== orgId || t.deletion_scheduled_at !== null,
+    );
     if (invalidTemplateIndex !== -1) {
       throw new ArgValidationError(
         info,

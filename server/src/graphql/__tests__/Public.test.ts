@@ -35,6 +35,8 @@ describe("GraphQL/Public", () => {
   let mocks: Mocks;
   let knex: Knex;
   let contactRepository: ContactRepository;
+
+  let petition: Petition;
   let access: PetitionAccess;
   let fields: PetitionField[];
   let org: Organization;
@@ -47,17 +49,17 @@ describe("GraphQL/Public", () => {
     knex = testClient.container.get<Knex>(KNEX);
     contactRepository = testClient.container.get<ContactRepository>(ContactRepository);
     mocks = new Mocks(knex);
-    [org] = await mocks.createRandomOrganizations(1, () => ({
+
+    ({ organization: org, user } = await mocks.createSessionUserAndOrganization(() => ({
       name: "Parallel",
       status: "DEV",
-    }));
+    })));
 
     limit = await mocks.createOrganizationUsageLimit(org.id, "SIGNATURIT_SHARED_APIKEY", 10);
     await mocks.createOrganizationUsageLimit(org.id, "PETITION_SEND", 10);
 
-    [user] = await mocks.createRandomUsers(org.id, 1);
     [contact] = await mocks.createRandomContacts(org.id, 1);
-    const [petition] = await mocks.createRandomPetitions(org.id, user.id, 1);
+    [petition] = await mocks.createRandomPetitions(org.id, user.id, 1);
     fields = await mocks.createRandomPetitionFields(
       petition.id,
       3,
@@ -69,6 +71,7 @@ describe("GraphQL/Public", () => {
         ][i] as Partial<PetitionField>,
     );
     [access] = await mocks.createPetitionAccess(petition.id, user.id, [contact.id], user.id);
+    await mocks.createRandomPetitionMessage(petition.id, access.id, user.id);
   });
 
   afterAll(async () => {
@@ -828,7 +831,9 @@ describe("GraphQL/Public", () => {
               ],
             },
           );
-          expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+          expect(errors).toContainGraphQLError("ONGOING_PROCESS_ERROR", {
+            processType: "SIGNATURE",
+          });
           expect(data).toBeNull();
         });
 
@@ -860,7 +865,9 @@ describe("GraphQL/Public", () => {
               ],
             },
           );
-          expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+          expect(errors).toContainGraphQLError("ONGOING_PROCESS_ERROR", {
+            processType: "APPROVAL",
+          });
           expect(data).toBeNull();
         });
       });
@@ -2077,7 +2084,9 @@ describe("GraphQL/Public", () => {
             },
           );
 
-          expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+          expect(errors).toContainGraphQLError("ONGOING_PROCESS_ERROR", {
+            processType: "SIGNATURE",
+          });
           expect(data).toBeNull();
         });
 
@@ -2111,7 +2120,9 @@ describe("GraphQL/Public", () => {
             },
           );
 
-          expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+          expect(errors).toContainGraphQLError("ONGOING_PROCESS_ERROR", {
+            processType: "APPROVAL",
+          });
           expect(data).toBeNull();
         });
       });
@@ -3372,7 +3383,7 @@ describe("GraphQL/Public", () => {
             replyId: toGlobalId("PetitionFieldReply", simpleReply.id),
           },
         );
-        expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+        expect(errors).toContainGraphQLError("ONGOING_PROCESS_ERROR", { processType: "SIGNATURE" });
         expect(data).toBeNull();
       });
 
@@ -3400,7 +3411,7 @@ describe("GraphQL/Public", () => {
             replyId: toGlobalId("PetitionFieldReply", simpleReply.id),
           },
         );
-        expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+        expect(errors).toContainGraphQLError("ONGOING_PROCESS_ERROR", { processType: "APPROVAL" });
         expect(data).toBeNull();
       });
     });
@@ -3702,7 +3713,7 @@ describe("GraphQL/Public", () => {
           },
         );
 
-        expect(errors).toContainGraphQLError("ONGOING_SIGNATURE_REQUEST_ERROR");
+        expect(errors).toContainGraphQLError("ONGOING_PROCESS_ERROR", { processType: "SIGNATURE" });
         expect(data).toBeNull();
       });
 
@@ -3742,7 +3753,7 @@ describe("GraphQL/Public", () => {
           },
         );
 
-        expect(errors).toContainGraphQLError("ONGOING_APPROVAL_REQUEST_ERROR");
+        expect(errors).toContainGraphQLError("ONGOING_PROCESS_ERROR", { processType: "APPROVAL" });
         expect(data).toBeNull();
       });
     });
@@ -4070,6 +4081,94 @@ describe("GraphQL/Public", () => {
 
         expect(errors).toContainGraphQLError("FILE_NOT_FOUND_ERROR");
         expect(data).toBeNull();
+      });
+    });
+
+    describe("verifyPublicAccess", () => {
+      let petition: Petition;
+      let access: PetitionAccess;
+      beforeEach(async () => {
+        const [contact] = await mocks.createRandomContacts(org.id, 1);
+        [petition] = await mocks.createRandomPetitions(org.id, user.id, 1, () => ({
+          status: "PENDING",
+        }));
+        [access] = await mocks.createPetitionAccess(petition.id, user.id, [contact.id], user.id);
+      });
+
+      it("verifies a public access", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!, $token: ID!) {
+              verifyPublicAccess(keycode: $keycode, token: $token) {
+                isAllowed
+              }
+            }
+          `,
+          { keycode: access.keycode, token: "test" },
+        );
+        expect(errors).toBeUndefined();
+        expect(data?.verifyPublicAccess).toEqual({ isAllowed: true });
+      });
+
+      it("sends error if the petition is scheduled for deletion", async () => {
+        await mocks.knex
+          .from("petition")
+          .where("id", petition.id)
+          .update({ deletion_scheduled_at: new Date() });
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!, $token: ID!) {
+              verifyPublicAccess(keycode: $keycode, token: $token) {
+                isAllowed
+              }
+            }
+          `,
+          { keycode: access.keycode, token: "test" },
+        );
+        expect(errors).toContainGraphQLError("PUBLIC_PETITION_NOT_AVAILABLE");
+        expect(data).toBeNull();
+      });
+    });
+
+    describe("accesses", () => {
+      beforeAll(async () => {
+        const petitions = await mocks.createRandomPetitions(org.id, user.id, 15, () => ({
+          deletion_scheduled_at: new Date(),
+        }));
+
+        for (const petition of petitions) {
+          const [access] = await mocks.createPetitionAccess(
+            petition.id,
+            user.id,
+            [contact.id],
+            user.id,
+          );
+          await mocks.createRandomPetitionMessage(petition.id, access.id, user.id);
+        }
+      });
+
+      it("returns a list of every available access for a contact, ignoring those of petitions scheduled for deletion", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            query ($keycode: ID!) {
+              accesses(limit: 100, offset: 0, keycode: $keycode) {
+                totalCount
+                items {
+                  petition {
+                    id
+                  }
+                }
+              }
+            }
+          `,
+          { keycode: access.keycode },
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.accesses).toEqual({
+          totalCount: 1,
+          items: [{ petition: { id: toGlobalId("Petition", petition.id) } }],
+        });
       });
     });
   });

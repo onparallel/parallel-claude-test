@@ -300,7 +300,9 @@ export type PetitionEventType =
   | "PETITION_APPROVAL_REQUEST_STEP_SKIPPED"
   | "PETITION_APPROVAL_REQUEST_STEP_REMINDER"
   | "PETITION_APPROVAL_REQUEST_STEP_FINISHED"
-  | "PETITION_APPROVAL_REQUEST_STEP_CANCELED";
+  | "PETITION_APPROVAL_REQUEST_STEP_CANCELED"
+  | "PETITION_SCHEDULED_FOR_DELETION"
+  | "PETITION_RECOVERED_FROM_DELETION";
 
 export const PetitionEventTypeValues = [
   "PETITION_CREATED",
@@ -356,6 +358,8 @@ export const PetitionEventTypeValues = [
   "PETITION_APPROVAL_REQUEST_STEP_REMINDER",
   "PETITION_APPROVAL_REQUEST_STEP_FINISHED",
   "PETITION_APPROVAL_REQUEST_STEP_CANCELED",
+  "PETITION_SCHEDULED_FOR_DELETION",
+  "PETITION_RECOVERED_FROM_DELETION",
 ] as PetitionEventType[];
 
 export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";
@@ -1577,6 +1581,7 @@ export interface Petition {
   automatic_numbering_config: Maybe<any>; // jsonb
   standard_list_definition_override: any; // jsonb
   approval_flow_config: Maybe<any>; // jsonb
+  deletion_scheduled_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetition = PartialProps<
@@ -1636,6 +1641,7 @@ export type CreatePetition = PartialProps<
   | "automatic_numbering_config"
   | "standard_list_definition_override"
   | "approval_flow_config"
+  | "deletion_scheduled_at"
 >;
 
 export interface PetitionAccess {

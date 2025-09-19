@@ -234,6 +234,41 @@ describe("GraphQL/PetitionEventSubscription", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("sends error when trying to create a subscription for a template scheduled for deletion", async () => {
+      const [template] = await mocks.createRandomTemplates(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({
+          deletion_scheduled_at: new Date(),
+        }),
+      );
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation ($eventsUrl: String!, $name: String, $fromTemplateId: GID) {
+            createPetitionEventSubscription(
+              eventsUrl: $eventsUrl
+              name: $name
+              fromTemplateId: $fromTemplateId
+            ) {
+              id
+              name
+              eventsUrl
+              isEnabled
+            }
+          }
+        `,
+        {
+          eventsUrl: "https://www.example.com/api",
+          name: "example",
+          fromTemplateId: toGlobalId("Petition", template.id),
+        },
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("updatePetitionEventSubscription", () => {
@@ -276,6 +311,36 @@ describe("GraphQL/PetitionEventSubscription", () => {
           isEnabled: true,
         },
       });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to update a subscription for a template scheduled for deletion", async () => {
+      const [template] = await mocks.createRandomTemplates(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({
+          deletion_scheduled_at: new Date(),
+        }),
+      );
+
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation ($id: GID!, $fromTemplateId: GID) {
+            updatePetitionEventSubscription(id: $id, fromTemplateId: $fromTemplateId) {
+              id
+              eventsUrl
+              isEnabled
+            }
+          }
+        `,
+        {
+          id: subscriptionId,
+          fromTemplateId: toGlobalId("Petition", template.id),
+        },
+      );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();

@@ -11,7 +11,11 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validateAnd } from "../helpers/validateArgs";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validUrl } from "../helpers/validators/validUrl";
-import { petitionsAreOfTypeTemplate, userHasAccessToPetitions } from "../petition/authorizers";
+import {
+  petitionsAreNotScheduledForDeletion,
+  petitionsAreOfTypeTemplate,
+  userHasAccessToPetitions,
+} from "../petition/authorizers";
 import {
   profileTypeFieldBelongsToProfileType,
   userHasAccessToProfileType,
@@ -100,6 +104,7 @@ export const createPetitionEventSubscription = mutationField("createPetitionEven
       and(
         petitionsAreOfTypeTemplate("fromTemplateId" as never),
         userHasAccessToPetitions("fromTemplateId" as never),
+        petitionsAreNotScheduledForDeletion("fromTemplateId" as never),
       ),
     ),
     ifArgDefined(
@@ -210,6 +215,7 @@ export const updatePetitionEventSubscription = mutationField("updatePetitionEven
       and(
         petitionsAreOfTypeTemplate("fromTemplateId" as never),
         userHasAccessToPetitions("fromTemplateId" as never),
+        petitionsAreNotScheduledForDeletion("fromTemplateId" as never),
       ),
     ),
     ifArgDefined(

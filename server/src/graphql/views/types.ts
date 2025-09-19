@@ -158,6 +158,7 @@ export const PetitionListViewData = objectType({
         ],
       }),
     });
+    t.nullable.boolean("scheduledForDeletion");
   },
 });
 
@@ -185,6 +186,7 @@ export const PetitionListViewDataInput = inputObjectType({
       }),
     });
     t.nullable.list.nonNull.field("columns", { type: "PetitionListViewColumn" });
+    t.nullable.boolean("scheduledForDeletion");
   },
 });
 

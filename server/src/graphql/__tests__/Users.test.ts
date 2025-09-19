@@ -282,7 +282,7 @@ describe("GraphQL/Users", () => {
   describe("activateUser, deactivateUser", () => {
     let activeUsers: User[];
     let inactiveUsers: User[];
-    let user0Petition: Petition;
+    let user0Petitions: Petition[];
     let user0Drafts: Petition[];
 
     let user1Petitions: Petition[];
@@ -316,11 +316,11 @@ describe("GraphQL/Users", () => {
         () => ({ status: "DRAFT" }),
       );
 
-      [user0Petition] = await mocks.createRandomPetitions(
+      user0Petitions = await mocks.createRandomPetitions(
         organization.id,
         activeUsers[0].id,
-        1,
-        () => ({ status: "PENDING" }),
+        2,
+        (i) => ({ status: "PENDING", deletion_scheduled_at: i === 1 ? new Date() : null }),
       );
 
       user1Petitions = await mocks.createRandomPetitions(
@@ -411,7 +411,7 @@ describe("GraphQL/Users", () => {
         totalCount: 3,
         items: expect.toIncludeSameMembers([
           {
-            id: toGlobalId("Petition", user0Petition.id),
+            id: toGlobalId("Petition", user0Petitions[0].id),
             permissions: [
               {
                 permissionType: "OWNER",
@@ -445,13 +445,53 @@ describe("GraphQL/Users", () => {
           },
         ]),
       });
+
+      // query petition to make sure the permissions are correctly set
+      const { errors: petitionsBinErrors, data: petitionsBinData } = await testClient.execute(gql`
+        query {
+          petitions(offset: 0, limit: 100, isScheduledForDeletion: true) {
+            totalCount
+            items {
+              ... on PetitionBase {
+                id
+                permissions {
+                  ... on PetitionUserPermission {
+                    permissionType
+                    user {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `);
+
+      expect(petitionsBinErrors).toBeUndefined();
+      expect(petitionsBinData?.petitions).toEqual({
+        totalCount: 1,
+        items: expect.toIncludeSameMembers([
+          {
+            id: toGlobalId("Petition", user0Petitions[1].id),
+            permissions: [
+              {
+                permissionType: "OWNER",
+                user: {
+                  id: sessionUserGID,
+                },
+              },
+            ],
+          },
+        ]),
+      });
     });
 
     it("removes user from all their groups and deletes all petition permissions", async () => {
       // create a group, add user as member and share a petition with the group
       const [group] = await mocks.createUserGroups(1, organization.id);
       await mocks.insertUserGroupMembers(group.id, [activeUsers[0].id]);
-      await mocks.sharePetitionWithGroups(user0Petition.id, [group.id]);
+      await mocks.sharePetitionWithGroups(user0Petitions[0].id, [group.id]);
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -505,7 +545,12 @@ describe("GraphQL/Users", () => {
           deleted_at: null,
         },
         {
-          petition_id: user0Petition.id,
+          petition_id: user0Petitions[0].id,
+          type: "OWNER",
+          deleted_at: null,
+        },
+        {
+          petition_id: user0Petitions[1].id,
           type: "OWNER",
           deleted_at: null,
         },
@@ -594,14 +639,24 @@ describe("GraphQL/Users", () => {
         /* sql */ `
           select petition_id, type, user_id, updated_by 
           from petition_permission 
-          where petition_id in (?,?,?,?,?,?) and deleted_at is null
+          where petition_id in (?,?,?,?,?,?,?) and deleted_at is null
         `,
-        [...user0Drafts.map((p) => p.id), user0Petition.id, ...user1Petitions.map((p) => p.id)],
+        [
+          ...user0Drafts.map((p) => p.id),
+          ...user0Petitions.map((p) => p.id),
+          ...user1Petitions.map((p) => p.id),
+        ],
       );
 
       expect(petitionUserPermissions).toIncludeSameMembers([
         {
-          petition_id: user0Petition.id,
+          petition_id: user0Petitions[0].id,
+          type: "OWNER",
+          user_id: activeUsers[2].id,
+          updated_by: `User:${sessionUser.id}`,
+        },
+        {
+          petition_id: user0Petitions[1].id,
           type: "OWNER",
           user_id: activeUsers[2].id,
           updated_by: `User:${sessionUser.id}`,

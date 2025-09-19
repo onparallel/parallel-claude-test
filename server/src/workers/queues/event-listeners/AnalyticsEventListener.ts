@@ -366,7 +366,7 @@ export class AnalyticsEventListener implements EventListener<EventType> {
 
   private async trackPetitionDeletedEvent(event: PetitionDeletedEvent) {
     const petition = await this.petitions.loadPetition(event.petition_id);
-    if (!petition) return;
+    if (!petition || !event.data.user_id) return;
 
     this.analytics.trackEvent({
       type: "PETITION_DELETED",

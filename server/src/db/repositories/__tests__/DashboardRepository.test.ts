@@ -69,10 +69,11 @@ describe("DashboardRepository", () => {
         name: ["KYC", "AML", "HIGH_RISK"][i],
       }));
 
-      await mocks.createRandomPetitions(organization.id, users[0].id, 4, (i) => ({
+      await mocks.createRandomPetitions(organization.id, users[0].id, 5, (i) => ({
         from_template_id: templates[0].id,
-        status: ["DRAFT", "DRAFT", "DRAFT", "PENDING"][i] as PetitionStatus,
+        status: ["DRAFT", "DRAFT", "DRAFT", "PENDING", "PENDING"][i] as PetitionStatus,
         recipient_locale: "en",
+        deletion_scheduled_at: i === 4 ? new Date() : null,
       }));
 
       const completedKycs = await mocks.createRandomPetitions(
@@ -967,7 +968,7 @@ describe("DashboardRepository", () => {
 
   describe("getPetitionsRatioValues", () => {
     beforeAll(async () => {
-      await mocks.createRandomPetitions(organization.id, users[0].id, 10, (i) => ({
+      await mocks.createRandomPetitions(organization.id, users[0].id, 11, (i) => ({
         status: [
           "DRAFT",
           "DRAFT",
@@ -979,7 +980,9 @@ describe("DashboardRepository", () => {
           "CLOSED",
           "CLOSED",
           "CLOSED",
+          "CLOSED",
         ][i] as PetitionStatus,
+        deletion_scheduled_at: i === 10 ? new Date() : null,
       }));
     });
 
@@ -1079,13 +1082,15 @@ describe("DashboardRepository", () => {
 
   describe("getPetitionsPieChartValues", () => {
     beforeAll(async () => {
-      await mocks.createRandomPetitions(organization.id, users[0].id, 20, (i) => ({
+      await mocks.createRandomPetitions(organization.id, users[0].id, 21, (i) => ({
         status: [
           ...range(0, 2).map(() => "DRAFT"),
           ...range(0, 5).map(() => "PENDING"),
           ...range(0, 7).map(() => "COMPLETED"),
           ...range(0, 6).map(() => "CLOSED"),
+          ...range(0, 1).map(() => "PENDING"),
         ][i] as PetitionStatus,
+        deletion_scheduled_at: i === 20 ? new Date() : null,
       }));
     });
 

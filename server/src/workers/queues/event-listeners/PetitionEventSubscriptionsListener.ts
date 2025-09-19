@@ -31,7 +31,7 @@ export class PetitionEventSubscriptionsListener implements EventListener<Petitio
 
   public async handle(event: PetitionEvent) {
     const petition = await this.petitions.loadPetition(event.petition_id);
-    if (!petition) {
+    if (!petition || petition.deletion_scheduled_at !== null) {
       return;
     }
     const userIds = (await this.petitions.loadEffectivePermissions(petition.id)).map(

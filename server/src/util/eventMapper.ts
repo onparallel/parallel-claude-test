@@ -283,7 +283,7 @@ export function mapPetitionEventPayload(event: PetitionEvent) {
     }
     case "PETITION_DELETED": {
       return {
-        userId: toGlobalId("User", event.data.user_id),
+        userId: event.data.user_id ? toGlobalId("User", event.data.user_id) : null,
         status: event.data.status,
       };
     }
@@ -384,6 +384,17 @@ export function mapPetitionEventPayload(event: PetitionEvent) {
           event.data.petition_approval_request_step_id,
         ),
       };
+
+    case "PETITION_SCHEDULED_FOR_DELETION": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+      };
+    }
+    case "PETITION_RECOVERED_FROM_DELETION": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+      };
+    }
 
     default:
       return {};

@@ -189,7 +189,9 @@ export class PetitionImportExportService implements IPetitionImportExportService
       this.petitions.loadFieldsForPetition(petitionId),
     ]);
 
-    if (!petition) throw new Error(`Petition:${petitionId} not found`);
+    if (!petition || petition.deletion_scheduled_at !== null) {
+      throw new Error(`Petition:${petitionId} not found`);
+    }
 
     const standardProfileTypes = await this.profiles.loadStandardProfileTypesByOrgId(
       petition.org_id,

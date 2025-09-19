@@ -10,6 +10,7 @@ import { useHandleNavigation } from "@parallel/utils/navigation";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish, isNullish } from "remeda";
 import { Card, CardHeader } from "../common/Card";
 import { DateTime } from "../common/DateTime";
 import { NormalLink } from "../common/Link";
@@ -75,7 +76,11 @@ export function PetitionProfilesTable({
             <Button
               leftIcon={<AddIcon fontSize="18px" />}
               onClick={onAddProfile}
-              isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+              isDisabled={
+                petition.isAnonymized ||
+                myEffectivePermission === "READ" ||
+                isNonNullish(petition.permanentDeletionAt)
+              }
             >
               <FormattedMessage
                 id="component.petition-profiles-table.add-profile"
@@ -98,7 +103,7 @@ export function PetitionProfilesTable({
             rowKeyProp="id"
             marginBottom={2}
             onRowClick={handleRowClick}
-            isSelectable
+            isSelectable={isNullish(petition.permanentDeletionAt)}
             onSelectionChange={onChangeSelectedIds}
             actions={actions}
           />
@@ -111,7 +116,9 @@ export function PetitionProfilesTable({
                   defaultMessage="There are no profiles associated to this parallel yet."
                 />
               </Text>
-              {!petition.isAnonymized && myEffectivePermission !== "READ" ? (
+              {!petition.isAnonymized &&
+              myEffectivePermission !== "READ" &&
+              isNullish(petition.permanentDeletionAt) ? (
                 <Text>
                   <FormattedMessage
                     id="component.petition-profiles-table.associate-profile"
@@ -236,6 +243,7 @@ PetitionProfilesTable.fragments = {
       fragment PetitionProfilesTable_Petition on Petition {
         id
         isAnonymized
+        permanentDeletionAt
         myEffectivePermission {
           permissionType
         }

@@ -40,6 +40,7 @@ export const HeaderNameEditable = Object.assign(
       useImperativeHandle(ref, () => ({ focus: () => previewRef.current?.focus() }), []);
 
       const isReadOnly =
+        props.isDisabled ||
         isPublic ||
         myEffectivePermission === "READ" ||
         (petition.isRestricted && petition.__typename === "PetitionTemplate");

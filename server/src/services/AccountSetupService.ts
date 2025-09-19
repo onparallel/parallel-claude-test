@@ -184,6 +184,7 @@ export class AccountSetupService implements IAccountSetupService {
       signature: null,
       sharedWith: null,
       fromTemplateId: null,
+      scheduledForDeletion: null,
     };
     await this.views.createPetitionListView(
       (

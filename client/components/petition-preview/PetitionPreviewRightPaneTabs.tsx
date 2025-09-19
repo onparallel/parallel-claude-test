@@ -24,6 +24,7 @@ interface PetitionPreviewRightPaneTabsProps {
   onDeleteComment: (petitionFieldCommentId: string) => void;
   onMarkAsUnread: (petitionFieldCommentId: string) => void;
   onlyReadPermission: boolean;
+  isDisabled: boolean;
 }
 
 export function PetitionPreviewRightPaneTabs({
@@ -37,6 +38,7 @@ export function PetitionPreviewRightPaneTabs({
   onDeleteComment,
   onMarkAsUnread,
   onlyReadPermission,
+  isDisabled,
 }: PetitionPreviewRightPaneTabsProps) {
   const [tabIndex, setTabIndex] = useState(activeFieldId ? 1 : 0);
 
@@ -120,7 +122,7 @@ export function PetitionPreviewRightPaneTabs({
               key={activeFieldId}
               petition={petition}
               field={activeField}
-              isDisabled={petition.isAnonymized || petition.__typename === "PetitionTemplate"}
+              isDisabled={isDisabled}
               onClose={() => setActiveFieldId(null)}
               onAddComment={onAddComment}
               onUpdateComment={onUpdateComment}
@@ -155,7 +157,6 @@ PetitionPreviewRightPaneTabs.fragments = {
     return gql`
       fragment PetitionPreviewRightPaneTabs_PetitionBase on PetitionBase {
         id
-        isAnonymized
         fields {
           id
           ...PetitionPreviewRightPaneTabs_PetitionField

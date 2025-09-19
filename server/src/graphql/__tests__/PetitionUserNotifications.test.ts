@@ -590,7 +590,27 @@ describe("GraphQL - PetitionUserNotifications", () => {
     expect(otherUserNotifications).toEqual([]);
   });
 
-  it("all petition notifications should be deleted if the petition is deleted", async () => {
+  it("all petition notifications should be deleted if the petition is permanently deleted", async () => {
+    const { errors } = await testClient.mutate({
+      mutation: gql`
+        mutation ($petitionIds: [GID!]!) {
+          deletePetitions(ids: $petitionIds, deletePermanently: true)
+        }
+      `,
+      variables: {
+        petitionIds: [toGlobalId("Petition", petition.id)],
+      },
+    });
+    expect(errors).toBeUndefined();
+
+    const petitionNotifications = await knex<PetitionUserNotification>("petition_user_notification")
+      .where("petition_id", petition.id)
+      .select("id");
+
+    expect(petitionNotifications).toEqual([]);
+  });
+
+  it("all petition notifications should be conserved if the petition is sent to bin", async () => {
     const { errors } = await testClient.mutate({
       mutation: gql`
         mutation ($petitionIds: [GID!]!) {
@@ -607,7 +627,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       .where("petition_id", petition.id)
       .select("id");
 
-    expect(petitionNotifications).toEqual([]);
+    expect(petitionNotifications).toHaveLength(5);
   });
 
   it("notifications should be deleted if user transfers the ownership of their petition and then deletes it", async () => {
@@ -629,7 +649,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     const { errors: deleteErrors } = await testClient.mutate({
       mutation: gql`
         mutation ($petitionIds: [GID!]!) {
-          deletePetitions(ids: $petitionIds)
+          deletePetitions(ids: $petitionIds, deletePermanently: true)
         }
       `,
       variables: {

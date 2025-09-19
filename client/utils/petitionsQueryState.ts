@@ -2,6 +2,7 @@ import { approvalsQueryItem } from "@parallel/components/petition-list/filters/P
 import { sharedWithQueryItem } from "@parallel/components/petition-list/filters/PetitionListSharedWithFilter";
 import { tagFilterQueryItem } from "@parallel/components/petition-list/filters/PetitionListTagFilter";
 import {
+  boolean,
   buildBuildStateUrl,
   buildParseQuery,
   buildUseGoTo,
@@ -27,6 +28,7 @@ const QUERY_STATE = {
     .withValidation((value) => typeof value === "string" && /^\/([^\/]+\/)*$/.test(value))
     .orDefault("/"),
   status: values(["DRAFT", "PENDING", "COMPLETED", "CLOSED"]).list(),
+  scheduledForDeletion: boolean().orDefault(false),
   sharedWith: sharedWithQueryItem(),
   approvals: approvalsQueryItem(),
   tagsFilters: tagFilterQueryItem(),

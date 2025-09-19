@@ -29,6 +29,7 @@ import {
 } from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
+import { PetitionPermanentDeletionAlert } from "@parallel/components/petition-compose/PetitionPermanentDeletionAlert";
 import {
   HiddenFieldDialog,
   useHiddenFieldDialog,
@@ -92,7 +93,7 @@ import { waitForElement } from "@parallel/utils/waitForElement";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, omit } from "remeda";
+import { isNonNullish, isNullish, omit } from "remeda";
 
 type PetitionPreviewProps = UnwrapPromise<ReturnType<typeof PetitionPreview.getInitialProps>>;
 
@@ -462,8 +463,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
       setShowRefreshRepliesAlert(true);
     } else if (
       isApolloError(error, "REPLY_ALREADY_DELETED_ERROR") ||
-      isApolloError(error, "ONGOING_APPROVAL_REQUEST_ERROR") ||
-      isApolloError(error, "ONGOING_SIGNATURE_REQUEST_ERROR")
+      isApolloError(error, "ONGOING_PROCESS_ERROR")
     ) {
       await refetch();
     } else if (
@@ -483,6 +483,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const showGeneratePrefilledPublicLinkButton =
     me.hasPublicLinkPrefill &&
     petition.__typename === "PetitionTemplate" &&
+    isNullish(petition.permanentDeletionAt) &&
     petition.publicLink?.isActive &&
     petition.fields.some(
       (f) => !isFileTypeField(f.type) && isNonNullish(f.alias) && f.previewReplies.length > 0,
@@ -490,11 +491,13 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 
   const showSendToButton =
     isPetition &&
+    isNullish(petition.permanentDeletionAt) &&
     !petition.accesses?.find((a) => a.status === "ACTIVE" && !a.isContactless) &&
     petition.isInteractionWithRecipientsEnabled;
 
   const showStartSignatureButton =
     isPetition &&
+    isNullish(petition.permanentDeletionAt) &&
     !!petition.signatureConfig?.isEnabled &&
     petition.signatureConfig.review === false &&
     !petition.isInteractionWithRecipientsEnabled &&
@@ -585,7 +588,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           key={petition.id}
           queryObject={queryData}
           petition={petition}
-          onUpdatePetition={handleUpdatePetition}
           onRefetch={() => refetch()}
           section="preview"
           headerActions={
@@ -595,7 +597,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 id="petition-next"
                 colorScheme="primary"
                 icon={<PaperPlaneIcon fontSize="18px" />}
-                isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+                isDisabled={
+                  petition.isAnonymized ||
+                  myEffectivePermission === "READ" ||
+                  isNonNullish(petition.permanentDeletionAt)
+                }
                 label={intl.formatMessage({
                   id: "generic.send-to",
                   defaultMessage: "Send to...",
@@ -608,7 +614,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 id="petition-start-signature"
                 colorScheme="primary"
                 petition={petition}
-                isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+                isDisabled={
+                  petition.isAnonymized ||
+                  myEffectivePermission === "READ" ||
+                  isNonNullish(petition.permanentDeletionAt)
+                }
               />
             ) : null
           }
@@ -627,7 +637,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                     key={activeFieldId}
                     petition={petition}
                     field={activeField}
-                    isDisabled={petition.isAnonymized || petition.__typename === "PetitionTemplate"}
+                    isDisabled={
+                      petition.isAnonymized ||
+                      petition.__typename === "PetitionTemplate" ||
+                      isNonNullish(petition.permanentDeletionAt)
+                    }
                     onClose={() => setActiveFieldId(null)}
                     onAddComment={handleAddComment}
                     onUpdateComment={handleUpdateComment}
@@ -649,6 +663,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                   onMarkAsUnread={handleMarkAsUnread}
                   activeField={activeField}
                   onlyReadPermission={myEffectivePermission === "READ"}
+                  isDisabled={
+                    petition.isAnonymized ||
+                    petition.__typename === "PetitionTemplate" ||
+                    isNonNullish(petition.permanentDeletionAt)
+                  }
                 />
               </Flex>
             </>
@@ -662,7 +681,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               isDisabled={
                 isPetitionUsageLimitReached ||
                 petition.isAnonymized ||
-                myEffectivePermission === "READ"
+                myEffectivePermission === "READ" ||
+                isNonNullish(petition.permanentDeletionAt)
               }
               fontFamily="body"
               width="100%"
@@ -673,45 +693,52 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           )}
           {/* Alerts box */}
           <Box>
-            {!isPetition ? (
-              <PetitionPreviewOnlyAlert
-                onGeneratePrefilledLink={
-                  showGeneratePrefilledPublicLinkButton
-                    ? handleGeneratePrefilledPublicLinkClick
-                    : undefined
-                }
+            {isNonNullish(petition.permanentDeletionAt) ? (
+              <PetitionPermanentDeletionAlert
+                date={petition.permanentDeletionAt}
+                isTemplate={petition.__typename === "PetitionTemplate"}
               />
-            ) : null}
+            ) : (
+              <>
+                {showRefreshRepliesAlert ? (
+                  <RecipientViewRefreshRepliesAlert
+                    onRefetch={async () => {
+                      await refetch();
+                      setShowRefreshRepliesAlert(false);
+                    }}
+                  />
+                ) : null}
 
-            {showRefreshRepliesAlert ? (
-              <RecipientViewRefreshRepliesAlert
-                onRefetch={async () => {
-                  await refetch();
-                  setShowRefreshRepliesAlert(false);
-                }}
-              />
-            ) : null}
+                {showPetitionLimitReachedAlert ? (
+                  <PetitionLimitReachedAlert limit={limitValue} />
+                ) : null}
 
-            {showPetitionLimitReachedAlert ? (
-              <PetitionLimitReachedAlert limit={limitValue} />
-            ) : null}
-
-            {isPetition ? (
-              <PetitionComposeAndPreviewAlerts
-                onCancelApprovals={handleCancelApprovals}
-                onStartApprovals={() => handleStartApprovalFlow()}
-                onStartSignature={handleStartSignature}
-                onClosePetition={() => {
-                  handleClosePetition(petition);
-                }}
-                onCancelSignature={handleCancelSignature}
-                petitionStatus={petition.status}
-                signatureStatus={signatureStatus}
-                approvalsStatus={petition.currentApprovalRequestStatus}
-                signatureAfterApprovals={petition.signatureConfig?.reviewAfterApproval}
-                hasNotStartedApprovals={hasNotStartedApprovals}
-              />
-            ) : null}
+                {isPetition ? (
+                  <PetitionComposeAndPreviewAlerts
+                    onCancelApprovals={handleCancelApprovals}
+                    onStartApprovals={() => handleStartApprovalFlow()}
+                    onStartSignature={handleStartSignature}
+                    onClosePetition={() => {
+                      handleClosePetition(petition);
+                    }}
+                    onCancelSignature={handleCancelSignature}
+                    petitionStatus={petition.status}
+                    signatureStatus={signatureStatus}
+                    approvalsStatus={petition.currentApprovalRequestStatus}
+                    signatureAfterApprovals={petition.signatureConfig?.reviewAfterApproval}
+                    hasNotStartedApprovals={hasNotStartedApprovals}
+                  />
+                ) : (
+                  <PetitionPreviewOnlyAlert
+                    onGeneratePrefilledLink={
+                      showGeneratePrefilledPublicLinkButton
+                        ? handleGeneratePrefilledPublicLinkClick
+                        : undefined
+                    }
+                  />
+                )}
+              </>
+            )}
           </Box>
           {/* End of alerts box */}
           <OverrideWithOrganizationTheme
@@ -792,7 +819,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                                   (isPetition && petition.status === "CLOSED") ||
                                   petition.isAnonymized ||
                                   isPetitionUsageLimitReached ||
-                                  (isPetition && petition.hasStartedProcess)
+                                  (isPetition && petition.hasStartedProcess) ||
+                                  isNonNullish(petition.permanentDeletionAt)
                                 }
                                 isCacheOnly={!isPetition}
                                 myEffectivePermission={myEffectivePermission}
@@ -860,7 +888,10 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                           colorScheme="primary"
                           onClick={handleFinalize}
                           isDisabled={
-                            petition.isAnonymized || isClosed || myEffectivePermission === "READ"
+                            petition.isAnonymized ||
+                            isClosed ||
+                            myEffectivePermission === "READ" ||
+                            isNonNullish(petition.permanentDeletionAt)
                           }
                         >
                           {petition.signatureConfig?.isEnabled &&
@@ -976,6 +1007,7 @@ const _fragments = {
         timezone
         ...ConfirmPetitionSignersDialog_SignatureConfig
       }
+      permanentDeletionAt
       ...useAllFieldsWithIndices_PetitionBase
       ...useGetPetitionPages_PetitionBase
       ...PetitionLayout_PetitionBase

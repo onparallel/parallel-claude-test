@@ -14,7 +14,9 @@ import { validPetitionSignerData } from "../../helpers/validators/validSignature
 import {
   petitionCanUploadCustomSignatureDocument,
   petitionIsNotAnonymized,
+  petitionsAreNotScheduledForDeletion,
   petitionsAreOfTypePetition,
+  petitionSignatureRequestIsNotScheduledForDeletion,
   signatureRequestHasStatus,
   signatureRequestIsNotAnonymized,
   userHasAccessToPetitions,
@@ -34,6 +36,7 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     async (root, args, ctx) => {
       const petition = (await ctx.petitions.loadPetition(args.petitionId))!;
@@ -153,6 +156,7 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"]),
+    petitionSignatureRequestIsNotScheduledForDeletion("petitionSignatureRequestId"),
     signatureRequestIsNotAnonymized("petitionSignatureRequestId"),
     signatureRequestHasStatus("petitionSignatureRequestId", [
       "ENQUEUED", // not processed yet by queue, will be cancelled without processing
@@ -187,6 +191,7 @@ export const updateSignatureRequestMetadata = mutationField("updateSignatureRequ
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"]),
+    petitionSignatureRequestIsNotScheduledForDeletion("petitionSignatureRequestId"),
     signatureRequestIsNotAnonymized("petitionSignatureRequestId"),
   ),
   args: {
@@ -269,6 +274,7 @@ export const sendSignatureRequestReminders = mutationField("sendSignatureRequest
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"]),
+    petitionSignatureRequestIsNotScheduledForDeletion("petitionSignatureRequestId"),
     signatureRequestIsNotAnonymized("petitionSignatureRequestId"),
   ),
   args: {
@@ -303,6 +309,7 @@ export const createCustomSignatureDocumentUploadLink = mutationField(
     authorize: authenticateAnd(
       userHasEnabledIntegration("SIGNATURE"),
       userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       petitionCanUploadCustomSignatureDocument("petitionId"),
       petitionsAreOfTypePetition("petitionId"),
       petitionIsNotAnonymized("petitionId"),

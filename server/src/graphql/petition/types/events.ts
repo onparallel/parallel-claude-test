@@ -131,6 +131,10 @@ export const PetitionEvent = interfaceType({
         return "PetitionApprovalRequestStepFinishedEvent";
       case "PETITION_APPROVAL_REQUEST_STEP_CANCELED":
         return "PetitionApprovalRequestStepCanceledEvent";
+      case "PETITION_SCHEDULED_FOR_DELETION":
+        return "PetitionScheduledForDeletionEvent";
+      case "PETITION_RECOVERED_FROM_DELETION":
+        return "PetitionRecoveredFromDeletionEvent";
     }
   },
   sourceType: "petitionEvents.PetitionEvent",
@@ -993,6 +997,30 @@ export const PetitionApprovalRequestStepCanceledEvent = createPetitionEvent(
         (await ctx.approvalRequests.loadPetitionApprovalRequestStep(
           o.data.petition_approval_request_step_id,
         ))!,
+    });
+  },
+);
+
+export const PetitionScheduledForDeletionEvent = createPetitionEvent(
+  "PetitionScheduledForDeletionEvent",
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
+      },
+    });
+  },
+);
+
+export const PetitionRecoveredFromDeletionEvent = createPetitionEvent(
+  "PetitionRecoveredFromDeletionEvent",
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
+      },
     });
   },
 );

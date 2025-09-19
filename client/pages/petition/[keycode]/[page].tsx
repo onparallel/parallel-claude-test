@@ -261,8 +261,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
       setShowRefreshRepliesAlert(true);
     } else if (
       isApolloError(error, "REPLY_ALREADY_DELETED_ERROR") ||
-      isApolloError(error, "ONGOING_APPROVAL_REQUEST_ERROR") ||
-      isApolloError(error, "ONGOING_SIGNATURE_REQUEST_ERROR")
+      isApolloError(error, "ONGOING_PROCESS_ERROR")
     ) {
       await refetchAccess();
     } else if (

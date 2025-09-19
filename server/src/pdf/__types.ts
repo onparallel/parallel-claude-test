@@ -1627,6 +1627,8 @@ export type Mutation = {
   publicUpdatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
+  /** Recover a list of petitions from the recycle bin */
+  recoverPetitionsFromDeletion: Success;
   /** Rejects the current approval request step. Step must be in PENDING status. */
   rejectPetitionApprovalRequestStep: PetitionApprovalRequestStep;
   /** Removes an email from AWS SES suppression list */
@@ -1795,8 +1797,6 @@ export type Mutation = {
   /** Updates an existing event subscription for the user's profiles */
   updateProfileEventSubscription: ProfileEventSubscription;
   updateProfileFieldValue: Profile;
-  /** @deprecated use updateProfileFieldValueOptions */
-  updateProfileFieldValueMonitoringStatus: Profile;
   updateProfileFieldValueOptions: ProfileFieldValue;
   /** Updates a profile list view */
   updateProfileListView: ProfileListView;
@@ -2536,6 +2536,7 @@ export type MutationdeletePetitionVariableArgs = {
 };
 
 export type MutationdeletePetitionsArgs = {
+  deletePermanently?: InputMaybe<Scalars["Boolean"]["input"]>;
   dryrun?: InputMaybe<Scalars["Boolean"]["input"]>;
   folders?: InputMaybe<FoldersInput>;
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -2900,6 +2901,11 @@ export type MutationpublicUpdatePetitionFieldRepliesArgs = {
 export type MutationreactivateAccessesArgs = {
   accessIds: Array<Scalars["GID"]["input"]>;
   petitionId: Scalars["GID"]["input"];
+};
+
+export type MutationrecoverPetitionsFromDeletionArgs = {
+  folders?: InputMaybe<FoldersInput>;
+  ids?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationrejectPetitionApprovalRequestStepArgs = {
@@ -3424,12 +3430,6 @@ export type MutationupdateProfileFieldValueArgs = {
   source?: InputMaybe<ProfileFieldValueSource>;
 };
 
-export type MutationupdateProfileFieldValueMonitoringStatusArgs = {
-  enabled: Scalars["Boolean"]["input"];
-  profileId: Scalars["GID"]["input"];
-  profileTypeFieldId: Scalars["GID"]["input"];
-};
-
 export type MutationupdateProfileFieldValueOptionsArgs = {
   data: UpdateProfileFieldValueOptionsDataInput;
   profileId: Scalars["GID"]["input"];
@@ -3891,6 +3891,7 @@ export type Petition = PetitionBase & {
   organization: Organization;
   owner: User;
   path: Scalars["String"]["output"];
+  permanentDeletionAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   profiles: Array<Profile>;
@@ -4216,6 +4217,7 @@ export type PetitionBase = {
   organization: Organization;
   owner: User;
   path: Scalars["String"]["output"];
+  permanentDeletionAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The reminders configuration for the petition. */
@@ -4412,8 +4414,10 @@ export type PetitionEventType =
   | "PETITION_CREATED"
   | "PETITION_DELETED"
   | "PETITION_MESSAGE_BOUNCED"
+  | "PETITION_RECOVERED_FROM_DELETION"
   | "PETITION_REMINDER_BOUNCED"
   | "PETITION_REOPENED"
+  | "PETITION_SCHEDULED_FOR_DELETION"
   | "PETITION_TAGGED"
   | "PETITION_UNTAGGED"
   | "PROFILE_ASSOCIATED"
@@ -4730,6 +4734,7 @@ export type PetitionListViewData = {
   columns: Maybe<Array<PetitionListViewColumn>>;
   fromTemplateId: Maybe<Array<Scalars["GID"]["output"]>>;
   path: Scalars["String"]["output"];
+  scheduledForDeletion: Maybe<Scalars["Boolean"]["output"]>;
   search: Maybe<Scalars["String"]["output"]>;
   searchIn: PetitionListViewSearchIn;
   sharedWith: Maybe<PetitionListViewDataSharedWith>;
@@ -4754,6 +4759,7 @@ export type PetitionListViewDataInput = {
   columns?: InputMaybe<Array<PetitionListViewColumn>>;
   fromTemplateId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   path?: InputMaybe<Scalars["String"]["input"]>;
+  scheduledForDeletion?: InputMaybe<Scalars["Boolean"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   searchIn?: InputMaybe<PetitionListViewSearchIn>;
   sharedWith?: InputMaybe<PetitionSharedWithFilter>;
@@ -4894,6 +4900,15 @@ export type PetitionProgress = {
   internal: PetitionFieldProgress;
 };
 
+export type PetitionRecoveredFromDeletionEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition: Maybe<PetitionBaseMini>;
+  type: PetitionEventType;
+  user: Maybe<User>;
+};
+
 export type PetitionReminder = CreatedAt & {
   /** The access of this petition message. */
   access: PetitionAccess;
@@ -4925,6 +4940,15 @@ export type PetitionReminderType =
   | "MANUAL";
 
 export type PetitionReopenedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition: Maybe<PetitionBaseMini>;
+  type: PetitionEventType;
+  user: Maybe<User>;
+};
+
+export type PetitionScheduledForDeletionEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
@@ -5169,6 +5193,7 @@ export type PetitionTemplate = PetitionBase & {
   organization: Organization;
   owner: User;
   path: Scalars["String"]["output"];
+  permanentDeletionAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The public link linked to this template */
@@ -5607,8 +5632,6 @@ export type ProfileFieldValue = ProfileFieldResponse & {
   expiryDate: Maybe<Scalars["String"]["output"]>;
   field: ProfileTypeField;
   hasActiveMonitoring: Scalars["Boolean"]["output"];
-  /** @deprecated don't use! */
-  hasDraft: Scalars["Boolean"]["output"];
   hasPendingReview: Scalars["Boolean"]["output"];
   hasStoredValue: Scalars["Boolean"]["output"];
   id: Scalars["GID"]["output"];
@@ -6589,6 +6612,7 @@ export type QuerypetitionsArgs = {
   excludeAnonymized?: InputMaybe<Scalars["Boolean"]["input"]>;
   excludePublicTemplates?: InputMaybe<Scalars["Boolean"]["input"]>;
   filters?: InputMaybe<PetitionFilter>;
+  isScheduledForDeletion?: InputMaybe<Scalars["Boolean"]["input"]>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   minEffectivePermission?: InputMaybe<PetitionPermissionType>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
@@ -6700,6 +6724,7 @@ export type QuerytemplatesArgs = {
   category?: InputMaybe<Scalars["String"]["input"]>;
   isOwner?: InputMaybe<Scalars["Boolean"]["input"]>;
   isPublic: Scalars["Boolean"]["input"];
+  isScheduledForDeletion?: InputMaybe<Scalars["Boolean"]["input"]>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   locale?: InputMaybe<PetitionLocale>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;

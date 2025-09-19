@@ -34,6 +34,7 @@ import { useAssociateProfileToPetitionDialog } from "@parallel/components/petiti
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
+import { PetitionPermanentDeletionAlert } from "@parallel/components/petition-compose/PetitionPermanentDeletionAlert";
 import {
   PetitionAccessTable_PetitionAccessFragment,
   PetitionActivity_associateProfileToPetitionDocument,
@@ -442,7 +443,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       key={petition.id}
       queryObject={queryObject}
       petition={petition}
-      onUpdatePetition={handleUpdatePetition}
       onRefetch={() => refetch()}
       section="activity"
       headerActions={
@@ -452,7 +452,9 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       }
     >
       <Box position="sticky" top={0} zIndex={2} className="no-print">
-        {displayPetitionLimitReachedAlert ? (
+        {isNonNullish(petition.permanentDeletionAt) ? (
+          <PetitionPermanentDeletionAlert date={petition.permanentDeletionAt} />
+        ) : displayPetitionLimitReachedAlert ? (
           <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
         ) : null}
       </Box>
@@ -531,6 +533,7 @@ const _fragments = {
           ...FieldErrorDialog_PetitionField
         }
       }
+
       ...useAllFieldsWithIndices_PetitionBase
       ...useConfirmSendReminderDialog_Petition
       ...PetitionProfilesTable_Petition

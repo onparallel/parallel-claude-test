@@ -126,6 +126,27 @@ export const petitionsAreNotPublicTemplates = createPetitionAuthorizer(
   "Petition is public template",
 );
 
+export const petitionsAreNotScheduledForDeletion = createPetitionAuthorizer(
+  (p) => p.deletion_scheduled_at === null,
+  "Petition is scheduled for deletion",
+);
+
+export function petitionSignatureRequestIsNotScheduledForDeletion<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, number>,
+>(argNamePetitionSignatureRequestId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const signature = await ctx.petitions.loadPetitionSignatureById(
+      getArg(args, argNamePetitionSignatureRequestId),
+    );
+    assert(signature);
+    const petition = await ctx.petitions.loadPetition(signature.petition_id);
+
+    return petition?.deletion_scheduled_at === null;
+  };
+}
+
 export const petitionsAreOfTypePetition = createPetitionAuthorizer((p) => !p.is_template);
 export const petitionsHaveEnabledInteractionWithRecipients = createPetitionAuthorizer(
   (p) => p.enable_interaction_with_recipients,
@@ -1538,14 +1559,17 @@ export function commentIsNotFromApprovalRequest<
 export function petitionDoesNotHaveStartedProcess<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const [process] = await ctx.petitions.getPetitionStartedProcesses(getArg(args, argName));
-    if (isNonNullish(process)) {
+    const [processType] = await ctx.petitions.getPetitionStartedProcesses(
+      unMaybeArray(getArg(args, argName)),
+    );
+    if (isNonNullish(processType)) {
       throw new ApolloError(
-        `Petition has an ongoing ${process.toLowerCase()} process`,
-        `ONGOING_${process}_REQUEST_ERROR`,
+        `Petition has an ongoing ${processType.toLowerCase()} process`,
+        `ONGOING_PROCESS_ERROR`,
+        { processType },
       );
     }
 

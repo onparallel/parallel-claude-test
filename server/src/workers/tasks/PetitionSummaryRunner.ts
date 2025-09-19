@@ -63,7 +63,12 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
 
     const summaryConfig = petition?.summary_config;
 
-    if (isNullish(petition) || petition.is_template || isNullish(summaryConfig)) {
+    if (
+      isNullish(petition) ||
+      petition.is_template ||
+      petition.deletion_scheduled_at !== null ||
+      isNullish(summaryConfig)
+    ) {
       throw new Error("Petition not found or summary_config is not defined");
     }
 

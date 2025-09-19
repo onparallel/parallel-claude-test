@@ -449,6 +449,7 @@ export class DashboardRepository extends BaseRepository {
       this.from({ p: "petition" })
         .where("p.org_id", orgId)
         .where("p.is_template", false)
+        .whereNull("p.deletion_scheduled_at")
         .whereNull("p.deleted_at")
         .mmodify(function (q) {
           builders.forEach((b) => b.call(this, q));

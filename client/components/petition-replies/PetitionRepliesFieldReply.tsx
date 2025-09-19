@@ -170,6 +170,7 @@ export function PetitionRepliesFieldReply({
               <GridItem paddingBottom={1}>
                 <CopyOrDownloadReplyButton
                   reply={reply}
+                  isDisabled={reply.isAnonymized || !!petition.permanentDeletionAt}
                   petitionFieldType={petitionField.type}
                   content={content}
                   onAction={handleAction}
@@ -646,6 +647,7 @@ PetitionRepliesFieldReply.fragments = {
     fragment PetitionRepliesFieldReply_Petition on Petition {
       id
       isReviewFlowEnabled
+      permanentDeletionAt
     }
     ${getReplyContents.fragments.PetitionField}
   `,

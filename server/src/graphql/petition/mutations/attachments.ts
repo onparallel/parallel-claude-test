@@ -20,6 +20,7 @@ import {
   petitionIsNotAnonymized,
   petitionsAreEditable,
   petitionsAreNotPublicTemplates,
+  petitionsAreNotScheduledForDeletion,
   userHasAccessToPetitions,
 } from "../authorizers";
 import { petitionCanUploadAttachments } from "./authorizers";
@@ -31,6 +32,7 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
     type: "PetitionFieldAttachmentUploadData",
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       fieldsBelongsToPetition("petitionId", "fieldId"),
       petitionsAreNotPublicTemplates("petitionId"),
     ),
@@ -87,6 +89,7 @@ export const petitionFieldAttachmentUploadComplete = mutationField(
     },
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       fieldsBelongsToPetition("petitionId", "fieldId"),
       fieldAttachmentBelongsToField("fieldId", "attachmentId"),
     ),
@@ -113,6 +116,7 @@ export const deletePetitionFieldAttachment = mutationField("deletePetitionFieldA
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldAttachmentBelongsToField("fieldId", "attachmentId"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -179,6 +183,7 @@ export const createPetitionAttachmentUploadLink = mutationField(
     type: list("PetitionAttachmentUploadData"),
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       petitionsAreNotPublicTemplates("petitionId"),
       petitionIsNotAnonymized("petitionId"),
       petitionsAreEditable("petitionId"),
@@ -256,6 +261,7 @@ export const petitionAttachmentUploadComplete = mutationField("petitionAttachmen
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -283,6 +289,7 @@ export const deletePetitionAttachment = mutationField("deletePetitionAttachment"
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -345,6 +352,7 @@ export const reorderPetitionAttachments = mutationField("reorderPetitionAttachme
   type: "PetitionBase",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionAttachmentBelongsToPetition("petitionId", "attachmentIds"),
     isValidPetitionAttachmentReorder("petitionId", "attachmentType", "attachmentIds"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -374,6 +382,7 @@ export const updatePetitionAttachmentType = mutationField("updatePetitionAttachm
   type: "PetitionAttachment",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -405,6 +414,7 @@ export const updatePetitionAttachmentVisibility = mutationField(
     type: "PetitionAttachment",
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
       petitionsAreNotPublicTemplates("petitionId"),
       petitionIsNotAnonymized("petitionId"),

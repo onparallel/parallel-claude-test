@@ -108,6 +108,7 @@ export function PetitionListHeader({
         "approvals",
         "sort",
         "columns",
+        "scheduledForDeletion",
       ]) as Omit<PetitionListViewData, "__typename">,
     );
   }, [queryState, views]);
@@ -150,6 +151,7 @@ export function PetitionListHeader({
               "approvals",
               "sort",
               "columns",
+              "scheduledForDeletion",
             ]),
           } as PetitionListViewDataInput,
         },
@@ -157,7 +159,8 @@ export function PetitionListHeader({
       if (isNonNullish(data)) {
         setQueryState({
           view: data.createPetitionListView.id,
-          ...omit(data.createPetitionListView.data, ["__typename"]),
+          ...omit(data.createPetitionListView.data, ["__typename", "scheduledForDeletion"]),
+          scheduledForDeletion: data.createPetitionListView.data.scheduledForDeletion ?? undefined,
         });
       }
     } catch (error) {
@@ -187,6 +190,7 @@ export function PetitionListHeader({
             "fromTemplateId",
             "search",
             "approvals",
+            "scheduledForDeletion",
           ]),
         ).some(isNonNullish)
       ) {
@@ -224,6 +228,7 @@ export function PetitionListHeader({
                     "path",
                     "sort",
                     "columns",
+                    "scheduledForDeletion",
                   ]),
                 }),
           } as PetitionListViewDataInput,
@@ -362,6 +367,7 @@ PetitionListHeader.fragments = {
           direction
         }
         columns
+        scheduledForDeletion
       }
       isDefault
       type

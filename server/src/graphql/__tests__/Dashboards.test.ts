@@ -147,6 +147,8 @@ describe("GraphQL / Dashboards", () => {
   let otherUser: User;
   let otherTemplate: Petition;
 
+  let templateScheduledForDeletion: Petition;
+
   let otherProfileType: ProfileType;
   let otherProfileTypeField: ProfileTypeField;
 
@@ -172,6 +174,14 @@ describe("GraphQL / Dashboards", () => {
     ));
 
     [userTemplate] = await mocks.createRandomTemplates(organization.id, user.id, 1);
+    [templateScheduledForDeletion] = await mocks.createRandomTemplates(
+      organization.id,
+      user.id,
+      1,
+      () => ({
+        deletion_scheduled_at: new Date(),
+      }),
+    );
 
     [otherOrg] = await mocks.createRandomOrganizations(1);
     [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
@@ -904,6 +914,43 @@ describe("GraphQL / Dashboards", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("sends error when passing a template that is scheduled for deletion", async () => {
+      const [template] = await mocks.createRandomTemplates(organization.id, user.id, 1, () => ({
+        deletion_scheduled_at: new Date(),
+      }));
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: CreatePetitionButtonDashboardModuleSettingsInput!
+          ) {
+            createCreatePetitionButtonDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "KYC",
+          size: "SMALL",
+          settings: {
+            templateId: toGlobalId("Petition", template.id),
+            buttonLabel: "Start KYC...",
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("createPetitionsNumberDashboardModule", () => {
@@ -1013,6 +1060,51 @@ describe("GraphQL / Dashboards", () => {
           settings: {
             filters: {
               fromTemplateId: [toGlobalId("Petition", otherTemplate.id)],
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        argName: "settings.filters.fromTemplateId[0]",
+        message: "Template not found",
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error when passing a template that is scheduled for deletion", async () => {
+      const [template] = await mocks.createRandomTemplates(organization.id, user.id, 1, () => ({
+        deletion_scheduled_at: new Date(),
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: PetitionsNumberDashboardModuleSettingsInput!
+          ) {
+            createPetitionsNumberDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Number of petitions",
+          size: "SMALL",
+          settings: {
+            filters: {
+              fromTemplateId: toGlobalId("Petition", template.id),
             },
           },
         },
@@ -1615,6 +1707,55 @@ describe("GraphQL / Dashboards", () => {
                 fromTemplateId: [toGlobalId("Petition", otherTemplate.id)],
               },
               { status: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"] },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        argName: "settings.filters[0].fromTemplateId[0]",
+        message: "Template not found",
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error when passing a template that is scheduled for deletion", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $title: String!
+            $size: DashboardModuleSize!
+            $settings: PetitionsRatioDashboardModuleSettingsInput!
+          ) {
+            createPetitionsRatioDashboardModule(
+              dashboardId: $dashboardId
+              title: $title
+              size: $size
+              settings: $settings
+            ) {
+              id
+              modules {
+                id
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          title: "Ratio of petitions",
+          size: "SMALL",
+          settings: {
+            graphicType: "RATIO",
+            filters: [
+              {
+                status: ["DRAFT", "PENDING"],
+                fromTemplateId: toGlobalId("Petition", templateScheduledForDeletion.id),
+              },
+              {
+                status: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"],
+                fromTemplateId: toGlobalId("Petition", templateScheduledForDeletion.id),
+              },
             ],
           },
         },
@@ -3468,6 +3609,51 @@ describe("GraphQL / Dashboards", () => {
           },
         },
       });
+    });
+
+    it("sends error when passing a template that is scheduled for deletion", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $dashboardId: GID!
+            $moduleId: GID!
+            $data: UpdateCreatePetitionButtonDashboardModuleInput!
+          ) {
+            updateCreatePetitionButtonDashboardModule(
+              dashboardId: $dashboardId
+              moduleId: $moduleId
+              data: $data
+            ) {
+              id
+              title
+              size
+              ... on DashboardCreatePetitionButtonModule {
+                settings {
+                  label
+                  template {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
+          moduleId: toGlobalId("DashboardModule", modules[0].id),
+          data: {
+            title: "Updated Button",
+            size: "MEDIUM",
+            settings: {
+              buttonLabel: "Create New KYC",
+              templateId: toGlobalId("Petition", templateScheduledForDeletion.id),
+            },
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 

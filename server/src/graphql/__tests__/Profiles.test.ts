@@ -1723,6 +1723,49 @@ describe("GraphQL/Profiles", () => {
         ],
       });
     });
+
+    it("queries associated petitions of a profile, ignoring petitions that are scheduled for deletion", async () => {
+      const petitions = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        2,
+        (i) => ({ deletion_scheduled_at: i === 0 ? new Date() : null }),
+      );
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+
+      const profileId = fromGlobalId(profile.id, "Profile").id;
+
+      await mocks.knex.from("petition_profile").insert([
+        { petition_id: petitions[0].id, profile_id: profileId },
+        { petition_id: petitions[1].id, profile_id: profileId },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($profileId: GID!) {
+            profile(profileId: $profileId) {
+              id
+              associatedPetitions(limit: 10) {
+                items {
+                  id
+                }
+                totalCount
+              }
+            }
+          }
+        `,
+        { profileId: toGlobalId("Profile", profileId) },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profile).toEqual({
+        id: toGlobalId("Profile", profileId),
+        associatedPetitions: {
+          items: [{ id: toGlobalId("Petition", petitions[1].id) }],
+          totalCount: 1,
+        },
+      });
+    });
   });
 
   describe("profileTypes", () => {
@@ -9683,7 +9726,101 @@ describe("GraphQL/Profiles", () => {
       expect(data).toBeNull();
     });
 
-    it("removes relation between profile and petition if petition is deleted", async () => {
+    it("removes relation between profile and petition if petition is permanently deleted", async () => {
+      const { errors: linkErrors, data: linkData } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $profileId: GID!) {
+            associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
+              profile {
+                id
+                associatedPetitions(limit: 10) {
+                  items {
+                    id
+                  }
+                  totalCount
+                }
+              }
+              petition {
+                id
+                profiles {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          profileId: toGlobalId("Profile", profile.id),
+        },
+      );
+
+      expect(linkErrors).toBeUndefined();
+      expect(linkData?.associateProfileToPetition).toEqual({
+        profile: {
+          id: toGlobalId("Profile", profile.id),
+          associatedPetitions: {
+            items: [{ id: toGlobalId("Petition", petition.id) }],
+            totalCount: 1,
+          },
+        },
+        petition: {
+          id: toGlobalId("Petition", petition.id),
+          profiles: [{ id: toGlobalId("Profile", profile.id) }],
+        },
+      });
+
+      const { errors: deleteError, data: deleteData } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!) {
+            deletePetitions(ids: [$petitionId], deletePermanently: true)
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+        },
+      );
+
+      expect(deleteError).toBeUndefined();
+      expect(deleteData?.deletePetitions).toEqual("SUCCESS");
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($profileId: GID!) {
+            profile(profileId: $profileId) {
+              id
+              associatedPetitions(limit: 10) {
+                items {
+                  id
+                }
+                totalCount
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+        },
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData?.profile).toEqual({
+        id: toGlobalId("Profile", profile.id),
+        associatedPetitions: { items: [], totalCount: 0 },
+      });
+
+      const petitionProfile = await mocks.knex
+        .from("petition_profile")
+        .where({
+          petition_id: petition.id,
+          profile_id: profile.id,
+        })
+        .select("*");
+
+      expect(petitionProfile).toHaveLength(0);
+    });
+
+    it("do not remove relation between profile and petition if petition is sent to bin", async () => {
       const { errors: linkErrors, data: linkData } = await testClient.execute(
         gql`
           mutation ($petitionId: GID!, $profileId: GID!) {
@@ -9774,7 +9911,7 @@ describe("GraphQL/Profiles", () => {
         })
         .select("*");
 
-      expect(petitionProfile).toHaveLength(0);
+      expect(petitionProfile).toHaveLength(1);
     });
 
     it("removes relation between profile and petition if profile is deleted", async () => {

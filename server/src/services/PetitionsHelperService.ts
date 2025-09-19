@@ -27,11 +27,7 @@ import {
   AdverseMediaSearchContent,
   IAdverseMediaSearchService,
 } from "./AdverseMediaSearchService";
-import {
-  BACKGROUND_CHECK_SERVICE,
-  BackgroundCheckContent,
-  IBackgroundCheckService,
-} from "./BackgroundCheckService";
+import { BackgroundCheckContent } from "./BackgroundCheckService";
 import { ENCRYPTION_SERVICE, IEncryptionService } from "./EncryptionService";
 import {
   IOrganizationCreditsService,
@@ -50,7 +46,6 @@ export class PetitionsHelperService {
     @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: IOrganizationCreditsService,
     @inject(ENCRYPTION_SERVICE) private encryption: IEncryptionService,
     @inject(ADVERSE_MEDIA_SEARCH_SERVICE) private adverseMedia: IAdverseMediaSearchService,
-    @inject(BACKGROUND_CHECK_SERVICE) private backgroundCheck: IBackgroundCheckService,
   ) {}
 
   async userCanWriteOnPetitionField(
@@ -86,11 +81,12 @@ export class PetitionsHelperService {
       );
     }
 
-    const [process] = await this.petitions.getPetitionStartedProcesses(petitionId);
-    if (isNonNullish(process)) {
+    const [processType] = await this.petitions.getPetitionStartedProcesses(petitionId);
+    if (isNonNullish(processType)) {
       throw new ApolloError(
-        `Petition has an ongoing ${process.toLowerCase()} process`,
-        `ONGOING_${process}_REQUEST_ERROR`,
+        `Petition has an ongoing ${processType.toLowerCase()} process`,
+        `ONGOING_PROCESS_ERROR`,
+        { processType },
       );
     }
     if (isNonNullish(overwriteReplyId)) {

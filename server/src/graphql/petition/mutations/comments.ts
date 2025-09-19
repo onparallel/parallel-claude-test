@@ -16,6 +16,7 @@ import {
   fieldsBelongsToPetition,
   fieldsHaveCommentsEnabled,
   petitionIsNotAnonymized,
+  petitionsAreNotScheduledForDeletion,
   petitionsAreOfTypePetition,
   userHasAccessToPetitions,
   userIsOwnerOfPetitionFieldComment,
@@ -57,6 +58,7 @@ export const createPetitionComment = mutationField("createPetitionComment", {
     petitionIsNotAnonymized("petitionId"),
     usersCanBeMentionedInComment("content"),
     petitionsAreOfTypePetition("petitionId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
   ),
   validateArgs: validateCommentContentSchema("content"),
   args: {
@@ -122,6 +124,7 @@ export const deletePetitionComment = mutationField("deletePetitionComment", {
   type: "PetitionFieldOrPetition",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
     userIsOwnerOfPetitionFieldComment("petitionFieldCommentId"),
     petitionIsNotAnonymized("petitionId"),
@@ -169,6 +172,7 @@ export const updatePetitionComment = mutationField("updatePetitionComment", {
     petitionIsNotAnonymized("petitionId"),
     usersCanBeMentionedInComment("content"),
     commentIsNotFromApprovalRequest("petitionFieldCommentId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),

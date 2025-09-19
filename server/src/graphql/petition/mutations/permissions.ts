@@ -1,10 +1,10 @@
 import { booleanArg, list, mutationField, nonNull } from "nexus";
 import { Petition } from "../../../db/__types";
-import { authenticate, authenticateAnd, chain } from "../../helpers/authorize";
+import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { validateAnd } from "../../helpers/validateArgs";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
-import { userHasAccessToPetitions } from "../authorizers";
+import { petitionsAreNotScheduledForDeletion, userHasAccessToPetitions } from "../authorizers";
 import { userHasAccessToUsers } from "./authorizers";
 
 export const transferPetitionOwnership = mutationField("transferPetitionOwnership", {
@@ -13,6 +13,7 @@ export const transferPetitionOwnership = mutationField("transferPetitionOwnershi
   type: list(nonNull("PetitionBase")),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER"]),
+    petitionsAreNotScheduledForDeletion("petitionIds"),
     userHasAccessToUsers("userId"),
   ),
 
@@ -50,7 +51,10 @@ export const updatePetitionPermissionSubscription = mutationField(
   {
     description: "Updates the subscription flag on a PetitionPermission",
     type: "Petition",
-    authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
+    authorize: authenticateAnd(
+      userHasAccessToPetitions("petitionId"),
+      petitionsAreNotScheduledForDeletion("petitionId"),
+    ),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
       isSubscribed: nonNull(booleanArg()),

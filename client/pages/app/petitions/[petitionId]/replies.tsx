@@ -17,12 +17,12 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import {
   PetitionLayout,
-  usePetitionStateWrapper,
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
 import { useAssociateProfileToPetitionDialog } from "@parallel/components/petition-common/dialogs/AssociateProfileToPetitionDialog";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
+import { PetitionPermanentDeletionAlert } from "@parallel/components/petition-compose/PetitionPermanentDeletionAlert";
 import { PetitionApprovalsCard } from "@parallel/components/petition-replies/PetitionApprovalsCard";
 import {
   PetitionRepliesField,
@@ -44,10 +44,8 @@ import {
   PetitionReplies_PetitionFragment,
   PetitionReplies_associateProfileToPetitionDocument,
   PetitionReplies_petitionDocument,
-  PetitionReplies_updatePetitionDocument,
   PetitionReplies_updatePetitionFieldRepliesStatusDocument,
   PetitionReplies_userDocument,
-  UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { Fragments } from "@parallel/utils/apollo/fragments";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
@@ -164,8 +162,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     setTimeout(() => highlight(element));
   });
 
-  const wrapper = usePetitionStateWrapper();
-  const [updatePetition] = useMutation(PetitionReplies_updatePetitionDocument);
   const downloadReplyFile = useDownloadReplyFile();
   const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
   const updatePetitionFieldRepliesStatus = useUpdatePetitionFieldRepliesStatus();
@@ -196,13 +192,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }
 
   const { handleClosePetition } = useClosePetition({ onRefetch: () => refetch() });
-
-  const handleUpdatePetition = useCallback(
-    wrapper(async (data: UpdatePetitionInput) => {
-      return await updatePetition({ variables: { petitionId, data } });
-    }),
-    [petitionId],
-  );
 
   const { openWindow } = useManagedWindow({
     onRefreshField: refetch,
@@ -518,12 +507,14 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const hasApprovals = petition.approvalFlowConfig && petition.approvalFlowConfig.length > 0;
 
+  const isAnonymizedOrDeletionScheduled =
+    petition.isAnonymized || isNonNullish(petition.permanentDeletionAt);
+
   return (
     <PetitionLayout
       key={petition.id}
       queryObject={queryObject}
       petition={petition}
-      onUpdatePetition={handleUpdatePetition}
       onRefetch={() => refetch()}
       section="replies"
       headerActions={
@@ -539,7 +530,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             profiles={petition.profiles}
             onChangeProfile={setProfileId}
             onAssociateProfile={handleAssociateProfile}
-            isReadOnly={petition.isAnonymized}
+            isReadOnly={isAnonymizedOrDeletionScheduled}
             canAddProfiles={petition.myEffectivePermission?.permissionType !== "READ"}
             petitionId={petitionId}
             petition={petition}
@@ -562,7 +553,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 key={activeFieldId}
                 petition={petition}
                 field={activeField}
-                isDisabled={petition.isAnonymized}
+                isDisabled={isAnonymizedOrDeletionScheduled}
                 onClose={() => setActiveFieldId(null)}
                 onAddComment={handleAddComment}
                 onUpdateComment={handleUpdateComment}
@@ -591,6 +582,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               onRefetch={() => {
                 refetch();
               }}
+              isDisabled={isAnonymizedOrDeletionScheduled}
             />
           </Flex>
         </>
@@ -613,10 +605,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             id: "generic.reload-data",
             defaultMessage: "Reload",
           })}
+          isDisabled={isAnonymizedOrDeletionScheduled}
         />
         {petition.status === "CLOSED" ||
-        petition.isAnonymized ||
-        myEffectivePermission === "READ" ? null : (
+        myEffectivePermission === "READ" ||
+        isAnonymizedOrDeletionScheduled ? null : (
           <Button
             data-action="close-petition"
             colorScheme="primary"
@@ -663,7 +656,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             }
           />
         ) : null}
-        {showDownloadAll && !petition.isAnonymized ? (
+        {showDownloadAll && !isAnonymizedOrDeletionScheduled ? (
           <ResponsiveButtonIcon
             icon={<DownloadIcon fontSize="lg" display="block" />}
             onClick={handleDownloadAllClick}
@@ -673,7 +666,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             })}
           />
         ) : null}
-        {petition.isDocumentGenerationEnabled && !petition.isAnonymized ? (
+        {petition.isDocumentGenerationEnabled && !isAnonymizedOrDeletionScheduled ? (
           <ResponsiveButtonIcon
             icon={<FilePdfIcon fontSize="lg" display="block" />}
             onClick={() => setTimeout(() => handlePrintPdfTask(petition.id), 100)}
@@ -686,7 +679,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       </HStack>
       <Box flex={1} overflow="auto" minHeight={0}>
         <Box position="sticky" top={0} zIndex={2}>
-          {displayPetitionLimitReachedAlert ? (
+          {isNonNullish(petition.permanentDeletionAt) ? (
+            <PetitionPermanentDeletionAlert date={petition.permanentDeletionAt} />
+          ) : displayPetitionLimitReachedAlert ? (
             <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
           ) : null}
         </Box>
@@ -699,7 +694,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               onRefetchPetition={refetch}
               onToggleGeneralComments={handleToggleGeneralComments}
               isShowingGeneralComments={activeFieldId === GENERAL_COMMENTS_FIELD_ID}
-              isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+              isDisabled={isAnonymizedOrDeletionScheduled || myEffectivePermission === "READ"}
             />
           ) : petition.isDocumentGenerationEnabled ? (
             <PetitionSignaturesCard
@@ -712,7 +707,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               onRefetchPetition={refetch}
               onToggleGeneralComments={handleToggleGeneralComments}
               isShowingGeneralComments={activeFieldId === GENERAL_COMMENTS_FIELD_ID}
-              isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+              isDisabled={isAnonymizedOrDeletionScheduled || myEffectivePermission === "READ"}
             />
           ) : null}
           {petition.variables.length ? (
@@ -751,7 +746,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                           handleUpdateRepliesStatus(fieldId, [replyId], status, x.field.id)
                         }
                         isDisabled={
-                          myEffectivePermission === "READ" || petition.status === "CLOSED"
+                          myEffectivePermission === "READ" ||
+                          petition.status === "CLOSED" ||
+                          isNonNullish(petition.permanentDeletionAt)
                         }
                         filter={filter}
                         fieldLogic={x.fieldLogic!}
@@ -801,6 +798,7 @@ PetitionReplies.fragments = {
         approvalFlowConfig {
           ...Fragments_FullApprovalFlowConfig
         }
+        permanentDeletionAt
         ...PetitionLayout_PetitionBase
         ...PetitionRepliesField_Petition
         ...PetitionVariablesCard_PetitionBase

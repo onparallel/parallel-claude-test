@@ -26,6 +26,7 @@ interface CopyOrDownloadReplyButtonProps {
   petitionFieldType: PetitionFieldType;
   content: any;
   onAction: (action: PetitionRepliesFieldAction) => void;
+  isDisabled?: boolean;
 }
 
 export function CopyOrDownloadReplyButton({
@@ -33,13 +34,14 @@ export function CopyOrDownloadReplyButton({
   petitionFieldType,
   content,
   onAction,
+  isDisabled,
 }: CopyOrDownloadReplyButtonProps) {
   const intl = useIntl();
   return (
     <Stack spacing={1}>
       {petitionFieldType === "BACKGROUND_CHECK" ? (
         <IconButtonWithTooltip
-          isDisabled={reply.isAnonymized}
+          isDisabled={isDisabled}
           onClick={() => onAction(isNonNullish(content?.entity) ? "VIEW_DETAILS" : "VIEW_RESULTS")}
           icon={<EyeIcon />}
           size="xs"
@@ -57,7 +59,7 @@ export function CopyOrDownloadReplyButton({
         />
       ) : petitionFieldType === "ADVERSE_MEDIA_SEARCH" ? (
         <IconButtonWithTooltip
-          isDisabled={reply.isAnonymized}
+          isDisabled={isDisabled}
           onClick={() => onAction("VIEW_ARTICLES")}
           icon={<EyeIcon />}
           size="xs"
@@ -69,7 +71,7 @@ export function CopyOrDownloadReplyButton({
       ) : isFileTypeField(petitionFieldType) ? (
         <>
           <ReplyDownloadButton
-            isDisabled={reply.isAnonymized || content.uploadComplete === false || content.error}
+            isDisabled={!!isDisabled || content.uploadComplete === false || content.error}
             contentType={reply.isAnonymized ? "" : content.contentType}
             onDownload={(preview) => onAction(preview ? "PREVIEW_FILE" : "DOWNLOAD_FILE")}
           />
@@ -84,11 +86,12 @@ export function CopyOrDownloadReplyButton({
           size="xs"
           fontSize="md"
           text={petitionFieldType === "PROFILE_SEARCH" ? content.search : content}
-          isDisabled={reply.isAnonymized}
+          isDisabled={isDisabled}
         />
       )}
       {reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
         <NetDocumentsIconButton
+          isDisabled={isDisabled}
           externalId={reply.metadata.EXTERNAL_ID_CUATRECASAS}
           size="xs"
           placement="right"
@@ -96,6 +99,7 @@ export function CopyOrDownloadReplyButton({
       ) : null}
       {reply.metadata.FILE_EXPORT_IMANAGE_URL !== undefined ? (
         <FileExportAccessIconButton
+          isDisabled={isDisabled}
           size="xs"
           placement="right"
           url={reply.metadata.FILE_EXPORT_IMANAGE_URL}

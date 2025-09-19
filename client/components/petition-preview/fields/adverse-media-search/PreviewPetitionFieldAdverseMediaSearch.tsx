@@ -259,7 +259,9 @@ export function PreviewPetitionFieldAdverseMediaSearch({
                   isDisabled={isDisabled || isDeletingReply[reply.id] || reply.isAnonymized}
                   onRemove={() => handleDeleteReply(reply.id)}
                   onViewReply={handleViewReply}
-                  isViewDisabled={isCacheOnly || reply.isAnonymized}
+                  isViewDisabled={
+                    isCacheOnly || reply.isAnonymized || !!petition.permanentDeletionAt
+                  }
                 />
               </motion.li>
             ))}
@@ -276,6 +278,7 @@ export function PreviewPetitionFieldAdverseMediaSearch({
                   article={article}
                   isDisabled={isDisabled}
                   onViewArticle={() => handleViewArticle(article.id)}
+                  isViewDisabled={isCacheOnly || !!petition.permanentDeletionAt}
                 />
               </motion.li>
             ))}
@@ -590,6 +593,7 @@ PreviewPetitionFieldAdverseMediaSearch.fragments = {
           ...PreviewPetitionFieldAdverseMediaSearch_PetitionField
         }
       }
+      permanentDeletionAt
       ...useFieldLogic_PetitionBase
     }
     ${useFieldLogic.fragments.PetitionBase}

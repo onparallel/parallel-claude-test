@@ -65,6 +65,7 @@ import { userHasAccessToIntegrations } from "../integrations/authorizers";
 import {
   petitionIsNotAnonymized,
   petitionsAreNotPublicTemplates,
+  petitionsAreNotScheduledForDeletion,
   petitionsAreOfTypeTemplate,
   repliesBelongsToPetition,
   replyIsForFieldOfType,
@@ -1591,6 +1592,7 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
     userHasPermissionOnProfileTypeField("profileTypeFieldId", "WRITE"),
     profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
     userHasAccessToPetitions("petitionId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     repliesBelongsToPetition("petitionId", "fileReplyIds"),
     replyIsForFieldOfType("fileReplyIds", [
@@ -1690,6 +1692,7 @@ export const copyReplyContentToProfileFieldValue = mutationField(
       profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
       userHasPermissionOnProfileTypeField("profileTypeFieldId", "WRITE"),
       userHasAccessToPetitions("petitionId"),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       petitionIsNotAnonymized("petitionId"),
       repliesBelongsToPetition("petitionId", "replyId"),
       replyIsForFieldOfType("replyId", ["BACKGROUND_CHECK", "ADVERSE_MEDIA_SEARCH"]),
@@ -1863,6 +1866,7 @@ export const associateProfileToPetition = mutationField("associateProfileToPetit
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     userHasAccessToProfile("profileId"),
     profileIsNotAnonymized("profileId"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -1894,6 +1898,8 @@ export const disassociateProfilesFromPetitions = mutationField(
       userHasFeatureFlag("PROFILES"),
       userHasAccessToProfile("profileIds"),
       profileIsNotAnonymized("profileIds"),
+      userHasAccessToPetitions("petitionIds"),
+      petitionsAreNotScheduledForDeletion("petitionIds"),
       petitionIsNotAnonymized("petitionIds"),
       profileIsAssociatedToPetition("profileIds", "petitionIds"),
       profileHasStatus("profileIds", ["OPEN", "CLOSED"]),
@@ -2603,6 +2609,7 @@ export const createProfileTypeProcess = mutationField("createProfileTypeProcess"
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
     userHasAccessToProfileType("profileTypeId"),
     userHasAccessToPetitions("templateIds"),
+    petitionsAreNotScheduledForDeletion("templateIds"),
     petitionsAreOfTypeTemplate("templateIds"),
     petitionsAreNotPublicTemplates("templateIds"),
   ),
@@ -2638,6 +2645,10 @@ export const editProfileTypeProcess = mutationField("editProfileTypeProcess", {
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
     userHasAccessToProfileTypeProcess("profileTypeProcessId"),
     userHasAccessToEditProfileTypeProcessInput("data"),
+    ifArgDefined(
+      "data.templateIds",
+      petitionsAreNotScheduledForDeletion("data.templateIds" as never),
+    ),
   ),
   args: {
     profileTypeProcessId: nonNull(globalIdArg("ProfileTypeProcess")),
@@ -2766,38 +2777,6 @@ export const profileImportExcelModelDownloadLink = mutationField(
         filename,
         "attachment",
       );
-    },
-  },
-);
-
-/** @deprecated */
-export const updateProfileFieldValueMonitoringStatus = mutationField(
-  "updateProfileFieldValueMonitoringStatus",
-  {
-    deprecation: "use updateProfileFieldValueOptions",
-    type: "Profile",
-    authorize: authenticateAnd(
-      userHasFeatureFlag("PROFILES"),
-      userHasAccessToProfile("profileId"),
-      profileHasStatus("profileId", "OPEN"),
-      profileIsNotAnonymized("profileId"),
-      profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
-      userHasPermissionOnProfileTypeField("profileTypeFieldId", "WRITE"),
-      profileTypeFieldIsOfType("profileTypeFieldId", ["ADVERSE_MEDIA_SEARCH"]),
-    ),
-    args: {
-      profileId: nonNull(globalIdArg("Profile")),
-      profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
-      enabled: nonNull(booleanArg()),
-    },
-    resolve: async (_, args, ctx) => {
-      await ctx.profiles.updateProfileFieldValueOptionsByProfileId(
-        args.profileId,
-        args.profileTypeFieldId,
-        { active_monitoring: args.enabled },
-      );
-
-      return (await ctx.profiles.loadProfile(args.profileId))!;
     },
   },
 );

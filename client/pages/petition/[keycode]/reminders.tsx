@@ -25,6 +25,7 @@ import {
   OptOut_remindersOptOutDocument,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
+import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useReminderOptOutReasons } from "@parallel/utils/useReminderOptOutReasons";
 import { GetServerSidePropsContext } from "next";
@@ -58,7 +59,9 @@ function OptOut(props: OptOutProps) {
 
   const handleOptOut = async (event: FormEvent) => {
     event.preventDefault();
-    await publicRemindersOptOut({ variables: { keycode, reason, other, referer: ref as string } });
+    await withError(
+      publicRemindersOptOut({ variables: { keycode, reason, other, referer: ref as string } }),
+    );
     setOptedOut(true);
   };
 

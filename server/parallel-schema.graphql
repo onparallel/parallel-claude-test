@@ -2539,10 +2539,19 @@ type Mutation {
   """
   deletePetitions(
     """
+    Pass true to permanently delete instead of scheduling for deletion
+    """
+    deletePermanently: Boolean = false
+
+    """
     If true, this will do a dry-run of the mutation to throw possible errors but it will not perform any modification in DB
     """
     dryrun: Boolean = false
     folders: FoldersInput
+
+    """
+    Pass true to force deleting petitions shared to other users
+    """
     force: Boolean = false
     ids: [GID!]
   ): Success!
@@ -3071,6 +3080,11 @@ type Mutation {
   Reactivates the specified inactive petition accesses.
   """
   reactivateAccesses(accessIds: [GID!]!, petitionId: GID!): [PetitionAccess!]!
+
+  """
+  Recover a list of petitions from the recycle bin
+  """
+  recoverPetitionsFromDeletion(folders: FoldersInput, ids: [GID!]): Success!
 
   """
   Rejects the current approval request step. Step must be in PENDING status.
@@ -3791,11 +3805,6 @@ type Mutation {
     profileId: GID!
     source: ProfileFieldValueSource
   ): Profile!
-  updateProfileFieldValueMonitoringStatus(
-    enabled: Boolean!
-    profileId: GID!
-    profileTypeFieldId: GID!
-  ): Profile! @deprecated(reason: "use updateProfileFieldValueOptions")
   updateProfileFieldValueOptions(
     data: UpdateProfileFieldValueOptionsDataInput!
     profileId: GID!
@@ -4470,6 +4479,7 @@ type Petition implements PetitionBase {
   organization: Organization!
   owner: User!
   path: String!
+  permanentDeletionAt: DateTime
 
   """
   The permissions linked to the petition
@@ -4976,6 +4986,7 @@ interface PetitionBase {
   organization: Organization!
   owner: User!
   path: String!
+  permanentDeletionAt: DateTime
 
   """
   The permissions linked to the petition
@@ -5231,8 +5242,10 @@ enum PetitionEventType {
   PETITION_CREATED
   PETITION_DELETED
   PETITION_MESSAGE_BOUNCED
+  PETITION_RECOVERED_FROM_DELETION
   PETITION_REMINDER_BOUNCED
   PETITION_REOPENED
+  PETITION_SCHEDULED_FOR_DELETION
   PETITION_TAGGED
   PETITION_UNTAGGED
   PROFILE_ASSOCIATED
@@ -5809,6 +5822,7 @@ type PetitionListViewData {
   columns: [PetitionListViewColumn!]
   fromTemplateId: [GID!]
   path: String!
+  scheduledForDeletion: Boolean
   search: String
   searchIn: PetitionListViewSearchIn!
   sharedWith: PetitionListViewDataSharedWith
@@ -5833,6 +5847,7 @@ input PetitionListViewDataInput {
   columns: [PetitionListViewColumn!]
   fromTemplateId: [GID!]
   path: String
+  scheduledForDeletion: Boolean
   search: String
   searchIn: PetitionListViewSearchIn
   sharedWith: PetitionSharedWithFilter
@@ -6073,6 +6088,15 @@ type PetitionProgress {
   internal: PetitionFieldProgress!
 }
 
+type PetitionRecoveredFromDeletionEvent implements PetitionEvent {
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: PetitionBaseMini
+  type: PetitionEventType!
+  user: User
+}
+
 type PetitionReminder implements CreatedAt {
   """
   The access of this petition message.
@@ -6126,6 +6150,15 @@ enum PetitionReminderType {
 }
 
 type PetitionReopenedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: PetitionBaseMini
+  type: PetitionEventType!
+  user: User
+}
+
+type PetitionScheduledForDeletionEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
@@ -6513,6 +6546,7 @@ type PetitionTemplate implements PetitionBase {
   organization: Organization!
   owner: User!
   path: String!
+  permanentDeletionAt: DateTime
 
   """
   The permissions linked to the petition
@@ -7083,7 +7117,6 @@ type ProfileFieldValue implements ProfileFieldResponse {
   expiryDate: String
   field: ProfileTypeField!
   hasActiveMonitoring: Boolean!
-  hasDraft: Boolean! @deprecated(reason: "don't use!")
   hasPendingReview: Boolean!
   hasStoredValue: Boolean!
   id: GID!
@@ -8430,6 +8463,11 @@ type Query {
     filters: PetitionFilter
 
     """
+    Only show petitions scheduled for deletion in result. If falsy, only show petitions not scheduled for deletion
+    """
+    isScheduledForDeletion: Boolean
+
+    """
     Number of elements to take from the list.
     """
     limit: Int
@@ -8582,6 +8620,7 @@ type Query {
     category: String
     isOwner: Boolean
     isPublic: Boolean!
+    isScheduledForDeletion: Boolean
 
     """
     Number of elements to take from the list.

@@ -1732,6 +1732,8 @@ export interface Mutation {
   publicUpdatePetitionFieldReplies: Array<PublicPetitionFieldReply>;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
+  /** Recover a list of petitions from the recycle bin */
+  recoverPetitionsFromDeletion: Success;
   /** Rejects the current approval request step. Step must be in PENDING status. */
   rejectPetitionApprovalRequestStep: PetitionApprovalRequestStep;
   /** Removes an email from AWS SES suppression list */
@@ -1900,8 +1902,6 @@ export interface Mutation {
   /** Updates an existing event subscription for the user's profiles */
   updateProfileEventSubscription: ProfileEventSubscription;
   updateProfileFieldValue: Profile;
-  /** @deprecated use updateProfileFieldValueOptions */
-  updateProfileFieldValueMonitoringStatus: Profile;
   updateProfileFieldValueOptions: ProfileFieldValue;
   /** Updates a profile list view */
   updateProfileListView: ProfileListView;
@@ -2641,6 +2641,7 @@ export interface MutationdeletePetitionVariableArgs {
 }
 
 export interface MutationdeletePetitionsArgs {
+  deletePermanently?: InputMaybe<Scalars["Boolean"]["input"]>;
   dryrun?: InputMaybe<Scalars["Boolean"]["input"]>;
   folders?: InputMaybe<FoldersInput>;
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -3005,6 +3006,11 @@ export interface MutationpublicUpdatePetitionFieldRepliesArgs {
 export interface MutationreactivateAccessesArgs {
   accessIds: Array<Scalars["GID"]["input"]>;
   petitionId: Scalars["GID"]["input"];
+}
+
+export interface MutationrecoverPetitionsFromDeletionArgs {
+  folders?: InputMaybe<FoldersInput>;
+  ids?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 }
 
 export interface MutationrejectPetitionApprovalRequestStepArgs {
@@ -3529,12 +3535,6 @@ export interface MutationupdateProfileFieldValueArgs {
   source?: InputMaybe<ProfileFieldValueSource>;
 }
 
-export interface MutationupdateProfileFieldValueMonitoringStatusArgs {
-  enabled: Scalars["Boolean"]["input"];
-  profileId: Scalars["GID"]["input"];
-  profileTypeFieldId: Scalars["GID"]["input"];
-}
-
 export interface MutationupdateProfileFieldValueOptionsArgs {
   data: UpdateProfileFieldValueOptionsDataInput;
   profileId: Scalars["GID"]["input"];
@@ -4006,6 +4006,7 @@ export interface Petition extends PetitionBase {
   organization: Organization;
   owner: User;
   path: Scalars["String"]["output"];
+  permanentDeletionAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   profiles: Array<Profile>;
@@ -4348,6 +4349,7 @@ export interface PetitionBase {
   organization: Organization;
   owner: User;
   path: Scalars["String"]["output"];
+  permanentDeletionAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The reminders configuration for the petition. */
@@ -4558,8 +4560,10 @@ export type PetitionEventType =
   | "PETITION_CREATED"
   | "PETITION_DELETED"
   | "PETITION_MESSAGE_BOUNCED"
+  | "PETITION_RECOVERED_FROM_DELETION"
   | "PETITION_REMINDER_BOUNCED"
   | "PETITION_REOPENED"
+  | "PETITION_SCHEDULED_FOR_DELETION"
   | "PETITION_TAGGED"
   | "PETITION_UNTAGGED"
   | "PROFILE_ASSOCIATED"
@@ -4892,6 +4896,7 @@ export interface PetitionListViewData {
   columns?: Maybe<Array<PetitionListViewColumn>>;
   fromTemplateId?: Maybe<Array<Scalars["GID"]["output"]>>;
   path: Scalars["String"]["output"];
+  scheduledForDeletion?: Maybe<Scalars["Boolean"]["output"]>;
   search?: Maybe<Scalars["String"]["output"]>;
   searchIn: PetitionListViewSearchIn;
   sharedWith?: Maybe<PetitionListViewDataSharedWith>;
@@ -4918,6 +4923,7 @@ export interface PetitionListViewDataInput {
   columns?: InputMaybe<Array<PetitionListViewColumn>>;
   fromTemplateId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   path?: InputMaybe<Scalars["String"]["input"]>;
+  scheduledForDeletion?: InputMaybe<Scalars["Boolean"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
   searchIn?: InputMaybe<PetitionListViewSearchIn>;
   sharedWith?: InputMaybe<PetitionSharedWithFilter>;
@@ -5068,6 +5074,16 @@ export interface PetitionProgress {
   internal: PetitionFieldProgress;
 }
 
+export interface PetitionRecoveredFromDeletionEvent extends PetitionEvent {
+  __typename?: "PetitionRecoveredFromDeletionEvent";
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition?: Maybe<PetitionBaseMini>;
+  type: PetitionEventType;
+  user?: Maybe<User>;
+}
+
 export interface PetitionReminder extends CreatedAt {
   __typename?: "PetitionReminder";
   /** The access of this petition message. */
@@ -5102,6 +5118,16 @@ export type PetitionReminderType =
 
 export interface PetitionReopenedEvent extends PetitionEvent {
   __typename?: "PetitionReopenedEvent";
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition?: Maybe<PetitionBaseMini>;
+  type: PetitionEventType;
+  user?: Maybe<User>;
+}
+
+export interface PetitionScheduledForDeletionEvent extends PetitionEvent {
+  __typename?: "PetitionScheduledForDeletionEvent";
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
@@ -5354,6 +5380,7 @@ export interface PetitionTemplate extends PetitionBase {
   organization: Organization;
   owner: User;
   path: Scalars["String"]["output"];
+  permanentDeletionAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The public link linked to this template */
@@ -5820,8 +5847,6 @@ export interface ProfileFieldValue extends ProfileFieldResponse {
   expiryDate?: Maybe<Scalars["String"]["output"]>;
   field: ProfileTypeField;
   hasActiveMonitoring: Scalars["Boolean"]["output"];
-  /** @deprecated don't use! */
-  hasDraft: Scalars["Boolean"]["output"];
   hasPendingReview: Scalars["Boolean"]["output"];
   hasStoredValue: Scalars["Boolean"]["output"];
   id: Scalars["GID"]["output"];
@@ -6846,6 +6871,7 @@ export interface QuerypetitionsArgs {
   excludeAnonymized?: InputMaybe<Scalars["Boolean"]["input"]>;
   excludePublicTemplates?: InputMaybe<Scalars["Boolean"]["input"]>;
   filters?: InputMaybe<PetitionFilter>;
+  isScheduledForDeletion?: InputMaybe<Scalars["Boolean"]["input"]>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   minEffectivePermission?: InputMaybe<PetitionPermissionType>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
@@ -6957,6 +6983,7 @@ export interface QuerytemplatesArgs {
   category?: InputMaybe<Scalars["String"]["input"]>;
   isOwner?: InputMaybe<Scalars["Boolean"]["input"]>;
   isPublic: Scalars["Boolean"]["input"];
+  isScheduledForDeletion?: InputMaybe<Scalars["Boolean"]["input"]>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   locale?: InputMaybe<PetitionLocale>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
@@ -9416,6 +9443,7 @@ export type PetitionViewTabs_PetitionListViewDataFragment = {
   searchIn: PetitionListViewSearchIn;
   path: string;
   columns?: Array<PetitionListViewColumn> | null;
+  scheduledForDeletion?: boolean | null;
   sharedWith?: {
     __typename?: "PetitionListViewDataSharedWith";
     operator: FilterSharedWithLogicalOperator;
@@ -9465,6 +9493,7 @@ export type PetitionViewTabs_PetitionListViewFragment = {
     searchIn: PetitionListViewSearchIn;
     path: string;
     columns?: Array<PetitionListViewColumn> | null;
+    scheduledForDeletion?: boolean | null;
     sharedWith?: {
       __typename?: "PetitionListViewDataSharedWith";
       operator: FilterSharedWithLogicalOperator;
@@ -9550,6 +9579,7 @@ export type PetitionViewTabs_createPetitionListViewMutation = {
       searchIn: PetitionListViewSearchIn;
       path: string;
       columns?: Array<PetitionListViewColumn> | null;
+      scheduledForDeletion?: boolean | null;
       sharedWith?: {
         __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
@@ -9613,6 +9643,7 @@ export type PetitionViewTabs_updatePetitionListViewMutation = {
       searchIn: PetitionListViewSearchIn;
       path: string;
       columns?: Array<PetitionListViewColumn> | null;
+      scheduledForDeletion?: boolean | null;
       sharedWith?: {
         __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
@@ -14940,6 +14971,7 @@ export type PetitionHeader_PetitionBase_Petition_Fragment = {
   id: string;
   isDocumentGenerationEnabled: boolean;
   isInteractionWithRecipientsEnabled: boolean;
+  permanentDeletionAt?: string | null;
   path: string;
   locale: PetitionLocale;
   deadline?: string | null;
@@ -14962,6 +14994,7 @@ export type PetitionHeader_PetitionBase_PetitionTemplate_Fragment = {
   id: string;
   isDocumentGenerationEnabled: boolean;
   isInteractionWithRecipientsEnabled: boolean;
+  permanentDeletionAt?: string | null;
   path: string;
   locale: PetitionLocale;
   isPublic: boolean;
@@ -15044,6 +15077,7 @@ export type PetitionLayout_PetitionBase_Petition_Fragment = {
   status: PetitionStatus;
   isDocumentGenerationEnabled: boolean;
   isInteractionWithRecipientsEnabled: boolean;
+  permanentDeletionAt?: string | null;
   path: string;
   locale: PetitionLocale;
   deadline?: string | null;
@@ -15051,12 +15085,12 @@ export type PetitionLayout_PetitionBase_Petition_Fragment = {
   isAnonymized: boolean;
   lastChangeAt: string;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-  profiles: Array<{ __typename?: "Profile"; id: string }>;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
     permissionType: PetitionPermissionType;
   } | null;
+  profiles: Array<{ __typename?: "Profile"; id: string }>;
 };
 
 export type PetitionLayout_PetitionBase_PetitionTemplate_Fragment = {
@@ -15065,6 +15099,7 @@ export type PetitionLayout_PetitionBase_PetitionTemplate_Fragment = {
   name?: string | null;
   isDocumentGenerationEnabled: boolean;
   isInteractionWithRecipientsEnabled: boolean;
+  permanentDeletionAt?: string | null;
   path: string;
   locale: PetitionLocale;
   isPublic: boolean;
@@ -17422,6 +17457,7 @@ export type PetitionAccessTable_PetitionFragment = {
   __typename?: "Petition";
   status: PetitionStatus;
   isAnonymized: boolean;
+  permanentDeletionAt?: string | null;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
@@ -18030,6 +18066,19 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionMessageBouncedEvent_F
   };
 };
 
+export type PetitionActivityTimeline_PetitionEvent_PetitionRecoveredFromDeletionEvent_Fragment = {
+  __typename?: "PetitionRecoveredFromDeletionEvent";
+  id: string;
+  createdAt: string;
+  user?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    status: UserStatus;
+    isMe: boolean;
+  } | null;
+};
+
 export type PetitionActivityTimeline_PetitionEvent_PetitionReminderBouncedEvent_Fragment = {
   __typename?: "PetitionReminderBouncedEvent";
   id: string;
@@ -18045,6 +18094,19 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionReminderBouncedEvent_
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment = {
   __typename?: "PetitionReopenedEvent";
+  id: string;
+  createdAt: string;
+  user?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    status: UserStatus;
+    isMe: boolean;
+  } | null;
+};
+
+export type PetitionActivityTimeline_PetitionEvent_PetitionScheduledForDeletionEvent_Fragment = {
+  __typename?: "PetitionScheduledForDeletionEvent";
   id: string;
   createdAt: string;
   user?: {
@@ -18534,8 +18596,10 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionDeletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionMessageBouncedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_PetitionRecoveredFromDeletionEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionReminderBouncedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_PetitionScheduledForDeletionEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionTaggedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionUntaggedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ProfileAssociatedEvent_Fragment
@@ -18586,6 +18650,7 @@ export type PetitionProfilesTable_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   isAnonymized: boolean;
+  permanentDeletionAt?: string | null;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -19900,6 +19965,19 @@ export type TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragm
   };
 };
 
+export type TimelinePetitionRecoveredFromDeletionEvent_PetitionRecoveredFromDeletionEventFragment =
+  {
+    __typename?: "PetitionRecoveredFromDeletionEvent";
+    createdAt: string;
+    user?: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      status: UserStatus;
+      isMe: boolean;
+    } | null;
+  };
+
 export type TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragment = {
   __typename?: "PetitionReminderBouncedEvent";
   createdAt: string;
@@ -19914,6 +19992,18 @@ export type TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFra
 
 export type TimelinePetitionReopenedEvent_PetitionReopenedEventFragment = {
   __typename?: "PetitionReopenedEvent";
+  createdAt: string;
+  user?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    status: UserStatus;
+    isMe: boolean;
+  } | null;
+};
+
+export type TimelinePetitionScheduledForDeletionEvent_PetitionScheduledForDeletionEventFragment = {
+  __typename?: "PetitionScheduledForDeletionEvent";
   createdAt: string;
   user?: {
     __typename?: "User";
@@ -25648,6 +25738,7 @@ export type PetitionComposeRightPaneTabs_PetitionBase_Petition_Fragment = {
   isRecipientViewContentsHidden: boolean;
   isRestricted: boolean;
   isRestrictedWithPassword: boolean;
+  permanentDeletionAt?: string | null;
   isAnonymized: boolean;
   lastChangeAt: string;
   closedAt?: string | null;
@@ -25722,6 +25813,7 @@ export type PetitionComposeRightPaneTabs_PetitionBase_PetitionTemplate_Fragment 
   isRecipientViewContentsHidden: boolean;
   isRestricted: boolean;
   isRestrictedWithPassword: boolean;
+  permanentDeletionAt?: string | null;
   isAnonymized: boolean;
   lastChangeAt: string;
   name?: string | null;
@@ -25980,6 +26072,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   isRecipientViewContentsHidden: boolean;
   isRestricted: boolean;
   isRestrictedWithPassword: boolean;
+  permanentDeletionAt?: string | null;
   isAnonymized: boolean;
   closedAt?: string | null;
   anonymizeAfterMonths?: number | null;
@@ -26052,6 +26145,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   isRecipientViewContentsHidden: boolean;
   isRestricted: boolean;
   isRestrictedWithPassword: boolean;
+  permanentDeletionAt?: string | null;
   isAnonymized: boolean;
   name?: string | null;
   anonymizeAfterMonths?: number | null;
@@ -26774,6 +26868,10 @@ export type useConfirmDiscardDraftDialog_PetitionBase_Petition_Fragment = {
   id: string;
   path: string;
   name?: string | null;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
 };
 
 export type useConfirmDiscardDraftDialog_PetitionBase_PetitionTemplate_Fragment = {
@@ -26781,6 +26879,10 @@ export type useConfirmDiscardDraftDialog_PetitionBase_PetitionTemplate_Fragment 
   id: string;
   path: string;
   name?: string | null;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
 };
 
 export type useConfirmDiscardDraftDialog_PetitionBaseFragment =
@@ -28932,6 +29034,7 @@ export type PetitionListHeader_PetitionListViewFragment = {
     searchIn: PetitionListViewSearchIn;
     path: string;
     columns?: Array<PetitionListViewColumn> | null;
+    scheduledForDeletion?: boolean | null;
     sharedWith?: {
       __typename?: "PetitionListViewDataSharedWith";
       operator: FilterSharedWithLogicalOperator;
@@ -28993,6 +29096,7 @@ export type PetitionListHeader_createPetitionListViewMutation = {
       searchIn: PetitionListViewSearchIn;
       path: string;
       columns?: Array<PetitionListViewColumn> | null;
+      scheduledForDeletion?: boolean | null;
       sharedWith?: {
         __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
@@ -29056,6 +29160,7 @@ export type PetitionListHeader_updatePetitionListViewMutation = {
       searchIn: PetitionListViewSearchIn;
       path: string;
       columns?: Array<PetitionListViewColumn> | null;
+      scheduledForDeletion?: boolean | null;
       sharedWith?: {
         __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
@@ -29103,13 +29208,7 @@ export type PetitionTemplateClosingMessageCard_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
   closingEmailBody?: any | null;
-  isRestricted: boolean;
-  isPublic: boolean;
   locale: PetitionLocale;
-  myEffectivePermission?: {
-    __typename?: "EffectivePetitionUserPermission";
-    permissionType: PetitionPermissionType;
-  } | null;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -29138,14 +29237,8 @@ export type PetitionTemplateCompletingMessageCard_PetitionTemplateFragment = {
   isCompletingMessageEnabled: boolean;
   completingMessageSubject?: string | null;
   completingMessageBody?: any | null;
-  isRestricted: boolean;
-  isPublic: boolean;
   locale: PetitionLocale;
   signatureConfig?: { __typename?: "SignatureConfig"; isEnabled: boolean } | null;
-  myEffectivePermission?: {
-    __typename?: "EffectivePetitionUserPermission";
-    permissionType: PetitionPermissionType;
-  } | null;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -29173,12 +29266,6 @@ export type PetitionTemplateRequestMessageCard_PetitionTemplateFragment = {
   id: string;
   emailSubject?: string | null;
   emailBody?: any | null;
-  isRestricted: boolean;
-  isPublic: boolean;
-  myEffectivePermission?: {
-    __typename?: "EffectivePetitionUserPermission";
-    permissionType: PetitionPermissionType;
-  } | null;
   defaultOnBehalf?: {
     __typename?: "User";
     id: string;
@@ -29474,7 +29561,6 @@ export type PetitionPreviewRightPaneTabs_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   unreadGeneralCommentCount: number;
   id: string;
-  isAnonymized: boolean;
   isInteractionWithRecipientsEnabled: boolean;
   generalCommentCount: number;
   fields: Array<{
@@ -29676,7 +29762,6 @@ export type PetitionPreviewRightPaneTabs_PetitionBase_Petition_Fragment = {
 export type PetitionPreviewRightPaneTabs_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  isAnonymized: boolean;
   isInteractionWithRecipientsEnabled: boolean;
   fields: Array<{
     __typename?: "PetitionField";
@@ -30016,6 +30101,7 @@ export type PreviewPetitionField_UserFragment = {
 export type PreviewPetitionField_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
+  permanentDeletionAt?: string | null;
   status: PetitionStatus;
   fields: Array<{
     __typename?: "PetitionField";
@@ -30165,6 +30251,7 @@ export type PreviewPetitionField_PetitionBase_Petition_Fragment = {
 export type PreviewPetitionField_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
+  permanentDeletionAt?: string | null;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -31439,6 +31526,7 @@ export type PreviewPetitionFieldGroup_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   status: PetitionStatus;
   id: string;
+  permanentDeletionAt?: string | null;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -31587,6 +31675,7 @@ export type PreviewPetitionFieldGroup_PetitionBase_Petition_Fragment = {
 export type PreviewPetitionFieldGroup_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
+  permanentDeletionAt?: string | null;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -32102,6 +32191,7 @@ export type PreviewPetitionFieldAdverseMediaSearch_PetitionFieldFragment = {
 export type PreviewPetitionFieldAdverseMediaSearch_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
+  permanentDeletionAt?: string | null;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -32189,6 +32279,7 @@ export type PreviewPetitionFieldAdverseMediaSearch_PetitionBase_Petition_Fragmen
 export type PreviewPetitionFieldAdverseMediaSearch_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
+  permanentDeletionAt?: string | null;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -32481,6 +32572,7 @@ export type PreviewPetitionFieldBackgroundCheck_PetitionFieldFragment = {
 export type PreviewPetitionFieldBackgroundCheck_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
+  permanentDeletionAt?: string | null;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -32568,6 +32660,7 @@ export type PreviewPetitionFieldBackgroundCheck_PetitionBase_Petition_Fragment =
 export type PreviewPetitionFieldBackgroundCheck_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
+  permanentDeletionAt?: string | null;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -35490,6 +35583,7 @@ export type PetitionRepliesField_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   isReviewFlowEnabled: boolean;
+  permanentDeletionAt?: string | null;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -36117,6 +36211,7 @@ export type PetitionRepliesFieldReply_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   isReviewFlowEnabled: boolean;
+  permanentDeletionAt?: string | null;
 };
 
 export type PetitionRepliesFieldReply_PetitionFieldFragment = {
@@ -36339,6 +36434,7 @@ export type PetitionRepliesPopoverField_dataQuery = {
         hasStartedProcess: boolean;
         isAnonymized: boolean;
         id: string;
+        permanentDeletionAt?: string | null;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -36494,6 +36590,7 @@ export type PetitionRepliesPopoverField_dataQuery = {
     | {
         __typename?: "PetitionTemplate";
         id: string;
+        permanentDeletionAt?: string | null;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -36654,10 +36751,10 @@ export type PetitionRepliesRightPaneTabs_UserFragment = {
 export type PetitionRepliesRightPaneTabs_PetitionFragment = {
   __typename?: "Petition";
   id: string;
-  isAnonymized: boolean;
   isDocumentGenerationEnabled: boolean;
   unreadGeneralCommentCount: number;
   summaryConfig?: { [key: string]: any } | null;
+  isAnonymized: boolean;
   status: PetitionStatus;
   generalCommentCount: number;
   isInteractionWithRecipientsEnabled: boolean;
@@ -50388,6 +50485,7 @@ export type PetitionActivity_PetitionFragment = {
   name?: string | null;
   status: PetitionStatus;
   isAnonymized: boolean;
+  permanentDeletionAt?: string | null;
   emailSubject?: string | null;
   emailBody?: any | null;
   isDocumentGenerationEnabled: boolean;
@@ -50736,6 +50834,7 @@ export type PetitionActivity_updatePetitionMutation = {
         name?: string | null;
         status: PetitionStatus;
         isAnonymized: boolean;
+        permanentDeletionAt?: string | null;
         emailSubject?: string | null;
         emailBody?: any | null;
         isDocumentGenerationEnabled: boolean;
@@ -51690,6 +51789,18 @@ export type PetitionActivity_eventsQuery = {
                 };
               }
             | {
+                __typename?: "PetitionRecoveredFromDeletionEvent";
+                id: string;
+                createdAt: string;
+                user?: {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: string | null;
+                  status: UserStatus;
+                  isMe: boolean;
+                } | null;
+              }
+            | {
                 __typename?: "PetitionReminderBouncedEvent";
                 id: string;
                 createdAt: string;
@@ -51708,6 +51819,18 @@ export type PetitionActivity_eventsQuery = {
               }
             | {
                 __typename?: "PetitionReopenedEvent";
+                id: string;
+                createdAt: string;
+                user?: {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: string | null;
+                  status: UserStatus;
+                  isMe: boolean;
+                } | null;
+              }
+            | {
+                __typename?: "PetitionScheduledForDeletionEvent";
                 id: string;
                 createdAt: string;
                 user?: {
@@ -52209,6 +52332,7 @@ export type PetitionActivity_petitionQuery = {
         name?: string | null;
         status: PetitionStatus;
         isAnonymized: boolean;
+        permanentDeletionAt?: string | null;
         emailSubject?: string | null;
         emailBody?: any | null;
         isDocumentGenerationEnabled: boolean;
@@ -52566,6 +52690,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   isDocumentGenerationEnabled: boolean;
   isRestricted: boolean;
   isAnonymized: boolean;
+  permanentDeletionAt?: string | null;
   name?: string | null;
   lastChangeAt: string;
   isReviewFlowEnabled: boolean;
@@ -52852,6 +52977,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   isDocumentGenerationEnabled: boolean;
   isRestricted: boolean;
   isAnonymized: boolean;
+  permanentDeletionAt?: string | null;
   name?: string | null;
   lastChangeAt: string;
   isReviewFlowEnabled: boolean;
@@ -53543,6 +53669,7 @@ export type PetitionCompose_updatePetitionMutation = {
         isInteractionWithRecipientsEnabled: boolean;
         status: PetitionStatus;
         isDocumentGenerationEnabled: boolean;
+        permanentDeletionAt?: string | null;
         path: string;
         deadline?: string | null;
         locale: PetitionLocale;
@@ -53762,6 +53889,7 @@ export type PetitionCompose_updatePetitionMutation = {
         name?: string | null;
         isDocumentGenerationEnabled: boolean;
         isInteractionWithRecipientsEnabled: boolean;
+        permanentDeletionAt?: string | null;
         path: string;
         isPublic: boolean;
         defaultPath: string;
@@ -53867,6 +53995,7 @@ export type PetitionCompose_updateFieldPositionsMutation = {
         status: PetitionStatus;
         isDocumentGenerationEnabled: boolean;
         isInteractionWithRecipientsEnabled: boolean;
+        permanentDeletionAt?: string | null;
         path: string;
         locale: PetitionLocale;
         deadline?: string | null;
@@ -53885,12 +54014,12 @@ export type PetitionCompose_updateFieldPositionsMutation = {
           }> | null;
         }>;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-        profiles: Array<{ __typename?: "Profile"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
+        profiles: Array<{ __typename?: "Profile"; id: string }>;
       }
     | {
         __typename?: "PetitionTemplate";
@@ -53898,6 +54027,7 @@ export type PetitionCompose_updateFieldPositionsMutation = {
         name?: string | null;
         isDocumentGenerationEnabled: boolean;
         isInteractionWithRecipientsEnabled: boolean;
+        permanentDeletionAt?: string | null;
         path: string;
         locale: PetitionLocale;
         isPublic: boolean;
@@ -53963,6 +54093,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
           status: PetitionStatus;
           isDocumentGenerationEnabled: boolean;
           isInteractionWithRecipientsEnabled: boolean;
+          permanentDeletionAt?: string | null;
           path: string;
           locale: PetitionLocale;
           deadline?: string | null;
@@ -54013,12 +54144,12 @@ export type PetitionCompose_createPetitionFieldMutation = {
             profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
           }>;
           tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-          profiles: Array<{ __typename?: "Profile"; id: string }>;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
             isSubscribed: boolean;
             permissionType: PetitionPermissionType;
           } | null;
+          profiles: Array<{ __typename?: "Profile"; id: string }>;
         }
       | {
           __typename?: "PetitionTemplate";
@@ -54026,6 +54157,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
           name?: string | null;
           isDocumentGenerationEnabled: boolean;
           isInteractionWithRecipientsEnabled: boolean;
+          permanentDeletionAt?: string | null;
           path: string;
           locale: PetitionLocale;
           isPublic: boolean;
@@ -54266,6 +54398,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           status: PetitionStatus;
           isDocumentGenerationEnabled: boolean;
           isInteractionWithRecipientsEnabled: boolean;
+          permanentDeletionAt?: string | null;
           path: string;
           locale: PetitionLocale;
           deadline?: string | null;
@@ -54316,12 +54449,12 @@ export type PetitionCompose_clonePetitionFieldMutation = {
             profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
           }>;
           tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-          profiles: Array<{ __typename?: "Profile"; id: string }>;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
             isSubscribed: boolean;
             permissionType: PetitionPermissionType;
           } | null;
+          profiles: Array<{ __typename?: "Profile"; id: string }>;
         }
       | {
           __typename?: "PetitionTemplate";
@@ -54329,6 +54462,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           name?: string | null;
           isDocumentGenerationEnabled: boolean;
           isInteractionWithRecipientsEnabled: boolean;
+          permanentDeletionAt?: string | null;
           path: string;
           locale: PetitionLocale;
           isPublic: boolean;
@@ -54547,6 +54681,7 @@ export type PetitionCompose_deletePetitionFieldMutation = {
         status: PetitionStatus;
         isDocumentGenerationEnabled: boolean;
         isInteractionWithRecipientsEnabled: boolean;
+        permanentDeletionAt?: string | null;
         path: string;
         locale: PetitionLocale;
         deadline?: string | null;
@@ -54560,12 +54695,12 @@ export type PetitionCompose_deletePetitionFieldMutation = {
           children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
         }>;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-        profiles: Array<{ __typename?: "Profile"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
+        profiles: Array<{ __typename?: "Profile"; id: string }>;
       }
     | {
         __typename?: "PetitionTemplate";
@@ -54573,6 +54708,7 @@ export type PetitionCompose_deletePetitionFieldMutation = {
         name?: string | null;
         isDocumentGenerationEnabled: boolean;
         isInteractionWithRecipientsEnabled: boolean;
+        permanentDeletionAt?: string | null;
         path: string;
         locale: PetitionLocale;
         isPublic: boolean;
@@ -55233,6 +55369,7 @@ export type PetitionCompose_createProfileLinkedPetitionFieldMutation = {
           status: PetitionStatus;
           isDocumentGenerationEnabled: boolean;
           isInteractionWithRecipientsEnabled: boolean;
+          permanentDeletionAt?: string | null;
           path: string;
           locale: PetitionLocale;
           deadline?: string | null;
@@ -55283,12 +55420,12 @@ export type PetitionCompose_createProfileLinkedPetitionFieldMutation = {
             profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
           }>;
           tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-          profiles: Array<{ __typename?: "Profile"; id: string }>;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
             isSubscribed: boolean;
             permissionType: PetitionPermissionType;
           } | null;
+          profiles: Array<{ __typename?: "Profile"; id: string }>;
         }
       | {
           __typename?: "PetitionTemplate";
@@ -55296,6 +55433,7 @@ export type PetitionCompose_createProfileLinkedPetitionFieldMutation = {
           name?: string | null;
           isDocumentGenerationEnabled: boolean;
           isInteractionWithRecipientsEnabled: boolean;
+          permanentDeletionAt?: string | null;
           path: string;
           locale: PetitionLocale;
           isPublic: boolean;
@@ -55670,6 +55808,7 @@ export type PetitionCompose_petitionQuery = {
         isDocumentGenerationEnabled: boolean;
         isRestricted: boolean;
         isAnonymized: boolean;
+        permanentDeletionAt?: string | null;
         name?: string | null;
         lastChangeAt: string;
         isReviewFlowEnabled: boolean;
@@ -55978,6 +56117,7 @@ export type PetitionCompose_petitionQuery = {
         isDocumentGenerationEnabled: boolean;
         isRestricted: boolean;
         isAnonymized: boolean;
+        permanentDeletionAt?: string | null;
         name?: string | null;
         lastChangeAt: string;
         isReviewFlowEnabled: boolean;
@@ -56302,6 +56442,8 @@ export type PetitionQuery = {
 export type PetitionMessages_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
+  isRestricted: boolean;
+  permanentDeletionAt?: string | null;
   name?: string | null;
   status: PetitionStatus;
   isDocumentGenerationEnabled: boolean;
@@ -56309,25 +56451,25 @@ export type PetitionMessages_PetitionBase_Petition_Fragment = {
   path: string;
   locale: PetitionLocale;
   deadline?: string | null;
-  isRestricted: boolean;
   isAnonymized: boolean;
   lastChangeAt: string;
-  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-  profiles: Array<{ __typename?: "Profile"; id: string }>;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
     permissionType: PetitionPermissionType;
   } | null;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+  profiles: Array<{ __typename?: "Profile"; id: string }>;
 };
 
 export type PetitionMessages_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
+  isPublic: boolean;
   id: string;
+  isRestricted: boolean;
+  permanentDeletionAt?: string | null;
   emailSubject?: string | null;
   emailBody?: any | null;
-  isRestricted: boolean;
-  isPublic: boolean;
   isCompletingMessageEnabled: boolean;
   completingMessageSubject?: string | null;
   completingMessageBody?: any | null;
@@ -56541,6 +56683,8 @@ export type PetitionMessages_petitionQuery = {
     | {
         __typename?: "Petition";
         id: string;
+        isRestricted: boolean;
+        permanentDeletionAt?: string | null;
         name?: string | null;
         status: PetitionStatus;
         isDocumentGenerationEnabled: boolean;
@@ -56548,24 +56692,24 @@ export type PetitionMessages_petitionQuery = {
         path: string;
         locale: PetitionLocale;
         deadline?: string | null;
-        isRestricted: boolean;
         isAnonymized: boolean;
         lastChangeAt: string;
-        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-        profiles: Array<{ __typename?: "Profile"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+        profiles: Array<{ __typename?: "Profile"; id: string }>;
       }
     | {
         __typename?: "PetitionTemplate";
+        isPublic: boolean;
         id: string;
+        isRestricted: boolean;
+        permanentDeletionAt?: string | null;
         emailSubject?: string | null;
         emailBody?: any | null;
-        isRestricted: boolean;
-        isPublic: boolean;
         isCompletingMessageEnabled: boolean;
         completingMessageSubject?: string | null;
         completingMessageBody?: any | null;
@@ -56622,6 +56766,8 @@ export type PetitionMessages_updatePetitionMutation = {
     | {
         __typename?: "Petition";
         id: string;
+        isRestricted: boolean;
+        permanentDeletionAt?: string | null;
         name?: string | null;
         status: PetitionStatus;
         isDocumentGenerationEnabled: boolean;
@@ -56629,24 +56775,24 @@ export type PetitionMessages_updatePetitionMutation = {
         path: string;
         locale: PetitionLocale;
         deadline?: string | null;
-        isRestricted: boolean;
         isAnonymized: boolean;
         lastChangeAt: string;
-        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-        profiles: Array<{ __typename?: "Profile"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+        profiles: Array<{ __typename?: "Profile"; id: string }>;
       }
     | {
         __typename?: "PetitionTemplate";
+        isPublic: boolean;
         id: string;
+        isRestricted: boolean;
+        permanentDeletionAt?: string | null;
         emailSubject?: string | null;
         emailBody?: any | null;
-        isRestricted: boolean;
-        isPublic: boolean;
         isCompletingMessageEnabled: boolean;
         completingMessageSubject?: string | null;
         completingMessageBody?: any | null;
@@ -57157,6 +57303,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   isInteractionWithRecipientsEnabled: boolean;
   isDocumentGenerationEnabled: boolean;
   isAnonymized: boolean;
+  permanentDeletionAt?: string | null;
   name?: string | null;
   isReviewFlowEnabled: boolean;
   path: string;
@@ -57583,6 +57730,7 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
   isInteractionWithRecipientsEnabled: boolean;
   isDocumentGenerationEnabled: boolean;
   isAnonymized: boolean;
+  permanentDeletionAt?: string | null;
   defaultPath: string;
   name?: string | null;
   path: string;
@@ -58026,6 +58174,7 @@ export type PetitionPreview_updatePetitionMutation = {
         isInteractionWithRecipientsEnabled: boolean;
         isDocumentGenerationEnabled: boolean;
         isAnonymized: boolean;
+        permanentDeletionAt?: string | null;
         name?: string | null;
         isReviewFlowEnabled: boolean;
         path: string;
@@ -58469,6 +58618,7 @@ export type PetitionPreview_updatePetitionMutation = {
         isInteractionWithRecipientsEnabled: boolean;
         isDocumentGenerationEnabled: boolean;
         isAnonymized: boolean;
+        permanentDeletionAt?: string | null;
         defaultPath: string;
         name?: string | null;
         path: string;
@@ -58829,6 +58979,7 @@ export type PetitionPreview_completePetitionMutation = {
     isInteractionWithRecipientsEnabled: boolean;
     isDocumentGenerationEnabled: boolean;
     isAnonymized: boolean;
+    permanentDeletionAt?: string | null;
     name?: string | null;
     isReviewFlowEnabled: boolean;
     path: string;
@@ -59285,6 +59436,7 @@ export type PetitionPreview_petitionQuery = {
         isInteractionWithRecipientsEnabled: boolean;
         isDocumentGenerationEnabled: boolean;
         isAnonymized: boolean;
+        permanentDeletionAt?: string | null;
         name?: string | null;
         isReviewFlowEnabled: boolean;
         path: string;
@@ -59728,6 +59880,7 @@ export type PetitionPreview_petitionQuery = {
         isInteractionWithRecipientsEnabled: boolean;
         isDocumentGenerationEnabled: boolean;
         isAnonymized: boolean;
+        permanentDeletionAt?: string | null;
         defaultPath: string;
         name?: string | null;
         path: string;
@@ -60168,6 +60321,7 @@ export type PetitionReplies_PetitionFragment = {
   id: string;
   isDocumentGenerationEnabled: boolean;
   isAnonymized: boolean;
+  permanentDeletionAt?: string | null;
   name?: string | null;
   status: PetitionStatus;
   generalCommentCount: number;
@@ -60944,6 +61098,7 @@ export type PetitionReplies_updatePetitionMutation = {
         status: PetitionStatus;
         isDocumentGenerationEnabled: boolean;
         isInteractionWithRecipientsEnabled: boolean;
+        permanentDeletionAt?: string | null;
         path: string;
         locale: PetitionLocale;
         deadline?: string | null;
@@ -60951,12 +61106,12 @@ export type PetitionReplies_updatePetitionMutation = {
         isAnonymized: boolean;
         lastChangeAt: string;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-        profiles: Array<{ __typename?: "Profile"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
+        profiles: Array<{ __typename?: "Profile"; id: string }>;
       }
     | {
         __typename?: "PetitionTemplate";
@@ -60964,6 +61119,7 @@ export type PetitionReplies_updatePetitionMutation = {
         name?: string | null;
         isDocumentGenerationEnabled: boolean;
         isInteractionWithRecipientsEnabled: boolean;
+        permanentDeletionAt?: string | null;
         path: string;
         locale: PetitionLocale;
         isPublic: boolean;
@@ -61162,6 +61318,7 @@ export type PetitionReplies_petitionQuery = {
         id: string;
         isDocumentGenerationEnabled: boolean;
         isAnonymized: boolean;
+        permanentDeletionAt?: string | null;
         name?: string | null;
         status: PetitionStatus;
         generalCommentCount: number;
@@ -61842,6 +61999,7 @@ export type Petitions_UserFragment = {
       searchIn: PetitionListViewSearchIn;
       path: string;
       columns?: Array<PetitionListViewColumn> | null;
+      scheduledForDeletion?: boolean | null;
       sharedWith?: {
         __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
@@ -62132,6 +62290,7 @@ export type Petitions_userQuery = {
         searchIn: PetitionListViewSearchIn;
         path: string;
         columns?: Array<PetitionListViewColumn> | null;
+        scheduledForDeletion?: boolean | null;
         sharedWith?: {
           __typename?: "PetitionListViewDataSharedWith";
           operator: FilterSharedWithLogicalOperator;
@@ -62225,6 +62384,7 @@ export type Petitions_petitionsQueryVariables = Exact<{
   includeLastActivityAt: Scalars["Boolean"]["input"];
   includeLastRecipientActivityAt: Scalars["Boolean"]["input"];
   includeApprovals: Scalars["Boolean"]["input"];
+  isScheduledForDeletion: Scalars["Boolean"]["input"];
 }>;
 
 export type Petitions_petitionsQuery = {
@@ -67821,6 +67981,10 @@ export type useDeletePetitions_PetitionBaseOrFolder_Petition_Fragment = {
   id: string;
   path: string;
   name?: string | null;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
 };
 
 export type useDeletePetitions_PetitionBaseOrFolder_PetitionFolder_Fragment = {
@@ -67835,6 +67999,10 @@ export type useDeletePetitions_PetitionBaseOrFolder_PetitionTemplate_Fragment = 
   id: string;
   path: string;
   name?: string | null;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
 };
 
 export type useDeletePetitions_PetitionBaseOrFolderFragment =
@@ -67847,6 +68015,10 @@ export type useDeletePetitions_PetitionBase_Petition_Fragment = {
   id: string;
   path: string;
   name?: string | null;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
 };
 
 export type useDeletePetitions_PetitionBase_PetitionTemplate_Fragment = {
@@ -67854,6 +68026,10 @@ export type useDeletePetitions_PetitionBase_PetitionTemplate_Fragment = {
   id: string;
   path: string;
   name?: string | null;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
 };
 
 export type useDeletePetitions_PetitionBaseFragment =
@@ -67873,8 +68049,26 @@ export type useDeletePetitions_petitionsQueryVariables = Exact<{
 
 export type useDeletePetitions_petitionsQuery = {
   petitionsById: Array<
-    | { __typename?: "Petition"; id: string; path: string; name?: string | null }
-    | { __typename?: "PetitionTemplate"; id: string; path: string; name?: string | null }
+    | {
+        __typename?: "Petition";
+        id: string;
+        path: string;
+        name?: string | null;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        path: string;
+        name?: string | null;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
+      }
     | null
   >;
 };
@@ -67882,6 +68076,7 @@ export type useDeletePetitions_petitionsQuery = {
 export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
   ids?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
   folders?: InputMaybe<FoldersInput>;
+  deletePermanently?: InputMaybe<Scalars["Boolean"]["input"]>;
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   dryrun?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
@@ -67934,6 +68129,66 @@ export type usePermanentlyDeleteProfile_deleteProfileMutationVariables = Exact<{
 }>;
 
 export type usePermanentlyDeleteProfile_deleteProfileMutation = { deleteProfile: Success };
+
+export type useRecoverPetition_PetitionBaseOrFolder_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  path: string;
+  name?: string | null;
+};
+
+export type useRecoverPetition_PetitionBaseOrFolder_PetitionFolder_Fragment = {
+  __typename?: "PetitionFolder";
+  path: string;
+  petitionCount: number;
+  folderId: string;
+};
+
+export type useRecoverPetition_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  path: string;
+  name?: string | null;
+};
+
+export type useRecoverPetition_PetitionBaseOrFolderFragment =
+  | useRecoverPetition_PetitionBaseOrFolder_Petition_Fragment
+  | useRecoverPetition_PetitionBaseOrFolder_PetitionFolder_Fragment
+  | useRecoverPetition_PetitionBaseOrFolder_PetitionTemplate_Fragment;
+
+export type useRecoverPetition_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  path: string;
+  name?: string | null;
+};
+
+export type useRecoverPetition_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  path: string;
+  name?: string | null;
+};
+
+export type useRecoverPetition_PetitionBaseFragment =
+  | useRecoverPetition_PetitionBase_Petition_Fragment
+  | useRecoverPetition_PetitionBase_PetitionTemplate_Fragment;
+
+export type useRecoverPetition_PetitionFolderFragment = {
+  __typename?: "PetitionFolder";
+  path: string;
+  petitionCount: number;
+  folderId: string;
+};
+
+export type useRecoverPetition_recoverPetitionsFromDeletionMutationVariables = Exact<{
+  ids?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  folders?: InputMaybe<FoldersInput>;
+}>;
+
+export type useRecoverPetition_recoverPetitionsFromDeletionMutation = {
+  recoverPetitionsFromDeletion: Success;
+};
 
 export type useRecoverProfile_closeProfileMutationVariables = Exact<{
   profileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
@@ -72831,6 +73086,32 @@ export const TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRe
     TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEventFragment,
     unknown
   >;
+export const TimelinePetitionScheduledForDeletionEvent_PetitionScheduledForDeletionEventFragmentDoc =
+  gql`
+    fragment TimelinePetitionScheduledForDeletionEvent_PetitionScheduledForDeletionEvent on PetitionScheduledForDeletionEvent {
+      user {
+        ...UserReference_User
+      }
+      createdAt
+    }
+    ${UserReference_UserFragmentDoc}
+  ` as unknown as DocumentNode<
+    TimelinePetitionScheduledForDeletionEvent_PetitionScheduledForDeletionEventFragment,
+    unknown
+  >;
+export const TimelinePetitionRecoveredFromDeletionEvent_PetitionRecoveredFromDeletionEventFragmentDoc =
+  gql`
+    fragment TimelinePetitionRecoveredFromDeletionEvent_PetitionRecoveredFromDeletionEvent on PetitionRecoveredFromDeletionEvent {
+      user {
+        ...UserReference_User
+      }
+      createdAt
+    }
+    ${UserReference_UserFragmentDoc}
+  ` as unknown as DocumentNode<
+    TimelinePetitionRecoveredFromDeletionEvent_PetitionRecoveredFromDeletionEventFragment,
+    unknown
+  >;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -72987,6 +73268,12 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on PetitionApprovalRequestStepCanceledEvent {
       ...TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEvent
     }
+    ... on PetitionScheduledForDeletionEvent {
+      ...TimelinePetitionScheduledForDeletionEvent_PetitionScheduledForDeletionEvent
+    }
+    ... on PetitionRecoveredFromDeletionEvent {
+      ...TimelinePetitionRecoveredFromDeletionEvent_PetitionRecoveredFromDeletionEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -73039,6 +73326,8 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelinePetitionApprovalRequestStepReminderEvent_PetitionApprovalRequestStepReminderEventFragmentDoc}
   ${TimelinePetitionApprovalRequestStepFinishedEvent_PetitionApprovalRequestStepFinishedEventFragmentDoc}
   ${TimelinePetitionApprovalRequestStepCanceledEvent_PetitionApprovalRequestStepCanceledEventFragmentDoc}
+  ${TimelinePetitionScheduledForDeletionEvent_PetitionScheduledForDeletionEventFragmentDoc}
+  ${TimelinePetitionRecoveredFromDeletionEvent_PetitionRecoveredFromDeletionEventFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivityTimeline_PetitionEventFragment, unknown>;
 export const PetitionRemindersConfig_RemindersConfigFragmentDoc = gql`
   fragment PetitionRemindersConfig_RemindersConfig on RemindersConfig {
@@ -74774,6 +75063,7 @@ export const PreviewPetitionFieldAdverseMediaSearch_PetitionBaseFragmentDoc = gq
         ...PreviewPetitionFieldAdverseMediaSearch_PetitionField
       }
     }
+    permanentDeletionAt
     ...useFieldLogic_PetitionBase
   }
   ${PreviewPetitionFieldAdverseMediaSearch_PetitionFieldFragmentDoc}
@@ -77374,6 +77664,9 @@ export const useDeletePetitions_PetitionBaseFragmentDoc = gql`
     id
     path
     ...PetitionName_PetitionBase
+    myEffectivePermission {
+      permissionType
+    }
   }
   ${PetitionName_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<useDeletePetitions_PetitionBaseFragment, unknown>;
@@ -77449,6 +77742,7 @@ export const PetitionHeader_PetitionBaseFragmentDoc = gql`
     id
     isDocumentGenerationEnabled
     isInteractionWithRecipientsEnabled
+    permanentDeletionAt
     path
     ... on Petition {
       ...PetitionHeader_Petition
@@ -77502,6 +77796,7 @@ export const PetitionAccessTable_PetitionFragmentDoc = gql`
       ...PetitionAccessTable_PetitionAccess
     }
     isAnonymized
+    permanentDeletionAt
     myEffectivePermission {
       permissionType
     }
@@ -77762,6 +78057,7 @@ export const PetitionProfilesTable_PetitionFragmentDoc = gql`
   fragment PetitionProfilesTable_Petition on Petition {
     id
     isAnonymized
+    permanentDeletionAt
     myEffectivePermission {
       permissionType
     }
@@ -78485,6 +78781,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     isRecipientViewContentsHidden
     isRestricted
     isRestrictedWithPassword
+    permanentDeletionAt
     approvalFlowConfig {
       ...Fragments_FullApprovalFlowConfig
     }
@@ -78579,6 +78876,7 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
       permissionType
     }
     isAnonymized
+    permanentDeletionAt
     ... on Petition {
       status
       hasStartedProcess
@@ -78794,11 +79092,6 @@ export const PetitionTemplateRequestMessageCard_PetitionTemplateFragmentDoc = gq
     id
     emailSubject
     emailBody
-    isRestricted
-    isPublic
-    myEffectivePermission {
-      permissionType
-    }
     defaultOnBehalf {
       ...UserSelect_User
     }
@@ -78815,14 +79108,9 @@ export const PetitionTemplateCompletingMessageCard_PetitionTemplateFragmentDoc =
     isCompletingMessageEnabled
     completingMessageSubject
     completingMessageBody
-    isRestricted
-    isPublic
     locale
     signatureConfig {
       isEnabled
-    }
-    myEffectivePermission {
-      permissionType
     }
     ...usePetitionMessagePlaceholderOptions_PetitionBase
   }
@@ -78835,12 +79123,7 @@ export const PetitionTemplateClosingMessageCard_PetitionTemplateFragmentDoc = gq
   fragment PetitionTemplateClosingMessageCard_PetitionTemplate on PetitionTemplate {
     id
     closingEmailBody
-    isRestricted
-    isPublic
     locale
-    myEffectivePermission {
-      permissionType
-    }
     ...usePetitionMessagePlaceholderOptions_PetitionBase
   }
   ${usePetitionMessagePlaceholderOptions_PetitionBaseFragmentDoc}
@@ -78848,8 +79131,14 @@ export const PetitionTemplateClosingMessageCard_PetitionTemplateFragmentDoc = gq
 export const PetitionMessages_PetitionBaseFragmentDoc = gql`
   fragment PetitionMessages_PetitionBase on PetitionBase {
     id
+    isRestricted
+    permanentDeletionAt
+    myEffectivePermission {
+      permissionType
+    }
     ...PetitionLayout_PetitionBase
     ... on PetitionTemplate {
+      isPublic
       ...PetitionTemplateRequestMessageCard_PetitionTemplate
       ...PetitionTemplateCompletingMessageCard_PetitionTemplate
       ...PetitionTemplateClosingMessageCard_PetitionTemplate
@@ -79317,6 +79606,7 @@ export const PreviewPetitionFieldBackgroundCheck_PetitionBaseFragmentDoc = gql`
         ...PreviewPetitionFieldBackgroundCheck_PetitionField
       }
     }
+    permanentDeletionAt
     ...useFieldLogic_PetitionBase
   }
   ${PreviewPetitionFieldBackgroundCheck_PetitionFieldFragmentDoc}
@@ -79466,7 +79756,6 @@ export const RecipientViewContents_PetitionBaseFragmentDoc = gql`
 export const PetitionPreviewRightPaneTabs_PetitionBaseFragmentDoc = gql`
   fragment PetitionPreviewRightPaneTabs_PetitionBase on PetitionBase {
     id
-    isAnonymized
     fields {
       id
       ...PetitionPreviewRightPaneTabs_PetitionField
@@ -79565,6 +79854,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
       timezone
       ...ConfirmPetitionSignersDialog_SignatureConfig
     }
+    permanentDeletionAt
     ...useAllFieldsWithIndices_PetitionBase
     ...useGetPetitionPages_PetitionBase
     ...PetitionLayout_PetitionBase
@@ -79818,6 +80108,7 @@ export const PetitionRepliesFieldReply_PetitionFragmentDoc = gql`
   fragment PetitionRepliesFieldReply_Petition on Petition {
     id
     isReviewFlowEnabled
+    permanentDeletionAt
   }
 ` as unknown as DocumentNode<PetitionRepliesFieldReply_PetitionFragment, unknown>;
 export const PetitionRepliesField_PetitionFragmentDoc = gql`
@@ -80046,7 +80337,6 @@ export const PetitionRepliesRightPaneTabs_PetitionFragmentDoc = gql`
     myEffectivePermission {
       permissionType
     }
-    isAnonymized
     isDocumentGenerationEnabled
     unreadGeneralCommentCount
     fields {
@@ -80100,6 +80390,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     approvalFlowConfig {
       ...Fragments_FullApprovalFlowConfig
     }
+    permanentDeletionAt
     ...PetitionLayout_PetitionBase
     ...PetitionRepliesField_Petition
     ...PetitionVariablesCard_PetitionBase
@@ -80170,6 +80461,7 @@ export const PetitionViewTabs_PetitionListViewDataFragmentDoc = gql`
       direction
     }
     columns
+    scheduledForDeletion
   }
 ` as unknown as DocumentNode<PetitionViewTabs_PetitionListViewDataFragment, unknown>;
 export const ViewTabs_ListViewFragmentDoc = gql`
@@ -80231,6 +80523,7 @@ export const PetitionListHeader_PetitionListViewFragmentDoc = gql`
         direction
       }
       columns
+      scheduledForDeletion
     }
     isDefault
     type
@@ -81901,6 +82194,33 @@ export const usePetitionCommentsMutations_PetitionFieldCommentFragmentDoc = gql`
   }
   ${PetitionFieldComment_PetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<usePetitionCommentsMutations_PetitionFieldCommentFragment, unknown>;
+export const useRecoverPetition_PetitionBaseFragmentDoc = gql`
+  fragment useRecoverPetition_PetitionBase on PetitionBase {
+    id
+    path
+    ...PetitionName_PetitionBase
+  }
+  ${PetitionName_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<useRecoverPetition_PetitionBaseFragment, unknown>;
+export const useRecoverPetition_PetitionFolderFragmentDoc = gql`
+  fragment useRecoverPetition_PetitionFolder on PetitionFolder {
+    folderId: id
+    path
+    petitionCount
+  }
+` as unknown as DocumentNode<useRecoverPetition_PetitionFolderFragment, unknown>;
+export const useRecoverPetition_PetitionBaseOrFolderFragmentDoc = gql`
+  fragment useRecoverPetition_PetitionBaseOrFolder on PetitionBaseOrFolder {
+    ... on PetitionBase {
+      ...useRecoverPetition_PetitionBase
+    }
+    ... on PetitionFolder {
+      ...useRecoverPetition_PetitionFolder
+    }
+  }
+  ${useRecoverPetition_PetitionBaseFragmentDoc}
+  ${useRecoverPetition_PetitionFolderFragmentDoc}
+` as unknown as DocumentNode<useRecoverPetition_PetitionBaseOrFolderFragment, unknown>;
 export const useUpdateIsReadNotification_PetitionFieldCommentFragmentDoc = gql`
   fragment useUpdateIsReadNotification_PetitionFieldComment on PetitionFieldComment {
     id
@@ -88572,8 +88892,16 @@ export const Petitions_petitionsDocument = gql`
     $includeLastActivityAt: Boolean!
     $includeLastRecipientActivityAt: Boolean!
     $includeApprovals: Boolean!
+    $isScheduledForDeletion: Boolean!
   ) {
-    petitions(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filters: $filters) {
+    petitions(
+      offset: $offset
+      limit: $limit
+      search: $search
+      sortBy: $sortBy
+      filters: $filters
+      isScheduledForDeletion: $isScheduledForDeletion
+    ) {
       items {
         ...Petitions_PetitionBaseOrFolder
       }
@@ -89813,10 +90141,17 @@ export const useDeletePetitions_deletePetitionsDocument = gql`
   mutation useDeletePetitions_deletePetitions(
     $ids: [GID!]
     $folders: FoldersInput
+    $deletePermanently: Boolean
     $force: Boolean
     $dryrun: Boolean
   ) {
-    deletePetitions(ids: $ids, folders: $folders, force: $force, dryrun: $dryrun)
+    deletePetitions(
+      ids: $ids
+      folders: $folders
+      deletePermanently: $deletePermanently
+      force: $force
+      dryrun: $dryrun
+    )
   }
 ` as unknown as DocumentNode<
   useDeletePetitions_deletePetitionsMutation,
@@ -89867,6 +90202,14 @@ export const usePermanentlyDeleteProfile_deleteProfileDocument = gql`
 ` as unknown as DocumentNode<
   usePermanentlyDeleteProfile_deleteProfileMutation,
   usePermanentlyDeleteProfile_deleteProfileMutationVariables
+>;
+export const useRecoverPetition_recoverPetitionsFromDeletionDocument = gql`
+  mutation useRecoverPetition_recoverPetitionsFromDeletion($ids: [GID!], $folders: FoldersInput) {
+    recoverPetitionsFromDeletion(ids: $ids, folders: $folders)
+  }
+` as unknown as DocumentNode<
+  useRecoverPetition_recoverPetitionsFromDeletionMutation,
+  useRecoverPetition_recoverPetitionsFromDeletionMutationVariables
 >;
 export const useRecoverProfile_closeProfileDocument = gql`
   mutation useRecoverProfile_closeProfile($profileIds: [GID!]!) {

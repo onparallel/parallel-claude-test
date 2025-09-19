@@ -9,7 +9,6 @@ import {
 import {
   PetitionLayout_PetitionBaseFragment,
   PetitionLayout_QueryFragment,
-  UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { Focusable } from "@parallel/utils/types";
@@ -42,7 +41,6 @@ export interface PetitionLayoutProps {
   queryObject: PetitionLayout_QueryFragment;
   petition: PetitionLayout_PetitionBaseFragment;
   onNextClick?: () => void;
-  onUpdatePetition: (value: UpdatePetitionInput) => void;
   section: PetitionSection;
   headerActions?: ReactNode;
   drawer?: ReactNode;
@@ -51,7 +49,6 @@ export interface PetitionLayoutProps {
   hasRightPane?: boolean;
   isRightPaneActive?: boolean;
   rightPane?: ReactNode;
-  hasLeftPane?: boolean;
   isLeftPaneActive?: boolean;
   leftPane?: ReactNode;
 }
@@ -60,7 +57,6 @@ export function PetitionLayout({
   queryObject,
   petition,
   section,
-  onUpdatePetition,
   headerActions,
   children,
   drawer,
@@ -69,7 +65,6 @@ export function PetitionLayout({
   isRightPaneActive,
   rightPane,
   hasRightPane,
-  hasLeftPane,
   isLeftPaneActive,
   leftPane,
 }: PropsWithChildren<PetitionLayoutProps>) {

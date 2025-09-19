@@ -1,6 +1,13 @@
 import gql from "graphql-tag";
 import { Knex } from "knex";
-import { Organization, Petition, ProfileType, ProfileTypeProcess, User } from "../../db/__types";
+import {
+  Organization,
+  Petition,
+  Profile,
+  ProfileType,
+  ProfileTypeProcess,
+  User,
+} from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { toGlobalId } from "../../util/globalId";
@@ -47,12 +54,113 @@ describe("GraphQL/Profile Type Processes", () => {
       normalUser.id,
     ));
 
-    templates = await mocks.createRandomTemplates(organization.id, user.id, 3);
+    templates = await mocks.createRandomTemplates(organization.id, user.id, 5, (i) => ({
+      deletion_scheduled_at: i > 2 ? new Date() : null,
+    }));
     [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
   });
 
   afterAll(async () => {
     await testClient.stop();
+  });
+
+  describe("keyProcesses", () => {
+    let profile: Profile;
+    let processes: ProfileTypeProcess[];
+
+    let petitions: Petition[];
+
+    beforeAll(async () => {
+      processes = await mocks.knex.from("profile_type_process").insert(
+        [
+          {
+            profile_type_id: profileType.id,
+            process_name: { en: "Process 1" },
+            position: 0,
+          },
+          {
+            profile_type_id: profileType.id,
+            process_name: { en: "Process 2" },
+            position: 1,
+          },
+        ],
+        "*",
+      );
+
+      petitions = await mocks.createRandomPetitions(organization.id, user.id, 2, (i) => ({
+        from_template_id: templates[0].id,
+        deletion_scheduled_at: i === 0 ? new Date() : null,
+      }));
+
+      [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+
+      await mocks.knex.from("petition_profile").insert([
+        {
+          petition_id: petitions[0].id,
+          profile_id: profile.id,
+        },
+        {
+          petition_id: petitions[1].id,
+          profile_id: profile.id,
+        },
+      ]);
+
+      await mocks.knex.from("profile_type_process_template").insert([
+        { profile_type_process_id: processes[0].id, template_id: templates[0].id },
+        { profile_type_process_id: processes[0].id, template_id: templates[1].id },
+        { profile_type_process_id: processes[0].id, template_id: templates[2].id },
+        { profile_type_process_id: processes[0].id, template_id: templates[3].id },
+        { profile_type_process_id: processes[0].id, template_id: templates[4].id },
+        { profile_type_process_id: processes[1].id, template_id: templates[0].id },
+        { profile_type_process_id: processes[1].id, template_id: templates[4].id },
+      ]);
+    });
+
+    it("loads the key processes of a profile type, ignoring templates and petitions that are scheduled for deletion", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($profileTypeId: GID!, $profileId: GID!) {
+            profileType(profileTypeId: $profileTypeId) {
+              id
+              keyProcesses {
+                id
+                templates {
+                  id
+                }
+                latestPetition(profileId: $profileId) {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileType.id),
+          profileId: toGlobalId("Profile", profile.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profileType).toEqual({
+        id: toGlobalId("ProfileType", profileType.id),
+        keyProcesses: [
+          {
+            id: toGlobalId("ProfileTypeProcess", processes[0].id),
+            templates: expect.toIncludeSameMembers([
+              { id: toGlobalId("Petition", templates[0].id) },
+              { id: toGlobalId("Petition", templates[1].id) },
+              { id: toGlobalId("Petition", templates[2].id) },
+            ]),
+            latestPetition: { id: toGlobalId("Petition", petitions[1].id) },
+          },
+          {
+            id: toGlobalId("ProfileTypeProcess", processes[1].id),
+            templates: [{ id: toGlobalId("Petition", templates[0].id) }],
+            latestPetition: { id: toGlobalId("Petition", petitions[1].id) },
+          },
+        ],
+      });
+    });
   });
 
   describe("createProfileTypeProcess", () => {
@@ -86,7 +194,7 @@ describe("GraphQL/Profile Type Processes", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileType.id),
           processName: { en: "Process 1" },
-          templateIds: templates.map((t) => toGlobalId("Petition", t.id)),
+          templateIds: templates.slice(0, 3).map((t) => toGlobalId("Petition", t.id)),
         },
       );
 
@@ -95,7 +203,7 @@ describe("GraphQL/Profile Type Processes", () => {
         id: expect.any(String),
         name: { en: "Process 1" },
         position: 0,
-        templates: templates.map((t) => ({ id: toGlobalId("Petition", t.id) })),
+        templates: templates.slice(0, 3).map((t) => ({ id: toGlobalId("Petition", t.id) })),
       });
     });
 
@@ -298,7 +406,35 @@ describe("GraphQL/Profile Type Processes", () => {
         {
           profileTypeId: toGlobalId("ProfileType", profileType.id),
           processName: { en: "My Process" },
-          templateIds: templates.map((t) => toGlobalId("Petition", t.id)),
+          templateIds: templates.slice(0, 3).map((t) => toGlobalId("Petition", t.id)),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("fails if passing templates that are scheduled for deletion", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $processName: LocalizableUserText!
+            $templateIds: [GID!]!
+          ) {
+            createProfileTypeProcess(
+              profileTypeId: $profileTypeId
+              processName: $processName
+              templateIds: $templateIds
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileType.id),
+          processName: { en: "My Process" },
+          templateIds: [toGlobalId("Petition", templates[4].id)],
         },
       );
 
@@ -426,7 +562,7 @@ describe("GraphQL/Profile Type Processes", () => {
           profileTypeProcessId: toGlobalId("ProfileTypeProcess", profileTypeProcess.id),
           data: {
             processName: { en: "New Process Name" },
-            templateIds: templates.map((t) => toGlobalId("Petition", t.id)),
+            templateIds: templates.slice(0, 3).map((t) => toGlobalId("Petition", t.id)),
           },
         },
       );
@@ -448,7 +584,7 @@ describe("GraphQL/Profile Type Processes", () => {
           profileTypeProcessId: toGlobalId("ProfileTypeProcess", profileTypeProcess.id),
           data: {
             processName: { en: "New Process Name" },
-            templateIds: templates.map((t) => toGlobalId("Petition", t.id)),
+            templateIds: templates.slice(0, 3).map((t) => toGlobalId("Petition", t.id)),
           },
         },
       );
@@ -496,6 +632,28 @@ describe("GraphQL/Profile Type Processes", () => {
       );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("fails if passing templates that are scheduled for deletion", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeProcessId: GID!, $data: EditProfileTypeProcessInput!) {
+            editProfileTypeProcess(profileTypeProcessId: $profileTypeProcessId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeProcessId: toGlobalId("ProfileTypeProcess", profileTypeProcess.id),
+          data: {
+            processName: { en: "New Process Name" },
+            templateIds: [toGlobalId("Petition", templates[4].id)],
+          },
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
   });

@@ -29,7 +29,7 @@ import { toBytes } from "../../util/fileSize";
 import { toGlobalId } from "../../util/globalId";
 import { isValidTimezone } from "../../util/time";
 import { random } from "../../util/token";
-import { authenticateAnd, ifArgDefined } from "../helpers/authorize";
+import { and, authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { datetimeArg } from "../helpers/scalars/DateTime";
@@ -50,6 +50,7 @@ import {
 import {
   petitionHasRepliableFields,
   petitionIsNotAnonymized,
+  petitionsAreNotScheduledForDeletion,
   petitionsAreOfTypePetition,
   petitionsAreOfTypeTemplate,
   petitionsHaveEnabledInteractionWithRecipients,
@@ -68,6 +69,7 @@ export const createPrintPdfTask = mutationField("createPrintPdfTask", {
   type: "Task",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionIsNotAnonymized("petitionId"),
   ),
   args: {
@@ -100,6 +102,7 @@ export const createExportRepliesTask = mutationField("createExportRepliesTask", 
   type: "Task",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionIsNotAnonymized("petitionId"),
   ),
   args: {
@@ -130,7 +133,10 @@ export const createExportExcelTask = mutationField("createExportExcelTask", {
   description:
     "Creates a task for exporting an xlsx file with petition text replies and sends it to the queue",
   type: "Task",
-  authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
+  ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     callbackUrl: stringArg({
@@ -164,6 +170,7 @@ export const createTemplateRepliesReportTask = mutationField("createTemplateRepl
   authorize: authenticateAnd(
     contextUserHasPermission("REPORTS:TEMPLATE_REPLIES"),
     userHasAccessToPetitions("petitionId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreOfTypeTemplate("petitionId"),
   ),
   args: {
@@ -205,6 +212,7 @@ export const createTemplateStatsReportTask = mutationField("createTemplateStatsR
   authorize: authenticateAnd(
     contextUserHasPermission("REPORTS:TEMPLATE_STATISTICS"),
     userHasAccessToPetitions("templateId"),
+    petitionsAreNotScheduledForDeletion("templateId"),
     petitionsAreOfTypeTemplate("templateId"),
   ),
   args: {
@@ -389,6 +397,7 @@ export const createBulkPetitionSendTask = mutationField("createBulkPetitionSendT
     contextUserHasPermission("PETITIONS:CREATE_PETITIONS"),
     userHasFeatureFlag("BULK_PETITION_SEND_TASK"),
     userHasAccessToPetitions("templateId"),
+    petitionsAreNotScheduledForDeletion("templateId"),
     petitionIsNotAnonymized("templateId"),
     petitionsAreOfTypeTemplate("templateId"),
     petitionHasRepliableFields("templateId"),
@@ -421,6 +430,7 @@ export const createTemplateRepliesCsvExportTask = mutationField(
     authorize: authenticateAnd(
       userHasFeatureFlag("TEMPLATE_REPLIES_CSV_EXPORT_TASK"),
       userHasAccessToPetitions("templateId"),
+      petitionsAreNotScheduledForDeletion("templateId"),
       petitionIsNotAnonymized("templateId"),
       petitionsAreOfTypeTemplate("templateId"),
     ),
@@ -448,6 +458,7 @@ export const createPetitionSummaryTask = mutationField("createPetitionSummaryTas
   authorize: authenticateAnd(
     userHasFeatureFlag("PETITION_SUMMARY"),
     userHasAccessToPetitions("petitionId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     petitionsAreOfTypePetition("petitionId"),
   ),
@@ -501,6 +512,7 @@ export const createFileExportTask = mutationField("createFileExportTask", {
   type: "Task",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     petitionsAreOfTypePetition("petitionId"),
     userHasAccessToIntegrations("integrationId", ["FILE_EXPORT"], true),
@@ -539,7 +551,13 @@ export const createAddPetitionPermissionMaybeTask = mutationField(
     Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
   `,
     authorize: authenticateAnd(
-      ifArgDefined("petitionIds", userHasAccessToPetitions("petitionIds" as never)),
+      ifArgDefined(
+        "petitionIds",
+        and(
+          userHasAccessToPetitions("petitionIds" as never),
+          petitionsAreNotScheduledForDeletion("petitionIds" as never),
+        ),
+      ),
       userHasAccessToUsers("userIds"),
       userHasAccessToUserGroups("userGroupIds"),
     ),
@@ -692,6 +710,7 @@ export const createEditPetitionPermissionMaybeTask = mutationField(
     type: "MaybeTask",
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
+      petitionsAreNotScheduledForDeletion("petitionIds"),
       userHasAccessToUsers("userIds"),
       userHasAccessToUserGroups("userGroupIds"),
     ),
@@ -773,6 +792,7 @@ export const createRemovePetitionPermissionMaybeTask = mutationField(
     type: "MaybeTask",
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
+      petitionsAreNotScheduledForDeletion("petitionIds"),
       userHasAccessToUsers("userIds"),
       userHasAccessToUserGroups("userGroupIds"),
     ),

@@ -226,6 +226,7 @@ export class ClientRiskUpdateListener
         ],
         null,
         orgId,
+        "PARALLEL_MONITORING",
       );
     }
   }

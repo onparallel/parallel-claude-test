@@ -81,6 +81,10 @@ export const petitionsQuery = queryField((t) => {
       excludePublicTemplates: booleanArg({
         description: "Exclude public templates from result",
       }),
+      isScheduledForDeletion: booleanArg({
+        description:
+          "Only show petitions scheduled for deletion in result. If falsy, only show petitions not scheduled for deletion",
+      }),
     },
     searchable: true,
     sortableBy: [
@@ -117,6 +121,7 @@ export const petitionsQuery = queryField((t) => {
         filters,
         searchByNameOnly,
         excludeAnonymized,
+        isScheduledForDeletion,
         excludePublicTemplates,
         minEffectivePermission,
       },
@@ -141,6 +146,7 @@ export const petitionsQuery = queryField((t) => {
           searchByNameOnly: searchByNameOnly ?? false,
           excludeAnonymized: excludeAnonymized ?? false,
           excludePublicTemplates: excludePublicTemplates ?? false,
+          isScheduledForDeletion: isScheduledForDeletion ?? false,
         },
       });
     },
@@ -331,9 +337,14 @@ export const templatesQuery = queryField((t) => {
       isPublic: nonNull(booleanArg()),
       isOwner: booleanArg(),
       category: stringArg(),
+      isScheduledForDeletion: booleanArg(),
     },
     searchable: true,
-    resolve: (_, { limit, offset, path, locale, search, isPublic, isOwner, category }, ctx) => {
+    resolve: (
+      _,
+      { limit, offset, path, locale, search, isPublic, isOwner, category, isScheduledForDeletion },
+      ctx,
+    ) => {
       if (isPublic) {
         return ctx.petitions.getPaginatedPublicTemplates({
           search,
@@ -369,6 +380,7 @@ export const templatesQuery = queryField((t) => {
                       }
                     : null,
             },
+            isScheduledForDeletion: isScheduledForDeletion ?? false,
           },
         });
       }

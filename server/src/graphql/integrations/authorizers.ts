@@ -45,6 +45,7 @@ export function authenticatePetitionOrProfileReplyToken<
 
         const results = await Promise.all([
           petition?.anonymized_at === null,
+          petition?.deletion_scheduled_at === null,
           ctx.petitions.userHasAccessToPetitions(ctx.user!.id, [params.petitionId]),
           ctx.petitions.fieldsBelongToPetition(params.petitionId, [params.fieldId]),
           ctx.petitions.fieldHasType([params.fieldId], [fieldType]),

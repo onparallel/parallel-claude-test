@@ -30,13 +30,24 @@ export const remindersOptOut = queryField("remindersOptOut", {
   },
   resolve: async (_, { keycode }, ctx) => {
     const access = await ctx.petitions.loadAccessByKeycode(keycode);
-    if (!access || access.status === "INACTIVE") return null;
+    if (!access || access.status === "INACTIVE") {
+      return null;
+    }
 
     const granter = await ctx.users.loadUser(access.granter_id);
-    if (!granter) return null;
+    if (!granter) {
+      return null;
+    }
+
+    const petition = await ctx.petitions.loadPetition(access.petition_id);
+    if (!petition || petition.deletion_scheduled_at !== null) {
+      return null;
+    }
 
     const organization = await ctx.organizations.loadOrg(granter.org_id);
-    if (!organization) return null;
+    if (!organization) {
+      return null;
+    }
 
     const logoPath = await ctx.organizations.loadOrgLogoPath(organization.id);
 
@@ -66,9 +77,9 @@ export const accessesQuery = queryField((t) => {
       status: list(nonNull(arg({ type: "PetitionStatus" }))),
     },
     searchable: true,
-    authorize: authenticatePublicAccess("keycode" as never),
+    authorize: authenticatePublicAccess("keycode"),
     resolve: async (root, { offset, limit, status, search }, ctx) => {
-      return await ctx.contacts.getPaginatedAccessesForContact(ctx.access!.contact_id!, {
+      return ctx.contacts.getPaginatedAccessesForContact(ctx.access!.contact_id!, {
         search,
         offset,
         limit,
@@ -161,7 +172,11 @@ export const publicPetitionLinkBySlug = queryField("publicPetitionLinkBySlug", {
       ? await ctx.petitions.loadPetition(publicLink.template_id)
       : undefined;
 
-    return publicLink?.is_active && petition ? publicLink : null;
+    if (!petition || petition.deletion_scheduled_at !== null) {
+      return null;
+    }
+
+    return publicLink?.is_active ? publicLink : null;
   },
 });
 

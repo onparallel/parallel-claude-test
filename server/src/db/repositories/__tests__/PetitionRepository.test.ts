@@ -1,4 +1,5 @@
 import { faker } from "@faker-js/faker";
+import { subDays } from "date-fns";
 import { toDate } from "date-fns-tz";
 import { Container } from "inversify";
 import { Knex } from "knex";
@@ -3485,6 +3486,117 @@ describe("repositories/PetitionRepository", () => {
           is_subscribed: true, // subscribed through a group, not subscribed through direct permission
         },
       ]);
+    });
+  });
+
+  describe("deletePetitionsScheduledForDeletion", () => {
+    let petition: Petition;
+
+    beforeEach(async () => {
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        deletion_scheduled_at: subDays(new Date(), 30),
+      }));
+
+      const users = await mocks.createRandomUsers(organization.id, 3);
+      for (const user of users) {
+        await mocks.sharePetitions([petition.id], user.id, "WRITE");
+      }
+
+      await mocks.knex.from("petition_user_notification").insert([
+        {
+          petition_id: petition.id,
+          user_id: users[0].id,
+          type: "COMMENT_CREATED",
+          data: {
+            user_id: users[0].id,
+          },
+        },
+        {
+          petition_id: petition.id,
+          user_id: users[1].id,
+          type: "COMMENT_CREATED",
+          data: {
+            user_id: users[1].id,
+          },
+        },
+        {
+          petition_id: petition.id,
+          user_id: users[2].id,
+          type: "COMMENT_CREATED",
+          data: {
+            user_id: users[2].id,
+          },
+        },
+      ]);
+    });
+
+    it("deletes petitions scheduled for deletion", async () => {
+      await petitions.deletePetitionsScheduledForDeletion(30, "TEST");
+
+      const [deletedPetition] = await mocks.knex
+        .from("petition")
+        .where({ id: petition.id })
+        .select("*");
+      expect(deletedPetition.deleted_at).not.toBeNull();
+
+      const notifications = await mocks.knex
+        .from("petition_user_notification")
+        .where({ petition_id: petition.id })
+        .select("*");
+      expect(notifications).toHaveLength(0);
+
+      const events = await mocks.knex
+        .from("petition_event")
+        .where({ petition_id: petition.id })
+        .select("*");
+      expect(events.map(pick(["type", "data"]))).toEqual([
+        {
+          type: "PETITION_DELETED",
+          data: {
+            user_id: null,
+            status: petition.status,
+          },
+        },
+      ]);
+
+      const permissions = await mocks.knex
+        .from("petition_permission")
+        .where({ petition_id: petition.id })
+        .select("*");
+      expect(permissions.map(pick(["deleted_at"]))).toEqual([
+        { deleted_at: expect.any(Date) },
+        { deleted_at: expect.any(Date) },
+        { deleted_at: expect.any(Date) },
+        { deleted_at: expect.any(Date) },
+      ]);
+    });
+
+    it("does not delete if not enough days have passed", async () => {
+      await petitions.deletePetitionsScheduledForDeletion(31, "TEST");
+
+      const [deletedPetition] = await mocks.knex
+        .from("petition")
+        .where({ id: petition.id })
+        .select("*");
+      expect(deletedPetition.deleted_at).toBeNull();
+
+      const notifications = await mocks.knex
+        .from("petition_user_notification")
+        .where({ petition_id: petition.id })
+        .select("*");
+      expect(notifications).toHaveLength(3);
+
+      const events = await mocks.knex
+        .from("petition_event")
+        .where({ petition_id: petition.id })
+        .select("*");
+      expect(events).toHaveLength(0);
+
+      const permissions = await mocks.knex
+        .from("petition_permission")
+        .where({ petition_id: petition.id, deleted_at: null })
+        .select("*");
+      expect(permissions).toHaveLength(4);
     });
   });
 });

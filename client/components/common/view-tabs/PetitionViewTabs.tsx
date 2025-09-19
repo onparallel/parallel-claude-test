@@ -38,7 +38,8 @@ export const PetitionViewTabs = Object.assign(
       if (isNonNullish(view)) {
         setQueryState({
           view: view.type === "ALL" ? "ALL" : view.id,
-          ...omit(view.data, ["__typename"]),
+          ...omit(view.data, ["__typename", "scheduledForDeletion"]),
+          scheduledForDeletion: view.data.scheduledForDeletion ?? undefined,
         });
       }
     };
@@ -93,7 +94,9 @@ export const PetitionViewTabs = Object.assign(
         if (isNonNullish(data)) {
           setQueryState({
             view: data.createPetitionListView.id,
-            ...omit(data.createPetitionListView.data, ["__typename"]),
+            ...omit(data.createPetitionListView.data, ["__typename", "scheduledForDeletion"]),
+            scheduledForDeletion:
+              data.createPetitionListView.data.scheduledForDeletion ?? undefined,
           });
         }
       } catch (error) {
@@ -203,6 +206,7 @@ export const PetitionViewTabs = Object.assign(
               direction
             }
             columns
+            scheduledForDeletion
           }
         `;
       },

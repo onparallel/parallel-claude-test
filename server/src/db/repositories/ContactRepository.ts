@@ -180,6 +180,7 @@ export class ContactRepository extends BaseRepository {
             .where("pp.user_id", userId)
             .whereNull("pp.deleted_at")
             .whereNull("p.deleted_at")
+            .whereNull("p.deletion_scheduled_at")
             .distinctOn("pa.id")
             .select("pa.*");
         })
@@ -219,6 +220,7 @@ export class ContactRepository extends BaseRepository {
             })
             .where("pa.contact_id", contactId)
             .whereNull("p.deleted_at")
+            .whereNull("p.deletion_scheduled_at")
             .distinctOn("pa.id")
             .select("pa.*");
         })

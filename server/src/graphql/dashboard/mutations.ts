@@ -14,6 +14,7 @@ import { SUCCESS } from "../helpers/Success";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import {
+  petitionsAreNotScheduledForDeletion,
   petitionsAreOfTypeTemplate,
   userHasAccessToPetitions,
   userHasFeatureFlag,
@@ -148,6 +149,7 @@ export const createCreatePetitionButtonDashboardModule = mutationField(
       dashboardCanCreateModule("dashboardId"),
       userHasAccessToPetitions("settings.templateId"),
       petitionsAreOfTypeTemplate("settings.templateId"),
+      petitionsAreNotScheduledForDeletion("settings.templateId"),
     ),
     args: {
       dashboardId: nonNull(globalIdArg("Dashboard")),
@@ -620,6 +622,7 @@ export const updateCreatePetitionButtonDashboardModule = mutationField(
         and(
           userHasAccessToPetitions("data.settings.templateId"),
           petitionsAreOfTypeTemplate("data.settings.templateId"),
+          petitionsAreNotScheduledForDeletion("data.settings.templateId"),
         ),
       ),
     ),

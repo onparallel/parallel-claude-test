@@ -159,6 +159,7 @@ import {
   petitionsAreEditable,
   petitionsAreInPath,
   petitionsAreNotPublicTemplates,
+  petitionsAreNotScheduledForDeletion,
   petitionsAreOfTypePetition,
   petitionsAreOfTypeTemplate,
   petitionsArePublicTemplates,
@@ -179,6 +180,7 @@ import { validatePublicPetitionLinkSlug } from "../validations";
 import { ApolloError, ArgValidationError, ForbiddenError } from "./../../helpers/errors";
 import {
   fieldIsNotBeingUsedInAutoSearchConfig,
+  publicPetitionLinkIsNotScheduledForDeletion,
   userCanSendAs,
   userHasAccessToPublicPetitionLink,
   userHasAccessToUserAndUserGroups,
@@ -197,6 +199,7 @@ export const createPetition = mutationField("createPetition", {
         ifArgDefined(
           "petitionId",
           and(
+            petitionsAreNotScheduledForDeletion("petitionId" as never),
             petitionIsNotAnonymized("petitionId" as never),
             or(
               userHasAccessToPetitions("petitionId" as never),
@@ -214,6 +217,7 @@ export const createPetition = mutationField("createPetition", {
         ifArgDefined(
           "petitionId",
           and(
+            petitionsAreNotScheduledForDeletion("petitionId" as never),
             petitionIsNotAnonymized("petitionId" as never),
             or(
               userHasAccessToPetitions("petitionId" as never),
@@ -316,6 +320,7 @@ export const clonePetitions = mutationField("clonePetitions", {
       ),
     ),
     contextUserCanClonePetitions("petitionIds"),
+    petitionsAreNotScheduledForDeletion("petitionIds"),
   ),
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
@@ -369,7 +374,14 @@ export const deletePetitions = mutationField("deletePetitions", {
   args: {
     ids: list(nonNull(globalIdArg("Petition"))),
     folders: "FoldersInput",
-    force: booleanArg({ default: false }),
+    deletePermanently: booleanArg({
+      default: false,
+      description: "Pass true to permanently delete instead of scheduling for deletion",
+    }),
+    force: booleanArg({
+      default: false,
+      description: "Pass true to force deleting petitions shared to other users",
+    }),
     dryrun: booleanArg({
       default: false,
       description:
@@ -386,6 +398,10 @@ export const deletePetitions = mutationField("deletePetitions", {
     }
   },
   resolve: async (_, args, ctx) => {
+    function petitionIsOwnedByUser(p: PetitionPermission[]) {
+      return p.some((u) => u.type === "OWNER" && u.user_id === ctx.user!.id);
+    }
+
     function petitionIsSharedByOwner(p: PetitionPermission[]) {
       return (
         p?.length > 1 && // the petition is being shared to another user
@@ -424,6 +440,14 @@ export const deletePetitions = mutationField("deletePetitions", {
       return SUCCESS;
     }
 
+    const petitions = await ctx.petitions.loadPetition(petitionIds);
+    const publicTemplates = petitions.filter((p) => p && p.is_template && p.template_public);
+    if (publicTemplates.length > 0) {
+      throw new ApolloError("Can't delete a public template", "DELETE_PUBLIC_TEMPLATE_ERROR", {
+        petitionIds: publicTemplates.map((p) => toGlobalId("Petition", p!.id)),
+      });
+    }
+
     // user permissions grouped by permission_id
     const userPermissions = await ctx.petitions.loadUserPermissionsByPetitionId(petitionIds);
 
@@ -451,65 +475,40 @@ export const deletePetitions = mutationField("deletePetitions", {
       );
     }
 
-    const petitions = await ctx.petitions.loadPetition(petitionIds);
-    const publicTemplates = petitions.filter((p) => p && p.is_template && p.template_public);
-    if (publicTemplates.length > 0) {
-      throw new ApolloError("Can't delete a public template", "DELETE_PUBLIC_TEMPLATE_ERROR", {
-        petitionIds: publicTemplates.map((p) => toGlobalId("Petition", p!.id)),
-      });
-    }
-
     if (args.dryrun) {
       return SUCCESS;
     }
 
+    const [petitionsOwnedByMe, petitionsSharedToMe] = partition(
+      zip(petitionIds, userPermissions),
+      ([, permissions]) => petitionIsOwnedByUser(permissions),
+    );
+
     await ctx.petitions.withTransaction(async (t) => {
       // delete my permissions to the petitions
       const deletedPermissions = await ctx.petitions.deleteUserPermissions(
-        petitionIds,
+        petitionsSharedToMe.map(([petitionId]) => petitionId),
         ctx.user!.id,
         `User:${ctx.user!.id}`,
         t,
       );
-
-      const ownerPermissions = deletedPermissions.filter((p) => p.type === "OWNER");
-
-      const [, deletedPetitions] = await Promise.all([
-        // make sure to also remove every remaining permission on deleted owned petitions
-        ctx.petitions.deleteAllPermissions(
-          ownerPermissions.map((p) => p.petition_id),
-          `User:${ctx.user!.id}`,
-          t,
-        ),
-        //finally, delete only petitions OWNED by me
-        ctx.petitions.deletePetition(
-          ownerPermissions.map((p) => p.petition_id),
-          ctx.user!,
-          t,
-        ),
-        // delete every user notification on the deleted petitions
-        ctx.petitions.deletePetitionUserNotificationsByPetitionId(
-          deletedPermissions.map((p) => p.petition_id),
-          undefined,
-          t,
-        ),
-      ]);
-
-      await ctx.petitions.createEvent(
-        deletedPetitions.map((petition) => ({
-          type: "PETITION_DELETED",
-          petition_id: petition.id,
-          data: {
-            user_id: ctx.user!.id,
-            status: petition.status!,
-          },
-        })),
+      // delete my notifications to the petitions
+      await ctx.petitions.deletePetitionUserNotificationsByPetitionId(
+        deletedPermissions.map((p) => p.petition_id),
+        [ctx.user!.id],
         t,
       );
 
+      if (petitionsOwnedByMe.length === 0) {
+        return;
+      }
+
       // check if there are pending signature requests on this petitions and cancel those
       const pendingSignatureRequests = (
-        await ctx.petitions.loadPetitionSignaturesByPetitionId(deletedPetitions.map((p) => p.id))
+        await ctx.petitions.loadPetitionSignaturesByPetitionId.raw(
+          petitionsOwnedByMe.map(([petitionId]) => petitionId),
+          t,
+        )
       ).flat();
 
       if (pendingSignatureRequests.length > 0) {
@@ -521,7 +520,75 @@ export const deletePetitions = mutationField("deletePetitions", {
           t,
         );
       }
+
+      await ctx.approvals.cancelApprovalRequestFlowByPetitionId(
+        petitionsOwnedByMe.map(([petitionId]) => petitionId),
+        ctx.user!.id,
+        t,
+      );
+
+      if (args.deletePermanently) {
+        // remove every permission on petitions owned by me
+        await ctx.petitions.deleteAllPermissions(
+          petitionsOwnedByMe.map(([petitionId]) => petitionId),
+          `User:${ctx.user!.id}`,
+          t,
+        );
+        // finally, delete petitions owned by me
+        const deletedPetitions = await ctx.petitions.deletePetition(
+          petitionsOwnedByMe.map(([petitionId]) => petitionId),
+          ctx.user!,
+          t,
+        );
+        // delete every user notification on the deleted petitions
+        await ctx.petitions.deletePetitionUserNotificationsByPetitionId(
+          petitionsOwnedByMe.map(([petitionId]) => petitionId),
+          undefined,
+          t,
+        );
+
+        await ctx.petitions.createEvent(
+          deletedPetitions.map((petition) => ({
+            type: "PETITION_DELETED",
+            petition_id: petition.id,
+            data: {
+              user_id: ctx.user!.id,
+              status: petition.status!,
+            },
+          })),
+          t,
+        );
+      } else {
+        // schedule for deletion petitions owned by me
+        await ctx.petitions.deactivateAllAccessesByPetitionId(
+          petitionsOwnedByMe.map(([petitionId]) => petitionId),
+          ctx.user!.id,
+          t,
+        );
+        await ctx.petitions.deactivatePublicPetitionLinksByTemplateId(
+          petitionsOwnedByMe.map(([petitionId]) => petitionId),
+          ctx.user!.id,
+          t,
+        );
+        const scheduledForDeletion = await ctx.petitions.schedulePetitionForDeletion(
+          petitionsOwnedByMe.map(([petitionId]) => petitionId),
+          `User:${ctx.user!.id}`,
+          t,
+        );
+
+        await ctx.petitions.createEvent(
+          scheduledForDeletion.map((petition) => ({
+            type: "PETITION_SCHEDULED_FOR_DELETION",
+            petition_id: petition.id,
+            data: {
+              user_id: ctx.user!.id,
+            },
+          })),
+          t,
+        );
+      }
     });
+
     return SUCCESS;
   },
 });
@@ -532,6 +599,7 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
   type: "PetitionBase",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreEditable("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -689,6 +757,7 @@ export const updatePetitionRestriction = mutationField("updatePetitionRestrictio
   type: "PetitionBase",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
   ),
@@ -738,6 +807,7 @@ export const closePetition = mutationField("closePetition", {
   type: "Petition",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     async (_, args, ctx) => {
@@ -748,7 +818,8 @@ export const closePetition = mutationField("closePetition", {
       if (signature && ["ENQUEUED", "PROCESSED", "PROCESSING"].includes(signature.status)) {
         throw new ApolloError(
           "Can't close the parallel with an ongoing signature process.",
-          "ONGOING_SIGNATURE_REQUEST_ERROR",
+          "ONGOING_PROCESS_ERROR",
+          { processType: "SIGNATURE" },
         );
       }
 
@@ -760,7 +831,8 @@ export const closePetition = mutationField("closePetition", {
       if (approvalSteps.some((s) => s.status === "PENDING")) {
         throw new ApolloError(
           "Can't close the parallel with a pending approval process.",
-          "ONGOING_APPROVAL_REQUEST_ERROR",
+          "ONGOING_PROCESS_ERROR",
+          { processType: "APPROVAL" },
         );
       }
 
@@ -801,7 +873,7 @@ export const updatePetition = mutationField("updatePetition", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreNotPublicTemplates("petitionId"),
-
+    petitionsAreNotScheduledForDeletion("petitionId"),
     ifSomeDefined(
       [
         "data.description",
@@ -1169,6 +1241,7 @@ export const updateTemplateDocumentTheme = mutationField("updateTemplateDocument
   type: "PetitionBase",
   authorize: authenticateAnd(
     userHasAccessToPetitions("templateId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("templateId"),
     petitionsAreNotPublicTemplates("templateId"),
     petitionsAreEditable("templateId"),
     petitionIsNotAnonymized("templateId"),
@@ -1193,6 +1266,7 @@ export const createPetitionField = mutationField("createPetitionField", {
   type: "PetitionField",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreEditable("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -1285,6 +1359,7 @@ export const clonePetitionField = mutationField("clonePetitionField", {
   type: "PetitionField",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     petitionsAreEditable("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
@@ -1309,6 +1384,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
   type: "PetitionBase",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldIsNotFixed("fieldId"),
     petitionsAreEditable("petitionId"),
@@ -1384,6 +1460,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
   type: "PetitionField",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     petitionsAreEditable("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
@@ -1750,6 +1827,7 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
   type: "PetitionField",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["DYNAMIC_SELECT"]),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -1870,6 +1948,7 @@ export const approveOrRejectPetitionFieldReplies = mutationField(
     type: "Petition",
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       not(petitionHasStatus("petitionId", "CLOSED")),
     ),
     args: {
@@ -1893,6 +1972,7 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
   type: "PetitionField",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     repliesBelongsToField("petitionFieldId", "petitionFieldReplyIds"),
     replyStatusCanBeUpdated("petitionFieldId"),
@@ -2017,6 +2097,7 @@ export const createContactlessPetitionAccess = mutationField("createContactlessP
   type: "PetitionAccess",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionHasRepliableFields("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     petitionsHaveEnabledInteractionWithRecipients("petitionId"),
@@ -2062,6 +2143,7 @@ export const sendPetition = mutationField("sendPetition", {
   type: nonNull(list(nonNull("SendPetitionResult"))),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionHasRepliableFields("petitionId"),
     userHasAccessToContactGroups("contactIdGroups"),
     userCanSendAs("senderId" as never),
@@ -2305,6 +2387,7 @@ export const sendReminders = mutationField("sendReminders", {
   type: nonNull(list(nonNull("PetitionReminder"))),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     accessesBelongToPetition("petitionId", "accessIds"),
     accessesHaveStatus("accessIds", "ACTIVE"),
     accessesHaveRemindersLeft("accessIds"),
@@ -2370,6 +2453,7 @@ export const switchAutomaticReminders = mutationField("switchAutomaticReminders"
   type: list(nonNull("PetitionAccess")),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     accessesBelongToPetition("petitionId", "accessIds"),
     accessesHaveStatus("accessIds", "ACTIVE"),
     accessesIsNotOptedOut("accessIds"),
@@ -2401,6 +2485,7 @@ export const deactivateAccesses = mutationField("deactivateAccesses", {
   type: list(nonNull("PetitionAccess")),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     accessesBelongToPetition("petitionId", "accessIds"),
     petitionIsNotAnonymized("petitionId"),
   ),
@@ -2424,6 +2509,7 @@ export const reactivateAccesses = mutationField("reactivateAccesses", {
   type: list(nonNull("PetitionAccess")),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     accessesBelongToPetition("petitionId", "accessIds"),
     accessesBelongToValidContacts("accessIds"),
     petitionIsNotAnonymized("petitionId"),
@@ -2443,6 +2529,7 @@ export const cancelScheduledMessage = mutationField("cancelScheduledMessage", {
   type: nullable("PetitionMessage"),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     messageBelongToPetition("petitionId", "messageId"),
     petitionIsNotAnonymized("petitionId"),
   ),
@@ -2460,6 +2547,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
   type: "PetitionField",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     petitionsAreEditable("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
@@ -2544,6 +2632,7 @@ export const sendPetitionClosedNotification = mutationField("sendPetitionClosedN
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     petitionsHaveEnabledInteractionWithRecipients("petitionId"),
   ),
@@ -2592,6 +2681,7 @@ export const reopenPetition = mutationField("reopenPetition", {
   type: "Petition",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     petitionHasStatus("petitionId", ["COMPLETED", "CLOSED"]),
   ),
@@ -2616,7 +2706,10 @@ export const reopenPetition = mutationField("reopenPetition", {
 export const updatePetitionMetadata = mutationField("updatePetitionMetadata", {
   description: "Updates the metadata of the specified petition",
   type: "Petition",
-  authorize: authenticateAnd(userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])),
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
+  ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     metadata: nonNull(jsonObjectArg()),
@@ -2635,6 +2728,7 @@ export const updatePetitionFieldReplyMetadata = mutationField("updatePetitionFie
   type: "PetitionFieldReply",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     petitionIsNotAnonymized("petitionId"),
   ),
@@ -2661,6 +2755,7 @@ export const updateTemplateDefaultPermissions = mutationField("updateTemplateDef
   type: "PetitionTemplate",
   authorize: authenticateAnd(
     userHasAccessToPetitions("templateId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("templateId"),
     petitionsAreOfTypeTemplate("templateId"),
     userHasAccessToUserAndUserGroups("permissions"),
   ),
@@ -2694,6 +2789,7 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
   type: "PublicPetitionLink",
   authorize: authenticateAnd(
     userHasAccessToPetitions("templateId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("templateId"),
     petitionsAreOfTypeTemplate("templateId"),
     templateDoesNotHavePublicPetitionLink("templateId"),
     petitionsHaveEnabledInteractionWithRecipients("templateId"),
@@ -2749,6 +2845,7 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
   type: "PublicPetitionLink",
   authorize: authenticateAnd(
     userHasAccessToPublicPetitionLink("publicPetitionLinkId", ["OWNER", "WRITE"]),
+    publicPetitionLinkIsNotScheduledForDeletion("publicPetitionLinkId"),
   ),
   args: {
     publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
@@ -2808,6 +2905,7 @@ export const modifyPetitionCustomProperty = mutationField("modifyPetitionCustomP
   type: "PetitionBase",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     userHasFeatureFlag("CUSTOM_PROPERTIES"),
   ),
@@ -2848,6 +2946,7 @@ export const completePetition = mutationField("completePetition", {
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionIsNotAnonymized("petitionId"),
   ),
@@ -3017,6 +3116,7 @@ export const createPublicPetitionLinkPrefillData = mutationField(
     authorize: authenticateAnd(
       userHasFeatureFlag("PUBLIC_PETITION_LINK_PREFILL_DATA"),
       userHasAccessToPublicPetitionLink("publicPetitionLinkId", ["OWNER", "WRITE"]),
+      publicPetitionLinkIsNotScheduledForDeletion("publicPetitionLinkId"),
     ),
     args: {
       publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
@@ -3061,6 +3161,7 @@ export const linkPetitionFieldChildren = mutationField("linkPetitionFieldChildre
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreEditable("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -3131,6 +3232,7 @@ export const unlinkPetitionFieldChildren = mutationField("unlinkPetitionFieldChi
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreEditable("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -3204,6 +3306,7 @@ export const linkFieldGroupToProfileType = mutationField("linkFieldGroupToProfil
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreEditable("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -3245,6 +3348,7 @@ export const createProfileLinkedPetitionField = mutationField("createProfileLink
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreEditable("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -3298,6 +3402,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
       profileIsNotAnonymized("profileId"),
       profileHasSameProfileTypeAsField("profileId", "petitionFieldId"),
       userHasAccessToPetitions("petitionId"),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       petitionsAreNotPublicTemplates("petitionId"),
       petitionIsNotAnonymized("petitionId"),
       petitionHasStatus("petitionId", ["CLOSED"]),
@@ -3955,6 +4060,7 @@ export const updatePetitionFieldGroupRelationships = mutationField(
     authorize: authenticateAnd(
       userHasFeatureFlag("PROFILES"),
       userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       petitionsAreEditable("petitionId"),
       petitionDoesNotHaveStartedProcess("petitionId"),
       petitionsAreNotPublicTemplates("petitionId"),
@@ -4003,6 +4109,7 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
     userHasFeatureFlag("PROFILES"),
     contextUserHasPermission("PETITIONS:CREATE_PETITIONS"),
     userHasAccessToPetitions("templateId"),
+    petitionsAreNotScheduledForDeletion("templateId"),
     petitionsAreOfTypeTemplate("templateId"),
     petitionsAreNotPublicTemplates("templateId"),
     petitionIsNotAnonymized("templateId"),
@@ -4144,6 +4251,7 @@ export const prefillPetitionFromProfiles = mutationField("prefillPetitionFromPro
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToPetitions("petitionId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreOfTypePetition("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     userHasAccessToCreatePetitionFromProfilePrefillInput("petitionId", "prefill"),
@@ -4244,6 +4352,7 @@ export const createFieldGroupRepliesFromProfiles = mutationField(
       petitionIsNotAnonymized("petitionId"),
       petitionsAreOfTypePetition("petitionId"),
       userHasAccessToPetitions("petitionId"),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       fieldsBelongsToPetition("petitionId", "petitionFieldId"),
       fieldHasType("petitionFieldId", ["FIELD_GROUP"]),
       fieldIsLinkedToProfileType("petitionFieldId"),
@@ -4349,6 +4458,7 @@ export const enableAutomaticNumberingOnPetitionFields = mutationField(
     type: "PetitionBase",
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      petitionsAreNotScheduledForDeletion("petitionId"),
       petitionIsNotAnonymized("petitionId"),
       petitionsAreEditable("petitionId"),
       petitionDoesNotHaveStartedProcess("petitionId"),
@@ -4368,3 +4478,64 @@ export const enableAutomaticNumberingOnPetitionFields = mutationField(
     },
   },
 );
+
+export const recoverPetitionsFromDeletion = mutationField("recoverPetitionsFromDeletion", {
+  description: "Recover a list of petitions from the recycle bin",
+  type: "Success",
+  authorize: authenticateAnd(ifArgDefined("ids", userHasAccessToPetitions("ids" as never))),
+  args: {
+    ids: list(nonNull(globalIdArg("Petition"))),
+    folders: "FoldersInput",
+  },
+  validateArgs: (_, args, ctx, info) => {
+    if ((args.ids?.length ?? 0) + (args.folders?.folderIds?.length ?? 0) === 0) {
+      throw new ArgValidationError(
+        info,
+        "ids or folders",
+        `Expected ids or folders.folderIds to be defined and not empty`,
+      );
+    }
+  },
+  resolve: async (_, { ids, folders }, ctx) => {
+    let petitionIds = ids ?? [];
+    if (isNonNullish(folders)) {
+      const folderIds = fromGlobalIds(folders.folderIds, "PetitionFolder", true).ids;
+      const folderPetitions = await ctx.petitions.getUserPetitionsInsideFolders(
+        folderIds,
+        folders.type === "TEMPLATE",
+        ctx.user!,
+      );
+      petitionIds.push(...folderPetitions.map((p) => p.id));
+    }
+
+    petitionIds = unique(petitionIds);
+    if (petitionIds.length === 0) {
+      // nothing to recover
+      return SUCCESS;
+    }
+
+    const userPermissions = await ctx.petitions.loadUserPermissionsByPetitionId(petitionIds);
+
+    if (
+      !userPermissions.every((p) => p.some((u) => u.type === "OWNER" && u.user_id === ctx.user!.id))
+    ) {
+      throw new ForbiddenError("You don't have permission to recover these petitions");
+    }
+
+    const recovered = await ctx.petitions.updatePetition(
+      petitionIds,
+      { deletion_scheduled_at: null },
+      `User:${ctx.user!.id}`,
+    );
+
+    await ctx.petitions.createEvent(
+      recovered.map((p) => ({
+        type: "PETITION_RECOVERED_FROM_DELETION",
+        data: { user_id: ctx.user!.id },
+        petition_id: p.id,
+      })),
+    );
+
+    return SUCCESS;
+  },
+});

@@ -8,6 +8,7 @@ import {
   petitionDoesNotHaveStartedProcess,
   petitionIsNotAnonymized,
   petitionsAreEditable,
+  petitionsAreNotScheduledForDeletion,
   userHasAccessToPetitions,
 } from "../authorizers";
 import {
@@ -22,6 +23,7 @@ export const createPetitionVariable = mutationField("createPetitionVariable", {
   description: "Creates a new variable on the petition.",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreEditable("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -60,6 +62,7 @@ export const updatePetitionVariable = mutationField("updatePetitionVariable", {
   description: "Updates a variable on the petition.",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreEditable("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -93,6 +96,7 @@ export const deletePetitionVariable = mutationField("deletePetitionVariable", {
   description: "Deletes a variable from the petition.",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
+    petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreEditable("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionIsNotAnonymized("petitionId"),

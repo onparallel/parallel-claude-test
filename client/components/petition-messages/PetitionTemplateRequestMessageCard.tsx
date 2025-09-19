@@ -24,12 +24,13 @@ interface PetitionTemplateRequestMessageCardProps {
   petition: PetitionTemplateRequestMessageCard_PetitionTemplateFragment;
   user: PetitionTemplateRequestMessageCard_UserFragment;
   onUpdatePetition: (data: UpdatePetitionInput) => void;
+  isDisabled: boolean;
 }
 
 export const PetitionTemplateRequestMessageCard = Object.assign(
   chakraForwardRef<"section", PetitionTemplateRequestMessageCardProps>(
     function PetitionTemplateRequestMessageCard(
-      { petition, user, onUpdatePetition, ...props },
+      { petition, user, onUpdatePetition, isDisabled, ...props },
       ref,
     ) {
       const [messages, setMessages] = useState({
@@ -52,8 +53,6 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
         onUpdatePetition({ emailBody: isEmptyRTEValue(emailBody) ? null : emailBody });
       };
 
-      const myEffectivePermission = petition.myEffectivePermission!.permissionType;
-
       const _handleSearchUsers = useSearchUsers();
 
       const handleSearchUsers = useCallback(
@@ -69,8 +68,7 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
         setOnBehalf(user);
         onUpdatePetition({ defaultOnBehalfId: user?.id ?? null });
       };
-      const isDisabled =
-        petition.isRestricted || petition.isPublic || myEffectivePermission === "READ";
+
       return (
         <Card ref={ref} {...props}>
           <CardHeader leftIcon={<EmailIcon marginEnd={2} role="presentation" />}>
@@ -142,11 +140,6 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
           id
           emailSubject
           emailBody
-          isRestricted
-          isPublic
-          myEffectivePermission {
-            permissionType
-          }
           defaultOnBehalf {
             ...UserSelect_User
           }

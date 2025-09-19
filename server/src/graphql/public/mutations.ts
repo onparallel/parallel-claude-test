@@ -723,6 +723,7 @@ export const publicRemindersOptOut = mutationField("publicRemindersOptOut", {
     other: nonNull(stringArg()),
     referer: nullable(stringArg()),
   },
+  authorize: fetchPetitionAccess("keycode"),
   resolve: async (_, args, ctx) => {
     try {
       const access = await ctx.petitions.loadAccessByKeycode(args.keycode);

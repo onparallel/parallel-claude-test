@@ -88,8 +88,9 @@ export class PetitionApprovalRequestRepository extends BaseRepository {
     id: number,
     data: Partial<PetitionApprovalRequestStep>,
     updatedBy: string,
+    t?: Knex.Transaction,
   ): Promise<PetitionApprovalRequestStep | undefined> {
-    const [row] = await this.from("petition_approval_request_step")
+    const [row] = await this.from("petition_approval_request_step", t)
       .where("id", id)
       .whereNull("deprecated_at")
       .update(
@@ -108,12 +109,13 @@ export class PetitionApprovalRequestRepository extends BaseRepository {
     petitionApprovalRequestStepId: number,
     users: { id: number; skipped?: boolean; canceled?: boolean }[],
     createdBy: string,
+    t?: Knex.Transaction,
   ) {
     if (users.length === 0) {
       return;
     }
 
-    await this.from("petition_approval_request_step_approver").insert(
+    await this.from("petition_approval_request_step_approver", t).insert(
       users.map((u) => ({
         petition_approval_request_step_id: petitionApprovalRequestStepId,
         user_id: u.id,
@@ -135,13 +137,14 @@ export class PetitionApprovalRequestRepository extends BaseRepository {
       skipped?: boolean;
     },
     updatedBy: string,
+    t?: Knex.Transaction,
   ) {
     const ids = unMaybeArray(id);
     if (ids.length === 0) {
       return;
     }
 
-    await this.from("petition_approval_request_step_approver")
+    await this.from("petition_approval_request_step_approver", t)
       .whereIn("id", ids)
       .update({
         ...(timestamps.sent ? { sent_at: this.now() } : {}),
@@ -168,14 +171,26 @@ export class PetitionApprovalRequestRepository extends BaseRepository {
       });
   }
 
-  async updatePetitionApprovalRequestStepsAsDeprecated(petitionId: number) {
-    const data = await this.from("petition_approval_request_step")
-      .where("petition_id", petitionId)
+  async updatePetitionApprovalRequestStepsAsDeprecated(
+    petitionId: MaybeArray<number>,
+    t?: Knex.Transaction,
+  ) {
+    const petitionIds = unMaybeArray(petitionId);
+    if (petitionIds.length === 0) {
+      return [];
+    }
+    const data = await this.from("petition_approval_request_step", t)
+      .whereIn("petition_id", petitionIds)
       .whereNull("deprecated_at")
       .update({ deprecated_at: this.now() })
       .returning("*");
 
-    return sortBy(data, [(d) => d.step_number, "asc"]);
+    return petitionIds.map((id) =>
+      sortBy(
+        data.filter((d) => d.petition_id === id),
+        [(d) => d.step_number, "asc"],
+      ),
+    );
   }
 
   async deleteNotStartedPetitionApprovalRequestStepsAndApproversByPetitionId(petitionId: number) {

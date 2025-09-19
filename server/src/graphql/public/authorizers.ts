@@ -92,7 +92,7 @@ export function fetchPetitionAccess<
       ]);
       ctx.contact = contact;
 
-      if (!petition) {
+      if (!petition || petition.deletion_scheduled_at !== null) {
         throw new ApolloError(
           `Petition for petition access with keycode ${keycode} not found`,
           "PUBLIC_PETITION_NOT_AVAILABLE",
@@ -215,6 +215,10 @@ export function validPublicPetitionLinkSlug<
       throw new ForbiddenError("Template does not allow interaction with recipients");
     }
 
+    if (template.deletion_scheduled_at !== null) {
+      throw new ForbiddenError("Template is scheduled for deletion");
+    }
+
     return true;
   };
 }
@@ -302,12 +306,13 @@ export function publicPetitionDoesNotHaveOngoingProcess<
     assert(access, "Access not found");
     const petitionId = access.petition_id;
 
-    const [process] = await ctx.petitions.getPetitionStartedProcesses(petitionId);
+    const [processType] = await ctx.petitions.getPetitionStartedProcesses(petitionId);
 
-    if (isNonNullish(process)) {
+    if (isNonNullish(processType)) {
       throw new ApolloError(
-        `Petition has an ongoing ${process.toLowerCase()} process`,
-        `ONGOING_${process}_REQUEST_ERROR`,
+        `Petition has an ongoing ${processType.toLowerCase()} process`,
+        `ONGOING_PROCESS_ERROR`,
+        { processType },
       );
     }
     return true;

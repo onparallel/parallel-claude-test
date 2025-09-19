@@ -33,6 +33,7 @@ import { RichTextEditor } from "../common/slate/RichTextEditor";
 interface PetitionTemplateCompletingMessageCardProps {
   petition: PetitionTemplateCompletingMessageCard_PetitionTemplateFragment;
   onUpdatePetition: (data: UpdatePetitionInput) => void;
+  isDisabled: boolean;
 }
 
 const messagesSubject: Record<PetitionLocale, string> = {
@@ -53,7 +54,10 @@ const messagesBody: Record<PetitionLocale, string> = {
 
 export const PetitionTemplateCompletingMessageCard = Object.assign(
   chakraForwardRef<"section", PetitionTemplateCompletingMessageCardProps>(
-    function PetitionTemplateCompletingMessageCard({ petition, onUpdatePetition, ...props }, ref) {
+    function PetitionTemplateCompletingMessageCard(
+      { petition, onUpdatePetition, isDisabled, ...props },
+      ref,
+    ) {
       const intl = useIntl();
       const placeholders = usePetitionMessagePlaceholderOptions({ petition });
       const [isEnabled, setIsEnabled] = useState(petition.isCompletingMessageEnabled);
@@ -64,8 +68,6 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
         petition.completingMessageBody ??
           textWithPlaceholderToSlateNodes(messagesBody[petition.locale], placeholders),
       );
-
-      const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
       const handleSubjectChange = (completingMessageSubject: string) => {
         if (completingMessageSubject === subject) return;
@@ -96,15 +98,12 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
         });
       };
 
-      const isReadOnly =
-        petition.isRestricted || petition.isPublic || myEffectivePermission === "READ";
-
       return (
         <Card {...props}>
           <CardHeader
             leftIcon={<AppWindowIcon marginEnd={2} role="presentation" />}
             rightAction={
-              <Switch isChecked={isEnabled} onChange={handleSwitchChange} isDisabled={isReadOnly} />
+              <Switch isChecked={isEnabled} onChange={handleSwitchChange} isDisabled={isDisabled} />
             }
           >
             <HStack>
@@ -143,7 +142,7 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
                   </AlertDescription>
                 </CloseableAlert>
               ) : null}
-              <FormControl isDisabled={isReadOnly}>
+              <FormControl isDisabled={isDisabled}>
                 <FormLabel paddingBottom={0}>
                   <FormattedMessage
                     id="component.petition-template-completing-message.subject-label"
@@ -166,7 +165,7 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
               <FormControl
                 marginTop={4}
                 id={`completing-message-${petition.id}`}
-                isDisabled={isReadOnly}
+                isDisabled={isDisabled}
               >
                 <RichTextEditor
                   value={body}
@@ -193,14 +192,9 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
           isCompletingMessageEnabled
           completingMessageSubject
           completingMessageBody
-          isRestricted
-          isPublic
           locale
           signatureConfig {
             isEnabled
-          }
-          myEffectivePermission {
-            permissionType
           }
           ...usePetitionMessagePlaceholderOptions_PetitionBase
         }
