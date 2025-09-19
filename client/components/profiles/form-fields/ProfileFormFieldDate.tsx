@@ -4,7 +4,7 @@ import { DateInput } from "@parallel/components/common/DateInput";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { isPast, sub } from "date-fns";
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { isNonNullish } from "remeda";
 import { ProfileFormData } from "../ProfileForm";
 import { ProfileFormFieldProps } from "./ProfileFormField";
@@ -29,7 +29,7 @@ export function ProfileFormFieldDate({
   onToggleSuggestions,
 }: ProfileFormFieldDateProps) {
   const { browserName } = useBrowserMetadata();
-  const { register } = useFormContext<ProfileFormData>();
+  const { control } = useFormContext<ProfileFormData>();
   const alertIsActive =
     isNonNullish(expiryDate) &&
     isNonNullish(field.expiryAlertAheadTime) &&
@@ -47,17 +47,26 @@ export function ProfileFormFieldDate({
       onToggleSuggestions={onToggleSuggestions}
     >
       <Flex flex="1" position="relative">
-        <DateInput
-          {...register(`fields.${field.id}.content.value`)}
-          borderColor="transparent"
-          color={!!useReplyAsExpiryDate && alertIsActive ? "red.500" : undefined}
-          onBlur={(e) => {
-            if (e.target.value) {
-              showExpiryDateDialog({});
-            }
+        <Controller
+          name={`fields.${field.id}.content.value`}
+          control={control}
+          render={({ field }) => {
+            return (
+              <DateInput
+                {...field}
+                borderColor="transparent"
+                color={!!useReplyAsExpiryDate && alertIsActive ? "red.500" : undefined}
+                onBlur={(e) => {
+                  if (e.target.value) {
+                    showExpiryDateDialog({});
+                  }
+                }}
+                isDisabled={isDisabled}
+              />
+            );
           }}
-          isDisabled={isDisabled}
         />
+
         {browserName === "Firefox" ? null : (
           <Center
             boxSize={10}

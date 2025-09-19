@@ -41,7 +41,7 @@ export function ProfileFormFieldNumber({
             <NumeralInput
               name={name}
               borderColor="transparent"
-              value={value ?? undefined}
+              value={value}
               onChange={(value) => onChange(value ?? null)}
               onBlur={() => {
                 if (isNonNullish(value)) {

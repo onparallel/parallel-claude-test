@@ -85,7 +85,14 @@ function buildFormDefaultValue(properties: ProfileForm_ProfileFieldPropertyFragm
         {
           type,
           profileTypeFieldId: id,
-          content: type === "FILE" ? { value: [] } : (value?.content ?? { value: null }),
+          content:
+            type === "FILE"
+              ? { value: [] }
+              : {
+                  value:
+                    value?.content?.value ??
+                    (["SHORT_TEXT", "TEXT", "PHONE", "DATE"].includes(type) ? "" : null),
+                },
           expiryDate: isExpirable
             ? ((type === "FILE" ? files?.[0]?.expiryDate : value?.expiryDate) ?? null)
             : null,
