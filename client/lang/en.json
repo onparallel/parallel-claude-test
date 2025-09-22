@@ -17800,9 +17800,9 @@
     "context": "You are viewing a filter from the dashboard module: {module}. Results may differ due to the parallels not being shared with you."
   },
   {
-    "term": "page.petitions.no-parallels",
-    "definition": "You have no parallels yet. Start by creating one now!",
-    "context": "You have no parallels yet. Start by creating one now!"
+    "term": "page.petitions.no-deleted-templates-or-parallels",
+    "definition": "There are no {type, select, PETITION {parallels} other {templates}} in the bin",
+    "context": "There are no {type, select, PETITION {parallels} other {templates}} in the bin"
   },
   {
     "term": "page.petitions.no-results",
@@ -17810,9 +17810,9 @@
     "context": "There are no parallels matching your criteria"
   },
   {
-    "term": "page.petitions.no-templates",
-    "definition": "You have no templates yet. Start by creating one now!",
-    "context": "You have no templates yet. Start by creating one now!"
+    "term": "page.petitions.no-templates-or-parallels",
+    "definition": "You have no {type, select, PETITION {parallels} other {templates}} yet. Start by creating one now!",
+    "context": "You have no {type, select, PETITION {parallels} other {templates}} yet. Start by creating one now!"
   },
   {
     "term": "page.petitions.scheduled-for-deletion-alert",

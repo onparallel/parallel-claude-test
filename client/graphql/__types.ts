@@ -62795,6 +62795,7 @@ export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
   lastRecipientActivityAt?: string | null;
   currentApprovalRequestStatus?: PetitionApprovalRequestStatus;
   id: string;
+  permanentDeletionAt?: string | null;
   createdAt?: string;
   path: string;
   myEffectivePermission?: {
@@ -62902,6 +62903,7 @@ export type Petitions_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
   name?: string | null;
   isPublic: boolean;
   id: string;
+  permanentDeletionAt?: string | null;
   createdAt?: string;
   locale: PetitionLocale;
   isRestricted: boolean;
@@ -63151,6 +63153,7 @@ export type Petitions_petitionsQuery = {
           lastRecipientActivityAt?: string | null;
           currentApprovalRequestStatus?: PetitionApprovalRequestStatus;
           id: string;
+          permanentDeletionAt?: string | null;
           createdAt?: string;
           path: string;
           myEffectivePermission?: {
@@ -63261,6 +63264,7 @@ export type Petitions_petitionsQuery = {
           name?: string | null;
           isPublic: boolean;
           id: string;
+          permanentDeletionAt?: string | null;
           createdAt?: string;
           locale: PetitionLocale;
           isRestricted: boolean;
@@ -70909,6 +70913,7 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   currentApprovalRequestStatus?: PetitionApprovalRequestStatus;
   id: string;
   name?: string | null;
+  permanentDeletionAt?: string | null;
   createdAt?: string;
   status: PetitionStatus;
   accesses?: Array<{
@@ -71002,6 +71007,7 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
+  permanentDeletionAt?: string | null;
   createdAt?: string;
   locale: PetitionLocale;
   isRestricted: boolean;
@@ -81811,6 +81817,7 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
   fragment usePetitionsTableColumns_PetitionBase on PetitionBase {
     id
     name
+    permanentDeletionAt
     createdAt @include(if: $includeCreatedAt)
     permissions @include(if: $includeSharedWith) {
       permissionType

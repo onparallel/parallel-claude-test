@@ -720,19 +720,23 @@ function Petitions() {
                   />
                 ) : (
                   <Center flex="1" minHeight="200px">
-                    <Text fontSize="lg">
-                      {queryState.type === "TEMPLATE" ? (
+                    {queryState.scheduledForDeletion ? (
+                      <Text fontSize="lg">
                         <FormattedMessage
-                          id="page.petitions.no-templates"
-                          defaultMessage="You have no templates yet. Start by creating one now!"
+                          id="page.petitions.no-deleted-templates-or-parallels"
+                          defaultMessage="There are no {type, select, PETITION {parallels} other {templates}} in the bin"
+                          values={{ type: queryState.type }}
                         />
-                      ) : (
+                      </Text>
+                    ) : (
+                      <Text fontSize="lg">
                         <FormattedMessage
-                          id="page.petitions.no-parallels"
-                          defaultMessage="You have no parallels yet. Start by creating one now!"
+                          id="page.petitions.no-templates-or-parallels"
+                          defaultMessage="You have no {type, select, PETITION {parallels} other {templates}} yet. Start by creating one now!"
+                          values={{ type: queryState.type }}
                         />
-                      )}
-                    </Text>
+                      </Text>
+                    )}
                   </Center>
                 )
               ) : null

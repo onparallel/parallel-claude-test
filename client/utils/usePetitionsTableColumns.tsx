@@ -44,7 +44,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { MouseEvent, useMemo } from "react";
-import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 import { firstBy, isNonNullish } from "remeda";
 import { EnumerateList } from "./EnumerateList";
 import { useGoToContact } from "./goToContact";
@@ -571,7 +571,10 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
     Filter: PetitionListTagFilter,
     CellContent: ({ row }) =>
       row.__typename === "Petition" && isNonNullish(row.tags) ? (
-        <PetitionTagListCellContent petition={row} />
+        <PetitionTagListCellContent
+          petition={row}
+          isDisabled={isNonNullish(row.permanentDeletionAt)}
+        />
       ) : null,
   },
   {
@@ -644,9 +647,7 @@ export const PETITIONS_COLUMNS: PetitionsTableColumns_PetitionOrFolder[] = [
   },
 ];
 
-export const TEMPLATES_COLUMNS = (
-  intl: IntlShape,
-): PetitionsTableColumns_PetitionTemplateOrFolder[] => [
+export const TEMPLATES_COLUMNS: PetitionsTableColumns_PetitionTemplateOrFolder[] = [
   {
     key: "name",
     isSortable: true,
@@ -748,7 +749,10 @@ export const TEMPLATES_COLUMNS = (
     Filter: PetitionListTagFilter,
     CellContent: ({ row }) =>
       row.__typename === "PetitionTemplate" && isNonNullish(row.tags) ? (
-        <PetitionTagListCellContent petition={row} />
+        <PetitionTagListCellContent
+          petition={row}
+          isDisabled={isNonNullish(row.permanentDeletionAt)}
+        />
       ) : null,
   },
 ];
@@ -781,10 +785,9 @@ export function usePetitionsTableColumns(
   type: PetitionBaseType,
   me: usePetitionsTableColumns_UserFragment,
 ): PetitionsTableColumns_PetitionBaseOrFolder[] {
-  const intl = useIntl();
   return useMemo(() => {
     if (type === "TEMPLATE") {
-      return TEMPLATES_COLUMNS(intl);
+      return TEMPLATES_COLUMNS;
     } else {
       return PETITIONS_COLUMNS.filter((c) =>
         c.key === "approvals" ? me.hasPetitionApprovalFlow : true,
@@ -804,6 +807,7 @@ usePetitionsTableColumns.fragments = {
     fragment usePetitionsTableColumns_PetitionBase on PetitionBase {
       id
       name
+      permanentDeletionAt
       createdAt @include(if: $includeCreatedAt)
       permissions @include(if: $includeSharedWith) {
         permissionType

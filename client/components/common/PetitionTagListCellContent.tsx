@@ -20,8 +20,10 @@ type TagSelection = PetitionTagListCellContent_TagFragment;
 
 export function PetitionTagListCellContent({
   petition,
+  isDisabled,
 }: {
   petition: PetitionTagListCellContent_PetitionBaseFragment;
+  isDisabled: boolean;
 }) {
   const selectWrapperRef = useRef<HTMLDivElement>(null);
   const selectRef = useRef<TagSelectInstance<true>>(null);
@@ -79,9 +81,9 @@ export function PetitionTagListCellContent({
       alignItems="center"
       sx={{ scrollMarginTop: "38px" }}
       position="relative"
-      onClick={handleClick}
+      onClick={isDisabled ? undefined : handleClick}
     >
-      {isEditing ? (
+      {isEditing && !isDisabled ? (
         <Box position="absolute" inset={0} zIndex="1">
           <TagSelect
             ref={selectRef}
@@ -126,7 +128,7 @@ export function PetitionTagListCellContent({
           alignItems="center"
           maxWidth="400px"
         >
-          {petition.tags.length === 0 ? (
+          {petition.tags.length === 0 && !isDisabled ? (
             <Stack
               direction="row"
               alignItems="center"
