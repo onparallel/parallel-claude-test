@@ -33,6 +33,7 @@ import { inject, injectable } from "inversify";
 import { decode } from "jsonwebtoken";
 import { isNonNullish, isNullish, pick } from "remeda";
 import { getClientIp } from "request-ip";
+import { assert } from "ts-essentials";
 import { Memoize } from "typescript-memoize";
 import { URL, URLSearchParams } from "url";
 import { CONFIG, Config } from "../config";
@@ -253,9 +254,10 @@ export class Auth implements IAuth {
   }
 
   async guessLogin(req: Request, res: Response, next: NextFunction) {
-    const { email, locale, redirect } = req.body;
-    const [, domain] = email.split("@");
     try {
+      const { email, locale, redirect } = req.body;
+      assert(typeof email === "string", "Invalid body");
+      const [, domain] = email.split("@");
       const sso = await this.integrations.loadSSOIntegrationByDomain(domain);
       if (sso) {
         const org = (await this.orgs.loadOrg(sso.org_id))!;
@@ -278,7 +280,7 @@ export class Auth implements IAuth {
       } else {
         res.json({ type: "PASSWORD" });
       }
-    } catch (error: any) {
+    } catch (error) {
       next(error);
     }
   }
@@ -429,6 +431,7 @@ export class Auth implements IAuth {
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password } = req.body;
+      assert(typeof email === "string" && typeof password === "string", "Invalid body");
       req.context.logger.info(`Login attempt for ${email}`);
       const auth = await this.initiateAuth(email, password, this.getContextData(req));
       if (auth.AuthenticationResult) {
@@ -456,7 +459,7 @@ export class Auth implements IAuth {
       } else {
         res.status(401).send({ error: "UnknownError" });
       }
-    } catch (error: any) {
+    } catch (error) {
       if (error instanceof PasswordResetRequiredException) {
         res.status(401).send({ error: "PasswordResetRequired" });
         return;
@@ -471,10 +474,12 @@ export class Auth implements IAuth {
         return;
       }
 
-      req.context.logger.error(error?.message, {
-        stack: error?.stack,
-        body: { email: req.body.email }, // be careful not to expose the password!
-      });
+      if (error instanceof Error) {
+        req.context.logger.error(error.message, {
+          stack: error.stack,
+          body: { email: req.body.email }, // be careful not to expose the password!
+        });
+      }
       res.status(401).send({ error: "InvalidUsernameOrPassword" });
     }
   }
@@ -482,6 +487,12 @@ export class Auth implements IAuth {
   async newPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password, newPassword } = req.body;
+      assert(
+        typeof email === "string" &&
+          typeof password === "string" &&
+          typeof newPassword === "string",
+        "Invalid body",
+      );
       const auth = await this.initiateAuth(email, password, this.getContextData(req));
       if (auth.ChallengeName !== "NEW_PASSWORD_REQUIRED") {
         return res.status(401).send({ error: "UnknownError" });
@@ -523,6 +534,7 @@ export class Auth implements IAuth {
 
   async forgotPassword(req: Request, res: Response, next: NextFunction) {
     const { email, locale } = req.body;
+    assert(typeof email === "string", "Invalid body");
     const [, cognitoUser] = await withError(this.getUser(email));
     try {
       if (cognitoUser?.UserStatus === "FORCE_CHANGE_PASSWORD") {
@@ -572,6 +584,12 @@ export class Auth implements IAuth {
   async confirmForgotPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, verificationCode, newPassword } = req.body;
+      assert(
+        typeof email === "string" &&
+          typeof verificationCode === "string" &&
+          typeof newPassword === "string",
+        "Invalid body",
+      );
       this.logger.info(`Confirming forgot password for ${email}`);
       await withForcedDelay(
         async () =>
