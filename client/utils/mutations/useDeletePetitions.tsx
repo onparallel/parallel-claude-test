@@ -1,6 +1,7 @@
 import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { Button, Center, ListItem, Spinner, Stack, Text, UnorderedList } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
+import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   BaseModalProps,
@@ -28,6 +29,8 @@ export function useDeletePetitions({ modalProps }: { modalProps?: BaseModalProps
   const showErrorDialog = useErrorDialog();
   const confirmDelete = useDialog(ConfirmDeletePetitionsDialog);
   const confirmDeleteSharedPetitions = useDialog(ConfirmDeleteSharedPetitionsDialog);
+  const confirmDeletePermanentlyPetitions = useConfirmDeletePermanentlyPetitionsDialog();
+
   const apollo = useApolloClient();
 
   const [deletePetitions] = useMutation(useDeletePetitions_deletePetitionsDocument);
@@ -78,22 +81,36 @@ export function useDeletePetitions({ modalProps }: { modalProps?: BaseModalProps
         if (error && isApolloError(error, "DELETE_SHARED_PETITION_ERROR")) {
           if (!skipConfirmDialogs) {
             // some of the petitions are shared by me to other users, show a confirmation dialog before deleting
-            await confirmDeleteSharedPetitions({
-              petitionIds: error.graphQLErrors[0].extensions!.petitionIds as string[],
-              type,
-              currentPath,
-              deletePermanently,
-              modalProps,
-            });
+            if (deletePermanently) {
+              await confirmDeletePermanentlyPetitions({
+                petitionsOrFolders: petitionsOrFolders,
+                type,
+                modalProps,
+              });
+            } else {
+              await confirmDeleteSharedPetitions({
+                petitionIds: error.graphQLErrors[0].extensions!.petitionIds as string[],
+                type,
+                currentPath,
+                modalProps,
+              });
+            }
           }
         } else if (!error) {
           if (!skipConfirmDialogs) {
-            await confirmDelete({
-              petitionsOrFolders: petitionsOrFolders,
-              type,
-              deletePermanently,
-              modalProps,
-            });
+            if (deletePermanently) {
+              await confirmDeletePermanentlyPetitions({
+                petitionsOrFolders: petitionsOrFolders,
+                type,
+                modalProps,
+              });
+            } else {
+              await confirmDelete({
+                petitionsOrFolders: petitionsOrFolders,
+                type,
+                modalProps,
+              });
+            }
           }
         } else {
           throw error;
@@ -208,12 +225,10 @@ export function useDeletePetitions({ modalProps }: { modalProps?: BaseModalProps
 function ConfirmDeletePetitionsDialog({
   petitionsOrFolders,
   type,
-  deletePermanently,
   ...props
 }: DialogProps<{
   petitionsOrFolders: useDeletePetitions_PetitionBaseOrFolderFragment[];
   type: PetitionBaseType;
-  deletePermanently?: boolean;
 }>) {
   const intl = useIntl();
   const [folders, petitions] = partitionOnTypename(petitionsOrFolders, "PetitionFolder");
@@ -296,46 +311,52 @@ function ConfirmDeletePetitionsDialog({
                 }}
               />
             ) : (
-              <FormattedMessage
-                id="component.confirm-delete-petitions-dialog.body"
-                defaultMessage="Are you sure you want to delete {list}? Any pending signature or approval requests will be cancelled."
-                values={{
-                  list: intl.formatList(
-                    [
-                      folders.length > 0
-                        ? intl.formatMessage(
-                            {
-                              id: "component.confirm-delete-petitions-dialog.body-part-folders",
-                              defaultMessage:
-                                "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected folders}} ({petitionCount, plural, =1{# parallel} other {# parallels}})",
-                            },
-                            {
-                              count: folders.length,
-                              name: <PathName path={folders[0].path} type={type} />,
-                              petitionCount: folderPetitionCount,
-                            },
-                          )
-                        : null,
-                      petitions.length > 0
-                        ? intl.formatMessage(
-                            {
-                              id: "component.confirm-delete-petitions-dialog.body-part-petitions",
-                              defaultMessage:
-                                "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected parallels}}",
-                            },
-                            {
-                              count: petitions.length,
-                              name: <PetitionNameWithPath petition={petitions[0]} />,
-                            },
-                          )
-                        : null,
-                    ].filter(isNonNullish),
-                  ),
-                }}
-              />
+              <>
+                <FormattedMessage
+                  id="component.confirm-delete-petitions-dialog.body"
+                  defaultMessage="Are you sure you want to delete {list}?"
+                  values={{
+                    list: intl.formatList(
+                      [
+                        folders.length > 0
+                          ? intl.formatMessage(
+                              {
+                                id: "component.confirm-delete-petitions-dialog.body-part-folders",
+                                defaultMessage:
+                                  "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected folders}} ({petitionCount, plural, =1{# parallel} other {# parallels}})",
+                              },
+                              {
+                                count: folders.length,
+                                name: <PathName path={folders[0].path} type={type} />,
+                                petitionCount: folderPetitionCount,
+                              },
+                            )
+                          : null,
+                        petitions.length > 0
+                          ? intl.formatMessage(
+                              {
+                                id: "component.confirm-delete-petitions-dialog.body-part-petitions",
+                                defaultMessage:
+                                  "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected parallels}}",
+                              },
+                              {
+                                count: petitions.length,
+                                name: <PetitionNameWithPath petition={petitions[0]} />,
+                              },
+                            )
+                          : null,
+                      ].filter(isNonNullish),
+                    ),
+                  }}
+                />{" "}
+                <FormattedMessage
+                  id="component.confirm-delete-petitions-dialog.body-process-cancelled"
+                  defaultMessage="Any pending signature or approval requests will be cancelled."
+                />
+              </>
             )}
           </Text>
-          {isOneSharedToMe ? (
+          {isOneSharedToMe && (
             <Text fontWeight="bold">
               <FormattedMessage
                 id="component.confirm-delete-petitions-dialog.shared-to-me-body-2"
@@ -343,24 +364,6 @@ function ConfirmDeletePetitionsDialog({
                 values={{ type }}
               />
             </Text>
-          ) : (
-            deletePermanently && (
-              <Text fontWeight="bold">
-                {type === "TEMPLATE" ? (
-                  <FormattedMessage
-                    id="component.delete-petitions-dialog.delete-permanently-template"
-                    defaultMessage="This action will delete the {count, plural, =1 {template} other {templates}} permanently and cannot be undone."
-                    values={{ count }}
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="component.delete-petitions-dialog.delete-permanently-petition"
-                    defaultMessage="This action will delete the {count, plural, =1 {parallel} other {parallels}} permanently and cannot be undone."
-                    values={{ count }}
-                  />
-                )}
-              </Text>
-            )
           )}
         </Stack>
       }
@@ -389,13 +392,11 @@ function ConfirmDeleteSharedPetitionsDialog({
   petitionIds,
   type,
   currentPath,
-  deletePermanently,
   ...props
 }: DialogProps<{
   petitionIds: string[];
   type: PetitionBaseType;
   currentPath?: string;
-  deletePermanently?: boolean;
 }>) {
   const { data, loading } = useQuery(useDeletePetitions_petitionsDocument, {
     variables: { ids: petitionIds },
@@ -434,13 +435,19 @@ function ConfirmDeleteSharedPetitionsDialog({
               />
             </Text>
           ) : (
-            <Text>
-              <FormattedMessage
-                id="component.delete-shared-petitions-dialog.petition-body-1"
-                defaultMessage="You shared {count, plural, =1{this parallel} other{these parallels}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{parallel} other{parallels}}. Any pending signature or approval requests will be cancelled."
-                values={{ count }}
-              />
-            </Text>
+            <>
+              <Text>
+                <FormattedMessage
+                  id="component.delete-shared-petitions-dialog.petition-body-1"
+                  defaultMessage="You shared {count, plural, =1{this parallel} other{these parallels}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{parallel} other{parallels}}."
+                  values={{ count }}
+                />{" "}
+                <FormattedMessage
+                  id="component.confirm-delete-petitions-dialog.body-process-cancelled"
+                  defaultMessage="Any pending signature or approval requests will be cancelled."
+                />
+              </Text>
+            </>
           )}
 
           <Text>
@@ -469,8 +476,135 @@ function ConfirmDeleteSharedPetitionsDialog({
               ))}
             </UnorderedList>
           )}
-          {deletePermanently && (
-            <Text fontWeight={500}>
+        </Stack>
+      }
+      confirm={
+        <Button
+          data-testid="dialog-delete-button"
+          colorScheme="red"
+          onClick={() => props.onResolve()}
+        >
+          <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
+function useConfirmDeletePermanentlyPetitionsDialog() {
+  const showDialog = useConfirmDeleteDialog();
+  const intl = useIntl();
+  return useCallback(
+    async ({
+      petitionsOrFolders,
+      type,
+      modalProps,
+    }: {
+      petitionsOrFolders: useDeletePetitions_PetitionBaseOrFolderFragment[];
+      type: PetitionBaseType;
+      modalProps?: BaseModalProps;
+    }) => {
+      const [folders, petitions] = partitionOnTypename(petitionsOrFolders, "PetitionFolder");
+      const folderPetitionCount = folders.reduce((acc, curr) => acc + curr.petitionCount, 0);
+      const count = folderPetitionCount + petitions.length;
+      return await showDialog({
+        header:
+          type === "TEMPLATE" ? (
+            <FormattedMessage
+              id="component.confirm-delete-petitions-dialog.template-header"
+              defaultMessage="Delete {count, plural, =1 {template} other {templates}}"
+              values={{ count }}
+            />
+          ) : (
+            <FormattedMessage
+              id="component.confirm-delete-petitions-dialog.petition-header"
+              defaultMessage="Delete {count, plural, =1 {parallel} other {parallels}}"
+              values={{ count }}
+            />
+          ),
+        description: (
+          <Stack>
+            <Text>
+              {type === "TEMPLATE" ? (
+                <FormattedMessage
+                  id="component.confirm-delete-templates-dialog.body"
+                  defaultMessage="Are you sure you want to delete {list}?"
+                  values={{
+                    list: intl.formatList(
+                      [
+                        folders.length > 0
+                          ? intl.formatMessage(
+                              {
+                                id: "component.confirm-delete-templates-dialog.body-part-folders",
+                                defaultMessage:
+                                  "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected folders}} ({petitionCount, plural, =1{# template} other {# templates}})",
+                              },
+                              {
+                                count: folders.length,
+                                name: <PathName path={folders[0].path} type={type} />,
+                                petitionCount: folderPetitionCount,
+                              },
+                            )
+                          : null,
+                        petitions.length > 0
+                          ? intl.formatMessage(
+                              {
+                                id: "component.confirm-delete-templates-dialog.body-part-templates",
+                                defaultMessage:
+                                  "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected templates}}",
+                              },
+                              {
+                                count: petitions.length,
+                                name: <PetitionNameWithPath petition={petitions[0]} />,
+                              },
+                            )
+                          : null,
+                      ].filter(isNonNullish),
+                    ),
+                  }}
+                />
+              ) : (
+                <FormattedMessage
+                  id="component.confirm-delete-petitions-dialog.body"
+                  defaultMessage="Are you sure you want to delete {list}?"
+                  values={{
+                    list: intl.formatList(
+                      [
+                        folders.length > 0
+                          ? intl.formatMessage(
+                              {
+                                id: "component.confirm-delete-petitions-dialog.body-part-folders",
+                                defaultMessage:
+                                  "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected folders}} ({petitionCount, plural, =1{# parallel} other {# parallels}})",
+                              },
+                              {
+                                count: folders.length,
+                                name: <PathName path={folders[0].path} type={type} />,
+                                petitionCount: folderPetitionCount,
+                              },
+                            )
+                          : null,
+                        petitions.length > 0
+                          ? intl.formatMessage(
+                              {
+                                id: "component.confirm-delete-petitions-dialog.body-part-petitions",
+                                defaultMessage:
+                                  "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected parallels}}",
+                              },
+                              {
+                                count: petitions.length,
+                                name: <PetitionNameWithPath petition={petitions[0]} />,
+                              },
+                            )
+                          : null,
+                      ].filter(isNonNullish),
+                    ),
+                  }}
+                />
+              )}
+            </Text>
+            <Text fontWeight="bold">
               {type === "TEMPLATE" ? (
                 <FormattedMessage
                   id="component.delete-petitions-dialog.delete-permanently-template"
@@ -485,20 +619,12 @@ function ConfirmDeleteSharedPetitionsDialog({
                 />
               )}
             </Text>
-          )}
-        </Stack>
-      }
-      confirm={
-        <Button
-          data-testid="dialog-delete-button"
-          colorScheme="red"
-          onClick={() => props.onResolve()}
-        >
-          <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
-        </Button>
-      }
-      {...props}
-    />
+          </Stack>
+        ),
+        modalProps,
+      });
+    },
+    [],
   );
 }
 

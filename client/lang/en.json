@@ -1791,8 +1791,8 @@
   },
   {
     "term": "component.confirm-delete-petitions-dialog.body",
-    "definition": "Are you sure you want to delete {list}? Any pending signature or approval requests will be cancelled.",
-    "context": "Are you sure you want to delete {list}? Any pending signature or approval requests will be cancelled."
+    "definition": "Are you sure you want to delete {list}?",
+    "context": "Are you sure you want to delete {list}?"
   },
   {
     "term": "component.confirm-delete-petitions-dialog.body-part-folders",
@@ -1803,6 +1803,11 @@
     "term": "component.confirm-delete-petitions-dialog.body-part-petitions",
     "definition": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected parallels}}",
     "context": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected parallels}}"
+  },
+  {
+    "term": "component.confirm-delete-petitions-dialog.body-process-cancelled",
+    "definition": "Any pending signature or approval requests will be cancelled.",
+    "context": "Any pending signature or approval requests will be cancelled."
   },
   {
     "term": "component.confirm-delete-petitions-dialog.petition-header",
@@ -3606,8 +3611,8 @@
   },
   {
     "term": "component.delete-shared-petitions-dialog.petition-body-1",
-    "definition": "You shared {count, plural, =1{this parallel} other{these parallels}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{parallel} other{parallels}}. Any pending signature or approval requests will be cancelled.",
-    "context": "You shared {count, plural, =1{this parallel} other{these parallels}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{parallel} other{parallels}}. Any pending signature or approval requests will be cancelled."
+    "definition": "You shared {count, plural, =1{this parallel} other{these parallels}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{parallel} other{parallels}}.",
+    "context": "You shared {count, plural, =1{this parallel} other{these parallels}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{parallel} other{parallels}}."
   },
   {
     "term": "component.delete-shared-petitions-dialog.petition-header",
