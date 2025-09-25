@@ -437,9 +437,6 @@ export const PetitionHeader = Object.assign(
         const needRefetch = await recoverPetition(
           [petition],
           petition.__typename === "Petition" ? "PETITION" : "TEMPLATE",
-          petition.__typename === "Petition" || petition.__typename === "PetitionTemplate"
-            ? (petition.name ?? null)
-            : null,
         );
         if (needRefetch) {
           onRefetch?.();
@@ -907,9 +904,11 @@ export const PetitionHeader = Object.assign(
 
             ...HeaderNameEditable_PetitionBase
             ...useDeletePetitions_PetitionBase
+            ...useRecoverPetition_PetitionBase
           }
           ${HeaderNameEditable.fragments.PetitionBase}
           ${useDeletePetitions.fragments.PetitionBase}
+          ${useRecoverPetition.fragments.PetitionBase}
         `;
       },
       get PetitionTemplate() {

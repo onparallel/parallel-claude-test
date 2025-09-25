@@ -78926,6 +78926,14 @@ export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<HeaderNameEditable_PetitionBaseFragment, unknown>;
+export const useRecoverPetition_PetitionBaseFragmentDoc = gql`
+  fragment useRecoverPetition_PetitionBase on PetitionBase {
+    id
+    path
+    ...PetitionName_PetitionBase
+  }
+  ${PetitionName_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<useRecoverPetition_PetitionBaseFragment, unknown>;
 export const PetitionHeader_PetitionFragmentDoc = gql`
   fragment PetitionHeader_Petition on Petition {
     id
@@ -78943,9 +78951,11 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
     }
     ...HeaderNameEditable_PetitionBase
     ...useDeletePetitions_PetitionBase
+    ...useRecoverPetition_PetitionBase
   }
   ${HeaderNameEditable_PetitionBaseFragmentDoc}
   ${useDeletePetitions_PetitionBaseFragmentDoc}
+  ${useRecoverPetition_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionHeader_PetitionFragment, unknown>;
 export const PetitionHeader_PetitionTemplateFragmentDoc = gql`
   fragment PetitionHeader_PetitionTemplate on PetitionTemplate {
@@ -81795,6 +81805,25 @@ export const useDeletePetitions_PetitionBaseOrFolderFragmentDoc = gql`
   ${useDeletePetitions_PetitionBaseFragmentDoc}
   ${useDeletePetitions_PetitionFolderFragmentDoc}
 ` as unknown as DocumentNode<useDeletePetitions_PetitionBaseOrFolderFragment, unknown>;
+export const useRecoverPetition_PetitionFolderFragmentDoc = gql`
+  fragment useRecoverPetition_PetitionFolder on PetitionFolder {
+    folderId: id
+    path
+    petitionCount
+  }
+` as unknown as DocumentNode<useRecoverPetition_PetitionFolderFragment, unknown>;
+export const useRecoverPetition_PetitionBaseOrFolderFragmentDoc = gql`
+  fragment useRecoverPetition_PetitionBaseOrFolder on PetitionBaseOrFolder {
+    ... on PetitionBase {
+      ...useRecoverPetition_PetitionBase
+    }
+    ... on PetitionFolder {
+      ...useRecoverPetition_PetitionFolder
+    }
+  }
+  ${useRecoverPetition_PetitionBaseFragmentDoc}
+  ${useRecoverPetition_PetitionFolderFragmentDoc}
+` as unknown as DocumentNode<useRecoverPetition_PetitionBaseOrFolderFragment, unknown>;
 export const PetitionTagListCellContent_TagFragmentDoc = gql`
   fragment PetitionTagListCellContent_Tag on Tag {
     id
@@ -81892,6 +81921,7 @@ export const usePetitionsTableColumns_PetitionFolderFragmentDoc = gql`
 export const Petitions_PetitionBaseOrFolderFragmentDoc = gql`
   fragment Petitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
     ...useDeletePetitions_PetitionBaseOrFolder
+    ...useRecoverPetition_PetitionBaseOrFolder
     ... on PetitionBase {
       name
       ...usePetitionsTableColumns_PetitionBase
@@ -81913,6 +81943,7 @@ export const Petitions_PetitionBaseOrFolderFragmentDoc = gql`
     }
   }
   ${useDeletePetitions_PetitionBaseOrFolderFragmentDoc}
+  ${useRecoverPetition_PetitionBaseOrFolderFragmentDoc}
   ${usePetitionsTableColumns_PetitionBaseFragmentDoc}
   ${usePetitionsTableColumns_PetitionFolderFragmentDoc}
 ` as unknown as DocumentNode<Petitions_PetitionBaseOrFolderFragment, unknown>;
@@ -83428,33 +83459,6 @@ export const usePetitionCommentsMutations_PetitionFieldCommentFragmentDoc = gql`
   }
   ${PetitionFieldComment_PetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<usePetitionCommentsMutations_PetitionFieldCommentFragment, unknown>;
-export const useRecoverPetition_PetitionBaseFragmentDoc = gql`
-  fragment useRecoverPetition_PetitionBase on PetitionBase {
-    id
-    path
-    ...PetitionName_PetitionBase
-  }
-  ${PetitionName_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<useRecoverPetition_PetitionBaseFragment, unknown>;
-export const useRecoverPetition_PetitionFolderFragmentDoc = gql`
-  fragment useRecoverPetition_PetitionFolder on PetitionFolder {
-    folderId: id
-    path
-    petitionCount
-  }
-` as unknown as DocumentNode<useRecoverPetition_PetitionFolderFragment, unknown>;
-export const useRecoverPetition_PetitionBaseOrFolderFragmentDoc = gql`
-  fragment useRecoverPetition_PetitionBaseOrFolder on PetitionBaseOrFolder {
-    ... on PetitionBase {
-      ...useRecoverPetition_PetitionBase
-    }
-    ... on PetitionFolder {
-      ...useRecoverPetition_PetitionFolder
-    }
-  }
-  ${useRecoverPetition_PetitionBaseFragmentDoc}
-  ${useRecoverPetition_PetitionFolderFragmentDoc}
-` as unknown as DocumentNode<useRecoverPetition_PetitionBaseOrFolderFragment, unknown>;
 export const useUpdateIsReadNotification_PetitionFieldCommentFragmentDoc = gql`
   fragment useUpdateIsReadNotification_PetitionFieldComment on PetitionFieldComment {
     id

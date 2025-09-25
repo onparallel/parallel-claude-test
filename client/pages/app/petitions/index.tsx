@@ -257,14 +257,7 @@ function Petitions() {
   const recoverPetition = useRecoverPetition();
   const handleRecoverClick = useCallback(async () => {
     try {
-      const needRefetch = await recoverPetition(
-        selectedRowsRef.current,
-        stateRef.current.type,
-        selectedRowsRef.current[0]?.__typename === "Petition" ||
-          selectedRowsRef.current[0]?.__typename === "PetitionTemplate"
-          ? (selectedRowsRef.current[0]?.name ?? null)
-          : null,
-      );
+      const needRefetch = await recoverPetition(selectedRowsRef.current, stateRef.current.type);
       if (needRefetch) {
         refetch();
       }
@@ -805,6 +798,7 @@ Petitions.fragments = {
     return gql`
       fragment Petitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
         ...useDeletePetitions_PetitionBaseOrFolder
+        ...useRecoverPetition_PetitionBaseOrFolder
         ... on PetitionBase {
           name
           ...usePetitionsTableColumns_PetitionBase
@@ -826,6 +820,7 @@ Petitions.fragments = {
         }
       }
       ${useDeletePetitions.fragments.PetitionBaseOrFolder}
+      ${useRecoverPetition.fragments.PetitionBaseOrFolder}
       ${usePetitionsTableColumns.fragments.PetitionBase}
       ${usePetitionsTableColumns.fragments.PetitionFolder}
     `;

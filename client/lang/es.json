@@ -11200,14 +11200,44 @@
     "context": "When you recover a parallel, you will be able to edit its content again. Any data already anonymized cannot be recovered."
   },
   {
+    "term": "component.recover-petition-dialog.body-part-folders",
+    "definition": "{count, plural, =1{<b>{name}</b>} other {las <b>{count}</b> carpetas seleccionadas}} ({petitionCount, plural, =1{# parallel} other {# parallels}})",
+    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected folders}} ({petitionCount, plural, =1{# parallel} other {# parallels}})"
+  },
+  {
+    "term": "component.recover-petition-dialog.body-part-folders-template",
+    "definition": "{count, plural, =1{<b>{name}</b>} other {las <b>{count}</b> carpetas seleccionadas}} ({petitionCount, plural, =1{# plantilla} other {# plantillas}})",
+    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected folders}} ({petitionCount, plural, =1{# template} other {# templates}})"
+  },
+  {
+    "term": "component.recover-petition-dialog.body-part-petitions",
+    "definition": "{count, plural, =1{<b>{name}</b>} other {los <b>{count}</b> parallels seleccionados}}",
+    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected parallels}}"
+  },
+  {
+    "term": "component.recover-petition-dialog.body-part-templates",
+    "definition": "{count, plural, =1{<b>{name}</b>} other {las <b>{count}</b> plantillas seleccionadas}}",
+    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected templates}}"
+  },
+  {
     "term": "component.recover-petition-dialog.body-question",
-    "definition": "¿Quieres recuperar {count, plural, =1 {el parallel de {petitionName}} other {los parallels seleccionados}}?",
-    "context": "Do you want to recover {count, plural, =1 {the parallel of {petitionName}} other {the selected parallels}}?"
+    "definition": "¿Quieres recuperar {list}?",
+    "context": "Do you want to recover {list}?"
+  },
+  {
+    "term": "component.recover-petition-dialog.body-template",
+    "definition": "Cuando recuperes una plantilla, podrás editar su contenido de nuevo.",
+    "context": "When you recover a template, you will be able to edit its content again."
   },
   {
     "term": "component.recover-petition-dialog.header",
     "definition": "Recuperar {count, plural, =1 {parallel} other {# parallels}}",
-    "context": "Recover {count, plural, =1 {parallel} other {parallels}}"
+    "context": "Recover {count, plural, =1 {parallel} other {# parallels}}"
+  },
+  {
+    "term": "component.recover-petition-dialog.header-template",
+    "definition": "Recuperar {count, plural, =1 {plantilla} other {# plantillas}}",
+    "context": "Recover {count, plural, =1 {template} other {# templates}}"
   },
   {
     "term": "component.recover-profile-dialog.body",
