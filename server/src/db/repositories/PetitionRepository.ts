@@ -108,7 +108,6 @@ import {
   StandardListDefinition,
   TemplateDefaultPermission,
   User,
-  UserPetitionEventLog,
 } from "../__types";
 import {
   CreatePetitionEvent,
@@ -4076,24 +4075,32 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  readonly attachPetitionEventsToUsers = this.buildBatchProcessor<
+  readonly attachPetitionEventToUsers = this.buildBatchProcessor<
     { petitionEventId: number; userIds: number[] },
-    UserPetitionEventLog
+    number
   >(async (keys, t) => {
     if (keys.length === 0) {
       return [];
     }
 
-    return await this.insert(
-      "user_petition_event_log",
-      keys.flatMap((key) =>
-        key.userIds.map((userId) => ({
-          petition_event_id: key.petitionEventId,
-          user_id: userId,
-        })),
-      ),
+    await this.raw(
+      /* sql */ `
+      ? 
+      ON CONFLICT (user_id, petition_event_id) DO NOTHING;`,
+      [
+        this.from("user_petition_event_log").insert(
+          keys.flatMap((key) =>
+            key.userIds.map((userId) => ({
+              petition_event_id: key.petitionEventId,
+              user_id: userId,
+            })),
+          ),
+        ),
+      ],
       t,
-    ).returning("*");
+    );
+
+    return keys.map(() => 0);
   });
 
   async shouldNotifyPetitionClosed(petitionId: number) {

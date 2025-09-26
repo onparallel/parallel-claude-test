@@ -1,5 +1,4 @@
 import { inject, injectable } from "inversify";
-import { DatabaseError } from "pg";
 import { isNonNullish, isNullish } from "remeda";
 import { ProfileEventType, ProfileEventTypeValues } from "../../../db/__types";
 
@@ -40,21 +39,9 @@ export class ProfileEventSubscriptionsListener implements EventListener<ProfileE
       (p) => p.user_id!,
     );
 
-    try {
-      if (userIds.length > 0) {
-        await this.profiles.attachProfileEventsToUsers({ profileEventId: event.id, userIds });
-      }
-    } catch (error) {
-      if (
-        error instanceof DatabaseError &&
-        error.constraint === "user_profile_event_log__user_id__profile_event_id"
-      ) {
-        // this event is already attached, continue normally
-      } else {
-        throw error;
-      }
+    if (userIds.length > 0) {
+      await this.profiles.attachProfileEventToUsers({ profileEventId: event.id, userIds });
     }
-
     const activeSubscriptions = await this.subscriptions.loadProfileEventSubscriptionsByOrgId(
       profile.org_id,
     );

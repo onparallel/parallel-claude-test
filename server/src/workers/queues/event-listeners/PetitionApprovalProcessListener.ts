@@ -4,6 +4,7 @@ import {
   PetitionRecoveredFromDeletionEvent,
 } from "../../../db/events/PetitionEvent";
 import { FeatureFlagRepository } from "../../../db/repositories/FeatureFlagRepository";
+import { PetitionApprovalRequestRepository } from "../../../db/repositories/PetitionApprovalRequestRepository";
 import { PetitionRepository } from "../../../db/repositories/PetitionRepository";
 import { APPROVALS_SERVICE, IApprovalsService } from "../../../services/ApprovalsService";
 import { EventListener } from "../EventProcessorQueue";
@@ -20,6 +21,8 @@ export class PetitionApprovalProcessListener
   ];
 
   constructor(
+    @inject(PetitionApprovalRequestRepository)
+    private readonly approvalRequests: PetitionApprovalRequestRepository,
     @inject(PetitionRepository) private readonly petitions: PetitionRepository,
     @inject(FeatureFlagRepository) private readonly featureFlags: FeatureFlagRepository,
     @inject(APPROVALS_SERVICE)
@@ -52,6 +55,10 @@ export class PetitionApprovalProcessListener
         ? `User:${event.data.user_id}`
         : `PetitionAccess:${event.data.petition_access_id!}`;
 
-    await this.approvals.startApprovalRequestFlowByPetitionId(petition.id, createdBy);
+    const currentSteps =
+      await this.approvalRequests.loadCurrentPetitionApprovalRequestStepsByPetitionId(petition.id);
+    if (currentSteps.length === 0) {
+      await this.approvals.startApprovalRequestFlowByPetitionId(petition.id, createdBy);
+    }
   }
 }

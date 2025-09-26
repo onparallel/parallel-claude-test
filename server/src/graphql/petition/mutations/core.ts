@@ -509,7 +509,9 @@ export const deletePetitions = mutationField("deletePetitions", {
           petitionsOwnedByMe.map(([petitionId]) => petitionId),
           t,
         )
-      ).flat();
+      )
+        .flat()
+        .filter((s) => ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(s.status));
 
       if (pendingSignatureRequests.length > 0) {
         await ctx.signature.cancelSignatureRequest(
@@ -524,6 +526,7 @@ export const deletePetitions = mutationField("deletePetitions", {
       await ctx.approvals.cancelApprovalRequestFlowByPetitionId(
         petitionsOwnedByMe.map(([petitionId]) => petitionId),
         ctx.user!.id,
+        { onlyIfPending: true },
         t,
       );
 

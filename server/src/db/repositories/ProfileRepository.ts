@@ -63,7 +63,6 @@ import {
   User,
   UserLocale,
   UserLocaleValues,
-  UserProfileEventLog,
 } from "../__types";
 import { PetitionEvent } from "../events/PetitionEvent";
 import {
@@ -2660,21 +2659,32 @@ export class ProfileRepository extends BaseRepository {
     );
   }
 
-  readonly attachProfileEventsToUsers = this.buildBatchProcessor<
+  readonly attachProfileEventToUsers = this.buildBatchProcessor<
     { profileEventId: number; userIds: number[] },
-    UserProfileEventLog
+    number
   >(async (keys, t) => {
     if (keys.length === 0) {
       return [];
     }
 
-    return await this.insert(
-      "user_profile_event_log",
-      keys.flatMap((key) =>
-        key.userIds.map((userId) => ({ profile_event_id: key.profileEventId, user_id: userId })),
-      ),
+    await this.raw(
+      /* sql */ `
+      ? 
+      ON CONFLICT (user_id, profile_event_id) DO NOTHING;`,
+      [
+        this.from("user_profile_event_log").insert(
+          keys.flatMap((key) =>
+            key.userIds.map((userId) => ({
+              profile_event_id: key.profileEventId,
+              user_id: userId,
+            })),
+          ),
+        ),
+      ],
       t,
-    ).returning("*");
+    );
+
+    return keys.map(() => 0);
   });
 
   async getProfileIdsWithActiveMonitoringByProfileTypeFieldId(profileTypeFieldId: number) {

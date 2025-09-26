@@ -1,5 +1,4 @@
 import { inject, injectable } from "inversify";
-import { DatabaseError } from "pg";
 import { isNonNullish, isNullish } from "remeda";
 import { PetitionEventType, PetitionEventTypeValues } from "../../../db/__types";
 
@@ -40,18 +39,9 @@ export class PetitionEventSubscriptionsListener implements EventListener<Petitio
     if (userIds.length === 0) {
       return;
     }
-    try {
-      await this.petitions.attachPetitionEventsToUsers({ petitionEventId: event.id, userIds });
-    } catch (error) {
-      if (
-        error instanceof DatabaseError &&
-        error.constraint === "user_petition_event_log__user_id__petition_event_id"
-      ) {
-        // this event is already attached, continue normally
-      } else {
-        throw error;
-      }
-    }
+
+    await this.petitions.attachPetitionEventToUsers({ petitionEventId: event.id, userIds });
+
     const activeSubscriptions = (
       await this.subscriptions.loadPetitionEventSubscriptionsByUserId(userIds)
     ).flat();

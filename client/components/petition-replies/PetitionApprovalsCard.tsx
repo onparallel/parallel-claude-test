@@ -536,6 +536,7 @@ export const PetitionApprovalsCard = Object.assign(
                         onSkip={() => handleSkipApprovalFlow(step)}
                         onSendReminder={() => handleSendReminder(step)}
                         isDisabled={
+                          isDisabled ||
                           petition.status !== "COMPLETED" ||
                           isNotCurrentOrNextStep ||
                           stepNotApplicable ||

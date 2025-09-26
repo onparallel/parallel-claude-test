@@ -25,6 +25,7 @@ export interface IApprovalsService {
   cancelApprovalRequestFlowByPetitionId(
     petitionId: MaybeArray<number>,
     userId: number,
+    opts?: { onlyIfPending?: boolean },
     t?: Knex.Transaction,
   ): Promise<(PetitionApprovalRequestStep | null)[]>;
 }
@@ -98,6 +99,7 @@ export class ApprovalsService implements IApprovalsService {
   async cancelApprovalRequestFlowByPetitionId(
     petitionId: MaybeArray<number>,
     userId: number,
+    opts?: { onlyIfPending?: boolean },
     t?: Knex.Transaction,
   ) {
     const petitionIds = unMaybeArray(petitionId);
@@ -120,7 +122,7 @@ export class ApprovalsService implements IApprovalsService {
 
       let currentStep = petitionSteps.find((s) => s.status === "PENDING");
 
-      if (!currentStep) {
+      if (!currentStep && !opts?.onlyIfPending) {
         // no pending steps, get latest approved or skipped
         currentStep = findLast(
           petitionSteps,
@@ -186,7 +188,10 @@ export class ApprovalsService implements IApprovalsService {
       t,
     );
 
-    await this.approvalRequests.updatePetitionApprovalRequestStepsAsDeprecated(petitionIds, t);
+    await this.approvalRequests.updatePetitionApprovalRequestStepsAsDeprecated(
+      canceledSteps.filter(isNonNullish).map((s) => s.petition_id),
+      t,
+    );
 
     return canceledSteps;
   }
