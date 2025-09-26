@@ -3483,6 +3483,7 @@ export class ProfileRepository extends BaseRepository {
         or strict_word_similarity(:search, coalesce(p.localizable_name->>'es', '')) > :threshold
         or strict_word_similarity(:search, coalesce(p.localizable_name->>'en', '')) > :threshold
       )
+      and p.org_id = :orgId
       and p.deleted_at is null
       and p.anonymized_at is null; 
     `,
