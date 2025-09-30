@@ -37,6 +37,7 @@ export interface ProfilePropertyContentProps {
   files?: ProfilePropertyContent_ProfileFieldFileFragment[] | null;
   value?: ProfilePropertyContent_ProfileFieldValueFragment | null;
   singleLine?: boolean;
+  fromHistory?: boolean;
 }
 
 export const ProfilePropertyContent = Object.assign(
@@ -60,7 +61,9 @@ export const ProfilePropertyContent = Object.assign(
       `,
       ProfileFieldValue: gql`
         fragment ProfilePropertyContent_ProfileFieldValue on ProfileFieldValue {
+          id
           content
+          anonymizedAt
         }
       `,
       // make id optional so "fake" values can be passed
@@ -71,44 +74,58 @@ export const ProfilePropertyContent = Object.assign(
             filename
             contentType
           }
+          anonymizedAt
         }
       `,
     },
   },
 );
 
+interface ProfileFieldFileContentProps {
+  file: ProfilePropertyContent_ProfileFieldFileFragment;
+  field: ProfilePropertyContent_ProfileTypeFieldFragment;
+  profileId: string | null | undefined;
+}
+
+function ProfileFieldFileContent({ file, field, profileId }: ProfileFieldFileContentProps) {
+  const downloadProfileFieldFile = useDownloadProfileFieldFile();
+  const isShiftDown = useIsGlobalKeyDown("Shift");
+  const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
+
+  return isNullish(file.anonymizedAt) && isNonNullish(file.file) ? (
+    <SimpleFileButton
+      {...pick(file.file!, ["filename", "contentType"])}
+      onClick={
+        isNonNullish(profileId) && isNonNullish(file.id)
+          ? () =>
+              withError(
+                downloadProfileFieldFile(
+                  profileId,
+                  field.id,
+                  file.id!,
+                  userHasRemovePreviewFiles ? false : !isShiftDown,
+                ),
+              )
+          : undefined
+      }
+    />
+  ) : (
+    <Box textStyle="hint">
+      <FormattedMessage id="generic.not-available" defaultMessage="Not available" />
+    </Box>
+  );
+}
+
 const ProfileFieldFiles = chakraForwardRef<"ul" | "div", ProfilePropertyContentProps>(
   function ProfileFieldFiles({ files, field, profileId, singleLine, ...props }, ref) {
     assert(files !== undefined, "files must be defined if field type is FILE");
-    const downloadProfileFieldFile = useDownloadProfileFieldFile();
-    const isShiftDown = useIsGlobalKeyDown("Shift");
-    const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
     const buttons =
-      files?.map((file) => (
-        <SimpleFileButton
-          key={undefined}
-          {...pick(file.file!, ["filename", "contentType"])}
-          onClick={
-            isNonNullish(profileId) && isNonNullish(file.id)
-              ? () =>
-                  withError(
-                    downloadProfileFieldFile(
-                      profileId,
-                      field.id,
-                      file.id!,
-                      userHasRemovePreviewFiles ? false : !isShiftDown,
-                    ),
-                  )
-              : undefined
-          }
-        />
+      files?.map((file, key) => (
+        <ProfileFieldFileContent key={key} file={file} field={field} profileId={profileId} />
       )) ?? [];
     return buttons.length === 0 ? (
       <Box ref={ref} textStyle="hint" {...props}>
-        <FormattedMessage
-          id="component.petition-field-replies-content.no-value"
-          defaultMessage="No value"
-        />
+        <FormattedMessage id="generic.profile-property-no-value" defaultMessage="No value" />
       </Box>
     ) : buttons.length === 1 ? (
       <Flex ref={ref} {...(props as any)}>
@@ -119,20 +136,7 @@ const ProfileFieldFiles = chakraForwardRef<"ul" | "div", ProfilePropertyContentP
         values={files ?? []}
         maxItems={1}
         renderItem={({ value }, index) => (
-          <SimpleFileButton
-            key={index}
-            {...pick(value.file!, ["filename", "contentType"])}
-            onClick={
-              isNonNullish(profileId) && isNonNullish(value.id)
-                ? (event) => {
-                    event.stopPropagation();
-                    withError(
-                      downloadProfileFieldFile(profileId, field.id, value.id!, !isShiftDown),
-                    );
-                  }
-                : undefined
-            }
-          />
+          <ProfileFieldFileContent key={index} file={value} field={field} profileId={profileId} />
         )}
         renderOther={({ children, remaining }) => (
           <SmallPopover
@@ -142,24 +146,7 @@ const ProfileFieldFiles = chakraForwardRef<"ul" | "div", ProfilePropertyContentP
                   .filter((file) => isNonNullish(file.file))
                   .map((file, i) => (
                     <ListItem key={i} minWidth={0} display="flex">
-                      <SimpleFileButton
-                        {...pick(file.file!, ["filename", "contentType"])}
-                        onClick={
-                          isNonNullish(profileId) && isNonNullish(file.id)
-                            ? (event) => {
-                                event.stopPropagation();
-                                withError(
-                                  downloadProfileFieldFile(
-                                    profileId,
-                                    field.id,
-                                    file.id!,
-                                    !isShiftDown,
-                                  ),
-                                );
-                              }
-                            : undefined
-                        }
-                      />
+                      <ProfileFieldFileContent file={file} field={field} profileId={profileId} />
                     </ListItem>
                   ))}
               </List>
@@ -187,6 +174,12 @@ const ProfileFieldValue = chakraForwardRef<"p" | "span" | "div", ProfileProperty
       return (
         <Box ref={ref} as="span" textStyle="hint" {...props}>
           <FormattedMessage id="generic.profile-property-no-value" defaultMessage="No value" />
+        </Box>
+      );
+    } else if (isNonNullish(value.anonymizedAt)) {
+      return (
+        <Box ref={ref} as="span" textStyle="hint" {...props}>
+          <FormattedMessage id="generic.not-available" defaultMessage="Not available" />
         </Box>
       );
     } else {
@@ -340,7 +333,10 @@ const ProfileFieldValue = chakraForwardRef<"p" | "span" | "div", ProfileProperty
 );
 
 const ProfileFieldBackgroundCheckValue = chakraForwardRef<"div", ProfilePropertyContentProps>(
-  function ProfileFieldBackgroundCheckValue({ value, field, profileId, ...props }, ref) {
+  function ProfileFieldBackgroundCheckValue(
+    { value, field, profileId, fromHistory, ...props },
+    ref,
+  ) {
     const intl = useIntl();
     const content = value!.content!;
     const handleClick = async (event: MouseEvent<HTMLButtonElement>) => {
@@ -350,12 +346,19 @@ const ProfileFieldBackgroundCheckValue = chakraForwardRef<"div", ProfileProperty
         const { name, date, type, country, birthCountry } = query ?? {};
         const url = `/${intl.locale}/app/background-check/${isNonNullish(entity) ? entity.id : "results"}?${new URLSearchParams(
           {
-            token: btoa(JSON.stringify({ profileTypeFieldId: field.id, profileId })),
+            token: btoa(
+              JSON.stringify({
+                profileTypeFieldId: field.id,
+                profileId,
+                ...(fromHistory ? { profileFieldValueId: value?.id } : {}),
+              }),
+            ),
             ...(name ? { name } : {}),
             ...(date ? { date } : {}),
             ...(type ? { type } : {}),
             ...(country ? { country } : {}),
             ...(birthCountry ? { birthCountry } : {}),
+            ...(fromHistory ? { disabled: "true" } : {}),
           },
         )}`;
         await openNewWindow(url);
@@ -453,7 +456,10 @@ const ProfileFieldBackgroundCheckValue = chakraForwardRef<"div", ProfileProperty
 );
 
 const ProfileFieldAdverseMediaSearchValue = chakraForwardRef<"div", ProfilePropertyContentProps>(
-  function ProfileFieldAdverseMediaSearchValue({ value, field, profileId, ...props }, ref) {
+  function ProfileFieldAdverseMediaSearchValue(
+    { value, field, profileId, fromHistory, ...props },
+    ref,
+  ) {
     const intl = useIntl();
     const savedArticles = value?.content?.articles?.items.filter(
       (article: AdverseMediaArticle) => article.classification === "RELEVANT",
@@ -471,9 +477,10 @@ const ProfileFieldAdverseMediaSearchValue = chakraForwardRef<"div", ProfilePrope
             JSON.stringify({
               profileTypeFieldId: field.id,
               profileId,
+              ...(fromHistory ? { profileFieldValueId: value?.id } : {}),
             }),
           ),
-          readonly: "true",
+          ...(fromHistory ? { readonly: "true" } : {}),
         })}`;
         await openNewWindow(url);
       } catch {}

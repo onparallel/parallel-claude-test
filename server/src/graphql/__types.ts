@@ -775,7 +775,7 @@ export interface NexusGenEnums {
   ProfileEventType: db.ProfileEventType;
   ProfileExternalSourceConflictResolutionAction: "IGNORE" | "OVERWRITE";
   ProfileExternalSourceSearchParamType: "SELECT" | "TEXT";
-  ProfileFieldValueSource:
+  ProfileFieldPropertyValueSource:
     | "EXCEL_IMPORT"
     | "EXTERNAL"
     | "MANUAL"
@@ -1774,6 +1774,11 @@ export interface NexusGenObjects {
   };
   ProfileFieldValue: db.ProfileFieldValue & { has_stored_value: boolean };
   ProfileFieldValueMonitoredEvent: profileEvents.ProfileFieldValueMonitoredEvent;
+  ProfileFieldValuePagination: {
+    // root type
+    items: NexusGenRootTypes["ProfileFieldValue"][]; // [ProfileFieldValue!]!
+    totalCount: number; // Int!
+  };
   ProfileFieldValueUpdatedEvent: profileEvents.ProfileFieldValueUpdatedEvent;
   ProfileListView: db.ProfileListView;
   ProfileListViewData: {
@@ -1806,6 +1811,14 @@ export interface NexusGenObjects {
   ProfileSubscription: db.ProfileSubscription;
   ProfileType: db.ProfileType;
   ProfileTypeField: db.ProfileTypeField;
+  ProfileTypeFieldFileHistory: db.ProfileFieldFile & {
+    event_type: "PROFILE_FIELD_FILE_ADDED" | "PROFILE_FIELD_FILE_REMOVED";
+  };
+  ProfileTypeFieldFileHistoryPagination: {
+    // root type
+    items: NexusGenRootTypes["ProfileTypeFieldFileHistory"][]; // [ProfileTypeFieldFileHistory!]!
+    totalCount: number; // Int!
+  };
   ProfileTypeFieldPermission: db.ProfileTypeFieldPermission;
   ProfileTypePagination: {
     // root type
@@ -4230,12 +4243,15 @@ export interface NexusGenFieldTypes {
     createdBy: NexusGenRootTypes["User"] | null; // User
     expiresAt: NexusGenScalars["DateTime"] | null; // DateTime
     expiryDate: string | null; // String
+    externalSourceName: string | null; // String
     field: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     file: NexusGenRootTypes["FileUpload"] | null; // FileUpload
     id: NexusGenScalars["GID"]; // GID!
+    petitionFieldReply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply
     profile: NexusGenRootTypes["Profile"]; // Profile!
     removedAt: NexusGenScalars["DateTime"] | null; // DateTime
     removedBy: NexusGenRootTypes["User"] | null; // User
+    source: NexusGenEnums["ProfileFieldPropertyValueSource"] | null; // ProfileFieldPropertyValueSource
   };
   ProfileFieldFileAddedEvent: {
     // field return type
@@ -4285,15 +4301,18 @@ export interface NexusGenFieldTypes {
     createdBy: NexusGenRootTypes["User"] | null; // User
     expiresAt: NexusGenScalars["DateTime"] | null; // DateTime
     expiryDate: string | null; // String
+    externalSourceName: string | null; // String
     field: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     hasActiveMonitoring: boolean; // Boolean!
     hasPendingReview: boolean; // Boolean!
     hasStoredValue: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isDraft: boolean; // Boolean!
+    petitionFieldReply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply
     profile: NexusGenRootTypes["Profile"]; // Profile!
     removedAt: NexusGenScalars["DateTime"] | null; // DateTime
     removedBy: NexusGenRootTypes["User"] | null; // User
+    source: NexusGenEnums["ProfileFieldPropertyValueSource"] | null; // ProfileFieldPropertyValueSource
   };
   ProfileFieldValueMonitoredEvent: {
     // field return type
@@ -4302,6 +4321,11 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
+  };
+  ProfileFieldValuePagination: {
+    // field return type
+    items: NexusGenRootTypes["ProfileFieldValue"][]; // [ProfileFieldValue!]!
+    totalCount: number; // Int!
   };
   ProfileFieldValueUpdatedEvent: {
     // field return type
@@ -4441,6 +4465,16 @@ export interface NexusGenFieldTypes {
     position: number; // Int!
     profileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     type: NexusGenEnums["ProfileTypeFieldType"]; // ProfileTypeFieldType!
+  };
+  ProfileTypeFieldFileHistory: {
+    // field return type
+    eventType: string; // String!
+    profileFieldFile: NexusGenRootTypes["ProfileFieldFile"]; // ProfileFieldFile!
+  };
+  ProfileTypeFieldFileHistoryPagination: {
+    // field return type
+    items: NexusGenRootTypes["ProfileTypeFieldFileHistory"][]; // [ProfileTypeFieldFileHistory!]!
+    totalCount: number; // Int!
   };
   ProfileTypeFieldPermission: {
     // field return type
@@ -4744,6 +4778,8 @@ export interface NexusGenFieldTypes {
     profileRelationshipTypes: NexusGenRootTypes["ProfileRelationshipType"][]; // [ProfileRelationshipType!]!
     profileRelationshipTypesWithDirection: NexusGenRootTypes["ProfileRelationshipTypeWithDirection"][]; // [ProfileRelationshipTypeWithDirection!]!
     profileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
+    profileTypeFieldFileHistory: NexusGenRootTypes["ProfileTypeFieldFileHistoryPagination"]; // ProfileTypeFieldFileHistoryPagination!
+    profileTypeFieldValueHistory: NexusGenRootTypes["ProfileFieldValuePagination"]; // ProfileFieldValuePagination!
     profileTypes: NexusGenRootTypes["ProfileTypePagination"]; // ProfileTypePagination!
     profiles: NexusGenRootTypes["ProfilePagination"]; // ProfilePagination!
     profilesWithSameContent: NexusGenRootTypes["ProfilesWithContent"][]; // [ProfilesWithContent!]!
@@ -5353,10 +5389,13 @@ export interface NexusGenFieldTypes {
     createdBy: NexusGenRootTypes["User"] | null; // User
     expiresAt: NexusGenScalars["DateTime"] | null; // DateTime
     expiryDate: string | null; // String
+    externalSourceName: string | null; // String
     field: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
+    petitionFieldReply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply
     profile: NexusGenRootTypes["Profile"]; // Profile!
     removedAt: NexusGenScalars["DateTime"] | null; // DateTime
     removedBy: NexusGenRootTypes["User"] | null; // User
+    source: NexusGenEnums["ProfileFieldPropertyValueSource"] | null; // ProfileFieldPropertyValueSource
   };
   TemplateDefaultPermission: {
     // field return type
@@ -7528,12 +7567,15 @@ export interface NexusGenFieldTypeNames {
     createdBy: "User";
     expiresAt: "DateTime";
     expiryDate: "String";
+    externalSourceName: "String";
     field: "ProfileTypeField";
     file: "FileUpload";
     id: "GID";
+    petitionFieldReply: "PetitionFieldReply";
     profile: "Profile";
     removedAt: "DateTime";
     removedBy: "User";
+    source: "ProfileFieldPropertyValueSource";
   };
   ProfileFieldFileAddedEvent: {
     // field return type name
@@ -7583,15 +7625,18 @@ export interface NexusGenFieldTypeNames {
     createdBy: "User";
     expiresAt: "DateTime";
     expiryDate: "String";
+    externalSourceName: "String";
     field: "ProfileTypeField";
     hasActiveMonitoring: "Boolean";
     hasPendingReview: "Boolean";
     hasStoredValue: "Boolean";
     id: "GID";
     isDraft: "Boolean";
+    petitionFieldReply: "PetitionFieldReply";
     profile: "Profile";
     removedAt: "DateTime";
     removedBy: "User";
+    source: "ProfileFieldPropertyValueSource";
   };
   ProfileFieldValueMonitoredEvent: {
     // field return type name
@@ -7600,6 +7645,11 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     profile: "Profile";
     type: "ProfileEventType";
+  };
+  ProfileFieldValuePagination: {
+    // field return type name
+    items: "ProfileFieldValue";
+    totalCount: "Int";
   };
   ProfileFieldValueUpdatedEvent: {
     // field return type name
@@ -7739,6 +7789,16 @@ export interface NexusGenFieldTypeNames {
     position: "Int";
     profileType: "ProfileType";
     type: "ProfileTypeFieldType";
+  };
+  ProfileTypeFieldFileHistory: {
+    // field return type name
+    eventType: "String";
+    profileFieldFile: "ProfileFieldFile";
+  };
+  ProfileTypeFieldFileHistoryPagination: {
+    // field return type name
+    items: "ProfileTypeFieldFileHistory";
+    totalCount: "Int";
   };
   ProfileTypeFieldPermission: {
     // field return type name
@@ -8042,6 +8102,8 @@ export interface NexusGenFieldTypeNames {
     profileRelationshipTypes: "ProfileRelationshipType";
     profileRelationshipTypesWithDirection: "ProfileRelationshipTypeWithDirection";
     profileType: "ProfileType";
+    profileTypeFieldFileHistory: "ProfileTypeFieldFileHistoryPagination";
+    profileTypeFieldValueHistory: "ProfileFieldValuePagination";
     profileTypes: "ProfileTypePagination";
     profiles: "ProfilePagination";
     profilesWithSameContent: "ProfilesWithContent";
@@ -8651,10 +8713,13 @@ export interface NexusGenFieldTypeNames {
     createdBy: "User";
     expiresAt: "DateTime";
     expiryDate: "String";
+    externalSourceName: "String";
     field: "ProfileTypeField";
+    petitionFieldReply: "PetitionFieldReply";
     profile: "Profile";
     removedAt: "DateTime";
     removedBy: "User";
+    source: "ProfileFieldPropertyValueSource";
   };
   TemplateDefaultPermission: {
     // field return type name
@@ -9152,7 +9217,7 @@ export interface NexusGenArgTypes {
       // args
       fields: NexusGenInputs["CreateProfileFieldValueInput"][]; // [CreateProfileFieldValueInput!]!
       profileTypeId: NexusGenScalars["GID"]; // GID!
-      source?: NexusGenEnums["ProfileFieldValueSource"] | null; // ProfileFieldValueSource
+      source?: NexusGenEnums["ProfileFieldPropertyValueSource"] | null; // ProfileFieldPropertyValueSource
       subscribe?: boolean | null; // Boolean
     };
     createProfileEventSubscription: {
@@ -9171,7 +9236,7 @@ export interface NexusGenArgTypes {
       expiryDate?: NexusGenScalars["Date"] | null; // Date
       profileId: NexusGenScalars["GID"]; // GID!
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
-      source?: NexusGenEnums["ProfileFieldValueSource"] | null; // ProfileFieldValueSource
+      source?: NexusGenEnums["ProfileFieldPropertyValueSource"] | null; // ProfileFieldPropertyValueSource
     };
     createProfileLinkedPetitionField: {
       // args
@@ -10283,7 +10348,7 @@ export interface NexusGenArgTypes {
       // args
       fields: NexusGenInputs["UpdateProfileFieldValueInput"][]; // [UpdateProfileFieldValueInput!]!
       profileId: NexusGenScalars["GID"]; // GID!
-      source?: NexusGenEnums["ProfileFieldValueSource"] | null; // ProfileFieldValueSource
+      source?: NexusGenEnums["ProfileFieldPropertyValueSource"] | null; // ProfileFieldPropertyValueSource
     };
     updateProfileFieldValueOptions: {
       // args
@@ -10312,7 +10377,7 @@ export interface NexusGenArgTypes {
       force?: boolean | null; // Boolean
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
       profileTypeId: NexusGenScalars["GID"]; // GID!
-      source?: NexusGenEnums["ProfileFieldValueSource"] | null; // ProfileFieldValueSource
+      source?: NexusGenEnums["ProfileFieldPropertyValueSource"] | null; // ProfileFieldPropertyValueSource
     };
     updateProfileTypeFieldPermissions: {
       // args
@@ -10777,6 +10842,20 @@ export interface NexusGenArgTypes {
     profileType: {
       // args
       profileTypeId: NexusGenScalars["GID"]; // GID!
+    };
+    profileTypeFieldFileHistory: {
+      // args
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+      profileId: NexusGenScalars["GID"]; // GID!
+      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+    };
+    profileTypeFieldValueHistory: {
+      // args
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+      profileId: NexusGenScalars["GID"]; // GID!
+      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
     };
     profileTypes: {
       // args

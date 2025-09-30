@@ -1,4 +1,5 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
+import { isNonNullish } from "remeda";
 import { IntegrationType } from "../../db/__types";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { MaybeArray, unMaybeArray } from "../../util/types";
@@ -70,6 +71,10 @@ export function authenticatePetitionOrProfileReplyToken<
           "PROFILES",
         );
 
+        const profileFieldValue = isNonNullish(params.profileFieldValueId)
+          ? await ctx.profiles.loadProfileFieldValueById(params.profileFieldValueId)
+          : null;
+
         const results = [
           userHasFeatureFlag, // user has feature flag
           profile?.anonymized_at === null, // profile is not anonymized
@@ -77,6 +82,9 @@ export function authenticatePetitionOrProfileReplyToken<
           profile?.profile_type_id === profileTypeField?.profile_type_id, // profile has profileTypeField
           profileTypeField?.type === fieldType, // profileTypeField is of type fieldType
           isAtLeast(userPermission, "READ"), // user has READ or WRITE permission on profileTypeField
+          !params.profileFieldValueId || // if profileFieldValueId is provided, it must belong to the profile and profileTypeField
+            (profileFieldValue?.profile_id === params.profileId &&
+              profileFieldValue?.profile_type_field_id === params.profileTypeFieldId),
         ];
 
         return results.every((r) => r);

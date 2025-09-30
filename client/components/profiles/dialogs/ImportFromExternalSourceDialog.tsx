@@ -822,7 +822,8 @@ function ImportFromExternalSourceDialogUpdateProfile({
                         _content={{ opacity: isSameContent || !canWriteValue ? 0.4 : undefined }}
                       >
                         {canReadValue ? (
-                          <ProfilePropertyContent field={field} value={{ content }} />
+                          // id is faked but it's not used for anything in this case - only to avoid TS errors - TODO find a better solution
+                          <ProfilePropertyContent field={field} value={{ content, id: field.id }} />
                         ) : (
                           "•".repeat(20)
                         )}

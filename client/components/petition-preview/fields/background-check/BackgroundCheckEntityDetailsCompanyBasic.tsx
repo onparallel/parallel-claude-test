@@ -20,6 +20,7 @@ import {
 import { FormattedMessage, useIntl } from "react-intl";
 
 export function BackgroundCheckEntityDetailsCompanyBasic({
+  isDisabled,
   hasReply,
   isSaving,
   isDeleting,
@@ -29,6 +30,7 @@ export function BackgroundCheckEntityDetailsCompanyBasic({
   onDownloadPDF,
   data,
 }: {
+  isDisabled?: boolean;
   hasReply: boolean;
   isSaving: boolean;
   isDeleting: boolean;
@@ -77,6 +79,7 @@ export function BackgroundCheckEntityDetailsCompanyBasic({
               variant="ghost"
               colorScheme="primary"
               leftIcon={<EyeIcon />}
+              isDisabled={isDisabled}
               onClick={() => onDownloadPDF()}
               width={{ base: "100%", sm: "auto" }}
             >
@@ -101,7 +104,7 @@ export function BackgroundCheckEntityDetailsCompanyBasic({
                     e.stopPropagation();
                     onDelete();
                   }}
-                  isDisabled={isDeleting || isReadOnly}
+                  isDisabled={isDeleting || isReadOnly || isDisabled}
                 />
               </HStack>
             ) : (
@@ -111,7 +114,7 @@ export function BackgroundCheckEntityDetailsCompanyBasic({
                 leftIcon={<StarEmptyIcon />}
                 onClick={onSave}
                 isLoading={isSaving}
-                isDisabled={isReadOnly}
+                isDisabled={isReadOnly || isDisabled}
                 width={{ base: "100%", sm: "auto" }}
               >
                 <FormattedMessage

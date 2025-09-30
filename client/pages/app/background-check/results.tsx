@@ -81,6 +81,7 @@ interface BackgroundCheckFieldSearchResultsTableContext {
   isDeletingEntity: Record<string, boolean>;
   isSavingEntity: Record<string, boolean>;
   isReadOnly: boolean;
+  isDisabled: boolean;
   onFalsePositiveClick: (entityIds: string[], isFalsePositive: boolean) => Promise<void>;
 }
 
@@ -96,6 +97,7 @@ function BackgroundCheckFieldSearchResults({
   type,
   country,
   birthCountry,
+  isDisabled,
 }: UnwrapPromise<ReturnType<typeof BackgroundCheckFieldSearchResults.getInitialProps>>) {
   const router = useRouter();
   const { query } = router;
@@ -289,9 +291,10 @@ function BackgroundCheckFieldSearchResults({
       onDeleteEntity: handleDelete,
       onSaveEntity: handleSave,
       isReadOnly: isTemplate || isReadOnly,
+      isDisabled,
       onFalsePositiveClick: handleSetFalsePositives,
     }),
-    [savedEntityId, isDeletingEntity, isSavingEntity],
+    [savedEntityId, isDeletingEntity, isSavingEntity, isDisabled],
   );
 
   const { page, items } = state;
@@ -435,15 +438,18 @@ function BackgroundCheckFieldSearchResults({
                     }}
                   />
                 </Text>
-                <IconButtonWithTooltip
-                  variant="outline"
-                  label={intl.formatMessage({
-                    id: "component.background-check-search-result.refresh-search",
-                    defaultMessage: "Refresh search",
-                  })}
-                  icon={<RepeatIcon />}
-                  onClick={handleRefreshSearch}
-                />
+                {!isReadOnly && !isDisabled ? (
+                  <IconButtonWithTooltip
+                    variant="outline"
+                    label={intl.formatMessage({
+                      id: "component.background-check-search-result.refresh-search",
+                      defaultMessage: "Refresh search",
+                    })}
+                    icon={<RepeatIcon />}
+                    onClick={handleRefreshSearch}
+                    isDisabled={isDisabled}
+                  />
+                ) : null}
               </HStack>
             </>
           ) : (
@@ -455,7 +461,10 @@ function BackgroundCheckFieldSearchResults({
               <Skeleton height="24px" width="100%" maxWidth="260px" />
             </>
           )}
-          {result?.hasPendingReview && (totalCount === 0 || result.reviewDiff?.items?.added) ? (
+          {!isReadOnly &&
+          !isDisabled &&
+          result?.hasPendingReview &&
+          (totalCount === 0 || result.reviewDiff?.items?.added) ? (
             <BackgroundCheckSearchDifferencesAlert
               diff={result.reviewDiff}
               onConfirmChangesClick={handleConfirmChangesClick}
@@ -479,7 +488,7 @@ function BackgroundCheckFieldSearchResults({
           }
           loading={loading}
           totalCount={totalCount}
-          onRowClick={handleRowClick}
+          onRowClick={isDisabled ? undefined : handleRowClick}
           header={
             <Flex
               direction={{ base: "column", sm: "row" }}
@@ -508,7 +517,7 @@ function BackgroundCheckFieldSearchResults({
                   variant="outline"
                   fontWeight={500}
                   onClick={handleResetClick}
-                  isDisabled={query.readonly === "true"}
+                  isDisabled={query.readonly === "true" || isDisabled}
                 >
                   <FormattedMessage
                     id="component.background-check-search-result.modify-search"
@@ -525,6 +534,7 @@ function BackgroundCheckFieldSearchResults({
                       defaultMessage: "Save to profile",
                     })}
                     breakpoint="lg"
+                    isDisabled={isDisabled}
                   />
                 ) : (
                   <Button
@@ -537,7 +547,8 @@ function BackgroundCheckFieldSearchResults({
                       query.readonly === "true" ||
                       totalCount === 0 ||
                       isNonNullish(savedEntityId) ||
-                      result?.items.every((i) => i.isFalsePositive)
+                      result?.items.every((i) => i.isFalsePositive) ||
+                      isDisabled
                     }
                   >
                     <FormattedMessage
@@ -816,7 +827,9 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                     label={intl.formatMessage({ id: "generic.delete", defaultMessage: "Delete" })}
                     icon={<DeleteIcon />}
                     isLoading={context.isDeletingEntity[row.id]}
-                    isDisabled={context.isSavingEntity[row.id] || context.isReadOnly}
+                    isDisabled={
+                      context.isSavingEntity[row.id] || context.isReadOnly || context.isDisabled
+                    }
                     variant="outline"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -853,7 +866,8 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                     isDisabled={
                       context.isSavingEntity[row.id] ||
                       context.isReadOnly ||
-                      isNonNullish(context.savedEntityId)
+                      isNonNullish(context.savedEntityId) ||
+                      context.isDisabled
                     }
                     variant="outline"
                     onClick={(e) => {
@@ -873,7 +887,7 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                     size="sm"
                     fontSize="md"
                     isLoading={context.isSavingEntity[row.id]}
-                    isDisabled={context.isReadOnly}
+                    isDisabled={context.isReadOnly || context.isDisabled}
                     variant="solid"
                     colorScheme="primary"
                     icon={<StarEmptyIcon />}
@@ -897,7 +911,11 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                     size="sm"
                     fontSize="md"
                     icon={<UserXIcon />}
-                    isDisabled={context.isReadOnly || isNonNullish(context.savedEntityId)}
+                    isDisabled={
+                      context.isReadOnly ||
+                      isNonNullish(context.savedEntityId) ||
+                      context.isDisabled
+                    }
                     onClick={(e) => {
                       e.stopPropagation();
                       context.onFalsePositiveClick([row.id], true);
@@ -1045,8 +1063,9 @@ BackgroundCheckFieldSearchResults.getInitialProps = async ({ query }: WithApollo
   const type = query.type as BackgroundCheckEntitySearchType | null;
   const country = query.country as string | null;
   const birthCountry = query.birthCountry as string | null;
+  const isDisabled = query.disabled === "true";
 
-  return { token, name, date, type, country, birthCountry };
+  return { token, name, date, type, country, birthCountry, isDisabled };
 };
 
 export default compose(

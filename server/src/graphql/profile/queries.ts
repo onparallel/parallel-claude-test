@@ -13,7 +13,7 @@ import { indexBy, isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { ProfileTypeField } from "../../db/__types";
 import { validateProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
-import { authenticate, authenticateAnd, ifArgDefined } from "../helpers/authorize";
+import { authenticate, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
@@ -24,6 +24,7 @@ import {
   profileTypeFieldIsOfType,
   userHasAccessToProfile,
   userHasAccessToProfileType,
+  userHasPermissionOnProfileTypeField,
 } from "./authorizers";
 
 export const profileTypes = queryField((t) => {
@@ -345,4 +346,72 @@ export const profilesWithSameContent = queryField("profilesWithSameContent", {
       };
     });
   },
+});
+
+export const profileTypeFieldValueHistory = queryField((t) => {
+  t.paginationField("profileTypeFieldValueHistory", {
+    type: "ProfileFieldValue",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PROFILES"),
+      userHasAccessToProfile("profileId"),
+      userHasPermissionOnProfileTypeField("profileTypeFieldId", "READ"),
+      not(profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"])),
+    ),
+    extendArgs: {
+      profileId: nonNull(globalIdArg("Profile")),
+      profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
+    },
+    resolve: async (_, args, ctx) => {
+      return ctx.profiles.getPaginatedHistoryForProfileTypeFieldValue(
+        args.profileId,
+        args.profileTypeFieldId,
+        {
+          limit: args.limit,
+          offset: args.offset,
+        },
+      );
+    },
+  });
+});
+
+export const profileTypeFieldFileHistory = queryField((t) => {
+  t.paginationField("profileTypeFieldFileHistory", {
+    type: objectType({
+      name: "ProfileTypeFieldFileHistory",
+      definition(t) {
+        t.nonNull.string("eventType", {
+          resolve: (o) => (o.event_type === "PROFILE_FIELD_FILE_ADDED" ? "ADDED" : "REMOVED"),
+        });
+        t.nonNull.field("profileFieldFile", {
+          type: "ProfileFieldFile",
+          resolve: async (o, _, ctx) => {
+            return await ctx.profiles.loadProfileFieldFileById(o.id);
+          },
+        });
+      },
+      sourceType: /* ts */ `db.ProfileFieldFile & {
+        event_type: "PROFILE_FIELD_FILE_ADDED" | "PROFILE_FIELD_FILE_REMOVED";
+      }`,
+    }),
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PROFILES"),
+      userHasAccessToProfile("profileId"),
+      userHasPermissionOnProfileTypeField("profileTypeFieldId", "READ"),
+      profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
+    ),
+    extendArgs: {
+      profileId: nonNull(globalIdArg("Profile")),
+      profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
+    },
+    resolve: async (_, args, ctx) => {
+      return ctx.profiles.getPaginatedHistoryForProfileTypeFieldFile(
+        args.profileId,
+        args.profileTypeFieldId,
+        {
+          limit: args.limit,
+          offset: args.offset,
+        },
+      );
+    },
+  });
 });

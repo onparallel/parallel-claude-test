@@ -165,6 +165,13 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
     }
 
     async function profileParamsResolver(params: NumericParams<ProfileReplyParams>) {
+      if (isNonNullish(params.profileFieldValueId)) {
+        const value = await ctx.profiles.loadProfileFieldValueById(params.profileFieldValueId);
+        if (isNullish(value)) {
+          throw new ApolloError("Profile field value not found", "PROFILE_FIELD_VALUE_NOT_FOUND");
+        }
+        return await ctx.profilesHelper.mapValueContentFromDatabase(value);
+      }
       const { value, draftValue } = await ctx.profiles.loadProfileFieldValueWithDraft(params);
 
       const currentValue = draftValue ?? value;
@@ -295,10 +302,17 @@ export const adverseMediaArticleDetails = queryField("adverseMediaArticleDetails
     }
 
     async function profileParamsResolver(params: NumericParams<ProfileReplyParams>) {
-      const { value, draftValue } = await ctx.profiles.loadProfileFieldValueWithDraft(params);
-
       const article = await ctx.adverseMedia.fetchArticle(args.id, { searchTerms: args.search });
 
+      if (isNonNullish(params.profileFieldValueId)) {
+        const value = await ctx.profiles.loadProfileFieldValueById(params.profileFieldValueId);
+        if (isNullish(value)) {
+          throw new ApolloError("Profile field value not found", "PROFILE_FIELD_VALUE_NOT_FOUND");
+        }
+        return ctx.adverseMedia.addRelevanceToArticle(article, value.content);
+      }
+
+      const { value, draftValue } = await ctx.profiles.loadProfileFieldValueWithDraft(params);
       const currentValue = draftValue ?? value;
 
       return ctx.adverseMedia.addRelevanceToArticle(article, currentValue?.content);

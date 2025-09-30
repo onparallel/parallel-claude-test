@@ -3161,6 +3161,30 @@ export const MessageSquareIcon = createIcon({
   ),
 });
 
+export const HistoryIcon = createIcon({
+  displayName: "HistoryIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g>
+      <path
+        d="m15.7414 15.4457-3.3414-3.397v-4.04875c0-.21217-.0843-.41565-.2343-.56568s-.3536-.23432-.5657-.23432c-.2122 0-.4157.08429-.5657.23432s-.2343.35351-.2343.56568v4.39995c-.0002.1111.0229.2208.0675.3225s.1098.1929.1917.2679l3.6014 3.6338c.1573.1414.3639.2156.5752.2065.2114-.0091.4107-.1008.5552-.2553.1431-.1564.2183-.3633.209-.575-.0093-.2119-.1023-.4113-.2586-.5546z"
+        fill="currentColor"
+        strokeWidth="1.5"
+      />
+      <g
+        stroke="currentColor"
+        fill="none"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="m14.55 21.67c4.29-1.13 7.45-5.03 7.45-9.67 0-5.52-4.44-10-10-10-6.67 0-10 5.56-10 5.56m0 0v-4.56m0 4.56h2.01 2.43" />
+        <path d="m2 12c0 5.52 4.48 10 10 10" strokeDasharray="3 3" />
+      </g>
+    </g>
+  ),
+});
+
 export const UndoIcon = createIcon({
   displayName: "UndoIcon",
   viewBox: "0 0 24 24",

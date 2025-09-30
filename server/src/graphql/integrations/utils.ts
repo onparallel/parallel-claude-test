@@ -9,6 +9,7 @@ export interface PetitionReplyParams {
 export interface ProfileReplyParams {
   profileId: string;
   profileTypeFieldId: string;
+  profileFieldValueId?: string;
 }
 
 type PetitionOrProfileReplyParams = PetitionReplyParams | ProfileReplyParams;
@@ -49,6 +50,9 @@ function isProfileToken(token: any): token is ProfileReplyParams {
     typeof token.profileId === "string" &&
     isGlobalId(token.profileId, "Profile") &&
     typeof token.profileTypeFieldId === "string" &&
-    isGlobalId(token.profileTypeFieldId, "ProfileTypeField")
+    isGlobalId(token.profileTypeFieldId, "ProfileTypeField") &&
+    (!token.profileFieldValueId ||
+      (typeof token.profileFieldValueId === "string" &&
+        isGlobalId(token.profileFieldValueId, "ProfileFieldValue")))
   );
 }

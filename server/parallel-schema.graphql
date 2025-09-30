@@ -2251,7 +2251,7 @@ type Mutation {
   createProfile(
     fields: [CreateProfileFieldValueInput!]!
     profileTypeId: GID!
-    source: ProfileFieldValueSource
+    source: ProfileFieldPropertyValueSource
 
     """
     Subscribe the context user to profile notifications
@@ -2276,7 +2276,7 @@ type Mutation {
     expiryDate: Date
     profileId: GID!
     profileTypeFieldId: GID!
-    source: ProfileFieldValueSource
+    source: ProfileFieldPropertyValueSource
   ): ProfileFieldPropertyAndFileWithUploadData!
 
   """
@@ -3805,7 +3805,7 @@ type Mutation {
   updateProfileFieldValue(
     fields: [UpdateProfileFieldValueInput!]!
     profileId: GID!
-    source: ProfileFieldValueSource
+    source: ProfileFieldPropertyValueSource
   ): Profile!
   updateProfileFieldValueOptions(
     data: UpdateProfileFieldValueOptionsDataInput!
@@ -3838,7 +3838,7 @@ type Mutation {
     force: Boolean
     profileTypeFieldId: GID!
     profileTypeId: GID!
-    source: ProfileFieldValueSource
+    source: ProfileFieldPropertyValueSource
   ): ProfileTypeField!
 
   """
@@ -7024,9 +7024,11 @@ type ProfileFieldFile implements ProfileFieldResponse {
   """
   expiresAt: DateTime
   expiryDate: String
+  externalSourceName: String
   field: ProfileTypeField!
   file: FileUpload
   id: GID!
+  petitionFieldReply: PetitionFieldReply
   profile: Profile!
 
   """
@@ -7034,6 +7036,11 @@ type ProfileFieldFile implements ProfileFieldResponse {
   """
   removedAt: DateTime
   removedBy: User
+
+  """
+  Source of the response.
+  """
+  source: ProfileFieldPropertyValueSource
 }
 
 type ProfileFieldFileAddedEvent implements ProfileEvent {
@@ -7088,6 +7095,15 @@ type ProfileFieldPropertyPagination {
   totalCount: Int!
 }
 
+enum ProfileFieldPropertyValueSource {
+  EXCEL_IMPORT
+  EXTERNAL
+  MANUAL
+  PARALLEL_API
+  PARALLEL_MONITORING
+  PETITION_FIELD_REPLY
+}
+
 interface ProfileFieldResponse {
   """
   Time when the response was anonymized.
@@ -7105,7 +7121,9 @@ interface ProfileFieldResponse {
   """
   expiresAt: DateTime
   expiryDate: String
+  externalSourceName: String
   field: ProfileTypeField!
+  petitionFieldReply: PetitionFieldReply
   profile: Profile!
 
   """
@@ -7113,6 +7131,11 @@ interface ProfileFieldResponse {
   """
   removedAt: DateTime
   removedBy: User
+
+  """
+  Source of the response.
+  """
+  source: ProfileFieldPropertyValueSource
 }
 
 type ProfileFieldValue implements ProfileFieldResponse {
@@ -7133,12 +7156,14 @@ type ProfileFieldValue implements ProfileFieldResponse {
   """
   expiresAt: DateTime
   expiryDate: String
+  externalSourceName: String
   field: ProfileTypeField!
   hasActiveMonitoring: Boolean!
   hasPendingReview: Boolean!
   hasStoredValue: Boolean!
   id: GID!
   isDraft: Boolean!
+  petitionFieldReply: PetitionFieldReply
   profile: Profile!
 
   """
@@ -7146,6 +7171,11 @@ type ProfileFieldValue implements ProfileFieldResponse {
   """
   removedAt: DateTime
   removedBy: User
+
+  """
+  Source of the response.
+  """
+  source: ProfileFieldPropertyValueSource
 }
 
 type ProfileFieldValueMonitoredEvent implements ProfileEvent {
@@ -7156,13 +7186,16 @@ type ProfileFieldValueMonitoredEvent implements ProfileEvent {
   type: ProfileEventType!
 }
 
-enum ProfileFieldValueSource {
-  EXCEL_IMPORT
-  EXTERNAL
-  MANUAL
-  PARALLEL_API
-  PARALLEL_MONITORING
-  PETITION_FIELD_REPLY
+type ProfileFieldValuePagination {
+  """
+  The requested slice of items.
+  """
+  items: [ProfileFieldValue!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
 }
 
 type ProfileFieldValueUpdatedEvent implements ProfileEvent {
@@ -7418,6 +7451,23 @@ type ProfileTypeField {
   position: Int!
   profileType: ProfileType!
   type: ProfileTypeFieldType!
+}
+
+type ProfileTypeFieldFileHistory {
+  eventType: String!
+  profileFieldFile: ProfileFieldFile!
+}
+
+type ProfileTypeFieldFileHistoryPagination {
+  """
+  The requested slice of items.
+  """
+  items: [ProfileTypeFieldFileHistory!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
 }
 
 type ProfileTypeFieldPermission {
@@ -8526,6 +8576,32 @@ type Query {
     otherSideProfileTypeId: GID
   ): [ProfileRelationshipTypeWithDirection!]!
   profileType(profileTypeId: GID!): ProfileType!
+  profileTypeFieldFileHistory(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+    profileId: GID!
+    profileTypeFieldId: GID!
+  ): ProfileTypeFieldFileHistoryPagination!
+  profileTypeFieldValueHistory(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+    profileId: GID!
+    profileTypeFieldId: GID!
+  ): ProfileFieldValuePagination!
   profileTypes(
     filter: ProfileTypeFilter
 

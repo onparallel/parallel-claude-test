@@ -169,6 +169,23 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
       query: EntitySearchRequest,
       params: NumericParams<ProfileReplyParams>,
     ) {
+      if (isNonNullish(params.profileFieldValueId)) {
+        const value = await ctx.profiles.loadProfileFieldValueById(params.profileFieldValueId);
+        if (isNullish(value)) {
+          throw new ApolloError(
+            `Can't find BACKGROUND_CHECK profile field value`,
+            "REPLY_NOT_FOUND",
+          );
+        }
+        return {
+          ...ctx.backgroundCheck.mapBackgroundCheckSearch(value.content),
+          isDraft: value.is_draft,
+          hasStoredValue: isNonNullish(value),
+          hasPendingReview: value.pending_review,
+          reviewDiff: ctx.backgroundCheck.mergeReviewReasons(value.review_reason ?? []).search,
+        };
+      }
+
       async function createFirstTimeDraftSearch() {
         await ctx.profilesHelper.userCanWriteOnProfile(
           params.profileId,
@@ -417,6 +434,24 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
     }
 
     async function profileParamsResolver(params: NumericParams<ProfileReplyParams>) {
+      if (isNonNullish(params.profileFieldValueId)) {
+        const value = await ctx.profiles.loadProfileFieldValueById(params.profileFieldValueId);
+        if (isNullish(value) || isNullish(value.content?.entity)) {
+          throw new ApolloError(
+            `Can't find BACKGROUND_CHECK profile field value`,
+            "REPLY_NOT_FOUND",
+          );
+        }
+        return {
+          ...ctx.backgroundCheck.mapBackgroundCheckEntity(
+            value.content.entity,
+            value.content.entity.id,
+          ),
+          hasPendingReview: value.pending_review,
+          reviewDiff: ctx.backgroundCheck.mergeReviewReasons(value.review_reason ?? []).entity,
+        };
+      }
+
       const { value, draftValue } = await ctx.profiles.loadProfileFieldValueWithDraft(params);
       const currentValue = draftValue ?? value;
 

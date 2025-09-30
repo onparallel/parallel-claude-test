@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { outdent } from "outdent";
-import { isNonNullish, omit, pick, range, times } from "remeda";
+import { indexBy, isNonNullish, omit, pick, range, times } from "remeda";
 import {
   FileUpload,
   Organization,
@@ -10,14 +10,17 @@ import {
   PetitionFieldReply,
   PetitionFieldType,
   Profile,
+  ProfileFieldFile,
   ProfileType,
   ProfileTypeField,
   ProfileTypeFieldType,
+  ProfileTypeFieldTypeValues,
   User,
   UserGroup,
 } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
+import { ProfileRepository } from "../../db/repositories/ProfileRepository";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
@@ -11931,6 +11934,950 @@ describe("GraphQL/Profiles", () => {
         .first();
 
       expect(dbPinnedProfileType).toBeUndefined();
+    });
+  });
+
+  describe("profileTypeFieldValueHistory", () => {
+    let profileType: ProfileType;
+    let profileTypeFieldsByType: Record<ProfileTypeFieldType, ProfileTypeField>;
+
+    let profile: Profile;
+    let profilesRepo: ProfileRepository;
+    beforeAll(() => {
+      profilesRepo = testClient.container.get(ProfileRepository);
+    });
+    beforeEach(async () => {
+      [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+
+      const profileTypeFields = await mocks.createRandomProfileTypeFields(
+        organization.id,
+        profileType.id,
+        ProfileTypeFieldTypeValues.length,
+        (i) => ({
+          type: ProfileTypeFieldTypeValues[i],
+        }),
+      );
+
+      profileTypeFieldsByType = indexBy(profileTypeFields, (f) => f.type);
+
+      await mocks.knex
+        .from("profile_type_field")
+        .whereIn("id", [
+          profileTypeFieldsByType["SELECT"].id,
+          profileTypeFieldsByType["CHECKBOX"].id,
+        ])
+        .update({
+          options: {
+            standardList: null,
+            values: [
+              {
+                value: "option_1",
+                label: { en: "Option 1", es: "Opción 1" },
+              },
+              {
+                value: "option_2",
+                label: { en: "Option 2", es: "Opción 2" },
+              },
+              {
+                value: "option_3",
+                label: { en: "Option 3", es: "Opción 3" },
+              },
+            ],
+          },
+        });
+
+      [profile] = await mocks.createRandomProfiles(organization.id, profileType.id);
+
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["TEXT"].id),
+          content: { value: "Hello!" },
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["TEXT"].id),
+          content: { value: "Hello World!" },
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["TEXT"].id),
+          content: { value: "Hello" },
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["TEXT"].id),
+          content: { value: "Bye!" },
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["TEXT"].id),
+          content: null,
+        },
+      ]);
+
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["DATE"].id),
+          content: { value: "2025-01-01" },
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["DATE"].id),
+          content: null,
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["DATE"].id),
+          content: { value: "2025-02-01" },
+        },
+      ]);
+
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["NUMBER"].id),
+          content: { value: 1 },
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["NUMBER"].id),
+          content: { value: 2 },
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["NUMBER"].id),
+          content: { value: 3 },
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["NUMBER"].id),
+          content: null,
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["NUMBER"].id),
+          content: { value: 4 },
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["NUMBER"].id),
+          content: { value: 40 },
+        },
+      ]);
+
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["SELECT"].id),
+          content: { value: "option_2" },
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["SELECT"].id),
+          content: { value: "option_2" },
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["SELECT"].id),
+          content: { value: "option_3" },
+        },
+      ]);
+
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId(
+            "ProfileTypeField",
+            profileTypeFieldsByType["CHECKBOX"].id,
+          ),
+          content: { value: ["option_1"] },
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId(
+            "ProfileTypeField",
+            profileTypeFieldsByType["CHECKBOX"].id,
+          ),
+          content: { value: ["option_1", "option_2"] },
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId(
+            "ProfileTypeField",
+            profileTypeFieldsByType["CHECKBOX"].id,
+          ),
+          content: { value: ["option_1", "option_2", "option_3"] },
+        },
+      ]);
+      await updateProfileValue(toGlobalId("Profile", profile.id), [
+        {
+          profileTypeFieldId: toGlobalId(
+            "ProfileTypeField",
+            profileTypeFieldsByType["CHECKBOX"].id,
+          ),
+          content: { value: ["option_1", "option_3"] },
+        },
+      ]);
+
+      await profilesRepo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            type: "BACKGROUND_CHECK",
+            profileTypeFieldId: profileTypeFieldsByType["BACKGROUND_CHECK"].id,
+            content: {
+              query: {
+                name: "John Doe",
+                date: "2024-10-10",
+                type: "PERSON",
+                country: "FR",
+              },
+              search: {
+                totalCount: 2,
+                items: [
+                  {
+                    id: "123",
+                    type: "PERSON",
+                    name: "John Doe",
+                    properties: {},
+                  },
+                  {
+                    id: "1234",
+                    type: "PERSON",
+                    name: "John Doe 2",
+                    properties: {},
+                  },
+                ],
+                createdAt: new Date(),
+              },
+              entity: null,
+            },
+          },
+        ],
+        sessionUser.id,
+        organization.id,
+        "MANUAL",
+      );
+
+      await profilesRepo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            type: "BACKGROUND_CHECK",
+            profileTypeFieldId: profileTypeFieldsByType["BACKGROUND_CHECK"].id,
+            content: {
+              query: {
+                name: "John Doe",
+                date: "2024-10-10",
+                type: "PERSON",
+                country: "FR",
+              },
+              search: {
+                totalCount: 2,
+                items: [
+                  {
+                    id: "123",
+                    type: "PERSON",
+                    name: "John Doe",
+                    properties: {},
+                  },
+                  {
+                    id: "1234",
+                    type: "PERSON",
+                    name: "John Doe 2",
+                    properties: {},
+                  },
+                ],
+                createdAt: new Date(),
+              },
+              entity: null,
+              falsePositives: [{ id: "1234", addedAt: new Date(), addedByUserId: sessionUser.id }],
+            },
+          },
+        ],
+        sessionUser.id,
+        organization.id,
+        "MANUAL",
+      );
+      await profilesRepo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            type: "BACKGROUND_CHECK",
+            profileTypeFieldId: profileTypeFieldsByType["BACKGROUND_CHECK"].id,
+            content: {
+              query: {
+                name: "John Doe",
+                date: "2024-10-10",
+                type: "PERSON",
+                country: "FR",
+              },
+              search: {
+                totalCount: 2,
+                items: [
+                  {
+                    id: "123",
+                    type: "PERSON",
+                    name: "John Doe",
+                    properties: {},
+                  },
+                  {
+                    id: "1234",
+                    type: "PERSON",
+                    name: "John Doe 2",
+                    properties: {},
+                  },
+                ],
+                createdAt: new Date(),
+              },
+              entity: {
+                id: "123",
+                type: "PERSON",
+                name: "John Doe",
+                properties: {},
+                createdAt: new Date(),
+              },
+              falsePositives: [{ id: "1234", addedAt: new Date(), addedByUserId: sessionUser.id }],
+            },
+          },
+        ],
+        sessionUser.id,
+        organization.id,
+        "MANUAL",
+      );
+    });
+
+    it("gets history of a TEXT property", async () => {
+      const { data, errors } = await testClient.execute(
+        gql`
+          query ($profileId: GID!, $profileTypeFieldId: GID!) {
+            profileTypeFieldValueHistory(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              offset: 0
+              limit: 100
+            ) {
+              totalCount
+              items {
+                id
+                content
+                createdAt
+                removedAt
+                source
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["TEXT"].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profileTypeFieldValueHistory).toEqual({
+        totalCount: 4,
+        items: [
+          {
+            id: expect.any(String),
+            content: { value: "Bye!" },
+            createdAt: expect.any(Date),
+            removedAt: expect.any(Date),
+            source: "MANUAL",
+          },
+          {
+            id: expect.any(String),
+            content: { value: "Hello" },
+            createdAt: expect.any(Date),
+            removedAt: expect.any(Date),
+            source: "MANUAL",
+          },
+          {
+            id: expect.any(String),
+            content: { value: "Hello World!" },
+            createdAt: expect.any(Date),
+            removedAt: expect.any(Date),
+            source: "MANUAL",
+          },
+          {
+            id: expect.any(String),
+            content: { value: "Hello!" },
+            createdAt: expect.any(Date),
+            removedAt: expect.any(Date),
+            source: "MANUAL",
+          },
+        ],
+      });
+    });
+
+    it("gets history of a DATE property", async () => {
+      const { data, errors } = await testClient.execute(
+        gql`
+          query ($profileId: GID!, $profileTypeFieldId: GID!) {
+            profileTypeFieldValueHistory(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              offset: 0
+              limit: 100
+            ) {
+              totalCount
+              items {
+                id
+                content
+                createdAt
+                removedAt
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["DATE"].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profileTypeFieldValueHistory).toEqual({
+        totalCount: 2,
+        items: [
+          {
+            id: expect.any(String),
+            content: { value: "2025-02-01" },
+            createdAt: expect.any(Date),
+            removedAt: null,
+          },
+          {
+            id: expect.any(String),
+            content: { value: "2025-01-01" },
+            createdAt: expect.any(Date),
+            removedAt: expect.any(Date),
+          },
+        ],
+      });
+    });
+
+    it("gets history of a NUMBER property", async () => {
+      const { data, errors } = await testClient.execute(
+        gql`
+          query ($profileId: GID!, $profileTypeFieldId: GID!) {
+            profileTypeFieldValueHistory(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              offset: 1
+              limit: 100
+            ) {
+              totalCount
+              items {
+                id
+                content
+                createdAt
+                removedAt
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["NUMBER"].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profileTypeFieldValueHistory).toEqual({
+        totalCount: 5,
+        items: [
+          {
+            id: expect.any(String),
+            content: { value: 4 },
+            createdAt: expect.any(Date),
+            removedAt: expect.any(Date),
+          },
+          {
+            id: expect.any(String),
+            content: { value: 3 },
+            createdAt: expect.any(Date),
+            removedAt: expect.any(Date),
+          },
+          {
+            id: expect.any(String),
+            content: { value: 2 },
+            createdAt: expect.any(Date),
+            removedAt: expect.any(Date),
+          },
+          {
+            id: expect.any(String),
+            content: { value: 1 },
+            createdAt: expect.any(Date),
+            removedAt: expect.any(Date),
+          },
+        ],
+      });
+    });
+
+    it("gets history of a SELECT property", async () => {
+      const { data, errors } = await testClient.execute(
+        gql`
+          query ($profileId: GID!, $profileTypeFieldId: GID!) {
+            profileTypeFieldValueHistory(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              offset: 0
+              limit: 100
+            ) {
+              totalCount
+              items {
+                id
+                content
+                createdAt
+                removedAt
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["SELECT"].id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profileTypeFieldValueHistory).toEqual({
+        totalCount: 2,
+        items: [
+          {
+            id: expect.any(String),
+            content: { value: "option_3" },
+            createdAt: expect.any(Date),
+            removedAt: null,
+          },
+          {
+            id: expect.any(String),
+            content: { value: "option_2" },
+            createdAt: expect.any(Date),
+            removedAt: expect.any(Date),
+          },
+        ],
+      });
+    });
+
+    it("gets history of a CHECKBOX property", async () => {
+      const { data, errors } = await testClient.execute(
+        gql`
+          query ($profileId: GID!, $profileTypeFieldId: GID!) {
+            profileTypeFieldValueHistory(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              offset: 0
+              limit: 100
+            ) {
+              totalCount
+              items {
+                id
+                content
+                createdAt
+                removedAt
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId(
+            "ProfileTypeField",
+            profileTypeFieldsByType["CHECKBOX"].id,
+          ),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profileTypeFieldValueHistory).toEqual({
+        totalCount: 4,
+        items: [
+          {
+            id: expect.any(String),
+            content: { value: ["option_1", "option_3"] },
+            createdAt: expect.any(Date),
+            removedAt: null,
+          },
+          {
+            id: expect.any(String),
+            content: { value: ["option_1", "option_2", "option_3"] },
+            createdAt: expect.any(Date),
+            removedAt: expect.any(Date),
+          },
+          {
+            id: expect.any(String),
+            content: { value: ["option_1", "option_2"] },
+            createdAt: expect.any(Date),
+            removedAt: expect.any(Date),
+          },
+          {
+            id: expect.any(String),
+            content: { value: ["option_1"] },
+            createdAt: expect.any(Date),
+            removedAt: expect.any(Date),
+          },
+        ],
+      });
+    });
+
+    it("gets history of a BACKGROUND_CHECK property", async () => {
+      const { data, errors } = await testClient.execute(
+        gql`
+          query ($profileId: GID!, $profileTypeFieldId: GID!) {
+            profileTypeFieldValueHistory(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              offset: 0
+              limit: 100
+            ) {
+              totalCount
+              items {
+                id
+                content
+                createdAt
+                removedAt
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId(
+            "ProfileTypeField",
+            profileTypeFieldsByType["BACKGROUND_CHECK"].id,
+          ),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profileTypeFieldValueHistory).toEqual({
+        totalCount: 3,
+        items: [
+          {
+            id: expect.any(String),
+            content: {
+              query: {
+                name: "John Doe",
+                date: "2024-10-10",
+                type: "PERSON",
+                country: "FR",
+              },
+              search: {
+                totalCount: 2,
+                falsePositivesCount: 1,
+                createdAt: expect.any(String),
+              },
+              entity: {
+                id: "123",
+                type: "PERSON",
+                name: "John Doe",
+                properties: {},
+                createdAt: expect.any(String),
+              },
+            },
+            createdAt: expect.any(Date),
+            removedAt: null,
+          },
+          {
+            id: expect.any(String),
+            content: {
+              query: {
+                name: "John Doe",
+                date: "2024-10-10",
+                type: "PERSON",
+                country: "FR",
+              },
+              search: {
+                totalCount: 2,
+                falsePositivesCount: 1,
+                createdAt: expect.any(String),
+              },
+              entity: null,
+            },
+            createdAt: expect.any(Date),
+            removedAt: expect.any(Date),
+          },
+          {
+            id: expect.any(String),
+            content: {
+              query: {
+                name: "John Doe",
+                date: "2024-10-10",
+                type: "PERSON",
+                country: "FR",
+              },
+              search: {
+                totalCount: 2,
+                falsePositivesCount: 0,
+                createdAt: expect.any(String),
+              },
+              entity: null,
+            },
+            createdAt: expect.any(Date),
+            removedAt: expect.any(Date),
+          },
+        ],
+      });
+    });
+
+    it("sends error if property is of type FILE", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($profileId: GID!, $profileTypeFieldId: GID!) {
+            profileTypeFieldValueHistory(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              offset: 0
+              limit: 100
+            ) {
+              totalCount
+              items {
+                id
+                content
+                createdAt
+                removedAt
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldsByType["FILE"].id),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("profileTypeFieldFileHistory", () => {
+    let profileType: ProfileType;
+
+    let profile: Profile;
+    let profileTypeField: ProfileTypeField;
+    let profilesRepo: ProfileRepository;
+
+    let fileUploads: FileUpload[];
+    let pffs1: ProfileFieldFile[];
+    let pffs2: ProfileFieldFile[];
+    beforeAll(() => {
+      profilesRepo = testClient.container.get(ProfileRepository);
+    });
+
+    beforeEach(async () => {
+      [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+
+      [profileTypeField] = await mocks.createRandomProfileTypeFields(
+        organization.id,
+        profileType.id,
+        1,
+        () => ({
+          type: "FILE",
+        }),
+      );
+
+      [profile] = await mocks.createRandomProfiles(organization.id, profileType.id);
+
+      fileUploads = await mocks.createRandomFileUpload(3, (i) => ({
+        filename: `file_${i + 1}.pdf`,
+      }));
+      pffs1 = await profilesRepo.createProfileFieldFiles(
+        profile.id,
+        profileTypeField.id,
+        fileUploads.slice(0, 2).map((fu) => ({ fileUploadId: fu.id })),
+        null,
+        sessionUser.id,
+        "MANUAL",
+      );
+      await profilesRepo.createProfileUpdatedEvents(
+        profile.id,
+        pffs1.map((pff) => ({
+          org_id: organization.id,
+          profile_id: profile.id,
+          type: "PROFILE_FIELD_FILE_ADDED",
+          data: {
+            profile_type_field_id: profileTypeField.id,
+            profile_field_file_id: pff.id,
+            alias: profileTypeField.alias,
+            user_id: sessionUser.id,
+          },
+        })),
+        organization.id,
+        sessionUser.id,
+      );
+
+      await profilesRepo.deleteProfileFieldFiles(pffs1[0].id, sessionUser.id);
+      await profilesRepo.createProfileUpdatedEvents(
+        profile.id,
+        [
+          {
+            org_id: organization.id,
+            profile_id: profile.id,
+            type: "PROFILE_FIELD_FILE_REMOVED",
+            data: {
+              user_id: sessionUser.id,
+              profile_type_field_id: profileTypeField.id,
+              profile_field_file_id: pffs1[0].id,
+              alias: profileTypeField.alias,
+            },
+          },
+        ],
+        organization.id,
+        sessionUser.id,
+      );
+
+      pffs2 = await profilesRepo.createProfileFieldFiles(
+        profile.id,
+        profileTypeField.id,
+        fileUploads.slice(2).map((fu) => ({ fileUploadId: fu.id })),
+        null,
+        sessionUser.id,
+        "MANUAL",
+      );
+      await profilesRepo.createProfileUpdatedEvents(
+        profile.id,
+        pffs2.map((pff) => ({
+          org_id: organization.id,
+          profile_id: profile.id,
+          type: "PROFILE_FIELD_FILE_ADDED",
+          data: {
+            profile_type_field_id: profileTypeField.id,
+            profile_field_file_id: pff.id,
+            alias: profileTypeField.alias,
+            user_id: sessionUser.id,
+          },
+        })),
+        organization.id,
+        sessionUser.id,
+      );
+    });
+
+    it("gets history of a FILE property", async () => {
+      const { data, errors } = await testClient.execute(
+        gql`
+          query ($profileId: GID!, $profileTypeFieldId: GID!) {
+            profileTypeFieldFileHistory(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              offset: 0
+              limit: 100
+            ) {
+              totalCount
+              items {
+                eventType
+                profileFieldFile {
+                  id
+                  source
+                  createdBy {
+                    id
+                  }
+                  createdAt
+                  file {
+                    filename
+                  }
+                  removedBy {
+                    id
+                  }
+                  removedAt
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profileTypeFieldFileHistory).toEqual({
+        totalCount: 4,
+        items: [
+          {
+            eventType: "ADDED",
+            profileFieldFile: {
+              id: toGlobalId("ProfileFieldFile", pffs2[0].id),
+              source: "MANUAL",
+              createdBy: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+              createdAt: expect.any(Date),
+              file: {
+                filename: "file_3.pdf",
+              },
+              removedBy: null,
+              removedAt: null,
+            },
+          },
+          {
+            eventType: "REMOVED",
+            profileFieldFile: {
+              id: toGlobalId("ProfileFieldFile", pffs1[0].id),
+              source: "MANUAL",
+              createdBy: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+              createdAt: expect.any(Date),
+              file: {
+                filename: "file_1.pdf",
+              },
+              removedBy: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+              removedAt: expect.any(Date),
+            },
+          },
+          {
+            eventType: "ADDED",
+            profileFieldFile: {
+              id: toGlobalId("ProfileFieldFile", pffs1[1].id),
+              source: "MANUAL",
+              createdBy: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+              createdAt: expect.any(Date),
+              file: {
+                filename: "file_2.pdf",
+              },
+              removedBy: null,
+              removedAt: null,
+            },
+          },
+          {
+            eventType: "ADDED",
+            profileFieldFile: {
+              id: toGlobalId("ProfileFieldFile", pffs1[0].id),
+              source: "MANUAL",
+              createdBy: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+              createdAt: expect.any(Date),
+              file: {
+                filename: "file_1.pdf",
+              },
+              removedBy: {
+                id: toGlobalId("User", sessionUser.id),
+              },
+              removedAt: expect.any(Date),
+            },
+          },
+        ],
+      });
     });
   });
 });

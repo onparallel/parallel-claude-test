@@ -2298,7 +2298,7 @@ export type MutationcreatePrintPdfTaskArgs = {
 export type MutationcreateProfileArgs = {
   fields: Array<CreateProfileFieldValueInput>;
   profileTypeId: Scalars["GID"]["input"];
-  source?: InputMaybe<ProfileFieldValueSource>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
@@ -2317,7 +2317,7 @@ export type MutationcreateProfileFieldFileUploadLinkArgs = {
   expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
-  source?: InputMaybe<ProfileFieldValueSource>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 };
 
 export type MutationcreateProfileLinkedPetitionFieldArgs = {
@@ -3429,7 +3429,7 @@ export type MutationupdateProfileEventSubscriptionArgs = {
 export type MutationupdateProfileFieldValueArgs = {
   fields: Array<UpdateProfileFieldValueInput>;
   profileId: Scalars["GID"]["input"];
-  source?: InputMaybe<ProfileFieldValueSource>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 };
 
 export type MutationupdateProfileFieldValueOptionsArgs = {
@@ -3458,7 +3458,7 @@ export type MutationupdateProfileTypeFieldArgs = {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   profileTypeFieldId: Scalars["GID"]["input"];
   profileTypeId: Scalars["GID"]["input"];
-  source?: InputMaybe<ProfileFieldValueSource>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 };
 
 export type MutationupdateProfileTypeFieldPermissionsArgs = {
@@ -5563,13 +5563,17 @@ export type ProfileFieldFile = ProfileFieldResponse & {
   /** Expiration datetime of the value, considering organization's timezone. */
   expiresAt: Maybe<Scalars["DateTime"]["output"]>;
   expiryDate: Maybe<Scalars["String"]["output"]>;
+  externalSourceName: Maybe<Scalars["String"]["output"]>;
   field: ProfileTypeField;
   file: Maybe<FileUpload>;
   id: Scalars["GID"]["output"];
+  petitionFieldReply: Maybe<PetitionFieldReply>;
   profile: Profile;
   /** Time when the response was removed. */
   removedAt: Maybe<Scalars["DateTime"]["output"]>;
   removedBy: Maybe<User>;
+  /** Source of the response. */
+  source: Maybe<ProfileFieldPropertyValueSource>;
 };
 
 export type ProfileFieldFileAddedEvent = ProfileEvent & {
@@ -5619,6 +5623,14 @@ export type ProfileFieldPropertyPagination = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type ProfileFieldPropertyValueSource =
+  | "EXCEL_IMPORT"
+  | "EXTERNAL"
+  | "MANUAL"
+  | "PARALLEL_API"
+  | "PARALLEL_MONITORING"
+  | "PETITION_FIELD_REPLY";
+
 export type ProfileFieldResponse = {
   /** Time when the response was anonymized. */
   anonymizedAt: Maybe<Scalars["DateTime"]["output"]>;
@@ -5628,11 +5640,15 @@ export type ProfileFieldResponse = {
   /** Expiration datetime of the value, considering organization's timezone. */
   expiresAt: Maybe<Scalars["DateTime"]["output"]>;
   expiryDate: Maybe<Scalars["String"]["output"]>;
+  externalSourceName: Maybe<Scalars["String"]["output"]>;
   field: ProfileTypeField;
+  petitionFieldReply: Maybe<PetitionFieldReply>;
   profile: Profile;
   /** Time when the response was removed. */
   removedAt: Maybe<Scalars["DateTime"]["output"]>;
   removedBy: Maybe<User>;
+  /** Source of the response. */
+  source: Maybe<ProfileFieldPropertyValueSource>;
 };
 
 export type ProfileFieldValue = ProfileFieldResponse & {
@@ -5645,16 +5661,20 @@ export type ProfileFieldValue = ProfileFieldResponse & {
   /** Expiration datetime of the value, considering organization's timezone. */
   expiresAt: Maybe<Scalars["DateTime"]["output"]>;
   expiryDate: Maybe<Scalars["String"]["output"]>;
+  externalSourceName: Maybe<Scalars["String"]["output"]>;
   field: ProfileTypeField;
   hasActiveMonitoring: Scalars["Boolean"]["output"];
   hasPendingReview: Scalars["Boolean"]["output"];
   hasStoredValue: Scalars["Boolean"]["output"];
   id: Scalars["GID"]["output"];
   isDraft: Scalars["Boolean"]["output"];
+  petitionFieldReply: Maybe<PetitionFieldReply>;
   profile: Profile;
   /** Time when the response was removed. */
   removedAt: Maybe<Scalars["DateTime"]["output"]>;
   removedBy: Maybe<User>;
+  /** Source of the response. */
+  source: Maybe<ProfileFieldPropertyValueSource>;
 };
 
 export type ProfileFieldValueMonitoredEvent = ProfileEvent & {
@@ -5665,13 +5685,12 @@ export type ProfileFieldValueMonitoredEvent = ProfileEvent & {
   type: ProfileEventType;
 };
 
-export type ProfileFieldValueSource =
-  | "EXCEL_IMPORT"
-  | "EXTERNAL"
-  | "MANUAL"
-  | "PARALLEL_API"
-  | "PARALLEL_MONITORING"
-  | "PETITION_FIELD_REPLY";
+export type ProfileFieldValuePagination = {
+  /** The requested slice of items. */
+  items: Array<ProfileFieldValue>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"]["output"];
+};
 
 export type ProfileFieldValueUpdatedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
@@ -5894,6 +5913,18 @@ export type ProfileTypeField = {
   position: Scalars["Int"]["output"];
   profileType: ProfileType;
   type: ProfileTypeFieldType;
+};
+
+export type ProfileTypeFieldFileHistory = {
+  eventType: Scalars["String"]["output"];
+  profileFieldFile: ProfileFieldFile;
+};
+
+export type ProfileTypeFieldFileHistoryPagination = {
+  /** The requested slice of items. */
+  items: Array<ProfileTypeFieldFileHistory>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type ProfileTypeFieldPermission = {
@@ -6420,6 +6451,8 @@ export type Query = {
   profileRelationshipTypes: Array<ProfileRelationshipType>;
   profileRelationshipTypesWithDirection: Array<ProfileRelationshipTypeWithDirection>;
   profileType: ProfileType;
+  profileTypeFieldFileHistory: ProfileTypeFieldFileHistoryPagination;
+  profileTypeFieldValueHistory: ProfileFieldValuePagination;
   profileTypes: ProfileTypePagination;
   profiles: ProfilePagination;
   profilesWithSameContent: Array<ProfilesWithContent>;
@@ -6661,6 +6694,20 @@ export type QueryprofileRelationshipTypesWithDirectionArgs = {
 
 export type QueryprofileTypeArgs = {
   profileTypeId: Scalars["GID"]["input"];
+};
+
+export type QueryprofileTypeFieldFileHistoryArgs = {
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+};
+
+export type QueryprofileTypeFieldValueHistoryArgs = {
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
 };
 
 export type QueryprofileTypesArgs = {

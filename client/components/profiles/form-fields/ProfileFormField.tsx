@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { Badge, FormControl, FormLabel, HStack, Text } from "@chakra-ui/react";
-import { FieldDateIcon } from "@parallel/chakra/icons";
+import { FieldDateIcon, HistoryIcon } from "@parallel/chakra/icons";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import {
   LocalizableUserText,
   LocalizableUserTextRender,
@@ -31,6 +32,8 @@ import { isNonNullish, isNullish } from "remeda";
 import { noop } from "ts-essentials";
 import { ProfileFieldSuggestion } from "../ProfileFieldSuggestion";
 import { ProfileFormData } from "../ProfileForm";
+import { useProfileFieldFileHistoryDialog } from "../dialogs/ProfileFieldFileHistoryDialog";
+import { useProfileFieldValueHistoryDialog } from "../dialogs/ProfileFieldValueHistoryDialog";
 import { useUpdateProfileFieldExpirationDialog } from "../dialogs/UpdateProfileFieldExpirationDialog";
 import { ProfileFormFieldAdverseMediaSearch } from "./ProfileFormFieldAdverseMediaSearch";
 import { ProfileFormFieldBackgroundCheck } from "./ProfileFormFieldBackgroundCheck";
@@ -65,6 +68,7 @@ export interface ProfileFormFieldProps {
 
 export function ProfileFormField(props: ProfileFormFieldProps) {
   const intl = useIntl();
+  const historyButtonRef = useRef<HTMLButtonElement>(null);
 
   const { control, setValue } = useFormContext<ProfileFormData>();
   const { field, fieldsWithIndices, files } = props;
@@ -316,6 +320,27 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
       });
   });
 
+  const showProfileFieldValueHistoryDialog = useProfileFieldValueHistoryDialog();
+  const showProfileFieldFileHistoryDialog = useProfileFieldFileHistoryDialog();
+
+  const handleShowHistory = useCallback(async () => {
+    try {
+      if (field.type === "FILE") {
+        await showProfileFieldFileHistoryDialog({
+          field,
+          profileId: props.profileId ?? "",
+          modalProps: { finalFocusRef: historyButtonRef },
+        });
+      } else {
+        await showProfileFieldValueHistoryDialog({
+          field,
+          profileId: props.profileId ?? "",
+          modalProps: { finalFocusRef: historyButtonRef },
+        });
+      }
+    } catch {}
+  }, [field.id, props.profileId]);
+
   const commonProps = {
     ...props,
     expiryDate,
@@ -340,18 +365,27 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
         isInvalid={isInvalid}
         isDisabled={props.isDisabled}
         _hover={{
-          "& .edit-visibility": {
+          "& .edit-visibility, & .view-history-button": {
             display: "flex",
+            opacity: 1,
           },
         }}
         _focusWithin={{
-          "& .edit-visibility": {
+          "& .edit-visibility, & .view-history-button": {
             display: "flex",
+            opacity: 1,
           },
         }}
       >
-        <HStack justify="space-between" marginBottom={1}>
-          <FormLabel fontSize="sm" fontWeight={400} color="gray.700" margin={0} flex="1">
+        <HStack marginBottom={1}>
+          <FormLabel
+            fontSize="sm"
+            fontWeight={400}
+            color="gray.700"
+            margin={0}
+            flex="1"
+            minHeight={7}
+          >
             <LocalizableUserTextRender
               value={field.name}
               default={
@@ -369,6 +403,21 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
               <FormattedMessage id="generic.edited-indicator" defaultMessage="Edited" />
             </Badge>
           ) : null}
+          <IconButtonWithTooltip
+            ref={historyButtonRef}
+            opacity={0}
+            className="view-history-button"
+            size="xs"
+            minHeight={7}
+            minWidth={7}
+            icon={<HistoryIcon boxSize={3.5} />}
+            label={intl.formatMessage({
+              id: "generic.history",
+              defaultMessage: "History",
+            })}
+            placement="start"
+            onClick={handleShowHistory}
+          />
           {needsExpirationDialog ? (
             <ProfileFormFieldExpirationButton
               isDisabled={fieldIsEmpty || props.isDisabled === true}
@@ -472,8 +521,10 @@ ProfileFormField.fragments = {
         expiryAlertAheadTime
         options
         ...ProfileFormFieldInputGroup_ProfileTypeField
+        ...useProfileFieldValueHistoryDialog_ProfileTypeField
       }
       ${ProfileFormFieldInputGroup.fragments.ProfileTypeField}
+      ${useProfileFieldValueHistoryDialog.fragments.ProfileTypeField}
     `;
   },
   get ProfileFieldValue() {

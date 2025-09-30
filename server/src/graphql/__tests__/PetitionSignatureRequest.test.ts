@@ -34,7 +34,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
       organization.id,
       user.id,
       1,
-      undefined,
+      () => ({ signature_config: { isEnabled: true } }),
       () => ({
         type: "READ",
       }),

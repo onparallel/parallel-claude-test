@@ -14,9 +14,11 @@ import { isNonNullish, isNullish, unique } from "remeda";
 export function BackgroundCheckEntityDetailsRelationships({
   entityId,
   relationships,
+  isDisabled,
 }: {
   entityId: string;
   relationships: BackgroundCheckEntityDetailsRelationships_BackgroundCheckEntityDetailsRelationshipFragment[];
+  isDisabled?: boolean;
 }) {
   const router = useRouter();
   const { query } = router;
@@ -96,7 +98,7 @@ export function BackgroundCheckEntityDetailsRelationships({
             context={context}
             rows={relationships}
             rowKeyProp="id"
-            onRowClick={handleRelationshipsRowClick}
+            onRowClick={isDisabled ? undefined : handleRelationshipsRowClick}
           />
         </Box>
       ) : (

@@ -16,7 +16,7 @@ import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { userHasAccessToProfile } from "./authorizers";
 
-export const ProfileFieldValueSourceValues = [
+export const ProfileFieldPropertyValueSourceValues = [
   "MANUAL",
   "EXTERNAL",
   "EXCEL_IMPORT",
@@ -25,9 +25,11 @@ export const ProfileFieldValueSourceValues = [
   "PETITION_FIELD_REPLY",
 ] as const;
 
-export const ProfileFieldValueSource = enumType({
-  name: "ProfileFieldValueSource",
-  members: ProfileFieldValueSourceValues,
+type ProfileFieldPropertyValueSource = (typeof ProfileFieldPropertyValueSourceValues)[number];
+
+export const ProfileFieldPropertyValueSource = enumType({
+  name: "ProfileFieldPropertyValueSource",
+  members: ProfileFieldPropertyValueSourceValues,
 });
 
 export const ProfileTypeStandardType = enumType({
@@ -425,6 +427,40 @@ export const ProfileFieldResponse = interfaceType({
     t.nullable.datetime("anonymizedAt", {
       description: "Time when the response was anonymized.",
       resolve: (o) => o.anonymized_at,
+    });
+    t.nullable.field("source", {
+      description: "Source of the response.",
+      type: "ProfileFieldPropertyValueSource",
+      resolve: (o) => o.source as ProfileFieldPropertyValueSource | null,
+    });
+    t.nullable.string("externalSourceName", {
+      resolve: async (o, _, ctx) => {
+        if (
+          !("external_source_integration_id" in o) ||
+          isNullish(o.external_source_integration_id)
+        ) {
+          return null;
+        }
+
+        const integration = await ctx.integrations.loadIntegration(
+          o.external_source_integration_id,
+        );
+        if (!integration || integration.type !== "PROFILE_EXTERNAL_SOURCE") {
+          return null;
+        }
+
+        return integration.name;
+      },
+    });
+    t.nullable.field("petitionFieldReply", {
+      type: "PetitionFieldReply",
+      resolve: async (o, _, ctx) => {
+        if (!o.petition_field_reply_id) {
+          return null;
+        }
+
+        return await ctx.petitions.loadFieldReply(o.petition_field_reply_id);
+      },
     });
   },
 });

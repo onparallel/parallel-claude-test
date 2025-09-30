@@ -18,7 +18,7 @@ import {
   zip,
 } from "remeda";
 import { assert } from "ts-essentials";
-import { LocalizableUserText, ProfileFieldValueSourceValues } from "../../graphql";
+import { LocalizableUserText, ProfileFieldPropertyValueSourceValues } from "../../graphql";
 import {
   PROFILE_TYPE_FIELD_SERVICE,
   ProfileTypeFieldMonitoring,
@@ -82,7 +82,7 @@ import {
 import { SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 
-type ProfileFieldValueSource = (typeof ProfileFieldValueSourceValues)[number];
+type ProfileFieldPropertyValueSource = (typeof ProfileFieldPropertyValueSourceValues)[number];
 
 export interface ProfileFilter {
   profileId?: number[] | null;
@@ -703,9 +703,7 @@ export class ProfileRepository extends BaseRepository {
     { cacheKeyFn: keyBuilder(["profileId", "profileTypeFieldId"]) },
   );
 
-  readonly loadProfileFieldFileById = this.buildLoadBy("profile_field_file", "id", (q) =>
-    q.whereNull("removed_at").whereNull("deleted_at").whereNotNull("file_upload_id"),
-  );
+  readonly loadProfileFieldFileById = this.buildLoadBy("profile_field_file", "id");
 
   readonly loadProfileFieldFilesByProfileId = this.buildLoadMultipleBy(
     "profile_field_file",
@@ -1144,7 +1142,7 @@ export class ProfileRepository extends BaseRepository {
       expiryDate?: string | null;
       petitionFieldReplyId?: number | null;
     }[],
-    source: ProfileFieldValueSource,
+    source: ProfileFieldPropertyValueSource,
     externalSourceIntegrationId?: number,
     t?: Knex.Transaction,
   ) {
@@ -1185,7 +1183,7 @@ export class ProfileRepository extends BaseRepository {
     }[],
     userId: number | null,
     orgId: number,
-    source: ProfileFieldValueSource,
+    source: ProfileFieldPropertyValueSource,
     externalSourceIntegrationId?: number,
     t?: Knex.Transaction,
   ) {
@@ -1486,7 +1484,7 @@ export class ProfileRepository extends BaseRepository {
       expiryDate?: string | null;
     }[],
     userId: number | null,
-    source: ProfileFieldValueSource,
+    source: ProfileFieldPropertyValueSource,
   ) {
     if (!fields.every((f) => ["ADVERSE_MEDIA_SEARCH", "BACKGROUND_CHECK"].includes(f.type))) {
       throw new Error(
@@ -1614,7 +1612,7 @@ export class ProfileRepository extends BaseRepository {
     files: { fileUploadId: number; petitionFieldReplyId?: number | null }[],
     expiryDate: string | null | undefined,
     userId: number,
-    source: ProfileFieldValueSource,
+    source: ProfileFieldPropertyValueSource,
   ) {
     if (files.length === 0) {
       return [];
@@ -2574,7 +2572,7 @@ export class ProfileRepository extends BaseRepository {
       new?: string | null;
     }[],
     userId: number,
-    source: ProfileFieldValueSource,
+    source: ProfileFieldPropertyValueSource,
     orgId: number,
     t?: Knex.Transaction,
   ) {
@@ -3578,4 +3576,54 @@ export class ProfileRepository extends BaseRepository {
       })
       .update({ ...data });
   }
+
+  getPaginatedHistoryForProfileTypeFieldValue(
+    profileId: number,
+    profileTypeFieldId: number,
+    opts: PageOpts,
+  ) {
+    return this.getPagination<ProfileFieldValue & { has_stored_value: boolean }>(
+      this.from("profile_field_value")
+        .where({
+          profile_id: profileId,
+          profile_type_field_id: profileTypeFieldId,
+          is_draft: false,
+        })
+        .orderBy("created_at", "desc")
+        .orderBy("id", "desc")
+        .select("*", this.knex.raw("true as has_stored_value")),
+      opts,
+    );
+  }
+
+  getPaginatedHistoryForProfileTypeFieldFile(
+    profileId: number,
+    profileTypeFieldId: number,
+    opts: PageOpts,
+  ) {
+    return this.getPagination<
+      ProfileFieldFile & {
+        event_type: "PROFILE_FIELD_FILE_ADDED" | "PROFILE_FIELD_FILE_REMOVED";
+      }
+    >(
+      this.from({ pe: "profile_event" })
+        .where("pe.profile_id", profileId)
+        .whereIn("pe.type", ["PROFILE_FIELD_FILE_ADDED", "PROFILE_FIELD_FILE_REMOVED"])
+        .whereRaw(/* sql */ `(pe."data"->>'profile_type_field_id')::int = ?`, [profileTypeFieldId])
+        .joinRaw(
+          /* sql */ `
+          join profile_field_file pff 
+          on pe.type in ('PROFILE_FIELD_FILE_ADDED', 'PROFILE_FIELD_FILE_REMOVED')
+          and pff.id = (pe."data"->>'profile_field_file_id')::int`,
+        )
+        .orderBy("pe.created_at", "desc")
+        .orderBy("pe.id", "desc")
+        .select("pe.type as event_type", "pff.*"),
+      opts,
+    );
+  }
+
+  readonly loadProfileFieldValueById = this.buildLoadBy("profile_field_value", "id", (q) =>
+    q.whereNull("anonymized_at"),
+  );
 }

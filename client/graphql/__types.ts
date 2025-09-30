@@ -2403,7 +2403,7 @@ export interface MutationcreatePrintPdfTaskArgs {
 export interface MutationcreateProfileArgs {
   fields: Array<CreateProfileFieldValueInput>;
   profileTypeId: Scalars["GID"]["input"];
-  source?: InputMaybe<ProfileFieldValueSource>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
   subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
 }
 
@@ -2422,7 +2422,7 @@ export interface MutationcreateProfileFieldFileUploadLinkArgs {
   expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
-  source?: InputMaybe<ProfileFieldValueSource>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 }
 
 export interface MutationcreateProfileLinkedPetitionFieldArgs {
@@ -3534,7 +3534,7 @@ export interface MutationupdateProfileEventSubscriptionArgs {
 export interface MutationupdateProfileFieldValueArgs {
   fields: Array<UpdateProfileFieldValueInput>;
   profileId: Scalars["GID"]["input"];
-  source?: InputMaybe<ProfileFieldValueSource>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 }
 
 export interface MutationupdateProfileFieldValueOptionsArgs {
@@ -3563,7 +3563,7 @@ export interface MutationupdateProfileTypeFieldArgs {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   profileTypeFieldId: Scalars["GID"]["input"];
   profileTypeId: Scalars["GID"]["input"];
-  source?: InputMaybe<ProfileFieldValueSource>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 }
 
 export interface MutationupdateProfileTypeFieldPermissionsArgs {
@@ -5772,13 +5772,17 @@ export interface ProfileFieldFile extends ProfileFieldResponse {
   /** Expiration datetime of the value, considering organization's timezone. */
   expiresAt?: Maybe<Scalars["DateTime"]["output"]>;
   expiryDate?: Maybe<Scalars["String"]["output"]>;
+  externalSourceName?: Maybe<Scalars["String"]["output"]>;
   field: ProfileTypeField;
   file?: Maybe<FileUpload>;
   id: Scalars["GID"]["output"];
+  petitionFieldReply?: Maybe<PetitionFieldReply>;
   profile: Profile;
   /** Time when the response was removed. */
   removedAt?: Maybe<Scalars["DateTime"]["output"]>;
   removedBy?: Maybe<User>;
+  /** Source of the response. */
+  source?: Maybe<ProfileFieldPropertyValueSource>;
 }
 
 export interface ProfileFieldFileAddedEvent extends ProfileEvent {
@@ -5834,6 +5838,14 @@ export interface ProfileFieldPropertyPagination {
   totalCount: Scalars["Int"]["output"];
 }
 
+export type ProfileFieldPropertyValueSource =
+  | "EXCEL_IMPORT"
+  | "EXTERNAL"
+  | "MANUAL"
+  | "PARALLEL_API"
+  | "PARALLEL_MONITORING"
+  | "PETITION_FIELD_REPLY";
+
 export interface ProfileFieldResponse {
   /** Time when the response was anonymized. */
   anonymizedAt?: Maybe<Scalars["DateTime"]["output"]>;
@@ -5843,11 +5855,15 @@ export interface ProfileFieldResponse {
   /** Expiration datetime of the value, considering organization's timezone. */
   expiresAt?: Maybe<Scalars["DateTime"]["output"]>;
   expiryDate?: Maybe<Scalars["String"]["output"]>;
+  externalSourceName?: Maybe<Scalars["String"]["output"]>;
   field: ProfileTypeField;
+  petitionFieldReply?: Maybe<PetitionFieldReply>;
   profile: Profile;
   /** Time when the response was removed. */
   removedAt?: Maybe<Scalars["DateTime"]["output"]>;
   removedBy?: Maybe<User>;
+  /** Source of the response. */
+  source?: Maybe<ProfileFieldPropertyValueSource>;
 }
 
 export interface ProfileFieldValue extends ProfileFieldResponse {
@@ -5861,16 +5877,20 @@ export interface ProfileFieldValue extends ProfileFieldResponse {
   /** Expiration datetime of the value, considering organization's timezone. */
   expiresAt?: Maybe<Scalars["DateTime"]["output"]>;
   expiryDate?: Maybe<Scalars["String"]["output"]>;
+  externalSourceName?: Maybe<Scalars["String"]["output"]>;
   field: ProfileTypeField;
   hasActiveMonitoring: Scalars["Boolean"]["output"];
   hasPendingReview: Scalars["Boolean"]["output"];
   hasStoredValue: Scalars["Boolean"]["output"];
   id: Scalars["GID"]["output"];
   isDraft: Scalars["Boolean"]["output"];
+  petitionFieldReply?: Maybe<PetitionFieldReply>;
   profile: Profile;
   /** Time when the response was removed. */
   removedAt?: Maybe<Scalars["DateTime"]["output"]>;
   removedBy?: Maybe<User>;
+  /** Source of the response. */
+  source?: Maybe<ProfileFieldPropertyValueSource>;
 }
 
 export interface ProfileFieldValueMonitoredEvent extends ProfileEvent {
@@ -5882,13 +5902,13 @@ export interface ProfileFieldValueMonitoredEvent extends ProfileEvent {
   type: ProfileEventType;
 }
 
-export type ProfileFieldValueSource =
-  | "EXCEL_IMPORT"
-  | "EXTERNAL"
-  | "MANUAL"
-  | "PARALLEL_API"
-  | "PARALLEL_MONITORING"
-  | "PETITION_FIELD_REPLY";
+export interface ProfileFieldValuePagination {
+  __typename?: "ProfileFieldValuePagination";
+  /** The requested slice of items. */
+  items: Array<ProfileFieldValue>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"]["output"];
+}
 
 export interface ProfileFieldValueUpdatedEvent extends ProfileEvent {
   __typename?: "ProfileFieldValueUpdatedEvent";
@@ -6126,6 +6146,20 @@ export interface ProfileTypeField {
   position: Scalars["Int"]["output"];
   profileType: ProfileType;
   type: ProfileTypeFieldType;
+}
+
+export interface ProfileTypeFieldFileHistory {
+  __typename?: "ProfileTypeFieldFileHistory";
+  eventType: Scalars["String"]["output"];
+  profileFieldFile: ProfileFieldFile;
+}
+
+export interface ProfileTypeFieldFileHistoryPagination {
+  __typename?: "ProfileTypeFieldFileHistoryPagination";
+  /** The requested slice of items. */
+  items: Array<ProfileTypeFieldFileHistory>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"]["output"];
 }
 
 export interface ProfileTypeFieldPermission {
@@ -6680,6 +6714,8 @@ export interface Query {
   profileRelationshipTypes: Array<ProfileRelationshipType>;
   profileRelationshipTypesWithDirection: Array<ProfileRelationshipTypeWithDirection>;
   profileType: ProfileType;
+  profileTypeFieldFileHistory: ProfileTypeFieldFileHistoryPagination;
+  profileTypeFieldValueHistory: ProfileFieldValuePagination;
   profileTypes: ProfileTypePagination;
   profiles: ProfilePagination;
   profilesWithSameContent: Array<ProfilesWithContent>;
@@ -6921,6 +6957,20 @@ export interface QueryprofileRelationshipTypesWithDirectionArgs {
 
 export interface QueryprofileTypeArgs {
   profileTypeId: Scalars["GID"]["input"];
+}
+
+export interface QueryprofileTypeFieldFileHistoryArgs {
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+}
+
+export interface QueryprofileTypeFieldValueHistoryArgs {
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
 }
 
 export interface QueryprofileTypesArgs {
@@ -8819,12 +8869,15 @@ export type ProfilePropertyContent_ProfileTypeFieldFragment = {
 
 export type ProfilePropertyContent_ProfileFieldValueFragment = {
   __typename?: "ProfileFieldValue";
+  id: string;
   content?: { [key: string]: any } | null;
+  anonymizedAt?: string | null;
 };
 
 export type ProfilePropertyContent_ProfileFieldFileFragment = {
   __typename?: "ProfileFieldFile";
   id?: string;
+  anonymizedAt?: string | null;
   file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
 };
 
@@ -42266,6 +42319,168 @@ export type ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkMut
   profileImportExcelModelDownloadLink: string;
 };
 
+export type useProfileFieldFileHistoryDialog_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  type: ProfileTypeFieldType;
+  options: { [key: string]: any };
+};
+
+export type useProfileFieldFileHistoryDialog_ProfileTypeFieldFileHistoryFragment = {
+  __typename?: "ProfileTypeFieldFileHistory";
+  eventType: string;
+  profileFieldFile: {
+    __typename?: "ProfileFieldFile";
+    id?: string;
+    source?: ProfileFieldPropertyValueSource | null;
+    createdAt: string;
+    anonymizedAt?: string | null;
+    createdBy?: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      status: UserStatus;
+      isMe: boolean;
+    } | null;
+    petitionFieldReply?: {
+      __typename?: "PetitionFieldReply";
+      id: string;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      field?: {
+        __typename?: "PetitionField";
+        id: string;
+        petition:
+          | { __typename?: "Petition"; id: string }
+          | { __typename?: "PetitionTemplate"; id: string };
+      } | null;
+    } | null;
+    file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
+  };
+};
+
+export type useProfileFieldFileHistoryDialog_profileTypeFieldFileHistoryQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type useProfileFieldFileHistoryDialog_profileTypeFieldFileHistoryQuery = {
+  profileTypeFieldFileHistory: {
+    __typename?: "ProfileTypeFieldFileHistoryPagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileTypeFieldFileHistory";
+      eventType: string;
+      profileFieldFile: {
+        __typename?: "ProfileFieldFile";
+        id?: string;
+        source?: ProfileFieldPropertyValueSource | null;
+        createdAt: string;
+        anonymizedAt?: string | null;
+        createdBy?: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          status: UserStatus;
+          isMe: boolean;
+        } | null;
+        petitionFieldReply?: {
+          __typename?: "PetitionFieldReply";
+          id: string;
+          parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+          field?: {
+            __typename?: "PetitionField";
+            id: string;
+            petition:
+              | { __typename?: "Petition"; id: string }
+              | { __typename?: "PetitionTemplate"; id: string };
+          } | null;
+        } | null;
+        file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
+      };
+    }>;
+  };
+};
+
+export type useProfileFieldValueHistoryDialog_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  type: ProfileTypeFieldType;
+  options: { [key: string]: any };
+};
+
+export type useProfileFieldValueHistoryDialog_ProfileFieldValueFragment = {
+  __typename?: "ProfileFieldValue";
+  id: string;
+  createdAt: string;
+  source?: ProfileFieldPropertyValueSource | null;
+  externalSourceName?: string | null;
+  content?: { [key: string]: any } | null;
+  anonymizedAt?: string | null;
+  createdBy?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    status: UserStatus;
+    isMe: boolean;
+  } | null;
+  petitionFieldReply?: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+    field?: {
+      __typename?: "PetitionField";
+      id: string;
+      petition:
+        | { __typename?: "Petition"; id: string }
+        | { __typename?: "PetitionTemplate"; id: string };
+    } | null;
+  } | null;
+};
+
+export type useProfileFieldValueHistoryDialog_profileTypeFieldValueHistoryQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type useProfileFieldValueHistoryDialog_profileTypeFieldValueHistoryQuery = {
+  profileTypeFieldValueHistory: {
+    __typename?: "ProfileFieldValuePagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileFieldValue";
+      id: string;
+      createdAt: string;
+      source?: ProfileFieldPropertyValueSource | null;
+      externalSourceName?: string | null;
+      content?: { [key: string]: any } | null;
+      anonymizedAt?: string | null;
+      createdBy?: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        status: UserStatus;
+        isMe: boolean;
+      } | null;
+      petitionFieldReply?: {
+        __typename?: "PetitionFieldReply";
+        id: string;
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+        field?: {
+          __typename?: "PetitionField";
+          id: string;
+          petition:
+            | { __typename?: "Petition"; id: string }
+            | { __typename?: "PetitionTemplate"; id: string };
+        } | null;
+      } | null;
+    }>;
+  };
+};
+
 export type useProfileSubscribersDialog_UserFragment = {
   __typename?: "User";
   id: string;
@@ -63966,10 +64181,12 @@ export type ProfileSearch_ProfileFragment = {
       __typename?: "ProfileFieldValue";
       id: string;
       content?: { [key: string]: any } | null;
+      anonymizedAt?: string | null;
     } | null;
     files?: Array<{
       __typename?: "ProfileFieldFile";
       id?: string;
+      anonymizedAt?: string | null;
       file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
     }> | null;
     field: {
@@ -64039,10 +64256,12 @@ export type ProfileSearch_conflictCheckProfileSearchQuery = {
         __typename?: "ProfileFieldValue";
         id: string;
         content?: { [key: string]: any } | null;
+        anonymizedAt?: string | null;
       } | null;
       files?: Array<{
         __typename?: "ProfileFieldFile";
         id?: string;
+        anonymizedAt?: string | null;
         file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
       }> | null;
       field: {
@@ -64556,11 +64775,14 @@ export type Profiles_profilesQuery = {
         files?: Array<{
           __typename?: "ProfileFieldFile";
           id?: string;
+          anonymizedAt?: string | null;
           file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
         }> | null;
         value?: {
           __typename?: "ProfileFieldValue";
+          id: string;
           content?: { [key: string]: any } | null;
+          anonymizedAt?: string | null;
         } | null;
       }>;
       profileType: {
@@ -71353,9 +71575,15 @@ export type useProfileTableColumns_ProfileFieldPropertyFragment = {
   files?: Array<{
     __typename?: "ProfileFieldFile";
     id?: string;
+    anonymizedAt?: string | null;
     file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
   }> | null;
-  value?: { __typename?: "ProfileFieldValue"; content?: { [key: string]: any } | null } | null;
+  value?: {
+    __typename?: "ProfileFieldValue";
+    id: string;
+    content?: { [key: string]: any } | null;
+    anonymizedAt?: string | null;
+  } | null;
 };
 
 export type useProfileTableColumns_ProfileWithPropertiesFragment = {
@@ -71375,9 +71603,15 @@ export type useProfileTableColumns_ProfileWithPropertiesFragment = {
     files?: Array<{
       __typename?: "ProfileFieldFile";
       id?: string;
+      anonymizedAt?: string | null;
       file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
     }> | null;
-    value?: { __typename?: "ProfileFieldValue"; content?: { [key: string]: any } | null } | null;
+    value?: {
+      __typename?: "ProfileFieldValue";
+      id: string;
+      content?: { [key: string]: any } | null;
+      anonymizedAt?: string | null;
+    } | null;
   }>;
   subscribers: Array<{
     __typename?: "ProfileSubscription";
@@ -72743,6 +72977,20 @@ export const ProfileFormFieldInputGroup_ProfileTypeFieldFragmentDoc = gql`
     expiryAlertAheadTime
   }
 ` as unknown as DocumentNode<ProfileFormFieldInputGroup_ProfileTypeFieldFragment, unknown>;
+export const ProfilePropertyContent_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfilePropertyContent_ProfileTypeField on ProfileTypeField {
+    id
+    type
+    options
+  }
+` as unknown as DocumentNode<ProfilePropertyContent_ProfileTypeFieldFragment, unknown>;
+export const useProfileFieldValueHistoryDialog_ProfileTypeFieldFragmentDoc = gql`
+  fragment useProfileFieldValueHistoryDialog_ProfileTypeField on ProfileTypeField {
+    id
+    ...ProfilePropertyContent_ProfileTypeField
+  }
+  ${ProfilePropertyContent_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<useProfileFieldValueHistoryDialog_ProfileTypeFieldFragment, unknown>;
 export const ProfileFormField_ProfileTypeFieldFragmentDoc = gql`
   fragment ProfileFormField_ProfileTypeField on ProfileTypeField {
     id
@@ -72752,8 +73000,10 @@ export const ProfileFormField_ProfileTypeFieldFragmentDoc = gql`
     expiryAlertAheadTime
     options
     ...ProfileFormFieldInputGroup_ProfileTypeField
+    ...useProfileFieldValueHistoryDialog_ProfileTypeField
   }
   ${ProfileFormFieldInputGroup_ProfileTypeFieldFragmentDoc}
+  ${useProfileFieldValueHistoryDialog_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<ProfileFormField_ProfileTypeFieldFragment, unknown>;
 export const ProfileForm_ProfileTypeFieldFragmentDoc = gql`
   fragment ProfileForm_ProfileTypeField on ProfileTypeField {
@@ -77448,13 +77698,6 @@ export const useCreateProfileRelationshipsDialog_ProfileRelationshipTypeWithDire
     useCreateProfileRelationshipsDialog_ProfileRelationshipTypeWithDirectionFragment,
     unknown
   >;
-export const ProfilePropertyContent_ProfileTypeFieldFragmentDoc = gql`
-  fragment ProfilePropertyContent_ProfileTypeField on ProfileTypeField {
-    id
-    type
-    options
-  }
-` as unknown as DocumentNode<ProfilePropertyContent_ProfileTypeFieldFragment, unknown>;
 export const ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResultFragmentDoc =
   gql`
     fragment ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResult on ProfileExternalSourceSearchSingleResult {
@@ -77528,6 +77771,90 @@ export const ImportFromExternalSourceDialog_ProfileExternalSourceSearchMultipleR
     ImportFromExternalSourceDialog_ProfileExternalSourceSearchMultipleResultsDetailFragment,
     unknown
   >;
+export const useProfileFieldFileHistoryDialog_ProfileTypeFieldFragmentDoc = gql`
+  fragment useProfileFieldFileHistoryDialog_ProfileTypeField on ProfileTypeField {
+    id
+    ...ProfilePropertyContent_ProfileTypeField
+  }
+  ${ProfilePropertyContent_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<useProfileFieldFileHistoryDialog_ProfileTypeFieldFragment, unknown>;
+export const ProfilePropertyContent_ProfileFieldFileFragmentDoc = gql`
+  fragment ProfilePropertyContent_ProfileFieldFile on ProfileFieldFile {
+    id @include(if: true)
+    file {
+      filename
+      contentType
+    }
+    anonymizedAt
+  }
+` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldFileFragment, unknown>;
+export const useProfileFieldFileHistoryDialog_ProfileTypeFieldFileHistoryFragmentDoc = gql`
+  fragment useProfileFieldFileHistoryDialog_ProfileTypeFieldFileHistory on ProfileTypeFieldFileHistory {
+    eventType
+    profileFieldFile {
+      id
+      source
+      createdBy {
+        id
+        ...UserReference_User
+      }
+      createdAt
+      ...ProfilePropertyContent_ProfileFieldFile
+      petitionFieldReply {
+        id
+        parent {
+          id
+        }
+        field {
+          id
+          petition {
+            id
+          }
+        }
+      }
+    }
+  }
+  ${UserReference_UserFragmentDoc}
+  ${ProfilePropertyContent_ProfileFieldFileFragmentDoc}
+` as unknown as DocumentNode<
+  useProfileFieldFileHistoryDialog_ProfileTypeFieldFileHistoryFragment,
+  unknown
+>;
+export const ProfilePropertyContent_ProfileFieldValueFragmentDoc = gql`
+  fragment ProfilePropertyContent_ProfileFieldValue on ProfileFieldValue {
+    id
+    content
+    anonymizedAt
+  }
+` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldValueFragment, unknown>;
+export const useProfileFieldValueHistoryDialog_ProfileFieldValueFragmentDoc = gql`
+  fragment useProfileFieldValueHistoryDialog_ProfileFieldValue on ProfileFieldValue {
+    id
+    createdAt
+    createdBy {
+      id
+      fullName
+      ...UserReference_User
+    }
+    source
+    externalSourceName
+    petitionFieldReply {
+      id
+      parent {
+        id
+      }
+      field {
+        id
+        petition {
+          id
+        }
+      }
+    }
+    ...ProfilePropertyContent_ProfileFieldValue
+  }
+  ${UserReference_UserFragmentDoc}
+  ${ProfilePropertyContent_ProfileFieldValueFragmentDoc}
+` as unknown as DocumentNode<useProfileFieldValueHistoryDialog_ProfileFieldValueFragment, unknown>;
 export const useProfileSubscribersDialog_ProfileFragmentDoc = gql`
   fragment useProfileSubscribersDialog_Profile on Profile {
     id
@@ -82205,20 +82532,6 @@ export const ProfileSearch_ProfileTypeFragmentDoc = gql`
     name
   }
 ` as unknown as DocumentNode<ProfileSearch_ProfileTypeFragment, unknown>;
-export const ProfilePropertyContent_ProfileFieldValueFragmentDoc = gql`
-  fragment ProfilePropertyContent_ProfileFieldValue on ProfileFieldValue {
-    content
-  }
-` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldValueFragment, unknown>;
-export const ProfilePropertyContent_ProfileFieldFileFragmentDoc = gql`
-  fragment ProfilePropertyContent_ProfileFieldFile on ProfileFieldFile {
-    id @include(if: true)
-    file {
-      filename
-      contentType
-    }
-  }
-` as unknown as DocumentNode<ProfilePropertyContent_ProfileFieldFileFragment, unknown>;
 export const ProfileSearch_ProfileFragmentDoc = gql`
   fragment ProfileSearch_Profile on Profile {
     id
@@ -87431,6 +87744,54 @@ export const ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkDo
 ` as unknown as DocumentNode<
   ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkMutation,
   ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkMutationVariables
+>;
+export const useProfileFieldFileHistoryDialog_profileTypeFieldFileHistoryDocument = gql`
+  query useProfileFieldFileHistoryDialog_profileTypeFieldFileHistory(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $limit: Int
+    $offset: Int
+  ) {
+    profileTypeFieldFileHistory(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      limit: $limit
+      offset: $offset
+    ) {
+      totalCount
+      items {
+        ...useProfileFieldFileHistoryDialog_ProfileTypeFieldFileHistory
+      }
+    }
+  }
+  ${useProfileFieldFileHistoryDialog_ProfileTypeFieldFileHistoryFragmentDoc}
+` as unknown as DocumentNode<
+  useProfileFieldFileHistoryDialog_profileTypeFieldFileHistoryQuery,
+  useProfileFieldFileHistoryDialog_profileTypeFieldFileHistoryQueryVariables
+>;
+export const useProfileFieldValueHistoryDialog_profileTypeFieldValueHistoryDocument = gql`
+  query useProfileFieldValueHistoryDialog_profileTypeFieldValueHistory(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $limit: Int
+    $offset: Int
+  ) {
+    profileTypeFieldValueHistory(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      limit: $limit
+      offset: $offset
+    ) {
+      totalCount
+      items {
+        ...useProfileFieldValueHistoryDialog_ProfileFieldValue
+      }
+    }
+  }
+  ${useProfileFieldValueHistoryDialog_ProfileFieldValueFragmentDoc}
+` as unknown as DocumentNode<
+  useProfileFieldValueHistoryDialog_profileTypeFieldValueHistoryQuery,
+  useProfileFieldValueHistoryDialog_profileTypeFieldValueHistoryQueryVariables
 >;
 export const useProfileSubscribersDialog_subscribeToProfileDocument = gql`
   mutation useProfileSubscribersDialog_subscribeToProfile($profileIds: [GID!]!, $userIds: [GID!]!) {

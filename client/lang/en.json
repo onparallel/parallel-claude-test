@@ -9400,6 +9400,51 @@
     "context": "Please wait while we run the background check..."
   },
   {
+    "term": "component.profile-field-file-history-dialog.created-by",
+    "definition": "Created by",
+    "context": "Created by"
+  },
+  {
+    "term": "component.profile-field-file-history-dialog.date",
+    "definition": "Date",
+    "context": "Date"
+  },
+  {
+    "term": "component.profile-field-file-history-dialog.event-type",
+    "definition": "Action",
+    "context": "Action"
+  },
+  {
+    "term": "component.profile-field-file-history-dialog.event-type-added",
+    "definition": "Added",
+    "context": "Added"
+  },
+  {
+    "term": "component.profile-field-file-history-dialog.event-type-removed",
+    "definition": "Removed",
+    "context": "Removed"
+  },
+  {
+    "term": "component.profile-field-file-history-dialog.file",
+    "definition": "File",
+    "context": "File"
+  },
+  {
+    "term": "component.profile-field-file-history-dialog.header",
+    "definition": "Property history",
+    "context": "Property history"
+  },
+  {
+    "term": "component.profile-field-file-history-dialog.no-data",
+    "definition": "There has never been a file added for this property.",
+    "context": "There has never been a file added for this property."
+  },
+  {
+    "term": "component.profile-field-file-history-dialog.source",
+    "definition": "Source",
+    "context": "Source"
+  },
+  {
     "term": "component.profile-field-file-upload.invalid-attachment-message.file-too-large",
     "definition": "Only attachments of up to {size} are allowed.",
     "context": "Only attachments of up to {size} are allowed."
@@ -9518,6 +9563,36 @@
     "term": "component.profile-field-suggestion.popover",
     "definition": "Suggested reply from:",
     "context": "Suggested reply from:"
+  },
+  {
+    "term": "component.profile-field-value-history-dialog.created-by",
+    "definition": "Created by",
+    "context": "Created by"
+  },
+  {
+    "term": "component.profile-field-value-history-dialog.date",
+    "definition": "Date",
+    "context": "Date"
+  },
+  {
+    "term": "component.profile-field-value-history-dialog.header",
+    "definition": "Property history",
+    "context": "Property history"
+  },
+  {
+    "term": "component.profile-field-value-history-dialog.no-data",
+    "definition": "There has never been a value set for this property.",
+    "context": "There has never been a value set for this property."
+  },
+  {
+    "term": "component.profile-field-value-history-dialog.source",
+    "definition": "Source",
+    "context": "Source"
+  },
+  {
+    "term": "component.profile-field-value-history-dialog.value",
+    "definition": "Value",
+    "context": "Value"
   },
   {
     "term": "component.profile-field.expiration-date",
@@ -10133,6 +10208,41 @@
     "term": "component.profile-types-table.no-results",
     "definition": "There's no profile types matching your criteria",
     "context": "There's no profile types matching your criteria"
+  },
+  {
+    "term": "component.profile-value-source.excel-import",
+    "definition": "Manually imported by {sourceName}",
+    "context": "Manually imported by {sourceName}"
+  },
+  {
+    "term": "component.profile-value-source.external",
+    "definition": "Imported from external source by {sourceName}",
+    "context": "Imported from external source by {sourceName}"
+  },
+  {
+    "term": "component.profile-value-source.external-with-external-source-name",
+    "definition": "Imported from {externalSourceName} by {sourceName}",
+    "context": "Imported from {externalSourceName} by {sourceName}"
+  },
+  {
+    "term": "component.profile-value-source.manual",
+    "definition": "Manually edited by {sourceName}",
+    "context": "Manually edited by {sourceName}"
+  },
+  {
+    "term": "component.profile-value-source.parallel-api",
+    "definition": "Edited by API by {sourceName}",
+    "context": "Edited by API by {sourceName}"
+  },
+  {
+    "term": "component.profile-value-source.parallel-monitoring",
+    "definition": "Automatically edited by Parallel",
+    "context": "Automatically edited by Parallel"
+  },
+  {
+    "term": "component.profile-value-source.petition-field-reply",
+    "definition": "Imported from {parallelLink} by {sourceName}",
+    "context": "Imported from {parallelLink} by {sourceName}"
   },
   {
     "term": "component.profiles-chart-module-settings.global-filter",
@@ -14828,6 +14938,11 @@
     "term": "generic.hide",
     "definition": "Hide",
     "context": "Hide"
+  },
+  {
+    "term": "generic.history",
+    "definition": "History",
+    "context": "History"
   },
   {
     "term": "generic.i-understand",

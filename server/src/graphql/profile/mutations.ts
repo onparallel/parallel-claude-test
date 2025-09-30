@@ -429,7 +429,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
           "Pass force=true to remove expirations from values and files when setting isExpirable to false",
       }),
     ),
-    source: nullable("ProfileFieldValueSource"),
+    source: nullable("ProfileFieldPropertyValueSource"),
   },
   validateArgs: validUpdateProfileTypeFieldData("profileTypeFieldId", "data"),
   resolve: async (_, args, ctx, info) => {
@@ -905,7 +905,7 @@ export const createProfile = mutationField("createProfile", {
         ),
       ),
     ),
-    source: nullable("ProfileFieldValueSource"),
+    source: nullable("ProfileFieldPropertyValueSource"),
   },
   resolve: async (_, args, ctx) => {
     const profileTypeFields =
@@ -1158,7 +1158,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
         ),
       ),
     ),
-    source: nullable("ProfileFieldValueSource"),
+    source: nullable("ProfileFieldPropertyValueSource"),
   },
   resolve: async (_, { profileId, fields, source }, ctx) => {
     const [profileTypeFields, profile] = await Promise.all([
@@ -1344,7 +1344,7 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
     profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
     data: nonNull(list(nonNull("FileUploadInput"))),
     expiryDate: dateArg(),
-    source: nullable("ProfileFieldValueSource"),
+    source: nullable("ProfileFieldPropertyValueSource"),
   },
   validateArgs: validateAnd(
     validFileUploadInput("data", { maxSizeBytes: toBytes(100, "MB") }),
@@ -1494,7 +1494,10 @@ export const profileFieldFileUploadComplete = mutationField("profileFieldFileUpl
         (pff) =>
           isNullish(pff) ||
           pff.profile_id !== profileId ||
-          pff.profile_type_field_id !== profileTypeFieldId,
+          pff.profile_type_field_id !== profileTypeFieldId ||
+          pff.removed_at !== null ||
+          pff.deleted_at !== null ||
+          pff.file_upload_id === null,
       )
     ) {
       throw new ForbiddenError("Not authorized");
@@ -1789,11 +1792,17 @@ export const profileFieldFileDownloadLink = mutationField("profileFieldFileDownl
   },
   resolve: async (_, args, ctx) => {
     try {
-      const profileFieldFile = (await ctx.profiles.loadProfileFieldFileById(
-        args.profileFieldFileId,
-      ))!;
+      const profileFieldFile = await ctx.profiles.loadProfileFieldFileById(args.profileFieldFileId);
 
-      const file = await ctx.files.loadFileUpload(profileFieldFile.file_upload_id!);
+      if (
+        !profileFieldFile ||
+        profileFieldFile.anonymized_at !== null ||
+        !profileFieldFile.file_upload_id
+      ) {
+        throw new Error(`FileUpload:${profileFieldFile?.file_upload_id} not found`);
+      }
+
+      const file = await ctx.files.loadFileUpload(profileFieldFile.file_upload_id);
       if (!file) {
         throw new Error(`FileUpload:${profileFieldFile.file_upload_id} not found`);
       }

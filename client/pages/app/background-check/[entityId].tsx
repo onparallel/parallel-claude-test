@@ -47,6 +47,7 @@ function BackgroundCheckProfileDetails({
   type,
   country,
   birthCountry,
+  isDisabled,
 }: UnwrapPromise<ReturnType<typeof BackgroundCheckProfileDetails.getInitialProps>>) {
   const intl = useIntl();
   const router = useRouter();
@@ -266,6 +267,7 @@ function BackgroundCheckProfileDetails({
               onClick={handleGoBackClick}
               variant="outline"
               backgroundColor="white"
+              isDisabled={isDisabled}
             />
             <Box>
               <Text as="span" fontWeight={600}>
@@ -306,6 +308,7 @@ function BackgroundCheckProfileDetails({
                 })}
                 icon={<RepeatIcon />}
                 onClick={handleRefreshEntity}
+                isDisabled={isDisabled}
               />
             ) : null}
           </HStack>
@@ -380,7 +383,7 @@ function BackgroundCheckProfileDetails({
           </>
         ) : (
           <>
-            {details.hasPendingReview && details?.reviewDiff ? (
+            {!isDisabled && details.hasPendingReview && details?.reviewDiff ? (
               <BackgroundCheckEntityDifferencesAlert
                 onConfirmChangesClick={handleConfirmChangesClick}
                 diff={details.reviewDiff}
@@ -389,6 +392,7 @@ function BackgroundCheckProfileDetails({
             {details.__typename === "BackgroundCheckEntityDetailsCompany" ? (
               <>
                 <BackgroundCheckEntityDetailsCompanyBasic
+                  isDisabled={isDisabled}
                   hasReply={details.isStoredEntity ?? false}
                   isReadOnly={isReadOnly || isTemplate}
                   isDeleting={isDeletingReply}
@@ -403,6 +407,7 @@ function BackgroundCheckProfileDetails({
             ) : details.__typename === "BackgroundCheckEntityDetailsPerson" ? (
               <>
                 <BackgroundCheckEntityDetailsPersonBasic
+                  isDisabled={isDisabled}
                   hasReply={details.isStoredEntity ?? false}
                   isReadOnly={isReadOnly || isTemplate}
                   isDeleting={isDeletingReply}
@@ -424,6 +429,7 @@ function BackgroundCheckProfileDetails({
               <BackgroundCheckEntityDetailsRelationships
                 entityId={entityId}
                 relationships={details.properties.relationships}
+                isDisabled={isDisabled}
               />
             ) : null}
 
@@ -567,8 +573,9 @@ BackgroundCheckProfileDetails.getInitialProps = async ({ query }: WithApolloData
   const type = query.type as BackgroundCheckEntitySearchType | null;
   const country = query.country as string | null;
   const birthCountry = query.birthCountry as string | null;
+  const isDisabled = query.disabled === "true";
 
-  return { entityId, token, name, date, type, country, birthCountry };
+  return { entityId, token, name, date, type, country, birthCountry, isDisabled };
 };
 
 export default compose(
