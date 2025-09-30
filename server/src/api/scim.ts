@@ -1,4 +1,5 @@
 import { json, Router } from "express";
+import { DatabaseError } from "pg";
 import { isNonNullish, isNullish, pick } from "remeda";
 import { ApiContext } from "../context";
 import { CreateUser, CreateUserData, User, UserData, UserStatus } from "../db/__types";
@@ -151,32 +152,44 @@ scim
         }
 
         if (ssoIntegrations.length > 0) {
-          const user = await req.context.accountSetup.createUser(
-            {
-              org_id: orgId,
-              status: active ? "ACTIVE" : "INACTIVE",
-              external_id: externalId,
-            },
-            {
-              // fake unique cognitoId, should update when user logs in
-              cognito_id: `${req.context.organization!.id}_${externalId}`,
-              email: email.toLowerCase(),
-              first_name: name.givenName,
-              last_name: name.familyName,
-              details: {
-                source: "SCIM",
+          try {
+            const user = await req.context.accountSetup.createUser(
+              {
+                org_id: orgId,
+                status: active ? "ACTIVE" : "INACTIVE",
+                external_id: externalId,
               },
-              preferred_locale: "en",
-            },
-            `Provisioning:${req.context.organization!.id}`,
-          );
-          const userData = (await req.context.users.loadUserData(user.user_data_id))!;
-          res.json(
-            toScimUser({
-              ...pick(user, ["status", "external_id"]),
-              ...pick(userData, ["email", "first_name", "last_name"]),
-            }),
-          );
+              {
+                // fake unique cognitoId, should update when user logs in
+                cognito_id: `${req.context.organization!.id}_${externalId}`,
+                email: email.toLowerCase(),
+                first_name: name.givenName,
+                last_name: name.familyName,
+                details: {
+                  source: "SCIM",
+                },
+                preferred_locale: "en",
+              },
+              `Provisioning:${req.context.organization!.id}`,
+            );
+            const userData = (await req.context.users.loadUserData(user.user_data_id))!;
+            res.json(
+              toScimUser({
+                ...pick(user, ["status", "external_id"]),
+                ...pick(userData, ["email", "first_name", "last_name"]),
+              }),
+            );
+          } catch (error) {
+            if (
+              error instanceof DatabaseError &&
+              error.constraint === "user__org_id__user_data_id"
+            ) {
+              req.context.logger.error(
+                `User ${email} already exists on organization ${orgId}. New externalId: ${externalId}`,
+              );
+            }
+            throw error;
+          }
         } else {
           res.sendStatus(401);
         }
@@ -235,6 +248,9 @@ scim
             case "name.familyName":
               userDataUpdate.last_name = op.value;
               break;
+            case "externalId":
+              userUpdate.external_id = op.value;
+              break;
             case "active": {
               const user = await req.context.users.loadUserByExternalId({
                 externalId: req.params.externalId,
@@ -248,47 +264,57 @@ scim
               break;
             }
             default:
+              req.context.logger.error(`Unknown path: ${op.op} ${op.path}`);
               break;
           }
+        } else {
+          req.context.logger.error(`Unknown operation: ${op.op} ${op.path}`);
         }
       }
-      if (isNonNullish(userUpdate.status)) {
-        const user = await req.context.users.loadUserByExternalId.raw({
-          orgId: req.context.organization!.id,
-          externalId: req.params.externalId,
-        });
+      const user = await req.context.users.loadUserByExternalId.raw({
+        orgId: req.context.organization!.id,
+        externalId: req.params.externalId,
+      });
 
-        if (user && user.status !== userUpdate.status) {
-          if (userUpdate.status === "ACTIVE") {
-            const allUsersGroups = await req.context.userGroups.loadAllUsersGroupsByOrgId(
-              user.org_id,
-            );
-            await req.context.userGroups.addUsersToGroups(
-              allUsersGroups.map((ug) => ug.id),
-              user.id,
-              `Provisioning:${req.context.organization!.id}`,
-            );
-          } else if (userUpdate.status === "INACTIVE") {
-            await req.context.userGroups.removeUsersFromAllGroups(
-              user.id,
-              `Provisioning:${req.context.organization!.id}`,
-            );
-          }
+      if (!user) {
+        res.sendStatus(401);
+        return;
+      }
+
+      if (isNonNullish(userUpdate.status) && user.status !== userUpdate.status) {
+        if (userUpdate.status === "ACTIVE") {
+          const allUsersGroups = await req.context.userGroups.loadAllUsersGroupsByOrgId(
+            user.org_id,
+          );
+          await req.context.userGroups.addUsersToGroups(
+            allUsersGroups.map((ug) => ug.id),
+            user.id,
+            `Provisioning:${req.context.organization!.id}`,
+          );
+        } else if (userUpdate.status === "INACTIVE") {
+          await req.context.userGroups.removeUsersFromAllGroups(
+            user.id,
+            `Provisioning:${req.context.organization!.id}`,
+          );
         }
+      }
+
+      if (Object.keys(userUpdate).length > 0) {
         await req.context.users.updateUserByExternalId(
           req.params.externalId,
           req.context.organization!.id,
           userUpdate,
           `Provisioning:${req.context.organization!.id}`,
         );
-
-        if (userUpdate.status === "ON_HOLD") {
-          await req.context.emails.sendTransferParallelsEmail(
-            req.params.externalId,
-            req.context.organization!.id,
-          );
-        }
       }
+
+      if (userUpdate.status === "ON_HOLD") {
+        await req.context.emails.sendTransferParallelsEmail(
+          req.params.externalId,
+          req.context.organization!.id,
+        );
+      }
+
       if (isNonNullish(userDataUpdate.first_name) || isNonNullish(userDataUpdate.last_name)) {
         await req.context.users.updateUserDataByExternalId(
           req.params.externalId,
@@ -297,21 +323,14 @@ scim
           `Provisioning:${req.context.organization!.id}`,
         );
       }
-      const user = await req.context.users.loadUserByExternalId({
-        orgId: req.context.organization!.id,
-        externalId: req.params.externalId,
-      });
-      if (!user) {
-        res.sendStatus(401);
-      } else {
-        const userData = (await req.context.users.loadUserData(user.user_data_id))!;
-        res.json(
-          toScimUser({
-            ...pick(user, ["status", "external_id"]),
-            ...pick(userData, ["email", "first_name", "last_name"]),
-          }),
-        );
-      }
+
+      const userData = (await req.context.users.loadUserData(user.user_data_id))!;
+      res.json(
+        toScimUser({
+          ...pick(user, ["status", "external_id"]),
+          ...pick(userData, ["email", "first_name", "last_name"]),
+        }),
+      );
     } catch (error) {
       next(error);
     }
