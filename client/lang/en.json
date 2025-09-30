@@ -2800,9 +2800,29 @@
     "context": "New team"
   },
   {
+    "term": "component.create-or-edit-petition-variable-dialog.add-label",
+    "definition": "Add label",
+    "context": "Add label"
+  },
+  {
+    "term": "component.create-or-edit-petition-variable-dialog.add-value-labels",
+    "definition": "Add value labels",
+    "context": "Add value labels"
+  },
+  {
+    "term": "component.create-or-edit-petition-variable-dialog.add-value-labels-description",
+    "definition": "Change the label of the variable depending on the value.",
+    "context": "Change the label of the variable depending on the value."
+  },
+  {
     "term": "component.create-or-edit-petition-variable-dialog.create-title",
     "definition": "New variable",
     "context": "New variable"
+  },
+  {
+    "term": "component.create-or-edit-petition-variable-dialog.duplicate-value-error",
+    "definition": "This value already exists",
+    "context": "This value already exists"
   },
   {
     "term": "component.create-or-edit-petition-variable-dialog.edit-title",
@@ -2815,9 +2835,39 @@
     "context": "Once the variable is added, its name cannot be edited."
   },
   {
+    "term": "component.create-or-edit-petition-variable-dialog.label",
+    "definition": "Label",
+    "context": "Label"
+  },
+  {
+    "term": "component.create-or-edit-petition-variable-dialog.label-placeholder",
+    "definition": "e.g. Low, Medium, High",
+    "context": "e.g. Low, Medium, High"
+  },
+  {
+    "term": "component.create-or-edit-petition-variable-dialog.show-in-replies",
+    "definition": "Show in the review section",
+    "context": "Show in the review section"
+  },
+  {
+    "term": "component.create-or-edit-petition-variable-dialog.show-in-replies-description",
+    "definition": "If you enable this option, the variable will appear in the review section.",
+    "context": "If you enable this option, the variable will appear in the review section."
+  },
+  {
     "term": "component.create-or-edit-petition-variable-dialog.unique-identifier-alredy-exists",
     "definition": "This identifier is already in use",
     "context": "This identifier is already in use"
+  },
+  {
+    "term": "component.create-or-edit-petition-variable-dialog.value",
+    "definition": "Value",
+    "context": "Value"
+  },
+  {
+    "term": "component.create-or-edit-petition-variable-dialog.value-placeholder",
+    "definition": "e.g. 1, 2, 3",
+    "context": "e.g. 1, 2, 3"
   },
   {
     "term": "component.create-or-edit-petition-variable-dialog.variable-initial-value",

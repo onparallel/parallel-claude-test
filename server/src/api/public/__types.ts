@@ -564,6 +564,8 @@ export type CreatePetitionFromProfilePrefillInput = {
 export type CreatePetitionVariableInput = {
   defaultValue: Scalars["Float"]["input"];
   name: Scalars["String"]["input"];
+  showInReplies?: InputMaybe<Scalars["Boolean"]["input"]>;
+  valueLabels?: InputMaybe<Array<PetitionVariableValueLabelInput>>;
 };
 
 export type CreateProfileFieldValueInput = {
@@ -5286,11 +5288,24 @@ export type PetitionUserPermission = PetitionPermission &
 export type PetitionVariable = {
   defaultValue: Scalars["Float"]["output"];
   name: Scalars["String"]["output"];
+  showInReplies: Scalars["Boolean"]["output"];
+  /** The value labels of the variable. */
+  valueLabels: Array<PetitionVariableValueLabel>;
 };
 
 export type PetitionVariableResult = {
   name: Scalars["String"]["output"];
   value: Maybe<Scalars["Float"]["output"]>;
+};
+
+export type PetitionVariableValueLabel = {
+  label: Scalars["String"]["output"];
+  value: Scalars["Float"]["output"];
+};
+
+export type PetitionVariableValueLabelInput = {
+  label: Scalars["String"]["input"];
+  value: Scalars["Float"]["input"];
 };
 
 export type PetitionsNumberDashboardModuleSettingsInput = {
@@ -7317,6 +7332,8 @@ export type UpdatePetitionInput = {
 
 export type UpdatePetitionVariableInput = {
   defaultValue: Scalars["Float"]["input"];
+  showInReplies?: InputMaybe<Scalars["Boolean"]["input"]>;
+  valueLabels?: InputMaybe<Array<PetitionVariableValueLabelInput>>;
 };
 
 export type UpdatePetitionsNumberDashboardModuleInput = {

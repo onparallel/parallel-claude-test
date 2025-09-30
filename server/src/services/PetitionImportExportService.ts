@@ -105,10 +105,20 @@ const PETITION_JSON_SCHEMA = {
           type: ["array", "null"],
           items: {
             type: "object",
-            required: ["name", "defaultValue"],
+            required: ["name", "defaultValue", "showInReplies", "valueLabels"],
             properties: {
               name: { type: "string" },
               defaultValue: { type: "number" },
+              showInReplies: { type: "boolean" },
+              valueLabels: {
+                type: "array",
+                items: {
+                  type: "object",
+                  required: ["value", "label"],
+                  properties: { value: { type: "number" }, label: { type: "string" } },
+                  additionalProperties: false,
+                },
+              },
             },
           },
         },
@@ -162,7 +172,14 @@ interface PetitionJson {
   isTemplate: boolean;
   templateDescription: string | null;
   fields: PetitionFieldJson[];
-  variables?: { name: string; defaultValue: number }[] | null;
+  variables?:
+    | {
+        name: string;
+        defaultValue: number;
+        showInReplies: boolean;
+        valueLabels: { value: number; label: string }[];
+      }[]
+    | null;
   customLists?: { name: string; values: string[] }[] | null;
   standardListOverrides?: { listName: string; listVersion: string }[] | null;
 }
@@ -259,6 +276,8 @@ export class PetitionImportExportService implements IPetitionImportExportService
       variables: petition.variables?.map((v) => ({
         name: v.name,
         defaultValue: v.default_value,
+        showInReplies: v.show_in_replies,
+        valueLabels: v.value_labels,
       })),
       customLists:
         petition.custom_lists && petition.custom_lists.length > 0
@@ -411,6 +430,8 @@ export class PetitionImportExportService implements IPetitionImportExportService
       json.variables?.map((v) => ({
         name: v.name,
         default_value: v.defaultValue,
+        show_in_replies: v.showInReplies,
+        value_labels: v.valueLabels,
       })) ?? [];
 
     this.validateJsonVariablesAndAliases(variables, fieldAliases);
@@ -441,6 +462,8 @@ export class PetitionImportExportService implements IPetitionImportExportService
             json.variables?.map((v) => ({
               name: v.name,
               default_value: v.defaultValue,
+              show_in_replies: v.showInReplies,
+              value_labels: v.valueLabels,
             })) ?? [],
           custom_lists: json.customLists ?? [],
         },

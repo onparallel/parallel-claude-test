@@ -177,6 +177,8 @@ export interface NexusGenInputs {
     // input type
     defaultValue: number; // Float!
     name: string; // String!
+    showInReplies?: boolean | null; // Boolean
+    valueLabels?: NexusGenInputs["PetitionVariableValueLabelInput"][] | null; // [PetitionVariableValueLabelInput!]
   };
   CreateProfileFieldValueInput: {
     // input type
@@ -304,6 +306,11 @@ export interface NexusGenInputs {
     // input type
     operator: NexusGenEnums["PetitionTagFilterLineOperator"]; // PetitionTagFilterLineOperator!
     value: NexusGenScalars["GID"][]; // [GID!]!
+  };
+  PetitionVariableValueLabelInput: {
+    // input type
+    label: string; // String!
+    value: number; // Float!
   };
   PetitionsNumberDashboardModuleSettingsInput: {
     // input type
@@ -532,6 +539,8 @@ export interface NexusGenInputs {
   UpdatePetitionVariableInput: {
     // input type
     defaultValue: number; // Float!
+    showInReplies?: boolean | null; // Boolean
+    valueLabels?: NexusGenInputs["PetitionVariableValueLabelInput"][] | null; // [PetitionVariableValueLabelInput!]
   };
   UpdatePetitionsNumberDashboardModuleInput: {
     // input type
@@ -1676,10 +1685,17 @@ export interface NexusGenObjects {
   PetitionVariable: {
     name: string;
     default_value: number;
+    show_in_replies: boolean;
+    value_labels: { value: number; label: string }[];
   };
   PetitionVariableResult: {
     name: string;
     value: number | null;
+  };
+  PetitionVariableValueLabel: {
+    // root type
+    label: string; // String!
+    value: number; // Float!
   };
   Profile: db.Profile;
   ProfileAnonymizedEvent: profileEvents.ProfileAnonymizedEvent;
@@ -4050,11 +4066,18 @@ export interface NexusGenFieldTypes {
     // field return type
     defaultValue: number; // Float!
     name: string; // String!
+    showInReplies: boolean; // Boolean!
+    valueLabels: NexusGenRootTypes["PetitionVariableValueLabel"][]; // [PetitionVariableValueLabel!]!
   };
   PetitionVariableResult: {
     // field return type
     name: string; // String!
     value: number | null; // Float
+  };
+  PetitionVariableValueLabel: {
+    // field return type
+    label: string; // String!
+    value: number; // Float!
   };
   Profile: {
     // field return type
@@ -7341,10 +7364,17 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     defaultValue: "Float";
     name: "String";
+    showInReplies: "Boolean";
+    valueLabels: "PetitionVariableValueLabel";
   };
   PetitionVariableResult: {
     // field return type name
     name: "String";
+    value: "Float";
+  };
+  PetitionVariableValueLabel: {
+    // field return type name
+    label: "String";
     value: "Float";
   };
   Profile: {

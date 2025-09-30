@@ -610,6 +610,8 @@ export interface CreatePetitionFromProfilePrefillInput {
 export interface CreatePetitionVariableInput {
   defaultValue: Scalars["Float"]["input"];
   name: Scalars["String"]["input"];
+  showInReplies?: InputMaybe<Scalars["Boolean"]["input"]>;
+  valueLabels?: InputMaybe<Array<PetitionVariableValueLabelInput>>;
 }
 
 export interface CreateProfileFieldValueInput {
@@ -5475,12 +5477,26 @@ export interface PetitionVariable {
   __typename?: "PetitionVariable";
   defaultValue: Scalars["Float"]["output"];
   name: Scalars["String"]["output"];
+  showInReplies: Scalars["Boolean"]["output"];
+  /** The value labels of the variable. */
+  valueLabels: Array<PetitionVariableValueLabel>;
 }
 
 export interface PetitionVariableResult {
   __typename?: "PetitionVariableResult";
   name: Scalars["String"]["output"];
   value?: Maybe<Scalars["Float"]["output"]>;
+}
+
+export interface PetitionVariableValueLabel {
+  __typename?: "PetitionVariableValueLabel";
+  label: Scalars["String"]["output"];
+  value: Scalars["Float"]["output"];
+}
+
+export interface PetitionVariableValueLabelInput {
+  label: Scalars["String"]["input"];
+  value: Scalars["Float"]["input"];
 }
 
 export interface PetitionsNumberDashboardModuleSettingsInput {
@@ -7605,6 +7621,8 @@ export interface UpdatePetitionInput {
 
 export interface UpdatePetitionVariableInput {
   defaultValue: Scalars["Float"]["input"];
+  showInReplies?: InputMaybe<Scalars["Boolean"]["input"]>;
+  valueLabels?: InputMaybe<Array<PetitionVariableValueLabelInput>>;
 }
 
 export interface UpdatePetitionsNumberDashboardModuleInput {
@@ -25796,7 +25814,13 @@ export type PetitionComposeRightPaneTabs_PetitionBase_Petition_Fragment = {
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<{
+    __typename?: "PetitionVariable";
+    name: string;
+    defaultValue: number;
+    showInReplies: boolean;
+    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
+  }>;
 };
 
 export type PetitionComposeRightPaneTabs_PetitionBase_PetitionTemplate_Fragment = {
@@ -25889,7 +25913,13 @@ export type PetitionComposeRightPaneTabs_PetitionBase_PetitionTemplate_Fragment 
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<{
+    __typename?: "PetitionVariable";
+    name: string;
+    defaultValue: number;
+    showInReplies: boolean;
+    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
+  }>;
   organization: { __typename?: "Organization"; customHost?: string | null };
 };
 
@@ -25910,14 +25940,26 @@ export type PetitionComposeVariables_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
   lastChangeAt: string;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<{
+    __typename?: "PetitionVariable";
+    name: string;
+    defaultValue: number;
+    showInReplies: boolean;
+    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
+  }>;
 };
 
 export type PetitionComposeVariables_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
   lastChangeAt: string;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<{
+    __typename?: "PetitionVariable";
+    name: string;
+    defaultValue: number;
+    showInReplies: boolean;
+    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
+  }>;
 };
 
 export type PetitionComposeVariables_PetitionBaseFragment =
@@ -25934,7 +25976,17 @@ export type PetitionComposeVariables_deletePetitionVariableMutation = {
     __typename?: "Petition";
     id: string;
     lastChangeAt: string;
-    variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+    variables: Array<{
+      __typename?: "PetitionVariable";
+      name: string;
+      defaultValue: number;
+      showInReplies: boolean;
+      valueLabels: Array<{
+        __typename?: "PetitionVariableValueLabel";
+        value: number;
+        label: string;
+      }>;
+    }>;
   };
 };
 
@@ -27361,18 +27413,38 @@ export type useCreateOrUpdateFieldGroupRelationshipsDialog_updatePetitionFieldGr
         };
   };
 
+export type CreateOrUpdatePetitionVariableDialog_PetitionVariableFragment = {
+  __typename?: "PetitionVariable";
+  name: string;
+  defaultValue: number;
+  showInReplies: boolean;
+  valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
+};
+
 export type CreateOrUpdatePetitionVariableDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
   lastChangeAt: string;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<{
+    __typename?: "PetitionVariable";
+    name: string;
+    defaultValue: number;
+    showInReplies: boolean;
+    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
+  }>;
 };
 
 export type CreateOrUpdatePetitionVariableDialog_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
   lastChangeAt: string;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<{
+    __typename?: "PetitionVariable";
+    name: string;
+    defaultValue: number;
+    showInReplies: boolean;
+    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
+  }>;
 };
 
 export type CreateOrUpdatePetitionVariableDialog_PetitionBaseFragment =
@@ -27389,7 +27461,17 @@ export type CreateOrUpdatePetitionVariableDialog_createPetitionVariableMutation 
     __typename?: "Petition";
     id: string;
     lastChangeAt: string;
-    variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+    variables: Array<{
+      __typename?: "PetitionVariable";
+      name: string;
+      defaultValue: number;
+      showInReplies: boolean;
+      valueLabels: Array<{
+        __typename?: "PetitionVariableValueLabel";
+        value: number;
+        label: string;
+      }>;
+    }>;
   };
 };
 
@@ -27404,7 +27486,17 @@ export type CreateOrUpdatePetitionVariableDialog_updatePetitionVariableMutation 
     __typename?: "Petition";
     id: string;
     lastChangeAt: string;
-    variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+    variables: Array<{
+      __typename?: "PetitionVariable";
+      name: string;
+      defaultValue: number;
+      showInReplies: boolean;
+      valueLabels: Array<{
+        __typename?: "PetitionVariableValueLabel";
+        value: number;
+        label: string;
+      }>;
+    }>;
   };
 };
 
@@ -37957,13 +38049,25 @@ export type PetitionSignaturesCard_petitionQuery = {
 export type PetitionVariablesCard_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<{
+    __typename?: "PetitionVariable";
+    name: string;
+    defaultValue: number;
+    showInReplies: boolean;
+    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
+  }>;
 };
 
 export type PetitionVariablesCard_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<{
+    __typename?: "PetitionVariable";
+    name: string;
+    defaultValue: number;
+    showInReplies: boolean;
+    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
+  }>;
 };
 
 export type PetitionVariablesCard_PetitionBaseFragment =
@@ -53703,7 +53807,13 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     visibility?: { [key: string]: any } | null;
   }> | null;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<{
+    __typename?: "PetitionVariable";
+    name: string;
+    defaultValue: number;
+    showInReplies: boolean;
+    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
+  }>;
   profiles: Array<{ __typename?: "Profile"; id: string }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
@@ -53999,7 +54109,13 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<{
+    __typename?: "PetitionVariable";
+    name: string;
+    defaultValue: number;
+    showInReplies: boolean;
+    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
+  }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -54618,7 +54734,17 @@ export type PetitionCompose_updatePetitionMutation = {
           numberingType: AutomaticNumberingType;
         } | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<{
+          __typename?: "PetitionVariable";
+          name: string;
+          defaultValue: number;
+          showInReplies: boolean;
+          valueLabels: Array<{
+            __typename?: "PetitionVariableValueLabel";
+            value: number;
+            label: string;
+          }>;
+        }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
@@ -54724,7 +54850,17 @@ export type PetitionCompose_updatePetitionMutation = {
             environment: SignatureOrgIntegrationEnvironment;
           } | null;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<{
+          __typename?: "PetitionVariable";
+          name: string;
+          defaultValue: number;
+          showInReplies: boolean;
+          valueLabels: Array<{
+            __typename?: "PetitionVariableValueLabel";
+            value: number;
+            label: string;
+          }>;
+        }>;
         organization: { __typename?: "Organization"; customHost?: string | null };
       };
 };
@@ -56840,7 +56976,17 @@ export type PetitionCompose_petitionQuery = {
           visibility?: { [key: string]: any } | null;
         }> | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<{
+          __typename?: "PetitionVariable";
+          name: string;
+          defaultValue: number;
+          showInReplies: boolean;
+          valueLabels: Array<{
+            __typename?: "PetitionVariableValueLabel";
+            value: number;
+            label: string;
+          }>;
+        }>;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
@@ -57158,7 +57304,17 @@ export type PetitionCompose_petitionQuery = {
             environment: SignatureOrgIntegrationEnvironment;
           } | null;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<{
+          __typename?: "PetitionVariable";
+          name: string;
+          defaultValue: number;
+          showInReplies: boolean;
+          valueLabels: Array<{
+            __typename?: "PetitionVariableValueLabel";
+            value: number;
+            label: string;
+          }>;
+        }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -61483,7 +61639,13 @@ export type PetitionReplies_PetitionFragment = {
       canCreate: boolean;
     };
   }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<{
+    __typename?: "PetitionVariable";
+    name: string;
+    defaultValue: number;
+    showInReplies: boolean;
+    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
+  }>;
   approvalFlowConfig?: Array<{
     __typename?: "ApprovalFlowConfig";
     name: string;
@@ -62480,7 +62642,17 @@ export type PetitionReplies_petitionQuery = {
             canCreate: boolean;
           };
         }>;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<{
+          __typename?: "PetitionVariable";
+          name: string;
+          defaultValue: number;
+          showInReplies: boolean;
+          valueLabels: Array<{
+            __typename?: "PetitionVariableValueLabel";
+            value: number;
+            label: string;
+          }>;
+        }>;
         approvalFlowConfig?: Array<{
           __typename?: "ApprovalFlowConfig";
           name: string;
@@ -75579,15 +75751,29 @@ export const useCreateOrUpdateFieldGroupRelationshipsDialog_PetitionBaseFragment
   useCreateOrUpdateFieldGroupRelationshipsDialog_PetitionBaseFragment,
   unknown
 >;
+export const CreateOrUpdatePetitionVariableDialog_PetitionVariableFragmentDoc = gql`
+  fragment CreateOrUpdatePetitionVariableDialog_PetitionVariable on PetitionVariable {
+    name
+    defaultValue
+    showInReplies
+    valueLabels {
+      value
+      label
+    }
+  }
+` as unknown as DocumentNode<
+  CreateOrUpdatePetitionVariableDialog_PetitionVariableFragment,
+  unknown
+>;
 export const CreateOrUpdatePetitionVariableDialog_PetitionBaseFragmentDoc = gql`
   fragment CreateOrUpdatePetitionVariableDialog_PetitionBase on PetitionBase {
     id
     variables {
-      name
-      defaultValue
+      ...CreateOrUpdatePetitionVariableDialog_PetitionVariable
     }
     lastChangeAt
   }
+  ${CreateOrUpdatePetitionVariableDialog_PetitionVariableFragmentDoc}
 ` as unknown as DocumentNode<CreateOrUpdatePetitionVariableDialog_PetitionBaseFragment, unknown>;
 export const useCreatePetitionFieldGroupProfileTypeDialog_ProfileTypeFragmentDoc = gql`
   fragment useCreatePetitionFieldGroupProfileTypeDialog_ProfileType on ProfileType {
@@ -80086,9 +80272,11 @@ export const PetitionComposeVariables_PetitionBaseFragmentDoc = gql`
     variables {
       name
       defaultValue
+      ...CreateOrUpdatePetitionVariableDialog_PetitionVariable
     }
     lastChangeAt
   }
+  ${CreateOrUpdatePetitionVariableDialog_PetitionVariableFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeVariables_PetitionBaseFragment, unknown>;
 export const PetitionComposeRightPaneTabs_PetitionBaseFragmentDoc = gql`
   fragment PetitionComposeRightPaneTabs_PetitionBase on PetitionBase {
@@ -81376,6 +81564,11 @@ export const PetitionVariablesCard_PetitionBaseFragmentDoc = gql`
     variables {
       name
       defaultValue
+      showInReplies
+      valueLabels {
+        value
+        label
+      }
     }
   }
 ` as unknown as DocumentNode<PetitionVariablesCard_PetitionBaseFragment, unknown>;
@@ -81629,6 +81822,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     }
     variables {
       name
+      showInReplies
     }
     approvalFlowConfig {
       ...Fragments_FullApprovalFlowConfig

@@ -1607,15 +1607,31 @@ export const FoldersInput = inputObjectType({
   },
 });
 
+export const PetitionVariableValueLabel = objectType({
+  name: "PetitionVariableValueLabel",
+  definition(t) {
+    t.nonNull.float("value");
+    t.nonNull.string("label");
+  },
+});
+
 export const PetitionVariable = objectType({
   name: "PetitionVariable",
   definition(t) {
     t.nonNull.string("name");
     t.nonNull.float("defaultValue", { resolve: (o) => o.default_value });
+    t.nonNull.boolean("showInReplies", { resolve: (o) => o.show_in_replies });
+    t.nonNull.list.nonNull.field("valueLabels", {
+      type: "PetitionVariableValueLabel",
+      description: "The value labels of the variable.",
+      resolve: (o) => o.value_labels,
+    });
   },
   sourceType: /* ts */ `{
     name: string;
     default_value: number;
+    show_in_replies: boolean;
+    value_labels: { value: number; label: string }[];
   }`,
 });
 

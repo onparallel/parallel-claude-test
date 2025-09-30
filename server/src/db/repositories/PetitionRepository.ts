@@ -145,6 +145,8 @@ import { FileRepository, ReadOnlyFileRepository } from "./FileRepository";
 export interface PetitionVariable {
   name: string;
   default_value: number;
+  show_in_replies: boolean;
+  value_labels: { value: number; label: string }[];
 }
 
 export interface PetitionCustomList {
@@ -8554,14 +8556,26 @@ export class PetitionRepository extends BaseRepository {
       /* sql */ `
         update petition
         set 
-          variables = coalesce(variables, '[]') || jsonb_build_object('name', ?::text, 'default_value', ?::float),
+          variables = coalesce(variables, '[]') || jsonb_build_object(
+            'name', ?::text,
+            'default_value', ?::float,
+            'show_in_replies', ?::boolean,
+            'value_labels', ?::jsonb
+          ),
           last_change_at = now(),
           updated_at = now(),
           updated_by = ?
         where id = ?
         returning *;
       `,
-      [data.name, data.default_value, updatedBy, petitionId],
+      [
+        data.name,
+        data.default_value,
+        data.show_in_replies,
+        JSON.stringify(data.value_labels),
+        updatedBy,
+        petitionId,
+      ],
     );
 
     return petition;
@@ -8578,13 +8592,18 @@ export class PetitionRepository extends BaseRepository {
       update petition
       set 
         variables = (
-        select jsonb_agg(
-          case
-            when element->>'name' = ? then jsonb_build_object('name', ?::text, 'default_value', ?::float)
-            else element
-          end
-        )
-        from jsonb_array_elements(variables) as element
+          select jsonb_agg(
+            case
+              when element->>'name' = ? then jsonb_build_object(
+                'name', ?::text,
+                'default_value', ?::float,
+                'show_in_replies', ?::boolean,
+                'value_labels', ?::jsonb
+              )
+              else element
+            end
+          )
+          from jsonb_array_elements(variables) as element
         ),
         last_change_at = now(),
         updated_at = now(),
@@ -8592,7 +8611,15 @@ export class PetitionRepository extends BaseRepository {
       where id = ?
       returning *;
       `,
-      [key, key, data.default_value, updatedBy, petitionId],
+      [
+        key,
+        key,
+        data.default_value,
+        data.show_in_replies,
+        JSON.stringify(data.value_labels),
+        updatedBy,
+        petitionId,
+      ],
     );
 
     return petition;

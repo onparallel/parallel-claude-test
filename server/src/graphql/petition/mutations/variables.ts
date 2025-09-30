@@ -18,6 +18,14 @@ import {
 
 export const FIELD_REFERENCE_REGEX = /^[a-z_][a-z0-9_]*$/i;
 
+export const PetitionVariableValueLabelInput = inputObjectType({
+  name: "PetitionVariableValueLabelInput",
+  definition(t) {
+    t.nonNull.float("value");
+    t.nonNull.string("label");
+  },
+});
+
 export const createPetitionVariable = mutationField("createPetitionVariable", {
   type: "Petition",
   description: "Creates a new variable on the petition.",
@@ -37,6 +45,10 @@ export const createPetitionVariable = mutationField("createPetitionVariable", {
         definition(t) {
           t.nonNull.string("name");
           t.nonNull.float("defaultValue");
+          t.boolean("showInReplies");
+          t.list.nonNull.field("valueLabels", {
+            type: "PetitionVariableValueLabelInput",
+          });
         },
       }),
     ),
@@ -51,6 +63,8 @@ export const createPetitionVariable = mutationField("createPetitionVariable", {
       {
         name: args.data.name,
         default_value: args.data.defaultValue,
+        show_in_replies: args.data.showInReplies ?? true,
+        value_labels: args.data.valueLabels ?? [],
       },
       `User:${ctx.user!.id}`,
     );
@@ -75,6 +89,10 @@ export const updatePetitionVariable = mutationField("updatePetitionVariable", {
         name: "UpdatePetitionVariableInput",
         definition(t) {
           t.nonNull.float("defaultValue");
+          t.boolean("showInReplies");
+          t.list.nonNull.field("valueLabels", {
+            type: "PetitionVariableValueLabelInput",
+          });
         },
       }),
     ),
@@ -85,6 +103,8 @@ export const updatePetitionVariable = mutationField("updatePetitionVariable", {
       args.name,
       {
         default_value: args.data.defaultValue,
+        show_in_replies: args.data.showInReplies ?? true,
+        value_labels: args.data.valueLabels ?? [],
       },
       `User:${ctx.user!.id}`,
     );

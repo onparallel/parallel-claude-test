@@ -314,9 +314,11 @@ PetitionComposeVariables.fragments = {
       variables {
         name
         defaultValue
+        ...CreateOrUpdatePetitionVariableDialog_PetitionVariable
       }
       lastChangeAt
     }
+    ${useCreateOrUpdatePetitionVariableDialog.fragments.PetitionVariable}
   `,
 };
 

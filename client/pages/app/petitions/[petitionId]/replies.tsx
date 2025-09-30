@@ -710,7 +710,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               isDisabled={isAnonymizedOrDeletionScheduled || myEffectivePermission === "READ"}
             />
           ) : null}
-          {petition.variables.length ? (
+          {petition.variables.some((v) => v.showInReplies) ? (
             <PetitionVariablesCard
               ref={variablesRef as any}
               layerStyle="highlightable"
@@ -794,6 +794,7 @@ PetitionReplies.fragments = {
         }
         variables {
           name
+          showInReplies
         }
         approvalFlowConfig {
           ...Fragments_FullApprovalFlowConfig

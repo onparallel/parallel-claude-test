@@ -674,6 +674,8 @@ input CreatePetitionFromProfilePrefillInput {
 input CreatePetitionVariableInput {
   defaultValue: Float!
   name: String!
+  showInReplies: Boolean
+  valueLabels: [PetitionVariableValueLabelInput!]
 }
 
 input CreateProfileFieldValueInput {
@@ -6700,11 +6702,27 @@ type PetitionUserPermission implements PetitionPermission & Timestamps {
 type PetitionVariable {
   defaultValue: Float!
   name: String!
+  showInReplies: Boolean!
+
+  """
+  The value labels of the variable.
+  """
+  valueLabels: [PetitionVariableValueLabel!]!
 }
 
 type PetitionVariableResult {
   name: String!
   value: Float
+}
+
+type PetitionVariableValueLabel {
+  label: String!
+  value: Float!
+}
+
+input PetitionVariableValueLabelInput {
+  label: String!
+  value: Float!
 }
 
 input PetitionsNumberDashboardModuleSettingsInput {
@@ -9468,6 +9486,8 @@ input UpdatePetitionInput {
 
 input UpdatePetitionVariableInput {
   defaultValue: Float!
+  showInReplies: Boolean
+  valueLabels: [PetitionVariableValueLabelInput!]
 }
 
 input UpdatePetitionsNumberDashboardModuleInput {

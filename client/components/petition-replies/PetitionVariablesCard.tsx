@@ -42,36 +42,47 @@ export const PetitionVariablesCard = Object.assign(
           />
         </CardHeader>
         <Stack spacing={4} padding={4} paddingBottom={6} overflowX="auto">
-          {petition.variables.map(({ name }) => {
-            const total = finalVariables[name];
-            return (
-              <HStack key={name}>
-                <IconButtonWithTooltip
-                  label={intl.formatMessage({
-                    id: "component.petition-compose-variables.show-calculation-steps",
-                    defaultMessage: "Show calculation steps",
-                  })}
-                  icon={<CalculatorIcon boxSize={4} />}
-                  size="xs"
-                  onClick={() => handleViewCalculationRules(name)}
-                />
-                <OverflownText
-                  as={Badge}
-                  colorScheme="blue"
-                  textTransform="inherit"
-                  fontSize="md"
-                  whiteSpace="nowrap"
-                  overflow="hidden"
-                  textOverflow="ellipsis"
-                  minWidth="0"
-                >
-                  {name}
-                </OverflownText>
-                <Text as="span">=</Text>
-                <Text>{total}</Text>
-              </HStack>
-            );
-          })}
+          {petition.variables
+            .filter((v) => v.showInReplies)
+            .map(({ name, valueLabels }) => {
+              const total = finalVariables[name];
+              const label = valueLabels.find((v) => v.value === total)?.label;
+              return (
+                <HStack key={name}>
+                  <IconButtonWithTooltip
+                    label={intl.formatMessage({
+                      id: "component.petition-compose-variables.show-calculation-steps",
+                      defaultMessage: "Show calculation steps",
+                    })}
+                    icon={<CalculatorIcon boxSize={4} />}
+                    size="xs"
+                    onClick={() => handleViewCalculationRules(name)}
+                  />
+                  <OverflownText
+                    as={Badge}
+                    colorScheme="blue"
+                    textTransform="inherit"
+                    fontSize="md"
+                    whiteSpace="nowrap"
+                    overflow="hidden"
+                    textOverflow="ellipsis"
+                    minWidth="0"
+                  >
+                    {name}
+                  </OverflownText>
+                  <Text as="span">=</Text>
+                  <Text>
+                    {label ? (
+                      <>
+                        <b>{label}</b> ({total})
+                      </>
+                    ) : (
+                      total
+                    )}
+                  </Text>
+                </HStack>
+              );
+            })}
         </Stack>
       </Card>
     );
@@ -84,6 +95,11 @@ export const PetitionVariablesCard = Object.assign(
           variables {
             name
             defaultValue
+            showInReplies
+            valueLabels {
+              value
+              label
+            }
           }
         }
       `,
