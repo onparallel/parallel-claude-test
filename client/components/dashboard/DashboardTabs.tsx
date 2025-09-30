@@ -111,6 +111,7 @@ export const DashboardTabs = Object.assign(
     return (
       <RadioTabList
         ref={ref}
+        className="no-print"
         variant="line"
         name="dashboard"
         value={currentDashboard?.id}

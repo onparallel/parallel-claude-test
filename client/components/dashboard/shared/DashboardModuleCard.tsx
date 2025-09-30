@@ -69,6 +69,7 @@ export const DashboardModuleCard = Object.assign(
         position="relative"
         overflow="hidden"
         zIndex={isDragging ? 10 : 1}
+        data-testid="dashboard-module-card"
         {...props}
       >
         {isEditing && !isReadOnly && (
@@ -167,6 +168,7 @@ export const DashboardModuleCard = Object.assign(
           pointerEvents={isEditing ? "none" : "auto"}
           opacity={isEditing ? 0.7 : 1}
           filter={isEditing ? "blur(1px)" : "none"}
+          data-testid="dashboard-module-content"
         >
           {children}
         </Flex>

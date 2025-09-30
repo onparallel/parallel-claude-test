@@ -18,6 +18,7 @@ export function DashboardLinkToResults({ href, label }: { href: string; label: s
         _focus={{ opacity: 1 }}
         _active={{ opacity: 1 }}
         placement="right"
+        className="no-print"
       />
     </NakedLink>
   );

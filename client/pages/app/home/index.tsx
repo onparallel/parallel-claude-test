@@ -282,7 +282,7 @@ function Home() {
     >
       <Stack minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
         <Stack maxWidth="container.xl" width="100%" margin="0 auto">
-          <HStack justify="space-between" padding={2}>
+          <HStack justify="space-between" padding={2} className="no-print">
             <HStack>
               <HomeIcon boxSize={5} />
               <Heading as="h2" size="lg">
@@ -350,7 +350,7 @@ function Home() {
               />
             </MotionConfig>
 
-            <HStack padding={0.5} alignItems="flex-end">
+            <HStack padding={0.5} alignItems="flex-end" className="no-print">
               {isEditing && isNonNullish(dashboard) ? (
                 <Button
                   variant="outline"
@@ -714,6 +714,7 @@ const DashboardGrid = memo(
             gridGap={4}
             templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }}
             gridAutoRows="130px"
+            className="dashboard-grid"
           >
             {modules.map((module) => (
               <SortableDashboardModule

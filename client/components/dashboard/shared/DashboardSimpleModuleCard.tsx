@@ -26,6 +26,7 @@ export const DashboardSimpleModuleCard = Object.assign(
             fontWeight={700}
             fontSize="48px"
             justifyContent={alignment}
+            className="dashboard-number-module"
           >
             {children}
           </Flex>
