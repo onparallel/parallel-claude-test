@@ -255,4 +255,8 @@ export class DocusignClient extends BaseClient implements ISignatureClient {
       });
     });
   }
+
+  async canSendSignatureReminder(petitionId: number, signatureId: number) {
+    return true;
+  }
 }

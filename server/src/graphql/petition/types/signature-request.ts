@@ -153,6 +153,16 @@ export const PetitionSignatureRequest = objectType({
       resolve: (o) => o.metadata,
     });
     t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
+    t.nullable.datetime("latestSignatureReminderAt", {
+      resolve: async (o, _, ctx) => {
+        const latestEvent = await ctx.petitions.getLatestSignatureReminderEventForPetition(
+          o.petition_id,
+          o.id,
+        );
+
+        return latestEvent?.created_at ?? null;
+      },
+    });
   },
 });
 

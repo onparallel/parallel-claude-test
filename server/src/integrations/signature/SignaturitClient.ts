@@ -304,6 +304,20 @@ export class SignaturitClient extends BaseClient implements ISignatureClient {
     });
   }
 
+  async canSendSignatureReminder(petitionId: number, signatureId: number) {
+    const latestSignatureEvent = await this.petitions.getLatestSignatureReminderEventForPetition(
+      petitionId,
+      signatureId,
+    );
+
+    if (isNullish(latestSignatureEvent)) {
+      return true;
+    }
+
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    return latestSignatureEvent.created_at < twentyFourHoursAgo;
+  }
+
   private async createSignaturitBranding(orgId: number, locale: ContactLocale) {
     return await this.withSignaturitSDK(async (sdk, context) => {
       const intl = await this.i18n.getIntl(locale);

@@ -12425,6 +12425,16 @@
     "context": "Enter a title..."
   },
   {
+    "term": "component.signature-reminder-already-sent-dialog.body",
+    "definition": "{providerName} solo permite un recordatorio por día. El último recordatorio se envió {timeAgo}.",
+    "context": "{providerName} only allows one reminder per day. The latest reminder was sent {timeAgo}."
+  },
+  {
+    "term": "component.signature-reminder-already-sent-dialog.header",
+    "definition": "Recordatorio ya enviado",
+    "context": "Reminder already sent"
+  },
+  {
     "term": "component.signature-sent-alert.petition-requires-signature-alert-1",
     "definition": "<b>Firma digital pendiente,</b> {tone, select, INFORMAL{enviaremos el documento a firmar cuando se revise la información.} other{le enviaremos el documento a firmar una vez haya sido revisada la información.}}",
     "context": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."

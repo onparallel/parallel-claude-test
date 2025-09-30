@@ -5008,6 +5008,7 @@ export type PetitionSignatureRequest = Timestamps & {
   extraErrorData: Maybe<Scalars["JSON"]["output"]>;
   id: Scalars["GID"]["output"];
   isAnonymized: Scalars["Boolean"]["output"];
+  latestSignatureReminderAt: Maybe<Scalars["DateTime"]["output"]>;
   /** Metadata for this signature request. */
   metadata: Scalars["JSONObject"]["output"];
   petition: Petition;

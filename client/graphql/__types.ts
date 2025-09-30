@@ -5190,6 +5190,7 @@ export interface PetitionSignatureRequest extends Timestamps {
   extraErrorData?: Maybe<Scalars["JSON"]["output"]>;
   id: Scalars["GID"]["output"];
   isAnonymized: Scalars["Boolean"]["output"];
+  latestSignatureReminderAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** Metadata for this signature request. */
   metadata: Scalars["JSONObject"]["output"];
   petition: Petition;
@@ -33255,6 +33256,7 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
   createdAt: string;
   errorMessage?: string | null;
   extraErrorData?: any | null;
+  latestSignatureReminderAt?: string | null;
   cancelReason?: string | null;
   signerStatus: Array<{
     __typename?: "PetitionSignatureRequestSignerStatus";
@@ -33276,7 +33278,14 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
       signWithDigitalCertificate?: boolean | null;
     };
   }>;
-  signatureConfig: { __typename?: "SignatureConfig"; signingMode: SignatureConfigSigningMode };
+  signatureConfig: {
+    __typename?: "SignatureConfig";
+    signingMode: SignatureConfigSigningMode;
+    integration?: {
+      __typename?: "SignatureOrgIntegration";
+      provider: SignatureOrgIntegrationProvider;
+    } | null;
+  };
 };
 
 export type NewSignatureRequestRow_PetitionFragment = {
@@ -33593,6 +33602,7 @@ export type PetitionApprovalsCard_PetitionFragment = {
     createdAt: string;
     errorMessage?: string | null;
     extraErrorData?: any | null;
+    latestSignatureReminderAt?: string | null;
     cancelReason?: string | null;
     signerStatus: Array<{
       __typename?: "PetitionSignatureRequestSignerStatus";
@@ -33614,7 +33624,14 @@ export type PetitionApprovalsCard_PetitionFragment = {
         signWithDigitalCertificate?: boolean | null;
       };
     }>;
-    signatureConfig: { __typename?: "SignatureConfig"; signingMode: SignatureConfigSigningMode };
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      signingMode: SignatureConfigSigningMode;
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        provider: SignatureOrgIntegrationProvider;
+      } | null;
+    };
   }>;
   currentApprovalRequestSteps?: Array<{
     __typename?: "PetitionApprovalRequestStep";
@@ -33875,6 +33892,7 @@ export type PetitionApprovalsCard_PetitionPollingFragment = {
     createdAt: string;
     errorMessage?: string | null;
     extraErrorData?: any | null;
+    latestSignatureReminderAt?: string | null;
     cancelReason?: string | null;
     signerStatus: Array<{
       __typename?: "PetitionSignatureRequestSignerStatus";
@@ -33896,7 +33914,14 @@ export type PetitionApprovalsCard_PetitionPollingFragment = {
         signWithDigitalCertificate?: boolean | null;
       };
     }>;
-    signatureConfig: { __typename?: "SignatureConfig"; signingMode: SignatureConfigSigningMode };
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      signingMode: SignatureConfigSigningMode;
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        provider: SignatureOrgIntegrationProvider;
+      } | null;
+    };
   }>;
   approvalFlowConfig?: Array<{
     __typename?: "ApprovalFlowConfig";
@@ -34024,6 +34049,7 @@ export type PetitionApprovalsCard_cancelPetitionApprovalRequestStepMutation = {
         createdAt: string;
         errorMessage?: string | null;
         extraErrorData?: any | null;
+        latestSignatureReminderAt?: string | null;
         cancelReason?: string | null;
         signerStatus: Array<{
           __typename?: "PetitionSignatureRequestSignerStatus";
@@ -34048,6 +34074,10 @@ export type PetitionApprovalsCard_cancelPetitionApprovalRequestStepMutation = {
         signatureConfig: {
           __typename?: "SignatureConfig";
           signingMode: SignatureConfigSigningMode;
+          integration?: {
+            __typename?: "SignatureOrgIntegration";
+            provider: SignatureOrgIntegrationProvider;
+          } | null;
         };
       }>;
       currentApprovalRequestSteps?: Array<{
@@ -34352,6 +34382,7 @@ export type PetitionApprovalsCard_skipPetitionApprovalRequestStepMutation = {
         createdAt: string;
         errorMessage?: string | null;
         extraErrorData?: any | null;
+        latestSignatureReminderAt?: string | null;
         cancelReason?: string | null;
         signerStatus: Array<{
           __typename?: "PetitionSignatureRequestSignerStatus";
@@ -34376,6 +34407,10 @@ export type PetitionApprovalsCard_skipPetitionApprovalRequestStepMutation = {
         signatureConfig: {
           __typename?: "SignatureConfig";
           signingMode: SignatureConfigSigningMode;
+          integration?: {
+            __typename?: "SignatureOrgIntegration";
+            provider: SignatureOrgIntegrationProvider;
+          } | null;
         };
       }>;
       currentApprovalRequestSteps?: Array<{
@@ -34682,6 +34717,7 @@ export type PetitionApprovalsCard_rejectPetitionApprovalRequestStepMutation = {
         createdAt: string;
         errorMessage?: string | null;
         extraErrorData?: any | null;
+        latestSignatureReminderAt?: string | null;
         cancelReason?: string | null;
         signerStatus: Array<{
           __typename?: "PetitionSignatureRequestSignerStatus";
@@ -34706,6 +34742,10 @@ export type PetitionApprovalsCard_rejectPetitionApprovalRequestStepMutation = {
         signatureConfig: {
           __typename?: "SignatureConfig";
           signingMode: SignatureConfigSigningMode;
+          integration?: {
+            __typename?: "SignatureOrgIntegration";
+            provider: SignatureOrgIntegrationProvider;
+          } | null;
         };
       }>;
       currentApprovalRequestSteps?: Array<{
@@ -35011,6 +35051,7 @@ export type PetitionApprovalsCard_approvePetitionApprovalRequestStepMutation = {
         createdAt: string;
         errorMessage?: string | null;
         extraErrorData?: any | null;
+        latestSignatureReminderAt?: string | null;
         cancelReason?: string | null;
         signerStatus: Array<{
           __typename?: "PetitionSignatureRequestSignerStatus";
@@ -35035,6 +35076,10 @@ export type PetitionApprovalsCard_approvePetitionApprovalRequestStepMutation = {
         signatureConfig: {
           __typename?: "SignatureConfig";
           signingMode: SignatureConfigSigningMode;
+          integration?: {
+            __typename?: "SignatureOrgIntegration";
+            provider: SignatureOrgIntegrationProvider;
+          } | null;
         };
       }>;
       currentApprovalRequestSteps?: Array<{
@@ -35340,6 +35385,7 @@ export type PetitionApprovalsCard_startPetitionApprovalRequestStepMutation = {
         createdAt: string;
         errorMessage?: string | null;
         extraErrorData?: any | null;
+        latestSignatureReminderAt?: string | null;
         cancelReason?: string | null;
         signerStatus: Array<{
           __typename?: "PetitionSignatureRequestSignerStatus";
@@ -35364,6 +35410,10 @@ export type PetitionApprovalsCard_startPetitionApprovalRequestStepMutation = {
         signatureConfig: {
           __typename?: "SignatureConfig";
           signingMode: SignatureConfigSigningMode;
+          integration?: {
+            __typename?: "SignatureOrgIntegration";
+            provider: SignatureOrgIntegrationProvider;
+          } | null;
         };
       }>;
       currentApprovalRequestSteps?: Array<{
@@ -35686,6 +35736,7 @@ export type PetitionApprovalsCard_petitionQuery = {
           createdAt: string;
           errorMessage?: string | null;
           extraErrorData?: any | null;
+          latestSignatureReminderAt?: string | null;
           cancelReason?: string | null;
           signerStatus: Array<{
             __typename?: "PetitionSignatureRequestSignerStatus";
@@ -35710,6 +35761,10 @@ export type PetitionApprovalsCard_petitionQuery = {
           signatureConfig: {
             __typename?: "SignatureConfig";
             signingMode: SignatureConfigSigningMode;
+            integration?: {
+              __typename?: "SignatureOrgIntegration";
+              provider: SignatureOrgIntegrationProvider;
+            } | null;
           };
         }>;
         approvalFlowConfig?: Array<{
@@ -37514,6 +37569,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
     createdAt: string;
     errorMessage?: string | null;
     extraErrorData?: any | null;
+    latestSignatureReminderAt?: string | null;
     cancelReason?: string | null;
     signerStatus: Array<{
       __typename?: "PetitionSignatureRequestSignerStatus";
@@ -37535,7 +37591,14 @@ export type PetitionSignaturesCard_PetitionFragment = {
         signWithDigitalCertificate?: boolean | null;
       };
     }>;
-    signatureConfig: { __typename?: "SignatureConfig"; signingMode: SignatureConfigSigningMode };
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      signingMode: SignatureConfigSigningMode;
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        provider: SignatureOrgIntegrationProvider;
+      } | null;
+    };
   }>;
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
@@ -37724,6 +37787,7 @@ export type PetitionSignaturesCard_PetitionPollingFragment = {
     createdAt: string;
     errorMessage?: string | null;
     extraErrorData?: any | null;
+    latestSignatureReminderAt?: string | null;
     cancelReason?: string | null;
     signerStatus: Array<{
       __typename?: "PetitionSignatureRequestSignerStatus";
@@ -37745,7 +37809,14 @@ export type PetitionSignaturesCard_PetitionPollingFragment = {
         signWithDigitalCertificate?: boolean | null;
       };
     }>;
-    signatureConfig: { __typename?: "SignatureConfig"; signingMode: SignatureConfigSigningMode };
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      signingMode: SignatureConfigSigningMode;
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        provider: SignatureOrgIntegrationProvider;
+      } | null;
+    };
   }>;
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
@@ -37846,6 +37917,7 @@ export type PetitionSignaturesCard_completePetitionMutation = {
       createdAt: string;
       errorMessage?: string | null;
       extraErrorData?: any | null;
+      latestSignatureReminderAt?: string | null;
       cancelReason?: string | null;
       signerStatus: Array<{
         __typename?: "PetitionSignatureRequestSignerStatus";
@@ -37867,7 +37939,14 @@ export type PetitionSignaturesCard_completePetitionMutation = {
           signWithDigitalCertificate?: boolean | null;
         };
       }>;
-      signatureConfig: { __typename?: "SignatureConfig"; signingMode: SignatureConfigSigningMode };
+      signatureConfig: {
+        __typename?: "SignatureConfig";
+        signingMode: SignatureConfigSigningMode;
+        integration?: {
+          __typename?: "SignatureOrgIntegration";
+          provider: SignatureOrgIntegrationProvider;
+        } | null;
+      };
     }>;
     currentSignatureRequest?: {
       __typename?: "PetitionSignatureRequest";
@@ -38063,6 +38142,7 @@ export type PetitionSignaturesCard_petitionQuery = {
           createdAt: string;
           errorMessage?: string | null;
           extraErrorData?: any | null;
+          latestSignatureReminderAt?: string | null;
           cancelReason?: string | null;
           signerStatus: Array<{
             __typename?: "PetitionSignatureRequestSignerStatus";
@@ -38087,6 +38167,10 @@ export type PetitionSignaturesCard_petitionQuery = {
           signatureConfig: {
             __typename?: "SignatureConfig";
             signingMode: SignatureConfigSigningMode;
+            integration?: {
+              __typename?: "SignatureOrgIntegration";
+              provider: SignatureOrgIntegrationProvider;
+            } | null;
           };
         }>;
         currentSignatureRequest?: {
@@ -61919,6 +62003,7 @@ export type PetitionReplies_PetitionFragment = {
     createdAt: string;
     errorMessage?: string | null;
     extraErrorData?: any | null;
+    latestSignatureReminderAt?: string | null;
     cancelReason?: string | null;
     signerStatus: Array<{
       __typename?: "PetitionSignatureRequestSignerStatus";
@@ -61940,7 +62025,14 @@ export type PetitionReplies_PetitionFragment = {
         signWithDigitalCertificate?: boolean | null;
       };
     }>;
-    signatureConfig: { __typename?: "SignatureConfig"; signingMode: SignatureConfigSigningMode };
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      signingMode: SignatureConfigSigningMode;
+      integration?: {
+        __typename?: "SignatureOrgIntegration";
+        provider: SignatureOrgIntegrationProvider;
+      } | null;
+    };
   }>;
   automaticNumberingConfig?: {
     __typename?: "AutomaticNumberingConfig";
@@ -62926,6 +63018,7 @@ export type PetitionReplies_petitionQuery = {
           createdAt: string;
           errorMessage?: string | null;
           extraErrorData?: any | null;
+          latestSignatureReminderAt?: string | null;
           cancelReason?: string | null;
           signerStatus: Array<{
             __typename?: "PetitionSignatureRequestSignerStatus";
@@ -62950,6 +63043,10 @@ export type PetitionReplies_petitionQuery = {
           signatureConfig: {
             __typename?: "SignatureConfig";
             signingMode: SignatureConfigSigningMode;
+            integration?: {
+              __typename?: "SignatureOrgIntegration";
+              provider: SignatureOrgIntegrationProvider;
+            } | null;
           };
         }>;
         automaticNumberingConfig?: {
@@ -76866,6 +76963,9 @@ export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gq
     }
     signatureConfig {
       signingMode
+      integration {
+        provider
+      }
     }
     metadata
     auditTrailFilename
@@ -76873,6 +76973,7 @@ export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gq
     createdAt
     errorMessage
     extraErrorData
+    latestSignatureReminderAt
   }
   ${PetitionSignatureRequestStatusText_PetitionSignatureRequestFragmentDoc}
   ${SignerReference_PetitionSignerFragmentDoc}

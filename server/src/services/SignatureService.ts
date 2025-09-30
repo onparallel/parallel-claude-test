@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { isNonNullish, isNullish, omit, partition } from "remeda";
+import { assert } from "ts-essentials";
 import { CONFIG, Config } from "../config";
 import {
   PetitionAccess,
@@ -9,7 +10,10 @@ import {
   User,
 } from "../db/__types";
 import { FileRepository } from "../db/repositories/FileRepository";
-import { IntegrationRepository } from "../db/repositories/IntegrationRepository";
+import {
+  IntegrationProvider,
+  IntegrationRepository,
+} from "../db/repositories/IntegrationRepository";
 import {
   PetitionRepository,
   PetitionSignatureConfig,
@@ -17,6 +21,10 @@ import {
   PetitionSignatureRequestCancelData,
 } from "../db/repositories/PetitionRepository";
 import { isValidEmail } from "../graphql/helpers/validators/validEmail";
+import {
+  SIGNATURE_CLIENT_FACTORY,
+  SignatureClientFactory,
+} from "../integrations/signature/SignatureClient";
 import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
 import { MaybeArray, unMaybeArray } from "../util/types";
@@ -39,10 +47,7 @@ export interface ISignatureService {
     extraData?: Partial<PetitionSignatureRequest>,
     t?: Knex.Transaction,
   ): Promise<PetitionSignatureRequest[]>;
-  sendSignatureReminders(
-    signatures: MaybeArray<PetitionSignatureRequest>,
-    userId: number,
-  ): Promise<void>;
+  sendSignatureReminder(signature: PetitionSignatureRequest, userId: number): Promise<boolean>;
   storeSignedDocument(
     signature: PetitionSignatureRequest,
     signedDocumentExternalId: string,
@@ -66,6 +71,7 @@ export class SignatureService implements ISignatureService {
     @inject(QUEUES_SERVICE) private queues: IQueuesService,
     @inject(FileRepository) private files: FileRepository,
     @inject(STORAGE_SERVICE) private storage: IStorageService,
+    @inject(SIGNATURE_CLIENT_FACTORY) private signatureClientFactory: SignatureClientFactory,
   ) {}
 
   async createSignatureRequest(
@@ -204,21 +210,42 @@ export class SignatureService implements ISignatureService {
     });
   }
 
-  async sendSignatureReminders(signature: MaybeArray<PetitionSignatureRequest>, userId: number) {
-    const signatures = unMaybeArray(signature).filter((s) => s.status === "PROCESSED");
-    if (signatures.length > 0) {
-      await this.queues.enqueueMessages(
-        "signature-worker",
-        signatures.map((s) => ({
-          id: `signature-${toGlobalId("Petition", s.petition_id)}`,
-          groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,
-          body: {
-            type: "send-signature-reminder" as const,
-            payload: { petitionSignatureRequestId: s.id, userId },
-          },
-        })),
-      );
+  async sendSignatureReminder(signature: PetitionSignatureRequest, userId: number) {
+    const integration = await this.integrations.loadIntegration(
+      signature.signature_config.orgIntegrationId,
+    );
+    assert(integration, "Integration not found");
+
+    const client = this.signatureClientFactory(
+      integration.provider as IntegrationProvider<"SIGNATURE">,
+      integration.id,
+    );
+
+    const canSendReminder = await client.canSendSignatureReminder(
+      signature.petition_id,
+      signature.id,
+    );
+
+    if (canSendReminder) {
+      await this.queues.enqueueMessages("signature-worker", {
+        groupId: `signature-${toGlobalId("Petition", signature.petition_id)}`,
+        body: {
+          type: "send-signature-reminder" as const,
+          payload: { petitionSignatureRequestId: signature.id, userId },
+        },
+      });
+
+      await this.petitions.createEvent({
+        type: "SIGNATURE_REMINDER",
+        petition_id: signature.petition_id,
+        data: {
+          user_id: userId,
+          petition_signature_request_id: signature.id,
+        },
+      });
     }
+
+    return canSendReminder;
   }
 
   async onOrganizationBrandChange(orgId: number, opts?: UpdateBrandingOpts) {

@@ -118,6 +118,7 @@ import {
   ReplyDeletedEvent,
   ReplyStatusChangedEvent,
   ReplyUpdatedEvent,
+  SignatureReminderEvent,
   UserPermissionAddedEvent,
 } from "../events/PetitionEvent";
 import {
@@ -4031,6 +4032,21 @@ export class PetitionRepository extends BaseRepository {
         .select("*"),
       opts,
     );
+  }
+
+  async getLatestSignatureReminderEventForPetition(
+    petitionId: number,
+    signatureRequestId: number,
+  ): Promise<SignatureReminderEvent | undefined> {
+    const [event] = await this.from("petition_event")
+      .where("petition_id", petitionId)
+      .where("type", "SIGNATURE_REMINDER")
+      .whereRaw("(data->>'petition_signature_request_id')::int = ?", [signatureRequestId])
+      .orderBy("created_at", "desc")
+      .select("*")
+      .limit(1);
+
+    return event as SignatureReminderEvent | undefined;
   }
 
   async getPetitionEventsByType<T extends PetitionEventType>(

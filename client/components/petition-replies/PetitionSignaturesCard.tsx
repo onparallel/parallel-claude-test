@@ -320,20 +320,24 @@ export function PetitionSignaturesCardBody({
   const handleSendSignatureReminder = useCallback(
     async (petitionSignatureRequestId: string) => {
       try {
-        await sendSignatureRequestReminders({ variables: { petitionSignatureRequestId } });
-        toast({
-          title: intl.formatMessage({
-            id: "component.petition-signatures-card.reminder-sent-toast-title",
-            defaultMessage: "Reminder sent",
-          }),
-          description: intl.formatMessage({
-            id: "component.petition-signatures-card.reminder-sent-toast-description",
-            defaultMessage: "We have sent a reminder to the pending signers",
-          }),
-          duration: 5000,
-          isClosable: true,
-          status: "success",
+        const { data } = await sendSignatureRequestReminders({
+          variables: { petitionSignatureRequestId },
         });
+        if (data?.sendSignatureRequestReminders === "SUCCESS") {
+          toast({
+            title: intl.formatMessage({
+              id: "component.petition-signatures-card.reminder-sent-toast-title",
+              defaultMessage: "Reminder sent",
+            }),
+            description: intl.formatMessage({
+              id: "component.petition-signatures-card.reminder-sent-toast-description",
+              defaultMessage: "We have sent a reminder to the pending signers",
+            }),
+            duration: 5000,
+            isClosable: true,
+            status: "success",
+          });
+        }
       } catch {}
     },
     [sendSignatureRequestReminders],
@@ -354,6 +358,7 @@ export function PetitionSignaturesCardBody({
           onDownload={handleDownloadSignedDoc}
           onSendReminder={handleSendSignatureReminder}
           isDisabled={isDisabled}
+          onRefetch={onRefetchPetition}
         />
       ) : null}
       {older.length ? (

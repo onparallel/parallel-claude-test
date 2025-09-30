@@ -6227,6 +6227,7 @@ type PetitionSignatureRequest implements Timestamps {
   extraErrorData: JSON
   id: GID!
   isAnonymized: Boolean!
+  latestSignatureReminderAt: DateTime
 
   """
   Metadata for this signature request.

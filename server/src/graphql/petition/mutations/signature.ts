@@ -294,11 +294,13 @@ export const sendSignatureRequestReminders = mutationField("sendSignatureRequest
       );
     }
 
-    if (signature.status === "PROCESSED") {
-      await ctx.signature.sendSignatureReminders(signature, ctx.user!.id);
+    if (signature.status !== "PROCESSED") {
+      return RESULT.SUCCESS;
     }
 
-    return RESULT.SUCCESS;
+    const sent = await ctx.signature.sendSignatureReminder(signature, ctx.user!.id);
+
+    return sent ? RESULT.SUCCESS : RESULT.FAILURE;
   },
 });
 

@@ -12425,6 +12425,16 @@
     "context": "Enter a title..."
   },
   {
+    "term": "component.signature-reminder-already-sent-dialog.body",
+    "definition": "{providerName} only allows one reminder per day. The latest reminder was sent {timeAgo}.",
+    "context": "{providerName} only allows one reminder per day. The latest reminder was sent {timeAgo}."
+  },
+  {
+    "term": "component.signature-reminder-already-sent-dialog.header",
+    "definition": "Reminder already sent",
+    "context": "Reminder already sent"
+  },
+  {
     "term": "component.signature-sent-alert.petition-requires-signature-alert-1",
     "definition": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed.",
     "context": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."

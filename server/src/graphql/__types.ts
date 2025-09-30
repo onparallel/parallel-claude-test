@@ -3938,6 +3938,7 @@ export interface NexusGenFieldTypes {
     extraErrorData: NexusGenScalars["JSON"] | null; // JSON
     id: NexusGenScalars["GID"]; // GID!
     isAnonymized: boolean; // Boolean!
+    latestSignatureReminderAt: NexusGenScalars["DateTime"] | null; // DateTime
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     petition: NexusGenRootTypes["Petition"]; // Petition!
     signatureConfig: NexusGenRootTypes["SignatureConfig"]; // SignatureConfig!
@@ -7262,6 +7263,7 @@ export interface NexusGenFieldTypeNames {
     extraErrorData: "JSON";
     id: "GID";
     isAnonymized: "Boolean";
+    latestSignatureReminderAt: "DateTime";
     metadata: "JSONObject";
     petition: "Petition";
     signatureConfig: "SignatureConfig";

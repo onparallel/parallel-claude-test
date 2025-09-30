@@ -3,6 +3,7 @@ import { Box, Button, GridItem, Heading, HStack, MenuItem, MenuList, Text } from
 import { BellIcon, DocumentIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { CurrentSignatureRequestRow_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { useSignatureCancelledRequestErrorMessage } from "@parallel/utils/useSignatureCancelledRequestErrorMessage";
+import { differenceInHours } from "date-fns";
 import { Fragment } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
@@ -13,6 +14,7 @@ import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
 import { SignerReference } from "../common/SignerReference";
 import { useSignatureCancelledRequestErrorDialog } from "../petition-activity/dialogs/SignatureCancelledRequestErrorDialog";
 import { useConfirmSendSignatureReminderDialog } from "./dialogs/ConfirmSendSignatureReminderDialog";
+import { useSignatureReminderAlreadySentDialog } from "./dialogs/SignatureReminderAlreadySentDialog";
 import { PetitionSignatureRequestSignerStatusIcon } from "./PetitionSignatureRequestSignerStatusIcon";
 import { PetitionSignatureRequestStatusText } from "./PetitionSignatureRequestStatusText";
 
@@ -22,6 +24,7 @@ interface CurrentSignatureRequestRowProps {
   onDownload: (petitionSignatureRequestId: string, downloadAuditTrail: boolean) => void;
   onSendReminder: (petitionSignatureRequestId: string) => void;
   isDisabled?: boolean;
+  onRefetch?: () => void;
 }
 
 export function CurrentSignatureRequestRow({
@@ -30,6 +33,7 @@ export function CurrentSignatureRequestRow({
   onDownload,
   onSendReminder,
   isDisabled,
+  onRefetch,
 }: CurrentSignatureRequestRowProps) {
   const intl = useIntl();
   const status = signatureRequest.status;
@@ -46,10 +50,30 @@ export function CurrentSignatureRequestRow({
   );
 
   const showConfirmSendSignatureReminderDialog = useConfirmSendSignatureReminderDialog();
+  const showSignatureReminderAlreadySentDialog = useSignatureReminderAlreadySentDialog();
   async function handleConfirmSendSignatureReminders() {
     try {
+      if (
+        signatureRequest.signatureConfig.integration?.provider === "SIGNATURIT" &&
+        signatureRequest.latestSignatureReminderAt
+      ) {
+        const hoursSinceLatestReminder = differenceInHours(
+          new Date(),
+          signatureRequest.latestSignatureReminderAt,
+        );
+
+        if (hoursSinceLatestReminder < 24) {
+          await showSignatureReminderAlreadySentDialog.ignoringDialogErrors({
+            sentAt: signatureRequest.latestSignatureReminderAt,
+            providerName: "Signaturit",
+          });
+          return;
+        }
+      }
+
       await showConfirmSendSignatureReminderDialog();
       onSendReminder(signatureRequest.id);
+      onRefetch?.();
     } catch {}
   }
 
@@ -203,6 +227,9 @@ CurrentSignatureRequestRow.fragments = {
       }
       signatureConfig {
         signingMode
+        integration {
+          provider
+        }
       }
       metadata
       auditTrailFilename
@@ -210,6 +237,7 @@ CurrentSignatureRequestRow.fragments = {
       createdAt
       errorMessage
       extraErrorData
+      latestSignatureReminderAt
     }
     ${PetitionSignatureRequestStatusText.fragments.PetitionSignatureRequest}
     ${SignerReference.fragments.PetitionSigner}

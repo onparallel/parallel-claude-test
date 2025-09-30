@@ -327,15 +327,6 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
 
       const client = this.signatureClientFactory(integration.provider, integration.id);
       await client.sendPendingSignatureReminder(signature.external_id.replace(/^.*?\//, ""));
-
-      await this.petitions.createEvent({
-        type: "SIGNATURE_REMINDER",
-        petition_id: signature.petition_id,
-        data: {
-          user_id: payload.userId,
-          petition_signature_request_id: signature.id,
-        },
-      });
     } catch (error) {
       if (!(error instanceof InvalidCredentialsError)) {
         throw error;

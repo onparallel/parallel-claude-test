@@ -59,6 +59,7 @@ export interface ISignatureClient extends BaseClient {
   cancelSignatureRequest: (externalId: string) => Promise<void>;
   downloadSignedDocument: (externalId: string) => Promise<Buffer>;
   downloadAuditTrail: (externalId: string) => Promise<Buffer>;
+  canSendSignatureReminder: (petitionId: number, signatureId: number) => Promise<boolean>;
   sendPendingSignatureReminder: (signatureId: string) => Promise<void>;
   onOrganizationBrandChange?(orgId: number): Promise<void>;
 }
