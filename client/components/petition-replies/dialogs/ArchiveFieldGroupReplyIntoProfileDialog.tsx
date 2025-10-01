@@ -46,8 +46,13 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { getProfileNamePreview } from "@parallel/utils/getProfileNamePreview";
+import {
+  countTotalRows,
+  groupFieldsWithProfileTypes,
+} from "@parallel/utils/groupFieldsWithProfileTypes";
 import { useReopenProfile } from "@parallel/utils/mutations/useReopenProfile";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
+import { useRerender } from "@parallel/utils/useRerender";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { difference, isNonNullish, isNullish, sort, unique, zip } from "remeda";
@@ -167,17 +172,22 @@ function ArchiveFieldGroupReplyIntoProfileGrid({
     )
     .map(([field]) => field);
 
+  // Get groups as array of arrays
+  const groupedFieldsArrays = groupFieldsWithProfileTypes(fieldGroupsWithProfileTypes);
+
   return (
     <ProfileSelectRerenderProvider>
       <Grid gap={2} templateColumns="2fr 3fr auto" alignItems="center">
-        {fieldGroupsWithProfileTypes.map((field) => {
+        {groupedFieldsArrays.map((fields) => {
+          const field = fields[0];
+
           return field.replies.map((reply, index) => {
             return (
               <ArchiveFieldGroupReplyIntoProfileRow
                 key={field.id + index}
                 petitionId={petition.id}
                 field={field}
-                reply={reply}
+                replies={fields.length > 1 ? fields.flatMap((field) => field.replies) : [reply]}
                 index={index}
                 onSelectProfile={onSelectProfile}
                 onSaveProfile={onSaveProfile}
@@ -195,7 +205,7 @@ function ArchiveFieldGroupReplyIntoProfileGrid({
 interface ArchiveFieldGroupReplyIntoProfileRowProps {
   petitionId: string;
   field: useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment;
-  reply: useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyFragment;
+  replies: useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyFragment[];
   index: number;
   onSelectProfile: (profileId: string) => void;
   onSaveProfile: (profileId: string) => void;
@@ -206,7 +216,7 @@ interface ArchiveFieldGroupReplyIntoProfileRowProps {
 function ArchiveFieldGroupReplyIntoProfileRow({
   petitionId,
   field,
-  reply,
+  replies,
   index,
   onSelectProfile,
   onSaveProfile,
@@ -214,6 +224,8 @@ function ArchiveFieldGroupReplyIntoProfileRow({
   isDisabled,
 }: ArchiveFieldGroupReplyIntoProfileRowProps) {
   const intl = useIntl();
+
+  const reply = replies[0];
 
   const profile = reply.associatedProfile ?? null;
   const repliesWithProfileFields = reply.children
@@ -223,16 +235,30 @@ function ArchiveFieldGroupReplyIntoProfileRow({
     useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInnerFragment[],
   ][];
 
+  const allRepliesWithProfileFields = replies.flatMap((reply) => {
+    return reply.children
+      ?.filter(({ field }) => isNonNullish(field.profileTypeField))
+      .map(({ field, replies }) => [field, replies]) as [
+      useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment,
+      useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInnerFragment[],
+    ][];
+  });
+
   const profileName = getProfileNamePreview({
     profileType: field.profileType!,
     fieldsWithProfileTypeFields: repliesWithProfileFields,
   });
 
-  const [selectedProfile, setSelectedProfile] = useState<ProfileSelectSelection | null>(profile);
-  const [isSaved, setIsSaved] = useState(isNonNullish(profile));
-  const [isEditing, setIsEditing] = useState(false);
+  const [state, setState] = useState({
+    selectedProfile: profile as ProfileSelectSelection,
+    isSaved: isNonNullish(profile),
+    isEditing: false,
+  });
+  const [key, rerender] = useRerender();
 
-  const savedProfile = useRef<ProfileSelectSelection | null>(profile);
+  const savedProfile = useRef<ProfileSelectSelection | undefined>(
+    profile as ProfileSelectSelection,
+  );
   const profileSelectRef = useRef<ProfileSelectInstance<false>>(null);
 
   const showResolveProfilePropertiesConflictsDialog = useResolveProfilePropertiesConflictsDialog();
@@ -243,14 +269,17 @@ function ArchiveFieldGroupReplyIntoProfileRow({
   const reopenProfile = useReopenProfile();
 
   useEffect(() => {
-    if (isNonNullish(selectedProfile)) {
-      if (!isSaved || (isEditing && savedProfile.current?.id !== selectedProfile.id)) {
+    if (isNonNullish(state.selectedProfile)) {
+      if (
+        !state.isSaved ||
+        (state.isEditing && savedProfile.current?.id !== state.selectedProfile?.id)
+      ) {
         onSelectProfile(reply.id);
       } else {
         onSaveProfile(reply.id);
       }
     }
-  }, [selectedProfile?.id, isSaved, isEditing, savedProfile.current?.id]);
+  }, [state.selectedProfile, state.isSaved, state.isEditing, savedProfile.current]);
 
   const showUniqueValueConflictDialog = useDialog(UniqueValueConflictDialog);
 
@@ -259,14 +288,14 @@ function ArchiveFieldGroupReplyIntoProfileRow({
   async function archiveProfile(profile: ProfileSelectSelection, ignoreFieldsInName?: boolean) {
     let conflictResolutions = (
       ignoreFieldsInName
-        ? reply.children
-            ?.filter(
-              ({ field }) =>
+        ? Object.entries(repliesGroupedByProfileTypeFieldId)
+            .filter(
+              ([, { field }]) =>
                 isNonNullish(field.profileTypeField) && field.profileTypeField.isUsedInProfileName,
             )
-            .map(({ field }) => ({
+            .map(([profileTypeFieldId]) => ({
               action: "IGNORE",
-              profileTypeFieldId: field.profileTypeField!.id,
+              profileTypeFieldId,
             }))
         : []
     ) as ArchiveFieldGroupReplyIntoProfileConflictResolutionInput[];
@@ -303,10 +332,13 @@ function ArchiveFieldGroupReplyIntoProfileRow({
           expirations: [],
         },
       });
-      setIsSaved(true);
-      setIsEditing(false);
-      onRefetch();
+      setState({
+        selectedProfile: profile as ProfileSelectSelection,
+        isSaved: true,
+        isEditing: false,
+      });
       savedProfile.current = profile;
+      onRefetch();
     } catch (error) {
       if (isApolloError(error, "CONFLICT_RESOLUTION_REQUIRED_ERROR")) {
         try {
@@ -318,10 +350,10 @@ function ArchiveFieldGroupReplyIntoProfileRow({
           let expirations = [] as ArchiveFieldGroupReplyIntoProfileExpirationInput[];
 
           if (conflicts.length) {
-            const conflictingPetitionFieldWithReplies =
-              repliesWithProfileFields!.filter(([field]) =>
-                conflicts.includes(field.profileTypeField!.id),
-              ) ?? [];
+            const conflictingPetitionFieldWithReplies = getFieldsWithRepliesFromGrouped(
+              repliesGroupedByProfileTypeFieldId,
+              conflicts,
+            );
             conflictResolutions = await showResolveProfilePropertiesConflictsDialog({
               petitionId,
               profileId: profile!.id,
@@ -340,10 +372,10 @@ function ArchiveFieldGroupReplyIntoProfileRow({
           });
 
           if (filteredPendingExpirations.length) {
-            const profileTypeFieldsWithReplies =
-              repliesWithProfileFields!.filter(([field, _]) =>
-                filteredPendingExpirations.includes(field.profileTypeField!.id),
-              ) ?? [];
+            const profileTypeFieldsWithReplies = getFieldsWithRepliesFromGrouped(
+              repliesGroupedByProfileTypeFieldId,
+              filteredPendingExpirations,
+            );
 
             expirations = await showConfigureExpirationsDateDialog({
               petitionId,
@@ -351,8 +383,9 @@ function ArchiveFieldGroupReplyIntoProfileRow({
               profileTypeFieldsWithReplies,
             });
           }
+          let response;
           try {
-            await archiveFieldGroupReplyIntoProfile({
+            response = await archiveFieldGroupReplyIntoProfile({
               variables: {
                 petitionId,
                 petitionFieldId: field.id,
@@ -377,25 +410,38 @@ function ArchiveFieldGroupReplyIntoProfileRow({
             }
             throw error;
           }
-
-          setIsSaved(true);
-          setIsEditing(false);
+          const newProfile = response.data?.archiveFieldGroupReplyIntoProfile
+            .associatedProfile as ProfileSelectSelection;
+          setState(() => ({
+            selectedProfile: newProfile,
+            isSaved: true,
+            isEditing: false,
+          }));
+          savedProfile.current = newProfile;
           onRefetch();
-          savedProfile.current = profile;
+          rerender(); // rerender the profile select to show the new profile name
         } catch (e) {
           if (isDialogError(e) && e.reason === "CREATE_NEW_PROFILE") {
             try {
               const { profile } = await showCreateProfileDialog({
                 profileTypeId: field.profileType!.id,
                 profileFieldValues: Object.fromEntries(
-                  repliesWithProfileFields.map(([field, replies]) => [
-                    field.profileTypeField!.id,
-                    replies?.[0]?.content?.value,
-                  ]),
+                  Object.entries(repliesGroupedByProfileTypeFieldId).map(
+                    ([profileTypeFieldId, { firstFieldReplies }]) => [
+                      profileTypeFieldId,
+                      firstFieldReplies[0]?.content?.value,
+                    ],
+                  ),
                 ),
               });
               await archiveProfile(profile as any, true);
-              setSelectedProfile(profile as any);
+              setState({
+                selectedProfile: profile as ProfileSelectSelection,
+                isSaved: true,
+                isEditing: false,
+              });
+              onRefetch();
+              savedProfile.current = profile as ProfileSelectSelection;
             } catch {}
           }
         }
@@ -414,120 +460,163 @@ function ArchiveFieldGroupReplyIntoProfileRow({
     }
   }
 
+  // Group all replies by profileTypeFieldId to handle merged fields
+  const repliesGroupedByProfileTypeFieldId: Record<
+    string,
+    {
+      field: useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment;
+      firstFieldReplies: useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInnerFragment[];
+    }
+  > = {};
+
+  for (const [field, replies] of allRepliesWithProfileFields) {
+    const profileTypeFieldId = field.profileTypeField?.id;
+    if (profileTypeFieldId && replies.length > 0) {
+      // Only save the first field we find, ignore subsequent ones
+      if (!repliesGroupedByProfileTypeFieldId[profileTypeFieldId]) {
+        repliesGroupedByProfileTypeFieldId[profileTypeFieldId] = {
+          field,
+          firstFieldReplies: [...replies], // All replies from the first field
+        };
+      }
+      // If profileTypeFieldId already exists, ignore this field (desired behavior)
+    }
+  }
+
+  // Helper function to convert grouped replies back to the original format for dialogs
+  const getFieldsWithRepliesFromGrouped = (
+    groupedReplies: typeof repliesGroupedByProfileTypeFieldId,
+    filterIds: string[],
+  ): [
+    useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment,
+    useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInnerFragment[],
+  ][] => {
+    return Object.entries(groupedReplies)
+      .filter(([profileTypeFieldId]) => filterIds.includes(profileTypeFieldId))
+      .map(([, { field, firstFieldReplies }]) => [field, [firstFieldReplies[0]]]);
+  };
+
   const needUpdateProfile =
     isNonNullish(profile) &&
-    repliesWithProfileFields.some(([f, replies]) => {
-      const profileField = profile.properties
-        .filter(({ field }) => field.myPermission === "WRITE")
-        .find(({ field }) => {
-          return field.id === f.profileTypeField?.id;
-        });
-
-      if (isNonNullish(profileField)) {
-        if (f.type === "BACKGROUND_CHECK") {
-          const fieldContent = replies?.[0]?.content;
-          const profileFieldContent = profileField.value?.content;
-
-          const {
-            date = "",
-            name = "",
-            type = "",
-            country = "",
-            birthCountry = "",
-          } = fieldContent?.query ?? {};
-          const {
-            date: profileDate = "",
-            name: profileName = "",
-            type: profileType = "",
-            country: profileCountry = "",
-            birthCountry: profileBirthCountry = "",
-          } = profileFieldContent?.query ?? {};
-
-          return (
-            fieldContent?.entity?.id !== profileFieldContent?.entity?.id ||
-            `${date}-${name}-${type}-${country}-${birthCountry}` !==
-              `${profileDate}-${profileName}-${profileType}-${profileCountry}-${profileBirthCountry}` ||
-            fieldContent?.search?.falsePositivesCount !==
-              profileFieldContent?.search?.falsePositivesCount ||
-            fieldContent?.search?.totalCount !== profileFieldContent?.search?.totalCount
-          );
-        }
-
-        if (f.type === "ADVERSE_MEDIA_SEARCH") {
-          const fieldContent = replies?.[0]?.content;
-          const profileFieldContent = profileField.value?.content;
-
-          const fieldSearch =
-            fieldContent?.search
-              ?.map(
-                (search: AdverseMediaSearchTermInput) =>
-                  search.term || search.entityId || search.wikiDataId,
-              )
-              .filter(isNonNullish) ?? [];
-
-          const profileSearch =
-            profileFieldContent?.search
-              ?.map(
-                (search: AdverseMediaSearchTermInput) =>
-                  search.term || search.entityId || search.wikiDataId,
-              )
-              .filter(isNonNullish) ?? [];
-
-          const fieldIdsWithClassification =
-            fieldContent?.articles?.items?.map(
-              ({ id, classification }: AdverseMediaArticle) => `${id}-${classification}`,
-            ) || [];
-
-          const profileIdsWithClassification =
-            profileFieldContent?.articles?.items?.map(
-              ({ id, classification }: AdverseMediaArticle) => `${id}-${classification}`,
-            ) || [];
-
-          return (
-            fieldSearch.length !== profileSearch.length ||
-            fieldIdsWithClassification.length !== profileIdsWithClassification.length ||
-            difference.multiset(fieldSearch, profileSearch).length > 0 ||
-            difference.multiset(fieldIdsWithClassification, profileIdsWithClassification).length > 0
-          );
-        }
-
-        if (f.type === "FILE_UPLOAD") {
-          const petitionFilesToString = replies.map((reply) => {
-            const { filename, size, contentType } = reply.content;
-            return `${filename}-${size}-${contentType})`;
+    Object.entries(repliesGroupedByProfileTypeFieldId).some(
+      ([profileTypeFieldId, { field, firstFieldReplies }]) => {
+        const profileField = profile.properties
+          .filter(({ field }) => field.myPermission === "WRITE")
+          .find(({ field }) => {
+            return field.id === profileTypeFieldId;
           });
-          const profileFilesToString =
-            profileField?.files
-              ?.map((file) => {
-                if (isNullish(file) || isNullish(file.file)) return null;
-                const { filename, size, contentType } = file.file;
-                return `${filename}-${size}-${contentType})`;
-              })
-              .filter(isNonNullish) ?? [];
 
-          return (
-            petitionFilesToString.length !== profileFilesToString.length ||
-            difference.multiset(petitionFilesToString, profileFilesToString).length > 0
-          );
+        if (isNonNullish(profileField)) {
+          const firstReply = firstFieldReplies[0];
+          if (field.type === "BACKGROUND_CHECK") {
+            const fieldContent = firstReply?.content;
+            const profileFieldContent = profileField.value?.content;
+
+            const {
+              date = "",
+              name = "",
+              type = "",
+              country = "",
+              birthCountry = "",
+            } = fieldContent?.query ?? {};
+            const {
+              date: profileDate = "",
+              name: profileName = "",
+              type: profileType = "",
+              country: profileCountry = "",
+              birthCountry: profileBirthCountry = "",
+            } = profileFieldContent?.query ?? {};
+
+            return (
+              fieldContent?.entity?.id !== profileFieldContent?.entity?.id ||
+              `${date}-${name}-${type}-${country}-${birthCountry}` !==
+                `${profileDate}-${profileName}-${profileType}-${profileCountry}-${profileBirthCountry}` ||
+              fieldContent?.search?.falsePositivesCount !==
+                profileFieldContent?.search?.falsePositivesCount ||
+              fieldContent?.search?.totalCount !== profileFieldContent?.search?.totalCount
+            );
+          }
+
+          if (field.type === "ADVERSE_MEDIA_SEARCH") {
+            const fieldContent = firstReply?.content;
+            const profileFieldContent = profileField.value?.content;
+
+            const fieldSearch =
+              fieldContent?.search
+                ?.map(
+                  (search: AdverseMediaSearchTermInput) =>
+                    search.term || search.entityId || search.wikiDataId,
+                )
+                .filter(isNonNullish) ?? [];
+
+            const profileSearch =
+              profileFieldContent?.search
+                ?.map(
+                  (search: AdverseMediaSearchTermInput) =>
+                    search.term || search.entityId || search.wikiDataId,
+                )
+                .filter(isNonNullish) ?? [];
+
+            const fieldIdsWithClassification =
+              fieldContent?.articles?.items?.map(
+                ({ id, classification }: AdverseMediaArticle) => `${id}-${classification}`,
+              ) || [];
+
+            const profileIdsWithClassification =
+              profileFieldContent?.articles?.items?.map(
+                ({ id, classification }: AdverseMediaArticle) => `${id}-${classification}`,
+              ) || [];
+
+            return (
+              fieldSearch.length !== profileSearch.length ||
+              fieldIdsWithClassification.length !== profileIdsWithClassification.length ||
+              difference.multiset(fieldSearch, profileSearch).length > 0 ||
+              difference.multiset(fieldIdsWithClassification, profileIdsWithClassification).length >
+                0
+            );
+          }
+
+          if (field.type === "FILE_UPLOAD") {
+            // For FILE_UPLOAD we use only the replies from the first field
+            const petitionFilesToString = firstFieldReplies.map((reply) => {
+              const { filename, size, contentType } = reply.content;
+              return `${filename}-${size}-${contentType})`;
+            });
+            const profileFilesToString =
+              profileField?.files
+                ?.map((file) => {
+                  if (isNullish(file) || isNullish(file.file)) return null;
+                  const { filename, size, contentType } = file.file;
+                  return `${filename}-${size}-${contentType})`;
+                })
+                .filter(isNonNullish) ?? [];
+
+            return (
+              petitionFilesToString.length !== profileFilesToString.length ||
+              difference.multiset(petitionFilesToString, profileFilesToString).length > 0
+            );
+          }
+
+          if (field.type === "CHECKBOX") {
+            const replyValue = sort<string>(firstReply?.content.value ?? [], (a, b) =>
+              a.localeCompare(b),
+            );
+            const profileValue = sort<string>(profileField.value?.content?.value ?? [], (a, b) =>
+              a.localeCompare(b),
+            );
+            return (
+              replyValue.length !== profileValue.length ||
+              replyValue.join(",") !== profileValue.join(",")
+            );
+          }
+
+          // Check if the value of the profile field is different from the reply only for simple text values like text, number, date, etc.
+          return firstReply?.content?.value !== profileField.value?.content?.value;
         }
 
-        if (f.type === "CHECKBOX") {
-          const replyValue = sort<string>(replies?.[0]?.content.value ?? [], (a, b) =>
-            a.localeCompare(b),
-          );
-          const profileValue = sort<string>(profileField.value?.content?.value ?? [], (a, b) =>
-            a.localeCompare(b),
-          );
-          return (
-            replyValue.length !== profileValue.length ||
-            replyValue.join(",") !== profileValue.join(",")
-          );
-        }
-
-        // Check if the value of the profile field is different from the reply only for simple text values like text, number, date, etc.
-        return replies?.[0]?.content?.value !== profileField.value?.content?.value;
-      }
-    });
+        return false;
+      },
+    );
 
   return (
     <>
@@ -557,10 +646,14 @@ function ArchiveFieldGroupReplyIntoProfileRow({
       <HStack alignItems="top">
         <FormControl>
           <ProfileSelect
+            key={key}
             ref={profileSelectRef}
-            value={selectedProfile}
+            value={state.selectedProfile}
             onChange={(profile, meta) => {
-              setSelectedProfile(profile);
+              setState((current) => ({
+                ...current,
+                selectedProfile: profile as ProfileSelectSelection,
+              }));
               if (isNonNullish(profile) && meta.action === "create-option") {
                 archiveProfile(profile, true);
               }
@@ -569,26 +662,31 @@ function ArchiveFieldGroupReplyIntoProfileRow({
             canCreateProfiles
             defaultCreateProfileName={profileName || ""}
             defaultCreateProfileFieldValues={Object.fromEntries(
-              repliesWithProfileFields.map(([field, replies]) => [
-                field.profileTypeField!.id,
-                replies?.[0]?.content?.value,
-              ]),
+              Object.entries(repliesGroupedByProfileTypeFieldId).map(
+                ([profileTypeFieldId, { firstFieldReplies }]) => [
+                  profileTypeFieldId,
+                  firstFieldReplies[0]?.content?.value,
+                ],
+              ),
             )}
             createOptionPosition="first"
             profileTypeId={field?.profileType?.id}
-            isDisabled={(!isEditing && isSaved) || isDisabled}
+            isDisabled={(!state.isEditing && state.isSaved) || isDisabled}
           />
         </FormControl>
-        {isSaved ? (
-          isEditing ? (
+        {state.isSaved ? (
+          state.isEditing ? (
             <IconButtonWithTooltip
               size="md"
               label={intl.formatMessage({ id: "generic.cancel", defaultMessage: "Cancel" })}
               icon={<CloseIcon boxSize={3} />}
               onClick={(e) => {
                 e.stopPropagation();
-                setIsEditing(false);
-                setSelectedProfile(savedProfile.current);
+                setState((current) => ({
+                  ...current,
+                  selectedProfile: savedProfile.current as ProfileSelectSelection,
+                  isEditing: false,
+                }));
               }}
               isDisabled={isDisabled}
             />
@@ -600,20 +698,20 @@ function ArchiveFieldGroupReplyIntoProfileRow({
               variant="outline"
               onClick={(e) => {
                 e.stopPropagation();
-                setIsEditing(true);
+                setState({ ...state, isEditing: true });
               }}
               isDisabled={isDisabled}
             />
           )
         ) : null}
       </HStack>
-      {needUpdateProfile && !isEditing ? (
+      {needUpdateProfile && !state.isEditing ? (
         <HStack spacing={0}>
           <Button
             colorScheme="primary"
             leftIcon={<RepeatIcon />}
             onClick={() => {
-              archiveProfile(selectedProfile!);
+              archiveProfile(state.selectedProfile!);
             }}
             isDisabled={isDisabled}
           >
@@ -628,7 +726,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
             </Text>
           </AlertPopover>
         </HStack>
-      ) : isSaved && !isEditing ? (
+      ) : state.isSaved && !state.isEditing ? (
         <HStack paddingX={4} justifyContent="center">
           <CheckIcon color="green.500" />
           <Box>
@@ -639,8 +737,8 @@ function ArchiveFieldGroupReplyIntoProfileRow({
         <Button
           colorScheme="primary"
           leftIcon={<SaveIcon />}
-          onClick={() => archiveProfile(selectedProfile!)}
-          isDisabled={savedProfile.current?.id === selectedProfile?.id || isDisabled}
+          onClick={() => archiveProfile(state.selectedProfile!)}
+          isDisabled={savedProfile.current?.id === state.selectedProfile?.id || isDisabled}
         >
           <FormattedMessage id="generic.save" defaultMessage="Save" />
         </Button>
@@ -690,6 +788,7 @@ useArchiveFieldGroupReplyIntoProfileDialog.fragments = {
       }
       profileTypeField {
         id
+        isUsedInProfileName
       }
       replies {
         id
@@ -702,6 +801,7 @@ useArchiveFieldGroupReplyIntoProfileDialog.fragments = {
   `,
   PetitionField: gql`
     fragment useArchiveFieldGroupReplyIntoProfileDialog_PetitionField on PetitionField {
+      ...groupFieldsWithProfileTypes_PetitionField
       ...useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInner
       ...useConfigureExpirationsDateDialog_PetitionField
       ...useResolveProfilePropertiesConflictsDialog_PetitionField
@@ -711,9 +811,9 @@ useArchiveFieldGroupReplyIntoProfileDialog.fragments = {
         ...useResolveProfilePropertiesConflictsDialog_PetitionField
       }
     }
-    ${ProfileSelect.fragments.Profile}
     ${useConfigureExpirationsDateDialog.fragments.PetitionField}
     ${useResolveProfilePropertiesConflictsDialog.fragments.PetitionField}
+    ${groupFieldsWithProfileTypes.fragments.PetitionField}
   `,
   PetitionFieldReplyInner: gql`
     fragment useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInner on PetitionFieldReply {
@@ -740,7 +840,6 @@ useArchiveFieldGroupReplyIntoProfileDialog.fragments = {
             isExpirable
             expiryAlertAheadTime
             options
-            isUsedInProfileName
             myPermission
           }
           ...getProfileNamePreview_PetitionField
@@ -804,9 +903,14 @@ const _mutations = [
         expirations: $expirations
       ) {
         ...useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReply
+        associatedProfile {
+          id
+          ...ProfileSelect_Profile
+        }
       }
     }
     ${useArchiveFieldGroupReplyIntoProfileDialog.fragments.PetitionFieldReply}
+    ${ProfileSelect.fragments.Profile}
   `,
 ];
 
@@ -879,7 +983,7 @@ function DialogHeader({
 }) {
   const fieldLogic = useFieldLogic(petition);
 
-  const repliesFieldGroupsWithProfileTypes = zip(petition.fields, fieldLogic)
+  const fieldGroupsWithProfileTypes = zip(petition.fields, fieldLogic)
     .filter(
       ([field, { isVisible }]) =>
         isVisible &&
@@ -887,9 +991,11 @@ function DialogHeader({
         field.isLinkedToProfileType &&
         field.replies.length > 0,
     )
-    .flatMap(([f]) => f.replies);
+    .map(([field]) => field);
 
-  const groupsWithProfileTypesCount = repliesFieldGroupsWithProfileTypes.length;
+  // Apply the same grouping logic as in ArchiveFieldGroupReplyIntoProfileGrid
+  const groupedFieldsArrays = groupFieldsWithProfileTypes(fieldGroupsWithProfileTypes);
+  const groupsWithProfileTypesCount = countTotalRows(groupedFieldsArrays);
 
   return (
     <FormattedMessage

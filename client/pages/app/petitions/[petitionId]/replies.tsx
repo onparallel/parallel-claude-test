@@ -58,6 +58,11 @@ import {
   defaultFieldsFilter,
   filterPetitionFields,
 } from "@parallel/utils/filterPetitionFields";
+import {
+  countLinkedRows,
+  countTotalRows,
+  groupFieldsWithProfileTypes,
+} from "@parallel/utils/groupFieldsWithProfileTypes";
 import { useClosePetition } from "@parallel/utils/hooks/useClosePetition";
 import { useManagedWindow } from "@parallel/utils/hooks/useManagedWindow";
 import { LiquidPetitionScopeProvider } from "@parallel/utils/liquid/LiquidPetitionScopeProvider";
@@ -424,19 +429,23 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const hasLinkedToProfileTypeFields = allFields.some((f) => f.isLinkedToProfileTypeField);
 
-  const repliesFieldGroupsWithProfileTypes = zip(petition.fields, fieldLogic).filter(
-    ([field, { isVisible }]) =>
-      isVisible &&
-      field.type === "FIELD_GROUP" &&
-      field.isLinkedToProfileType &&
-      field.replies.length > 0,
-  );
+  // Get filtered fields without grouping to maintain original count
+  const repliesFieldGroupsWithProfileTypes = zip(petition.fields, fieldLogic)
+    .filter(
+      ([field, { isVisible }]) =>
+        isVisible &&
+        field.type === "FIELD_GROUP" &&
+        field.isLinkedToProfileType &&
+        field.replies.length > 0,
+    )
+    .map(([field]) => field);
 
-  const fieldGroupsWithProfileTypesTotal = repliesFieldGroupsWithProfileTypes.length;
+  // Use helper to get grouped fields (array of arrays)
+  const groupedFields = groupFieldsWithProfileTypes(repliesFieldGroupsWithProfileTypes);
 
-  const fieldGroupsWithProfileTypesLinked = repliesFieldGroupsWithProfileTypes.filter(
-    ([f]) => f.isLinkedToProfileType,
-  ).length;
+  // Count using helper utilities
+  const fieldGroupsWithProfileTypesTotal = countTotalRows(groupedFields);
+  const fieldGroupsWithProfileTypesLinked = countLinkedRows(groupedFields);
 
   const showArchiveFieldGroupReplyIntoProfileDialog = useArchiveFieldGroupReplyIntoProfileDialog();
   const handleAssociateAndFillProfile = async () => {
@@ -845,11 +854,18 @@ PetitionReplies.fragments = {
           id
           isLinkedToProfileTypeField
         }
+        replies {
+          associatedProfile {
+            id
+          }
+        }
         ...PetitionRepliesField_PetitionField
         ...PetitionRepliesFieldComments_PetitionField
+        ...groupFieldsWithProfileTypes_PetitionField
       }
       ${PetitionRepliesField.fragments.PetitionField}
       ${PetitionRepliesFieldComments.fragments.PetitionField}
+      ${groupFieldsWithProfileTypes.fragments.PetitionField}
     `;
   },
 };

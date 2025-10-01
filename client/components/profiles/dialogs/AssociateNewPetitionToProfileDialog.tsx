@@ -35,6 +35,7 @@ import {
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
+import { groupFieldsWithProfileTypes } from "@parallel/utils/groupFieldsWithProfileTypes";
 import {
   calculateCompatibleFieldGroups,
   calculateRelatedFieldGroupsWithCompatibleProfiles,
@@ -322,7 +323,9 @@ function AssociateNewPetitionToProfileDialogSelectFieldGroup({
 
   const fieldsWithIndices = useFieldsWithIndices(template);
 
-  const compatibleFieldGroupsIds = compatibleFieldGroups.map((f) => f.id);
+  const compatibleFieldGroupsIds = groupFieldsWithProfileTypes(compatibleFieldGroups).map(
+    ([f]) => f.id,
+  );
 
   const filteredFieldsWithIndices = useMemo(() => {
     return fieldsWithIndices.filter(([f]) => compatibleFieldGroupsIds.includes(f.id));
@@ -649,6 +652,7 @@ useAssociateNewPetitionToProfileDialog.fragments = {
           type
           options
           ...PetitionFieldReference_PetitionField
+          ...groupFieldsWithProfileTypes_PetitionField
         }
         ...useFieldsWithIndices_PetitionBase
         ...ProfileRelationshipsAssociationTable_PetitionBase
@@ -656,6 +660,7 @@ useAssociateNewPetitionToProfileDialog.fragments = {
       ${PetitionFieldReference.fragments.PetitionField}
       ${useFieldsWithIndices.fragments.PetitionBase}
       ${ProfileRelationshipsAssociationTable.fragments.PetitionBase}
+      ${groupFieldsWithProfileTypes.fragments.PetitionField}
     `;
   },
   get ProfileInner() {

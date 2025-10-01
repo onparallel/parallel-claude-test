@@ -3487,10 +3487,8 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
       ]);
 
       // only need visible fields of type FIELD_GROUP with a profile_type_id and its visible children
-      const fieldGroup = applyFieldVisibility(composedPetition).find(
-        (f) => f.id === args.petitionFieldId,
-      );
-
+      const visibleRootFields = applyFieldVisibility(composedPetition);
+      const fieldGroup = visibleRootFields.find((f) => f.id === args.petitionFieldId);
       if (isNullish(fieldGroup)) {
         // trying to archive a FIELD_GROUP reply that is not visible with the current field visibility
         throw new ForbiddenError(
@@ -3498,11 +3496,30 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         );
       }
 
+      // get not only the field referenced in arguments, but also all the fields with the same groupName and profile_type_id
+      const otherRelevantGroups =
+        isNonNullish(fieldGroup.options.groupName) && fieldGroup.options.groupName !== ""
+          ? visibleRootFields.filter(
+              (f) =>
+                f.id !== fieldGroup.id &&
+                f.type === "FIELD_GROUP" &&
+                f.profile_type_id === fieldGroup.profile_type_id &&
+                f.options.groupName === fieldGroup.options.groupName &&
+                f.replies.length === 1 &&
+                f.multiple === false,
+            )
+          : [];
+
       // get the replies from the children fields that are linked with a property on the profile
-      const groupReplies =
-        fieldGroup.replies
+      const groupReplies = [
+        ...(fieldGroup.replies
           .find((r) => r.id === args.parentReplyId)!
-          .children?.filter((c) => isNonNullish(c.field.profile_type_field_id)) ?? [];
+          .children?.filter((c) => isNonNullish(c.field.profile_type_field_id)) ?? []),
+        ...otherRelevantGroups.flatMap(
+          (g) =>
+            g.replies[0].children?.filter((c) => isNonNullish(c.field.profile_type_field_id)) ?? [],
+        ),
+      ];
 
       // load profile and get its values and files
       const [profile, profileTypeFields, profileFieldValuesAndDrafts, profileFieldFiles] =
@@ -3561,7 +3578,12 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         petitionFieldReplyId: number | null;
       }[] = [];
 
-      for (const { field, replies } of simpleReplies) {
+      // on simple replies, if there is more than 1 reply on the same profile_type_field_id (2 or more different groups being merged)
+      // we just take the first reply and ignore the others, as text values on profile are always single-response
+      for (const { field, replies } of uniqueBy(
+        simpleReplies,
+        (r) => r.field.profile_type_field_id,
+      )) {
         const reply = replies.at(0); // get only 1st reply on non-file fields
         const profileTypeField = profileTypeFields.find(
           (f) => f.id === field.profile_type_field_id!,
@@ -3700,7 +3722,10 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
       }[] = [];
 
       // same process than before, with FILE_UPLOADS
-      for (const { field, replies } of fileReplies) {
+      for (const { field, replies } of uniqueBy(
+        fileReplies,
+        (r) => r.field.profile_type_field_id!,
+      )) {
         const profileTypeField = profileTypeFields.find(
           (f) => f.id === field.profile_type_field_id!,
         );
@@ -4047,6 +4072,9 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         "PETITION_FIELD_REPLY",
       );
 
+      // clear cache so profile.localizable_name is correctly resolved after values update
+      ctx.profiles.loadProfile.dataloader.clear(profile.id);
+
       return await ctx.petitions.updatePetitionFieldReply(
         args.parentReplyId,
         { associated_profile_id: profile.id },
@@ -4210,12 +4238,28 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
     const petitionFieldGroups = (await ctx.petitions.loadFieldsForPetition(petition.id)).filter(
       (f) => f!.type === "FIELD_GROUP" && isNonNullish(f.profile_type_id),
     );
-    const prefill = args.prefill.map((input) => ({
-      ...input,
-      petitionFieldId: petitionFieldGroups.find(
+    const prefill = args.prefill.flatMap((input) => {
+      const mainGroup = petitionFieldGroups.find(
         (pf) => pf.from_petition_field_id === input.petitionFieldId,
-      )!.id,
-    }));
+      )!;
+      const allRelevantGroups = [
+        mainGroup,
+        ...petitionFieldGroups.filter(
+          (pf) =>
+            pf.id !== mainGroup.id &&
+            isNonNullish(mainGroup.options.groupName) &&
+            mainGroup.options.groupName !== "" &&
+            pf.profile_type_id === mainGroup.profile_type_id &&
+            pf.options.groupName === mainGroup.options.groupName &&
+            pf.multiple === false,
+        ),
+      ];
+      return allRelevantGroups.map((g) => ({
+        ...input,
+        petitionFieldId: g.id,
+      }));
+    });
+
     const { replies, propertiesWithInvalidFormat } =
       await ctx.petitionsHelper.buildFieldGroupRepliesFromProfiles(
         petition.id,

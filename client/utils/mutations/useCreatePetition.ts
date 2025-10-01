@@ -5,12 +5,13 @@ import { useCreatePetitionFromTemplateWithPrefillDialog } from "@parallel/compon
 import {
   PetitionLocale,
   useCreatePetition_createPetitionDocument,
+  useCreatePetition_PetitionBaseFragment,
   useCreatePetition_petitionDocument,
 } from "@parallel/graphql/__types";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
+import { isNonNullish } from "remeda";
 import { clearCache } from "../apollo/clearCache";
-import { getLinkedFieldGroups } from "../petitions/getLinkedFieldGroups";
 import { useUpdatingRef } from "../useUpdatingRef";
 
 export function useCreatePetition() {
@@ -50,10 +51,9 @@ export function useCreatePetition() {
           const { data: templateData } = await getPetition({ variables: { id: petitionId } });
 
           const template = templateData?.petition;
-          const linkedFieldGroups = getLinkedFieldGroups(template as any);
 
           // If template has linked field groups, show prefill dialog
-          if (template && linkedFieldGroups.length > 0) {
+          if (template && getLinkedFieldGroups(template).length > 0) {
             return await showCreatePetitionFromTemplateWithPrefillDialog({
               template,
             });
@@ -102,16 +102,36 @@ useCreatePetition.mutations = [
   `,
 ];
 
+const _fragments = {
+  PetitionBase: gql`
+    fragment useCreatePetition_PetitionBase on PetitionBase {
+      id
+      fields {
+        id
+        type
+        isLinkedToProfileType
+      }
+      ...useCreatePetitionFromTemplateWithPrefillDialog_PetitionBase
+    }
+    ${useCreatePetitionFromTemplateWithPrefillDialog.fragments.PetitionBase}
+  `,
+};
+
 const _queries = [
   gql`
     query useCreatePetition_petition($id: GID!) {
       petition(id: $id) {
         id
-        ...useCreatePetitionFromTemplateWithPrefillDialog_PetitionBase
-        ...getLinkedFieldGroups_PetitionBase
+        ...useCreatePetition_PetitionBase
       }
     }
-    ${getLinkedFieldGroups.fragments.PetitionBase}
-    ${useCreatePetitionFromTemplateWithPrefillDialog.fragments.PetitionBase}
+    ${_fragments.PetitionBase}
   `,
 ];
+
+const getLinkedFieldGroups = (petition: useCreatePetition_PetitionBaseFragment) => {
+  return petition.fields.filter(
+    (field) =>
+      isNonNullish(field) && field.type === "FIELD_GROUP" && field.isLinkedToProfileType === true,
+  );
+};

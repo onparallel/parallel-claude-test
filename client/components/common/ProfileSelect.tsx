@@ -277,6 +277,9 @@ export const ProfileSelect = Object.assign(
             : defaultCreateProfileFieldValues
               ? { profileFieldValues: defaultCreateProfileFieldValues }
               : {}),
+          modalProps: innerRef.current?.inputRef
+            ? { finalFocusRef: innerRef.current!.inputRef as any }
+            : undefined,
         });
         if (profile) {
           triggerRerender(profile.profileType.id);

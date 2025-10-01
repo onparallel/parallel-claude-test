@@ -9,22 +9,31 @@ import {
   CreatePetitionFromProfilePrefillInput,
 } from "@parallel/graphql/__types";
 import { isNonNullish, uniqueBy } from "remeda";
+import { groupFieldsWithProfileTypes } from "../groupFieldsWithProfileTypes";
 
-export const calculateCompatibleFieldGroups = ({
+// Use the GraphQL fragment field as the base type for better type safety
+type CompatibleFieldBase = calculateCompatibleFieldGroups_PetitionBaseFragment["fields"][0];
+
+export const calculateCompatibleFieldGroups = <
+  TField extends CompatibleFieldBase = CompatibleFieldBase,
+>({
   profile,
   petition,
 }: {
   profile: calculateCompatibleFieldGroups_ProfileFragment;
-  petition?: calculateCompatibleFieldGroups_PetitionBaseFragment | null;
-}) => {
+  petition?: { fields: TField[] } | null;
+}): TField[] => {
   if (!petition) return [];
 
-  const allFieldGroups =
+  return (
     petition.fields.filter(
-      (f) => isNonNullish(f) && f.type === "FIELD_GROUP" && f.isLinkedToProfileType,
-    ) ?? [];
-
-  return allFieldGroups.filter((f) => f.profileType?.id === profile.profileType.id);
+      (f) =>
+        isNonNullish(f) &&
+        f.type === "FIELD_GROUP" &&
+        f.isLinkedToProfileType &&
+        f.profileType?.id === profile.profileType.id,
+    ) ?? []
+  );
 };
 
 calculateCompatibleFieldGroups.fragments = {
@@ -72,10 +81,9 @@ export const calculateRelatedFieldGroupsWithCompatibleProfiles = ({
 ][] => {
   if (!petition || !compatibleFieldGroups.length) return [];
 
-  const allFieldGroups =
-    petition.fields.filter(
-      (f) => isNonNullish(f) && f.type === "FIELD_GROUP" && f.isLinkedToProfileType,
-    ) ?? [];
+  const groupedFields = groupFieldsWithProfileTypes(petition.fields);
+
+  const allFieldGroups = groupedFields.map(([f]) => f);
 
   const selectedGroup = groupId
     ? compatibleFieldGroups.find((f) => f.id === groupId)
@@ -162,7 +170,9 @@ calculateRelatedFieldGroupsWithCompatibleProfiles.fragments = {
           id
         }
         multiple
+        ...groupFieldsWithProfileTypes_PetitionField
       }
+      ${groupFieldsWithProfileTypes.fragments.PetitionField}
     `;
   },
   get PetitionBase() {

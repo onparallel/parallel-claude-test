@@ -34,7 +34,7 @@ import {
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
-import { getLinkedFieldGroups } from "@parallel/utils/petitions/getLinkedFieldGroups";
+import { groupFieldsWithProfileTypes } from "@parallel/utils/groupFieldsWithProfileTypes";
 import {
   calculateCompatibleFieldGroups,
   calculateRelatedFieldGroupsWithCompatibleProfiles,
@@ -91,7 +91,9 @@ function CreatePetitionFromTemplateSelectFieldGroupsStep({
 
   const { errors } = formState;
 
-  const linkedFieldGroups = useMemo(() => getLinkedFieldGroups(template as any), [template]);
+  const groupedFields = groupFieldsWithProfileTypes(template.fields);
+
+  const linkedFieldGroups = groupedFields.map(([field]) => field);
   const fieldsWithIndices = useFieldsWithIndices(template);
 
   const filteredFieldsWithIndices = useMemo(() => {
@@ -455,18 +457,18 @@ useCreatePetitionFromTemplateWithPrefillDialog.fragments = {
           id
           ...ProfileTypeReference_ProfileType
         }
+        ...groupFieldsWithProfileTypes_PetitionField
       }
-      ...getLinkedFieldGroups_PetitionBase
       ...useFieldsWithIndices_PetitionBase
       ...ProfileRelationshipsAssociationTable_PetitionBase
       ...useAssociateNewPetitionToProfileDialog_PetitionBase
     }
     ${PetitionFieldReference.fragments.PetitionField}
-    ${getLinkedFieldGroups.fragments.PetitionBase}
     ${useFieldsWithIndices.fragments.PetitionBase}
     ${ProfileRelationshipsAssociationTable.fragments.PetitionBase}
     ${ProfileTypeReference.fragments.ProfileType}
     ${useAssociateNewPetitionToProfileDialog.fragments.PetitionBase}
+    ${groupFieldsWithProfileTypes.fragments.PetitionField}
   `,
   Profile: gql`
     fragment useCreatePetitionFromTemplateWithPrefillDialog_Profile on Profile {

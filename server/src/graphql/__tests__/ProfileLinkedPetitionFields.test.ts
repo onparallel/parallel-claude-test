@@ -12,6 +12,7 @@ import {
   ProfileRelationshipType,
   ProfileType,
   ProfileTypeField,
+  ProfileTypeFieldType,
   ProfileTypeFieldTypeValues,
   User,
 } from "../../db/__types";
@@ -1362,6 +1363,7 @@ describe("ProfileLinkedPetitionFields", () => {
               }
               associatedProfile {
                 id
+                localizableName
                 events(limit: 100, offset: 0) {
                   totalCount
                   items {
@@ -1419,9 +1421,17 @@ describe("ProfileLinkedPetitionFields", () => {
       });
 
       expect(
-        pick(data?.archiveFieldGroupReplyIntoProfile.associatedProfile, ["id", "events"]),
+        pick(data?.archiveFieldGroupReplyIntoProfile.associatedProfile, [
+          "id",
+          "localizableName",
+          "events",
+        ]),
       ).toEqual({
-        id: data!.archiveFieldGroupReplyIntoProfile.associatedProfile.id,
+        id: expect.any(String),
+        localizableName: {
+          en: "Mike Wazowski",
+          es: "Mike Wazowski",
+        },
         events: {
           totalCount: 25,
           items: [
@@ -1868,6 +1878,7 @@ describe("ProfileLinkedPetitionFields", () => {
               }
               associatedProfile {
                 id
+                localizableName
                 events(limit: 100, offset: 0) {
                   totalCount
                   items {
@@ -1925,9 +1936,17 @@ describe("ProfileLinkedPetitionFields", () => {
       });
 
       expect(
-        pick(data.archiveFieldGroupReplyIntoProfile.associatedProfile, ["id", "events"]),
+        pick(data.archiveFieldGroupReplyIntoProfile.associatedProfile, [
+          "id",
+          "localizableName",
+          "events",
+        ]),
       ).toEqual({
-        id: data!.archiveFieldGroupReplyIntoProfile.associatedProfile.id,
+        id: expect.any(String),
+        localizableName: {
+          en: "Monsters Inc.",
+          es: "Monsters Inc.",
+        },
         events: {
           totalCount: 25,
           items: [
@@ -2378,6 +2397,7 @@ describe("ProfileLinkedPetitionFields", () => {
               }
               associatedProfile {
                 id
+                localizableName
                 events(limit: 100, offset: 0) {
                   totalCount
                   items {
@@ -2436,9 +2456,17 @@ describe("ProfileLinkedPetitionFields", () => {
       });
 
       expect(
-        pick(data?.archiveFieldGroupReplyIntoProfile.associatedProfile, ["id", "events"]),
+        pick(data?.archiveFieldGroupReplyIntoProfile.associatedProfile, [
+          "id",
+          "localizableName",
+          "events",
+        ]),
       ).toEqual({
-        id: data!.archiveFieldGroupReplyIntoProfile.associatedProfile.id,
+        id: expect.any(String),
+        localizableName: {
+          en: "Sulley - Employment contract",
+          es: "Sulley - Contrato de trabajo",
+        },
         events: {
           totalCount: 25,
           items: [
@@ -9494,6 +9522,259 @@ describe("ProfileLinkedPetitionFields", () => {
 
       expect(errors).toBeUndefined();
       expect(data).not.toBeNull();
+    });
+  });
+
+  describe("archiveFieldGroupReplyIntoProfile / field group merge", () => {
+    let profileType: ProfileType;
+
+    let profileTypeFields: ProfileTypeField[];
+
+    let petition: Petition;
+    let fieldGroups: PetitionField[];
+    const groupChildren: PetitionField[][] = [];
+
+    const groupReplies: PetitionFieldReply[] = [];
+
+    beforeEach(async () => {
+      [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+      profileTypeFields = await mocks.createRandomProfileTypeFields(
+        organization.id,
+        profileType.id,
+        3,
+        (i) => ({ type: ["TEXT", "TEXT", "FILE"][i] as ProfileTypeFieldType }),
+      );
+
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        status: "CLOSED",
+      }));
+      // fields 0, 1, 2 should be merged as those are single-response fields linked to the same profile type and with same groupName
+      // field 3 should be ignored as it's a multiple-response field
+      fieldGroups = await mocks.createRandomPetitionFields(petition.id, 4, (i) => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileType.id,
+        multiple: i < 3 ? false : true,
+        options: {
+          groupName: "Client",
+        },
+      }));
+
+      const children0 = await mocks.createRandomPetitionFields(petition.id, 2, (i) => ({
+        parent_petition_field_id: fieldGroups[0].id,
+        profile_type_field_id: [profileTypeFields[0].id, profileTypeFields[1].id][i],
+        type: ["TEXT", "TEXT"][i] as PetitionFieldType,
+      }));
+      groupChildren.push(children0);
+
+      const children1 = await mocks.createRandomPetitionFields(petition.id, 2, (i) => ({
+        parent_petition_field_id: fieldGroups[1].id,
+        profile_type_field_id: [profileTypeFields[1].id, profileTypeFields[2].id][i],
+        type: ["TEXT", "FILE_UPLOAD"][i] as PetitionFieldType,
+      }));
+      groupChildren.push(children1);
+
+      const children2 = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        parent_petition_field_id: fieldGroups[2].id,
+        profile_type_field_id: profileTypeFields[2].id,
+        type: "FILE_UPLOAD",
+      }));
+      groupChildren.push(children2);
+
+      const children3 = await mocks.createRandomPetitionFields(petition.id, 3, (i) => ({
+        parent_petition_field_id: fieldGroups[3].id,
+        profile_type_field_id: [
+          profileTypeFields[0].id,
+          profileTypeFields[1].id,
+          profileTypeFields[2].id,
+        ][i],
+        type: ["TEXT", "TEXT", "FILE_UPLOAD"][i] as PetitionFieldType,
+      }));
+      groupChildren.push(children3);
+
+      // GROUP REPLIES
+      const [group0Reply, group1Reply, group2Reply, group3Reply] =
+        await mocks.createFieldGroupReply(0, undefined, 4, (i) => ({
+          user_id: user.id,
+          petition_field_id: [
+            fieldGroups[0].id,
+            fieldGroups[1].id,
+            fieldGroups[2].id,
+            fieldGroups[3].id,
+          ][i],
+        }));
+      groupReplies.push(group0Reply, group1Reply, group2Reply, group3Reply);
+
+      // CHILD REPLIES
+      await mocks.createRandomTextReply(children0[0].id, undefined, 1, () => ({
+        parent_petition_field_reply_id: group0Reply.id,
+        user_id: user.id,
+        content: { value: "group0_field0" },
+      }));
+      await mocks.createRandomTextReply(children0[1].id, undefined, 1, () => ({
+        parent_petition_field_reply_id: group0Reply.id,
+        user_id: user.id,
+        content: { value: "group0_field1" },
+      }));
+
+      await mocks.createRandomTextReply(children1[0].id, undefined, 1, () => ({
+        parent_petition_field_reply_id: group1Reply.id,
+        user_id: user.id,
+        content: { value: "group1_field1" },
+      }));
+      await mocks.createRandomFileUploadReply(
+        children1[1].id,
+        undefined,
+        1,
+        () => ({
+          user_id: user.id,
+          parent_petition_field_reply_id: group1Reply.id,
+        }),
+        () => ({
+          filename: "group1_field2.txt",
+          content_type: "text/plain",
+          size: "100",
+          upload_complete: true,
+        }),
+      );
+
+      await mocks.createRandomFileUploadReply(
+        children2[0].id,
+        undefined,
+        1,
+        () => ({
+          user_id: user.id,
+          parent_petition_field_reply_id: group2Reply.id,
+        }),
+        () => ({
+          filename: "group2_field2.txt",
+          content_type: "text/plain",
+          size: "100",
+          upload_complete: true,
+        }),
+      );
+
+      await mocks.createRandomTextReply(children3[0].id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createRandomTextReply(children3[1].id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createRandomFileUploadReply(
+        children3[2].id,
+        undefined,
+        1,
+        () => ({
+          user_id: user.id,
+          parent_petition_field_reply_id: group3Reply.id,
+        }),
+        () => ({
+          upload_complete: true,
+        }),
+      );
+    });
+
+    it("merges multiple field groups into a single profile", async () => {
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+            $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: $expirations
+            ) {
+              id
+              associatedProfile {
+                id
+                properties {
+                  field {
+                    id
+                    type
+                  }
+                  value {
+                    id
+                    content
+                  }
+                  files {
+                    id
+                    file {
+                      filename
+                      contentType
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroups[1].id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReplies[1].id),
+          profileId: toGlobalId("Profile", profile.id),
+          conflictResolutions: [],
+          expirations: [],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", groupReplies[1].id),
+        associatedProfile: {
+          id: toGlobalId("Profile", profile.id),
+          properties: [
+            {
+              field: {
+                id: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
+                type: "TEXT",
+              },
+              value: {
+                id: expect.any(String),
+                content: { value: "group0_field0" },
+              },
+              files: null,
+            },
+            {
+              field: {
+                id: toGlobalId("ProfileTypeField", profileTypeFields[1].id),
+                type: "TEXT",
+              },
+              value: {
+                id: expect.any(String),
+                content: { value: "group1_field1" },
+              },
+              files: null,
+            },
+            {
+              field: {
+                id: toGlobalId("ProfileTypeField", profileTypeFields[2].id),
+                type: "FILE",
+              },
+              value: null,
+              files: [
+                {
+                  id: expect.any(String),
+                  file: {
+                    filename: "group1_field2.txt",
+                    contentType: "text/plain",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      });
     });
   });
 
