@@ -3588,6 +3588,7 @@ export class ProfileRepository extends BaseRepository {
           profile_id: profileId,
           profile_type_field_id: profileTypeFieldId,
           is_draft: false,
+          deleted_at: null,
         })
         .orderBy("created_at", "desc")
         .orderBy("id", "desc")
@@ -3607,15 +3608,17 @@ export class ProfileRepository extends BaseRepository {
       }
     >(
       this.from({ pe: "profile_event" })
-        .where("pe.profile_id", profileId)
-        .whereIn("pe.type", ["PROFILE_FIELD_FILE_ADDED", "PROFILE_FIELD_FILE_REMOVED"])
-        .whereRaw(/* sql */ `(pe."data"->>'profile_type_field_id')::int = ?`, [profileTypeFieldId])
         .joinRaw(
           /* sql */ `
-          join profile_field_file pff 
+        join profile_field_file pff 
           on pe.type in ('PROFILE_FIELD_FILE_ADDED', 'PROFILE_FIELD_FILE_REMOVED')
           and pff.id = (pe."data"->>'profile_field_file_id')::int`,
         )
+        .where("pe.profile_id", profileId)
+        .whereIn("pe.type", ["PROFILE_FIELD_FILE_ADDED", "PROFILE_FIELD_FILE_REMOVED"])
+        .where("pff.profile_id", profileId)
+        .where("pff.profile_type_field_id", profileTypeFieldId)
+        .whereNull("pff.deleted_at")
         .orderBy("pe.created_at", "desc")
         .orderBy("pe.id", "desc")
         .select("pe.type as event_type", "pff.*"),
