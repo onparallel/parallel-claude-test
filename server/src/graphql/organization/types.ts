@@ -107,7 +107,7 @@ export const Organization = objectType({
       },
       resolve: async (root, args, ctx) => {
         const path = await ctx.organizations.loadOrgLogoPath(root.id);
-        return isNonNullish(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
+        return isNonNullish(path) ? await ctx.images.getImageUrl(path, args.options) : null;
       },
     });
     t.nullable.string("iconUrl", {
@@ -117,7 +117,7 @@ export const Organization = objectType({
       },
       resolve: async (root, args, ctx) => {
         const path = await ctx.organizations.loadOrgIconPath(root.id);
-        return isNonNullish(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
+        return isNonNullish(path) ? await ctx.images.getImageUrl(path, args.options) : null;
       },
     });
     t.field("status", {

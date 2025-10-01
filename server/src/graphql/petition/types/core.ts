@@ -756,7 +756,7 @@ export const PetitionTemplate = objectType({
       resolve: async (root, args, ctx) => {
         if (root.public_metadata?.image_public_file_id) {
           const file = await ctx.files.loadPublicFile(root.public_metadata.image_public_file_id);
-          return await ctx.images.getImageUrl(file!.path, args.options as any);
+          return await ctx.images.getImageUrl(file!.path, args.options);
         }
         return null;
       },
@@ -1086,9 +1086,7 @@ export const PetitionSigner = objectType({
           return null;
         }
         const file = await ctx.files.loadPublicFile(root.signWithEmbeddedImageFileUploadId);
-        return isNonNullish(file)
-          ? await ctx.images.getImageUrl(file.path, args.options as any)
-          : null;
+        return isNonNullish(file) ? await ctx.images.getImageUrl(file.path, args.options) : null;
       },
     });
   },

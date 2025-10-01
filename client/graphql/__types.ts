@@ -1224,7 +1224,13 @@ export interface IOrgIntegrationPagination {
 }
 
 export interface ImageOptions {
+  flatten?: InputMaybe<ImageOptionsFlatten>;
   resize?: InputMaybe<ImageOptionsResize>;
+  toFormat?: InputMaybe<ImageOptionsToFormat>;
+}
+
+export interface ImageOptionsFlatten {
+  background?: InputMaybe<Scalars["String"]["input"]>;
 }
 
 export interface ImageOptionsResize {
@@ -1234,6 +1240,8 @@ export interface ImageOptionsResize {
 }
 
 export type ImageOptionsResizeFit = "contain" | "cover" | "fill" | "inside" | "outside";
+
+export type ImageOptionsToFormat = "jpeg" | "png" | "webp";
 
 /** A feature flag name with his value */
 export interface InputFeatureFlagNameValue {
@@ -73858,7 +73866,7 @@ export const DocumentThemePreview_OrganizationFragmentDoc = gql`
   fragment DocumentThemePreview_Organization on Organization {
     id
     name
-    logoUrl(options: { resize: { width: 600 } })
+    logoUrl(options: { resize: { width: 600 }, toFormat: png })
   }
 ` as unknown as DocumentNode<DocumentThemePreview_OrganizationFragment, unknown>;
 export const BrandingDocumentTheme_OrganizationThemeFragmentDoc = gql`
@@ -73921,7 +73929,7 @@ export const BrandingGeneralPreview_UserFragmentDoc = gql`
     organization {
       id
       name
-      logoUrl(options: { resize: { width: 600 } })
+      logoUrl(options: { resize: { width: 600 }, toFormat: png })
       brandTheme {
         ...BrandingGeneralPreview_OrganizationBrandThemeData
       }
@@ -73941,7 +73949,7 @@ export const BrandingGeneral_UserFragmentDoc = gql`
         fontFamily
         preferredTone
       }
-      logoUrl(options: { resize: { width: 600 } })
+      logoUrl(options: { resize: { width: 600 }, toFormat: png })
     }
     ...BrandingGeneralPreview_User
   }
@@ -75372,7 +75380,7 @@ export const ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc = gql`
     signWithDigitalCertificate
     signWithEmbeddedImageFileUploadId
     signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(
-      options: { resize: { height: 300, fit: inside } }
+      options: { resize: { height: 300, fit: inside }, toFormat: png }
     )
   }
   ${Fragments_FullPetitionSignerFragmentDoc}
@@ -75897,7 +75905,7 @@ export const SignatureConfigDialog_SignatureConfigFragmentDoc = gql`
       ...Fragments_FullPetitionSigner
       signWithEmbeddedImageFileUploadId
       signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(
-        options: { resize: { height: 300, fit: inside } }
+        options: { resize: { height: 300, fit: inside }, toFormat: png }
       )
     }
     title
@@ -85665,7 +85673,7 @@ export const BrandingGeneral_updateOrgLogoDocument = gql`
   mutation BrandingGeneral_updateOrgLogo($file: Upload!) {
     updateOrganizationLogo(file: $file) {
       id
-      logoUrl(options: { resize: { width: 600 } })
+      logoUrl(options: { resize: { width: 600 }, toFormat: png })
     }
   }
 ` as unknown as DocumentNode<

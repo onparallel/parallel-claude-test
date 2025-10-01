@@ -194,7 +194,7 @@ export const User = objectType({
       },
       resolve: async (root, args, ctx) => {
         const path = await ctx.users.loadAvatarPathByUserDataId(root.user_data_id);
-        return isNonNullish(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
+        return isNonNullish(path) ? await ctx.images.getImageUrl(path, args.options) : null;
       },
     });
     t.field("preferredLocale", {

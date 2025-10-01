@@ -390,7 +390,7 @@ BrandingGeneral.fragments = {
           fontFamily
           preferredTone
         }
-        logoUrl(options: { resize: { width: 600 } })
+        logoUrl(options: { resize: { width: 600 }, toFormat: png })
       }
       ...BrandingGeneralPreview_User
     }
@@ -403,7 +403,7 @@ BrandingGeneral.mutations = [
     mutation BrandingGeneral_updateOrgLogo($file: Upload!) {
       updateOrganizationLogo(file: $file) {
         id
-        logoUrl(options: { resize: { width: 600 } })
+        logoUrl(options: { resize: { width: 600 }, toFormat: png })
       }
     }
   `,

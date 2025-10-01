@@ -162,7 +162,7 @@ BrandingGeneralPreview.fragments = {
         organization {
           id
           name
-          logoUrl(options: { resize: { width: 600 } })
+          logoUrl(options: { resize: { width: 600 }, toFormat: png })
           brandTheme {
             ...BrandingGeneralPreview_OrganizationBrandThemeData
           }

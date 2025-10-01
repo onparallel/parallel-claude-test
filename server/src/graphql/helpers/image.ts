@@ -18,5 +18,19 @@ export const ImageOptions = inputObjectType({
         },
       }),
     });
+    t.nullable.field("flatten", {
+      type: inputObjectType({
+        name: "ImageOptionsFlatten",
+        definition(t) {
+          t.nullable.string("background");
+        },
+      }),
+    });
+    t.nullable.field("toFormat", {
+      type: enumType({
+        name: "ImageOptionsToFormat",
+        members: ["png", "jpeg", "webp"],
+      }),
+    });
   },
 });

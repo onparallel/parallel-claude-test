@@ -220,7 +220,13 @@ export interface NexusGenInputs {
   };
   ImageOptions: {
     // input type
+    flatten?: NexusGenInputs["ImageOptionsFlatten"] | null; // ImageOptionsFlatten
     resize?: NexusGenInputs["ImageOptionsResize"] | null; // ImageOptionsResize
+    toFormat?: NexusGenEnums["ImageOptionsToFormat"] | null; // ImageOptionsToFormat
+  };
+  ImageOptionsFlatten: {
+    // input type
+    background?: string | null; // String
   };
   ImageOptionsResize: {
     // input type
@@ -688,6 +694,7 @@ export interface NexusGenEnums {
   FilterSharedWithLogicalOperator: "AND" | "OR";
   FilterSharedWithOperator: "IS_OWNER" | "NOT_IS_OWNER" | "NOT_SHARED_WITH" | "SHARED_WITH";
   ImageOptionsResizeFit: "contain" | "cover" | "fill" | "inside" | "outside";
+  ImageOptionsToFormat: "jpeg" | "png" | "webp";
   IntegrationType: db.IntegrationType;
   ListViewSortDirection: "ASC" | "DESC";
   ListViewType: db.ListViewType;

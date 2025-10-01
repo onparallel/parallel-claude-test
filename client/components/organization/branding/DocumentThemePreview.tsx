@@ -204,7 +204,7 @@ DocumentThemePreview.fragments = {
     fragment DocumentThemePreview_Organization on Organization {
       id
       name
-      logoUrl(options: { resize: { width: 600 } })
+      logoUrl(options: { resize: { width: 600 }, toFormat: png })
     }
   `,
 };

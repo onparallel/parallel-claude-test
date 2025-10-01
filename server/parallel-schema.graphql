@@ -1318,7 +1318,13 @@ type IOrgIntegrationPagination {
 }
 
 input ImageOptions {
+  flatten: ImageOptionsFlatten
   resize: ImageOptionsResize
+  toFormat: ImageOptionsToFormat
+}
+
+input ImageOptionsFlatten {
+  background: String
 }
 
 input ImageOptionsResize {
@@ -1333,6 +1339,12 @@ enum ImageOptionsResizeFit {
   fill
   inside
   outside
+}
+
+enum ImageOptionsToFormat {
+  jpeg
+  png
+  webp
 }
 
 """

@@ -695,7 +695,7 @@ ConfirmPetitionSignersDialog.fragments = {
         signWithDigitalCertificate
         signWithEmbeddedImageFileUploadId
         signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(
-          options: { resize: { height: 300, fit: inside } }
+          options: { resize: { height: 300, fit: inside }, toFormat: png }
         )
       }
       ${Fragments.FullPetitionSigner}

@@ -986,7 +986,7 @@ const _fragments = {
           ...Fragments_FullPetitionSigner
           signWithEmbeddedImageFileUploadId
           signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(
-            options: { resize: { height: 300, fit: inside } }
+            options: { resize: { height: 300, fit: inside }, toFormat: png }
           )
         }
         title

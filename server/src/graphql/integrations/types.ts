@@ -52,7 +52,7 @@ export const IOrgIntegration = interfaceType({
           COMPANIES_HOUSE: "gov-uk.png",
         }[root.provider];
         return isNonNullish(asset)
-          ? await ctx.images.getAssetImageUrl(`static/logos/${asset}`, args.options as any)
+          ? await ctx.images.getAssetImageUrl(`static/logos/${asset}`, args.options)
           : null;
       },
     });
