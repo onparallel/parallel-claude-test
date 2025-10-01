@@ -122,6 +122,7 @@ export async function createQueueWorker_OLD<Q extends keyof Config["queueWorkers
           visibilityTimeout: queueConfig.visibilityTimeout,
           heartbeatInterval: queueConfig.heartbeatInterval,
           batchSize,
+          alwaysAcknowledge: true,
           handleMessage: async (message) => {
             logger.info(`Queue ${name}: Start processing message`, { payload: message.Body });
             try {

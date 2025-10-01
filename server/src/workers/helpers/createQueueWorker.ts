@@ -153,6 +153,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
           visibilityTimeout: queueConfig.visibilityTimeout,
           heartbeatInterval: queueConfig.heartbeatInterval,
           batchSize: pollingBatchSize,
+          alwaysAcknowledge: true,
           ...(processBatchConcurrently
             ? {
                 handleMessageBatch: async (messages) => {
@@ -209,7 +210,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                             typeof forkTimeout === "number"
                               ? forkTimeout
                               : await forkTimeout(parser(message.Body!), queueConfig);
-                          return await new Promise<void>((resolve, reject) => {
+                          await new Promise<void>((resolve, reject) => {
                             fork(
                               script,
                               [
