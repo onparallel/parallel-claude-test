@@ -239,6 +239,20 @@ scim
       const userUpdate: Partial<CreateUser> = {};
       const userDataUpdate: Partial<CreateUserData> = {};
 
+      let userExternalId = req.params.externalId;
+
+      const user = (await req.context.users.loadUserByExternalId({
+        externalId: userExternalId,
+        orgId: req.context.organization!.id,
+      }))!;
+
+      let userDataId = user.user_data_id;
+
+      if (!user) {
+        res.sendStatus(401);
+        return;
+      }
+
       for (const op of req.body.Operations) {
         if (op.op === "Replace") {
           switch (op.path) {
@@ -252,15 +266,27 @@ scim
               userUpdate.external_id = op.value;
               break;
             case "active": {
-              const user = await req.context.users.loadUserByExternalId({
-                externalId: req.params.externalId,
-                orgId: req.context.organization!.id,
-              });
               userUpdate.status = await getUserNewStatus(
                 user!.id,
                 op.value === "True",
                 req.context,
               );
+              break;
+            }
+            case 'emails[type eq "work"].value': {
+              const userData = (await req.context.users.loadUserData(userDataId))!;
+              const newUserData = await req.context.users.getOrCreateUserData(
+                {
+                  first_name: userData.first_name,
+                  last_name: userData.last_name,
+                  // fake unique cognitoId, should update when user logs in
+                  cognito_id: `${req.context.organization!.id}_${userExternalId}`,
+                  preferred_locale: userData.preferred_locale,
+                  email: op.value.toLowerCase(),
+                },
+                `Provisioning:${req.context.organization!.id}`,
+              );
+              userUpdate.user_data_id = newUserData.id;
               break;
             }
             default:
@@ -270,15 +296,6 @@ scim
         } else {
           req.context.logger.error(`Unknown operation: ${op.op} ${op.path}`);
         }
-      }
-      const user = await req.context.users.loadUserByExternalId.raw({
-        orgId: req.context.organization!.id,
-        externalId: req.params.externalId,
-      });
-
-      if (!user) {
-        res.sendStatus(401);
-        return;
       }
 
       if (isNonNullish(userUpdate.status) && user.status !== userUpdate.status) {
@@ -301,30 +318,33 @@ scim
 
       if (Object.keys(userUpdate).length > 0) {
         await req.context.users.updateUserByExternalId(
-          req.params.externalId,
+          userExternalId,
           req.context.organization!.id,
           userUpdate,
           `Provisioning:${req.context.organization!.id}`,
         );
+
+        userExternalId = userUpdate.external_id ?? req.params.externalId;
+        userDataId = userUpdate.user_data_id ?? userDataId;
       }
 
       if (userUpdate.status === "ON_HOLD") {
         await req.context.emails.sendTransferParallelsEmail(
-          req.params.externalId,
+          userExternalId,
           req.context.organization!.id,
         );
       }
 
-      if (isNonNullish(userDataUpdate.first_name) || isNonNullish(userDataUpdate.last_name)) {
+      if (Object.keys(userDataUpdate).length > 0) {
         await req.context.users.updateUserDataByExternalId(
-          req.params.externalId,
+          userExternalId,
           req.context.organization!.id,
           userDataUpdate,
           `Provisioning:${req.context.organization!.id}`,
         );
       }
 
-      const userData = (await req.context.users.loadUserData(user.user_data_id))!;
+      const userData = (await req.context.users.loadUserData(userDataId))!;
       res.json(
         toScimUser({
           ...pick(user, ["status", "external_id"]),
