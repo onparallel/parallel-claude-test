@@ -1,0 +1,162 @@
+{
+    "title": "Documents",
+    "stories": [
+        {
+            "name": "Background Check Results Typst",
+            "parameters": {
+                "server": {
+                    "id": "documents/BackgroundCheckResultsTypst"
+                }
+            },
+            "args": {
+                "assetsUrl": "https://static-staging.onparallel.com",
+                "query": {
+                    "name": "Vladimir Putin",
+                    "date": "1952-10-07",
+                    "type": "",
+                    "country": "ru",
+                    "birthCountry": "ru"
+                },
+                "search": {
+                    "items": [
+                        {
+                            "id": "Q7747",
+                            "name": "Vladimir Vladimirovich PUTIN",
+                            "type": "Person",
+                            "score": 0.95,
+                            "isFalsePositive": false,
+                            "isMatch": true,
+                            "properties": {
+                                "gender": [
+                                    "male"
+                                ],
+                                "topics": [
+                                    "role.pep",
+                                    "sanction"
+                                ],
+                                "country": [
+                                    "ru"
+                                ],
+                                "countryOfBirth": [
+                                    "ru"
+                                ],
+                                "birthDate": [
+                                    "1952-10-07"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "Q4361931",
+                            "name": "Vladimir Alekseevich Pekhtin",
+                            "type": "Person",
+                            "score": 0.78,
+                            "isFalsePositive": false,
+                            "isMatch": false,
+                            "properties": {
+                                "gender": [
+                                    "male"
+                                ],
+                                "topics": [
+                                    "role.pep"
+                                ],
+                                "country": [
+                                    "ru"
+                                ],
+                                "countryOfBirth": [
+                                    "ru"
+                                ],
+                                "birthDate": [
+                                    "1950-12-09"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "Q8341234",
+                            "name": "Vladimir Kozhin",
+                            "type": "Person",
+                            "score": 0.72,
+                            "isFalsePositive": false,
+                            "isMatch": false,
+                            "properties": {
+                                "gender": [
+                                    "male"
+                                ],
+                                "topics": [
+                                    "role.pep"
+                                ],
+                                "country": [
+                                    "ru"
+                                ],
+                                "countryOfBirth": [
+                                    "ru"
+                                ],
+                                "birthDate": [
+                                    "1958-11-21"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "COMP-102455",
+                            "name": "Putin Industries Ltd",
+                            "type": "Company",
+                            "score": 0.65,
+                            "isFalsePositive": false,
+                            "isMatch": false,
+                            "properties": {
+                                "topics": [
+                                    "poi.name",
+                                    "sanction"
+                                ],
+                                "jurisdiction": [
+                                    "cy"
+                                ],
+                                "incorporationDate": [
+                                    "2010-03-15"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "COMP-567890",
+                            "name": "Rosneft Oil Company",
+                            "type": "Company",
+                            "score": 0.58,
+                            "isFalsePositive": true,
+                            "isMatch": false,
+                            "properties": {
+                                "topics": [
+                                    "sanction",
+                                    "poi.energy"
+                                ],
+                                "jurisdiction": [
+                                    "ru"
+                                ],
+                                "incorporationDate": [
+                                    "1993-04-14"
+                                ]
+                            }
+                        }
+                    ],
+                    "createdAt": "2024-01-19T13:08:12.752Z",
+                    "totalCount": 5
+                }
+            },
+            "argTypes": {
+                "assetsUrl": {
+                    "control": {
+                        "type": "text"
+                    }
+                },
+                "query": {
+                    "control": {
+                        "type": "object"
+                    }
+                },
+                "search": {
+                    "control": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -6,6 +6,7 @@ import { assert } from "ts-essentials";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 
 import { BackgroundCheckProfileProps } from "../pdf/documents/BackgroundCheckProfile";
+import { BackgroundCheckResultsProps } from "../pdf/documents/BackgroundCheckResultsTypst";
 import { IPrinter, PRINTER } from "./Printer";
 import { IRedis, REDIS } from "./Redis";
 import {
@@ -142,7 +143,7 @@ export type EntityDetailsResponse<ExtendedInfo extends boolean = false> = (
   createdAt: Date;
 } & (ExtendedInfo extends true ? { hasStoredEntity: boolean; isStoredEntity: boolean } : {});
 
-interface EntityDetailsPdfResponse {
+interface PrintableDocumentResponse {
   mime_type: string;
   binary_stream: Readable;
 }
@@ -186,7 +187,11 @@ export interface IBackgroundCheckService {
   entityProfileDetailsPdf(
     userId: number,
     props: Omit<BackgroundCheckProfileProps, "assetsUrl">,
-  ): Promise<EntityDetailsPdfResponse>;
+  ): Promise<PrintableDocumentResponse>;
+  entitySearchResultsPdf(
+    userId: number,
+    props: Omit<BackgroundCheckResultsProps, "assetsUrl">,
+  ): Promise<PrintableDocumentResponse>;
   mapBackgroundCheckSearch(content: BackgroundCheckContent): EntitySearchResponse<true>;
   mapBackgroundCheckEntity(
     entity: EntityDetailsResponse,
@@ -253,8 +258,20 @@ export class BackgroundCheckService implements IBackgroundCheckService {
   async entityProfileDetailsPdf(
     userId: number,
     props: Omit<BackgroundCheckProfileProps, "assetsUrl">,
-  ): Promise<EntityDetailsPdfResponse> {
+  ): Promise<PrintableDocumentResponse> {
     const stream = await this.printer.backgroundCheckProfile(userId, props);
+
+    return {
+      binary_stream: Readable.from(stream),
+      mime_type: "application/pdf",
+    };
+  }
+
+  async entitySearchResultsPdf(
+    userId: number,
+    props: Omit<BackgroundCheckResultsProps, "assetsUrl">,
+  ): Promise<PrintableDocumentResponse> {
+    const stream = await this.printer.backgroundCheckResults(userId, props);
 
     return {
       binary_stream: Readable.from(stream),

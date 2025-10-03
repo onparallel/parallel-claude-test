@@ -626,7 +626,8 @@ export type TaskName =
   | "PROFILES_EXCEL_IMPORT"
   | "DASHBOARD_REFRESH"
   | "PROFILES_EXCEL_EXPORT"
-  | "DOCUMENT_PROCESSING";
+  | "DOCUMENT_PROCESSING"
+  | "BACKGROUND_CHECK_RESULTS_PDF";
 
 export const TaskNameValues = [
   "PRINT_PDF",
@@ -650,6 +651,7 @@ export const TaskNameValues = [
   "DASHBOARD_REFRESH",
   "PROFILES_EXCEL_EXPORT",
   "DOCUMENT_PROCESSING",
+  "BACKGROUND_CHECK_RESULTS_PDF",
 ] as TaskName[];
 
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";

@@ -1460,6 +1460,7 @@ export interface Mutation {
   /** Creates a new Azure OpenAI integration on the provided organization */
   createAzureOpenAiIntegration: SupportMethodResponse;
   createBackgroundCheckProfilePdfTask: Task;
+  createBackgroundCheckResultsPdfTask: Task;
   /** Creates a new Bankflip Document Processing integration on the provided organization */
   createBankflipDocumentProcessingIntegration: SupportMethodResponse;
   /** Creates a new Bankflip ID Verification integration on the provided organization */
@@ -2149,6 +2150,15 @@ export interface MutationcreateAzureOpenAiIntegrationArgs {
 export interface MutationcreateBackgroundCheckProfilePdfTaskArgs {
   entityId: Scalars["String"]["input"];
   token: Scalars["String"]["input"];
+}
+
+export interface MutationcreateBackgroundCheckResultsPdfTaskArgs {
+  birthCountry?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars["String"]["input"]>;
+  date?: InputMaybe<Scalars["String"]["input"]>;
+  name: Scalars["String"]["input"];
+  token: Scalars["String"]["input"];
+  type?: InputMaybe<BackgroundCheckEntitySearchType>;
 }
 
 export interface MutationcreateBankflipDocumentProcessingIntegrationArgs {
@@ -7519,6 +7529,7 @@ export interface Task {
 
 export type TaskName =
   | "BACKGROUND_CHECK_PROFILE_PDF"
+  | "BACKGROUND_CHECK_RESULTS_PDF"
   | "BANKFLIP_SESSION_COMPLETED"
   | "BULK_PETITION_SEND"
   | "CLOSE_PETITIONS"
@@ -70381,6 +70392,35 @@ export type useBackgroundCheckProfileDownloadTask_getTaskResultFileMutation = {
   getTaskResultFile: { __typename?: "TaskResultFile"; url: string };
 };
 
+export type useBackgroundCheckResultsDownloadTask_createBackgroundCheckResultsPdfTaskMutationVariables =
+  Exact<{
+    token: Scalars["String"]["input"];
+    name: Scalars["String"]["input"];
+    date?: InputMaybe<Scalars["String"]["input"]>;
+    type?: InputMaybe<BackgroundCheckEntitySearchType>;
+    country?: InputMaybe<Scalars["String"]["input"]>;
+    birthCountry?: InputMaybe<Scalars["String"]["input"]>;
+  }>;
+
+export type useBackgroundCheckResultsDownloadTask_createBackgroundCheckResultsPdfTaskMutation = {
+  createBackgroundCheckResultsPdfTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    progress?: number | null;
+    output?: any | null;
+    error?: { [key: string]: any } | null;
+  };
+};
+
+export type useBackgroundCheckResultsDownloadTask_getTaskResultFileMutationVariables = Exact<{
+  taskId: Scalars["GID"]["input"];
+}>;
+
+export type useBackgroundCheckResultsDownloadTask_getTaskResultFileMutation = {
+  getTaskResultFile: { __typename?: "TaskResultFile"; url: string };
+};
+
 export type useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskMutationVariables =
   Exact<{
     profileId: Scalars["ID"]["input"];
@@ -92660,6 +92700,42 @@ export const useBackgroundCheckProfileDownloadTask_getTaskResultFileDocument = g
 ` as unknown as DocumentNode<
   useBackgroundCheckProfileDownloadTask_getTaskResultFileMutation,
   useBackgroundCheckProfileDownloadTask_getTaskResultFileMutationVariables
+>;
+export const useBackgroundCheckResultsDownloadTask_createBackgroundCheckResultsPdfTaskDocument =
+  gql`
+    mutation useBackgroundCheckResultsDownloadTask_createBackgroundCheckResultsPdfTask(
+      $token: String!
+      $name: String!
+      $date: String
+      $type: BackgroundCheckEntitySearchType
+      $country: String
+      $birthCountry: String
+    ) {
+      createBackgroundCheckResultsPdfTask(
+        token: $token
+        name: $name
+        date: $date
+        type: $type
+        country: $country
+        birthCountry: $birthCountry
+      ) {
+        ...TaskProgressDialog_Task
+      }
+    }
+    ${TaskProgressDialog_TaskFragmentDoc}
+  ` as unknown as DocumentNode<
+    useBackgroundCheckResultsDownloadTask_createBackgroundCheckResultsPdfTaskMutation,
+    useBackgroundCheckResultsDownloadTask_createBackgroundCheckResultsPdfTaskMutationVariables
+  >;
+export const useBackgroundCheckResultsDownloadTask_getTaskResultFileDocument = gql`
+  mutation useBackgroundCheckResultsDownloadTask_getTaskResultFile($taskId: GID!) {
+    getTaskResultFile(taskId: $taskId, preview: true) {
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  useBackgroundCheckResultsDownloadTask_getTaskResultFileMutation,
+  useBackgroundCheckResultsDownloadTask_getTaskResultFileMutationVariables
 >;
 export const useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskDocument = gql`
   mutation useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTask($profileId: ID!) {

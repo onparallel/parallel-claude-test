@@ -1789,6 +1789,14 @@ type Mutation {
     orgId: GID!
   ): SupportMethodResponse!
   createBackgroundCheckProfilePdfTask(entityId: String!, token: String!): Task!
+  createBackgroundCheckResultsPdfTask(
+    birthCountry: String
+    country: String
+    date: String
+    name: String!
+    token: String!
+    type: BackgroundCheckEntitySearchType
+  ): Task!
 
   """
   Creates a new Bankflip Document Processing integration on the provided organization
@@ -9359,6 +9367,7 @@ type Task {
 
 enum TaskName {
   BACKGROUND_CHECK_PROFILE_PDF
+  BACKGROUND_CHECK_RESULTS_PDF
   BANKFLIP_SESSION_COMPLETED
   BULK_PETITION_SEND
   CLOSE_PETITIONS

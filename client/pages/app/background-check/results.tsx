@@ -56,6 +56,7 @@ import { formatPartialDate } from "@parallel/utils/formatPartialDate";
 import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, useQueryState, values } from "@parallel/utils/queryState";
+import { useBackgroundCheckResultsDownloadTask } from "@parallel/utils/tasks/useBackgroundCheckResultsDownloadTask";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
@@ -63,7 +64,7 @@ import { useLoadOpenSanctionsCountryNames } from "@parallel/utils/useLoadOpenSan
 import { createHash } from "crypto";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, pick } from "remeda";
 type BackgroundCheckFieldSearchResults_Selection = { isNew: boolean } & (
@@ -283,6 +284,19 @@ function BackgroundCheckFieldSearchResults({
     } catch {}
   };
 
+  const handleDownloadPdfClick = async () => {
+    try {
+      await downloadBackgroundCheckResultsPdf({
+        token,
+        name,
+        date,
+        type,
+        country,
+        birthCountry,
+      });
+    } catch {}
+  };
+
   const context = useMemo(
     () => ({
       savedEntityId,
@@ -335,6 +349,7 @@ function BackgroundCheckFieldSearchResults({
 
   const toast = useToast();
   const showBackgroundCheckContentsNotUpdatedDialog = useBackgroundCheckContentsNotUpdatedDialog();
+  const downloadBackgroundCheckResultsPdf = useBackgroundCheckResultsDownloadTask();
 
   const handleRefreshSearch = useCallback(async () => {
     try {
@@ -513,6 +528,17 @@ function BackgroundCheckFieldSearchResults({
               </Box>
 
               <HStack>
+                <ResponsiveButtonIcon
+                  fontWeight={500}
+                  variant="outline"
+                  icon={<SaveIcon />}
+                  onClick={handleDownloadPdfClick}
+                  label={intl.formatMessage({
+                    id: "component.background-check-search-result.download-pdf",
+                    defaultMessage: "Download PDF",
+                  })}
+                  breakpoint="lg"
+                />
                 <Button
                   variant="outline"
                   fontWeight={500}
@@ -524,6 +550,7 @@ function BackgroundCheckFieldSearchResults({
                     defaultMessage="Modify search"
                   />
                 </Button>
+
                 {isProfile && result?.isDraft && totalCount === 0 ? (
                   <ResponsiveButtonIcon
                     colorScheme="purple"
@@ -762,9 +789,16 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
             return (
               <Flex gap={2} flexWrap="wrap">
                 {row.properties.birthDate?.map((date, i) => (
-                  <Text as="span" key={i}>
-                    {formatPartialDate({ date })}
-                  </Text>
+                  <Fragment key={i}>
+                    <Text as="span" key={i}>
+                      {formatPartialDate({ date })}
+                    </Text>
+                    {i < row.properties.birthDate!.length - 1 && (
+                      <Text as="span" aria-hidden="true">
+                        &middot;
+                      </Text>
+                    )}
+                  </Fragment>
                 )) ?? "-"}
               </Flex>
             );

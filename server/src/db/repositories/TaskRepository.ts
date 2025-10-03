@@ -87,6 +87,14 @@ export type TaskInput<TName extends TaskName> = {
     token: string;
     entity_id: string;
   };
+  BACKGROUND_CHECK_RESULTS_PDF: {
+    token: string;
+    name: string;
+    date: string | null;
+    type: string | null;
+    country: string | null;
+    birth_country: string | null;
+  };
   PETITION_SHARING:
     | AddPetitionPermissionsInput
     | EditPetitionPermissionsInput
@@ -249,6 +257,9 @@ export type TaskOutput<TName extends TaskName> = {
     ai_completion_log_id: number;
   };
   BACKGROUND_CHECK_PROFILE_PDF: {
+    temporary_file_id: number;
+  };
+  BACKGROUND_CHECK_RESULTS_PDF: {
     temporary_file_id: number;
   };
   PETITION_SHARING: {

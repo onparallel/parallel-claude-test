@@ -1347,6 +1347,7 @@ export type Mutation = {
   /** Creates a new Azure OpenAI integration on the provided organization */
   createAzureOpenAiIntegration: SupportMethodResponse;
   createBackgroundCheckProfilePdfTask: Task;
+  createBackgroundCheckResultsPdfTask: Task;
   /** Creates a new Bankflip Document Processing integration on the provided organization */
   createBankflipDocumentProcessingIntegration: SupportMethodResponse;
   /** Creates a new Bankflip ID Verification integration on the provided organization */
@@ -2036,6 +2037,15 @@ export type MutationcreateAzureOpenAiIntegrationArgs = {
 export type MutationcreateBackgroundCheckProfilePdfTaskArgs = {
   entityId: Scalars["String"]["input"];
   token: Scalars["String"]["input"];
+};
+
+export type MutationcreateBackgroundCheckResultsPdfTaskArgs = {
+  birthCountry?: InputMaybe<Scalars["String"]["input"]>;
+  country?: InputMaybe<Scalars["String"]["input"]>;
+  date?: InputMaybe<Scalars["String"]["input"]>;
+  name: Scalars["String"]["input"];
+  token: Scalars["String"]["input"];
+  type?: InputMaybe<BackgroundCheckEntitySearchType>;
 };
 
 export type MutationcreateBankflipDocumentProcessingIntegrationArgs = {
@@ -7221,6 +7231,7 @@ export type Task = {
 
 export type TaskName =
   | "BACKGROUND_CHECK_PROFILE_PDF"
+  | "BACKGROUND_CHECK_RESULTS_PDF"
   | "BANKFLIP_SESSION_COMPLETED"
   | "BULK_PETITION_SEND"
   | "CLOSE_PETITIONS"

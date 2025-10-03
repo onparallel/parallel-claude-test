@@ -310,6 +310,7 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
       "DOW_JONES_PROFILE_DOWNLOAD",
       "TEMPLATE_REPLIES_CSV_EXPORT",
       "BACKGROUND_CHECK_PROFILE_PDF",
+      "BACKGROUND_CHECK_RESULTS_PDF",
       "PROFILES_EXCEL_EXPORT",
     ]),
   ),
@@ -326,6 +327,7 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
       | Task<"DOW_JONES_PROFILE_DOWNLOAD">
       | Task<"TEMPLATE_REPLIES_CSV_EXPORT">
       | Task<"BACKGROUND_CHECK_PROFILE_PDF">
+      | Task<"BACKGROUND_CHECK_RESULTS_PDF">
       | Task<"PROFILES_EXCEL_EXPORT">;
 
     const file = isNonNullish(task.output)
@@ -499,6 +501,42 @@ export const createBackgroundCheckProfilePdfTask = mutationField(
           input: {
             token: args.token,
             entity_id: args.entityId,
+          },
+        },
+        `User:${ctx.user!.id}`,
+      );
+    },
+  },
+);
+
+export const createBackgroundCheckResultsPdfTask = mutationField(
+  "createBackgroundCheckResultsPdfTask",
+  {
+    type: "Task",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("BACKGROUND_CHECK"),
+      authenticatePetitionOrProfileReplyToken("token", "BACKGROUND_CHECK"),
+    ),
+    args: {
+      token: nonNull(stringArg()),
+      name: nonNull(stringArg()),
+      date: stringArg(),
+      type: arg({ type: "BackgroundCheckEntitySearchType" }),
+      country: stringArg(),
+      birthCountry: stringArg(),
+    },
+    resolve: async (_, args, ctx) => {
+      return await ctx.tasks.createTask(
+        {
+          name: "BACKGROUND_CHECK_RESULTS_PDF",
+          user_id: ctx.user!.id,
+          input: {
+            token: args.token,
+            name: args.name,
+            date: args.date ?? null,
+            type: args.type ?? null,
+            country: args.country ?? null,
+            birth_country: args.birthCountry ?? null,
           },
         },
         `User:${ctx.user!.id}`,

@@ -17,6 +17,7 @@ import {
   isOpenSanctionsCountryCode,
   useLoadOpenSanctionsCountryNames,
 } from "@parallel/utils/useLoadOpenSanctionsCountryNames";
+import { Fragment } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export function BackgroundCheckEntityDetailsPersonBasic({
@@ -277,9 +278,21 @@ export function BackgroundCheckEntityDetailsPersonBasic({
           <HStack>
             <FieldDateIcon />
 
-            <Flex gap={2}>
-              {dateOfBirth?.map((date, i) => <Text key={i}>{formatPartialDate({ date })}</Text>) ??
-                "-"}
+            <Flex gap={2} align="center">
+              {dateOfBirth && dateOfBirth.length > 0 ? (
+                dateOfBirth.map((date, i) => (
+                  <Fragment key={i}>
+                    <Text>{formatPartialDate({ date })}</Text>
+                    {i < dateOfBirth.length - 1 && (
+                      <Text as="span" aria-hidden="true">
+                        &middot;
+                      </Text>
+                    )}
+                  </Fragment>
+                ))
+              ) : (
+                <Text>-</Text>
+              )}
             </Flex>
           </HStack>
         </Stack>

@@ -7,6 +7,9 @@ import { buildPdf } from "../pdf/buildPdf";
 import BackgroundCheckProfileTypst, {
   BackgroundCheckProfileProps,
 } from "../pdf/documents/BackgroundCheckProfileTypst";
+import BackgroundCheckResultsTypst, {
+  BackgroundCheckResultsProps,
+} from "../pdf/documents/BackgroundCheckResultsTypst";
 import AnnexCoverPageTypst, {
   AnnexCoverPageProps,
 } from "../pdf/documents/recipient/AnnexCoverPageTypst";
@@ -43,6 +46,10 @@ export interface IPrinter {
   backgroundCheckProfile(
     userId: number,
     props: Omit<BackgroundCheckProfileProps, "assetsUrl">,
+  ): Promise<Readable>;
+  backgroundCheckResults(
+    userId: number,
+    props: Omit<BackgroundCheckResultsProps, "assetsUrl">,
   ): Promise<Readable>;
   signatureBoxesPage(
     userId: number,
@@ -119,6 +126,17 @@ export class Printer implements IPrinter {
     return (
       await buildPdf(
         BackgroundCheckProfileTypst,
+        { ...props, assetsUrl: this.config.misc.assetsUrl },
+        { client, locale: "en" },
+      )
+    ).stream;
+  }
+
+  public async backgroundCheckResults(userId: number, props: BackgroundCheckResultsProps) {
+    const client = await this.createClient(userId);
+    return (
+      await buildPdf(
+        BackgroundCheckResultsTypst,
         { ...props, assetsUrl: this.config.misc.assetsUrl },
         { client, locale: "en" },
       )

@@ -5,6 +5,7 @@ import { Task } from "../db/repositories/TaskRepository";
 import { TaskRunner } from "./helpers/TaskRunner";
 import { createQueueWorker_OLD } from "./helpers/createQueueWorker_OLD";
 import { BackgroundCheckProfilePdfRunner } from "./tasks/BackgroundCheckProfilePdfRunner";
+import { BackgroundCheckResultsPdfRunner } from "./tasks/BackgroundCheckResultsPdfRunner";
 import { BankflipSessionCompletedRunner } from "./tasks/BankflipSessionCompletedRunner";
 import { BulkPetitionSendRunner } from "./tasks/BulkPetitionSendRunner";
 import { ClosePetitionsRunner } from "./tasks/ClosePetitionsRunner";
@@ -39,6 +40,7 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   TEMPLATE_REPLIES_CSV_EXPORT: TemplateRepliesCsvExportRunner,
   PETITION_SUMMARY: PetitionSummaryRunner,
   BACKGROUND_CHECK_PROFILE_PDF: BackgroundCheckProfilePdfRunner,
+  BACKGROUND_CHECK_RESULTS_PDF: BackgroundCheckResultsPdfRunner,
   PETITION_SHARING: PetitionSharingRunner,
   PROFILE_NAME_PATTERN_UPDATED: ProfileNamePatternUpdatedRunner,
   ID_VERIFICATION_SESSION_COMPLETED: IdVerificationSessionCompletedRunner,

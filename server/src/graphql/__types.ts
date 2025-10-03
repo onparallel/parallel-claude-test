@@ -2940,6 +2940,7 @@ export interface NexusGenFieldTypes {
     createAwsBedrockCompletionIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createAzureOpenAiIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createBackgroundCheckProfilePdfTask: NexusGenRootTypes["Task"]; // Task!
+    createBackgroundCheckResultsPdfTask: NexusGenRootTypes["Task"]; // Task!
     createBankflipDocumentProcessingIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createBankflipIdVerificationIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createBulkPetitionSendTask: NexusGenRootTypes["Task"]; // Task!
@@ -6265,6 +6266,7 @@ export interface NexusGenFieldTypeNames {
     createAwsBedrockCompletionIntegration: "SupportMethodResponse";
     createAzureOpenAiIntegration: "SupportMethodResponse";
     createBackgroundCheckProfilePdfTask: "Task";
+    createBackgroundCheckResultsPdfTask: "Task";
     createBankflipDocumentProcessingIntegration: "SupportMethodResponse";
     createBankflipIdVerificationIntegration: "SupportMethodResponse";
     createBulkPetitionSendTask: "Task";
@@ -8964,6 +8966,15 @@ export interface NexusGenArgTypes {
       // args
       entityId: string; // String!
       token: string; // String!
+    };
+    createBackgroundCheckResultsPdfTask: {
+      // args
+      birthCountry?: string | null; // String
+      country?: string | null; // String
+      date?: string | null; // String
+      name: string; // String!
+      token: string; // String!
+      type?: NexusGenEnums["BackgroundCheckEntitySearchType"] | null; // BackgroundCheckEntitySearchType
     };
     createBankflipDocumentProcessingIntegration: {
       // args

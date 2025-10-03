@@ -880,6 +880,11 @@
     "context": "Individuals"
   },
   {
+    "term": "component.background-check-results-download-task.header",
+    "definition": "Generating PDF file...",
+    "context": "Generating PDF file..."
+  },
+  {
     "term": "component.background-check-search-differences-alert.new-items-found-description",
     "definition": "We have found {n, plural, =1 {# new result} other {# new results}} for your search.",
     "context": "We have found {n, plural, =1 {# new result} other {# new results}} for your search."
@@ -913,6 +918,11 @@
     "term": "component.background-check-search-result.date-of-birth",
     "definition": "Date of birth",
     "context": "Date of birth"
+  },
+  {
+    "term": "component.background-check-search-result.download-pdf",
+    "definition": "Download PDF",
+    "context": "Download PDF"
   },
   {
     "term": "component.background-check-search-result.gender",

@@ -12,6 +12,7 @@ import { Header } from "../components/background-check/Header";
 import { RiskLabel } from "../components/background-check/RiskLabel";
 import { WithInternationalFontFamily } from "../components/WithInternationalFontFamily";
 import { formatPartialDate } from "../utils/formatPartialDate";
+import { getCountryName } from "../utils/getCountryName";
 
 export interface BackgroundCheckProfileProps {
   assetsUrl: string;
@@ -19,293 +20,6 @@ export interface BackgroundCheckProfileProps {
   query?: EntitySearchRequest;
   search?: EntitySearchResponse;
 }
-
-const COUNTRIES = {
-  zz: "Global",
-  eu: "European Union",
-  zr: "Zaire",
-  cz: "Czech Republic",
-  xk: "Kosovo",
-  dd: "East Germany",
-  yucs: "Yugoslavia",
-  csxx: "Serbia and Montenegro",
-  cshh: "Czechoslovakia",
-  suhh: "Soviet Union",
-  "ge-ab": "Abkhazia (Occupied Georgia)",
-  "x-so": "South Ossetia (Occupied Georgia)",
-  "ua-lpr": "Luhansk (Occupied Ukraine)",
-  "ua-dpr": "Donetsk (Occupied Ukraine)",
-  "ua-cri": "Crimea (Occupied Ukraine)",
-  "so-som": "Somaliland",
-  "cy-trnc": "Northern Cyprus",
-  "az-nk": "Nagorno-Karabakh",
-  "cn-xz": "Tibet",
-  "gg-srk": "Sark",
-  "gb-wls": "Wales",
-  "gb-sct": "Scotland",
-  "gb-nir": "Northern Ireland",
-  "md-pmr": "Transnistria (PMR)",
-  ac: "Ascension Island",
-  ad: "Andorra",
-  ae: "United Arab Emirates",
-  af: "Afghanistan",
-  ag: "Antigua & Barbuda",
-  ai: "Anguilla",
-  al: "Albania",
-  am: "Armenia",
-  ao: "Angola",
-  aq: "Antarctica",
-  ar: "Argentina",
-  as: "American Samoa",
-  at: "Austria",
-  au: "Australia",
-  aw: "Aruba",
-  ax: "Åland Islands",
-  az: "Azerbaijan",
-  ba: "Bosnia & Herzegovina",
-  bb: "Barbados",
-  bd: "Bangladesh",
-  be: "Belgium",
-  bf: "Burkina Faso",
-  bg: "Bulgaria",
-  bh: "Bahrain",
-  bi: "Burundi",
-  bj: "Benin",
-  bl: "St. Barthélemy",
-  bm: "Bermuda",
-  bn: "Brunei",
-  bo: "Bolivia",
-  bq: "Caribbean Netherlands",
-  br: "Brazil",
-  bs: "Bahamas",
-  bt: "Bhutan",
-  bv: "Bouvet Island",
-  bw: "Botswana",
-  by: "Belarus",
-  bz: "Belize",
-  ca: "Canada",
-  cc: "Cocos (Keeling) Islands",
-  cd: "Congo - Kinshasa",
-  cf: "Central African Republic",
-  cg: "Congo - Brazzaville",
-  ch: "Switzerland",
-  ci: "Côte d'Ivoire",
-  ck: "Cook Islands",
-  cl: "Chile",
-  cm: "Cameroon",
-  cn: "China",
-  co: "Colombia",
-  cp: "Clipperton Island",
-  cq: "Sark",
-  cr: "Costa Rica",
-  cu: "Cuba",
-  cv: "Cape Verde",
-  cw: "Curaçao",
-  cx: "Christmas Island",
-  cy: "Cyprus",
-  de: "Germany",
-  dg: "Diego Garcia",
-  dj: "Djibouti",
-  dk: "Denmark",
-  dm: "Dominica",
-  do: "Dominican Republic",
-  dz: "Algeria",
-  ea: "Ceuta & Melilla",
-  ec: "Ecuador",
-  ee: "Estonia",
-  eg: "Egypt",
-  eh: "Western Sahara",
-  er: "Eritrea",
-  es: "Spain",
-  et: "Ethiopia",
-  ez: "Eurozone",
-  fi: "Finland",
-  fj: "Fiji",
-  fk: "Falkland Islands",
-  fm: "Micronesia",
-  fo: "Faroe Islands",
-  fr: "France",
-  ga: "Gabon",
-  gb: "United Kingdom",
-  gd: "Grenada",
-  ge: "Georgia",
-  gf: "French Guiana",
-  gg: "Guernsey",
-  gh: "Ghana",
-  gi: "Gibraltar",
-  gl: "Greenland",
-  gm: "Gambia",
-  gn: "Guinea",
-  gp: "Guadeloupe",
-  gq: "Equatorial Guinea",
-  gr: "Greece",
-  gs: "South Georgia & South Sandwich Islands",
-  gt: "Guatemala",
-  gu: "Guam",
-  gw: "Guinea-Bissau",
-  gy: "Guyana",
-  hk: "Hong Kong SAR China",
-  hm: "Heard & McDonald Islands",
-  hn: "Honduras",
-  hr: "Croatia",
-  ht: "Haiti",
-  hu: "Hungary",
-  ic: "Canary Islands",
-  id: "Indonesia",
-  ie: "Ireland",
-  il: "Israel",
-  im: "Isle of Man",
-  in: "India",
-  io: "British Indian Ocean Territory",
-  iq: "Iraq",
-  ir: "Iran",
-  is: "Iceland",
-  it: "Italy",
-  je: "Jersey",
-  jm: "Jamaica",
-  jo: "Jordan",
-  jp: "Japan",
-  ke: "Kenya",
-  kg: "Kyrgyzstan",
-  kh: "Cambodia",
-  ki: "Kiribati",
-  km: "Comoros",
-  kn: "St. Kitts & Nevis",
-  kp: "North Korea",
-  kr: "South Korea",
-  kw: "Kuwait",
-  ky: "Cayman Islands",
-  kz: "Kazakhstan",
-  la: "Laos",
-  lb: "Lebanon",
-  lc: "St. Lucia",
-  li: "Liechtenstein",
-  lk: "Sri Lanka",
-  lr: "Liberia",
-  ls: "Lesotho",
-  lt: "Lithuania",
-  lu: "Luxembourg",
-  lv: "Latvia",
-  ly: "Libya",
-  ma: "Morocco",
-  mc: "Monaco",
-  md: "Moldova",
-  me: "Montenegro",
-  mf: "St. Martin",
-  mg: "Madagascar",
-  mh: "Marshall Islands",
-  mk: "North Macedonia",
-  ml: "Mali",
-  mm: "Myanmar (Burma)",
-  mn: "Mongolia",
-  mo: "Macao SAR China",
-  mp: "Northern Mariana Islands",
-  mq: "Martinique",
-  mr: "Mauritania",
-  ms: "Montserrat",
-  mt: "Malta",
-  mu: "Mauritius",
-  mv: "Maldives",
-  mw: "Malawi",
-  mx: "Mexico",
-  my: "Malaysia",
-  mz: "Mozambique",
-  na: "Namibia",
-  nc: "New Caledonia",
-  ne: "Niger",
-  nf: "Norfolk Island",
-  ng: "Nigeria",
-  ni: "Nicaragua",
-  nl: "Netherlands",
-  no: "Norway",
-  np: "Nepal",
-  nr: "Nauru",
-  nu: "Niue",
-  nz: "New Zealand",
-  om: "Oman",
-  pa: "Panama",
-  pe: "Peru",
-  pf: "French Polynesia",
-  pg: "Papua New Guinea",
-  ph: "Philippines",
-  pk: "Pakistan",
-  pl: "Poland",
-  pm: "St. Pierre & Miquelon",
-  pn: "Pitcairn Islands",
-  pr: "Puerto Rico",
-  ps: "Palestinian Territories",
-  pt: "Portugal",
-  pw: "Palau",
-  py: "Paraguay",
-  qa: "Qatar",
-  qo: "Outlying Oceania",
-  re: "Réunion",
-  ro: "Romania",
-  rs: "Serbia",
-  ru: "Russia",
-  rw: "Rwanda",
-  sa: "Saudi Arabia",
-  sb: "Solomon Islands",
-  sc: "Seychelles",
-  sd: "Sudan",
-  se: "Sweden",
-  sg: "Singapore",
-  sh: "St. Helena",
-  si: "Slovenia",
-  sj: "Svalbard & Jan Mayen",
-  sk: "Slovakia",
-  sl: "Sierra Leone",
-  sm: "San Marino",
-  sn: "Senegal",
-  so: "Somalia",
-  sr: "Suriname",
-  ss: "South Sudan",
-  st: "São Tomé & Príncipe",
-  sv: "El Salvador",
-  sx: "Sint Maarten",
-  sy: "Syria",
-  sz: "Eswatini",
-  ta: "Tristan da Cunha",
-  tc: "Turks & Caicos Islands",
-  td: "Chad",
-  tf: "French Southern Territories",
-  tg: "Togo",
-  th: "Thailand",
-  tj: "Tajikistan",
-  tk: "Tokelau",
-  tl: "Timor-Leste",
-  tm: "Turkmenistan",
-  tn: "Tunisia",
-  to: "Tonga",
-  tr: "Türkiye",
-  tt: "Trinidad & Tobago",
-  tv: "Tuvalu",
-  tw: "Taiwan",
-  tz: "Tanzania",
-  ua: "Ukraine",
-  ug: "Uganda",
-  um: "U.S. Outlying Islands",
-  un: "United Nations",
-  us: "United States",
-  uy: "Uruguay",
-  uz: "Uzbekistan",
-  va: "Vatican City",
-  vc: "St. Vincent & Grenadines",
-  ve: "Venezuela",
-  vg: "British Virgin Islands",
-  vi: "U.S. Virgin Islands",
-  vn: "Vietnam",
-  vu: "Vanuatu",
-  wf: "Wallis & Futuna",
-  ws: "Samoa",
-  xa: "Pseudo-Accents",
-  xb: "Pseudo-Bidi",
-  ye: "Yemen",
-  yt: "Mayotte",
-  za: "South Africa",
-  zm: "Zambia",
-  zw: "Zimbabwe",
-} as Record<string, string>;
 
 const gray200 = "#E2E8F0";
 
@@ -448,7 +162,6 @@ function ListOfTexts({ values }: { values?: string[] }) {
 
 export default function BackgroundCheckProfile(props: BackgroundCheckProfileProps) {
   const intl = useIntl();
-
   return (
     <Document>
       <Page style={styles.page} wrap>
@@ -481,14 +194,16 @@ export default function BackgroundCheckProfile(props: BackgroundCheckProfileProp
                   <View style={styles.row}>
                     <Text style={styles.boldText}>Nationality:</Text>
                     <Text style={styles.normalText}>
-                      {props.query?.country ? COUNTRIES[props.query.country.toLowerCase()] : "Any"}
+                      {props.query?.country
+                        ? getCountryName(props.query.country, intl.locale)
+                        : "Any"}
                     </Text>
                   </View>
                   <View style={styles.row}>
                     <Text style={styles.boldText}>Country of birth:</Text>
                     <Text style={styles.normalText}>
                       {props.query?.birthCountry
-                        ? COUNTRIES[props.query.birthCountry.toLowerCase()]
+                        ? getCountryName(props.query.birthCountry, intl.locale)
                         : "Any"}
                     </Text>
                   </View>
@@ -497,7 +212,9 @@ export default function BackgroundCheckProfile(props: BackgroundCheckProfileProp
                 <View style={styles.row}>
                   <Text style={styles.boldText}>Country:</Text>
                   <Text style={styles.normalText}>
-                    {props.query?.country ? COUNTRIES[props.query.country.toLowerCase()] : "Any"}
+                    {props.query?.country
+                      ? getCountryName(props.query.country, intl.locale)
+                      : "Any"}
                   </Text>
                 </View>
               )}
@@ -549,15 +266,17 @@ export default function BackgroundCheckProfile(props: BackgroundCheckProfileProp
                   <View style={styles.row}>
                     <Text style={styles.boldText}>Nationality:</Text>
                     <Text style={styles.normalText}>
-                      {props.entity.properties?.nationality?.map((n) => COUNTRIES[n]).join(" · ") ??
-                        " - "}
+                      {props.entity.properties?.nationality
+                        ?.map((n) => getCountryName(n, intl.locale))
+                        .join(" · ") ?? " - "}
                     </Text>
                   </View>
                   <View style={styles.row}>
                     <Text style={styles.boldText}>Country:</Text>
                     <Text style={styles.normalText}>
-                      {props.entity.properties?.country?.map((c) => COUNTRIES[c]).join(" · ") ??
-                        " - "}
+                      {props.entity.properties?.country
+                        ?.map((c) => getCountryName(c, intl.locale))
+                        .join(" · ") ?? " - "}
                     </Text>
                   </View>
                   <View style={styles.row}>
@@ -575,7 +294,7 @@ export default function BackgroundCheckProfile(props: BackgroundCheckProfileProp
                     <Text style={styles.boldText}>Jurisdiction:</Text>
                     <Text style={styles.normalText}>
                       {props.entity.properties?.jurisdiction
-                        ?.map((n) => COUNTRIES[n])
+                        ?.map((n) => getCountryName(n, intl.locale))
                         .join(" · ") ?? " - "}
                     </Text>
                   </View>
