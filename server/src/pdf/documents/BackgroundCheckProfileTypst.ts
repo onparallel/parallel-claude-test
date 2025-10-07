@@ -50,14 +50,15 @@ function BackgroundCheckProfileTypst(props: BackgroundCheckProfileProps, intl: I
     
     #item("Searching for", "${props.query?.type === "PERSON" ? "Person" : props.query?.type === "COMPANY" ? "Entity" : "person / entity"}")
     #item("Name", ${isNullish(props.query?.name) ? notSet : `"${props.query.name}"`})
-    #item("Birthdate", ${isNullish(props.query?.date) ? notSet : `"${props.query.date}"`})
     ${
       props.query?.type === "PERSON"
         ? outdent`
+    #item("Birthdate", ${isNullish(props.query?.date) ? notSet : `"${props.query.date}"`})
     #item("Nationality", ${isNullish(props.query?.country) ? notSet : `"${getCountryName(props.query.country, intl.locale)}"`})
     #item("Country of birth", ${isNullish(props.query?.birthCountry) ? notSet : `"${getCountryName(props.query.birthCountry, intl.locale)}"`})`
         : outdent`
-    #item("Country", ${isNullish(props.query?.country) ? notSet : `"${getCountryName(props.query.country, intl.locale)}"`})`
+    #item("Date of registration", ${isNullish(props.query?.date) ? notSet : `"${props.query.date}"`})
+    #item("Jurisdiction", ${isNullish(props.query?.country) ? notSet : `"${getCountryName(props.query.country, intl.locale)}"`})`
     }
     #item("Saved on", "${intl.formatDate(new Date((props.entity as any)?.createdAt), FORMATS.FULL)}")
   

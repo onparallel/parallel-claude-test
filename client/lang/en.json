@@ -665,11 +665,6 @@
     "context": "Entity"
   },
   {
-    "term": "component.background-check-entity-details-company-basic.jurisdiction",
-    "definition": "Jurisdiction",
-    "context": "Jurisdiction"
-  },
-  {
     "term": "component.background-check-entity-details-company-basic.preview-pdf",
     "definition": "Preview PDF",
     "context": "Preview PDF"
@@ -1390,11 +1385,6 @@
     "context": "Country (nationality / jurisdiction)"
   },
   {
-    "term": "component.configure-automate-search-dialog.country-of-jurisdiction-label",
-    "definition": "Country of jurisdiction",
-    "context": "Country of jurisdiction"
-  },
-  {
     "term": "component.configure-automate-search-dialog.date-of-birth-helper-text",
     "definition": "There are no date fields in the form.",
     "context": "There are no date fields in the form."
@@ -1523,11 +1513,6 @@
     "term": "component.configure-profile-automate-search-dialog.country-of-birth-label",
     "definition": "Country of birth",
     "context": "Country of birth"
-  },
-  {
-    "term": "component.configure-profile-automate-search-dialog.country-of-jurisdiction-label",
-    "definition": "Country of jurisdiction",
-    "context": "Country of jurisdiction"
   },
   {
     "term": "component.configure-profile-automate-search-dialog.date-of-birth-helper-text",
@@ -9410,11 +9395,6 @@
     "context": "Please wait while we run the background check..."
   },
   {
-    "term": "component.profile-field-file-history-dialog.created-by",
-    "definition": "Created by",
-    "context": "Created by"
-  },
-  {
     "term": "component.profile-field-file-history-dialog.date",
     "definition": "Date",
     "context": "Date"
@@ -9433,11 +9413,6 @@
     "term": "component.profile-field-file-history-dialog.event-type-removed",
     "definition": "Removed",
     "context": "Removed"
-  },
-  {
-    "term": "component.profile-field-file-history-dialog.file",
-    "definition": "File",
-    "context": "File"
   },
   {
     "term": "component.profile-field-file-history-dialog.header",
@@ -9573,11 +9548,6 @@
     "term": "component.profile-field-suggestion.popover",
     "definition": "Suggested reply from:",
     "context": "Suggested reply from:"
-  },
-  {
-    "term": "component.profile-field-value-history-dialog.created-by",
-    "definition": "Created by",
-    "context": "Created by"
   },
   {
     "term": "component.profile-field-value-history-dialog.date",
@@ -15045,6 +15015,11 @@
     "context": "Invite user"
   },
   {
+    "term": "generic.jurisdiction",
+    "definition": "Jurisdiction",
+    "context": "Jurisdiction"
+  },
+  {
     "term": "generic.language",
     "definition": "Language",
     "context": "Language"
@@ -16863,11 +16838,6 @@
     "term": "page.background-check.country-label",
     "definition": "Country (nationality / jurisdiction)",
     "context": "Country (nationality / jurisdiction)"
-  },
-  {
-    "term": "page.background-check.country-of-jurisdiction-label",
-    "definition": "Country of jurisdiction",
-    "context": "Country of jurisdiction"
   },
   {
     "term": "page.background-check.date-of-birth",

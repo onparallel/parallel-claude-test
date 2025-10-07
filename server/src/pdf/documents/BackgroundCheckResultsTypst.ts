@@ -41,14 +41,15 @@ function BackgroundCheckResultsTypst(props: BackgroundCheckResultsProps, intl: I
     
     #item("Searching for", "${getEntityTypeLabel(props.query?.type)}")
     #item("Name", ${isNullish(props.query?.name) ? notSet : `"${props.query.name}"`})
-    #item("Birthdate", ${isNullish(props.query?.date) ? notSet : `"${props.query.date}"`})
     ${
       props.query?.type === "PERSON"
         ? outdent`
+    #item("Birthdate", ${isNullish(props.query?.date) ? notSet : `"${props.query.date}"`})
     #item("Nationality", ${isNullish(props.query?.country) ? notSet : `"${getCountryName(props.query.country.toLowerCase(), intl.locale)}"`})
     #item("Country of birth", ${isNullish(props.query?.birthCountry) ? notSet : `"${getCountryName(props.query.birthCountry.toLowerCase(), intl.locale)}"`})`
         : outdent`
-    #item("Country", ${isNullish(props.query?.country) ? notSet : `"${getCountryName(props.query.country.toLowerCase(), intl.locale)}"`})`
+    #item("Date of registration", ${isNullish(props.query?.date) ? notSet : `"${props.query.date}"`})
+    #item("Jurisdiction", ${isNullish(props.query?.country) ? notSet : `"${getCountryName(props.query.country.toLowerCase(), intl.locale)}"`})`
     }
     #item("Results as of", "${intl.formatDate(props.search.createdAt, FORMATS.FULL)}")
     #item("Results found", "${props.search.totalCount}")

@@ -98,7 +98,6 @@ export type FeatureFlagName =
   | "RECIPIENT_LANG_PT"
   | "BACKGROUND_CHECK"
   | "CREATE_PROFILE_TYPE"
-  | "PDF_EXPORT_V2"
   | "SHOW_CONTACTS_BUTTON"
   | "KEY_PROCESSES"
   | "DASHBOARDS"
@@ -108,7 +107,8 @@ export type FeatureFlagName =
   | "DOCUMENT_PROCESSING"
   | "ADVERSE_MEDIA_SEARCH"
   | "SIGN_WITH_DIGITAL_CERTIFICATE"
-  | "SIGN_WITH_EMBEDDED_IMAGE";
+  | "SIGN_WITH_EMBEDDED_IMAGE"
+  | "PDF_EXPORT_V2";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -141,7 +141,6 @@ export const FeatureFlagNameValues = [
   "RECIPIENT_LANG_PT",
   "BACKGROUND_CHECK",
   "CREATE_PROFILE_TYPE",
-  "PDF_EXPORT_V2",
   "SHOW_CONTACTS_BUTTON",
   "KEY_PROCESSES",
   "DASHBOARDS",
@@ -152,6 +151,7 @@ export const FeatureFlagNameValues = [
   "ADVERSE_MEDIA_SEARCH",
   "SIGN_WITH_DIGITAL_CERTIFICATE",
   "SIGN_WITH_EMBEDDED_IMAGE",
+  "PDF_EXPORT_V2",
 ] as FeatureFlagName[];
 
 export type IntegrationType =

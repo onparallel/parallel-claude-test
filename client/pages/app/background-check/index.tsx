@@ -236,10 +236,7 @@ function BackgroundCheckFieldSearch({
                         defaultMessage="Nationality"
                       />
                     ) : selectedType === "COMPANY" ? (
-                      <FormattedMessage
-                        id="page.background-check.country-of-jurisdiction-label"
-                        defaultMessage="Country of jurisdiction"
-                      />
+                      <FormattedMessage id="generic.jurisdiction" defaultMessage="Jurisdiction" />
                     ) : (
                       <FormattedMessage
                         id="page.background-check.country-label"

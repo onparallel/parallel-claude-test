@@ -261,10 +261,7 @@ export function ConfigureProfileBackgroundCheckAutomateSearchDialog({
                   defaultMessage="Nationality"
                 />
               ) : type === "COMPANY" ? (
-                <FormattedMessage
-                  id="component.configure-profile-automate-search-dialog.country-of-jurisdiction-label"
-                  defaultMessage="Country of jurisdiction"
-                />
+                <FormattedMessage id="generic.jurisdiction" defaultMessage="Jurisdiction" />
               ) : (
                 <FormattedMessage
                   id="component.configure-profile-automate-search-dialog.country-label"

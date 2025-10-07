@@ -148,11 +148,7 @@ export function BackgroundCheckEntityDetailsCompanyBasic({
         </Stack>
         <Stack>
           <Text {...detailsSpanProps}>
-            <FormattedMessage
-              id="component.background-check-entity-details-company-basic.jurisdiction"
-              defaultMessage="Jurisdiction"
-            />
-            :
+            <FormattedMessage id="generic.jurisdiction" defaultMessage="Jurisdiction" />:
           </Text>
           {jurisdiction?.map((nationCode: string) => {
             const flag =

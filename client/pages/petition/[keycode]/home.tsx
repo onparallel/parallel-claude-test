@@ -439,7 +439,7 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
                   })}
               </LinkOverlay>
             </NakedLink>
-            <Text fontSize="sm" color="gray.600" noOfLines={2} wordBreak="break-all" zIndex={1}>
+            <Text fontSize="sm" color="gray.600" noOfLines={2} wordBreak="break-all">
               <FormattedMessage
                 id="page.recipient-view-client-portal.requested-by"
                 defaultMessage="Requested by {name}, on {date}"
