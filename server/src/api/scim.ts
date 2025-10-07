@@ -273,7 +273,7 @@ scim
               );
               break;
             }
-            case 'emails[type eq "work"].value': {
+            case 'emails[type eq \\"work\\"].value': {
               const userData = (await req.context.users.loadUserData(userDataId))!;
               const newUserData = await req.context.users.getOrCreateUserData(
                 {

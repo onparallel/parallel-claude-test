@@ -236,7 +236,7 @@ export class UserRepository extends BaseRepository {
       [this.sqlIn(emails)],
       t,
     );
-    const byEmail = groupBy(users, (u) => u.ud_email);
+    const byEmail = groupBy(users, (u) => u.ud_email.trim().toLowerCase());
     return emails.map((email) => byEmail[email]?.map((u) => omit(u, ["ud_email"])) ?? []);
   });
 

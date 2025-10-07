@@ -73,7 +73,7 @@ export function emailIsNotRegisteredInTargetOrg<
   TOrgId extends Arg<TypeName, FieldName, Maybe<number>>,
 >(emailArg: TEmail, orgIdArg: TOrgId): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const email = getArg(args, emailArg);
+    const email = getArg(args, emailArg).trim().toLowerCase();
     const targetOrgId = getArg(args, orgIdArg) ?? ctx.user!.org_id;
     const users = await ctx.users.loadUsersByEmail(email);
 

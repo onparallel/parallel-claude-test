@@ -326,7 +326,7 @@ export class Auth implements IAuth {
       const cognitoId = payload["cognito:username"] as string;
       const firstName = payload["given_name"] as string;
       const lastName = payload["family_name"] as string;
-      const email = (payload["email"] as string).toLowerCase();
+      const email = (payload["email"] as string).trim().toLowerCase();
       const externalId = payload["identities"][0].userId as string;
       const users = await this.users.loadUsersByEmail(email);
       let user = users.find((u) => u.org_id === orgId);
@@ -542,7 +542,7 @@ export class Auth implements IAuth {
         res.status(401).send({ error: "ForceChangePasswordException" });
         return;
       }
-      const [user] = await this.users.loadUsersByEmail(email);
+      const [user] = await this.users.loadUsersByEmail(email.trim().toLowerCase());
       const userData = user ? await this.users.loadUserData(user.user_data_id) : null;
       if (userData?.is_sso_user) {
         res.status(401).send({ error: "ExternalUser" });
@@ -983,7 +983,7 @@ export class Auth implements IAuth {
       locale: UserLocale;
     };
     try {
-      const [user] = await req.context.users.loadUsersByEmail(email);
+      const [user] = await req.context.users.loadUsersByEmail(email.trim().toLowerCase());
       if (user) {
         await this.cognitoIdP.send(
           new ConfirmSignUpCommand({
@@ -1029,7 +1029,7 @@ export class Auth implements IAuth {
 
   async resetTempPassword(email: string, locale: UserLocale) {
     const [users, cognitoUser] = await Promise.all([
-      this.users.loadUsersByEmail(email),
+      this.users.loadUsersByEmail(email.trim().toLowerCase()),
       this.getUser(email),
     ]);
     const definedUsers = users.filter(isNonNullish);
