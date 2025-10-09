@@ -22,6 +22,7 @@ import {
 } from "./SignatureClient";
 
 interface UserInfoResponse {
+  sub: string;
   accounts: { accountId: string; baseUri: string; isDefault: "true" | "false" }[];
 }
 
@@ -59,7 +60,16 @@ export class DocusignClient extends BaseClient implements ISignatureClient {
             this.config.oauth.docusign[context.environment].oauthBaseUri.replace("https://", ""),
           );
           const userInfo = (await client.getUserInfo(accessToken)) as UserInfoResponse;
-          const defaultAccount = userInfo.accounts.find((a) => a.isDefault === "true")!;
+          let defaultAccount;
+          if (userInfo.sub === "99bb6246-5369-4ab3-abb4-edc79a0a96f6") {
+            defaultAccount = userInfo.accounts.find(
+              (a) => a.accountId === "37eea64b-7a44-456e-b536-fc7d627c4e1c",
+            )!;
+          } else {
+            defaultAccount = userInfo.accounts.find((a) => a.isDefault === "true");
+          }
+
+          assert(isNonNullish(defaultAccount), `Default account not found ${stringify(userInfo)}`);
 
           client.setBasePath(`${defaultAccount.baseUri}/restapi`);
           client.addDefaultHeader("Authorization", `Bearer ${accessToken}`);
