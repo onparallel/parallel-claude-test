@@ -1150,6 +1150,11 @@
     "context": "Thank you for completing"
   },
   {
+    "term": "petition-excel-export.background-check-results",
+    "definition": "búsqueda de antecedentes",
+    "context": "background check search"
+  },
+  {
     "term": "petition-excel-export.comments",
     "definition": "Comentarios",
     "context": "Comments"

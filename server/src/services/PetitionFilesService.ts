@@ -16,6 +16,7 @@ import { renderTextWithPlaceholders } from "../util/slate/placeholders";
 import { random } from "../util/token";
 import { UnwrapArray } from "../util/types";
 import { HandledTaskRunnerError } from "../workers/helpers/TaskRunner";
+import { BACKGROUND_CHECK_SERVICE, BackgroundCheckService } from "./BackgroundCheckService";
 import { I18N_SERVICE, II18nService } from "./I18nService";
 import { ILogger, LOGGER } from "./Logger";
 import { IPrinter, PRINTER } from "./Printer";
@@ -59,6 +60,7 @@ export class PetitionFilesService {
     @inject(FileRepository) private files: FileRepository,
     @inject(UserRepository) private users: UserRepository,
     @inject(ContactRepository) private contacts: ContactRepository,
+    @inject(BACKGROUND_CHECK_SERVICE) private backgroundCheck: BackgroundCheckService,
     @inject(STORAGE_SERVICE) private storage: IStorageService,
     @inject(PRINTER) private printer: IPrinter,
     @inject(LOGGER) private logger: ILogger,
@@ -100,9 +102,9 @@ export class PetitionFilesService {
         r.status !== "REJECTED",
     );
 
-    // get all BACKGROUND_CHECK ENTITY replies
+    // get all BACKGROUND_CHECK replies (matched entities and/or search results)
     const backgroundCheckEntityReplies = allVisibleReplies.filter(
-      (r) => r.type === "BACKGROUND_CHECK" && isNonNullish(r.content.entity),
+      (r) => r.type === "BACKGROUND_CHECK",
     );
 
     const latestPetitionSignature =
@@ -242,38 +244,81 @@ export class PetitionFilesService {
         }
 
         if (includeFileReplies && field.type === "BACKGROUND_CHECK") {
-          // on BACKGROUND_CHECK fields, export the PDF if reply has set "entity"
-          for (const reply of field.replies.filter((r) => isNonNullish(r.content.entity))) {
-            // this.logger.info(`Exporting BackgroundCheck PetitionFieldReply:${reply.id}...`);
-            const filename = resolveFileName(
-              field,
-              options.pattern,
-              `${reply.content.entity.type}-${reply.content.entity.id}.pdf`,
-            );
-            results.push({
-              filename,
-              getDownloadUrl: async () => {
-                const path = random(16);
-                await this.storage.temporaryFiles.uploadFile(
-                  path,
-                  "application/pdf",
-                  await this.printer.backgroundCheckProfile(userId, reply.content),
-                );
-                return this.storage.temporaryFiles.getSignedDownloadEndpoint(
-                  path,
-                  filename,
-                  "inline",
-                );
-              },
-              getStream: () => {
-                return this.printer.backgroundCheckProfile(userId, reply.content);
-              },
-              metadata: {
-                type: "PETITION_FILE_FIELD_REPLIES",
-                fieldId: field.id,
-                replyId: reply.id,
-              },
-            });
+          for (const reply of field.replies) {
+            if (isNonNullish(reply.content.entity)) {
+              // export entity match PDF
+              // this.logger.info(`Exporting BackgroundCheck PetitionFieldReply:${reply.id}...`);
+              const filename = resolveFileName(
+                field,
+                options.pattern,
+                `${reply.content.entity.type}-${reply.content.entity.id}.pdf`,
+              );
+              results.push({
+                filename,
+                getDownloadUrl: async () => {
+                  const path = random(16);
+                  await this.storage.temporaryFiles.uploadFile(
+                    path,
+                    "application/pdf",
+                    await this.printer.backgroundCheckProfile(userId, reply.content),
+                  );
+                  return this.storage.temporaryFiles.getSignedDownloadEndpoint(
+                    path,
+                    filename,
+                    "inline",
+                  );
+                },
+                getStream: () => {
+                  return this.printer.backgroundCheckProfile(userId, reply.content);
+                },
+                metadata: {
+                  type: "PETITION_FILE_FIELD_REPLIES",
+                  fieldId: field.id,
+                  replyId: reply.id,
+                },
+              });
+            } else {
+              // export search results PDF
+              const filename = resolveFileName(
+                field,
+                options.pattern,
+                `${reply.content.query.name}-${intl.formatMessage({
+                  id: "petition-excel-export.background-check-results",
+                  defaultMessage: "background check search",
+                })}.pdf`,
+              );
+
+              const content = {
+                query: reply.content.query,
+                // extend search results with false positives information
+                search: this.backgroundCheck.mapBackgroundCheckSearch(reply.content),
+              };
+
+              results.push({
+                filename,
+                getDownloadUrl: async () => {
+                  const path = random(16);
+                  await this.storage.temporaryFiles.uploadFile(
+                    path,
+                    "application/pdf",
+                    await this.printer.backgroundCheckResults(userId, content),
+                  );
+                  return this.storage.temporaryFiles.getSignedDownloadEndpoint(
+                    path,
+                    filename,
+                    "inline",
+                  );
+                },
+                getStream: () => {
+                  return this.printer.backgroundCheckResults(userId, content);
+                },
+                metadata: {
+                  type: "PETITION_FILE_FIELD_REPLIES",
+                  fieldId: field.id,
+                  replyId: reply.id,
+                },
+              });
+            }
           }
         }
 
