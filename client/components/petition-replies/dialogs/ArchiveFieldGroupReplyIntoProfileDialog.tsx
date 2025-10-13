@@ -493,7 +493,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
   ][] => {
     return Object.entries(groupedReplies)
       .filter(([profileTypeFieldId]) => filterIds.includes(profileTypeFieldId))
-      .map(([, { field, firstFieldReplies }]) => [field, [firstFieldReplies[0]]]);
+      .map(([, { field, firstFieldReplies }]) => [field, firstFieldReplies]);
   };
 
   const needUpdateProfile =
