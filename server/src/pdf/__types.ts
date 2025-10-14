@@ -1129,7 +1129,13 @@ export type IOrgIntegrationPagination = {
 };
 
 export type ImageOptions = {
+  flatten?: InputMaybe<ImageOptionsFlatten>;
   resize?: InputMaybe<ImageOptionsResize>;
+  toFormat?: InputMaybe<ImageOptionsToFormat>;
+};
+
+export type ImageOptionsFlatten = {
+  background?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type ImageOptionsResize = {
@@ -1139,6 +1145,8 @@ export type ImageOptionsResize = {
 };
 
 export type ImageOptionsResizeFit = "contain" | "cover" | "fill" | "inside" | "outside";
+
+export type ImageOptionsToFormat = "jpeg" | "png" | "webp";
 
 /** A feature flag name with his value */
 export type InputFeatureFlagNameValue = {

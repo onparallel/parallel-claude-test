@@ -244,7 +244,7 @@ export const supportMethods: {
         },
         {
           name: "host",
-          description: "e.g. https://core.bankflip.io",
+          description: "e.g. https://core.permisso.io",
           type: {
             kind: "NON_NULL",
             name: null,
@@ -309,7 +309,7 @@ export const supportMethods: {
         },
         {
           name: "host",
-          description: "e.g. https://core.bankflip.io",
+          description: "e.g. https://core.permisso.io",
           type: {
             kind: "NON_NULL",
             name: null,

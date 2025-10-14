@@ -1808,7 +1808,7 @@ type Mutation {
     apiKey: String!
 
     """
-    e.g. https://core.bankflip.io
+    e.g. https://core.permisso.io
     """
     host: String!
 
@@ -1833,7 +1833,7 @@ type Mutation {
     apiKey: String!
 
     """
-    e.g. https://core.bankflip.io
+    e.g. https://core.permisso.io
     """
     host: String!
 

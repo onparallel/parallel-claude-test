@@ -568,8 +568,8 @@ export class PetitionFieldService {
           return {
             attachToPdf: field?.options.attachToPdf ?? false,
             config: {
-              type: field?.options.config.type ?? "SIMPLE",
-              allowedDocuments: field?.options.config.allowedDocuments ?? [
+              type: field?.options.config?.type ?? "SIMPLE",
+              allowedDocuments: field?.options.config?.allowedDocuments ?? [
                 "ID_CARD",
                 "PASSPORT",
                 "RESIDENCE_PERMIT",

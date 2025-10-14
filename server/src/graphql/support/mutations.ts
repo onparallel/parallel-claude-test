@@ -680,7 +680,7 @@ export const createBankflipIdVerificationIntegration = mutationField(
         globalIdArg("Organization", { description: `e.g. ${toGlobalId("Organization", 1)}` }),
       ),
       apiKey: nonNull(stringArg({ description: "Bankflip Account API KEY" })),
-      host: nonNull(stringArg({ description: "e.g. https://core.bankflip.io" })),
+      host: nonNull(stringArg({ description: "e.g. https://core.permisso.io" })),
       webhookSecret: nonNull(stringArg({ description: "Secret for webhook verification" })),
     },
     resolve: async (_, args, ctx) => {
@@ -726,7 +726,7 @@ export const createBankflipDocumentProcessingIntegration = mutationField(
         globalIdArg("Organization", { description: `e.g. ${toGlobalId("Organization", 1)}` }),
       ),
       apiKey: nonNull(stringArg({ description: "Bankflip Account API KEY" })),
-      host: nonNull(stringArg({ description: "e.g. https://core.bankflip.io" })),
+      host: nonNull(stringArg({ description: "e.g. https://core.permisso.io" })),
       webhookSecret: nonNull(stringArg({ description: "Secret for webhook verification" })),
     },
     resolve: async (_, args, ctx) => {
