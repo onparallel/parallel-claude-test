@@ -1,5 +1,7 @@
 #! /bin/bash
 
+yente_version="5.0.2" # https://github.com/opensanctions/yente/releases
+
 # make sure to copy all files in image/yente
 
 sudo hostnamectl set-hostname yente
@@ -31,7 +33,7 @@ sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
 
 echo "0 0,12 * * * root /opt/certbot/bin/python -c 'import random; import time; time.sleep(random.random() * 3600)' && sudo certbot renew --quiet" | sudo tee -a /etc/crontab > /dev/null
 
-curl --silent --location --output release.tar.gz https://github.com/opensanctions/yente/archive/refs/tags/v4.2.3.tar.gz
+curl --silent --location --output release.tar.gz https://github.com/opensanctions/yente/archive/refs/tags/v${yente_version}.tar.gz
 mkdir release
 tar -xf release.tar.gz --directory release --strip-components 1
 rm release.tar.gz
@@ -48,6 +50,5 @@ sudo systemctl enable nginx
 
 sudo systemctl start docker
 sudo systemctl start yente
-
 sudo systemctl start nginx
 

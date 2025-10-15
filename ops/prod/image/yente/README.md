@@ -4,18 +4,18 @@
 
 ```
 cd ops/prod/image
-scp yente/.env yente/nginx.conf yente/yente.service build-yente* yente-green:~
-ssh yente-green
+scp yente/.env yente/nginx.conf yente/yente.service build-yente* yente-blue:~
+ssh yente-blue
 chmod +x build-yente*
 ./build-yente.sh
 ```
 
 **starts yente downtime**
 
-- Point yente.parallel.so to new yente-blue/green.parallel.so
+- Point yente.parallel.so to new yente-blue/blue.parallel.so
 
 ```
-ssh yente-green
+ssh yente-blue
 ./build-yente-postinstall.sh
 ```
 
