@@ -1,4 +1,5 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import {
   Box,
   Button,
@@ -342,10 +343,8 @@ function ArchiveFieldGroupReplyIntoProfileRow({
     } catch (error) {
       if (isApolloError(error, "CONFLICT_RESOLUTION_REQUIRED_ERROR")) {
         try {
-          const conflicts =
-            (error.graphQLErrors[0].extensions?.conflictResolutions as string[]) ?? [];
-          const pendingExpirations =
-            (error.graphQLErrors[0].extensions?.expirations as string[]) ?? [];
+          const conflicts = (error.errors[0].extensions?.conflictResolutions as string[]) ?? [];
+          const pendingExpirations = (error.errors[0].extensions?.expirations as string[]) ?? [];
 
           let expirations = [] as ArchiveFieldGroupReplyIntoProfileExpirationInput[];
 
@@ -398,7 +397,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
           } catch (error) {
             if (isApolloError(error, "PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT")) {
               const conflicts =
-                (error.graphQLErrors[0].extensions?.conflicts as {
+                (error.errors[0].extensions?.conflicts as {
                   profileTypeFieldName: LocalizableUserText;
                   profileTypeFieldId: string;
                 }[]) ?? [];
@@ -447,7 +446,7 @@ function ArchiveFieldGroupReplyIntoProfileRow({
         }
       } else if (isApolloError(error, "PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT")) {
         const conflicts =
-          (error.graphQLErrors[0].extensions?.conflicts as {
+          (error.errors[0].extensions?.conflicts as {
             profileTypeFieldName: LocalizableUserText;
             profileTypeFieldId: string;
           }[]) ?? [];

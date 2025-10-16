@@ -1,4 +1,5 @@
-import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient, useMutation, useQuery } from "@apollo/client/react";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import {
   PreviewPetitionField_publicRetryAsyncFieldCompletionDocument,
@@ -249,6 +250,10 @@ export function RecipientViewPetitionField({
 
   const { refetch } = useQuery(RecipientViewPetitionField_queryDocument, {
     skip: true,
+    variables: {
+      keycode: props.keycode,
+      fieldId: props.field.id,
+    },
   });
   const handleRefreshAsyncField = useCallback(
     () => refetch({ fieldId: props.field.id, keycode: props.keycode }),

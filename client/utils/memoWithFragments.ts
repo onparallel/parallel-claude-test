@@ -1,10 +1,5 @@
-import {
-  createFragmentMap,
-  FragmentMap,
-  isField,
-  isInlineFragment,
-} from "@apollo/client/utilities";
-import { DocumentNode, FieldNode, FragmentDefinitionNode, SelectionSetNode } from "graphql";
+import { createFragmentMap, FragmentMap, isField } from "@apollo/client/utilities/internal";
+import { DocumentNode, FieldNode, FragmentDefinitionNode, Kind, SelectionSetNode } from "graphql";
 import { ComponentProps, ComponentType, memo } from "react";
 import { assert } from "ts-essentials";
 
@@ -78,7 +73,7 @@ function checkSelectionSet(
         if (!checkField(a, b, selection, fragmentMap)) {
           return false;
         }
-      } else if (isInlineFragment(selection)) {
+      } else if (selection.kind === Kind.INLINE_FRAGMENT) {
         if (!checkSelectionSet(a, b, selection.selectionSet, fragmentMap)) {
           return false;
         }

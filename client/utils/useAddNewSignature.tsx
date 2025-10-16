@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { useSignatureConfigDialog } from "@parallel/components/petition-common/dialogs/SignatureConfigDialog";
 import { useConfirmRestartSignatureRequestDialog } from "@parallel/components/petition-replies/dialogs/ConfirmRestartSignatureRequestDialog";
 import {

@@ -1,4 +1,5 @@
-import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient, useMutation, useQuery } from "@apollo/client/react";
 import { Box, Center, Flex, Image, useToast } from "@chakra-ui/react";
 import { AlreadyLoggedIn } from "@parallel/components/auth/AlreadyLoggedIn";
 import { EmailVerificationRequiredAlert } from "@parallel/components/auth/EmailVerificationRequiredAlert";
@@ -340,7 +341,7 @@ const _queries = [
 
 Login.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   try {
-    await fetchQuery(Login_currentUserDocument, { ignoreCache: true });
+    await fetchQuery(Login_currentUserDocument, { fetchPolicy: "network-only" });
   } catch (error: any) {
     return {};
   }

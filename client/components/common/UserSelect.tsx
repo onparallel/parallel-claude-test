@@ -1,4 +1,5 @@
-import { gql, useApolloClient, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient, useQuery } from "@apollo/client/react";
 import { UsersIcon } from "@parallel/chakra/icons";
 import {
   UserLocale,
@@ -26,7 +27,8 @@ import Select, {
   components,
 } from "react-select";
 import AsyncSelect from "react-select/async";
-import { indexBy, zip } from "remeda";
+import { indexBy, isNonNullish, zip } from "remeda";
+import { assert } from "ts-essentials";
 import { OverflownText } from "./OverflownText";
 import { UserDropdownEmpty } from "./UserDropdownEmpty";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
@@ -292,6 +294,12 @@ function useGetUsersOrGroups() {
         },
         fetchPolicy: "network-only",
       });
+
+      assert(
+        isNonNullish(fromServer.data),
+        "Result data in UserSelect_useGetUsersOrGroupsDocument is missing",
+      );
+
       const fromServerById = indexBy(fromServer.data.getUsersOrGroups, (x) => x.id);
       const result = fromCache.map(([id, value]) => value ?? fromServerById[id]!);
       return Array.isArray(ids) ? result : result[0];

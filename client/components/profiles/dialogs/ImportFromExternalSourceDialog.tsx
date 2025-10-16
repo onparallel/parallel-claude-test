@@ -1,4 +1,5 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import {
   Alert,
   AlertDescription,
@@ -636,7 +637,7 @@ function ImportFromExternalSourceDialogUpdateProfile({
             } catch (error) {
               if (isApolloError(error, "PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT")) {
                 const conflicts =
-                  (error.graphQLErrors[0].extensions?.conflicts as {
+                  (error.errors[0].extensions?.conflicts as {
                     profileId: string;
                     profileName: LocalizableUserText;
                     profileStatus: ProfileStatus;

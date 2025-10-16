@@ -1,4 +1,5 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import { Button, Progress } from "@chakra-ui/react";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
@@ -59,14 +60,14 @@ export function TaskProgressDialog({
             variables: { taskId: task.id, keycode },
             fetchPolicy: "network-only",
           });
-          updatedTask = data.publicTask;
+          updatedTask = (data as any).publicTask;
         } else {
           const { data } = await apollo.query({
             query: TaskProgressDialog_taskDocument,
             variables: { id: task.id },
             fetchPolicy: "network-only",
           });
-          updatedTask = data.task;
+          updatedTask = (data as any).task;
         }
         setTask(updatedTask);
         if (updatedTask.status === "COMPLETED") {

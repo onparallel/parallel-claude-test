@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Box, Center, Spinner, Stack, useToast } from "@chakra-ui/react";
 import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import { ShareButton } from "@parallel/components/common/ShareButton";
@@ -223,9 +224,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           });
         } catch (error) {
           if (isApolloError(error, "NO_REMINDERS_LEFT")) {
-            showNoRemindersLeftToast(
-              error.graphQLErrors[0]!.extensions!.petitionAccessId as string,
-            );
+            showNoRemindersLeftToast(error.errors[0]!.extensions!.petitionAccessId as string);
           }
           return;
         }

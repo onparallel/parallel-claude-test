@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Box, Circle, Flex, List, ListItem, Stack, Text } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";

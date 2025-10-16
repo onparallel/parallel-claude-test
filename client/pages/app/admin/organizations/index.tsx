@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Badge, Flex, Heading, useToast } from "@chakra-ui/react";
 import { AdminOrganizationsListTableHeader } from "@parallel/components/admin-organizations/AdminOrganizationsListTableHeader";
 import { useCreateOrganizationDialog } from "@parallel/components/admin-organizations/dialogs/CreateOrganizationDialog";

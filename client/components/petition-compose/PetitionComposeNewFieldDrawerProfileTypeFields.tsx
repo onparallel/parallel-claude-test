@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Box, Button, HStack, Heading, Image, Stack, Text } from "@chakra-ui/react";
 import { ProfilesIcon, SettingsIcon } from "@parallel/chakra/icons";
 import {

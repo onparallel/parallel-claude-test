@@ -1,19 +1,24 @@
-import { ApolloClient, FieldMergeFunction, from, InMemoryCache } from "@apollo/client";
+import {
+  ApolloClient,
+  CombinedGraphQLErrors,
+  FieldMergeFunction,
+  InMemoryCache,
+} from "@apollo/client";
+import { ApolloLink } from "@apollo/client/link";
 import { BatchHttpLink } from "@apollo/client/link/batch-http";
-import { setContext } from "@apollo/client/link/context";
-import { split } from "@apollo/client/link/core";
-import { onError } from "@apollo/client/link/error";
+import { SetContextLink } from "@apollo/client/link/context";
+import { ErrorLink } from "@apollo/client/link/error";
 import { RetryLink } from "@apollo/client/link/retry";
-import { getOperationName } from "@apollo/client/utilities";
+import { LocalState } from "@apollo/client/local-state";
+import { getOperationName } from "@apollo/client/utilities/internal";
 import fragmentMatcher from "@parallel/graphql/__fragment-matcher";
 import { Login_currentUserDocument } from "@parallel/graphql/__types";
-import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
+import UploadHttpLink from "apollo-upload-client/UploadHttpLink.mjs";
 import { parse as parseCookie, serialize as serializeCookie } from "cookie";
 import { DefinitionNode, Kind, OperationDefinitionNode, OperationTypeNode } from "graphql";
 import { IncomingMessage } from "http";
 import Router from "next/router";
 import { filter, indexBy, map, pick, pipe, sortBy, uniqueBy } from "remeda";
-import typeDefs from "./client-schema.graphql";
 
 export interface CreateApolloClientOptions {
   req?: IncomingMessage;
@@ -53,7 +58,7 @@ export function mergeArraysBy(path: string[]): FieldMergeFunction {
   };
 }
 
-let _cached: ApolloClient<any>;
+let _cached: ApolloClient;
 export function createApolloClient(initialState: any, { req }: CreateApolloClientOptions) {
   // Make sure to create a new client for every server-side request so that data isn't shared between connections
   if (typeof window !== "undefined" && _cached) {
@@ -65,9 +70,9 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
     node.kind === Kind.OPERATION_DEFINITION;
 
   const client = new ApolloClient({
-    link: from([
+    link: ApolloLink.from([
       // Auth link
-      setContext((_, { headers }) => {
+      new SetContextLink(({ headers }) => {
         return {
           headers: {
             ...headers,
@@ -81,13 +86,14 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
         };
       }),
       // Auth error handler
-      onError(({ graphQLErrors, operation }) => {
+      new ErrorLink(({ error, operation }) => {
         if (typeof window !== "undefined") {
           // CurrentUser is the operation used in the login page, if we dont
           // check for it we get into a redirect loop
           if (
             operation.operationName !== getOperationName(Login_currentUserDocument) &&
-            graphQLErrors?.[0]?.extensions?.code === "UNAUTHENTICATED"
+            CombinedGraphQLErrors.is(error) &&
+            error.errors?.[0]?.extensions?.code === "UNAUTHENTICATED"
           ) {
             Router.push("/login");
           }
@@ -106,17 +112,19 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
         },
       }),
       // if operation is Query, then batch
-      split(
+      ApolloLink.split(
         (op) => {
           const definition = op.query.definitions.find(isDefinitionNode);
           return definition?.operation === OperationTypeNode.QUERY;
         },
         // Batch requests happening concurrently
         new BatchHttpLink({ uri, batchInterval: 0 }),
-        createUploadLink({ uri, headers: { "Apollo-Require-Preflight": "true" } }),
+        new UploadHttpLink({ uri, headers: { "Apollo-Require-Preflight": "true" } }),
       ),
     ]),
+
     ssrMode: typeof window === "undefined",
+
     cache: new InMemoryCache({
       dataIdFromObject: (o) => {
         // we don't want PetitionBaseMini to clash with Petition and PetitionTemplate objects in the Apollo cache
@@ -382,8 +390,17 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
         },
       },
     }).restore(initialState ?? {}),
-    typeDefs,
-    connectToDevTools: typeof window !== "undefined" && process.env.NODE_ENV === "development",
+
+    /*
+    Inserted by Apollo Client 3->4 migration codemod.
+    If you are not using the `@client` directive in your application,
+    you can safely remove this option.
+    */
+    localState: new LocalState({}),
+
+    devtools: {
+      enabled: typeof window !== "undefined" && process.env.NODE_ENV === "development",
+    },
   });
   _cached = client;
   return client;

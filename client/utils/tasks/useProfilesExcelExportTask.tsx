@@ -1,4 +1,5 @@
-import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient, useMutation } from "@apollo/client/react";
 import { BaseModalProps } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {

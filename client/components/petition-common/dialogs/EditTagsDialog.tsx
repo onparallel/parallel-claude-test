@@ -1,4 +1,5 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { Box, Button } from "@chakra-ui/react";
 import { TagSelect, TagSelectInstance } from "@parallel/components/common/TagSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";

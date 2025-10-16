@@ -1,4 +1,5 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import {
   Alert,
   AlertDescription,
@@ -355,14 +356,14 @@ function CreateOrUpdateProfileTypeFieldDialog({
                     }
                   } else if (isApolloError(e, "REMOVE_PROFILE_TYPE_FIELD_SELECT_OPTIONS_ERROR")) {
                     data.substitutions = await showConfirmRemovedSelectOptionsReplacementDialog({
-                      ...(e.graphQLErrors[0].extensions as {
+                      ...(e.errors[0].extensions as {
                         removedOptions: (SelectOptionValue & { count: number })[];
                         currentOptions: SelectOptionValue[];
                       }),
                       showOptionsWithColors: data.options!.showOptionsWithColors,
                     });
                   } else if (isApolloError(e, "REMOVE_PROFILE_TYPE_FIELD_MONITORING_ERROR")) {
-                    const { profileIds } = e.graphQLErrors[0]?.extensions as {
+                    const { profileIds } = e.errors[0]?.extensions as {
                       profileIds: string[];
                     };
                     if (

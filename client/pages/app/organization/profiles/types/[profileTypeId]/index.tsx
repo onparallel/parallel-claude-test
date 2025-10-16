@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import {
   Alert,
   AlertDescription,
@@ -286,7 +287,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
           });
         } catch {}
       } else if (isApolloError(e, "DELETE_PROFILE_TYPE_FIELD_ERROR")) {
-        const aggregatedErrors = e.graphQLErrors[0]?.extensions?.aggregatedErrors as {
+        const aggregatedErrors = e.errors[0]?.extensions?.aggregatedErrors as {
           code: "FIELD_HAS_VALUE_OR_FILES" | "EVENT_SUBSCRIPTION_EXISTS_ERROR";
           count: number;
         }[];

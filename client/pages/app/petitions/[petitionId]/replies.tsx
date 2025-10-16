@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Box, Button, Flex, HStack, Stack, Text, useToast } from "@chakra-ui/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import {

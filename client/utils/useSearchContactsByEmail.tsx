@@ -1,17 +1,24 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import { ContactSelect } from "@parallel/components/common/ContactSelect";
 import { useSearchContactsByEmail_contactsByEmailDocument } from "@parallel/graphql/__types";
 import { useCallback } from "react";
+import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 
 export function useSearchContactsByEmail() {
   const apollo = useApolloClient();
   return useCallback(async function (emails: string[]) {
-    const result = await apollo.query({
+    const { data } = await apollo.query({
       query: useSearchContactsByEmail_contactsByEmailDocument,
       variables: { emails },
       fetchPolicy: "no-cache",
     });
-    return result.data.contactsByEmail;
+    assert(
+      isNonNullish(data),
+      "Result data in useSearchContactsByEmail_contactsByEmailDocument is missing",
+    );
+    return data.contactsByEmail;
   }, []);
 }
 

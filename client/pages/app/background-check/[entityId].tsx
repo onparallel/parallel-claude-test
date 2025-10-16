@@ -1,4 +1,5 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { Box, Center, HStack, Skeleton, Spinner, Stack, Text, useToast } from "@chakra-ui/react";
 import { RepeatIcon, ShortSearchIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";

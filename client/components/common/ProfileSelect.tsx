@@ -1,4 +1,5 @@
-import { gql, useApolloClient, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient, useQuery } from "@apollo/client/react";
 import { Box, Text } from "@chakra-ui/react";
 import {
   ProfileSelect_ProfileFragment,
@@ -42,7 +43,7 @@ import Select, {
 import AsyncSelect from "react-select/async";
 import AsyncCreatableSelect from "react-select/async-creatable";
 import { indexBy, isNonNullish, zip } from "remeda";
-import { noop } from "ts-essentials";
+import { assert, noop } from "ts-essentials";
 import { useCreateProfileDialog } from "../profiles/dialogs/CreateProfileDialog";
 import { HighlightText } from "./HighlightText";
 import { LocalizableUserTextRender, localizableUserTextRender } from "./LocalizableUserTextRender";
@@ -184,7 +185,7 @@ export const ProfileSelect = Object.assign(
 
     const loadProfiles = useDebouncedAsync(
       async (search: string | null | undefined) => {
-        const result = await apollo.query({
+        const { data } = await apollo.query({
           query: ProfileSelect_profilesDocument,
           variables: {
             offset: 0,
@@ -201,9 +202,9 @@ export const ProfileSelect = Object.assign(
 
         const exclude = excludeProfiles ? [...excludeProfiles] : [];
 
-        const items = result.data.profiles.items;
+        assert(isNonNullish(data), "Result data in ProfileSelect_profilesDocument is missing");
 
-        return items.filter((p) => !exclude.includes(p.id)) as any[];
+        return data.profiles.items.filter((p) => !exclude.includes(p.id)) as any[];
       },
       300,
       [unMaybeArray(profileTypeId ?? []).join(","), hideCreate],
@@ -437,7 +438,7 @@ function useGetProfiles() {
               },
               fetchPolicy: "network-only",
             });
-            return fromServer.data.profile;
+            return fromServer.data?.profile;
           } catch (e) {}
         },
         {

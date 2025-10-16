@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Button, FormControl, FormErrorMessage, Input, Stack, Text } from "@chakra-ui/react";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";

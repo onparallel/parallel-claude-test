@@ -1,4 +1,5 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import {
   Alert,
   AlertDescription,
@@ -179,7 +180,7 @@ function AssociateNewPetitionToProfileDialogSelectTemplate({
                   try {
                     await showPreviewImportFromProfileFormatErrorDialog({
                       profileIds: [profile.id],
-                      profileTypeFieldIds: e.graphQLErrors?.[0].extensions
+                      profileTypeFieldIds: e.errors?.[0].extensions
                         ?.profileTypeFieldIds as string[],
                     });
                     await createPetition(true);
@@ -388,7 +389,7 @@ function AssociateNewPetitionToProfileDialogSelectFieldGroup({
                   try {
                     await showPreviewImportFromProfileFormatErrorDialog({
                       profileIds: [profile.id],
-                      profileTypeFieldIds: e.graphQLErrors?.[0].extensions
+                      profileTypeFieldIds: e.errors?.[0].extensions
                         ?.profileTypeFieldIds as string[],
                     });
                     await createPetition(true);
@@ -565,8 +566,7 @@ export function AssociateNewPetitionToProfileDialogPrefillFieldGroups({
                 try {
                   await showPreviewImportFromProfileFormatErrorDialog({
                     profileIds: [profile.id],
-                    profileTypeFieldIds: e.graphQLErrors?.[0].extensions
-                      ?.profileTypeFieldIds as string[],
+                    profileTypeFieldIds: e.errors?.[0].extensions?.profileTypeFieldIds as string[],
                   });
                   await createPetition(true);
                 } catch {}

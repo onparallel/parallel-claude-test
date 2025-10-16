@@ -30,6 +30,8 @@ export function withFeatureFlag(featureFlag: FeatureFlag, orPath = "/path") {
         }
         const { data } = await context.fetchQuery(HasFeatureFlagDocument, {
           variables: { featureFlag },
+          // no need to check this every time
+          fetchPolicy: "cache-first",
         });
         if (data?.me?.hasFeatureFlag) {
           return await getInitialProps?.(context);

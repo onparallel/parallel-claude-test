@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Progress, Stack, Text, useToast } from "@chakra-ui/react";
 import { useBlockingDialog } from "@parallel/components/common/dialogs/BlockingDialog";
 import {

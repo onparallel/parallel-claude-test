@@ -1,4 +1,5 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import {
   Alert,
   AlertDescription,
@@ -41,7 +42,8 @@ import { useRerender } from "@parallel/utils/useRerender";
 import { useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { pick } from "remeda";
+import { isNonNullish, pick } from "remeda";
+import { assert } from "ts-essentials";
 
 interface PublicLinkSettingsData {
   title: string;
@@ -85,15 +87,17 @@ export function PublicLinkSettingsDialog({
 
   useAsyncEffect(async (isMounted) => {
     if (!publicLink) {
-      const {
-        data: { getSlugForPublicPetitionLink: slug },
-      } = await apollo.query({
+      const { data } = await apollo.query({
         query: PublicLinkSettingsDialog_getSlugDocument,
         variables: { petitionName: template.name },
         fetchPolicy: "network-only",
       });
       if (isMounted()) {
-        setValue("slug", slug);
+        assert(
+          isNonNullish(data),
+          "Result data in PublicLinkSettingsDialog_getSlugDocument is missing",
+        );
+        setValue("slug", data.getSlugForPublicPetitionLink);
       }
     }
   }, []);
@@ -117,7 +121,7 @@ export function PublicLinkSettingsDialog({
         variables: { slug },
         fetchPolicy: "no-cache",
       });
-      return data.isValidPublicPetitionLinkSlug;
+      return data?.isValidPublicPetitionLinkSlug ?? false;
     },
     300,
     [],
@@ -134,7 +138,7 @@ export function PublicLinkSettingsDialog({
       if (e === "DEBOUNCED") {
         return "DEBOUNCED";
       } else if (isApolloError(e)) {
-        return e.graphQLErrors[0]?.extensions?.code as string;
+        return e.errors[0]?.extensions?.code as string;
       } else {
         throw e;
       }

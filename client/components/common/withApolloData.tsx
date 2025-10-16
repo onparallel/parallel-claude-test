@@ -1,25 +1,28 @@
-import {
-  ApolloClient,
-  ApolloProvider,
-  ApolloQueryResult,
-  DocumentNode,
-  OperationVariables,
-} from "@apollo/client";
+import { ApolloClient, DocumentNode, OperationVariables } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client/react";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { NextComponentType, NextPageContext } from "next";
 import Router from "next/router";
+import { assert } from "ts-essentials";
 
 export type WithApolloDataContext = NextPageContext & {
-  apollo: ApolloClient<any>;
-  fetchQuery<TData = any, TVariables extends OperationVariables = OperationVariables>(
-    query: DocumentNode | TypedDocumentNode<TData, TVariables>,
-    options?: {
-      variables?: TVariables;
-      ignoreCache?: boolean;
-    },
-  ): Promise<ApolloQueryResult<TData>>;
+  apollo: ApolloClient;
+  fetchQuery: {
+    <TData = unknown, TVariables extends OperationVariables = OperationVariables>(
+      ...args:
+        | [
+            query: DocumentNode | TypedDocumentNode<TData, TVariables>,
+            options: {
+              fetchPolicy?: "cache-first" | "cache-and-network" | "network-only";
+            } & ({} extends TVariables ? { variables?: TVariables } : { variables: TVariables }),
+          ]
+        | ({} extends TVariables
+            ? [query: DocumentNode | TypedDocumentNode<TData, TVariables>]
+            : never)
+    ): Promise<{ data: TData }>;
+  };
 };
 
 const SERVER_STATE = "__SERVER_STATE__";
@@ -71,43 +74,50 @@ export function withApolloData<P = {}>(
               (await getInitialProps?.({
                 ...context,
                 apollo,
-                async fetchQuery<
+                fetchQuery: (async <
                   TData = any,
                   TVariables extends OperationVariables = OperationVariables,
                 >(
                   query: DocumentNode | TypedDocumentNode<TData, TVariables>,
                   options?: {
-                    variables?: TVariables;
-                    ignoreCache?: boolean;
-                  },
-                ) {
-                  return await new Promise<ApolloQueryResult<TData>>((resolve, reject) => {
+                    fetchPolicy?: "cache-first" | "cache-and-network" | "network-only";
+                  } & ({} extends TVariables
+                    ? { variables?: TVariables }
+                    : { variables: TVariables }),
+                ) => {
+                  return await new Promise<{ data: TData }>((resolve, reject) => {
                     let resolved = false;
                     // On the browser we fetch from cache and fire a request
                     // that will update the cache when it arrives
                     const fetchPolicy =
-                      typeof window !== "undefined" && !options?.ignoreCache
-                        ? "cache-and-network"
-                        : "network-only";
+                      typeof window === "undefined"
+                        ? "network-only"
+                        : (options?.fetchPolicy ?? "cache-and-network");
                     const subscription = apollo
-                      .watchQuery<TData, TVariables>({
+                      .watchQuery({
                         query,
                         variables: options?.variables,
                         fetchPolicy,
-                      })
-                      .subscribe((result) => {
-                        if (!resolved) {
-                          resolve(result);
-                          resolved = true;
-                        }
-                        // if it's loading means we used cache-and-network and we
-                        // are waiting for the network response
-                        if (!result.loading) {
-                          subscription.unsubscribe();
-                        }
-                      }, reject);
+                      } as ApolloClient.WatchQueryOptions<TData, TVariables>)
+                      .subscribe({
+                        next: (result) => {
+                          if (result.dataState === "empty") {
+                            return;
+                          }
+                          assert(result.dataState === "complete");
+                          if (!resolved) {
+                            resolve(result);
+                            resolved = true;
+                          }
+                          // if it's loading means we used a "network" policy and we are waiting for the network response
+                          if (!result.loading && fetchPolicy !== "cache-first") {
+                            subscription.unsubscribe();
+                          }
+                        },
+                        error: reject,
+                      });
                   });
-                },
+                }) as WithApolloDataContext["fetchQuery"],
               })) ?? ({} as P);
 
             if (typeof window !== "undefined") {
@@ -130,7 +140,7 @@ export function withApolloData<P = {}>(
             if (error instanceof RedirectError) {
               return redirect(context, error.location);
             } else if (isApolloError(error)) {
-              const code = error.graphQLErrors[0]?.extensions?.code;
+              const code = error.errors[0]?.extensions?.code;
               if (code === "UNAUTHENTICATED") {
                 const url = (req?.url ?? context.asPath) as string;
                 const [path, params] = url.split("?");
@@ -149,8 +159,8 @@ export function withApolloData<P = {}>(
               ) {
                 return redirect(context, `/petition/${query.keycode}`);
               } else {
-                if (process.env.NODE_ENV === "development" && error.graphQLErrors[0]?.extensions) {
-                  console.error(error.graphQLErrors[0].extensions);
+                if (process.env.NODE_ENV === "development" && error.errors[0]?.extensions) {
+                  console.error(error.errors[0].extensions);
                 }
               }
             }

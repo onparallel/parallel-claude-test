@@ -1,4 +1,5 @@
-import { DataProxy, gql, useMutation } from "@apollo/client";
+import { ApolloCache, gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import {
   AlertDescription,
   AlertIcon,
@@ -142,7 +143,7 @@ export const PetitionComposeAttachments = Object.assign(
     }, [attachmentsList]);
 
     function updateAttachmentUploadingStatus(
-      cache: DataProxy,
+      cache: ApolloCache,
       attachment: PetitionComposeAttachments_PetitionAttachmentFragment,
     ) {
       updateFragment(cache, {

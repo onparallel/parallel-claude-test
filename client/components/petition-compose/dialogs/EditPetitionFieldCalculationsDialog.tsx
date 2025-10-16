@@ -1,4 +1,5 @@
-import { gql, useFragment } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useFragment } from "@apollo/client/react";
 import {
   Alert,
   AlertDescription,

@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import {
   Alert,
   AlertDescription,
@@ -164,7 +165,7 @@ function Petitions() {
   const userCanCreatePetition = useHasPermission("PETITIONS:CREATE_PETITIONS");
 
   const { selectedIdsRef, selectedRows, selectedRowsRef, onChangeSelectedIds } = useSelection(
-    petitions?.items,
+    petitions?.items as Petitions_PetitionBaseOrFolderFragment[] | undefined,
     rowKeyProp,
   );
 
@@ -647,7 +648,7 @@ function Petitions() {
           <TablePage
             flex="0 1 auto"
             columns={filteredColumns}
-            rows={petitions?.items}
+            rows={petitions?.items as Petitions_PetitionBaseOrFolderFragment[] | undefined}
             context={context}
             rowKeyProp={rowKeyProp}
             isSelectable
@@ -690,7 +691,7 @@ function Petitions() {
               </>
             }
             body={
-              data?.petitions.totalCount === 0 && !loading ? (
+              data?.petitions?.totalCount === 0 && !loading ? (
                 queryState.search ||
                 queryState.sharedWith ||
                 queryState.tagsFilters ||

@@ -37,7 +37,10 @@ export function withPermission<P = {}>(
             `Please, place "withPermission" before "withApolloData" in the "compose" argument list.`,
           );
         }
-        const { data } = await context.fetchQuery(WithPermissionDocument);
+        const { data } = await context.fetchQuery(WithPermissionDocument, {
+          // no need to check this every time
+          fetchPolicy: "cache-first",
+        });
 
         const { orPath = "/app", operator = "AND" } = options;
         const hasPermission = unMaybeArray(permissions)[operator === "OR" ? "some" : "every"]((p) =>

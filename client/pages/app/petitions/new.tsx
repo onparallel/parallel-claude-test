@@ -1,4 +1,5 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Container, Grid, Stack, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
 import { PathBreadcrumbs } from "@parallel/components/common/PathBreadcrumbs";

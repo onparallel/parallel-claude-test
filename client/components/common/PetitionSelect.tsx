@@ -1,4 +1,5 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import { Center, Text } from "@chakra-ui/react";
 import { SearchIcon } from "@parallel/chakra/icons";
 import {
@@ -26,6 +27,7 @@ import Select, {
 } from "react-select";
 import AsyncSelect from "react-select/async";
 import { indexBy, isNonNullish, zip } from "remeda";
+import { assert } from "ts-essentials";
 import { PetitionSelect_PetitionBaseFragment } from "../../graphql/__types";
 import { OverflownText } from "./OverflownText";
 import { PetitionSelectOption } from "./PetitionSelectOption";
@@ -132,7 +134,7 @@ export const PetitionSelect = Object.assign(
 
     const loadPetitions = useDebouncedAsync(
       async (search: string | null | undefined) => {
-        const result = await apollo.query({
+        const { data } = await apollo.query({
           query: PetitionSelect_petitionsDocument,
           variables: {
             offset: 0,
@@ -148,13 +150,18 @@ export const PetitionSelect = Object.assign(
           },
           fetchPolicy: "no-cache",
         });
+
+        assert(isNonNullish(data), "Result data in PetitionSelect_petitionsDocument is missing");
+
         assertTypenameArray(
-          result.data.petitions.items,
+          data.petitions.items,
           type === "PETITION" ? "Petition" : "PetitionTemplate",
         );
 
-        return result.data.petitions.items.filter((p) =>
-          excludePetitions ? !excludePetitions?.includes(p.id) : true,
+        return data.petitions.items.filter((p) =>
+          excludePetitions
+            ? p?.__typename === "Petition" && !excludePetitions?.includes(p.id)
+            : true,
         ) as any[];
       },
       300,
@@ -292,7 +299,7 @@ function useGetPetitions() {
               },
               fetchPolicy: "network-only",
             });
-            return fromServer.data.petition;
+            return fromServer.data?.petition;
           } catch (e) {}
         },
         {

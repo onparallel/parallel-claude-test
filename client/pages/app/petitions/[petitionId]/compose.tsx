@@ -1,4 +1,5 @@
-import { ApolloError, gql, useApolloClient, useMutation } from "@apollo/client";
+import { CombinedGraphQLErrors, gql } from "@apollo/client";
+import { useApolloClient, useMutation } from "@apollo/client/react";
 import { Box, Stack, Text } from "@chakra-ui/react";
 import { AlertCircleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
@@ -436,15 +437,15 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     return false;
   };
 
-  const isFieldIsReferencedError = (error: unknown): error is ApolloError => {
+  const isFieldIsReferencedError = (error: unknown): error is CombinedGraphQLErrors => {
     return (
       isApolloError(error) &&
-      (error.graphQLErrors[0].extensions?.code as string)?.startsWith("FIELD_IS_REFERENCED_")
+      (error.errors[0].extensions?.code as string)?.startsWith("FIELD_IS_REFERENCED_")
     );
   };
 
   const handleFieldIsReferencedError = async (
-    error: ApolloError,
+    error: CombinedGraphQLErrors,
     activeFieldId: string,
     onAction?: () => Promise<void>,
   ) => {
@@ -795,7 +796,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         await changePetitionFieldType({
           variables: { petitionId, fieldId, type },
         });
-        cleanPreviewFieldReplies(apollo, fieldId);
+        cleanPreviewFieldReplies(apollo.cache, fieldId);
         return;
       } catch (e) {
         if (isFieldIsReferencedError(e)) {
@@ -1867,7 +1868,7 @@ PetitionCompose.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
     fetchQuery(PetitionCompose_userDocument),
     fetchQuery(PetitionCompose_petitionDocument, {
       variables: { id: petitionId },
-      ignoreCache: true,
+      fetchPolicy: "network-only",
     }),
   ]);
   return { petitionId };

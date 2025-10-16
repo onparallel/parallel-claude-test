@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import {
   AlertDescription,
   AlertIcon,
@@ -141,9 +142,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
           reset(data);
         } catch (error) {
           if (isApolloError(error, "ARG_VALIDATION_ERROR")) {
-            if (
-              (error.graphQLErrors[0].extensions!.extra as any).code === "INVALID_HEX_VALUE_ERROR"
-            ) {
+            if ((error.errors[0].extensions!.extra as any).code === "INVALID_HEX_VALUE_ERROR") {
               setError("color", { type: "validate" });
             }
           } else {

@@ -1,7 +1,8 @@
 import { DocumentNode, OperationVariables, TypedDocumentNode } from "@apollo/client";
-import { QueryHookOptions, QueryResult, useQuery } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import { useRef } from "react";
 import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { assignRef } from "../assignRef";
 
 export function useQueryOrPreviousData<
@@ -9,26 +10,28 @@ export function useQueryOrPreviousData<
   TVariables extends OperationVariables = OperationVariables,
 >(
   query: DocumentNode | TypedDocumentNode<TData, TVariables>,
-  options?: QueryHookOptions<TData, TVariables>,
-  usePrevious: (
-    prev?: QueryHookOptions<TData, TVariables>,
-    current?: QueryHookOptions<TData, TVariables>,
+  options?: useQuery.Options<TData, TVariables>,
+  shouldUsePrevious: (
+    prev?: useQuery.Result<TData, TVariables, "complete">,
+    current?: useQuery.Result<TData, TVariables, "complete" | "empty">,
   ) => boolean = () => true,
-): QueryResult<TData, TVariables> {
-  const previousRef = useRef<{
-    data: TData | undefined;
-    options?: QueryHookOptions<TData, TVariables>;
-  }>({ data: undefined, options: undefined });
-  const { data, ...rest } = useQuery(query, options);
-  const previous = previousRef.current;
-  if (isNonNullish(data)) {
-    assignRef(previousRef, { data, options });
-    return { data, ...rest };
+): useQuery.Result<TData, TVariables, "complete" | "empty"> {
+  const previousRef = useRef<useQuery.Result<TData, TVariables, "complete">>();
+  const queryResult = useQuery<TData, TVariables>(
+    query,
+    options as useQuery.Options<TData, TVariables>,
+  );
+  assert(queryResult.dataState === "complete" || queryResult.dataState === "empty");
+
+  if (queryResult.dataState === "complete") {
+    assignRef(previousRef, queryResult as useQuery.Result<TData, TVariables, "complete">);
+    return queryResult;
+  } else if (
+    isNonNullish(previousRef.current) &&
+    shouldUsePrevious(previousRef.current, queryResult)
+  ) {
+    return previousRef.current;
   } else {
-    if (usePrevious(previous.options, options)) {
-      return { data: previous.data, ...rest };
-    } else {
-      return { data, ...rest };
-    }
+    return queryResult;
   }
 }

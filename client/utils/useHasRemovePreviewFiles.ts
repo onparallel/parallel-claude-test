@@ -1,4 +1,5 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import { useHasRemovePreviewFiles_MeDocument } from "@parallel/graphql/__types";
 import { isNullish } from "remeda";
 import { useConstant } from "./useConstant";

@@ -1,10 +1,13 @@
-import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient, useMutation } from "@apollo/client/react";
 import {
   usePetitionSummaryBackgroundTask_createPetitionSummaryTaskDocument,
   usePetitionSummaryBackgroundTask_createPetitionSummaryTaskMutationVariables,
   usePetitionSummaryBackgroundTask_taskDocument,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
+import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { waitFor } from "../promises/waitFor";
 import { BackgroundTaskOptions } from "./backgroundTaskOptions";
 
@@ -28,16 +31,20 @@ export function usePetitionSummaryBackgroundTask() {
           if (performance.now() - startTime > timeout) {
             throw new Error("TIMEOUT");
           }
-          const {
-            data: { task },
-          } = await apollo.query({
+          const { data } = await apollo.query({
             query: usePetitionSummaryBackgroundTask_taskDocument,
             variables: { id: initialData!.createPetitionSummaryTask.id },
             fetchPolicy: "network-only",
           });
-          if (task.status === "COMPLETED") {
-            return task;
-          } else if (task.status === "FAILED") {
+
+          assert(
+            isNonNullish(data),
+            "Result data in usePetitionSummaryBackgroundTask_taskDocument is missing",
+          );
+
+          if (data.task.status === "COMPLETED") {
+            return data.task;
+          } else if (data.task.status === "FAILED") {
             throw new Error("FAILED");
           }
           await waitFor(pollingInterval);

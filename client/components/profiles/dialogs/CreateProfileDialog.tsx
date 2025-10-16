@@ -1,4 +1,5 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { Button, FormControl, FormErrorMessage, FormLabel, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -153,7 +154,7 @@ function CreateProfileDialog({
               });
             } catch (e) {
               if (isApolloError(e, "PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT")) {
-                const { conflicts } = e.graphQLErrors[0].extensions as {
+                const { conflicts } = e.errors[0].extensions as {
                   conflicts: { profileTypeFieldId: string; profileId: string }[];
                 };
                 for (const conflict of conflicts) {
@@ -166,7 +167,7 @@ function CreateProfileDialog({
                 return;
               } else if (isApolloError(e, "INVALID_PROFILE_FIELD_VALUE")) {
                 const aggregatedErrors =
-                  (e.graphQLErrors[0].extensions!.aggregatedErrors as {
+                  (e.errors[0].extensions!.aggregatedErrors as {
                     profileTypeFieldId: string;
                     code: string;
                   }[]) ?? [];

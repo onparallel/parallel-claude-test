@@ -1,4 +1,5 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import { UserSelect_UserFragment, useSearchUsers_usersDocument } from "@parallel/graphql/__types";
 import { UserSelect, UserSelectSelection } from "../components/common/UserSelect";
 import { useDebouncedAsync } from "./useDebouncedAsync";
@@ -26,7 +27,7 @@ export function useSearchUsers() {
         },
         fetchPolicy: "no-cache",
       });
-      return data.me.organization.users.items as UserSelect_UserFragment[];
+      return data?.me.organization.users.items ?? ([] as UserSelect_UserFragment[]);
     },
     150,
     [],

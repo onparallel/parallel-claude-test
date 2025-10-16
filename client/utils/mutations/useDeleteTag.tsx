@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Stack, Text } from "@chakra-ui/react";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { useDeleteTag_deleteTagDocument } from "@parallel/graphql/__types";
@@ -30,7 +31,7 @@ export function useDeleteTag() {
       if (isApolloError(e, "TAG_IS_USED")) {
         await showConfirmDeleteTag({
           name,
-          extra: (e.graphQLErrors[0].extensions as any)?.data ?? [],
+          extra: (e.errors[0].extensions as any)?.data ?? [],
         });
         const { data } = await deleteTag({
           variables: { id, force: true },

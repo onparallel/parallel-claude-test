@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Box, Button, Center, Flex, Stack, useToast } from "@chakra-ui/react";
 import { ChevronRightIcon, EditSimpleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -1135,7 +1136,7 @@ PetitionPreview.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
     fetchQuery(PetitionPreview_userDocument),
     fetchQuery(PetitionPreview_petitionDocument, {
       variables: { id: petitionId },
-      ignoreCache: true,
+      fetchPolicy: "network-only",
     }),
   ]);
   return { petitionId };

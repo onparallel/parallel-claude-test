@@ -1,5 +1,6 @@
 /* eslint-disable formatjs/no-literal-string-in-jsx */
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import {
   Button,
   Grid,
@@ -117,7 +118,7 @@ export function SupportMethodModal({ field, queryType, schemaTypes, onClose }: M
               variables,
               fetchPolicy: "no-cache",
             });
-      setStatus({ loading: false, data: data[field.name] });
+      setStatus({ loading: false, data: (data as any)[field.name] });
     } catch (e: any) {
       setStatus({
         loading: false,

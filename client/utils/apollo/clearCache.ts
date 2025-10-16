@@ -1,7 +1,6 @@
-import { MutationUpdaterFn } from "@apollo/client";
+import { ApolloCache } from "@apollo/client";
 
-type DataProxy = Parameters<MutationUpdaterFn>[0];
-export function clearCache(cache: DataProxy, regex: RegExp) {
+export function clearCache(cache: ApolloCache, regex: RegExp) {
   const store = (cache as any).data;
   const data = store.data as any;
   for (const key of Object.keys(data)) {

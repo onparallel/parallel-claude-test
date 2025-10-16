@@ -211,7 +211,7 @@ DowJonesFieldSearch.getInitialProps = async ({ query, fetchQuery }: WithApolloDa
     fetchQuery(DowJonesFieldSearch_userDocument),
     fetchQuery(DowJonesFieldSearch_petitionFieldDocument, {
       variables: { petitionId, petitionFieldId },
-      ignoreCache: true,
+      fetchPolicy: "network-only",
     }),
   ]);
 

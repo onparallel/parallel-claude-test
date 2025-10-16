@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import {
   Alert,
   AlertDescription,
@@ -114,7 +115,7 @@ function PublicPetitionLink({
           await handleSendReminder(_data!.email);
         }
       } else if (isApolloError(error, "ARG_VALIDATION_ERROR")) {
-        const code = (error as any).graphQLErrors[0]?.extensions?.extra?.error_code;
+        const code = (error as any).errors[0]?.extensions?.extra?.error_code;
         if (code === "INVALID_MX_EMAIL_ERROR" || code === "INVALID_EMAIL_ERROR") {
           toast({
             status: "error",

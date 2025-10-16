@@ -1,4 +1,5 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Box, Center, Divider, Flex, Heading, Image, Stack, Text } from "@chakra-ui/react";
 import { CheckIcon, LinkedInSimpleIcon, TwitterIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";

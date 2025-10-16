@@ -1,4 +1,5 @@
-import { DataProxy, gql, useMutation } from "@apollo/client";
+import { ApolloCache, gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import {
   Box,
   Button,
@@ -231,7 +232,7 @@ const _PetitionComposeField = chakraForwardRef<
     );
   };
 
-  function updateAttachmentUploadingStatus(cache: DataProxy, id: string, isUploading: boolean) {
+  function updateAttachmentUploadingStatus(cache: ApolloCache, id: string, isUploading: boolean) {
     updateFragment(cache, {
       fragment: PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc,
       fragmentName: "PetitionComposeFieldAttachment_PetitionFieldAttachment",
@@ -750,6 +751,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
       ({
         elementRef,
         focusFromPrevious: () => focusTitle(true),
+
         focusFromNext: () => {
           if (field.type === "SELECT" || field.type === "CHECKBOX") {
             focusFieldOptions(true);
@@ -1110,11 +1112,9 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           </Box>
         ) : null}
       </Stack>
-
       {showRestrictedPetitionFieldAlert ? (
         <RestrictedPetitionFieldAlert fieldType={field.type} />
       ) : null}
-
       {field.visibility ? (
         <Box paddingTop={1}>
           <PetitionComposeVisibilityAccordion

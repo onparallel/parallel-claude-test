@@ -1,4 +1,5 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import {
   Alert,
   AlertDescription,
@@ -49,6 +50,8 @@ import { nanoid } from "nanoid";
 import { forwardRef, useRef } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
+import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 
 const ProfileTypeFieldPermissionTypeValues = [
   "HIDDEN",
@@ -158,6 +161,16 @@ export function ProfileTypeFieldPermissionDialog({
         },
         fetchPolicy: "no-cache",
       });
+
+      assert(
+        isNonNullish(userGroupsData),
+        "Result data in useProfileTypeFieldPermissionDialog_userGroupsDocument is missing",
+      );
+      assert(
+        isNonNullish(usersData),
+        "Result data in useProfileTypeFieldPermissionDialog_usersDocument is missing",
+      );
+
       return [...userGroupsData.userGroups.items, ...usersData.me.organization.users.items];
     },
     150,

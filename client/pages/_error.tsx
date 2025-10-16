@@ -1,4 +1,4 @@
-import { isApolloError } from "@apollo/client";
+import { CombinedGraphQLErrors } from "@apollo/client";
 import { Text } from "@chakra-ui/react";
 import { SupportLink } from "@parallel/components/common/SupportLink";
 import { ErrorPage } from "@parallel/components/public/ErrorPage";
@@ -68,8 +68,8 @@ CustomError.getInitialProps = async (context: NextPageContext) => {
       errorCode = window.__NEXT_DATA__.props.pageProps.errorCode;
     } else {
       errorCode =
-        err && isApolloError(err)
-          ? err.graphQLErrors?.[0]?.extensions!.code
+        err && CombinedGraphQLErrors.is(err)
+          ? err.errors?.[0]?.extensions!.code
           : (err as any)?.message;
       if (err && !SENTRY_WHITELISTED_ERRORS.includes(errorCode!)) {
         Sentry.captureUnderscoreErrorException(context);
@@ -80,7 +80,9 @@ CustomError.getInitialProps = async (context: NextPageContext) => {
       Sentry.captureUnderscoreErrorException(context);
     }
     errorCode =
-      err && isApolloError(err) ? err.graphQLErrors?.[0]?.extensions!.code : (err as any)?.message;
+      err && CombinedGraphQLErrors.is(err)
+        ? err.errors?.[0]?.extensions!.code
+        : (err as any)?.message;
   }
   return { errorCode };
 };

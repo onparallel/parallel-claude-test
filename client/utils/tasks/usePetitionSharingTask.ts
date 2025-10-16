@@ -1,4 +1,5 @@
-import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient, useMutation } from "@apollo/client/react";
 import {
   usePetitionSharingTask_createAddPetitionPermissionMaybeTaskDocument,
   usePetitionSharingTask_createAddPetitionPermissionMaybeTaskMutationVariables,
@@ -57,17 +58,21 @@ export function usePetitionSharingBackgroundTask() {
             setIsLoading(false);
             throw new Error("TIMEOUT");
           }
-          const {
-            data: { task },
-          } = await apollo.query({
+          const { data } = await apollo.query({
             query: usePetitionSharingTask_taskDocument,
             variables: { id: maybeTask.id },
             fetchPolicy: "network-only",
           });
-          if (task.status === "COMPLETED") {
+
+          assert(
+            isNonNullish(data),
+            "Result data in usePetitionSharingTask_taskDocument is missing",
+          );
+
+          if (data.task.status === "COMPLETED") {
             setIsLoading(false);
             return;
-          } else if (task.status === "FAILED") {
+          } else if (data.task.status === "FAILED") {
             setIsLoading(false);
             throw new Error("FAILED");
           }

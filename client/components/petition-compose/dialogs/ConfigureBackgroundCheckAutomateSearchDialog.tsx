@@ -1,4 +1,5 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Button, FormControl, FormHelperText, FormLabel, Stack, Text } from "@chakra-ui/react";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";

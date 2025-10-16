@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import {
   Box,
   Button,
@@ -521,7 +522,7 @@ DowJonesFieldSearchResults.getInitialProps = async ({
   await Promise.all([
     fetchQuery(DowJonesFieldSearchResults_petitionFieldDocument, {
       variables: { petitionId, petitionFieldId },
-      ignoreCache: true,
+      fetchPolicy: "network-only",
     }),
   ]);
   return { petitionId, petitionFieldId };

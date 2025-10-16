@@ -1,4 +1,5 @@
-import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient, useMutation, useQuery } from "@apollo/client/react";
 import { Button, Center, ListItem, Spinner, Stack, Text, UnorderedList } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
@@ -20,6 +21,7 @@ import {
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { isApolloError } from "../apollo/isApolloError";
 import { partitionOnTypename } from "../apollo/typename";
 import { withError } from "../promises/withError";
@@ -89,7 +91,7 @@ export function useDeletePetitions({ modalProps }: { modalProps?: BaseModalProps
               });
             } else {
               await confirmDeleteSharedPetitions({
-                petitionIds: error.graphQLErrors[0].extensions!.petitionIds as string[],
+                petitionIds: error.errors[0].extensions!.petitionIds as string[],
                 type,
                 currentPath,
                 modalProps,
@@ -123,7 +125,7 @@ export function useDeletePetitions({ modalProps }: { modalProps?: BaseModalProps
         if (isApolloError(error)) {
           const { data } = await apollo.query({
             query: useDeletePetitions_petitionsDocument,
-            variables: { ids: error.graphQLErrors[0]?.extensions?.petitionIds as string[] },
+            variables: { ids: error.errors[0]?.extensions?.petitionIds as string[] },
           });
 
           const errorHeader = (
@@ -138,8 +140,12 @@ export function useDeletePetitions({ modalProps }: { modalProps?: BaseModalProps
             </Stack>
           );
 
-          const errorCode = error.graphQLErrors[0]?.extensions?.code as string | undefined;
-          const conflictingPetitions = data.petitionsById ?? [];
+          const errorCode = error.errors[0]?.extensions?.code as string | undefined;
+          assert(
+            isNonNullish(data?.petitionsById),
+            "Result data in useDeletePetitions_petitionsDocument is missing",
+          );
+          const conflictingPetitions = data.petitionsById;
 
           // can't delete a petition that was shared to me via group
           if (errorCode === "DELETE_GROUP_PETITION_ERROR") {

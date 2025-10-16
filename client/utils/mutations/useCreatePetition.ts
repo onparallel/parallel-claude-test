@@ -1,4 +1,5 @@
-import { gql, useApolloClient, useLazyQuery, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient, useLazyQuery, useMutation } from "@apollo/client/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
 import { useCreatePetitionFromTemplateWithPrefillDialog } from "@parallel/components/petition-new/dialogs/CreatePetitionFromTemplateWithPrefillDialog";

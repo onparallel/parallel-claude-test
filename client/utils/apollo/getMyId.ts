@@ -1,16 +1,17 @@
-import { DataProxy, gql, useApolloClient } from "@apollo/client";
+import { ApolloCache, gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import { GetMyIdDocument } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 
 export function useGetMyId() {
   const apollo = useApolloClient();
   return useMemo(() => {
-    return getMyId(apollo);
+    return getMyId(apollo.cache);
   }, []);
 }
 
-export function getMyId(proxy: DataProxy) {
-  const data = proxy.readQuery({
+export function getMyId(cache: ApolloCache) {
+  const data = cache.readQuery({
     query: GetMyIdDocument,
   });
   return data!.me.id;

@@ -1,4 +1,5 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import { useConfirmCommentMentionAndShareDialog } from "@parallel/components/common/dialogs/ConfirmCommentMentionAndShareDialog";
 import { PetitionFieldComment } from "@parallel/components/common/PetitionFieldComment";
@@ -12,6 +13,8 @@ import {
   usePetitionCommentsMutations_updatePetitionCommentDocument,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
+import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { isApolloError } from "../apollo/isApolloError";
 import { Maybe } from "../types";
 
@@ -23,7 +26,7 @@ export function useCreatePetitionComment() {
   const showConfirmCommentMentionAndShareDialog = useConfirmCommentMentionAndShareDialog();
   const { refetch: fetchUsersOrGroups } = useQuery(
     usePetitionCommentsMutations_getUsersOrGroupsDocument,
-    { skip: true },
+    { skip: true, variables: { ids: [] } },
   );
 
   return useCallback(
@@ -40,8 +43,14 @@ export function useCreatePetitionComment() {
         });
       } catch (e) {
         if (isApolloError(e, "NO_PERMISSIONS_MENTION_ERROR")) {
-          const ids = e.graphQLErrors[0].extensions!.ids as string[];
+          const ids = e.errors[0].extensions!.ids as string[];
           const { data } = await fetchUsersOrGroups({ ids });
+
+          assert(
+            isNonNullish(data),
+            "Result data in usePetitionCommentsMutations_getUsersOrGroupsDocument is missing",
+          );
+
           try {
             const shareResult = await showConfirmCommentMentionAndShareDialog({
               petitionId: variables.petitionId,
@@ -71,7 +80,7 @@ export function useUpdatePetitionComment() {
   const showConfirmCommentMentionAndShareDialog = useConfirmCommentMentionAndShareDialog();
   const { refetch: fetchUsersOrGroups } = useQuery(
     usePetitionCommentsMutations_getUsersOrGroupsDocument,
-    { skip: true },
+    { skip: true, variables: { ids: [] } },
   );
 
   return useCallback(
@@ -88,8 +97,14 @@ export function useUpdatePetitionComment() {
         });
       } catch (e) {
         if (isApolloError(e, "NO_PERMISSIONS_MENTION_ERROR")) {
-          const ids = e.graphQLErrors[0].extensions!.ids as string[];
+          const ids = e.errors[0].extensions!.ids as string[];
           const { data } = await fetchUsersOrGroups({ ids });
+
+          assert(
+            isNonNullish(data),
+            "Result data in usePetitionCommentsMutations_getUsersOrGroupsDocument is missing",
+          );
+
           try {
             const shareResult = await showConfirmCommentMentionAndShareDialog({
               petitionId: variables.petitionId,

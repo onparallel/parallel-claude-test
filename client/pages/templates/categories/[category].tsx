@@ -15,7 +15,8 @@ import { createApolloClient } from "@parallel/utils/apollo/client";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { FormattedMessage, useIntl } from "react-intl";
-import { indexBy } from "remeda";
+import { indexBy, isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 
 function LandingTemplatesCategory({
   samples,
@@ -130,30 +131,38 @@ export const getServerSideProps: GetServerSideProps<{
   const locale = ctx.locale as PetitionLocale;
 
   try {
-    const {
-      data: { landingTemplateCategorySamples: samples },
-    } = await client.query({
+    const { data: dataSamples } = await client.query({
       query: LandingTemplatesCategory_categorySamplesDocument,
       variables: { locale },
     });
 
-    const {
-      data: {
-        landingTemplates: { items: templates },
-      },
-    } = await client.query({
+    assert(
+      isNonNullish(dataSamples),
+      "Result data in LandingTemplatesCategory_categorySamplesDocument is missing",
+    );
+
+    const { data: dataTemplates } = await client.query({
       query: LandingTemplatesCategory_landingTemplatesDocument,
       variables: { offset: 0, limit: 50, category, locale },
     });
 
-    if (templates.length === 0) {
+    assert(
+      isNonNullish(dataTemplates),
+      "Result data in LandingTemplatesCategory_landingTemplatesDocument is missing",
+    );
+
+    if (dataTemplates.landingTemplates.items.length === 0) {
       return {
         notFound: true,
       };
     }
 
     return {
-      props: { samples, templates, category },
+      props: {
+        samples: dataSamples.landingTemplateCategorySamples,
+        templates: dataTemplates.landingTemplates.items,
+        category,
+      },
     };
   } catch {
     return {

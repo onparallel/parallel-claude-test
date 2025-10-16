@@ -39,6 +39,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, zip } from "remeda";
+import { assert } from "ts-essentials";
 
 function LandingTemplateDetails({
   template,
@@ -451,28 +452,38 @@ export const getServerSideProps: GetServerSideProps<{
   try {
     const client = createApolloClient({}, { req });
 
-    const {
-      data: { landingTemplateBySlug: template },
-    } = await client.query({
+    const { data: templateData } = await client.query({
       query: LandingTemplateDetails_landingTemplateBySlugDocument,
       variables: { slug },
     });
-    if (!template) {
+
+    assert(
+      isNonNullish(templateData),
+      "Result data in LandingTemplateDetails_landingTemplateBySlugDocument is missing",
+    );
+
+    if (!templateData?.landingTemplateBySlug) {
       throw new Error();
     }
 
-    const categories = template.categories ?? [];
+    const categories = templateData.landingTemplateBySlug.categories;
 
-    const {
-      data: {
-        landingTemplates: { items: relatedTemplates },
-      },
-    } = await client.query({
+    const { data } = await client.query({
       query: LandingTemplateDetails_landingTemplatesDocument,
       variables: { offset: 0, limit: 4, locale, categories },
     });
 
-    return { props: { template, relatedTemplates } };
+    assert(
+      isNonNullish(data),
+      "Result data in LandingTemplateDetails_landingTemplatesDocument is missing",
+    );
+
+    return {
+      props: {
+        template: templateData.landingTemplateBySlug,
+        relatedTemplates: data.landingTemplates.items,
+      },
+    };
   } catch (err) {
     return { notFound: true };
   }

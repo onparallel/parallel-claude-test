@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { useToast } from "@chakra-ui/react";
 import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
 

@@ -1,4 +1,5 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { FormControl, FormErrorMessage } from "@chakra-ui/react";
 import { ProfileTypeFieldSelect } from "@parallel/components/common/ProfileTypeFieldSelect";
 import { ProfileTypeSelect } from "@parallel/components/common/ProfileTypeSelect";

@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import {
   Box,
   Button,
@@ -100,10 +101,10 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
       } catch (error: any) {
         if (
           isApolloError(error) &&
-          (error.graphQLErrors[0]?.extensions?.code === "INVALID_FORMAT_ERROR" ||
-            error.graphQLErrors[0]?.extensions?.code === "NO_CONTACTS_FOUND_ERROR")
+          (error.errors[0]?.extensions?.code === "INVALID_FORMAT_ERROR" ||
+            error.errors[0]?.extensions?.code === "NO_CONTACTS_FOUND_ERROR")
         ) {
-          await showImportErrorDialog((error.graphQLErrors[0]?.extensions?.rows ?? []) as number[]);
+          await showImportErrorDialog((error.errors[0]?.extensions?.rows ?? []) as number[]);
         }
       }
     }

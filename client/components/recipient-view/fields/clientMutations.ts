@@ -1,4 +1,5 @@
-import { DataProxy, gql, useApolloClient, useMutation } from "@apollo/client";
+import { ApolloCache, gql } from "@apollo/client";
+import { useApolloClient, useMutation } from "@apollo/client/react";
 import {
   RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocument,
   RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyDocument,
@@ -160,7 +161,7 @@ export function useCreateFileUploadReply() {
             await uploadFile(file, presignedPostData, {
               signal: controller.signal,
               onProgress(progress) {
-                updateReplyContent(apollo, reply.id, (content) => ({
+                updateReplyContent(apollo.cache, reply.id, (content) => ({
                   ...content,
                   progress,
                 }));
@@ -190,7 +191,7 @@ export function useCreateFileUploadReply() {
 }
 
 function updateReplyContent(
-  proxy: DataProxy,
+  proxy: ApolloCache,
   replyId: string,
   updateFn: (cached: Record<string, any>) => Record<string, any>,
 ) {

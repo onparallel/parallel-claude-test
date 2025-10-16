@@ -1,4 +1,5 @@
-import { gql, useFragment, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useFragment, useMutation } from "@apollo/client/react";
 import {
   Button,
   Center,

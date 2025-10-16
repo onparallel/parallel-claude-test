@@ -1,4 +1,5 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import {
   Box,
   Button,
@@ -20,6 +21,7 @@ import { isValidEmail, PASSWORD_REGEX } from "@parallel/utils/validation";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 
 interface PublicSignupFormData {
   email: string;
@@ -55,6 +57,12 @@ export function PublicSignupForm({ onNext, email, source }: PublicSignupFormProp
         variables: { email },
         fetchPolicy: "no-cache",
       });
+
+      assert(
+        isNonNullish(data),
+        "Result data in PublicSignupForm_emailIsAvailableDocument is missing",
+      );
+
       return data.emailIsAvailable;
     },
     300,
@@ -69,7 +77,7 @@ export function PublicSignupForm({ onNext, email, source }: PublicSignupFormProp
       if (e === "DEBOUNCED") {
         return "DEBOUNCED";
       } else if (isApolloError(e)) {
-        return e.graphQLErrors[0]?.extensions?.code as string;
+        return e.errors[0]?.extensions?.code as string;
       } else {
         throw e;
       }

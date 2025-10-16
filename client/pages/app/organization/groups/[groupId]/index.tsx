@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Badge, Center, Flex, Text, useToast } from "@chakra-ui/react";
 import { UserXIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";

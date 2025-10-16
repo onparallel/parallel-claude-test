@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Badge, Center, Heading, Stack, Text, useToast } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
@@ -210,7 +211,7 @@ function OrganizationUsers() {
       if (isDialogError(error)) {
         return;
       } else if (isApolloError(error, "USER_ALREADY_IN_ORG_ERROR")) {
-        const user = error.graphQLErrors[0]?.extensions?.user as {
+        const user = error.errors[0]?.extensions?.user as {
           id: string;
           status: UserStatus;
           fullName: string;
@@ -266,7 +267,7 @@ function OrganizationUsers() {
           duration: 5000,
         });
       } else if (isApolloError(error, "ARG_VALIDATION_ERROR")) {
-        const code = (error as any).graphQLErrors[0]?.extensions?.extra?.error_code;
+        const code = (error as any).errors[0]?.extensions?.extra?.error_code;
         if (code === "INVALID_MX_EMAIL_ERROR" || code === "INVALID_EMAIL_ERROR") {
           toast({
             status: "error",

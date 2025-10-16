@@ -1,4 +1,5 @@
-import { gql, NetworkStatus, useApolloClient, useLazyQuery } from "@apollo/client";
+import { gql, NetworkStatus } from "@apollo/client";
+import { useApolloClient, useLazyQuery } from "@apollo/client/react";
 import {
   Button,
   Drawer,
@@ -41,10 +42,6 @@ export function NotificationsDrawer() {
     { data, called, loading, refetch, fetchMore, networkStatus, startPolling, stopPolling },
   ] = useLazyQuery(NotificationsDrawer_notificationsDocument, {
     notifyOnNetworkStatusChange: true,
-    variables: {
-      limit: NOTIFICATIONS_LIMIT,
-      filter,
-    },
   });
   const isInitialLoading = loading && networkStatus !== NetworkStatus.fetchMore;
   const filterRef = useRef<Focusable>(null);
@@ -69,13 +66,13 @@ export function NotificationsDrawer() {
     } else {
       // force unread to refresh on next open
       client.cache.evict({
-        id: getMyId(client),
+        id: getMyId(client.cache),
         fieldName: "notifications",
         args: { filter: "UNREAD" },
       });
-      stopPolling?.();
+      if (called) stopPolling?.();
     }
-  }, [isOpen]);
+  }, [isOpen, called]);
 
   const handleFetchMore = async () => {
     await fetchMore!({
@@ -90,7 +87,7 @@ export function NotificationsDrawer() {
   const client = useApolloClient();
   const handleFilterChange = async (type: PetitionUserNotificationFilter | null) => {
     client.cache.evict({
-      id: getMyId(client),
+      id: getMyId(client.cache),
       fieldName: "notifications",
       args: { filter: "UNREAD" },
     });

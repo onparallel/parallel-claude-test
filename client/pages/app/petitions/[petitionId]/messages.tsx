@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Box, Stack } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -153,7 +154,7 @@ PetitionMessages.getInitialProps = async ({ query, fetchQuery }: WithApolloDataC
     fetchQuery(PetitionMessages_userDocument),
     fetchQuery(PetitionMessages_petitionDocument, {
       variables: { id: petitionId },
-      ignoreCache: true,
+      fetchPolicy: "network-only",
     }),
   ]);
   return { petitionId };

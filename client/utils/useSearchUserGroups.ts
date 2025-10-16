@@ -1,4 +1,5 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import { UserSelect } from "@parallel/components/common/UserSelect";
 import {
   UserGroupType,
@@ -28,7 +29,7 @@ export function useSearchUserGroups() {
         },
         fetchPolicy: "no-cache",
       });
-      return data.userGroups.items as UserSelect_UserGroupFragment[];
+      return data?.userGroups.items ?? ([] as UserSelect_UserGroupFragment[]);
     },
     [],
   );

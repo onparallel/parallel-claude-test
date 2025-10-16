@@ -1,4 +1,5 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import {
   Box,
   Button,
@@ -70,6 +71,7 @@ import { useCallback, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, omit } from "remeda";
 import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
+import { assert } from "ts-essentials";
 
 type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getInitialProps>>;
 
@@ -253,6 +255,9 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
 
   async function handleRefetchPetition() {
     const { data } = await refetchAccess();
+
+    assert(isNonNullish(data), "Refetched data in RecipientView_accessDocument is missing");
+
     return data.access.petition;
   }
 

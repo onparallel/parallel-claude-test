@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Box, Center, Flex, Image, Stack, useCounter } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
 import { Logo } from "@parallel/components/common/Logo";
@@ -276,7 +277,7 @@ export async function getServerSideProps({
         query: Signup_publicLicenseCodeDocument,
         variables: { code, token: process.env.CLIENT_SERVER_TOKEN },
       });
-      if (!data.publicLicenseCode) {
+      if (!data?.publicLicenseCode) {
         return { props: {} };
       } else {
         return {

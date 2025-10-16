@@ -1,10 +1,13 @@
-import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient, useMutation } from "@apollo/client/react";
 import {
   useTemplateStatsReportTask_createTemplateStatsReportTaskDocument,
   useTemplateStatsReportTask_createTemplateStatsReportTaskMutationVariables,
   useTemplateStatsReportTask_taskDocument,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
+import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { waitFor } from "../promises/waitFor";
 import { BackgroundTaskOptions } from "./backgroundTaskOptions";
 
@@ -30,16 +33,20 @@ export function useTemplateStatsReportBackgroundTask() {
           if (performance.now() - startTime > timeout) {
             throw new Error("TIMEOUT");
           }
-          const {
-            data: { task },
-          } = await apollo.query({
+          const { data } = await apollo.query({
             query: useTemplateStatsReportTask_taskDocument,
             variables: { id: initialData!.createTemplateStatsReportTask.id },
             fetchPolicy: "network-only",
           });
-          if (task.status === "COMPLETED") {
-            return task;
-          } else if (task.status === "FAILED") {
+
+          assert(
+            isNonNullish(data),
+            "Result data in useTemplateStatsReportTask_taskDocument is missing",
+          );
+
+          if (data.task.status === "COMPLETED") {
+            return data.task;
+          } else if (data.task.status === "FAILED") {
             throw new Error("FAILED");
           }
 

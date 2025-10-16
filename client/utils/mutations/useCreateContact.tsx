@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Button, Stack, Text } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { useAskContactDetailsDialog } from "@parallel/components/common/dialogs/AskContactDetailsDialog";
@@ -43,8 +44,7 @@ export function useCreateContact() {
       } catch (error) {
         if (
           isApolloError(error, "ARG_VALIDATION_ERROR") &&
-          (error as any).graphQLErrors[0]?.extensions?.extra?.error_code ===
-            "INVALID_MX_EMAIL_ERROR"
+          (error as any).errors[0]?.extensions?.extra?.error_code === "INVALID_MX_EMAIL_ERROR"
         ) {
           await showForceClientDialog();
 

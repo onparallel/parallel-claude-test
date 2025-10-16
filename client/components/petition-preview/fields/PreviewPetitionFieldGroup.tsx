@@ -172,7 +172,7 @@ export function PreviewPetitionFieldGroup({
         } catch (e) {
           if (isApolloError(e, "NOTHING_TO_IMPORT_ERROR")) {
             try {
-              const profileIds = e.graphQLErrors?.[0].extensions?.profileIds as string[];
+              const profileIds = e.errors?.[0].extensions?.profileIds as string[];
               await showConfirmImportFromProfileDialog({
                 profileIds,
               });
@@ -194,8 +194,7 @@ export function PreviewPetitionFieldGroup({
             try {
               await showPreviewImportFromProfileFormatErrorDialog({
                 profileIds: response.profileIds,
-                profileTypeFieldIds: e.graphQLErrors?.[0].extensions
-                  ?.profileTypeFieldIds as string[],
+                profileTypeFieldIds: e.errors?.[0].extensions?.profileTypeFieldIds as string[],
               });
               await createFieldGroupRepliesFromProfiles({
                 petitionId: petition.id,
@@ -222,7 +221,7 @@ export function PreviewPetitionFieldGroup({
         } catch (e) {
           if (isApolloError(e, "NOTHING_TO_IMPORT_ERROR")) {
             try {
-              const profileIds = e.graphQLErrors?.[0].extensions?.profileIds as string[];
+              const profileIds = e.errors?.[0].extensions?.profileIds as string[];
               await showConfirmImportFromProfileDialog({ profileIds });
               await prefillPetitionFromProfiles({
                 petitionId: petition.id,
@@ -241,8 +240,7 @@ export function PreviewPetitionFieldGroup({
             try {
               await showPreviewImportFromProfileFormatErrorDialog({
                 profileIds: response.prefill.flatMap((p) => p.profileIds),
-                profileTypeFieldIds: e.graphQLErrors?.[0].extensions
-                  ?.profileTypeFieldIds as string[],
+                profileTypeFieldIds: e.errors?.[0].extensions?.profileTypeFieldIds as string[],
               });
               await prefillPetitionFromProfiles({
                 petitionId: petition.id,

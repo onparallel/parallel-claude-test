@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import {
   Alert,
   AlertDescription,
@@ -30,7 +31,7 @@ export function useDeleteContacts() {
       if (isApolloError(e, "CONTACT_HAS_ACTIVE_ACCESSES_ERROR")) {
         await showConfirmDeleteContacts({
           contacts,
-          extra: e.graphQLErrors[0].extensions as any,
+          extra: e.errors[0].extensions as any,
         });
         await deleteContacts({ variables: { ids: contacts.map((c) => c.id), force: true } });
       }

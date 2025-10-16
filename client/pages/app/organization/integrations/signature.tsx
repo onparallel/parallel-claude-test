@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import {
   Badge,
   Button,
@@ -147,7 +148,7 @@ function IntegrationsSignature() {
           if (isApolloError(error, "SIGNATURE_INTEGRATION_IN_USE_ERROR")) {
             try {
               await confirmRemoveSignatureToken({
-                pendingSignaturesCount: error.graphQLErrors[0].extensions!
+                pendingSignaturesCount: error.errors[0].extensions!
                   .pendingSignaturesCount as number,
               });
               await deleteSignatureIntegration({ variables: { id, force: true } });

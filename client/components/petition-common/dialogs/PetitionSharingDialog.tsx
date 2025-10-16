@@ -1,5 +1,6 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
-import { getOperationName } from "@apollo/client/utilities";
+import { gql } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
+import { getOperationName } from "@apollo/client/utilities/internal";
 import {
   Alert,
   AlertDescription,

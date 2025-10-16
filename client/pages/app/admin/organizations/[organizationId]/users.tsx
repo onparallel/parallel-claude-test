@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Badge, Center, Flex, Stack, Text, useToast } from "@chakra-ui/react";
 import { KeyIcon, LogInIcon, UsersIcon } from "@parallel/chakra/icons";
 import { AdminOrganizationMembersListTableHeader } from "@parallel/components/admin-organizations/AdminOrganizationMembersListTableHeader";
@@ -138,7 +139,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
           isClosable: true,
         });
       } else if (isApolloError(error, "ARG_VALIDATION_ERROR")) {
-        const code = (error as any).graphQLErrors[0]?.extensions?.extra?.error_code;
+        const code = (error as any).errors[0]?.extensions?.extra?.error_code;
         if (code === "INVALID_MX_EMAIL_ERROR" || code === "INVALID_EMAIL_ERROR") {
           toast({
             status: "error",

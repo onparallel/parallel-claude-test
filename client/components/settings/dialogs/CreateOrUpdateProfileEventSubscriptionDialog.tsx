@@ -1,4 +1,5 @@
-import { ApolloError, gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import {
   Box,
   Button,
@@ -36,6 +37,7 @@ import {
   CreateOrUpdateProfileEventSubscriptionDialog_profileTypeDocument,
   ProfileEventType,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
@@ -148,7 +150,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
   }, [fromProfileTypeId]);
 
   const { data } = useQuery(CreateOrUpdateProfileEventSubscriptionDialog_profileTypeDocument, {
-    variables: fromProfileTypeId ? { profileTypeId: fromProfileTypeId } : undefined,
+    variables: { profileTypeId: fromProfileTypeId ?? "" },
     skip: isNullish(fromProfileTypeId),
     fetchPolicy: "no-cache",
   });
@@ -235,8 +237,8 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
                 props.onResolve();
               }
             } catch (error) {
-              if (error instanceof ApolloError) {
-                const code = error.graphQLErrors[0]?.extensions?.code;
+              if (isApolloError(error)) {
+                const code = error.errors[0]?.extensions?.code;
                 if (code === "WEBHOOK_CHALLENGE_FAILED") {
                   setError("eventsUrl", { type: "challengeFailed" }, { shouldFocus: true });
                 }

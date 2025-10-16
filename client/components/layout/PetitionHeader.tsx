@@ -1,5 +1,6 @@
-import { gql, useMutation } from "@apollo/client";
-import { getOperationName } from "@apollo/client/utilities";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
+import { getOperationName } from "@apollo/client/utilities/internal";
 import {
   Badge,
   Box,

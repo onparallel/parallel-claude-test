@@ -1,5 +1,5 @@
 import { DocumentNode, OperationVariables, TypedDocumentNode } from "@apollo/client";
-import { QueryHookOptions, QueryResult, useQuery } from "@apollo/client/react";
+import { useQuery } from "@apollo/client/react";
 import { WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { NextComponentType } from "next";
 import { ComponentType, useRef } from "react";
@@ -9,53 +9,33 @@ export function useAssertQuery<
   TData = any,
   TVariables extends OperationVariables = OperationVariables,
 >(
-  query: DocumentNode | TypedDocumentNode<TData, TVariables>,
-  options?: QueryHookOptions<TData, TVariables>,
-): QueryResult<TData, TVariables> & { data: TData } {
-  const { data, ...rest } = useQuery(query, options);
-  if (!data) {
-    try {
-      // eslint-disable-next-line no-console
-      console.log((rest as any).diff);
-      // eslint-disable-next-line no-console
-      console.log(rest.error);
-    } catch {}
-    throw new Error(`Expected data to be present on the Apollo cache`);
+  ...args: Parameters<typeof useQuery<TData, TVariables>>
+): useQuery.Result<TData, TVariables, "complete"> {
+  const result = useQuery(...args);
+  if (result.dataState === "complete") {
+    return result as useQuery.Result<TData, TVariables, "complete">;
+  } else {
+    throw new Error("Expected data to be present on the Apollo cache");
   }
-  return {
-    ...rest,
-    data: data!,
-  };
 }
 
 export function useAssertQueryOrPreviousData<
   TData = any,
   TVariables extends OperationVariables = OperationVariables,
 >(
-  query: DocumentNode | TypedDocumentNode<TData, TVariables>,
-  options?: QueryHookOptions<TData, TVariables>,
-): QueryResult<TData, TVariables> & { data: TData } {
-  const previous = useRef<TData>();
-  const { data, ...rest } = useQuery(query, options);
-  if (!data) {
-    if (!previous.current) {
-      // eslint-disable-next-line no-console
-      console.log((rest as any).diff?.missing);
-      // eslint-disable-next-line no-console
-      console.log(rest.error);
-      throw new Error("Expected data to be present on the Apollo cache");
-    } else {
-      return {
-        data: previous.current!,
-        ...rest,
-      };
-    }
+  ...args: Parameters<typeof useQuery<TData, TVariables>>
+): useQuery.Result<TData, TVariables, "complete"> {
+  const previous = useRef<useQuery.Result<TData, TVariables, "complete">>();
+  const result = useQuery(...args);
+  if (result.dataState === "complete") {
+    assignRef(previous, result);
+    return result as useQuery.Result<TData, TVariables, "complete">;
   } else {
-    assignRef(previous, data);
-    return {
-      data: data!,
-      ...rest,
-    };
+    if (previous.current) {
+      return previous.current;
+    } else {
+      throw new Error("Expected data to be present on the Apollo cache");
+    }
   }
 }
 

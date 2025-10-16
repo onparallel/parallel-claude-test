@@ -1,4 +1,5 @@
-import { gql, useLazyQuery, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client/react";
 import {
   Button,
   FormControl,
@@ -323,7 +324,7 @@ function CreatePetitionFromTemplateSelectProfileStep({
                     try {
                       await showPreviewImportFromProfileFormatErrorDialog({
                         profileIds: [profile.id],
-                        profileTypeFieldIds: e.graphQLErrors?.[0].extensions
+                        profileTypeFieldIds: e.errors?.[0].extensions
                           ?.profileTypeFieldIds as string[],
                       });
                       await createPetition(true);

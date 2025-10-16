@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
@@ -15,7 +16,7 @@ import {
   useSentPetitionMessageDialog,
 } from "../../dialogs/SentPetitionMessageDialog";
 
-import { getOperationName } from "@apollo/client/utilities";
+import { getOperationName } from "@apollo/client/utilities/internal";
 import { useCallback } from "react";
 import { UserReference } from "../../../common/UserReference";
 import { useConfirmCancelScheduledMessageDialog } from "../../dialogs/ConfirmCancelScheduledMessageDialog";

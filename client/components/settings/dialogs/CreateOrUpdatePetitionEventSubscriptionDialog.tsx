@@ -1,4 +1,5 @@
-import { ApolloError, gql, useApolloClient, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient, useQuery } from "@apollo/client/react";
 import {
   Box,
   Button,
@@ -38,6 +39,7 @@ import {
   CreateOrUpdatePetitionEventSubscriptionDialog_petitionsDocument,
   PetitionEventType,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
@@ -50,6 +52,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { OptionProps, SingleValueProps, components } from "react-select";
 import Select from "react-select/async";
 import { isNonNullish, isNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { useDeleteWebhookSignatureKeysDialog } from "./ConfirmDeleteWebhookSignatureKeysDialog";
 interface CreateOrUpdatePetitionEventSubscriptionDialogProps {
   eventSubscription?: CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscriptionFragment;
@@ -192,7 +195,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
 
   const loadTemplates = useDebouncedAsync(
     async (search: string | null | undefined) => {
-      const result = await apollo.query({
+      const { data } = await apollo.query({
         query: CreateOrUpdatePetitionEventSubscriptionDialog_petitionsDocument,
         variables: {
           offset: 0,
@@ -205,8 +208,14 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
         },
         fetchPolicy: "no-cache",
       });
-      assertTypenameArray(result.data.petitions.items, "PetitionTemplate");
-      return result.data.petitions.items;
+
+      assert(
+        isNonNullish(data),
+        "Result data in CreateOrUpdatePetitionEventSubscriptionDialog_petitionsDocument is missing",
+      );
+      assertTypenameArray(data.petitions.items, "PetitionTemplate");
+
+      return data.petitions.items;
     },
     300,
     [],
@@ -267,7 +276,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
   const { data } = useQuery(
     CreateOrUpdatePetitionEventSubscriptionDialog_petitionWithFieldsDocument,
     {
-      variables: fromTemplate ? { petitionId: fromTemplate.id } : undefined,
+      variables: { petitionId: fromTemplate?.id ?? "" },
       skip: isNullish(fromTemplate),
       fetchPolicy: "no-cache",
     },
@@ -333,8 +342,8 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
                 props.onResolve();
               }
             } catch (error) {
-              if (error instanceof ApolloError) {
-                const code = error.graphQLErrors[0]?.extensions?.code;
+              if (isApolloError(error)) {
+                const code = error.errors[0]?.extensions?.code;
                 if (code === "WEBHOOK_CHALLENGE_FAILED") {
                   setError("eventsUrl", { type: "challengeFailed" }, { shouldFocus: true });
                 }

@@ -1,4 +1,5 @@
-import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient, useMutation } from "@apollo/client/react";
 import {
   Box,
   Button,
@@ -111,7 +112,7 @@ export const TagSelect = Object.assign(
           if (firstLoadRef.current) {
             firstLoadRef.current = false;
           } else {
-            if (isNullish(data.tags) && partial) {
+            if (isNullish(data?.tags) && partial) {
               rerender();
             }
           }
@@ -453,7 +454,7 @@ function useGetTagValues<IsMulti extends boolean = false>(
           },
           fetchPolicy: "network-only",
         });
-        const fromServerById = indexBy(fromServer.data.tags.items, (x) => x.id);
+        const fromServerById = indexBy(fromServer.data?.tags.items ?? [], (x) => x.id);
         const result = fromCache.map(([id, value]) => value ?? fromServerById[id]!);
         return isMulti ? result : result[0];
       } catch {}

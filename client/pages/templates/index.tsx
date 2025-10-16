@@ -12,7 +12,8 @@ import { createApolloClient } from "@parallel/utils/apollo/client";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { useIntl } from "react-intl";
-import { indexBy } from "remeda";
+import { indexBy, isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 
 function Templates({ samples }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
@@ -72,14 +73,15 @@ export async function getServerSideProps({ req, ...ctx }: GetServerSidePropsCont
   const client = createApolloClient({}, { req });
   const locale = ctx.locale as PetitionLocale;
 
-  const {
-    data: { landingTemplateCategorySamples: samples },
-  } = await client.query({
+  const { data } = await client.query({
     query: LandingTemplates_categorySamplesDocument,
     variables: { offset: 0, limit: 3, locale },
   });
+
+  assert(isNonNullish(data), "Result data in LandingTemplates_categorySamplesDocument is missing");
+
   return {
-    props: { samples },
+    props: { samples: data.landingTemplateCategorySamples },
   };
 }
 

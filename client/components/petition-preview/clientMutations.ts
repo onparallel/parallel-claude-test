@@ -1,4 +1,5 @@
-import { DataProxy, gql, useApolloClient, useLazyQuery, useMutation } from "@apollo/client";
+import { ApolloCache, gql } from "@apollo/client";
+import { useApolloClient, useLazyQuery, useMutation } from "@apollo/client/react";
 import {
   PreviewPetitionFieldMutations_createFieldGroupRepliesFromProfilesDocument,
   PreviewPetitionFieldMutations_createFileUploadReplyCompleteDocument,
@@ -86,11 +87,11 @@ export function useDeletePetitionReply() {
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
-        updatePreviewFieldReplies(client, fieldId, (replies) =>
+        updatePreviewFieldReplies(client.cache, fieldId, (replies) =>
           replies.filter(({ id }) => id !== replyId),
         );
         if (parentReplyId) {
-          updatePreviewFieldReply(client, parentReplyId, (reply) => {
+          updatePreviewFieldReply(client.cache, parentReplyId, (reply) => {
             return {
               ...(reply ?? {}),
               children: reply?.children?.map((child) => {
@@ -174,7 +175,7 @@ export function useUpdatePetitionFieldReply() {
 
       if (isCacheOnly) {
         const { fromZonedTime } = await import("date-fns-tz");
-        updateReplyContent(client, replyId, (oldContent) => ({
+        updateReplyContent(client.cache, replyId, (oldContent) => ({
           ...oldContent,
           ...(field?.type === "DATE_TIME"
             ? {
@@ -283,7 +284,7 @@ export function useCreatePetitionFieldReply() {
 
         const id = `${fieldId}-${getRandomId()}`;
 
-        updatePreviewFieldReplies(client, fieldId, (replies) => [
+        updatePreviewFieldReplies(client.cache, fieldId, (replies) => [
           ...(replies ?? []),
           {
             id,
@@ -312,7 +313,7 @@ export function useCreatePetitionFieldReply() {
         ]);
 
         if (parentReplyId) {
-          updatePreviewFieldReply(client, parentReplyId, (reply) => {
+          updatePreviewFieldReply(client.cache, parentReplyId, (reply) => {
             return {
               ...(reply ?? {}),
               children: reply?.children?.map((child) => {
@@ -457,7 +458,7 @@ export function useCreateFileUploadReply() {
       if (isCacheOnly) {
         for (const { file } of content) {
           const id = `${fieldId}-${getRandomId()}`;
-          updatePreviewFieldReplies(apollo, fieldId, (replies) => [
+          updatePreviewFieldReplies(apollo.cache, fieldId, (replies) => [
             ...(replies ?? []),
             {
               id,
@@ -477,7 +478,7 @@ export function useCreateFileUploadReply() {
           ]);
 
           if (parentReplyId) {
-            updatePreviewFieldReply(apollo, parentReplyId, (reply) => {
+            updatePreviewFieldReply(apollo.cache, parentReplyId, (reply) => {
               return {
                 ...(reply ?? {}),
                 children: reply?.children?.map((child) => {
@@ -540,7 +541,7 @@ export function useCreateFileUploadReply() {
               await uploadFile(file, presignedPostData, {
                 signal: controller.signal,
                 onProgress(progress) {
-                  updateReplyContent(apollo, reply.id, (content) => ({
+                  updateReplyContent(apollo.cache, reply.id, (content) => ({
                     ...content,
                     progress,
                   }));
@@ -608,7 +609,7 @@ export function useStartAsyncFieldCompletion() {
     }) {
       if (isCacheOnly) {
         const id = `${fieldId}-${getRandomId()}`;
-        updatePreviewFieldReplies(apollo, fieldId, () => [
+        updatePreviewFieldReplies(apollo.cache, fieldId, () => [
           {
             id,
             __typename: "PetitionFieldReply",
@@ -628,7 +629,7 @@ export function useStartAsyncFieldCompletion() {
         ]);
 
         if (parentReplyId) {
-          updatePreviewFieldReply(apollo, parentReplyId, (reply) => {
+          updatePreviewFieldReply(apollo.cache, parentReplyId, (reply) => {
             return {
               ...(reply ?? {}),
               children: reply?.children?.map((child) => {
@@ -675,7 +676,7 @@ export function useStartAsyncFieldCompletion() {
 // CACHE UPDATES
 
 export function updatePreviewFieldReplies(
-  proxy: DataProxy,
+  proxy: ApolloCache,
   fieldId: string,
   updateFn: (
     cached: PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment["previewReplies"],
@@ -694,7 +695,7 @@ export function updatePreviewFieldReplies(
 }
 
 function updatePreviewFieldReply(
-  proxy: DataProxy,
+  proxy: ApolloCache,
   replyId: string,
   updateFn: (
     cached: PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragment | null,
@@ -708,7 +709,7 @@ function updatePreviewFieldReply(
   });
 }
 
-export function cleanPreviewFieldReplies(proxy: DataProxy, fieldId: string) {
+export function cleanPreviewFieldReplies(proxy: ApolloCache, fieldId: string) {
   updateFragment(proxy, {
     id: fieldId,
     fragment: PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc,
@@ -765,7 +766,7 @@ updatePreviewFieldReplies.fragments = {
 };
 
 function updateReplyContent(
-  proxy: DataProxy,
+  proxy: ApolloCache,
   replyId: string,
   updateFn: (cached: Record<string, any>) => Record<string, any>,
 ) {

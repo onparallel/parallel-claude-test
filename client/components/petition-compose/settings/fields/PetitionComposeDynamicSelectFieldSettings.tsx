@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Box, Center, Flex, List, ListItem, Progress, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";

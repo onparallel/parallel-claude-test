@@ -1,4 +1,5 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import {
   Box,
   Button,
@@ -23,6 +24,8 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { components, MultiValueGenericProps, NoticeProps, OptionProps } from "react-select";
 import AsyncSelect from "react-select/async";
+import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 
 interface CreateFolderDialogProps {
   isTemplate: boolean;
@@ -69,7 +72,7 @@ function CreateFolderDialog({
   const apollo = useApolloClient();
   const loadPetitions = useCallback(
     async (search: string) => {
-      const result = await apollo.query({
+      const { data } = await apollo.query({
         query: CreateFolderDialog_petitionsDocument,
         variables: {
           offset: 0,
@@ -84,7 +87,9 @@ function CreateFolderDialog({
         fetchPolicy: "network-only",
       });
 
-      return result.data.petitions.items.filter(
+      assert(isNonNullish(data), "Result data in CreateFolderDialog_petitionsDocument is missing");
+
+      return data.petitions.items.filter(
         (i) =>
           i.__typename !== "PetitionFolder" &&
           (i as any).myEffectivePermission!.permissionType !== "READ",

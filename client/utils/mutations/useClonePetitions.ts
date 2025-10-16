@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import { useClonePetitions_clonePetitionsDocument } from "@parallel/graphql/__types";
 import { useCallback } from "react";

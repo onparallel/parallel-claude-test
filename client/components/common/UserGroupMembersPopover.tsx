@@ -1,4 +1,5 @@
-import { gql, useLazyQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client/react";
 import {
   Center,
   Flex,
@@ -37,7 +38,6 @@ export function UserGroupMembersPopover({
   userDetails,
 }: UserGroupMembersPopoverProps) {
   const [getMembers, { data }] = useLazyQuery(UserGroupMembersPopover_getMembersDocument, {
-    variables: { userGroupId },
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
   });
@@ -45,7 +45,14 @@ export function UserGroupMembersPopover({
     ? (data.getUsersOrGroups[0] as UserGroupMembersPopover_UserGroupFragment)
     : null;
   return (
-    <Popover trigger="hover" onOpen={() => getMembers()}>
+    <Popover
+      trigger="hover"
+      onOpen={() =>
+        getMembers({
+          variables: { userGroupId },
+        })
+      }
+    >
       <PopoverTrigger>{children}</PopoverTrigger>
       <Portal>
         <PopoverContent width="fit-content" maxWidth="320px">

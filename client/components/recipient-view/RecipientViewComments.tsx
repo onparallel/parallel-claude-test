@@ -1,4 +1,5 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import {
   Badge,
   Box,
@@ -290,7 +291,6 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
 
         <CloseButton size="sm" onClick={onClose} />
       </HStack>
-
       <Stack padding={0} overflow="auto" height="100%" spacing={0}>
         {isNullish(fieldId) ? (
           fieldsWithComments.length === 0 && isLoadingAccess ? (
@@ -359,12 +359,12 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
                 />
                 {deviceType === null ? (
                   // show only on desktop
-                  <Text fontSize="sm" color="gray.600">
+                  (<Text fontSize="sm" color="gray.600">
                     <FormattedMessage
                       id="component.petition-comments-and-notes-editor.ctrl-enter-help"
                       defaultMessage="Ctrl + enter to send"
                     />
-                  </Text>
+                  </Text>)
                 ) : null}
               </Stack>
               <Box>

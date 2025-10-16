@@ -1,4 +1,5 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Box, Button, Flex, HStack, IconButton } from "@chakra-ui/react";
 import { AddIcon, CloseIcon } from "@parallel/chakra/icons";
 import { ProfileForm } from "@parallel/components/profiles/ProfileForm";

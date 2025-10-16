@@ -1,4 +1,5 @@
-import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient, useMutation, useQuery } from "@apollo/client/react";
 import {
   PetitionPermissionType,
   PreviewPetitionField_PetitionBaseFragment,
@@ -250,6 +251,10 @@ export function PreviewPetitionField({
 
   const { refetch } = useQuery(PreviewPetitionField_queryDocument, {
     skip: true,
+    variables: {
+      petitionId,
+      fieldId: field.id,
+    },
   });
   const handleRefreshAsyncField = useCallback(async () => {
     await refetch({ fieldId: field.id, petitionId });

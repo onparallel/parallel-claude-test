@@ -1,4 +1,5 @@
-import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient, useMutation } from "@apollo/client/react";
 import { BaseModalProps } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
@@ -13,7 +14,8 @@ import {
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
-import { isNullish } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { isWindowBlockedError, openNewWindow } from "../openNewWindow";
 import { waitFor } from "../promises/waitFor";
 import { withError } from "../promises/withError";
@@ -108,16 +110,17 @@ export function usePrintPdfBackgroundTask() {
           if (performance.now() - startTime > timeout) {
             throw new Error("TIMEOUT");
           }
-          const {
-            data: { task },
-          } = await apollo.query({
+          const { data } = await apollo.query({
             query: usePrintPdfTask_taskDocument,
             variables: { id: initialData!.createPrintPdfTask.id },
             fetchPolicy: "network-only",
           });
-          if (task.status === "COMPLETED") {
-            return task;
-          } else if (task.status === "FAILED") {
+
+          assert(isNonNullish(data), "Result data in usePrintPdfTask_taskDocument is missing");
+
+          if (data.task.status === "COMPLETED") {
+            return data.task;
+          } else if (data.task.status === "FAILED") {
             throw new Error("FAILED");
           }
 

@@ -1,4 +1,5 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import { Box, Center, Circle, Flex, Grid, Heading, Image, Stack } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
@@ -22,6 +23,7 @@ import Router from "next/router";
 import { MouseEvent, MouseEventHandler } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 
 type ChooseOrgProps = UnwrapPromise<ReturnType<typeof ChooseOrg.getInitialProps>>;
 
@@ -36,6 +38,9 @@ function ChooseOrg({ organizations }: ChooseOrgProps) {
       });
       await apollo.clearStore();
       const { data } = await apollo.query({ query: ChooseOrg_QueryDocument });
+
+      assert(isNonNullish(data), "Result data in ChooseOrg_QueryDocument is missing");
+
       Router.push(
         data.me.hasDashboards
           ? "/app/home"

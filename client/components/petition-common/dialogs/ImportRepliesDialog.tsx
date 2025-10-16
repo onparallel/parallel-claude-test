@@ -1,4 +1,5 @@
-import { FetchResult, gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { ApolloLink, gql } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
 import {
   Box,
   Button,
@@ -66,6 +67,9 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
 
   const [getSelectedPetition, { data: selectedPetitionData }] = useLazyQuery(
     ImportRepliesDialog_petitionDocument,
+    {
+      fetchPolicy: "cache-and-network",
+    },
   );
 
   const { data: petitionData } = useQuery(ImportRepliesDialog_petitionDocument, {
@@ -186,7 +190,6 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
                   variables: {
                     petitionId: data.sourcePetitionId,
                   },
-                  fetchPolicy: "cache-and-network",
                 });
 
                 setInitialMapping(res.data);
@@ -217,7 +220,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
                 groupsWithoutChildren.length === 0
               ) {
                 let res =
-                  null as FetchResult<ImportRepliesDialog_createPetitionFieldRepliesMutation> | null;
+                  null as ApolloLink.Result<ImportRepliesDialog_createPetitionFieldRepliesMutation> | null;
 
                 if (mappedFields.fields.length) {
                   res = await createPetitionFieldReplies({

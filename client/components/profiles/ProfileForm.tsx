@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import {
   Alert,
   AlertDescription,
@@ -314,7 +315,7 @@ export const ProfileForm = Object.assign(
               });
             } catch (e) {
               if (isApolloError(e, "PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT")) {
-                const { conflicts } = e.graphQLErrors[0].extensions as {
+                const { conflicts } = e.errors[0].extensions as {
                   conflicts: { profileTypeFieldId: string; profileId: string }[];
                 };
                 for (const conflict of conflicts) {
@@ -328,7 +329,7 @@ export const ProfileForm = Object.assign(
               } else if (isApolloError(e, "INVALID_PROFILE_FIELD_VALUE")) {
                 if (isApolloError(e, "INVALID_PROFILE_FIELD_VALUE")) {
                   const aggregatedErrors =
-                    (e.graphQLErrors[0].extensions!.aggregatedErrors as {
+                    (e.errors[0].extensions!.aggregatedErrors as {
                       profileTypeFieldId: string;
                       code: string;
                     }[]) ?? [];

@@ -1,4 +1,5 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import { Box, Text } from "@chakra-ui/react";
 import {
   ProfileTypeSelect_ProfileTypeFragment,
@@ -25,6 +26,7 @@ import Select, {
 } from "react-select";
 import AsyncSelect from "react-select/async";
 import { indexBy, isNonNullish, zip } from "remeda";
+import { assert } from "ts-essentials";
 import { LocalizableUserTextRender, localizableUserTextRender } from "./LocalizableUserTextRender";
 import { OverflownText } from "./OverflownText";
 
@@ -116,7 +118,7 @@ export const ProfileTypeSelect = Object.assign(
 
     const loadProfileTypes = useDebouncedAsync(
       async (search: string | null | undefined) => {
-        const result = await apollo.query({
+        const { data } = await apollo.query({
           query: ProfileTypeSelect_profileTypesDocument,
           variables: {
             offset: 0,
@@ -127,9 +129,17 @@ export const ProfileTypeSelect = Object.assign(
           },
           fetchPolicy: "no-cache",
         });
-        const items = result.data.profileTypes.items;
 
-        return (showOnlyCreatable ? items.filter((pt) => pt.canCreate) : items) as any[];
+        assert(
+          isNonNullish(data),
+          "Result data in ProfileTypeSelect_profileTypesDocument is missing",
+        );
+
+        return (
+          showOnlyCreatable
+            ? data.profileTypes.items.filter((pt) => pt.canCreate)
+            : data.profileTypes.items
+        ) as any[];
       },
       300,
       [intl.locale, showOnlyCreatable],
@@ -266,7 +276,7 @@ function useGetProfileTypes() {
               },
               fetchPolicy: "network-only",
             });
-            return fromServer.data.profileType;
+            return fromServer.data?.profileType;
           } catch (e) {}
         },
         {

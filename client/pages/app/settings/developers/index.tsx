@@ -20,7 +20,7 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Badge, Box, Button, Center, HStack, List, ListItem, Switch, Text } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { AlertCircleFilledIcon, DeleteIcon, EditIcon, RepeatIcon } from "@parallel/chakra/icons";

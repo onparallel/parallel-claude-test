@@ -1,4 +1,5 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import { HStack, Text } from "@chakra-ui/react";
 import { UserIcon } from "@parallel/chakra/icons";
 import { CloseButton } from "@parallel/components/common/CloseButton";

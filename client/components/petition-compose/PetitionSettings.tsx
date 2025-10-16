@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import {
   Alert,
   AlertDescription,
@@ -338,7 +339,7 @@ function _PetitionSettings({
     } catch (error) {
       if (
         isApolloError(error) &&
-        error.graphQLErrors[0]?.extensions?.code === "INVALID_PETITION_RESTRICTION_PASSWORD"
+        error.errors[0]?.extensions?.code === "INVALID_PETITION_RESTRICTION_PASSWORD"
       ) {
         return false;
       } else {

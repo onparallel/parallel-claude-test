@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Flex, MenuDivider, MenuItem, MenuList } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 import {
