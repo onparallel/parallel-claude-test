@@ -106,42 +106,41 @@ export function DocumentThemeEditor({ user, isDisabled, themeId }: DocumentTheme
   return (
     <Stack spacing={8}>
       <Stack spacing={4}>
-        {user.hasPdfExportV2 ? (
-          <Stack spacing={2}>
-            <Text as="h4" id="layout-label" fontSize="lg" fontWeight="semibold">
-              <FormattedMessage
-                id="component.document-theme-editor.layout-header"
-                defaultMessage="Layout"
-              />
-            </Text>
-            <Controller
-              name="doubleColumn"
-              control={control}
-              render={({ field: { onChange, value, onBlur } }) => (
-                <RadioGroup
-                  value={value ? "double" : "single"}
-                  onChange={(value) => onChange(value === "double")}
-                  aria-labelledby="layout-label"
-                >
-                  <Stack spacing={5} direction="row">
-                    <Radio value="single" flex={1}>
-                      <FormattedMessage
-                        id="component.document-theme-editor.layout-single-column"
-                        defaultMessage="Single column"
-                      />
-                    </Radio>
-                    <Radio value="double" flex={1}>
-                      <FormattedMessage
-                        id="component.document-theme-editor.layout-double-column"
-                        defaultMessage="Double column"
-                      />
-                    </Radio>
-                  </Stack>
-                </RadioGroup>
-              )}
+        <Stack spacing={2}>
+          <Text as="h4" id="layout-label" fontSize="lg" fontWeight="semibold">
+            <FormattedMessage
+              id="component.document-theme-editor.layout-header"
+              defaultMessage="Layout"
             />
-          </Stack>
-        ) : null}
+          </Text>
+          <Controller
+            name="doubleColumn"
+            control={control}
+            render={({ field: { onChange, value, onBlur } }) => (
+              <RadioGroup
+                value={value ? "double" : "single"}
+                onChange={(value) => onChange(value === "double")}
+                aria-labelledby="layout-label"
+              >
+                <Stack spacing={5} direction="row">
+                  <Radio value="single" flex={1}>
+                    <FormattedMessage
+                      id="component.document-theme-editor.layout-single-column"
+                      defaultMessage="Single column"
+                    />
+                  </Radio>
+                  <Radio value="double" flex={1}>
+                    <FormattedMessage
+                      id="component.document-theme-editor.layout-double-column"
+                      defaultMessage="Double column"
+                    />
+                  </Radio>
+                </Stack>
+              </RadioGroup>
+            )}
+          />
+        </Stack>
+
         <Stack spacing={2}>
           <Text as="h4" fontSize="lg" fontWeight="semibold">
             <FormattedMessage
@@ -172,17 +171,13 @@ export function DocumentThemeEditor({ user, isDisabled, themeId }: DocumentTheme
                   defaultMessage: "Bottom",
                 }),
               },
-              ...(user.hasPdfExportV2
-                ? [
-                    {
-                      key: "columnGap" as const,
-                      label: intl.formatMessage({
-                        id: "component.document-theme-editor.column-gap",
-                        defaultMessage: "Column gap",
-                      }),
-                    },
-                  ]
-                : []),
+              {
+                key: "columnGap" as const,
+                label: intl.formatMessage({
+                  id: "component.document-theme-editor.column-gap",
+                  defaultMessage: "Column gap",
+                }),
+              },
             ].map(({ key, label }) => (
               <FormControl key={key} isDisabled={isDisabled} isInvalid={!!formState.errors[key]}>
                 <FormLabel fontWeight="normal" width="auto">
@@ -388,7 +383,6 @@ export function DocumentThemeEditor({ user, isDisabled, themeId }: DocumentTheme
 DocumentThemeEditor.fragments = {
   User: gql`
     fragment DocumentThemeEditor_User on User {
-      hasPdfExportV2: hasFeatureFlag(featureFlag: PDF_EXPORT_V2)
       ...useAvailablePetitionLocales_User
     }
     ${useAvailablePetitionLocales.fragments.User}

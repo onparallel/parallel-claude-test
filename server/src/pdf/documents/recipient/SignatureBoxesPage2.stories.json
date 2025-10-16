@@ -2,7 +2,7 @@
   "title": "Documents",
   "stories": [
     {
-      "name": "Signature Boxes Page Typst",
+      "name": "Signature Boxes Page",
       "parameters": {
         "server": {
           "id": "documents/recipient/SignatureBoxesPage2"

@@ -445,11 +445,6 @@
     "context": "Reply by {name} on {date}"
   },
   {
-    "term": "document.petition-export.view-replies-in-nd",
-    "definition": "See answers in ND",
-    "context": "See answers in ND"
-  },
-  {
     "term": "export-template-report.column-header-untitled-field",
     "definition": "Untitled field",
     "context": "Untitled field"

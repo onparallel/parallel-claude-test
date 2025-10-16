@@ -125,11 +125,6 @@
     "context": "Reply by {name} on {date}"
   },
   {
-    "term": "document.petition-export.view-replies-in-nd",
-    "definition": "Veure respostes a ND",
-    "context": "See answers in ND"
-  },
-  {
     "term": "footer.slogan",
     "definition": "Treballa millor amb",
     "context": "Work better with"

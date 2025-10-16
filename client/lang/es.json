@@ -4605,16 +4605,6 @@
     "context": "Others"
   },
   {
-    "term": "component.feature-flag-descriptions.pdf-export-v2-description",
-    "definition": "Activa el nuevo motor de PDF \"Typst\"",
-    "context": "Enables the new PDF engine \"Typst\""
-  },
-  {
-    "term": "component.feature-flag-descriptions.pdf-export-v2-name",
-    "definition": "PDF Export V2",
-    "context": "PDF Export V2"
-  },
-  {
     "term": "component.feature-flag-descriptions.permission-management-description",
     "definition": "Permite a los usuarios gestionar los permisos de usuario en los equipos.",
     "context": "Allows users to manage user permissions on teams."

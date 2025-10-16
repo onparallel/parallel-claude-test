@@ -373,6 +373,4 @@ function BackgroundCheckProfileTypst(props: BackgroundCheckProfileProps, intl: I
   `;
 }
 
-BackgroundCheckProfileTypst.TYPST = true;
-
 export default BackgroundCheckProfileTypst as PdfDocument<{}, BackgroundCheckProfileProps>;

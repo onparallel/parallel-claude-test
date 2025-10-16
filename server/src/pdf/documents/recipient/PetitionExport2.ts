@@ -815,8 +815,6 @@ function groupFieldsByPages<T extends PetitionExport2_PetitionBaseFragment>(
   return pages;
 }
 
-PetitionExport2.TYPST = true;
-
 PetitionExport2.fragments = {
   get PetitionBase() {
     return gql`

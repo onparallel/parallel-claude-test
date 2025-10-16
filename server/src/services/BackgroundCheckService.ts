@@ -2,10 +2,8 @@ import { inject, injectable } from "inversify";
 import { difference, isNonNullish, isNullish } from "remeda";
 import { Readable } from "stream";
 import { assert } from "ts-essentials";
-
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
-
-import { BackgroundCheckProfileProps } from "../pdf/documents/BackgroundCheckProfile";
+import { BackgroundCheckProfileProps } from "../pdf/documents/BackgroundCheckProfileTypst";
 import { BackgroundCheckResultsProps } from "../pdf/documents/BackgroundCheckResultsTypst";
 import { IPrinter, PRINTER } from "./Printer";
 import { IRedis, REDIS } from "./Redis";

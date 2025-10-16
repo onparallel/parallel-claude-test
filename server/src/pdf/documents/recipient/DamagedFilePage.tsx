@@ -40,6 +40,4 @@ function DamagedFilePage({ theme, fileName }: DamagedFilePageProps, intl: IntlSh
   ].join("\n");
 }
 
-DamagedFilePage.TYPST = true;
-
 export default DamagedFilePage as PdfDocument<{}, DamagedFilePageProps>;

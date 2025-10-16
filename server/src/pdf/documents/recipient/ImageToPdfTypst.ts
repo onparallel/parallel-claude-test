@@ -46,6 +46,4 @@ function ImageToPdfTypst({ imagePath, theme }: ImageToPdfProps, intl: IntlShape)
   `;
 }
 
-ImageToPdfTypst.TYPST = true;
-
 export default ImageToPdfTypst as PdfDocument<{}, ImageToPdfProps>;

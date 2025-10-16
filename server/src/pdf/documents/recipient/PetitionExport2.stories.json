@@ -2,7 +2,7 @@
   "title": "Documents",
   "stories": [
     {
-      "name": "Petition Export Typst",
+      "name": "Petition Export",
       "parameters": {
         "server": {
           "id": "documents/recipient/PetitionExport2"

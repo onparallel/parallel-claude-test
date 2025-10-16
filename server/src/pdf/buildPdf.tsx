@@ -1,107 +1,17 @@
-import { Font, renderToStream } from "@react-pdf/renderer";
 import { execSync } from "child_process";
 import { createReadStream, createWriteStream } from "fs";
 import { copyFile, mkdir, rm, stat, symlink, unlink, writeFile } from "fs/promises";
-import hyphen from "hyphen";
 import { tmpdir } from "os";
 import pMap from "p-map";
 import { resolve } from "path";
-import { createElement } from "react";
-import { IntlConfig, IntlProvider, createIntl } from "react-intl";
-import { entries, filter, forEach, groupBy, isNullish, mapValues, pipe, unique } from "remeda";
+import { IntlConfig, createIntl } from "react-intl";
+import { entries, filter, forEach, groupBy, mapValues, pipe, unique } from "remeda";
 import { Readable } from "stream";
 import { assert } from "ts-essentials";
-import { ContactLocale } from "../db/__types";
 import { toBytes } from "../util/fileSize";
 import { loadMessages } from "../util/loadMessages";
 import { random } from "../util/token";
-import fonts from "./utils/fonts.json";
-import internationalFonts from "./utils/international_fonts.json";
 import { PdfDocument, PdfDocumentGetPropsContext } from "./utils/pdf";
-
-let hasInit = false;
-
-function init() {
-  const families = [...internationalFonts, ...fonts] as {
-    family: string;
-    fonts: { src: string; fontStyle: "italic"; fontWeight: number }[];
-  }[];
-  for (const f of families) {
-    const fonts = f.fonts.map((font) => ({
-      ...font,
-      fontWeight: font.fontWeight ?? 400,
-      src: `${process.env.ASSETS_URL!}/static/fonts/pdf/${encodeURIComponent(f.family)}/${
-        font.src
-      }`,
-    }));
-    Font.register({
-      family: f.family,
-      fonts: [
-        ...fonts,
-        // Add fallback for fonts with missing italic style
-        ...(fonts.some((font) => font.fontStyle === "italic")
-          ? []
-          : [
-              {
-                ...fonts.find(
-                  (font) =>
-                    (font.fontStyle !== "italic" && font.fontWeight === undefined) ||
-                    font.fontWeight === 400,
-                )!,
-                fontStyle: "italic",
-              },
-            ]),
-      ],
-    });
-  }
-
-  Font.registerEmojiSource({
-    format: "png",
-    url: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/",
-  });
-}
-
-async function createHyphenationCallback(locale: ContactLocale) {
-  let pattern;
-  switch (locale) {
-    case "en":
-      pattern = await import("hyphen/patterns/en-us");
-      break;
-    case "es":
-      pattern = await import("hyphen/patterns/es");
-      break;
-    case "it":
-      pattern = await import("hyphen/patterns/it");
-      break;
-    case "pt":
-      pattern = await import("hyphen/patterns/pt");
-      break;
-    case "ca":
-      pattern = await import("hyphen/patterns/ca");
-      break;
-    default:
-      pattern = null as never;
-      break;
-  }
-  const SOFT_HYPHEN = "\u00ad";
-  const hyphenator = hyphen(pattern);
-  const splitHyphen = (word: string) => word.split(SOFT_HYPHEN);
-  const cache = new Map<string, string[]>();
-
-  return (word: string | null) => {
-    if (isNullish(word)) {
-      return [];
-    }
-    if (!cache.has(word)) {
-      const splitted = word.includes(SOFT_HYPHEN)
-        ? splitHyphen(word)
-        : splitHyphen(hyphenator(word) as string);
-      cache.set(word, splitted);
-      return splitted;
-    }
-    return cache.get(word)!;
-  };
-}
 
 interface PdfMetadataItem<TLabel extends string, TValue> {
   func: "metadata";
@@ -179,81 +89,66 @@ export async function buildPdf<ID, P extends {}, M extends Record<string, any>>(
     defaultRichTextElements: {},
     onWarn: () => {},
   };
-  if ("TYPST" in document && document.TYPST) {
-    const content = document(props as any, createIntl(intlProps));
-    const root = resolve(tmpdir(), random(16));
-    await mkdir(`${root}/assets`, { recursive: true });
-    const source = `${root}/document.typ`;
-    const target = `${root}/document.pdf`;
-    try {
-      await writeFile(source, content);
-      const metadata = JSON.parse(
-        execSync(`typst query --input prequery-fallback=true ${source} 'metadata'`, {
-          encoding: "utf-8",
-        }),
-      ) as PdfMetadataItem<string, any>[];
-      await pMap(
-        pipe(
-          metadata,
-          filter((p) => p.label === "<web-resource>"),
-          groupBy((p) => p.value.url as string),
-          mapValues((values) => unique(values.map((v) => v.value.path as string))),
-          entries(),
-          forEach(([, paths]) => assert(paths.every((p) => p.startsWith("assets/")))),
-        ),
-        async ([url, paths]) => {
-          const path = `${root}/${paths[0]}`;
-          await fetchToFile(url, path, {
-            maxFileSize: toBytes(10, "MB"),
-            fallbackUrl: `${process.env.ASSETS_URL!}/static/images/pixel.png`,
-          });
-
-          try {
-            execSync(`convert ${path} -resize 2000x2000\\> ${path}`);
-          } catch (error) {
-            console.log("Error resizing image", error);
-            await fetchToFile(`${process.env.ASSETS_URL!}/static/images/pixel.png`, path);
-          }
-
-          for (const path of paths.slice(1)) {
-            await symlink(`${root}/${paths[0]}`, `${root}/${path}`);
-          }
-        },
-        { concurrency: 3 },
-      );
-      execSync(
-        `typst compile ${source} ${target} --font-path ${resolve(process.cwd(), "../client/public/static/fonts/pdf")}`,
-      );
-      const stream = createReadStream(target);
-      stream.on("close", () => {
-        rm(root, { recursive: true, force: true }).then();
-      });
-      return {
-        stream,
-        metadata: pipe(
-          metadata,
-          filter((p) => p.label !== "<web-resource>"),
-          groupBy((p) => p.label.slice(1, -1)),
-          mapValues((values) => values.map((v) => v.value)),
-        ) as any,
-      };
-    } finally {
-      await rm(`${root}/assets`, { recursive: true, force: true });
-      await unlink(source);
-    }
-  } else {
-    if (!hasInit) {
-      init();
-      hasInit = true;
-    }
-    Font.registerHyphenationCallback(await createHyphenationCallback(context.locale ?? "en"));
-    return {
-      stream: Readable.from(
-        await renderToStream(
-          <IntlProvider {...intlProps}>{createElement<P>(document, props as any)}</IntlProvider>,
-        ),
+  // All documents now use Typst
+  const content = document(props as any, createIntl(intlProps));
+  const root = resolve(tmpdir(), random(16));
+  await mkdir(`${root}/assets`, { recursive: true });
+  const source = `${root}/document.typ`;
+  const target = `${root}/document.pdf`;
+  try {
+    await writeFile(source, content);
+    const metadata = JSON.parse(
+      execSync(`typst query --input prequery-fallback=true ${source} 'metadata'`, {
+        encoding: "utf-8",
+      }),
+    ) as PdfMetadataItem<string, any>[];
+    await pMap(
+      pipe(
+        metadata,
+        filter((p) => p.label === "<web-resource>"),
+        groupBy((p) => p.value.url as string),
+        mapValues((values) => unique(values.map((v) => v.value.path as string))),
+        entries(),
+        forEach(([, paths]) => assert(paths.every((p) => p.startsWith("assets/")))),
       ),
-      metadata: {} as any,
+      async ([url, paths]) => {
+        const path = `${root}/${paths[0]}`;
+        await fetchToFile(url, path, {
+          maxFileSize: toBytes(10, "MB"),
+          fallbackUrl: `${process.env.ASSETS_URL!}/static/images/pixel.png`,
+        });
+
+        try {
+          execSync(`convert ${path} -resize 2000x2000\\> ${path}`);
+        } catch (error) {
+          console.log("Error resizing image", error);
+          await fetchToFile(`${process.env.ASSETS_URL!}/static/images/pixel.png`, path);
+        }
+
+        for (const path of paths.slice(1)) {
+          await symlink(`${root}/${paths[0]}`, `${root}/${path}`);
+        }
+      },
+      { concurrency: 3 },
+    );
+    execSync(
+      `typst compile ${source} ${target} --font-path ${resolve(process.cwd(), "../client/public/static/fonts/pdf")}`,
+    );
+    const stream = createReadStream(target);
+    stream.on("close", () => {
+      rm(root, { recursive: true, force: true }).then();
+    });
+    return {
+      stream,
+      metadata: pipe(
+        metadata,
+        filter((p) => p.label !== "<web-resource>"),
+        groupBy((p) => p.label.slice(1, -1)),
+        mapValues((values) => values.map((v) => v.value)),
+      ) as any,
     };
+  } finally {
+    await rm(`${root}/assets`, { recursive: true, force: true });
+    await unlink(source);
   }
 }

@@ -416,17 +416,6 @@ export function useFeatureFlags() {
             }),
           },
           {
-            name: "PDF_EXPORT_V2",
-            title: intl.formatMessage({
-              id: "component.feature-flag-descriptions.pdf-export-v2-name",
-              defaultMessage: "PDF Export V2",
-            }),
-            description: intl.formatMessage({
-              id: "component.feature-flag-descriptions.pdf-export-v2-description",
-              defaultMessage: 'Enables the new PDF engine "Typst"',
-            }),
-          },
-          {
             name: "DASHBOARDS",
             title: intl.formatMessage({
               id: "component.feature-flag-descriptions.dashboards-name",

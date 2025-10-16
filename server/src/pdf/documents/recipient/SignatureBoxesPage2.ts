@@ -5,7 +5,7 @@ import { isNonNullish } from "remeda";
 import { PdfDocumentTheme } from "../../../util/PdfDocumentTheme";
 import {
   SignatureBoxesPage2_PetitionBaseFragment,
-  SignatureBoxesPage_petitionDocument,
+  SignatureBoxesPage2_petitionDocument,
 } from "../../__types";
 import { documentSignatures } from "../../utils/documentSignatures";
 import { PdfDocument, PdfDocumentGetProps } from "../../utils/pdf";
@@ -59,8 +59,6 @@ function SignatureBoxesPage2({ petition }: SignatureBoxesPageProps, intl: IntlSh
   ].join("\n");
 }
 
-SignatureBoxesPage2.TYPST = true;
-
 SignatureBoxesPage2.fragments = {
   get PetitionBase() {
     return gql`
@@ -97,7 +95,7 @@ SignatureBoxesPage2.queries = [
 ];
 
 SignatureBoxesPage2.getProps = (async ({ petitionId, ...rest }, { client }) => {
-  const response = await client!.request(SignatureBoxesPage_petitionDocument, {
+  const response = await client!.request(SignatureBoxesPage2_petitionDocument, {
     petitionId,
   });
   return {

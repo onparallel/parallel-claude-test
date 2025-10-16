@@ -45,7 +45,8 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
   const form = useForm<DocumentThemeEditorData>({
     mode: "onChange",
     defaultValues: {
-      ...(user.hasPdfExportV2 ? { doubleColumn: false, columnGap: 10 } : {}),
+      doubleColumn: false,
+      columnGap: 10,
       ...selectedTheme.data,
     },
   });
@@ -249,7 +250,6 @@ BrandingDocumentTheme.fragments = {
     return gql`
       fragment BrandingDocumentTheme_User on User {
         id
-        hasPdfExportV2: hasFeatureFlag(featureFlag: PDF_EXPORT_V2)
         organization {
           ...DocumentThemePreview_Organization
           pdfDocumentThemes {

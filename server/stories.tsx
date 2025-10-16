@@ -1,4 +1,3 @@
-import { Document, Page, renderToStream, Text, View } from "@react-pdf/renderer";
 import Convert from "ansi-to-html";
 import cors from "cors";
 import { config } from "dotenv";
@@ -88,21 +87,22 @@ app
       });
       stream.pipe(res);
     } catch (error) {
+      console.error("Error rendering PDF:", error);
       if (error instanceof Error) {
-        (
-          await renderToStream(
-            <Document>
-              <Page>
-                <View>
-                  <Text>{error.toString()}</Text>
-                </View>
-                <View>
-                  <Text>{error.stack}</Text>
-                </View>
-              </Page>
-            </Document>,
-          )
-        ).pipe(res);
+        // Return error as HTML instead of PDF
+        const convert = new Convert();
+        res.status(500).send(/* html */ `
+          <html>
+          <body>
+            <h1>Error rendering PDF</h1>
+            <pre style="background-color: #333; color: #fff; max-width: 100vw; white-space: pre-wrap;">${convert.toHtml(
+              escapeHTML(error.toString() + "\n\n" + (error.stack || "")),
+              { bg: "#333", fg: "#fff" },
+            )}</pre>
+            ${LR_SCRIPT}
+          </body>
+          </html>
+        `);
       }
     }
   });

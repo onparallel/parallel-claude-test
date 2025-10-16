@@ -129,8 +129,6 @@ export class PetitionBinder implements IPetitionBinder {
 
     const mainDocs: { path: string; filename?: string }[] = [];
 
-    const userHasExportV2 = await this.featureFlags.userHasFeatureFlag(userId, "PDF_EXPORT_V2");
-
     if (isNullish(customDocumentTemporaryFileId)) {
       const petitionExport = await this.printer.petitionExport(userId, {
         petitionId,
@@ -138,7 +136,6 @@ export class PetitionBinder implements IPetitionBinder {
         showSignatureBoxes,
         includeNetDocumentsLinks,
         locale: petition.recipient_locale,
-        useExportV2: userHasExportV2,
       });
 
       mainDocs.push({
@@ -157,7 +154,6 @@ export class PetitionBinder implements IPetitionBinder {
         const signatureBoxesPage = await this.printer.signatureBoxesPage(userId, {
           petitionId,
           locale: petition.recipient_locale,
-          useExportV2: userHasExportV2,
         });
         mainDocs.push({
           path: await this.writeTemporaryFile(tempDir.path, signatureBoxesPage.stream, "pdf"),

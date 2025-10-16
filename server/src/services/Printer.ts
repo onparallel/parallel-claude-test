@@ -15,14 +15,12 @@ import AnnexCoverPageTypst, {
 } from "../pdf/documents/recipient/AnnexCoverPageTypst";
 import DamagedFilePage, { DamagedFilePageProps } from "../pdf/documents/recipient/DamagedFilePage";
 import ImageToPdfTypst, { ImageToPdfProps } from "../pdf/documents/recipient/ImageToPdfTypst";
-import PetitionExport, {
+import PetitionExport2, {
   PetitionExportInitialData,
-} from "../pdf/documents/recipient/PetitionExport";
-import PetitionExport2 from "../pdf/documents/recipient/PetitionExport2";
-import SignatureBoxesPage, {
+} from "../pdf/documents/recipient/PetitionExport2";
+import SignatureBoxesPage2, {
   SignatureBoxesPageInitialData,
-} from "../pdf/documents/recipient/SignatureBoxesPage";
-import SignatureBoxesPage2 from "../pdf/documents/recipient/SignatureBoxesPage2";
+} from "../pdf/documents/recipient/SignatureBoxesPage2";
 import { toGlobalId } from "../util/globalId";
 import { AUTH, IAuth } from "./AuthService";
 
@@ -34,7 +32,6 @@ export interface IPrinter {
     data: Omit<PetitionExportInitialData, "petitionId" | "assetsUrl"> & {
       petitionId: number;
       locale: ContactLocale;
-      useExportV2?: boolean;
     },
   ): Promise<{ stream: Readable; metadata: DocumentMetadata }>;
   annexCoverPage(
@@ -56,7 +53,6 @@ export interface IPrinter {
     data: Omit<SignatureBoxesPageInitialData, "petitionId"> & {
       petitionId: number;
       locale: ContactLocale;
-      useExportV2?: boolean;
     },
   ): Promise<{ stream: Readable; metadata: DocumentMetadata }>;
   damagedFilePage(
@@ -86,17 +82,15 @@ export class Printer implements IPrinter {
     {
       petitionId,
       locale,
-      useExportV2,
       ...data
     }: Omit<PetitionExportInitialData, "petitionId" | "assetsUrl"> & {
       petitionId: number;
       locale: ContactLocale;
-      useExportV2?: boolean;
     },
   ) {
     const client = await this.createClient(userId);
     return await buildPdf(
-      (useExportV2 ? PetitionExport2 : PetitionExport) as any,
+      PetitionExport2,
       {
         ...data,
         petitionId: toGlobalId("Petition", petitionId),
@@ -148,12 +142,11 @@ export class Printer implements IPrinter {
     data: Omit<SignatureBoxesPageInitialData, "petitionId"> & {
       petitionId: number;
       locale: ContactLocale;
-      useExportV2?: boolean;
     },
   ) {
     const client = await this.createClient(userId);
     return await buildPdf(
-      data.useExportV2 ? SignatureBoxesPage2 : SignatureBoxesPage,
+      SignatureBoxesPage2,
       { petitionId: toGlobalId("Petition", data.petitionId) },
       { client, locale: data.locale },
     );

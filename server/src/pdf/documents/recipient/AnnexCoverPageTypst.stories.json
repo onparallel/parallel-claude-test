@@ -2,7 +2,7 @@
     "title": "Documents",
     "stories": [
         {
-            "name": "Annex Cover Page Typst",
+            "name": "Annex Cover Page",
             "parameters": {
                 "server": {
                     "id": "documents/recipient/AnnexCoverPageTypst"

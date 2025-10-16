@@ -59,6 +59,4 @@ function AnnexCoverPageTypst(
   `;
 }
 
-AnnexCoverPageTypst.TYPST = true;
-
 export default AnnexCoverPageTypst as PdfDocument<{}, AnnexCoverPageProps>;

@@ -2,7 +2,7 @@
   "title": "Documents",
   "stories": [
     {
-      "name": "Image to PDF Typst",
+      "name": "Image to PDF",
       "parameters": {
         "server": {
           "id": "documents/recipient/ImageToPdfTypst"

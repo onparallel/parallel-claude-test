@@ -1000,7 +1000,6 @@ export type FeatureFlag =
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "KEY_PROCESSES"
   | "ON_BEHALF_OF"
-  | "PDF_EXPORT_V2"
   | "PERMISSION_MANAGEMENT"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "PETITION_APPROVAL_FLOW"
@@ -7692,753 +7691,6 @@ export type VerificationCodeRequest = {
   token: Scalars["ID"]["output"];
 };
 
-export type ContactReference_ContactFragment = { id: string; fullName: string };
-
-export type FieldActivity_PetitionFieldReplyFragment = {
-  id: string;
-  status: PetitionFieldReplyStatus;
-  repliedAt: string | null;
-  lastReviewedAt: string | null;
-  repliedBy:
-    | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-    | { __typename: "User"; id: string; fullName: string | null }
-    | null;
-  lastReviewedBy: { id: string; fullName: string | null } | null;
-  field: { requireApproval: boolean } | null;
-};
-
-export type SignaturesBlock_SignatureConfigFragment = {
-  timezone: string;
-  signers: Array<{
-    fullName: string;
-    email: string | null;
-    signWithEmbeddedImageUrl300: string | null;
-  } | null>;
-};
-
-export type UserOrContactReference_UserOrPetitionAccess_PetitionAccess_Fragment = {
-  __typename: "PetitionAccess";
-  contact: { id: string; fullName: string } | null;
-};
-
-export type UserOrContactReference_UserOrPetitionAccess_User_Fragment = {
-  __typename: "User";
-  id: string;
-  fullName: string | null;
-};
-
-export type UserOrContactReference_UserOrPetitionAccessFragment =
-  | UserOrContactReference_UserOrPetitionAccess_PetitionAccess_Fragment
-  | UserOrContactReference_UserOrPetitionAccess_User_Fragment;
-
-export type UserReference_UserFragment = { id: string; fullName: string | null };
-
-export type PetitionExport_PetitionBase_Petition_Fragment = {
-  __typename: "Petition";
-  id: string;
-  name: string | null;
-  fromTemplate: { id: string } | null;
-  currentSignatureRequest: {
-    signatureConfig: {
-      timezone: string;
-      signers: Array<{
-        fullName: string;
-        email: string | null;
-        signWithEmbeddedImageUrl300: string | null;
-      } | null>;
-    };
-  } | null;
-  fields: Array<{
-    id: string;
-    type: PetitionFieldType;
-    multiple: boolean;
-    alias: string | null;
-    options: { [key: string]: any };
-    visibility: { [key: string]: any } | null;
-    math: Array<{ [key: string]: any }> | null;
-    title: string | null;
-    description: string | null;
-    showInPdf: boolean;
-    showActivityInPdf: boolean;
-    replies: Array<{
-      id: string;
-      content: { [key: string]: any };
-      isAnonymized: boolean;
-      status: PetitionFieldReplyStatus;
-      metadata: { [key: string]: any };
-      repliedAt: string | null;
-      lastReviewedAt: string | null;
-      children: Array<{
-        field: {
-          id: string;
-          type: PetitionFieldType;
-          multiple: boolean;
-          alias: string | null;
-          options: { [key: string]: any };
-          visibility: { [key: string]: any } | null;
-          math: Array<{ [key: string]: any }> | null;
-          title: string | null;
-          description: string | null;
-          showInPdf: boolean;
-          showActivityInPdf: boolean;
-          parent: { id: string; showActivityInPdf: boolean } | null;
-          children: Array<{
-            id: string;
-            type: PetitionFieldType;
-            title: string | null;
-            options: { [key: string]: any };
-            description: string | null;
-            showInPdf: boolean;
-            showActivityInPdf: boolean;
-            visibility: { [key: string]: any } | null;
-            math: Array<{ [key: string]: any }> | null;
-            multiple: boolean;
-            parent: { id: string } | null;
-            replies: Array<{
-              id: string;
-              status: PetitionFieldReplyStatus;
-              content: { [key: string]: any };
-              metadata: { [key: string]: any };
-              isAnonymized: boolean;
-              repliedAt: string | null;
-              lastReviewedAt: string | null;
-              repliedBy:
-                | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-                | { __typename: "User"; id: string; fullName: string | null }
-                | null;
-              lastReviewedBy: { id: string; fullName: string | null } | null;
-              field: { requireApproval: boolean } | null;
-            }>;
-          }> | null;
-        };
-        replies: Array<{
-          id: string;
-          status: PetitionFieldReplyStatus;
-          content: { [key: string]: any };
-          metadata: { [key: string]: any };
-          isAnonymized: boolean;
-          repliedAt: string | null;
-          lastReviewedAt: string | null;
-          repliedBy:
-            | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-            | { __typename: "User"; id: string; fullName: string | null }
-            | null;
-          lastReviewedBy: { id: string; fullName: string | null } | null;
-          field: { requireApproval: boolean } | null;
-        }>;
-      }> | null;
-      repliedBy:
-        | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-        | { __typename: "User"; id: string; fullName: string | null }
-        | null;
-      lastReviewedBy: { id: string; fullName: string | null } | null;
-      field: { requireApproval: boolean } | null;
-    }>;
-    children: Array<{
-      id: string;
-      type: PetitionFieldType;
-      multiple: boolean;
-      alias: string | null;
-      options: { [key: string]: any };
-      visibility: { [key: string]: any } | null;
-      math: Array<{ [key: string]: any }> | null;
-      title: string | null;
-      description: string | null;
-      showInPdf: boolean;
-      showActivityInPdf: boolean;
-      replies: Array<{
-        id: string;
-        status: PetitionFieldReplyStatus;
-        content: { [key: string]: any };
-        metadata: { [key: string]: any };
-        isAnonymized: boolean;
-        repliedAt: string | null;
-        lastReviewedAt: string | null;
-        repliedBy:
-          | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-          | { __typename: "User"; id: string; fullName: string | null }
-          | null;
-        lastReviewedBy: { id: string; fullName: string | null } | null;
-        field: { requireApproval: boolean } | null;
-      }>;
-      parent: { id: string } | null;
-    }> | null;
-    parent: { id: string; showActivityInPdf: boolean } | null;
-  }>;
-  organization: { name: string; logoUrl: string | null };
-  selectedDocumentTheme: { data: { [key: string]: any } };
-  variables: Array<{ name: string; defaultValue: number }>;
-  customLists: Array<{ name: string; values: Array<string> }>;
-  automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
-  standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
-};
-
-export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
-  __typename: "PetitionTemplate";
-  id: string;
-  name: string | null;
-  fields: Array<{
-    id: string;
-    type: PetitionFieldType;
-    multiple: boolean;
-    alias: string | null;
-    options: { [key: string]: any };
-    visibility: { [key: string]: any } | null;
-    math: Array<{ [key: string]: any }> | null;
-    title: string | null;
-    description: string | null;
-    showInPdf: boolean;
-    showActivityInPdf: boolean;
-    replies: Array<{
-      id: string;
-      content: { [key: string]: any };
-      isAnonymized: boolean;
-      status: PetitionFieldReplyStatus;
-      metadata: { [key: string]: any };
-      repliedAt: string | null;
-      lastReviewedAt: string | null;
-      children: Array<{
-        field: {
-          id: string;
-          type: PetitionFieldType;
-          multiple: boolean;
-          alias: string | null;
-          options: { [key: string]: any };
-          visibility: { [key: string]: any } | null;
-          math: Array<{ [key: string]: any }> | null;
-          title: string | null;
-          description: string | null;
-          showInPdf: boolean;
-          showActivityInPdf: boolean;
-          parent: { id: string; showActivityInPdf: boolean } | null;
-          children: Array<{
-            id: string;
-            type: PetitionFieldType;
-            title: string | null;
-            options: { [key: string]: any };
-            description: string | null;
-            showInPdf: boolean;
-            showActivityInPdf: boolean;
-            visibility: { [key: string]: any } | null;
-            math: Array<{ [key: string]: any }> | null;
-            multiple: boolean;
-            parent: { id: string } | null;
-            replies: Array<{
-              id: string;
-              status: PetitionFieldReplyStatus;
-              content: { [key: string]: any };
-              metadata: { [key: string]: any };
-              isAnonymized: boolean;
-              repliedAt: string | null;
-              lastReviewedAt: string | null;
-              repliedBy:
-                | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-                | { __typename: "User"; id: string; fullName: string | null }
-                | null;
-              lastReviewedBy: { id: string; fullName: string | null } | null;
-              field: { requireApproval: boolean } | null;
-            }>;
-          }> | null;
-        };
-        replies: Array<{
-          id: string;
-          status: PetitionFieldReplyStatus;
-          content: { [key: string]: any };
-          metadata: { [key: string]: any };
-          isAnonymized: boolean;
-          repliedAt: string | null;
-          lastReviewedAt: string | null;
-          repliedBy:
-            | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-            | { __typename: "User"; id: string; fullName: string | null }
-            | null;
-          lastReviewedBy: { id: string; fullName: string | null } | null;
-          field: { requireApproval: boolean } | null;
-        }>;
-      }> | null;
-      repliedBy:
-        | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-        | { __typename: "User"; id: string; fullName: string | null }
-        | null;
-      lastReviewedBy: { id: string; fullName: string | null } | null;
-      field: { requireApproval: boolean } | null;
-    }>;
-    children: Array<{
-      id: string;
-      type: PetitionFieldType;
-      multiple: boolean;
-      alias: string | null;
-      options: { [key: string]: any };
-      visibility: { [key: string]: any } | null;
-      math: Array<{ [key: string]: any }> | null;
-      title: string | null;
-      description: string | null;
-      showInPdf: boolean;
-      showActivityInPdf: boolean;
-      replies: Array<{
-        id: string;
-        status: PetitionFieldReplyStatus;
-        content: { [key: string]: any };
-        metadata: { [key: string]: any };
-        isAnonymized: boolean;
-        repliedAt: string | null;
-        lastReviewedAt: string | null;
-        repliedBy:
-          | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-          | { __typename: "User"; id: string; fullName: string | null }
-          | null;
-        lastReviewedBy: { id: string; fullName: string | null } | null;
-        field: { requireApproval: boolean } | null;
-      }>;
-      parent: { id: string } | null;
-    }> | null;
-    parent: { id: string; showActivityInPdf: boolean } | null;
-  }>;
-  organization: { name: string; logoUrl: string | null };
-  selectedDocumentTheme: { data: { [key: string]: any } };
-  variables: Array<{ name: string; defaultValue: number }>;
-  customLists: Array<{ name: string; values: Array<string> }>;
-  automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
-  standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
-};
-
-export type PetitionExport_PetitionBaseFragment =
-  | PetitionExport_PetitionBase_Petition_Fragment
-  | PetitionExport_PetitionBase_PetitionTemplate_Fragment;
-
-export type PetitionExport_PetitionFieldInnerFragment = {
-  id: string;
-  type: PetitionFieldType;
-  title: string | null;
-  options: { [key: string]: any };
-  description: string | null;
-  showInPdf: boolean;
-  showActivityInPdf: boolean;
-  visibility: { [key: string]: any } | null;
-  math: Array<{ [key: string]: any }> | null;
-  multiple: boolean;
-};
-
-export type PetitionExport_PetitionFieldReplyInnerFragment = {
-  id: string;
-  status: PetitionFieldReplyStatus;
-  content: { [key: string]: any };
-  metadata: { [key: string]: any };
-  isAnonymized: boolean;
-  repliedAt: string | null;
-  lastReviewedAt: string | null;
-  repliedBy:
-    | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-    | { __typename: "User"; id: string; fullName: string | null }
-    | null;
-  lastReviewedBy: { id: string; fullName: string | null } | null;
-  field: { requireApproval: boolean } | null;
-};
-
-export type PetitionExport_PetitionFieldFragment = {
-  id: string;
-  type: PetitionFieldType;
-  title: string | null;
-  options: { [key: string]: any };
-  description: string | null;
-  showInPdf: boolean;
-  showActivityInPdf: boolean;
-  visibility: { [key: string]: any } | null;
-  math: Array<{ [key: string]: any }> | null;
-  multiple: boolean;
-  parent: { id: string; showActivityInPdf: boolean } | null;
-  children: Array<{
-    id: string;
-    type: PetitionFieldType;
-    title: string | null;
-    options: { [key: string]: any };
-    description: string | null;
-    showInPdf: boolean;
-    showActivityInPdf: boolean;
-    visibility: { [key: string]: any } | null;
-    math: Array<{ [key: string]: any }> | null;
-    multiple: boolean;
-    parent: { id: string } | null;
-    replies: Array<{
-      id: string;
-      status: PetitionFieldReplyStatus;
-      content: { [key: string]: any };
-      metadata: { [key: string]: any };
-      isAnonymized: boolean;
-      repliedAt: string | null;
-      lastReviewedAt: string | null;
-      repliedBy:
-        | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-        | { __typename: "User"; id: string; fullName: string | null }
-        | null;
-      lastReviewedBy: { id: string; fullName: string | null } | null;
-      field: { requireApproval: boolean } | null;
-    }>;
-  }> | null;
-};
-
-export type PetitionExport_PetitionFieldReplyFragment = {
-  id: string;
-  status: PetitionFieldReplyStatus;
-  content: { [key: string]: any };
-  metadata: { [key: string]: any };
-  isAnonymized: boolean;
-  repliedAt: string | null;
-  lastReviewedAt: string | null;
-  children: Array<{
-    field: {
-      id: string;
-      type: PetitionFieldType;
-      title: string | null;
-      options: { [key: string]: any };
-      description: string | null;
-      showInPdf: boolean;
-      showActivityInPdf: boolean;
-      visibility: { [key: string]: any } | null;
-      math: Array<{ [key: string]: any }> | null;
-      multiple: boolean;
-      parent: { id: string; showActivityInPdf: boolean } | null;
-      children: Array<{
-        id: string;
-        type: PetitionFieldType;
-        title: string | null;
-        options: { [key: string]: any };
-        description: string | null;
-        showInPdf: boolean;
-        showActivityInPdf: boolean;
-        visibility: { [key: string]: any } | null;
-        math: Array<{ [key: string]: any }> | null;
-        multiple: boolean;
-        parent: { id: string } | null;
-        replies: Array<{
-          id: string;
-          status: PetitionFieldReplyStatus;
-          content: { [key: string]: any };
-          metadata: { [key: string]: any };
-          isAnonymized: boolean;
-          repliedAt: string | null;
-          lastReviewedAt: string | null;
-          repliedBy:
-            | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-            | { __typename: "User"; id: string; fullName: string | null }
-            | null;
-          lastReviewedBy: { id: string; fullName: string | null } | null;
-          field: { requireApproval: boolean } | null;
-        }>;
-      }> | null;
-    };
-    replies: Array<{
-      id: string;
-      status: PetitionFieldReplyStatus;
-      content: { [key: string]: any };
-      metadata: { [key: string]: any };
-      isAnonymized: boolean;
-      repliedAt: string | null;
-      lastReviewedAt: string | null;
-      repliedBy:
-        | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-        | { __typename: "User"; id: string; fullName: string | null }
-        | null;
-      lastReviewedBy: { id: string; fullName: string | null } | null;
-      field: { requireApproval: boolean } | null;
-    }>;
-  }> | null;
-  repliedBy:
-    | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-    | { __typename: "User"; id: string; fullName: string | null }
-    | null;
-  lastReviewedBy: { id: string; fullName: string | null } | null;
-  field: { requireApproval: boolean } | null;
-};
-
-export type PetitionExport_petitionQueryVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-}>;
-
-export type PetitionExport_petitionQuery = {
-  petition:
-    | {
-        __typename: "Petition";
-        id: string;
-        name: string | null;
-        fromTemplate: { id: string } | null;
-        currentSignatureRequest: {
-          signatureConfig: {
-            timezone: string;
-            signers: Array<{
-              fullName: string;
-              email: string | null;
-              signWithEmbeddedImageUrl300: string | null;
-            } | null>;
-          };
-        } | null;
-        fields: Array<{
-          id: string;
-          type: PetitionFieldType;
-          multiple: boolean;
-          alias: string | null;
-          options: { [key: string]: any };
-          visibility: { [key: string]: any } | null;
-          math: Array<{ [key: string]: any }> | null;
-          title: string | null;
-          description: string | null;
-          showInPdf: boolean;
-          showActivityInPdf: boolean;
-          replies: Array<{
-            id: string;
-            content: { [key: string]: any };
-            isAnonymized: boolean;
-            status: PetitionFieldReplyStatus;
-            metadata: { [key: string]: any };
-            repliedAt: string | null;
-            lastReviewedAt: string | null;
-            children: Array<{
-              field: {
-                id: string;
-                type: PetitionFieldType;
-                multiple: boolean;
-                alias: string | null;
-                options: { [key: string]: any };
-                visibility: { [key: string]: any } | null;
-                math: Array<{ [key: string]: any }> | null;
-                title: string | null;
-                description: string | null;
-                showInPdf: boolean;
-                showActivityInPdf: boolean;
-                parent: { id: string; showActivityInPdf: boolean } | null;
-                children: Array<{
-                  id: string;
-                  type: PetitionFieldType;
-                  title: string | null;
-                  options: { [key: string]: any };
-                  description: string | null;
-                  showInPdf: boolean;
-                  showActivityInPdf: boolean;
-                  visibility: { [key: string]: any } | null;
-                  math: Array<{ [key: string]: any }> | null;
-                  multiple: boolean;
-                  parent: { id: string } | null;
-                  replies: Array<{
-                    id: string;
-                    status: PetitionFieldReplyStatus;
-                    content: { [key: string]: any };
-                    metadata: { [key: string]: any };
-                    isAnonymized: boolean;
-                    repliedAt: string | null;
-                    lastReviewedAt: string | null;
-                    repliedBy:
-                      | {
-                          __typename: "PetitionAccess";
-                          contact: { id: string; fullName: string } | null;
-                        }
-                      | { __typename: "User"; id: string; fullName: string | null }
-                      | null;
-                    lastReviewedBy: { id: string; fullName: string | null } | null;
-                    field: { requireApproval: boolean } | null;
-                  }>;
-                }> | null;
-              };
-              replies: Array<{
-                id: string;
-                status: PetitionFieldReplyStatus;
-                content: { [key: string]: any };
-                metadata: { [key: string]: any };
-                isAnonymized: boolean;
-                repliedAt: string | null;
-                lastReviewedAt: string | null;
-                repliedBy:
-                  | {
-                      __typename: "PetitionAccess";
-                      contact: { id: string; fullName: string } | null;
-                    }
-                  | { __typename: "User"; id: string; fullName: string | null }
-                  | null;
-                lastReviewedBy: { id: string; fullName: string | null } | null;
-                field: { requireApproval: boolean } | null;
-              }>;
-            }> | null;
-            repliedBy:
-              | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-              | { __typename: "User"; id: string; fullName: string | null }
-              | null;
-            lastReviewedBy: { id: string; fullName: string | null } | null;
-            field: { requireApproval: boolean } | null;
-          }>;
-          children: Array<{
-            id: string;
-            type: PetitionFieldType;
-            multiple: boolean;
-            alias: string | null;
-            options: { [key: string]: any };
-            visibility: { [key: string]: any } | null;
-            math: Array<{ [key: string]: any }> | null;
-            title: string | null;
-            description: string | null;
-            showInPdf: boolean;
-            showActivityInPdf: boolean;
-            replies: Array<{
-              id: string;
-              status: PetitionFieldReplyStatus;
-              content: { [key: string]: any };
-              metadata: { [key: string]: any };
-              isAnonymized: boolean;
-              repliedAt: string | null;
-              lastReviewedAt: string | null;
-              repliedBy:
-                | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-                | { __typename: "User"; id: string; fullName: string | null }
-                | null;
-              lastReviewedBy: { id: string; fullName: string | null } | null;
-              field: { requireApproval: boolean } | null;
-            }>;
-            parent: { id: string } | null;
-          }> | null;
-          parent: { id: string; showActivityInPdf: boolean } | null;
-        }>;
-        organization: { name: string; logoUrl: string | null };
-        selectedDocumentTheme: { data: { [key: string]: any } };
-        variables: Array<{ name: string; defaultValue: number }>;
-        customLists: Array<{ name: string; values: Array<string> }>;
-        automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
-        standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
-      }
-    | {
-        __typename: "PetitionTemplate";
-        id: string;
-        name: string | null;
-        fields: Array<{
-          id: string;
-          type: PetitionFieldType;
-          multiple: boolean;
-          alias: string | null;
-          options: { [key: string]: any };
-          visibility: { [key: string]: any } | null;
-          math: Array<{ [key: string]: any }> | null;
-          title: string | null;
-          description: string | null;
-          showInPdf: boolean;
-          showActivityInPdf: boolean;
-          replies: Array<{
-            id: string;
-            content: { [key: string]: any };
-            isAnonymized: boolean;
-            status: PetitionFieldReplyStatus;
-            metadata: { [key: string]: any };
-            repliedAt: string | null;
-            lastReviewedAt: string | null;
-            children: Array<{
-              field: {
-                id: string;
-                type: PetitionFieldType;
-                multiple: boolean;
-                alias: string | null;
-                options: { [key: string]: any };
-                visibility: { [key: string]: any } | null;
-                math: Array<{ [key: string]: any }> | null;
-                title: string | null;
-                description: string | null;
-                showInPdf: boolean;
-                showActivityInPdf: boolean;
-                parent: { id: string; showActivityInPdf: boolean } | null;
-                children: Array<{
-                  id: string;
-                  type: PetitionFieldType;
-                  title: string | null;
-                  options: { [key: string]: any };
-                  description: string | null;
-                  showInPdf: boolean;
-                  showActivityInPdf: boolean;
-                  visibility: { [key: string]: any } | null;
-                  math: Array<{ [key: string]: any }> | null;
-                  multiple: boolean;
-                  parent: { id: string } | null;
-                  replies: Array<{
-                    id: string;
-                    status: PetitionFieldReplyStatus;
-                    content: { [key: string]: any };
-                    metadata: { [key: string]: any };
-                    isAnonymized: boolean;
-                    repliedAt: string | null;
-                    lastReviewedAt: string | null;
-                    repliedBy:
-                      | {
-                          __typename: "PetitionAccess";
-                          contact: { id: string; fullName: string } | null;
-                        }
-                      | { __typename: "User"; id: string; fullName: string | null }
-                      | null;
-                    lastReviewedBy: { id: string; fullName: string | null } | null;
-                    field: { requireApproval: boolean } | null;
-                  }>;
-                }> | null;
-              };
-              replies: Array<{
-                id: string;
-                status: PetitionFieldReplyStatus;
-                content: { [key: string]: any };
-                metadata: { [key: string]: any };
-                isAnonymized: boolean;
-                repliedAt: string | null;
-                lastReviewedAt: string | null;
-                repliedBy:
-                  | {
-                      __typename: "PetitionAccess";
-                      contact: { id: string; fullName: string } | null;
-                    }
-                  | { __typename: "User"; id: string; fullName: string | null }
-                  | null;
-                lastReviewedBy: { id: string; fullName: string | null } | null;
-                field: { requireApproval: boolean } | null;
-              }>;
-            }> | null;
-            repliedBy:
-              | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-              | { __typename: "User"; id: string; fullName: string | null }
-              | null;
-            lastReviewedBy: { id: string; fullName: string | null } | null;
-            field: { requireApproval: boolean } | null;
-          }>;
-          children: Array<{
-            id: string;
-            type: PetitionFieldType;
-            multiple: boolean;
-            alias: string | null;
-            options: { [key: string]: any };
-            visibility: { [key: string]: any } | null;
-            math: Array<{ [key: string]: any }> | null;
-            title: string | null;
-            description: string | null;
-            showInPdf: boolean;
-            showActivityInPdf: boolean;
-            replies: Array<{
-              id: string;
-              status: PetitionFieldReplyStatus;
-              content: { [key: string]: any };
-              metadata: { [key: string]: any };
-              isAnonymized: boolean;
-              repliedAt: string | null;
-              lastReviewedAt: string | null;
-              repliedBy:
-                | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
-                | { __typename: "User"; id: string; fullName: string | null }
-                | null;
-              lastReviewedBy: { id: string; fullName: string | null } | null;
-              field: { requireApproval: boolean } | null;
-            }>;
-            parent: { id: string } | null;
-          }> | null;
-          parent: { id: string; showActivityInPdf: boolean } | null;
-        }>;
-        organization: { name: string; logoUrl: string | null };
-        selectedDocumentTheme: { data: { [key: string]: any } };
-        variables: Array<{ name: string; defaultValue: number }>;
-        customLists: Array<{ name: string; values: Array<string> }>;
-        automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
-        standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
-      }
-    | null;
-};
-
 export type PetitionExport2_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
   id: string;
@@ -9133,56 +8385,6 @@ export type PetitionExport2_petitionQuery = {
     | null;
 };
 
-export type SignatureBoxesPage_PetitionBase_Petition_Fragment = {
-  __typename: "Petition";
-  fromTemplate: { id: string } | null;
-  currentSignatureRequest: {
-    signatureConfig: {
-      timezone: string;
-      signers: Array<{
-        fullName: string;
-        email: string | null;
-        signWithEmbeddedImageUrl300: string | null;
-      } | null>;
-    };
-  } | null;
-  selectedDocumentTheme: { data: { [key: string]: any } };
-};
-
-export type SignatureBoxesPage_PetitionBase_PetitionTemplate_Fragment = {
-  __typename: "PetitionTemplate";
-  selectedDocumentTheme: { data: { [key: string]: any } };
-};
-
-export type SignatureBoxesPage_PetitionBaseFragment =
-  | SignatureBoxesPage_PetitionBase_Petition_Fragment
-  | SignatureBoxesPage_PetitionBase_PetitionTemplate_Fragment;
-
-export type SignatureBoxesPage_petitionQueryVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-}>;
-
-export type SignatureBoxesPage_petitionQuery = {
-  petition:
-    | {
-        __typename: "Petition";
-        fromTemplate: { id: string } | null;
-        currentSignatureRequest: {
-          signatureConfig: {
-            timezone: string;
-            signers: Array<{
-              fullName: string;
-              email: string | null;
-              signWithEmbeddedImageUrl300: string | null;
-            } | null>;
-          };
-        } | null;
-        selectedDocumentTheme: { data: { [key: string]: any } };
-      }
-    | { __typename: "PetitionTemplate"; selectedDocumentTheme: { data: { [key: string]: any } } }
-    | null;
-};
-
 export type SignatureBoxesPage2_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
   fromTemplate: { id: string } | null;
@@ -9350,230 +8552,6 @@ export type LiquidPetitionScopeProvider_PetitionFieldReplyFragment = {
   isAnonymized: boolean;
 };
 
-export const PetitionExport_PetitionFieldInnerFragmentDoc = gql`
-  fragment PetitionExport_PetitionFieldInner on PetitionField {
-    id
-    type
-    title
-    options
-    description
-    showInPdf
-    showActivityInPdf
-    visibility
-    math
-    multiple
-  }
-` as unknown as DocumentNode<PetitionExport_PetitionFieldInnerFragment, unknown>;
-export const UserReference_UserFragmentDoc = gql`
-  fragment UserReference_User on User {
-    id
-    fullName
-  }
-` as unknown as DocumentNode<UserReference_UserFragment, unknown>;
-export const ContactReference_ContactFragmentDoc = gql`
-  fragment ContactReference_Contact on Contact {
-    id
-    fullName
-  }
-` as unknown as DocumentNode<ContactReference_ContactFragment, unknown>;
-export const UserOrContactReference_UserOrPetitionAccessFragmentDoc = gql`
-  fragment UserOrContactReference_UserOrPetitionAccess on UserOrPetitionAccess {
-    __typename
-    ... on User {
-      ...UserReference_User
-    }
-    ... on PetitionAccess {
-      contact {
-        ...ContactReference_Contact
-      }
-    }
-  }
-  ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
-` as unknown as DocumentNode<UserOrContactReference_UserOrPetitionAccessFragment, unknown>;
-export const FieldActivity_PetitionFieldReplyFragmentDoc = gql`
-  fragment FieldActivity_PetitionFieldReply on PetitionFieldReply {
-    id
-    status
-    repliedBy {
-      ...UserOrContactReference_UserOrPetitionAccess
-    }
-    repliedAt
-    lastReviewedBy {
-      ...UserReference_User
-    }
-    lastReviewedAt
-    field {
-      requireApproval
-    }
-  }
-  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
-  ${UserReference_UserFragmentDoc}
-` as unknown as DocumentNode<FieldActivity_PetitionFieldReplyFragment, unknown>;
-export const PetitionExport_PetitionFieldReplyInnerFragmentDoc = gql`
-  fragment PetitionExport_PetitionFieldReplyInner on PetitionFieldReply {
-    id
-    status
-    content
-    metadata
-    isAnonymized
-    ...FieldActivity_PetitionFieldReply
-  }
-  ${FieldActivity_PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<PetitionExport_PetitionFieldReplyInnerFragment, unknown>;
-export const PetitionExport_PetitionFieldFragmentDoc = gql`
-  fragment PetitionExport_PetitionField on PetitionField {
-    ...PetitionExport_PetitionFieldInner
-    parent {
-      id
-      showActivityInPdf
-    }
-    children {
-      ...PetitionExport_PetitionFieldInner
-      parent {
-        id
-      }
-      replies {
-        ...PetitionExport_PetitionFieldReplyInner
-      }
-    }
-  }
-  ${PetitionExport_PetitionFieldInnerFragmentDoc}
-  ${PetitionExport_PetitionFieldReplyInnerFragmentDoc}
-` as unknown as DocumentNode<PetitionExport_PetitionFieldFragment, unknown>;
-export const PetitionExport_PetitionFieldReplyFragmentDoc = gql`
-  fragment PetitionExport_PetitionFieldReply on PetitionFieldReply {
-    ...PetitionExport_PetitionFieldReplyInner
-    children {
-      field {
-        ...PetitionExport_PetitionField
-      }
-      replies {
-        ...PetitionExport_PetitionFieldReplyInner
-      }
-    }
-  }
-  ${PetitionExport_PetitionFieldReplyInnerFragmentDoc}
-  ${PetitionExport_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<PetitionExport_PetitionFieldReplyFragment, unknown>;
-export const SignaturesBlock_SignatureConfigFragmentDoc = gql`
-  fragment SignaturesBlock_SignatureConfig on SignatureConfig {
-    signers {
-      fullName
-      email
-      signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(options: { resize: { height: 300 } })
-    }
-    timezone
-  }
-` as unknown as DocumentNode<SignaturesBlock_SignatureConfigFragment, unknown>;
-export const LiquidPetitionScopeProvider_PetitionFieldFragmentDoc = gql`
-  fragment LiquidPetitionScopeProvider_PetitionField on PetitionField {
-    id
-    type
-    multiple
-    alias
-    options
-    visibility
-    math
-  }
-` as unknown as DocumentNode<LiquidPetitionScopeProvider_PetitionFieldFragment, unknown>;
-export const LiquidPetitionScopeProvider_PetitionFieldReplyFragmentDoc = gql`
-  fragment LiquidPetitionScopeProvider_PetitionFieldReply on PetitionFieldReply {
-    id
-    content
-    isAnonymized
-  }
-` as unknown as DocumentNode<LiquidPetitionScopeProvider_PetitionFieldReplyFragment, unknown>;
-export const LiquidPetitionScopeProvider_PetitionBaseFragmentDoc = gql`
-  fragment LiquidPetitionScopeProvider_PetitionBase on PetitionBase {
-    id
-    fields {
-      ...LiquidPetitionScopeProvider_PetitionField
-      children {
-        ...LiquidPetitionScopeProvider_PetitionField
-        replies {
-          ...LiquidPetitionScopeProvider_PetitionFieldReply
-        }
-      }
-      replies {
-        ...LiquidPetitionScopeProvider_PetitionFieldReply
-        children {
-          field {
-            ...LiquidPetitionScopeProvider_PetitionField
-          }
-          replies {
-            ...LiquidPetitionScopeProvider_PetitionFieldReply
-          }
-        }
-      }
-    }
-    variables {
-      name
-      defaultValue
-    }
-    customLists {
-      name
-      values
-    }
-    automaticNumberingConfig {
-      numberingType
-    }
-    standardListDefinitions {
-      listName
-      values {
-        key
-      }
-    }
-  }
-  ${LiquidPetitionScopeProvider_PetitionFieldFragmentDoc}
-  ${LiquidPetitionScopeProvider_PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<LiquidPetitionScopeProvider_PetitionBaseFragment, unknown>;
-export const PetitionExport_PetitionBaseFragmentDoc = gql`
-  fragment PetitionExport_PetitionBase on PetitionBase {
-    id
-    name
-    fields {
-      ...PetitionExport_PetitionField
-      replies {
-        ...PetitionExport_PetitionFieldReply
-      }
-    }
-    organization {
-      name
-      logoUrl
-    }
-    selectedDocumentTheme {
-      data
-    }
-    ... on Petition {
-      fromTemplate {
-        id
-      }
-      currentSignatureRequest {
-        signatureConfig {
-          ...SignaturesBlock_SignatureConfig
-        }
-      }
-    }
-    ...LiquidPetitionScopeProvider_PetitionBase
-    variables {
-      name
-      defaultValue
-    }
-    customLists {
-      name
-      values
-    }
-    automaticNumberingConfig {
-      numberingType
-    }
-    __typename
-  }
-  ${PetitionExport_PetitionFieldFragmentDoc}
-  ${PetitionExport_PetitionFieldReplyFragmentDoc}
-  ${SignaturesBlock_SignatureConfigFragmentDoc}
-  ${LiquidPetitionScopeProvider_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<PetitionExport_PetitionBaseFragment, unknown>;
 export const PetitionExport2_PetitionFieldInnerFragmentDoc = gql`
   fragment PetitionExport2_PetitionFieldInner on PetitionField {
     id
@@ -9660,6 +8638,68 @@ export const documentSignatures_SignatureConfigFragmentDoc = gql`
     timezone
   }
 ` as unknown as DocumentNode<documentSignatures_SignatureConfigFragment, unknown>;
+export const LiquidPetitionScopeProvider_PetitionFieldFragmentDoc = gql`
+  fragment LiquidPetitionScopeProvider_PetitionField on PetitionField {
+    id
+    type
+    multiple
+    alias
+    options
+    visibility
+    math
+  }
+` as unknown as DocumentNode<LiquidPetitionScopeProvider_PetitionFieldFragment, unknown>;
+export const LiquidPetitionScopeProvider_PetitionFieldReplyFragmentDoc = gql`
+  fragment LiquidPetitionScopeProvider_PetitionFieldReply on PetitionFieldReply {
+    id
+    content
+    isAnonymized
+  }
+` as unknown as DocumentNode<LiquidPetitionScopeProvider_PetitionFieldReplyFragment, unknown>;
+export const LiquidPetitionScopeProvider_PetitionBaseFragmentDoc = gql`
+  fragment LiquidPetitionScopeProvider_PetitionBase on PetitionBase {
+    id
+    fields {
+      ...LiquidPetitionScopeProvider_PetitionField
+      children {
+        ...LiquidPetitionScopeProvider_PetitionField
+        replies {
+          ...LiquidPetitionScopeProvider_PetitionFieldReply
+        }
+      }
+      replies {
+        ...LiquidPetitionScopeProvider_PetitionFieldReply
+        children {
+          field {
+            ...LiquidPetitionScopeProvider_PetitionField
+          }
+          replies {
+            ...LiquidPetitionScopeProvider_PetitionFieldReply
+          }
+        }
+      }
+    }
+    variables {
+      name
+      defaultValue
+    }
+    customLists {
+      name
+      values
+    }
+    automaticNumberingConfig {
+      numberingType
+    }
+    standardListDefinitions {
+      listName
+      values {
+        key
+      }
+    }
+  }
+  ${LiquidPetitionScopeProvider_PetitionFieldFragmentDoc}
+  ${LiquidPetitionScopeProvider_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<LiquidPetitionScopeProvider_PetitionBaseFragment, unknown>;
 export const PetitionExport2_PetitionBaseFragmentDoc = gql`
   fragment PetitionExport2_PetitionBase on PetitionBase {
     id
@@ -9695,25 +8735,6 @@ export const PetitionExport2_PetitionBaseFragmentDoc = gql`
   ${documentSignatures_SignatureConfigFragmentDoc}
   ${LiquidPetitionScopeProvider_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionExport2_PetitionBaseFragment, unknown>;
-export const SignatureBoxesPage_PetitionBaseFragmentDoc = gql`
-  fragment SignatureBoxesPage_PetitionBase on PetitionBase {
-    selectedDocumentTheme {
-      data
-    }
-    ... on Petition {
-      fromTemplate {
-        id
-      }
-      currentSignatureRequest {
-        signatureConfig {
-          ...documentSignatures_SignatureConfig
-        }
-      }
-    }
-    __typename
-  }
-  ${documentSignatures_SignatureConfigFragmentDoc}
-` as unknown as DocumentNode<SignatureBoxesPage_PetitionBaseFragment, unknown>;
 export const SignatureBoxesPage2_PetitionBaseFragmentDoc = gql`
   fragment SignatureBoxesPage2_PetitionBase on PetitionBase {
     selectedDocumentTheme {
@@ -9733,14 +8754,6 @@ export const SignatureBoxesPage2_PetitionBaseFragmentDoc = gql`
   }
   ${documentSignatures_SignatureConfigFragmentDoc}
 ` as unknown as DocumentNode<SignatureBoxesPage2_PetitionBaseFragment, unknown>;
-export const PetitionExport_petitionDocument = gql`
-  query PetitionExport_petition($petitionId: GID!) {
-    petition(id: $petitionId) {
-      ...PetitionExport_PetitionBase
-    }
-  }
-  ${PetitionExport_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<PetitionExport_petitionQuery, PetitionExport_petitionQueryVariables>;
 export const PetitionExport2_petitionDocument = gql`
   query PetitionExport2_petition($petitionId: GID!) {
     petition(id: $petitionId) {
@@ -9749,17 +8762,6 @@ export const PetitionExport2_petitionDocument = gql`
   }
   ${PetitionExport2_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionExport2_petitionQuery, PetitionExport2_petitionQueryVariables>;
-export const SignatureBoxesPage_petitionDocument = gql`
-  query SignatureBoxesPage_petition($petitionId: GID!) {
-    petition(id: $petitionId) {
-      ...SignatureBoxesPage_PetitionBase
-    }
-  }
-  ${SignatureBoxesPage_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<
-  SignatureBoxesPage_petitionQuery,
-  SignatureBoxesPage_petitionQueryVariables
->;
 export const SignatureBoxesPage2_petitionDocument = gql`
   query SignatureBoxesPage2_petition($petitionId: GID!) {
     petition(id: $petitionId) {

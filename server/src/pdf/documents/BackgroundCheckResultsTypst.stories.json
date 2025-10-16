@@ -2,7 +2,7 @@
     "title": "Documents",
     "stories": [
         {
-            "name": "Background Check Results Typst",
+            "name": "Background Check Results",
             "parameters": {
                 "server": {
                     "id": "documents/BackgroundCheckResultsTypst"

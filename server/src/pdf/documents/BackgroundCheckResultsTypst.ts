@@ -294,6 +294,4 @@ function BackgroundCheckResultsTypst(props: BackgroundCheckResultsProps, intl: I
   `;
 }
 
-BackgroundCheckResultsTypst.TYPST = true;
-
 export default BackgroundCheckResultsTypst as PdfDocument<{}, BackgroundCheckResultsProps>;

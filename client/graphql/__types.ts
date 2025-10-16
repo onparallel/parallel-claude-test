@@ -1086,7 +1086,6 @@ export type FeatureFlag =
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "KEY_PROCESSES"
   | "ON_BEHALF_OF"
-  | "PDF_EXPORT_V2"
   | "PERMISSION_MANAGEMENT"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "PETITION_APPROVAL_FLOW"
@@ -16836,7 +16835,6 @@ export type SignatureCompletedUserNotification_SignatureCompletedUserNotificatio
 export type BrandingDocumentTheme_UserFragment = {
   __typename?: "User";
   id: string;
-  hasPdfExportV2: boolean;
   hasRecipientLangCA: boolean;
   hasRecipientLangIT: boolean;
   hasRecipientLangPT: boolean;
@@ -16991,7 +16989,6 @@ export type BrandingGeneralPreview_UserFragment = {
 
 export type DocumentThemeEditor_UserFragment = {
   __typename?: "User";
-  hasPdfExportV2: boolean;
   hasRecipientLangCA: boolean;
   hasRecipientLangIT: boolean;
   hasRecipientLangPT: boolean;
@@ -49487,7 +49484,6 @@ export type OrganizationBranding_userQuery = {
     hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
     hasRemovedParallelBranding: boolean;
-    hasPdfExportV2: boolean;
     hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
     hasShowContactsButton: boolean;
@@ -73932,7 +73928,6 @@ export const useAvailablePetitionLocales_UserFragmentDoc = gql`
 ` as unknown as DocumentNode<useAvailablePetitionLocales_UserFragment, unknown>;
 export const DocumentThemeEditor_UserFragmentDoc = gql`
   fragment DocumentThemeEditor_User on User {
-    hasPdfExportV2: hasFeatureFlag(featureFlag: PDF_EXPORT_V2)
     ...useAvailablePetitionLocales_User
   }
   ${useAvailablePetitionLocales_UserFragmentDoc}
@@ -73940,7 +73935,6 @@ export const DocumentThemeEditor_UserFragmentDoc = gql`
 export const BrandingDocumentTheme_UserFragmentDoc = gql`
   fragment BrandingDocumentTheme_User on User {
     id
-    hasPdfExportV2: hasFeatureFlag(featureFlag: PDF_EXPORT_V2)
     organization {
       ...DocumentThemePreview_Organization
       pdfDocumentThemes {
