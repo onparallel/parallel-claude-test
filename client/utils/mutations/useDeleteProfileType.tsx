@@ -74,7 +74,7 @@ export function useDeleteProfileType() {
         try {
           await showConfirmDeleteWithSubscriptions({
             profileTypes,
-            subscriptionCount: error.graphQLErrors[0].extensions?.count as number,
+            subscriptionCount: error.errors[0].extensions?.count as number,
           });
           const { data: res } = await deleteProfileType({
             variables: {
