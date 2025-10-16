@@ -9285,6 +9285,7 @@ export interface NexusGenArgTypes {
       // args
       name: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
       pluralName: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
+      standardType?: NexusGenEnums["ProfileTypeStandardType"] | null; // ProfileTypeStandardType
     };
     createProfileTypeField: {
       // args
@@ -9500,6 +9501,8 @@ export interface NexusGenArgTypes {
     };
     deleteProfileType: {
       // args
+      dryRun?: boolean | null; // Boolean
+      force?: boolean | null; // Boolean
       profileTypeIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     deleteProfileTypeField: {

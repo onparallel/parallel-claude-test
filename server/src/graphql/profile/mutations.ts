@@ -92,7 +92,6 @@ import {
   profileTypeFieldIsNotUsedInMonitoringRules,
   profileTypeFieldIsOfType,
   profileTypeIsArchived,
-  profileTypeIsNotStandard,
   profileTypeIsStandard,
   profileTypeProcessBelongsToProfileType,
   profilesCanBeAssociated,
@@ -122,18 +121,51 @@ export const createProfileType = mutationField("createProfileType", {
   args: {
     name: nonNull(arg({ type: "LocalizableUserText" })),
     pluralName: nonNull(arg({ type: "LocalizableUserText" })),
+    standardType: nullable("ProfileTypeStandardType"),
   },
   validateArgs: validateAnd(
     validLocalizableUserText("name", { maxLength: 200 }),
     validLocalizableUserText("pluralName", { maxLength: 200 }),
   ),
   resolve: async (_, args, ctx) => {
-    return await ctx.profilesSetup.createDefaultProfileType(
-      ctx.user!.org_id,
-      args.name,
-      args.pluralName,
-      `User:${ctx.user!.id}`,
-    );
+    switch (args.standardType) {
+      case "INDIVIDUAL":
+        return await ctx.profilesSetup.createIndividualProfileType(
+          {
+            org_id: ctx.user!.org_id,
+            name: args.name,
+            name_plural: args.pluralName,
+          },
+          `User:${ctx.user!.id}`,
+        );
+      case "CONTRACT":
+        return await ctx.profilesSetup.createContractProfileType(
+          {
+            org_id: ctx.user!.org_id,
+            name: args.name,
+            name_plural: args.pluralName,
+          },
+          `User:${ctx.user!.id}`,
+        );
+      case "LEGAL_ENTITY":
+        return await ctx.profilesSetup.createLegalEntityProfileType(
+          {
+            org_id: ctx.user!.org_id,
+            name: args.name,
+            name_plural: args.pluralName,
+          },
+          `User:${ctx.user!.id}`,
+        );
+      default:
+        return await ctx.profilesSetup.createDefaultProfileType(
+          {
+            org_id: ctx.user!.org_id,
+            name: args.name,
+            name_plural: args.pluralName,
+          },
+          `User:${ctx.user!.id}`,
+        );
+    }
   },
 });
 
@@ -248,13 +280,51 @@ export const deleteProfileType = mutationField("deleteProfileType", {
     userHasAccessToProfileType("profileTypeIds"),
     profileTypeIsArchived("profileTypeIds"),
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
-    profileTypeIsNotStandard("profileTypeIds"),
   ),
   args: {
     profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
+    force: nullable(
+      booleanArg({
+        description: "Pass force=true to remove event subscriptions on the profile type",
+      }),
+    ),
+    dryRun: nullable(
+      booleanArg({
+        description: "Pass dryRun=true to only check if a subscription exists for the profile type",
+      }),
+    ),
   },
-  resolve: async (_, { profileTypeIds }, ctx) => {
+  resolve: async (_, { profileTypeIds, force, dryRun }, ctx) => {
+    const allSubscriptions = await ctx.subscriptions.loadProfileEventSubscriptionsByOrgId(
+      ctx.user!.org_id,
+    );
+
+    const profileTypeSubscriptions = allSubscriptions.filter(
+      (s) =>
+        isNonNullish(s.from_profile_type_id) && profileTypeIds.includes(s.from_profile_type_id),
+    );
+
+    if (profileTypeSubscriptions.length > 0 && !force) {
+      throw new ApolloError(
+        "A subscription exists for at least one of the provided profile types",
+        "EVENT_SUBSCRIPTION_EXISTS_ERROR",
+        {
+          count: profileTypeSubscriptions.length,
+        },
+      );
+    }
+
+    if (dryRun) {
+      return SUCCESS;
+    }
+
     await ctx.profiles.withTransaction(async (t) => {
+      await ctx.subscriptions.deleteEventSubscriptions(
+        profileTypeSubscriptions.map((s) => s.id),
+        `User:${ctx.user!.id}`,
+        t,
+      );
+
       await ctx.profiles.deletePinnedProfileTypes(profileTypeIds, t);
       await ctx.profiles.deleteProfilesByProfileTypeId(profileTypeIds, `User:${ctx.user!.id}`, t);
       await ctx.profiles.deleteProfileTypeFieldsByProfileTypeId(
@@ -263,6 +333,16 @@ export const deleteProfileType = mutationField("deleteProfileType", {
         t,
       );
       await ctx.views.deleteProfileListViewsByProfileTypeId(
+        profileTypeIds,
+        `User:${ctx.user!.id}`,
+        t,
+      );
+      await ctx.petitions.unlinkFieldGroupsFromProfileType(
+        profileTypeIds,
+        `User:${ctx.user!.id}`,
+        t,
+      );
+      await ctx.profiles.deleteProfileTypeAllowedRelationshipsByProfileTypeId(
         profileTypeIds,
         `User:${ctx.user!.id}`,
         t,
@@ -279,7 +359,6 @@ export const archiveProfileType = mutationField("archiveProfileType", {
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeIds"),
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
-    profileTypeIsNotStandard("profileTypeIds"),
   ),
   args: {
     profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
@@ -295,7 +374,6 @@ export const unarchiveProfileType = mutationField("unarchiveProfileType", {
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeIds"),
     contextUserHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES"),
-    profileTypeIsNotStandard("profileTypeIds"),
   ),
   args: {
     profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
@@ -799,7 +877,7 @@ export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
     force: nullable(
       booleanArg({
         description:
-          "Pass force=true delete the field even if it has values or files associated with it.",
+          "Pass force=true delete the field even if it has values or files associated with it, and remove event subscriptions on the profile type field",
       }),
     ),
   },
@@ -815,17 +893,50 @@ export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
         "FIELD_USED_IN_PATTERN",
       );
     }
-    const profileCount =
-      await ctx.profiles.countProfilesWithValuesOrFilesByProfileTypeFieldId(profileTypeFieldIds);
 
-    if (Number(profileCount) > 0 && !force) {
-      throw new ApolloError(
-        "At least one of the provided profile type field ids has value or files.",
-        "FIELD_HAS_VALUE_OR_FILES",
-        {
-          profileCount,
-        },
+    if (!force) {
+      const aggregatedErrors: {
+        code: string;
+        message: string;
+        count: number;
+      }[] = [];
+
+      const profileCount =
+        await ctx.profiles.countProfilesWithValuesOrFilesByProfileTypeFieldId(profileTypeFieldIds);
+      const allSubscriptions = await ctx.subscriptions.loadProfileEventSubscriptionsByOrgId(
+        ctx.user!.org_id,
       );
+
+      const profileTypeFieldSubscriptions = allSubscriptions.filter(
+        (s) =>
+          isNonNullish(s.from_profile_type_field_ids) &&
+          profileTypeFieldIds.some((ptfId) => s.from_profile_type_field_ids!.includes(ptfId)),
+      );
+
+      if (profileCount > 0) {
+        aggregatedErrors.push({
+          code: "FIELD_HAS_VALUE_OR_FILES",
+          message: "At least one of the provided profile type field ids has value or files.",
+          count: profileCount,
+        });
+      }
+      if (profileTypeFieldSubscriptions.length > 0) {
+        aggregatedErrors.push({
+          code: "EVENT_SUBSCRIPTION_EXISTS_ERROR",
+          message: "A subscription exists for at least one of the provided profile type fields",
+          count: profileTypeFieldSubscriptions.length,
+        });
+      }
+
+      if (aggregatedErrors.length > 0) {
+        throw new ApolloError(
+          "An error occurred while deleting the profile type field",
+          "DELETE_PROFILE_TYPE_FIELD_ERROR",
+          {
+            aggregatedErrors,
+          },
+        );
+      }
     }
 
     await ctx.profiles.deleteProfileTypeFields(

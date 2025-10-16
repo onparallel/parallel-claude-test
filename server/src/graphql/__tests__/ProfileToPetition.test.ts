@@ -87,7 +87,6 @@ describe("GraphQL/Profiles to Petitions", () => {
     beforeAll(async () => {
       const profilesSetup = testClient.container.get<ProfilesSetupService>(PROFILES_SETUP_SERVICE);
       await profilesSetup.createDefaultProfileTypes(organization.id, `User:${user.id}`);
-      await profilesSetup.createDefaultProfileRelationshipTypes(organization.id, `User:${user.id}`);
 
       [individual] = await mocks.knex
         .from("profile_type")

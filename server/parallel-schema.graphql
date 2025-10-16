@@ -2337,7 +2337,11 @@ type Mutation {
     """
     orgId: GID!
   ): SupportMethodResponse!
-  createProfileType(name: LocalizableUserText!, pluralName: LocalizableUserText!): ProfileType!
+  createProfileType(
+    name: LocalizableUserText!
+    pluralName: LocalizableUserText!
+    standardType: ProfileTypeStandardType
+  ): ProfileType!
   createProfileTypeField(data: CreateProfileTypeFieldInput!, profileTypeId: GID!): ProfileTypeField!
 
   """
@@ -2598,10 +2602,21 @@ type Mutation {
   Deletes a profile list view of the user
   """
   deleteProfileListView(id: GID!): User!
-  deleteProfileType(profileTypeIds: [GID!]!): Success!
+  deleteProfileType(
+    """
+    Pass dryRun=true to only check if a subscription exists for the profile type
+    """
+    dryRun: Boolean
+
+    """
+    Pass force=true to remove event subscriptions on the profile type
+    """
+    force: Boolean
+    profileTypeIds: [GID!]!
+  ): Success!
   deleteProfileTypeField(
     """
-    Pass force=true delete the field even if it has values or files associated with it.
+    Pass force=true delete the field even if it has values or files associated with it, and remove event subscriptions on the profile type field
     """
     force: Boolean
     profileTypeFieldIds: [GID!]!

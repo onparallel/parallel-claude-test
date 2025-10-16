@@ -56,7 +56,6 @@ describe("ProfileLinkedPetitionFields", () => {
     await mocks.createFeatureFlags([{ name: "PROFILES", default_value: true }]);
     const profilesSetup = testClient.container.get<ProfilesSetupService>(PROFILES_SETUP_SERVICE);
     await profilesSetup.createDefaultProfileTypes(organization.id, `User:${user.id}`);
-    await profilesSetup.createDefaultProfileRelationshipTypes(organization.id, `User:${user.id}`);
 
     [individual] = await mocks.knex
       .from("profile_type")

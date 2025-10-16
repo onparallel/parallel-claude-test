@@ -2364,6 +2364,7 @@ export type MutationcreateProfileRelationshipsExcelArgs = {
 export type MutationcreateProfileTypeArgs = {
   name: Scalars["LocalizableUserText"]["input"];
   pluralName: Scalars["LocalizableUserText"]["input"];
+  standardType?: InputMaybe<ProfileTypeStandardType>;
 };
 
 export type MutationcreateProfileTypeFieldArgs = {
@@ -2579,6 +2580,8 @@ export type MutationdeleteProfileListViewArgs = {
 };
 
 export type MutationdeleteProfileTypeArgs = {
+  dryRun?: InputMaybe<Scalars["Boolean"]["input"]>;
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
   profileTypeIds: Array<Scalars["GID"]["input"]>;
 };
 

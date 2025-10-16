@@ -3,7 +3,6 @@ import { Center, Flex, Text } from "@chakra-ui/react";
 import { ArchiveIcon, CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
-import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import { SimpleMenuSelect } from "@parallel/components/common/SimpleMenuSelect";
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -14,7 +13,10 @@ import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationProfilesLayout } from "@parallel/components/organization/profiles/OrganizationProfilesLayout";
 import { ProfileTypesListHeader } from "@parallel/components/organization/profiles/ProfileTypesListHeader";
-import { useCreateOrUpdateProfileTypeDialog } from "@parallel/components/organization/profiles/dialogs/CreateOrUpdateProfileTypeDialog";
+import {
+  useCreateProfileTypeDialog,
+  useUpdateProfileTypeDialog,
+} from "@parallel/components/organization/profiles/dialogs/CreateOrUpdateProfileTypeDialog";
 import {
   OrganizationProfileTypes_ProfileTypeFragment,
   OrganizationProfileTypes_cloneProfileTypeDocument,
@@ -42,7 +44,7 @@ import {
   values,
 } from "@parallel/utils/queryState";
 import { useSelection } from "@parallel/utils/useSelectionState";
-import { MouseEvent, PropsWithChildren, ReactNode, useCallback, useMemo } from "react";
+import { MouseEvent, PropsWithChildren, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const SORTING = ["name", "createdAt"] as const;
@@ -108,14 +110,15 @@ function OrganizationProfileTypes() {
   );
 
   const [createProfileType] = useMutation(OrganizationProfileTypes_createProfileTypeDocument);
-  const showCreateProfileTypeDialog = useCreateOrUpdateProfileTypeDialog();
+  const showCreateProfileTypeDialog = useCreateProfileTypeDialog();
   const handleCreateNewProfileType = async () => {
     try {
-      const { name, pluralName } = await showCreateProfileTypeDialog({});
+      const { name, pluralName, standardType } = await showCreateProfileTypeDialog({});
       await createProfileType({
         variables: {
           name,
           pluralName,
+          standardType,
         },
       });
       refetch();
@@ -123,12 +126,13 @@ function OrganizationProfileTypes() {
   };
 
   const [cloneProfileType] = useMutation(OrganizationProfileTypes_cloneProfileTypeDocument);
+  const showUpdateProfileTypeDialog = useUpdateProfileTypeDialog();
   const handleCloneClick = async () => {
     try {
-      const { name, pluralName } = await showCreateProfileTypeDialog({
-        isEditing: true,
+      const { name, pluralName } = await showUpdateProfileTypeDialog({
         name: selectedRows[0].name,
         pluralName: selectedRows[0].pluralName,
+        standardType: selectedRows[0].standardType ?? null,
       });
       await cloneProfileType({
         variables: {
@@ -172,7 +176,6 @@ function OrganizationProfileTypes() {
     onCloneClick: handleCloneClick,
     onUnarchiveClick: handleUnarchiveClick,
     onArchiveClick: handleArchiveClick,
-    hasStandardProfileTypeSelected: selectedRows.some((row) => row.isStandard),
   });
 
   const context = useMemo<OrganizationProfileTypesContext>(
@@ -348,7 +351,6 @@ function useProfileTypesListActions({
   onDeleteClick,
   onArchiveClick,
   onUnarchiveClick,
-  hasStandardProfileTypeSelected,
 }: {
   showArchived: boolean | null;
   selectedCount: number;
@@ -356,7 +358,6 @@ function useProfileTypesListActions({
   onDeleteClick: () => void;
   onArchiveClick: () => void;
   onUnarchiveClick: () => void;
-  hasStandardProfileTypeSelected: boolean;
 }) {
   return showArchived
     ? [
@@ -390,20 +391,6 @@ function useProfileTypesListActions({
             <FormattedMessage id="component.profile-types-table.archive" defaultMessage="Archive" />
           ),
           colorScheme: "red",
-          isDisabled: hasStandardProfileTypeSelected,
-          wrap: (button: ReactNode) => (
-            <RestrictedFeaturePopover
-              isRestricted={hasStandardProfileTypeSelected}
-              content={
-                <FormattedMessage
-                  id="component.profile-types-list-actions.archive-restricted"
-                  defaultMessage="Some of the selected profile types are provided by Parallel and cannot be archived."
-                />
-              }
-            >
-              {button}
-            </RestrictedFeaturePopover>
-          ),
         },
       ];
 }
@@ -418,7 +405,7 @@ OrganizationProfileTypes.fragments = {
         icon
         createdAt
         archivedAt
-        isStandard
+        standardType
         ...useDeleteProfileType_ProfileType
         ...useArchiveProfileType_ProfileType
       }
@@ -480,8 +467,9 @@ OrganizationProfileTypes.mutations = [
     mutation OrganizationProfileTypes_createProfileType(
       $name: LocalizableUserText!
       $pluralName: LocalizableUserText!
+      $standardType: ProfileTypeStandardType
     ) {
-      createProfileType(name: $name, pluralName: $pluralName) {
+      createProfileType(name: $name, pluralName: $pluralName, standardType: $standardType) {
         ...OrganizationProfileTypes_ProfileType
       }
     }

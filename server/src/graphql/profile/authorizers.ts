@@ -73,10 +73,6 @@ export const profileTypeIsArchived = createProfileTypeAuthorizer((p) =>
 
 export const profileIsNotAnonymized = createProfileAuthorizer((p) => isNullish(p.anonymized_at));
 
-export const profileTypeIsNotStandard = createProfileTypeAuthorizer(
-  (p) => p.standard_type === null,
-);
-
 export const profileTypeIsStandard = createProfileTypeAuthorizer((p) =>
   isNonNullish(p.standard_type),
 );

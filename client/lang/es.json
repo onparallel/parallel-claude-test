@@ -1711,8 +1711,8 @@
   },
   {
     "term": "component.confirm-deactivate-event-subscription-dialog.warning",
-    "definition": "Cualquier aplicación o script utilizando esta suscripción dejarán de recibir notificaciones de eventos de Parallel.",
-    "context": "Any applications or scripts using this event subscription will no longer receive event notifications from Parallel."
+    "definition": "Cualquier integración utilizando esta suscripción dejarán de recibir notificaciones de eventos de Parallel.",
+    "context": "Any integrations using this event subscription will no longer receive event notifications from Parallel."
   },
   {
     "term": "component.confirm-deactivate-user-dialog.deactivate-users",
@@ -1838,6 +1838,21 @@
     "term": "component.confirm-delete-profile-dialog.header",
     "definition": "Eliminar {count, plural, =1 {perfil} other {# perfiles}}",
     "context": "Delete {count, plural, =1 {profile} other {# profiles}}"
+  },
+  {
+    "term": "component.confirm-delete-profile-type-with-subscriptions.confirm-delete-header",
+    "definition": "Eliminar {count, plural, =1 {tipo de perfil} other {tipos de perfil}}",
+    "context": "Delete {count, plural, =1 {profile type} other {profile types}}"
+  },
+  {
+    "term": "component.confirm-delete-profile-type-with-subscriptions.subscriptions-in-use",
+    "definition": "Hay {count, plural, =1 {1 suscripción a eventos} other {# suscripciones a eventos}} utilizando {profileTypeCount, plural, =1 {este tipo de perfil} other {estos tipos de perfil}}.",
+    "context": "There {count, plural, =1 {is 1 event subscription} other {are # event subscriptions}} using {profileTypeCount, plural, =1 {this profile type} other {these profile types}}."
+  },
+  {
+    "term": "component.confirm-delete-profile-type-with-subscriptions.want-delete-profile-types",
+    "definition": "Si continúas, cualquier aplicación o script utilizando estas suscripciones a eventos dejarán de recibir notificaciones de eventos de Parallel.",
+    "context": "If you continue, any applications or scripts using these event subscriptions will no longer receive event notifications from Parallel."
   },
   {
     "term": "component.confirm-delete-profile-type.confirm-delete-header",
@@ -3360,9 +3375,49 @@
     "context": "Relationship"
   },
   {
+    "term": "component.create-profile-type-dialog.contract",
+    "definition": "Contrato",
+    "context": "Contract"
+  },
+  {
+    "term": "component.create-profile-type-dialog.contract-description",
+    "definition": "Perfiles de contratos y acuerdos para almacenar información de contratos, términos, partes y documentación relacionada.",
+    "context": "Contract and agreement profiles for storing contract information, terms, parties, and related documentation."
+  },
+  {
+    "term": "component.create-profile-type-dialog.custom",
+    "definition": "Desde cero",
+    "context": "From scratch"
+  },
+  {
+    "term": "component.create-profile-type-dialog.custom-description",
+    "definition": "Crea un tipo de perfil personalizado desde cero para almacenar cualquier estructura de información específica que necesites.",
+    "context": "Create a custom profile type from scratch to store any specific information structure you need."
+  },
+  {
     "term": "component.create-profile-type-dialog.edit-profile-type-name",
     "definition": "Editar nombre del tipo de perfil",
     "context": "Edit profile type name"
+  },
+  {
+    "term": "component.create-profile-type-dialog.individual",
+    "definition": "Persona física",
+    "context": "Individual"
+  },
+  {
+    "term": "component.create-profile-type-dialog.individual-description",
+    "definition": "Perfiles de personas físicas para almacenar información personal, incluyendo detalles de contacto, identificación y datos personales.",
+    "context": "Personal information profiles for individuals, including contact details, identification, and personal data."
+  },
+  {
+    "term": "component.create-profile-type-dialog.legal-entity",
+    "definition": "Persona jurídica",
+    "context": "Legal entity"
+  },
+  {
+    "term": "component.create-profile-type-dialog.legal-entity-description",
+    "definition": "Perfiles de personas jurídicas para almacenar información corporativa, incluyendo información legal, detalles de negocios y datos de la empresa.",
+    "context": "Business and organization profiles for companies, including corporate information, legal details, and business data."
   },
   {
     "term": "component.create-profile-type-dialog.new-profile-type",
@@ -3375,9 +3430,24 @@
     "context": "Plural name"
   },
   {
+    "term": "component.create-profile-type-dialog.plural-name-contract-helper",
+    "definition": "Contratos",
+    "context": "Contracts"
+  },
+  {
     "term": "component.create-profile-type-dialog.plural-name-helper",
     "definition": "Personas físicas",
     "context": "Individuals"
+  },
+  {
+    "term": "component.create-profile-type-dialog.plural-name-legal-entity-helper",
+    "definition": "Personas jurídicas",
+    "context": "Legal entities"
+  },
+  {
+    "term": "component.create-profile-type-dialog.select-template",
+    "definition": "Selecciona el tipo de perfil que mejor se adapte a tus necesidades.",
+    "context": "Select the profile type that best fits your needs."
   },
   {
     "term": "component.create-profile-type-dialog.singular-name",
@@ -3385,9 +3455,24 @@
     "context": "Singular name"
   },
   {
-    "term": "component.create-profile-type-dialog.singular-name-helper",
+    "term": "component.create-profile-type-dialog.singular-name-contract-helper",
+    "definition": "Contrato",
+    "context": "Contract"
+  },
+  {
+    "term": "component.create-profile-type-dialog.singular-name-individual-helper",
     "definition": "Persona física",
     "context": "Individual"
+  },
+  {
+    "term": "component.create-profile-type-dialog.singular-name-legal-entity-helper",
+    "definition": "Persona jurídica",
+    "context": "Legal entity"
+  },
+  {
+    "term": "component.create-profile-type-dialog.title",
+    "definition": "¿Qué quieres crear?",
+    "context": "What do you want to create?"
   },
   {
     "term": "component.custom-list-details.options-included",
@@ -10150,11 +10235,6 @@
     "context": "Settings"
   },
   {
-    "term": "component.profile-types-list-actions.archive-restricted",
-    "definition": "Alguno de los tipos de perfil seleccionados es proporcionado por Parallel y no se puede archivar.",
-    "context": "Some of the selected profile types are provided by Parallel and cannot be archived."
-  },
-  {
     "term": "component.profile-types-table.active",
     "definition": "Activos",
     "context": "Active"
@@ -13630,9 +13710,19 @@
     "context": "The alert will be activated on {date}."
   },
   {
-    "term": "component.use-confirm-delete-profile-type-field-dialog.description",
-    "definition": "Estás a punto de eliminar {count, plural, =1 {esta propiedad} other {# propiedades}}. Por favor, ten en cuenta que hay {profileCount, plural, =1{# perfil que tiene} other{# perfiles que tienen}} respuesta en {count, plural, =1 {esta propiedad} other {alguna de estas propiedades}}, y si continúas, estas respuestas se eliminarán permanentemente.",
-    "context": "You are about to delete {count, plural, =1 {this property} other {# properties}}. Please note that there {profileCount, plural, =1{is # profile that has} other{are # profiles that have}} an answer on {count, plural, =1 {this property} other {one of these properties}}, and if you continue, these answers will be deleted permanently."
+    "term": "component.use-confirm-delete-profile-type-field-dialog.description-main",
+    "definition": "Estás a punto de eliminar {count, plural, =1 {esta propiedad} other {# propiedades}}.",
+    "context": "You are about to delete {count, plural, =1 {this property} other {# properties}}."
+  },
+  {
+    "term": "component.use-confirm-delete-profile-type-field-dialog.description-profiles",
+    "definition": "Por favor, ten en cuenta que hay {profileCount, plural, =1{# perfil que tiene} other{# perfiles que tienen}} respuesta en {count, plural, =1 {esta propiedad} other {alguna de estas propiedades}}, y si continúas, estas respuestas se eliminarán permanentemente.",
+    "context": "Please note that there {profileCount, plural, =1{is # profile that has} other{are # profiles that have}} an answer on {count, plural, =1 {this property} other {one of these properties}}, and if you continue, these answers will be deleted permanently."
+  },
+  {
+    "term": "component.use-confirm-delete-profile-type-field-dialog.description-subscriptions",
+    "definition": " Por favor, ten en cuenta que hay {subscriptionsCount, plural, =1{# suscripción a eventos configurada} other{# suscripciones a eventos configuradas}} en {count, plural, =1 {esta propiedad} other {alguna de estas propiedades}}, y si continúas, cualquier aplicación o script utilizando {subscriptionsCount, plural, =1 {esta suscripción} other {estas suscripciones}} dejarán de recibir notificaciones de eventos de Parallel.",
+    "context": "Please note that there {subscriptionsCount, plural, =1{is # event subscription} other{are # event subscriptions}} configured on {count, plural, =1 {this property} other {one of these properties}}, and if you continue, any applications or scripts using this event {count, plural, =1 {subscription} other {subscriptions}} will no longer receive event notifications from Parallel."
   },
   {
     "term": "component.use-confirm-delete-profile-type-field-dialog.header",

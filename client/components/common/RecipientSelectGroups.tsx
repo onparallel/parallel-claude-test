@@ -677,7 +677,6 @@ RecipientSelectGroups.fragments = {
         alias
         options
         isLinkedToProfileType
-        isLinkedToProfileType
         isLinkedToProfileTypeField
         profileTypeField {
           id

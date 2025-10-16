@@ -21,6 +21,7 @@ import {
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { ProfileRepository } from "../../db/repositories/ProfileRepository";
+import { PROFILES_SETUP_SERVICE, ProfilesSetupService } from "../../services/ProfilesSetupService";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
@@ -133,6 +134,9 @@ describe("GraphQL/Profiles", () => {
     await mocks.knex.from("profile_field_file").delete();
     await mocks.knex.from("profile_field_value").delete();
     await mocks.knex.from("profile_type_field_permission").delete();
+    await mocks.knex
+      .from("petition_field")
+      .update({ profile_type_id: null, profile_type_field_id: null });
     await mocks.knex.from("profile_type_field").delete();
     await mocks.knex.from("profile_event").delete();
     await mocks.knex.from("profile_subscription").delete();
@@ -144,7 +148,12 @@ describe("GraphQL/Profiles", () => {
     await mocks.knex.from("profile_type_process_template").delete();
     await mocks.knex.from("profile_type_process").delete();
     await mocks.knex.from("profile_list_view").delete();
-    await mocks.knex.from("profile_type").delete();
+    await mocks.knex.from("event_subscription").delete();
+    await mocks.knex.from("profile_type").update({
+      deleted_at: new Date(),
+      archived_at: new Date(),
+      archived_by_user_id: sessionUser.id,
+    });
 
     profileTypes = await mocks.createRandomProfileTypes(
       organization.id,
@@ -2885,8 +2894,9 @@ describe("GraphQL/Profiles", () => {
   });
 
   describe("createProfileType", () => {
-    beforeEach(async () => {
-      await mocks.knex.from("task").delete();
+    beforeAll(async () => {
+      const profilesSetup = testClient.container.get<ProfilesSetupService>(PROFILES_SETUP_SERVICE);
+      await profilesSetup.createDefaultProfileTypes(organization.id, "TEST");
     });
 
     it("creates a new profile type on organization", async () => {
@@ -2998,6 +3008,1027 @@ describe("GraphQL/Profiles", () => {
           ],
         },
       });
+    });
+
+    it("creates a new profile type based on an INDIVIDUAL standard type, and sets allowed relationships with current standard types", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $name: LocalizableUserText!
+            $pluralName: LocalizableUserText!
+            $standardType: ProfileTypeStandardType
+          ) {
+            createProfileType(name: $name, pluralName: $pluralName, standardType: $standardType) {
+              id
+              name
+              pluralName
+              standardType
+              isStandard
+              fields {
+                id
+                type
+                name
+                isUsedInProfileName
+                alias
+                isStandard
+              }
+            }
+          }
+        `,
+        {
+          name: { en: "My Individual", es: "Mi Persona" },
+          pluralName: { en: "My Individuals", es: "Mis Personas" },
+          standardType: "INDIVIDUAL",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createProfileType).toEqual({
+        id: expect.any(String),
+        name: { en: "My Individual", es: "Mi Persona" },
+        pluralName: { en: "My Individuals", es: "Mis Personas" },
+        standardType: "INDIVIDUAL",
+        isStandard: true,
+        fields: [
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "First name", es: "Nombre" },
+            isUsedInProfileName: true,
+            alias: "p_first_name",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Last name", es: "Apellido" },
+            isUsedInProfileName: true,
+            alias: "p_last_name",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Email", es: "Correo electrónico" },
+            isUsedInProfileName: false,
+            alias: "p_email",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "PHONE",
+            name: { en: "Phone number", es: "Número de teléfono" },
+            isUsedInProfileName: false,
+            alias: "p_phone_number",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "PHONE",
+            name: { en: "Mobile phone number", es: "Número de teléfono móvil" },
+            isUsedInProfileName: false,
+            alias: "p_mobile_phone_number",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "DATE",
+            name: { en: "Date of birth", es: "Fecha de nacimiento" },
+            isUsedInProfileName: false,
+            alias: "p_birth_date",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Gender", es: "Género" },
+            isUsedInProfileName: false,
+            alias: "p_gender",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Address", es: "Dirección" },
+            isUsedInProfileName: false,
+            alias: "p_address",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "City", es: "Ciudad" },
+            isUsedInProfileName: false,
+            alias: "p_city",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "ZIP code", es: "Código postal" },
+            isUsedInProfileName: false,
+            alias: "p_zip",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Country of residence", es: "País de residencia" },
+            isUsedInProfileName: false,
+            alias: "p_country_of_residence",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "FILE",
+            name: { en: "Proof of address document", es: "Documento de prueba de domicilio" },
+            isUsedInProfileName: false,
+            alias: "p_proof_of_address_document",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Citizenship", es: "Nacionalidad" },
+            isUsedInProfileName: false,
+            alias: "p_citizenship",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "ID number", es: "Número de identificación" },
+            isUsedInProfileName: false,
+            alias: "p_tax_id",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "FILE",
+            name: { en: "ID document", es: "Documento de identidad" },
+            isUsedInProfileName: false,
+            alias: "p_id_document",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "FILE",
+            name: { en: "Passport", es: "Pasaporte" },
+            isUsedInProfileName: false,
+            alias: "p_passport_document",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Passport number", es: "Número de pasaporte" },
+            isUsedInProfileName: false,
+            alias: "p_passport_number",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Is PEP?", es: "¿Es PRP?" },
+            isUsedInProfileName: false,
+            alias: "p_is_pep",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Risk", es: "Riesgo" },
+            isUsedInProfileName: false,
+            alias: "p_risk",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "FILE",
+            name: { en: "Risk assessment", es: "Evaluación de riesgo" },
+            isUsedInProfileName: false,
+            alias: "p_risk_assessment",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "TEXT",
+            name: { en: "Source of funds", es: "Orígen de los fondos" },
+            isUsedInProfileName: false,
+            alias: "p_source_of_funds",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "BACKGROUND_CHECK",
+            name: { en: "Background check", es: "Búsqueda en listados" },
+            isUsedInProfileName: false,
+            alias: "p_background_check",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Occupation", es: "Ocupación" },
+            isUsedInProfileName: false,
+            alias: "p_occupation",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "FILE",
+            name: { en: "Power of attorney", es: "Poder de representación" },
+            isUsedInProfileName: false,
+            alias: "p_poa",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Position", es: "Cargo" },
+            isUsedInProfileName: false,
+            alias: "p_position",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Client status", es: "Estado cliente" },
+            isUsedInProfileName: false,
+            alias: "p_client_status",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Marital status", es: "Estado civil" },
+            isUsedInProfileName: false,
+            alias: "p_marital_status",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "CHECKBOX",
+            name: { en: "Relationship", es: "Relación" },
+            isUsedInProfileName: false,
+            alias: "p_relationship",
+            isStandard: true,
+          },
+        ],
+      });
+
+      const newProfileTypeId = fromGlobalId(data.createProfileType.id, "ProfileType").id;
+      const profileRelationshipTypes = await mocks.knex
+        .from("profile_relationship_type")
+        .where("org_id", organization.id)
+        .where("deleted_at", null)
+        .select("id", "alias");
+
+      const relationshipsByAlias = indexBy(profileRelationshipTypes, (r) => r.alias);
+      const dbAllowedRelationships = await mocks.knex
+        .from("profile_relationship_type_allowed_profile_type")
+        .where("org_id", organization.id)
+        .where("deleted_at", null)
+        .where("allowed_profile_type_id", newProfileTypeId)
+        .select("*");
+      expect(dbAllowedRelationships).toHaveLength(18);
+      expect(
+        dbAllowedRelationships.map(pick(["direction", "profile_relationship_type_id"])),
+      ).toIncludeSameMembers([
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id: relationshipsByAlias["p_parent__child"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id: relationshipsByAlias["p_parent__child"].id,
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id: relationshipsByAlias["p_family_member"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id: relationshipsByAlias["p_family_member"].id,
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id: relationshipsByAlias["p_close_associate"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id: relationshipsByAlias["p_close_associate"].id,
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id: relationshipsByAlias["p_spouse"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id: relationshipsByAlias["p_spouse"].id,
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id:
+            relationshipsByAlias["p_legal_representative__legally_represented"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id:
+            relationshipsByAlias["p_legal_representative__legally_represented"].id,
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id:
+            relationshipsByAlias["p_legal_guardian__legally_guarded"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id:
+            relationshipsByAlias["p_legal_guardian__legally_guarded"].id,
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id: relationshipsByAlias["p_director__managed_by"].id,
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id:
+            relationshipsByAlias["p_shareholder__participated_in_by"].id,
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id:
+            relationshipsByAlias["p_beneficial_owner__direct_or_indirect_property"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id: relationshipsByAlias["p_contract__counterparty"].id,
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id: relationshipsByAlias["p_contact__contacted_via"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id: relationshipsByAlias["p_contact__contacted_via"].id,
+        },
+      ]);
+    });
+
+    it("creates a new profile type based on an LEGAL_ENTITY standard type, and sets allowed relationships with current standard types", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $name: LocalizableUserText!
+            $pluralName: LocalizableUserText!
+            $standardType: ProfileTypeStandardType
+          ) {
+            createProfileType(name: $name, pluralName: $pluralName, standardType: $standardType) {
+              id
+              name
+              pluralName
+              standardType
+              isStandard
+              fields {
+                id
+                type
+                name
+                isUsedInProfileName
+                alias
+                isStandard
+              }
+            }
+          }
+        `,
+        {
+          name: { en: "My Legal Entity", es: "Mi Entidad Legal" },
+          pluralName: { en: "My Legal Entities", es: "Mis Entidades Legales" },
+          standardType: "LEGAL_ENTITY",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createProfileType).toEqual({
+        id: expect.any(String),
+        name: { en: "My Legal Entity", es: "Mi Entidad Legal" },
+        pluralName: { en: "My Legal Entities", es: "Mis Entidades Legales" },
+        standardType: "LEGAL_ENTITY",
+        isStandard: true,
+        fields: [
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Entity name", es: "Denominación social" },
+            isUsedInProfileName: true,
+            alias: "p_entity_name",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Trade name", es: "Nombre comercial" },
+            isUsedInProfileName: false,
+            alias: "p_trade_name",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Entity type", es: "Tipo de Entidad" },
+            isUsedInProfileName: false,
+            alias: "p_entity_type",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Registration number", es: "Número de registro" },
+            isUsedInProfileName: false,
+            alias: "p_registration_number",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Tax ID", es: "Número de identificación fiscal" },
+            isUsedInProfileName: false,
+            alias: "p_tax_id",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Registered address", es: "Domicilio social" },
+            isUsedInProfileName: false,
+            alias: "p_registered_address",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "PHONE",
+            name: { en: "Phone number", es: "Teléfono" },
+            isUsedInProfileName: false,
+            alias: "p_phone_number",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "City", es: "Ciudad" },
+            isUsedInProfileName: false,
+            alias: "p_city",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "ZIP Code", es: "Código postal" },
+            isUsedInProfileName: false,
+            alias: "p_zip",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Country", es: "País" },
+            isUsedInProfileName: false,
+            alias: "p_country",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Country of incorporation", es: "País de constitución" },
+            isUsedInProfileName: false,
+            alias: "p_country_of_incorporation",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "DATE",
+            name: { en: "Date of incorporation", es: "Fecha de constitución" },
+            isUsedInProfileName: false,
+            alias: "p_date_of_incorporation",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Main business activity", es: "Actividad comercial principal" },
+            isUsedInProfileName: false,
+            alias: "p_main_business_activity",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "FILE",
+            name: { en: "Ownership structure", es: "Estructura de propiedad" },
+            isUsedInProfileName: false,
+            alias: "p_ownership_structure",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "FILE",
+            name: { en: "UBO statement", es: "Acta de titularidad real" },
+            isUsedInProfileName: false,
+            alias: "p_ubo_statement",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "FILE",
+            name: { en: "Financial statements", es: "Estados financieros" },
+            isUsedInProfileName: false,
+            alias: "p_financial_statements",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Risk", es: "Riesgo" },
+            isUsedInProfileName: false,
+            alias: "p_risk",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "FILE",
+            name: { en: "Risk assessment", es: "Evaluación de riesgo" },
+            isUsedInProfileName: false,
+            alias: "p_risk_assessment",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Power of attorney types", es: "Tipos de Poderes" },
+            isUsedInProfileName: false,
+            alias: "p_poa_types",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Power of attorney scope", es: "Alcance del Poder" },
+            isUsedInProfileName: false,
+            alias: "p_poa_scope",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "FILE",
+            name: { en: "Power of attorney document", es: "Documento del poder de representación" },
+            isUsedInProfileName: false,
+            alias: "p_poa_document",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "DATE",
+            name: {
+              en: "Effective date of power of attorney",
+              es: "Fecha de inicio del poder",
+            },
+            isUsedInProfileName: false,
+            alias: "p_poa_effective_date",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "DATE",
+            name: {
+              en: "Expiration date of power of attorney",
+              es: "Fecha de vencimiento del poder",
+            },
+            isUsedInProfileName: false,
+            alias: "p_poa_expiration_date",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Revocation conditions", es: "Condiciones de revocación" },
+            isUsedInProfileName: false,
+            alias: "p_poa_revocation_conditions",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Registered power of attorney", es: "Poder de representación registrado" },
+            isUsedInProfileName: false,
+            alias: "p_poa_registered",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "BACKGROUND_CHECK",
+            name: { en: "Background check", es: "Búsqueda en listados" },
+            isUsedInProfileName: false,
+            alias: "p_background_check",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "FILE",
+            name: {
+              en: "Tax identification document",
+              es: "Código de identificación fiscal (documento)",
+            },
+            isUsedInProfileName: false,
+            alias: "p_tax_id_document",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "FILE",
+            name: { en: "Deed of incorporation", es: "Escritura de constitución" },
+            isUsedInProfileName: false,
+            alias: "p_deed_incorporation",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "FILE",
+            name: { en: "Bylaws", es: "Estatutos sociales" },
+            isUsedInProfileName: false,
+            alias: "p_bylaws",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Client status", es: "Estado cliente" },
+            isUsedInProfileName: false,
+            alias: "p_client_status",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "CHECKBOX",
+            name: { en: "Relationship", es: "Relación" },
+            isUsedInProfileName: false,
+            alias: "p_relationship",
+            isStandard: true,
+          },
+        ],
+      });
+
+      const newProfileTypeId = fromGlobalId(data.createProfileType.id, "ProfileType").id;
+
+      const profileRelationshipTypes = await mocks.knex
+        .from("profile_relationship_type")
+        .where("org_id", organization.id)
+        .where("deleted_at", null)
+        .select("id", "alias");
+      const relationshipsByAlias = indexBy(profileRelationshipTypes, (r) => r.alias);
+      const dbAllowedRelationships = await mocks.knex
+        .from("profile_relationship_type_allowed_profile_type")
+        .where("org_id", organization.id)
+        .where("deleted_at", null)
+        .where("allowed_profile_type_id", newProfileTypeId)
+        .select("*");
+      expect(dbAllowedRelationships).toHaveLength(14);
+      expect(
+        dbAllowedRelationships.map(pick(["direction", "profile_relationship_type_id"])),
+      ).toIncludeSameMembers([
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id:
+            relationshipsByAlias["p_legal_representative__legally_represented"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id:
+            relationshipsByAlias["p_legal_representative__legally_represented"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id: relationshipsByAlias["p_director__managed_by"].id,
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id:
+            relationshipsByAlias["p_shareholder__participated_in_by"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id:
+            relationshipsByAlias["p_shareholder__participated_in_by"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id:
+            relationshipsByAlias["p_beneficial_owner__direct_or_indirect_property"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id: relationshipsByAlias["p_contract__counterparty"].id,
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id: relationshipsByAlias["p_parent_company__subsidiary"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id: relationshipsByAlias["p_parent_company__subsidiary"].id,
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id: relationshipsByAlias["p_main_office__branch_office"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id: relationshipsByAlias["p_main_office__branch_office"].id,
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id: relationshipsByAlias["p_associated_company"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id: relationshipsByAlias["p_associated_company"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id: relationshipsByAlias["p_contact__contacted_via"].id,
+        },
+      ]);
+    });
+
+    it("creates a new profile type based on an CONTRACT standard type, and sets allowed relationships with current standard types", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $name: LocalizableUserText!
+            $pluralName: LocalizableUserText!
+            $standardType: ProfileTypeStandardType
+          ) {
+            createProfileType(name: $name, pluralName: $pluralName, standardType: $standardType) {
+              id
+              name
+              pluralName
+              standardType
+              isStandard
+              fields {
+                id
+                type
+                name
+                isUsedInProfileName
+                alias
+                isStandard
+              }
+            }
+          }
+        `,
+        {
+          name: { en: "My Contract", es: "Mi Contrato" },
+          pluralName: { en: "My Contracts", es: "Mis Contratos" },
+          standardType: "CONTRACT",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createProfileType).toEqual({
+        id: expect.any(String),
+        name: { en: "My Contract", es: "Mi Contrato" },
+        pluralName: { en: "My Contracts", es: "Mis Contratos" },
+        standardType: "CONTRACT",
+        isStandard: true,
+        fields: [
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Counterparty", es: "Contraparte" },
+            isUsedInProfileName: true,
+            alias: "p_counterparty",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Contract type", es: "Tipo de contrato" },
+            isUsedInProfileName: true,
+            alias: "p_contract_type",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "DATE",
+            name: { en: "Effective date", es: "Fecha de inicio" },
+            isUsedInProfileName: false,
+            alias: "p_effective_date",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "DATE",
+            name: { en: "Expiration date", es: "Fecha de vencimiento" },
+            isUsedInProfileName: false,
+            alias: "p_expiration_date",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Jurisdiction", es: "Jurisdicción" },
+            isUsedInProfileName: false,
+            alias: "p_jurisdiction",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "NUMBER",
+            name: { en: "Contract value", es: "Valor del contrato" },
+            isUsedInProfileName: false,
+            alias: "p_contract_value",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Currency", es: "Moneda" },
+            isUsedInProfileName: false,
+            alias: "p_contract_currency",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Payment terms", es: "Términos de pago" },
+            isUsedInProfileName: false,
+            alias: "p_payment_terms",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Renewal terms", es: "Términos de renovación" },
+            isUsedInProfileName: false,
+            alias: "p_renewal_terms",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "FILE",
+            name: { en: "Original document", es: "Documento original" },
+            isUsedInProfileName: false,
+            alias: "p_original_document",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "FILE",
+            name: { en: "Amendments", es: "Enmiendas" },
+            isUsedInProfileName: false,
+            alias: "p_amendments",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Termination clauses", es: "Cláusulas de terminación" },
+            isUsedInProfileName: false,
+            alias: "p_termination_clauses",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SELECT",
+            name: { en: "Confidentiality agreement", es: "Acuerdo de confidencialidad" },
+            isUsedInProfileName: false,
+            alias: "p_confidentiality_agreement",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Performance metrics", es: "Métricas de desempeño" },
+            isUsedInProfileName: false,
+            alias: "p_performance_metrics",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Dispute resolution mechanism", es: "Mecanismo de resolución de disputas" },
+            isUsedInProfileName: false,
+            alias: "p_dispute_resolution_mechanism",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Compliance obligations", es: "Obligaciones de cumplimiento" },
+            isUsedInProfileName: false,
+            alias: "p_compliance_obligations",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Security provisions", es: "Provisiones de seguridad" },
+            isUsedInProfileName: false,
+            alias: "p_security_provisions",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "TEXT",
+            name: { en: "Notes", es: "Notas" },
+            isUsedInProfileName: false,
+            alias: "p_notes",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: {
+              en: "Billing contact full name",
+              es: "Nombre completo del contacto de facturación",
+            },
+            isUsedInProfileName: false,
+            alias: "p_billing_contact_full_name",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: {
+              en: "Billing contact email",
+              es: "Correo electrónico del contacto de facturación",
+            },
+            isUsedInProfileName: false,
+            alias: "p_billing_contact_email",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Legal contact full name", es: "Nombre completo del contacto de legal" },
+            isUsedInProfileName: false,
+            alias: "p_legal_contact_full_name",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "SHORT_TEXT",
+            name: { en: "Legal contact email", es: "Correo electrónico del contacto de legal" },
+            isUsedInProfileName: false,
+            alias: "p_legal_contact_email",
+            isStandard: true,
+          },
+          {
+            id: expect.any(String),
+            type: "DATE",
+            name: { en: "Signature date", es: "Fecha de firma" },
+            isUsedInProfileName: false,
+            alias: "p_signature_date",
+            isStandard: true,
+          },
+        ],
+      });
+
+      const newProfileTypeId = fromGlobalId(data.createProfileType.id, "ProfileType").id;
+      const relationships = await mocks.knex
+        .from("profile_relationship_type")
+        .where("org_id", organization.id)
+        .where("deleted_at", null)
+        .select("id", "alias");
+      const relationshipsByAlias = indexBy(relationships, (r) => r.alias);
+      const dbAllowedRelationships = await mocks.knex
+        .from("profile_relationship_type_allowed_profile_type")
+        .where("org_id", organization.id)
+        .where("deleted_at", null)
+        .where("allowed_profile_type_id", newProfileTypeId)
+        .select("*");
+      expect(dbAllowedRelationships).toHaveLength(5);
+      expect(
+        dbAllowedRelationships.map(pick(["direction", "profile_relationship_type_id"])),
+      ).toIncludeSameMembers([
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id: relationshipsByAlias["p_contract__counterparty"].id,
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id: relationshipsByAlias["p_main_contract__annex"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id: relationshipsByAlias["p_main_contract__annex"].id,
+        },
+        {
+          direction: "LEFT_RIGHT",
+          profile_relationship_type_id: relationshipsByAlias["p_addendum__amended_by"].id,
+        },
+        {
+          direction: "RIGHT_LEFT",
+          profile_relationship_type_id: relationshipsByAlias["p_addendum__amended_by"].id,
+        },
+      ]);
     });
   });
 
@@ -3536,33 +4567,6 @@ describe("GraphQL/Profiles", () => {
       ]);
     });
 
-    it("sends error when trying to archive a standard profile type", async () => {
-      const [standardProfileType] = await mocks.createRandomProfileTypes(
-        organization.id,
-        1,
-        () => ({
-          name: json({ en: "Standard", es: "Standard" }),
-          standard_type: "CONTRACT",
-        }),
-      );
-
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($profileTypeIds: [GID!]!) {
-            archiveProfileType(profileTypeIds: $profileTypeIds) {
-              id
-            }
-          }
-        `,
-        {
-          profileTypeIds: [toGlobalId("ProfileType", standardProfileType.id)],
-        },
-      );
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-
     it("does not unpin profile type when archiving it", async () => {
       await mocks.knex
         .from("user_profile_type_pinned")
@@ -3640,38 +4644,17 @@ describe("GraphQL/Profiles", () => {
         { id: toGlobalId("ProfileType", profileTypes[2].id) },
       ]);
     });
-
-    it("sends error when trying to unarchive a standard profile type", async () => {
-      const [standardProfileType] = await mocks.createRandomProfileTypes(
-        organization.id,
-        1,
-        () => ({
-          name: json({ en: "Standard", es: "Standard" }),
-          standard_type: "CONTRACT",
-          archived_at: new Date(),
-          archived_by_user_id: sessionUser.id,
-        }),
-      );
-
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($profileTypeIds: [GID!]!) {
-            unarchiveProfileType(profileTypeIds: $profileTypeIds) {
-              id
-            }
-          }
-        `,
-        {
-          profileTypeIds: [toGlobalId("ProfileType", standardProfileType.id)],
-        },
-      );
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
   });
 
   describe("deleteProfileType", () => {
+    let petition: Petition;
+    beforeAll(async () => {
+      [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+    });
+    afterAll(async () => {
+      await mocks.knex.from("petition_field").where("petition_id", petition.id).delete();
+    });
+
     it("fails try to delete a profile type before archive it", async () => {
       const { errors, data } = await testClient.execute(
         gql`
@@ -3803,33 +4786,6 @@ describe("GraphQL/Profiles", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error when trying to delete a standard profile type", async () => {
-      const [standardProfileType] = await mocks.createRandomProfileTypes(
-        organization.id,
-        1,
-        () => ({
-          name: json({ en: "Standard", es: "Standard" }),
-          standard_type: "CONTRACT",
-          archived_at: new Date(),
-          archived_by_user_id: sessionUser.id,
-        }),
-      );
-
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($profileTypeIds: [GID!]!) {
-            deleteProfileType(profileTypeIds: $profileTypeIds)
-          }
-        `,
-        {
-          profileTypeIds: [toGlobalId("ProfileType", standardProfileType.id)],
-        },
-      );
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-
     it("unpins a profile type when deleting it", async () => {
       const [profileType] = await mocks.createRandomProfileTypes(organization.id, 1, () => ({
         archived_at: new Date(),
@@ -3939,6 +4895,303 @@ describe("GraphQL/Profiles", () => {
           })),
         ),
       );
+    });
+
+    it("removes FIELD_GROUP associations with the deleted profile type", async () => {
+      const fieldGroups = await mocks.createRandomPetitionFields(petition.id, 2, (i) => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileTypes[i].id,
+      }));
+      const children = [
+        ...(await mocks.createRandomPetitionFields(petition.id, 3, (i) => ({
+          parent_petition_field_id: fieldGroups[0].id,
+          profile_type_field_id: profileType0Fields[i].id,
+          type: "SHORT_TEXT",
+        }))),
+        ...(await mocks.createRandomPetitionFields(petition.id, 3, (i) => ({
+          parent_petition_field_id: fieldGroups[1].id,
+          profile_type_field_id: profileType1Fields[i].id,
+          type: "SHORT_TEXT",
+        }))),
+      ];
+
+      await mocks.knex
+        .from("profile_type")
+        .update({
+          archived_at: new Date(),
+          archived_by_user_id: sessionUser.id,
+        })
+        .where("id", profileTypes[0].id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            deleteProfileType(profileTypeIds: $profileTypeIds)
+          }
+        `,
+        {
+          profileTypeIds: [toGlobalId("ProfileType", profileTypes[0].id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deleteProfileType).toEqual("SUCCESS");
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($id: GID!) {
+            petition(id: $id) {
+              fields {
+                id
+                type
+                profileType {
+                  id
+                }
+                children {
+                  id
+                  type
+                  profileTypeField {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          id: toGlobalId("Petition", petition.id),
+        },
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData?.petition).toEqual({
+        fields: [
+          {
+            id: toGlobalId("PetitionField", fieldGroups[0].id),
+            type: "FIELD_GROUP",
+            profileType: null,
+            children: children.slice(0, 3).map((c) => ({
+              id: toGlobalId("PetitionField", c.id),
+              type: c.type,
+              profileTypeField: null,
+            })),
+          },
+          {
+            id: toGlobalId("PetitionField", fieldGroups[1].id),
+            type: "FIELD_GROUP",
+            profileType: {
+              id: toGlobalId("ProfileType", profileTypes[1].id),
+            },
+            children: children.slice(3, 6).map((c, i) => ({
+              id: toGlobalId("PetitionField", c.id),
+              type: c.type,
+              profileTypeField: {
+                id: toGlobalId("ProfileTypeField", profileType1Fields[i].id),
+              },
+            })),
+          },
+        ],
+      });
+
+      const dbFieldGroups = await mocks.knex
+        .from("petition_field")
+        .whereIn(
+          "id",
+          fieldGroups.map((fg) => fg.id),
+        )
+        .select("id", "type", "profile_type_id");
+
+      expect(dbFieldGroups.map(pick(["id", "type", "profile_type_id"]))).toIncludeSameMembers([
+        { id: fieldGroups[0].id, type: "FIELD_GROUP", profile_type_id: null },
+        { id: fieldGroups[1].id, type: "FIELD_GROUP", profile_type_id: profileTypes[1].id },
+      ]);
+
+      const dbChildren = await mocks.knex
+        .from("petition_field")
+        .whereIn(
+          "id",
+          children.map((c) => c.id),
+        )
+        .select("id", "type", "profile_type_field_id");
+
+      expect(dbChildren.map(pick(["id", "type", "profile_type_field_id"]))).toIncludeSameMembers([
+        ...children
+          .slice(0, 3)
+          .map((c) => ({ id: c.id, type: c.type, profile_type_field_id: null })),
+        ...children.slice(3, 6).map((c, i) => ({
+          id: c.id,
+          type: c.type,
+          profile_type_field_id: profileType1Fields[i].id,
+        })),
+      ]);
+    });
+
+    it("deletes allowed relationships when deleting a profile type", async () => {
+      const relationships = await mocks.knex.from("profile_relationship_type").insert(
+        ["rel_1", "rel_2", "rel_3"].map((alias) => ({
+          alias,
+          org_id: organization.id,
+          left_right_name: { en: "Left Right" },
+          right_left_name: { en: "Right Left" },
+          is_reciprocal: false,
+        })),
+        "*",
+      );
+      const relationshipsByAlias = indexBy(relationships, (r) => r.alias);
+      await mocks.knex.from("profile_relationship_type_allowed_profile_type").insert([
+        {
+          org_id: organization.id,
+          profile_relationship_type_id: relationshipsByAlias["rel_1"].id,
+          allowed_profile_type_id: profileTypes[0].id,
+          direction: "LEFT_RIGHT",
+        },
+        {
+          org_id: organization.id,
+          profile_relationship_type_id: relationshipsByAlias["rel_2"].id,
+          allowed_profile_type_id: profileTypes[0].id,
+          direction: "LEFT_RIGHT",
+        },
+        {
+          org_id: organization.id,
+          profile_relationship_type_id: relationshipsByAlias["rel_3"].id,
+          allowed_profile_type_id: profileTypes[1].id,
+          direction: "LEFT_RIGHT",
+        },
+      ]);
+
+      await mocks.knex
+        .from("profile_type")
+        .update({
+          archived_at: new Date(),
+          archived_by_user_id: sessionUser.id,
+        })
+        .where("id", profileTypes[0].id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            deleteProfileType(profileTypeIds: $profileTypeIds)
+          }
+        `,
+        {
+          profileTypeIds: [toGlobalId("ProfileType", profileTypes[0].id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deleteProfileType).toEqual("SUCCESS");
+
+      const dbAllowedRelationships = await mocks.knex
+        .from("profile_relationship_type_allowed_profile_type")
+        .where("org_id", organization.id)
+        .where("allowed_profile_type_id", profileTypes[0].id)
+        .select("*");
+      expect(dbAllowedRelationships).toHaveLength(2);
+      expect(dbAllowedRelationships.map(pick(["deleted_at"]))).toEqual([
+        { deleted_at: expect.any(Date) },
+        { deleted_at: expect.any(Date) },
+      ]);
+    });
+
+    it("sends error if a subscription on the profile type exists for any user", async () => {
+      const [otherUser] = await mocks.createRandomUsers(organization.id);
+      await mocks.knex.from("event_subscription").insert([
+        {
+          type: "PROFILE",
+          endpoint: "https://www.example.com",
+          from_profile_type_id: profileTypes[0].id,
+          user_id: otherUser.id,
+          event_types: json(["PROFILE_CREATED"]),
+          is_enabled: false,
+          name: "test",
+        },
+        {
+          type: "PROFILE",
+          endpoint: "https://www.example.com",
+          from_profile_type_id: null,
+          user_id: sessionUser.id,
+          event_types: json(["PROFILE_CLOSED"]),
+          is_enabled: true,
+          name: "test",
+        },
+      ]);
+
+      await mocks.knex
+        .from("profile_type")
+        .update({
+          archived_at: new Date(),
+          archived_by_user_id: sessionUser.id,
+        })
+        .where("id", profileTypes[0].id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            deleteProfileType(profileTypeIds: $profileTypeIds)
+          }
+        `,
+        {
+          profileTypeIds: [toGlobalId("ProfileType", profileTypes[0].id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("EVENT_SUBSCRIPTION_EXISTS_ERROR", {
+        count: 1,
+      });
+      expect(data).toBeNull();
+    });
+
+    it("removes event subscription on the profile type if passing force flag", async () => {
+      const [otherUser] = await mocks.createRandomUsers(organization.id);
+      await mocks.knex.from("event_subscription").insert([
+        {
+          type: "PROFILE",
+          endpoint: "https://www.example.com",
+          from_profile_type_id: profileTypes[0].id,
+          user_id: otherUser.id,
+          event_types: json(["PROFILE_CREATED"]),
+          is_enabled: false,
+          name: "test",
+        },
+        {
+          type: "PROFILE",
+          endpoint: "https://www.example.com",
+          from_profile_type_id: null,
+          user_id: sessionUser.id,
+          event_types: json(["PROFILE_CLOSED"]),
+          is_enabled: true,
+          name: "test",
+        },
+      ]);
+
+      await mocks.knex
+        .from("profile_type")
+        .update({
+          archived_at: new Date(),
+          archived_by_user_id: sessionUser.id,
+        })
+        .where("id", profileTypes[0].id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeIds: [GID!]!) {
+            deleteProfileType(profileTypeIds: $profileTypeIds, force: true)
+          }
+        `,
+        {
+          profileTypeIds: [toGlobalId("ProfileType", profileTypes[0].id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deleteProfileType).toEqual("SUCCESS");
+
+      const dbEventSubscriptions = await mocks.knex
+        .from("event_subscription")
+        .where("from_profile_type_id", profileTypes[0].id)
+        .whereNull("deleted_at")
+        .select("*");
+      expect(dbEventSubscriptions).toHaveLength(0);
     });
   });
 
@@ -6503,6 +7756,14 @@ describe("GraphQL/Profiles", () => {
   });
 
   describe("deleteProfileTypeField", () => {
+    let petition: Petition;
+    beforeAll(async () => {
+      [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+    });
+    afterAll(async () => {
+      await mocks.knex.from("petition_field").where("petition_id", petition.id).delete();
+    });
+
     it("deletes a profile type field and reorders the positions", async () => {
       const removedPtfId = profileType0Fields[2].id;
       const { errors, data } = await testClient.execute(
@@ -6724,6 +7985,149 @@ describe("GraphQL/Profiles", () => {
           content: { value: "Specter" },
         },
       });
+    });
+
+    it("unlinks FIELD_GROUP children when deleting a profile type field", async () => {
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, (i) => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileTypes[0].id,
+      }));
+      const children = await mocks.createRandomPetitionFields(petition.id, 4, (i) => ({
+        parent_petition_field_id: fieldGroup.id,
+        profile_type_field_id: profileType0Fields[i].id,
+        type: "SHORT_TEXT",
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $profileTypeFieldIds: [GID!]!) {
+            deleteProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldIds: $profileTypeFieldIds
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[2].id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deleteProfileTypeField).toEqual({
+        id: toGlobalId("ProfileType", profileTypes[0].id),
+      });
+
+      const dbChildren = await mocks.knex
+        .from("petition_field")
+        .whereIn(
+          "id",
+          children.map((c) => c.id),
+        )
+        .select("*");
+
+      expect(
+        dbChildren.map(pick(["id", "profile_type_id", "profile_type_field_id"])),
+      ).toIncludeSameMembers([
+        {
+          id: children[0].id,
+          profile_type_id: null,
+          profile_type_field_id: profileType0Fields[0].id,
+        },
+        {
+          id: children[1].id,
+          profile_type_id: null,
+          profile_type_field_id: profileType0Fields[1].id,
+        },
+        { id: children[2].id, profile_type_id: null, profile_type_field_id: null },
+        {
+          id: children[3].id,
+          profile_type_id: null,
+          profile_type_field_id: profileType0Fields[3].id,
+        },
+      ]);
+    });
+
+    it("sends error if a subscription on the profile type field exists for any user", async () => {
+      await mocks.knex.from("event_subscription").insert([
+        {
+          type: "PROFILE",
+          endpoint: "https://www.example.com",
+          from_profile_type_field_ids: [profileType0Fields[2].id],
+          user_id: sessionUser.id,
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $profileTypeFieldIds: [GID!]!) {
+            deleteProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldIds: $profileTypeFieldIds
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[2].id)],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("DELETE_PROFILE_TYPE_FIELD_ERROR", {
+        aggregatedErrors: [
+          {
+            code: "EVENT_SUBSCRIPTION_EXISTS_ERROR",
+            message: "A subscription exists for at least one of the provided profile type fields",
+            count: 1,
+          },
+        ],
+      });
+      expect(data).toBeNull();
+    });
+
+    it("removes event subscription on the profile type field if passing force flag", async () => {
+      await mocks.knex.from("event_subscription").insert([
+        {
+          type: "PROFILE",
+          endpoint: "https://www.example.com",
+          from_profile_type_field_ids: [profileType0Fields[2].id],
+          user_id: sessionUser.id,
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $profileTypeFieldIds: [GID!]!) {
+            deleteProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldIds: $profileTypeFieldIds
+              force: true
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[2].id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deleteProfileTypeField).toEqual({
+        id: toGlobalId("ProfileType", profileTypes[0].id),
+      });
+
+      const dbEventSubscriptions = await mocks.knex
+        .from("event_subscription")
+        .where("from_profile_type_field_ids", [profileType0Fields[2].id])
+        .whereNull("deleted_at")
+        .select("*");
+      expect(dbEventSubscriptions).toHaveLength(0);
     });
   });
 

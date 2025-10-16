@@ -2961,7 +2961,6 @@ describe("repositories/PetitionRepository", () => {
 
     beforeAll(async () => {
       await profilesSetup.createDefaultProfileTypes(organization.id, `User:${user.id}`);
-      await profilesSetup.createDefaultProfileRelationshipTypes(organization.id, `User:${user.id}`);
 
       profileTypes = await mocks.knex
         .from("profile_type")
@@ -3233,12 +3232,8 @@ describe("repositories/PetitionRepository", () => {
       const [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
 
       await profilesSetup.createDefaultProfileTypes(otherOrg.id, `User:${otherUser.id}`);
-      await profilesSetup.createDefaultProfileRelationshipTypes(
-        otherOrg.id,
-        `User:${otherUser.id}`,
-      );
-
       const otherOrgPts = await mocks.knex
+
         .from("profile_type")
         .where({ org_id: otherOrg.id, deleted_at: null })
         .select("*");

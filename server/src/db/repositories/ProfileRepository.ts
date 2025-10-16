@@ -109,7 +109,7 @@ export class ProfileRepository extends BaseRepository {
   );
 
   readonly loadProfileTypesByOrgId = this.buildLoadMultipleBy("profile_type", "org_id", (q) =>
-    q.whereNull("deleted_at"),
+    q.whereNull("deleted_at").orderBy("created_at", "asc"),
   );
   readonly loadStandardProfileTypesByOrgId = this.buildLoadMultipleBy(
     "profile_type",
@@ -369,6 +369,23 @@ export class ProfileRepository extends BaseRepository {
     }, t);
   }
 
+  async deleteProfileTypeAllowedRelationshipsByProfileTypeId(
+    profileTypeIds: number[],
+    deletedBy: string,
+    t?: Knex.Transaction,
+  ) {
+    if (profileTypeIds.length === 0) {
+      return;
+    }
+    await this.from("profile_relationship_type_allowed_profile_type", t)
+      .whereIn("allowed_profile_type_id", profileTypeIds)
+      .whereNull("deleted_at")
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
+      });
+  }
+
   async deleteProfileTypes(id: MaybeArray<number>, deletedBy: string, t?: Knex.Transaction) {
     const ids = unMaybeArray(id);
     if (ids.length === 0) {
@@ -489,12 +506,12 @@ export class ProfileRepository extends BaseRepository {
     await this.raw(
       /* sql */ `
       with deleted_profile_type_field_ids as (
-        select * from (?) as t(profile_type_field_id)
+        select * from (:profileTypeFieldIds) as t(profile_type_field_id)
       ),
       deleted_profile_type_fields as (
         update profile_type_field as ptf set
           deleted_at = NOW(),
-          deleted_by = ?
+          deleted_by = :deletedBy
         from deleted_profile_type_field_ids dptfi
         where ptf.id = dptfi.profile_type_field_id
         and ptf.deleted_at is null
@@ -503,50 +520,62 @@ export class ProfileRepository extends BaseRepository {
       new_positions as (
         select id, rank() over (order by position asc) - 1 as position
         from profile_type_field
-        where profile_type_id = ? and deleted_at is null and id not in (select id from deleted_profile_type_fields)
+        where profile_type_id = :profileTypeId and deleted_at is null and id not in (select id from deleted_profile_type_fields)
       ),
       update_positions as (
         update profile_type_field ptf set
           position = np.position,
           updated_at = NOW(),
-          updated_by = ?
+          updated_by = :deletedBy
         from new_positions np
         where np.id = ptf.id and np.position != ptf.position
       ),
       deleted_profile_field_values as (
         update profile_field_value pfv set
           deleted_at = NOW(),
-          deleted_by = ?
+          deleted_by = :deletedBy
         from deleted_profile_type_fields dptf
         where pfv.profile_type_field_id = dptf.id
       ),
       deleted_profile_field_files as (
         update profile_field_file pff set
           deleted_at = NOW(),
-          deleted_by = ?
+          deleted_by = :deletedBy
         from deleted_profile_type_fields dptf
         where pff.profile_type_field_id = dptf.id
+      ),
+      updated_petition_fields as (
+        update petition_field pf set
+          profile_type_field_id = null,
+          updated_at = NOW(),
+          updated_by = :deletedBy
+        from deleted_profile_type_fields dptf
+        where pf.profile_type_field_id = dptf.id
+      ),
+      deleted_profile_subscriptions as (
+        update event_subscription es set
+          deleted_at = NOW(),
+          deleted_by = :deletedBy
+        from deleted_profile_type_fields dptf
+        where es.from_profile_type_field_ids @> array[dptf.id]
+        and es.deleted_at is null
       ),
       update_profile_value_cache as (
         update profile p set
           value_cache = value_cache - (select array_agg(id::text) from deleted_profile_type_fields dptf)
-        where p.profile_type_id = ?
+        where p.profile_type_id = :profileTypeId
         and p.deleted_at is null
       )
       select 1
     `,
-      [
-        this.sqlValues(
+      {
+        profileTypeFieldIds: this.sqlValues(
           unMaybeArray(profileTypeFieldIds).map((id) => [id]),
           ["int"],
         ),
-        deletedBy,
         profileTypeId,
         deletedBy,
-        deletedBy,
-        deletedBy,
-        profileTypeId,
-      ],
+      },
     );
     this.loadProfileTypeFieldsByProfileTypeId.dataloader.clear(profileTypeId);
   }
@@ -2974,9 +3003,14 @@ export class ProfileRepository extends BaseRepository {
   async createProfileRelationshipAllowedProfileType(
     data: MaybeArray<CreateProfileRelationshipTypeAllowedProfileType>,
     createdBy: string,
+    t?: Knex.Transaction,
   ) {
-    return await this.from("profile_relationship_type_allowed_profile_type").insert(
-      unMaybeArray(data).map((d) => ({ ...d, created_by: createdBy })),
+    const dataArr = unMaybeArray(data);
+    if (dataArr.length === 0) {
+      return [];
+    }
+    return await this.from("profile_relationship_type_allowed_profile_type", t).insert(
+      dataArr.map((d) => ({ ...d, created_by: createdBy })),
       "*",
     );
   }

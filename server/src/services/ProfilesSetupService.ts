@@ -1,7 +1,8 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import pMap from "p-map";
-import { indexBy } from "remeda";
+import { indexBy, isNonNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { CreateProfileTypeField, ProfileType, ProfileTypeStandardType } from "../db/__types";
 import { ProfileRepository } from "../db/repositories/ProfileRepository";
 import { ViewRepository } from "../db/repositories/ViewRepository";
@@ -37,19 +38,31 @@ type ProfileRelationshipTypeDefinition = Record<
   () => Promise<[LocalizableUserText, LocalizableUserText | null]>
 >;
 
+type CreateProfileTypeOptions = {
+  org_id: number;
+  name: LocalizableUserText;
+  name_plural: LocalizableUserText;
+};
+
 export const PROFILES_SETUP_SERVICE = Symbol.for("PROFILES_SETUP_SERVICE");
 export interface IProfilesSetupService {
-  createDefaultProfileType(
-    orgId: number,
-    name: LocalizableUserText,
-    pluralName: LocalizableUserText,
-    createdBy: string,
-  ): Promise<ProfileType>;
+  createDefaultProfileType(data: CreateProfileTypeOptions, createdBy: string): Promise<ProfileType>;
   createDefaultProfileTypes(orgId: number, createdBy: string): Promise<void>;
-  createDefaultContractProfileType(orgId: number, createdBy: string): Promise<void>;
-  createDefaultIndividualProfileType(orgId: number, createdBy: string): Promise<void>;
-  createDefaultLegalEntityProfileType(orgId: number, createdBy: string): Promise<void>;
-  createDefaultProfileRelationshipTypes(orgId: number, createdBy: string): Promise<void>;
+  createContractProfileType(
+    data: CreateProfileTypeOptions,
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<ProfileType>;
+  createIndividualProfileType(
+    data: CreateProfileTypeOptions,
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<ProfileType>;
+  createLegalEntityProfileType(
+    data: CreateProfileTypeOptions,
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<ProfileType>;
   getProfileTypeFieldsDefinition(
     standardType: ProfileTypeStandardType,
   ): Promise<StandardProfileTypeFieldDefinition[]>;
@@ -68,18 +81,9 @@ export class ProfilesSetupService implements IProfilesSetupService {
     @inject(ViewRepository) private views: ViewRepository,
   ) {}
 
-  async createDefaultProfileType(
-    orgId: number,
-    name: LocalizableUserText,
-    pluralName: LocalizableUserText,
-    createdBy: string,
-  ) {
+  async createDefaultProfileType(data: CreateProfileTypeOptions, createdBy: string) {
     return await this.profiles.withTransaction(async (t) => {
-      const [profileType] = await this.profiles.createProfileType(
-        { name, name_plural: pluralName, org_id: orgId },
-        createdBy,
-        t,
-      );
+      const [profileType] = await this.profiles.createProfileType(data, createdBy, t);
 
       const [field] = await this.profiles.createProfileTypeField(
         profileType.id,
@@ -94,7 +98,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
         t,
       );
 
-      await this.views.createProfileListViewsByOrgId(orgId, profileType, createdBy, t);
+      await this.views.createProfileListViewsByOrgId(data.org_id, profileType, createdBy, t);
 
       return await this.profiles.updateProfileType(
         profileType.id,
@@ -1271,7 +1275,6 @@ export class ProfilesSetupService implements IProfilesSetupService {
               ],
             },
           },
-
           {
             type: "BACKGROUND_CHECK",
             name: await this.intl.getLocalizableUserText({
@@ -1396,20 +1399,18 @@ export class ProfilesSetupService implements IProfilesSetupService {
     }
   }
 
-  async createDefaultContractProfileType(orgId: number, createdBy: string, t?: Knex.Transaction) {
+  async createContractProfileType(
+    data: CreateProfileTypeOptions,
+    createdBy: string,
+    t?: Knex.Transaction,
+  ) {
     const [contract] = await this.profiles.createProfileType(
       {
         standard_type: "CONTRACT",
-        name: await this.intl.getLocalizableUserText({
-          id: "profiles.default-profile-type.contract",
-          defaultMessage: "Contract",
-        }),
-        name_plural: await this.intl.getLocalizableUserText({
-          id: "profiles.default-profile-type.contract-plural",
-          defaultMessage: "Contracts",
-        }),
+        name: data.name,
+        name_plural: data.name_plural,
         icon: "DOCUMENT",
-        org_id: orgId,
+        org_id: data.org_id,
       },
       createdBy,
       t,
@@ -1422,8 +1423,6 @@ export class ProfilesSetupService implements IProfilesSetupService {
       t,
     );
 
-    await this.views.createProfileListViewsByOrgId(orgId, contract, createdBy, t);
-
     const counterParty = contractFields.find((f) => f.alias === "p_counterparty")!;
     const contractType = contractFields.find((f) => f.alias === "p_contract_type")!;
 
@@ -1433,22 +1432,29 @@ export class ProfilesSetupService implements IProfilesSetupService {
       createdBy,
       t,
     );
+
+    await this.views.createProfileListViewsByOrgId(data.org_id, contract, createdBy, t);
+    await this.createDefaultProfileRelationshipAllowedProfileTypesByProfileType(
+      contract,
+      createdBy,
+      t,
+    );
+
+    return contract;
   }
 
-  async createDefaultIndividualProfileType(orgId: number, createdBy: string, t?: Knex.Transaction) {
+  async createIndividualProfileType(
+    data: CreateProfileTypeOptions,
+    createdBy: string,
+    t?: Knex.Transaction,
+  ) {
     const [individual] = await this.profiles.createProfileType(
       {
         standard_type: "INDIVIDUAL",
-        name: await this.intl.getLocalizableUserText({
-          id: "profiles.default-profile-type.individual",
-          defaultMessage: "Individual",
-        }),
-        name_plural: await this.intl.getLocalizableUserText({
-          id: "profiles.default-profile-type.individual-plural",
-          defaultMessage: "Individuals",
-        }),
+        name: data.name,
+        name_plural: data.name_plural,
         icon: "PERSON",
-        org_id: orgId,
+        org_id: data.org_id,
       },
       createdBy,
       t,
@@ -1461,8 +1467,6 @@ export class ProfilesSetupService implements IProfilesSetupService {
       t,
     );
 
-    await this.views.createProfileListViewsByOrgId(orgId, individual, createdBy, t);
-
     const firstName = individualFields.find((f) => f.alias === "p_first_name")!;
     const lastName = individualFields.find((f) => f.alias === "p_last_name")!;
 
@@ -1472,26 +1476,29 @@ export class ProfilesSetupService implements IProfilesSetupService {
       createdBy,
       t,
     );
+
+    await this.views.createProfileListViewsByOrgId(data.org_id, individual, createdBy, t);
+    await this.createDefaultProfileRelationshipAllowedProfileTypesByProfileType(
+      individual,
+      createdBy,
+      t,
+    );
+
+    return individual;
   }
 
-  async createDefaultLegalEntityProfileType(
-    orgId: number,
+  async createLegalEntityProfileType(
+    data: CreateProfileTypeOptions,
     createdBy: string,
     t?: Knex.Transaction,
   ) {
     const [legalEntity] = await this.profiles.createProfileType(
       {
         standard_type: "LEGAL_ENTITY",
-        name: await this.intl.getLocalizableUserText({
-          id: "profiles.default-profile-type.legal-entity",
-          defaultMessage: "Company",
-        }),
-        name_plural: await this.intl.getLocalizableUserText({
-          id: "profiles.default-profile-type.legal-entity-plural",
-          defaultMessage: "Companies",
-        }),
+        name: data.name,
+        name_plural: data.name_plural,
         icon: "BUILDING",
-        org_id: orgId,
+        org_id: data.org_id,
       },
       createdBy,
       t,
@@ -1504,8 +1511,6 @@ export class ProfilesSetupService implements IProfilesSetupService {
       t,
     );
 
-    await this.views.createProfileListViewsByOrgId(orgId, legalEntity, createdBy, t);
-
     const entityName = legalEntityFields.find((f) => f.alias === "p_entity_name")!;
 
     await this.profiles.updateProfileType(
@@ -1514,57 +1519,124 @@ export class ProfilesSetupService implements IProfilesSetupService {
       createdBy,
       t,
     );
+
+    await this.views.createProfileListViewsByOrgId(data.org_id, legalEntity, createdBy, t);
+    await this.createDefaultProfileRelationshipAllowedProfileTypesByProfileType(
+      legalEntity,
+      createdBy,
+      t,
+    );
+
+    return legalEntity;
   }
 
   async createDefaultProfileTypes(orgId: number, createdBy: string) {
+    await this.createDefaultProfileRelationshipTypes(orgId, createdBy);
+
     await this.profiles.withTransaction(async (t) => {
-      await this.createDefaultIndividualProfileType(orgId, createdBy, t);
-      await this.createDefaultLegalEntityProfileType(orgId, createdBy, t);
-      await this.createDefaultContractProfileType(orgId, createdBy, t);
+      await this.createIndividualProfileType(
+        {
+          org_id: orgId,
+          name: await this.intl.getLocalizableUserText({
+            id: "profiles.default-profile-type.individual",
+            defaultMessage: "Individual",
+          }),
+          name_plural: await this.intl.getLocalizableUserText({
+            id: "profiles.default-profile-type.individual-plural",
+            defaultMessage: "Individuals",
+          }),
+        },
+        createdBy,
+        t,
+      );
+      await this.createLegalEntityProfileType(
+        {
+          org_id: orgId,
+          name: await this.intl.getLocalizableUserText({
+            id: "profiles.default-profile-type.legal-entity",
+            defaultMessage: "Company",
+          }),
+          name_plural: await this.intl.getLocalizableUserText({
+            id: "profiles.default-profile-type.legal-entity-plural",
+            defaultMessage: "Companies",
+          }),
+        },
+        createdBy,
+        t,
+      );
+      await this.createContractProfileType(
+        {
+          org_id: orgId,
+          name: await this.intl.getLocalizableUserText({
+            id: "profiles.default-profile-type.contract",
+            defaultMessage: "Contract",
+          }),
+          name_plural: await this.intl.getLocalizableUserText({
+            id: "profiles.default-profile-type.contract-plural",
+            defaultMessage: "Contracts",
+          }),
+        },
+        createdBy,
+        t,
+      );
     });
   }
 
-  async createDefaultProfileRelationshipTypes(orgId: number, createdBy: string) {
-    const profileTypes = await this.profiles.getOrganizationStandardProfileTypes(orgId);
-    const profileTypesByStandardType = indexBy(profileTypes, (pt) => pt.standard_type);
-    const relationshipTypesDefinition = this.getProfileRelationshipTypesDefinition();
-
-    const relationships = await this.profiles.createProfileRelationshipType(
-      await pMap(Object.entries(relationshipTypesDefinition), async ([alias, i18n]) => {
-        const [left, right] = await i18n();
-        return {
-          org_id: orgId,
-          alias,
-          left_right_name: left,
-          right_left_name: right,
-          is_reciprocal: right === null,
-        };
-      }),
-
+  private async createDefaultProfileRelationshipTypes(orgId: number, createdBy: string) {
+    await this.profiles.createProfileRelationshipType(
+      await pMap(
+        Object.entries(this.getProfileRelationshipTypesDefinition()),
+        async ([alias, i18n]) => {
+          const [left, right] = await i18n();
+          return {
+            org_id: orgId,
+            alias,
+            left_right_name: left,
+            right_left_name: right,
+            is_reciprocal: right === null,
+          };
+        },
+      ),
       createdBy,
     );
+  }
 
-    const relationshipsByAlias = indexBy(relationships, (r) => r.alias);
-
+  private async createDefaultProfileRelationshipAllowedProfileTypesByProfileType(
+    profileType: ProfileType,
+    createdBy: string,
+    t?: Knex.Transaction,
+  ) {
+    assert(profileType.standard_type, "Standard type is required");
+    // no need to pass transaction for this query, as relationship types will always be created beforehand
+    const relationshipTypes = await this.profiles.loadProfileRelationshipTypesByOrgId(
+      profileType.org_id,
+    );
+    const relationshipTypesByAlias = indexBy(relationshipTypes, (r) => r.alias);
     const allowedProfileTypesDefinition =
       this.getProfileRelationshipAllowedProfileTypesDefinition();
-
     await this.profiles.createProfileRelationshipAllowedProfileType(
-      Object.entries(allowedProfileTypesDefinition).flatMap(([alias, [left, right]]) => [
-        ...left.map((type) => ({
-          org_id: orgId,
-          allowed_profile_type_id: profileTypesByStandardType[type].id,
-          profile_relationship_type_id: relationshipsByAlias[alias].id,
-          direction: "LEFT_RIGHT" as const,
-        })),
-        ...right.map((type) => ({
-          org_id: orgId,
-          allowed_profile_type_id: profileTypesByStandardType[type].id,
-          profile_relationship_type_id: relationshipsByAlias[alias].id,
-          direction: "RIGHT_LEFT" as const,
-        })),
-      ]),
+      Object.entries(allowedProfileTypesDefinition)
+        .filter(([alias]) => isNonNullish(relationshipTypesByAlias[alias]))
+        .flatMap(([alias, [left, right]]) => [
+          ...left
+            .filter((st) => st === profileType.standard_type)
+            .map(() => ({
+              org_id: profileType.org_id,
+              allowed_profile_type_id: profileType.id,
+              profile_relationship_type_id: relationshipTypesByAlias[alias].id,
+              direction: "LEFT_RIGHT" as const,
+            })),
+          ...right
+            .filter((st) => st === profileType.standard_type)
+            .map(() => ({
+              org_id: profileType.org_id,
+              allowed_profile_type_id: profileType.id,
+              profile_relationship_type_id: relationshipTypesByAlias[alias].id,
+              direction: "RIGHT_LEFT" as const,
+            })),
+        ]),
       createdBy,
+      t,
     );
   }
 

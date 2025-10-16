@@ -12,11 +12,14 @@ import {
 import Link from "next/link";
 import { useCallback } from "react";
 import { FormattedMessage } from "react-intl";
+import { isApolloError } from "../apollo/isApolloError";
 
 export function useDeleteProfileType() {
   const [deleteProfileType] = useMutation(useDeleteProfileType_deleteProfileTypeDocument);
   const client = useApolloClient();
   const showConfirmDeleteWithProfiles = useDialog(ConfirmDeleteProfileTypeDialog);
+  const showConfirmDeleteWithSubscriptions = useConfirmDeleteProfileTypeWithSubscriptionsDialog();
+
   const showConfirmDelete = useConfirmDeleteProfileTypeDialog();
 
   return async function ({
@@ -41,6 +44,13 @@ export function useDeleteProfileType() {
           profileTypes,
         });
       } else {
+        await deleteProfileType({
+          variables: {
+            profileTypeIds: profileTypes.map((profileType) => profileType.id),
+            dryRun: true,
+          },
+        });
+        // if dryrun succeeds, show the generic confirm delete dialog
         await showConfirmDelete({
           profileTypes,
         });
@@ -56,8 +66,26 @@ export function useDeleteProfileType() {
         },
       });
 
-      return res?.deleteProfileType;
-    } catch {}
+      return res!.deleteProfileType;
+    } catch (error) {
+      // dryrun failed, show the confirm delete with subscriptions dialog
+      if (isApolloError(error, "EVENT_SUBSCRIPTION_EXISTS_ERROR")) {
+        try {
+          await showConfirmDeleteWithSubscriptions({
+            profileTypes,
+            subscriptionCount: error.graphQLErrors[0].extensions?.count as number,
+          });
+          const { data: res } = await deleteProfileType({
+            variables: {
+              profileTypeIds: profileTypes.map((profileType) => profileType.id),
+              force: true,
+            },
+          });
+          return res!.deleteProfileType;
+        } catch {}
+      }
+      return "FAILURE";
+    }
   };
 }
 
@@ -84,8 +112,12 @@ useDeleteProfileType.queries = [
 
 useDeleteProfileType.mutations = [
   gql`
-    mutation useDeleteProfileType_deleteProfileType($profileTypeIds: [GID!]!) {
-      deleteProfileType(profileTypeIds: $profileTypeIds)
+    mutation useDeleteProfileType_deleteProfileType(
+      $profileTypeIds: [GID!]!
+      $dryRun: Boolean
+      $force: Boolean
+    ) {
+      deleteProfileType(profileTypeIds: $profileTypeIds, dryRun: $dryRun, force: $force)
     }
   `,
 ];
@@ -138,7 +170,7 @@ function useConfirmDeleteProfileTypeDialog() {
 }
 
 function ConfirmDeleteProfileTypeDialog({
-  profileCount: profilesCount,
+  profileCount,
   profileTypes,
   ...props
 }: DialogProps<{
@@ -166,7 +198,7 @@ function ConfirmDeleteProfileTypeDialog({
                 id="component.use-delete-profile-type.profiles-in-use"
                 defaultMessage="There {count, plural, =1 {is <a>1 profile</a>} other {are <a># profiles</a>}} using {profileTypeCount, plural, =1 {this profile type} other {these profile types}}."
                 values={{
-                  count: profilesCount,
+                  count: profileCount,
                   profileTypeCount: profileTypes.length,
                   a: (chunks) => (
                     <Link
@@ -201,4 +233,46 @@ function ConfirmDeleteProfileTypeDialog({
       }
     />
   );
+}
+
+function useConfirmDeleteProfileTypeWithSubscriptionsDialog() {
+  const showDialog = useConfirmDeleteDialog();
+  return async ({
+    profileTypes,
+    subscriptionCount,
+  }: {
+    profileTypes: useDeleteProfileType_ProfileTypeFragment[];
+    subscriptionCount: number;
+  }) => {
+    return await showDialog({
+      header: (
+        <FormattedMessage
+          id="component.confirm-delete-profile-type-with-subscriptions.confirm-delete-header"
+          defaultMessage="Delete {count, plural, =1 {profile type} other {profile types}}"
+          values={{
+            count: profileTypes.length,
+          }}
+        />
+      ),
+      description: (
+        <Stack>
+          <FormattedMessage
+            id="component.confirm-delete-profile-type-with-subscriptions.subscriptions-in-use"
+            defaultMessage="There {count, plural, =1 {is 1 event subscription} other {are # event subscriptions}} using {profileTypeCount, plural, =1 {this profile type} other {these profile types}}."
+            values={{
+              count: subscriptionCount,
+              profileTypeCount: profileTypes.length,
+            }}
+          />
+
+          <Text>
+            <FormattedMessage
+              id="component.confirm-delete-profile-type-with-subscriptions.want-delete-profile-types"
+              defaultMessage="If you continue, any applications or scripts using these event subscriptions will no longer receive event notifications from Parallel."
+            />
+          </Text>
+        </Stack>
+      ),
+    });
+  };
 }

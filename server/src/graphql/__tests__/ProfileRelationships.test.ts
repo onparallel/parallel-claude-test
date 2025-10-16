@@ -35,7 +35,6 @@ describe("GraphQL/Profile Relationships", () => {
     })));
 
     await profilesSetup.createDefaultProfileTypes(organization.id, "TEST");
-    await profilesSetup.createDefaultProfileRelationshipTypes(organization.id, "TEST");
 
     await mocks.createFeatureFlags([{ name: "PROFILES", default_value: true }]);
 

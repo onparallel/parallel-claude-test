@@ -23,7 +23,7 @@ function ConfirmDeactivateEventSubscriptionDialog({ ...props }: DialogProps<{}>)
           <Text>
             <FormattedMessage
               id="component.confirm-deactivate-event-subscription-dialog.warning"
-              defaultMessage="Any applications or scripts using this event subscription will no longer receive event notifications from Parallel."
+              defaultMessage="Any integrations using this event subscription will no longer receive event notifications from Parallel."
             />
           </Text>
         </Stack>

@@ -2469,6 +2469,7 @@ export interface MutationcreateProfileRelationshipsExcelArgs {
 export interface MutationcreateProfileTypeArgs {
   name: Scalars["LocalizableUserText"]["input"];
   pluralName: Scalars["LocalizableUserText"]["input"];
+  standardType?: InputMaybe<ProfileTypeStandardType>;
 }
 
 export interface MutationcreateProfileTypeFieldArgs {
@@ -2684,6 +2685,8 @@ export interface MutationdeleteProfileListViewArgs {
 }
 
 export interface MutationdeleteProfileTypeArgs {
+  dryRun?: InputMaybe<Scalars["Boolean"]["input"]>;
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
   profileTypeIds: Array<Scalars["GID"]["input"]>;
 }
 
@@ -51245,7 +51248,7 @@ export type OrganizationProfileTypes_ProfileTypeFragment = {
   icon: ProfileTypeIcon;
   createdAt: string;
   archivedAt?: string | null;
-  isStandard: boolean;
+  standardType?: ProfileTypeStandardType | null;
 };
 
 export type OrganizationProfileTypes_ProfileTypePaginationFragment = {
@@ -51259,7 +51262,7 @@ export type OrganizationProfileTypes_ProfileTypePaginationFragment = {
     icon: ProfileTypeIcon;
     createdAt: string;
     archivedAt?: string | null;
-    isStandard: boolean;
+    standardType?: ProfileTypeStandardType | null;
   }>;
 };
 
@@ -51284,7 +51287,7 @@ export type OrganizationProfileTypes_profileTypesQuery = {
       icon: ProfileTypeIcon;
       createdAt: string;
       archivedAt?: string | null;
-      isStandard: boolean;
+      standardType?: ProfileTypeStandardType | null;
     }>;
   };
 };
@@ -51371,6 +51374,7 @@ export type OrganizationProfileTypes_userQuery = {
 export type OrganizationProfileTypes_createProfileTypeMutationVariables = Exact<{
   name: Scalars["LocalizableUserText"]["input"];
   pluralName: Scalars["LocalizableUserText"]["input"];
+  standardType?: InputMaybe<ProfileTypeStandardType>;
 }>;
 
 export type OrganizationProfileTypes_createProfileTypeMutation = {
@@ -51382,7 +51386,7 @@ export type OrganizationProfileTypes_createProfileTypeMutation = {
     icon: ProfileTypeIcon;
     createdAt: string;
     archivedAt?: string | null;
-    isStandard: boolean;
+    standardType?: ProfileTypeStandardType | null;
   };
 };
 
@@ -69827,6 +69831,8 @@ export type useDeleteProfileType_profilesQuery = {
 
 export type useDeleteProfileType_deleteProfileTypeMutationVariables = Exact<{
   profileTypeIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  dryRun?: InputMaybe<Scalars["Boolean"]["input"]>;
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type useDeleteProfileType_deleteProfileTypeMutation = { deleteProfileType: Success };
@@ -79758,7 +79764,7 @@ export const OrganizationProfileTypes_ProfileTypeFragmentDoc = gql`
     icon
     createdAt
     archivedAt
-    isStandard
+    standardType
     ...useDeleteProfileType_ProfileType
     ...useArchiveProfileType_ProfileType
   }
@@ -80107,7 +80113,6 @@ export const RecipientSelectGroups_PetitionFragmentDoc = gql`
       id
       alias
       options
-      isLinkedToProfileType
       isLinkedToProfileType
       isLinkedToProfileTypeField
       profileTypeField {
@@ -90272,8 +90277,9 @@ export const OrganizationProfileTypes_createProfileTypeDocument = gql`
   mutation OrganizationProfileTypes_createProfileType(
     $name: LocalizableUserText!
     $pluralName: LocalizableUserText!
+    $standardType: ProfileTypeStandardType
   ) {
-    createProfileType(name: $name, pluralName: $pluralName) {
+    createProfileType(name: $name, pluralName: $pluralName, standardType: $standardType) {
       ...OrganizationProfileTypes_ProfileType
     }
   }
@@ -92548,8 +92554,12 @@ export const useDeleteProfileType_profilesDocument = gql`
   useDeleteProfileType_profilesQueryVariables
 >;
 export const useDeleteProfileType_deleteProfileTypeDocument = gql`
-  mutation useDeleteProfileType_deleteProfileType($profileTypeIds: [GID!]!) {
-    deleteProfileType(profileTypeIds: $profileTypeIds)
+  mutation useDeleteProfileType_deleteProfileType(
+    $profileTypeIds: [GID!]!
+    $dryRun: Boolean
+    $force: Boolean
+  ) {
+    deleteProfileType(profileTypeIds: $profileTypeIds, dryRun: $dryRun, force: $force)
   }
 ` as unknown as DocumentNode<
   useDeleteProfileType_deleteProfileTypeMutation,

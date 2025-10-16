@@ -5397,36 +5397,54 @@ export class PetitionRepository extends BaseRepository {
       .whereNull("archived_at")
       .orderBy("id", "asc");
 
-    const searchIn = [];
-    const individual = standardProfileTypes.find((pt) => pt.standard_type === "INDIVIDUAL");
-    if (individual) {
-      searchIn.push({ profileTypeId: individual.id, profileTypeFieldIds: [] });
-    }
+    const searchIn: { profileTypeId: number; profileTypeFieldIds: number[] }[] = [];
 
-    const legalEntity = standardProfileTypes.find((pt) => pt.standard_type === "LEGAL_ENTITY");
-    if (legalEntity) {
+    const individuals = standardProfileTypes.filter((pt) => pt.standard_type === "INDIVIDUAL");
+    searchIn.push(
+      ...individuals.map((individual) => ({
+        profileTypeId: individual.id,
+        profileTypeFieldIds: [],
+      })),
+    );
+
+    const legalEntities = standardProfileTypes.filter((pt) => pt.standard_type === "LEGAL_ENTITY");
+    if (legalEntities.length > 0) {
       const profileTypeFields = await this.from("profile_type_field", t)
-        .where("profile_type_id", legalEntity.id)
+        .whereIn(
+          "profile_type_id",
+          legalEntities.map((le) => le.id),
+        )
         .whereNull("deleted_at")
         .whereIn("alias", ["p_trade_name", "p_entity_name"])
-        .select("id");
-      searchIn.push({
-        profileTypeId: legalEntity.id,
-        profileTypeFieldIds: profileTypeFields.map((f) => f.id),
-      });
+        .select("id", "profile_type_id");
+
+      const legalEntityFieldsByPtId = groupBy(profileTypeFields, (f) => f.profile_type_id);
+      searchIn.push(
+        ...Object.entries(legalEntityFieldsByPtId).map(([ptId, fields]) => ({
+          profileTypeId: parseInt(ptId),
+          profileTypeFieldIds: fields.map((f) => f.id),
+        })),
+      );
     }
 
-    const contract = standardProfileTypes.find((pt) => pt.standard_type === "CONTRACT");
-    if (contract) {
+    const contracts = standardProfileTypes.filter((pt) => pt.standard_type === "CONTRACT");
+    if (contracts.length > 0) {
       const profileTypeFields = await this.from("profile_type_field", t)
-        .where("profile_type_id", contract.id)
+        .whereIn(
+          "profile_type_id",
+          contracts.map((c) => c.id),
+        )
         .whereNull("deleted_at")
         .whereIn("alias", ["p_counterparty"])
-        .select("id");
-      searchIn.push({
-        profileTypeId: contract.id,
-        profileTypeFieldIds: profileTypeFields.map((f) => f.id),
-      });
+        .select("id", "profile_type_id");
+
+      const contractFieldsByPtId = groupBy(profileTypeFields, (f) => f.profile_type_id);
+      searchIn.push(
+        ...Object.entries(contractFieldsByPtId).map(([ptId, fields]) => ({
+          profileTypeId: parseInt(ptId),
+          profileTypeFieldIds: fields.map((f) => f.id),
+        })),
+      );
     }
 
     return { searchIn };
@@ -9557,6 +9575,41 @@ export class PetitionRepository extends BaseRepository {
       select * from deleted_petitions;
     `,
       [deletedBy, daysAfterScheduling, deletedBy],
+    );
+  }
+
+  async unlinkFieldGroupsFromProfileType(
+    profileTypeIds: number[],
+    updatedBy: string,
+    t?: Knex.Transaction,
+  ) {
+    if (profileTypeIds.length === 0) {
+      return;
+    }
+
+    await this.raw(
+      /* sql */ `
+      with field_groups as (
+        select * from petition_field 
+        where profile_type_id in :profileTypeIds 
+        and type = 'FIELD_GROUP' 
+        and deleted_at is null
+      )
+      update petition_field pf
+      set 
+        profile_type_id = null,
+        profile_type_field_id = null,
+        updated_at = now(),
+        updated_by = :updatedBy
+      from field_groups fg
+      where (
+        pf.id = fg.id
+        or pf.parent_petition_field_id = fg.id
+      )
+      and pf.deleted_at is null
+    `,
+      { profileTypeIds: this.sqlIn(profileTypeIds), updatedBy },
+      t,
     );
   }
 }

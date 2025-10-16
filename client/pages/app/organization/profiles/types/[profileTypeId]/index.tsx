@@ -52,7 +52,7 @@ import { ProfileTypeFieldStandardType } from "@parallel/components/organization/
 import { ProfileTypeFieldTypeIndicator } from "@parallel/components/organization/profiles/ProfileTypeFieldTypeIndicator";
 import { ProfileTypeIconSelect } from "@parallel/components/organization/profiles/ProfileTypeIconSelect";
 import { ProfileTypeSettings } from "@parallel/components/organization/profiles/ProfileTypeSettings";
-import { useCreateOrUpdateProfileTypeDialog } from "@parallel/components/organization/profiles/dialogs/CreateOrUpdateProfileTypeDialog";
+import { useUpdateProfileTypeDialog } from "@parallel/components/organization/profiles/dialogs/CreateOrUpdateProfileTypeDialog";
 import { useCreateOrUpdateProfileTypeFieldDialog } from "@parallel/components/organization/profiles/dialogs/CreateOrUpdateProfileTypeFieldDialog";
 import { useProfileTypeFieldPermissionDialog } from "@parallel/components/organization/profiles/dialogs/ProfileTypeFieldPermissionDialog";
 import { useProfileTypeFieldsInPatternDialog } from "@parallel/components/organization/profiles/dialogs/ProfileTypeFieldsInPatternDialog";
@@ -173,13 +173,14 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
     [profileTypeId],
   );
 
-  const showCreateOrUpdateProfileTypeDialog = useCreateOrUpdateProfileTypeDialog();
+  const showUpdateProfileTypeDialog = useUpdateProfileTypeDialog();
   const handleChangeProfileTypeName = async () => {
     try {
-      const { name, pluralName } = await showCreateOrUpdateProfileTypeDialog({
+      const { name, pluralName } = await showUpdateProfileTypeDialog({
         isEditing: true,
         name: profileType.name,
         pluralName: profileType.pluralName,
+        standardType: profileType.standardType ?? null,
       });
       await updateProfileType({
         variables: {
@@ -195,11 +196,11 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
   const [cloneProfileType] = useMutation(OrganizationProfileType_cloneProfileTypeDocument);
   const handleCloneProfileType = async () => {
     try {
-      const { name, pluralName } = await showCreateOrUpdateProfileTypeDialog({
+      const { name, pluralName } = await showUpdateProfileTypeDialog({
         isEditing: false,
         name: profileType.name,
         pluralName: profileType.pluralName,
-        modalProps: { finalFocusRef: headerMoreOptionsButtonRef },
+        standardType: profileType.standardType ?? null,
       });
       const res = await cloneProfileType({
         variables: {
@@ -284,10 +285,19 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
             }),
           });
         } catch {}
-      } else if (isApolloError(e, "FIELD_HAS_VALUE_OR_FILES")) {
+      } else if (isApolloError(e, "DELETE_PROFILE_TYPE_FIELD_ERROR")) {
+        const aggregatedErrors = e.graphQLErrors[0]?.extensions?.aggregatedErrors as {
+          code: "FIELD_HAS_VALUE_OR_FILES" | "EVENT_SUBSCRIPTION_EXISTS_ERROR";
+          count: number;
+        }[];
+
         try {
           await showConfirmDeleteProfileTypeFieldDialog({
-            profileCount: e.graphQLErrors[0]?.extensions?.profileCount as number,
+            profileCount:
+              aggregatedErrors.find((e) => e.code === "FIELD_HAS_VALUE_OR_FILES")?.count ?? 0,
+            subscriptionsCount:
+              aggregatedErrors.find((e) => e.code === "EVENT_SUBSCRIPTION_EXISTS_ERROR")?.count ??
+              0,
             profileFieldsCount: profileTypeFieldIds.length,
           });
           await deleteProfileTypeField({
@@ -436,17 +446,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
       basePath="/app/organization/profiles/types"
       queryObject={queryObject}
       subHeader={
-        profileType.isStandard ? (
-          <Alert status="info">
-            <AlertIcon />
-            <AlertDescription>
-              <FormattedMessage
-                id="page.organization-profile-type.standard-profile-type-alert-description"
-                defaultMessage="This profile type is provided by Parallel, and only some of the options can be modified."
-              />
-            </AlertDescription>
-          </Alert>
-        ) : profileType.archivedAt ? (
+        profileType.archivedAt ? (
           <Alert status="info">
             <AlertIcon />
             <AlertDescription>
@@ -464,6 +464,16 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
                     </Button>
                   ),
                 }}
+              />
+            </AlertDescription>
+          </Alert>
+        ) : profileType.isStandard ? (
+          <Alert status="info">
+            <AlertIcon />
+            <AlertDescription>
+              <FormattedMessage
+                id="page.organization-profile-type.standard-profile-type-alert-description"
+                defaultMessage="This profile type is provided by Parallel, and only some of the options can be modified."
               />
             </AlertDescription>
           </Alert>
@@ -530,34 +540,30 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
                         />
                       </MenuItem>
                     )}
-                    {!profileType.isStandard ? (
-                      <>
-                        <MenuDivider />
-                        {profileType.archivedAt ? (
-                          <MenuItem
-                            color="red.500"
-                            onClick={handleDeleteProfileType}
-                            icon={<DeleteIcon display="block" boxSize={4} />}
-                          >
-                            <FormattedMessage
-                              id="component.profile-type-header.delete-label"
-                              defaultMessage="Delete profile type"
-                            />
-                          </MenuItem>
-                        ) : (
-                          <MenuItem
-                            color="red.500"
-                            onClick={handleArchiveProfileType}
-                            icon={<ArchiveIcon display="block" boxSize={4} />}
-                          >
-                            <FormattedMessage
-                              id="component.profile-type-header.archive-label"
-                              defaultMessage="Archive profile type"
-                            />
-                          </MenuItem>
-                        )}
-                      </>
-                    ) : null}
+                    <MenuDivider />
+                    {profileType.archivedAt ? (
+                      <MenuItem
+                        color="red.500"
+                        onClick={handleDeleteProfileType}
+                        icon={<DeleteIcon display="block" boxSize={4} />}
+                      >
+                        <FormattedMessage
+                          id="component.profile-type-header.delete-label"
+                          defaultMessage="Delete profile type"
+                        />
+                      </MenuItem>
+                    ) : (
+                      <MenuItem
+                        color="red.500"
+                        onClick={handleArchiveProfileType}
+                        icon={<ArchiveIcon display="block" boxSize={4} />}
+                      >
+                        <FormattedMessage
+                          id="component.profile-type-header.archive-label"
+                          defaultMessage="Archive profile type"
+                        />
+                      </MenuItem>
+                    )}
                   </MenuList>
                 }
               />
@@ -936,9 +942,11 @@ function useConfirmDeleteProfileTypeFieldDialog() {
   return useCallback(
     async ({
       profileCount,
+      subscriptionsCount,
       profileFieldsCount,
     }: {
       profileCount: number;
+      subscriptionsCount: number;
       profileFieldsCount: number;
     }) => {
       return await showDialog({
@@ -953,16 +961,38 @@ function useConfirmDeleteProfileTypeFieldDialog() {
           />
         ),
         description: (
-          <Text>
-            <FormattedMessage
-              id="component.use-confirm-delete-profile-type-field-dialog.description"
-              defaultMessage="You are about to delete {count, plural, =1 {this property} other {# properties}}. Please note that there {profileCount, plural, =1{is # profile that has} other{are # profiles that have}} an answer on {count, plural, =1 {this property} other {one of these properties}}, and if you continue, these answers will be deleted permanently."
-              values={{
-                profileCount,
-                count: profileFieldsCount,
-              }}
-            />
-          </Text>
+          <>
+            <Text>
+              <FormattedMessage
+                id="component.use-confirm-delete-profile-type-field-dialog.description-main"
+                defaultMessage="You are about to delete {count, plural, =1 {this property} other {# properties}}."
+                values={{
+                  count: profileFieldsCount,
+                }}
+              />
+            </Text>
+            {profileCount > 0 && (
+              <Text>
+                <FormattedMessage
+                  id="component.use-confirm-delete-profile-type-field-dialog.description-profiles"
+                  defaultMessage="Please note that there {profileCount, plural, =1{is # profile that has} other{are # profiles that have}} an answer on {count, plural, =1 {this property} other {one of these properties}}, and if you continue, these answers will be deleted permanently."
+                  values={{
+                    profileCount,
+                    count: profileFieldsCount,
+                  }}
+                />
+              </Text>
+            )}
+            {subscriptionsCount > 0 && (
+              <Text>
+                <FormattedMessage
+                  id="component.use-confirm-delete-profile-type-field-dialog.description-subscriptions"
+                  values={{ count: profileFieldsCount, subscriptionsCount }}
+                  defaultMessage="Please note that there {subscriptionsCount, plural, =1{is # event subscription} other{are # event subscriptions}} configured on {count, plural, =1 {this property} other {one of these properties}}, and if you continue, any applications or scripts using this event {count, plural, =1 {subscription} other {subscriptions}} will no longer receive event notifications from Parallel."
+                />
+              </Text>
+            )}
+          </>
         ),
       });
     },

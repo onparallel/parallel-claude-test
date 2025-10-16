@@ -125,7 +125,7 @@ async function fetchMissingStandardTypes(knex: Knex, orgId: number) {
       select * from (values ${ProfileTypeStandardTypeValues.map(() => "(?::profile_type_standard_type)").join(", ")}) as t("standard_type")
     ),
     current_types as (
-      select standard_type from profile_type where org_id = ? and standard_type is not null and deleted_at is null and archived_at is null
+      select distinct standard_type from profile_type where org_id = ? and standard_type is not null and deleted_at is null and archived_at is null
     )
     select * from all_types
     except
@@ -182,13 +182,34 @@ async function main() {
       console.log(`Creating ${standardType}`);
       switch (standardType) {
         case "CONTRACT":
-          await profiles.createDefaultContractProfileType(orgId, `User:${ownerId}`);
+          await profiles.createContractProfileType(
+            {
+              org_id: orgId,
+              name: { en: "Contract", es: "Contrato" },
+              name_plural: { en: "Contracts", es: "Contratos" },
+            },
+            `User:${ownerId}`,
+          );
           break;
         case "INDIVIDUAL":
-          await profiles.createDefaultIndividualProfileType(orgId, `User:${ownerId}`);
+          await profiles.createIndividualProfileType(
+            {
+              org_id: orgId,
+              name: { en: "Individual", es: "Persona" },
+              name_plural: { en: "Individuals", es: "Personas" },
+            },
+            `User:${ownerId}`,
+          );
           break;
         case "LEGAL_ENTITY":
-          await profiles.createDefaultLegalEntityProfileType(orgId, `User:${ownerId}`);
+          await profiles.createLegalEntityProfileType(
+            {
+              org_id: orgId,
+              name: { en: "Company", es: "Compañía" },
+              name_plural: { en: "Companies", es: "Compañías" },
+            },
+            `User:${ownerId}`,
+          );
           break;
         default:
           throw new Error(`Unknown standard type: ${standardType}`);

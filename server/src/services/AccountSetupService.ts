@@ -83,7 +83,6 @@ export class AccountSetupService implements IAccountSetupService {
 
     await this.organizations.createDefaultOrganizationThemes(organization.id, createdBy);
     await this.profilesSetup.createDefaultProfileTypes(organization.id, createdBy);
-    await this.profilesSetup.createDefaultProfileRelationshipTypes(organization.id, createdBy);
     await this.integrationsSetup.createSignaturitIntegration(
       {
         name: "Signaturit Sandbox",
@@ -286,6 +285,8 @@ export class AccountSetupService implements IAccountSetupService {
 
   private async pinProfileTypesForUser(user: User) {
     const profileTypes = await this.profiles.loadProfileTypesByOrgId(user.org_id);
+    // there may be more than 1 INDIVIDUAL or LEGAL_ENTITY profile type in the organization,
+    // here we will just take the first one of each
     const legalEntity = profileTypes.find((pt) => pt.standard_type === "LEGAL_ENTITY");
     const individual = profileTypes.find((pt) => pt.standard_type === "INDIVIDUAL");
 

@@ -110,8 +110,8 @@ export class SubscriptionRepository extends BaseRepository {
       });
   }
 
-  async deleteEventSubscriptions(ids: MaybeArray<number>, deletedBy: string) {
-    await this.from("event_subscription")
+  async deleteEventSubscriptions(ids: MaybeArray<number>, deletedBy: string, t?: Knex.Transaction) {
+    await this.from("event_subscription", t)
       .whereIn("id", unMaybeArray(ids))
       .whereNull("deleted_at")
       .update({
