@@ -5977,6 +5977,7 @@ describe("GraphQL/Profiles", () => {
           type: "PROFILE_UPDATED",
           data: {
             user_id: sessionUser.id,
+            org_integration_id: null,
           },
         },
         {
@@ -5984,6 +5985,7 @@ describe("GraphQL/Profiles", () => {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: sessionUser.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeField3.id,
             current_profile_field_value_id: expect.any(Number),
             previous_profile_field_value_id: p0Value.id,
@@ -5995,6 +5997,7 @@ describe("GraphQL/Profiles", () => {
           type: "PROFILE_UPDATED",
           data: {
             user_id: sessionUser.id,
+            org_integration_id: null,
           },
         },
         {
@@ -6002,6 +6005,7 @@ describe("GraphQL/Profiles", () => {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: sessionUser.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeField3.id,
             current_profile_field_value_id: expect.any(Number),
             previous_profile_field_value_id: p1Value.id,

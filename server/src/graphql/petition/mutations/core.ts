@@ -3946,6 +3946,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                       profile_type_field_id: profileTypeField.id,
                       expiry_date: expiration?.expiryDate ?? null,
                       alias: profileTypeField?.alias ?? null,
+                      org_integration_id: null,
                     },
                   } satisfies ProfileFieldExpiryUpdatedEvent<true>,
                 ]
@@ -4015,6 +4016,8 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                       reply.associated_profile_id!,
                     ].sort();
                     return {
+                      created_by_user_id: ctx.user!.id,
+                      org_id: ctx.user!.org_id,
                       left_side_profile_id: leftSideId,
                       right_side_profile_id: rightSideId,
                       profile_relationship_type_id: relationship.profile_relationship_type_id,
@@ -4023,6 +4026,8 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
 
                   if (relationship.direction === "LEFT_RIGHT") {
                     return {
+                      created_by_user_id: ctx.user!.id,
+                      org_id: ctx.user!.org_id,
                       left_side_profile_id:
                         relationship.left_side_petition_field_id === args.petitionFieldId
                           ? profile.id
@@ -4035,6 +4040,8 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                     };
                   } else {
                     return {
+                      created_by_user_id: ctx.user!.id,
+                      org_id: ctx.user!.org_id,
                       left_side_profile_id:
                         relationship.left_side_petition_field_id === args.petitionFieldId
                           ? reply.associated_profile_id!
@@ -4048,8 +4055,6 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                   }
                 }),
             ),
-            ctx.user!.id,
-            ctx.user!.org_id,
           );
         }
       }

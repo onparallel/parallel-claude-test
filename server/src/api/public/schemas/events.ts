@@ -1073,12 +1073,18 @@ const ProfileEventSchemas = {
     },
   },
   PROFILE_CREATED: {
-    description: "The profile has been created.",
+    description:
+      "The profile has been created. A profile can be created either manually by a user or automatically by an integration.",
     properties: {
       userId: {
         description: "The ID of the user that created the profile",
-        type: "string",
+        type: ["string", "null"],
         example: toGlobalId("User", 1),
+      },
+      integrationId: {
+        description: "The ID of the integration that created the profile",
+        type: ["string", "null"],
+        example: toGlobalId("OrgIntegration", 1),
       },
     },
   },
@@ -1090,6 +1096,11 @@ const ProfileEventSchemas = {
         description:
           "The ID of the user that updated the expiry. If null, expiry was updated automatically by monitoring rules.",
         example: toGlobalId("User", 1),
+      },
+      integrationId: {
+        description: "The ID of the integration where the new value was obtained.",
+        type: ["string", "null"],
+        example: toGlobalId("OrgIntegration", 1),
       },
       profileTypeFieldId: {
         description: "The ID of the profile field",
@@ -1160,13 +1171,19 @@ const ProfileEventSchemas = {
     },
   },
   PROFILE_FIELD_VALUE_UPDATED: {
-    description: "The value of a field has been updated.",
+    description:
+      "The value of a field has been updated. A value can be updated either manually by a user or automatically by monitoring rules",
     properties: {
       userId: {
         type: ["string", "null"],
         description:
           "The ID of the user that updated the value. If null, value was updated automatically by monitoring rules.",
         example: toGlobalId("User", 1),
+      },
+      integrationId: {
+        description: "The ID of the integration where the new value was obtained.",
+        type: ["string", "null"],
+        example: toGlobalId("OrgIntegration", 1),
       },
       profileTypeFieldId: {
         description: "The ID of the profile field",
@@ -1210,6 +1227,11 @@ const ProfileEventSchemas = {
           "The ID of the user that updated the property. Null means the property was updated by monitoring rules.",
         example: toGlobalId("User", 1),
       },
+      integrationId: {
+        description: "The ID of the integration where the new value was obtained.",
+        type: ["string", "null"],
+        example: toGlobalId("OrgIntegration", 1),
+      },
     },
   },
   PROFILE_RELATIONSHIP_CREATED: {
@@ -1217,8 +1239,13 @@ const ProfileEventSchemas = {
     properties: {
       userId: {
         description: "The ID of the user that created the relationship",
-        type: "string",
+        type: ["string", "null"],
         example: toGlobalId("User", 1),
+      },
+      integrationId: {
+        description: "The ID of the integration where the new relationship was obtained.",
+        type: ["string", "null"],
+        example: toGlobalId("OrgIntegration", 1),
       },
       profileRelationshipId: {
         description: "The ID of the relationship",
@@ -1245,6 +1272,11 @@ const ProfileEventSchemas = {
           "The ID of the user that created the relationship. Null if the relationship was removed automatically by compliance rules.",
         type: ["string", "null"],
         example: toGlobalId("User", 1),
+      },
+      integrationId: {
+        description: "The ID of the integration where the relationship was removed.",
+        type: ["string", "null"],
+        example: toGlobalId("OrgIntegration", 1),
       },
       profileRelationshipId: {
         description: "The ID of the relationship",

@@ -652,10 +652,12 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
                     expiry_date: null,
                     profile_type_field_id: profileTypeField.id,
                     user_id: ctx.user!.id,
+                    org_integration_id: null,
                   },
                 })),
                 ctx.user!.org_id,
                 ctx.user!.id,
+                undefined,
                 t,
               );
             }
@@ -1112,6 +1114,7 @@ export const deleteProfile = mutationField("deleteProfile", {
             profile_id: d.profileId,
             data: {
               user_id: ctx.user!.id,
+              org_integration_id: null,
               other_side_profile_id: d.deletedProfileId,
               profile_relationship_id: d.profileRelationshipId,
               profile_relationship_type_id: d.profileRelationshipTypeId,
@@ -1423,6 +1426,7 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
                     profile_type_field_id: profileTypeFieldId,
                     expiry_date: expiryDate ?? null,
                     alias: profileTypeField?.alias ?? null,
+                    org_integration_id: null,
                   },
                 } satisfies ProfileFieldExpiryUpdatedEvent<true>,
               ]
@@ -1450,6 +1454,7 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
             expiry_date: expiryDate ?? null,
             profile_type_field_id: profileTypeFieldId,
             alias: profileTypeField?.alias ?? null,
+            org_integration_id: null,
           },
         },
         ctx.user!.org_id,
@@ -1669,6 +1674,7 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
                   profile_type_field_id: profileTypeFieldId,
                   expiry_date: expiryDate ?? null,
                   alias: profileTypeField?.alias ?? null,
+                  org_integration_id: null,
                 },
               } satisfies ProfileFieldExpiryUpdatedEvent<true>,
             ]
@@ -2111,13 +2117,13 @@ export const createProfileRelationship = mutationField("createProfileRelationshi
             ? [args.profileId, r.profileId]
             : [r.profileId, args.profileId];
         return {
+          created_by_user_id: ctx.user!.id,
+          org_id: ctx.user!.org_id,
           profile_relationship_type_id: r.profileRelationshipTypeId,
           left_side_profile_id: leftId,
           right_side_profile_id: rightId,
         };
       }),
-      ctx.user!.id,
-      ctx.user!.org_id,
     );
 
     return (await ctx.profiles.loadProfile(args.profileId))!;
@@ -2164,6 +2170,7 @@ export const removeProfileRelationship = mutationField("removeProfileRelationshi
               profile_relationship_type_id: r.profile_relationship_type_id,
               profile_relationship_type_alias: relationshipType?.alias ?? null,
               reason: "REMOVED_BY_USER",
+              org_integration_id: null,
             },
           },
           {
@@ -2177,6 +2184,7 @@ export const removeProfileRelationship = mutationField("removeProfileRelationshi
               profile_relationship_type_id: r.profile_relationship_type_id,
               profile_relationship_type_alias: relationshipType?.alias ?? null,
               reason: "REMOVED_BY_USER",
+              org_integration_id: null,
             },
           },
         ] satisfies ProfileRelationshipRemovedEvent<true>[];

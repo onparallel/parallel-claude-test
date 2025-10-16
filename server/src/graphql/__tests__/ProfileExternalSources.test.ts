@@ -1213,6 +1213,7 @@ describe("Profile External Sources", () => {
                 type: "PROFILE_UPDATED",
                 data: {
                   userId: toGlobalId("User", user.id),
+                  integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                 },
               },
               {
@@ -1224,6 +1225,7 @@ describe("Profile External Sources", () => {
                     individualPTFsByAlias["p_occupation"].id,
                   ),
                   alias: "p_occupation",
+                  integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                 },
               },
               {
@@ -1235,6 +1237,7 @@ describe("Profile External Sources", () => {
                     individualPTFsByAlias["p_tax_id"].id,
                   ),
                   alias: "p_tax_id",
+                  integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                 },
               },
               {
@@ -1246,6 +1249,7 @@ describe("Profile External Sources", () => {
                     individualPTFsByAlias["p_city"].id,
                   ),
                   alias: "p_city",
+                  integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                 },
               },
               {
@@ -1257,6 +1261,7 @@ describe("Profile External Sources", () => {
                     individualPTFsByAlias["p_address"].id,
                   ),
                   alias: "p_address",
+                  integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                 },
               },
               {
@@ -1268,6 +1273,7 @@ describe("Profile External Sources", () => {
                     individualPTFsByAlias["p_email"].id,
                   ),
                   alias: "p_email",
+                  integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                 },
               },
               {
@@ -1279,6 +1285,7 @@ describe("Profile External Sources", () => {
                     individualPTFsByAlias["p_last_name"].id,
                   ),
                   alias: "p_last_name",
+                  integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                 },
               },
               {
@@ -1290,6 +1297,7 @@ describe("Profile External Sources", () => {
                     individualPTFsByAlias["p_first_name"].id,
                   ),
                   alias: "p_first_name",
+                  integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                 },
               },
             ],
@@ -1451,6 +1459,7 @@ describe("Profile External Sources", () => {
                 type: "PROFILE_UPDATED",
                 data: {
                   userId: toGlobalId("User", user.id),
+                  integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                 },
               },
               {
@@ -1462,6 +1471,7 @@ describe("Profile External Sources", () => {
                     legalEntityPTFsByAlias["p_date_of_incorporation"].id,
                   ),
                   alias: "p_date_of_incorporation",
+                  integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                 },
               },
               {
@@ -1473,6 +1483,7 @@ describe("Profile External Sources", () => {
                     legalEntityPTFsByAlias["p_city"].id,
                   ),
                   alias: "p_city",
+                  integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                 },
               },
             ],
@@ -1621,6 +1632,7 @@ describe("Profile External Sources", () => {
                 type: "PROFILE_UPDATED",
                 data: {
                   userId: toGlobalId("User", user.id),
+                  integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                 },
               },
               {
@@ -1632,6 +1644,7 @@ describe("Profile External Sources", () => {
                     individualPTFsByAlias["p_last_name"].id,
                   ),
                   alias: "p_last_name",
+                  integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                 },
               },
               {
@@ -1643,12 +1656,14 @@ describe("Profile External Sources", () => {
                     individualPTFsByAlias["p_first_name"].id,
                   ),
                   alias: "p_first_name",
+                  integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                 },
               },
               {
                 type: "PROFILE_CREATED",
                 data: {
                   userId: toGlobalId("User", user.id),
+                  integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                 },
               },
             ],
@@ -2131,6 +2146,7 @@ describe("Profile External Sources", () => {
                   type: "PROFILE_UPDATED",
                   data: {
                     userId: toGlobalId("User", user.id),
+                    integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                   },
                 },
                 {
@@ -2139,12 +2155,14 @@ describe("Profile External Sources", () => {
                     alias: "name",
                     profileTypeFieldId: toGlobalId("ProfileTypeField", nameField.id),
                     userId: toGlobalId("User", user.id),
+                    integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                   },
                 },
                 {
                   type: "PROFILE_CREATED",
                   data: {
                     userId: toGlobalId("User", user.id),
+                    integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                   },
                 },
               ],
@@ -2288,12 +2306,14 @@ describe("Profile External Sources", () => {
                   type: "PROFILE_UPDATED",
                   data: {
                     userId: toGlobalId("User", user.id),
+                    integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                   },
                 },
                 {
                   type: "PROFILE_FIELD_VALUE_UPDATED",
                   data: {
                     alias: "name",
+                    integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
                     profileTypeFieldId: toGlobalId("ProfileTypeField", nameField.id),
                     userId: toGlobalId("User", user.id),
                   },

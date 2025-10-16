@@ -3,7 +3,9 @@ import { ProfileEvent as DbProfileEvent, ProfileEventType } from "../__types";
 
 export type ProfileEventPayload<TType extends ProfileEventType> = {
   PROFILE_CREATED: {
-    user_id: number;
+    // a profile can be created either by a user or an external source integration
+    user_id: number | null;
+    org_integration_id: number | null;
   };
   PROFILE_FIELD_VALUE_UPDATED: {
     user_id: number | null; // null means value was updated by monitor cron
@@ -26,7 +28,8 @@ export type ProfileEventPayload<TType extends ProfileEventType> = {
     alias: string | null;
   };
   PROFILE_FIELD_EXPIRY_UPDATED: {
-    user_id: number | null; // null means value was updated by monitor cron
+    user_id: number | null; // null means value was updated by monitor cron or an integration
+    org_integration_id: number | null;
     profile_type_field_id: number;
     expiry_date: string | null;
     alias: string | null;
@@ -51,17 +54,22 @@ export type ProfileEventPayload<TType extends ProfileEventType> = {
   };
   PROFILE_ANONYMIZED: {};
   PROFILE_UPDATED: {
-    user_id: number | null; // null means profile was updated by monitoring rules
+    user_id: number | null; // null means profile was updated by monitoring rules or an integration
+    org_integration_id: number | null;
   };
   PROFILE_RELATIONSHIP_CREATED: {
-    user_id: number;
+    // a profile relationship can be created either by a user or an external source integration
+    user_id: number | null;
+    org_integration_id: number | null;
     profile_relationship_id: number;
     profile_relationship_type_id: number;
     other_side_profile_id: number;
     profile_relationship_type_alias: string | null;
   };
   PROFILE_RELATIONSHIP_REMOVED: {
+    // a profile relationship can be removed either by a user or an external source integration
     user_id: number | null;
+    org_integration_id: number | null;
     profile_relationship_id: number;
     profile_relationship_type_id: number;
     other_side_profile_id: number;

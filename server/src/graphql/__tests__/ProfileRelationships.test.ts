@@ -1994,6 +1994,7 @@ describe("GraphQL/Profile Relationships", () => {
                     type: "PROFILE_RELATIONSHIP_CREATED",
                     data: {
                       userId: toGlobalId("User", user.id),
+                      integrationId: null,
                       profileRelationshipId: expect.any(String),
                       profileRelationshipTypeId: toGlobalId(
                         "ProfileRelationshipType",
@@ -2017,6 +2018,7 @@ describe("GraphQL/Profile Relationships", () => {
                     type: "PROFILE_RELATIONSHIP_CREATED",
                     data: {
                       userId: toGlobalId("User", user.id),
+                      integrationId: null,
                       profileRelationshipId: expect.any(String),
                       profileRelationshipTypeId: toGlobalId(
                         "ProfileRelationshipType",
@@ -2299,6 +2301,7 @@ describe("GraphQL/Profile Relationships", () => {
               type: "PROFILE_RELATIONSHIP_REMOVED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
                 profileRelationshipId: toGlobalId(
                   "ProfileRelationship",
                   legalRepresentativeRelationship.id,
@@ -2353,6 +2356,7 @@ describe("GraphQL/Profile Relationships", () => {
               type: "PROFILE_RELATIONSHIP_REMOVED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
                 profileRelationshipId: toGlobalId(
                   "ProfileRelationship",
                   legalRepresentativeRelationship.id,
@@ -2472,6 +2476,7 @@ describe("GraphQL/Profile Relationships", () => {
               type: "PROFILE_RELATIONSHIP_REMOVED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
                 profileRelationshipId: toGlobalId("ProfileRelationship", parentRelationship.id),
                 profileRelationshipTypeId: toGlobalId(
                   "ProfileRelationshipType",

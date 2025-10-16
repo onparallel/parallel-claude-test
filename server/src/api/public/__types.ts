@@ -5832,7 +5832,7 @@ export type ProfileRelationshipCreatedEvent = ProfileEvent & {
   profile: Maybe<Profile>;
   relationship: Maybe<ProfileRelationship>;
   type: ProfileEventType;
-  user: User;
+  user: Maybe<User>;
 };
 
 export type ProfileRelationshipDirection = "LEFT_RIGHT" | "RIGHT_LEFT";

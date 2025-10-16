@@ -160,6 +160,7 @@ async function deleteProfilesScheduledForDeletion(
               profile_relationship_type_alias: relationshipType?.alias ?? null,
               profile_relationship_type_id: d.profileRelationshipTypeId,
               other_side_profile_id: d.deletedProfileId,
+              org_integration_id: null,
             },
           };
         }),

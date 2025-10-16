@@ -438,12 +438,18 @@ export function mapProfileEventPayload(event: ProfileEvent) {
     }
     case "PROFILE_CREATED": {
       return {
-        userId: toGlobalId("User", event.data.user_id),
+        userId: isNonNullish(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
+        integrationId: isNonNullish(event.data.org_integration_id)
+          ? toGlobalId("OrgIntegration", event.data.org_integration_id)
+          : null,
       };
     }
     case "PROFILE_FIELD_EXPIRY_UPDATED": {
       return {
         userId: isNonNullish(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
+        integrationId: isNonNullish(event.data.org_integration_id)
+          ? toGlobalId("OrgIntegration", event.data.org_integration_id)
+          : null,
         profileTypeFieldId: toGlobalId("ProfileTypeField", event.data.profile_type_field_id),
         expiryDate: event.data.expiry_date,
         alias: event.data.alias,
@@ -468,6 +474,9 @@ export function mapProfileEventPayload(event: ProfileEvent) {
     case "PROFILE_FIELD_VALUE_UPDATED": {
       return {
         userId: isNonNullish(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
+        integrationId: isNonNullish(event.data.external_source_integration_id)
+          ? toGlobalId("OrgIntegration", event.data.external_source_integration_id)
+          : null,
         profileTypeFieldId: toGlobalId("ProfileTypeField", event.data.profile_type_field_id),
         alias: event.data.alias,
       };
@@ -485,11 +494,17 @@ export function mapProfileEventPayload(event: ProfileEvent) {
     case "PROFILE_UPDATED": {
       return {
         userId: isNonNullish(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
+        integrationId: isNonNullish(event.data.org_integration_id)
+          ? toGlobalId("OrgIntegration", event.data.org_integration_id)
+          : null,
       };
     }
     case "PROFILE_RELATIONSHIP_CREATED": {
       return {
-        userId: toGlobalId("User", event.data.user_id),
+        userId: isNonNullish(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
+        integrationId: isNonNullish(event.data.org_integration_id)
+          ? toGlobalId("OrgIntegration", event.data.org_integration_id)
+          : null,
         profileRelationshipId: toGlobalId(
           "ProfileRelationship",
           event.data.profile_relationship_id,
@@ -504,6 +519,9 @@ export function mapProfileEventPayload(event: ProfileEvent) {
     case "PROFILE_RELATIONSHIP_REMOVED": {
       return {
         userId: isNonNullish(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
+        integrationId: isNonNullish(event.data.org_integration_id)
+          ? toGlobalId("OrgIntegration", event.data.org_integration_id)
+          : null,
         profileRelationshipId: toGlobalId(
           "ProfileRelationship",
           event.data.profile_relationship_id,

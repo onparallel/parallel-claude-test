@@ -827,7 +827,12 @@ export class ProfileRepository extends BaseRepository {
     );
   }
 
-  async createProfiles(data: MaybeArray<CreateProfile>, userId: number, t?: Knex.Transaction) {
+  async createProfiles(
+    data: MaybeArray<CreateProfile>,
+    userId: number | null,
+    orgIntegrationId?: number,
+    t?: Knex.Transaction,
+  ) {
     const dataArr = unMaybeArray(data);
     if (dataArr.length === 0) {
       return [];
@@ -839,7 +844,11 @@ export class ProfileRepository extends BaseRepository {
         dataArr.map((p) => ({
           ...p,
           created_at: this.now(),
-          created_by: `User:${userId}`,
+          created_by: userId
+            ? `User:${userId}`
+            : orgIntegrationId
+              ? `OrgIntegration:${orgIntegrationId}`
+              : null,
         })),
         t,
       );
@@ -850,6 +859,7 @@ export class ProfileRepository extends BaseRepository {
           type: "PROFILE_CREATED",
           data: {
             user_id: userId,
+            org_integration_id: orgIntegrationId ?? null,
           },
         })),
         t,
@@ -922,7 +932,7 @@ export class ProfileRepository extends BaseRepository {
         [profileTypeFieldId: number]: string | null;
       };
     }[],
-    updatedBy: string,
+    updatedBy: string | null,
     t?: Knex.Transaction,
   ) {
     if (profileValues.length === 0) {
@@ -1134,7 +1144,7 @@ export class ProfileRepository extends BaseRepository {
   async createProfileWithValues(
     orgId: number,
     profileTypeId: number,
-    userId: number,
+    userId: number | null,
     fields: {
       profileTypeFieldId: number;
       type: ProfileTypeFieldType;
@@ -1154,6 +1164,7 @@ export class ProfileRepository extends BaseRepository {
           profile_type_id: profileTypeId,
         },
         userId,
+        externalSourceIntegrationId,
         t,
       );
       if (fields.length > 0) {
@@ -1197,7 +1208,7 @@ export class ProfileRepository extends BaseRepository {
       const events = await this.raw<ProfileEvent>(
         /* sql */ `
           with new_values as (
-            select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date, pending_review, review_reason, petition_field_reply_id)
+            select * from (:new_values) as t(profile_id, profile_type_field_id, type, content, expiry_date, pending_review, review_reason, petition_field_reply_id)
           ),
           profile_type_fields as (
             select id, is_unique from profile_type_field
@@ -1213,9 +1224,9 @@ export class ProfileRepository extends BaseRepository {
               nv.type, 
               nv.content,
               case(nv.expiry_date) when '-infinity'::date then null else nv.expiry_date end,
-              ?, -- created_by_user_id
-              ?, -- source
-              ?, -- external_source_integration_id
+              :created_by_user_id::int,
+              :source,
+              :external_source_integration_id::int,
               case when nv.type in ('BACKGROUND_CHECK', 'ADVERSE_MEDIA_SEARCH') then true else false end, -- this fields are monitored by default
               nv.pending_review,
               nv.review_reason,
@@ -1237,7 +1248,7 @@ export class ProfileRepository extends BaseRepository {
             -- when removing or updating values, make sure to also remove its possible drafts
             update profile_field_value pfv
               set removed_at = now(),
-              removed_by_user_id = ?
+              removed_by_user_id = :created_by_user_id::int
             from new_values nv
             where 
               pfv.profile_id = nv.profile_id 
@@ -1268,9 +1279,9 @@ export class ProfileRepository extends BaseRepository {
               nv.type,
               case(nv.content) when 'null'::jsonb then rpv.content else nv.content end,
               case(nv.expiry_date) when '-infinity'::date then rpv.expiry_date else nv.expiry_date end,
-              ?, -- created_by_user_id
-              ?, -- source
-              ?, -- external_source_integration_id
+              :created_by_user_id::int,
+              :source,
+              :external_source_integration_id::int,
               rpv.active_monitoring, -- active_monitoring is always inherited from previous values
               nv.pending_review, -- pending_review is always set explicitly, not inherited
               nv.review_reason,
@@ -1284,7 +1295,7 @@ export class ProfileRepository extends BaseRepository {
           ),
           events as (
             insert into profile_event (org_id, profile_id, type, data)
-            select ?::int as org_id, profile_id, type, data from (
+            select :org_id::int as org_id, profile_id, type, data from (
               -- events for values that did not exist before
               select
                 wnpv.profile_id as profile_id,
@@ -1294,7 +1305,8 @@ export class ProfileRepository extends BaseRepository {
                   'profile_type_field_id', wnpv.profile_type_field_id,
                   'current_profile_field_value_id', wnpv.id,
                   'previous_profile_field_value_id', null,
-                  'alias', ptf.alias
+                  'alias', ptf.alias,
+                  'external_source_integration_id', :external_source_integration_id::int
                 ) as data,
                 ptf.position
               from with_no_previous_values wnpv
@@ -1308,7 +1320,8 @@ export class ProfileRepository extends BaseRepository {
                   'user_id', wnpv.created_by_user_id,
                   'profile_type_field_id', wnpv.profile_type_field_id,
                   'expiry_date', wnpv.expiry_date,
-                  'alias', ptf.alias
+                  'alias', ptf.alias,
+                  'org_integration_id', :external_source_integration_id::int
                 ) as data,
                 ptf.position
               from with_no_previous_values wnpv
@@ -1324,7 +1337,8 @@ export class ProfileRepository extends BaseRepository {
                   'profile_type_field_id', rpv.profile_type_field_id,
                   'current_profile_field_value_id', wpv.id,
                   'previous_profile_field_value_id', rpv.id,
-                  'alias', ptf.alias
+                  'alias', ptf.alias,
+                  'external_source_integration_id', :external_source_integration_id::int
                 ) as data,
                 ptf.position
               from removed_previous_values rpv
@@ -1342,7 +1356,8 @@ export class ProfileRepository extends BaseRepository {
                   'user_id', rpv.removed_by_user_id,
                   'profile_type_field_id', wpv.profile_type_field_id,
                   'expiry_date', wpv.expiry_date,
-                  'alias', ptf.alias
+                  'alias', ptf.alias,
+                  'org_integration_id', :external_source_integration_id::int
                 ) as data,
                 ptf.position
               from removed_previous_values rpv
@@ -1357,13 +1372,16 @@ export class ProfileRepository extends BaseRepository {
             -- force create PROFILE_UPDATED after all other events
             insert into profile_event (org_id, profile_id, type, data)
             select
-              ?::int as org_id,
+              :org_id::int as org_id,
               t.profile_id as profile_id,
               'PROFILE_UPDATED'::profile_event_type as type,
-              jsonb_build_object('user_id', t.user_id) as data from (
-                select distinct profile_id, created_by_user_id as user_id from with_no_previous_values
+              jsonb_build_object(
+                'user_id', t.user_id,
+                'org_integration_id', :external_source_integration_id::int
+              ) as data from (
+                select distinct profile_id, created_by_user_id as user_id, external_source_integration_id as org_integration_id from with_no_previous_values
                 union
-                select distinct profile_id, removed_by_user_id as user_id from removed_previous_values
+                select distinct profile_id, removed_by_user_id as user_id, external_source_integration_id as org_integration_id from removed_previous_values
               ) t
             returning *
           ),
@@ -1400,9 +1418,8 @@ export class ProfileRepository extends BaseRepository {
           union all
           select * from profile_updated_events
         `,
-        [
-          // new_values
-          this.sqlValues(
+        {
+          new_values: this.sqlValues(
             _fields.map((f) => [
               f.profileId,
               f.profileTypeFieldId,
@@ -1421,16 +1438,11 @@ export class ProfileRepository extends BaseRepository {
             ]),
             ["int", "int", "profile_type_field_type", "jsonb", "date", "boolean", "jsonb", "int"],
           ),
-          // with_no_previous_values
-          ...[userId, source, externalSourceIntegrationId ?? null],
-          // removed_previous_values
-          ...[userId],
-          // with_previous_values
-          ...[userId, source, externalSourceIntegrationId ?? null],
-          // events
-          orgId,
-          orgId,
-        ],
+          created_by_user_id: userId,
+          source,
+          external_source_integration_id: externalSourceIntegrationId ?? null,
+          org_id: orgId,
+        },
         t,
       );
       await this.queues.enqueueEvents(events, "profile_event", undefined, t);
@@ -1471,7 +1483,15 @@ export class ProfileRepository extends BaseRepository {
         t,
       );
 
-      await this.updateProfileNamesWithPattern(profileValues, `User:${userId}`, t);
+      await this.updateProfileNamesWithPattern(
+        profileValues,
+        userId
+          ? `User:${userId}`
+          : externalSourceIntegrationId
+            ? `OrgIntegration:${externalSourceIntegrationId}`
+            : null,
+        t,
+      );
     }, t);
   }
 
@@ -1729,6 +1749,7 @@ export class ProfileRepository extends BaseRepository {
     >,
     orgId: number,
     userId: number | null,
+    orgIntegrationId?: number,
     t?: Knex.Transaction,
   ) {
     const eventsArray = unMaybeArray(events);
@@ -1745,6 +1766,7 @@ export class ProfileRepository extends BaseRepository {
           org_id: orgId,
           data: {
             user_id: userId,
+            org_integration_id: orgIntegrationId ?? null,
           },
         },
       ],
@@ -2964,9 +2986,7 @@ export class ProfileRepository extends BaseRepository {
   );
 
   async createProfileRelationship(
-    data: MaybeArray<Omit<CreateProfileRelationship, "org_id" | "created_by_user_id">>,
-    userId: number,
-    orgId: number,
+    data: MaybeArray<CreateProfileRelationship>,
     t?: Knex.Transaction,
   ) {
     const dataArr = unMaybeArray(data);
@@ -2980,20 +3000,21 @@ export class ProfileRepository extends BaseRepository {
         return await this.raw<ProfileEvent>(
           /* sql */ `
           with pr as (
-            insert into profile_relationship (org_id, left_side_profile_id, right_side_profile_id, profile_relationship_type_id, created_by_user_id)
-            select ?::int as org_id, t.left_side_profile_id, t.right_side_profile_id, t.profile_relationship_type_id, ?::int as created_by_user_id 
-            from (?) as t(left_side_profile_id, right_side_profile_id, profile_relationship_type_id) 
+            insert into profile_relationship (org_id, left_side_profile_id, right_side_profile_id, profile_relationship_type_id, created_by_user_id, created_by_integration_id)
+            select t.org_id, t.left_side_profile_id, t.right_side_profile_id, t.profile_relationship_type_id, t.created_by_user_id, t.created_by_integration_id
+            from (?) as t(org_id, left_side_profile_id, right_side_profile_id, profile_relationship_type_id, created_by_user_id, created_by_integration_id) 
             on conflict (org_id, left_side_profile_id, profile_relationship_type_id, right_side_profile_id) where deleted_at is null and removed_at is null
             do nothing
             returning *
           )
           insert into profile_event (org_id, profile_id, type, data)
           select
-            ?::int as org_id,
+            pr.org_id,
             pr.left_side_profile_id,
             'PROFILE_RELATIONSHIP_CREATED'::profile_event_type,
             jsonb_build_object(
-              'user_id', ?::int,
+              'user_id', pr.created_by_user_id,
+              'org_integration_id', pr.created_by_integration_id,
               'other_side_profile_id', pr.right_side_profile_id,
               'profile_relationship_id', pr.id,
               'profile_relationship_type_id', pr.profile_relationship_type_id,
@@ -3002,11 +3023,12 @@ export class ProfileRepository extends BaseRepository {
           from pr join profile_relationship_type prt on pr.profile_relationship_type_id = prt.id
           union all
           select
-            ?::int as org_id,
+            pr.org_id,
             pr.right_side_profile_id,
             'PROFILE_RELATIONSHIP_CREATED'::profile_event_type,
             jsonb_build_object(
-              'user_id', ?::int,
+              'user_id', pr.created_by_user_id,
+              'org_integration_id', pr.created_by_integration_id,
               'other_side_profile_id', pr.left_side_profile_id,
               'profile_relationship_id', pr.id,
               'profile_relationship_type_id', pr.profile_relationship_type_id,
@@ -3016,20 +3038,17 @@ export class ProfileRepository extends BaseRepository {
           returning *
         `,
           [
-            orgId,
-            userId,
             this.sqlValues(
               dataChunk.map((c) => [
+                c.org_id,
                 c.left_side_profile_id,
                 c.right_side_profile_id,
                 c.profile_relationship_type_id,
+                c.created_by_user_id ?? null,
+                c.created_by_integration_id ?? null,
               ]),
-              ["int", "int", "int"],
+              ["int", "int", "int", "int", "int", "int"],
             ),
-            orgId,
-            userId,
-            orgId,
-            userId,
           ],
           t,
         );

@@ -4388,7 +4388,7 @@ export interface NexusGenFieldTypes {
     profile: NexusGenRootTypes["Profile"] | null; // Profile
     relationship: NexusGenRootTypes["ProfileRelationship"] | null; // ProfileRelationship
     type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
-    user: NexusGenRootTypes["User"]; // User!
+    user: NexusGenRootTypes["User"] | null; // User
   };
   ProfileRelationshipRemovedEvent: {
     // field return type

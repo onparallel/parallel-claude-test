@@ -7354,7 +7354,7 @@ type ProfileRelationshipCreatedEvent implements ProfileEvent {
   profile: Profile
   relationship: ProfileRelationship
   type: ProfileEventType!
-  user: User!
+  user: User
 }
 
 enum ProfileRelationshipDirection {

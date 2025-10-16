@@ -78,6 +78,9 @@ export const ProfileCreatedEvent = createProfileEvent("ProfileCreatedEvent", (t)
   t.nullable.field("user", {
     type: "User",
     resolve: async (root, _, ctx) => {
+      if (isNullish(root.data.user_id)) {
+        return null;
+      }
       return await ctx.users.loadUser(root.data.user_id);
     },
   });
@@ -206,10 +209,13 @@ export const ProfileRelationshipCreatedEvent = createProfileEvent(
         return await ctx.profiles.loadProfileRelationship(root.data.profile_relationship_id);
       },
     });
-    t.field("user", {
+    t.nullable.field("user", {
       type: "User",
       resolve: async (root, _, ctx) => {
-        return (await ctx.users.loadUser(root.data.user_id))!;
+        if (isNullish(root.data.user_id)) {
+          return null;
+        }
+        return await ctx.users.loadUser(root.data.user_id);
       },
     });
   },

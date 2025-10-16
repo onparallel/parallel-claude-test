@@ -1456,13 +1456,13 @@ export const createProfileRelationshipsExcel = mutationField("createProfileRelat
             ? [d.left_side_profile_id, d.right_side_profile_id].sort()
             : [d.left_side_profile_id, d.right_side_profile_id];
           return {
+            created_by_user_id: ctx.realUser!.id,
+            org_id: args.orgId,
             left_side_profile_id: leftSideProfileId,
             right_side_profile_id: rightSideProfileId,
             profile_relationship_type_id: profileRelationshipType.id,
           };
         }),
-        ctx.realUser!.id,
-        args.orgId,
       );
 
       return {

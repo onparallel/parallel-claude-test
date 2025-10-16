@@ -2445,6 +2445,7 @@ describe("Background Check - Profiles", () => {
           type: "PROFILE_UPDATED",
           data: {
             user_id: user.id,
+            org_integration_id: null,
           },
         },
         {
@@ -2457,6 +2458,7 @@ describe("Background Check - Profiles", () => {
             current_profile_field_value_id: pfvs.find((v) => !v.is_draft)!.id,
             previous_profile_field_value_id: null,
             alias: null,
+            external_source_integration_id: null,
           },
         },
       ]);
@@ -2607,6 +2609,7 @@ describe("Background Check - Profiles", () => {
           type: "PROFILE_UPDATED",
           data: {
             user_id: user.id,
+            org_integration_id: null,
           },
         },
         {
@@ -2619,6 +2622,7 @@ describe("Background Check - Profiles", () => {
             current_profile_field_value_id: pfvs.find((v) => !v.is_draft)!.id,
             previous_profile_field_value_id: null,
             alias: null,
+            external_source_integration_id: null,
           },
         },
       ]);
@@ -2973,6 +2977,7 @@ describe("Background Check - Profiles", () => {
           type: "PROFILE_UPDATED",
           data: {
             user_id: user.id,
+            org_integration_id: null,
           },
         },
         {
@@ -2981,6 +2986,7 @@ describe("Background Check - Profiles", () => {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: user.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeField.id,
             current_profile_field_value_id: pfvs.find((v) => !v.is_draft)!.id,
             previous_profile_field_value_id: null,
@@ -3170,6 +3176,7 @@ describe("Background Check - Profiles", () => {
           type: "PROFILE_UPDATED",
           data: {
             user_id: user.id,
+            org_integration_id: null,
           },
         },
         {
@@ -3178,6 +3185,7 @@ describe("Background Check - Profiles", () => {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: user.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeField.id,
             current_profile_field_value_id: firstBy(
               pfvs.filter((v) => !v.is_draft),
@@ -3196,6 +3204,7 @@ describe("Background Check - Profiles", () => {
           type: "PROFILE_UPDATED",
           data: {
             user_id: user.id,
+            org_integration_id: null,
           },
         },
         {
@@ -3204,6 +3213,7 @@ describe("Background Check - Profiles", () => {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: user.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeField.id,
             current_profile_field_value_id: firstBy(
               pfvs.filter((v) => !v.is_draft),
@@ -3415,6 +3425,7 @@ describe("Background Check - Profiles", () => {
           type: "PROFILE_UPDATED",
           data: {
             user_id: user.id,
+            org_integration_id: null,
           },
         },
         {
@@ -3423,6 +3434,7 @@ describe("Background Check - Profiles", () => {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: user.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeField.id,
             current_profile_field_value_id: firstBy(
               pfvs.filter((v) => !v.is_draft),
@@ -3441,6 +3453,7 @@ describe("Background Check - Profiles", () => {
           type: "PROFILE_UPDATED",
           data: {
             user_id: user.id,
+            org_integration_id: null,
           },
         },
         {
@@ -3449,6 +3462,7 @@ describe("Background Check - Profiles", () => {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: user.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeField.id,
             current_profile_field_value_id: firstBy(
               pfvs.filter((v) => !v.is_draft),

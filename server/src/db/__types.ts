@@ -2336,17 +2336,24 @@ export interface ProfileRelationship {
   left_side_profile_id: number; // int4
   profile_relationship_type_id: number; // int4
   right_side_profile_id: number; // int4
-  created_by_user_id: number; // int4
+  created_by_user_id: Maybe<number>; // int4
   created_at: Date; // timestamptz
   removed_at: Maybe<Date>; // timestamptz
   removed_by_user_id: Maybe<number>; // int4
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  created_by_integration_id: Maybe<number>; // int4
 }
 
 export type CreateProfileRelationship = PartialProps<
   Omit<ProfileRelationship, "id">,
-  "created_at" | "removed_at" | "removed_by_user_id" | "deleted_at" | "deleted_by"
+  | "created_by_user_id"
+  | "created_at"
+  | "removed_at"
+  | "removed_by_user_id"
+  | "deleted_at"
+  | "deleted_by"
+  | "created_by_integration_id"
 >;
 
 export interface ProfileRelationshipType {

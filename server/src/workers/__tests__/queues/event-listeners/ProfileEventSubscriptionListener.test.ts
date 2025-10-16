@@ -235,7 +235,10 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
     await profileEventSubscriptionsListener.handle({
       ...event,
       type: "PROFILE_CREATED",
-      data: { user_id: users[0].id },
+      data: {
+        user_id: users[0].id,
+        org_integration_id: null,
+      },
     });
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
@@ -251,6 +254,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
             type: "PROFILE_CREATED",
             data: {
               userId: toGlobalId("User", users[0].id),
+              integrationId: null,
             },
             createdAt: event.created_at,
           },
@@ -273,6 +277,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
       type: "PROFILE_FIELD_VALUE_UPDATED",
       data: {
         user_id: users[0].id,
+        external_source_integration_id: null,
         profile_type_field_id: profileTypeFields[1].id,
         current_profile_field_value_id: null,
         previous_profile_field_value_id: null,
@@ -293,6 +298,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
             type: "PROFILE_FIELD_VALUE_UPDATED",
             data: {
               userId: toGlobalId("User", users[0].id),
+              integrationId: null,
               profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[1].id),
               alias: null,
             },

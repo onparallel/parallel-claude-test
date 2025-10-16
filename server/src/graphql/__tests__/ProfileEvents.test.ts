@@ -116,12 +116,13 @@ describe("ProfileEvents", () => {
       expect(dbEvents.map(pick(["type", "data"]))).toEqual([
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id },
+          data: { user_id: sessionUser.id, org_integration_id: null },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: sessionUser.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeFields[2].id,
             current_profile_field_value_id: expect.any(Number),
             previous_profile_field_value_id: null,
@@ -201,12 +202,13 @@ describe("ProfileEvents", () => {
       expect(dbEvents.map(pick(["type", "data"]))).toEqual([
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id },
+          data: { user_id: sessionUser.id, org_integration_id: null },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: sessionUser.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeFields[2].id,
             current_profile_field_value_id: expect.any(Number),
             previous_profile_field_value_id: dbEvents[3].data.current_profile_field_value_id,
@@ -215,12 +217,13 @@ describe("ProfileEvents", () => {
         },
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id },
+          data: { user_id: sessionUser.id, org_integration_id: null },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: sessionUser.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeFields[2].id,
             current_profile_field_value_id: expect.any(Number),
             previous_profile_field_value_id: null,
@@ -303,12 +306,13 @@ describe("ProfileEvents", () => {
       expect(dbEvents.map(pick(["type", "data"]))).toEqual([
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id },
+          data: { user_id: sessionUser.id, org_integration_id: null },
         },
         {
           type: "PROFILE_FIELD_EXPIRY_UPDATED",
           data: {
             user_id: sessionUser.id,
+            org_integration_id: null,
             profile_type_field_id: profileTypeFields[2].id,
             expiry_date: "2026-10-10",
             alias: null,
@@ -316,12 +320,13 @@ describe("ProfileEvents", () => {
         },
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id },
+          data: { user_id: sessionUser.id, org_integration_id: null },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: sessionUser.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeFields[2].id,
             current_profile_field_value_id: expect.any(Number),
             previous_profile_field_value_id: null,
@@ -380,12 +385,13 @@ describe("ProfileEvents", () => {
       expect(dbEvents.map(pick(["type", "data"]))).toEqual([
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id },
+          data: { user_id: sessionUser.id, org_integration_id: null },
         },
         {
           type: "PROFILE_FIELD_EXPIRY_UPDATED",
           data: {
             user_id: sessionUser.id,
+            org_integration_id: null,
             profile_type_field_id: profileTypeFields[2].id,
             expiry_date: "2026-10-10",
             alias: null,
@@ -395,6 +401,7 @@ describe("ProfileEvents", () => {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: sessionUser.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeFields[2].id,
             current_profile_field_value_id: expect.any(Number),
             previous_profile_field_value_id: null,
@@ -452,12 +459,13 @@ describe("ProfileEvents", () => {
       expect(dbEvents.map(pick(["type", "data"]))).toEqual([
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id },
+          data: { user_id: sessionUser.id, org_integration_id: null },
         },
         {
           type: "PROFILE_FIELD_EXPIRY_UPDATED",
           data: {
             user_id: sessionUser.id,
+            org_integration_id: null,
             profile_type_field_id: profileTypeFields[1].id,
             expiry_date: "2026-10-10",
             alias: null,
@@ -467,6 +475,7 @@ describe("ProfileEvents", () => {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: sessionUser.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeFields[1].id,
             current_profile_field_value_id: expect.any(Number),
             previous_profile_field_value_id: null,
@@ -547,12 +556,13 @@ describe("ProfileEvents", () => {
       expect(dbEvents.map(pick(["type", "data"]))).toEqual([
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id },
+          data: { user_id: sessionUser.id, org_integration_id: null },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: sessionUser.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeFields[0].id,
             current_profile_field_value_id: expect.any(Number),
             previous_profile_field_value_id: null,
@@ -638,12 +648,13 @@ describe("ProfileEvents", () => {
       expect(dbEvents.map(pick(["type", "data"]))).toEqual([
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id },
+          data: { user_id: sessionUser.id, org_integration_id: null },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: sessionUser.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeFields[0].id,
             current_profile_field_value_id: null,
             previous_profile_field_value_id: dbEvents[3].data.current_profile_field_value_id,
@@ -652,12 +663,13 @@ describe("ProfileEvents", () => {
         },
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id },
+          data: { user_id: sessionUser.id, org_integration_id: null },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: sessionUser.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeFields[0].id,
             current_profile_field_value_id: expect.any(Number),
             previous_profile_field_value_id: null,
@@ -758,12 +770,16 @@ describe("ProfileEvents", () => {
       expect(dbEvents.map(pick(["type", "data"]))).toEqual([
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id },
+          data: {
+            user_id: sessionUser.id,
+            org_integration_id: null,
+          },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: sessionUser.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeFields[3].id,
             current_profile_field_value_id: null,
             previous_profile_field_value_id: dbEvents[3].data.current_profile_field_value_id,
@@ -772,12 +788,13 @@ describe("ProfileEvents", () => {
         },
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id },
+          data: { user_id: sessionUser.id, org_integration_id: null },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
           data: {
             user_id: sessionUser.id,
+            external_source_integration_id: null,
             profile_type_field_id: profileTypeFields[3].id,
             current_profile_field_value_id: expect.any(Number),
             previous_profile_field_value_id: null,

@@ -1439,6 +1439,7 @@ describe("ProfileLinkedPetitionFields", () => {
               type: "PROFILE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
               },
             },
 
@@ -1471,6 +1472,7 @@ describe("ProfileLinkedPetitionFields", () => {
                   individualProfileTypeFields[alias].id,
                 ),
                 alias,
+                integrationId: null,
               },
             })),
             ...[
@@ -1954,6 +1956,7 @@ describe("ProfileLinkedPetitionFields", () => {
               type: "PROFILE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
               },
             },
             ...[
@@ -1984,6 +1987,7 @@ describe("ProfileLinkedPetitionFields", () => {
                   legalEntityProfileTypeFields[alias].id,
                 ),
                 alias,
+                integrationId: null,
               },
             })),
             ...[
@@ -2474,6 +2478,7 @@ describe("ProfileLinkedPetitionFields", () => {
               type: "PROFILE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
               },
             },
 
@@ -2503,6 +2508,7 @@ describe("ProfileLinkedPetitionFields", () => {
                   contractProfileTypeFields[alias].id,
                 ),
                 alias,
+                integrationId: null,
               },
             })),
             {
@@ -2515,6 +2521,7 @@ describe("ProfileLinkedPetitionFields", () => {
                 ),
                 alias: "p_expiration_date",
                 expiryDate: "2022-01-01",
+                integrationId: null,
               },
             },
             ...["p_expiration_date", "p_effective_date", "p_contract_type", "p_counterparty"].map(
@@ -2527,6 +2534,7 @@ describe("ProfileLinkedPetitionFields", () => {
                     contractProfileTypeFields[alias].id,
                   ),
                   alias,
+                  integrationId: null,
                 },
               }),
             ),
@@ -3181,6 +3189,7 @@ describe("ProfileLinkedPetitionFields", () => {
               type: "PROFILE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
               },
             },
             {
@@ -3192,6 +3201,7 @@ describe("ProfileLinkedPetitionFields", () => {
                   contractProfileTypeFields["p_jurisdiction"].id,
                 ),
                 alias: "p_jurisdiction",
+                integrationId: null,
               },
             },
             {
@@ -3204,6 +3214,7 @@ describe("ProfileLinkedPetitionFields", () => {
                 ),
                 alias: "p_expiration_date",
                 expiryDate: "2022-01-01",
+                integrationId: null,
               },
             },
             ...["p_expiration_date", "p_effective_date", "p_contract_type", "p_counterparty"].map(
@@ -3216,6 +3227,7 @@ describe("ProfileLinkedPetitionFields", () => {
                     contractProfileTypeFields[alias].id,
                   ),
                   alias,
+                  integrationId: null,
                 },
               }),
             ),
@@ -3223,6 +3235,7 @@ describe("ProfileLinkedPetitionFields", () => {
               type: "PROFILE_CREATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
               },
             },
           ],
@@ -3283,6 +3296,7 @@ describe("ProfileLinkedPetitionFields", () => {
                 type: "PROFILE_UPDATED",
                 data: {
                   userId: toGlobalId("User", user.id),
+                  integrationId: null,
                 },
               },
               ...[
@@ -3310,6 +3324,7 @@ describe("ProfileLinkedPetitionFields", () => {
                     contractProfileTypeFields[alias].id,
                   ),
                   alias,
+                  integrationId: null,
                 },
               })),
               ...["p_amendments", "p_original_document"].map((alias) => ({
@@ -3336,6 +3351,7 @@ describe("ProfileLinkedPetitionFields", () => {
                 type: "PROFILE_UPDATED",
                 data: {
                   userId: toGlobalId("User", user.id),
+                  integrationId: null,
                 },
               },
               {
@@ -3348,6 +3364,7 @@ describe("ProfileLinkedPetitionFields", () => {
                   ),
                   alias: "p_expiration_date",
                   expiryDate: "2022-01-01",
+                  integrationId: null,
                 },
               },
               ...[
@@ -3365,12 +3382,14 @@ describe("ProfileLinkedPetitionFields", () => {
                     contractProfileTypeFields[alias].id,
                   ),
                   alias,
+                  integrationId: null,
                 },
               })),
               {
                 type: "PROFILE_CREATED",
                 data: {
                   userId: toGlobalId("User", user.id),
+                  integrationId: null,
                 },
               },
             ]),
@@ -3501,6 +3520,7 @@ describe("ProfileLinkedPetitionFields", () => {
               type: "PROFILE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
               },
             },
             ...[
@@ -3527,6 +3547,7 @@ describe("ProfileLinkedPetitionFields", () => {
               type: "PROFILE_FIELD_VALUE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
                 profileTypeFieldId: toGlobalId(
                   "ProfileTypeField",
                   individualProfileTypeFields[alias].id,
@@ -3545,6 +3566,7 @@ describe("ProfileLinkedPetitionFields", () => {
               type: "PROFILE_CREATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
               },
             },
           ],
@@ -4505,6 +4527,7 @@ describe("ProfileLinkedPetitionFields", () => {
               type: "PROFILE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
               },
             },
             ...[
@@ -4530,6 +4553,7 @@ describe("ProfileLinkedPetitionFields", () => {
                   legalEntityProfileTypeFields[alias].id,
                 ),
                 alias,
+                integrationId: null,
               },
             })),
             ...[
@@ -5061,6 +5085,7 @@ describe("ProfileLinkedPetitionFields", () => {
               type: "PROFILE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
               },
             },
             ...[
@@ -5090,6 +5115,7 @@ describe("ProfileLinkedPetitionFields", () => {
                   individualProfileTypeFields[alias].id,
                 ),
                 alias,
+                integrationId: null,
               },
             })),
             ...["p_risk_assessment", "p_passport_document", "p_proof_of_address_document"].map(
@@ -5590,6 +5616,7 @@ describe("ProfileLinkedPetitionFields", () => {
               type: "PROFILE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
               },
             },
             ...[
@@ -5620,6 +5647,7 @@ describe("ProfileLinkedPetitionFields", () => {
                   legalEntityProfileTypeFields[alias].id,
                 ),
                 alias,
+                integrationId: null,
               },
             })),
             ...["p_poa_document", "p_risk_assessment", "p_financial_statements"].map((alias) => ({
@@ -5657,6 +5685,7 @@ describe("ProfileLinkedPetitionFields", () => {
               type: "PROFILE_UPDATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
               },
             },
             ...["p_risk", "p_entity_name"].map((alias) => ({
@@ -5668,12 +5697,14 @@ describe("ProfileLinkedPetitionFields", () => {
                   legalEntityProfileTypeFields[alias].id,
                 ),
                 alias,
+                integrationId: null,
               },
             })),
             {
               type: "PROFILE_CREATED",
               data: {
                 userId: toGlobalId("User", user.id),
+                integrationId: null,
               },
             },
           ]),
@@ -6119,6 +6150,7 @@ describe("ProfileLinkedPetitionFields", () => {
                 type: "PROFILE_UPDATED",
                 data: {
                   userId: toGlobalId("User", user.id),
+                  integrationId: null,
                 },
               },
               ...[
@@ -6149,6 +6181,7 @@ describe("ProfileLinkedPetitionFields", () => {
                     legalEntityProfileTypeFields[alias].id,
                   ),
                   alias,
+                  integrationId: null,
                 },
               })),
               ...[
@@ -6179,6 +6212,7 @@ describe("ProfileLinkedPetitionFields", () => {
                     relationshipTypes.find((rt) => rt.alias === "p_director__managed_by")!.id,
                   ),
                   relationshipAlias: "p_director__managed_by",
+                  integrationId: null,
                 },
               },
               {
@@ -6193,6 +6227,7 @@ describe("ProfileLinkedPetitionFields", () => {
                     )!.id,
                   ),
                   relationshipAlias: "p_legal_representative__legally_represented",
+                  integrationId: null,
                 },
               },
               {
@@ -6337,6 +6372,7 @@ describe("ProfileLinkedPetitionFields", () => {
                 type: "PROFILE_UPDATED",
                 data: {
                   userId: toGlobalId("User", user.id),
+                  integrationId: null,
                 },
               },
               ...[
@@ -6361,6 +6397,7 @@ describe("ProfileLinkedPetitionFields", () => {
               ].map((alias) => ({
                 type: "PROFILE_FIELD_VALUE_UPDATED",
                 data: {
+                  integrationId: null,
                   userId: toGlobalId("User", user.id),
                   profileTypeFieldId: toGlobalId(
                     "ProfileTypeField",
@@ -7538,13 +7575,17 @@ describe("ProfileLinkedPetitionFields", () => {
             events: {
               totalCount: 3,
               items: [
-                { type: "PROFILE_UPDATED", data: { userId: toGlobalId("User", user.id) } },
+                {
+                  type: "PROFILE_UPDATED",
+                  data: { userId: toGlobalId("User", user.id), integrationId: null },
+                },
                 {
                   type: "PROFILE_FIELD_VALUE_UPDATED",
                   data: {
                     userId: toGlobalId("User", user.id),
                     profileTypeFieldId: toGlobalId("ProfileTypeField", nameField.id),
                     alias: "name",
+                    integrationId: null,
                   },
                 },
                 {
