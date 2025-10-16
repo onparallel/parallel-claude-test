@@ -359,12 +359,12 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
                 />
                 {deviceType === null ? (
                   // show only on desktop
-                  (<Text fontSize="sm" color="gray.600">
+                  <Text fontSize="sm" color="gray.600">
                     <FormattedMessage
                       id="component.petition-comments-and-notes-editor.ctrl-enter-help"
                       defaultMessage="Ctrl + enter to send"
                     />
-                  </Text>)
+                  </Text>
                 ) : null}
               </Stack>
               <Box>
