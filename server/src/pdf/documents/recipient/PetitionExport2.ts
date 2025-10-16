@@ -505,7 +505,7 @@ function fieldReply(
               return t(label);
             }
           }
-          return value;
+          return t(value);
         })
         .flatMap((value, i) => [...(i > 0 ? ["#linebreak()", value] : [value])]);
     case "DYNAMIC_SELECT":
