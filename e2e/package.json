@@ -9,14 +9,14 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.46.1",
-    "@types/imapflow": "^1.0.19",
+    "@types/imapflow": "^1.0.189",
     "@types/mailparser": "^3.4.4"
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
     "dotenv": "^16.4.5",
-    "imapflow": "^1.0.164",
-    "mailparser": "^3.7.1",
+    "imapflow": "^1.0.199",
+    "mailparser": "^3.7.5",
     "remeda": "^1.61.0"
   },
   "main": "index.js"
