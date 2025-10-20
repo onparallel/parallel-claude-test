@@ -1,4 +1,4 @@
-import { ApolloClient, DocumentNode, OperationVariables } from "@apollo/client";
+import { ApolloClient, DocumentNode, NetworkStatus, OperationVariables } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { createApolloClient } from "@parallel/utils/apollo/client";
@@ -101,7 +101,16 @@ export function withApolloData<P = {}>(
                       } as ApolloClient.WatchQueryOptions<TData, TVariables>)
                       .subscribe({
                         next: (result) => {
-                          if (result.dataState === "empty") {
+                          if (
+                            result.dataState === "empty" &&
+                            result.networkStatus === NetworkStatus.loading
+                          ) {
+                            // do nothing, wait for result
+                            return;
+                          }
+                          if (result.networkStatus === NetworkStatus.error) {
+                            reject(result.error!);
+                            subscription.unsubscribe();
                             return;
                           }
                           assert(result.dataState === "complete");

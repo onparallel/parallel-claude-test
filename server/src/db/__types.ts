@@ -107,8 +107,7 @@ export type FeatureFlagName =
   | "DOCUMENT_PROCESSING"
   | "ADVERSE_MEDIA_SEARCH"
   | "SIGN_WITH_DIGITAL_CERTIFICATE"
-  | "SIGN_WITH_EMBEDDED_IMAGE"
-  | "PDF_EXPORT_V2";
+  | "SIGN_WITH_EMBEDDED_IMAGE";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -151,7 +150,6 @@ export const FeatureFlagNameValues = [
   "ADVERSE_MEDIA_SEARCH",
   "SIGN_WITH_DIGITAL_CERTIFICATE",
   "SIGN_WITH_EMBEDDED_IMAGE",
-  "PDF_EXPORT_V2",
 ] as FeatureFlagName[];
 
 export type IntegrationType =
