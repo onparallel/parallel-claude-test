@@ -8564,7 +8564,7 @@ describe("GraphQL/Profiles", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_STATUS_ERROR");
       expect(data).toBeNull();
     });
 
@@ -9502,7 +9502,7 @@ describe("GraphQL/Profiles", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_STATUS_ERROR");
       expect(data).toBeNull();
     });
 
@@ -10126,7 +10126,7 @@ describe("GraphQL/Profiles", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_STATUS_ERROR");
       expect(data).toBeNull();
     });
   });
@@ -10468,7 +10468,7 @@ describe("GraphQL/Profiles", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_STATUS_ERROR");
       expect(data).toBeNull();
     });
 
@@ -10618,7 +10618,7 @@ describe("GraphQL/Profiles", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_STATUS_ERROR");
       expect(data).toBeNull();
     });
   });
@@ -12420,7 +12420,7 @@ describe("GraphQL/Profiles", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_STATUS_ERROR");
       expect(data).toBeNull();
     });
   });

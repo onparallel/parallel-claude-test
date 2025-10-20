@@ -309,7 +309,11 @@ export function profileHasStatus<
     const validStatuses = unMaybeArray(status);
 
     const profiles = await ctx.profiles.loadProfile(profileIds);
-    return profiles.every((p) => isNonNullish(p) && validStatuses.includes(p.status));
+    if (!profiles.every((p) => isNonNullish(p) && validStatuses.includes(p.status))) {
+      throw new ApolloError("The profile has an invalid status", "INVALID_PROFILE_STATUS_ERROR");
+    }
+
+    return true;
   };
 }
 

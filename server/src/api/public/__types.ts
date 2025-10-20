@@ -12432,6 +12432,83 @@ export type UpdateProfileFieldValue_deleteProfileFieldFileMutation = {
   deleteProfileFieldFile: Result;
 };
 
+export type deleteProfile_deleteProfileMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+}>;
+
+export type deleteProfile_deleteProfileMutation = { deleteProfile: Success };
+
+export type CloseProfile_closeProfileMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  includeFieldOptions: Scalars["Boolean"]["input"];
+  includeRelationships: Scalars["Boolean"]["input"];
+  includeSubscribers: Scalars["Boolean"]["input"];
+}>;
+
+export type CloseProfile_closeProfileMutation = {
+  closeProfile: Array<{
+    id: string;
+    name: string;
+    status: ProfileStatus;
+    createdAt: string;
+    properties: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+        options?: { [key: string]: any };
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    relationships?: Array<{
+      id: string;
+      leftSideProfile: {
+        id: string;
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      };
+      rightSideProfile: {
+        id: string;
+        name: string;
+        status: ProfileStatus;
+        createdAt: string;
+        profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      };
+      relationshipType: {
+        alias: string | null;
+        id: string;
+        leftRightName: { [locale in UserLocale]?: string };
+        rightLeftName: { [locale in UserLocale]?: string };
+      };
+    }>;
+    subscribers?: Array<{
+      user: {
+        id: string;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      };
+    }>;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+  }>;
+};
+
 export type DownloadProfileFieldFile_profileQueryVariables = Exact<{
   profileId: Scalars["GID"]["input"];
 }>;
@@ -15176,6 +15253,30 @@ export const UpdateProfileFieldValue_deleteProfileFieldFileDocument = gql`
 ` as unknown as DocumentNode<
   UpdateProfileFieldValue_deleteProfileFieldFileMutation,
   UpdateProfileFieldValue_deleteProfileFieldFileMutationVariables
+>;
+export const deleteProfile_deleteProfileDocument = gql`
+  mutation deleteProfile_deleteProfile($profileId: GID!) {
+    deleteProfile(profileIds: [$profileId], force: true)
+  }
+` as unknown as DocumentNode<
+  deleteProfile_deleteProfileMutation,
+  deleteProfile_deleteProfileMutationVariables
+>;
+export const CloseProfile_closeProfileDocument = gql`
+  mutation CloseProfile_closeProfile(
+    $profileId: GID!
+    $includeFieldOptions: Boolean!
+    $includeRelationships: Boolean!
+    $includeSubscribers: Boolean!
+  ) {
+    closeProfile(profileIds: [$profileId]) {
+      ...Profile
+    }
+  }
+  ${ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  CloseProfile_closeProfileMutation,
+  CloseProfile_closeProfileMutationVariables
 >;
 export const DownloadProfileFieldFile_profileDocument = gql`
   query DownloadProfileFieldFile_profile($profileId: GID!) {

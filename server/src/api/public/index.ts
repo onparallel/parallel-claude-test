@@ -42,6 +42,7 @@ import {
   BulkSendTemplate_createBulkPetitionSendTaskDocument,
   BulkSendTemplate_uploadBulkPetitionSendTaskInputFileDocument,
   ClosePetition_closePetitionDocument,
+  CloseProfile_closeProfileDocument,
   CreateContact_contactDocument,
   CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   CreatePetitionRecipients_petitionDocument,
@@ -154,6 +155,7 @@ import {
   UpdateReply_updateFileUploadReplyDocument,
   UpdateReply_updatePetitionFieldRepliesDocument,
   UserFragmentDoc,
+  deleteProfile_deleteProfileDocument,
 } from "./__types";
 import { description } from "./description";
 import {
@@ -5002,7 +5004,93 @@ export function publicApi(container: Container) {
         assert("id" in profileQuery.profile);
         return Ok(mapProfile(profileQuery.profile, includes));
       },
+    )
+    .delete(
+      {
+        operationId: "DeleteProfile",
+        summary: "Delete a profile",
+        description:
+          "Permanently delete the profile. It must have status `CLOSED` or `DELETION_SCHEDULED`.",
+        tags: ["Profiles"],
+        responses: {
+          204: SuccessResponse(),
+          400: ErrorResponse({ description: "Invalid profile status" }),
+          403: ErrorResponse({ description: "You don't have access to this resource" }),
+        },
+      },
+      async ({ client, params }) => {
+        const _mutation = gql`
+          mutation deleteProfile_deleteProfile($profileId: GID!) {
+            deleteProfile(profileIds: [$profileId], force: true)
+          }
+        `;
+
+        try {
+          await client.request(deleteProfile_deleteProfileDocument, {
+            profileId: params.profileId,
+          });
+
+          return NoContent();
+        } catch (error) {
+          if (containsGraphQLError(error, "INVALID_PROFILE_STATUS_ERROR")) {
+            throw new BadRequestError(
+              "The profile must have status CLOSED or DELETION_SCHEDULED in order to be deleted.",
+            );
+          }
+
+          throw new ForbiddenError("You don't have access to this resource");
+        }
+      },
     );
+
+  api.path("/profiles/:profileId/close", { params: { profileId } }).post(
+    {
+      operationId: "CloseProfile",
+      summary: "Closes a profile",
+      description: "Close a profile. It must have status `OPEN` or `DELETION_SCHEDULED`.",
+      query: profileIncludeParam,
+      responses: {
+        200: SuccessResponse(Profile),
+        400: ErrorResponse({ description: "Invalid profile status" }),
+        403: ErrorResponse({ description: "You don't have access to this resource" }),
+      },
+      tags: ["Profiles"],
+    },
+    async ({ client, params, query }) => {
+      const _mutation = gql`
+        mutation CloseProfile_closeProfile(
+          $profileId: GID!
+          $includeFieldOptions: Boolean!
+          $includeRelationships: Boolean!
+          $includeSubscribers: Boolean!
+        ) {
+          closeProfile(profileIds: [$profileId]) {
+            ...Profile
+          }
+        }
+        ${ProfileFragment}
+      `;
+
+      try {
+        const includes = getProfileIncludesFromQuery(query);
+        const result = await client.request(CloseProfile_closeProfileDocument, {
+          profileId: params.profileId,
+          ...includes,
+        });
+
+        assert("id" in result.closeProfile![0]);
+        return Ok(mapProfile(result.closeProfile[0]!, includes));
+      } catch (error) {
+        if (containsGraphQLError(error, "INVALID_PROFILE_STATUS_ERROR")) {
+          throw new BadRequestError(
+            "The profile must have status OPEN or DELETION_SCHEDULED in order to be closed.",
+          );
+        }
+
+        throw new ForbiddenError("You don't have access to this resource");
+      }
+    },
+  );
 
   api
     .path("/profiles/:profileId/values/:alias/:fileId", {

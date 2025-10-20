@@ -1645,7 +1645,7 @@ describe("GraphQL/Profile Relationships", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_STATUS_ERROR");
       expect(data).toBeNull();
     });
 
