@@ -256,7 +256,6 @@ export function PreviewPetitionFieldGroup({
           return;
         }
       }
-      onRefreshField();
       showToast({
         title: intl.formatMessage({
           id: "component.preview-petition-field-group.profile-successfully-imported",
