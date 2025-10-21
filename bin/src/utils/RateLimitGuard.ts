@@ -1,3 +1,5 @@
+import { waitFor } from "./wait";
+
 export class RateLimitGuard {
   private intervalInNs: bigint;
   private lastSlot: bigint = 0n;

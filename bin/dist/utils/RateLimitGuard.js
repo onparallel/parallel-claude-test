@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RateLimitGuard = void 0;
+const wait_1 = require("./wait");
 class RateLimitGuard {
     constructor(rateLimitPerSecond) {
         this.lastSlot = 0n;
@@ -30,10 +31,10 @@ class RateLimitGuard {
                     if (this.queue.length === 0) {
                         return;
                     }
-                    await waitFor(Number(this.intervalInNs / BigInt(1e6)));
+                    await (0, wait_1.waitFor)(Number(this.intervalInNs / BigInt(1e6)));
                 }
                 else {
-                    await waitFor(Number((this.intervalInNs - ellapsed) / BigInt(1e6)));
+                    await (0, wait_1.waitFor)(Number((this.intervalInNs - ellapsed) / BigInt(1e6)));
                 }
             }
         }
