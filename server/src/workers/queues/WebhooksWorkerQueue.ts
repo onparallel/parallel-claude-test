@@ -59,13 +59,10 @@ export class WebhooksWorker extends QueueWorker<WebhooksWorkerPayload> {
     );
 
     if (!error && response.ok) {
-      if (subscription.is_failing) {
-        await this.subscriptions.updateEventSubscription(
-          payload.subscriptionId,
-          { is_failing: false },
-          this.config.instanceName,
-        );
-      }
+      await this.subscriptions.markEventSubscriptionAsNotified(
+        payload.subscriptionId,
+        this.config.instanceName,
+      );
 
       return;
     }

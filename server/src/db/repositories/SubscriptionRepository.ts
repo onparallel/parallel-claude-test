@@ -96,6 +96,20 @@ export class SubscriptionRepository extends BaseRepository {
     return row;
   }
 
+  async markEventSubscriptionAsNotified(id: number, updatedBy: string) {
+    const [row] = await this.from("event_subscription").where({ id, deleted_at: null }).update(
+      {
+        last_notified_at: this.now(),
+        is_failing: false,
+        updated_by: updatedBy,
+        updated_at: this.now(),
+      },
+      "*",
+    );
+
+    return row;
+  }
+
   async appendErrorLog(id: number, errorLog: any, updatedBy: string) {
     await this.from("event_subscription")
       .where({ id: id, deleted_at: null })
