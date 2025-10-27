@@ -7,6 +7,7 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import {
   BaseModalProps,
   DialogProps,
+  isDialogError,
   useDialog,
 } from "@parallel/components/common/dialogs/DialogProvider";
 import { useCreateContact_createContactDocument } from "@parallel/graphql/__types";
@@ -61,7 +62,13 @@ export function useCreateContact() {
           showGenericErrorToast(error);
         }
       }
-    } catch {}
+    } catch (error) {
+      if (isDialogError(error)) {
+        throw error;
+      } else {
+        showGenericErrorToast(error);
+      }
+    }
     return null;
   }, []);
 }

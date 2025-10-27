@@ -23,6 +23,7 @@ import { AddIcon, DeleteIcon } from "@parallel/chakra/icons";
 import { RecipientSelectGroups_PetitionFragment } from "@parallel/graphql/__types";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
+import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { useUpdateContact } from "@parallel/utils/mutations/useUpdateContact";
 import { untranslated } from "@parallel/utils/untranslated";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
@@ -56,7 +57,6 @@ interface RecipientSelectGroupsProps {
   recipientGroups: ContactSelectSelection[][];
   onChangeRecipientGroups: (groups: ContactSelectSelection[][]) => void;
   onSearchContacts: ContactSelectProps["onSearchContacts"];
-  onCreateContact: ContactSelectProps["onCreateContact"];
   canAddRecipientGroups?: boolean;
   maxGroups: number;
 }
@@ -68,7 +68,6 @@ export function RecipientSelectGroups({
   maxGroups,
   onChangeRecipientGroups,
   onSearchContacts,
-  onCreateContact,
 }: RecipientSelectGroupsProps) {
   const intl = useIntl();
   const recipientGroupSelectRef = useMultipleRefs<ContactSelectInstance<true>>();
@@ -219,11 +218,12 @@ export function RecipientSelectGroups({
     });
   }
 
+  const createContact = useCreateContact();
   async function handleCreateContact(
     groupNumber: number,
     data: { email?: string; firstName?: string; lastName?: string },
   ) {
-    const contact = await onCreateContact(data);
+    const contact = await createContact(data);
     setTimeout(() => recipientGroupSelectRef[groupNumber].current?.focus());
     return contact;
   }
@@ -259,6 +259,7 @@ export function RecipientSelectGroups({
         });
         if (isNonNullish(newContact)) {
           addNewContact([...recipientGroups[groupNumber], newContact]);
+          toggleSuggestionGroup(groupNumber, false);
         }
       } else {
         const contactNeedsUpdate =
@@ -271,10 +272,16 @@ export function RecipientSelectGroups({
 
         if (isNonNullish(updatedContact)) {
           addNewContact([...recipientGroups[groupNumber], updatedContact]);
+          toggleSuggestionGroup(groupNumber, false);
         }
       }
-      toggleSuggestionGroup(groupNumber, false);
-    } catch {}
+    } catch (e) {
+      // If user cancels dialog, silently ignore - suggestions should remain visible
+      if (isDialogError(e)) {
+        return;
+      }
+      throw e;
+    }
   };
 
   const fieldLogic = useFieldLogic(petition);
@@ -510,7 +517,7 @@ export function RecipientSelectGroups({
                 )}
               </FormErrorMessage>
               {showSuggestionGroup[index] && filteredSuggestions.length ? (
-                <HStack wrap="wrap" paddingTop={1}>
+                <HStack wrap="wrap" paddingTop={2}>
                   {filteredSuggestions.map((suggestion, i) => {
                     return (
                       <RecipientSuggestion

@@ -141,9 +141,11 @@ export const ContactSelect = Object.assign(
           onChange(option as any, { action: "select-option", option });
         }
         setIsCreating(false);
+        setTimeout(() => innerRef.current?.focus(), 1);
         return true;
       } catch {}
       setIsCreating(false);
+      setTimeout(() => innerRef.current?.focus(), 1);
       return false;
     }
     async function handleInputChange(_value: string, meta: InputActionMeta) {

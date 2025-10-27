@@ -572,7 +572,8 @@ function BackgroundCheckFieldSearchResults({
                     borderColor="primary.500"
                     onClick={handleFalsePositivesButtonClick}
                     isDisabled={
-                      query.readonly === "true" ||
+                      isTemplate ||
+                      isReadOnly ||
                       totalCount === 0 ||
                       isNonNullish(savedEntityId) ||
                       result?.items.every((i) => i.isFalsePositive) ||

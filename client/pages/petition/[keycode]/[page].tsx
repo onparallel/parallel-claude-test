@@ -49,7 +49,7 @@ import {
   RecipientView_publicCompletePetitionDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { useAssertQuery, withAssertApolloQuery } from "@parallel/utils/apollo/useAssertQuery";
+import { useAssertQuery, withApolloQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
 import { focusPetitionField } from "@parallel/utils/focusPetitionField";
@@ -653,7 +653,7 @@ RecipientView.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCont
 };
 
 export default compose(
-  withAssertApolloQuery({
+  withApolloQuery({
     query: RecipientView_accessDocument,
     variables: ({ keycode }: RecipientViewProps) => ({
       keycode,

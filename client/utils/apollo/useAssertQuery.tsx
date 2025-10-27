@@ -39,7 +39,7 @@ export function useAssertQueryOrPreviousData<
   }
 }
 
-export function withAssertApolloQuery<P, TVariables extends OperationVariables>({
+export function withApolloQuery<P, TVariables extends OperationVariables>({
   query,
   variables,
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -53,16 +53,23 @@ export function withAssertApolloQuery<P, TVariables extends OperationVariables>(
     // eslint-disable-next-line @typescript-eslint/naming-convention
     Component: NextComponentType<WithApolloDataContext, P, P>,
   ): NextComponentType<WithApolloDataContext, P, P> {
-    const WithAssertApolloQuery: ComponentType<P> = function (props) {
-      const { loading } = useQuery(query, {
+    const WithApolloQuery: ComponentType<P> = function (props) {
+      const loadedRef = useRef(false);
+      const { dataState } = useQuery(query, {
         variables: variables(props),
         fetchPolicy: "cache-first",
+        skip: loadedRef.current,
       });
-      return loading ? <IfLoading {...(props as any)} /> : <Component {...(props as any)} />;
+      if (dataState === "complete") {
+        assignRef(loadedRef, true);
+        return <Component {...(props as any)} />;
+      } else {
+        return <IfLoading {...(props as any)} />;
+      }
     };
     const { displayName, ...rest } = Component;
-    return Object.assign(WithAssertApolloQuery, rest, {
-      displayName: `WithAssertApolloQuery(${displayName ?? Component.name})`,
+    return Object.assign(WithApolloQuery, rest, {
+      displayName: `WithApolloQuery(${displayName ?? Component.name})`,
     });
   };
 }

@@ -46,7 +46,6 @@ import {
   RemindersConfig,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { emptyRTEValue } from "@parallel/utils/slate/RichTextEditor/emptyRTEValue";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
@@ -67,7 +66,6 @@ import { useContactlessLinkDialog } from "./ContactlessLinkDialog";
 
 export interface AddPetitionAccessDialogProps {
   onSearchContacts?: ContactSelectProps["onSearchContacts"];
-  onCreateContact?: ContactSelectProps["onCreateContact"];
   onUpdatePetition?: (data: UpdatePetitionInput) => void;
   canAddRecipientGroups?: boolean;
   petitionId: string;
@@ -92,7 +90,6 @@ export function AddPetitionAccessDialog({
   onUpdatePetition = noop,
   // TODO: fix this
   onSearchContacts = useSearchContacts(),
-  onCreateContact = useCreateContact(),
   ...props
 }: DialogProps<AddPetitionAccessDialogProps, AddPetitionAccessDialogResult>) {
   const userCanSendOnBehalfOfAnyone = useHasPermission("PETITIONS:SEND_ON_BEHALF");
@@ -481,7 +478,6 @@ export function AddPetitionAccessDialog({
                     recipientGroups={value}
                     onChangeRecipientGroups={onChange}
                     onSearchContacts={onSearchContacts}
-                    onCreateContact={onCreateContact}
                     showErrors={!!error}
                     canAddRecipientGroups={canAddRecipientGroups}
                     maxGroups={petitionsPeriod ? petitionsPeriod.limit - petitionsPeriod.used : 0}
