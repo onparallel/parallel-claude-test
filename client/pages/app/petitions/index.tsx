@@ -442,7 +442,7 @@ function Petitions() {
           onChangeSelectedIds([]);
           setQueryState((current) => ({
             ...current,
-            scheduledForDeletion: isScheduledForDeletion || null,
+            scheduledForDeletion: isScheduledForDeletion,
           }));
         },
       }) as PetitionsTableContext,
@@ -468,7 +468,7 @@ function Petitions() {
   );
 
   const actions = usePetitionListActions({
-    showDeleted: queryState.scheduledForDeletion ?? false,
+    showDeleted: queryState.scheduledForDeletion,
     userCanChangePath,
     userCanCreateTemplate: userCanCreateTemplate && !selectedPetitionIsAnonymized,
     userCanCreatePetition,

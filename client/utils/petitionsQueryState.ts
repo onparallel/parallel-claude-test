@@ -28,7 +28,7 @@ const QUERY_STATE = {
     .withValidation((value) => typeof value === "string" && /^\/([^\/]+\/)*$/.test(value))
     .orDefault("/"),
   status: values(["DRAFT", "PENDING", "COMPLETED", "CLOSED"]).list(),
-  scheduledForDeletion: boolean(),
+  scheduledForDeletion: boolean().orDefault(false),
   sharedWith: sharedWithQueryItem(),
   approvals: approvalsQueryItem(),
   tagsFilters: tagFilterQueryItem(),

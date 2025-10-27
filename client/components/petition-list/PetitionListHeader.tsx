@@ -417,8 +417,22 @@ const _mutations = [
 function viewsAreEqual(view1: Partial<PetitionListViewData>, view2: Partial<PetitionListViewData>) {
   return (
     isDeepEqual(
-      omit(view1, ["__typename", "sharedWith", "sort", "tagsFilters", "approvals"]),
-      omit(view2, ["__typename", "sharedWith", "sort", "tagsFilters", "approvals"]),
+      omit(view1, [
+        "__typename",
+        "sharedWith",
+        "sort",
+        "tagsFilters",
+        "approvals",
+        "scheduledForDeletion",
+      ]),
+      omit(view2, [
+        "__typename",
+        "sharedWith",
+        "sort",
+        "tagsFilters",
+        "approvals",
+        "scheduledForDeletion",
+      ]),
     ) &&
     isDeepEqual(
       isNonNullish(view1.sharedWith)
@@ -469,6 +483,7 @@ function viewsAreEqual(view1: Partial<PetitionListViewData>, view2: Partial<Peti
             filters: view2.approvals.filters.map(omit(["__typename"])),
           }
         : view2.approvals,
-    )
+    ) &&
+    (view1.scheduledForDeletion ?? false) === (view2.scheduledForDeletion ?? false)
   );
 }
