@@ -137,7 +137,7 @@ function Petitions() {
         offset: queryState.items * (queryState.page - 1),
         limit: queryState.items,
         search: queryState.search,
-        isScheduledForDeletion: queryState.scheduledForDeletion,
+        isScheduledForDeletion: queryState.scheduledForDeletion ?? false,
         filters: {
           path: queryState.search && queryState.searchIn === "EVERYWHERE" ? null : queryState.path,
           status: queryState.status,
@@ -442,7 +442,7 @@ function Petitions() {
           onChangeSelectedIds([]);
           setQueryState((current) => ({
             ...current,
-            scheduledForDeletion: isScheduledForDeletion,
+            scheduledForDeletion: isScheduledForDeletion || null,
           }));
         },
       }) as PetitionsTableContext,
@@ -468,7 +468,7 @@ function Petitions() {
   );
 
   const actions = usePetitionListActions({
-    showDeleted: queryState.scheduledForDeletion,
+    showDeleted: queryState.scheduledForDeletion ?? false,
     userCanChangePath,
     userCanCreateTemplate: userCanCreateTemplate && !selectedPetitionIsAnonymized,
     userCanCreatePetition,
