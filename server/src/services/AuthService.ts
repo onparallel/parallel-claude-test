@@ -287,7 +287,7 @@ export class Auth implements IAuth {
 
   async callback(req: Request, res: Response, next: NextFunction) {
     try {
-      if (typeof req.query.state !== "string") {
+      if (typeof req.query.state !== "string" || typeof req.query.code !== "string") {
         throw new Error("Invalid state");
       }
       const state = new URLSearchParams(
@@ -321,6 +321,18 @@ export class Auth implements IAuth {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if ("error" in errorData && errorData.error === "invalid_grant") {
+          throw new Error("Invalid state");
+        }
+
+        throw new Error(
+          `Failed to get oauth tokens: ${response.status} ${response.statusText} ${errorData}`,
+        );
+      }
+
       const tokens = await response.json();
       const payload = decode(tokens["id_token"]) as any;
       const cognitoId = payload["cognito:username"] as string;
