@@ -3451,14 +3451,15 @@ type Mutation {
   updateBackgroundCheckEntity(entityId: String, token: String!): Success!
 
   """
-  Updates the cutoff for the background check service
+  Updates the threshold for the background check service
   """
-  updateBackgroundCheckOrganizationCutoff(
-    """
-    Cutoff value between 0 and 1
-    """
-    cutoff: String!
+  updateBackgroundCheckOrganizationThreshold(
     orgId: GID!
+
+    """
+    Threshold value between 0 and 1
+    """
+    threshold: String!
   ): SupportMethodResponse!
   updateBackgroundCheckSearchFalsePositives(
     entityIds: [String!]!

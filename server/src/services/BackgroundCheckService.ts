@@ -13,7 +13,7 @@ import {
 } from "./background-check-clients/BackgroundCheckClient";
 
 export interface EntitySearchOptions {
-  cutoff?: number;
+  threshold?: number;
 }
 
 export interface EntitySearchRequest {
@@ -225,7 +225,7 @@ export class BackgroundCheckService implements IBackgroundCheckService {
     assert(org, "Organization not found");
 
     return await this.getClient().entitySearch(query, {
-      cutoff: org.preferences["BACKGROUND_CHECK"]?.cutoff,
+      threshold: org.preferences["BACKGROUND_CHECK"]?.threshold,
     });
   }
 

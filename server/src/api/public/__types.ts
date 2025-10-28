@@ -1726,8 +1726,8 @@ export type Mutation = {
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
   updateBackgroundCheckEntity: Success;
-  /** Updates the cutoff for the background check service */
-  updateBackgroundCheckOrganizationCutoff: SupportMethodResponse;
+  /** Updates the threshold for the background check service */
+  updateBackgroundCheckOrganizationThreshold: SupportMethodResponse;
   updateBackgroundCheckSearchFalsePositives: Success;
   updateCompaniesHouseCustomProperties: SupportMethodResponse;
   /** Updates a contact. */
@@ -3189,9 +3189,9 @@ export type MutationupdateBackgroundCheckEntityArgs = {
   token: Scalars["String"]["input"];
 };
 
-export type MutationupdateBackgroundCheckOrganizationCutoffArgs = {
-  cutoff: Scalars["String"]["input"];
+export type MutationupdateBackgroundCheckOrganizationThresholdArgs = {
   orgId: Scalars["GID"]["input"];
+  threshold: Scalars["String"]["input"];
 };
 
 export type MutationupdateBackgroundCheckSearchFalsePositivesArgs = {

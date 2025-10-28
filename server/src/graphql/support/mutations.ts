@@ -1551,15 +1551,15 @@ export const createAnthropicCompletionIntegration = mutationField(
   },
 );
 
-export const updateBackgroundCheckOrganizationCutoff = mutationField(
-  "updateBackgroundCheckOrganizationCutoff",
+export const updateBackgroundCheckOrganizationThreshold = mutationField(
+  "updateBackgroundCheckOrganizationThreshold",
   {
     type: "SupportMethodResponse",
-    description: "Updates the cutoff for the background check service",
+    description: "Updates the threshold for the background check service",
     authorize: superAdminAccess(),
     args: {
       orgId: nonNull(globalIdArg("Organization")),
-      cutoff: nonNull(stringArg({ description: "Cutoff value between 0 and 1" })),
+      threshold: nonNull(stringArg({ description: "Threshold value between 0 and 1" })),
     },
     resolve: async (_, args, ctx) => {
       const org = await ctx.organizations.loadOrg(args.orgId);
@@ -1570,11 +1570,11 @@ export const updateBackgroundCheckOrganizationCutoff = mutationField(
         };
       }
 
-      const cutoff = round(parseFloat(args.cutoff), 2);
-      if (isNullish(cutoff) || Number.isNaN(cutoff) || cutoff < 0 || cutoff > 1) {
+      const threshold = round(parseFloat(args.threshold), 2);
+      if (isNullish(threshold) || Number.isNaN(threshold) || threshold < 0 || threshold > 1) {
         return {
           result: RESULT.FAILURE,
-          message: "Cutoff must be between 0 and 1",
+          message: "threshold must be between 0 and 1",
         };
       }
 
@@ -1584,7 +1584,7 @@ export const updateBackgroundCheckOrganizationCutoff = mutationField(
           preferences: {
             ...org.preferences,
             BACKGROUND_CHECK: {
-              cutoff,
+              threshold,
             },
           },
         },
@@ -1593,7 +1593,7 @@ export const updateBackgroundCheckOrganizationCutoff = mutationField(
 
       return {
         result: RESULT.SUCCESS,
-        message: "Background Check cutoff updated successfully",
+        message: `Background Check threshold set to ${threshold} successfully`,
       };
     },
   },

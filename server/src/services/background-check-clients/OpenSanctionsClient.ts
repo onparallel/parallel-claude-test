@@ -250,9 +250,9 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
     }
 
     let url = "match/default";
-    if (opts?.cutoff) {
-      assert(opts.cutoff >= 0 && opts.cutoff <= 1, "Invalid cutoff");
-      url += `?${new URLSearchParams({ cutoff: opts.cutoff.toString() })}`;
+    if (opts?.threshold) {
+      assert(opts.threshold >= 0 && opts.threshold <= 1, "Invalid threshold");
+      url += `?${new URLSearchParams({ threshold: opts.threshold.toString() })}`;
     }
 
     const data = await this.apiCall<OpenSanctionsMatchResponse>("POST", url, { queries });

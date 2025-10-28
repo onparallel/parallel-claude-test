@@ -1027,21 +1027,9 @@ export const supportMethods: {
   },
   {
     field: {
-      name: "updateBackgroundCheckOrganizationCutoff",
-      description: "Updates the cutoff for the background check service",
+      name: "updateBackgroundCheckOrganizationThreshold",
+      description: "Updates the threshold for the background check service",
       args: [
-        {
-          name: "cutoff",
-          description: "Cutoff value between 0 and 1",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "String", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
         {
           name: "orgId",
           description: null,
@@ -1049,6 +1037,18 @@ export const supportMethods: {
             kind: "NON_NULL",
             name: null,
             ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "threshold",
+          description: "Threshold value between 0 and 1",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
           },
           defaultValue: null,
           isDeprecated: false,

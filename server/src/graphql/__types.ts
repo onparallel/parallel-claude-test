@@ -3137,7 +3137,7 @@ export interface NexusGenFieldTypes {
     unsubscribeFromProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateBackgroundCheckEntity: NexusGenEnums["Success"]; // Success!
-    updateBackgroundCheckOrganizationCutoff: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    updateBackgroundCheckOrganizationThreshold: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateBackgroundCheckSearchFalsePositives: NexusGenEnums["Success"]; // Success!
     updateCompaniesHouseCustomProperties: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
@@ -6463,7 +6463,7 @@ export interface NexusGenFieldTypeNames {
     unsubscribeFromProfile: "Profile";
     untagPetition: "PetitionBase";
     updateBackgroundCheckEntity: "Success";
-    updateBackgroundCheckOrganizationCutoff: "SupportMethodResponse";
+    updateBackgroundCheckOrganizationThreshold: "SupportMethodResponse";
     updateBackgroundCheckSearchFalsePositives: "Success";
     updateCompaniesHouseCustomProperties: "SupportMethodResponse";
     updateContact: "Contact";
@@ -10110,10 +10110,10 @@ export interface NexusGenArgTypes {
       entityId?: string | null; // String
       token: string; // String!
     };
-    updateBackgroundCheckOrganizationCutoff: {
+    updateBackgroundCheckOrganizationThreshold: {
       // args
-      cutoff: string; // String!
       orgId: NexusGenScalars["GID"]; // GID!
+      threshold: string; // String!
     };
     updateBackgroundCheckSearchFalsePositives: {
       // args
