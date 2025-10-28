@@ -16,7 +16,7 @@ import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { userHasAccessToProfile } from "./authorizers";
 
-export const ProfileFieldPropertyValueSourceValues = [
+export const ProfileUpdateSource = [
   "MANUAL",
   "EXTERNAL",
   "EXCEL_IMPORT",
@@ -25,11 +25,11 @@ export const ProfileFieldPropertyValueSourceValues = [
   "PETITION_FIELD_REPLY",
 ] as const;
 
-type ProfileFieldPropertyValueSource = (typeof ProfileFieldPropertyValueSourceValues)[number];
+type ProfileUpdateSource = (typeof ProfileUpdateSource)[number];
 
 export const ProfileFieldPropertyValueSource = enumType({
   name: "ProfileFieldPropertyValueSource",
-  members: ProfileFieldPropertyValueSourceValues,
+  members: ProfileUpdateSource,
 });
 
 export const ProfileTypeStandardType = enumType({
@@ -431,7 +431,7 @@ export const ProfileFieldResponse = interfaceType({
     t.nullable.field("source", {
       description: "Source of the response.",
       type: "ProfileFieldPropertyValueSource",
-      resolve: (o) => o.source as ProfileFieldPropertyValueSource | null,
+      resolve: (o) => o.source as ProfileUpdateSource | null,
     });
     t.nullable.string("externalSourceName", {
       resolve: async (o, _, ctx) => {

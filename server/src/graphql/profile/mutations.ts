@@ -2235,6 +2235,7 @@ export const createProfileRelationship = mutationField("createProfileRelationshi
           right_side_profile_id: rightId,
         };
       }),
+      "MANUAL",
     );
 
     return (await ctx.profiles.loadProfile(args.profileId))!;

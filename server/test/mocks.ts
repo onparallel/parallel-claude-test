@@ -25,7 +25,7 @@ import {
   EInformaProfileExternalSourceIntegration,
   EInformaSearchParams,
 } from "../src/integrations/profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
-import { BackgroundCheckProfileProps } from "../src/pdf/documents/BackgroundCheckProfile";
+import { BackgroundCheckProfileProps } from "../src/pdf/documents/BackgroundCheckProfileTypst";
 import {
   AdverseMediaSearchService,
   IAdverseMediaSearchService,
@@ -174,6 +174,8 @@ export class MockQueuesService implements IQueuesService {
   constructor() {}
   async enqueueMessages() {}
   async enqueueEvents() {}
+  async enqueueEventsWithDelay() {}
+  async enqueueEventsWithLowPriority() {}
   async waitForPendingMessages() {}
 }
 

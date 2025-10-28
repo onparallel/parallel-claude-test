@@ -4149,7 +4149,7 @@ export class PetitionRepository extends BaseRepository {
       { chunkSize: 100, concurrency: 1 },
     );
 
-    await this.queues.enqueueEvents(petitionEvents, "petition_event", undefined, t);
+    await this.queues.enqueueEvents(petitionEvents, "petition_event", t);
 
     return petitionEvents;
   }
@@ -4170,7 +4170,7 @@ export class PetitionRepository extends BaseRepository {
       { chunkSize: 100, concurrency: 1 },
     );
 
-    await this.queues.enqueueEvents(petitionEvents, "petition_event", notifyAfter, t);
+    await this.queues.enqueueEventsWithDelay(petitionEvents, "petition_event", notifyAfter, t);
 
     return petitionEvents;
   }
@@ -4224,7 +4224,11 @@ export class PetitionRepository extends BaseRepository {
     t?: Knex.Transaction,
   ) {
     const [event] = await this.from("petition_event", t).where("id", eventId).update(data, "*");
-    await this.queues.enqueueEvents(event, "petition_event", notifyAfter, t);
+    if (isNonNullish(notifyAfter)) {
+      await this.queues.enqueueEventsWithDelay(event, "petition_event", notifyAfter, t);
+    } else {
+      await this.queues.enqueueEvents(event, "petition_event", t);
+    }
 
     return event;
   }

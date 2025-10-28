@@ -9,6 +9,7 @@ import { TableTypes } from "../db/helpers/BaseRepository";
 import { awsLogger } from "../util/awsLogger";
 import { pMapChunk } from "../util/promises/pMapChunk";
 import { waitFor } from "../util/promises/waitFor";
+import { random } from "../util/token";
 import { MaybeArray, unMaybeArray } from "../util/types";
 import { QueueWorkerPayload_OLD } from "../workers/helpers/createQueueWorker_OLD";
 import { ILogger, LOGGER } from "./Logger";
@@ -36,7 +37,17 @@ export interface IQueuesService {
   enqueueEvents<TName extends "petition_event" | "system_event" | "profile_event">(
     events: MaybeArray<Pick<TableTypes[TName], "id" | "type" | "created_at">>,
     tableName: TName,
-    delaySeconds?: number,
+    t?: Knex.Transaction,
+  ): Promise<void>;
+  enqueueEventsWithLowPriority<TName extends "petition_event" | "system_event" | "profile_event">(
+    events: MaybeArray<Pick<TableTypes[TName], "id" | "type" | "created_at">>,
+    tableName: TName,
+    t?: Knex.Transaction,
+  ): Promise<void>;
+  enqueueEventsWithDelay<TName extends "petition_event" | "system_event" | "profile_event">(
+    events: MaybeArray<Pick<TableTypes[TName], "id" | "type" | "created_at">>,
+    tableName: TName,
+    delaySeconds: number,
     t?: Knex.Transaction,
   ): Promise<void>;
 }
@@ -79,6 +90,9 @@ export class QueuesService implements IQueuesService {
       | { body: QueueWorkerPayload_OLD<Q>; groupId?: string; delaySeconds?: number },
     t?: Knex.Transaction,
   ) {
+    if (Array.isArray(messages) && messages.length === 0) {
+      return;
+    }
     if (isNonNullish(t) && t.isCompleted()) {
       const promise = t.executionPromise
         .then(() => this.sendSQSMessage(queue, messages))
@@ -147,48 +161,78 @@ export class QueuesService implements IQueuesService {
   async enqueueEvents<TName extends "petition_event" | "system_event" | "profile_event">(
     events: MaybeArray<Pick<TableTypes[TName], "id" | "type" | "created_at">>,
     tableName: TName,
-    delaySeconds?: number,
     t?: Knex.Transaction,
   ) {
+    const groupId = `event-processor-${random(10)}`;
     const _events = unMaybeArray(events).filter(isNonNullish);
-    if (_events.length > 0) {
-      if (delaySeconds && delaySeconds > 0) {
-        await this.enqueueMessages(
-          "delay-queue",
-          _events.map((event) => {
-            return {
-              id: `${tableName}-${event.id}`,
-              body: {
-                queue: "event-processor" as const,
-                body: {
-                  id: event.id,
-                  type: event.type,
-                  created_at: event.created_at,
-                  table_name: tableName,
-                },
-                groupId: `${tableName}-${event.id}`,
-              },
-              delaySeconds,
-            };
-          }),
-          t,
-        );
-      } else {
-        await this.enqueueMessages(
-          "event-processor",
-          _events.map((event) => ({
-            id: `event-processor-${event.id}`,
-            groupId: `event-processor-${event.id}`,
+    await this.enqueueMessages(
+      "event-processor",
+      _events.map((event) => ({
+        id: `event-processor-${event.id}`,
+        groupId,
+        body: {
+          id: event.id,
+          type: event.type,
+          created_at: event.created_at,
+          table_name: tableName,
+        },
+      })),
+      t,
+    );
+  }
+
+  async enqueueEventsWithDelay<TName extends "petition_event" | "system_event" | "profile_event">(
+    events: MaybeArray<Pick<TableTypes[TName], "id" | "type" | "created_at">>,
+    tableName: TName,
+    delaySeconds: number,
+    t?: Knex.Transaction,
+  ) {
+    const groupId = `event-processor-${random(10)}`;
+    const _events = unMaybeArray(events).filter(isNonNullish);
+    await this.enqueueMessages(
+      "delay-queue",
+      _events.map((event) => {
+        return {
+          id: `${tableName}-${event.id}`,
+          body: {
+            queue: "event-processor" as const,
             body: {
               id: event.id,
               type: event.type,
               created_at: event.created_at,
               table_name: tableName,
             },
-          })),
-          t,
-        );
-      }
-    }
+            groupId,
+          },
+          delaySeconds,
+        };
+      }),
+      t,
+    );
+  }
+
+  async enqueueEventsWithLowPriority<
+    TName extends "petition_event" | "system_event" | "profile_event",
+  >(
+    events: MaybeArray<Pick<TableTypes[TName], "id" | "type" | "created_at">>,
+    tableName: TName,
+    t?: Knex.Transaction,
+  ) {
+    const groupId = `event-processor-${random(10)}`;
+    const _events = unMaybeArray(events).filter(isNonNullish);
+    await this.enqueueMessages(
+      "low-priority-event-queue",
+      _events.map((event) => ({
+        id: `event-processor-${event.id}`,
+        groupId,
+        body: {
+          id: event.id,
+          type: event.type,
+          created_at: event.created_at,
+          table_name: tableName,
+        },
+      })),
+      t,
+    );
   }
 }

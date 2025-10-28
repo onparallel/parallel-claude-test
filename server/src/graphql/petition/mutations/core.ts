@@ -4055,6 +4055,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                   }
                 }),
             ),
+            "PETITION_FIELD_REPLY",
           );
         }
       }

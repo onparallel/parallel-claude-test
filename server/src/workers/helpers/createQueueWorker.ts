@@ -27,6 +27,7 @@ export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
   "email-events": EmailEventsWorkerPayload;
   "email-sender": EmailSenderWorkerPayload;
   "event-processor": EventProcessorPayload;
+  "low-priority-event-queue": EventProcessorPayload;
   "signature-worker": SignatureWorkerPayload;
   "task-worker": TaskWorkerPayload;
   "delay-queue": DelayQueuePayload;

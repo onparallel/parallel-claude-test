@@ -78,6 +78,15 @@ export function buildConfig() {
       secretKey: process.env.RECAPTCHA_SECRET_KEY!,
     },
     queueWorkers: {
+      "low-priority-event-queue": {
+        queueUrl: process.env.WORKERS_LOW_PRIORITY_EVENT_QUEUE_ENDPOINT!,
+        visibilityTimeout: parseInt(
+          process.env.WORKERS_LOW_PRIORITY_EVENT_QUEUE_VISIBILITY_TIMEOUT!,
+        ),
+        heartbeatInterval: parseInt(
+          process.env.WORKERS_LOW_PRIORITY_EVENT_QUEUE_HEARTBEAT_INTERVAL!,
+        ),
+      },
       "email-sender": {
         queueUrl: process.env.WORKERS_EMAIL_SENDER_ENDPOINT!,
         visibilityTimeout: parseInt(process.env.WORKERS_EMAIL_SENDER_VISIBILITY_TIMEOUT!),

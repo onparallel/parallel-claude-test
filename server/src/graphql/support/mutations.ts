@@ -1463,6 +1463,7 @@ export const createProfileRelationshipsExcel = mutationField("createProfileRelat
             profile_relationship_type_id: profileRelationshipType.id,
           };
         }),
+        "EXCEL_IMPORT",
       );
 
       return {

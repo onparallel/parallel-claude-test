@@ -21,7 +21,7 @@ export class SystemRepository extends BaseRepository {
       return [];
     }
     const systemEvents = await this.insert("system_event", eventsArray, t);
-    await this.queues.enqueueEvents(systemEvents, "system_event", undefined, t);
+    await this.queues.enqueueEvents(systemEvents, "system_event", t);
     return systemEvents;
   }
 

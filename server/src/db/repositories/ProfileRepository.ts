@@ -18,7 +18,7 @@ import {
   zip,
 } from "remeda";
 import { assert } from "ts-essentials";
-import { LocalizableUserText, ProfileFieldPropertyValueSourceValues } from "../../graphql";
+import { LocalizableUserText, ProfileUpdateSource } from "../../graphql";
 import {
   PROFILE_TYPE_FIELD_SERVICE,
   ProfileTypeFieldMonitoring,
@@ -82,7 +82,7 @@ import {
 import { SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 
-type ProfileFieldPropertyValueSource = (typeof ProfileFieldPropertyValueSourceValues)[number];
+type ProfileUpdateSource = (typeof ProfileUpdateSource)[number];
 
 export interface ProfileFilter {
   profileId?: number[] | null;
@@ -1181,7 +1181,7 @@ export class ProfileRepository extends BaseRepository {
       expiryDate?: string | null;
       petitionFieldReplyId?: number | null;
     }[],
-    source: ProfileFieldPropertyValueSource,
+    source: ProfileUpdateSource,
     externalSourceIntegrationId?: number,
     t?: Knex.Transaction,
   ) {
@@ -1223,7 +1223,7 @@ export class ProfileRepository extends BaseRepository {
     }[],
     userId: number | null,
     orgId: number,
-    source: ProfileFieldPropertyValueSource,
+    source: ProfileUpdateSource,
     externalSourceIntegrationId?: number,
     t?: Knex.Transaction,
   ) {
@@ -1474,7 +1474,12 @@ export class ProfileRepository extends BaseRepository {
         },
         t,
       );
-      await this.queues.enqueueEvents(events, "profile_event", undefined, t);
+
+      if (source === "EXCEL_IMPORT") {
+        await this.queues.enqueueEventsWithLowPriority(events, "profile_event", t);
+      } else {
+        await this.queues.enqueueEvents(events, "profile_event", t);
+      }
 
       const profileValues = await this.raw<{
         profileId: number;
@@ -1533,7 +1538,7 @@ export class ProfileRepository extends BaseRepository {
       expiryDate?: string | null;
     }[],
     userId: number | null,
-    source: ProfileFieldPropertyValueSource,
+    source: ProfileUpdateSource,
   ) {
     if (!fields.every((f) => ["ADVERSE_MEDIA_SEARCH", "BACKGROUND_CHECK"].includes(f.type))) {
       throw new Error(
@@ -1661,7 +1666,7 @@ export class ProfileRepository extends BaseRepository {
     files: { fileUploadId: number; petitionFieldReplyId?: number | null }[],
     expiryDate: string | null | undefined,
     userId: number,
-    source: ProfileFieldPropertyValueSource,
+    source: ProfileUpdateSource,
   ) {
     if (files.length === 0) {
       return [];
@@ -1733,7 +1738,7 @@ export class ProfileRepository extends BaseRepository {
       return [];
     }
     const profileEvents = await this.insert("profile_event", eventsArray, t);
-    await this.queues.enqueueEvents(profileEvents, "profile_event", undefined, t);
+    await this.queues.enqueueEvents(profileEvents, "profile_event", t);
     return profileEvents;
   }
 
@@ -2148,8 +2153,8 @@ export class ProfileRepository extends BaseRepository {
           (e) => e.source === "petition_events",
         );
 
-        await this.queues.enqueueEvents(petitionEvents, "petition_event", undefined, t);
-        await this.queues.enqueueEvents(profileEvents, "profile_event", undefined, t);
+        await this.queues.enqueueEvents(petitionEvents, "petition_event", t);
+        await this.queues.enqueueEvents(profileEvents, "profile_event", t);
       },
       { concurrency: 1, chunkSize: 1000 },
     );
@@ -2623,7 +2628,7 @@ export class ProfileRepository extends BaseRepository {
       new?: string | null;
     }[],
     userId: number,
-    source: ProfileFieldPropertyValueSource,
+    source: ProfileUpdateSource,
     orgId: number,
     t?: Knex.Transaction,
   ) {
@@ -3021,6 +3026,7 @@ export class ProfileRepository extends BaseRepository {
 
   async createProfileRelationship(
     data: MaybeArray<CreateProfileRelationship>,
+    source: ProfileUpdateSource,
     t?: Knex.Transaction,
   ) {
     const dataArr = unMaybeArray(data);
@@ -3091,7 +3097,11 @@ export class ProfileRepository extends BaseRepository {
     );
 
     // postpone event enqueuing until all queries were executed, to ensure no conflicts thrown
-    await this.queues.enqueueEvents(events, "profile_event", undefined, t);
+    if (source === "EXCEL_IMPORT") {
+      await this.queues.enqueueEventsWithLowPriority(events, "profile_event", t);
+    } else {
+      await this.queues.enqueueEvents(events, "profile_event", t);
+    }
   }
 
   async removeProfileRelationships(profileRelationshipIds: number[], user: User) {
