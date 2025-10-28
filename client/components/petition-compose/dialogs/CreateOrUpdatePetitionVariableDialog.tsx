@@ -39,7 +39,7 @@ interface CreateOrUpdatePetitionVariableDialogProps {
   variable?: CreateOrUpdatePetitionVariableDialog_PetitionVariableFragment;
   defaultName?: string;
   petitionId: string;
-  onDelete?: (name: string) => Promise<void>;
+  onDelete?: (name: string) => Promise<boolean>;
 }
 
 export interface VariableData {
@@ -100,8 +100,10 @@ function CreateOrUpdatePetitionVariableDialog({
 
   const handleDeleteVariable = async () => {
     try {
-      await onDelete?.(variable!.name);
-      props.onReject();
+      const isDeleted = await onDelete?.(variable!.name);
+      if (isDeleted) {
+        props.onReject();
+      }
     } catch (e) {}
   };
 

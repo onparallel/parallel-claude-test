@@ -62,10 +62,8 @@ export function PetitionFieldLogicConditionEditor({
   isReadOnly?: boolean;
   showErrors?: boolean;
 }) {
-  const {
-    fieldsWithIndices,
-    fieldWithIndex: [field],
-  } = usePetitionFieldLogicContext();
+  const { fieldsWithIndices, fieldWithIndex } = usePetitionFieldLogicContext();
+  const field = fieldWithIndex?.[0];
   const referencedField =
     "fieldId" in condition
       ? fieldsWithIndices.find(([f]) => f.id === condition.fieldId)?.[0]
@@ -267,12 +265,10 @@ function ConditionPredicate({
   showErrors,
   isReadOnly,
 }: ConditionPredicateProps) {
-  const {
-    fieldsWithIndices,
-    fieldWithIndex: [field],
-    customLists,
-    standardListDefinitions,
-  } = usePetitionFieldLogicContext();
+  const { fieldsWithIndices, fieldWithIndex, customLists, standardListDefinitions } =
+    usePetitionFieldLogicContext();
+
+  const field = fieldWithIndex?.[0];
   const isFieldCondition = "fieldId" in condition;
   const isVariableCondition = "variableName" in condition;
   const referencedField = isFieldCondition
@@ -281,7 +277,7 @@ function ConditionPredicate({
   const referencedVariable = isVariableCondition ? condition.variableName : undefined;
   const isMultipleValue = isNonNullish(referencedField)
     ? referencedField.multiple ||
-      (isNonNullish(referencedField.parent) && referencedField.parent.id !== field.parent?.id)
+      (isNonNullish(referencedField.parent) && referencedField.parent.id !== field?.parent?.id)
     : false;
 
   const filteredStandardListDefinitions = ["CHECKBOX", "SELECT"].includes(

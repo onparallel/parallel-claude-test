@@ -2656,6 +2656,7 @@ export interface MutationdeletePetitionReplyArgs {
 }
 
 export interface MutationdeletePetitionVariableArgs {
+  dryrun?: InputMaybe<Scalars["Boolean"]["input"]>;
   name: Scalars["String"]["input"];
   petitionId: Scalars["GID"]["input"];
 }
@@ -26042,6 +26043,7 @@ export type PetitionComposeVariables_PetitionBaseFragment =
 export type PetitionComposeVariables_deletePetitionVariableMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   name: Scalars["String"]["input"];
+  dryrun?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type PetitionComposeVariables_deletePetitionVariableMutation = {
@@ -86606,8 +86608,12 @@ export const PetitionComposeNewFieldDrawerProfileTypeFields_linkFieldGroupToProf
     PetitionComposeNewFieldDrawerProfileTypeFields_linkFieldGroupToProfileTypeMutationVariables
   >;
 export const PetitionComposeVariables_deletePetitionVariableDocument = gql`
-  mutation PetitionComposeVariables_deletePetitionVariable($petitionId: GID!, $name: String!) {
-    deletePetitionVariable(petitionId: $petitionId, name: $name) {
+  mutation PetitionComposeVariables_deletePetitionVariable(
+    $petitionId: GID!
+    $name: String!
+    $dryrun: Boolean
+  ) {
+    deletePetitionVariable(petitionId: $petitionId, name: $name, dryrun: $dryrun) {
       ...PetitionComposeVariables_PetitionBase
     }
   }

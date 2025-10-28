@@ -8,7 +8,7 @@ import { toGlobalId } from "../../../util/globalId";
 import { never } from "../../../util/never";
 import { Maybe, MaybeArray, unMaybeArray } from "../../../util/types";
 import { NexusGenInputs } from "../../__types";
-import { Arg, getArg } from "../../helpers/authorize";
+import { and, Arg, getArg } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
 import { contextUserHasAccessToUserGroups } from "../../user-group/authorizers";
 
@@ -232,41 +232,88 @@ export function variableIsNotBeingReferencedByFieldLogic<
 
     const petitionFields = await ctx.petitions.loadAllFieldsByPetitionId(petitionId);
 
-    const referencingFields = petitionFields.filter((f) => {
-      if (
-        (f.visibility as PetitionFieldVisibility | null)?.conditions.some(
-          (c) => "variableName" in c && c.variableName === variableName,
-        )
-      ) {
-        return true;
-      }
-
-      if (
-        f.math?.some(
-          (m) =>
-            m.conditions.some((c) => "variableName" in c && c.variableName === variableName) ||
-            m.operations.some(
-              (op) =>
-                op.variable === variableName ||
-                (op.operand.type === "VARIABLE" && op.operand.name === variableName),
-            ),
-        )
-      ) {
-        return true;
-      }
-
-      return false;
+    const referencingFieldInMath = petitionFields.filter((f) => {
+      return f.math?.some(
+        (m) =>
+          m.conditions.some((c) => "variableName" in c && c.variableName === variableName) ||
+          m.operations.some(
+            (op) =>
+              op.variable === variableName ||
+              (op.operand.type === "VARIABLE" && op.operand.name === variableName),
+          ),
+      );
     });
 
-    if (referencingFields.length > 0) {
+    const referencingFieldInVisibility = petitionFields.filter((f) => {
+      return (f.visibility as PetitionFieldVisibility | null)?.conditions.some(
+        (c) => "variableName" in c && c.variableName === variableName,
+      );
+    });
+
+    if (referencingFieldInMath.length > 0 || referencingFieldInVisibility.length > 0) {
       throw new ApolloError(
         "The variable is being referenced in another field.",
         "VARIABLE_IS_REFERENCED_ERROR",
+        {
+          referencingFieldInMathIds: referencingFieldInMath.map((f) =>
+            toGlobalId("PetitionField", f.id),
+          ),
+          referencingFieldInVisibilityIds: referencingFieldInVisibility.map((f) =>
+            toGlobalId("PetitionField", f.id),
+          ),
+        },
       );
     }
 
     return true;
   };
+}
+
+export function variableIsNotBeingReferencedByApprovalFlowConfig<
+  TypeName extends string,
+  FieldName extends string,
+  TArgPetitionId extends Arg<TypeName, FieldName, number>,
+  TArgVariableName extends Arg<TypeName, FieldName, string>,
+>(
+  petitionIdArg: TArgPetitionId,
+  variableNameArg: TArgVariableName,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = getArg(args, petitionIdArg);
+    const variableName = getArg(args, variableNameArg);
+
+    const petition = await ctx.petitions.loadPetition(petitionId);
+
+    const referencingApprovalFlowConfigs = petition?.approval_flow_config?.filter((config) => {
+      return config.visibility?.conditions.some(
+        (c) => "variableName" in c && c.variableName === variableName,
+      );
+    });
+
+    if (referencingApprovalFlowConfigs?.length) {
+      throw new ApolloError(
+        "The variable is being referenced in an approval flow configuration.",
+        "VARIABLE_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG",
+      );
+    }
+
+    return true;
+  };
+}
+
+export function variableIsNotBeingReferencedOnLogicConditions<
+  TypeName extends string,
+  FieldName extends string,
+  TArgPetitionId extends Arg<TypeName, FieldName, number>,
+  TArgVariableName extends Arg<TypeName, FieldName, string>,
+>(
+  petitionIdArg: TArgPetitionId,
+  variableNameArg: TArgVariableName,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return and(
+    variableIsNotBeingReferencedByFieldLogic(petitionIdArg, variableNameArg),
+    variableIsNotBeingReferencedByApprovalFlowConfig(petitionIdArg, variableNameArg),
+  );
 }
 
 export function fieldIsNotBeingUsedInAutoSearchConfig<

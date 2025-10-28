@@ -2557,7 +2557,14 @@ type Mutation {
   """
   Deletes a variable from the petition.
   """
-  deletePetitionVariable(name: String!, petitionId: GID!): Petition!
+  deletePetitionVariable(
+    """
+    If true, this will do a dry-run of the mutation to throw possible errors but it will not perform any modification in DB
+    """
+    dryrun: Boolean = false
+    name: String!
+    petitionId: GID!
+  ): Petition!
 
   """
   Delete petitions and folders.

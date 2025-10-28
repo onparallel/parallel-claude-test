@@ -1,4 +1,5 @@
-import { inputObjectType, mutationField, nonNull, stringArg } from "nexus";
+import { booleanArg, inputObjectType, mutationField, nonNull, stringArg } from "nexus";
+import { assert } from "ts-essentials";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { validateAnd } from "../../helpers/validateArgs";
@@ -13,7 +14,7 @@ import {
 } from "../authorizers";
 import {
   petitionVariableCanBeCreated,
-  variableIsNotBeingReferencedByFieldLogic,
+  variableIsNotBeingReferencedOnLogicConditions,
 } from "./authorizers";
 
 export const FIELD_REFERENCE_REGEX = /^[a-z_][a-z0-9_]*$/i;
@@ -120,13 +121,24 @@ export const deletePetitionVariable = mutationField("deletePetitionVariable", {
     petitionsAreEditable("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    variableIsNotBeingReferencedByFieldLogic("petitionId", "name"),
+    variableIsNotBeingReferencedOnLogicConditions("petitionId", "name"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     name: nonNull(stringArg()),
+    dryrun: booleanArg({
+      default: false,
+      description:
+        "If true, this will do a dry-run of the mutation to throw possible errors but it will not perform any modification in DB",
+    }),
   },
   resolve: async (_, args, ctx) => {
+    if (args.dryrun) {
+      const petition = await ctx.petitions.loadPetition(args.petitionId);
+      assert(petition, "petition expected to be defined");
+      return petition;
+    }
+
     return await ctx.petitions.deleteVariable(args.petitionId, args.name, `User:${ctx.user!.id}`);
   },
 });

@@ -18,6 +18,7 @@ import {
 import { Menu } from "@parallel/chakra/components";
 import {
   AddIcon,
+  AlertCircleIcon,
   BracesIcon,
   CalculatorIcon,
   EditIcon,
@@ -33,11 +34,13 @@ import {
   PetitionVariable,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { PetitionFieldMath, PetitionFieldVisibility } from "@parallel/utils/fieldLogic/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, uniqueBy } from "remeda";
+import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { HelpCenterLink, NakedHelpCenterLink } from "../common/HelpCenterLink";
 import { IconButtonWithTooltip, IconButtonWithTooltipProps } from "../common/IconButtonWithTooltip";
 import { OverflownText } from "../common/OverflownText";
@@ -65,6 +68,8 @@ export function PetitionComposeVariables({
 }: PetitionComposeVariablesProps) {
   const intl = useIntl();
 
+  const showErrorDialog = useErrorDialog();
+
   const [updatePetitionField] = useMutation(PetitionComposeVariables_updatePetitionFieldDocument);
   const handleEditField = async (fieldId: string, data: UpdatePetitionFieldInput) => {
     try {
@@ -89,82 +94,117 @@ export function PetitionComposeVariables({
     PetitionComposeVariables_deletePetitionVariableDocument,
   );
   const handleDeleteVariable = async (name: string) => {
-    const referencingMath = allFieldsWithIndices.filter(([f]) =>
-      (f.math as PetitionFieldMath)?.some(
-        (calc) =>
-          calc.conditions.some((c) => "variableName" in c && c.variableName === name) ||
-          calc.operations.some(
-            (o) =>
-              ("variable" in o && o.variable === name) ||
-              (o.operand.type === "VARIABLE" && o.operand.name === name),
-          ),
-      ),
-    );
-
-    const referencingVisibility = allFieldsWithIndices.filter(([f]) =>
-      (f.visibility as PetitionFieldVisibility)?.conditions.some(
-        (c) => "variableName" in c && c.variableName === name,
-      ),
-    );
-
-    if (referencingMath.length || referencingVisibility.length) {
-      await showReferencedCalculationsDialog({
-        fieldsWithIndices: uniqueBy(
-          [...referencingMath, ...referencingVisibility],
-          ([_, fieldIndex]) => fieldIndex,
-        ),
-        referencedInMath: referencingMath.length > 0,
-        referencesInVisibility: referencingVisibility.length > 0,
+    try {
+      await deletePetitionVariable({
+        variables: { petitionId: petition.id, name, dryrun: true },
       });
-      for (const [field] of referencingVisibility) {
-        const visibility = field.visibility! as PetitionFieldVisibility;
-        const conditions = visibility.conditions.filter(
-          (c) => !("variableName" in c && c?.variableName === name),
+    } catch (error) {
+      if (isApolloError(error, "VARIABLE_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG")) {
+        await showErrorDialog.ignoringDialogErrors({
+          header: (
+            <Stack direction="row" spacing={2} align="center">
+              <AlertCircleIcon role="presentation" />
+              <Text>
+                <FormattedMessage
+                  id="page.petition-compose.variable-referenced-in-header"
+                  defaultMessage="Variable referenced"
+                />
+              </Text>
+            </Stack>
+          ),
+          message: (
+            <FormattedMessage
+              id="page.petition-compose.variable-referenced-in-message"
+              defaultMessage="This variable is referenced in <b>{configurationName}</b> and cannot be removed."
+              values={{
+                configurationName: intl
+                  .formatMessage({
+                    id: "component.petition-settings.approval-steps",
+                    defaultMessage: "Approval steps",
+                  })
+                  .toLowerCase(),
+              }}
+            />
+          ),
+        });
+        return false;
+      }
+      if (isApolloError(error, "VARIABLE_IS_REFERENCED_ERROR")) {
+        const referencingMath = allFieldsWithIndices.filter(([f]) =>
+          (error.errors[0].extensions?.referencingFieldInMathIds as string[])?.includes(f.id),
         );
-        await handleEditField(field.id, {
-          visibility: conditions.length > 0 ? { ...visibility, conditions } : null,
+
+        const referencingVisibility = allFieldsWithIndices.filter(([f]) =>
+          (error.errors[0].extensions?.referencingFieldInVisibilityIds as string[])?.includes(f.id),
+        );
+
+        await showReferencedCalculationsDialog({
+          fieldsWithIndices: uniqueBy(
+            [...referencingMath, ...referencingVisibility],
+            ([_, fieldIndex]) => fieldIndex,
+          ),
+          referencedInMath: referencingMath.length > 0,
+          referencesInVisibility: referencingVisibility.length > 0,
         });
+        for (const [field] of referencingVisibility) {
+          const visibility = field.visibility! as PetitionFieldVisibility;
+          const conditions = visibility.conditions.filter(
+            (c) => !("variableName" in c && c?.variableName === name),
+          );
+          await handleEditField(field.id, {
+            visibility: conditions.length > 0 ? { ...visibility, conditions } : null,
+          });
+        }
+        for (const [field] of referencingMath) {
+          const newMath = (field.math! as PetitionFieldMath)
+            .map((calc) => {
+              const conditions = calc.conditions.filter(
+                (c) => !("variableName" in c && c?.variableName === name),
+              );
+
+              const operations = calc.operations.filter(
+                (o) =>
+                  !(
+                    ("variable" in o && o.variable === name) ||
+                    (o.operand.type === "VARIABLE" && o.operand.name === name)
+                  ),
+              );
+
+              if (!conditions.length || !operations.length) {
+                return null;
+              }
+
+              return {
+                ...calc,
+                conditions,
+                operations,
+              };
+            })
+            .filter(isNonNullish);
+
+          await handleEditField(field.id, {
+            math: newMath.length > 0 ? newMath : null,
+          });
+          await showConfirmDeleteVariableDialog();
+          await deletePetitionVariable({
+            variables: {
+              petitionId: petition.id,
+              name,
+            },
+          });
+          return true;
+        }
       }
-      for (const [field] of referencingMath) {
-        const newMath = (field.math! as PetitionFieldMath)
-          .map((calc) => {
-            const conditions = calc.conditions.filter(
-              (c) => !("variableName" in c && c?.variableName === name),
-            );
-
-            const operations = calc.operations.filter(
-              (o) =>
-                !(
-                  ("variable" in o && o.variable === name) ||
-                  (o.operand.type === "VARIABLE" && o.operand.name === name)
-                ),
-            );
-
-            if (!conditions.length || !operations.length) {
-              return null;
-            }
-
-            return {
-              ...calc,
-              conditions,
-              operations,
-            };
-          })
-          .filter(isNonNullish);
-
-        await handleEditField(field.id, {
-          math: newMath.length > 0 ? newMath : null,
-        });
-      }
-    } else {
-      await showConfirmDeleteVariableDialog();
     }
+
+    await showConfirmDeleteVariableDialog();
     await deletePetitionVariable({
       variables: {
         petitionId: petition.id,
         name,
       },
     });
+    return true;
   };
 
   const handleEditVariable = async (variable: PetitionVariable) => {
@@ -325,8 +365,12 @@ PetitionComposeVariables.fragments = {
 
 const _mutations = [
   gql`
-    mutation PetitionComposeVariables_deletePetitionVariable($petitionId: GID!, $name: String!) {
-      deletePetitionVariable(petitionId: $petitionId, name: $name) {
+    mutation PetitionComposeVariables_deletePetitionVariable(
+      $petitionId: GID!
+      $name: String!
+      $dryrun: Boolean
+    ) {
+      deletePetitionVariable(petitionId: $petitionId, name: $name, dryrun: $dryrun) {
         ...PetitionComposeVariables_PetitionBase
       }
     }

@@ -2551,6 +2551,7 @@ export type MutationdeletePetitionReplyArgs = {
 };
 
 export type MutationdeletePetitionVariableArgs = {
+  dryrun?: InputMaybe<Scalars["Boolean"]["input"]>;
   name: Scalars["String"]["input"];
   petitionId: Scalars["GID"]["input"];
 };

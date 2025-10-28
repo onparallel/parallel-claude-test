@@ -41,6 +41,14 @@ export function defaultFieldCondition<T extends Pick<PetitionField, "id" | "type
   };
 }
 
+export function defaultVariableCondition(variableName: string): PetitionFieldLogicCondition {
+  return {
+    variableName,
+    operator: "GREATER_THAN",
+    value: 0,
+  };
+}
+
 export function defaultFieldConditionValue<
   T extends Pick<PetitionField, "id" | "type" | "options">,
 >(field: T, column?: number): number | string | null {

@@ -29,9 +29,8 @@ export function PetitionFieldMathOperandSelect({
 }: ValueProps<PetitionFieldMathOperand, false> & {
   isReadOnly?: boolean;
 }) {
-  const {
-    fieldWithIndex: [field],
-  } = usePetitionFieldLogicContext();
+  const { fieldWithIndex } = usePetitionFieldLogicContext();
+  const field = fieldWithIndex?.[0];
   const intl = useIntl();
   const rsProps = useReactSelectProps<MathOperandOption, false, never>({
     isReadOnly,
@@ -61,7 +60,7 @@ export function PetitionFieldMathOperandSelect({
         ([f]) =>
           f.type === "NUMBER" &&
           (isNonNullish(f.parent)
-            ? f.multiple === false && f.parent.id === field.parent?.id
+            ? f.multiple === false && f.parent.id === field?.parent?.id
             : f.multiple === false),
       )
       .map(([f, fieldIndex]) => ({

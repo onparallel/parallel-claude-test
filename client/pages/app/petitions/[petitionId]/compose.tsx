@@ -473,7 +473,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         message: (
           <FormattedMessage
             id="page.petition-compose.field-referenced-in-message"
-            defaultMessage="This field is referenced in <b>{configurationName}</b> and cannot be removed or modified."
+            defaultMessage="This field is referenced in <b>{configurationName}</b> and cannot be removed."
             values={{
               configurationName: intl
                 .formatMessage({

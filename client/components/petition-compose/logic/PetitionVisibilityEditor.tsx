@@ -2,7 +2,10 @@ import { gql } from "@apollo/client";
 import { Box, Button, Flex, Grid, HStack, IconButton, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { PetitionVisibilityEditor_PetitionBaseFragment } from "@parallel/graphql/__types";
-import { defaultFieldCondition } from "@parallel/utils/fieldLogic/conditions";
+import {
+  defaultFieldCondition,
+  defaultVariableCondition,
+} from "@parallel/utils/fieldLogic/conditions";
 import {
   PetitionFieldLogicCondition,
   PetitionFieldLogicConditionLogicalJoin,
@@ -83,7 +86,11 @@ export function PetitionVisibilityEditor({
         conditions:
           referenceField && referenceField.type !== "HEADING"
             ? [defaultFieldCondition(referenceField)]
-            : ([{}] as PetitionFieldLogicCondition[]),
+            : petition.variables.length
+              ? ([
+                  defaultVariableCondition(petition.variables[0].name),
+                ] as PetitionFieldLogicCondition[])
+              : ([{}] as PetitionFieldLogicCondition[]),
       }
     );
   }, [visibilityOn, value, referenceField]);
@@ -246,7 +253,10 @@ export function PetitionVisibilityEditor({
           <Box>
             {visibility.conditions.length < 15 && !isReadOnly ? (
               <PetitionFieldLogicAddConditionButton
-                isDisabled={!lastConditionField || lastConditionField.type === "HEADING"}
+                isDisabled={
+                  "fieldId" in lastCondition &&
+                  (!lastConditionField || lastConditionField.type === "HEADING")
+                }
                 conditions={visibility.conditions}
                 onAddCondition={(condition) =>
                   setConditions((conditions) => [...conditions, condition])

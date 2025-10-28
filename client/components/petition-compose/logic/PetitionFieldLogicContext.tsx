@@ -9,7 +9,7 @@ import { PropsWithChildren, createContext, useContext, useMemo } from "react";
 import { pick } from "remeda";
 
 interface PetitionFieldLogicContextProps {
-  field: PetitionFieldLogicContext_PetitionFieldFragment;
+  field?: PetitionFieldLogicContext_PetitionFieldFragment;
   petition: PetitionFieldLogicContext_PetitionBaseFragment;
   includeSelf?: boolean;
 }
@@ -30,7 +30,7 @@ interface UsePetitionFieldLogicContext
     PetitionFieldLogicContext_PetitionBaseFragment,
     "variables" | "customLists" | "standardListDefinitions"
   > {
-  fieldWithIndex: [field: PetitionFieldSelection, fieldIndex: PetitionFieldIndex];
+  fieldWithIndex?: [field: PetitionFieldSelection, fieldIndex: PetitionFieldIndex];
   fieldsWithIndices: [field: PetitionFieldSelection, fieldIndex: PetitionFieldIndex][];
   isTemplate: boolean;
 }
@@ -46,10 +46,10 @@ export function PetitionFieldLogicContext({
   includeSelf,
 }: PropsWithChildren<PetitionFieldLogicContextProps>) {
   const fieldsWithIndices = useAllFieldsWithIndices(petition);
-  const fieldIndex = fieldsWithIndices.findIndex(([f]) => f.id === field.id);
+  const fieldIndex = fieldsWithIndices.findIndex(([f]) => f.id === field?.id);
   const value = useMemo<UsePetitionFieldLogicContext>(() => {
     return {
-      fieldWithIndex: fieldsWithIndices.find(([f]) => f.id === field.id)!,
+      fieldWithIndex: fieldsWithIndices.find(([f]) => f.id === field?.id),
       fieldsWithIndices: fieldsWithIndices
         .slice(0, includeSelf ? fieldIndex + 1 : fieldIndex)
         .filter(([f]) => !f.isReadOnly),

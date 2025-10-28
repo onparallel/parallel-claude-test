@@ -18016,8 +18016,8 @@
   },
   {
     "term": "page.petition-compose.field-referenced-in-message",
-    "definition": "Este campo está referenciado en <b>{configurationName}</b> y no se puede eliminar ni modificar.",
-    "context": "This field is referenced in <b>{configurationName}</b> and cannot be removed or modified."
+    "definition": "Este campo está referenciado en <b>{configurationName}</b> y no se puede eliminar.",
+    "context": "This field is referenced in <b>{configurationName}</b> and cannot be removed."
   },
   {
     "term": "page.petition-compose.field-referenced-in-petition-attachments-visibility",
@@ -18033,6 +18033,16 @@
     "term": "page.petition-compose.first-child-is-reply-only-from-profile-error",
     "definition": "El primer campo de un grupo no puede ser opcional. El campo tiene <b>{settingName}</b> habilitado, por lo que no puede ser opcional. Deshabilita esta configuración para poder reordenar.",
     "context": "The first field of a group cannot be optional. The field has <b>{settingName}</b> enabled, so it cannot be optional. Disable this setting to be able to reorder."
+  },
+  {
+    "term": "page.petition-compose.variable-referenced-in-header",
+    "definition": "Variable referenciada",
+    "context": "Variable referenced"
+  },
+  {
+    "term": "page.petition-compose.variable-referenced-in-message",
+    "definition": "Esta variable está referenciada en <b>{configurationName}</b> y no se puede eliminar.",
+    "context": "This variable is referenced in <b>{configurationName}</b> and cannot be removed."
   },
   {
     "term": "page.petition-replies.export-pdf",

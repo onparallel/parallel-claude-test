@@ -9473,6 +9473,7 @@ export interface NexusGenArgTypes {
     };
     deletePetitionVariable: {
       // args
+      dryrun?: boolean | null; // Boolean
       name: string; // String!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
