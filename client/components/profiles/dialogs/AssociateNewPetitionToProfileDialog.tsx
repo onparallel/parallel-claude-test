@@ -178,8 +178,9 @@ function AssociateNewPetitionToProfileDialogSelectTemplate({
               } catch (e) {
                 if (isApolloError(e, "INVALID_FORMAT_ERROR")) {
                   try {
+                    const profileIds = prefill.flatMap((p) => p.profileIds);
                     await showPreviewImportFromProfileFormatErrorDialog({
-                      profileIds: [profile.id],
+                      profileIds,
                       profileTypeFieldIds: e.errors?.[0].extensions
                         ?.profileTypeFieldIds as string[],
                     });
@@ -387,8 +388,9 @@ function AssociateNewPetitionToProfileDialogSelectFieldGroup({
               } catch (e) {
                 if (isApolloError(e, "INVALID_FORMAT_ERROR")) {
                   try {
+                    const profileIds = prefill.flatMap((p) => p.profileIds);
                     await showPreviewImportFromProfileFormatErrorDialog({
-                      profileIds: [profile.id],
+                      profileIds,
                       profileTypeFieldIds: e.errors?.[0].extensions
                         ?.profileTypeFieldIds as string[],
                     });
@@ -564,8 +566,9 @@ export function AssociateNewPetitionToProfileDialogPrefillFieldGroups({
             } catch (e) {
               if (isApolloError(e, "INVALID_FORMAT_ERROR")) {
                 try {
+                  const profileIds = prefill.flatMap((p) => p.profileIds);
                   await showPreviewImportFromProfileFormatErrorDialog({
-                    profileIds: [profile.id],
+                    profileIds,
                     profileTypeFieldIds: e.errors?.[0].extensions?.profileTypeFieldIds as string[],
                   });
                   await createPetition(true);
