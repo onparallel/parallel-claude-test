@@ -31,6 +31,17 @@ sudo /opt/certbot/bin/pip install --upgrade pip
 sudo /opt/certbot/bin/pip install certbot certbot
 sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
 
+# Create a hook to reload nginx when certificates are renewed
+HOOK_PATH="/etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh"
+sudo tee "$HOOK_PATH" > /dev/null <<'EOF'
+HOOK_PATH="/etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh"
+
+#!/bin/bash
+echo "Reloading nginx to apply new certificates..."
+systemctl reload nginx
+EOF
+sudo chmod +x "$HOOK_PATH"
+
 echo "0 0,12 * * * root /opt/certbot/bin/python -c 'import random; import time; time.sleep(random.random() * 3600)' && sudo certbot renew --quiet" | sudo tee -a /etc/crontab > /dev/null
 
 curl --silent --location --output release.tar.gz https://github.com/opensanctions/yente/archive/refs/tags/v${yente_version}.tar.gz
