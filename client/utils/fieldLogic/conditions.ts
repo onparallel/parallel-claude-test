@@ -19,7 +19,8 @@ export function defaultFieldCondition<T extends Pick<PetitionField, "id" | "type
     (field.type === "DYNAMIC_SELECT" && column === undefined) ||
     field.type === "FIELD_GROUP" ||
     field.type === "BACKGROUND_CHECK" ||
-    field.type === "ADVERSE_MEDIA_SEARCH";
+    field.type === "ADVERSE_MEDIA_SEARCH" ||
+    field.type === "USER_ASSIGNMENT";
 
   return {
     fieldId: field.id,
