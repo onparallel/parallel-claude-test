@@ -20,7 +20,7 @@ export const NotificationsButton = Object.assign(
     const isPageVisible = usePageVisibility();
     const { data, startPolling, stopPolling } = useQuery(
       NotificationsButton_UnreadPetitionUserNotificationIdsDocument,
-      { pollInterval: POLL_INTERVAL, skip: !isPageVisible },
+      { pollInterval: POLL_INTERVAL, skip: !isPageVisible, skipPollAttempt: () => !isPageVisible },
     );
     const { isOpen, onOpen } = useNotificationsState();
 

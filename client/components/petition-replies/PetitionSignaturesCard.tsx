@@ -383,10 +383,12 @@ const POLL_INTERVAL = 30_000;
 function usePetitionSignaturesCardPolling(petition: PetitionSignaturesCard_PetitionFragment) {
   const current = petition.signatureRequests.at(0);
   const isPageVisible = usePageVisibility();
+  const shouldSkip = !isPageVisible || (isNullish(petition?.signatureConfig) && isNullish(current));
   const { startPolling, stopPolling } = useQuery(PetitionSignaturesCard_petitionDocument, {
     pollInterval: POLL_INTERVAL,
     variables: { petitionId: petition.id },
-    skip: !isPageVisible || (isNullish(petition?.signatureConfig) && isNullish(current)),
+    skip: shouldSkip,
+    skipPollAttempt: () => shouldSkip,
   });
 
   useEffect(() => {

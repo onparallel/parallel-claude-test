@@ -85,23 +85,27 @@ export function PetitionRepliesFieldComments({
 
   const showGeneralComments = isNullish(field) && fieldId === "general";
 
+  const shouldSkipFieldPolling = showGeneralComments || isNullish(field?.id);
+
   const { data, loading: loadingField } = useQuery(
     PetitionRepliesFieldComments_petitionFieldQueryDocument,
     {
-      skip: showGeneralComments,
       variables: { petitionId, petitionFieldId: field?.id ?? "" },
       pollInterval: 10_000,
       fetchPolicy: "cache-and-network",
+      skip: shouldSkipFieldPolling,
+      skipPollAttempt: () => shouldSkipFieldPolling,
     },
   );
 
   const { data: petitionData, loading: loadingPetition } = useQuery(
     PetitionRepliesFieldComments_petitionQueryDocument,
     {
-      skip: !showGeneralComments,
       variables: { petitionId },
       pollInterval: 10_000,
       fetchPolicy: "cache-and-network",
+      skip: !showGeneralComments,
+      skipPollAttempt: () => !showGeneralComments,
     },
   );
 
@@ -132,14 +136,18 @@ export function PetitionRepliesFieldComments({
     [comments.length],
   );
 
+  const ranInitial = useRef(false);
+
   useEffect(() => {
+    if (ranInitial.current) return;
     if (!loading) {
+      ranInitial.current = true;
       if (comments.at(-1)?.isInternal) {
         setTabIsNotes(true);
       }
       setTimeout(() => editorRef.current?.focus());
     }
-  }, [field?.id, loading]);
+  }, [loading, field?.id]);
 
   // Scroll to bottom when a comment is added
   const previousCommentCount = usePrevious(comments.length);
