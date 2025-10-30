@@ -715,6 +715,7 @@ ConfirmPetitionSignersDialog.fragments = {
           ...ConfirmPetitionSignersDialog_PetitionSigner
         }
         integration {
+          id
           provider
         }
       }

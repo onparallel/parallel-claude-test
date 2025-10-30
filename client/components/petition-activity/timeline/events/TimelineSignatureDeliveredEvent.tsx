@@ -52,6 +52,7 @@ TimelineSignatureDeliveredEvent.fragments = {
       signature {
         signatureConfig {
           integration {
+            id
             provider
           }
         }

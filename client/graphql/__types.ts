@@ -18552,6 +18552,7 @@ export type PetitionActivityTimeline_PetitionEvent_SignatureDeliveredEvent_Fragm
       __typename?: "SignatureConfig";
       integration?: {
         __typename?: "SignatureOrgIntegration";
+        id: string;
         provider: SignatureOrgIntegrationProvider;
       } | null;
     };
@@ -20434,6 +20435,7 @@ export type TimelineSignatureDeliveredEvent_SignatureDeliveredEventFragment = {
       __typename?: "SignatureConfig";
       integration?: {
         __typename?: "SignatureOrgIntegration";
+        id: string;
         provider: SignatureOrgIntegrationProvider;
       } | null;
     };
@@ -21622,6 +21624,7 @@ export type ConfirmPetitionSignersDialog_SignatureConfigFragment = {
   } | null>;
   integration?: {
     __typename?: "SignatureOrgIntegration";
+    id: string;
     provider: SignatureOrgIntegrationProvider;
   } | null;
 };
@@ -33404,6 +33407,7 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
     signingMode: SignatureConfigSigningMode;
     integration?: {
       __typename?: "SignatureOrgIntegration";
+      id: string;
       provider: SignatureOrgIntegrationProvider;
     } | null;
   };
@@ -33750,6 +33754,7 @@ export type PetitionApprovalsCard_PetitionFragment = {
       signingMode: SignatureConfigSigningMode;
       integration?: {
         __typename?: "SignatureOrgIntegration";
+        id: string;
         provider: SignatureOrgIntegrationProvider;
       } | null;
     };
@@ -34040,6 +34045,7 @@ export type PetitionApprovalsCard_PetitionPollingFragment = {
       signingMode: SignatureConfigSigningMode;
       integration?: {
         __typename?: "SignatureOrgIntegration";
+        id: string;
         provider: SignatureOrgIntegrationProvider;
       } | null;
     };
@@ -34197,6 +34203,7 @@ export type PetitionApprovalsCard_cancelPetitionApprovalRequestStepMutation = {
           signingMode: SignatureConfigSigningMode;
           integration?: {
             __typename?: "SignatureOrgIntegration";
+            id: string;
             provider: SignatureOrgIntegrationProvider;
           } | null;
         };
@@ -34530,6 +34537,7 @@ export type PetitionApprovalsCard_skipPetitionApprovalRequestStepMutation = {
           signingMode: SignatureConfigSigningMode;
           integration?: {
             __typename?: "SignatureOrgIntegration";
+            id: string;
             provider: SignatureOrgIntegrationProvider;
           } | null;
         };
@@ -34865,6 +34873,7 @@ export type PetitionApprovalsCard_rejectPetitionApprovalRequestStepMutation = {
           signingMode: SignatureConfigSigningMode;
           integration?: {
             __typename?: "SignatureOrgIntegration";
+            id: string;
             provider: SignatureOrgIntegrationProvider;
           } | null;
         };
@@ -35199,6 +35208,7 @@ export type PetitionApprovalsCard_approvePetitionApprovalRequestStepMutation = {
           signingMode: SignatureConfigSigningMode;
           integration?: {
             __typename?: "SignatureOrgIntegration";
+            id: string;
             provider: SignatureOrgIntegrationProvider;
           } | null;
         };
@@ -35533,6 +35543,7 @@ export type PetitionApprovalsCard_startPetitionApprovalRequestStepMutation = {
           signingMode: SignatureConfigSigningMode;
           integration?: {
             __typename?: "SignatureOrgIntegration";
+            id: string;
             provider: SignatureOrgIntegrationProvider;
           } | null;
         };
@@ -35884,6 +35895,7 @@ export type PetitionApprovalsCard_petitionQuery = {
             signingMode: SignatureConfigSigningMode;
             integration?: {
               __typename?: "SignatureOrgIntegration";
+              id: string;
               provider: SignatureOrgIntegrationProvider;
             } | null;
           };
@@ -37717,6 +37729,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
       signingMode: SignatureConfigSigningMode;
       integration?: {
         __typename?: "SignatureOrgIntegration";
+        id: string;
         provider: SignatureOrgIntegrationProvider;
       } | null;
     };
@@ -37935,6 +37948,7 @@ export type PetitionSignaturesCard_PetitionPollingFragment = {
       signingMode: SignatureConfigSigningMode;
       integration?: {
         __typename?: "SignatureOrgIntegration";
+        id: string;
         provider: SignatureOrgIntegrationProvider;
       } | null;
     };
@@ -38065,6 +38079,7 @@ export type PetitionSignaturesCard_completePetitionMutation = {
         signingMode: SignatureConfigSigningMode;
         integration?: {
           __typename?: "SignatureOrgIntegration";
+          id: string;
           provider: SignatureOrgIntegrationProvider;
         } | null;
       };
@@ -38290,6 +38305,7 @@ export type PetitionSignaturesCard_petitionQuery = {
             signingMode: SignatureConfigSigningMode;
             integration?: {
               __typename?: "SignatureOrgIntegration";
+              id: string;
               provider: SignatureOrgIntegrationProvider;
             } | null;
           };
@@ -53549,6 +53565,7 @@ export type PetitionActivity_eventsQuery = {
                     __typename?: "SignatureConfig";
                     integration?: {
                       __typename?: "SignatureOrgIntegration";
+                      id: string;
                       provider: SignatureOrgIntegrationProvider;
                     } | null;
                   };
@@ -59448,6 +59465,7 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
     } | null>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
+      id: string;
       provider: SignatureOrgIntegrationProvider;
     } | null;
   } | null;
@@ -60340,6 +60358,7 @@ export type PetitionPreview_updatePetitionMutation = {
           } | null>;
           integration?: {
             __typename?: "SignatureOrgIntegration";
+            id: string;
             provider: SignatureOrgIntegrationProvider;
           } | null;
         } | null;
@@ -61602,6 +61621,7 @@ export type PetitionPreview_petitionQuery = {
           } | null>;
           integration?: {
             __typename?: "SignatureOrgIntegration";
+            id: string;
             provider: SignatureOrgIntegrationProvider;
           } | null;
         } | null;
@@ -62233,6 +62253,7 @@ export type PetitionReplies_PetitionFragment = {
       signingMode: SignatureConfigSigningMode;
       integration?: {
         __typename?: "SignatureOrgIntegration";
+        id: string;
         provider: SignatureOrgIntegrationProvider;
       } | null;
     };
@@ -63257,6 +63278,7 @@ export type PetitionReplies_petitionQuery = {
             signingMode: SignatureConfigSigningMode;
             integration?: {
               __typename?: "SignatureOrgIntegration";
+              id: string;
               provider: SignatureOrgIntegrationProvider;
             } | null;
           };
@@ -74638,6 +74660,7 @@ export const TimelineSignatureDeliveredEvent_SignatureDeliveredEventFragmentDoc 
     signature {
       signatureConfig {
         integration {
+          id
           provider
         }
       }
@@ -75473,6 +75496,7 @@ export const ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc = gql`
       ...ConfirmPetitionSignersDialog_PetitionSigner
     }
     integration {
+      id
       provider
     }
   }
@@ -77361,6 +77385,7 @@ export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gq
     signatureConfig {
       signingMode
       integration {
+        id
         provider
       }
     }
@@ -86294,6 +86319,7 @@ export const SignatureConfigDialog_meDocument = gql`
         signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
           items {
             ... on SignatureOrgIntegration {
+              id
               ...SignatureConfigDialog_SignatureOrgIntegration
             }
           }
@@ -90148,6 +90174,7 @@ export const IntegrationsSignature_userDocument = gql`
         signatureIntegrations: integrations(type: SIGNATURE, limit: $limit, offset: $offset) {
           items {
             ... on SignatureOrgIntegration {
+              id
               ...IntegrationsSignature_SignatureOrgIntegration
             }
           }

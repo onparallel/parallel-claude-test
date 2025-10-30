@@ -504,6 +504,7 @@ IntegrationsSignature.queries = [
           signatureIntegrations: integrations(type: SIGNATURE, limit: $limit, offset: $offset) {
             items {
               ... on SignatureOrgIntegration {
+                id
                 ...IntegrationsSignature_SignatureOrgIntegration
               }
             }

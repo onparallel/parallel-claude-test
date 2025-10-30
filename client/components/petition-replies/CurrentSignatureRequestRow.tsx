@@ -228,6 +228,7 @@ CurrentSignatureRequestRow.fragments = {
       signatureConfig {
         signingMode
         integration {
+          id
           provider
         }
       }

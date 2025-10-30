@@ -1083,6 +1083,7 @@ const _query = [
           signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
             items {
               ... on SignatureOrgIntegration {
+                id
                 ...SignatureConfigDialog_SignatureOrgIntegration
               }
             }
