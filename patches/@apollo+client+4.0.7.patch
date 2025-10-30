@@ -1,0 +1,24 @@
+diff --git a/node_modules/@apollo/client/__cjs/core/ObservableQuery.cjs b/node_modules/@apollo/client/__cjs/core/ObservableQuery.cjs
+index 194571c..d9e4654 100644
+--- a/node_modules/@apollo/client/__cjs/core/ObservableQuery.cjs
++++ b/node_modules/@apollo/client/__cjs/core/ObservableQuery.cjs
+@@ -224,6 +224,7 @@ class ObservableQuery {
+                 diff.result ?? undefined
+                 : undefined;
+             return this.maskResult({
++                diff,
+                 data,
+                 dataState: diff.complete ? "complete"
+                     : data === undefined ? "empty"
+diff --git a/node_modules/@apollo/client/core/ObservableQuery.js b/node_modules/@apollo/client/core/ObservableQuery.js
+index ae0769c..7223cb1 100644
+--- a/node_modules/@apollo/client/core/ObservableQuery.js
++++ b/node_modules/@apollo/client/core/ObservableQuery.js
+@@ -216,6 +216,7 @@ export class ObservableQuery {
+                 diff.result ?? undefined
+                 : undefined;
+             return this.maskResult({
++                diff,
+                 data,
+                 dataState: diff.complete ? "complete"
+                     : data === undefined ? "empty"
