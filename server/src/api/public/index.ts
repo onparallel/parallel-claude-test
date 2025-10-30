@@ -4896,6 +4896,10 @@ export function publicApi(container: Container) {
           ...includes,
         });
 
+        if (profile.status !== "OPEN") {
+          throw new BadRequestError("The profile must have status OPEN in order to be updated.");
+        }
+
         const profileTypeFields = profile.properties
           .filter((p) => isNonNullish(p.field.alias))
           .map((p) => p.field);
