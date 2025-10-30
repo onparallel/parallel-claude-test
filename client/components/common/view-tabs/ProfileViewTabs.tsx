@@ -130,11 +130,13 @@ export const ProfileViewTabs = Object.assign(
       try {
         const view = views.find((v) => viewId === v.id);
         assert(isNonNullish(view), "view should exist");
+        if (currentView.id === viewId) {
+          const defaultView = views.find((v) => v.isDefault && v.id !== view.id);
+          handleViewChange(defaultView ? defaultView.id : allView.id);
+        }
         await deleteProfileListView({
           variables: { id: view.id, profileTypeId: queryState.type! },
         });
-        const defaultView = views.find((v) => v.isDefault && v.id !== view.id);
-        handleViewChange(defaultView ? defaultView.id : allView.id);
       } catch (error) {
         showGenericErrorToast(error);
       }

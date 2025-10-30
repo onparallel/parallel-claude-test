@@ -116,7 +116,6 @@ import {
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDeepEqual, isNonNullish, isNullish, omit, pick, unique } from "remeda";
-import { assert } from "ts-essentials";
 
 interface ProfilesTableContext {
   status: ProfileStatus[];
@@ -875,7 +874,9 @@ function ProfilesListHeader({
     const currentView = views.find((v) =>
       state.view === "ALL" ? v.type === "ALL" : v.id === state.view,
     );
-    assert(isNonNullish(currentView));
+    if (!isNonNullish(currentView)) {
+      return false;
+    }
     const toCompare: [any, any][] = [
       // columns
       [currentView.data.columns ?? DEFAULT_COLUMNS, state.columns ?? DEFAULT_COLUMNS],
