@@ -491,7 +491,8 @@ function ConditionPredicate({
           referencedField.type !== "DYNAMIC_SELECT" &&
           referencedField.type !== "BACKGROUND_CHECK" &&
           referencedField.type !== "ADVERSE_MEDIA_SEARCH" &&
-          referencedField.type !== "FIELD_GROUP"
+          referencedField.type !== "FIELD_GROUP" &&
+          referencedField.type !== "USER_ASSIGNMENT"
         ) {
           options.push(
             {

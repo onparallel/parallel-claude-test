@@ -5,6 +5,9 @@ import { isPossiblePhoneNumber } from "libphonenumber-js";
 import { difference, isNonNullish, isNullish, unique } from "remeda";
 import { ProfileTypeField, ProfileTypeFieldType } from "../db/__types";
 import { ProfileRepository } from "../db/repositories/ProfileRepository";
+import { UserRepository } from "../db/repositories/UserRepository";
+import { isValidEmail } from "../graphql/helpers/validators/validEmail";
+import { fromGlobalId, isGlobalId } from "../util/globalId";
 import { isValidDate } from "../util/time";
 import { validateShortTextFormat } from "../util/validateShortTextFormat";
 import {
@@ -20,6 +23,7 @@ export const PROFILE_VALIDATION_SERVICE = Symbol.for("PROFILE_VALIDATION_SERVICE
 @injectable()
 export class ProfileValidationService {
   constructor(
+    @inject(UserRepository) private users: UserRepository,
     @inject(ProfileRepository) private profiles: ProfileRepository,
     @inject(PROFILE_TYPE_FIELD_SERVICE)
     private profileTypeFields: ProfileTypeFieldService,
@@ -31,6 +35,7 @@ export class ProfileValidationService {
   async validateProfileFieldValueContent(
     field: Pick<ProfileTypeField, "type" | "options">,
     content: any,
+    orgId: number,
   ) {
     switch (field.type) {
       case "SELECT": {
@@ -96,6 +101,35 @@ export class ProfileValidationService {
       }
       case "FILE":
         throw new Error("Can't validate file field");
+      case "USER_ASSIGNMENT": {
+        /**
+         * content.value should be a string, and can be an email or a globalId of a User
+         * In any case the user should be found in the right organization
+         */
+        this.assertString(content);
+        if (isValidEmail(content.value)) {
+          const users = await this.users.loadUsersByEmail(content.value);
+          const user = users.find((u) => u.org_id === orgId);
+
+          if (!user) {
+            throw new Error(`User with email ${content.value} not found in organization`);
+          }
+          return;
+        } else if (isGlobalId(content.value, "User")) {
+          const user = await this.users.loadUser(fromGlobalId(content.value, "User").id);
+
+          if (!user || user.org_id !== orgId) {
+            throw new Error(`User with id ${content.value} not found in organization`);
+          }
+        } else {
+          throw new Error("Invalid value");
+        }
+        return;
+      }
+      case "BACKGROUND_CHECK":
+      case "ADVERSE_MEDIA_SEARCH":
+        // These fields are managed internally and don't require content validation
+        return;
     }
   }
 

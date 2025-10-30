@@ -5794,6 +5794,11 @@ enum PetitionFieldType {
   A text field.
   """
   TEXT
+
+  """
+  A field for user assignment
+  """
+  USER_ASSIGNMENT
 }
 
 input PetitionFilter {
@@ -7536,6 +7541,7 @@ enum ProfileTypeFieldType {
   SELECT
   SHORT_TEXT
   TEXT
+  USER_ASSIGNMENT
 }
 
 input ProfileTypeFilter {
@@ -9831,6 +9837,7 @@ type UserAuthenticationToken implements CreatedAt {
 }
 
 input UserFilter {
+  fromUserGroupId: [GID!]
   status: [UserStatus!]
 }
 

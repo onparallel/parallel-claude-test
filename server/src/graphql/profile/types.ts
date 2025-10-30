@@ -549,7 +549,7 @@ export const ProfileFieldValue = objectType({
     t.globalId("id");
     t.implements("ProfileFieldResponse");
     t.nullable.jsonObject("content", {
-      resolve: (root, _, ctx) => ctx.profilesHelper.mapValueContentFromDatabase(root),
+      resolve: async (root, _, ctx) => await ctx.profilesHelper.mapValueContentFromDatabase(root),
     });
     t.nonNull.boolean("isDraft", {
       resolve: (o) => o.is_draft,

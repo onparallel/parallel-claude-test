@@ -50,6 +50,7 @@ import { ProfileFormFieldPhone } from "./ProfileFormFieldPhone";
 import { ProfileFormFieldSelect } from "./ProfileFormFieldSelect";
 import { ProfileFormFieldShortText } from "./ProfileFormFieldShortText";
 import { ProfileFormFieldText } from "./ProfileFormFieldText";
+import { ProfileFormFieldUserAssignment } from "./ProfileFormFieldUserAssignment";
 
 export interface ProfileFormFieldProps {
   onRefetch?: () => void;
@@ -460,6 +461,8 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
           />
         ) : field.type === "CHECKBOX" ? (
           <ProfileFormFieldCheckbox {...commonProps} />
+        ) : field.type === "USER_ASSIGNMENT" ? (
+          <ProfileFormFieldUserAssignment {...commonProps} />
         ) : null}
         {expiryDate && (field.type !== "DATE" || !field.options?.useReplyAsExpiryDate) ? (
           <HStack marginTop={1} marginStart={1} color="gray.700" spacing={1.5}>

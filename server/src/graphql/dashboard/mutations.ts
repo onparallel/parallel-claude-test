@@ -5,7 +5,6 @@ import { DashboardModule } from "../../db/__types";
 import { ModuleSettings } from "../../db/repositories/DashboardRepository";
 import { PetitionFilter } from "../../db/repositories/PetitionRepository";
 import { ProfileFilter } from "../../db/repositories/ProfileRepository";
-import { ProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
 import { and, authenticateAnd, ifArgDefined, or } from "../helpers/authorize";
 import { ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -26,6 +25,7 @@ import {
 } from "../profile/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
+import { mapProfileFieldValuesFilterToDatabase } from "../views/helpers";
 import {
   dashboardCanCreateModule,
   dashboardIsNotGroupSharedToContextUser,
@@ -410,7 +410,7 @@ export const createProfilesNumberDashboardModule = mutationField(
             profileTypeId: settings.profileTypeId,
             filters: {
               status: settings.filter.status ?? ["OPEN"],
-              values: settings.filter.values as ProfileFieldValuesFilter,
+              values: mapProfileFieldValuesFilterToDatabase(settings.filter.values),
             },
           },
         },
@@ -488,6 +488,7 @@ export const createProfilesRatioDashboardModule = mutationField(
             graphicType: settings.graphicType,
             filters: settings.filters.map((f) => ({
               ...f,
+              values: mapProfileFieldValuesFilterToDatabase(f.values),
               status: f.status ?? ["OPEN"],
             })) as [ProfileFilter, ProfileFilter],
           },
@@ -584,7 +585,7 @@ export const createProfilesPieChartDashboardModule = mutationField(
             groupByFilter: settings.groupByFilter
               ? {
                   status: settings.groupByFilter.status ?? ["OPEN"],
-                  values: settings.groupByFilter.values as ProfileFieldValuesFilter,
+                  values: mapProfileFieldValuesFilterToDatabase(settings.groupByFilter.values),
                 }
               : undefined,
             graphicType: settings.graphicType,
@@ -593,7 +594,7 @@ export const createProfilesPieChartDashboardModule = mutationField(
               label: item.label,
               filter: {
                 status: item.filter.status ?? ["OPEN"],
-                values: item.filter.values as ProfileFieldValuesFilter,
+                values: mapProfileFieldValuesFilterToDatabase(item.filter.values),
               },
             })),
           },
@@ -898,7 +899,7 @@ export const updateProfilesNumberDashboardModule = mutationField(
           profileTypeId: data.settings.profileTypeId,
           filters: {
             status: data.settings.filter.status,
-            values: data.settings.filter.values as ProfileFieldValuesFilter,
+            values: mapProfileFieldValuesFilterToDatabase(data.settings.filter.values),
           },
         } as ModuleSettings<"PROFILES_NUMBER">;
         updateData.result = null;
@@ -970,7 +971,10 @@ export const updateProfilesRatioDashboardModule = mutationField(
               }),
           profileTypeId: data.settings.profileTypeId,
           graphicType: data.settings.graphicType,
-          filters: data.settings.filters as [ProfileFilter, ProfileFilter],
+          filters: data.settings.filters.map((f) => ({
+            ...f,
+            values: mapProfileFieldValuesFilterToDatabase(f.values),
+          })) as [ProfileFilter, ProfileFilter],
         } as ModuleSettings<"PROFILES_RATIO">;
         updateData.result = null;
       }
@@ -1044,7 +1048,7 @@ export const updateProfilesPieChartDashboardModule = mutationField(
           groupByFilter: data.settings.groupByFilter
             ? {
                 status: data.settings.groupByFilter.status,
-                values: data.settings.groupByFilter.values as ProfileFieldValuesFilter,
+                values: mapProfileFieldValuesFilterToDatabase(data.settings.groupByFilter.values),
               }
             : undefined,
           graphicType: data.settings.graphicType,
@@ -1053,7 +1057,7 @@ export const updateProfilesPieChartDashboardModule = mutationField(
             label: item.label,
             filter: {
               status: item.filter.status,
-              values: item.filter.values as ProfileFieldValuesFilter,
+              values: mapProfileFieldValuesFilterToDatabase(item.filter.values),
             },
           })),
         } as ModuleSettings<"PROFILES_PIE_CHART">;

@@ -5,6 +5,7 @@ import { Readable } from "stream";
 import { assert } from "ts-essentials";
 import { Profile, ProfileFieldValue, ProfileTypeField, UserLocale } from "../db/__types";
 import { ProfileFilter, ProfileRepository } from "../db/repositories/ProfileRepository";
+import { UserRepository } from "../db/repositories/UserRepository";
 import { toGlobalId } from "../util/globalId";
 import { isAtLeast } from "../util/profileTypeFieldPermission";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
@@ -26,12 +27,14 @@ export const EXPORTABLE_FIELD_TYPES = [
   "NUMBER",
   "SELECT",
   "CHECKBOX",
+  "USER_ASSIGNMENT",
 ] as const;
 
 @injectable()
 export class ProfileExcelExportService extends ProfileExcelService {
   constructor(
     @inject(ProfileRepository) private profiles: ProfileRepository,
+    @inject(UserRepository) private users: UserRepository,
     @inject(I18N_SERVICE) private i18n: II18nService,
     @inject(LOGGER) private logger: ILogger,
     @inject(PROFILE_TYPE_FIELD_SERVICE) profileTypeFields: ProfileTypeFieldService,
@@ -79,6 +82,11 @@ export class ProfileExcelExportService extends ProfileExcelService {
       intl,
     );
 
+    let userEmails: { user_id: number; email: string }[] = [];
+    if (exportableFieldsWithPermissions.some((f) => f.type === "USER_ASSIGNMENT")) {
+      userEmails = await this.users.getUserEmailsByOrgId(profileType.org_id);
+    }
+
     let offset = 0;
     const limit = 5000;
     let totalCount: number | null = null;
@@ -113,6 +121,7 @@ export class ProfileExcelExportService extends ProfileExcelService {
         exportableFieldsWithPermissions,
         workbook.worksheets[0],
         offset,
+        userEmails,
       );
 
       offset += items.length;
@@ -142,6 +151,7 @@ export class ProfileExcelExportService extends ProfileExcelService {
     fieldsWithPermissions: ProfileTypeField[],
     worksheet: Excel.Worksheet,
     offset: number,
+    userEmails: { user_id: number; email: string }[] = [],
   ) {
     const profilesValues = await this.profiles.loadProfileFieldValuesByProfileId(
       profiles.map((p) => p.id),
@@ -157,7 +167,7 @@ export class ProfileExcelExportService extends ProfileExcelService {
         assert(field, `Invalid profile type field id ${field.id}`);
         const fieldValue = profileValues.find((v) => v.profile_type_field_id === field.id);
 
-        row[globalId] = this.stringifyProfileFieldValue(field, fieldValue);
+        row[globalId] = this.stringifyProfileFieldValue(field, fieldValue, userEmails);
         if (field.is_expirable && !field.options.useReplyAsExpiryDate) {
           row[`${globalId}-expiry`] = fieldValue?.expiry_date ?? "";
         }
@@ -168,11 +178,20 @@ export class ProfileExcelExportService extends ProfileExcelService {
     }
   }
 
-  private stringifyProfileFieldValue(field: ProfileTypeField, value?: ProfileFieldValue) {
+  private stringifyProfileFieldValue(
+    field: ProfileTypeField,
+    value?: ProfileFieldValue,
+    userEmails: { user_id: number; email: string }[] = [],
+  ) {
     assert(EXPORTABLE_FIELD_TYPES.includes(field.type), `Cannot stringify ${field.type} field`);
 
     if (field.type === "CHECKBOX") {
       return value?.content?.value.join(",");
+    }
+
+    if (field.type === "USER_ASSIGNMENT" && value?.content?.value) {
+      assert(typeof value.content.value === "number", "User assignment value must be a number");
+      return userEmails.find((u) => u.user_id === value.content.value)?.email;
     }
 
     return value?.content?.value;

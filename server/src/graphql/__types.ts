@@ -632,6 +632,7 @@ export interface NexusGenInputs {
   };
   UserFilter: {
     // input type
+    fromUserGroupId?: NexusGenScalars["GID"][] | null; // [GID!]
     status?: NexusGenEnums["UserStatus"][] | null; // [UserStatus!]
   };
   UserOrUserGroupPermissionInput: {
@@ -1789,11 +1790,12 @@ export interface NexusGenObjects {
   ProfileFieldValueUpdatedEvent: profileEvents.ProfileFieldValueUpdatedEvent;
   ProfileListView: db.ProfileListView;
   ProfileListViewData: {
-    columns?: string[] | null;
-    search?: string | null;
-    sort?: NexusGenRootTypes["ProfileListViewSort"] | null;
-    values?: NexusGenScalars["JSONObject"] | null;
-    status?: NexusGenEnums["ProfileStatus"] | NexusGenEnums["ProfileStatus"][] | null;
+    // root type
+    columns?: string[] | null; // [String!]
+    search?: string | null; // String
+    sort?: NexusGenRootTypes["ProfileListViewSort"] | null; // ProfileListViewSort
+    status?: NexusGenEnums["ProfileStatus"][] | null; // [ProfileStatus!]
+    values?: NexusGenScalars["JSONObject"] | null; // JSONObject
   };
   ProfileListViewSort: {
     // root type

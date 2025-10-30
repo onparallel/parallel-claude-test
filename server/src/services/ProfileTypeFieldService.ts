@@ -14,7 +14,11 @@ import {
   UserLocale,
   UserLocaleValues,
 } from "../db/__types";
+import { UserRepository } from "../db/repositories/UserRepository";
 import { LOCALIZABLE_USER_TEXT_SCHEMA } from "../graphql";
+import { isValidEmail } from "../graphql/helpers/validators/validEmail";
+import { fromGlobalId, isGlobalId } from "../util/globalId";
+import { never } from "../util/never";
 import { walkObject } from "../util/walkObject";
 import { PETITION_FIELD_SERVICE, PetitionFieldService } from "./PetitionFieldService";
 
@@ -253,6 +257,16 @@ export const SCHEMAS = {
       monitoring: FIELD_MONITORING_SCHEMA,
     },
   },
+  USER_ASSIGNMENT: {
+    type: "object",
+    additionalProperties: false,
+    required: [],
+    properties: {
+      allowedUserGroupId: {
+        type: ["number", "null"],
+      },
+    },
+  },
 } as const;
 
 export type ProfileTypeFieldOptions = {
@@ -269,7 +283,10 @@ export const PROFILE_TYPE_FIELD_SERVICE = Symbol.for("PROFILE_TYPE_FIELD_SERVICE
 
 @injectable()
 export class ProfileTypeFieldService {
-  constructor(@inject(PETITION_FIELD_SERVICE) private petitionFields: PetitionFieldService) {}
+  constructor(
+    @inject(PETITION_FIELD_SERVICE) private petitionFields: PetitionFieldService,
+    @inject(UserRepository) private users: UserRepository,
+  ) {}
 
   defaultProfileTypeFieldOptions(type: ProfileTypeFieldType): any {
     if (type === "DATE") {
@@ -306,6 +323,11 @@ export class ProfileTypeFieldService {
         node[key] = globalIdMap("ProfileTypeField", value);
       }
 
+      if (key === "allowedUserGroupId" && isNonNullish(value)) {
+        // Replace the value in-place with the mapped ID
+        node[key] = globalIdMap("UserGroup", value);
+      }
+
       if (key === "autoSearchConfig" && isNonNullish(value)) {
         if (isNonNullish(value.name) && Array.isArray(value.name)) {
           value.name = value.name.map((id: any) => globalIdMap("ProfileTypeField", id));
@@ -333,7 +355,7 @@ export class ProfileTypeFieldService {
     }
   }
 
-  mapValueContentToDatabase(type: ProfileTypeFieldType, content: any) {
+  async mapValueContentToDatabase(type: ProfileTypeFieldType, content: any, orgId: number) {
     switch (type) {
       case "PHONE":
         assert(typeof content.value === "string", "Expected value to be a string");
@@ -341,6 +363,22 @@ export class ProfileTypeFieldService {
           value: content.value.replace(/[^\d+]/g, ""), // remove all non-digits or +
           // pretty value is calculated in gql resolver and not required to be stored
         };
+
+      case "USER_ASSIGNMENT":
+        if (isValidEmail(content.value)) {
+          const users = await this.users.loadUsersByEmail(content.value);
+          const user = users.find((u) => u.org_id === orgId);
+          assert(user, `User with email ${content.value} not found in organization`);
+          return {
+            value: user.id,
+          };
+        } else if (isGlobalId(content.value, "User")) {
+          return {
+            value: fromGlobalId(content.value).id,
+          };
+        } else {
+          never(`Invalid user assignment value: Expected email or globalId, got ${content.value}`);
+        }
 
       default:
         return content;
@@ -362,6 +400,7 @@ export class ProfileTypeFieldService {
       BACKGROUND_CHECK: "BACKGROUND_CHECK",
       CHECKBOX: "CHECKBOX",
       ADVERSE_MEDIA_SEARCH: "ADVERSE_MEDIA_SEARCH",
+      USER_ASSIGNMENT: "USER_ASSIGNMENT",
     };
     const type = FIELD_TYPE_MAP[profileTypeField.type];
 

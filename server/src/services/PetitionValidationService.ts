@@ -4,9 +4,11 @@ import { inject, injectable } from "inversify";
 import { isPossiblePhoneNumber } from "libphonenumber-js";
 import { difference, isNonNullish, isNullish, omit } from "remeda";
 import { PetitionField, PetitionFieldType } from "../db/__types";
+import { UserRepository } from "../db/repositories/UserRepository";
 import { DynamicSelectOption } from "../graphql/helpers/parseDynamicSelectValues";
+import { isValidEmail } from "../graphql/helpers/validators/validEmail";
 import { toBytes } from "../util/fileSize";
-import { isGlobalId } from "../util/globalId";
+import { fromGlobalId, isGlobalId } from "../util/globalId";
 import { never } from "../util/never";
 import { isValidDate, isValidDatetime, isValidTimezone } from "../util/time";
 import { Maybe } from "../util/types";
@@ -31,9 +33,16 @@ export class ValidateReplyContentError extends Error {
 }
 @injectable()
 export class PetitionValidationService {
-  constructor(@inject(PETITION_FIELD_SERVICE) private petitionFields: PetitionFieldService) {}
+  constructor(
+    @inject(PETITION_FIELD_SERVICE) private petitionFields: PetitionFieldService,
+    @inject(UserRepository) private users: UserRepository,
+  ) {}
 
-  async validateFieldReplyContent(field: Pick<PetitionField, "type" | "options">, content: any) {
+  async validateFieldReplyContent(
+    field: Pick<PetitionField, "type" | "options">,
+    content: any,
+    orgId: number,
+  ) {
     switch (field.type) {
       case "NUMBER": {
         if (
@@ -368,6 +377,59 @@ export class PetitionValidationService {
             "profileIds",
             "INVALID_STRUCTURE_ERROR",
             "Must be an array of valid profile ids.",
+          );
+        }
+        break;
+      }
+      case "USER_ASSIGNMENT": {
+        /*
+         * {
+         *    value: string
+         * }
+         */
+
+        if (!("value" in content)) {
+          throw new ValidateReplyContentError(
+            "value",
+            "INVALID_STRUCTURE_ERROR",
+            "Reply must contain a 'value' field.",
+          );
+        }
+
+        const isString = typeof content.value === "string";
+
+        if (!isString) {
+          throw new ValidateReplyContentError(
+            "value",
+            "INVALID_TYPE_ERROR",
+            "Reply value must be a string.",
+          );
+        }
+        if (isValidEmail(content.value)) {
+          const users = await this.users.loadUsersByEmail(content.value);
+          const user = users.find((u) => u.org_id === orgId);
+          if (!user) {
+            throw new ValidateReplyContentError(
+              "value",
+              "INVALID_VALUE_ERROR",
+              `User with email ${content.value} not found in organization`,
+            );
+          }
+        } else if (isGlobalId(content.value, "User")) {
+          const user = await this.users.loadUser(fromGlobalId(content.value, "User").id);
+
+          if (!user || user.org_id !== orgId) {
+            throw new ValidateReplyContentError(
+              "value",
+              "INVALID_VALUE_ERROR",
+              `User with id ${content.value} not found in organization`,
+            );
+          }
+        } else {
+          throw new ValidateReplyContentError(
+            "value",
+            "INVALID_VALUE_ERROR",
+            "Expected a user ID or an email",
           );
         }
         break;

@@ -435,11 +435,11 @@ export function validateProfilesPieChartDashboardModuleSettingsInput<
       }
 
       const ptf = await ctx.profiles.loadProfileTypeField(settings.groupByProfileTypeFieldId);
-      if (!ptf || ptf.type !== "SELECT") {
+      if (!ptf || !["SELECT", "USER_ASSIGNMENT"].includes(ptf.type)) {
         throw new ArgValidationError(
           info,
           `${argName}.groupByProfileTypeFieldId`,
-          "Must be a SELECT field",
+          "Must be a SELECT or USER_ASSIGNMENT field",
         );
       }
     }

@@ -69,7 +69,10 @@ export function validatePublicPetitionLinkSlug<TypeName extends string, FieldNam
 export function validateCreatePetitionFieldReplyInput<
   TypeName extends string,
   FieldName extends string,
->(prop: ArgWithPath<TypeName, FieldName, NexusGenInputs["CreatePetitionFieldReplyInput"][]>) {
+>(
+  prop: ArgWithPath<TypeName, FieldName, NexusGenInputs["CreatePetitionFieldReplyInput"][]>,
+  opts?: { publicContext: boolean },
+) {
   return (async (_, args, ctx, info) => {
     const [fieldReplies, argName] = getArgWithPath(args, prop);
     await validateCreateReplyInput(fieldReplies, argName, ctx, info);
@@ -82,7 +85,11 @@ export function validateCreatePetitionFieldReplyInput<
     for (const [index, reply] of fieldReplies.entries()) {
       const field = fieldsById[reply.id];
       try {
-        await ctx.petitionValidation.validateFieldReplyContent(field, reply.content);
+        await ctx.petitionValidation.validateFieldReplyContent(
+          field,
+          reply.content,
+          opts?.publicContext ? ctx.contact!.org_id : ctx.user!.org_id,
+        );
       } catch (e) {
         if (e instanceof ValidateReplyContentError) {
           throw new InvalidReplyError(
@@ -151,7 +158,10 @@ export function validateCreatePetitionFieldReplyInput<
 export function validateUpdatePetitionFieldReplyInput<
   TypeName extends string,
   FieldName extends string,
->(prop: ArgWithPath<TypeName, FieldName, NexusGenInputs["UpdatePetitionFieldReplyInput"][]>) {
+>(
+  prop: ArgWithPath<TypeName, FieldName, NexusGenInputs["UpdatePetitionFieldReplyInput"][]>,
+  opts?: { publicContext: boolean },
+) {
   return (async (_, args, ctx, info) => {
     const [replyContents, argName] = getArgWithPath(args, prop);
     const replyIds = unique(replyContents.map((r) => r.id));
@@ -175,7 +185,11 @@ export function validateUpdatePetitionFieldReplyInput<
       }
 
       try {
-        await ctx.petitionValidation.validateFieldReplyContent(field, content);
+        await ctx.petitionValidation.validateFieldReplyContent(
+          field,
+          content,
+          opts?.publicContext ? ctx.contact!.org_id : ctx.user!.org_id,
+        );
       } catch (e) {
         if (e instanceof ValidateReplyContentError) {
           throw new InvalidReplyError(

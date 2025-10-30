@@ -56,6 +56,7 @@ import { PetitionRepliesFieldFilePassword } from "./field-replies/PetitionReplie
 import { PetitionRepliesFieldFileSchema } from "./field-replies/PetitionRepliesFieldFileSchema";
 import { PetitionRepliesFieldFileUploadPayslipReply } from "./field-replies/PetitionRepliesFieldFileUploadPayslipReply";
 import { PetitionRepliesFieldIdVerificationReply } from "./field-replies/PetitionRepliesFieldIdVerificationReply";
+import { PetitionRepliesFieldUserAssignmentReply } from "./field-replies/PetitionRepliesFieldUserAssignmentReply";
 import { PetitionRepliesPopoverField } from "./PetitionRepliesPopoverField";
 
 export interface PetitionRepliesFieldReplyProps {
@@ -429,6 +430,11 @@ export function PetitionRepliesFieldReply({
                     </Stack>
                   ) : type === "ADVERSE_MEDIA_SEARCH" ? (
                     <PetitionRepliesFieldAdverseMediaSearch reply={reply} />
+                  ) : type === "USER_ASSIGNMENT" ? (
+                    <>
+                      <PetitionRepliesFieldUserAssignmentReply reply={reply} />
+                      <Box marginStart={1}>{editReplyIconButton()}</Box>
+                    </>
                   ) : isFileTypeField(type) ? (
                     <Stack flex="1">
                       <Flex flexWrap="wrap" gap={1.5} alignItems="center" minHeight={6}>
@@ -686,6 +692,7 @@ PetitionRepliesFieldReply.fragments = {
     ${UserOrContactReference.fragments.UserOrPetitionAccess}
     ${CopyOrDownloadReplyButton.fragments.PetitionFieldReply}
     ${getReplyContents.fragments.PetitionFieldReply}
+    ${PetitionRepliesFieldUserAssignmentReply.fragments.PetitionFieldReply}
   `,
 };
 

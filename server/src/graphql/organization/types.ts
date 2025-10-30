@@ -154,6 +154,7 @@ export const Organization = objectType({
           name: "UserFilter",
           definition(t) {
             t.nullable.list.nonNull.field("status", { type: "UserStatus" });
+            t.nullable.list.nonNull.globalId("fromUserGroupId", { prefixName: "UserGroup" });
           },
         }),
       },
@@ -177,6 +178,7 @@ export const Organization = objectType({
           excludeIds: exclude,
           searchByEmailOnly,
           status: filters?.status,
+          fromUserGroupIds: filters?.fromUserGroupId,
           sortBy: sortBy?.map((value) => {
             const [field, order] = parseSortBy(value);
             return { field: columnMap[field], order };

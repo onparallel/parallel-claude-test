@@ -107,7 +107,7 @@ export function ProfilesChartModuleSettings({
                 <ProfileTypeFieldSelect
                   value={profileTypeFields.find((f) => f.id === value) as any}
                   fields={profileTypeFields}
-                  filterFields={(f) => f.type === "SELECT"}
+                  filterFields={(f) => f.type === "SELECT" || f.type === "USER_ASSIGNMENT"}
                   onChange={(v) => onChange(v?.id)}
                 />
                 <FormErrorMessage>

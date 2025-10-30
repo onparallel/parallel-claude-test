@@ -1,4 +1,5 @@
 import { inject, injectable } from "inversify";
+import pMap from "p-map";
 import { groupBy, indexBy, isNonNullish, partition, unique, zip } from "remeda";
 import { Readable } from "stream";
 import { assert } from "ts-essentials";
@@ -111,6 +112,7 @@ export class ProfileExcelImportService extends ProfileExcelService {
           })),
           user.id,
         );
+
         await this.profiles.updateProfileFieldValues(
           [
             ...zip(creates, profiles).flatMap(([create, profile]) =>
@@ -137,17 +139,25 @@ export class ProfileExcelImportService extends ProfileExcelService {
   }
 
   private cellToValueContent(cell: CellData, type: ProfileTypeFieldType) {
-    return cell.value && cell.value.trim() !== ""
-      ? {
-          value:
-            type === "NUMBER"
-              ? parseFloat(cell.value)
-              : type === "CHECKBOX"
-                ? // split the checkbox value by commas (ignoring escaped commas) and trim whitespace from each item
-                  cell.value.split(/(?<!\\),/).map((x) => x.trim())
-                : cell.value,
-        }
-      : null;
+    if (!cell.value || cell.value.trim() === "") {
+      return null;
+    }
+
+    switch (type) {
+      case "NUMBER":
+        return {
+          value: parseFloat(cell.value),
+        };
+      case "CHECKBOX":
+        // split the checkbox value by commas (ignoring escaped commas) and trim whitespace from each item
+        return {
+          value: cell.value.split(/(?<!\\),/).map((x) => x.trim()),
+        };
+      default:
+        return {
+          value: cell.value.trim(),
+        };
+    }
   }
 
   async parseExcelData(
@@ -203,93 +213,109 @@ export class ProfileExcelImportService extends ProfileExcelService {
       profileTypeFieldId: number;
     }[] = [];
 
-    for (const contentById of cellRows) {
-      // validate profileId value, if it exists
-      const profileId = this.validateProfileIdCell(contentById["profile-id"]);
-      const profileValues: ParsedProfileFieldValue[] = [];
-      for (const [id, cell] of Object.entries(contentById)) {
-        if (!validIds.includes(id)) {
-          throw new UnknownIdError(id);
-        }
-
-        // if its an "expiry" or "profile-id" column, skip it
-        if (id.endsWith("-expiry") || id === "profile-id") {
-          continue;
-        }
-
-        const found = fields.find(({ field }) => toGlobalId("ProfileTypeField", field.id) === id);
-        assert(found, `Field not found for ID: ${id}`);
-
-        const { isRequired, field, permission } = found;
-
-        if (isRequired && !cell.value && !profileId) {
-          // if we are creating a new profile, every required field must have a value
-          throw new CellError(cell, "Required field is empty");
-        }
-        // if its an optional field and its empty, skip it
-        if (!isRequired && !cell.value) {
-          continue;
-        }
-
-        // at this point we are sure the cell has a value, we need to check if the user has write permission for this field
-        if (!isAtLeast(permission, "WRITE")) {
-          throw new CellError(cell, "You do not have write permission for this field");
-        }
-
-        const content = this.cellToValueContent(cell, field.type);
-
-        try {
-          await this.profileValidation.validateProfileFieldValueContent(field, content);
-
-          if (field.is_unique && content?.value && typeof content.value === "string") {
-            possibleConflictingCells.push({
-              profileTypeFieldId: field.id,
-              cell,
-              profileId,
-            });
+    // use concurrency so dataloaders in validateProfileFieldValueContent and mapValueContentToDatabase can accumulate requests
+    // and run a single query to database
+    await pMap(
+      cellRows,
+      async (contentById) => {
+        // validate profileId value, if it exists
+        const profileId = this.validateProfileIdCell(contentById["profile-id"]);
+        const profileValues: ParsedProfileFieldValue[] = [];
+        for (const [id, cell] of Object.entries(contentById)) {
+          if (!validIds.includes(id)) {
+            throw new UnknownIdError(id);
           }
-        } catch (error) {
-          throw new CellError(cell, error instanceof Error ? error.message : "UNKNOWN");
+
+          // if its an "expiry" or "profile-id" column, skip it
+          if (id.endsWith("-expiry") || id === "profile-id") {
+            continue;
+          }
+
+          const found = fields.find(({ field }) => toGlobalId("ProfileTypeField", field.id) === id);
+          assert(found, `Field not found for ID: ${id}`);
+
+          const { isRequired, field, permission } = found;
+
+          if (isRequired && !cell.value && !profileId) {
+            // if we are creating a new profile, every required field must have a value
+            throw new CellError(cell, "Required field is empty");
+          }
+          // if its an optional field and its empty, skip it
+          if (!isRequired && !cell.value) {
+            continue;
+          }
+
+          // at this point we are sure the cell has a value, we need to check if the user has write permission for this field
+          if (!isAtLeast(permission, "WRITE")) {
+            throw new CellError(cell, "You do not have write permission for this field");
+          }
+
+          const content = this.cellToValueContent(cell, field.type);
+
+          try {
+            await this.profileValidation.validateProfileFieldValueContent(
+              field,
+              content,
+              user.org_id,
+            );
+
+            if (field.is_unique && content?.value && typeof content.value === "string") {
+              possibleConflictingCells.push({
+                profileTypeFieldId: field.id,
+                cell,
+                profileId,
+              });
+            }
+          } catch (error) {
+            throw new CellError(cell, error instanceof Error ? error.message : "UNKNOWN");
+          }
+
+          const expiryCell =
+            field.is_expirable && field.type === "DATE" && field.options.useReplyAsExpiryDate
+              ? cell
+              : field.is_expirable
+                ? contentById[`${toGlobalId("ProfileTypeField", field.id)}-expiry`]
+                : null;
+          if (
+            expiryCell &&
+            expiryCell.value &&
+            expiryCell.value !== "" &&
+            !isValidDate(expiryCell.value)
+          ) {
+            throw new CellError(expiryCell, "Invalid date format");
+          }
+
+          profileValues.push({
+            content: content
+              ? await this.profileTypeFields.mapValueContentToDatabase(
+                  field.type,
+                  content,
+                  user.org_id,
+                )
+              : content,
+            profileTypeFieldId: field.id,
+            type: field.type,
+            expiryDate: expiryCell?.value || null,
+            alias: field.alias,
+          });
         }
 
-        const expiryCell =
-          field.is_expirable && field.type === "DATE" && field.options.useReplyAsExpiryDate
-            ? cell
-            : field.is_expirable
-              ? contentById[`${toGlobalId("ProfileTypeField", field.id)}-expiry`]
-              : null;
+        // if we are creating a new profile, every required field must have a value
         if (
-          expiryCell &&
-          expiryCell.value &&
-          expiryCell.value !== "" &&
-          !isValidDate(expiryCell.value)
+          !profileId &&
+          !requiredFieldIds.every((id) => profileValues.find((v) => v.profileTypeFieldId === id))
         ) {
-          throw new CellError(expiryCell, "Invalid date format");
+          throw new InvalidDataError("Missing required columns");
         }
 
-        profileValues.push({
-          content,
-          profileTypeFieldId: field.id,
-          type: field.type,
-          expiryDate: expiryCell?.value || null,
-          alias: field.alias,
+        createOrUpdateData.push({
+          profileId,
+          profileIdCell: contentById["profile-id"],
+          values: profileValues,
         });
-      }
-
-      // if we are creating a new profile, every required field must have a value
-      if (
-        !profileId &&
-        !requiredFieldIds.every((id) => profileValues.find((v) => v.profileTypeFieldId === id))
-      ) {
-        throw new InvalidDataError("Missing required columns");
-      }
-
-      createOrUpdateData.push({
-        profileId,
-        profileIdCell: contentById["profile-id"],
-        values: profileValues,
-      });
-    }
+      },
+      { concurrency: 100 },
+    );
 
     // validate that all provided profiles exist and have correct profile_type_id
     const profileIds = createOrUpdateData.map(({ profileId }) => profileId).filter(isNonNullish);

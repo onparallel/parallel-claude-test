@@ -7974,7 +7974,7 @@ export class PetitionRepository extends BaseRepository {
    */
   async prefillPetition(petitionId: number, prefill: Record<string, any>, owner: User) {
     const fields = await this.loadAllFieldsByPetitionId(petitionId);
-    const parsedReplies = await this.parsePrefillReplies(prefill, fields);
+    const parsedReplies = await this.parsePrefillReplies(prefill, fields, null, owner.org_id);
 
     const [fieldGroupReplies, otherReplies] = partition(
       parsedReplies,
@@ -7983,16 +7983,17 @@ export class PetitionRepository extends BaseRepository {
 
     // first create every other reply that has type !== FIELD_GROUP
     if (otherReplies.length > 0) {
-      await this.createPetitionFieldReply(
-        petitionId,
-        otherReplies.map((reply) => ({
-          user_id: owner.id,
-          petition_field_id: reply.fieldId,
-          content: this.petitionFields.mapReplyContentToDatabase(reply.fieldType, reply.content),
-          type: reply.fieldType,
-        })),
-        `User:${owner.id}`,
-      );
+      const data = await pMap(otherReplies, async (reply) => ({
+        user_id: owner.id,
+        petition_field_id: reply.fieldId,
+        content: await this.petitionFields.mapReplyContentToDatabase(
+          reply.fieldType,
+          reply.content,
+          owner.org_id,
+        ),
+        type: reply.fieldType,
+      }));
+      await this.createPetitionFieldReply(petitionId, data, `User:${owner.id}`);
     }
 
     if (fieldGroupReplies.length > 0) {
@@ -8045,16 +8046,21 @@ export class PetitionRepository extends BaseRepository {
         if (isNonNullish(childrenReplies) && childrenReplies.length > 0) {
           await this.createPetitionFieldReply(
             petitionId,
-            childrenReplies.map((reply) => ({
-              user_id: owner.id,
-              petition_field_id: reply.fieldId,
-              content: this.petitionFields.mapReplyContentToDatabase(
-                reply.fieldType,
-                reply.content,
-              ),
-              type: reply.fieldType,
-              parent_petition_field_reply_id: parentReply.id,
-            })),
+            await pMap(
+              childrenReplies,
+              async (reply) => ({
+                user_id: owner.id,
+                petition_field_id: reply.fieldId,
+                content: await this.petitionFields.mapReplyContentToDatabase(
+                  reply.fieldType,
+                  reply.content,
+                  owner.org_id,
+                ),
+                type: reply.fieldType,
+                parent_petition_field_reply_id: parentReply.id,
+              }),
+              { concurrency: 1 },
+            ),
             `User:${owner.id}`,
           );
         }
@@ -8096,6 +8102,7 @@ export class PetitionRepository extends BaseRepository {
       | "profile_type_field_id"
     >[],
     parentFieldId: number | null = null,
+    orgId: number,
   ) {
     const entries = Object.entries(prefill);
     const result: {
@@ -8177,10 +8184,19 @@ export class PetitionRepository extends BaseRepository {
         // for FIELD_GROUP field, a single reply is an object with the child field alias as key and the reply as value
         if (typeof value === "object") {
           singleReplies.push(
-            ...(await pMap(fieldReplies, async (childPrefill) => ({
-              content: {},
-              childrenReplies: await this.parsePrefillReplies(childPrefill, fields, field.id),
-            }))),
+            ...(await pMap(
+              fieldReplies,
+              async (childPrefill) => ({
+                content: {},
+                childrenReplies: await this.parsePrefillReplies(
+                  childPrefill,
+                  fields,
+                  field.id,
+                  orgId,
+                ),
+              }),
+              { concurrency: 1 },
+            )),
           );
         }
       } else if (field.type === "NUMBER") {
@@ -8194,7 +8210,7 @@ export class PetitionRepository extends BaseRepository {
 
       for (const { content, childrenReplies } of singleReplies) {
         try {
-          await this.petitionValidation.validateFieldReplyContent(field, content);
+          await this.petitionValidation.validateFieldReplyContent(field, content, orgId);
           result.push({ fieldId: field.id, fieldType: field.type, content, childrenReplies });
         } catch {}
       }

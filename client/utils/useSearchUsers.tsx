@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
-import { UserSelect_UserFragment, useSearchUsers_usersDocument } from "@parallel/graphql/__types";
+import { useSearchUsers_usersDocument } from "@parallel/graphql/__types";
 import { UserSelect, UserSelectSelection } from "../components/common/UserSelect";
 import { useDebouncedAsync } from "./useDebouncedAsync";
 
 interface UserSearchUsersOptions {
   excludeIds?: string[];
+  allowedUsersInGroupIds?: string[];
 }
 
 export function useSearchUsers() {
@@ -21,13 +22,17 @@ export function useSearchUsers() {
         variables: {
           search,
           exclude: excludeIds,
-          filters: { status: ["ACTIVE"] },
+          filters: {
+            status: ["ACTIVE"],
+            fromUserGroupId: options.allowedUsersInGroupIds,
+          },
           limit: 100,
           offset: 0,
         },
         fetchPolicy: "no-cache",
       });
-      return data?.me.organization.users.items ?? ([] as UserSelect_UserFragment[]);
+
+      return data?.me.organization.users.items ?? [];
     },
     150,
     [],
@@ -54,6 +59,7 @@ const _queries = [
             filters: $filters
           ) {
             items {
+              id
               ...UserSelect_User
             }
           }

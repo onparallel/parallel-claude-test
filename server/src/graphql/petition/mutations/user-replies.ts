@@ -687,7 +687,11 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
             };
           } else {
             return {
-              content: ctx.petitionFields.mapReplyContentToDatabase(field.type, fieldReply.content),
+              content: await ctx.petitionFields.mapReplyContentToDatabase(
+                field.type,
+                fieldReply.content,
+                ctx.user!.org_id,
+              ),
               petition_field_id: field.id,
               parent_petition_field_reply_id: fieldReply.parentReplyId ?? null,
               type: field.type,
@@ -737,6 +741,7 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
         "DATE",
         "DATE_TIME",
         "CHECKBOX",
+        "USER_ASSIGNMENT",
       ],
     ),
     replyCanBeUpdated((args) => args.replies.map((r) => r.id)),
@@ -778,10 +783,18 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
 
     return await ctx.petitions.updatePetitionFieldRepliesContent(
       args.petitionId,
-      replyInput.map((replyData) => ({
-        id: replyData.id,
-        content: ctx.petitionFields.mapReplyContentToDatabase(replyData.type, replyData.content),
-      })),
+      await pMap(
+        replyInput,
+        async (replyData) => ({
+          id: replyData.id,
+          content: await ctx.petitionFields.mapReplyContentToDatabase(
+            replyData.type,
+            replyData.content,
+            ctx.user!.org_id,
+          ),
+        }),
+        { concurrency: 1 },
+      ),
       "User",
       ctx.user!.id,
     );

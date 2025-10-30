@@ -27,6 +27,7 @@ import { PetitionComposeIdVerificationSettings } from "./fields/PetitionComposeI
 import { PetitionComposeNumberSettings } from "./fields/PetitionComposeNumberSettings";
 import { PetitionComposeSelectSettings } from "./fields/PetitionComposeSelectSettings";
 import { PetitionComposeShortTextSettings } from "./fields/PetitionComposeShortTextSettings";
+import { PetitionComposeUserAssignmentSettings } from "./fields/PetitionComposeUserAssignmentSettings";
 import { AllowCommentSettingsRow } from "./rows/AllowCommentSettingsRow";
 import { AllowMultipleFilesSettingsRow } from "./rows/AllowMultipleFilesSettingsRow";
 import { AllowMultipleRepliesSettingsRow } from "./rows/AllowMultipleRepliesSettingsRow";
@@ -73,6 +74,7 @@ const COMPONENTS: Partial<
   BACKGROUND_CHECK: PetitionComposeBackgroundCheckSettings,
   ADVERSE_MEDIA_SEARCH: PetitionComposeAdverseMediaSearchSettings,
   ID_VERIFICATION: PetitionComposeIdVerificationSettings,
+  USER_ASSIGNMENT: PetitionComposeUserAssignmentSettings,
 };
 
 export const ONLY_INTERNAL_FIELD_TYPES = [
@@ -80,6 +82,7 @@ export const ONLY_INTERNAL_FIELD_TYPES = [
   "ADVERSE_MEDIA_SEARCH",
   "PROFILE_SEARCH",
   "DOW_JONES_KYC",
+  "USER_ASSIGNMENT",
 ] as PetitionFieldType[];
 
 const ONLY_ONE_REPLY_FIELD_TYPES = [
@@ -129,6 +132,8 @@ export const PetitionComposeFieldSettings = Object.assign(
       const canChangeFieldType = !["FIELD_GROUP"].includes(field.type);
 
       const canChangeMultiple = !["HEADING", ...ONLY_ONE_REPLY_FIELD_TYPES].includes(field.type);
+
+      const canShowInPdf = !ONLY_INTERNAL_FIELD_TYPES.includes(field.type);
 
       const isReplyable = !["HEADING", "FIELD_GROUP"].includes(field.type);
 
@@ -324,8 +329,9 @@ export const PetitionComposeFieldSettings = Object.assign(
               </SettingsRowGroup>
             ) : null}
 
-            {(!isFileTypeField(field.type) || canOnlyBeInternal) &&
-            !petition.isDocumentGenerationEnabled ? null : (
+            {((!isFileTypeField(field.type) || canOnlyBeInternal) &&
+              !petition.isDocumentGenerationEnabled) ||
+            !canShowInPdf ? null : (
               <SettingsRowGroup
                 label={
                   <FormattedMessage

@@ -100,6 +100,11 @@ export function getPetitionFieldTypeDescription(intl: IntlShape, type: PetitionF
         id: "util.get-petition-field-type-description.adverse-media-search-description",
         defaultMessage: "Integrate an internal search field for adverse media.",
       });
+    case "USER_ASSIGNMENT":
+      return intl.formatMessage({
+        id: "util.get-petition-field-type-description.user-assignment-description",
+        defaultMessage: "Assign one user from your organization to this petition.",
+      });
     default:
       throw new Error(`Missing description PetitionFieldType  "${type}"`);
   }

@@ -26,6 +26,7 @@ import { BackgroundCheckRiskLabel } from "../petition-common/BackgroundCheckRisk
 import { Divider } from "./Divider";
 import { OverflownText } from "./OverflownText";
 import { SimpleFileButton } from "./SimpleFileButton";
+import { UserReference } from "./UserReference";
 
 export interface PetitionFieldRepliesContentProps {
   petitionId: string;
@@ -201,6 +202,24 @@ const PetitionFieldRepliesContentNonFile = chakraForwardRef<
             field={field}
             reply={reply}
           />
+        );
+      } else if (field.type === "USER_ASSIGNMENT") {
+        return (
+          <Box key={undefined}>
+            <UserReference
+              useYou={false}
+              user={
+                isNonNullish(reply.content.user)
+                  ? {
+                      id: reply.content.user.id,
+                      fullName: reply.content.user.fullName,
+                      status: reply.content.user.status,
+                      isMe: false,
+                    }
+                  : null
+              }
+            />
+          </Box>
         );
       } else {
         never(`PetitionFieldType ${field.type} not implemented`);

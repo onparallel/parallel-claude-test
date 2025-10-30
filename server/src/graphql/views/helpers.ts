@@ -1,6 +1,7 @@
-import { isNullish, pick } from "remeda";
+import { isNullish, pick, pickBy } from "remeda";
 import { assert } from "ts-essentials";
-import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { ProfileTypeField } from "../../db/__types";
+import { fromGlobalId, isGlobalId, toGlobalId } from "../../util/globalId";
 import { ProfileFieldValuesFilterOperatorValues } from "../../util/ProfileFieldValuesFilter";
 import { NexusGenInputs, NexusGenObjects } from "../__types";
 
@@ -21,11 +22,14 @@ export function mapProfileListViewDataToDatabase(
     search: input.search ?? null,
     sort: input.sort ?? null,
     status: input.status ?? null,
-    values: input.values ?? null,
+    values: input.values ? mapProfileFieldValuesFilterToDatabase(input.values) : null,
   };
 }
 
-export function mapProfileListViewDataFromDatabase(data: NexusGenObjects["ProfileListViewData"]) {
+export function mapProfileListViewDataFromDatabase(
+  data: NexusGenObjects["ProfileListViewData"],
+  profileTypeFieldsById: Record<number, ProfileTypeField>,
+) {
   return {
     columns:
       data.columns?.map((col) => {
@@ -38,34 +42,63 @@ export function mapProfileListViewDataFromDatabase(data: NexusGenObjects["Profil
       }) ?? null,
     search: data.search ?? null,
     sort: data.sort ?? null,
-    // TODO: REMOVE AFTER RELEASE
-    // this is a temporal workaround to allow status to be stored as string in the database
-    // and may be removed once the release and migration are done
-    // status: data.status ?? null,
-    status: data.status && typeof data.status === "string" ? [data.status] : (data.status ?? null),
-    values: data.values ? mapValuesFilter(data.values) : null,
+    status: data.status ?? null,
+    values: data.values ? mapValuesFilterFromDatabase(profileTypeFieldsById)(data.values) : null,
   };
 }
-function mapValuesFilter(v: any) {
-  assert(
-    isNullish(v.logicalOperator) || ["AND", "OR"].includes(v.logicalOperator),
-    `Invalid logical operator: ${v.logicalOperator}`,
-  );
-  assert(
-    isNullish(v.operator) || ProfileFieldValuesFilterOperatorValues.includes(v.operator),
-    "Invalid operator",
-  );
-  assert(isNullish(v.conditions) || Array.isArray(v.conditions), "Invalid conditions");
-  assert(
-    isNullish(v.profileTypeFieldId) || typeof v.profileTypeFieldId === "number",
-    "Invalid profileTypeFieldId",
-  );
 
-  return {
-    ...pick(v, ["logicalOperator", "value", "operator"]),
-    profileTypeFieldId: v.profileTypeFieldId
-      ? toGlobalId("ProfileTypeField", v.profileTypeFieldId)
-      : v.profileTypeFieldId,
-    conditions: v.conditions?.map(mapValuesFilter),
+function mapValuesFilterFromDatabase(profileTypeFieldsById: Record<number, ProfileTypeField>) {
+  return (v: any) => {
+    assert(
+      isNullish(v.logicalOperator) || ["AND", "OR"].includes(v.logicalOperator),
+      `Invalid logical operator: ${v.logicalOperator}`,
+    );
+    assert(
+      isNullish(v.operator) || ProfileFieldValuesFilterOperatorValues.includes(v.operator),
+      "Invalid operator",
+    );
+    assert(isNullish(v.conditions) || Array.isArray(v.conditions), "Invalid conditions");
+    assert(
+      isNullish(v.profileTypeFieldId) || typeof v.profileTypeFieldId === "number",
+      "Invalid profileTypeFieldId",
+    );
+
+    const profileTypeField = v.profileTypeFieldId
+      ? profileTypeFieldsById[v.profileTypeFieldId]
+      : null;
+
+    return {
+      ...pick(v, ["logicalOperator", "operator"]),
+      value: v.value
+        ? profileTypeField?.type === "USER_ASSIGNMENT"
+          ? toGlobalId("User", v.value)
+          : v.value
+        : null,
+      profileTypeFieldId: v.profileTypeFieldId
+        ? toGlobalId("ProfileTypeField", v.profileTypeFieldId)
+        : v.profileTypeFieldId,
+      conditions: v.conditions?.map(mapValuesFilterFromDatabase(profileTypeFieldsById)),
+    };
   };
+}
+
+export function mapProfileFieldValuesFilterToDatabase(
+  v: NexusGenInputs["ProfileFieldValuesFilter"] | null | undefined,
+): any {
+  if (isNullish(v)) {
+    return v;
+  }
+
+  return pickBy(
+    {
+      ...pick(v, ["logicalOperator", "operator", "profileTypeFieldId"]),
+      conditions: v.conditions?.map(mapProfileFieldValuesFilterToDatabase),
+      value: v.value
+        ? isGlobalId(v.value, "User")
+          ? fromGlobalId(v.value, "User").id
+          : v.value
+        : v.value,
+    },
+    (value) => value !== undefined,
+  );
 }

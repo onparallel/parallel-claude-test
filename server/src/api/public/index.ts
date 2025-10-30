@@ -2151,7 +2151,8 @@ export function publicApi(container: Container) {
     - For \`NUMBER\` fields, the reply must be a number.
     - For \`CHECKBOX\` fields, the reply must be an array of strings containing all the chosen options.
     - For \`DYNAMIC_SELECT\` fields, the reply must be an array of strings in which each position in the array represents the selected option in the same level. 
-  `;
+    - For \`USER_ASSIGNMENT\` fields, the reply must be the email of the user.
+    `;
 
   api
     .path("/petitions/:petitionId/fields/:fieldId/replies", {
@@ -2172,9 +2173,9 @@ export function publicApi(container: Container) {
           ],
           {
             description: outdent`
-        ${replyBodyDescription}
-        - For \`FIELD_GROUP\` fields, you need to first create an 'empty' reply on the field. Then call this endpoint again, passing the id of the child field and the id of the empty reply as the \`parentReplyId\`. Every reply with the same \`parentReplyId\` will be grouped together.
-        `,
+            ${replyBodyDescription}
+            - For \`FIELD_GROUP\` fields, you need to first create an 'empty' reply on the field. Then call this endpoint again, passing the id of the child field and the id of the empty reply as the \`parentReplyId\`. Every reply with the same \`parentReplyId\` will be grouped together.
+            `,
           },
         ),
         responses: {

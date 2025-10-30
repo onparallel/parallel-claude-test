@@ -7610,6 +7610,7 @@ describe("ProfileLinkedPetitionFields", () => {
     let fieldGroup: PetitionField;
     let checkboxChild: PetitionField;
     let backgroundCheckChild: PetitionField;
+    let userAssignmentChild: PetitionField;
 
     beforeEach(async () => {
       [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
@@ -7627,18 +7628,15 @@ describe("ProfileLinkedPetitionFields", () => {
         type: "FIELD_GROUP",
         profile_type_id: profileType.id,
       }));
-      [checkboxChild, backgroundCheckChild] = await mocks.createRandomPetitionFields(
-        petition.id,
-        2,
-        (i) => {
-          const type = ["CHECKBOX", "BACKGROUND_CHECK"][i] as PetitionFieldType;
+      [checkboxChild, backgroundCheckChild, userAssignmentChild] =
+        await mocks.createRandomPetitionFields(petition.id, 3, (i) => {
+          const type = ["CHECKBOX", "BACKGROUND_CHECK", "USER_ASSIGNMENT"][i] as PetitionFieldType;
           return {
             type,
             parent_petition_field_id: fieldGroup.id,
             profile_type_field_id: profileTypeFields.find((f) => f.type === type)!.id,
           };
-        },
-      );
+        });
     });
 
     it("archives a CHECKBOX reply into a profile", async () => {
@@ -7708,6 +7706,97 @@ describe("ProfileLinkedPetitionFields", () => {
               value: {
                 isDraft: false,
                 content: { value: ["A", "C"] },
+              },
+            },
+          ],
+        },
+      });
+    });
+
+    it("archives a USER_ASSIGNMENT reply into a profile", async () => {
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+      await mocks.createRandomTextReply(userAssignmentChild.id, undefined, 1, () => ({
+        parent_petition_field_reply_id: groupReply.id,
+        user_id: user.id,
+        type: "USER_ASSIGNMENT",
+        content: { value: user.id },
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+            $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+            $profileTypeFieldId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: $expirations
+            ) {
+              associatedProfile {
+                id
+                properties(filter: [{ profileTypeFieldId: $profileTypeFieldId }]) {
+                  field {
+                    id
+                    type
+                  }
+                  value {
+                    isDraft
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+          profileTypeFieldId: toGlobalId(
+            "ProfileTypeField",
+            profileTypeFields.find((f) => f.type === "USER_ASSIGNMENT")!.id,
+          ),
+          conflictResolutions: [],
+          expirations: [],
+        },
+      );
+      expect(errors).toBeUndefined();
+      expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+        associatedProfile: {
+          id: toGlobalId("Profile", profile.id),
+          properties: [
+            {
+              field: {
+                id: toGlobalId(
+                  "ProfileTypeField",
+                  profileTypeFields.find((f) => f.type === "USER_ASSIGNMENT")!.id,
+                ),
+                type: "USER_ASSIGNMENT",
+              },
+              value: {
+                isDraft: false,
+                content: {
+                  value: toGlobalId("User", user.id),
+                  user: {
+                    id: toGlobalId("User", user.id),
+                    email: expect.any(String),
+                    fullName: expect.any(String),
+                    status: "ACTIVE",
+                  },
+                },
               },
             },
           ],

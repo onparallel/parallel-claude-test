@@ -82,6 +82,7 @@ export class OrganizationRepository extends BaseRepository {
       searchByEmailOnly?: Maybe<boolean>;
       sortBy?: SortBy<keyof User | "full_name" | "email" | "first_name" | "last_name">[];
       status?: Maybe<UserStatus[]>;
+      fromUserGroupIds?: Maybe<number[]>;
     } & PageOpts,
   ) {
     return this.getPagination<User>(
@@ -91,7 +92,7 @@ export class OrganizationRepository extends BaseRepository {
         .whereNull("user.deleted_at")
         .whereNull("user_data.deleted_at")
         .mmodify((q) => {
-          const { search, excludeIds, sortBy, status } = opts;
+          const { search, excludeIds, sortBy, status, fromUserGroupIds } = opts;
           if (search) {
             q.andWhere((q2) => {
               if (opts.searchByEmailOnly) {
@@ -135,6 +136,11 @@ export class OrganizationRepository extends BaseRepository {
 
           if (isNonNullish(status) && status.length > 0) {
             q.whereIn("status", status);
+          }
+
+          if (isNonNullish(fromUserGroupIds) && fromUserGroupIds.length > 0) {
+            q.join({ ugm: "user_group_member" }, "ugm.user_id", "user.id");
+            q.whereIn("ugm.user_group_id", fromUserGroupIds);
           }
         })
         .orderBy("user.id")

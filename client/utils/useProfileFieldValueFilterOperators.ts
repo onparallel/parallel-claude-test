@@ -61,7 +61,11 @@ export function useProfileFieldValueFilterOperators(
         { label: "≥", value: "GREATER_THAN_OR_EQUAL" },
       );
     }
-    if (["TEXT", "SHORT_TEXT", "DATE", "SELECT", "CHECKBOX", "PHONE"].includes(field.type)) {
+    if (
+      ["TEXT", "SHORT_TEXT", "DATE", "SELECT", "CHECKBOX", "PHONE", "USER_ASSIGNMENT"].includes(
+        field.type,
+      )
+    ) {
       operators.push(
         {
           label: intl.formatMessage({

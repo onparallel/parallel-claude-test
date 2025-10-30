@@ -33,6 +33,7 @@ import {
 import { Spacer } from "@parallel/components/common/Spacer";
 import { TableColumn, TableColumnFilterProps } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
+import { UserSelect } from "@parallel/components/common/UserSelect";
 import { ProfileFormFieldCheckboxInner } from "@parallel/components/profiles/form-fields/ProfileFormFieldCheckbox";
 import { ProfileFormFieldSelectInner } from "@parallel/components/profiles/form-fields/ProfileFormFieldSelect";
 import {
@@ -44,7 +45,15 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import useMergedRef from "@react-hook/merged-ref";
 import { format, startOfMonth } from "date-fns";
-import { ClipboardEvent, forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ClipboardEvent,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { components, InputActionMeta, InputProps } from "react-select";
@@ -60,6 +69,7 @@ import {
 } from "./ProfileFieldValuesFilter";
 import { UseReactSelectProps, useReactSelectProps } from "./react-select/hooks";
 import { useProfileFieldValueFilterOperators } from "./useProfileFieldValueFilterOperators";
+import { useSearchUsers } from "./useSearchUsers";
 import { isValidDateString } from "./validation";
 import { ValueProps } from "./ValueProps";
 
@@ -371,6 +381,18 @@ export function ProfileValueFilterLine({
   // workaround phone input validation
   const [validPhone, setValidPhone] = useState(true);
 
+  const allowedUsersInGroupIds = profileTypeField.options?.allowedUserGroupId ?? [];
+  const _handleSearchUsers = useSearchUsers();
+  const handleSearchUsers = useCallback(
+    async (search: string, excludeUserIds: string[]) => {
+      return await _handleSearchUsers(search, {
+        excludeIds: [...excludeUserIds, ...(value?.id ? [value.id] : [])],
+        allowedUsersInGroupIds,
+      });
+    },
+    [_handleSearchUsers, value?.id, allowedUsersInGroupIds],
+  );
+
   return (
     <>
       {isNonNullish(onRemove) ? (
@@ -437,6 +459,8 @@ export function ProfileValueFilterLine({
                 } else {
                   _value = null;
                 }
+              } else if (profileTypeField.type === "USER_ASSIGNMENT") {
+                _value = typeof _value === "string" ? _value : null;
               } else {
                 never();
               }
@@ -556,6 +580,14 @@ export function ProfileValueFilterLine({
                     />
                   ) : null}
                 </>
+              ) : profileTypeField.type === "USER_ASSIGNMENT" ? (
+                <UserSelect
+                  size="sm"
+                  value={value as any}
+                  onChange={(user) => onChange(user?.id ?? null)}
+                  {...rest}
+                  onSearch={handleSearchUsers}
+                />
               ) : (
                 never()
               )}

@@ -23,6 +23,7 @@ const CACHED_PROFILE_TYPE_FIELDS = [
   "DATE",
   "PHONE",
   "NUMBER",
+  "USER_ASSIGNMENT",
 ] as const;
 
 const DRAFTABLE_PROFILE_TYPE_FIELDS = ["ADVERSE_MEDIA_SEARCH", "BACKGROUND_CHECK"] as const;
@@ -219,7 +220,7 @@ export class ProfileValuesFilterRepositoryHelper {
           break;
         case "EQUAL":
           if (
-            ["TEXT", "SHORT_TEXT", "NUMBER", "DATE", "SELECT", "PHONE"].includes(
+            ["TEXT", "SHORT_TEXT", "NUMBER", "DATE", "SELECT", "PHONE", "USER_ASSIGNMENT"].includes(
               profileTypeField.type,
             )
           ) {
@@ -234,7 +235,7 @@ export class ProfileValuesFilterRepositoryHelper {
               sqlArray(this.knex, value),
             ]);
           } else {
-            never();
+            never(`Unimplemented operator ${operator} for type ${profileTypeField.type}`);
           }
           break;
         case "START_WITH":

@@ -50,6 +50,7 @@ import { PreviewPetitionFieldBackgroundCheck } from "./fields/background-check/P
 import { PreviewPetitionFieldGroup } from "./fields/PreviewPetitionFieldGroup";
 import { PreviewPetitionFieldKyc } from "./fields/PreviewPetitionFieldKyc";
 import { PreviewPetitionFieldProfileSearch } from "./fields/PreviewPetitionFieldProfileSearch";
+import { PreviewPetitionFieldUserAssignment } from "./fields/PreviewPetitionFieldUserAssignment";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
@@ -370,7 +371,6 @@ export function PreviewPetitionField({
         <RecipientViewPetitionFieldIdVerification
           {...props}
           {...commonProps}
-          isDisabled={fieldIsDisabled}
           onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
           onRefreshField={handleRefreshAsyncField}
           isCacheOnly={isCacheOnly}
@@ -385,6 +385,8 @@ export function PreviewPetitionField({
           onRefreshField={handleRefreshAsyncField}
           isCacheOnly={isCacheOnly}
         />
+      ) : field.type === "USER_ASSIGNMENT" ? (
+        <PreviewPetitionFieldUserAssignment {...props} {...commonProps} />
       ) : null}
     </RecipientViewPetitionFieldCard>
   );

@@ -51,6 +51,7 @@ import { usePreviewImportFromProfileDialog } from "../dialogs/PreviewImportFromP
 import { usePreviewImportFromProfileFormatErrorDialog } from "../dialogs/PreviewImportFromProfileFormatErrorDialog";
 import { PreviewPetitionFieldKyc } from "./PreviewPetitionFieldKyc";
 import { PreviewPetitionFieldProfileSearch } from "./PreviewPetitionFieldProfileSearch";
+import { PreviewPetitionFieldUserAssignment } from "./PreviewPetitionFieldUserAssignment";
 import { PreviewPetitionFieldAdverseMediaSearch } from "./adverse-media-search/PreviewPetitionFieldAdverseMediaSearch";
 import { PreviewPetitionFieldBackgroundCheck } from "./background-check/PreviewPetitionFieldBackgroundCheck";
 
@@ -570,6 +571,8 @@ function PreviewPetitionFieldGroupField(props: {
           onRefreshField={onRefreshField}
           isCacheOnly={isCacheOnly}
         />
+      ) : field.type === "USER_ASSIGNMENT" ? (
+        <PreviewPetitionFieldUserAssignment {...commonProps} />
       ) : null}
     </Box>
   );

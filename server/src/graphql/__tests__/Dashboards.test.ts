@@ -3487,7 +3487,7 @@ describe("GraphQL / Dashboards", () => {
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
         argName: "settings.groupByProfileTypeFieldId",
-        message: "Must be a SELECT field",
+        message: "Must be a SELECT or USER_ASSIGNMENT field",
       });
       expect(data).toBeNull();
     });

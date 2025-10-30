@@ -22,6 +22,7 @@ import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { ProfileRepository } from "../../db/repositories/ProfileRepository";
 import { PROFILES_SETUP_SERVICE, ProfilesSetupService } from "../../services/ProfilesSetupService";
+import { fullName } from "../../util/fullName";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
@@ -294,7 +295,7 @@ describe("GraphQL/Profiles", () => {
     profileType1Fields = await mocks.createRandomProfileTypeFields(
       organization.id,
       profileTypes[1].id,
-      3,
+      4,
       (i) =>
         [
           {
@@ -311,6 +312,12 @@ describe("GraphQL/Profiles", () => {
             name: json({ en: "Address", es: "Dirección" }),
             type: "TEXT" as const,
             alias: "ADDRESS",
+          },
+          {
+            name: json({ en: "User", es: "Usuario" }),
+            type: "USER_ASSIGNMENT" as const,
+            alias: "USER",
+            permission: "WRITE" as const,
           },
         ][i],
     );
@@ -1826,7 +1833,7 @@ describe("GraphQL/Profiles", () => {
           {
             id: toGlobalId("ProfileType", profileTypes[1].id),
             name: { en: "Legal entity", es: "Persona jurídica" },
-            fields: times(3, (i) => ({
+            fields: times(4, (i) => ({
               position: i,
               name: { es: expect.any(String), en: expect.any(String) },
             })),
@@ -1995,7 +2002,7 @@ describe("GraphQL/Profiles", () => {
           {
             id: toGlobalId("ProfileType", profileTypes[1].id),
             name: { en: "Legal entity", es: "Persona jurídica" },
-            fields: times(3, (i) => ({
+            fields: times(4, (i) => ({
               position: i,
               name: { es: expect.any(String), en: expect.any(String) },
             })),
@@ -5213,6 +5220,7 @@ describe("GraphQL/Profiles", () => {
               profileType {
                 id
                 fields {
+                  type
                   position
                 }
               }
@@ -5240,12 +5248,18 @@ describe("GraphQL/Profiles", () => {
         isExpirable: true,
         expiryAlertAheadTime: { months: 1 },
         options: {},
-        position: 3,
+        position: 4,
         type: "SHORT_TEXT",
         isUsedInProfileName: false,
         profileType: {
           id: toGlobalId("ProfileType", profileTypes[1].id),
-          fields: [{ position: 0 }, { position: 1 }, { position: 2 }, { position: 3 }],
+          fields: [
+            { type: "SHORT_TEXT", position: 0 },
+            { type: "SHORT_TEXT", position: 1 },
+            { type: "TEXT", position: 2 },
+            { type: "USER_ASSIGNMENT", position: 3 },
+            { type: "SHORT_TEXT", position: 4 },
+          ],
         },
       });
     });
@@ -6025,6 +6039,10 @@ describe("GraphQL/Profiles", () => {
           },
           {
             field: { id: toGlobalId("ProfileTypeField", profileType1Fields[2].id) },
+            value: null,
+          },
+          {
+            field: { id: toGlobalId("ProfileTypeField", profileType1Fields[3].id) },
             value: null,
           },
           {
@@ -9414,6 +9432,274 @@ describe("GraphQL/Profiles", () => {
           },
         ],
       });
+      expect(data).toBeNull();
+    });
+
+    it("stores USER_ASSIGNMENT content as id when passing it as user email", async () => {
+      const firstName = faker.person.firstName();
+      const lastName = faker.person.lastName();
+      const email = `${firstName}_${lastName}@onparallel.com`.toLowerCase();
+      const [newUser] = await mocks.createRandomUsers(organization.id, 1, undefined, () => ({
+        email,
+        first_name: firstName,
+        last_name: lastName,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[1].id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileId: GID!
+            $fields: [UpdateProfileFieldValueInput!]!
+            $filter: [ProfileFieldPropertyFilter!]
+          ) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              properties(filter: $filter) {
+                field {
+                  type
+                }
+                value {
+                  content
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType1Fields[3].id),
+              content: { value: email },
+            },
+          ],
+          filter: [
+            { profileTypeFieldId: toGlobalId("ProfileTypeField", profileType1Fields[3].id) },
+          ],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileFieldValue).toEqual({
+        id: toGlobalId("Profile", profile.id),
+        properties: [
+          {
+            field: { type: "USER_ASSIGNMENT" },
+            value: {
+              content: {
+                value: toGlobalId("User", newUser.id),
+                user: {
+                  id: toGlobalId("User", newUser.id),
+                  email,
+                  fullName: fullName(firstName, lastName),
+                  status: "ACTIVE",
+                },
+              },
+            },
+          },
+        ],
+      });
+    });
+
+    it("stores USER_ASSIGNMENT content as id when passing it as user globalId", async () => {
+      const firstName = faker.person.firstName();
+      const lastName = faker.person.lastName();
+      const email = `${firstName}_${lastName}@onparallel.com`.toLowerCase();
+      const [newUser] = await mocks.createRandomUsers(organization.id, 1, undefined, () => ({
+        email,
+        first_name: firstName,
+        last_name: lastName,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[1].id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileId: GID!
+            $fields: [UpdateProfileFieldValueInput!]!
+            $filter: [ProfileFieldPropertyFilter!]
+          ) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              properties(filter: $filter) {
+                field {
+                  type
+                }
+                value {
+                  content
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType1Fields[3].id),
+              content: { value: toGlobalId("User", newUser.id) },
+            },
+          ],
+          filter: [
+            { profileTypeFieldId: toGlobalId("ProfileTypeField", profileType1Fields[3].id) },
+          ],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileFieldValue).toEqual({
+        id: toGlobalId("Profile", profile.id),
+        properties: [
+          {
+            field: { type: "USER_ASSIGNMENT" },
+            value: {
+              content: {
+                value: toGlobalId("User", newUser.id),
+                user: {
+                  id: toGlobalId("User", newUser.id),
+                  email,
+                  fullName: fullName(firstName, lastName),
+                  status: "ACTIVE",
+                },
+              },
+            },
+          },
+        ],
+      });
+    });
+
+    it("throws error if passing USER_ASSIGNMENT content as numeric id", async () => {
+      const firstName = faker.person.firstName();
+      const lastName = faker.person.lastName();
+      const email = `${firstName}_${lastName}@onparallel.com`.toLowerCase();
+      const [newUser] = await mocks.createRandomUsers(organization.id, 1, undefined, () => ({
+        email,
+        first_name: firstName,
+        last_name: lastName,
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[1].id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileId: GID!
+            $fields: [UpdateProfileFieldValueInput!]!
+            $filter: [ProfileFieldPropertyFilter!]
+          ) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              properties(filter: $filter) {
+                field {
+                  type
+                }
+                value {
+                  content
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType1Fields[3].id),
+              content: { value: newUser.id },
+            },
+          ],
+          filter: [
+            { profileTypeFieldId: toGlobalId("ProfileTypeField", profileType1Fields[3].id) },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
+      expect(data).toBeNull();
+    });
+
+    it("throws error if email does not exist in the organization", async () => {
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[1].id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileId: GID!
+            $fields: [UpdateProfileFieldValueInput!]!
+            $filter: [ProfileFieldPropertyFilter!]
+          ) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              properties(filter: $filter) {
+                field {
+                  type
+                }
+                value {
+                  content
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType1Fields[3].id),
+              content: { value: "unknown_email@onparallel.com" },
+            },
+          ],
+          filter: [
+            { profileTypeFieldId: toGlobalId("ProfileTypeField", profileType1Fields[3].id) },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
+      expect(data).toBeNull();
+    });
+
+    it("throws error if user globalId does not exist in the organization", async () => {
+      const [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[1].id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileId: GID!
+            $fields: [UpdateProfileFieldValueInput!]!
+            $filter: [ProfileFieldPropertyFilter!]
+          ) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              properties(filter: $filter) {
+                field {
+                  type
+                }
+                value {
+                  content
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType1Fields[3].id),
+              content: { value: toGlobalId("User", 123123123) },
+            },
+          ],
+          filter: [
+            { profileTypeFieldId: toGlobalId("ProfileTypeField", profileType1Fields[3].id) },
+          ],
+        },
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
       expect(data).toBeNull();
     });
   });

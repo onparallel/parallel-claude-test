@@ -4700,7 +4700,9 @@ export type PetitionFieldType =
   /** A short text field. */
   | "SHORT_TEXT"
   /** A text field. */
-  | "TEXT";
+  | "TEXT"
+  /** A field for user assignment */
+  | "USER_ASSIGNMENT";
 
 export type PetitionFilter = {
   approvals?: InputMaybe<PetitionApprovalsFilterInput>;
@@ -5967,7 +5969,8 @@ export type ProfileTypeFieldType =
   | "PHONE"
   | "SELECT"
   | "SHORT_TEXT"
-  | "TEXT";
+  | "TEXT"
+  | "USER_ASSIGNMENT";
 
 export type ProfileTypeFilter = {
   includeArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -7575,6 +7578,7 @@ export type UserAuthenticationToken = CreatedAt & {
 };
 
 export type UserFilter = {
+  fromUserGroupId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   status?: InputMaybe<Array<UserStatus>>;
 };
 

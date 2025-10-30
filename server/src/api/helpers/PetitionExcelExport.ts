@@ -1,4 +1,5 @@
 import Excel from "exceljs";
+import pMap from "p-map";
 import { IntlShape } from "react-intl";
 import { Readable } from "stream";
 import { PetitionField, PetitionFieldReply } from "../../db/__types";
@@ -69,38 +70,47 @@ export class PetitionExcelExport {
     );
   }
 
-  public addPetitionFieldReply(field: ComposedPetitionField) {
-    const content = this.extractCellContents(field);
+  public async addPetitionFieldReply(field: ComposedPetitionField) {
+    const content = await this.extractCellContents(field);
     this.textRepliesTab.addRows({ title: content.title, answer: content.answer }, content.format);
   }
 
-  private extractDynamicSelectReply(field: ComposedPetitionField) {
-    return this.extractReplies(field, (r) =>
+  private async extractDynamicSelectReply(field: ComposedPetitionField) {
+    return await this.extractReplies(field, (r) =>
       (r.content.value as [string, string | null][]).map(([, v]) => v).join(", "),
     );
   }
 
-  private extractSimpleReply(field: ComposedPetitionField) {
-    return this.extractReplies(field, (r) => r.content.value);
+  private async extractSimpleReply(field: ComposedPetitionField) {
+    return await this.extractReplies(field, (r) => r.content.value);
   }
 
-  private extractDateReply(field: ComposedPetitionField, format: Intl.DateTimeFormatOptions) {
-    return this.extractReplies(field, (r) =>
+  private async extractDateReply(field: ComposedPetitionField, format: Intl.DateTimeFormatOptions) {
+    return await this.extractReplies(field, (r) =>
       this.intl.formatDate(r.content.value, { ...format, timeZone: "Etc/UTC" }),
     );
   }
 
-  private extractReplyUrl(field: ComposedPetitionField) {
-    return this.extractReplies(field, (r) =>
+  private async extractReplyUrl(field: ComposedPetitionField) {
+    return await this.extractReplies(field, (r) =>
       fieldReplyUrl(this.parallelUrl, this.intl.locale, field, r),
     );
   }
 
-  private extractReplies(
+  private async extractUserAssignmentReply(field: ComposedPetitionField) {
+    return await this.extractReplies(field, async (r) => {
+      const userData = await this.context.users.loadUserDataByUserId(r.content.value as number);
+      return userData?.email ?? "";
+    });
+  }
+
+  private async extractReplies(
     field: ComposedPetitionField,
-    contentMapper: (reply: UnwrapArray<ComposedPetitionField["replies"]>) => string,
+    contentMapper: (
+      reply: UnwrapArray<ComposedPetitionField["replies"]>,
+    ) => Promise<string> | string,
   ) {
-    const replies = field.replies.map(contentMapper).join(";");
+    const replies = (await pMap(field.replies, contentMapper, { concurrency: 1 })).join(";");
 
     let fieldTitle =
       field.title ??
@@ -133,21 +143,23 @@ export class PetitionExcelExport {
     };
   }
 
-  private extractCellContents(field: ComposedPetitionField): {
+  private async extractCellContents(field: ComposedPetitionField): Promise<{
     title: string;
     answer: string;
     format?: { font: Partial<Excel.Font> };
-  } {
+  }> {
     if (["TEXT", "SHORT_TEXT", "SELECT", "NUMBER", "PHONE", "CHECKBOX"].includes(field.type)) {
-      return this.extractSimpleReply(field);
+      return await this.extractSimpleReply(field);
     } else if (field.type === "DYNAMIC_SELECT") {
-      return this.extractDynamicSelectReply(field);
+      return await this.extractDynamicSelectReply(field);
     } else if (field.type === "DATE") {
-      return this.extractDateReply(field, FORMATS["L"]);
+      return await this.extractDateReply(field, FORMATS["L"]);
     } else if (field.type === "DATE_TIME") {
-      return this.extractDateReply(field, FORMATS["L+LTS"]);
+      return await this.extractDateReply(field, FORMATS["L+LTS"]);
     } else if (field.type === "BACKGROUND_CHECK" || field.type === "ADVERSE_MEDIA_SEARCH") {
-      return this.extractReplyUrl(field);
+      return await this.extractReplyUrl(field);
+    } else if (field.type === "USER_ASSIGNMENT") {
+      return await this.extractUserAssignmentReply(field);
     } else {
       throw new Error(`Can't extract replies on field type ${field.type}`);
     }

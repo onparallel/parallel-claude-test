@@ -161,7 +161,7 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
     };
   }
 
-  private isValidContentById(profileTypeFields: ProfileTypeField[]) {
+  private isValidContentById(profileTypeFields: ProfileTypeField[], orgId: number) {
     return async (profileTypeFieldId: number, content: any) => {
       try {
         const field = profileTypeFields.find((f) => f.id === profileTypeFieldId);
@@ -169,7 +169,7 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
           this.logger.info(`Field with id ${profileTypeFieldId} not found. Skipping...`);
           return false;
         }
-        await this.profileValidation.validateProfileFieldValueContent(field, content);
+        await this.profileValidation.validateProfileFieldValueContent(field, content, orgId);
         return true;
       } catch (error) {
         if (error instanceof Error) {
@@ -182,7 +182,7 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
     };
   }
 
-  private isValidContentByAlias(profileTypeFields: ProfileTypeField[]) {
+  private isValidContentByAlias(profileTypeFields: ProfileTypeField[], orgId: number) {
     return async (alias: string, content: any) => {
       try {
         const field = profileTypeFields.find((f) => f.alias === alias);
@@ -190,7 +190,7 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
           this.logger.warn(`Field with alias ${alias} not found. Skipping...`);
           return false;
         }
-        await this.profileValidation.validateProfileFieldValueContent(field, content);
+        await this.profileValidation.validateProfileFieldValueContent(field, content, orgId);
         return true;
       } catch (error) {
         if (error instanceof Error) {
@@ -239,7 +239,7 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
               ...(await provider.buildProfileTypeFieldValueContentsByAlias(
                 profileType.standard_type!,
                 result.rawResponse,
-                this.isValidContentByAlias(profileTypeFields),
+                this.isValidContentByAlias(profileTypeFields, user.org_id),
               )),
               ...(await provider.buildCustomProfileTypeFieldValueContentsByProfileTypeFieldId(
                 integrationId,
@@ -247,7 +247,7 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
                 profileType.standard_type!,
                 result.rawResponse,
                 this.isPropertyCompatible(profileTypeFields),
-                this.isValidContentById(profileTypeFields),
+                this.isValidContentById(profileTypeFields, user.org_id),
               )),
             },
           },
@@ -292,7 +292,7 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
             ...(await provider.buildProfileTypeFieldValueContentsByAlias(
               profileType.standard_type!,
               result.rawResponse,
-              this.isValidContentByAlias(profileTypeFields),
+              this.isValidContentByAlias(profileTypeFields, user.org_id),
             )),
             ...(await provider.buildCustomProfileTypeFieldValueContentsByProfileTypeFieldId(
               integrationId,
@@ -300,7 +300,7 @@ export class ProfileExternalSourcesService implements IProfileExternalSourcesSer
               profileType.standard_type!,
               result.rawResponse,
               this.isPropertyCompatible(profileTypeFields),
-              this.isValidContentById(profileTypeFields),
+              this.isValidContentById(profileTypeFields, user.org_id),
             )),
           },
         },

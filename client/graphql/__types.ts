@@ -4859,7 +4859,9 @@ export type PetitionFieldType =
   /** A short text field. */
   | "SHORT_TEXT"
   /** A text field. */
-  | "TEXT";
+  | "TEXT"
+  /** A field for user assignment */
+  | "USER_ASSIGNMENT";
 
 export interface PetitionFilter {
   approvals?: InputMaybe<PetitionApprovalsFilterInput>;
@@ -6203,7 +6205,8 @@ export type ProfileTypeFieldType =
   | "PHONE"
   | "SELECT"
   | "SHORT_TEXT"
-  | "TEXT";
+  | "TEXT"
+  | "USER_ASSIGNMENT";
 
 export interface ProfileTypeFilter {
   includeArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -7869,6 +7872,7 @@ export interface UserAuthenticationToken extends CreatedAt {
 }
 
 export interface UserFilter {
+  fromUserGroupId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   status?: InputMaybe<Array<UserStatus>>;
 }
 
@@ -17543,6 +17547,23 @@ export type ProfileFieldSelectSettings_ProfileTypeFieldFragment = {
   id: string;
   type: ProfileTypeFieldType;
   isStandard: boolean;
+};
+
+export type ProfileFieldUserAssignmentSettings_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  options: { [key: string]: any };
+};
+
+export type ProfileFieldUserAssignmentSettings_UserGroupsQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type ProfileFieldUserAssignmentSettings_UserGroupsQuery = {
+  userGroups: {
+    __typename?: "UserGroupPagination";
+    items: Array<{ __typename?: "UserGroup"; id: string; name: string }>;
+  };
 };
 
 export type PetitionAccessTable_PetitionFragment = {
@@ -29158,6 +29179,13 @@ export type PetitionComposeShortTextSettings_PetitionFieldFragment = {
   profileTypeField?: { __typename?: "ProfileTypeField"; options: { [key: string]: any } } | null;
 };
 
+export type PetitionComposeUserAssignmentSettings_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  options: { [key: string]: any };
+  isFixed: boolean;
+};
+
 export type ImportOptionsSettingsRow_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -40108,6 +40136,12 @@ export type PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragment =
   content: { [key: string]: any };
   status: PetitionFieldReplyStatus;
   metadata: { [key: string]: any };
+};
+
+export type PetitionRepliesFieldUserAssignmentReply_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  id: string;
+  content: { [key: string]: any };
 };
 
 export type ProfileFieldSuggestion_PetitionFieldFragment = {
@@ -76693,6 +76727,13 @@ export const PetitionComposeNumberSettings_PetitionFieldFragmentDoc = gql`
     isLinkedToProfileTypeField
   }
 ` as unknown as DocumentNode<PetitionComposeNumberSettings_PetitionFieldFragment, unknown>;
+export const PetitionComposeUserAssignmentSettings_PetitionFieldFragmentDoc = gql`
+  fragment PetitionComposeUserAssignmentSettings_PetitionField on PetitionField {
+    id
+    options
+    isFixed
+  }
+` as unknown as DocumentNode<PetitionComposeUserAssignmentSettings_PetitionFieldFragment, unknown>;
 export const ImportOptionsSettingsRow_PetitionFieldFragmentDoc = gql`
   fragment ImportOptionsSettingsRow_PetitionField on PetitionField {
     id
@@ -77882,6 +77923,15 @@ export const PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragmentD
   }
 ` as unknown as DocumentNode<
   PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragment,
+  unknown
+>;
+export const PetitionRepliesFieldUserAssignmentReply_PetitionFieldReplyFragmentDoc = gql`
+  fragment PetitionRepliesFieldUserAssignmentReply_PetitionFieldReply on PetitionFieldReply {
+    id
+    content
+  }
+` as unknown as DocumentNode<
+  PetitionRepliesFieldUserAssignmentReply_PetitionFieldReplyFragment,
   unknown
 >;
 export const ProfileKeyProcesses_PetitionBaseMiniFragmentDoc = gql`
@@ -79614,6 +79664,12 @@ export const ProfileFieldSelectSettings_ProfileTypeFieldFragmentDoc = gql`
     isStandard
   }
 ` as unknown as DocumentNode<ProfileFieldSelectSettings_ProfileTypeFieldFragment, unknown>;
+export const ProfileFieldUserAssignmentSettings_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileFieldUserAssignmentSettings_ProfileTypeField on ProfileTypeField {
+    id
+    options
+  }
+` as unknown as DocumentNode<ProfileFieldUserAssignmentSettings_ProfileTypeFieldFragment, unknown>;
 export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc = gql`
   fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
     id
@@ -79627,8 +79683,10 @@ export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc
     isStandard
     isUnique
     ...ProfileFieldSelectSettings_ProfileTypeField
+    ...ProfileFieldUserAssignmentSettings_ProfileTypeField
   }
   ${ProfileFieldSelectSettings_ProfileTypeFieldFragmentDoc}
+  ${ProfileFieldUserAssignmentSettings_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<
   useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment,
   unknown
@@ -85941,6 +85999,19 @@ export const useProfileTypeFieldPermissionDialog_userGroupsDocument = gql`
 ` as unknown as DocumentNode<
   useProfileTypeFieldPermissionDialog_userGroupsQuery,
   useProfileTypeFieldPermissionDialog_userGroupsQueryVariables
+>;
+export const ProfileFieldUserAssignmentSettings_UserGroupsDocument = gql`
+  query ProfileFieldUserAssignmentSettings_UserGroups {
+    userGroups {
+      items {
+        id
+        name
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  ProfileFieldUserAssignmentSettings_UserGroupsQuery,
+  ProfileFieldUserAssignmentSettings_UserGroupsQueryVariables
 >;
 export const AddPetitionAccessDialog_petitionDocument = gql`
   query AddPetitionAccessDialog_petition($petitionId: GID!) {
@@ -93366,6 +93437,7 @@ export const useSearchUsers_usersDocument = gql`
           filters: $filters
         ) {
           items {
+            id
             ...UserSelect_User
           }
         }

@@ -70,6 +70,7 @@ export class ProfilesExcelImportRunner extends TaskRunner<"PROFILES_EXCEL_IMPORT
           error: {
             code: "INVALID_CELL_ERROR",
             cell: error.cell,
+            message: error.message,
           },
         };
       } else if (error instanceof UnknownIdError) {

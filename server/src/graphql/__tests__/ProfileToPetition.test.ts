@@ -6435,7 +6435,7 @@ describe("GraphQL/Profiles to Petitions", () => {
 
       groupChildren = await mocks.createRandomPetitionFields(
         petition.id,
-        ProfileTypeFieldTypeValues.length + 1,
+        11,
         (i) =>
           [
             {
@@ -7628,8 +7628,11 @@ describe("GraphQL/Profiles to Petitions", () => {
         associated_profile_id: mikeRoss.id,
       }));
 
+      const unlinkedFields = groupChildren.filter((f) => f.profile_type_field_id === null)!;
+      expect(unlinkedFields).toHaveLength(1);
+
       const [unlinkedReply] = await mocks.createRandomTextReply(
-        groupChildren.at(-1)!.id,
+        unlinkedFields[0].id,
         undefined,
         1,
         () => ({

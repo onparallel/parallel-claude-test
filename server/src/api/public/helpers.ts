@@ -151,6 +151,8 @@ function mapFieldReplyContent(fieldType: PetitionFieldType, content: any): any {
       return {};
     case "BACKGROUND_CHECK":
       return content;
+    case "USER_ASSIGNMENT":
+      return content;
     default:
       return content.value as string;
   }
@@ -283,6 +285,12 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
           return replies[0].content.value.map((v: string[]) => v[1] ?? null) ?? null;
         }
       case "DATE_TIME":
+        if (replies.length > 1) {
+          return replies.map((r) => r.content);
+        } else {
+          return replies[0].content ?? null;
+        }
+      case "USER_ASSIGNMENT":
         if (replies.length > 1) {
           return replies.map((r) => r.content);
         } else {
@@ -601,7 +609,9 @@ function mapProfileValues<T extends ProfileFragment>(profile: T) {
             p.field.alias,
             p.field.type === "FILE"
               ? (p.files?.map((f) => ({ id: f.id, ...f.file })) ?? null)
-              : (p.value?.content?.value ?? null),
+              : p.field.type === "USER_ASSIGNMENT"
+                ? (p.value?.content?.user?.email ?? null)
+                : (p.value?.content?.value ?? null),
           ] as const,
       ),
       Object.fromEntries,
@@ -675,6 +685,7 @@ export function buildSubmittedReplyContent(
     case "PHONE":
     case "NUMBER":
     case "CHECKBOX":
+    case "USER_ASSIGNMENT":
       replyContent = { value: body.reply };
       break;
     case "DYNAMIC_SELECT": {
@@ -846,9 +857,17 @@ export function parseProfileTypeFieldInput<
     }
 
     if (
-      !["TEXT", "SELECT", "SHORT_TEXT", "CHECKBOX", "NUMBER", "PHONE", "DATE", "FILE"].includes(
-        field.type,
-      )
+      ![
+        "TEXT",
+        "SELECT",
+        "SHORT_TEXT",
+        "CHECKBOX",
+        "NUMBER",
+        "PHONE",
+        "DATE",
+        "FILE",
+        "USER_ASSIGNMENT",
+      ].includes(field.type)
     ) {
       throw new Error(
         `Field '${alias}' cannot be submitted via API. Please, remove it from the values and try again.`,

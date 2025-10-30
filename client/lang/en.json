@@ -7210,6 +7210,11 @@
     "context": "Options"
   },
   {
+    "term": "component.petition-compose-new-field-drawer.category-organization",
+    "definition": "Organization",
+    "context": "Organization"
+  },
+  {
     "term": "component.petition-compose-new-field-drawer.category-text",
     "definition": "Text",
     "context": "Text"
@@ -7273,6 +7278,21 @@
     "term": "component.petition-compose-text-settings.format-placeholder",
     "definition": "No format",
     "context": "No format"
+  },
+  {
+    "term": "component.petition-compose-user-assignment-settings.allowed-user-group-description",
+    "definition": "Restrict which users can be assigned by selecting specific user group. If empty, all users will be available.",
+    "context": "Restrict which users can be assigned by selecting specific user group. If empty, all users will be available."
+  },
+  {
+    "term": "component.petition-compose-user-assignment-settings.allowed-user-group-label",
+    "definition": "Allowed user group",
+    "context": "Allowed user group"
+  },
+  {
+    "term": "component.petition-compose-user-assignment-settings.allowed-user-groups-placeholder",
+    "definition": "All users",
+    "context": "All users"
   },
   {
     "term": "component.petition-compose-variables.add-variable",
@@ -7583,6 +7603,11 @@
     "term": "component.petition-field-type-select-dropdown.thumbnail-alt",
     "definition": "Thumbnail for field type \"{type}\"",
     "context": "Thumbnail for field type \"{type}\""
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.user-assignment-description",
+    "definition": "Assign one or multiple users from your organization to this petition.",
+    "context": "Assign one or multiple users from your organization to this petition."
   },
   {
     "term": "component.petition-field-visibility-editor.all",
@@ -9623,6 +9648,21 @@
     "term": "component.profile-field-suggestion.popover",
     "definition": "Suggested reply from:",
     "context": "Suggested reply from:"
+  },
+  {
+    "term": "component.profile-field-user-assignment-settings.allowed-user-group",
+    "definition": "Allowed user group",
+    "context": "Allowed user group"
+  },
+  {
+    "term": "component.profile-field-user-assignment-settings.allowed-user-group-help",
+    "definition": "Limit which users can be selected by filtering by user group. If empty, all users in the organization will be available.",
+    "context": "Limit which users can be selected by filtering by user group. If empty, all users in the organization will be available."
+  },
+  {
+    "term": "component.profile-field-user-assignment-settings.allowed-user-group-placeholder",
+    "definition": "Select user group",
+    "context": "Select user group"
   },
   {
     "term": "component.profile-field-value-history-dialog.date",
@@ -15330,6 +15370,11 @@
     "context": "No results"
   },
   {
+    "term": "generic.no-value",
+    "definition": "No value",
+    "context": "No value"
+  },
+  {
     "term": "generic.not-available",
     "definition": "Not available",
     "context": "Not available"
@@ -15538,6 +15583,11 @@
     "term": "generic.petition-field-type-text",
     "definition": "Long replies",
     "context": "Long replies"
+  },
+  {
+    "term": "generic.petition-field-type-user-assignment",
+    "definition": "User assignment",
+    "context": "User assignment"
   },
   {
     "term": "generic.petition-permission-type-owner",
@@ -15798,6 +15848,11 @@
     "term": "generic.profile-type-field-type-text",
     "definition": "Long text",
     "context": "Long text"
+  },
+  {
+    "term": "generic.profile-type-field-type-user-assignment",
+    "definition": "User assignment",
+    "context": "User assignment"
   },
   {
     "term": "generic.profiles",
@@ -20233,6 +20288,11 @@
     "term": "util.get-petition-field-type-description.text-description",
     "definition": "Add a long-answer field for detailed input, such as descriptions, addresses, etc.",
     "context": "Add a long-answer field for detailed input, such as descriptions, addresses, etc."
+  },
+  {
+    "term": "util.get-petition-field-type-description.user-assignment-description",
+    "definition": "Assign one user from your organization to this petition.",
+    "context": "Assign one user from your organization to this petition."
   },
   {
     "term": "util.recipient-view-delegate-access.toast-body",

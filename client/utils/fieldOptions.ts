@@ -112,4 +112,8 @@ export interface FieldOptions {
       backgroundCheck: string | null;
     } | null;
   };
+  USER_ASSIGNMENT: {
+    allowedUserGroupId?: Maybe<string>;
+    replyOnlyFromProfile?: boolean;
+  };
 }

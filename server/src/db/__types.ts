@@ -386,7 +386,8 @@ export type PetitionFieldType =
   | "BACKGROUND_CHECK"
   | "ID_VERIFICATION"
   | "PROFILE_SEARCH"
-  | "ADVERSE_MEDIA_SEARCH";
+  | "ADVERSE_MEDIA_SEARCH"
+  | "USER_ASSIGNMENT";
 
 export const PetitionFieldTypeValues = [
   "TEXT",
@@ -407,6 +408,7 @@ export const PetitionFieldTypeValues = [
   "ID_VERIFICATION",
   "PROFILE_SEARCH",
   "ADVERSE_MEDIA_SEARCH",
+  "USER_ASSIGNMENT",
 ] as PetitionFieldType[];
 
 export type PetitionMessageStatus = "SCHEDULED" | "CANCELLED" | "PROCESSING" | "PROCESSED";
@@ -557,7 +559,8 @@ export type ProfileTypeFieldType =
   | "SELECT"
   | "BACKGROUND_CHECK"
   | "CHECKBOX"
-  | "ADVERSE_MEDIA_SEARCH";
+  | "ADVERSE_MEDIA_SEARCH"
+  | "USER_ASSIGNMENT";
 
 export const ProfileTypeFieldTypeValues = [
   "TEXT",
@@ -570,6 +573,7 @@ export const ProfileTypeFieldTypeValues = [
   "BACKGROUND_CHECK",
   "CHECKBOX",
   "ADVERSE_MEDIA_SEARCH",
+  "USER_ASSIGNMENT",
 ] as ProfileTypeFieldType[];
 
 export type ProfileTypeStandardType = "INDIVIDUAL" | "LEGAL_ENTITY" | "CONTRACT";

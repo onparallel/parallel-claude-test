@@ -107,6 +107,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
               ...(user.hasDowJonesField ? ["DOW_JONES_KYC"] : []),
               "ID_VERIFICATION",
               ...(user.hasProfileSearchField ? ["PROFILE_SEARCH"] : []),
+              "USER_ASSIGNMENT",
             ],
           },
         ] as { category: string; fields: PetitionFieldType[] }[];
@@ -334,6 +335,11 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
                   <FormattedMessage
                     id="component.petition-field-type-select-dropdown.field-group-description"
                     defaultMessage="Link fields to create a group that can be answered as many times as needed."
+                  />
+                ) : activeType === "USER_ASSIGNMENT" ? (
+                  <FormattedMessage
+                    id="component.petition-field-type-select-dropdown.user-assignment-description"
+                    defaultMessage="Assign one or multiple users from your organization to this petition."
                   />
                 ) : null}
               </Box>

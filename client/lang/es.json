@@ -7210,6 +7210,11 @@
     "context": "Options"
   },
   {
+    "term": "component.petition-compose-new-field-drawer.category-organization",
+    "definition": "Organización",
+    "context": "Organization"
+  },
+  {
     "term": "component.petition-compose-new-field-drawer.category-text",
     "definition": "Texto",
     "context": "Text"
@@ -7273,6 +7278,21 @@
     "term": "component.petition-compose-text-settings.format-placeholder",
     "definition": "Sin formato",
     "context": "No format"
+  },
+  {
+    "term": "component.petition-compose-user-assignment-settings.allowed-user-group-description",
+    "definition": "Restringe qué usuarios pueden ser asignados seleccionando un grupo de usuarios específico. Si está vacío, todos los usuarios estarán disponibles.",
+    "context": "Restrict which users can be assigned by selecting specific user group. If empty, all users will be available."
+  },
+  {
+    "term": "component.petition-compose-user-assignment-settings.allowed-user-group-label",
+    "definition": "Grupo de usuarios permitido",
+    "context": "Allowed user group"
+  },
+  {
+    "term": "component.petition-compose-user-assignment-settings.allowed-user-groups-placeholder",
+    "definition": "Todos los usuarios",
+    "context": "All users"
   },
   {
     "term": "component.petition-compose-variables.add-variable",
@@ -7583,6 +7603,11 @@
     "term": "component.petition-field-type-select-dropdown.thumbnail-alt",
     "definition": "Previsualización del tipo de campo \"{type}\"",
     "context": "Thumbnail for field type \"{type}\""
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.user-assignment-description",
+    "definition": "Asigna uno o varios usuarios de tu organización a esta petición.",
+    "context": "Assign one or multiple users from your organization to this petition."
   },
   {
     "term": "component.petition-field-visibility-editor.all",
@@ -9623,6 +9648,21 @@
     "term": "component.profile-field-suggestion.popover",
     "definition": "Respuesta sugerida de:",
     "context": "Suggested reply from:"
+  },
+  {
+    "term": "component.profile-field-user-assignment-settings.allowed-user-group",
+    "definition": "Grupo de usuarios permitido",
+    "context": "Allowed user group"
+  },
+  {
+    "term": "component.profile-field-user-assignment-settings.allowed-user-group-help",
+    "definition": "Limita qué usuarios pueden ser seleccionados filtrando por grupo de usuarios. Si está vacío, todos los usuarios en la organización estarán disponibles.",
+    "context": "Limit which users can be selected by filtering by user group. If empty, all users in the organization will be available."
+  },
+  {
+    "term": "component.profile-field-user-assignment-settings.allowed-user-group-placeholder",
+    "definition": "Seleccionar grupo de usuarios",
+    "context": "Select user group"
   },
   {
     "term": "component.profile-field-value-history-dialog.date",
@@ -15330,6 +15370,11 @@
     "context": "No results"
   },
   {
+    "term": "generic.no-value",
+    "definition": "Sin valor",
+    "context": "No value"
+  },
+  {
     "term": "generic.not-available",
     "definition": "No disponible",
     "context": "Not available"
@@ -15538,6 +15583,11 @@
     "term": "generic.petition-field-type-text",
     "definition": "Respuestas largas",
     "context": "Long replies"
+  },
+  {
+    "term": "generic.petition-field-type-user-assignment",
+    "definition": "Asignación de usuario",
+    "context": "User assignment"
   },
   {
     "term": "generic.petition-permission-type-owner",
@@ -15798,6 +15848,11 @@
     "term": "generic.profile-type-field-type-text",
     "definition": "Texto largo",
     "context": "Long text"
+  },
+  {
+    "term": "generic.profile-type-field-type-user-assignment",
+    "definition": "Asignación de usuario",
+    "context": "User assignment"
   },
   {
     "term": "generic.profiles",
@@ -20233,6 +20288,11 @@
     "term": "util.get-petition-field-type-description.text-description",
     "definition": "Añade un campo de respuesta larga para respuestas detalladas, como descripciones, direcciones, etc.",
     "context": "Add a long-answer field for detailed input, such as descriptions, addresses, etc."
+  },
+  {
+    "term": "util.get-petition-field-type-description.user-assignment-description",
+    "definition": "Asigna un usuario de tu organización a esta petición.",
+    "context": "Assign one user from your organization to this petition."
   },
   {
     "term": "util.recipient-view-delegate-access.toast-body",

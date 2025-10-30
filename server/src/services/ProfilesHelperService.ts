@@ -11,6 +11,8 @@ import {
 import { ProfileRepository } from "../db/repositories/ProfileRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { ForbiddenError } from "../graphql/helpers/errors";
+import { fullName } from "../util/fullName";
+import { toGlobalId } from "../util/globalId";
 import { isAtLeast } from "../util/profileTypeFieldPermission";
 import {
   ADVERSE_MEDIA_SEARCH_SERVICE,
@@ -50,7 +52,7 @@ export class ProfilesHelperService {
     }
   }
 
-  mapValueContentFromDatabase(pfv: Pick<ProfileFieldValue, "type" | "content" | "is_draft">) {
+  async mapValueContentFromDatabase(pfv: Pick<ProfileFieldValue, "type" | "content" | "is_draft">) {
     if (pfv.type === "BACKGROUND_CHECK") {
       const content = pfv.content as BackgroundCheckContent;
       return {
@@ -84,6 +86,21 @@ export class ProfilesHelperService {
           ),
           createdAt: content.articles.createdAt,
         },
+      };
+    } else if (pfv.type === "USER_ASSIGNMENT") {
+      const user = await this.users.loadUser(pfv.content.value);
+      const userData = await this.users.loadUserDataByUserId(pfv.content.value);
+      return {
+        value: toGlobalId("User", pfv.content.value),
+        user:
+          user && userData
+            ? {
+                id: toGlobalId("User", user.id),
+                fullName: fullName(userData.first_name, userData.last_name),
+                email: userData.email,
+                status: user.status,
+              }
+            : null,
       };
     } else {
       return pfv.content;

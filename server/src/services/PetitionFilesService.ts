@@ -323,7 +323,7 @@ export class PetitionFilesService {
         }
 
         if (includeXlsx && !isFileTypeField(field.type)) {
-          excelWorkbook.addPetitionFieldReply(field);
+          await excelWorkbook.addPetitionFieldReply(field);
         }
       }
     };

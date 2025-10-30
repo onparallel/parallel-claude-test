@@ -8,9 +8,9 @@ import {
   objectType,
   stringArg,
 } from "nexus";
+import pMap from "p-map";
 import { isNonNullish, isNullish, unique } from "remeda";
 import { assert } from "ts-essentials";
-import { CreatePetitionFieldReply } from "../../../db/__types";
 import { PetitionFieldOptions } from "../../../services/PetitionFieldService";
 import { toGlobalId } from "../../../util/globalId";
 import { random } from "../../../util/token";
@@ -83,21 +83,29 @@ export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetit
   ),
   validateArgs: validateAnd(
     notEmptyArray("fields"),
-    validateCreatePetitionFieldReplyInput("fields"),
+    validateCreatePetitionFieldReplyInput("fields", { publicContext: true }),
   ),
   resolve: async (_, args, ctx) => {
     const fields = await ctx.petitions.loadField(unique(args.fields.map((field) => field.id)));
 
-    const data: CreatePetitionFieldReply[] = args.fields.map((fieldReply) => {
-      const field = fields.find((f) => f!.id === fieldReply.id)!;
-      return {
-        content: ctx.petitionFields.mapReplyContentToDatabase(field.type, fieldReply.content),
-        petition_field_id: fieldReply.id,
-        parent_petition_field_reply_id: fieldReply.parentReplyId ?? null,
-        type: field.type,
-        petition_access_id: ctx.access!.id,
-      };
-    });
+    const data = await pMap(
+      args.fields,
+      async (fieldReply) => {
+        const field = fields.find((f) => f!.id === fieldReply.id)!;
+        return {
+          content: await ctx.petitionFields.mapReplyContentToDatabase(
+            field.type,
+            fieldReply.content,
+            ctx.contact!.org_id,
+          ),
+          petition_field_id: fieldReply.id,
+          parent_petition_field_reply_id: fieldReply.parentReplyId ?? null,
+          type: field.type,
+          petition_access_id: ctx.access!.id,
+        };
+      },
+      { concurrency: 1 },
+    );
 
     return await ctx.petitions.createPetitionFieldReply(
       ctx.access!.petition_id,
@@ -140,7 +148,7 @@ export const publicUpdatePetitionFieldReplies = mutationField("publicUpdatePetit
   ),
   validateArgs: validateAnd(
     notEmptyArray("replies"),
-    validateUpdatePetitionFieldReplyInput("replies"),
+    validateUpdatePetitionFieldReplyInput("replies", { publicContext: true }),
   ),
   resolve: async (_, args, ctx) => {
     const replyIds = unique(args.replies.map((r) => r.id));
@@ -154,12 +162,22 @@ export const publicUpdatePetitionFieldReplies = mutationField("publicUpdatePetit
       };
     });
 
+    const mappedRepliesInput = await pMap(
+      repliesInput,
+      async (replyData) => ({
+        id: replyData.id,
+        content: await ctx.petitionFields.mapReplyContentToDatabase(
+          replyData.type,
+          replyData.content,
+          ctx.contact!.org_id,
+        ),
+      }),
+      { concurrency: 1 },
+    );
+
     return await ctx.petitions.updatePetitionFieldRepliesContent(
       ctx.access!.petition_id,
-      repliesInput.map((replyData) => ({
-        id: replyData.id,
-        content: ctx.petitionFields.mapReplyContentToDatabase(replyData.type, replyData.content),
-      })),
+      mappedRepliesInput,
       "PetitionAccess",
       ctx.access!.id,
     );

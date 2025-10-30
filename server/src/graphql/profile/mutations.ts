@@ -1064,6 +1064,7 @@ export const createProfile = mutationField("createProfile", {
           await ctx.profileValidation.validateProfileFieldValueContent(
             profileTypeField,
             field.content,
+            ctx.user!.org_id,
           );
         } catch (e) {
           if (e instanceof Error) {
@@ -1104,7 +1105,19 @@ export const createProfile = mutationField("createProfile", {
         ctx.user!.org_id,
         args.profileTypeId,
         ctx.user!.id,
-        fields,
+        await pMap(
+          fields,
+          async (field) => ({
+            ...field,
+            // map content after being sure there are no INVALID_PROFILE_FIELD_VALUE errors
+            content: await ctx.profileTypeFields.mapValueContentToDatabase(
+              field.type,
+              field.content,
+              ctx.user!.org_id,
+            ),
+          }),
+          { concurrency: 1 },
+        ),
         args.source ?? "MANUAL",
       );
       if (args.subscribe) {
@@ -1328,6 +1341,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
             await ctx.profileValidation.validateProfileFieldValueContent(
               profileTypeField,
               field.content,
+              ctx.user!.org_id,
             );
           } catch (e) {
             if (e instanceof Error) {
@@ -1389,7 +1403,21 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
 
     try {
       await ctx.profiles.updateProfileFieldValues(
-        updateFieldsData,
+        await pMap(
+          updateFieldsData,
+          async (field) => ({
+            ...field,
+            // map content after being sure there are no INVALID_PROFILE_FIELD_VALUE errors
+            content: field.content
+              ? await ctx.profileTypeFields.mapValueContentToDatabase(
+                  field.type,
+                  field.content,
+                  ctx.user!.org_id,
+                )
+              : field.content,
+          }),
+          { concurrency: 1 },
+        ),
         ctx.user!.id,
         ctx.user!.org_id,
         source ?? "MANUAL",
@@ -2590,22 +2618,42 @@ export const completeProfileFromExternalSource = mutationField(
       }
 
       const aggregatedErrors: { profileTypeFieldId: string; error: string; content: any }[] = [];
-      for (const field of fields) {
-        try {
-          // fields should already be validated as entity.parsed_data is validated before storing it on DB
-          // just in case, validate again
-          await ctx.profileValidation.validateProfileFieldValueContent(
-            field.profileTypeField,
-            field.content,
-          );
-        } catch (error) {
-          aggregatedErrors.push({
-            profileTypeFieldId: toGlobalId("ProfileTypeField", field.profileTypeField.id),
-            error: error instanceof Error ? error.message : "UNKNOWN",
-            content: field.content,
-          });
-        }
-      }
+
+      const validatedFields = await pMap(
+        fields,
+        async (field) => {
+          try {
+            // fields should already be validated as entity.parsed_data is validated before storing it on DB
+            // just in case, validate again
+            await ctx.profileValidation.validateProfileFieldValueContent(
+              field.profileTypeField,
+              field.content,
+              ctx.user!.org_id,
+            );
+
+            return {
+              ...field,
+              content: field.content
+                ? await ctx.profileTypeFields.mapValueContentToDatabase(
+                    field.profileTypeField.type,
+                    field.content,
+                    ctx.user!.org_id,
+                  )
+                : field.content,
+            };
+          } catch (error) {
+            aggregatedErrors.push({
+              profileTypeFieldId: toGlobalId("ProfileTypeField", field.profileTypeField.id),
+              error: error instanceof Error ? error.message : "UNKNOWN",
+              content: field.content,
+            });
+
+            return null as never;
+          }
+        },
+        { concurrency: 1 },
+      );
+
       if (aggregatedErrors.length > 0) {
         throw new ApolloError("Validation errors on profile field values", "VALIDATION_ERRORS", {
           errors: aggregatedErrors,
@@ -2615,7 +2663,7 @@ export const completeProfileFromExternalSource = mutationField(
       try {
         if (args.profileId) {
           await ctx.profiles.updateProfileFieldValues(
-            fields.map((f) => ({
+            validatedFields.map((f) => ({
               profileId: args.profileId!,
               profileTypeFieldId: f.profileTypeField.id,
               type: f.profileTypeField.type,
@@ -2633,7 +2681,7 @@ export const completeProfileFromExternalSource = mutationField(
             ctx.user!.org_id,
             args.profileTypeId,
             ctx.user!.id,
-            fields.map((f) => ({
+            validatedFields.map((f) => ({
               profileTypeFieldId: f.profileTypeField.id,
               type: f.profileTypeField.type,
               content: f.content,
@@ -2977,6 +3025,7 @@ export const saveProfileFieldValueDraft = mutationField("saveProfileFieldValueDr
     profileHasStatus("profileId", "OPEN"),
     profileIsNotAnonymized("profileId"),
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
+    profileTypeFieldIsOfType("profileTypeFieldId", ["BACKGROUND_CHECK", "ADVERSE_MEDIA_SEARCH"]),
     userHasPermissionOnProfileTypeField("profileTypeFieldId", "WRITE"),
     contextUserHasPermission("PROFILES:CREATE_PROFILES"),
   ),

@@ -70,6 +70,7 @@ import {
   SelectOptionValue,
 } from "../settings/ProfileFieldSelectSettings";
 import { ProfileFieldShortTextSettings } from "../settings/ProfileFieldShortTextSettings";
+import { ProfileFieldUserAssignmentSettings } from "../settings/ProfileFieldUserAssignmentSettings";
 import { useConfirmRemovedSelectOptionsReplacementDialog } from "./ConfirmRemovedSelectOptionsReplacementDialog";
 
 export interface CreateOrUpdateProfileTypeFieldDialogProps {
@@ -102,6 +103,7 @@ export interface CreateOrUpdateProfileTypeFieldDialogFormData {
     showOptionsWithColors?: boolean;
     standardList?: string | null;
     autoSearchConfig?: ProfileTypeFieldOptions<"BACKGROUND_CHECK">["autoSearchConfig"];
+    allowedUserGroupId?: string | null;
   } & IProfileFieldMonitoringSettings;
 }
 
@@ -155,6 +157,11 @@ function defaultOptions(
       monitoring: options.monitoring ?? {
         searchFrequency: { type: "FIXED", frequency: "3_YEARS" },
       },
+    };
+  } else if (type === "USER_ASSIGNMENT") {
+    assertType<ProfileTypeFieldOptions<"USER_ASSIGNMENT">>(options);
+    return {
+      allowedUserGroupId: options.allowedUserGroupId ?? null,
     };
   } else {
     return options;
@@ -294,6 +301,10 @@ function CreateOrUpdateProfileTypeFieldDialog({
               } else if (formData.type === "SHORT_TEXT") {
                 // options.format is not allowed to be changed
                 data.isUnique = formData.isUnique ?? false;
+              } else if (formData.type === "USER_ASSIGNMENT") {
+                data.options = {
+                  allowedUserGroupId: formData.options.allowedUserGroupId ?? null,
+                };
               }
 
               let force = false;
@@ -459,6 +470,10 @@ function CreateOrUpdateProfileTypeFieldDialog({
                   format: formData.options.format ?? null,
                 };
                 data.isUnique = formData.isUnique ?? false;
+              } else if (formData.type === "USER_ASSIGNMENT") {
+                data.options = {
+                  allowedUserGroupId: formData.options.allowedUserGroupId ?? null,
+                };
               }
 
               try {
@@ -648,61 +663,64 @@ function CreateOrUpdateProfileTypeFieldDialog({
             {selectedType === "BACKGROUND_CHECK" ? (
               <ProfileFieldAutoSearchSettings profileTypeId={profileType.id} />
             ) : null}
+            {selectedType === "USER_ASSIGNMENT" ? <ProfileFieldUserAssignmentSettings /> : null}
           </FormProvider>
 
-          <Stack spacing={2}>
-            <FormControl as={HStack} isInvalid={!!errors.isExpirable}>
-              <Stack flex={1} spacing={1}>
-                <FormLabel margin={0}>
-                  <FormattedMessage
-                    id="component.create-or-update-property-dialog.expiration"
-                    defaultMessage="Expiration"
-                  />
-                </FormLabel>
-                <FormHelperText margin={0}>
-                  <FormattedMessage
-                    id="component.create-or-update-property-dialog.expiration-description"
-                    defaultMessage="Select if this property will have an expiration date. Example: Passports and contracts."
-                  />
-                </FormHelperText>
-              </Stack>
-              <Center>
-                <Switch {...register("isExpirable")} />
-              </Center>
-            </FormControl>
-            {isExpirable ? (
-              <>
-                {selectedType === "DATE" ? (
-                  <FormControl>
-                    <Checkbox {...register("options.useReplyAsExpiryDate")}>
-                      <FormattedMessage
-                        id="component.create-or-update-property-dialog.use-reply-as-expiry-date"
-                        defaultMessage="Use reply as expiry date"
-                      />
-                    </Checkbox>
-                  </FormControl>
-                ) : null}
-                <FormControl as={HStack} isInvalid={!!errors.expiryAlertAheadTime}>
-                  <FormLabel fontSize="sm" whiteSpace="nowrap" fontWeight="normal" margin={0}>
+          {selectedType === "USER_ASSIGNMENT" ? null : (
+            <Stack spacing={2}>
+              <FormControl as={HStack} isInvalid={!!errors.isExpirable}>
+                <Stack flex={1} spacing={1}>
+                  <FormLabel margin={0}>
                     <FormattedMessage
-                      id="component.create-or-update-property-dialog.expiry-alert-ahead-time-label"
-                      defaultMessage="Remind on:"
+                      id="component.create-or-update-property-dialog.expiration"
+                      defaultMessage="Expiration"
                     />
                   </FormLabel>
-                  <Box width="100%">
-                    <Controller
-                      name="expiryAlertAheadTime"
-                      control={control}
-                      rules={{ required: isExpirable ? true : false }}
-                      render={({ field }) => (
-                        <SimpleSelect size="sm" options={expirationOptions} {...field} />
-                      )}
+                  <FormHelperText margin={0}>
+                    <FormattedMessage
+                      id="component.create-or-update-property-dialog.expiration-description"
+                      defaultMessage="Select if this property will have an expiration date. Example: Passports and contracts."
                     />
-                  </Box>
-                </FormControl>
-              </>
-            ) : null}
-          </Stack>
+                  </FormHelperText>
+                </Stack>
+                <Center>
+                  <Switch {...register("isExpirable")} />
+                </Center>
+              </FormControl>
+              {isExpirable ? (
+                <>
+                  {selectedType === "DATE" ? (
+                    <FormControl>
+                      <Checkbox {...register("options.useReplyAsExpiryDate")}>
+                        <FormattedMessage
+                          id="component.create-or-update-property-dialog.use-reply-as-expiry-date"
+                          defaultMessage="Use reply as expiry date"
+                        />
+                      </Checkbox>
+                    </FormControl>
+                  ) : null}
+                  <FormControl as={HStack} isInvalid={!!errors.expiryAlertAheadTime}>
+                    <FormLabel fontSize="sm" whiteSpace="nowrap" fontWeight="normal" margin={0}>
+                      <FormattedMessage
+                        id="component.create-or-update-property-dialog.expiry-alert-ahead-time-label"
+                        defaultMessage="Remind on:"
+                      />
+                    </FormLabel>
+                    <Box width="100%">
+                      <Controller
+                        name="expiryAlertAheadTime"
+                        control={control}
+                        rules={{ required: isExpirable ? true : false }}
+                        render={({ field }) => (
+                          <SimpleSelect size="sm" options={expirationOptions} {...field} />
+                        )}
+                      />
+                    </Box>
+                  </FormControl>
+                </>
+              ) : null}
+            </Stack>
+          )}
         </Stack>
       }
       confirm={
@@ -737,8 +755,10 @@ useCreateOrUpdateProfileTypeFieldDialog.fragments = {
         isStandard
         isUnique
         ...ProfileFieldSelectSettings_ProfileTypeField
+        ...ProfileFieldUserAssignmentSettings_ProfileTypeField
       }
       ${ProfileFieldSelectSettings.fragments.ProfileTypeField}
+      ${ProfileFieldUserAssignmentSettings.fragments.ProfileTypeField}
     `;
   },
   get ProfileType() {

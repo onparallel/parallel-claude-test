@@ -30,6 +30,7 @@ import { LocalizableUserTextRender } from "./LocalizableUserTextRender";
 import { OverflownText } from "./OverflownText";
 import { SimpleFileButton } from "./SimpleFileButton";
 import { SmallPopover } from "./SmallPopover";
+import { UserReference } from "./UserReference";
 
 export interface ProfilePropertyContentProps {
   profileId?: string;
@@ -325,6 +326,16 @@ const ProfileFieldValue = chakraForwardRef<"p" | "span" | "div", ProfileProperty
             {...rest}
           />
         );
+      } else if (field.type === "USER_ASSIGNMENT") {
+        const { noOfLines: _, ...rest } = props;
+        return (
+          <ProfileFieldUserAssignmentValue
+            value={value}
+            field={field}
+            singleLine={singleLine}
+            {...rest}
+          />
+        );
       } else {
         never(`ProfileTypeFieldType ${field.type} not implemented`);
       }
@@ -548,3 +559,19 @@ const ProfileFieldAdverseMediaSearchValue = chakraForwardRef<"div", ProfilePrope
     );
   },
 );
+
+const ProfileFieldUserAssignmentValue = chakraForwardRef<
+  "span" | "div",
+  ProfilePropertyContentProps
+>(function ProfileFieldUserAssignmentValue({ value, field, singleLine, ...props }, ref) {
+  const user = value?.content?.user;
+
+  return (
+    <UserReference
+      ref={ref}
+      fontWeight="normal"
+      user={isNonNullish(user) ? { ...user, isMe: false } : null}
+      {...props}
+    />
+  );
+});

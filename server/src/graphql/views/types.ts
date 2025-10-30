@@ -1,4 +1,5 @@
 import { enumType, inputObjectType, interfaceType, objectType } from "nexus";
+import { indexBy } from "remeda";
 import { ListViewTypeValues } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { mapProfileListViewDataFromDatabase } from "./helpers";
@@ -200,7 +201,15 @@ export const ProfileListView = objectType({
     t.globalId("id", { prefixName: "ProfileListView" });
     t.field("data", {
       type: "ProfileListViewData",
-      resolve: (o) => mapProfileListViewDataFromDatabase(o.data),
+      resolve: async (o, _, ctx) => {
+        const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+          o.profile_type_id,
+        );
+        return mapProfileListViewDataFromDatabase(
+          o.data,
+          indexBy(profileTypeFields, (f) => f.id),
+        );
+      },
     });
     t.field("profileType", {
       type: "ProfileType",
@@ -232,16 +241,6 @@ export const ProfileListViewData = objectType({
     t.nullable.list.nonNull.field("status", { type: "ProfileStatus" });
     t.nullable.jsonObject("values");
   },
-  // TODO: REMOVE AFTER RELEASE
-  // this is a temporal workaround to allow status to be stored as string in the database
-  // and may be removed once the release and migration are done
-  sourceType: /* ts */ `{
-    columns?: string[] | null;
-    search?: string | null;
-    sort?: NexusGenRootTypes["ProfileListViewSort"] | null;
-    values?: NexusGenScalars["JSONObject"] | null;
-    status?: NexusGenEnums["ProfileStatus"] | NexusGenEnums["ProfileStatus"][] | null;
-  }`,
 });
 
 export const ProfileListViewDataInput = inputObjectType({

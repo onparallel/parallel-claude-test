@@ -112,6 +112,13 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
         }),
         fields: ["NUMBER", "PHONE", "DATE", "DATE_TIME"],
       },
+      {
+        category: intl.formatMessage({
+          id: "component.petition-compose-new-field-drawer.category-organization",
+          defaultMessage: "Organization",
+        }),
+        fields: ["USER_ASSIGNMENT"],
+      },
     ] as {
       category: string;
       fields?: PetitionFieldType[];

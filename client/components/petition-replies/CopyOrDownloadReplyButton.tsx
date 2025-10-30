@@ -37,6 +37,16 @@ export function CopyOrDownloadReplyButton({
   isDisabled,
 }: CopyOrDownloadReplyButtonProps) {
   const intl = useIntl();
+
+  const textContent =
+    petitionFieldType === "USER_ASSIGNMENT"
+      ? isNonNullish(content.user)
+        ? content.user.fullName
+        : intl.formatMessage({ id: "generic.deleted-user", defaultMessage: "Deleted user" })
+      : petitionFieldType === "PROFILE_SEARCH"
+        ? content.search
+        : content;
+
   return (
     <Stack spacing={1}>
       {petitionFieldType === "BACKGROUND_CHECK" ? (
@@ -82,12 +92,7 @@ export function CopyOrDownloadReplyButton({
           ) : null}
         </>
       ) : (
-        <CopyToClipboardButton
-          size="xs"
-          fontSize="md"
-          text={petitionFieldType === "PROFILE_SEARCH" ? content.search : content}
-          isDisabled={isDisabled}
-        />
+        <CopyToClipboardButton size="xs" fontSize="md" text={textContent} isDisabled={isDisabled} />
       )}
       {reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
         <NetDocumentsIconButton

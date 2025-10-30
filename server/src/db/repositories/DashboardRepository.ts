@@ -1,11 +1,13 @@
 import { inject } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy, isNonNullish, isNullish, omit, sumBy, unique } from "remeda";
+import { groupBy, indexBy, isNonNullish, isNullish, omit, sumBy, unique, zip } from "remeda";
 import { assert } from "ts-essentials";
 import {
   PROFILE_TYPE_FIELD_SERVICE,
   ProfileTypeFieldService,
 } from "../../services/ProfileTypeFieldService";
+import { fullName } from "../../util/fullName";
+import { never } from "../../util/never";
 import { hashString } from "../../util/token";
 import { Replace } from "../../util/types";
 import {
@@ -32,6 +34,7 @@ import {
 import { KNEX } from "../knex";
 import { PetitionFilter } from "./PetitionRepository";
 import { ProfileFilter } from "./ProfileRepository";
+import { UserRepository } from "./UserRepository";
 
 type UserDashboardPreferences = {
   tab_order: number[];
@@ -108,6 +111,8 @@ export class DashboardRepository extends BaseRepository {
     private petitionFilter: PetitionFilterRepositoryHelper,
     @inject(PROFILE_TYPE_FIELD_SERVICE)
     private profileTypeFields: ProfileTypeFieldService,
+    @inject(UserRepository)
+    private users: UserRepository,
   ) {
     super(knex);
   }
@@ -480,8 +485,10 @@ export class DashboardRepository extends BaseRepository {
 
     assert(
       isNullish(settings.groupByProfileTypeFieldId) ||
-        profileTypeFieldsById[settings.groupByProfileTypeFieldId]?.type === "SELECT",
-      "Group by can only be done with SELECT properties",
+        ["SELECT", "USER_ASSIGNMENT"].includes(
+          profileTypeFieldsById[settings.groupByProfileTypeFieldId]?.type,
+        ),
+      "Group by can only be done with SELECT or USER_ASSIGNMENT properties",
     );
 
     const joins: Record<number, string> = {};
@@ -795,7 +802,7 @@ export class DashboardRepository extends BaseRepository {
 
     const groupByField = fieldsById[settings.groupByProfileTypeFieldId];
     assert(
-      groupByField && groupByField.type === "SELECT",
+      groupByField && ["SELECT", "USER_ASSIGNMENT"].includes(groupByField.type),
       `Profile type field ${settings.groupByProfileTypeFieldId} not found`,
     );
 
@@ -820,9 +827,32 @@ export class DashboardRepository extends BaseRepository {
       .groupBy("p_all.group_by_value")
       .from("p_all");
 
-    const groupByValues = await this.profileTypeFields.loadProfileTypeFieldSelectValues(
-      groupByField.options,
-    );
+    let groupByValues: {
+      value: string;
+      label: { es?: string; en?: string };
+      color?: string;
+    }[] = [];
+    if (groupByField.type === "SELECT") {
+      groupByValues = await this.profileTypeFields.loadProfileTypeFieldSelectValues(
+        groupByField.options,
+      );
+    } else if (groupByField.type === "USER_ASSIGNMENT") {
+      const userIds = data
+        .map((d) => d.group_by_value)
+        .filter(isNonNullish)
+        .map((v) => parseInt(v));
+      const userDatas = await this.users.loadUserDataByUserId(userIds);
+      groupByValues = zip(userIds, userDatas).map(([userId, data]) => ({
+        value: userId.toString(),
+        label: {
+          es: `${fullName(data?.first_name, data?.last_name)} <${data?.email}>`,
+          en: `${fullName(data?.first_name, data?.last_name)} <${data?.email}>`,
+        },
+      }));
+    } else {
+      never();
+    }
+
     const showOptionsWithColors = !!groupByField.options.showOptionsWithColors;
     return {
       items: data.map((d) => {

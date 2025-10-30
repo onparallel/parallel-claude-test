@@ -1424,7 +1424,8 @@ export class Mocks {
         r.type === "CHECKBOX" ||
         r.type === "DATE" ||
         r.type === "PHONE" ||
-        r.type === "NUMBER",
+        r.type === "NUMBER" ||
+        r.type === "USER_ASSIGNMENT",
     );
 
     if (cacheableValues.length > 0) {

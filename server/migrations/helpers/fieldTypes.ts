@@ -8,7 +8,32 @@ export async function addFieldType(knex: Knex, fieldName: string) {
 }
 
 export async function removeFieldType(knex: Knex, fieldName: string) {
-  await knex.from("petition_field_reply").where("type", fieldName).delete();
+  const replies = await knex.from("petition_field_reply").where("type", fieldName).select("id");
+  if (replies.length > 0) {
+    await knex
+      .from("profile_field_value")
+      .whereIn(
+        "petition_field_reply_id",
+        replies.map((r) => r.id),
+      )
+      .update({ petition_field_reply_id: null });
+    await knex
+      .from("profile_field_file")
+      .whereIn(
+        "petition_field_reply_id",
+        replies.map((r) => r.id),
+      )
+      .update({ petition_field_reply_id: null });
+
+    await knex
+      .from("petition_field_reply")
+      .whereIn(
+        "id",
+        replies.map((r) => r.id),
+      )
+      .delete();
+  }
+
   const fields = await knex.from("petition_field").where("type", fieldName).select("id");
   const fieldIds = fields.map((f) => f.id);
 

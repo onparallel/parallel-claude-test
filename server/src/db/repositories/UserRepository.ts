@@ -208,6 +208,22 @@ export class UserRepository extends BaseRepository {
     return userIds.map((id) => (byUserId[id] ? omit(byUserId[id], ["user_id"]) : null));
   });
 
+  async getUserEmailsByOrgId(orgId: number) {
+    return await this.raw<{ user_id: number; email: string }>(
+      /* sql */ `
+        select 
+          u.id as user_id, 
+          ud.email as email 
+        from "user" u 
+        join "user_data" ud on u.user_data_id = ud.id
+        where u.org_id = ? 
+          and u.deleted_at is null 
+          and ud.deleted_at is null;
+      `,
+      [orgId],
+    );
+  }
+
   readonly loadUserByExternalId = this.buildLoader<
     { orgId: number; externalId: string },
     Maybe<User>,

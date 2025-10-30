@@ -41,6 +41,7 @@ export const excludedFieldsTarget = [
   "BACKGROUND_CHECK",
   "PROFILE_SEARCH",
   "ADVERSE_MEDIA_SEARCH",
+  "USER_ASSIGNMENT",
 ] as PetitionFieldType[];
 
 export const excludedFieldsOrigin = [

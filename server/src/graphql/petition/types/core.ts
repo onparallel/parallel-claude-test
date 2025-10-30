@@ -796,6 +796,7 @@ export const PetitionFieldType = enumType({
       name: "ADVERSE_MEDIA_SEARCH",
       description: "A field for performing searches in the adverse media database",
     },
+    { name: "USER_ASSIGNMENT", description: "A field for user assignment" },
   ],
 });
 
@@ -841,16 +842,36 @@ export const PetitionField = objectType({
     });
     t.boolean("isInternal", {
       description: "Determines if the field is visible by the recipients.",
-      resolve: (o) => ["DOW_JONES_KYC", "BACKGROUND_CHECK"].includes(o.type) || o.is_internal,
+      resolve: (o) =>
+        [
+          "DOW_JONES_KYC",
+          "BACKGROUND_CHECK",
+          "ADVERSE_MEDIA_SEARCH",
+          "PROFILE_SEARCH",
+          "USER_ASSIGNMENT",
+        ].includes(o.type) || o.is_internal,
     });
     t.boolean("showInPdf", {
       description: "Determines if the field is visible in PDF export.",
-      resolve: (o) => !["DOW_JONES_KYC", "BACKGROUND_CHECK"].includes(o.type) && o.show_in_pdf,
+      resolve: (o) =>
+        ![
+          "DOW_JONES_KYC",
+          "BACKGROUND_CHECK",
+          "ADVERSE_MEDIA_SEARCH",
+          "PROFILE_SEARCH",
+          "USER_ASSIGNMENT",
+        ].includes(o.type) && o.show_in_pdf,
     });
     t.boolean("showActivityInPdf", {
       description: "Determines if the field last activity is visible in PDF export.",
       resolve: (o) =>
-        !["DOW_JONES_KYC", "BACKGROUND_CHECK"].includes(o.type) && o.show_activity_in_pdf,
+        ![
+          "DOW_JONES_KYC",
+          "BACKGROUND_CHECK",
+          "ADVERSE_MEDIA_SEARCH",
+          "PROFILE_SEARCH",
+          "USER_ASSIGNMENT",
+        ].includes(o.type) && o.show_activity_in_pdf,
     });
     t.boolean("isReadOnly", {
       description: "Determines if the field accepts replies",

@@ -27,7 +27,8 @@ export function getReplyContents({
     isFileTypeField(type) ||
     type === "BACKGROUND_CHECK" ||
     type === "PROFILE_SEARCH" ||
-    type === "ADVERSE_MEDIA_SEARCH"
+    type === "ADVERSE_MEDIA_SEARCH" ||
+    type === "USER_ASSIGNMENT"
   ) {
     return [reply.content];
   } else if (type === "NUMBER") {

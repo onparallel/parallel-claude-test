@@ -11,4 +11,5 @@ export type PetitionFieldType =
   | "DATE"
   | "DATE_TIME"
   | "ES_TAX_DOCUMENTS"
-  | "DOW_JONES_KYC";
+  | "DOW_JONES_KYC"
+  | "USER_ASSIGNMENT";

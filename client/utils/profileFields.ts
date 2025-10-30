@@ -10,6 +10,7 @@ import {
   FieldTextIcon,
   MediaIcon,
   ShortSearchIcon,
+  UserIcon,
 } from "@parallel/chakra/icons";
 import { LocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
 import type { IProfileFieldMonitoringSettings } from "@parallel/components/organization/profiles/settings/ProfileFieldMonitoringSettings";
@@ -58,6 +59,9 @@ export type ProfileTypeFieldOptions<TType extends ProfileTypeFieldType> = {
     } | null;
   };
   ADVERSE_MEDIA_SEARCH: IProfileFieldMonitoringSettings;
+  USER_ASSIGNMENT: {
+    allowedUserGroupId?: Maybe<string>;
+  };
 }[TType];
 
 export const PROFILE_TYPE_FIELD_CONFIG = Object.freeze({
@@ -151,6 +155,15 @@ export const PROFILE_TYPE_FIELD_CONFIG = Object.freeze({
       }),
     icon: MediaIcon,
     color: "green.700",
+  },
+  USER_ASSIGNMENT: {
+    label: (intl) =>
+      intl.formatMessage({
+        id: "generic.profile-type-field-type-user-assignment",
+        defaultMessage: "User assignment",
+      }),
+    icon: UserIcon,
+    color: "blue.500",
   },
 } as Record<
   ProfileTypeFieldType,

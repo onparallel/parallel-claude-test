@@ -220,6 +220,10 @@ function validateSchema(
             validateValue(value.value, "string", true);
           }
           break;
+        case "USER_ASSIGNMENT":
+          validateOperator(value.operator, ["EQUAL", "NOT_EQUAL"], profileTypeField);
+          validateValue(value.value, "string");
+          break;
         case "FILE":
           // any other operator besides HAS_VALUE and NOT_HAS_VALUE is not allowed on FILEs
           never();

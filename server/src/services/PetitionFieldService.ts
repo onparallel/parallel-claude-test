@@ -1,10 +1,12 @@
+/** no-recipient */
 import DataLoader from "dataloader";
 import { fromZonedTime } from "date-fns-tz";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { FromSchema } from "json-schema-to-ts";
 import pMap from "p-map";
 import { join } from "path";
 import { isNonNullish, omit } from "remeda";
+import { assert } from "ts-essentials";
 import {
   ContactLocale,
   CreatePetitionField,
@@ -13,7 +15,9 @@ import {
   PetitionFieldType,
   TableTypes,
 } from "../db/__types";
-import { fromGlobalId } from "../util/globalId";
+import { UserRepository } from "../db/repositories/UserRepository";
+import { isValidEmail } from "../graphql/helpers/validators/validEmail";
+import { fromGlobalId, isGlobalId } from "../util/globalId";
 import { never } from "../util/never";
 
 const EU_COUNTRIES =
@@ -423,6 +427,14 @@ export const SCHEMAS = {
       integrationId: { type: ["number", "null"] },
     },
   },
+  USER_ASSIGNMENT: {
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      allowedUserGroupId: { type: ["number", "null"] },
+      replyOnlyFromProfile: { type: ["boolean", "null"] },
+    },
+  },
 } as const;
 
 export type PetitionFieldOptions = {
@@ -433,6 +445,8 @@ export const PETITION_FIELD_SERVICE = Symbol.for("PETITION_FIELD_SERVICE");
 
 @injectable()
 export class PetitionFieldService {
+  constructor(@inject(UserRepository) private users: UserRepository) {}
+
   defaultFieldProperties(
     type: PetitionFieldType,
     field?: PetitionField,
@@ -584,6 +598,12 @@ export class PetitionFieldService {
             searchIn: [],
           };
         }
+        case "USER_ASSIGNMENT": {
+          return {
+            replyOnlyFromProfile,
+            allowedUserGroupId: field?.options.allowedUserGroupId ?? null,
+          };
+        }
         default:
           throw new Error();
       }
@@ -597,6 +617,7 @@ export class PetitionFieldService {
         "BACKGROUND_CHECK",
         "PROFILE_SEARCH",
         "ADVERSE_MEDIA_SEARCH",
+        "USER_ASSIGNMENT",
       ].includes(type)
         ? true
         : (field?.is_internal ?? false),
@@ -605,6 +626,7 @@ export class PetitionFieldService {
         "BACKGROUND_CHECK",
         "PROFILE_SEARCH",
         "ADVERSE_MEDIA_SEARCH",
+        "USER_ASSIGNMENT",
       ].includes(type)
         ? false
         : (field?.show_in_pdf ?? true),
@@ -769,6 +791,13 @@ export class PetitionFieldService {
             : null,
           replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,
         };
+      case "USER_ASSIGNMENT":
+        return {
+          allowedUserGroupId: isNonNullish(field.options.allowedUserGroupId)
+            ? idMapFn("UserGroup", field.options.allowedUserGroupId)
+            : null,
+          replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,
+        };
       default:
         never(`Unknown field type: ${field.type}`);
     }
@@ -788,18 +817,36 @@ export class PetitionFieldService {
     };
   }
 
-  mapReplyContentToDatabase(type: PetitionFieldType, content: any) {
-    return type === "DATE_TIME"
-      ? {
+  async mapReplyContentToDatabase(type: PetitionFieldType, content: any, orgId: number) {
+    switch (type) {
+      case "DATE_TIME":
+        return {
           ...content,
           value: fromZonedTime(content.datetime, content.timezone).toISOString(),
+        };
+      case "PROFILE_SEARCH":
+        return {
+          ...omit(content, ["profileIds"]),
+          value: content.profileIds.map((id: string) => fromGlobalId(id, "Profile").id),
+        };
+      case "USER_ASSIGNMENT":
+        if (isValidEmail(content.value)) {
+          const users = await this.users.loadUsersByEmail(content.value);
+          const user = users.find((u) => u.org_id === orgId);
+          assert(user, `User with email ${content.value} not found in organization`);
+          return {
+            value: user.id,
+          };
+        } else if (isGlobalId(content.value, "User")) {
+          return {
+            value: fromGlobalId(content.value).id,
+          };
+        } else {
+          never(`Invalid user assignment value: Expected email or globalId, got ${content.value}`);
         }
-      : type === "PROFILE_SEARCH"
-        ? {
-            ...omit(content, ["profileIds"]),
-            value: content.profileIds.map((id: string) => fromGlobalId(id, "Profile").id),
-          }
-        : content;
+      default:
+        return content;
+    }
   }
 
   private readonly standardListsLoader = new DataLoader<

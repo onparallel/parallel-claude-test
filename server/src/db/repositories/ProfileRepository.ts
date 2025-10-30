@@ -1438,7 +1438,7 @@ export class ProfileRepository extends BaseRepository {
               from new_values nv
               left join with_no_previous_values wnpv on wnpv.profile_id = nv.profile_id and wnpv.profile_type_field_id = nv.profile_type_field_id
               left join with_previous_values wpv on wpv.profile_id = nv.profile_id and wpv.profile_type_field_id = nv.profile_type_field_id
-              where nv.type in ('SHORT_TEXT', 'SELECT', 'CHECKBOX', 'DATE', 'PHONE', 'NUMBER')
+              where nv.type in ('SHORT_TEXT', 'SELECT', 'CHECKBOX', 'DATE', 'PHONE', 'NUMBER', 'USER_ASSIGNMENT')
               group by nv.profile_id
             ) t
             where p.id = t.profile_id
@@ -1454,11 +1454,7 @@ export class ProfileRepository extends BaseRepository {
               f.profileTypeFieldId,
               f.type,
               // undefined ('null'::jsonb) uses previous value, null removes
-              f.content === undefined
-                ? "null"
-                : f.content
-                  ? this.json(this.profileTypeFields.mapValueContentToDatabase(f.type, f.content))
-                  : null,
+              f.content === undefined ? "null" : f.content ? this.json(f.content) : null,
               // undefined ('-infinity'::date) uses previous value, null removes
               f.expiryDate === undefined ? "-infinity" : (f.expiryDate ?? null),
               f.pendingReview ?? false,
@@ -1581,9 +1577,7 @@ export class ProfileRepository extends BaseRepository {
             f.profileId,
             f.profileTypeFieldId,
             f.type,
-            f.content
-              ? JSON.stringify(this.profileTypeFields.mapValueContentToDatabase(f.type, f.content))
-              : null,
+            f.content ? this.json(f.content) : null,
             f.expiryDate ?? null,
           ]),
           ["int", "int", "profile_type_field_type", "jsonb", "date"],

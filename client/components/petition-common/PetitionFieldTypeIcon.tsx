@@ -18,6 +18,7 @@ import {
   MediaIcon,
   ProfileSearchIcon,
   ShortSearchIcon,
+  UserIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
@@ -49,6 +50,7 @@ export const PetitionFieldTypeIcon = chakraForwardRef<"svg", PetitionFieldTypeIc
         ID_VERIFICATION: IdVerificationIcon,
         PROFILE_SEARCH: ProfileSearchIcon,
         ADVERSE_MEDIA_SEARCH: MediaIcon,
+        USER_ASSIGNMENT: UserIcon,
       } as Record<PetitionFieldType, ElementType>
     )[type];
     return <Icon as={icon} {...(props as any)} ref={ref} />;

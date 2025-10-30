@@ -19,6 +19,7 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
+import { mapProfileFieldValuesFilterToDatabase } from "../views/helpers";
 import {
   profileTypeFieldBelongsToProfileType,
   profileTypeFieldIsOfType,
@@ -203,7 +204,10 @@ export const profiles = queryField((t) => {
           limit,
           offset,
           search,
-          filter: filter as any,
+          filter: {
+            ...filter,
+            values: mapProfileFieldValuesFilterToDatabase(filter?.values),
+          },
           sortBy: sortBy?.map((value) => {
             const [field, order] = parseSortBy(value);
             return { field, order };
@@ -315,7 +319,8 @@ export const profilesWithSameContent = queryField("profilesWithSameContent", {
           name: "ProfilesWithContent",
           definition(t) {
             t.nonNull.jsonObject("content", {
-              resolve: (root, _, ctx) => ctx.profilesHelper.mapValueContentFromDatabase(root),
+              resolve: async (root, _, ctx) =>
+                await ctx.profilesHelper.mapValueContentFromDatabase(root),
             });
             t.nonNull.list.nonNull.field("profiles", { type: "Profile" });
           },

@@ -1506,6 +1506,15 @@ const _DateTimeReplySubmitContent = {
   },
 } as const;
 
+const _UserAssignmentReplySubmitContent = {
+  title: "UserAssignmentReplyContent",
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    user: { type: "string", description: "The ID or email of the user" },
+  },
+} as const;
+
 const _PetitionFieldReplyStatus = {
   type: "string",
   title: "PetitionFieldReplyStatus",
@@ -1535,6 +1544,7 @@ export const SubmitReply = schema({
         _CheckboxReplySubmitContent,
         _DynamicSelectReplySubmitContent,
         _DateTimeReplySubmitContent,
+        _UserAssignmentReplySubmitContent,
       ],
     },
     status: _PetitionFieldReplyStatus,
@@ -1556,6 +1566,7 @@ export const UpdateReply = schema({
         _CheckboxReplySubmitContent,
         _DynamicSelectReplySubmitContent,
         _DateTimeReplySubmitContent,
+        _UserAssignmentReplySubmitContent,
       ],
     },
   },

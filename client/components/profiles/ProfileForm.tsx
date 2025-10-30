@@ -114,6 +114,7 @@ const SUGGESTIONS_TYPE_MAPPING: Record<ProfileTypeFieldType, PetitionFieldType[]
   BACKGROUND_CHECK: ["BACKGROUND_CHECK"],
   CHECKBOX: ["SELECT", "CHECKBOX"],
   ADVERSE_MEDIA_SEARCH: ["ADVERSE_MEDIA_SEARCH"],
+  USER_ASSIGNMENT: ["USER_ASSIGNMENT"],
 };
 
 function normalize(alias: string) {

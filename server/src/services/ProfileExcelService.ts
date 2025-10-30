@@ -11,7 +11,7 @@ import { ProfileTypeFieldService } from "./ProfileTypeFieldService";
 
 @injectable()
 export abstract class ProfileExcelService {
-  constructor(private profileTypeFields: ProfileTypeFieldService) {}
+  constructor(protected profileTypeFields: ProfileTypeFieldService) {}
 
   protected async initializeExcelWorkbook(
     columns: ("profile-id" | number)[],

@@ -4,7 +4,7 @@ import { Knex } from "knex";
 import { pick } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
-import { Organization, User } from "../../__types";
+import { Organization, User, UserGroup } from "../../__types";
 import { KNEX } from "../../knex";
 import { OrganizationRepository } from "../OrganizationRepository";
 import { Mocks } from "./mocks";
@@ -30,6 +30,8 @@ describe("repositories/OrganizationRepository", () => {
   describe("loadOrgUsers", () => {
     let org1: Organization, org2: Organization, org3: Organization;
     let org1Users: User[], org2Users: User[];
+
+    let userGroups: UserGroup[];
     const usersToSearch = [
       {
         first_name: "Joffrey",
@@ -69,6 +71,15 @@ describe("repositories/OrganizationRepository", () => {
     beforeAll(async () => {
       [org1, org2, org3] = await mocks.createRandomOrganizations(3);
       org1Users = await mocks.createRandomUsers(org1.id, 42);
+
+      userGroups = await mocks.createUserGroups(2, org1.id);
+
+      await mocks.insertUserGroupMembers(
+        userGroups[0].id,
+        org1Users.slice(0, 3).map((u) => u.id),
+      );
+      await mocks.insertUserGroupMembers(userGroups[1].id, [org1Users[7].id]);
+
       org2Users = await mocks.createRandomUsers(
         org2.id,
         10,
@@ -81,6 +92,17 @@ describe("repositories/OrganizationRepository", () => {
           // delete even i
           deleted_at: i % 2 === 0 ? new Date(2000, 1, 1) : null,
         }),
+      );
+    });
+
+    it("returns only from specified groups", async () => {
+      const result = organizations.getPaginatedUsersForOrg(org1.id, {
+        limit: 10,
+        fromUserGroupIds: [userGroups[0].id, userGroups[1].id],
+      });
+      expect(await result.totalCount).toBe(4);
+      expect(await result.items).toMatchObject(
+        [...org1Users.slice(0, 3), org1Users[7]].map(pick(["id"])),
       );
     });
 

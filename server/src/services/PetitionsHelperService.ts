@@ -15,7 +15,9 @@ import {
 import { FileRepository } from "../db/repositories/FileRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { ProfileRepository } from "../db/repositories/ProfileRepository";
+import { UserRepository } from "../db/repositories/UserRepository";
 import { ApolloError, ForbiddenError } from "../graphql/helpers/errors";
+import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
 import { includesSameElements } from "../util/includesSameElements";
 import { isFileTypeField } from "../util/isFileTypeField";
@@ -46,6 +48,7 @@ export class PetitionsHelperService {
     @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: IOrganizationCreditsService,
     @inject(ENCRYPTION_SERVICE) private encryption: IEncryptionService,
     @inject(ADVERSE_MEDIA_SEARCH_SERVICE) private adverseMedia: IAdverseMediaSearchService,
+    @inject(UserRepository) private users: UserRepository,
   ) {}
 
   async userCanWriteOnPetitionField(
@@ -211,6 +214,21 @@ export class PetitionsHelperService {
           ),
           createdAt: content.articles.createdAt,
         },
+      };
+    } else if (reply.type === "USER_ASSIGNMENT") {
+      const user = await this.users.loadUser(reply.content.value);
+      const userData = await this.users.loadUserDataByUserId(reply.content.value);
+      return {
+        value: toGlobalId("User", reply.content.value),
+        user:
+          user && userData
+            ? {
+                id: toGlobalId("User", user.id),
+                fullName: fullName(userData.first_name, userData.last_name),
+                email: userData.email,
+                status: user.status,
+              }
+            : null,
       };
     } else {
       return reply.content ?? {};
