@@ -13,6 +13,10 @@ import {
   DOCUMENT_PROCESSING_LISTENER,
   DocumentProcessingListener,
 } from "./DocumentProcessingListener";
+import {
+  KYC_REFRESH_DATE_UPDATE_LISTENER,
+  KycRefreshDateUpdateListener,
+} from "./KycRefreshDateUpdateListener";
 import { PETITION_ACTIVITY_LISTENER, PetitionActivityListener } from "./PetitionActivityListener";
 import {
   PETITION_APPROVAL_PROCESS_LISTENER,
@@ -46,4 +50,5 @@ export const eventListenersModule = new ContainerModule((options) => {
     .to(AutomaticBackgroundCheckProfileListener);
   options.bind(PETITION_APPROVAL_PROCESS_LISTENER).to(PetitionApprovalProcessListener);
   options.bind(CLIENT_RISK_UPDATE_LISTENER).to(ClientRiskUpdateListener);
+  options.bind(KYC_REFRESH_DATE_UPDATE_LISTENER).to(KycRefreshDateUpdateListener);
 });
