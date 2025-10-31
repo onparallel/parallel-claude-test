@@ -3600,6 +3600,7 @@ export function publicApi(container: Container) {
         },
         responses: {
           200: SuccessResponse(Profile),
+          400: ErrorResponse({ description: "Invalid profile status" }),
         },
         tags: ["Parallels"],
       },
@@ -3621,18 +3622,27 @@ export function publicApi(container: Container) {
           ${ProfileFragment}
         `;
 
-        const response = await client.request(
-          AssociatePetitionToProfile_associateProfileToPetitionDocument,
-          {
-            profileId: body.profileId,
-            petitionId: params.petitionId,
-            ...getProfileIncludesFromQuery(query),
-          },
-        );
+        try {
+          const response = await client.request(
+            AssociatePetitionToProfile_associateProfileToPetitionDocument,
+            {
+              profileId: body.profileId,
+              petitionId: params.petitionId,
+              ...getProfileIncludesFromQuery(query),
+            },
+          );
 
-        assert("id" in response.associateProfileToPetition.profile);
+          assert("id" in response.associateProfileToPetition.profile);
 
-        return Ok(mapProfile(response.associateProfileToPetition.profile));
+          return Ok(mapProfile(response.associateProfileToPetition.profile));
+        } catch (error) {
+          if (containsGraphQLError(error, "INVALID_PROFILE_STATUS_ERROR")) {
+            throw new BadRequestError(
+              "The profile must have status OPEN or CLOSED in order to be associated with a petition",
+            );
+          }
+          throw error;
+        }
       },
     );
 
@@ -3645,6 +3655,7 @@ export function publicApi(container: Container) {
         description: "Disassociates the parallel from a profile.",
         responses: {
           200: SuccessResponse(),
+          400: ErrorResponse({ description: "Invalid profile status" }),
           409: ErrorResponse({
             description: "The profile is not associated to this parallel",
           }),
@@ -3673,6 +3684,11 @@ export function publicApi(container: Container) {
         } catch (error) {
           if (containsGraphQLError(error, "PROFILE_NOT_ASSOCIATED_TO_PETITION")) {
             throw new ConflictError("The profile is not associated to this parallel");
+          }
+          if (containsGraphQLError(error, "INVALID_PROFILE_STATUS_ERROR")) {
+            throw new BadRequestError(
+              "The profile must have status OPEN or CLOSED in order to be disassociated from a petition",
+            );
           }
           throw error;
         }
@@ -5257,7 +5273,10 @@ export function publicApi(container: Container) {
         description: "Creates a relationships with the specified profile",
         tags: ["Profiles"],
         body: JsonBody(CreateProfileRelationship),
-        responses: { 201: SuccessResponse(ListOfProfileRelationships) },
+        responses: {
+          201: SuccessResponse(ListOfProfileRelationships),
+          400: ErrorResponse({ description: "Relationship cannot be created" }),
+        },
       },
       async ({ client, body, params }) => {
         let relationshipTypeId = "relationshipTypeId" in body ? body.relationshipTypeId : undefined;
@@ -5317,6 +5336,11 @@ export function publicApi(container: Container) {
           if (containsGraphQLError(error, "INVALID_PROFILE_RELATIONSHIP_TYPE_ERROR")) {
             throw new BadRequestError(
               "The profiles cannot be associated with the given relationship type",
+            );
+          }
+          if (containsGraphQLError(error, "INVALID_PROFILE_STATUS_ERROR")) {
+            throw new BadRequestError(
+              "The profile must have status OPEN or CLOSED in order to be associated with a relationship",
             );
           }
           throw error;
@@ -5403,6 +5427,7 @@ export function publicApi(container: Container) {
         query: profileIncludeParam,
         responses: {
           201: SuccessResponse(Profile),
+          400: ErrorResponse({ description: "Invalid profile status" }),
         },
       },
       async ({ client, params, body, query }) => {
@@ -5420,17 +5445,27 @@ export function publicApi(container: Container) {
           }
           ${ProfileFragment}
         `;
-        const includes = getProfileIncludesFromQuery(query);
-        const response = await client.request(SubscribeToProfile_subscribeToProfileDocument, {
-          profileId: params.profileId,
-          userIds: body.userIds,
-          ...includes,
-        });
 
-        assert(response.subscribeToProfile.length === 1);
-        assert("id" in response.subscribeToProfile[0]);
+        try {
+          const includes = getProfileIncludesFromQuery(query);
+          const response = await client.request(SubscribeToProfile_subscribeToProfileDocument, {
+            profileId: params.profileId,
+            userIds: body.userIds,
+            ...includes,
+          });
 
-        return Created(mapProfile(response.subscribeToProfile[0], includes));
+          assert(response.subscribeToProfile.length === 1);
+          assert("id" in response.subscribeToProfile[0]);
+
+          return Created(mapProfile(response.subscribeToProfile[0], includes));
+        } catch (error) {
+          if (containsGraphQLError(error, "INVALID_PROFILE_STATUS_ERROR")) {
+            throw new BadRequestError(
+              "The profile must have status OPEN or CLOSED in order to be subscribed to",
+            );
+          }
+          throw error;
+        }
       },
     )
     .delete(
@@ -5443,6 +5478,7 @@ export function publicApi(container: Container) {
         body: JsonBody(ProfileSubscriptionInput(false)),
         responses: {
           200: SuccessResponse(Profile),
+          400: ErrorResponse({ description: "Invalid profile status" }),
         },
       },
       async ({ client, params, query, body }) => {
@@ -5461,20 +5497,29 @@ export function publicApi(container: Container) {
           ${ProfileFragment}
         `;
 
-        const includes = getProfileIncludesFromQuery(query);
-        const response = await client.request(
-          UnsubscribeFromProfile_unsubscribeFromProfileDocument,
-          {
-            profileId: params.profileId,
-            userIds: body.userIds,
-            ...includes,
-          },
-        );
+        try {
+          const includes = getProfileIncludesFromQuery(query);
+          const response = await client.request(
+            UnsubscribeFromProfile_unsubscribeFromProfileDocument,
+            {
+              profileId: params.profileId,
+              userIds: body.userIds,
+              ...includes,
+            },
+          );
 
-        assert(response.unsubscribeFromProfile.length === 1);
-        assert("id" in response.unsubscribeFromProfile[0]);
+          assert(response.unsubscribeFromProfile.length === 1);
+          assert("id" in response.unsubscribeFromProfile[0]);
 
-        return Ok(mapProfile(response.unsubscribeFromProfile[0], includes));
+          return Ok(mapProfile(response.unsubscribeFromProfile[0], includes));
+        } catch (error) {
+          if (containsGraphQLError(error, "INVALID_PROFILE_STATUS_ERROR")) {
+            throw new BadRequestError(
+              "The profile must have status OPEN or CLOSED in order to be unsubscribed from",
+            );
+          }
+          throw error;
+        }
       },
     );
 
