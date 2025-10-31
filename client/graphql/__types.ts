@@ -743,6 +743,7 @@ export type DashboardModuleProfileFieldValuesFilterOperator =
   | "HAS_BG_CHECK_RESULTS"
   | "HAS_BG_CHECK_TOPICS"
   | "HAS_EXPIRY"
+  | "HAS_PENDING_REVIEW"
   | "HAS_VALUE"
   | "IS_EXPIRED"
   | "IS_ONE_OF"
@@ -755,6 +756,7 @@ export type DashboardModuleProfileFieldValuesFilterOperator =
   | "NOT_HAS_BG_CHECK_RESULTS"
   | "NOT_HAS_BG_CHECK_TOPICS"
   | "NOT_HAS_EXPIRY"
+  | "NOT_HAS_PENDING_REVIEW"
   | "NOT_HAS_VALUE"
   | "NOT_IS_ONE_OF"
   | "START_WITH";

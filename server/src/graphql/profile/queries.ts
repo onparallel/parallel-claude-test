@@ -12,7 +12,10 @@ import pMap from "p-map";
 import { indexBy, isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { ProfileTypeField } from "../../db/__types";
-import { validateProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
+import {
+  ProfileFieldValuesFilterOperatorValues,
+  validateProfileFieldValuesFilter,
+} from "../../util/ProfileFieldValuesFilter";
 import { authenticate, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -126,36 +129,7 @@ export const profiles = queryField((t) => {
                 t.nullable.field("operator", {
                   type: enumType({
                     name: "ProfileFieldValuesFilterOperator",
-                    members: [
-                      "HAS_VALUE",
-                      "NOT_HAS_VALUE",
-                      "EQUAL",
-                      "NOT_EQUAL",
-                      "START_WITH",
-                      "END_WITH",
-                      "CONTAIN",
-                      "NOT_CONTAIN",
-                      "IS_ONE_OF",
-                      "NOT_IS_ONE_OF",
-                      "LESS_THAN",
-                      "LESS_THAN_OR_EQUAL",
-                      "GREATER_THAN",
-                      "GREATER_THAN_OR_EQUAL",
-                      "HAS_BG_CHECK_RESULTS",
-                      "NOT_HAS_BG_CHECK_RESULTS",
-                      "HAS_BG_CHECK_MATCH",
-                      "NOT_HAS_BG_CHECK_MATCH",
-                      "HAS_BG_CHECK_TOPICS",
-                      "NOT_HAS_BG_CHECK_TOPICS",
-                      "HAS_ANY_BG_CHECK_TOPICS",
-                      "NOT_HAS_ANY_BG_CHECK_TOPICS",
-                      "IS_EXPIRED",
-                      "EXPIRES_IN",
-                      "HAS_EXPIRY",
-                      "NOT_HAS_EXPIRY",
-                      "HAS_PENDING_REVIEW",
-                      "NOT_HAS_PENDING_REVIEW",
-                    ],
+                    members: ProfileFieldValuesFilterOperatorValues,
                   }),
                 });
                 t.nullable.json("value");
