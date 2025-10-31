@@ -152,6 +152,17 @@
           }
         },
         {
+          "pid_file": "/var/run/parallel-low-priority-event-queue.pid",
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
+          "metrics_collection_interval": 10,
+          "append_dimensions": {
+            "Process": "parallel-low-priority-event-queue"
+          }
+        },
+        {
           "pid_file": "/var/run/parallel-signature-worker-queue.pid",
           "measurement": [
             "cpu_usage",
