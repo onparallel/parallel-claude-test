@@ -81,7 +81,7 @@ export class DocumentProcessingRunner extends TaskRunner<"DOCUMENT_PROCESSING"> 
       return { success: false };
     }
 
-    if (parseInt(file.size) > toBytes(10, "MB")) {
+    if (parseInt(file.size) > toBytes(5, "MB")) {
       return { success: false };
     }
 
