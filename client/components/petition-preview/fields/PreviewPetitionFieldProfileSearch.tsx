@@ -124,13 +124,17 @@ export function PreviewPetitionFieldProfileSearch({
     browserTabRef.current?.close();
   };
 
+  const filteredReplies = parentReplyId
+    ? field.replies.filter((r) => r.parent?.id === parentReplyId)
+    : field.replies;
+
   return (
     <RecipientViewPetitionFieldLayout
       field={field}
       onCommentsButtonClick={onCommentsButtonClick}
       onDownloadAttachment={onDownloadAttachment}
     >
-      {field.replies.length ? (
+      {filteredReplies.length ? (
         <Text fontSize="sm" color="gray.600">
           <FormattedMessage
             id="component.recipient-view-petition-field-card.searches-uploaded"
@@ -140,10 +144,10 @@ export function PreviewPetitionFieldProfileSearch({
         </Text>
       ) : null}
 
-      {field.replies.length ? (
+      {filteredReplies.length ? (
         <List as={Stack} marginTop={1}>
           <AnimatePresence initial={false}>
-            {field.replies.map((reply) => (
+            {filteredReplies.map((reply) => (
               <motion.li
                 key={reply.id}
                 layout
@@ -170,7 +174,7 @@ export function PreviewPetitionFieldProfileSearch({
         marginTop={3}
         id={`reply-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}-new`}
       >
-        {false ? (
+        {filteredReplies.length ? (
           <FormattedMessage
             id="component.preview-petition-field-profile-search.modify-search"
             defaultMessage="Modify search"

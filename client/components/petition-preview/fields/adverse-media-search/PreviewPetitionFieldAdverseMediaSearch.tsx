@@ -226,6 +226,10 @@ export function PreviewPetitionFieldAdverseMediaSearch({
     [onDeleteReply],
   );
 
+  const filteredReplies = parentReplyId
+    ? field.replies.filter((r) => r.parent?.id === parentReplyId)
+    : field.replies;
+
   return (
     <RecipientViewPetitionFieldLayout
       field={field}
@@ -242,10 +246,10 @@ export function PreviewPetitionFieldAdverseMediaSearch({
         </Text>
       ) : null}
 
-      {true ? (
+      {filteredReplies.length ? (
         <List as={Stack} marginTop={1}>
           <AnimatePresence initial={false}>
-            {field.replies.map((reply) => (
+            {filteredReplies.map((reply) => (
               <motion.li
                 key={reply.id}
                 layout
@@ -292,13 +296,13 @@ export function PreviewPetitionFieldAdverseMediaSearch({
           isDisabled ||
           state === "FETCHING" ||
           !hasAdverseMediaSearchFeatureFlag ||
-          field.replies.some((reply) => reply.status === "APPROVED")
+          filteredReplies.some((reply) => reply.status === "APPROVED")
         }
         marginTop={3}
         outlineColor={state !== "FETCHING" && isInvalid ? "red.500" : undefined}
         id={`reply-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}-new`}
       >
-        {field.replies.length ? (
+        {filteredReplies.length ? (
           <FormattedMessage
             id="component.preview-petition-adverse-media-search.do-another-search"
             defaultMessage="Modify search"
