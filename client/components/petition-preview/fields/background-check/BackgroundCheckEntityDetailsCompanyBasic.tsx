@@ -182,8 +182,9 @@ export function BackgroundCheckEntityDetailsCompanyBasic({
           <HStack>
             <FieldDateIcon />
             <Text as="span">
-              {dateOfRegistration?.map((date, i) => formatPartialDate({ date }))?.join(" · ") ??
-                "-"}
+              {dateOfRegistration
+                ?.map((date, i) => formatPartialDate({ date, intl }))
+                ?.join(" · ") ?? "-"}
             </Text>
           </HStack>
         </Stack>

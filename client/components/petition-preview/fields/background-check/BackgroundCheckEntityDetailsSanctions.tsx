@@ -154,7 +154,7 @@ function useBackgroundCheckSanctionsColumns() {
           return (
             <>
               {properties.startDate?.map((date, i) => (
-                <Text key={i}>{formatPartialDate({ date })}</Text>
+                <Text key={i}>{formatPartialDate({ date, intl })}</Text>
               )) ?? "-"}
             </>
           );
@@ -175,7 +175,7 @@ function useBackgroundCheckSanctionsColumns() {
           return (
             <>
               {properties.endDate?.map((date, i) => (
-                <Text key={i}>{formatPartialDate({ date })}</Text>
+                <Text key={i}>{formatPartialDate({ date, intl })}</Text>
               )) ?? "-"}
             </>
           );

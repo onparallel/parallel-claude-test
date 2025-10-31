@@ -282,7 +282,7 @@ export function BackgroundCheckEntityDetailsPersonBasic({
               {dateOfBirth && dateOfBirth.length > 0 ? (
                 dateOfBirth.map((date, i) => (
                   <Fragment key={i}>
-                    <Text>{formatPartialDate({ date })}</Text>
+                    <Text>{formatPartialDate({ date, intl })}</Text>
                     {i < dateOfBirth.length - 1 && (
                       <Text as="span" aria-hidden="true">
                         &middot;

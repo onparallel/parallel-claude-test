@@ -1,11 +1,10 @@
 import { FORMATS } from "@parallel/utils/dates";
-import { useIntl } from "react-intl";
+import { IntlShape } from "react-intl";
 
 // Same function in server/src/pdf/utils/formatPartialDate.ts to format the date in the PDF
 // date is a string in the format "YYYY-MM-DD" or "YYYY-MM" or "YYYY"
 
-export function formatPartialDate({ date }: { date: string }) {
-  const intl = useIntl();
+export function formatPartialDate({ date, intl }: { date: string; intl: IntlShape }) {
   const splittedDate = date.split("-").map((d) => parseInt(d));
 
   if (splittedDate.length === 1) {

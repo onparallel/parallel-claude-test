@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useMutation } from "@apollo/client/react";
 import { Box, Center, HStack, Skeleton, Spinner, Stack, Text, useToast } from "@chakra-ui/react";
 import { RepeatIcon, ShortSearchIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
@@ -19,11 +19,11 @@ import { BackgroundCheckEntityDifferencesAlert } from "@parallel/components/peti
 import { useBackgroundCheckContentsNotUpdatedDialog } from "@parallel/components/profiles/dialogs/BackgroundCheckContentsNotUpdatedDialog";
 import {
   BackgroundCheckEntitySearchType,
-  BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragment,
   BackgroundCheckProfileDetails_backgroundCheckEntityDetailsDocument,
   BackgroundCheckProfileDetails_updateBackgroundCheckEntityDocument,
   BackgroundCheckProfileDetails_updateProfileFieldValueOptionsDocument,
 } from "@parallel/graphql/__types";
+import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
@@ -72,12 +72,13 @@ function BackgroundCheckProfileDetails({
 
   const entityTypeLabel = getEntityTypeLabel(intl, type);
 
-  const { data, loading, error, refetch } = useQuery(
+  const { data, loading, error, refetch } = useQueryOrPreviousData(
     BackgroundCheckProfileDetails_backgroundCheckEntityDetailsDocument,
     {
       variables: {
         token,
         entityId,
+        force: false,
       },
       fetchPolicy: "cache-and-network",
     },
@@ -88,9 +89,10 @@ function BackgroundCheckProfileDetails({
     showGenericErrorToast();
   }
 
-  const details = data?.backgroundCheckEntityDetails as
-    | BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsFragment
-    | undefined;
+  const details = data?.backgroundCheckEntityDetails;
+
+  // Only show skeleton when we have no data at all (true initial loading)
+  const isInitialLoading = loading && !details;
 
   useInterval(
     () => {
@@ -287,7 +289,7 @@ function BackgroundCheckProfileDetails({
           </HStack>
 
           <HStack>
-            {loading || !details || !details.createdAt ? (
+            {isInitialLoading || !details || !details.createdAt ? (
               <Skeleton height="18px" width="280px" />
             ) : (
               <Text>
@@ -315,7 +317,7 @@ function BackgroundCheckProfileDetails({
           </HStack>
         </HStack>
 
-        {loading || !details ? (
+        {isInitialLoading ? (
           <>
             <Card>
               <CardHeader minHeight="65px">
@@ -382,7 +384,7 @@ function BackgroundCheckProfileDetails({
               </Center>
             </Card>
           </>
-        ) : (
+        ) : isNonNullish(details) ? (
           <>
             {!isDisabled && details.hasPendingReview && details?.reviewDiff ? (
               <BackgroundCheckEntityDifferencesAlert
@@ -422,11 +424,11 @@ function BackgroundCheckProfileDetails({
               </>
             ) : null}
 
-            {isNonNullish(details.properties.sanctions) ? (
+            {isNonNullish(details?.properties?.sanctions) ? (
               <BackgroundCheckEntityDetailsSanctions sanctions={details.properties.sanctions} />
             ) : null}
 
-            {isNonNullish(details.properties.relationships) ? (
+            {isNonNullish(details?.properties?.relationships) ? (
               <BackgroundCheckEntityDetailsRelationships
                 entityId={entityId}
                 relationships={details.properties.relationships}
@@ -434,11 +436,11 @@ function BackgroundCheckProfileDetails({
               />
             ) : null}
 
-            {isNonNullish(details.datasets) ? (
+            {isNonNullish(details?.datasets) ? (
               <BackgroundCheckEntityDetailsDatasets datasets={details.datasets} />
             ) : null}
           </>
-        )}
+        ) : null}
       </Stack>
     </>
   );

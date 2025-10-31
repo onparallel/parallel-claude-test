@@ -250,7 +250,7 @@ function useBackgroundCheckRelationshipsColumns(entityId: string) {
           return (
             <>
               {properties.startDate?.map((date, i) => (
-                <Text key={i}>{formatPartialDate({ date })}</Text>
+                <Text key={i}>{formatPartialDate({ date, intl })}</Text>
               )) ?? "-"}
             </>
           );
@@ -271,7 +271,7 @@ function useBackgroundCheckRelationshipsColumns(entityId: string) {
           return (
             <>
               {properties.endDate?.map((date, i) => (
-                <Text key={i}>{formatPartialDate({ date })}</Text>
+                <Text key={i}>{formatPartialDate({ date, intl })}</Text>
               )) ?? "-"}
             </>
           );

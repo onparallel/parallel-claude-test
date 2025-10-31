@@ -121,8 +121,10 @@ export function PetitionSharingDialog({
     firstPetitionEffectivePermissions: [],
   };
 
+  const ranOnce = useRef(false);
   useEffect(() => {
-    if (!loading) {
+    if (!loading && !ranOnce.current) {
+      ranOnce.current = true;
       setTimeout(() => usersRef.current?.focus());
     }
   }, [loading]);

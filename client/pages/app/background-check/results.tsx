@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useMutation } from "@apollo/client/react";
 import {
   Box,
   Button,
@@ -51,6 +51,7 @@ import {
   BackgroundCheckFieldSearchResults_updateProfileFieldValueDocument,
   BackgroundCheckFieldSearchResults_updateProfileFieldValueOptionsDocument,
 } from "@parallel/graphql/__types";
+import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { formatPartialDate } from "@parallel/utils/formatPartialDate";
@@ -124,7 +125,7 @@ function BackgroundCheckFieldSearchResults({
 
   const entityTypeLabel = getEntityTypeLabel(intl, type);
 
-  const { data, loading, error, refetch } = useQuery(
+  const { data, loading, error, refetch } = useQueryOrPreviousData(
     BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocument,
     {
       variables: {
@@ -793,7 +794,7 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                 {row.properties.birthDate?.map((date, i) => (
                   <Fragment key={i}>
                     <Text as="span" key={i}>
-                      {formatPartialDate({ date })}
+                      {formatPartialDate({ date, intl })}
                     </Text>
                     {i < row.properties.birthDate!.length - 1 && (
                       <Text as="span" aria-hidden="true">
@@ -809,7 +810,7 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
               <Flex gap={2} flexWrap="wrap">
                 {row.properties.incorporationDate?.map((date, i) => (
                   <Text as="span" key={i}>
-                    {formatPartialDate({ date })}
+                    {formatPartialDate({ date, intl })}
                   </Text>
                 )) ?? "-"}
               </Flex>
