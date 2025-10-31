@@ -45,7 +45,86 @@ const CONFIG: Config[] =
         },
       ]
     : process.env.ENV === "production"
-      ? []
+      ? [
+          // DEMO (Compliance & Legal)
+          {
+            orgId: 45041,
+            profileTypes: [
+              //INDIVIDUALS
+              {
+                profileTypeId: 10480,
+                statusProfileTypeFieldId: 188993,
+                riskProfileTypeFieldId: 149549,
+                lastKycDateProfileTypeFieldId: 200648,
+                nextKycDateProfileTypeFieldId: 200649,
+                dateIntervalsByRisk: {
+                  HIGH: { years: 1 },
+                  MEDIUM_HIGH: { years: 2 },
+                  MEDIUM: { years: 3 },
+                  MEDIUM_LOW: { years: 4 },
+                  LOW: { years: 5 },
+                },
+                clientStatusValuesForKycRefresh: ["APPROVED", "ACTIVE"],
+              },
+              // COMPANIES
+              {
+                profileTypeId: 10481,
+                statusProfileTypeFieldId: 189002,
+                riskProfileTypeFieldId: 149568,
+                lastKycDateProfileTypeFieldId: 200554,
+                nextKycDateProfileTypeFieldId: 160769,
+                dateIntervalsByRisk: {
+                  HIGH: { years: 1 },
+                  MEDIUM_HIGH: { years: 2 },
+                  MEDIUM: { years: 3 },
+                  MEDIUM_LOW: { years: 4 },
+                  LOW: { years: 5 },
+                },
+
+                clientStatusValuesForKycRefresh: ["APPROVED", "ACTIVE"],
+              },
+            ],
+          },
+          // Osborne Clarke
+          {
+            orgId: 45322,
+            profileTypes: [
+              //INDIVIDUALS
+              {
+                profileTypeId: 11341,
+                statusProfileTypeFieldId: 197959,
+                riskProfileTypeFieldId: 197952,
+                lastKycDateProfileTypeFieldId: 200647,
+                nextKycDateProfileTypeFieldId: 198553,
+                dateIntervalsByRisk: {
+                  HIGH: { years: 1 },
+                  MEDIUM_HIGH: { years: 2 },
+                  MEDIUM: { years: 3 },
+                  MEDIUM_LOW: { years: 4 },
+                  LOW: { years: 5 },
+                },
+                clientStatusValuesForKycRefresh: ["APPROVED", "ACTIVE"],
+              },
+              // COMPANIES
+              {
+                profileTypeId: 11342,
+                statusProfileTypeFieldId: 197991,
+                riskProfileTypeFieldId: 197978,
+                lastKycDateProfileTypeFieldId: 200646,
+                nextKycDateProfileTypeFieldId: 198554,
+                dateIntervalsByRisk: {
+                  HIGH: { years: 1 },
+                  MEDIUM_HIGH: { years: 2 },
+                  MEDIUM: { years: 3 },
+                  MEDIUM_LOW: { years: 4 },
+                  LOW: { years: 5 },
+                },
+
+                clientStatusValuesForKycRefresh: ["APPROVED", "ACTIVE"],
+              },
+            ],
+          },
+        ]
       : [];
 
 @injectable()
