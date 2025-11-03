@@ -252,7 +252,8 @@ export class OpenSanctionsClient implements IBackgroundCheckClient {
     let url = "match/default";
     if (opts?.threshold) {
       assert(opts.threshold >= 0 && opts.threshold <= 1, "Invalid threshold");
-      url += `?${new URLSearchParams({ threshold: opts.threshold.toString() })}`;
+      const threshold = opts.threshold.toString();
+      url += `?${new URLSearchParams({ threshold, cutoff: threshold })}`;
     }
 
     const data = await this.apiCall<OpenSanctionsMatchResponse>("POST", url, { queries });
