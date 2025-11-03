@@ -224,7 +224,9 @@ export class PetitionImportExportService implements IPetitionImportExportService
 
     const fieldGroupIds = fields.filter((f) => f.type === "FIELD_GROUP").map((f) => f.id);
 
-    const children = await this.petitions.loadPetitionFieldChildren(fieldGroupIds);
+    const children = await this.petitions.loadPetitionFieldChildren(
+      fieldGroupIds.map((parentFieldId) => ({ petitionId, parentFieldId })),
+    );
 
     const childrenByFieldId = Object.fromEntries(
       fieldGroupIds.map((id, index) => [id, children[index]]),

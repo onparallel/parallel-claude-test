@@ -1989,7 +1989,10 @@ export class PetitionRepository extends BaseRepository {
 
     const clonedFields = [{ originalFieldId: fieldId, cloned }];
     if (field.type === "FIELD_GROUP") {
-      const children = await this.loadPetitionFieldChildren(field.id);
+      const children = await this.loadPetitionFieldChildren({
+        petitionId: field.petition_id,
+        parentFieldId: field.id,
+      });
       if (children.length) {
         const clonedChildren = await this.createPetitionFieldsAtPosition(
           petitionId,
@@ -8297,12 +8300,27 @@ export class PetitionRepository extends BaseRepository {
     return await this.userHasAccessToPetitions(userId, [field.petition_id]);
   }
 
-  readonly loadPetitionFieldChildren = this.buildLoadMultipleBy(
-    "petition_field",
-    "parent_petition_field_id",
-    (q) => {
-      q.whereNull("deleted_at").whereNotNull("parent_petition_field_id").orderBy("position", "asc");
+  readonly loadPetitionFieldChildren = this.buildLoader<
+    { petitionId: number; parentFieldId: number },
+    PetitionField[],
+    string
+  >(
+    async (keys, t) => {
+      if (keys.length === 0) {
+        return [];
+      }
+      const fields = await this.from("petition_field", t)
+        .whereNull("deleted_at")
+        .whereNotNull("parent_petition_field_id")
+        .whereIn("petition_id", unique(keys.map((k) => k.petitionId)))
+        .whereIn("parent_petition_field_id", unique(keys.map((k) => k.parentFieldId)))
+        .orderBy("position", "asc")
+        .select("*");
+
+      const byKey = groupBy(fields, keyBuilder(["petition_id", "parent_petition_field_id"]));
+      return keys.map(keyBuilder(["petitionId", "parentFieldId"])).map((key) => byKey[key] ?? []);
     },
+    { cacheKeyFn: keyBuilder(["petitionId", "parentFieldId"]) },
   );
 
   async linkPetitionFieldChildren(
@@ -8891,7 +8909,10 @@ export class PetitionRepository extends BaseRepository {
 
     if (fieldGroupReplies.length > 0) {
       const childFields = await this.loadPetitionFieldChildren(
-        fieldGroupReplies.map((r) => r.petition_field_id),
+        fieldGroupReplies.map((r) => ({
+          petitionId: fields[0]!.petition_id,
+          parentFieldId: r.petition_field_id,
+        })),
       );
 
       if (childFields.length > 0) {

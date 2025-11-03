@@ -414,7 +414,9 @@ export class PetitionsHelperService {
     const fieldGroups = (await this.petitions.loadFieldsForPetition(petitionId)).filter(
       (f) => f!.type === "FIELD_GROUP" && isNonNullish(f.profile_type_id),
     );
-    const children = await this.petitions.loadPetitionFieldChildren(fieldGroups.map((f) => f.id));
+    const children = await this.petitions.loadPetitionFieldChildren(
+      fieldGroups.map((f) => ({ petitionId, parentFieldId: f.id })),
+    );
     const groupsWithChildren = zip(fieldGroups, children);
 
     const replies: {
@@ -531,7 +533,9 @@ export class PetitionsHelperService {
     user: User,
   ) {
     const fieldChildren = (
-      await this.petitions.loadPetitionFieldChildren(data.map((d) => d.fieldGroupId))
+      await this.petitions.loadPetitionFieldChildren(
+        data.map((d) => ({ petitionId, parentFieldId: d.fieldGroupId })),
+      )
     ).map((children) => children.filter((c) => isNonNullish(c.profile_type_field_id)));
 
     for (const [{ fieldGroupId, parentReply, childReplies, associatedProfileId }, children] of zip(

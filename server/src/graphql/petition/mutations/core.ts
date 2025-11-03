@@ -1480,7 +1480,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       not(
         chain(
           fieldHasType("fieldId", ["FIELD_GROUP"]),
-          firstChildHasType("fieldId", [
+          firstChildHasType("petitionId", "fieldId", [
             "DOW_JONES_KYC",
             "BACKGROUND_CHECK",
             "PROFILE_SEARCH",
@@ -1784,7 +1784,10 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       }
 
       if (isNonNullish(data.is_internal) && field.type === "FIELD_GROUP") {
-        const fieldChildren = await ctx.petitions.loadPetitionFieldChildren(field.id);
+        const fieldChildren = await ctx.petitions.loadPetitionFieldChildren({
+          petitionId: field.petition_id,
+          parentFieldId: field.id,
+        });
         if (fieldChildren.length > 0) {
           if (field.is_internal) {
             // setting FIELD_GROUP as internal, set as internal all children fields
@@ -1803,7 +1806,10 @@ export const updatePetitionField = mutationField("updatePetitionField", {
               `User:${ctx.user!.id}`,
             );
           }
-          ctx.petitions.loadPetitionFieldChildren.dataloader.clear(field.id);
+          ctx.petitions.loadPetitionFieldChildren.dataloader.clear({
+            parentFieldId: field.id,
+            petitionId: field.petition_id,
+          });
         }
       }
 
@@ -3203,7 +3209,7 @@ export const linkPetitionFieldChildren = mutationField("linkPetitionFieldChildre
 
       ctx.petitions.loadPetition.dataloader.clear(petitionId);
       ctx.petitions.loadFieldsForPetition.dataloader.clear(petitionId);
-      ctx.petitions.loadPetitionFieldChildren.dataloader.clear(parentFieldId);
+      ctx.petitions.loadPetitionFieldChildren.dataloader.clear({ petitionId, parentFieldId });
 
       return (await ctx.petitions.loadField(parentFieldId))!;
     } catch (error) {
@@ -3276,7 +3282,7 @@ export const unlinkPetitionFieldChildren = mutationField("unlinkPetitionFieldChi
 
       ctx.petitions.loadPetition.dataloader.clear(petitionId);
       ctx.petitions.loadFieldsForPetition.dataloader.clear(petitionId);
-      ctx.petitions.loadPetitionFieldChildren.dataloader.clear(parentFieldId);
+      ctx.petitions.loadPetitionFieldChildren.dataloader.clear({ petitionId, parentFieldId });
 
       return (await ctx.petitions.loadField(parentFieldId))!;
     } catch (error) {
@@ -3389,7 +3395,10 @@ export const createProfileLinkedPetitionField = mutationField("createProfileLink
     await ctx.petitions.updatePetitionToPendingStatus(args.petitionId, `User:${ctx.user!.id}`);
 
     ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
-    ctx.petitions.loadPetitionFieldChildren.dataloader.clear(args.parentFieldId);
+    ctx.petitions.loadPetitionFieldChildren.dataloader.clear({
+      petitionId: args.petitionId,
+      parentFieldId: args.parentFieldId,
+    });
     return petitionField;
   },
 });

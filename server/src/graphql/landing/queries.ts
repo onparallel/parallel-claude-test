@@ -20,7 +20,10 @@ export const LandingTemplateField = objectType({
         if (o.type !== "FIELD_GROUP") {
           return null;
         }
-        return await ctx.petitions.loadPetitionFieldChildren(o.id);
+        return await ctx.petitions.loadPetitionFieldChildren({
+          petitionId: o.petition_id,
+          parentFieldId: o.id,
+        });
       },
     });
   },

@@ -974,14 +974,20 @@ export function fieldIsNotFirstChild<
 export function firstChildHasType<
   TypeName extends string,
   FieldName extends string,
+  TArgPetitionId extends Arg<TypeName, FieldName, number>,
   TArg extends Arg<TypeName, FieldName, number>,
 >(
+  argPetitionId: TArgPetitionId,
   argFieldId: TArg,
   fieldType: MaybeArray<PetitionFieldType>,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
+    const petitionId = getArg(args, argPetitionId);
     const fieldId = getArg(args, argFieldId);
-    const [firstChild] = await ctx.petitions.loadPetitionFieldChildren(fieldId);
+    const [firstChild] = await ctx.petitions.loadPetitionFieldChildren({
+      petitionId,
+      parentFieldId: fieldId,
+    });
     const validFieldTypes = unMaybeArray(fieldType);
 
     return isNonNullish(firstChild) && validFieldTypes.includes(firstChild.type);
@@ -1082,7 +1088,10 @@ export function fieldCanBeLinkedToProfileType<
     const petitionId = getArg(args, petitionIdArg);
     const petitionFieldId = getArg(args, petitionFieldIdArg);
 
-    const children = await ctx.petitions.loadPetitionFieldChildren(petitionFieldId);
+    const children = await ctx.petitions.loadPetitionFieldChildren({
+      petitionId,
+      parentFieldId: petitionFieldId,
+    });
 
     if (!children.every((c) => c.profile_type_field_id === null)) {
       // can't link/update the profile_type_id if any of its children has a profile_type_field_id
@@ -1127,7 +1136,10 @@ export function profileTypeFieldCanBeLinkedToFieldGroup<
       return false;
     }
 
-    const children = await ctx.petitions.loadPetitionFieldChildren(parentFieldId);
+    const children = await ctx.petitions.loadPetitionFieldChildren({
+      petitionId: parentField.petition_id,
+      parentFieldId,
+    });
     if (children.some((c) => c.profile_type_field_id === profileTypeFieldId)) {
       // profile_type_field_id can't be repeated on the same parent
       return false;

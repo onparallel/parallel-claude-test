@@ -551,7 +551,10 @@ export const PublicPetitionField = objectType({
         if (o.type !== "FIELD_GROUP") {
           return null;
         }
-        return await ctx.petitions.loadPetitionFieldChildren(o.id);
+        return await ctx.petitions.loadPetitionFieldChildren({
+          petitionId: o.petition_id,
+          parentFieldId: o.id,
+        });
       },
     });
     t.nullable.field("parent", {
@@ -750,7 +753,13 @@ export const PublicPetitionFieldReply = objectType({
           return null;
         }
 
-        const childrenFields = await ctx.petitions.loadPetitionFieldChildren(o.petition_field_id);
+        const field = await ctx.petitions.loadFieldForReply(o.id);
+        assert(isNonNullish(field), "Field not found");
+
+        const childrenFields = await ctx.petitions.loadPetitionFieldChildren({
+          petitionId: field.petition_id,
+          parentFieldId: o.petition_field_id,
+        });
         return childrenFields.map((field) => ({
           petition_field_id: field.id,
           parent_petition_field_reply_id: o.id,
