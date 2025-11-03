@@ -42,7 +42,7 @@ systemctl reload nginx
 EOF
 sudo chmod +x "$HOOK_PATH"
 
-echo "0 0,12 * * * root /opt/certbot/bin/python -c 'import random; import time; time.sleep(random.random() * 3600)' && sudo certbot renew --quiet" | sudo tee -a /etc/crontab > /dev/null
+echo "0 0,12 * * * root /opt/certbot/bin/python -c 'import random; import time; time.sleep(random.random() * 3600)' && sudo certbot renew --quiet --deploy-hook $HOOK_PATH" | sudo tee -a /etc/crontab > /dev/null
 
 curl --silent --location --output release.tar.gz https://github.com/opensanctions/yente/archive/refs/tags/v${yente_version}.tar.gz
 mkdir release
