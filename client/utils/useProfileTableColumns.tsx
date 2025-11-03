@@ -461,6 +461,8 @@ export function ProfileValueFilterLine({
                 }
               } else if (profileTypeField.type === "USER_ASSIGNMENT") {
                 _value = typeof _value === "string" ? _value : null;
+              } else if (profileTypeField.type === "ADVERSE_MEDIA_SEARCH") {
+                _value = null;
               } else {
                 never();
               }

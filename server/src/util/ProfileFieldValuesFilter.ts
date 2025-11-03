@@ -220,6 +220,14 @@ function validateSchema(
             validateValue(value.value, "string", true);
           }
           break;
+        case "ADVERSE_MEDIA_SEARCH":
+          validateOperator(
+            value.operator,
+            ["HAS_PENDING_REVIEW", "NOT_HAS_PENDING_REVIEW"],
+            profileTypeField,
+          );
+          assert(isNullish(value.value), `value not needed when ${value.operator}`);
+          break;
         case "USER_ASSIGNMENT":
           validateOperator(value.operator, ["EQUAL", "NOT_EQUAL"], profileTypeField);
           validateValue(value.value, "string");

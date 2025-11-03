@@ -243,6 +243,26 @@ export function useProfileFieldValueFilterOperators(
         },
       );
     }
+
+    if (field.type === "ADVERSE_MEDIA_SEARCH") {
+      operators.push(
+        {
+          label: intl.formatMessage({
+            id: "generic.profile-field-values-filter-operator-has-pending-review",
+            defaultMessage: "has pending review",
+          }),
+          value: "HAS_PENDING_REVIEW",
+        },
+        {
+          label: intl.formatMessage({
+            id: "generic.profile-field-values-filter-operator-not-has-pending-review",
+            defaultMessage: "does not have pending review",
+          }),
+          value: "NOT_HAS_PENDING_REVIEW",
+        },
+      );
+    }
+
     if (field.isExpirable) {
       operators.push(
         {
