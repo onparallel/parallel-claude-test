@@ -1,5 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { DatabaseError } from "pg";
 import { groupBy, indexBy, omit, unique } from "remeda";
 import { keyBuilder } from "../../util/keyBuilder";
 import { pMapChunk } from "../../util/promises/pMapChunk";
@@ -367,24 +368,44 @@ export class UserRepository extends BaseRepository {
   }
 
   async getOrCreateUserData(data: CreateUserData, createdBy: string, t?: Knex.Transaction) {
-    const [userData] = await this.raw<UserData>(
-      /* sql */ `
+    try {
+      const [userData] = await this.raw<UserData>(
+        /* sql */ `
       ? 
       ON CONFLICT (email) WHERE deleted_at is NULL
       DO UPDATE SET
         -- need to do an update for the RETURNING to return the row
         email=EXCLUDED.email
       RETURNING *;`,
-      [
-        this.from("user_data").insert({
-          ...data,
-          created_by: createdBy,
-          updated_by: createdBy,
-        }),
-      ],
-      t,
-    );
-    return userData;
+        [
+          this.from("user_data").insert({
+            ...data,
+            created_by: createdBy,
+            updated_by: createdBy,
+          }),
+        ],
+        t,
+      );
+      return userData;
+    } catch (error) {
+      if (error instanceof DatabaseError && error.constraint === "user_data__cognito_id__unique") {
+        // email isn't found, but there is a user_data with the same cognito_id
+        // so we get that user data and update the email
+        const [userData] = await this.from("user_data", t)
+          .where("cognito_id", data.cognito_id)
+          .update(
+            {
+              email: data.email,
+              updated_at: this.now(),
+              updated_by: createdBy,
+            },
+            "*",
+          );
+
+        return userData;
+      }
+      throw error;
+    }
   }
 
   async createUser(
