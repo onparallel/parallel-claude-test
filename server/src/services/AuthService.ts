@@ -418,7 +418,7 @@ export class Auth implements IAuth {
           }
         }
       }
-      await this.trackSessionLogin(user);
+      await this.trackSessionLogin(req, user);
       const token = await this.storeSessionInRedis({
         IdToken: tokens["id_token"],
         AccessToken: tokens["access_token"],
@@ -463,7 +463,7 @@ export class Auth implements IAuth {
           return;
         }
         const userData = await this.users.loadUserData(user.user_data_id);
-        await this.trackSessionLogin(user);
+        await this.trackSessionLogin(req, user);
         this.setSession(res, token);
         res.status(201).send({ preferredLocale: userData!.preferred_locale });
       } else if (auth.ChallengeName === "NEW_PASSWORD_REQUIRED") {
@@ -528,7 +528,7 @@ export class Auth implements IAuth {
             UserAttributes: [{ Name: "email_verified", Value: "true" }],
           }),
         );
-        await this.trackSessionLogin(user);
+        await this.trackSessionLogin(req, user);
         const token = await this.storeSessionInRedis(challenge.AuthenticationResult as any);
         this.setSession(res, token);
         res.status(201).send({});
@@ -724,10 +724,14 @@ export class Auth implements IAuth {
     return null;
   }
 
-  private async trackSessionLogin(user: User) {
+  private async trackSessionLogin(request: IncomingMessage, user: User) {
     await this.system.createEvent({
       type: "USER_LOGGED_IN",
-      data: { user_id: user.id },
+      data: {
+        user_id: user.id,
+        ip_address: getClientIp(request),
+        user_agent: request.headers["user-agent"] ?? null,
+      },
     });
   }
 

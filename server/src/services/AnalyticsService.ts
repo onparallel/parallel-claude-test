@@ -110,6 +110,8 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
     email: string;
     org_id: string;
     company_id: string;
+    ip_address: string | null;
+    user_agent: string | null;
   };
   /** a petition reminder is sent */
   REMINDER_EMAIL_SENT: {

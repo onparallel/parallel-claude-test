@@ -8,6 +8,8 @@ import {
 export type SystemEventPayload<TType extends SystemEventType> = {
   USER_LOGGED_IN: {
     user_id: number;
+    ip_address?: string | null;
+    user_agent?: string | null;
   };
   USER_CREATED: {
     user_id: number;

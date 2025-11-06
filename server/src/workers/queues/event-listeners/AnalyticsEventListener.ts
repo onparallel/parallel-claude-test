@@ -402,6 +402,8 @@ export class AnalyticsEventListener implements EventListener<EventType> {
         email: userData.email,
         org_id: toGlobalId("Organization", user.org_id),
         company_id: toGlobalId("Organization", user.org_id),
+        ip_address: event.data.ip_address ?? null,
+        user_agent: event.data.user_agent ?? null,
       },
     });
   }
