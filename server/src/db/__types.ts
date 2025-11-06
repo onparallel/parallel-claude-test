@@ -1267,7 +1267,7 @@ export interface EventSubscription {
   type: EventSubscriptionType; // event_subscription_type
   user_id: number; // int4
   name: Maybe<string>; // varchar
-  endpoint: string; // varchar
+  endpoint: string; // text
   event_types: Maybe<any>; // jsonb
   is_enabled: boolean; // bool
   is_failing: boolean; // bool

@@ -9,6 +9,7 @@ import { and, argIsDefined, authenticateAnd, ifArgDefined } from "../helpers/aut
 import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validateAnd } from "../helpers/validateArgs";
+import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validUrl } from "../helpers/validators/validUrl";
 import {
@@ -124,7 +125,11 @@ export const createPetitionEventSubscription = mutationField("createPetitionEven
     challenge: nullable(booleanArg()),
     ignoreOwnerEvents: booleanArg(),
   },
-  validateArgs: validateAnd(validUrl("eventsUrl"), notEmptyArray("fromTemplateFieldIds")),
+  validateArgs: validateAnd(
+    maxLength("name", 255),
+    validUrl("eventsUrl"),
+    notEmptyArray("fromTemplateFieldIds"),
+  ),
   resolve: async (_, args, ctx) => {
     const challengePassed =
       args.challenge === false || (await challengeWebhookUrl(args.eventsUrl, ctx.fetch));
@@ -177,7 +182,11 @@ export const createProfileEventSubscription = mutationField("createProfileEventS
     challenge: nullable(booleanArg()),
     ignoreOwnerEvents: booleanArg(),
   },
-  validateArgs: validateAnd(validUrl("eventsUrl"), notEmptyArray("fromProfileTypeFieldIds")),
+  validateArgs: validateAnd(
+    maxLength("name", 255),
+    validUrl("eventsUrl"),
+    notEmptyArray("fromProfileTypeFieldIds"),
+  ),
   resolve: async (_, args, ctx) => {
     const challengePassed =
       args.challenge === false || (await challengeWebhookUrl(args.eventsUrl, ctx.fetch));
@@ -236,7 +245,11 @@ export const updatePetitionEventSubscription = mutationField("updatePetitionEven
     fromTemplateFieldIds: list(nonNull(globalIdArg("PetitionField"))),
     ignoreOwnerEvents: booleanArg(),
   },
-  validateArgs: validateAnd(validUrl("eventsUrl"), notEmptyArray("fromTemplateFieldIds")),
+  validateArgs: validateAnd(
+    maxLength("name", 255),
+    validUrl("eventsUrl"),
+    notEmptyArray("fromTemplateFieldIds"),
+  ),
   resolve: async (_, args, ctx) => {
     const data: Partial<EventSubscription> = {};
     if (isNonNullish(args.isEnabled)) {
@@ -309,7 +322,11 @@ export const updateProfileEventSubscription = mutationField("updateProfileEventS
     fromProfileTypeFieldIds: list(nonNull(globalIdArg("ProfileTypeField"))),
     ignoreOwnerEvents: booleanArg(),
   },
-  validateArgs: validateAnd(validUrl("eventsUrl"), notEmptyArray("fromProfileTypeFieldIds")),
+  validateArgs: validateAnd(
+    maxLength("name", 255),
+    validUrl("eventsUrl"),
+    notEmptyArray("fromProfileTypeFieldIds"),
+  ),
   resolve: async (_, args, ctx) => {
     const data: Partial<EventSubscription> = {};
     if (isNonNullish(args.isEnabled)) {
