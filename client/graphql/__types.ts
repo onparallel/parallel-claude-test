@@ -50062,6 +50062,7 @@ export type PermissionsGroup_userQuery = {
     hasProfilesAccess: boolean;
     hasLoginAsAccess: boolean;
     hasPermissionManagement: boolean;
+    hasDashboardAccess: boolean;
     hasBackgroundCheck: boolean;
     hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
@@ -90010,6 +90011,7 @@ export const PermissionsGroup_userDocument = gql`
       hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
       hasLoginAsAccess: hasFeatureFlag(featureFlag: GHOST_LOGIN)
       hasPermissionManagement: hasFeatureFlag(featureFlag: PERMISSION_MANAGEMENT)
+      hasDashboardAccess: hasFeatureFlag(featureFlag: DASHBOARDS)
       organization {
         id
         status

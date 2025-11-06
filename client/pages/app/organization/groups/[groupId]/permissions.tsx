@@ -558,38 +558,42 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
           },
         ],
       },
-      {
-        category: intl.formatMessage({
-          id: "page.permissions-group.category-dashboards",
-          defaultMessage: "Dashboards",
-        }),
-        permissions: [
-          {
-            name: "DASHBOARDS:LIST_DASHBOARDS",
-            title: intl.formatMessage({
-              id: "page.permissions-group.dashboards-list",
-              defaultMessage: "View dashboards",
-            }),
-            description: intl.formatMessage({
-              id: "page.permissions-group.dashboards-list-description",
-              defaultMessage:
-                "Grants users in this team permissions to access the dashboards page.",
-            }),
-          },
-          {
-            name: "DASHBOARDS:CREATE_DASHBOARDS",
-            title: intl.formatMessage({
-              id: "page.permissions-group.dashboards-create",
-              defaultMessage: "Create dashboards",
-            }),
-            description: intl.formatMessage({
-              id: "page.permissions-group.dashboards-update-description",
-              defaultMessage:
-                "Grants users in this team permissions to create and manage new dashboards.",
-            }),
-          },
-        ],
-      },
+      ...(me.hasDashboardAccess
+        ? [
+            {
+              category: intl.formatMessage({
+                id: "page.permissions-group.category-dashboards",
+                defaultMessage: "Dashboards",
+              }),
+              permissions: [
+                {
+                  name: "DASHBOARDS:LIST_DASHBOARDS",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.dashboards-list",
+                    defaultMessage: "View dashboards",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.dashboards-list-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to access the dashboards page.",
+                  }),
+                },
+                {
+                  name: "DASHBOARDS:CREATE_DASHBOARDS",
+                  title: intl.formatMessage({
+                    id: "page.permissions-group.dashboards-create",
+                    defaultMessage: "Create dashboards",
+                  }),
+                  description: intl.formatMessage({
+                    id: "page.permissions-group.dashboards-update-description",
+                    defaultMessage:
+                      "Grants users in this team permissions to create and manage new dashboards.",
+                  }),
+                },
+              ],
+            },
+          ]
+        : []),
     ],
     [intl.locale],
   );
@@ -869,6 +873,7 @@ const _queries = [
         hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
         hasLoginAsAccess: hasFeatureFlag(featureFlag: GHOST_LOGIN)
         hasPermissionManagement: hasFeatureFlag(featureFlag: PERMISSION_MANAGEMENT)
+        hasDashboardAccess: hasFeatureFlag(featureFlag: DASHBOARDS)
         organization {
           id
           status
