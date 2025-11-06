@@ -31,6 +31,8 @@ sudo /opt/certbot/bin/pip install --upgrade pip
 sudo /opt/certbot/bin/pip install certbot certbot
 sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
 
+sudo certbot
+
 # Create a hook to reload nginx when certificates are renewed
 HOOK_PATH="/etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh"
 sudo tee "$HOOK_PATH" > /dev/null <<'EOF'
@@ -63,3 +65,4 @@ sudo systemctl start docker
 sudo systemctl start yente
 sudo systemctl start nginx
 
+sudo certbot certonly --webroot -w /usr/share/nginx/html -m santi@onparallel.com --agree-tos -d yente-#GREENBLUE#.parallel.so

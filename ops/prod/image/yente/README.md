@@ -4,19 +4,11 @@
 
 ```
 cd ops/prod/image
-scp yente/.env yente/nginx.conf yente/yente.service build-yente* yente-blue:~
-ssh yente-blue
-chmod +x build-yente*
+scp yente/.env yente/nginx.conf yente/yente.service build-yente.sh yente-green:~
+ssh yente-green
+chmod +x build-yente.sh
+sed -i -e "s/#GREENBLUE#/green/g" .env nginx.conf build-yente.sh
 ./build-yente.sh
-```
-
-**starts yente downtime**
-
-- Point yente.parallel.so to new yente-blue/blue.parallel.so
-
-```
-ssh yente-blue
-./build-yente-postinstall.sh
 ```
 
 - Edit /etc/nginx/nginx.conf and uncomment commented lines in 443 server
