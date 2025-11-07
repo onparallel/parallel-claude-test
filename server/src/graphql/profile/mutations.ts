@@ -940,6 +940,7 @@ export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
     }
 
     await ctx.profiles.deleteProfileTypeFields(
+      ctx.user!.org_id,
       profileTypeId,
       profileTypeFieldIds,
       `User:${ctx.user!.id}`,

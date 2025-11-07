@@ -495,6 +495,7 @@ export class ProfileRepository extends BaseRepository {
   }
 
   async deleteProfileTypeFields(
+    orgId: number,
     profileTypeId: number,
     profileTypeFieldIds: MaybeArray<number>,
     deletedBy: string,
@@ -513,14 +514,19 @@ export class ProfileRepository extends BaseRepository {
           deleted_at = NOW(),
           deleted_by = :deletedBy
         from deleted_profile_type_field_ids dptfi
-        where ptf.id = dptfi.profile_type_field_id
-        and ptf.deleted_at is null
+        where 
+          ptf.id = dptfi.profile_type_field_id
+          and ptf.profile_type_id = :profileTypeId
+          and ptf.deleted_at is null
         returning *
       ),
       new_positions as (
         select id, rank() over (order by position asc) - 1 as position
         from profile_type_field
-        where profile_type_id = :profileTypeId and deleted_at is null and id not in (select id from deleted_profile_type_fields)
+        where 
+          profile_type_id = :profileTypeId 
+          and deleted_at is null 
+          and id not in (select id from deleted_profile_type_fields)
       ),
       update_positions as (
         update profile_type_field ptf set
@@ -528,21 +534,42 @@ export class ProfileRepository extends BaseRepository {
           updated_at = NOW(),
           updated_by = :deletedBy
         from new_positions np
-        where np.id = ptf.id and np.position != ptf.position
+        where 
+          np.id = ptf.id 
+          and np.position != ptf.position 
+          and ptf.profile_type_id = :profileTypeId
+          and ptf.deleted_at is null
       ),
       deleted_profile_field_values as (
         update profile_field_value pfv set
           deleted_at = NOW(),
           deleted_by = :deletedBy
         from deleted_profile_type_fields dptf
-        where pfv.profile_type_field_id = dptf.id
+        where 
+          pfv.profile_type_field_id = dptf.id
+          and pfv.deleted_at is null
+          and pfv.removed_at is null
+          and pfv.is_draft = false
+      ),
+      deleted_profile_field_value_drafts as (
+        update profile_field_value pfv set
+          deleted_at = NOW(),
+          deleted_by = :deletedBy
+        from deleted_profile_type_fields dptf
+        where 
+          pfv.profile_type_field_id = dptf.id
+          and pfv.deleted_at is null
+          and pfv.removed_at is null
+          and pfv.is_draft = true
       ),
       deleted_profile_field_files as (
         update profile_field_file pff set
           deleted_at = NOW(),
           deleted_by = :deletedBy
         from deleted_profile_type_fields dptf
-        where pff.profile_type_field_id = dptf.id
+        where 
+          pff.profile_type_field_id = dptf.id
+          and pff.deleted_at is null
       ),
       updated_petition_fields as (
         update petition_field pf set
@@ -550,7 +577,10 @@ export class ProfileRepository extends BaseRepository {
           updated_at = NOW(),
           updated_by = :deletedBy
         from deleted_profile_type_fields dptf
-        where pf.profile_type_field_id = dptf.id
+        where 
+          pf.profile_type_field_id is not null
+          and pf.profile_type_field_id = dptf.id
+          and pf.deleted_at is null
       ),
       deleted_profile_subscriptions as (
         update event_subscription es set
@@ -563,17 +593,20 @@ export class ProfileRepository extends BaseRepository {
       update_profile_value_cache as (
         update profile p set
           value_cache = value_cache - (select array_agg(id::text) from deleted_profile_type_fields dptf)
-        where p.profile_type_id = :profileTypeId
-        and p.deleted_at is null
+        where 
+          p.org_id = :orgId
+          and p.profile_type_id = :profileTypeId
+          and p.deleted_at is null
       )
       select 1
     `,
       {
+        orgId,
+        profileTypeId,
         profileTypeFieldIds: this.sqlValues(
           unMaybeArray(profileTypeFieldIds).map((id) => [id]),
           ["int"],
         ),
-        profileTypeId,
         deletedBy,
       },
     );

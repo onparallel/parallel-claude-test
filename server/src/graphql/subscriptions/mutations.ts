@@ -127,6 +127,7 @@ export const createPetitionEventSubscription = mutationField("createPetitionEven
   },
   validateArgs: validateAnd(
     maxLength("name", 255),
+    maxLength("eventsUrl", 1000),
     validUrl("eventsUrl"),
     notEmptyArray("fromTemplateFieldIds"),
   ),
@@ -184,6 +185,7 @@ export const createProfileEventSubscription = mutationField("createProfileEventS
   },
   validateArgs: validateAnd(
     maxLength("name", 255),
+    maxLength("eventsUrl", 1000),
     validUrl("eventsUrl"),
     notEmptyArray("fromProfileTypeFieldIds"),
   ),
@@ -247,6 +249,7 @@ export const updatePetitionEventSubscription = mutationField("updatePetitionEven
   },
   validateArgs: validateAnd(
     maxLength("name", 255),
+    maxLength("eventsUrl", 1000),
     validUrl("eventsUrl"),
     notEmptyArray("fromTemplateFieldIds"),
   ),
@@ -324,6 +327,7 @@ export const updateProfileEventSubscription = mutationField("updateProfileEventS
   },
   validateArgs: validateAnd(
     maxLength("name", 255),
+    maxLength("eventsUrl", 1000),
     validUrl("eventsUrl"),
     notEmptyArray("fromProfileTypeFieldIds"),
   ),
