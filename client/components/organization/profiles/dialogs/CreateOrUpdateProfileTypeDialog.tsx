@@ -6,7 +6,10 @@ import {
   FormHelperText,
   FormLabel,
   GridItem,
+  RadioProps,
   SimpleGrid,
+  useRadio,
+  useRadioGroup,
 } from "@chakra-ui/react";
 import { BusinessIcon, ContractIcon, FileNewIcon, UserIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -18,7 +21,8 @@ import { LocalizableUserTextInput } from "@parallel/components/common/Localizabl
 import { LocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
 import { HStack, Stack, Text } from "@parallel/components/ui";
 import { ProfileTypeStandardType, UserLocale } from "@parallel/graphql/__types";
-import { ReactNode, useMemo, useRef, useState } from "react";
+import { useSetFocusRef } from "@parallel/utils/react-form-hook/useSetFocusRef";
+import { forwardRef, ReactNode, Ref, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -49,85 +53,24 @@ function SelectStandardTypeDialog({
   "SELECT_STANDARD_TYPE",
   { standardType: PreviewsType["key"] | null }
 >) {
-  const intl = useIntl();
-
-  const previews = useMemo(
-    () =>
-      [
-        {
-          key: "INDIVIDUAL",
-          icon: <UserIcon color="blue.800" boxSize={6} />,
-          background: "blue.100",
-          title: intl.formatMessage({
-            id: "component.create-profile-type-dialog.individual",
-            defaultMessage: "Individual",
-          }),
-          description: intl.formatMessage({
-            id: "component.create-profile-type-dialog.individual-description",
-            defaultMessage:
-              "Personal information profiles for individuals, including contact details, identification, and personal data.",
-          }),
-        },
-        {
-          key: "LEGAL_ENTITY",
-          icon: <BusinessIcon color="primary.800" boxSize={6} />,
-          background: "primary.100",
-          title: intl.formatMessage({
-            id: "component.create-profile-type-dialog.legal-entity",
-            defaultMessage: "Legal entity",
-          }),
-          description: intl.formatMessage({
-            id: "component.create-profile-type-dialog.legal-entity-description",
-            defaultMessage:
-              "Business and organization profiles for companies, including corporate information, legal details, and business data.",
-          }),
-        },
-        {
-          key: "CONTRACT",
-          icon: <ContractIcon color="green.800" boxSize={6} />,
-          background: "green.100",
-          title: intl.formatMessage({
-            id: "component.create-profile-type-dialog.contract",
-            defaultMessage: "Contract",
-          }),
-          description: intl.formatMessage({
-            id: "component.create-profile-type-dialog.contract-description",
-            defaultMessage:
-              "Contract and agreement profiles for storing contract information, terms, parties, and related documentation.",
-          }),
-        },
-        {
-          key: "CUSTOM",
-          icon: <FileNewIcon color="orange.800" boxSize={6} />,
-          background: "orange.100",
-          title: intl.formatMessage({
-            id: "component.create-profile-type-dialog.custom",
-            defaultMessage: "From scratch",
-          }),
-          description: intl.formatMessage({
-            id: "component.create-profile-type-dialog.custom-description",
-            defaultMessage:
-              "Create a custom profile type from scratch to store any specific information structure you need.",
-          }),
-        },
-      ] as PreviewsType[],
-    [intl.locale],
-  );
-
-  const { handleSubmit, setValue, watch } = useForm<{
-    standardType: ProfileTypeStandardType | "CUSTOM" | null;
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+    setFocus,
+  } = useForm<{
+    standardType: ProfileTypeStandardType | "CUSTOM";
   }>({
     mode: "onSubmit",
     defaultValues: {
-      standardType: null,
+      standardType: "CUSTOM",
     },
   });
-
-  const standardType = watch("standardType");
 
   return (
     <ConfirmDialog
       size="lg"
+      initialFocusRef={useSetFocusRef(setFocus, "standardType")}
       content={{
         containerProps: {
           as: "form",
@@ -146,47 +89,25 @@ function SelectStandardTypeDialog({
         />
       }
       body={
-        <Stack gap={4} flex="1">
-          <Text fontSize="sm">
+        <FormControl as={Stack} gap={4} flex="1" isInvalid={!!errors.standardType}>
+          <FormLabel fontWeight={400}>
             <FormattedMessage
               id="component.create-profile-type-dialog.select-template"
               defaultMessage="Select the profile type that best fits your needs."
             />
-          </Text>
-          <Stack flex="1">
-            {previews.map((preview) => {
-              const { key, icon, background, title, description } = preview;
-              return (
-                <Button
-                  key={key}
-                  isActive={standardType === key}
-                  variant="outline"
-                  display="block"
-                  onClick={() => setValue("standardType", key)}
-                  padding={4}
-                  height="auto"
-                  textAlign="left"
-                  fontWeight="normal"
-                >
-                  <HStack gap={4} paddingY={0.5}>
-                    <Center padding={2} borderRadius="md" backgroundColor={background}>
-                      {icon}
-                    </Center>
-                    <Stack gap={1}>
-                      <Text fontWeight="bold">{title}</Text>
-                      <Text fontSize="sm" color="gray.600" whiteSpace="break-spaces">
-                        {description}
-                      </Text>
-                    </Stack>
-                  </HStack>
-                </Button>
-              );
-            })}
-          </Stack>
-        </Stack>
+          </FormLabel>
+          <Controller
+            name="standardType"
+            control={control}
+            rules={{
+              required: true,
+            }}
+            render={({ field }) => <ProfileTypeRadioGroup {...field} />}
+          />
+        </FormControl>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" isDisabled={!standardType}>
+        <Button type="submit" colorScheme="primary">
           <FormattedMessage id="generic.next-button" defaultMessage="Next" />
         </Button>
       }
@@ -393,6 +314,149 @@ function UpdateProfileTypeDialog({
         )
       }
     />
+  );
+}
+
+interface ProfileTypeRadioProps {
+  value?: ProfileTypeStandardType | "CUSTOM";
+  onChange: (value: ProfileTypeStandardType | "CUSTOM") => void;
+}
+
+const ProfileTypeRadioGroup = forwardRef<HTMLInputElement, ProfileTypeRadioProps>(
+  function ProfileTypeRadioGroup({ value, onChange }, ref) {
+    const intl = useIntl();
+    const { getRootProps, getRadioProps } = useRadioGroup({
+      name: "standardType",
+      value,
+      defaultValue: "CUSTOM",
+      onChange,
+      isFocusable: true,
+    });
+
+    const previews = useMemo(
+      () =>
+        [
+          {
+            key: "INDIVIDUAL",
+            icon: <UserIcon color="blue.800" boxSize={6} />,
+            background: "blue.100",
+            title: intl.formatMessage({
+              id: "component.create-profile-type-dialog.individual",
+              defaultMessage: "Individual",
+            }),
+            description: intl.formatMessage({
+              id: "component.create-profile-type-dialog.individual-description",
+              defaultMessage:
+                "Personal information profiles for individuals, including contact details, identification, and personal data.",
+            }),
+          },
+          {
+            key: "LEGAL_ENTITY",
+            icon: <BusinessIcon color="primary.800" boxSize={6} />,
+            background: "primary.100",
+            title: intl.formatMessage({
+              id: "component.create-profile-type-dialog.legal-entity",
+              defaultMessage: "Legal entity",
+            }),
+            description: intl.formatMessage({
+              id: "component.create-profile-type-dialog.legal-entity-description",
+              defaultMessage:
+                "Business and organization profiles for companies, including corporate information, legal details, and business data.",
+            }),
+          },
+          {
+            key: "CONTRACT",
+            icon: <ContractIcon color="green.800" boxSize={6} />,
+            background: "green.100",
+            title: intl.formatMessage({
+              id: "component.create-profile-type-dialog.contract",
+              defaultMessage: "Contract",
+            }),
+            description: intl.formatMessage({
+              id: "component.create-profile-type-dialog.contract-description",
+              defaultMessage:
+                "Contract and agreement profiles for storing contract information, terms, parties, and related documentation.",
+            }),
+          },
+          {
+            key: "CUSTOM",
+            icon: <FileNewIcon color="orange.800" boxSize={6} />,
+            background: "orange.100",
+            title: intl.formatMessage({
+              id: "component.create-profile-type-dialog.custom",
+              defaultMessage: "From scratch",
+            }),
+            description: intl.formatMessage({
+              id: "component.create-profile-type-dialog.custom-description",
+              defaultMessage:
+                "Create a custom profile type from scratch to store any specific information structure you need.",
+            }),
+          },
+        ] as PreviewsType[],
+      [intl.locale],
+    );
+
+    return (
+      <Stack {...getRootProps()}>
+        {previews.map(({ key, icon, background, title, description }) => (
+          <ProfileTypeRadioButton
+            key={key}
+            inputRef={key === value ? ref : undefined}
+            {...getRadioProps({ value: key })}
+          >
+            <Center padding={2} borderRadius="md" backgroundColor={background}>
+              {icon}
+            </Center>
+            <Stack gap={0}>
+              <Text fontWeight="bold">{title}</Text>
+              <Text fontSize="sm" whiteSpace="break-spaces" fontWeight="normal">
+                {description}
+              </Text>
+            </Stack>
+          </ProfileTypeRadioButton>
+        ))}
+      </Stack>
+    );
+  },
+);
+
+interface ProfileTypeRadioButtonProps extends RadioProps {
+  inputRef?: Ref<HTMLInputElement>;
+}
+
+function ProfileTypeRadioButton({ inputRef, ...props }: ProfileTypeRadioButtonProps) {
+  const { getInputProps, getRadioProps } = useRadio(props);
+
+  return (
+    <Button
+      as="label"
+      variant="unstyled"
+      display="flex"
+      maxHeight="auto"
+      height="auto"
+      cursor="pointer"
+      gridArea={props.value}
+      borderRadius="md"
+      border="1px solid"
+      borderColor="gray.200"
+      fontWeight={500}
+      _checked={{
+        borderColor: "primary.500",
+        backgroundColor: "primary.50",
+      }}
+      _hover={{
+        backgroundColor: "primary.50",
+      }}
+      flex="1"
+      padding={4}
+      paddingY={3}
+      {...getRadioProps()}
+    >
+      <input {...getInputProps()} ref={inputRef} />
+      <HStack gap={4} paddingY={0.5}>
+        {props.children}
+      </HStack>
+    </Button>
   );
 }
 
