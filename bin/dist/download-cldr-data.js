@@ -20,9 +20,9 @@ async function getCurrencies() {
         const data = tables[0];
         // if any of these asserts fails make sure the table still has the same structure and correct code accordingly
         [
-            "State / Territory[2]",
+            "State or territory[2]",
             "Currency[2][3]",
-            "Symbol[upper-alpha 4] orAbbrev.[4]",
+            "Symbol[D] orAbbrev.[4]",
             "ISO code[3]",
             "Fractionalunit",
             "Numberto basic",
