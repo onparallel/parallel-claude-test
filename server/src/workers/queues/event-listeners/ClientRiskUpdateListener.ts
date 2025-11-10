@@ -19,7 +19,7 @@ const CONFIG =
         {
           // PARALLEL
           orgId: 1,
-          riskValues: ["LOW", "MEDIUM", "HIGH"] as const,
+          globalRiskValues: ["LOW", "MEDIUM", "HIGH"] as const,
           individual: {
             profileTypeId: 64,
             riskProfileTypeFieldId: 4380,
@@ -42,7 +42,7 @@ const CONFIG =
           {
             // ADLANTER
             orgId: 209,
-            riskValues: ["LOW", "MEDIUM", "HIGH", "VERY_HIGH"] as const,
+            globalRiskValues: ["LOW", "MEDIUM", "HIGH", "VERY_HIGH"] as const,
             individual: {
               profileTypeId: 5797,
               riskProfileTypeFieldId: 196647,
@@ -58,6 +58,26 @@ const CONFIG =
               riskProfileTypeFieldId: 194202,
             },
             clientFileRelationshipTypeId: 34061,
+          },
+          // OSBORNE CLARKE
+          {
+            orgId: 45322,
+            globalRiskValues: ["LOW", "MEDIUM", "HIGH"] as const,
+            individual: {
+              profileTypeId: 11341,
+              riskProfileTypeFieldId: 197952,
+              globalRiskProfileTypeFieldId: 198604,
+            },
+            legalEntity: {
+              profileTypeId: 11342,
+              riskProfileTypeFieldId: 197978,
+              globalRiskProfileTypeFieldId: 198605,
+            },
+            file: {
+              profileTypeId: 11344,
+              riskProfileTypeFieldId: 198602,
+            },
+            clientFileRelationshipTypeId: 37203,
           },
         ]
       : [];
@@ -200,10 +220,10 @@ export class ClientRiskUpdateListener
         companyRisk?.content?.value ?? null,
         ...fileRisks.map((v) => v?.content?.value ?? null),
       ].filter(isNonNullish),
-      [(v) => config.riskValues.indexOf(v), "desc"],
+      [(v) => config.globalRiskValues.indexOf(v), "desc"],
     );
 
-    if (!maxRisk) {
+    if (!maxRisk || config.globalRiskValues.indexOf(maxRisk) === -1) {
       return;
     }
 
