@@ -5080,6 +5080,9 @@ interface PetitionBase {
 }
 
 type PetitionBaseMini {
+  closedAt: DateTime
+  completedAt: DateTime
+  createdAt: DateTime!
   currentSignatureRequest: PetitionSignatureRequestMini
   full: PetitionBase
 

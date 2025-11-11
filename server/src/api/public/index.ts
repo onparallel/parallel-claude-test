@@ -90,6 +90,8 @@ import {
   GetPetition_petitionDocument,
   GetPetitions_petitionsDocument,
   GetProfileEvents_ProfileEventsDocument,
+  GetProfileKeyProcesses_profileDocument,
+  GetProfilePetitions_profileDocument,
   GetProfileRelationships_profileDocument,
   GetProfileSubscribers_profileDocument,
   GetProfileType_profileTypeDocument,
@@ -161,6 +163,7 @@ import { description } from "./description";
 import {
   ContactFragment,
   EventSubscriptionFragment,
+  KeyProcessFragment,
   PermissionFragment,
   PetitionAccessFragment,
   PetitionBaseFragment,
@@ -227,6 +230,7 @@ import {
   ListOfProfileEvents,
   ListOfProfileRelationships,
   ListOfProfileSubscriptions,
+  ListOfProfileTypeKeyProcesses,
   ListOfProfiles,
   ListOfSignatureRequests,
   ListOfSubscriptions,
@@ -5522,6 +5526,93 @@ export function publicApi(container: Container) {
         }
       },
     );
+
+  api.path("/profiles/:profileId/petitions", { params: { profileId } }).get(
+    {
+      operationId: "GetProfilePetitions",
+      summary: "List profile petitions",
+      description: outdent`
+          Returns a paginated list of all the parallels associated to this profile.
+        `,
+      query: {
+        ...paginationParams(),
+        ...petitionIncludeParam(),
+      },
+      tags: ["Profiles"],
+      responses: { 200: SuccessResponse(PaginatedPetitions) },
+    },
+    async ({ client, params, query }) => {
+      const _query = gql`
+        query GetProfilePetitions_profile(
+          $profileId: GID!
+          $offset: Int
+          $limit: Int
+          $includeRecipients: Boolean!
+          $includeFields: Boolean!
+          $includeTags: Boolean!
+          $includeRecipientUrl: Boolean!
+          $includeReplies: Boolean!
+          $includeProgress: Boolean!
+          $includeSigners: Boolean!
+          $includeVariablesResult: Boolean!
+          $includeSignatureRequests: Boolean!
+          $includeOwner: Boolean!
+        ) {
+          profile(profileId: $profileId) {
+            associatedPetitions(offset: $offset, limit: $limit) {
+              items {
+                ...Petition
+              }
+              totalCount
+            }
+          }
+        }
+        ${PetitionFragment}
+      `;
+
+      const response = await client.request(GetProfilePetitions_profileDocument, {
+        profileId: params.profileId,
+        ...pick(query, ["offset", "limit"]),
+        ...getPetitionIncludesFromQuery(query),
+      });
+
+      const { items, totalCount } = response.profile.associatedPetitions;
+      return Ok({ items: items.map((p) => mapPetition(p)), totalCount });
+    },
+  );
+
+  api.path("/profiles/:profileId/key-processes", { params: { profileId } }).get(
+    {
+      operationId: "GetProfileKeyProcesses",
+      summary: "List the key processes of a profile",
+      description: outdent`
+          Returns a list of all key processes of the profile.
+        `,
+      tags: ["Profiles"],
+      responses: { 200: SuccessResponse(ListOfProfileTypeKeyProcesses) },
+    },
+    async ({ client, params, query }) => {
+      const _query = gql`
+        query GetProfileKeyProcesses_profile($profileId: GID!) {
+          profile(profileId: $profileId) {
+            profileType {
+              keyProcesses {
+                ...KeyProcess
+              }
+            }
+          }
+        }
+        ${KeyProcessFragment}
+      `;
+
+      const response = await client.request(GetProfileKeyProcesses_profileDocument, {
+        profileId: params.profileId,
+      });
+
+      const items = response.profile.profileType.keyProcesses;
+      return Ok(items);
+    },
+  );
 
   api.path("/profile-types").get(
     {

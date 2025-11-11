@@ -496,6 +496,18 @@ export const PetitionBaseMini = objectType({
         return await ctx.petitions.loadPetition(root.id);
       },
     });
+    t.nonNull.datetime("createdAt", {
+      resolve: (o) => o.created_at,
+    });
+    t.nullable.datetime("completedAt", {
+      resolve: async (o, _, ctx) =>
+        o.status && ["COMPLETED", "CLOSED"].includes(o.status)
+          ? await ctx.petitions.loadPetitionLastCompletedAt(o.id)
+          : null,
+    });
+    t.nullable.datetime("closedAt", {
+      resolve: (o) => o.closed_at,
+    });
   },
 });
 

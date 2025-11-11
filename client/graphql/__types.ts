@@ -4399,6 +4399,9 @@ export interface PetitionBase {
 
 export interface PetitionBaseMini {
   __typename?: "PetitionBaseMini";
+  closedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  completedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  createdAt: Scalars["DateTime"]["output"];
   currentSignatureRequest?: Maybe<PetitionSignatureRequestMini>;
   full?: Maybe<PetitionBase>;
   /** The ID of the petition or template. */

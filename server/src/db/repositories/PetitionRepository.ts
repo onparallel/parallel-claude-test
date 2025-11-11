@@ -3104,6 +3104,7 @@ export class PetitionRepository extends BaseRepository {
           ...omit(sourcePetition, [
             "id",
             "created_at",
+            "closed_at",
             "updated_at",
             "template_public",
             "from_template_id",
@@ -7657,6 +7658,26 @@ export class PetitionRepository extends BaseRepository {
       [(t) => t.status.all, "desc"],
     );
   }
+
+  readonly loadPetitionLastCompletedAt = this.buildLoader<number, Date | null>(
+    async (petitionIds, t) => {
+      const rows = await this.raw<{ petition_id: number; completed_at: Date | null }>(
+        /* sql */ `
+        select 
+          petition_id, 
+          max(created_at) as completed_at 
+        from petition_event 
+        where petition_id in ? 
+          and type = 'PETITION_COMPLETED'
+        group by petition_id
+        `,
+        [this.sqlIn(petitionIds)],
+        t,
+      );
+      const byPetitionId = groupBy(rows, (r) => r.petition_id);
+      return petitionIds.map((petitionId) => byPetitionId[petitionId]?.at(0)?.completed_at ?? null);
+    },
+  );
 
   private async getPetitionTimes(petitionIds: number[]) {
     const events = await this.raw<{

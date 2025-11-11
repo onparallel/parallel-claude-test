@@ -3528,6 +3528,9 @@ export interface NexusGenFieldTypes {
   };
   PetitionBaseMini: {
     // field return type
+    closedAt: NexusGenScalars["DateTime"] | null; // DateTime
+    completedAt: NexusGenScalars["DateTime"] | null; // DateTime
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
     currentSignatureRequest: NexusGenRootTypes["PetitionSignatureRequestMini"] | null; // PetitionSignatureRequestMini
     full: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     id: NexusGenScalars["GID"]; // GID!
@@ -6854,6 +6857,9 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionBaseMini: {
     // field return type name
+    closedAt: "DateTime";
+    completedAt: "DateTime";
+    createdAt: "DateTime";
     currentSignatureRequest: "PetitionSignatureRequestMini";
     full: "PetitionBase";
     id: "GID";

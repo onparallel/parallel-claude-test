@@ -499,3 +499,18 @@ export const PetitionFieldCommentFragment = gql`
     }
   }
 `;
+
+export const KeyProcessFragment = gql`
+  fragment KeyProcess on ProfileTypeProcess {
+    id
+    name
+    latestPetition(profileId: $profileId) {
+      id
+      name
+      status
+      createdAt
+      completedAt
+      closedAt
+    }
+  }
+`;

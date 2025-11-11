@@ -2801,3 +2801,38 @@ export const ProfileValuesFilterSchema = schema({
     },
   ],
 } as const);
+
+const _ProfileTypeKeyProcess = {
+  title: "ProfileTypeKeyProcess",
+  type: "object",
+  additionalProperties: false,
+  required: ["id", "name", "latestPetition"],
+  properties: {
+    id: {
+      type: "string",
+      description: "ID of the key process",
+      example: toGlobalId("ProfileTypeProcess", 1),
+    },
+    name: _LocalizableUserText,
+    latestPetition: {
+      type: ["object", "null"],
+      additionalProperties: false,
+      required: ["id", "name", "status", "createdAt", "completedAt", "closedAt"],
+      properties: {
+        id: {
+          type: "string",
+          description: "ID of the parallel",
+          example: toGlobalId("Petition", 1),
+        },
+        name: { type: "string", description: "Name of the parallel", example: "KYC" },
+        status: { type: "string", description: "Status of the parallel", example: "CLOSED" },
+        createdAt: { type: "string", description: "Created at", format: "date-time" },
+        completedAt: { type: ["string", "null"], description: "Completed at", format: "date-time" },
+        closedAt: { type: ["string", "null"], description: "Closed at", format: "date-time" },
+      },
+    },
+  },
+} as const;
+
+export const ProfileTypeKeyProcess = schema(_ProfileTypeKeyProcess);
+export const ListOfProfileTypeKeyProcesses = ListOf(_ProfileTypeKeyProcess as JsonSchema);

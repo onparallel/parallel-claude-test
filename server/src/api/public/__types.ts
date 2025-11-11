@@ -4266,6 +4266,9 @@ export type PetitionBase = {
 };
 
 export type PetitionBaseMini = {
+  closedAt: Maybe<Scalars["DateTime"]["output"]>;
+  completedAt: Maybe<Scalars["DateTime"]["output"]>;
+  createdAt: Scalars["DateTime"]["output"];
   currentSignatureRequest: Maybe<PetitionSignatureRequestMini>;
   full: Maybe<PetitionBase>;
   /** The ID of the petition or template. */
@@ -8471,6 +8474,19 @@ export type PetitionFieldCommentFragment = {
         user: { id: string; email: string; fullName: string | null } | null;
       }
   >;
+};
+
+export type KeyProcessFragment = {
+  id: string;
+  name: { [locale in UserLocale]?: string };
+  latestPetition: {
+    id: string;
+    name: string | null;
+    status: PetitionStatus | null;
+    createdAt: string;
+    completedAt: string | null;
+    closedAt: string | null;
+  } | null;
 };
 
 export type waitForTask_TaskQueryVariables = Exact<{
@@ -12785,6 +12801,192 @@ export type UnsubscribeFromProfile_unsubscribeFromProfileMutation = {
   }>;
 };
 
+export type GetProfilePetitions_profileQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  includeRecipients: Scalars["Boolean"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeTags: Scalars["Boolean"]["input"];
+  includeRecipientUrl: Scalars["Boolean"]["input"];
+  includeReplies: Scalars["Boolean"]["input"];
+  includeProgress: Scalars["Boolean"]["input"];
+  includeSigners: Scalars["Boolean"]["input"];
+  includeVariablesResult: Scalars["Boolean"]["input"];
+  includeSignatureRequests: Scalars["Boolean"]["input"];
+  includeOwner: Scalars["Boolean"]["input"];
+}>;
+
+export type GetProfilePetitions_profileQuery = {
+  profile: {
+    associatedPetitions: {
+      totalCount: number;
+      items: Array<{
+        id: string;
+        path: string;
+        name: string | null;
+        locale: PetitionLocale;
+        createdAt: string;
+        customProperties: { [key: string]: any };
+        status: PetitionStatus;
+        deadline: string | null;
+        isAnonymized: boolean;
+        fields?: Array<{
+          id: string;
+          title: string | null;
+          description: string | null;
+          type: PetitionFieldType;
+          fromPetitionFieldId: string | null;
+          alias: string | null;
+          options: { [key: string]: any };
+          optional: boolean;
+          multiple: boolean;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+            associatedProfile: {
+              id: string;
+              name: string;
+              status: ProfileStatus;
+              createdAt: string;
+              profileType: { id: string; name: { [locale in UserLocale]?: string } };
+            } | null;
+            children: Array<{
+              field: { id: string; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                status: PetitionFieldReplyStatus;
+                metadata: { [key: string]: any };
+                createdAt: string;
+                updatedAt: string;
+              }>;
+            }> | null;
+          }>;
+          children: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+          }> | null;
+        }>;
+        tags?: Array<{ id: string; name: string }>;
+        signatureConfig?: {
+          isEnabled: boolean;
+          signers: Array<{
+            email: string | null;
+            firstName: string;
+            lastName: string | null;
+          } | null>;
+        } | null;
+        owner?: {
+          id: string;
+          email: string;
+          fullName: string | null;
+          firstName: string | null;
+          lastName: string | null;
+        };
+        fromTemplate: { id: string } | null;
+        recipients?: Array<{
+          recipientUrl: string | null;
+          id: string;
+          status: PetitionAccessStatus;
+          reminderCount: number;
+          remindersLeft: number;
+          remindersActive: boolean;
+          nextReminderAt: string | null;
+          createdAt: string;
+          contact: {
+            id: string;
+            email: string;
+            fullName: string;
+            firstName: string;
+            lastName: string | null;
+            createdAt: string;
+            updatedAt: string;
+          } | null;
+          granter: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          } | null;
+        }>;
+        replies?: Array<{
+          id: string;
+          alias: string | null;
+          type: PetitionFieldType;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+            children: Array<{
+              field: { id: string; alias: string | null; type: PetitionFieldType };
+              replies: Array<{
+                id: string;
+                content: { [key: string]: any };
+                metadata: { [key: string]: any };
+              }>;
+            }> | null;
+          }>;
+        }>;
+        progress?: {
+          external: { approved: number; replied: number; optional: number; total: number };
+          internal: { approved: number; replied: number; optional: number; total: number };
+        };
+        variablesResult?: Array<{ name: string; value: number | null }>;
+        signatures?: Array<{
+          id: string;
+          status: PetitionSignatureRequestStatus;
+          environment: SignatureOrgIntegrationEnvironment;
+          createdAt: string;
+          updatedAt: string;
+          signatureConfig: {
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          };
+        }>;
+      }>;
+    };
+  };
+};
+
+export type GetProfileKeyProcesses_profileQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+}>;
+
+export type GetProfileKeyProcesses_profileQuery = {
+  profile: {
+    profileType: {
+      keyProcesses: Array<{
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        latestPetition: {
+          id: string;
+          name: string | null;
+          status: PetitionStatus | null;
+          createdAt: string;
+          completedAt: string | null;
+          closedAt: string | null;
+        } | null;
+      }>;
+    };
+  };
+};
+
 export type GetProfileTypes_profileTypesQueryVariables = Exact<{
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
@@ -13843,6 +14045,20 @@ export const PetitionFieldCommentFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<PetitionFieldCommentFragment, unknown>;
+export const KeyProcessFragmentDoc = gql`
+  fragment KeyProcess on ProfileTypeProcess {
+    id
+    name
+    latestPetition(profileId: $profileId) {
+      id
+      name
+      status
+      createdAt
+      completedAt
+      closedAt
+    }
+  }
+` as unknown as DocumentNode<KeyProcessFragment, unknown>;
 export const waitForTask_TaskDocument = gql`
   query waitForTask_Task($id: GID!) {
     task(id: $id) {
@@ -15426,6 +15642,51 @@ export const UnsubscribeFromProfile_unsubscribeFromProfileDocument = gql`
 ` as unknown as DocumentNode<
   UnsubscribeFromProfile_unsubscribeFromProfileMutation,
   UnsubscribeFromProfile_unsubscribeFromProfileMutationVariables
+>;
+export const GetProfilePetitions_profileDocument = gql`
+  query GetProfilePetitions_profile(
+    $profileId: GID!
+    $offset: Int
+    $limit: Int
+    $includeRecipients: Boolean!
+    $includeFields: Boolean!
+    $includeTags: Boolean!
+    $includeRecipientUrl: Boolean!
+    $includeReplies: Boolean!
+    $includeProgress: Boolean!
+    $includeSigners: Boolean!
+    $includeVariablesResult: Boolean!
+    $includeSignatureRequests: Boolean!
+    $includeOwner: Boolean!
+  ) {
+    profile(profileId: $profileId) {
+      associatedPetitions(offset: $offset, limit: $limit) {
+        items {
+          ...Petition
+        }
+        totalCount
+      }
+    }
+  }
+  ${PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  GetProfilePetitions_profileQuery,
+  GetProfilePetitions_profileQueryVariables
+>;
+export const GetProfileKeyProcesses_profileDocument = gql`
+  query GetProfileKeyProcesses_profile($profileId: GID!) {
+    profile(profileId: $profileId) {
+      profileType {
+        keyProcesses {
+          ...KeyProcess
+        }
+      }
+    }
+  }
+  ${KeyProcessFragmentDoc}
+` as unknown as DocumentNode<
+  GetProfileKeyProcesses_profileQuery,
+  GetProfileKeyProcesses_profileQueryVariables
 >;
 export const GetProfileTypes_profileTypesDocument = gql`
   query GetProfileTypes_profileTypes(
