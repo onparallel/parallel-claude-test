@@ -3,10 +3,10 @@ import { firstBy, isNonNullish } from "remeda";
 import { Profile, ProfileRelationship } from "../../../db/__types";
 import {
   ProfileClosedEvent,
-  ProfileFieldValueUpdatedEvent,
   ProfileRelationshipCreatedEvent,
   ProfileRelationshipRemovedEvent,
   ProfileReopenedEvent,
+  ProfileUpdatedEvent,
 } from "../../../db/events/ProfileEvent";
 import { ProfileRepository } from "../../../db/repositories/ProfileRepository";
 import { EventListener } from "../EventProcessorQueue";
@@ -19,7 +19,7 @@ const CONFIG =
         {
           // PARALLEL
           orgId: 1,
-          globalRiskValues: ["LOW", "MEDIUM", "HIGH"] as const,
+          globalRiskValues: ["LOW", "MEDIUM", "HIGH"],
           individual: {
             profileTypeId: 64,
             riskProfileTypeFieldId: 4380,
@@ -42,7 +42,7 @@ const CONFIG =
           {
             // ADLANTER
             orgId: 209,
-            globalRiskValues: ["LOW", "MEDIUM", "HIGH", "VERY_HIGH"] as const,
+            globalRiskValues: ["LOW", "MEDIUM", "HIGH", "VERY_HIGH"],
             individual: {
               profileTypeId: 5797,
               riskProfileTypeFieldId: 196647,
@@ -62,7 +62,7 @@ const CONFIG =
           // OSBORNE CLARKE
           {
             orgId: 45322,
-            globalRiskValues: ["LOW", "MEDIUM", "HIGH"] as const,
+            globalRiskValues: ["LOW", "MEDIUM", "HIGH"],
             individual: {
               profileTypeId: 11341,
               riskProfileTypeFieldId: 197952,
@@ -86,7 +86,7 @@ const CONFIG =
 export class ClientRiskUpdateListener
   implements
     EventListener<
-      | "PROFILE_FIELD_VALUE_UPDATED"
+      | "PROFILE_UPDATED"
       | "PROFILE_RELATIONSHIP_CREATED"
       | "PROFILE_RELATIONSHIP_REMOVED"
       | "PROFILE_CLOSED"
@@ -94,13 +94,13 @@ export class ClientRiskUpdateListener
     >
 {
   public readonly types: (
-    | "PROFILE_FIELD_VALUE_UPDATED"
+    | "PROFILE_UPDATED"
     | "PROFILE_RELATIONSHIP_CREATED"
     | "PROFILE_RELATIONSHIP_REMOVED"
     | "PROFILE_CLOSED"
     | "PROFILE_REOPENED"
   )[] = [
-    "PROFILE_FIELD_VALUE_UPDATED",
+    "PROFILE_UPDATED",
     "PROFILE_RELATIONSHIP_CREATED",
     "PROFILE_RELATIONSHIP_REMOVED",
     "PROFILE_CLOSED",
@@ -111,7 +111,7 @@ export class ClientRiskUpdateListener
 
   public async handle(
     event:
-      | ProfileFieldValueUpdatedEvent
+      | ProfileUpdatedEvent
       | ProfileRelationshipCreatedEvent
       | ProfileRelationshipRemovedEvent
       | ProfileClosedEvent
@@ -127,14 +127,27 @@ export class ClientRiskUpdateListener
         continue;
       }
 
-      if (
-        // the risk value was updated on a client or a file
-        (event.type === "PROFILE_FIELD_VALUE_UPDATED" &&
-          [
-            config.individual.riskProfileTypeFieldId,
-            config.legalEntity.riskProfileTypeFieldId,
-            config.file.riskProfileTypeFieldId,
-          ].includes(event.data.profile_type_field_id)) ||
+      if (event.type === "PROFILE_UPDATED") {
+        // get every PROFILE_FIELD_VALUE_UPDATED events for this profile down to the previous PROFILE_UPDATED
+        // this way we can see the reasons of the PROFILE_UPDATED event and value if an update is required
+        const previousEvents = await this.profiles.getProfileEvents(event.profile_id, {
+          type: "PROFILE_FIELD_VALUE_UPDATED",
+          before: { eventId: event.id },
+          after: { type: "PROFILE_UPDATED" },
+        });
+
+        if (
+          previousEvents.find((e) =>
+            [
+              config.individual.riskProfileTypeFieldId,
+              config.legalEntity.riskProfileTypeFieldId,
+              config.file.riskProfileTypeFieldId,
+            ].includes(e.data.profile_type_field_id),
+          )
+        ) {
+          await this.updateGlobalClientRisk(profile, event.org_id, config);
+        }
+      } else if (
         // a relationship between a client and a file was created or removed
         ((event.type === "PROFILE_RELATIONSHIP_CREATED" ||
           event.type === "PROFILE_RELATIONSHIP_REMOVED") &&
