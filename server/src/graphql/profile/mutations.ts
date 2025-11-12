@@ -3035,13 +3035,14 @@ export const saveProfileFieldValueDraft = mutationField("saveProfileFieldValueDr
     profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
   },
   resolve: async (_, args, ctx) => {
-    const { draftValue } = await ctx.profiles.loadProfileFieldValueWithDraft.raw({
-      profileId: args.profileId,
-      profileTypeFieldId: args.profileTypeFieldId,
-    });
+    const removedDraft = await ctx.profiles.removeDraftProfileFieldValue(
+      args.profileId,
+      args.profileTypeFieldId,
+      ctx.user!.id,
+    );
 
-    if (!draftValue) {
-      throw new ForbiddenError("Property does not have a draft");
+    if (!removedDraft) {
+      return RESULT.SUCCESS;
     }
 
     await ctx.profiles.updateProfileFieldValues(
@@ -3049,13 +3050,13 @@ export const saveProfileFieldValueDraft = mutationField("saveProfileFieldValueDr
         {
           profileId: args.profileId,
           profileTypeFieldId: args.profileTypeFieldId,
-          type: draftValue.type,
-          content: draftValue.content,
+          type: removedDraft.type,
+          content: removedDraft.content,
         },
       ],
       ctx.user!.id,
       ctx.user!.org_id,
-      (draftValue.source as any) ?? "MANUAL",
+      (removedDraft.source as any) ?? "MANUAL",
     );
 
     return RESULT.SUCCESS;

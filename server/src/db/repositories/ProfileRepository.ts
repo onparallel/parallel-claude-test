@@ -1243,6 +1243,29 @@ export class ProfileRepository extends BaseRepository {
     }, t);
   }
 
+  async removeDraftProfileFieldValue(
+    profileId: number,
+    profileTypeFieldId: number,
+    userId: number,
+    t?: Knex.Transaction,
+  ): Promise<ProfileFieldValue | null> {
+    const [draft] = await this.from("profile_field_value", t)
+      .where("profile_id", profileId)
+      .where("profile_type_field_id", profileTypeFieldId)
+      .where("is_draft", true)
+      .whereNull("deleted_at")
+      .whereNull("removed_at")
+      .update(
+        {
+          removed_at: this.now(),
+          removed_by_user_id: userId,
+        },
+        "*",
+      );
+
+    return draft ?? null;
+  }
+
   async updateProfileFieldValues(
     fields: {
       profileId: number;

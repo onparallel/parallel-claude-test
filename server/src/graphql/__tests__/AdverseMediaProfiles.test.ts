@@ -1142,7 +1142,18 @@ describe("Adverse Media - Profiles", () => {
       ]);
     });
 
-    it("sends error if there is no draft value", async () => {
+    it("does nothing if there is no draft value", async () => {
+      const storedValue = await mocks.knex
+        .from("profile_field_value")
+        .where({
+          profile_id: profileId,
+          profile_type_field_id: profileTypeField.id,
+          is_draft: false,
+          removed_at: null,
+          deleted_at: null,
+        })
+        .first();
+
       await mocks.knex
         .from("profile_field_value")
         .where({
@@ -1150,7 +1161,10 @@ describe("Adverse Media - Profiles", () => {
           profile_type_field_id: profileTypeField.id,
           is_draft: true,
         })
-        .delete();
+        .update({
+          removed_at: new Date(),
+          removed_by_user_id: user.id,
+        });
 
       const { errors, data } = await testClient.execute(
         gql`
@@ -1167,8 +1181,21 @@ describe("Adverse Media - Profiles", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
+      expect(errors).toBeUndefined();
+      expect(data?.saveProfileFieldValueDraft).toEqual("SUCCESS");
+
+      const dbPfvs = await mocks.knex
+        .from("profile_field_value")
+        .where({
+          profile_id: profileId,
+          profile_type_field_id: profileTypeField.id,
+          is_draft: false,
+          removed_at: null,
+          deleted_at: null,
+        })
+        .whereNot("id", storedValue.id);
+
+      expect(dbPfvs).toHaveLength(0);
     });
 
     it("sends error if user does not have WRITE permission on the property", async () => {
