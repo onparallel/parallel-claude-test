@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { firstBy, isNonNullish } from "remeda";
+import { firstBy, isNonNullish, zip } from "remeda";
 import { Profile, ProfileRelationship } from "../../../db/__types";
 import {
   ProfileClosedEvent,
@@ -13,7 +13,29 @@ import { EventListener } from "../EventProcessorQueue";
 
 export const CLIENT_RISK_UPDATE_LISTENER = Symbol.for("CLIENT_RISK_UPDATE_LISTENER");
 
-const CONFIG =
+type Config = {
+  orgId: number;
+  globalRiskValues: string[];
+  individual: {
+    profileTypeId: number;
+    riskProfileTypeFieldId: number;
+    globalRiskProfileTypeFieldId: number;
+  };
+  legalEntity: {
+    profileTypeId: number;
+    riskProfileTypeFieldId: number;
+    globalRiskProfileTypeFieldId: number;
+  };
+  file: {
+    profileTypeId: number;
+    riskProfileTypeFieldId: number;
+    statusProfileTypeFieldId?: number;
+    statusValues?: string[];
+  };
+  clientFileRelationshipTypeId: number;
+};
+
+const CONFIG: Config[] =
   process.env.ENV === "staging"
     ? [
         {
@@ -76,6 +98,8 @@ const CONFIG =
             file: {
               profileTypeId: 11344,
               riskProfileTypeFieldId: 198602,
+              statusProfileTypeFieldId: 199452,
+              statusValues: ["P003"],
             },
             clientFileRelationshipTypeId: 37203,
           },
@@ -142,6 +166,9 @@ export class ClientRiskUpdateListener
               config.individual.riskProfileTypeFieldId,
               config.legalEntity.riskProfileTypeFieldId,
               config.file.riskProfileTypeFieldId,
+              ...(isNonNullish(config.file.statusProfileTypeFieldId)
+                ? [config.file.statusProfileTypeFieldId]
+                : []),
             ].includes(e.data.profile_type_field_id),
           )
         ) {
@@ -226,12 +253,28 @@ export class ClientRiskUpdateListener
         })),
       ]);
 
+    const fileStatus = isNonNullish(config.file.statusProfileTypeFieldId)
+      ? await this.profiles.loadProfileFieldValue(
+          clientFileProfiles.map((p) => ({
+            profileId: p.id,
+            profileTypeFieldId: config.file.statusProfileTypeFieldId!,
+          })),
+        )
+      : clientFileProfiles.map(() => null);
+
     // get the max risk of the client, between its "individual" value and the risk of every of its FILEs
     const maxRisk = firstBy(
       [
         individualRisk?.content?.value ?? null,
         companyRisk?.content?.value ?? null,
-        ...fileRisks.map((v) => v?.content?.value ?? null),
+        ...zip(fileRisks, fileStatus)
+          .filter(([_, status]) =>
+            isNonNullish(config.file.statusProfileTypeFieldId)
+              ? isNonNullish(status?.content?.value) &&
+                config.file.statusValues!.includes(status!.content.value)
+              : true,
+          )
+          .map(([risk]) => risk?.content?.value ?? null),
       ].filter(isNonNullish),
       [(v) => config.globalRiskValues.indexOf(v), "desc"],
     );
