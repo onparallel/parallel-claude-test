@@ -297,7 +297,11 @@ function CreateOrUpdateNumericVariableDialog({
 
               if (isUpdating) {
                 await updatePetitionVariable({
-                  variables: { petitionId, name: variable.name, data: variable },
+                  variables: {
+                    petitionId,
+                    name: variable.name,
+                    data: pick(variable, ["defaultValue", "showInReplies", "valueLabels"]),
+                  },
                 });
               } else {
                 await createPetitionVariable({
@@ -666,7 +670,11 @@ function CreateOrUpdateEnumVariableDialog({
 
               if (isUpdating) {
                 await updatePetitionVariable({
-                  variables: { petitionId, name: variable.name, data: variable },
+                  variables: {
+                    petitionId,
+                    name: variable.name,
+                    data: pick(variable, ["defaultValue", "showInReplies", "valueLabels"]),
+                  },
                 });
               } else {
                 await createPetitionVariable({
