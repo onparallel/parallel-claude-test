@@ -808,7 +808,7 @@ describe("validateFieldLogic", () => {
             },
             allFields,
             {
-              variables: [{ name: "PETITION_VARIABLE", default_value: 0 }],
+              variables: [{ type: "NUMBER", name: "PETITION_VARIABLE", default_value: 0 }],
               customLists: [],
               standardListDefinitions: [],
               loadSelectOptionsValuesAndLabels: (options) =>
@@ -818,7 +818,116 @@ describe("validateFieldLogic", () => {
         ).resolves.not.toThrow();
       });
 
-      it("variable conditions should use numeric values", async () => {
+      it("invalid operators for visibility conditions on ENUM variables", async () => {
+        const invalidOperators = [
+          "START_WITH",
+          "END_WITH",
+          "CONTAIN",
+          "NOT_CONTAIN",
+          "NUMBER_OF_SUBREPLIES",
+          "HAS_PROFILE_MATCH",
+          "IS_IN_LIST",
+          "NOT_IS_IN_LIST",
+          "ALL_IS_IN_LIST",
+          "ANY_IS_IN_LIST",
+          "NONE_IS_IN_LIST",
+          "IS_ONE_OF",
+          "NOT_IS_ONE_OF",
+        ];
+
+        for (const operator of invalidOperators) {
+          await expect(() =>
+            validateFieldLogic(
+              {
+                ...selectField,
+                visibility: {
+                  type: "SHOW",
+                  operator: "AND",
+                  conditions: [
+                    {
+                      variableName: "risk",
+                      operator,
+                      value: "low",
+                    },
+                  ],
+                },
+              },
+              allFields,
+              {
+                variables: [
+                  {
+                    type: "ENUM",
+                    name: "risk",
+                    default_value: "low",
+                    value_labels: [
+                      { value: "low", label: "Low" },
+                      { value: "medium", label: "Medium" },
+                      { value: "high", label: "High" },
+                    ],
+                  },
+                ],
+                customLists: [],
+                standardListDefinitions: [],
+                loadSelectOptionsValuesAndLabels: (options) =>
+                  petitionFields.loadSelectOptionsValuesAndLabels(options),
+              },
+            ),
+          ).rejects.toThrow(`Invalid operator ${operator} for variable condition 0`);
+        }
+      });
+
+      it("valid operators for visibility conditions on ENUM variables", async () => {
+        const validOperators: [string, string | string[]][] = [
+          ["EQUAL", "low"],
+          ["NOT_EQUAL", "low"],
+          ["LESS_THAN", "low"],
+          ["LESS_THAN_OR_EQUAL", "low"],
+          ["GREATER_THAN", "low"],
+          ["GREATER_THAN_OR_EQUAL", "low"],
+        ];
+
+        for (const [operator, value] of validOperators) {
+          await expect(
+            validateFieldLogic(
+              {
+                ...selectField,
+                visibility: {
+                  type: "SHOW",
+                  operator: "AND",
+                  conditions: [
+                    {
+                      variableName: "risk",
+                      operator,
+                      value,
+                    },
+                  ],
+                },
+              },
+              allFields,
+              {
+                variables: [
+                  {
+                    type: "ENUM",
+                    name: "risk",
+                    default_value: "low",
+                    value_labels: [
+                      { value: "low", label: "Low" },
+                      { value: "medium", label: "Medium" },
+                      { value: "high", label: "High" },
+                    ],
+                  },
+                ],
+                customLists: [],
+                standardListDefinitions: [],
+                loadSelectOptionsValuesAndLabels: (options) =>
+                  petitionFields.loadSelectOptionsValuesAndLabels(options),
+              },
+            ),
+          ).resolves.not.toThrow();
+        }
+      });
+
+      it("NUMBER variable conditions should use numeric values", async () => {
         await expect(
           validateFieldLogic(
             {
@@ -837,7 +946,7 @@ describe("validateFieldLogic", () => {
             },
             allFields,
             {
-              variables: [{ name: "PETITION_VARIABLE", default_value: 0 }],
+              variables: [{ type: "NUMBER", name: "PETITION_VARIABLE", default_value: 0 }],
               customLists: [],
               standardListDefinitions: [],
               loadSelectOptionsValuesAndLabels: (options) =>
@@ -847,7 +956,7 @@ describe("validateFieldLogic", () => {
         ).rejects.toThrow("Invalid value type string for variable condition 0");
       });
 
-      it("variable conditions should use numeric operators", async () => {
+      it("NUMBER variable conditions should use numeric operators", async () => {
         const invalidOperators = [
           "START_WITH",
           "END_WITH",
@@ -877,7 +986,7 @@ describe("validateFieldLogic", () => {
               },
               allFields,
               {
-                variables: [{ name: "PETITION_VARIABLE", default_value: 0 }],
+                variables: [{ type: "NUMBER", name: "PETITION_VARIABLE", default_value: 0 }],
                 customLists: [],
                 standardListDefinitions: [],
                 loadSelectOptionsValuesAndLabels: (options) =>
@@ -886,6 +995,86 @@ describe("validateFieldLogic", () => {
             ),
           ).rejects.toThrow(`Invalid operator ${operator} for variable condition 0`);
         }
+      });
+
+      it("ENUM variable conditions should use string values", async () => {
+        await expect(
+          validateFieldLogic(
+            {
+              ...selectField,
+              visibility: {
+                type: "SHOW",
+                operator: "AND",
+                conditions: [
+                  {
+                    variableName: "PETITION_VARIABLE",
+                    operator: "EQUAL",
+                    value: 1,
+                  },
+                ],
+              },
+            },
+            allFields,
+            {
+              variables: [
+                {
+                  type: "ENUM",
+                  name: "PETITION_VARIABLE",
+                  default_value: "low",
+                  value_labels: [
+                    { value: "low", label: "Low" },
+                    { value: "medium", label: "Medium" },
+                    { value: "high", label: "High" },
+                  ],
+                },
+              ],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
+          ),
+        ).rejects.toThrow("Invalid value type number for variable condition 0");
+      });
+
+      it("ENUM variable conditions should use values defined in value_labels of the variable", async () => {
+        await expect(
+          validateFieldLogic(
+            {
+              ...selectField,
+              visibility: {
+                type: "SHOW",
+                operator: "AND",
+                conditions: [
+                  {
+                    variableName: "PETITION_VARIABLE",
+                    operator: "EQUAL",
+                    value: "not an option",
+                  },
+                ],
+              },
+            },
+            allFields,
+            {
+              variables: [
+                {
+                  type: "ENUM",
+                  name: "PETITION_VARIABLE",
+                  default_value: "low",
+                  value_labels: [
+                    { value: "low", label: "Low" },
+                    { value: "medium", label: "Medium" },
+                    { value: "high", label: "High" },
+                  ],
+                },
+              ],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
+          ),
+        ).rejects.toThrow("Invalid value not an option for variable condition 0");
       });
 
       it("sends error if variable is not defined", async () => {
@@ -1261,7 +1450,7 @@ describe("validateFieldLogic", () => {
           },
           allFields,
           {
-            variables: [{ name: "score", default_value: 0 }],
+            variables: [{ type: "NUMBER", name: "score", default_value: 0 }],
             customLists: [],
             standardListDefinitions: [],
             loadSelectOptionsValuesAndLabels: (options) =>
@@ -1302,7 +1491,7 @@ describe("validateFieldLogic", () => {
           },
           allFields,
           {
-            variables: [{ name: "score", default_value: 0 }],
+            variables: [{ type: "NUMBER", name: "score", default_value: 0 }],
             customLists: [],
             standardListDefinitions: [],
             loadSelectOptionsValuesAndLabels: (options) =>
@@ -1344,8 +1533,8 @@ describe("validateFieldLogic", () => {
           allFields,
           {
             variables: [
-              { name: "score", default_value: 0 },
-              { name: "source", default_value: 100 },
+              { type: "NUMBER", name: "score", default_value: 0 },
+              { type: "NUMBER", name: "source", default_value: 100 },
             ],
             customLists: [],
             standardListDefinitions: [],
@@ -1387,7 +1576,7 @@ describe("validateFieldLogic", () => {
           },
           allFields,
           {
-            variables: [{ name: "score", default_value: 0 }],
+            variables: [{ type: "NUMBER", name: "score", default_value: 0 }],
             customLists: [],
             standardListDefinitions: [],
             loadSelectOptionsValuesAndLabels: (options) =>
@@ -1428,7 +1617,7 @@ describe("validateFieldLogic", () => {
           },
           allFields,
           {
-            variables: [{ name: "score", default_value: 0 }],
+            variables: [{ type: "NUMBER", name: "score", default_value: 0 }],
             customLists: [],
             standardListDefinitions: [],
             loadSelectOptionsValuesAndLabels: (options) =>
@@ -1470,8 +1659,8 @@ describe("validateFieldLogic", () => {
           allFields,
           {
             variables: [
-              { name: "score", default_value: 0 },
-              { name: "source", default_value: 100 },
+              { type: "NUMBER", name: "score", default_value: 0 },
+              { type: "NUMBER", name: "source", default_value: 100 },
             ],
             customLists: [],
             standardListDefinitions: [],
@@ -1514,8 +1703,8 @@ describe("validateFieldLogic", () => {
           allFields,
           {
             variables: [
-              { name: "score", default_value: 0 },
-              { name: "source", default_value: 100 },
+              { type: "NUMBER", name: "score", default_value: 0 },
+              { type: "NUMBER", name: "source", default_value: 100 },
             ],
             customLists: [],
             standardListDefinitions: [],
@@ -1562,8 +1751,8 @@ describe("validateFieldLogic", () => {
             allFields,
             {
               variables: [
-                { name: "score", default_value: 0 },
-                { name: "source", default_value: 100 },
+                { type: "NUMBER", name: "score", default_value: 0 },
+                { type: "NUMBER", name: "source", default_value: 100 },
               ],
               customLists: [],
               standardListDefinitions: [],
@@ -1611,8 +1800,8 @@ describe("validateFieldLogic", () => {
             allFields,
             {
               variables: [
-                { name: "score", default_value: 0 },
-                { name: "source", default_value: 100 },
+                { type: "NUMBER", name: "score", default_value: 0 },
+                { type: "NUMBER", name: "source", default_value: 100 },
               ],
               customLists: [],
               standardListDefinitions: [],
@@ -1660,8 +1849,8 @@ describe("validateFieldLogic", () => {
             allFields,
             {
               variables: [
-                { name: "score", default_value: 0 },
-                { name: "source", default_value: 100 },
+                { type: "NUMBER", name: "score", default_value: 0 },
+                { type: "NUMBER", name: "source", default_value: 100 },
               ],
               customLists: [],
               standardListDefinitions: [],
@@ -1704,7 +1893,7 @@ describe("validateFieldLogic", () => {
           },
           allFields,
           {
-            variables: [{ name: "score", default_value: 0 }],
+            variables: [{ type: "NUMBER", name: "score", default_value: 0 }],
             customLists: [],
             standardListDefinitions: [],
             loadSelectOptionsValuesAndLabels: (options) =>
@@ -1712,6 +1901,224 @@ describe("validateFieldLogic", () => {
           },
         ),
       ).resolves.not.toThrow();
+    });
+
+    it("valid operators for math operations with ENUM variables", async () => {
+      const validOperators = [
+        "ASSIGNATION",
+        "ASSIGNATION_IF_LOWER",
+        "ASSIGNATION_IF_GREATER",
+      ] as const;
+      for (const operator of validOperators) {
+        await expect(
+          validateFieldLogic(
+            {
+              ...selectField,
+              math: [
+                {
+                  operator: "AND",
+                  conditions: [
+                    {
+                      fieldId: textField.id,
+                      modifier: "NUMBER_OF_REPLIES",
+                      operator: "GREATER_THAN",
+                      value: 1,
+                    },
+                  ],
+                  operations: [
+                    {
+                      operator,
+                      operand: {
+                        type: "ENUM",
+                        value: "high",
+                      },
+                      variable: "risk",
+                    },
+                  ],
+                },
+              ],
+            },
+            allFields,
+            {
+              variables: [
+                {
+                  type: "ENUM",
+                  name: "risk",
+                  default_value: "low",
+                  value_labels: [
+                    { value: "low", label: "Low" },
+                    { value: "medium", label: "Medium" },
+                    { value: "high", label: "High" },
+                  ],
+                },
+              ],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
+          ),
+        ).resolves.not.toThrow();
+      }
+    });
+
+    it("invalid operators for math operations with ENUM variables", async () => {
+      const invalidOperators = ["ADDITION", "SUBSTRACTION", "MULTIPLICATION", "DIVISION"] as const;
+      for (const operator of invalidOperators) {
+        await expect(() =>
+          validateFieldLogic(
+            {
+              ...selectField,
+              math: [
+                {
+                  operator: "AND",
+                  conditions: [
+                    {
+                      fieldId: textField.id,
+                      modifier: "NUMBER_OF_REPLIES",
+                      operator: "GREATER_THAN",
+                      value: 1,
+                    },
+                  ],
+                  operations: [
+                    {
+                      operator,
+                      operand: {
+                        type: "ENUM",
+                        value: "high",
+                      },
+                      variable: "risk",
+                    },
+                  ],
+                },
+              ],
+            },
+            allFields,
+            {
+              variables: [
+                {
+                  type: "ENUM",
+                  name: "risk",
+                  default_value: "low",
+                  value_labels: [
+                    { value: "low", label: "Low" },
+                    { value: "medium", label: "Medium" },
+                    { value: "high", label: "High" },
+                  ],
+                },
+              ],
+              customLists: [],
+              standardListDefinitions: [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
+          ),
+        ).rejects.toThrow(`Invalid operator ${operator} for math operation 0`);
+      }
+    });
+
+    it("operand for math operations with ENUM variables should be an ENUM", async () => {
+      await expect(() =>
+        validateFieldLogic(
+          {
+            ...selectField,
+            math: [
+              {
+                operator: "AND",
+                conditions: [
+                  {
+                    fieldId: textField.id,
+                    modifier: "NUMBER_OF_REPLIES",
+                    operator: "GREATER_THAN",
+                    value: 1,
+                  },
+                ],
+                operations: [
+                  {
+                    operator: "ASSIGNATION",
+                    operand: {
+                      type: "NUMBER",
+                      value: 100,
+                    },
+                    variable: "risk",
+                  },
+                ],
+              },
+            ],
+          },
+          allFields,
+          {
+            variables: [
+              {
+                type: "ENUM",
+                name: "risk",
+                default_value: "low",
+                value_labels: [
+                  { value: "low", label: "Low" },
+                  { value: "medium", label: "Medium" },
+                  { value: "high", label: "High" },
+                ],
+              },
+            ],
+            customLists: [],
+            standardListDefinitions: [],
+            loadSelectOptionsValuesAndLabels: (options) =>
+              petitionFields.loadSelectOptionsValuesAndLabels(options),
+          },
+        ),
+      ).rejects.toThrow("Invalid operand type NUMBER for math operation 0");
+    });
+
+    it("operand values for math operations with ENUM variables should be a valid value", async () => {
+      await expect(() =>
+        validateFieldLogic(
+          {
+            ...selectField,
+            math: [
+              {
+                operator: "AND",
+                conditions: [
+                  {
+                    fieldId: textField.id,
+                    modifier: "NUMBER_OF_REPLIES",
+                    operator: "GREATER_THAN",
+                    value: 1,
+                  },
+                ],
+                operations: [
+                  {
+                    operator: "ASSIGNATION",
+                    operand: {
+                      type: "ENUM",
+                      value: "unknown",
+                    },
+                    variable: "risk",
+                  },
+                ],
+              },
+            ],
+          },
+          allFields,
+          {
+            variables: [
+              {
+                type: "ENUM",
+                name: "risk",
+                default_value: "low",
+                value_labels: [
+                  { value: "low", label: "Low" },
+                  { value: "medium", label: "Medium" },
+                  { value: "high", label: "High" },
+                ],
+              },
+            ],
+            customLists: [],
+            standardListDefinitions: [],
+            loadSelectOptionsValuesAndLabels: (options) =>
+              petitionFields.loadSelectOptionsValuesAndLabels(options),
+          },
+        ),
+      ).rejects.toThrow("Invalid value unknown for enum operand 0");
     });
 
     it("complex math", async () => {
@@ -1767,9 +2174,9 @@ describe("validateFieldLogic", () => {
           allFields,
           {
             variables: [
-              { name: "source", default_value: 0 },
-              { name: "score", default_value: 0 },
-              { name: "price_multiplier", default_value: 1 },
+              { type: "NUMBER", name: "source", default_value: 0 },
+              { type: "NUMBER", name: "score", default_value: 0 },
+              { type: "NUMBER", name: "price_multiplier", default_value: 1 },
             ],
             customLists: [],
             standardListDefinitions: [],

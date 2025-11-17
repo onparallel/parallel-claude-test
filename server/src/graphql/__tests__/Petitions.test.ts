@@ -2335,7 +2335,9 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ variables: JSON.stringify([{ name: "score", default_value: 0 }]) }),
+        () => ({
+          variables: JSON.stringify([{ type: "NUMBER", name: "score", default_value: 0 }]),
+        }),
       );
       const [selectField] = await mocks.createRandomPetitionFields(template.id, 1, () => ({
         type: "SELECT",

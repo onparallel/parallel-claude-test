@@ -734,7 +734,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               <LiquidPetitionScopeProvider petition={petition}>
                 {filterPetitionFields(fieldsWithIndices, fieldLogic, filter).map((x, index) =>
                   x.type === "FIELD" ? (
-                    <LiquidPetitionVariableProvider key={x.field.id} logic={x.fieldLogic}>
+                    <LiquidPetitionVariableProvider
+                      key={x.field.id}
+                      logic={x.fieldLogic}
+                      variables={petition.variables}
+                    >
                       <PetitionRepliesField
                         ref={fieldRefs[x.field.id]}
                         id={`field-${x.field.id}`}
@@ -805,6 +809,7 @@ PetitionReplies.fragments = {
         variables {
           name
           showInReplies
+          ...LiquidPetitionVariableProvider_PetitionVariable
         }
         approvalFlowConfig {
           ...Fragments_FullApprovalFlowConfig
@@ -840,6 +845,7 @@ PetitionReplies.fragments = {
       ${PetitionApprovalsCard.fragments.Petition}
       ${useClosePetition.fragments.PetitionBase}
       ${PetitionRepliesRightPaneTabs.fragments.Petition}
+      ${LiquidPetitionVariableProvider.fragments.PetitionVariable}
     `;
   },
   get PetitionField() {

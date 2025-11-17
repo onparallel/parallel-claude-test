@@ -61,11 +61,12 @@ export class PetitionExcelExport {
     await this.fieldCommentsTab.init();
   }
 
-  public addPetitionVariables(variables: Record<string, number>) {
+  public addPetitionVariables(variables: Record<string, number | string>) {
     this.textRepliesTab.addRows(
       Object.entries(variables).map(([name, value]) => ({
         title: name,
-        answer: isFinite(value) ? value : "",
+        answer:
+          (typeof value === "number" && isFinite(value)) || typeof value === "string" ? value : "",
       })),
     );
   }

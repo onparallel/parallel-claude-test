@@ -20,14 +20,14 @@ import {
   useEditPetitionFieldCalculationsDialog_PetitionBaseFragmentDoc,
   useEditPetitionFieldCalculationsDialog_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
+import { assignRef } from "@parallel/utils/assignRef";
 import { PetitionFieldMath } from "@parallel/utils/fieldLogic/types";
 import { withError } from "@parallel/utils/promises/withError";
 import { useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { isNullish, pick } from "remeda";
-import { assert } from "ts-essentials";
 import { PetitionFieldMathEditor } from "../logic/PetitionFieldMathEditor";
-import { useCreateOrUpdatePetitionVariableDialog } from "./CreateOrUpdatePetitionVariableDialog";
+import { useCreatePetitionVariableDialog } from "./CreateOrUpdatePetitionVariableDialog";
 
 interface EditPetitionFieldCalculationsDialogProps {
   field: useEditPetitionFieldCalculationsDialog_PetitionFieldFragment;
@@ -50,18 +50,32 @@ function EditPetitionFieldCalculationsDialog({
     fragmentName: "useEditPetitionFieldCalculationsDialog_PetitionBase",
     from: pick(_petition, ["__typename", "id"]),
   });
-  assert(result.complete);
-  const petition = result.data;
+
+  // Keep previous data when fragment is incomplete (e.g., after mutation updates cache)
+  // This can happen when a mutation updates only part of the fragment (e.g., variables)
+  const previousDataRef =
+    useRef<useEditPetitionFieldCalculationsDialog_PetitionBaseFragment | null>(null);
+  if (result.complete) {
+    assignRef(previousDataRef, result.data);
+  }
+
+  // Use complete data if available, otherwise fall back to previous complete data or initial props
+  const petition = result.complete ? result.data : (previousDataRef.current ?? _petition);
   const math = useRef(field.math as PetitionFieldMath | null | undefined);
   const [showErrors, setShowErrors] = useState(false);
 
-  const showCreateOrEditVariableDialog = useCreateOrUpdatePetitionVariableDialog();
+  const showCreateOrEditVariableDialog = useCreatePetitionVariableDialog();
   const handleAddNewVariable = async (defaultName?: string) => {
-    const variable = await showCreateOrEditVariableDialog({
+    const { variable } = await showCreateOrEditVariableDialog({
       petitionId: petition.id,
       defaultName,
     });
-    return variable.name;
+
+    return {
+      name: variable?.name ?? "",
+      type: variable?.type ?? "",
+      defaultValue: variable?.defaultValue ?? "",
+    };
   };
 
   return (
@@ -87,25 +101,23 @@ function EditPetitionFieldCalculationsDialog({
         <Stack>
           {petition.variables.length === 0 ? (
             <Alert status="warning" rounded="md">
-              <HStack>
-                <AlertDescription flex="1">
-                  <FormattedMessage
-                    id="component.edit-petition-field-calculations-dialog.variables-warning"
-                    defaultMessage="You need to add at least one variable to be able to perform calculations."
-                  />
-                </AlertDescription>
-                <Button
-                  variant="outline"
-                  backgroundColor="white"
-                  size="sm"
-                  onClick={() => withError(handleAddNewVariable)}
-                >
-                  <FormattedMessage
-                    id="component.edit-petition-field-calculations-dialog.create-variable-button"
-                    defaultMessage="Create variable"
-                  />
-                </Button>
-              </HStack>
+              <AlertDescription flex="1">
+                <FormattedMessage
+                  id="component.edit-petition-field-calculations-dialog.variables-warning"
+                  defaultMessage="You need to add at least one variable to be able to perform calculations."
+                />
+              </AlertDescription>
+              <Button
+                variant="outline"
+                backgroundColor="white"
+                size="sm"
+                onClick={() => withError(handleAddNewVariable)}
+              >
+                <FormattedMessage
+                  id="component.edit-petition-field-calculations-dialog.create-variable-button"
+                  defaultMessage="Create variable"
+                />
+              </Button>
             </Alert>
           ) : null}
           <Text>

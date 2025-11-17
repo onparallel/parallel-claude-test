@@ -55,7 +55,7 @@ function PetitionVariableSelectItem({
 }) {
   return (
     <Badge
-      colorScheme="blue"
+      colorScheme={option.variable.type === "ENUM" ? "green" : "blue"}
       fontSize="sm"
       textTransform="none"
       whiteSpace="nowrap"

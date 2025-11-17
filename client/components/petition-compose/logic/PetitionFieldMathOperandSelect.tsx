@@ -70,10 +70,12 @@ export function PetitionFieldMathOperandSelect({
         isChild: isNonNullish(f.parent),
       }));
 
-    const variableOptions = variables.map((v) => ({
-      type: "VARIABLE" as const,
-      variableName: v.name,
-    }));
+    const variableOptions = variables
+      .filter((v) => v.type === "NUMBER")
+      .map((v) => ({
+        type: "VARIABLE" as const,
+        variableName: v.name,
+      }));
 
     const value: MathOperandOption | null =
       operand.type === "NUMBER"
@@ -82,7 +84,9 @@ export function PetitionFieldMathOperandSelect({
           ? (fieldOptions.find((o) => o.field.id === operand.fieldId) ?? null)
           : operand.type === "VARIABLE"
             ? (variableOptions.find((o) => o.variableName === operand.name) ?? null)
-            : never();
+            : operand.type === "ENUM"
+              ? null // ENUM operands should be handled by PetitionFieldMathEnumSelect
+              : never();
 
     return {
       options: [
@@ -132,6 +136,12 @@ export function PetitionFieldMathOperandSelect({
     />
   );
   const [numberValue, setNumberValue] = useState(value?.type === "NUMBER" ? value.value : 0);
+
+  // If operand is ENUM, this component shouldn't be used (PetitionFieldMathEnumSelect should be used instead)
+  // Return null to prevent rendering errors
+  if (operand.type === "ENUM") {
+    return null;
+  }
 
   return isReadOnly ? (
     value?.type === "NUMBER" ? (
@@ -183,7 +193,8 @@ type MathOperandOption =
   | {
       type: "VARIABLE";
       variableName: string;
-    };
+    }
+  | { type: "ENUM"; value: string };
 
 const MathOperandItem = chakraForwardRef<
   "div",

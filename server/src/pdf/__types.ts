@@ -562,9 +562,10 @@ export type CreatePetitionFromProfilePrefillInput = {
 };
 
 export type CreatePetitionVariableInput = {
-  defaultValue: Scalars["Float"]["input"];
+  defaultValue: Scalars["JSON"]["input"];
   name: Scalars["String"]["input"];
   showInReplies?: InputMaybe<Scalars["Boolean"]["input"]>;
+  type: PetitionVariableType;
   valueLabels?: InputMaybe<Array<PetitionVariableValueLabelInput>>;
 };
 
@@ -2553,7 +2554,6 @@ export type MutationdeletePetitionReplyArgs = {
 };
 
 export type MutationdeletePetitionVariableArgs = {
-  dryrun?: InputMaybe<Scalars["Boolean"]["input"]>;
   name: Scalars["String"]["input"];
   petitionId: Scalars["GID"]["input"];
 };
@@ -5315,26 +5315,54 @@ export type PetitionUserPermission = PetitionPermission &
   };
 
 export type PetitionVariable = {
+  name: Scalars["String"]["output"];
+  showInReplies: Scalars["Boolean"]["output"];
+  type: PetitionVariableType;
+};
+
+export type PetitionVariableEnum = PetitionVariable & {
+  defaultValue: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
+  showInReplies: Scalars["Boolean"]["output"];
+  type: PetitionVariableType;
+  /** The value labels of the variable. */
+  valueLabels: Array<PetitionVariableEnumLabel>;
+};
+
+export type PetitionVariableEnumLabel = {
+  label: Scalars["String"]["output"];
+  value: Scalars["String"]["output"];
+};
+
+export type PetitionVariableNumber = PetitionVariable & {
   defaultValue: Scalars["Float"]["output"];
   name: Scalars["String"]["output"];
   showInReplies: Scalars["Boolean"]["output"];
+  type: PetitionVariableType;
   /** The value labels of the variable. */
-  valueLabels: Array<PetitionVariableValueLabel>;
+  valueLabels: Array<PetitionVariableNumberValueLabel>;
 };
 
-export type PetitionVariableResult = {
-  name: Scalars["String"]["output"];
-  value: Maybe<Scalars["Float"]["output"]>;
-};
-
-export type PetitionVariableValueLabel = {
+export type PetitionVariableNumberValueLabel = {
   label: Scalars["String"]["output"];
   value: Scalars["Float"]["output"];
 };
 
+export type PetitionVariableResult = {
+  name: Scalars["String"]["output"];
+  value: Maybe<Scalars["JSON"]["output"]>;
+};
+
+/** The type of a petition variable. */
+export type PetitionVariableType =
+  /** The variable is an enum. */
+  | "ENUM"
+  /** The variable is a number. */
+  | "NUMBER";
+
 export type PetitionVariableValueLabelInput = {
   label: Scalars["String"]["input"];
-  value: Scalars["Float"]["input"];
+  value: Scalars["JSON"]["input"];
 };
 
 export type PetitionsNumberDashboardModuleSettingsInput = {
@@ -7409,7 +7437,7 @@ export type UpdatePetitionInput = {
 };
 
 export type UpdatePetitionVariableInput = {
-  defaultValue: Scalars["Float"]["input"];
+  defaultValue?: InputMaybe<Scalars["JSON"]["input"]>;
   showInReplies?: InputMaybe<Scalars["Boolean"]["input"]>;
   valueLabels?: InputMaybe<Array<PetitionVariableValueLabelInput>>;
 };
@@ -7835,7 +7863,22 @@ export type PetitionExport2_PetitionBase_Petition_Fragment = {
   }>;
   organization: { name: string; logoUrl: string | null };
   selectedDocumentTheme: { data: { [key: string]: any } };
-  variables: Array<{ name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename: "PetitionVariableEnum";
+        type: PetitionVariableType;
+        name: string;
+        enumDefaultValue: string;
+        enumValueLabels: Array<{ value: string; label: string }>;
+      }
+    | {
+        __typename: "PetitionVariableNumber";
+        defaultValue: number;
+        type: PetitionVariableType;
+        name: string;
+        valueLabels: Array<{ value: number; label: string }>;
+      }
+  >;
   customLists: Array<{ name: string; values: Array<string> }>;
   automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
   standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
@@ -7964,7 +8007,22 @@ export type PetitionExport2_PetitionBase_PetitionTemplate_Fragment = {
   }>;
   organization: { name: string; logoUrl: string | null };
   selectedDocumentTheme: { data: { [key: string]: any } };
-  variables: Array<{ name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename: "PetitionVariableEnum";
+        type: PetitionVariableType;
+        name: string;
+        enumDefaultValue: string;
+        enumValueLabels: Array<{ value: string; label: string }>;
+      }
+    | {
+        __typename: "PetitionVariableNumber";
+        defaultValue: number;
+        type: PetitionVariableType;
+        name: string;
+        valueLabels: Array<{ value: number; label: string }>;
+      }
+  >;
   customLists: Array<{ name: string; values: Array<string> }>;
   automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
   standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
@@ -8259,7 +8317,22 @@ export type PetitionExport2_petitionQuery = {
         }>;
         organization: { name: string; logoUrl: string | null };
         selectedDocumentTheme: { data: { [key: string]: any } };
-        variables: Array<{ name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename: "PetitionVariableEnum";
+              type: PetitionVariableType;
+              name: string;
+              enumDefaultValue: string;
+              enumValueLabels: Array<{ value: string; label: string }>;
+            }
+          | {
+              __typename: "PetitionVariableNumber";
+              defaultValue: number;
+              type: PetitionVariableType;
+              name: string;
+              valueLabels: Array<{ value: number; label: string }>;
+            }
+        >;
         customLists: Array<{ name: string; values: Array<string> }>;
         automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
         standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
@@ -8387,7 +8460,22 @@ export type PetitionExport2_petitionQuery = {
         }>;
         organization: { name: string; logoUrl: string | null };
         selectedDocumentTheme: { data: { [key: string]: any } };
-        variables: Array<{ name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename: "PetitionVariableEnum";
+              type: PetitionVariableType;
+              name: string;
+              enumDefaultValue: string;
+              enumValueLabels: Array<{ value: string; label: string }>;
+            }
+          | {
+              __typename: "PetitionVariableNumber";
+              defaultValue: number;
+              type: PetitionVariableType;
+              name: string;
+              valueLabels: Array<{ value: number; label: string }>;
+            }
+        >;
         customLists: Array<{ name: string; values: Array<string> }>;
         automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
         standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
@@ -8492,7 +8580,22 @@ export type LiquidPetitionScopeProvider_PetitionBase_Petition_Fragment = {
       }> | null;
     }>;
   }>;
-  variables: Array<{ name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename: "PetitionVariableEnum";
+        type: PetitionVariableType;
+        name: string;
+        enumDefaultValue: string;
+        enumValueLabels: Array<{ value: string; label: string }>;
+      }
+    | {
+        __typename: "PetitionVariableNumber";
+        defaultValue: number;
+        type: PetitionVariableType;
+        name: string;
+        valueLabels: Array<{ value: number; label: string }>;
+      }
+  >;
   customLists: Array<{ name: string; values: Array<string> }>;
   automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
   standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
@@ -8536,7 +8639,22 @@ export type LiquidPetitionScopeProvider_PetitionBase_PetitionTemplate_Fragment =
       }> | null;
     }>;
   }>;
-  variables: Array<{ name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename: "PetitionVariableEnum";
+        type: PetitionVariableType;
+        name: string;
+        enumDefaultValue: string;
+        enumValueLabels: Array<{ value: string; label: string }>;
+      }
+    | {
+        __typename: "PetitionVariableNumber";
+        defaultValue: number;
+        type: PetitionVariableType;
+        name: string;
+        valueLabels: Array<{ value: number; label: string }>;
+      }
+  >;
   customLists: Array<{ name: string; values: Array<string> }>;
   automaticNumberingConfig: { numberingType: AutomaticNumberingType } | null;
   standardListDefinitions: Array<{ listName: string; values: Array<{ key: string }> }>;
@@ -8561,6 +8679,22 @@ export type LiquidPetitionScopeProvider_PetitionFieldReplyFragment = {
   content: { [key: string]: any };
   isAnonymized: boolean;
 };
+
+export type LiquidPetitionVariableProvider_PetitionVariable_PetitionVariableEnum_Fragment = {
+  __typename: "PetitionVariableEnum";
+  name: string;
+  enumValueLabels: Array<{ value: string; label: string }>;
+};
+
+export type LiquidPetitionVariableProvider_PetitionVariable_PetitionVariableNumber_Fragment = {
+  __typename: "PetitionVariableNumber";
+  name: string;
+  valueLabels: Array<{ value: number; label: string }>;
+};
+
+export type LiquidPetitionVariableProvider_PetitionVariableFragment =
+  | LiquidPetitionVariableProvider_PetitionVariable_PetitionVariableEnum_Fragment
+  | LiquidPetitionVariableProvider_PetitionVariable_PetitionVariableNumber_Fragment;
 
 export const PetitionExport2_PetitionFieldInnerFragmentDoc = gql`
   fragment PetitionExport2_PetitionFieldInner on PetitionField {
@@ -8690,8 +8824,23 @@ export const LiquidPetitionScopeProvider_PetitionBaseFragmentDoc = gql`
       }
     }
     variables {
+      __typename
+      type
       name
-      defaultValue
+      ... on PetitionVariableNumber {
+        defaultValue
+        valueLabels {
+          value
+          label
+        }
+      }
+      ... on PetitionVariableEnum {
+        enumDefaultValue: defaultValue
+        enumValueLabels: valueLabels {
+          value
+          label
+        }
+      }
     }
     customLists {
       name
@@ -8710,6 +8859,24 @@ export const LiquidPetitionScopeProvider_PetitionBaseFragmentDoc = gql`
   ${LiquidPetitionScopeProvider_PetitionFieldFragmentDoc}
   ${LiquidPetitionScopeProvider_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<LiquidPetitionScopeProvider_PetitionBaseFragment, unknown>;
+export const LiquidPetitionVariableProvider_PetitionVariableFragmentDoc = gql`
+  fragment LiquidPetitionVariableProvider_PetitionVariable on PetitionVariable {
+    __typename
+    name
+    ... on PetitionVariableNumber {
+      valueLabels {
+        value
+        label
+      }
+    }
+    ... on PetitionVariableEnum {
+      enumValueLabels: valueLabels {
+        value
+        label
+      }
+    }
+  }
+` as unknown as DocumentNode<LiquidPetitionVariableProvider_PetitionVariableFragment, unknown>;
 export const PetitionExport2_PetitionBaseFragmentDoc = gql`
   fragment PetitionExport2_PetitionBase on PetitionBase {
     id
@@ -8738,12 +8905,16 @@ export const PetitionExport2_PetitionBaseFragmentDoc = gql`
       }
     }
     ...LiquidPetitionScopeProvider_PetitionBase
+    variables {
+      ...LiquidPetitionVariableProvider_PetitionVariable
+    }
     __typename
   }
   ${PetitionExport2_PetitionFieldFragmentDoc}
   ${PetitionExport2_PetitionFieldReplyFragmentDoc}
   ${documentSignatures_SignatureConfigFragmentDoc}
   ${LiquidPetitionScopeProvider_PetitionBaseFragmentDoc}
+  ${LiquidPetitionVariableProvider_PetitionVariableFragmentDoc}
 ` as unknown as DocumentNode<PetitionExport2_PetitionBaseFragment, unknown>;
 export const SignatureBoxesPage2_PetitionBaseFragmentDoc = gql`
   fragment SignatureBoxesPage2_PetitionBase on PetitionBase {

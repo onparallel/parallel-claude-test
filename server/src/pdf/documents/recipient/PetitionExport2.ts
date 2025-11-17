@@ -27,7 +27,10 @@ import {
   LiquidPetitionScopeProvider,
   buildPetitionFieldsLiquidScope,
 } from "../../utils/liquid/LiquidPetitionScopeProvider";
-import { buildPetitionVariablesLiquidScope } from "../../utils/liquid/LiquidPetitionVariableProvider";
+import {
+  LiquidPetitionVariableProvider,
+  buildPetitionVariablesLiquidScope,
+} from "../../utils/liquid/LiquidPetitionVariableProvider";
 import { PdfDocument, PdfDocumentGetPropsContext } from "../../utils/pdf";
 import { block, box, element, heading, image, t, text, tt } from "../../utils/typst";
 
@@ -55,7 +58,31 @@ function PetitionExport2(
 ) {
   const theme = petition.selectedDocumentTheme.data as PdfDocumentTheme;
   const liquid = createLiquid();
-  const scope = buildPetitionFieldsLiquidScope(petition, intl);
+  const scope = buildPetitionFieldsLiquidScope(
+    {
+      ...petition,
+      variables: petition.variables.map((v) => {
+        if (v.__typename === "PetitionVariableNumber") {
+          return {
+            type: "NUMBER" as const,
+            name: v.name,
+            defaultValue: v.defaultValue,
+            valueLabels: v.valueLabels,
+          };
+        } else if (v.__typename === "PetitionVariableEnum") {
+          return {
+            type: "ENUM" as const,
+            name: v.name,
+            defaultValue: v.enumDefaultValue,
+            valueLabels: v.enumValueLabels,
+          };
+        } else {
+          never("Unimplemented variable type");
+        }
+      }),
+    },
+    intl,
+  );
   const doubleColumn = theme.doubleColumn;
   const columnGutter = 10;
   const DEBUG = false;
@@ -238,7 +265,10 @@ function PetitionExport2(
                       : []),
                     ...fieldDescription(field.description, {
                       liquid,
-                      scope: { ...scope, ...buildPetitionVariablesLiquidScope(logic) },
+                      scope: {
+                        ...scope,
+                        ...buildPetitionVariablesLiquidScope(logic, petition.variables),
+                      },
                       intl,
                     }),
                   ),
@@ -258,7 +288,10 @@ function PetitionExport2(
                       : []),
                     ...fieldDescription(field.description, {
                       liquid,
-                      scope: { ...scope, ...buildPetitionVariablesLiquidScope(logic) },
+                      scope: {
+                        ...scope,
+                        ...buildPetitionVariablesLiquidScope(logic, petition.variables),
+                      },
                       intl,
                     }),
                   ),
@@ -294,7 +327,10 @@ function PetitionExport2(
                             : []),
                           ...fieldDescription(child.field.description, {
                             liquid,
-                            scope: { ...scope, ...buildPetitionVariablesLiquidScope(logic) },
+                            scope: {
+                              ...scope,
+                              ...buildPetitionVariablesLiquidScope(logic, petition.variables),
+                            },
                             intl,
                           }),
                           ...fieldReplies(child.field, child.replies, {
@@ -313,7 +349,10 @@ function PetitionExport2(
                   : []),
                 ...fieldDescription(field.description, {
                   liquid,
-                  scope: { ...scope, ...buildPetitionVariablesLiquidScope(logic) },
+                  scope: {
+                    ...scope,
+                    ...buildPetitionVariablesLiquidScope(logic, petition.variables),
+                  },
                   intl,
                 }),
                 ...fieldReplies(field, field.replies, {
@@ -771,7 +810,28 @@ function trailingNewLines({ raw }: { raw: string }) {
 function groupFieldsByPages<T extends PetitionExport2_PetitionBaseFragment>(
   petition: T,
 ): { field: UnwrapArray<typeof petition.fields>; logic: FieldLogicResult }[][] {
-  const fieldLogic = evaluateFieldLogic(petition);
+  const fieldLogic = evaluateFieldLogic({
+    ...petition,
+    variables: petition.variables.map((v) => {
+      if (v.__typename === "PetitionVariableNumber") {
+        return {
+          type: "NUMBER" as const,
+          name: v.name,
+          defaultValue: v.defaultValue,
+          valueLabels: v.valueLabels,
+        };
+      } else if (v.__typename === "PetitionVariableEnum") {
+        return {
+          type: "ENUM" as const,
+          name: v.name,
+          defaultValue: v.enumDefaultValue,
+          valueLabels: v.enumValueLabels,
+        };
+      } else {
+        never("Unimplemented variable type");
+      }
+    }),
+  });
 
   const pages: { field: UnwrapArray<typeof petition.fields>; logic: FieldLogicResult }[][] = [];
   let page: { field: UnwrapArray<typeof petition.fields>; logic: FieldLogicResult }[] = [];
@@ -845,12 +905,16 @@ PetitionExport2.fragments = {
           }
         }
         ...LiquidPetitionScopeProvider_PetitionBase
+        variables {
+          ...LiquidPetitionVariableProvider_PetitionVariable
+        }
         __typename
       }
       ${this.PetitionField}
       ${this.PetitionFieldReply}
       ${documentSignatures.fragments.SignatureConfig}
       ${LiquidPetitionScopeProvider.fragments.PetitionBase}
+      ${LiquidPetitionVariableProvider.fragments.PetitionVariable}
     `;
   },
   get PetitionFieldInner() {

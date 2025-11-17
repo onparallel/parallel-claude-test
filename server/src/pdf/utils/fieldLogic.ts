@@ -8,11 +8,13 @@ import { assert } from "ts-essentials";
 import { PetitionFieldType } from "../../db/__types";
 
 import {
+  FieldLogicPetitionInput,
   FieldLogicResult,
   PetitionFieldLogicConditionOperator,
   PetitionFieldLogicVariableCondition,
 } from "../../util/fieldLogic";
 import { letters, numbers, romanNumerals } from "../../util/generators";
+import { never } from "../../util/never";
 import { UnwrapArray } from "../../util/types";
 import {
   PetitionFieldLogicCondition,
@@ -23,37 +25,31 @@ import {
   PetitionFieldVisibility,
 } from "./types";
 
-export interface FieldLogicPetitionInput {
-  variables: { name: string; defaultValue: number }[];
-  customLists: { name: string; values: string[] }[];
-  automaticNumberingConfig: { numberingType: "NUMBERS" | "LETTERS" | "ROMAN_NUMERALS" } | null;
-  standardListDefinitions: { listName: string; values: { key: string }[] }[];
-  fields: FieldLogicPetitionFieldInput[];
-}
-
-interface FieldLogicPetitionFieldReplyInner {
+interface PdfFieldLogicPetitionFieldReplyInner {
   id: string;
   content: any;
   isAnonymized: boolean;
 }
 
-interface FieldLogicPetitionFieldInner {
+interface PdfFieldLogicPetitionFieldInner {
   id: string;
   type: PetitionFieldType;
   options: any;
   visibility: any | null;
   math: any[] | null;
 }
-interface FieldLogicPetitionFieldInput extends FieldLogicPetitionFieldInner {
+interface PdfFieldLogicPetitionField extends PdfFieldLogicPetitionFieldInner {
   children?:
-    | (FieldLogicPetitionFieldInner & { replies: FieldLogicPetitionFieldReplyInner[] })[]
+    | (PdfFieldLogicPetitionFieldInner & { replies: PdfFieldLogicPetitionFieldReplyInner[] })[]
     | null;
-  replies: (FieldLogicPetitionFieldReplyInner & {
-    children?: { field: { id: string }; replies: FieldLogicPetitionFieldReplyInner[] }[] | null;
+  replies: (PdfFieldLogicPetitionFieldReplyInner & {
+    children?: { field: { id: string }; replies: PdfFieldLogicPetitionFieldReplyInner[] }[] | null;
   })[];
 }
 
-export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogicResult[] {
+interface PdfFieldLogicPetitionInput extends FieldLogicPetitionInput<PdfFieldLogicPetitionField> {}
+
+export function evaluateFieldLogic(petition: PdfFieldLogicPetitionInput): FieldLogicResult[] {
   const headerNumbers =
     petition.automaticNumberingConfig?.numberingType === "NUMBERS"
       ? numbers()
@@ -80,12 +76,12 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
       const visibilitiesById: { [fieldId: string]: boolean } = {};
       // we need to collect visible replies for child fields so that these fields can be referenced
       // later in fields outside the field group and only visible replies are taken into account
-      const childFieldReplies: { [fieldId: string]: FieldLogicPetitionFieldReplyInner[] } = {};
+      const childFieldReplies: { [fieldId: string]: PdfFieldLogicPetitionFieldReplyInner[] } = {};
       const currentVariables = Object.fromEntries(
         petition.variables.map((v) => [v.name, v.defaultValue]),
       );
 
-      function getReplies(referencedField: FieldLogicPetitionFieldInput) {
+      function getReplies(referencedField: PdfFieldLogicPetitionField) {
         const parent = parentById[referencedField.id];
         return isNonNullish(parent)
           ? // if field has parent use collected replies
@@ -112,20 +108,26 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
 
       function getOperandValue(
         operand: PetitionFieldMathOperand,
-        currentVariables: Record<string, number>,
-      ): number | null {
+        currentVariables: Record<string, number | string>,
+      ): number | string | null {
         if (operand.type === "NUMBER") {
           return operand.value;
         } else if (operand.type === "FIELD") {
           const referencedField = fieldsById[operand.fieldId];
           const replies = getReplies(referencedField);
           return replies.length > 0 ? (replies[0].content.value as number) : null;
-        } else {
+        } else if (operand.type === "VARIABLE") {
           return currentVariables[operand.name];
+        } else if (operand.type === "ENUM") {
+          return operand.value;
+        } else {
+          never("Unimplemented operand type");
         }
       }
 
-      function getNextEnumeration(field: Pick<FieldLogicPetitionFieldInner, "type" | "options">) {
+      function getNextEnumeration(
+        field: Pick<PdfFieldLogicPetitionFieldInner, "type" | "options">,
+      ) {
         if (
           isNonNullish(headerNumbers) &&
           field.type === "HEADING" &&
@@ -159,6 +161,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
                   operation,
                   currentVariables,
                   getOperandValue(operation.operand, currentVariables),
+                  petition.variables,
                 );
               }
             }
@@ -173,7 +176,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
             const groupVisibilityById: { [fieldId: string]: boolean } = {};
 
             function getReplies(
-              referencedField: UnwrapArray<FieldLogicPetitionFieldInput["children"]>,
+              referencedField: UnwrapArray<PdfFieldLogicPetitionField["children"]>,
             ) {
               const parent = parentById[referencedField.id];
               // if it belongs to the same FIELD_GROUP then only use replies in the same child reply
@@ -205,16 +208,20 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
 
             function getOperandValue(
               operand: PetitionFieldMathOperand,
-              currentVariables: Record<string, number>,
-            ): number | null {
+              currentVariables: Record<string, number | string>,
+            ): number | string | null {
               if (operand.type === "NUMBER") {
                 return operand.value;
               } else if (operand.type === "FIELD") {
                 const referencedField = fieldsById[operand.fieldId];
                 const replies = getReplies(referencedField);
                 return replies.length > 0 ? (replies[0].content.value as number) : null;
-              } else {
+              } else if (operand.type === "VARIABLE") {
                 return currentVariables[operand.name];
+              } else if (operand.type === "ENUM") {
+                return operand.value;
+              } else {
+                never("Unimplemented operand type");
               }
             }
 
@@ -252,6 +259,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
                           operation,
                           currentVariables,
                           getOperandValue(operation.operand, currentVariables),
+                          petition.variables,
                         );
                       }
                     }
@@ -290,18 +298,18 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
 
 function fieldConditionIsMet(
   condition: PetitionFieldLogicFieldCondition,
-  field: Pick<FieldLogicPetitionFieldInner, "type" | "options">,
-  replies: FieldLogicPetitionFieldReplyInner[],
-  petition: FieldLogicPetitionInput,
+  field: Pick<PdfFieldLogicPetitionFieldInner, "type" | "options">,
+  replies: PdfFieldLogicPetitionFieldReplyInner[],
+  petition: PdfFieldLogicPetitionInput,
 ) {
   const { operator, value, modifier } = condition;
-  function evaluator(reply: FieldLogicPetitionFieldReplyInner) {
+  function evaluator(reply: PdfFieldLogicPetitionFieldReplyInner) {
     const _value =
       condition.column !== undefined
         ? (reply.content.value?.[condition.column]?.[1] ?? null)
         : reply.content.value;
 
-    return evaluatePredicate(_value, operator, value, petition, field.type);
+    return evaluateValuePredicate(_value, operator, value, petition, field.type);
   }
 
   const { type, options } = field;
@@ -318,7 +326,7 @@ function fieldConditionIsMet(
         options,
         replies,
       });
-      return evaluatePredicate(completed.length, operator, value, petition, field.type);
+      return evaluateValuePredicate(completed.length, operator, value, petition, field.type);
     default:
       return false;
   }
@@ -326,18 +334,33 @@ function fieldConditionIsMet(
 
 function variableConditionIsMet(
   condition: PetitionFieldLogicVariableCondition,
-  currentVariables: Record<string, number>,
-  petition: FieldLogicPetitionInput,
+  currentVariables: Record<string, number | string>,
+  petition: PdfFieldLogicPetitionInput,
 ) {
   const { operator, value, variableName } = condition;
-  return evaluatePredicate(currentVariables[variableName], operator, value, petition);
+
+  const variable = petition.variables.find((v) => v.name === variableName);
+  assert(isNonNullish(variable), `Variable ${variableName} not found`);
+
+  if (variable.type === "NUMBER") {
+    return evaluateValuePredicate(currentVariables[variableName], operator, value, petition);
+  } else if (variable.type === "ENUM") {
+    return evaluateEnumPredicate(
+      currentVariables[variableName],
+      operator,
+      value,
+      variable.valueLabels.map((v) => v.value),
+    );
+  } else {
+    never("Unimplemented variable type");
+  }
 }
 
-function evaluatePredicate(
+function evaluateValuePredicate(
   reply: string | number | string[] | any[],
   operator: PetitionFieldLogicConditionOperator,
   value: string | string[] | number | null,
-  petition: FieldLogicPetitionInput,
+  petition: PdfFieldLogicPetitionInput,
   fieldType?: PetitionFieldType, // this is required to distinguish between empty CHECKBOX and empty PROFILE_SEARCH reply
 ) {
   try {
@@ -460,13 +483,81 @@ function evaluatePredicate(
   }
 }
 
+function evaluateEnumPredicate(
+  currentValue: string | number,
+  operator: PetitionFieldLogicConditionOperator,
+  value: string | string[] | number | null,
+  options: string[],
+) {
+  assert(
+    typeof currentValue === "string",
+    `expected currentValue to be string, got ${typeof currentValue}`,
+  );
+  assert(typeof value === "string", `expected value to be string, got ${typeof value}`);
+  assert(
+    options.some((v) => v === currentValue),
+    `expected currentValue to be one of the options`,
+  );
+  assert(
+    options.some((v) => v === value),
+    `expected value to be one of the options`,
+  );
+
+  switch (operator) {
+    case "EQUAL":
+      return currentValue === value;
+    case "NOT_EQUAL":
+      return currentValue !== value;
+    case "LESS_THAN":
+      return options.indexOf(currentValue) < options.indexOf(value);
+    case "LESS_THAN_OR_EQUAL":
+      return options.indexOf(currentValue) <= options.indexOf(value);
+    case "GREATER_THAN":
+      return options.indexOf(currentValue) > options.indexOf(value);
+    case "GREATER_THAN_OR_EQUAL":
+      return options.indexOf(currentValue) >= options.indexOf(value);
+    default:
+      throw new Error(`Unimplemented operator ${operator} for ENUM condition`);
+  }
+}
+
 function applyMathOperation(
   operation: PetitionFieldMathOperation,
-  currentVariables: Record<string, number>,
-  value: number | null,
+  currentVariables: Record<string, number | string>,
+  value: number | string | null,
+  variables: PdfFieldLogicPetitionInput["variables"],
 ) {
+  const variable = variables.find((v) => v.name === operation.variable);
+  assert(isNonNullish(variable), `Variable ${operation.variable} not found`);
   const currentValue = currentVariables[operation.variable];
+
+  if (variable.type === "NUMBER") {
+    currentVariables[operation.variable] = applyMathNumberOperation(currentValue, operation, value);
+  } else if (variable.type === "ENUM") {
+    currentVariables[operation.variable] = applyMathEnumOperation(
+      currentValue,
+      operation,
+      value,
+      variable.valueLabels.map((v) => v.value),
+    );
+  }
+}
+
+function applyMathNumberOperation(
+  currentValue: number | string,
+  operation: PetitionFieldMathOperation,
+  value: number | string | null,
+) {
   let result: number;
+
+  assert(
+    typeof currentValue === "number",
+    `expected currentValue to be number, got ${typeof currentValue}`,
+  );
+  assert(
+    value === null || typeof value === "number",
+    `expected value to be number or null, got ${typeof value}`,
+  );
   if (Number.isNaN(currentValue) || value === null) {
     result = NaN;
   } else {
@@ -492,12 +583,49 @@ function applyMathOperation(
       case "DIVISION":
         result = currentValue / value;
         break;
+      default:
+        never(`Invalid operator ${operation.operator} for NUMBER math operation`);
     }
   }
   if (!isFinite(result)) {
     result = NaN;
   }
-  currentVariables[operation.variable] = result;
+
+  return result;
+}
+
+function applyMathEnumOperation(
+  currentValue: number | string,
+  operation: PetitionFieldMathOperation,
+  value: number | string | null,
+  options: string[],
+) {
+  assert(
+    typeof currentValue === "string",
+    `current value for variable ${operation.variable} is not a string`,
+  );
+  assert(typeof value === "string", `value for variable ${operation.variable} is not a string`);
+  let result: string;
+
+  if (currentValue === value) {
+    result = currentValue;
+  } else {
+    switch (operation.operator) {
+      case "ASSIGNATION":
+        result = value;
+        break;
+      case "ASSIGNATION_IF_LOWER":
+        result = options.indexOf(value) < options.indexOf(currentValue) ? value : currentValue;
+        break;
+      case "ASSIGNATION_IF_GREATER":
+        result = options.indexOf(value) > options.indexOf(currentValue) ? value : currentValue;
+        break;
+      default:
+        never(`Invalid operator ${operation.operator} for ENUM math operation`);
+    }
+  }
+
+  return result;
 }
 
 interface PartialField {

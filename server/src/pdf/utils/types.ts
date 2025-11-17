@@ -39,7 +39,8 @@ export interface PetitionFieldMathRule {
 export type PetitionFieldMathOperand =
   | { type: "NUMBER"; value: number }
   | { type: "FIELD"; fieldId: string }
-  | { type: "VARIABLE"; name: string };
+  | { type: "VARIABLE"; name: string }
+  | { type: "ENUM"; value: string };
 
 export interface PetitionFieldMathOperation {
   variable: string;

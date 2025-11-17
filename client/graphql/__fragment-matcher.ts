@@ -120,6 +120,7 @@ const result: PossibleTypesResultData = {
       "SignatureCancelledUserNotification",
       "SignatureCompletedUserNotification",
     ],
+    PetitionVariable: ["PetitionVariableEnum", "PetitionVariableNumber"],
     ProfileEvent: [
       "PetitionAssociatedEvent",
       "PetitionDisassociatedEvent",

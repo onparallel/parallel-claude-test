@@ -7,6 +7,7 @@ import { PetitionFieldIndex, useAllFieldsWithIndices } from "@parallel/utils/fie
 import { UnwrapArray } from "@parallel/utils/types";
 import { PropsWithChildren, createContext, useContext, useMemo } from "react";
 import { pick } from "remeda";
+import { PetitionFieldMathEnumSelect } from "./PetitionFieldMathEnumSelect";
 
 interface PetitionFieldLogicContextProps {
   field?: PetitionFieldLogicContext_PetitionFieldFragment;
@@ -66,6 +67,25 @@ export function PetitionFieldLogicContext({
 }
 
 PetitionFieldLogicContext.fragments = {
+  get PetitionVariable() {
+    return gql`
+      fragment PetitionFieldLogicContext_PetitionVariable on PetitionVariable {
+        name
+        type
+        ... on PetitionVariableNumber {
+          defaultValue
+        }
+        ... on PetitionVariableEnum {
+          defaultEnum: defaultValue
+          enumLabels: valueLabels {
+            value
+            label
+          }
+        }
+      }
+      ${PetitionFieldMathEnumSelect.fragments.PetitionVariableEnum}
+    `;
+  },
   get PetitionBase() {
     return gql`
       fragment PetitionFieldLogicContext_PetitionBase on PetitionBase {
@@ -85,8 +105,7 @@ PetitionFieldLogicContext.fragments = {
           }
         }
         variables {
-          name
-          defaultValue
+          ...PetitionFieldLogicContext_PetitionVariable
         }
         customLists {
           name
@@ -112,6 +131,8 @@ PetitionFieldLogicContext.fragments = {
         isChild
       }
       ${useAllFieldsWithIndices.fragments.PetitionBase}
+      ${PetitionFieldMathEnumSelect.fragments.PetitionVariableEnum}
+      ${this.PetitionVariable}
     `;
   },
 };

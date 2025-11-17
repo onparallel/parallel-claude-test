@@ -5,11 +5,45 @@ import { isNonNullish, zip } from "remeda";
 import { PetitionFieldType } from "../../../db/__types";
 import { PetitionFieldOptions } from "../../../services/PetitionFieldService";
 import { getFieldsWithIndices } from "../../../util/fieldIndices";
+import { FieldLogicPetitionInput } from "../../../util/fieldLogic";
 import { isFileTypeField } from "../../../util/isFileTypeField";
+import { never } from "../../../util/never";
 import { LiquidPetitionScopeProvider_PetitionBaseFragment } from "../../__types";
 import { evaluateFieldLogic } from "../fieldLogic";
 import { LiquidScopeProvider } from "./LiquidScopeProvider";
 import { DateLiquidValue, DateTimeLiquidValue, WithLabelLiquidValue } from "./LiquidValue";
+
+interface LiquidPetitionFieldReplyInner {
+  id: string;
+  content: any;
+  isAnonymized: boolean;
+}
+
+interface LiquidPetitionFieldInner {
+  id: string;
+  type: PetitionFieldType;
+  options: any;
+  visibility: any | null;
+  math: any[] | null;
+  alias: string | null;
+  multiple: boolean;
+}
+
+interface LiquidPetitionFieldScope extends LiquidPetitionFieldInner {
+  children?: (LiquidPetitionFieldInner & { replies: LiquidPetitionFieldReplyInner[] })[] | null;
+  replies: (LiquidPetitionFieldReplyInner & {
+    children?:
+      | {
+          field: Pick<LiquidPetitionFieldInner, "id" | "type" | "options" | "alias" | "multiple">;
+          replies: LiquidPetitionFieldReplyInner[];
+        }[]
+      | null;
+  })[];
+}
+
+interface LiquidPetitionScopeInput extends FieldLogicPetitionInput<LiquidPetitionFieldScope> {
+  id: string;
+}
 
 export function LiquidPetitionScopeProvider({
   petition,
@@ -19,13 +53,42 @@ export function LiquidPetitionScopeProvider({
 }>) {
   const intl = useIntl();
   return (
-    <LiquidScopeProvider scope={buildPetitionFieldsLiquidScope(petition, intl)}>
+    <LiquidScopeProvider
+      scope={buildPetitionFieldsLiquidScope(
+        {
+          ...petition,
+          variables: petition.variables.map((v) => {
+            if (v.__typename === "PetitionVariableNumber") {
+              return {
+                type: "NUMBER" as const,
+                name: v.name,
+                defaultValue: v.defaultValue,
+                valueLabels: v.valueLabels,
+              };
+            } else if (v.__typename === "PetitionVariableEnum") {
+              return {
+                type: "ENUM" as const,
+                name: v.name,
+                defaultValue: v.enumDefaultValue,
+                valueLabels: v.enumValueLabels,
+              };
+            } else {
+              never("Unimplemented variable type");
+            }
+          }),
+        },
+        intl,
+      )}
+    >
       {children}
     </LiquidScopeProvider>
   );
 }
 
-export function buildPetitionFieldsLiquidScope(petition: FieldLogicPetitionInput, intl: IntlShape) {
+export function buildPetitionFieldsLiquidScope(
+  petition: LiquidPetitionScopeInput,
+  intl: IntlShape,
+) {
   const fieldsWithIndices = getFieldsWithIndices(petition.fields);
   const fieldLogic = evaluateFieldLogic(petition);
   const scope: Record<string, any> = { petitionId: petition.id, _: {} };
@@ -116,48 +179,6 @@ function getReplyValue(
   }
 }
 
-interface FieldLogicPetitionFieldReplyInner {
-  id: string;
-  content: any;
-  isAnonymized: boolean;
-}
-
-interface FieldLogicPetitionFieldInner {
-  id: string;
-  type: PetitionFieldType;
-  options: any;
-  visibility: any | null;
-  math: any[] | null;
-  alias: string | null;
-  multiple: boolean;
-}
-
-interface FieldLogicPetitionFieldInput extends FieldLogicPetitionFieldInner {
-  children?:
-    | (FieldLogicPetitionFieldInner & { replies: FieldLogicPetitionFieldReplyInner[] })[]
-    | null;
-  replies: (FieldLogicPetitionFieldReplyInner & {
-    children?:
-      | {
-          field: Pick<
-            FieldLogicPetitionFieldInner,
-            "id" | "type" | "options" | "alias" | "multiple"
-          >;
-          replies: FieldLogicPetitionFieldReplyInner[];
-        }[]
-      | null;
-  })[];
-}
-
-interface FieldLogicPetitionInput {
-  id: string;
-  variables: { name: string; defaultValue: number }[];
-  customLists: { name: string; values: string[] }[];
-  automaticNumberingConfig: { numberingType: "NUMBERS" | "LETTERS" | "ROMAN_NUMERALS" } | null;
-  standardListDefinitions: { listName: string; values: { key: string }[] }[];
-  fields: FieldLogicPetitionFieldInput[];
-}
-
 LiquidPetitionScopeProvider.fragments = {
   PetitionBase: gql`
     fragment LiquidPetitionScopeProvider_PetitionBase on PetitionBase {
@@ -183,8 +204,23 @@ LiquidPetitionScopeProvider.fragments = {
         }
       }
       variables {
+        __typename
+        type
         name
-        defaultValue
+        ... on PetitionVariableNumber {
+          defaultValue
+          valueLabels {
+            value
+            label
+          }
+        }
+        ... on PetitionVariableEnum {
+          enumDefaultValue: defaultValue
+          enumValueLabels: valueLabels {
+            value
+            label
+          }
+        }
       }
       customLists {
         name

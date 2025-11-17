@@ -2,10 +2,16 @@ import { Badge, Box, Flex, HStack, StackProps, Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
-import { PetitionFieldLogicContext_PetitionFieldFragment } from "@parallel/graphql/__types";
+import {
+  PetitionFieldLogicContext_PetitionBaseFragment,
+  PetitionFieldLogicContext_PetitionFieldFragment,
+} from "@parallel/graphql/__types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
-import { defaultFieldCondition } from "@parallel/utils/fieldLogic/conditions";
+import {
+  defaultFieldCondition,
+  defaultVariableCondition,
+} from "@parallel/utils/fieldLogic/conditions";
 import { PetitionFieldLogicCondition } from "@parallel/utils/fieldLogic/types";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { letters } from "@parallel/utils/generators";
@@ -64,6 +70,7 @@ export function PetitionFieldLogicConditionSubjectSelect({
     const variableOptions = variables.map((v) => ({
       type: "VARIABLE" as const,
       variableName: v.name,
+      variable: v,
     }));
 
     const value: ConditionSubjectSelectOption | null =
@@ -153,12 +160,17 @@ export function PetitionFieldLogicConditionSubjectSelect({
           }
         } else if (_value.type === "DYNAMIC_SELECT_OPTION") {
           onChange(defaultFieldCondition([_value.field, _value.columnIndex]));
-        } else {
-          onChange({
-            variableName: _value.variableName,
-            operator: "GREATER_THAN",
-            value: 0,
-          });
+        } else if (_value.type === "VARIABLE") {
+          onChange(
+            defaultVariableCondition({
+              name: _value.variableName,
+              type: _value.variable.type,
+              defaultValue:
+                _value.variable.__typename === "PetitionVariableEnum"
+                  ? _value.variable.defaultEnum
+                  : undefined,
+            }),
+          );
         }
       }}
       getOptionValue={getOptionValue}
@@ -187,6 +199,7 @@ type ConditionSubjectSelectOption =
   | {
       type: "VARIABLE";
       variableName: string;
+      variable: PetitionFieldLogicContext_PetitionBaseFragment["variables"][number];
     };
 
 const ConditionSubjectItem = chakraForwardRef<
@@ -262,7 +275,7 @@ const ConditionSubjectItem = chakraForwardRef<
       <Badge
         ref={ref}
         {...props}
-        colorScheme="blue"
+        colorScheme={option.variable.type === "ENUM" ? "green" : "blue"}
         fontSize="sm"
         textTransform="none"
         whiteSpace="nowrap"

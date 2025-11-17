@@ -175,9 +175,10 @@ export interface NexusGenInputs {
   };
   CreatePetitionVariableInput: {
     // input type
-    defaultValue: number; // Float!
+    defaultValue: NexusGenScalars["JSON"]; // JSON!
     name: string; // String!
     showInReplies?: boolean | null; // Boolean
+    type: NexusGenEnums["PetitionVariableType"]; // PetitionVariableType!
     valueLabels?: NexusGenInputs["PetitionVariableValueLabelInput"][] | null; // [PetitionVariableValueLabelInput!]
   };
   CreateProfileFieldValueInput: {
@@ -316,7 +317,7 @@ export interface NexusGenInputs {
   PetitionVariableValueLabelInput: {
     // input type
     label: string; // String!
-    value: number; // Float!
+    value: NexusGenScalars["JSON"]; // JSON!
   };
   PetitionsNumberDashboardModuleSettingsInput: {
     // input type
@@ -544,7 +545,7 @@ export interface NexusGenInputs {
   };
   UpdatePetitionVariableInput: {
     // input type
-    defaultValue: number; // Float!
+    defaultValue?: NexusGenScalars["JSON"] | null; // JSON
     showInReplies?: boolean | null; // Boolean
     valueLabels?: NexusGenInputs["PetitionVariableValueLabelInput"][] | null; // [PetitionVariableValueLabelInput!]
   };
@@ -782,6 +783,7 @@ export interface NexusGenEnums {
   PetitionTagFilterLineOperator: "CONTAINS" | "DOES_NOT_CONTAIN" | "IS_EMPTY";
   PetitionTagFilterLogicalOperator: "AND" | "OR";
   PetitionUserNotificationFilter: "ALL" | "COMMENTS" | "COMPLETED" | "OTHER" | "SHARED" | "UNREAD";
+  PetitionVariableType: "ENUM" | "NUMBER";
   ProfileEventType: db.ProfileEventType;
   ProfileExternalSourceConflictResolutionAction: "IGNORE" | "OVERWRITE";
   ProfileExternalSourceSearchParamType: "SELECT" | "TEXT";
@@ -1692,20 +1694,31 @@ export interface NexusGenObjects {
   PetitionUntaggedEvent: petitionEvents.PetitionUntaggedEvent;
   PetitionUserGroupPermission: db.PetitionPermission;
   PetitionUserPermission: db.PetitionPermission;
-  PetitionVariable: {
+  PetitionVariableEnum: {
     name: string;
+    type: "ENUM";
+    default_value: string;
+    value_labels: { value: string; label: string }[];
+  };
+  PetitionVariableEnumLabel: {
+    // root type
+    label: string; // String!
+    value: string; // String!
+  };
+  PetitionVariableNumber: {
+    name: string;
+    type: "NUMBER";
     default_value: number;
-    show_in_replies: boolean;
-    value_labels: { value: number; label: string }[];
+    value_labels?: { value: number; label: string }[];
   };
-  PetitionVariableResult: {
-    name: string;
-    value: number | null;
-  };
-  PetitionVariableValueLabel: {
+  PetitionVariableNumberValueLabel: {
     // root type
     label: string; // String!
     value: number; // Float!
+  };
+  PetitionVariableResult: {
+    name: string;
+    value: number | string | null;
   };
   Profile: db.Profile;
   ProfileAnonymizedEvent: profileEvents.ProfileAnonymizedEvent;
@@ -2055,6 +2068,13 @@ export interface NexusGenInterfaces {
   PetitionEvent: petitionEvents.PetitionEvent;
   PetitionPermission: db.PetitionPermission;
   PetitionUserNotification: db.PetitionUserNotification;
+  PetitionVariable: {
+    name: string;
+    type: "NUMBER" | "ENUM";
+    default_value: number | string;
+    show_in_replies: boolean;
+    value_labels?: { value: number | string; label: string }[];
+  };
   ProfileEvent: profileEvents.ProfileEvent;
   ProfileFieldResponse: db.ProfileFieldValue | db.ProfileFieldFile;
   TemplateDefaultPermission: db.TemplateDefaultPermission;
@@ -4091,22 +4111,36 @@ export interface NexusGenFieldTypes {
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     user: NexusGenRootTypes["User"]; // User!
   };
-  PetitionVariable: {
+  PetitionVariableEnum: {
+    // field return type
+    defaultValue: string; // String!
+    name: string; // String!
+    showInReplies: boolean; // Boolean!
+    type: NexusGenEnums["PetitionVariableType"]; // PetitionVariableType!
+    valueLabels: NexusGenRootTypes["PetitionVariableEnumLabel"][]; // [PetitionVariableEnumLabel!]!
+  };
+  PetitionVariableEnumLabel: {
+    // field return type
+    label: string; // String!
+    value: string; // String!
+  };
+  PetitionVariableNumber: {
     // field return type
     defaultValue: number; // Float!
     name: string; // String!
     showInReplies: boolean; // Boolean!
-    valueLabels: NexusGenRootTypes["PetitionVariableValueLabel"][]; // [PetitionVariableValueLabel!]!
+    type: NexusGenEnums["PetitionVariableType"]; // PetitionVariableType!
+    valueLabels: NexusGenRootTypes["PetitionVariableNumberValueLabel"][]; // [PetitionVariableNumberValueLabel!]!
+  };
+  PetitionVariableNumberValueLabel: {
+    // field return type
+    label: string; // String!
+    value: number; // Float!
   };
   PetitionVariableResult: {
     // field return type
     name: string; // String!
-    value: number | null; // Float
-  };
-  PetitionVariableValueLabel: {
-    // field return type
-    label: string; // String!
-    value: number; // Float!
+    value: NexusGenScalars["JSON"] | null; // JSON
   };
   Profile: {
     // field return type
@@ -5389,6 +5423,12 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isRead: boolean; // Boolean!
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+  };
+  PetitionVariable: {
+    // field return type
+    name: string; // String!
+    showInReplies: boolean; // Boolean!
+    type: NexusGenEnums["PetitionVariableType"]; // PetitionVariableType!
   };
   ProfileEvent: {
     // field return type
@@ -7420,22 +7460,36 @@ export interface NexusGenFieldTypeNames {
     updatedAt: "DateTime";
     user: "User";
   };
-  PetitionVariable: {
+  PetitionVariableEnum: {
+    // field return type name
+    defaultValue: "String";
+    name: "String";
+    showInReplies: "Boolean";
+    type: "PetitionVariableType";
+    valueLabels: "PetitionVariableEnumLabel";
+  };
+  PetitionVariableEnumLabel: {
+    // field return type name
+    label: "String";
+    value: "String";
+  };
+  PetitionVariableNumber: {
     // field return type name
     defaultValue: "Float";
     name: "String";
     showInReplies: "Boolean";
-    valueLabels: "PetitionVariableValueLabel";
+    type: "PetitionVariableType";
+    valueLabels: "PetitionVariableNumberValueLabel";
+  };
+  PetitionVariableNumberValueLabel: {
+    // field return type name
+    label: "String";
+    value: "Float";
   };
   PetitionVariableResult: {
     // field return type name
     name: "String";
-    value: "Float";
-  };
-  PetitionVariableValueLabel: {
-    // field return type name
-    label: "String";
-    value: "Float";
+    value: "JSON";
   };
   Profile: {
     // field return type name
@@ -8719,6 +8773,12 @@ export interface NexusGenFieldTypeNames {
     isRead: "Boolean";
     petition: "PetitionBase";
   };
+  PetitionVariable: {
+    // field return type name
+    name: "String";
+    showInReplies: "Boolean";
+    type: "PetitionVariableType";
+  };
   ProfileEvent: {
     // field return type name
     createdAt: "DateTime";
@@ -9483,7 +9543,6 @@ export interface NexusGenArgTypes {
     };
     deletePetitionVariable: {
       // args
-      dryrun?: boolean | null; // Boolean
       name: string; // String!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
@@ -11136,6 +11195,7 @@ export interface NexusGenAbstractTypeMembers {
     | "RemindersOptOutNotification"
     | "SignatureCancelledUserNotification"
     | "SignatureCompletedUserNotification";
+  PetitionVariable: "PetitionVariableEnum" | "PetitionVariableNumber";
   ProfileEvent:
     | "PetitionAssociatedEvent"
     | "PetitionDisassociatedEvent"
@@ -11249,6 +11309,8 @@ export interface NexusGenTypeInterfaces {
   PetitionUntaggedEvent: "PetitionEvent";
   PetitionUserGroupPermission: "PetitionPermission" | "Timestamps";
   PetitionUserPermission: "PetitionPermission" | "Timestamps";
+  PetitionVariableEnum: "PetitionVariable";
+  PetitionVariableNumber: "PetitionVariable";
   Profile: "Timestamps";
   ProfileAnonymizedEvent: "ProfileEvent";
   ProfileAssociatedEvent: "PetitionEvent";
@@ -11335,6 +11397,7 @@ export type NexusGenAbstractsUsingStrategyResolveType =
   | "PetitionFieldOrPetition"
   | "PetitionPermission"
   | "PetitionUserNotification"
+  | "PetitionVariable"
   | "ProfileEvent"
   | "ProfileExternalSourceSearchResults"
   | "ProfileFieldResponse"

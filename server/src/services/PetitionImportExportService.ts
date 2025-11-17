@@ -21,6 +21,7 @@ import { FIELD_REFERENCE_REGEX } from "../graphql";
 import { validateFieldLogic } from "../graphql/helpers/validators/validFieldLogic";
 import { validateRichTextContent } from "../graphql/helpers/validators/validRichTextContent";
 import { mapFieldLogic, PetitionFieldMath, PetitionFieldVisibility } from "../util/fieldLogic";
+import { never } from "../util/never";
 import { pFlatMap } from "../util/promises/pFlatMap";
 import { safeJsonParse } from "../util/safeJsonParse";
 import { PETITION_FIELD_SERVICE, PetitionFieldService } from "./PetitionFieldService";
@@ -104,22 +105,48 @@ const PETITION_JSON_SCHEMA = {
         variables: {
           type: ["array", "null"],
           items: {
-            type: "object",
-            required: ["name", "defaultValue", "showInReplies", "valueLabels"],
-            properties: {
-              name: { type: "string" },
-              defaultValue: { type: "number" },
-              showInReplies: { type: "boolean" },
-              valueLabels: {
-                type: "array",
-                items: {
-                  type: "object",
-                  required: ["value", "label"],
-                  properties: { value: { type: "number" }, label: { type: "string" } },
-                  additionalProperties: false,
+            anyOf: [
+              {
+                name: "PetitionVariableNumber",
+                type: "object",
+                required: ["type", "name", "defaultValue", "showInReplies", "valueLabels"],
+                properties: {
+                  type: { const: "NUMBER" },
+                  name: { type: "string" },
+                  defaultValue: { type: "number" },
+                  showInReplies: { type: "boolean" },
+                  valueLabels: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      required: ["value", "label"],
+                      properties: { value: { type: "number" }, label: { type: "string" } },
+                      additionalProperties: false,
+                    },
+                  },
                 },
               },
-            },
+              {
+                name: "PetitionVariableEnum",
+                type: "object",
+                required: ["type", "name", "defaultValue", "showInReplies", "valueLabels"],
+                properties: {
+                  type: { const: "ENUM" },
+                  name: { type: "string" },
+                  defaultValue: { type: "string" },
+                  showInReplies: { type: "boolean" },
+                  valueLabels: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      required: ["value", "label"],
+                      properties: { value: { type: "string" }, label: { type: "string" } },
+                      additionalProperties: false,
+                    },
+                  },
+                },
+              },
+            ],
           },
         },
         customLists: {
@@ -173,12 +200,22 @@ interface PetitionJson {
   templateDescription: string | null;
   fields: PetitionFieldJson[];
   variables?:
-    | {
-        name: string;
-        defaultValue: number;
-        showInReplies: boolean;
-        valueLabels: { value: number; label: string }[];
-      }[]
+    | (
+        | {
+            type: "NUMBER";
+            name: string;
+            defaultValue: number;
+            showInReplies: boolean;
+            valueLabels: { value: number; label: string }[];
+          }
+        | {
+            type: "ENUM";
+            name: string;
+            defaultValue: string;
+            showInReplies: boolean;
+            valueLabels: { value: string; label: string }[];
+          }
+      )[]
     | null;
   customLists?: { name: string; values: string[] }[] | null;
   standardListOverrides?: { listName: string; listVersion: string }[] | null;
@@ -275,12 +312,33 @@ export class PetitionImportExportService implements IPetitionImportExportService
         }),
         { concurrency: 1 },
       ),
-      variables: petition.variables?.map((v) => ({
-        name: v.name,
-        defaultValue: v.default_value,
-        showInReplies: v.show_in_replies,
-        valueLabels: v.value_labels,
-      })),
+      variables: petition.variables?.map((v) => {
+        if (v.type === "NUMBER") {
+          return {
+            type: "NUMBER" as const,
+            name: v.name,
+            defaultValue: v.default_value as number,
+            showInReplies: v.show_in_replies ?? true,
+            valueLabels: (v.value_labels ?? []).map((v) => ({
+              value: v.value as number,
+              label: v.label,
+            })),
+          };
+        } else if (v.type === "ENUM") {
+          return {
+            type: "ENUM" as const,
+            name: v.name,
+            defaultValue: v.default_value as string,
+            showInReplies: v.show_in_replies ?? true,
+            valueLabels: (v.value_labels ?? []).map((v) => ({
+              value: v.value as string,
+              label: v.label,
+            })),
+          };
+        } else {
+          never("Unimplemented variable type");
+        }
+      }),
       customLists:
         petition.custom_lists && petition.custom_lists.length > 0
           ? petition.custom_lists
@@ -430,6 +488,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
     const fieldAliases = allJsonFields.map((f) => f.alias).filter(isNonNullish);
     const variables =
       json.variables?.map((v) => ({
+        type: v.type,
         name: v.name,
         default_value: v.defaultValue,
         show_in_replies: v.showInReplies,
@@ -462,6 +521,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
             : null,
           variables:
             json.variables?.map((v) => ({
+              type: v.type,
               name: v.name,
               default_value: v.defaultValue,
               show_in_replies: v.showInReplies,

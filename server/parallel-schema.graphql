@@ -672,9 +672,10 @@ input CreatePetitionFromProfilePrefillInput {
 }
 
 input CreatePetitionVariableInput {
-  defaultValue: Float!
+  defaultValue: JSON!
   name: String!
   showInReplies: Boolean
+  type: PetitionVariableType!
   valueLabels: [PetitionVariableValueLabelInput!]
 }
 
@@ -2559,14 +2560,7 @@ type Mutation {
   """
   Deletes a variable from the petition.
   """
-  deletePetitionVariable(
-    """
-    If true, this will do a dry-run of the mutation to throw possible errors but it will not perform any modification in DB
-    """
-    dryrun: Boolean = false
-    name: String!
-    petitionId: GID!
-  ): Petition!
+  deletePetitionVariable(name: String!, petitionId: GID!): Petition!
 
   """
   Delete petitions and folders.
@@ -6752,30 +6746,69 @@ type PetitionUserPermission implements PetitionPermission & Timestamps {
   user: User!
 }
 
-type PetitionVariable {
-  defaultValue: Float!
+interface PetitionVariable {
   name: String!
   showInReplies: Boolean!
+  type: PetitionVariableType!
+}
+
+type PetitionVariableEnum implements PetitionVariable {
+  defaultValue: String!
+  name: String!
+  showInReplies: Boolean!
+  type: PetitionVariableType!
 
   """
   The value labels of the variable.
   """
-  valueLabels: [PetitionVariableValueLabel!]!
+  valueLabels: [PetitionVariableEnumLabel!]!
+}
+
+type PetitionVariableEnumLabel {
+  label: String!
+  value: String!
+}
+
+type PetitionVariableNumber implements PetitionVariable {
+  defaultValue: Float!
+  name: String!
+  showInReplies: Boolean!
+  type: PetitionVariableType!
+
+  """
+  The value labels of the variable.
+  """
+  valueLabels: [PetitionVariableNumberValueLabel!]!
+}
+
+type PetitionVariableNumberValueLabel {
+  label: String!
+  value: Float!
 }
 
 type PetitionVariableResult {
   name: String!
-  value: Float
+  value: JSON
 }
 
-type PetitionVariableValueLabel {
-  label: String!
-  value: Float!
+"""
+The type of a petition variable.
+"""
+enum PetitionVariableType {
+  """
+  The variable is an enum.
+  """
+  ENUM
+
+  """
+  The variable is a number.
+  """
+  NUMBER
 }
 
 input PetitionVariableValueLabelInput {
   label: String!
-  value: Float!
+  value: JSON!
 }
 
 input PetitionsNumberDashboardModuleSettingsInput {
@@ -9616,7 +9649,7 @@ input UpdatePetitionInput {
 }
 
 input UpdatePetitionVariableInput {
-  defaultValue: Float!
+  defaultValue: JSON
   showInReplies: Boolean
   valueLabels: [PetitionVariableValueLabelInput!]
 }

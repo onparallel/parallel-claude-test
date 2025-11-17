@@ -735,7 +735,7 @@ const _VariablesResult = {
   properties: {
     name: { type: "string", description: "The name of the variable" },
     value: {
-      type: ["number", "null"],
+      type: ["number", "string", "null"],
       description:
         "The final value of the variable based on the calculations applied on each field. This can be null if some calculation results in a non-numeric value, like division by zero.",
     },

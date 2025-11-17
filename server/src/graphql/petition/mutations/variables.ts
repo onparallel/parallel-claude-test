@@ -1,5 +1,4 @@
-import { booleanArg, inputObjectType, mutationField, nonNull, stringArg } from "nexus";
-import { assert } from "ts-essentials";
+import { inputObjectType, mutationField, nonNull, stringArg } from "nexus";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { validateAnd } from "../../helpers/validateArgs";
@@ -13,8 +12,12 @@ import {
   userHasAccessToPetitions,
 } from "../authorizers";
 import {
+  validateCreatePetitionVariableInput,
+  validateUpdatePetitionVariableInput,
+} from "../validations";
+import {
   petitionVariableCanBeCreated,
-  variableIsNotBeingReferencedOnLogicConditions,
+  variableIsNotReferencedInLogicConditions,
 } from "./authorizers";
 
 export const FIELD_REFERENCE_REGEX = /^[a-z_][a-z0-9_]*$/i;
@@ -22,7 +25,7 @@ export const FIELD_REFERENCE_REGEX = /^[a-z_][a-z0-9_]*$/i;
 export const PetitionVariableValueLabelInput = inputObjectType({
   name: "PetitionVariableValueLabelInput",
   definition(t) {
-    t.nonNull.float("value");
+    t.nonNull.json("value");
     t.nonNull.string("label");
   },
 });
@@ -44,8 +47,11 @@ export const createPetitionVariable = mutationField("createPetitionVariable", {
       inputObjectType({
         name: "CreatePetitionVariableInput",
         definition(t) {
+          t.nonNull.field("type", {
+            type: "PetitionVariableType",
+          });
           t.nonNull.string("name");
-          t.nonNull.float("defaultValue");
+          t.nonNull.json("defaultValue");
           t.boolean("showInReplies");
           t.list.nonNull.field("valueLabels", {
             type: "PetitionVariableValueLabelInput",
@@ -57,11 +63,13 @@ export const createPetitionVariable = mutationField("createPetitionVariable", {
   validateArgs: validateAnd(
     maxLength("data.name", 30),
     validateRegex("data.name", FIELD_REFERENCE_REGEX),
+    validateCreatePetitionVariableInput("data"),
   ),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.createVariable(
       args.petitionId,
       {
+        type: args.data.type,
         name: args.data.name,
         default_value: args.data.defaultValue,
         show_in_replies: args.data.showInReplies ?? true,
@@ -89,7 +97,7 @@ export const updatePetitionVariable = mutationField("updatePetitionVariable", {
       inputObjectType({
         name: "UpdatePetitionVariableInput",
         definition(t) {
-          t.nonNull.float("defaultValue");
+          t.json("defaultValue");
           t.boolean("showInReplies");
           t.list.nonNull.field("valueLabels", {
             type: "PetitionVariableValueLabelInput",
@@ -98,6 +106,7 @@ export const updatePetitionVariable = mutationField("updatePetitionVariable", {
       }),
     ),
   },
+  validateArgs: validateUpdatePetitionVariableInput("petitionId", "name", "data"),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updateVariable(
       args.petitionId,
@@ -105,7 +114,7 @@ export const updatePetitionVariable = mutationField("updatePetitionVariable", {
       {
         default_value: args.data.defaultValue,
         show_in_replies: args.data.showInReplies ?? true,
-        value_labels: args.data.valueLabels ?? [],
+        value_labels: args.data.valueLabels,
       },
       `User:${ctx.user!.id}`,
     );
@@ -121,24 +130,13 @@ export const deletePetitionVariable = mutationField("deletePetitionVariable", {
     petitionsAreEditable("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    variableIsNotBeingReferencedOnLogicConditions("petitionId", "name"),
+    variableIsNotReferencedInLogicConditions("petitionId", "name"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     name: nonNull(stringArg()),
-    dryrun: booleanArg({
-      default: false,
-      description:
-        "If true, this will do a dry-run of the mutation to throw possible errors but it will not perform any modification in DB",
-    }),
   },
   resolve: async (_, args, ctx) => {
-    if (args.dryrun) {
-      const petition = await ctx.petitions.loadPetition(args.petitionId);
-      assert(petition, "petition expected to be defined");
-      return petition;
-    }
-
     return await ctx.petitions.deleteVariable(args.petitionId, args.name, `User:${ctx.user!.id}`);
   },
 });

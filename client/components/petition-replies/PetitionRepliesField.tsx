@@ -356,7 +356,11 @@ export const PetitionRepliesField = Object.assign(
                   <Stack spacing={3}>
                     {filteredFields.map((x) => {
                       return x.type === "FIELD" ? (
-                        <LiquidPetitionVariableProvider key={x.field.id} logic={x.fieldLogic}>
+                        <LiquidPetitionVariableProvider
+                          key={x.field.id}
+                          logic={x.fieldLogic}
+                          variables={petition.variables}
+                        >
                           <Stack key={x.field.id}>
                             <Box>
                               <Box position="relative">
@@ -662,10 +666,14 @@ export const PetitionRepliesField = Object.assign(
                 ...PetitionRepliesField_PetitionField
               }
             }
+            variables {
+              ...LiquidPetitionVariableProvider_PetitionVariable
+            }
           }
           ${PetitionRepliesFieldReply.fragments.Petition}
           ${PetitionRepliesFieldReply.fragments.PetitionField}
           ${this.PetitionField}
+          ${LiquidPetitionVariableProvider.fragments.PetitionVariable}
         `;
       },
       get PetitionField() {

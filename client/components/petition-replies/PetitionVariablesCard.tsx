@@ -1,17 +1,20 @@
 import { gql } from "@apollo/client";
-import { Badge, HStack, Stack, Text } from "@chakra-ui/react";
+import { HStack, Stack, Text } from "@chakra-ui/react";
 import { CalculatorIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { PetitionVariablesCard_PetitionBaseFragment } from "@parallel/graphql/__types";
+import {
+  PetitionVariablesCard_PetitionBaseFragment,
+  PetitionVariableType,
+} from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Card, CardHeader } from "../common/Card";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { OverflownText } from "../common/OverflownText";
+import { VariableReference } from "../common/VariableReference";
 import { usePetitionComposeCalculationRulesDialog } from "../petition-compose/dialogs/PetitionComposeCalculationRulesDialog";
 
 export interface PetitionSignaturesCardProps {
   petition: PetitionVariablesCard_PetitionBaseFragment;
-  finalVariables: Record<string, number>;
+  finalVariables: Record<string, number | string>;
 }
 
 export const PetitionVariablesCard = Object.assign(
@@ -23,11 +26,18 @@ export const PetitionVariablesCard = Object.assign(
 
     const showCalculationRulesDialog = usePetitionComposeCalculationRulesDialog();
 
-    const handleViewCalculationRules = async (variableName: string) => {
+    const handleViewCalculationRules = async ({
+      name,
+      type,
+    }: {
+      name: string;
+      type: PetitionVariableType;
+    }) => {
       try {
         await showCalculationRulesDialog({
           petitionId: petition.id,
-          variableName,
+          variableName: name,
+          variableType: type,
           showFieldLogicChanges: true,
         });
       } catch {}
@@ -44,9 +54,16 @@ export const PetitionVariablesCard = Object.assign(
         <Stack spacing={4} padding={4} paddingBottom={6} overflowX="auto">
           {petition.variables
             .filter((v) => v.showInReplies)
-            .map(({ name, valueLabels }) => {
-              const total = finalVariables[name];
-              const label = valueLabels.find((v) => v.value === total)?.label;
+            .map((variable) => {
+              const name = variable.name;
+              const valueLabels =
+                variable.__typename === "PetitionVariableNumber"
+                  ? variable.valueLabels
+                  : variable.__typename === "PetitionVariableEnum"
+                    ? variable.enumLabels
+                    : [];
+              const finalValue = finalVariables[name];
+              const label = valueLabels.find((v) => v.value === finalValue)?.label;
               return (
                 <HStack key={name}>
                   <IconButtonWithTooltip
@@ -56,28 +73,17 @@ export const PetitionVariablesCard = Object.assign(
                     })}
                     icon={<CalculatorIcon boxSize={4} />}
                     size="xs"
-                    onClick={() => handleViewCalculationRules(name)}
+                    onClick={() => handleViewCalculationRules({ name, type: variable.type })}
                   />
-                  <OverflownText
-                    as={Badge}
-                    colorScheme="blue"
-                    textTransform="inherit"
-                    fontSize="md"
-                    whiteSpace="nowrap"
-                    overflow="hidden"
-                    textOverflow="ellipsis"
-                    minWidth="0"
-                  >
-                    {name}
-                  </OverflownText>
+                  <VariableReference variable={variable} />
                   <Text as="span">=</Text>
                   <Text>
                     {label ? (
                       <>
-                        <b>{label}</b> ({total})
+                        <b>{label}</b> ({finalValue})
                       </>
                     ) : (
-                      total
+                      finalValue
                     )}
                   </Text>
                 </HStack>
@@ -94,14 +100,25 @@ export const PetitionVariablesCard = Object.assign(
           id
           variables {
             name
-            defaultValue
             showInReplies
-            valueLabels {
-              value
-              label
+            ... on PetitionVariableNumber {
+              defaultValue
+              valueLabels {
+                value
+                label
+              }
             }
+            ... on PetitionVariableEnum {
+              defaultEnum: defaultValue
+              enumLabels: valueLabels {
+                value
+                label
+              }
+            }
+            ...VariableReference_PetitionVariable
           }
         }
+        ${VariableReference.fragments.PetitionVariable}
       `,
     },
   },

@@ -18,6 +18,7 @@ import {
 } from "../../../util/fieldLogic";
 import { fromGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
+import { never } from "../../../util/never";
 import { Maybe } from "../../../util/types";
 import { NexusGenInputs } from "../../__types";
 import { Arg, ArgWithPath, getArg, getArgWithPath } from "../authorize";
@@ -119,6 +120,14 @@ const PETITION_FIELD_MATH_OPERATION_SCHEMA = (fieldIdType: "string" | "number") 
           properties: {
             type: { enum: ["NUMBER"] },
             value: { type: "number" },
+          },
+        },
+        {
+          type: "object",
+          required: ["type", "value"],
+          properties: {
+            type: { enum: ["ENUM"] },
+            value: { type: "string" },
           },
         },
         {
@@ -438,52 +447,116 @@ export async function validateFieldLogic<
         }
       }
     } else {
+      const variable = props.variables.find((v) => v.name === c.variableName);
       assert(
-        typeof c.value === "number",
-        `Invalid value type ${typeof c.value} for variable condition ${index}`,
-      );
-
-      assertOneOf(
-        c.operator,
-        [
-          "EQUAL",
-          "NOT_EQUAL",
-          "GREATER_THAN",
-          "GREATER_THAN_OR_EQUAL",
-          "LESS_THAN",
-          "LESS_THAN_OR_EQUAL",
-        ] as const,
-        `Invalid operator ${c.operator} for variable condition ${index}`,
-      );
-
-      assert(
-        !!props.variables.find((v) => v.name === c.variableName),
+        isNonNullish(variable),
         `Can't find variable ${c.variableName} referenced in condition ${index}`,
       );
+
+      if (variable.type === "NUMBER") {
+        assertOneOf(
+          c.operator,
+          [
+            "EQUAL",
+            "NOT_EQUAL",
+            "GREATER_THAN",
+            "GREATER_THAN_OR_EQUAL",
+            "LESS_THAN",
+            "LESS_THAN_OR_EQUAL",
+          ] as const,
+          `Invalid operator ${c.operator} for variable condition ${index}`,
+        );
+        assert(
+          typeof c.value === "number",
+          `Invalid value type ${typeof c.value} for variable condition ${index}`,
+        );
+      } else if (variable.type === "ENUM") {
+        assert(
+          isNonNullish(variable.value_labels),
+          `Variable ${c.variableName} is of type ENUM but has no value labels`,
+        );
+        assertOneOf(
+          c.operator,
+          [
+            "EQUAL",
+            "NOT_EQUAL",
+            "LESS_THAN",
+            "LESS_THAN_OR_EQUAL",
+            "GREATER_THAN",
+            "GREATER_THAN_OR_EQUAL",
+          ] as const,
+          `Invalid operator ${c.operator} for variable condition ${index}`,
+        );
+
+        assert(
+          typeof c.value === "string",
+          `Invalid value type ${typeof c.value} for variable condition ${index}`,
+        );
+
+        const validValues = variable.value_labels.map((v) => v.value as string);
+        assert(
+          validValues.includes(c.value),
+          `Invalid value ${c.value} for variable condition ${index}`,
+        );
+      }
     }
   }
 
   function validateMathOperation(op: PetitionFieldMathOperation, index: number) {
+    const variable = props.variables.find((v) => v.name === op.variable);
+
     assert(
-      !!props.variables.find((v) => v.name === op.variable),
+      isNonNullish(variable),
       `Can't find variable ${op.variable} referenced in math operation ${index}`,
     );
 
-    if (op.operand.type === "FIELD") {
-      const fieldId = op.operand.fieldId;
-      const field = allFields.find((f) => f.id === fieldId);
-      assert(!!field, `Can't find field referenced in math operation ${index}`);
-      assert(
-        field.type === "NUMBER",
-        `Can't reference field of type ${field.type} in math operation ${index}`,
+    if (variable.type === "NUMBER") {
+      assertOneOf(
+        op.operand.type,
+        ["FIELD", "VARIABLE", "NUMBER"] as const,
+        `Invalid operand type ${op.operand.type} for math operation ${index}`,
       );
-    }
-    if (op.operand.type === "VARIABLE") {
-      const variableName = op.operand.name;
+      if (op.operand.type === "FIELD") {
+        const fieldId = op.operand.fieldId;
+        const field = allFields.find((f) => f.id === fieldId);
+        assert(!!field, `Can't find field referenced in math operation ${index}`);
+        assert(
+          field.type === "NUMBER",
+          `Can't reference field of type ${field.type} in math operation ${index}`,
+        );
+      } else if (op.operand.type === "VARIABLE") {
+        const variableName = op.operand.name;
+        const operandVariable = props.variables.find((v) => v.name === variableName);
+        assert(
+          isNonNullish(operandVariable),
+          `Can't find variable ${variableName} referenced in math operation ${index}`,
+        );
+        assert(
+          operandVariable.type === "NUMBER",
+          `Variable ${variableName} must be a NUMBER in math operation ${index}`,
+        );
+      }
+    } else if (variable.type === "ENUM") {
       assert(
-        !!props.variables.find((v) => v.name === variableName),
-        `Can't find variable ${variableName} referenced in math operation ${index}`,
+        isNonNullish(variable.value_labels),
+        `Variable ${op.variable} is of type ENUM but has no value labels`,
       );
+      assertOneOf(
+        op.operator,
+        ["ASSIGNATION", "ASSIGNATION_IF_LOWER", "ASSIGNATION_IF_GREATER"] as const,
+        `Invalid operator ${op.operator} for math operation ${index}`,
+      );
+      assert(
+        op.operand.type === "ENUM",
+        `Invalid operand type ${op.operand.type} for math operation ${index}`,
+      );
+      const operandValue = op.operand.value;
+      assert(
+        variable.value_labels.some((v) => v.value === operandValue),
+        `Invalid value ${operandValue} for enum operand ${index}`,
+      );
+    } else {
+      never("Invalid variable type");
     }
   }
 

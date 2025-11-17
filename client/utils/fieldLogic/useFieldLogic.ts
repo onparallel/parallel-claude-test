@@ -4,6 +4,7 @@ import {
   useFieldLogic_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
+import { never } from "../never";
 import { evaluateFieldLogic } from "./fieldLogic";
 import { FieldLogicResult, PetitionFieldMath, PetitionFieldVisibility } from "./types";
 
@@ -20,7 +21,24 @@ export function useFieldLogic(
   return useMemo(
     () =>
       evaluateFieldLogic({
-        variables: petition.variables,
+        variables: petition.variables.map((v) => {
+          if (v.__typename === "PetitionVariableNumber") {
+            return {
+              type: "NUMBER" as const,
+              name: v.name,
+              defaultValue: v.defaultValue,
+            };
+          } else if (v.__typename === "PetitionVariableEnum") {
+            return {
+              type: "ENUM" as const,
+              name: v.name,
+              defaultValue: v.defaultEnum,
+              valueLabels: v.enumValueLabels,
+            };
+          } else {
+            never("Unimplemented variable type");
+          }
+        }),
         customLists: petition.customLists,
         automaticNumberingConfig: petition.automaticNumberingConfig ?? null,
         standardListDefinitions: petition.standardListDefinitions,
@@ -63,7 +81,17 @@ useFieldLogic.fragments = {
       }
       variables {
         name
-        defaultValue
+        type
+        ... on PetitionVariableNumber {
+          defaultValue
+        }
+        ... on PetitionVariableEnum {
+          defaultEnum: defaultValue
+          enumValueLabels: valueLabels {
+            value
+            label
+          }
+        }
       }
       customLists {
         name
@@ -124,7 +152,17 @@ useFieldLogic.fragments = {
       }
       variables {
         name
-        defaultValue
+        type
+        ... on PetitionVariableNumber {
+          defaultValue
+        }
+        ... on PetitionVariableEnum {
+          defaultEnum: defaultValue
+          enumValueLabels: valueLabels {
+            value
+            label
+          }
+        }
       }
       customLists {
         name

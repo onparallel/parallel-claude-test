@@ -1,13 +1,18 @@
 import { PetitionFieldType } from "../db/__types";
 import { completedFieldReplies } from "./completedFieldReplies";
-import { applyFieldVisibility, PetitionFieldMath, PetitionFieldVisibility } from "./fieldLogic";
+import {
+  applyFieldVisibility,
+  FieldLogicPetitionInput,
+  PetitionFieldMath,
+  PetitionFieldVisibility,
+} from "./fieldLogic";
 
-interface FieldLogicPetitionFieldReplyInner {
+interface PetitionIsCompletedFieldReplyInner {
   content: any;
   anonymized_at: Date | null;
 }
 
-interface FieldLogicPetitionFieldInner {
+interface PetitionIsCompletedFieldInner {
   id: number;
   type: PetitionFieldType;
   options: any;
@@ -16,32 +21,27 @@ interface FieldLogicPetitionFieldInner {
   is_internal: boolean;
   optional: boolean;
 }
-interface FieldLogicPetitionFieldInput extends FieldLogicPetitionFieldInner {
+interface PetitionIsCompletedField extends PetitionIsCompletedFieldInner {
   children?:
-    | (FieldLogicPetitionFieldInner & { replies: FieldLogicPetitionFieldReplyInner[] })[]
+    | (PetitionIsCompletedFieldInner & { replies: PetitionIsCompletedFieldReplyInner[] })[]
     | null;
-  replies: (FieldLogicPetitionFieldReplyInner & {
+  replies: (PetitionIsCompletedFieldReplyInner & {
     children?:
       | {
           field: Pick<
-            FieldLogicPetitionFieldInner,
+            PetitionIsCompletedFieldInner,
             "id" | "type" | "is_internal" | "optional" | "options"
           >;
-          replies: FieldLogicPetitionFieldReplyInner[];
+          replies: PetitionIsCompletedFieldReplyInner[];
         }[]
       | null;
   })[];
 }
 
-interface FieldLogicPetitionInput {
-  variables: { name: string; defaultValue: number }[];
-  customLists: { name: string; values: string[] }[];
-  automaticNumberingConfig: { numberingType: "NUMBERS" | "LETTERS" | "ROMAN_NUMERALS" } | null;
-  standardListDefinitions: { listName: string; values: { key: string }[] }[];
-  fields: FieldLogicPetitionFieldInput[];
-}
-
-export function petitionIsCompleted(petition: FieldLogicPetitionInput, publicContext?: boolean) {
+export function petitionIsCompleted(
+  petition: FieldLogicPetitionInput<PetitionIsCompletedField>,
+  publicContext?: boolean,
+) {
   return applyFieldVisibility(petition).every(
     (field) =>
       (publicContext ? field.is_internal : false) ||

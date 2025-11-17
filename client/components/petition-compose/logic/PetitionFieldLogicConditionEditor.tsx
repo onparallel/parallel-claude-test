@@ -42,7 +42,7 @@ import {
 } from "react-intl";
 import { createFilter } from "react-select";
 import { isNonNullish, isNullish, unique } from "remeda";
-import { assert } from "ts-essentials";
+import { assert, noop } from "ts-essentials";
 import { HelpPopover } from "../../common/HelpPopover";
 import { NumeralInput } from "../../common/NumeralInput";
 import { SimpleOption, SimpleSelect } from "../../common/SimpleSelect";
@@ -50,6 +50,7 @@ import { useCustomListDetailsDialog } from "../dialogs/CustomListDetailsDialog";
 import { useStandardListDetailsDialog } from "../dialogs/StandardListDetailsDialog";
 import { PetitionFieldLogicConditionSubjectSelect } from "./PetitionFieldLogicConditionSubjectSelect";
 import { PetitionFieldSelection, usePetitionFieldLogicContext } from "./PetitionFieldLogicContext";
+import { PetitionFieldMathEnumSelect } from "./PetitionFieldMathEnumSelect";
 
 export function PetitionFieldLogicConditionEditor({
   condition,
@@ -62,7 +63,7 @@ export function PetitionFieldLogicConditionEditor({
   isReadOnly?: boolean;
   showErrors?: boolean;
 }) {
-  const { fieldsWithIndices, fieldWithIndex } = usePetitionFieldLogicContext();
+  const { fieldsWithIndices, fieldWithIndex, variables } = usePetitionFieldLogicContext();
   const field = fieldWithIndex?.[0];
   const referencedField =
     "fieldId" in condition
@@ -74,6 +75,11 @@ export function PetitionFieldLogicConditionEditor({
         referencedField.parent.id !== (field as any).parent?.id)
     : false;
   const Wrapper = isReadOnly ? Box : Fragment;
+
+  const variable =
+    "variableName" in condition
+      ? variables.find((v) => v.name === condition.variableName)
+      : undefined;
   return (
     <Wrapper {...(isReadOnly ? { fontSize: "sm" } : {})}>
       <PetitionFieldLogicConditionSubjectSelect
@@ -83,21 +89,46 @@ export function PetitionFieldLogicConditionEditor({
         showErrors={showErrors}
       />
       {isReadOnly ? (
-        <>
-          {isMultipleValue ? (
-            <ConditionMultipleValueModifier
+        variable?.__typename === "PetitionVariableEnum" ? (
+          <>
+            <Text as="span">
+              <FormattedMessage
+                id="component.petition-field-logic-condition-editor.is-equal-to"
+                defaultMessage="is equal to"
+              />
+            </Text>{" "}
+            <PetitionFieldMathEnumSelect
+              value={condition.value as string}
+              onChange={noop}
+              isReadOnly={true}
+              variable={variable}
+            />
+          </>
+        ) : (
+          <>
+            {isMultipleValue ? (
+              <ConditionMultipleValueModifier
+                value={condition}
+                onChange={onConditionChange}
+                isReadOnly
+              />
+            ) : null}
+            <ConditionPredicate
               value={condition}
               onChange={onConditionChange}
+              showErrors={showErrors}
               isReadOnly
             />
-          ) : null}
-          <ConditionPredicate
-            value={condition}
-            onChange={onConditionChange}
-            showErrors={showErrors}
-            isReadOnly
-          />
-        </>
+          </>
+        )
+      ) : variable?.__typename === "PetitionVariableEnum" ? (
+        <PetitionFieldMathEnumSelect
+          value={condition.value as string}
+          onChange={(value) => {
+            onConditionChange({ ...condition, value });
+          }}
+          variable={variable}
+        />
       ) : (
         <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }} alignItems="start">
           {isMultipleValue ? (

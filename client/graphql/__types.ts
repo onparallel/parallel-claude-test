@@ -608,9 +608,10 @@ export interface CreatePetitionFromProfilePrefillInput {
 }
 
 export interface CreatePetitionVariableInput {
-  defaultValue: Scalars["Float"]["input"];
+  defaultValue: Scalars["JSON"]["input"];
   name: Scalars["String"]["input"];
   showInReplies?: InputMaybe<Scalars["Boolean"]["input"]>;
+  type: PetitionVariableType;
   valueLabels?: InputMaybe<Array<PetitionVariableValueLabelInput>>;
 }
 
@@ -2658,7 +2659,6 @@ export interface MutationdeletePetitionReplyArgs {
 }
 
 export interface MutationdeletePetitionVariableArgs {
-  dryrun?: InputMaybe<Scalars["Boolean"]["input"]>;
   name: Scalars["String"]["input"];
   petitionId: Scalars["GID"]["input"];
 }
@@ -5503,29 +5503,59 @@ export interface PetitionUserPermission extends PetitionPermission, Timestamps {
 }
 
 export interface PetitionVariable {
-  __typename?: "PetitionVariable";
+  name: Scalars["String"]["output"];
+  showInReplies: Scalars["Boolean"]["output"];
+  type: PetitionVariableType;
+}
+
+export interface PetitionVariableEnum extends PetitionVariable {
+  __typename?: "PetitionVariableEnum";
+  defaultValue: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
+  showInReplies: Scalars["Boolean"]["output"];
+  type: PetitionVariableType;
+  /** The value labels of the variable. */
+  valueLabels: Array<PetitionVariableEnumLabel>;
+}
+
+export interface PetitionVariableEnumLabel {
+  __typename?: "PetitionVariableEnumLabel";
+  label: Scalars["String"]["output"];
+  value: Scalars["String"]["output"];
+}
+
+export interface PetitionVariableNumber extends PetitionVariable {
+  __typename?: "PetitionVariableNumber";
   defaultValue: Scalars["Float"]["output"];
   name: Scalars["String"]["output"];
   showInReplies: Scalars["Boolean"]["output"];
+  type: PetitionVariableType;
   /** The value labels of the variable. */
-  valueLabels: Array<PetitionVariableValueLabel>;
+  valueLabels: Array<PetitionVariableNumberValueLabel>;
+}
+
+export interface PetitionVariableNumberValueLabel {
+  __typename?: "PetitionVariableNumberValueLabel";
+  label: Scalars["String"]["output"];
+  value: Scalars["Float"]["output"];
 }
 
 export interface PetitionVariableResult {
   __typename?: "PetitionVariableResult";
   name: Scalars["String"]["output"];
-  value?: Maybe<Scalars["Float"]["output"]>;
+  value?: Maybe<Scalars["JSON"]["output"]>;
 }
 
-export interface PetitionVariableValueLabel {
-  __typename?: "PetitionVariableValueLabel";
-  label: Scalars["String"]["output"];
-  value: Scalars["Float"]["output"];
-}
+/** The type of a petition variable. */
+export type PetitionVariableType =
+  /** The variable is an enum. */
+  | "ENUM"
+  /** The variable is a number. */
+  | "NUMBER";
 
 export interface PetitionVariableValueLabelInput {
   label: Scalars["String"]["input"];
-  value: Scalars["Float"]["input"];
+  value: Scalars["JSON"]["input"];
 }
 
 export interface PetitionsNumberDashboardModuleSettingsInput {
@@ -7701,7 +7731,7 @@ export interface UpdatePetitionInput {
 }
 
 export interface UpdatePetitionVariableInput {
-  defaultValue: Scalars["Float"]["input"];
+  defaultValue?: InputMaybe<Scalars["JSON"]["input"]>;
   showInReplies?: InputMaybe<Scalars["Boolean"]["input"]>;
   valueLabels?: InputMaybe<Array<PetitionVariableValueLabelInput>>;
 }
@@ -9190,7 +9220,25 @@ export type RecipientSelectGroups_PetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -9480,6 +9528,22 @@ export type UserSelectOption_UserGroupFragment = {
   localizableName: { [locale in UserLocale]?: string };
   type: UserGroupType;
 };
+
+export type VariableReference_PetitionVariable_PetitionVariableEnum_Fragment = {
+  __typename?: "PetitionVariableEnum";
+  name: string;
+  type: PetitionVariableType;
+};
+
+export type VariableReference_PetitionVariable_PetitionVariableNumber_Fragment = {
+  __typename?: "PetitionVariableNumber";
+  name: string;
+  type: PetitionVariableType;
+};
+
+export type VariableReference_PetitionVariableFragment =
+  | VariableReference_PetitionVariable_PetitionVariableEnum_Fragment
+  | VariableReference_PetitionVariable_PetitionVariableNumber_Fragment;
 
 export type ConfirmCommentMentionAndShareDialog_PetitionFragment = {
   __typename?: "Petition";
@@ -19025,7 +19089,25 @@ export type AddPetitionAccessDialog_PetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -19213,7 +19295,25 @@ export type AddPetitionAccessDialog_petitionQuery = {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -19412,7 +19512,25 @@ export type AddPetitionAccessDialog_createContactlessPetitionAccessMutation = {
         __typename?: "AutomaticNumberingConfig";
         numberingType: AutomaticNumberingType;
       } | null;
-      variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+      variables: Array<
+        | {
+            __typename?: "PetitionVariableEnum";
+            name: string;
+            type: PetitionVariableType;
+            defaultEnum: string;
+            enumValueLabels: Array<{
+              __typename?: "PetitionVariableEnumLabel";
+              value: string;
+              label: string;
+            }>;
+          }
+        | {
+            __typename?: "PetitionVariableNumber";
+            defaultValue: number;
+            name: string;
+            type: PetitionVariableType;
+          }
+      >;
       customLists: Array<{
         __typename?: "PetitionCustomList";
         name: string;
@@ -20869,7 +20987,25 @@ export type SuggestedSigners_PublicPetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -21006,7 +21142,25 @@ export type SuggestedSigners_PetitionBase_Petition_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -21106,7 +21260,25 @@ export type SuggestedSigners_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -21325,7 +21497,25 @@ export type PetitionComposeAlertsContainer_PetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -21546,7 +21736,25 @@ export type PetitionComposeAlertsContainer_petitionQuery = {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -21782,7 +21990,25 @@ export type ConfirmPetitionSignersDialog_PetitionBase_Petition_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -21882,7 +22108,25 @@ export type ConfirmPetitionSignersDialog_PetitionBase_PetitionTemplate_Fragment 
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -22031,7 +22275,25 @@ export type ConfirmPetitionSignersDialog_petitionQuery = {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -22134,7 +22396,25 @@ export type ConfirmPetitionSignersDialog_petitionQuery = {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -22839,7 +23119,25 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -22981,7 +23279,25 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -23184,7 +23500,25 @@ export type SignatureConfigDialog_petitionQuery = {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -23329,7 +23663,25 @@ export type SignatureConfigDialog_petitionQuery = {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -23909,7 +24261,25 @@ export type PetitionComposeAttachments_PetitionBase_Petition_Fragment = {
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     }>;
   };
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -23977,7 +24347,25 @@ export type PetitionComposeAttachments_PetitionBase_PetitionTemplate_Fragment = 
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     }>;
   };
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -24072,7 +24460,25 @@ export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
             };
           }>;
         };
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -24158,7 +24564,25 @@ export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
             };
           }>;
         };
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -24288,7 +24712,25 @@ export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
               };
             }>;
           };
-          variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+          variables: Array<
+            | {
+                __typename?: "PetitionVariableEnum";
+                name: string;
+                type: PetitionVariableType;
+                defaultEnum: string;
+                enumLabels: Array<{
+                  __typename?: "PetitionVariableEnumLabel";
+                  value: string;
+                  label: string;
+                }>;
+              }
+            | {
+                __typename?: "PetitionVariableNumber";
+                defaultValue: number;
+                name: string;
+                type: PetitionVariableType;
+              }
+          >;
           customLists: Array<{
             __typename?: "PetitionCustomList";
             name: string;
@@ -24374,7 +24816,25 @@ export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
               };
             }>;
           };
-          variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+          variables: Array<
+            | {
+                __typename?: "PetitionVariableEnum";
+                name: string;
+                type: PetitionVariableType;
+                defaultEnum: string;
+                enumLabels: Array<{
+                  __typename?: "PetitionVariableEnumLabel";
+                  value: string;
+                  label: string;
+                }>;
+              }
+            | {
+                __typename?: "PetitionVariableNumber";
+                defaultValue: number;
+                name: string;
+                type: PetitionVariableType;
+              }
+          >;
           customLists: Array<{
             __typename?: "PetitionCustomList";
             name: string;
@@ -24477,7 +24937,25 @@ export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation 
               };
             }>;
           };
-          variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+          variables: Array<
+            | {
+                __typename?: "PetitionVariableEnum";
+                name: string;
+                type: PetitionVariableType;
+                defaultEnum: string;
+                enumLabels: Array<{
+                  __typename?: "PetitionVariableEnumLabel";
+                  value: string;
+                  label: string;
+                }>;
+              }
+            | {
+                __typename?: "PetitionVariableNumber";
+                defaultValue: number;
+                name: string;
+                type: PetitionVariableType;
+              }
+          >;
           customLists: Array<{
             __typename?: "PetitionCustomList";
             name: string;
@@ -24563,7 +25041,25 @@ export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation 
               };
             }>;
           };
-          variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+          variables: Array<
+            | {
+                __typename?: "PetitionVariableEnum";
+                name: string;
+                type: PetitionVariableType;
+                defaultEnum: string;
+                enumLabels: Array<{
+                  __typename?: "PetitionVariableEnumLabel";
+                  value: string;
+                  label: string;
+                }>;
+              }
+            | {
+                __typename?: "PetitionVariableNumber";
+                defaultValue: number;
+                name: string;
+                type: PetitionVariableType;
+              }
+          >;
           customLists: Array<{
             __typename?: "PetitionCustomList";
             name: string;
@@ -24660,7 +25156,25 @@ export type PetitionComposeAttachments_deletePetitionAttachmentMutation = {
             };
           }>;
         };
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -24746,7 +25260,25 @@ export type PetitionComposeAttachments_deletePetitionAttachmentMutation = {
             };
           }>;
         };
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -24843,7 +25375,25 @@ export type PetitionComposeField_PetitionBase_Petition_Fragment = {
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        name: string;
+        defaultValue: number;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -24885,7 +25435,25 @@ export type PetitionComposeField_PetitionBase_PetitionTemplate_Fragment = {
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        name: string;
+        defaultValue: number;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -25318,7 +25886,25 @@ export type PetitionComposeFieldList_PetitionBase_Petition_Fragment = {
       };
     }>;
   }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        name: string;
+        defaultValue: number;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -25410,7 +25996,25 @@ export type PetitionComposeFieldList_PetitionBase_PetitionTemplate_Fragment = {
       };
     }>;
   }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        name: string;
+        defaultValue: number;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -25917,13 +26521,32 @@ export type PetitionComposeRightPaneTabs_PetitionBase_Petition_Fragment = {
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
   } | null;
-  variables: Array<{
-    __typename?: "PetitionVariable";
-    name: string;
-    defaultValue: number;
-    showInReplies: boolean;
-    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
-  }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        showInReplies: boolean;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        name: string;
+        type: PetitionVariableType;
+        defaultValue: number;
+        showInReplies: boolean;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
 };
 
 export type PetitionComposeRightPaneTabs_PetitionBase_PetitionTemplate_Fragment = {
@@ -26016,19 +26639,64 @@ export type PetitionComposeRightPaneTabs_PetitionBase_PetitionTemplate_Fragment 
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
   } | null;
-  variables: Array<{
-    __typename?: "PetitionVariable";
-    name: string;
-    defaultValue: number;
-    showInReplies: boolean;
-    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
-  }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        showInReplies: boolean;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        name: string;
+        type: PetitionVariableType;
+        defaultValue: number;
+        showInReplies: boolean;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
   organization: { __typename?: "Organization"; customHost?: string | null };
 };
 
 export type PetitionComposeRightPaneTabs_PetitionBaseFragment =
   | PetitionComposeRightPaneTabs_PetitionBase_Petition_Fragment
   | PetitionComposeRightPaneTabs_PetitionBase_PetitionTemplate_Fragment;
+
+export type PetitionComposeVariables_PetitionVariable_PetitionVariableEnum_Fragment = {
+  __typename?: "PetitionVariableEnum";
+  name: string;
+  type: PetitionVariableType;
+  showInReplies: boolean;
+  defaultEnum: string;
+  enumLabels: Array<{ __typename?: "PetitionVariableEnumLabel"; value: string; label: string }>;
+};
+
+export type PetitionComposeVariables_PetitionVariable_PetitionVariableNumber_Fragment = {
+  __typename?: "PetitionVariableNumber";
+  name: string;
+  type: PetitionVariableType;
+  defaultValue: number;
+  showInReplies: boolean;
+  valueLabels: Array<{
+    __typename?: "PetitionVariableNumberValueLabel";
+    value: number;
+    label: string;
+  }>;
+};
+
+export type PetitionComposeVariables_PetitionVariableFragment =
+  | PetitionComposeVariables_PetitionVariable_PetitionVariableEnum_Fragment
+  | PetitionComposeVariables_PetitionVariable_PetitionVariableNumber_Fragment;
 
 export type PetitionComposeVariables_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -26043,26 +26711,64 @@ export type PetitionComposeVariables_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
   lastChangeAt: string;
-  variables: Array<{
-    __typename?: "PetitionVariable";
-    name: string;
-    defaultValue: number;
-    showInReplies: boolean;
-    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
-  }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        showInReplies: boolean;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        name: string;
+        type: PetitionVariableType;
+        defaultValue: number;
+        showInReplies: boolean;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
 };
 
 export type PetitionComposeVariables_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
   lastChangeAt: string;
-  variables: Array<{
-    __typename?: "PetitionVariable";
-    name: string;
-    defaultValue: number;
-    showInReplies: boolean;
-    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
-  }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        showInReplies: boolean;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        name: string;
+        type: PetitionVariableType;
+        defaultValue: number;
+        showInReplies: boolean;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
 };
 
 export type PetitionComposeVariables_PetitionBaseFragment =
@@ -26072,7 +26778,6 @@ export type PetitionComposeVariables_PetitionBaseFragment =
 export type PetitionComposeVariables_deletePetitionVariableMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   name: Scalars["String"]["input"];
-  dryrun?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type PetitionComposeVariables_deletePetitionVariableMutation = {
@@ -26080,17 +26785,32 @@ export type PetitionComposeVariables_deletePetitionVariableMutation = {
     __typename?: "Petition";
     id: string;
     lastChangeAt: string;
-    variables: Array<{
-      __typename?: "PetitionVariable";
-      name: string;
-      defaultValue: number;
-      showInReplies: boolean;
-      valueLabels: Array<{
-        __typename?: "PetitionVariableValueLabel";
-        value: number;
-        label: string;
-      }>;
-    }>;
+    variables: Array<
+      | {
+          __typename?: "PetitionVariableEnum";
+          name: string;
+          type: PetitionVariableType;
+          showInReplies: boolean;
+          defaultEnum: string;
+          enumLabels: Array<{
+            __typename?: "PetitionVariableEnumLabel";
+            value: string;
+            label: string;
+          }>;
+        }
+      | {
+          __typename?: "PetitionVariableNumber";
+          name: string;
+          type: PetitionVariableType;
+          defaultValue: number;
+          showInReplies: boolean;
+          valueLabels: Array<{
+            __typename?: "PetitionVariableNumberValueLabel";
+            value: number;
+            label: string;
+          }>;
+        }
+    >;
   };
 };
 
@@ -26729,7 +27449,25 @@ export type ConfigureApprovalStepsDialog_PetitionBase_Petition_Fragment = {
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -26776,7 +27514,25 @@ export type ConfigureApprovalStepsDialog_PetitionBase_PetitionTemplate_Fragment 
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -26833,7 +27589,25 @@ export type ConfigureApprovalStepsDialog_petitionQuery = {
           }> | null;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         }>;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -26883,7 +27657,25 @@ export type ConfigureApprovalStepsDialog_petitionQuery = {
           }> | null;
           parent?: { __typename?: "PetitionField"; id: string } | null;
         }>;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -27517,90 +28309,100 @@ export type useCreateOrUpdateFieldGroupRelationshipsDialog_updatePetitionFieldGr
         };
   };
 
-export type CreateOrUpdatePetitionVariableDialog_PetitionVariableFragment = {
-  __typename?: "PetitionVariable";
+export type useCreatePetitionVariableDialog_PetitionVariable_PetitionVariableEnum_Fragment = {
+  __typename?: "PetitionVariableEnum";
   name: string;
-  defaultValue: number;
   showInReplies: boolean;
-  valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
+  defaultEnum: string;
+  enumLabels: Array<{ __typename?: "PetitionVariableEnumLabel"; value: string; label: string }>;
 };
 
-export type CreateOrUpdatePetitionVariableDialog_PetitionBase_Petition_Fragment = {
-  __typename?: "Petition";
-  id: string;
-  lastChangeAt: string;
-  variables: Array<{
-    __typename?: "PetitionVariable";
-    name: string;
-    defaultValue: number;
-    showInReplies: boolean;
-    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
+export type useCreatePetitionVariableDialog_PetitionVariable_PetitionVariableNumber_Fragment = {
+  __typename?: "PetitionVariableNumber";
+  defaultValue: number;
+  name: string;
+  showInReplies: boolean;
+  valueLabels: Array<{
+    __typename?: "PetitionVariableNumberValueLabel";
+    value: number;
+    label: string;
   }>;
 };
 
-export type CreateOrUpdatePetitionVariableDialog_PetitionBase_PetitionTemplate_Fragment = {
-  __typename?: "PetitionTemplate";
-  id: string;
-  lastChangeAt: string;
-  variables: Array<{
-    __typename?: "PetitionVariable";
-    name: string;
-    defaultValue: number;
-    showInReplies: boolean;
-    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
-  }>;
-};
+export type useCreatePetitionVariableDialog_PetitionVariableFragment =
+  | useCreatePetitionVariableDialog_PetitionVariable_PetitionVariableEnum_Fragment
+  | useCreatePetitionVariableDialog_PetitionVariable_PetitionVariableNumber_Fragment;
 
-export type CreateOrUpdatePetitionVariableDialog_PetitionBaseFragment =
-  | CreateOrUpdatePetitionVariableDialog_PetitionBase_Petition_Fragment
-  | CreateOrUpdatePetitionVariableDialog_PetitionBase_PetitionTemplate_Fragment;
-
-export type CreateOrUpdatePetitionVariableDialog_createPetitionVariableMutationVariables = Exact<{
+export type useCreatePetitionVariableDialog_createPetitionVariableMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   data: CreatePetitionVariableInput;
 }>;
 
-export type CreateOrUpdatePetitionVariableDialog_createPetitionVariableMutation = {
+export type useCreatePetitionVariableDialog_createPetitionVariableMutation = {
   createPetitionVariable: {
     __typename?: "Petition";
     id: string;
-    lastChangeAt: string;
-    variables: Array<{
-      __typename?: "PetitionVariable";
-      name: string;
-      defaultValue: number;
-      showInReplies: boolean;
-      valueLabels: Array<{
-        __typename?: "PetitionVariableValueLabel";
-        value: number;
-        label: string;
-      }>;
-    }>;
+    variables: Array<
+      | {
+          __typename?: "PetitionVariableEnum";
+          name: string;
+          showInReplies: boolean;
+          defaultEnum: string;
+          enumLabels: Array<{
+            __typename?: "PetitionVariableEnumLabel";
+            value: string;
+            label: string;
+          }>;
+        }
+      | {
+          __typename?: "PetitionVariableNumber";
+          defaultValue: number;
+          name: string;
+          showInReplies: boolean;
+          valueLabels: Array<{
+            __typename?: "PetitionVariableNumberValueLabel";
+            value: number;
+            label: string;
+          }>;
+        }
+    >;
   };
 };
 
-export type CreateOrUpdatePetitionVariableDialog_updatePetitionVariableMutationVariables = Exact<{
+export type useCreatePetitionVariableDialog_updatePetitionVariableMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
-  name: Scalars["String"]["input"];
   data: UpdatePetitionVariableInput;
+  name: Scalars["String"]["input"];
 }>;
 
-export type CreateOrUpdatePetitionVariableDialog_updatePetitionVariableMutation = {
+export type useCreatePetitionVariableDialog_updatePetitionVariableMutation = {
   updatePetitionVariable: {
     __typename?: "Petition";
     id: string;
-    lastChangeAt: string;
-    variables: Array<{
-      __typename?: "PetitionVariable";
-      name: string;
-      defaultValue: number;
-      showInReplies: boolean;
-      valueLabels: Array<{
-        __typename?: "PetitionVariableValueLabel";
-        value: number;
-        label: string;
-      }>;
-    }>;
+    variables: Array<
+      | {
+          __typename?: "PetitionVariableEnum";
+          name: string;
+          showInReplies: boolean;
+          defaultEnum: string;
+          enumLabels: Array<{
+            __typename?: "PetitionVariableEnumLabel";
+            value: string;
+            label: string;
+          }>;
+        }
+      | {
+          __typename?: "PetitionVariableNumber";
+          defaultValue: number;
+          name: string;
+          showInReplies: boolean;
+          valueLabels: Array<{
+            __typename?: "PetitionVariableNumberValueLabel";
+            value: number;
+            label: string;
+          }>;
+        }
+    >;
   };
 };
 
@@ -28053,7 +28855,25 @@ export type useEditPetitionFieldCalculationsDialog_PetitionFieldFragment = {
 export type useEditPetitionFieldCalculationsDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        name: string;
+        defaultValue: number;
+        type: PetitionVariableType;
+      }
+  >;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -28093,7 +28913,25 @@ export type useEditPetitionFieldCalculationsDialog_PetitionBase_Petition_Fragmen
 export type useEditPetitionFieldCalculationsDialog_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        name: string;
+        defaultValue: number;
+        type: PetitionVariableType;
+      }
+  >;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -28161,7 +28999,25 @@ export type HiddenFieldDialog_PetitionBase_Petition_Fragment = {
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -28201,7 +29057,25 @@ export type HiddenFieldDialog_PetitionBase_PetitionTemplate_Fragment = {
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -28228,7 +29102,30 @@ export type HiddenFieldDialog_PetitionFieldFragment = {
 export type PetitionComposeCalculationRulesDialog_Petition_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -28325,7 +29222,30 @@ export type PetitionComposeCalculationRulesDialog_Petition_Petition_Fragment = {
 export type PetitionComposeCalculationRulesDialog_Petition_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -28442,7 +29362,30 @@ export type PetitionComposeCalculationRulesDialog_petitionQuery = {
     | {
         __typename?: "Petition";
         id: string;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -28542,7 +29485,30 @@ export type PetitionComposeCalculationRulesDialog_petitionQuery = {
     | {
         __typename?: "PetitionTemplate";
         id: string;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -28699,6 +29665,25 @@ export type StandardListDetailsDialog_standardListDefinitionQuery = {
   };
 };
 
+export type PetitionFieldLogicContext_PetitionVariable_PetitionVariableEnum_Fragment = {
+  __typename?: "PetitionVariableEnum";
+  name: string;
+  type: PetitionVariableType;
+  defaultEnum: string;
+  enumLabels: Array<{ __typename?: "PetitionVariableEnumLabel"; value: string; label: string }>;
+};
+
+export type PetitionFieldLogicContext_PetitionVariable_PetitionVariableNumber_Fragment = {
+  __typename?: "PetitionVariableNumber";
+  defaultValue: number;
+  name: string;
+  type: PetitionVariableType;
+};
+
+export type PetitionFieldLogicContext_PetitionVariableFragment =
+  | PetitionFieldLogicContext_PetitionVariable_PetitionVariableEnum_Fragment
+  | PetitionFieldLogicContext_PetitionVariable_PetitionVariableNumber_Fragment;
+
 export type PetitionFieldLogicContext_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
@@ -28724,7 +29709,25 @@ export type PetitionFieldLogicContext_PetitionBase_Petition_Fragment = {
       parent?: { __typename?: "PetitionField"; id: string } | null;
     }> | null;
   }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -28762,7 +29765,25 @@ export type PetitionFieldLogicContext_PetitionBase_PetitionTemplate_Fragment = {
       parent?: { __typename?: "PetitionField"; id: string } | null;
     }> | null;
   }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -28817,7 +29838,25 @@ export type PetitionFieldMathEditor_PetitionBase_Petition_Fragment = {
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        name: string;
+        defaultValue: number;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -28857,7 +29896,25 @@ export type PetitionFieldMathEditor_PetitionBase_PetitionTemplate_Fragment = {
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        name: string;
+        defaultValue: number;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -28878,6 +29935,13 @@ export type PetitionFieldMathEditor_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   math?: Array<{ [key: string]: any }> | null;
+};
+
+export type PetitionFieldMathEnumSelect_PetitionVariableEnumFragment = {
+  __typename?: "PetitionVariableEnum";
+  name: string;
+  defaultEnum: string;
+  enumLabels: Array<{ __typename?: "PetitionVariableEnumLabel"; value: string; label: string }>;
 };
 
 export type PetitionVisibilityEditor_PetitionBase_Petition_Fragment = {
@@ -28907,7 +29971,25 @@ export type PetitionVisibilityEditor_PetitionBase_Petition_Fragment = {
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -28947,7 +30029,25 @@ export type PetitionVisibilityEditor_PetitionBase_PetitionTemplate_Fragment = {
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -30248,7 +31348,25 @@ export type PetitionPreviewRightPaneTabs_PetitionBase_Petition_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -30402,7 +31520,25 @@ export type PetitionPreviewRightPaneTabs_PetitionBase_PetitionTemplate_Fragment 
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -30580,7 +31716,25 @@ export type PetitionPreviewStartSignatureButton_PetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -30733,11 +31887,34 @@ export type PreviewPetitionField_PetitionBase_Petition_Fragment = {
     }>;
   }>;
   organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+  variables: Array<
+    | {
+        __typename: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
   automaticNumberingConfig?: {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -30882,11 +32059,34 @@ export type PreviewPetitionField_PetitionBase_PetitionTemplate_Fragment = {
     }>;
   }>;
   organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+  variables: Array<
+    | {
+        __typename: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
   automaticNumberingConfig?: {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -32146,6 +33346,30 @@ export type PreviewPetitionFieldGroup_PetitionBase_Petition_Fragment = {
   status: PetitionStatus;
   id: string;
   permanentDeletionAt?: string | null;
+  variables: Array<
+    | {
+        __typename: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -32281,7 +33505,6 @@ export type PreviewPetitionFieldGroup_PetitionBase_Petition_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -32295,6 +33518,30 @@ export type PreviewPetitionFieldGroup_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
   permanentDeletionAt?: string | null;
+  variables: Array<
+    | {
+        __typename: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -32430,7 +33677,6 @@ export type PreviewPetitionFieldGroup_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -32885,7 +34131,25 @@ export type PreviewPetitionFieldAdverseMediaSearch_PetitionBase_Petition_Fragmen
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -32973,7 +34237,25 @@ export type PreviewPetitionFieldAdverseMediaSearch_PetitionBase_PetitionTemplate
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -33266,7 +34548,25 @@ export type PreviewPetitionFieldBackgroundCheck_PetitionBase_Petition_Fragment =
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -33354,7 +34654,25 @@ export type PreviewPetitionFieldBackgroundCheck_PetitionBase_PetitionTemplate_Fr
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -33582,7 +34900,25 @@ export type NewSignatureRequestRow_PetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -33956,7 +35292,25 @@ export type PetitionApprovalsCard_PetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -34405,7 +35759,25 @@ export type PetitionApprovalsCard_cancelPetitionApprovalRequestStepMutation = {
         __typename?: "AutomaticNumberingConfig";
         numberingType: AutomaticNumberingType;
       } | null;
-      variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+      variables: Array<
+        | {
+            __typename?: "PetitionVariableEnum";
+            name: string;
+            type: PetitionVariableType;
+            defaultEnum: string;
+            enumValueLabels: Array<{
+              __typename?: "PetitionVariableEnumLabel";
+              value: string;
+              label: string;
+            }>;
+          }
+        | {
+            __typename?: "PetitionVariableNumber";
+            defaultValue: number;
+            name: string;
+            type: PetitionVariableType;
+          }
+      >;
       customLists: Array<{
         __typename?: "PetitionCustomList";
         name: string;
@@ -34739,7 +36111,25 @@ export type PetitionApprovalsCard_skipPetitionApprovalRequestStepMutation = {
         __typename?: "AutomaticNumberingConfig";
         numberingType: AutomaticNumberingType;
       } | null;
-      variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+      variables: Array<
+        | {
+            __typename?: "PetitionVariableEnum";
+            name: string;
+            type: PetitionVariableType;
+            defaultEnum: string;
+            enumValueLabels: Array<{
+              __typename?: "PetitionVariableEnumLabel";
+              value: string;
+              label: string;
+            }>;
+          }
+        | {
+            __typename?: "PetitionVariableNumber";
+            defaultValue: number;
+            name: string;
+            type: PetitionVariableType;
+          }
+      >;
       customLists: Array<{
         __typename?: "PetitionCustomList";
         name: string;
@@ -35075,7 +36465,25 @@ export type PetitionApprovalsCard_rejectPetitionApprovalRequestStepMutation = {
         __typename?: "AutomaticNumberingConfig";
         numberingType: AutomaticNumberingType;
       } | null;
-      variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+      variables: Array<
+        | {
+            __typename?: "PetitionVariableEnum";
+            name: string;
+            type: PetitionVariableType;
+            defaultEnum: string;
+            enumValueLabels: Array<{
+              __typename?: "PetitionVariableEnumLabel";
+              value: string;
+              label: string;
+            }>;
+          }
+        | {
+            __typename?: "PetitionVariableNumber";
+            defaultValue: number;
+            name: string;
+            type: PetitionVariableType;
+          }
+      >;
       customLists: Array<{
         __typename?: "PetitionCustomList";
         name: string;
@@ -35410,7 +36818,25 @@ export type PetitionApprovalsCard_approvePetitionApprovalRequestStepMutation = {
         __typename?: "AutomaticNumberingConfig";
         numberingType: AutomaticNumberingType;
       } | null;
-      variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+      variables: Array<
+        | {
+            __typename?: "PetitionVariableEnum";
+            name: string;
+            type: PetitionVariableType;
+            defaultEnum: string;
+            enumValueLabels: Array<{
+              __typename?: "PetitionVariableEnumLabel";
+              value: string;
+              label: string;
+            }>;
+          }
+        | {
+            __typename?: "PetitionVariableNumber";
+            defaultValue: number;
+            name: string;
+            type: PetitionVariableType;
+          }
+      >;
       customLists: Array<{
         __typename?: "PetitionCustomList";
         name: string;
@@ -35745,7 +37171,25 @@ export type PetitionApprovalsCard_startPetitionApprovalRequestStepMutation = {
         __typename?: "AutomaticNumberingConfig";
         numberingType: AutomaticNumberingType;
       } | null;
-      variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+      variables: Array<
+        | {
+            __typename?: "PetitionVariableEnum";
+            name: string;
+            type: PetitionVariableType;
+            defaultEnum: string;
+            enumValueLabels: Array<{
+              __typename?: "PetitionVariableEnumLabel";
+              value: string;
+              label: string;
+            }>;
+          }
+        | {
+            __typename?: "PetitionVariableNumber";
+            defaultValue: number;
+            name: string;
+            type: PetitionVariableType;
+          }
+      >;
       customLists: Array<{
         __typename?: "PetitionCustomList";
         name: string;
@@ -36487,6 +37931,26 @@ export type PetitionRepliesField_PetitionFragment = {
     }>;
     parent?: { __typename?: "PetitionField"; id: string; commentCount: number } | null;
   }>;
+  variables: Array<
+    | {
+        __typename: "PetitionVariableEnum";
+        name: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename: "PetitionVariableNumber";
+        name: string;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
 };
 
 export type PetitionRepliesField_PetitionFieldFragment = {
@@ -37252,11 +38716,34 @@ export type PetitionRepliesPopoverField_dataQuery = {
           }>;
         }>;
         organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+        variables: Array<
+          | {
+              __typename: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+              valueLabels: Array<{
+                __typename?: "PetitionVariableNumberValueLabel";
+                value: number;
+                label: string;
+              }>;
+            }
+        >;
         automaticNumberingConfig?: {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -37404,11 +38891,34 @@ export type PetitionRepliesPopoverField_dataQuery = {
           }>;
         }>;
         organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+        variables: Array<
+          | {
+              __typename: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+              valueLabels: Array<{
+                __typename?: "PetitionVariableNumberValueLabel";
+                value: number;
+                label: string;
+              }>;
+            }
+        >;
         automaticNumberingConfig?: {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -37440,7 +38950,10 @@ export type PetitionRepliesRightPaneTabs_PetitionFragment = {
   status: PetitionStatus;
   generalCommentCount: number;
   isInteractionWithRecipientsEnabled: boolean;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string }>;
+  variables: Array<
+    | { __typename?: "PetitionVariableEnum"; name: string }
+    | { __typename?: "PetitionVariableNumber"; name: string }
+  >;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -37873,7 +39386,25 @@ export type PetitionSignaturesCard_PetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -38223,7 +39754,25 @@ export type PetitionSignaturesCard_completePetitionMutation = {
       __typename?: "AutomaticNumberingConfig";
       numberingType: AutomaticNumberingType;
     } | null;
-    variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+    variables: Array<
+      | {
+          __typename?: "PetitionVariableEnum";
+          name: string;
+          type: PetitionVariableType;
+          defaultEnum: string;
+          enumValueLabels: Array<{
+            __typename?: "PetitionVariableEnumLabel";
+            value: string;
+            label: string;
+          }>;
+        }
+      | {
+          __typename?: "PetitionVariableNumber";
+          defaultValue: number;
+          name: string;
+          type: PetitionVariableType;
+        }
+    >;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
@@ -38328,25 +39877,63 @@ export type PetitionSignaturesCard_petitionQuery = {
 export type PetitionVariablesCard_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
-  variables: Array<{
-    __typename?: "PetitionVariable";
-    name: string;
-    defaultValue: number;
-    showInReplies: boolean;
-    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
-  }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        showInReplies: boolean;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        showInReplies: boolean;
+        type: PetitionVariableType;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
 };
 
 export type PetitionVariablesCard_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  variables: Array<{
-    __typename?: "PetitionVariable";
-    name: string;
-    defaultValue: number;
-    showInReplies: boolean;
-    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
-  }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        showInReplies: boolean;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        showInReplies: boolean;
+        type: PetitionVariableType;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
 };
 
 export type PetitionVariablesCard_PetitionBaseFragment =
@@ -39330,7 +40917,25 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -39643,7 +41248,25 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -43430,7 +45053,25 @@ export type RecipientViewContents_PublicPetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -43530,7 +45171,25 @@ export type RecipientViewContents_PetitionBase_Petition_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -43630,7 +45289,25 @@ export type RecipientViewContents_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -43914,7 +45591,25 @@ export type RecipientViewProgressBar_PetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -44104,7 +45799,25 @@ export type RecipientViewProgressBar_PublicPetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -44242,7 +45955,25 @@ export type RecipientViewSidebar_PublicPetitionAccessFragment = {
       __typename?: "AutomaticNumberingConfig";
       numberingType: AutomaticNumberingType;
     } | null;
-    variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+    variables: Array<
+      | {
+          __typename?: "PetitionVariableEnum";
+          name: string;
+          type: PetitionVariableType;
+          defaultEnum: string;
+          enumValueLabels: Array<{
+            __typename?: "PetitionVariableEnumLabel";
+            value: string;
+            label: string;
+          }>;
+        }
+      | {
+          __typename?: "PetitionVariableNumber";
+          defaultValue: number;
+          name: string;
+          type: PetitionVariableType;
+        }
+    >;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
@@ -44477,7 +46208,25 @@ export type useRecipientViewConfirmPetitionSignersDialog_PublicPetitionFragment 
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -44577,7 +46326,25 @@ export type useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccessFra
       __typename?: "AutomaticNumberingConfig";
       numberingType: AutomaticNumberingType;
     } | null;
-    variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+    variables: Array<
+      | {
+          __typename?: "PetitionVariableEnum";
+          name: string;
+          type: PetitionVariableType;
+          defaultEnum: string;
+          enumValueLabels: Array<{
+            __typename?: "PetitionVariableEnumLabel";
+            value: string;
+            label: string;
+          }>;
+        }
+      | {
+          __typename?: "PetitionVariableNumber";
+          defaultValue: number;
+          name: string;
+          type: PetitionVariableType;
+        }
+    >;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
@@ -44618,6 +46385,30 @@ export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
   petition: {
     __typename?: "PublicPetition";
     status: PetitionStatus;
+    variables: Array<
+      | {
+          __typename: "PetitionVariableEnum";
+          name: string;
+          type: PetitionVariableType;
+          defaultEnum: string;
+          enumValueLabels: Array<{
+            __typename?: "PetitionVariableEnumLabel";
+            value: string;
+            label: string;
+          }>;
+        }
+      | {
+          __typename: "PetitionVariableNumber";
+          defaultValue: number;
+          name: string;
+          type: PetitionVariableType;
+          valueLabels: Array<{
+            __typename?: "PetitionVariableNumberValueLabel";
+            value: number;
+            label: string;
+          }>;
+        }
+    >;
     fields: Array<{
       __typename?: "PublicPetitionField";
       type: PetitionFieldType;
@@ -44697,7 +46488,6 @@ export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
       __typename?: "AutomaticNumberingConfig";
       numberingType: AutomaticNumberingType;
     } | null;
-    variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
@@ -45225,6 +47015,30 @@ export type RecipientViewPetitionFieldGroup_PublicPetitionFieldFragment = {
 export type RecipientViewPetitionFieldGroup_PublicPetitionFragment = {
   __typename?: "PublicPetition";
   status: PetitionStatus;
+  variables: Array<
+    | {
+        __typename: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
   fields: Array<{
     __typename?: "PublicPetitionField";
     type: PetitionFieldType;
@@ -45304,7 +47118,6 @@ export type RecipientViewPetitionFieldGroup_PublicPetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -52103,7 +53916,25 @@ export type PetitionActivity_PetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -52456,7 +54287,25 @@ export type PetitionActivity_updatePetitionMutation = {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -53955,7 +55804,25 @@ export type PetitionActivity_petitionQuery = {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -54329,13 +56196,32 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     visibility?: { [key: string]: any } | null;
   }> | null;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
-  variables: Array<{
-    __typename?: "PetitionVariable";
-    name: string;
-    defaultValue: number;
-    showInReplies: boolean;
-    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
-  }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        showInReplies: boolean;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        name: string;
+        type: PetitionVariableType;
+        defaultValue: number;
+        showInReplies: boolean;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
   profiles: Array<{ __typename?: "Profile"; id: string }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
@@ -54631,13 +56517,32 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
   } | null;
-  variables: Array<{
-    __typename?: "PetitionVariable";
-    name: string;
-    defaultValue: number;
-    showInReplies: boolean;
-    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
-  }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        showInReplies: boolean;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        name: string;
+        type: PetitionVariableType;
+        defaultValue: number;
+        showInReplies: boolean;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -55256,17 +57161,37 @@ export type PetitionCompose_updatePetitionMutation = {
           numberingType: AutomaticNumberingType;
         } | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
-        variables: Array<{
-          __typename?: "PetitionVariable";
-          name: string;
-          defaultValue: number;
-          showInReplies: boolean;
-          valueLabels: Array<{
-            __typename?: "PetitionVariableValueLabel";
-            value: number;
-            label: string;
-          }>;
-        }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              showInReplies: boolean;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+              showInReplies: boolean;
+              valueLabels: Array<{
+                __typename?: "PetitionVariableNumberValueLabel";
+                value: number;
+                label: string;
+              }>;
+            }
+        >;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
@@ -55372,17 +57297,32 @@ export type PetitionCompose_updatePetitionMutation = {
             environment: SignatureOrgIntegrationEnvironment;
           } | null;
         } | null;
-        variables: Array<{
-          __typename?: "PetitionVariable";
-          name: string;
-          defaultValue: number;
-          showInReplies: boolean;
-          valueLabels: Array<{
-            __typename?: "PetitionVariableValueLabel";
-            value: number;
-            label: string;
-          }>;
-        }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              showInReplies: boolean;
+              defaultEnum: string;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              name: string;
+              type: PetitionVariableType;
+              defaultValue: number;
+              showInReplies: boolean;
+              valueLabels: Array<{
+                __typename?: "PetitionVariableNumberValueLabel";
+                value: number;
+                label: string;
+              }>;
+            }
+        >;
         organization: { __typename?: "Organization"; customHost?: string | null };
       };
 };
@@ -57498,17 +59438,32 @@ export type PetitionCompose_petitionQuery = {
           visibility?: { [key: string]: any } | null;
         }> | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
-        variables: Array<{
-          __typename?: "PetitionVariable";
-          name: string;
-          defaultValue: number;
-          showInReplies: boolean;
-          valueLabels: Array<{
-            __typename?: "PetitionVariableValueLabel";
-            value: number;
-            label: string;
-          }>;
-        }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              showInReplies: boolean;
+              defaultEnum: string;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              name: string;
+              type: PetitionVariableType;
+              defaultValue: number;
+              showInReplies: boolean;
+              valueLabels: Array<{
+                __typename?: "PetitionVariableNumberValueLabel";
+                value: number;
+                label: string;
+              }>;
+            }
+        >;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
@@ -57826,17 +59781,32 @@ export type PetitionCompose_petitionQuery = {
             environment: SignatureOrgIntegrationEnvironment;
           } | null;
         } | null;
-        variables: Array<{
-          __typename?: "PetitionVariable";
-          name: string;
-          defaultValue: number;
-          showInReplies: boolean;
-          valueLabels: Array<{
-            __typename?: "PetitionVariableValueLabel";
-            value: number;
-            label: string;
-          }>;
-        }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              showInReplies: boolean;
+              defaultEnum: string;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              name: string;
+              type: PetitionVariableType;
+              defaultValue: number;
+              showInReplies: boolean;
+              valueLabels: Array<{
+                __typename?: "PetitionVariableNumberValueLabel";
+                value: number;
+                label: string;
+              }>;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -59074,6 +61044,35 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       signWithEmbeddedImageUrl300?: string | null;
     } | null>;
   } | null;
+  variables: Array<
+    | {
+        __typename: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
   currentApprovalRequestSteps?: Array<{
     __typename?: "PetitionApprovalRequestStep";
     id: string;
@@ -59089,7 +61088,6 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -59475,11 +61473,39 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
       provider: SignatureOrgIntegrationProvider;
     } | null;
   } | null;
+  variables: Array<
+    | {
+        __typename: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
   automaticNumberingConfig?: {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -59950,6 +61976,35 @@ export type PetitionPreview_updatePetitionMutation = {
             signWithEmbeddedImageUrl300?: string | null;
           } | null>;
         } | null;
+        variables: Array<
+          | {
+              __typename: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+              valueLabels: Array<{
+                __typename?: "PetitionVariableNumberValueLabel";
+                value: number;
+                label: string;
+              }>;
+            }
+        >;
         currentApprovalRequestSteps?: Array<{
           __typename?: "PetitionApprovalRequestStep";
           id: string;
@@ -59970,7 +62025,6 @@ export type PetitionPreview_updatePetitionMutation = {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -60368,11 +62422,39 @@ export type PetitionPreview_updatePetitionMutation = {
             provider: SignatureOrgIntegrationProvider;
           } | null;
         } | null;
+        variables: Array<
+          | {
+              __typename: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+              valueLabels: Array<{
+                __typename?: "PetitionVariableNumberValueLabel";
+                value: number;
+                label: string;
+              }>;
+            }
+        >;
         automaticNumberingConfig?: {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -60752,6 +62834,35 @@ export type PetitionPreview_completePetitionMutation = {
         signWithEmbeddedImageUrl300?: string | null;
       } | null>;
     } | null;
+    variables: Array<
+      | {
+          __typename: "PetitionVariableEnum";
+          name: string;
+          type: PetitionVariableType;
+          defaultEnum: string;
+          enumValueLabels: Array<{
+            __typename?: "PetitionVariableEnumLabel";
+            value: string;
+            label: string;
+          }>;
+          enumLabels: Array<{
+            __typename?: "PetitionVariableEnumLabel";
+            value: string;
+            label: string;
+          }>;
+        }
+      | {
+          __typename: "PetitionVariableNumber";
+          defaultValue: number;
+          name: string;
+          type: PetitionVariableType;
+          valueLabels: Array<{
+            __typename?: "PetitionVariableNumberValueLabel";
+            value: number;
+            label: string;
+          }>;
+        }
+    >;
     currentApprovalRequestSteps?: Array<{
       __typename?: "PetitionApprovalRequestStep";
       id: string;
@@ -60767,7 +62878,6 @@ export type PetitionPreview_completePetitionMutation = {
       __typename?: "AutomaticNumberingConfig";
       numberingType: AutomaticNumberingType;
     } | null;
-    variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
@@ -61213,6 +63323,35 @@ export type PetitionPreview_petitionQuery = {
             signWithEmbeddedImageUrl300?: string | null;
           } | null>;
         } | null;
+        variables: Array<
+          | {
+              __typename: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+              valueLabels: Array<{
+                __typename?: "PetitionVariableNumberValueLabel";
+                value: number;
+                label: string;
+              }>;
+            }
+        >;
         currentApprovalRequestSteps?: Array<{
           __typename?: "PetitionApprovalRequestStep";
           id: string;
@@ -61233,7 +63372,6 @@ export type PetitionPreview_petitionQuery = {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -61631,11 +63769,39 @@ export type PetitionPreview_petitionQuery = {
             provider: SignatureOrgIntegrationProvider;
           } | null;
         } | null;
+        variables: Array<
+          | {
+              __typename: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+              valueLabels: Array<{
+                __typename?: "PetitionVariableNumberValueLabel";
+                value: number;
+                label: string;
+              }>;
+            }
+        >;
         automaticNumberingConfig?: {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -62167,13 +64333,37 @@ export type PetitionReplies_PetitionFragment = {
       canCreate: boolean;
     };
   }>;
-  variables: Array<{
-    __typename?: "PetitionVariable";
-    name: string;
-    defaultValue: number;
-    showInReplies: boolean;
-    valueLabels: Array<{ __typename?: "PetitionVariableValueLabel"; value: number; label: string }>;
-  }>;
+  variables: Array<
+    | {
+        __typename: "PetitionVariableEnum";
+        name: string;
+        showInReplies: boolean;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        showInReplies: boolean;
+        type: PetitionVariableType;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
   approvalFlowConfig?: Array<{
     __typename?: "ApprovalFlowConfig";
     name: string;
@@ -63188,17 +65378,37 @@ export type PetitionReplies_petitionQuery = {
             canCreate: boolean;
           };
         }>;
-        variables: Array<{
-          __typename?: "PetitionVariable";
-          name: string;
-          defaultValue: number;
-          showInReplies: boolean;
-          valueLabels: Array<{
-            __typename?: "PetitionVariableValueLabel";
-            value: number;
-            label: string;
-          }>;
-        }>;
+        variables: Array<
+          | {
+              __typename: "PetitionVariableEnum";
+              name: string;
+              showInReplies: boolean;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              showInReplies: boolean;
+              type: PetitionVariableType;
+              valueLabels: Array<{
+                __typename?: "PetitionVariableNumberValueLabel";
+                value: number;
+                label: string;
+              }>;
+            }
+        >;
         approvalFlowConfig?: Array<{
           __typename?: "ApprovalFlowConfig";
           name: string;
@@ -66606,6 +68816,30 @@ export type RecipientView_PublicPetitionAccessFragment = {
         signWithDigitalCertificate?: boolean | null;
       }>;
     } | null;
+    variables: Array<
+      | {
+          __typename: "PetitionVariableEnum";
+          name: string;
+          type: PetitionVariableType;
+          defaultEnum: string;
+          enumValueLabels: Array<{
+            __typename?: "PetitionVariableEnumLabel";
+            value: string;
+            label: string;
+          }>;
+        }
+      | {
+          __typename: "PetitionVariableNumber";
+          defaultValue: number;
+          name: string;
+          type: PetitionVariableType;
+          valueLabels: Array<{
+            __typename?: "PetitionVariableNumberValueLabel";
+            value: number;
+            label: string;
+          }>;
+        }
+    >;
     currentSignatureRequest?: {
       __typename?: "PublicPetitionSignatureRequest";
       id: string;
@@ -66625,7 +68859,6 @@ export type RecipientView_PublicPetitionAccessFragment = {
       __typename?: "AutomaticNumberingConfig";
       numberingType: AutomaticNumberingType;
     } | null;
-    variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
@@ -66826,6 +69059,30 @@ export type RecipientView_PublicPetitionFragment = {
     email: string;
     initials?: string | null;
   }>;
+  variables: Array<
+    | {
+        __typename: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
   organization: {
     __typename?: "PublicOrganization";
     name: string;
@@ -66852,7 +69109,6 @@ export type RecipientView_PublicPetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -67041,6 +69297,30 @@ export type RecipientView_publicCompletePetitionMutation = {
       email: string;
       initials?: string | null;
     }>;
+    variables: Array<
+      | {
+          __typename: "PetitionVariableEnum";
+          name: string;
+          type: PetitionVariableType;
+          defaultEnum: string;
+          enumValueLabels: Array<{
+            __typename?: "PetitionVariableEnumLabel";
+            value: string;
+            label: string;
+          }>;
+        }
+      | {
+          __typename: "PetitionVariableNumber";
+          defaultValue: number;
+          name: string;
+          type: PetitionVariableType;
+          valueLabels: Array<{
+            __typename?: "PetitionVariableNumberValueLabel";
+            value: number;
+            label: string;
+          }>;
+        }
+    >;
     organization: {
       __typename?: "PublicOrganization";
       name: string;
@@ -67067,7 +69347,6 @@ export type RecipientView_publicCompletePetitionMutation = {
       __typename?: "AutomaticNumberingConfig";
       numberingType: AutomaticNumberingType;
     } | null;
-    variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
@@ -67284,6 +69563,30 @@ export type RecipientView_accessQuery = {
           signWithDigitalCertificate?: boolean | null;
         }>;
       } | null;
+      variables: Array<
+        | {
+            __typename: "PetitionVariableEnum";
+            name: string;
+            type: PetitionVariableType;
+            defaultEnum: string;
+            enumValueLabels: Array<{
+              __typename?: "PetitionVariableEnumLabel";
+              value: string;
+              label: string;
+            }>;
+          }
+        | {
+            __typename: "PetitionVariableNumber";
+            defaultValue: number;
+            name: string;
+            type: PetitionVariableType;
+            valueLabels: Array<{
+              __typename?: "PetitionVariableNumberValueLabel";
+              value: number;
+              label: string;
+            }>;
+          }
+      >;
       currentSignatureRequest?: {
         __typename?: "PublicPetitionSignatureRequest";
         id: string;
@@ -67303,7 +69606,6 @@ export type RecipientView_accessQuery = {
         __typename?: "AutomaticNumberingConfig";
         numberingType: AutomaticNumberingType;
       } | null;
-      variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
       customLists: Array<{
         __typename?: "PetitionCustomList";
         name: string;
@@ -68145,7 +70447,25 @@ export type useFieldLogic_PublicPetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -68249,7 +70569,25 @@ export type useFieldLogic_PetitionBase_Petition_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -68330,7 +70668,25 @@ export type useFieldLogic_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -68983,7 +71339,25 @@ export type LiquidPetitionScopeProvider_PetitionBase_Petition_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -69069,7 +71443,25 @@ export type LiquidPetitionScopeProvider_PetitionBase_PetitionTemplate_Fragment =
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -69142,7 +71534,25 @@ export type LiquidPetitionScopeProvider_PublicPetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -69160,6 +71570,30 @@ export type LiquidPetitionScopeProvider_PublicPetitionFieldFragment = {
   alias?: string | null;
   options: { [key: string]: any };
 };
+
+export type LiquidPetitionVariableProvider_PetitionVariable_PetitionVariableEnum_Fragment = {
+  __typename: "PetitionVariableEnum";
+  name: string;
+  enumValueLabels: Array<{
+    __typename?: "PetitionVariableEnumLabel";
+    value: string;
+    label: string;
+  }>;
+};
+
+export type LiquidPetitionVariableProvider_PetitionVariable_PetitionVariableNumber_Fragment = {
+  __typename: "PetitionVariableNumber";
+  name: string;
+  valueLabels: Array<{
+    __typename?: "PetitionVariableNumberValueLabel";
+    value: number;
+    label: string;
+  }>;
+};
+
+export type LiquidPetitionVariableProvider_PetitionVariableFragment =
+  | LiquidPetitionVariableProvider_PetitionVariable_PetitionVariableEnum_Fragment
+  | LiquidPetitionVariableProvider_PetitionVariable_PetitionVariableNumber_Fragment;
 
 export type useAvailablePetitionLocales_UserFragment = {
   __typename?: "User";
@@ -71166,7 +73600,25 @@ export type useGetPetitionPages_PublicPetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -71248,7 +73700,25 @@ export type useGetPetitionPages_PetitionBase_Petition_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -71330,7 +73800,25 @@ export type useGetPetitionPages_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -71524,7 +74012,25 @@ export type usePetitionCanFinalize_PetitionBase_Petition_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -71665,7 +74171,25 @@ export type usePetitionCanFinalize_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -71760,7 +74284,25 @@ export type usePetitionCanFinalize_PublicPetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -72418,7 +74960,25 @@ export type useStartSignatureRequest_PetitionFragment = {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
   } | null;
-  variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename?: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+      }
+  >;
   customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
   standardListDefinitions: Array<{
     __typename?: "StandardListDefinition";
@@ -72599,7 +75159,25 @@ export type useStartSignatureRequest_updateSignatureConfigMutation = {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
         } | null;
-        variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename?: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+            }
+        >;
         customLists: Array<{
           __typename?: "PetitionCustomList";
           name: string;
@@ -72785,7 +75363,25 @@ export type useStartSignatureRequest_completePetitionMutation = {
       __typename?: "AutomaticNumberingConfig";
       numberingType: AutomaticNumberingType;
     } | null;
-    variables: Array<{ __typename?: "PetitionVariable"; name: string; defaultValue: number }>;
+    variables: Array<
+      | {
+          __typename?: "PetitionVariableEnum";
+          name: string;
+          type: PetitionVariableType;
+          defaultEnum: string;
+          enumValueLabels: Array<{
+            __typename?: "PetitionVariableEnumLabel";
+            value: string;
+            label: string;
+          }>;
+        }
+      | {
+          __typename?: "PetitionVariableNumber";
+          defaultValue: number;
+          name: string;
+          type: PetitionVariableType;
+        }
+    >;
     customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
     standardListDefinitions: Array<{
       __typename?: "StandardListDefinition";
@@ -75619,7 +78215,17 @@ export const useFieldLogic_PetitionBaseFragmentDoc = gql`
     }
     variables {
       name
-      defaultValue
+      type
+      ... on PetitionVariableNumber {
+        defaultValue
+      }
+      ... on PetitionVariableEnum {
+        defaultEnum: defaultValue
+        enumValueLabels: valueLabels {
+          value
+          label
+        }
+      }
     }
     customLists {
       name
@@ -76357,6 +78963,22 @@ export const PetitionFieldLogicContext_PetitionFieldFragmentDoc = gql`
     isChild
   }
 ` as unknown as DocumentNode<PetitionFieldLogicContext_PetitionFieldFragment, unknown>;
+export const PetitionFieldLogicContext_PetitionVariableFragmentDoc = gql`
+  fragment PetitionFieldLogicContext_PetitionVariable on PetitionVariable {
+    name
+    type
+    ... on PetitionVariableNumber {
+      defaultValue
+    }
+    ... on PetitionVariableEnum {
+      defaultEnum: defaultValue
+      enumLabels: valueLabels {
+        value
+        label
+      }
+    }
+  }
+` as unknown as DocumentNode<PetitionFieldLogicContext_PetitionVariableFragment, unknown>;
 export const PetitionFieldLogicContext_PetitionBaseFragmentDoc = gql`
   fragment PetitionFieldLogicContext_PetitionBase on PetitionBase {
     id
@@ -76375,8 +78997,7 @@ export const PetitionFieldLogicContext_PetitionBaseFragmentDoc = gql`
       }
     }
     variables {
-      name
-      defaultValue
+      ...PetitionFieldLogicContext_PetitionVariable
     }
     customLists {
       name
@@ -76393,6 +79014,7 @@ export const PetitionFieldLogicContext_PetitionBaseFragmentDoc = gql`
     ...useAllFieldsWithIndices_PetitionBase
   }
   ${PetitionFieldLogicContext_PetitionFieldFragmentDoc}
+  ${PetitionFieldLogicContext_PetitionVariableFragmentDoc}
   ${useAllFieldsWithIndices_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionFieldLogicContext_PetitionBaseFragment, unknown>;
 export const PetitionVisibilityEditor_PetitionBaseFragmentDoc = gql`
@@ -76542,30 +79164,6 @@ export const useCreateOrUpdateFieldGroupRelationshipsDialog_PetitionBaseFragment
   useCreateOrUpdateFieldGroupRelationshipsDialog_PetitionBaseFragment,
   unknown
 >;
-export const CreateOrUpdatePetitionVariableDialog_PetitionVariableFragmentDoc = gql`
-  fragment CreateOrUpdatePetitionVariableDialog_PetitionVariable on PetitionVariable {
-    name
-    defaultValue
-    showInReplies
-    valueLabels {
-      value
-      label
-    }
-  }
-` as unknown as DocumentNode<
-  CreateOrUpdatePetitionVariableDialog_PetitionVariableFragment,
-  unknown
->;
-export const CreateOrUpdatePetitionVariableDialog_PetitionBaseFragmentDoc = gql`
-  fragment CreateOrUpdatePetitionVariableDialog_PetitionBase on PetitionBase {
-    id
-    variables {
-      ...CreateOrUpdatePetitionVariableDialog_PetitionVariable
-    }
-    lastChangeAt
-  }
-  ${CreateOrUpdatePetitionVariableDialog_PetitionVariableFragmentDoc}
-` as unknown as DocumentNode<CreateOrUpdatePetitionVariableDialog_PetitionBaseFragment, unknown>;
 export const useCreatePetitionFieldGroupProfileTypeDialog_ProfileTypeFragmentDoc = gql`
   fragment useCreatePetitionFieldGroupProfileTypeDialog_ProfileType on ProfileType {
     id
@@ -76673,6 +79271,7 @@ export const useEditPetitionFieldCalculationsDialog_PetitionBaseFragmentDoc = gq
     id
     variables {
       name
+      type
     }
     ...PetitionFieldMathEditor_PetitionBase
   }
@@ -76726,6 +79325,16 @@ export const StandardListDetailsDialog_StandardListDefinitionFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<StandardListDetailsDialog_StandardListDefinitionFragment, unknown>;
+export const PetitionFieldMathEnumSelect_PetitionVariableEnumFragmentDoc = gql`
+  fragment PetitionFieldMathEnumSelect_PetitionVariableEnum on PetitionVariableEnum {
+    name
+    defaultEnum: defaultValue
+    enumLabels: valueLabels {
+      value
+      label
+    }
+  }
+` as unknown as DocumentNode<PetitionFieldMathEnumSelect_PetitionVariableEnumFragment, unknown>;
 export const PetitionComposeAdverseMediaSearchSettings_PetitionFieldFragmentDoc = gql`
   fragment PetitionComposeAdverseMediaSearchSettings_PetitionField on PetitionField {
     id
@@ -81140,17 +83749,51 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
   ${PetitionRemindersConfig_RemindersConfigFragmentDoc}
   ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
 ` as unknown as DocumentNode<PetitionSettings_PetitionBaseFragment, unknown>;
+export const VariableReference_PetitionVariableFragmentDoc = gql`
+  fragment VariableReference_PetitionVariable on PetitionVariable {
+    name
+    type
+  }
+` as unknown as DocumentNode<VariableReference_PetitionVariableFragment, unknown>;
+export const useCreatePetitionVariableDialog_PetitionVariableFragmentDoc = gql`
+  fragment useCreatePetitionVariableDialog_PetitionVariable on PetitionVariable {
+    name
+    showInReplies
+    ... on PetitionVariableNumber {
+      defaultValue
+      valueLabels {
+        value
+        label
+      }
+    }
+    ... on PetitionVariableEnum {
+      defaultEnum: defaultValue
+      enumLabels: valueLabels {
+        value
+        label
+      }
+    }
+  }
+` as unknown as DocumentNode<useCreatePetitionVariableDialog_PetitionVariableFragment, unknown>;
+export const PetitionComposeVariables_PetitionVariableFragmentDoc = gql`
+  fragment PetitionComposeVariables_PetitionVariable on PetitionVariable {
+    name
+    type
+    ...VariableReference_PetitionVariable
+    ...useCreatePetitionVariableDialog_PetitionVariable
+  }
+  ${VariableReference_PetitionVariableFragmentDoc}
+  ${useCreatePetitionVariableDialog_PetitionVariableFragmentDoc}
+` as unknown as DocumentNode<PetitionComposeVariables_PetitionVariableFragment, unknown>;
 export const PetitionComposeVariables_PetitionBaseFragmentDoc = gql`
   fragment PetitionComposeVariables_PetitionBase on PetitionBase {
     id
     variables {
-      name
-      defaultValue
-      ...CreateOrUpdatePetitionVariableDialog_PetitionVariable
+      ...PetitionComposeVariables_PetitionVariable
     }
     lastChangeAt
   }
-  ${CreateOrUpdatePetitionVariableDialog_PetitionVariableFragmentDoc}
+  ${PetitionComposeVariables_PetitionVariableFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeVariables_PetitionBaseFragment, unknown>;
 export const PetitionComposeRightPaneTabs_PetitionBaseFragmentDoc = gql`
   fragment PetitionComposeRightPaneTabs_PetitionBase on PetitionBase {
@@ -81807,6 +84450,24 @@ export const PetitionPreviewRightPaneTabs_PetitionFieldFragmentDoc = gql`
   }
   ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreviewRightPaneTabs_PetitionFieldFragment, unknown>;
+export const LiquidPetitionVariableProvider_PetitionVariableFragmentDoc = gql`
+  fragment LiquidPetitionVariableProvider_PetitionVariable on PetitionVariable {
+    __typename
+    name
+    ... on PetitionVariableNumber {
+      valueLabels {
+        value
+        label
+      }
+    }
+    ... on PetitionVariableEnum {
+      enumValueLabels: valueLabels {
+        value
+        label
+      }
+    }
+  }
+` as unknown as DocumentNode<LiquidPetitionVariableProvider_PetitionVariableFragment, unknown>;
 export const useGetPetitionPages_PetitionBaseFragmentDoc = gql`
   fragment useGetPetitionPages_PetitionBase on PetitionBase {
     ...useFieldLogic_PetitionBase
@@ -81934,10 +84595,14 @@ export const PreviewPetitionFieldGroup_PetitionBaseFragmentDoc = gql`
     ...PreviewPetitionFieldBackgroundCheck_PetitionBase
     ...PreviewPetitionFieldKyc_PetitionBase
     ...usePetitionCanFinalize_PetitionBase
+    variables {
+      ...LiquidPetitionVariableProvider_PetitionVariable
+    }
   }
   ${PreviewPetitionFieldBackgroundCheck_PetitionBaseFragmentDoc}
   ${PreviewPetitionFieldKyc_PetitionBaseFragmentDoc}
   ${usePetitionCanFinalize_PetitionBaseFragmentDoc}
+  ${LiquidPetitionVariableProvider_PetitionVariableFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionFieldGroup_PetitionBaseFragment, unknown>;
 export const PreviewPetitionField_PetitionBaseFragmentDoc = gql`
   fragment PreviewPetitionField_PetitionBase on PetitionBase {
@@ -82159,6 +84824,9 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
       timezone
       ...ConfirmPetitionSignersDialog_SignatureConfig
     }
+    variables {
+      ...LiquidPetitionVariableProvider_PetitionVariable
+    }
     permanentDeletionAt
     ...useAllFieldsWithIndices_PetitionBase
     ...useGetPetitionPages_PetitionBase
@@ -82187,6 +84855,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
   ${PetitionPreviewRightPaneTabs_PetitionFieldFragmentDoc}
   ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
   ${ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc}
+  ${LiquidPetitionVariableProvider_PetitionVariableFragmentDoc}
   ${useAllFieldsWithIndices_PetitionBaseFragmentDoc}
   ${useGetPetitionPages_PetitionBaseFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
@@ -82435,23 +85104,38 @@ export const PetitionRepliesField_PetitionFragmentDoc = gql`
         ...PetitionRepliesField_PetitionField
       }
     }
+    variables {
+      ...LiquidPetitionVariableProvider_PetitionVariable
+    }
   }
   ${PetitionRepliesFieldReply_PetitionFragmentDoc}
   ${PetitionRepliesField_PetitionFieldFragmentDoc}
+  ${LiquidPetitionVariableProvider_PetitionVariableFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesField_PetitionFragment, unknown>;
 export const PetitionVariablesCard_PetitionBaseFragmentDoc = gql`
   fragment PetitionVariablesCard_PetitionBase on PetitionBase {
     id
     variables {
       name
-      defaultValue
       showInReplies
-      valueLabels {
-        value
-        label
+      ... on PetitionVariableNumber {
+        defaultValue
+        valueLabels {
+          value
+          label
+        }
       }
+      ... on PetitionVariableEnum {
+        defaultEnum: defaultValue
+        enumLabels: valueLabels {
+          value
+          label
+        }
+      }
+      ...VariableReference_PetitionVariable
     }
   }
+  ${VariableReference_PetitionVariableFragmentDoc}
 ` as unknown as DocumentNode<PetitionVariablesCard_PetitionBaseFragment, unknown>;
 export const OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc = gql`
   fragment OlderSignatureRequestRows_PetitionSignatureRequest on PetitionSignatureRequest {
@@ -82704,6 +85388,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     variables {
       name
       showInReplies
+      ...LiquidPetitionVariableProvider_PetitionVariable
     }
     approvalFlowConfig {
       ...Fragments_FullApprovalFlowConfig
@@ -82725,6 +85410,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
   }
   ${PetitionReplies_PetitionFieldFragmentDoc}
   ${ProfileDrawer_ProfileFragmentDoc}
+  ${LiquidPetitionVariableProvider_PetitionVariableFragmentDoc}
   ${Fragments_FullApprovalFlowConfigFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionRepliesField_PetitionFragmentDoc}
@@ -83668,7 +86354,17 @@ export const useFieldLogic_PublicPetitionFragmentDoc = gql`
     }
     variables {
       name
-      defaultValue
+      type
+      ... on PetitionVariableNumber {
+        defaultValue
+      }
+      ... on PetitionVariableEnum {
+        defaultEnum: defaultValue
+        enumValueLabels: valueLabels {
+          value
+          label
+        }
+      }
     }
     customLists {
       name
@@ -83941,6 +86637,9 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     isCompletingMessageEnabled
     currentApprovalRequestStatus
     hasStartedProcess
+    variables {
+      ...LiquidPetitionVariableProvider_PetitionVariable
+    }
     ...RecipientViewContents_PublicPetition
     ...RecipientViewProgressBar_PublicPetition
     ...useGetPetitionPages_PublicPetition
@@ -83956,6 +86655,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
   ${focusPetitionField_PublicPetitionFieldFragmentDoc}
   ${RecipientViewPetitionAlerts_PublicSignatureConfigFragmentDoc}
   ${RecipientViewHeader_PublicContactFragmentDoc}
+  ${LiquidPetitionVariableProvider_PetitionVariableFragmentDoc}
   ${RecipientViewContents_PublicPetitionFragmentDoc}
   ${RecipientViewProgressBar_PublicPetitionFragmentDoc}
   ${useGetPetitionPages_PublicPetitionFragmentDoc}
@@ -83987,8 +86687,12 @@ export const RecipientViewPetitionFieldGroup_PublicPetitionFragmentDoc = gql`
   fragment RecipientViewPetitionFieldGroup_PublicPetition on PublicPetition {
     status
     ...usePetitionCanFinalize_PublicPetition
+    variables {
+      ...LiquidPetitionVariableProvider_PetitionVariable
+    }
   }
   ${usePetitionCanFinalize_PublicPetitionFragmentDoc}
+  ${LiquidPetitionVariableProvider_PetitionVariableFragmentDoc}
 ` as unknown as DocumentNode<RecipientViewPetitionFieldGroup_PublicPetitionFragment, unknown>;
 export const RecipientViewPetitionField_PublicPetitionAccessFragmentDoc = gql`
   fragment RecipientViewPetitionField_PublicPetitionAccess on PublicPetitionAccess {
@@ -86711,12 +89415,8 @@ export const PetitionComposeNewFieldDrawerProfileTypeFields_linkFieldGroupToProf
     PetitionComposeNewFieldDrawerProfileTypeFields_linkFieldGroupToProfileTypeMutationVariables
   >;
 export const PetitionComposeVariables_deletePetitionVariableDocument = gql`
-  mutation PetitionComposeVariables_deletePetitionVariable(
-    $petitionId: GID!
-    $name: String!
-    $dryrun: Boolean
-  ) {
-    deletePetitionVariable(petitionId: $petitionId, name: $name, dryrun: $dryrun) {
+  mutation PetitionComposeVariables_deletePetitionVariable($petitionId: GID!, $name: String!) {
+    deletePetitionVariable(petitionId: $petitionId, name: $name) {
       ...PetitionComposeVariables_PetitionBase
     }
   }
@@ -86954,34 +89654,40 @@ export const useCreateOrUpdateFieldGroupRelationshipsDialog_updatePetitionFieldG
     useCreateOrUpdateFieldGroupRelationshipsDialog_updatePetitionFieldGroupRelationshipsMutation,
     useCreateOrUpdateFieldGroupRelationshipsDialog_updatePetitionFieldGroupRelationshipsMutationVariables
   >;
-export const CreateOrUpdatePetitionVariableDialog_createPetitionVariableDocument = gql`
-  mutation CreateOrUpdatePetitionVariableDialog_createPetitionVariable(
+export const useCreatePetitionVariableDialog_createPetitionVariableDocument = gql`
+  mutation useCreatePetitionVariableDialog_createPetitionVariable(
     $petitionId: GID!
     $data: CreatePetitionVariableInput!
   ) {
     createPetitionVariable(petitionId: $petitionId, data: $data) {
-      ...CreateOrUpdatePetitionVariableDialog_PetitionBase
+      id
+      variables {
+        ...useCreatePetitionVariableDialog_PetitionVariable
+      }
     }
   }
-  ${CreateOrUpdatePetitionVariableDialog_PetitionBaseFragmentDoc}
+  ${useCreatePetitionVariableDialog_PetitionVariableFragmentDoc}
 ` as unknown as DocumentNode<
-  CreateOrUpdatePetitionVariableDialog_createPetitionVariableMutation,
-  CreateOrUpdatePetitionVariableDialog_createPetitionVariableMutationVariables
+  useCreatePetitionVariableDialog_createPetitionVariableMutation,
+  useCreatePetitionVariableDialog_createPetitionVariableMutationVariables
 >;
-export const CreateOrUpdatePetitionVariableDialog_updatePetitionVariableDocument = gql`
-  mutation CreateOrUpdatePetitionVariableDialog_updatePetitionVariable(
+export const useCreatePetitionVariableDialog_updatePetitionVariableDocument = gql`
+  mutation useCreatePetitionVariableDialog_updatePetitionVariable(
     $petitionId: GID!
-    $name: String!
     $data: UpdatePetitionVariableInput!
+    $name: String!
   ) {
-    updatePetitionVariable(petitionId: $petitionId, name: $name, data: $data) {
-      ...CreateOrUpdatePetitionVariableDialog_PetitionBase
+    updatePetitionVariable(petitionId: $petitionId, data: $data, name: $name) {
+      id
+      variables {
+        ...useCreatePetitionVariableDialog_PetitionVariable
+      }
     }
   }
-  ${CreateOrUpdatePetitionVariableDialog_PetitionBaseFragmentDoc}
+  ${useCreatePetitionVariableDialog_PetitionVariableFragmentDoc}
 ` as unknown as DocumentNode<
-  CreateOrUpdatePetitionVariableDialog_updatePetitionVariableMutation,
-  CreateOrUpdatePetitionVariableDialog_updatePetitionVariableMutationVariables
+  useCreatePetitionVariableDialog_updatePetitionVariableMutation,
+  useCreatePetitionVariableDialog_updatePetitionVariableMutationVariables
 >;
 export const useCreatePetitionFieldGroupProfileTypeDialog_petitionDocument = gql`
   query useCreatePetitionFieldGroupProfileTypeDialog_petition($id: GID!) {

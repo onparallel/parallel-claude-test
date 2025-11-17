@@ -562,9 +562,10 @@ export type CreatePetitionFromProfilePrefillInput = {
 };
 
 export type CreatePetitionVariableInput = {
-  defaultValue: Scalars["Float"]["input"];
+  defaultValue: Scalars["JSON"]["input"];
   name: Scalars["String"]["input"];
   showInReplies?: InputMaybe<Scalars["Boolean"]["input"]>;
+  type: PetitionVariableType;
   valueLabels?: InputMaybe<Array<PetitionVariableValueLabelInput>>;
 };
 
@@ -2553,7 +2554,6 @@ export type MutationdeletePetitionReplyArgs = {
 };
 
 export type MutationdeletePetitionVariableArgs = {
-  dryrun?: InputMaybe<Scalars["Boolean"]["input"]>;
   name: Scalars["String"]["input"];
   petitionId: Scalars["GID"]["input"];
 };
@@ -5315,26 +5315,54 @@ export type PetitionUserPermission = PetitionPermission &
   };
 
 export type PetitionVariable = {
+  name: Scalars["String"]["output"];
+  showInReplies: Scalars["Boolean"]["output"];
+  type: PetitionVariableType;
+};
+
+export type PetitionVariableEnum = PetitionVariable & {
+  defaultValue: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
+  showInReplies: Scalars["Boolean"]["output"];
+  type: PetitionVariableType;
+  /** The value labels of the variable. */
+  valueLabels: Array<PetitionVariableEnumLabel>;
+};
+
+export type PetitionVariableEnumLabel = {
+  label: Scalars["String"]["output"];
+  value: Scalars["String"]["output"];
+};
+
+export type PetitionVariableNumber = PetitionVariable & {
   defaultValue: Scalars["Float"]["output"];
   name: Scalars["String"]["output"];
   showInReplies: Scalars["Boolean"]["output"];
+  type: PetitionVariableType;
   /** The value labels of the variable. */
-  valueLabels: Array<PetitionVariableValueLabel>;
+  valueLabels: Array<PetitionVariableNumberValueLabel>;
 };
 
-export type PetitionVariableResult = {
-  name: Scalars["String"]["output"];
-  value: Maybe<Scalars["Float"]["output"]>;
-};
-
-export type PetitionVariableValueLabel = {
+export type PetitionVariableNumberValueLabel = {
   label: Scalars["String"]["output"];
   value: Scalars["Float"]["output"];
 };
 
+export type PetitionVariableResult = {
+  name: Scalars["String"]["output"];
+  value: Maybe<Scalars["JSON"]["output"]>;
+};
+
+/** The type of a petition variable. */
+export type PetitionVariableType =
+  /** The variable is an enum. */
+  | "ENUM"
+  /** The variable is a number. */
+  | "NUMBER";
+
 export type PetitionVariableValueLabelInput = {
   label: Scalars["String"]["input"];
-  value: Scalars["Float"]["input"];
+  value: Scalars["JSON"]["input"];
 };
 
 export type PetitionsNumberDashboardModuleSettingsInput = {
@@ -7409,7 +7437,7 @@ export type UpdatePetitionInput = {
 };
 
 export type UpdatePetitionVariableInput = {
-  defaultValue: Scalars["Float"]["input"];
+  defaultValue?: InputMaybe<Scalars["JSON"]["input"]>;
   showInReplies?: InputMaybe<Scalars["Boolean"]["input"]>;
   valueLabels?: InputMaybe<Array<PetitionVariableValueLabelInput>>;
 };
@@ -8003,7 +8031,7 @@ export type PetitionFragment = {
     external: { approved: number; replied: number; optional: number; total: number };
     internal: { approved: number; replied: number; optional: number; total: number };
   };
-  variablesResult?: Array<{ name: string; value: number | null }>;
+  variablesResult?: Array<{ name: string; value: any | null }>;
   signatures?: Array<{
     id: string;
     status: PetitionSignatureRequestStatus;
@@ -8169,7 +8197,7 @@ export type PetitionBase_Petition_Fragment = {
     external: { approved: number; replied: number; optional: number; total: number };
     internal: { approved: number; replied: number; optional: number; total: number };
   };
-  variablesResult?: Array<{ name: string; value: number | null }>;
+  variablesResult?: Array<{ name: string; value: any | null }>;
   signatures?: Array<{
     id: string;
     status: PetitionSignatureRequestStatus;
@@ -8748,7 +8776,7 @@ export type GetPetitions_petitionsQuery = {
             external: { approved: number; replied: number; optional: number; total: number };
             internal: { approved: number; replied: number; optional: number; total: number };
           };
-          variablesResult?: Array<{ name: string; value: number | null }>;
+          variablesResult?: Array<{ name: string; value: any | null }>;
           signatures?: Array<{
             id: string;
             status: PetitionSignatureRequestStatus;
@@ -8909,7 +8937,7 @@ export type CreatePetition_petitionMutation = {
           external: { approved: number; replied: number; optional: number; total: number };
           internal: { approved: number; replied: number; optional: number; total: number };
         };
-        variablesResult?: Array<{ name: string; value: number | null }>;
+        variablesResult?: Array<{ name: string; value: any | null }>;
         signatures?: Array<{
           id: string;
           status: PetitionSignatureRequestStatus;
@@ -9068,7 +9096,7 @@ export type GetPetition_petitionQuery = {
           external: { approved: number; replied: number; optional: number; total: number };
           internal: { approved: number; replied: number; optional: number; total: number };
         };
-        variablesResult?: Array<{ name: string; value: number | null }>;
+        variablesResult?: Array<{ name: string; value: any | null }>;
         signatures?: Array<{
           id: string;
           status: PetitionSignatureRequestStatus;
@@ -9266,7 +9294,7 @@ export type UpdatePetition_updatePetitionMutation = {
           external: { approved: number; replied: number; optional: number; total: number };
           internal: { approved: number; replied: number; optional: number; total: number };
         };
-        variablesResult?: Array<{ name: string; value: number | null }>;
+        variablesResult?: Array<{ name: string; value: any | null }>;
         signatures?: Array<{
           id: string;
           status: PetitionSignatureRequestStatus;
@@ -9458,7 +9486,7 @@ export type ClosePetition_closePetitionMutation = {
       external: { approved: number; replied: number; optional: number; total: number };
       internal: { approved: number; replied: number; optional: number; total: number };
     };
-    variablesResult?: Array<{ name: string; value: number | null }>;
+    variablesResult?: Array<{ name: string; value: any | null }>;
     signatures?: Array<{
       id: string;
       status: PetitionSignatureRequestStatus;
@@ -9606,7 +9634,7 @@ export type ReopenPetition_reopenPetitionMutation = {
       external: { approved: number; replied: number; optional: number; total: number };
       internal: { approved: number; replied: number; optional: number; total: number };
     };
-    variablesResult?: Array<{ name: string; value: number | null }>;
+    variablesResult?: Array<{ name: string; value: any | null }>;
     signatures?: Array<{
       id: string;
       status: PetitionSignatureRequestStatus;
@@ -9775,7 +9803,7 @@ export type TagPetition_tagPetitionMutation = {
           external: { approved: number; replied: number; optional: number; total: number };
           internal: { approved: number; replied: number; optional: number; total: number };
         };
-        variablesResult?: Array<{ name: string; value: number | null }>;
+        variablesResult?: Array<{ name: string; value: any | null }>;
         signatures?: Array<{
           id: string;
           status: PetitionSignatureRequestStatus;
@@ -9998,7 +10026,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
         external: { approved: number; replied: number; optional: number; total: number };
         internal: { approved: number; replied: number; optional: number; total: number };
       };
-      variablesResult?: Array<{ name: string; value: number | null }>;
+      variablesResult?: Array<{ name: string; value: any | null }>;
       signatures?: Array<{
         id: string;
         status: PetitionSignatureRequestStatus;
@@ -13482,7 +13510,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
       external: { approved: number; replied: number; optional: number; total: number };
       internal: { approved: number; replied: number; optional: number; total: number };
     };
-    variablesResult?: Array<{ name: string; value: number | null }>;
+    variablesResult?: Array<{ name: string; value: any | null }>;
     signatures?: Array<{
       id: string;
       status: PetitionSignatureRequestStatus;

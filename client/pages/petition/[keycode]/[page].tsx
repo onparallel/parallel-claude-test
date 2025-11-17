@@ -389,7 +389,11 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                           <AnimatePresence initial={false}>
                             {fieldsWithLogic.map(({ field, logic }) => {
                               return (
-                                <LiquidPetitionVariableProvider key={field.id} logic={logic}>
+                                <LiquidPetitionVariableProvider
+                                  key={field.id}
+                                  logic={logic}
+                                  variables={petition.variables}
+                                >
                                   <RecipientViewPetitionField
                                     keycode={keycode}
                                     access={access!}
@@ -533,6 +537,9 @@ const _fragments = {
         isCompletingMessageEnabled
         currentApprovalRequestStatus
         hasStartedProcess
+        variables {
+          ...LiquidPetitionVariableProvider_PetitionVariable
+        }
         ...RecipientViewContents_PublicPetition
         ...RecipientViewProgressBar_PublicPetition
         ...useGetPetitionPages_PublicPetition
@@ -557,6 +564,7 @@ const _fragments = {
       ${getPetitionSignatureStatus.fragments.PublicPetition}
       ${RecipientViewPetitionAlerts.fragments.PublicSignatureConfig}
       ${useSignatureStatusDialog.fragments.PublicPetition}
+      ${LiquidPetitionVariableProvider.fragments.PetitionVariable}
     `;
   },
   get PublicUser() {

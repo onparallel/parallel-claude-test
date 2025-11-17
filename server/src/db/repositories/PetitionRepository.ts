@@ -143,11 +143,17 @@ import {
 } from "../notifications";
 import { FileRepository, ReadOnlyFileRepository } from "./FileRepository";
 
-export interface PetitionVariable {
+type PetitionVariableType = "NUMBER" | "ENUM";
+
+export interface PetitionVariable<
+  T extends PetitionVariableType = any,
+  TValue = T extends "NUMBER" ? number : T extends "ENUM" ? string : never,
+> {
+  type: T;
   name: string;
-  default_value: number;
-  show_in_replies: boolean;
-  value_labels: { value: number; label: string }[];
+  default_value: TValue;
+  show_in_replies?: boolean;
+  value_labels?: { value: TValue; label: string }[] | null;
 }
 
 export interface PetitionCustomList {
@@ -2922,10 +2928,25 @@ export class PetitionRepository extends BaseRepository {
       const petitionProperties = propertiesByPetitionId[id];
       return {
         id,
-        variables: (petitionProperties?.variables ?? []).map((v) => ({
-          name: v.name,
-          defaultValue: v.default_value,
-        })),
+        variables: (petitionProperties?.variables ?? []).map((v) => {
+          if (v.type === "ENUM") {
+            return {
+              type: "ENUM" as const,
+              name: v.name,
+              defaultValue: v.default_value as string,
+              valueLabels: v.value_labels as { value: string; label: string }[],
+            };
+          } else if (v.type === "NUMBER") {
+            return {
+              type: "NUMBER" as const,
+              name: v.name,
+              defaultValue: v.default_value as number,
+              valueLabels: (v.value_labels ?? []) as { value: number; label: string }[],
+            };
+          } else {
+            never("Unimplemented variable type");
+          }
+        }),
         customLists: petitionProperties?.custom_lists ?? [],
         automaticNumberingConfig: petitionProperties?.automatic_numbering_config
           ? { numberingType: petitionProperties.automatic_numbering_config.numbering_type }
@@ -2942,15 +2963,17 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
-  async getPetitionVariables(petitionIds: number[]) {
-    const petitionVariables = await this.from("petition")
-      .whereIn("id", petitionIds)
+  async getPetitionVariables(petitionId: number, key?: string) {
+    const [{ variables }] = await this.from("petition")
+      .where("id", petitionId)
       .whereNull("deleted_at")
-      .select(["id", "variables"]);
+      .select("variables");
 
-    const variablesByPetitionId = indexBy(petitionVariables, (v) => v.id);
-
-    return petitionIds.map((id) => variablesByPetitionId[id]?.variables ?? []);
+    if (key) {
+      return variables.filter((v) => v.name === key);
+    } else {
+      return variables;
+    }
   }
 
   async getLastPetitionReplyStatusChangeEvents(petitionIds: number[]) {
@@ -8650,10 +8673,11 @@ export class PetitionRepository extends BaseRepository {
         update petition
         set 
           variables = coalesce(variables, '[]') || jsonb_build_object(
+            'type', ?::text,
             'name', ?::text,
-            'default_value', ?::float,
+            'default_value', ?,
             'show_in_replies', ?::boolean,
-            'value_labels', ?::jsonb
+            'value_labels', ?
           ),
           last_change_at = now(),
           updated_at = now(),
@@ -8662,10 +8686,11 @@ export class PetitionRepository extends BaseRepository {
         returning *;
       `,
       [
+        data.type,
         data.name,
-        data.default_value,
-        data.show_in_replies,
-        JSON.stringify(data.value_labels),
+        this.json(data.default_value),
+        data.show_in_replies ?? true,
+        this.json(data.value_labels),
         updatedBy,
         petitionId,
       ],
@@ -8677,7 +8702,7 @@ export class PetitionRepository extends BaseRepository {
   async updateVariable(
     petitionId: number,
     key: string,
-    data: Omit<PetitionVariable, "name">,
+    data: Partial<Omit<PetitionVariable, "name" | "type">>,
     updatedBy: string,
   ) {
     const [petition] = await this.raw<Petition>(
@@ -8688,10 +8713,11 @@ export class PetitionRepository extends BaseRepository {
           select jsonb_agg(
             case
               when element->>'name' = ? then jsonb_build_object(
+                'type', element->>'type',
                 'name', ?::text,
-                'default_value', ?::float,
-                'show_in_replies', ?::boolean,
-                'value_labels', ?::jsonb
+                'default_value', coalesce(?, element->'default_value'),
+                'show_in_replies', coalesce(?, element->'show_in_replies'),
+                'value_labels', coalesce(?, element->'value_labels')
               )
               else element
             end
@@ -8707,9 +8733,9 @@ export class PetitionRepository extends BaseRepository {
       [
         key,
         key,
-        data.default_value,
-        data.show_in_replies,
-        JSON.stringify(data.value_labels),
+        isNonNullish(data.default_value) ? this.json(data.default_value) : null,
+        isNonNullish(data.show_in_replies) ? data.show_in_replies : null,
+        isNonNullish(data.value_labels) ? this.json(data.value_labels) : null,
         updatedBy,
         petitionId,
       ],
@@ -8744,7 +8770,7 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadResolvedPetitionVariables = this.buildLoader<
     number,
-    { name: string; value: number | null }[]
+    { name: string; value: number | string | null }[]
   >(async (petitionIds) => {
     const composedPetitions = await this.getComposedPetitionFieldsAndVariables(
       petitionIds as number[],
@@ -8758,7 +8784,10 @@ export class PetitionRepository extends BaseRepository {
         const total = finalVariables[variable.name];
         return {
           name: variable.name,
-          value: isFinite(total) ? total : null,
+          value:
+            (typeof total === "number" && isFinite(total)) || typeof total === "string"
+              ? total
+              : null,
         };
       });
     });

@@ -3174,7 +3174,7 @@ describe("GraphQL/Petition Fields", () => {
     beforeEach(async () => {
       // reset the petition before each test to be able to reuse it
       [userPetition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
-        variables: [{ name: "score", default_value: 0 }],
+        variables: [{ type: "NUMBER", name: "score", default_value: 0 }],
       }));
 
       fields = await mocks.createRandomPetitionFields(userPetition.id, 7, (index) => {
@@ -3456,9 +3456,9 @@ describe("GraphQL/Petition Fields", () => {
         .where("id", userPetition.id)
         .update({
           variables: JSON.stringify([
-            { name: "var_1", default_value: 0 },
-            { name: "var_2", default_value: 0 },
-            { name: "var_3", default_value: 0 },
+            { name: "var_1", type: "NUMBER", default_value: 0 },
+            { name: "var_2", type: "NUMBER", default_value: 0 },
+            { name: "var_3", type: "NUMBER", default_value: 0 },
           ]),
         });
 
@@ -3471,8 +3471,10 @@ describe("GraphQL/Petition Fields", () => {
               math
               petition {
                 variables {
-                  name
-                  defaultValue
+                  ... on PetitionVariableNumber {
+                    name
+                    defaultValue
+                  }
                 }
               }
             }

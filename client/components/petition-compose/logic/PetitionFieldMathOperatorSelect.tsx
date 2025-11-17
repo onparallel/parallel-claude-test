@@ -28,6 +28,30 @@ export function PetitionFieldMathOperatorSelect({
   const options = useMemo<PetitionFieldMathOperatorSelectOption[]>(
     () => [
       {
+        value: "ASSIGNATION",
+        label: intl.formatMessage({
+          id: "component.petition-field-math-operator-select.assignation",
+          defaultMessage: "Assign",
+        }),
+        icon: <AssignIcon />,
+      },
+      {
+        value: "ASSIGNATION_IF_LOWER",
+        label: intl.formatMessage({
+          id: "component.petition-field-math-operator-select.assignation-if-lower",
+          defaultMessage: "Assign if lower",
+        }),
+        icon: <AssignIcon />,
+      },
+      {
+        value: "ASSIGNATION_IF_GREATER",
+        label: intl.formatMessage({
+          id: "component.petition-field-math-operator-select.assignation-if-greater",
+          defaultMessage: "Assign if greater",
+        }),
+        icon: <AssignIcon />,
+      },
+      {
         value: "ADDITION",
         label: intl.formatMessage({
           id: "component.petition-field-math-operator-select.addition",
@@ -58,30 +82,6 @@ export function PetitionFieldMathOperatorSelect({
           defaultMessage: "Divide",
         }),
         icon: <DivideIcon />,
-      },
-      {
-        value: "ASSIGNATION",
-        label: intl.formatMessage({
-          id: "component.petition-field-math-operator-select.assignation",
-          defaultMessage: "Assign",
-        }),
-        icon: <AssignIcon />,
-      },
-      {
-        value: "ASSIGNATION_IF_LOWER",
-        label: intl.formatMessage({
-          id: "component.petition-field-math-operator-select.assignation-if-lower",
-          defaultMessage: "Assign if lower",
-        }),
-        icon: <AssignIcon />,
-      },
-      {
-        value: "ASSIGNATION_IF_GREATER",
-        label: intl.formatMessage({
-          id: "component.petition-field-math-operator-select.assignation-if-greater",
-          defaultMessage: "Assign if greater",
-        }),
-        icon: <AssignIcon />,
       },
     ],
     [],

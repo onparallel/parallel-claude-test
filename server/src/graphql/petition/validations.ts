@@ -14,6 +14,7 @@ import { NexusGenInputs } from "../__types";
 import { ArgWithPath, getArgWithPath } from "../helpers/authorize";
 import { ArgValidationError, InvalidReplyError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
+import { FIELD_REFERENCE_REGEX } from "./mutations";
 
 export function validatePublicPetitionLinkSlug<TypeName extends string, FieldName extends string>(
   prop: ArgWithPath<TypeName, FieldName, string | null | undefined>,
@@ -451,6 +452,94 @@ export function validateCommentContentSchema<TypeName extends string, FieldName 
     );
     if (!valid) {
       throw new ArgValidationError(info, argName, ajv.errorsText());
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+function validateVariableData(
+  type: "NUMBER" | "ENUM",
+  data: {
+    defaultValue: any;
+    valueLabels?: { value: any; label: string }[] | null;
+  },
+) {
+  if (type === "NUMBER") {
+    assert(typeof data.defaultValue === "number", `defaultValue must be a number`);
+    for (const vl of data.valueLabels ?? []) {
+      const index = (data.valueLabels ?? []).indexOf(vl);
+      assert(typeof vl.value === "number", `valueLabels[${index}].value must be a number`);
+    }
+  } else if (type === "ENUM") {
+    assert(typeof data.defaultValue === "string", `defaultValue must be a string`);
+    assert(
+      isNonNullish(data.valueLabels) && data.valueLabels.length > 0,
+      `valueLabels must be an array with at least one element`,
+    );
+    for (const vl of data.valueLabels) {
+      const index = data.valueLabels.indexOf(vl);
+      assert(typeof vl.value === "string", `valueLabels[${index}].value must be a string`);
+      assert(
+        FIELD_REFERENCE_REGEX.test(vl.value),
+        `valueLabels[${index}].value must match the regex ${FIELD_REFERENCE_REGEX.source}`,
+      );
+    }
+    const uniqueValues = unique(data.valueLabels.map((vl) => vl.value));
+    assert(uniqueValues.length === data.valueLabels.length, `valueLabels must have unique values`);
+    assert(
+      data.valueLabels.some((vl) => vl.value === data.defaultValue),
+      `defaultValue must be one of the valueLabels values`,
+    );
+  } else {
+    throw new Error(`Invalid variable type: ${type}`);
+  }
+}
+
+export function validateCreatePetitionVariableInput<
+  TypeName extends string,
+  FieldName extends string,
+>(prop: ArgWithPath<TypeName, FieldName, NexusGenInputs["CreatePetitionVariableInput"]>) {
+  return (async (_, args, ctx, info) => {
+    const [input, argName] = getArgWithPath(args, prop);
+
+    try {
+      validateVariableData(input.type, input);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new ArgValidationError(info, argName, error.message.replace("Assertion Error: ", ""));
+      }
+      throw error;
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+export function validateUpdatePetitionVariableInput<
+  TypeName extends string,
+  FieldName extends string,
+>(
+  petitionIdProp: ArgWithPath<TypeName, FieldName, number>,
+  keyProp: ArgWithPath<TypeName, FieldName, string>,
+  inputProp: ArgWithPath<TypeName, FieldName, NexusGenInputs["UpdatePetitionVariableInput"]>,
+) {
+  return (async (_, args, ctx, info) => {
+    const [petitionId] = getArgWithPath(args, petitionIdProp);
+    const [key] = getArgWithPath(args, keyProp);
+    const [input, argName] = getArgWithPath(args, inputProp);
+
+    const [variable] = await ctx.petitions.getPetitionVariables(petitionId, key);
+    if (!variable) {
+      return;
+    }
+
+    try {
+      validateVariableData(variable.type, {
+        defaultValue: input.defaultValue ?? variable.default_value,
+        valueLabels: input.valueLabels ?? variable.value_labels,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new ArgValidationError(info, argName, error.message.replace("Assertion Error: ", ""));
+      }
+      throw error;
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

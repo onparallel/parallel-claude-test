@@ -797,7 +797,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                         );
 
                         return (
-                          <LiquidPetitionVariableProvider key={field.id} logic={logic}>
+                          <LiquidPetitionVariableProvider
+                            key={field.id}
+                            logic={logic}
+                            variables={petition.variables}
+                          >
                             <Box
                               position="relative"
                               _focusWithin={{
@@ -1008,6 +1012,9 @@ const _fragments = {
         timezone
         ...ConfirmPetitionSignersDialog_SignatureConfig
       }
+      variables {
+        ...LiquidPetitionVariableProvider_PetitionVariable
+      }
       permanentDeletionAt
       ...useAllFieldsWithIndices_PetitionBase
       ...useGetPetitionPages_PetitionBase
@@ -1048,6 +1055,7 @@ const _fragments = {
     ${PetitionPreviewRightPaneTabs.fragments.PetitionBase}
     ${PetitionRepliesFieldComments.fragments.PetitionField}
     ${PetitionRepliesFieldComments.fragments.PetitionBase}
+    ${LiquidPetitionVariableProvider.fragments.PetitionVariable}
   `,
   Query: gql`
     fragment PetitionPreview_Query on Query {

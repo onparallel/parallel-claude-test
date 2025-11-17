@@ -8,6 +8,7 @@ import { assert } from "ts-essentials";
 import { PetitionFieldType } from "../db/__types";
 import { completedFieldReplies } from "./completedFieldReplies";
 import { letters, numbers, romanNumerals } from "./generators";
+import { never } from "./never";
 import { UnwrapArray } from "./types";
 
 export interface PetitionFieldLogic {
@@ -96,7 +97,8 @@ export interface PetitionFieldMathRule {
 type PetitionFieldMathOperand =
   | { type: "NUMBER"; value: number }
   | { type: "FIELD"; fieldId: number }
-  | { type: "VARIABLE"; name: string };
+  | { type: "VARIABLE"; name: string }
+  | { type: "ENUM"; value: string };
 
 export type PetitionFieldMathOperator =
   | "ASSIGNATION"
@@ -116,9 +118,9 @@ export interface PetitionFieldMathOperation {
 interface FieldLogic {
   isVisible: boolean;
   headerNumber?: string | null;
-  previousVariables: Record<string, number>;
-  currentVariables: Record<string, number>;
-  finalVariables: Record<string, number>;
+  previousVariables: Record<string, number | string>;
+  currentVariables: Record<string, number | string>;
+  finalVariables: Record<string, number | string>;
 }
 
 export interface FieldLogicResult extends FieldLogic {
@@ -148,12 +150,15 @@ interface FieldLogicPetitionFieldInput extends FieldLogicPetitionFieldInner {
   })[];
 }
 
-export interface FieldLogicPetitionInput {
-  variables: { name: string; defaultValue: number }[];
+export interface FieldLogicPetitionInput<TFieldInput = FieldLogicPetitionFieldInput> {
+  variables: (
+    | { type: "NUMBER"; name: string; defaultValue: number }
+    | { type: "ENUM"; name: string; defaultValue: string; valueLabels: { value: string }[] }
+  )[];
   customLists: { name: string; values: string[] }[];
   automaticNumberingConfig: { numberingType: "NUMBERS" | "LETTERS" | "ROMAN_NUMERALS" } | null;
   standardListDefinitions: { listName: string; values: { key: string }[] }[];
-  fields: FieldLogicPetitionFieldInput[];
+  fields: TFieldInput[];
 }
 
 export function mapFieldLogic<
@@ -331,16 +336,20 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
 
       function getOperandValue(
         operand: PetitionFieldMathOperand,
-        currentVariables: Record<string, number>,
-      ): number | null {
+        currentVariables: Record<string, number | string>,
+      ): number | string | null {
         if (operand.type === "NUMBER") {
           return operand.value;
         } else if (operand.type === "FIELD") {
           const referencedField = fieldsById[operand.fieldId];
           const replies = getReplies(referencedField);
           return replies.length > 0 ? (replies[0].content.value as number) : null;
-        } else {
+        } else if (operand.type === "VARIABLE") {
           return currentVariables[operand.name];
+        } else if (operand.type === "ENUM") {
+          return operand.value;
+        } else {
+          never("Unimplemented operand type");
         }
       }
 
@@ -378,6 +387,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
                   operation,
                   currentVariables,
                   getOperandValue(operation.operand, currentVariables),
+                  petition.variables,
                 );
               }
             }
@@ -424,16 +434,20 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
 
             function getOperandValue(
               operand: PetitionFieldMathOperand,
-              currentVariables: Record<string, number>,
-            ): number | null {
+              currentVariables: Record<string, number | string>,
+            ): number | string | null {
               if (operand.type === "NUMBER") {
                 return operand.value;
               } else if (operand.type === "FIELD") {
                 const referencedField = fieldsById[operand.fieldId];
                 const replies = getReplies(referencedField);
                 return replies.length > 0 ? (replies[0].content.value as number) : null;
-              } else {
+              } else if (operand.type === "VARIABLE") {
                 return currentVariables[operand.name];
+              } else if (operand.type === "ENUM") {
+                return operand.value;
+              } else {
+                never("Unimplemented operand type");
               }
             }
 
@@ -467,6 +481,7 @@ export function evaluateFieldLogic(petition: FieldLogicPetitionInput): FieldLogi
                           operation,
                           currentVariables,
                           getOperandValue(operation.operand, currentVariables),
+                          petition.variables,
                         );
                       }
                     }
@@ -516,7 +531,7 @@ function fieldConditionIsMet(
         ? (reply.content.value?.[condition.column]?.[1] ?? null)
         : reply.content.value;
 
-    return evaluatePredicate(_value, operator, value, petition, field.type);
+    return evaluateValuePredicate(_value, operator, value, petition, field.type);
   }
 
   const { type, options } = field;
@@ -533,7 +548,7 @@ function fieldConditionIsMet(
         options,
         replies,
       });
-      return evaluatePredicate(completed.length, operator, value, petition, field.type);
+      return evaluateValuePredicate(completed.length, operator, value, petition, field.type);
     default:
       return false;
   }
@@ -541,14 +556,29 @@ function fieldConditionIsMet(
 
 function variableConditionIsMet(
   condition: PetitionFieldLogicVariableCondition,
-  currentVariables: Record<string, number>,
+  currentVariables: Record<string, number | string>,
   petition: FieldLogicPetitionInput,
 ) {
   const { operator, value, variableName } = condition;
-  return evaluatePredicate(currentVariables[variableName], operator, value, petition);
+
+  const variable = petition.variables.find((v) => v.name === variableName);
+  assert(isNonNullish(variable), `Variable ${variableName} not found`);
+
+  if (variable.type === "NUMBER") {
+    return evaluateValuePredicate(currentVariables[variableName], operator, value, petition);
+  } else if (variable.type === "ENUM") {
+    return evaluateEnumPredicate(
+      currentVariables[variableName],
+      operator,
+      value,
+      variable.valueLabels.map((v) => v.value),
+    );
+  } else {
+    never("Unimplemented variable type");
+  }
 }
 
-function evaluatePredicate(
+function evaluateValuePredicate(
   reply: string | number | string[] | number[],
   operator: PetitionFieldLogicConditionOperator,
   value: string | string[] | number | null,
@@ -672,13 +702,81 @@ function evaluatePredicate(
   }
 }
 
+function evaluateEnumPredicate(
+  currentValue: string | number,
+  operator: PetitionFieldLogicConditionOperator,
+  value: string | string[] | number | null,
+  options: string[],
+) {
+  assert(
+    typeof currentValue === "string",
+    `expected currentValue to be string, got ${typeof currentValue}`,
+  );
+  assert(typeof value === "string", `expected value to be string, got ${typeof value}`);
+  assert(
+    options.some((v) => v === currentValue),
+    `expected currentValue to be one of the options`,
+  );
+  assert(
+    options.some((v) => v === value),
+    `expected value to be one of the options`,
+  );
+
+  switch (operator) {
+    case "EQUAL":
+      return currentValue === value;
+    case "NOT_EQUAL":
+      return currentValue !== value;
+    case "LESS_THAN":
+      return options.indexOf(currentValue) < options.indexOf(value);
+    case "LESS_THAN_OR_EQUAL":
+      return options.indexOf(currentValue) <= options.indexOf(value);
+    case "GREATER_THAN":
+      return options.indexOf(currentValue) > options.indexOf(value);
+    case "GREATER_THAN_OR_EQUAL":
+      return options.indexOf(currentValue) >= options.indexOf(value);
+    default:
+      throw new Error(`Unimplemented operator ${operator} for ENUM condition`);
+  }
+}
+
 function applyMathOperation(
   operation: PetitionFieldMathOperation,
-  currentVariables: Record<string, number>,
-  value: number | null,
+  currentVariables: Record<string, number | string>,
+  value: number | string | null,
+  variables: FieldLogicPetitionInput["variables"],
 ) {
+  const variable = variables.find((v) => v.name === operation.variable);
+  assert(isNonNullish(variable), `Variable ${operation.variable} not found`);
   const currentValue = currentVariables[operation.variable];
+
+  if (variable.type === "NUMBER") {
+    currentVariables[operation.variable] = applyMathNumberOperation(currentValue, operation, value);
+  } else if (variable.type === "ENUM") {
+    currentVariables[operation.variable] = applyMathEnumOperation(
+      currentValue,
+      operation,
+      value,
+      variable.valueLabels.map((v) => v.value),
+    );
+  }
+}
+
+function applyMathNumberOperation(
+  currentValue: number | string,
+  operation: PetitionFieldMathOperation,
+  value: number | string | null,
+) {
   let result: number;
+
+  assert(
+    typeof currentValue === "number",
+    `expected currentValue to be number, got ${typeof currentValue}`,
+  );
+  assert(
+    value === null || typeof value === "number",
+    `expected value to be number or null, got ${typeof value}`,
+  );
   if (Number.isNaN(currentValue) || value === null) {
     result = NaN;
   } else {
@@ -704,12 +802,49 @@ function applyMathOperation(
       case "DIVISION":
         result = currentValue / value;
         break;
+      default:
+        never(`Invalid operator ${operation.operator} for NUMBER math operation`);
     }
   }
   if (!isFinite(result)) {
     result = NaN;
   }
-  currentVariables[operation.variable] = result;
+
+  return result;
+}
+
+function applyMathEnumOperation(
+  currentValue: number | string,
+  operation: PetitionFieldMathOperation,
+  value: number | string | null,
+  options: string[],
+) {
+  assert(
+    typeof currentValue === "string",
+    `current value for variable ${operation.variable} is not a string`,
+  );
+  assert(typeof value === "string", `value for variable ${operation.variable} is not a string`);
+  let result: string;
+
+  if (currentValue === value) {
+    result = currentValue;
+  } else {
+    switch (operation.operator) {
+      case "ASSIGNATION":
+        result = value;
+        break;
+      case "ASSIGNATION_IF_LOWER":
+        result = options.indexOf(value) < options.indexOf(currentValue) ? value : currentValue;
+        break;
+      case "ASSIGNATION_IF_GREATER":
+        result = options.indexOf(value) > options.indexOf(currentValue) ? value : currentValue;
+        break;
+      default:
+        never(`Invalid operator ${operation.operator} for ENUM math operation`);
+    }
+  }
+
+  return result;
 }
 
 export function evaluateVisibilityArray<T extends { visibility?: any | null }>(

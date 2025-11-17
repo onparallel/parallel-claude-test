@@ -22,11 +22,13 @@ import {
   PetitionFieldLogicCondition,
   PetitionFieldLogicConditionLogicalJoin,
   PetitionFieldMath,
+  PetitionFieldMathOperand,
   PetitionFieldMathOperation,
   PetitionFieldMathRule,
 } from "@parallel/utils/fieldLogic/types";
 import { Fragment, SetStateAction, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
 import { noop } from "ts-essentials";
 import { PetitionFieldLogicAddConditionButton } from "./PetitionFieldLogicAddConditionButton";
 import { PetitionFieldLogicConditionEditor } from "./PetitionFieldLogicConditionEditor";
@@ -35,6 +37,7 @@ import {
   PetitionFieldLogicContext,
   usePetitionFieldLogicContext,
 } from "./PetitionFieldLogicContext";
+import { PetitionFieldMathEnumSelect } from "./PetitionFieldMathEnumSelect";
 import { PetitionFieldMathOperandSelect } from "./PetitionFieldMathOperandSelect";
 import { PetitionFieldMathOperatorSelect } from "./PetitionFieldMathOperatorSelect";
 import { PetitionVariableSelect } from "./PetitionVariableSelect";
@@ -45,7 +48,9 @@ export interface PetitionFieldMathEditorProps {
   onMathChange: (math: PetitionFieldMath) => void;
   showErrors?: boolean;
   isReadOnly?: boolean;
-  onCreateVariable?: (name: string) => Promise<string>;
+  onCreateVariable?: (
+    defaultName: string,
+  ) => Promise<{ name: string; type: string; defaultValue?: string }>;
 }
 
 const MAX_CALCULATIONS = 10;
@@ -90,7 +95,7 @@ export function PetitionFieldMathEditor({
       operations: [
         {
           variable: "",
-          operator: "ADDITION",
+          operator: "ASSIGNATION",
           operand: { type: "NUMBER", value: 0 },
         },
       ],
@@ -168,7 +173,9 @@ function PetitionFieldMathRow({
   onRowChange: (value: PetitionFieldMathRule) => void;
   onDelete?: () => void;
   showErrors?: boolean;
-  onCreateVariable?: (name: string) => Promise<string>;
+  onCreateVariable?: (
+    defaultName: string,
+  ) => Promise<{ name: string; type: string; defaultValue?: string }>;
 }) {
   const intl = useIntl();
   function setMath(dispatch: (prev: PetitionFieldMathRule) => PetitionFieldMathRule) {
@@ -205,6 +212,7 @@ function PetitionFieldMathRow({
       variables.map((v) => ({
         label: v.name,
         value: v.name,
+        variable: v,
       })),
     [Object.keys(variables).join(",")],
   );
@@ -289,67 +297,139 @@ function PetitionFieldMathRow({
       ) : null}
       <Grid
         templateColumns={{
-          base: "auto minmax(160px, 1fr) 2fr auto 1fr",
-          xl: "auto 160px 3fr auto 2fr",
+          base: "auto minmax(160px, 1fr) auto 1fr 2fr",
+          xl: "auto 160px auto 2fr 3fr",
         }}
         alignItems="start"
         columnGap={2}
         rowGap={2}
       >
-        {row.operations.map((operation, index) => (
-          <Fragment key={index}>
-            {index === 0 ? (
-              <Center height="30px" fontSize="sm" paddingStart={2}>
+        {row.operations.map((operation, index) => {
+          const variable = variables.find((v) => v.name === operation.variable);
+
+          return (
+            <Fragment key={index}>
+              {index === 0 ? (
+                <Center height="30px" fontSize="sm" paddingStart={2}>
+                  <FormattedMessage
+                    id="component.petition-field-math-editor.then"
+                    defaultMessage="Then"
+                  />
+                </Center>
+              ) : (
+                <Flex justifyContent="flex-start">
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
+                    icon={<DeleteIcon />}
+                    aria-label={intl.formatMessage({
+                      id: "generic.remove",
+                      defaultMessage: "Remove",
+                    })}
+                    onClick={() =>
+                      setOperations((operations) => operations.filter((_, i) => i !== index))
+                    }
+                  />
+                </Flex>
+              )}
+              <PetitionFieldMathOperatorSelect
+                value={operation.operator}
+                onChange={(value) => {
+                  if (
+                    !["ASSIGNATION", "ASSIGNATION_IF_LOWER", "ASSIGNATION_IF_GREATER"].includes(
+                      value ?? "",
+                    ) &&
+                    variable?.type === "ENUM"
+                  ) {
+                    updateOperation(index, {
+                      ...operation,
+                      operand: { type: "NUMBER", value: 0 },
+                      variable: "",
+                      operator: value!,
+                    });
+                  } else {
+                    updateOperation(index, { ...operation, operator: value! });
+                  }
+                }}
+              />
+              <Center height="30px" fontSize="sm">
                 <FormattedMessage
-                  id="component.petition-field-math-editor.then"
-                  defaultMessage="Then"
+                  id="component.petition-field-math-editor.to"
+                  defaultMessage="to"
                 />
               </Center>
-            ) : (
-              <Flex justifyContent="flex-start">
-                <IconButton
-                  variant="ghost"
-                  size="sm"
-                  icon={<DeleteIcon />}
-                  aria-label={intl.formatMessage({
-                    id: "generic.remove",
-                    defaultMessage: "Remove",
-                  })}
-                  onClick={() =>
-                    setOperations((operations) => operations.filter((_, i) => i !== index))
+              <PetitionVariableSelect
+                size="sm"
+                options={
+                  ["ASSIGNATION", "ASSIGNATION_IF_LOWER", "ASSIGNATION_IF_GREATER"].includes(
+                    operation.operator,
+                  )
+                    ? variableOptions
+                    : variableOptions.filter((v) => v.variable.type === "NUMBER")
+                }
+                value={operation.variable}
+                onChange={(value) => {
+                  const variable = variables.find((v) => v.name === value);
+
+                  updateOperation(index, {
+                    ...operation,
+                    operand:
+                      operation.operand.type === "ENUM" && variable?.type !== "ENUM"
+                        ? {
+                            type: "NUMBER" as const,
+                            value: 0,
+                          }
+                        : variable?.__typename === "PetitionVariableEnum"
+                          ? { type: "ENUM", value: variable.defaultEnum }
+                          : operation.operand,
+                    variable: value!,
+                  });
+                }}
+                isInvalid={showErrors && !operation.variable}
+                onCreateVariable={
+                  onCreateVariable &&
+                  (async (defaultName) => {
+                    try {
+                      const { name, type, defaultValue } = await onCreateVariable(defaultName);
+
+                      updateOperation(index, {
+                        ...operation,
+                        operand:
+                          operation.operand.type === "ENUM" && type !== "ENUM"
+                            ? {
+                                type: "NUMBER" as const,
+                                value: 0,
+                              }
+                            : type === "ENUM" && isNonNullish(defaultValue)
+                              ? { type: "ENUM" as const, value: defaultValue }
+                              : operation.operand,
+                        variable: name,
+                      });
+                    } catch {}
+                  })
+                }
+              />
+
+              {variable?.__typename === "PetitionVariableEnum" ? (
+                <PetitionFieldMathEnumSelect
+                  value={operation.operand.type === "ENUM" ? operation.operand.value : ""}
+                  variable={variable}
+                  onChange={(value) =>
+                    updateOperation(index, {
+                      ...operation,
+                      operand: { type: "ENUM", value },
+                    })
                   }
                 />
-              </Flex>
-            )}
-            <PetitionFieldMathOperatorSelect
-              value={operation.operator}
-              onChange={(value) => updateOperation(index, { ...operation, operator: value! })}
-            />
-            <PetitionFieldMathOperandSelect
-              value={operation.operand}
-              onChange={(value) => updateOperation(index, { ...operation, operand: value! })}
-            />
-            <Center height="30px" fontSize="sm">
-              <FormattedMessage id="component.petition-field-math-editor.to" defaultMessage="to" />
-            </Center>
-            <PetitionVariableSelect
-              size="sm"
-              options={variableOptions}
-              value={operation.variable}
-              onChange={(value) => updateOperation(index, { ...operation, variable: value! })}
-              isInvalid={showErrors && !operation.variable}
-              onCreateVariable={
-                onCreateVariable &&
-                (async (name) => {
-                  try {
-                    const value = await onCreateVariable(name);
-                    updateOperation(index, { ...operation, variable: value! });
-                  } catch {}
-                })
-              }
-            />
-          </Fragment>
-        ))}
+              ) : (
+                <PetitionFieldMathOperandSelect
+                  value={operation.operand}
+                  onChange={(value) => updateOperation(index, { ...operation, operand: value! })}
+                />
+              )}
+            </Fragment>
+          );
+        })}
       </Grid>
       <HStack justify="space-between">
         {row.operations.length >= MAX_OPERATIONS ? null : (
@@ -398,6 +478,7 @@ export function PetitionFieldMathRowReadOnly({
   fieldLogicChanges?: FieldLogicChange[] | null;
   filterByVariable?: string;
 }) {
+  const { variables } = usePetitionFieldLogicContext();
   return (
     <Stack spacing={2} padding={2} borderRadius="md" backgroundColor="purple.75">
       <Grid templateColumns="auto 1fr" alignItems="start" columnGap={2} rowGap={2}>
@@ -445,6 +526,7 @@ export function PetitionFieldMathRowReadOnly({
             return null;
           }
           const fieldLogicChange = fieldLogicChanges?.[index];
+          const variable = variables.find((v) => v.name === operation.variable);
           return (
             <Fragment key={index}>
               <Box justifySelf="flex-end" fontSize="sm" height="auto">
@@ -462,11 +544,20 @@ export function PetitionFieldMathRowReadOnly({
                   isReadOnly={true}
                 />
                 <Box as="span">
-                  <PetitionFieldMathOperandSelect
-                    value={operation.operand}
-                    onChange={noop}
-                    isReadOnly={true}
-                  />
+                  {variable?.__typename === "PetitionVariableEnum" ? (
+                    <PetitionFieldMathEnumSelect
+                      value={operation.operand.type === "ENUM" ? operation.operand.value : ""}
+                      variable={variable}
+                      onChange={noop}
+                      isReadOnly={true}
+                    />
+                  ) : (
+                    <PetitionFieldMathOperandSelect
+                      value={operation.operand as PetitionFieldMathOperand}
+                      onChange={noop}
+                      isReadOnly={true}
+                    />
+                  )}
                 </Box>
                 {operation.operand.type !== "NUMBER" && (
                   <Badge colorScheme="yellow" fontSize="sm">
@@ -481,7 +572,7 @@ export function PetitionFieldMathRowReadOnly({
                 </Box>
                 <Badge
                   display="block"
-                  colorScheme="blue"
+                  colorScheme={variable?.type === "ENUM" ? "green" : "blue"}
                   fontSize="sm"
                   textTransform="none"
                   whiteSpace="nowrap"

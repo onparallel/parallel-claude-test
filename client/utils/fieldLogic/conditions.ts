@@ -1,4 +1,4 @@
-import { PetitionField } from "@parallel/graphql/__types";
+import { PetitionField, PetitionVariableType } from "@parallel/graphql/__types";
 import { format } from "date-fns";
 import { FieldOptions } from "../fieldOptions";
 import { isFileTypeField } from "../isFileTypeField";
@@ -42,9 +42,24 @@ export function defaultFieldCondition<T extends Pick<PetitionField, "id" | "type
   };
 }
 
-export function defaultVariableCondition(variableName: string): PetitionFieldLogicCondition {
+export function defaultVariableCondition({
+  name,
+  type,
+  defaultValue,
+}: {
+  name: string;
+  type: PetitionVariableType;
+  defaultValue?: string;
+}): PetitionFieldLogicCondition {
+  if (type === "ENUM") {
+    return {
+      variableName: name,
+      operator: "EQUAL",
+      value: defaultValue ?? "",
+    };
+  }
   return {
-    variableName,
+    variableName: name,
     operator: "GREATER_THAN",
     value: 0,
   };

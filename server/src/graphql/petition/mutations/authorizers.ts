@@ -3,7 +3,7 @@ import { isNonNullish, isNullish, partition } from "remeda";
 import { ApiContext } from "../../../context";
 import { PetitionPermissionType, UserStatus } from "../../../db/__types";
 import { PetitionFieldOptions } from "../../../services/PetitionFieldService";
-import { PetitionFieldVisibility } from "../../../util/fieldLogic";
+import { PetitionFieldLogicCondition, PetitionFieldVisibility } from "../../../util/fieldLogic";
 import { toGlobalId } from "../../../util/globalId";
 import { never } from "../../../util/never";
 import { Maybe, MaybeArray, unMaybeArray } from "../../../util/types";
@@ -217,7 +217,7 @@ export function petitionVariableCanBeCreated<
   };
 }
 
-export function variableIsNotBeingReferencedByFieldLogic<
+function variableIsNotReferencedInFieldLogic<
   TypeName extends string,
   FieldName extends string,
   TArgPetitionId extends Arg<TypeName, FieldName, number>,
@@ -269,7 +269,7 @@ export function variableIsNotBeingReferencedByFieldLogic<
   };
 }
 
-export function variableIsNotBeingReferencedByApprovalFlowConfig<
+function variableIsNotReferencedInApprovalFlowConfig<
   TypeName extends string,
   FieldName extends string,
   TArgPetitionId extends Arg<TypeName, FieldName, number>,
@@ -301,7 +301,39 @@ export function variableIsNotBeingReferencedByApprovalFlowConfig<
   };
 }
 
-export function variableIsNotBeingReferencedOnLogicConditions<
+function variableIsNotReferencedInPetitionAttachmentsVisibility<
+  TypeName extends string,
+  FieldName extends string,
+  TArgPetitionId extends Arg<TypeName, FieldName, number>,
+  TArgVariableName extends Arg<TypeName, FieldName, string>,
+>(
+  petitionIdArg: TArgPetitionId,
+  variableNameArg: TArgVariableName,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = getArg(args, petitionIdArg);
+    const variableName = getArg(args, variableNameArg);
+
+    const petitionAttachments = await ctx.petitions.loadPetitionAttachmentsByPetitionId(petitionId);
+
+    if (
+      petitionAttachments.some((a) =>
+        a.visibility?.conditions.some(
+          (c: PetitionFieldLogicCondition) =>
+            "variableName" in c && c.variableName === variableName,
+        ),
+      )
+    ) {
+      throw new ApolloError(
+        "The variable is being referenced in a petition attachment visibility condition.",
+        "VARIABLE_IS_REFERENCED_IN_PETITION_ATTACHMENTS_VISIBILITY",
+      );
+    }
+    return true;
+  };
+}
+
+export function variableIsNotReferencedInLogicConditions<
   TypeName extends string,
   FieldName extends string,
   TArgPetitionId extends Arg<TypeName, FieldName, number>,
@@ -311,8 +343,9 @@ export function variableIsNotBeingReferencedOnLogicConditions<
   variableNameArg: TArgVariableName,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return and(
-    variableIsNotBeingReferencedByFieldLogic(petitionIdArg, variableNameArg),
-    variableIsNotBeingReferencedByApprovalFlowConfig(petitionIdArg, variableNameArg),
+    variableIsNotReferencedInFieldLogic(petitionIdArg, variableNameArg),
+    variableIsNotReferencedInApprovalFlowConfig(petitionIdArg, variableNameArg),
+    variableIsNotReferencedInPetitionAttachmentsVisibility(petitionIdArg, variableNameArg),
   );
 }
 

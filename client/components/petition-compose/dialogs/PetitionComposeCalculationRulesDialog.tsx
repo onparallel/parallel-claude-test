@@ -14,6 +14,7 @@ import {
   PetitionComposeCalculationRulesDialog_petitionDocument,
   PetitionComposeCalculationRulesDialog_PetitionFieldFragment,
   PetitionComposeCalculationRulesDialog_PetitionFragment,
+  PetitionVariableType,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex, useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import {
@@ -32,6 +33,7 @@ import { PetitionFieldMathRowReadOnly } from "../logic/PetitionFieldMathEditor";
 interface PetitionComposeCalculationRulesDialogProps {
   petitionId: string;
   variableName: string;
+  variableType: PetitionVariableType;
   showFieldLogicChanges?: boolean;
 }
 
@@ -39,6 +41,7 @@ type PetitionComposeCalculationRulesDialogSteps = {
   LOADING: PetitionComposeCalculationRulesDialogProps;
   CONTENT: {
     variableName: string;
+    variableType: PetitionVariableType;
     petition: PetitionComposeCalculationRulesDialog_PetitionFragment;
     showFieldLogicChanges?: boolean;
   };
@@ -50,6 +53,7 @@ type PetitionFieldWithChildren =
 function PetitionComposeCalculationRulesDialogLoading({
   petitionId,
   variableName,
+  variableType,
   showFieldLogicChanges,
   onStep,
   ...props
@@ -60,9 +64,14 @@ function PetitionComposeCalculationRulesDialogLoading({
 
   useEffect(() => {
     if (!loading && data?.petition) {
-      onStep("CONTENT", { petition: data.petition, variableName, showFieldLogicChanges });
+      onStep("CONTENT", {
+        petition: data.petition,
+        variableName,
+        variableType,
+        showFieldLogicChanges,
+      });
     }
-  }, [loading, data?.petition, onStep, variableName, showFieldLogicChanges]);
+  }, [loading, data?.petition, onStep, variableName, variableType, showFieldLogicChanges]);
 
   return (
     <ConfirmDialog
@@ -98,6 +107,7 @@ function PetitionComposeCalculationRulesDialogLoading({
 export function PetitionComposeCalculationRulesDialog({
   petition,
   variableName,
+  variableType,
   showFieldLogicChanges,
   ...props
 }: WizardStepDialogProps<PetitionComposeCalculationRulesDialogSteps, "CONTENT", void>) {
@@ -135,7 +145,19 @@ export function PetitionComposeCalculationRulesDialog({
             <FormattedMessage
               id="component.petition-compose-calculation-rules-dialog.description"
               defaultMessage="Rules that determine the value of {variableName}"
-              values={{ variableName: <Badge colorScheme="blue">{variableName}</Badge> }}
+              values={{
+                variableName: (
+                  <Badge
+                    colorScheme={variableType === "NUMBER" ? "blue" : "green"}
+                    textTransform="inherit"
+                    fontSize="md"
+                    top="-1px"
+                    position="relative"
+                  >
+                    {variableName}
+                  </Badge>
+                ),
+              }}
             />
           </Text>
 

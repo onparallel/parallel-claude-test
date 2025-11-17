@@ -131,7 +131,11 @@ export function RecipientViewPetitionFieldGroup({
           >
             {zip(group.children!, groupLogic).map(([{ field, replies }, logic]) => {
               return (
-                <LiquidPetitionVariableProvider key={field.id} logic={logic}>
+                <LiquidPetitionVariableProvider
+                  key={field.id}
+                  logic={logic}
+                  variables={petition.variables}
+                >
                   <RecipientViewPetitionFieldGroupField
                     parentReplyId={group.id}
                     field={{ ...field, replies }}
@@ -634,7 +638,11 @@ RecipientViewPetitionFieldGroup.fragments = {
     fragment RecipientViewPetitionFieldGroup_PublicPetition on PublicPetition {
       status
       ...usePetitionCanFinalize_PublicPetition
+      variables {
+        ...LiquidPetitionVariableProvider_PetitionVariable
+      }
     }
     ${usePetitionCanFinalize.fragments.PublicPetition}
+    ${LiquidPetitionVariableProvider.fragments.PetitionVariable}
   `,
 };

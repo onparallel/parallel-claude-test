@@ -343,7 +343,11 @@ export function PreviewPetitionFieldGroup({
                 assert(isNonNullish(childField), `Field ${_children.id} not found`);
 
                 return (
-                  <LiquidPetitionVariableProvider key={childField.id} logic={logic}>
+                  <LiquidPetitionVariableProvider
+                    key={childField.id}
+                    logic={logic}
+                    variables={petition.variables}
+                  >
                     <PreviewPetitionFieldGroupField
                       user={user}
                       parentReplyId={group.id}
@@ -595,10 +599,14 @@ PreviewPetitionFieldGroup.fragments = {
       ...PreviewPetitionFieldBackgroundCheck_PetitionBase
       ...PreviewPetitionFieldKyc_PetitionBase
       ...usePetitionCanFinalize_PetitionBase
+      variables {
+        ...LiquidPetitionVariableProvider_PetitionVariable
+      }
     }
     ${PreviewPetitionFieldBackgroundCheck.fragments.PetitionBase}
     ${PreviewPetitionFieldKyc.fragments.PetitionBase}
     ${usePetitionCanFinalize.fragments.PetitionBase}
+    ${LiquidPetitionVariableProvider.fragments.PetitionVariable}
   `,
   PetitionField: gql`
     fragment PreviewPetitionFieldGroup_PetitionField on PetitionField {

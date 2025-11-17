@@ -298,7 +298,10 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
             headers.splice(Object.keys(row).length, 0, header);
           }
 
-          row[columnId] = isFinite(value) ? value.toString() : "";
+          row[columnId] =
+            (typeof value === "number" && isFinite(value)) || typeof value === "string"
+              ? value.toString()
+              : "";
         }
 
         function replyContent(

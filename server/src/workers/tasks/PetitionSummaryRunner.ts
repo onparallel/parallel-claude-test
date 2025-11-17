@@ -24,6 +24,7 @@ import { evaluateFieldLogic, FieldLogicResult } from "../../util/fieldLogic";
 import { fullName } from "../../util/fullName";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { createLiquid } from "../../util/liquid";
+import { UnwrapArray, UnwrapPromise } from "../../util/types";
 import { TaskRunner } from "../helpers/TaskRunner";
 
 const SUMMARY_FIELD_TYPES = [
@@ -229,7 +230,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
               field.description,
               {
                 ...petitionFieldsScope,
-                ...this.buildPetitionVariablesLiquidScope(logic),
+                ...this.buildPetitionVariablesLiquidScope(logic, composedPetition.variables),
               },
               { globals: { intl } },
             )
@@ -253,7 +254,10 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
                             field.description,
                             {
                               ...petitionFieldsScope,
-                              ...this.buildPetitionVariablesLiquidScope(logic),
+                              ...this.buildPetitionVariablesLiquidScope(
+                                logic,
+                                composedPetition.variables,
+                              ),
                             },
                             { globals: { intl } },
                           )
@@ -352,7 +356,18 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
     }
   }
 
-  private buildPetitionVariablesLiquidScope(logic: FieldLogicResult) {
+  private buildPetitionVariablesLiquidScope(
+    logic: FieldLogicResult,
+    variables: UnwrapArray<
+      UnwrapPromise<ReturnType<typeof this.ctx.petitions.getComposedPetitionFieldsAndVariables>>
+    >["variables"],
+  ) {
+    const valueLabels = Object.fromEntries(
+      variables.map((v) => [
+        v.name,
+        Object.fromEntries(v.valueLabels.map((l) => [l.value, l.label])),
+      ]),
+    );
     return Object.fromEntries(
       Object.keys(logic.finalVariables).map((key) => [
         key,
@@ -360,6 +375,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
           logic.finalVariables[key],
           logic.currentVariables[key],
           logic.previousVariables[key],
+          valueLabels[key]?.[logic.finalVariables[key]] ?? null,
         ),
       ]),
     );
@@ -368,9 +384,10 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
 
 class PetitionVariableDrop extends Drop {
   constructor(
-    public final: number,
-    public after: number,
-    public before: number,
+    public final: number | string,
+    public after: number | string,
+    public before: number | string,
+    public label: string | null,
   ) {
     super();
   }

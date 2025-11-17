@@ -994,7 +994,7 @@ export function firstChildHasType<
   };
 }
 
-function fieldIsNotBeingReferencedByAnotherFieldLogic<
+function fieldIsNotReferencedInFieldLogic<
   TypeName extends string,
   FieldName extends string,
   TArgPetitionId extends Arg<TypeName, FieldName, number>,
@@ -1065,9 +1065,9 @@ export function fieldAliasIsAvailable<
   return async (_, args, ctx) => {
     const petitionId = getArg(args, petitionIdArg);
     const alias = getArg(args, aliasArg);
-    const [petitionVariables] = await ctx.petitions.getPetitionVariables([petitionId]);
+    const [petitionVariable] = await ctx.petitions.getPetitionVariables(petitionId, alias);
 
-    if (petitionVariables.some((v) => v.name === alias)) {
+    if (petitionVariable) {
       throw new ApolloError(`Alias is being used as petition variable`, "ALIAS_ALREADY_EXISTS");
     }
 
@@ -1659,7 +1659,7 @@ function fieldIsNotReferencedInPetitionAttachmentsVisibility<
   };
 }
 
-export function fieldIsNotReferencedOnLogicConditions<
+export function fieldIsNotReferencedInLogicConditions<
   TypeName extends string,
   FieldName extends string,
   TArgPetitionId extends Arg<TypeName, FieldName, number>,
@@ -1669,7 +1669,7 @@ export function fieldIsNotReferencedOnLogicConditions<
   fieldIdArg: TArgFieldId,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return and(
-    fieldIsNotBeingReferencedByAnotherFieldLogic(petitionIdArg, fieldIdArg),
+    fieldIsNotReferencedInFieldLogic(petitionIdArg, fieldIdArg),
     fieldIsNotReferencedInApprovalFlowConfig(petitionIdArg, fieldIdArg),
     fieldIsNotReferencedInPetitionAttachmentsVisibility(petitionIdArg, fieldIdArg),
   );

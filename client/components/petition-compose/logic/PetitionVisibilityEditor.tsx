@@ -88,7 +88,14 @@ export function PetitionVisibilityEditor({
             ? [defaultFieldCondition(referenceField)]
             : petition.variables.length
               ? ([
-                  defaultVariableCondition(petition.variables[0].name),
+                  defaultVariableCondition({
+                    name: petition.variables[0].name,
+                    type: petition.variables[0].type,
+                    defaultValue:
+                      petition.variables[0].__typename === "PetitionVariableEnum"
+                        ? petition.variables[0].defaultEnum
+                        : undefined,
+                  }),
                 ] as PetitionFieldLogicCondition[])
               : ([{}] as PetitionFieldLogicCondition[]),
       }

@@ -70,7 +70,8 @@ export interface PetitionFieldMathRule {
 export type PetitionFieldMathOperand =
   | { type: "NUMBER"; value: number }
   | { type: "FIELD"; fieldId: string }
-  | { type: "VARIABLE"; name: string };
+  | { type: "VARIABLE"; name: string }
+  | { type: "ENUM"; value: string };
 
 export type PetitionFieldMathOperator =
   | "ASSIGNATION"
@@ -90,18 +91,18 @@ export interface PetitionFieldMathOperation {
 export interface FieldLogic {
   isVisible: boolean;
   headerNumber?: string | null;
-  previousVariables: Record<string, number>;
-  currentVariables: Record<string, number>;
-  finalVariables: Record<string, number>;
+  previousVariables: Record<string, number | string>;
+  currentVariables: Record<string, number | string>;
+  finalVariables: Record<string, number | string>;
   changes: FieldLogicChange[];
 }
 
 export interface FieldLogicChange {
   rule: PetitionFieldMathRule;
   operation: PetitionFieldMathOperation;
-  operandValue: number | null;
-  previousValue: number | null;
-  newValue: number | null;
+  operandValue: number | string | null;
+  previousValue: number | string | null;
+  newValue: number | string | null;
 }
 
 export interface FieldLogicResult extends FieldLogic {

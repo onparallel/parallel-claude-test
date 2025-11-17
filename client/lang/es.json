@@ -2810,96 +2810,6 @@
     "context": "New team"
   },
   {
-    "term": "component.create-or-edit-petition-variable-dialog.add-label",
-    "definition": "Agregar etiqueta",
-    "context": "Add label"
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.add-value-labels",
-    "definition": "Usar etiquetas para los valores",
-    "context": "Add value labels"
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.add-value-labels-description",
-    "definition": "Muestra una etiqueta diferente según el valor.",
-    "context": "Change the label of the variable depending on the value."
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.create-title",
-    "definition": "Nueva variable",
-    "context": "New variable"
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.duplicate-value-error",
-    "definition": "Este valor ya existe",
-    "context": "This value already exists"
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.edit-title",
-    "definition": "Editar variable",
-    "context": "Edit variable"
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.info-name-variable",
-    "definition": "Una vez añadida la variable el nombre no se podrá editar.",
-    "context": "Once the variable is added, its name cannot be edited."
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.label",
-    "definition": "Etiqueta",
-    "context": "Label"
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.label-placeholder",
-    "definition": "Ej: Bajo, Medio, Alto",
-    "context": "e.g. Low, Medium, High"
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.show-in-replies",
-    "definition": "Mostrar en la sección de revisión",
-    "context": "Show in the review section"
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.show-in-replies-description",
-    "definition": "Si activas esta opción, la variable aparecerá en la sección de revisión.",
-    "context": "If you enable this option, the variable will appear in the review section."
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.unique-identifier-alredy-exists",
-    "definition": "Este identificador ya está siendo utilizado",
-    "context": "This identifier is already in use"
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.value",
-    "definition": "Valor",
-    "context": "Value"
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.value-placeholder",
-    "definition": "Ej: 1, 2, 3",
-    "context": "e.g. 1, 2, 3"
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.variable-initial-value",
-    "definition": "Valor inicial",
-    "context": "Initial value"
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.variable-invalid-error",
-    "definition": "El nombre debe empezar con letras y solo pueden contener letras, números y _",
-    "context": "The name must begin with letters and can only contain letters, numbers and _"
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.variable-name",
-    "definition": "Nombre de la variable",
-    "context": "Variable name"
-  },
-  {
-    "term": "component.create-or-edit-petition-variable-dialog.variable-name-placeholder",
-    "definition": "Ej: precio, score",
-    "context": "e.g: price, score"
-  },
-  {
     "term": "component.create-or-update-document-theme-dialog.create-theme-button",
     "definition": "Crear tema",
     "context": "Create theme"
@@ -2983,6 +2893,151 @@
     "term": "component.create-or-update-field-group-relationships-dialog.select-a-group",
     "definition": "Selecciona un grupo...",
     "context": "Select a group..."
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.add-label",
+    "definition": "Agregar etiqueta",
+    "context": "Add label"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.add-value-labels",
+    "definition": "Usar etiquetas para los valores",
+    "context": "Add value labels"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.add-value-labels-description",
+    "definition": "Muestra una etiqueta diferente según el valor.",
+    "context": "Change the label of the variable depending on the value."
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.duplicate-value-error",
+    "definition": "Este valor ya existe",
+    "context": "This value already exists"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.edit-variable-title",
+    "definition": "Editar {variableName}",
+    "context": "Edit {variableName}"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.enum-variable-title",
+    "definition": "Crear variable de enumeración",
+    "context": "Create enum variable"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.info-name-variable",
+    "definition": "Una vez añadida la variable el nombre no se podrá editar.",
+    "context": "Once the variable is added, its name cannot be edited."
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.internal-value-placeholder",
+    "definition": "Ej: bajo, medio, alto",
+    "context": "e.g. low, medium, high"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.label",
+    "definition": "Etiqueta",
+    "context": "Label"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.label-placeholder",
+    "definition": "Ej: Bajo, Medio, Alto",
+    "context": "e.g. Low, Medium, High"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.numeric-variable-title",
+    "definition": "Crear variable numérica",
+    "context": "Create numeric variable"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.options-label",
+    "definition": "Etiqueta",
+    "context": "Label"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.options-value-label",
+    "definition": "Valor interno",
+    "context": "Internal value"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.options-value-label-help",
+    "definition": "Este es el valor almacenado internamente.",
+    "context": "This is the value stored internally."
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.select-variable-type",
+    "definition": "Selecciona el tipo de variable que mejor se adapte a tus necesidades.",
+    "context": "Select the variable type that best fits your needs."
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.select-variable-type-title",
+    "definition": "¿Qué quieres crear?",
+    "context": "What do you want to create?"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.show-in-replies",
+    "definition": "Mostrar en la sección de revisión",
+    "context": "Show in the review section"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.show-in-replies-description",
+    "definition": "Si activas esta opción, la variable aparecerá en la sección de revisión.",
+    "context": "If you enable this option, the variable will appear in the review section."
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.unique-identifier-alredy-exists",
+    "definition": "Este identificador ya está siendo utilizado",
+    "context": "This identifier is already in use"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.value",
+    "definition": "Valor",
+    "context": "Value"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.value-placeholder",
+    "definition": "Ej: 1, 2, 3",
+    "context": "e.g. 1, 2, 3"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.variable-initial-value",
+    "definition": "Valor inicial",
+    "context": "Initial value"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.variable-invalid-error",
+    "definition": "El nombre debe empezar con letras y solo pueden contener letras, números y _",
+    "context": "The name must begin with letters and can only contain letters, numbers and _"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.variable-name",
+    "definition": "Nombre de la variable",
+    "context": "Variable name"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.variable-name-placeholder",
+    "definition": "Ej: precio, score",
+    "context": "e.g: price, score"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.variable-type-enum",
+    "definition": "Enumeración",
+    "context": "Enum"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.variable-type-enum-description",
+    "definition": "Una variable de enumeración que puede ser utilizada para seleccionar un valor de una lista de opciones.",
+    "context": "An enum variable that can be used to select a value from a list of options."
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.variable-type-number",
+    "definition": "Número",
+    "context": "Number"
+  },
+  {
+    "term": "component.create-or-update-petition-variable-dialog.variable-type-number-description",
+    "definition": "Una variable numérica que puede ser utilizada para realizar cálculos y comparaciones.",
+    "context": "A number variable that can be used to do calculations and comparisons."
   },
   {
     "term": "component.create-or-update-profile-type-field-dialog.profiles-with-same-content-dialog-body-1",
@@ -7378,6 +7433,11 @@
     "term": "component.petition-field-file-upload-payslip-reply.error-reading-document",
     "definition": "No hemos podido leer este documento. Por favor, revísalo para asegurar que sea el tipo de documento correcto.",
     "context": "We have not been able to read this document. Please check it to make sure it is the correct type of document."
+  },
+  {
+    "term": "component.petition-field-logic-condition-editor.is-equal-to",
+    "definition": "es igual a",
+    "context": "is equal to"
   },
   {
     "term": "component.petition-field-logic-condition-editor.view-list-content",
@@ -15370,11 +15430,6 @@
     "context": "No results"
   },
   {
-    "term": "generic.no-value",
-    "definition": "Sin valor",
-    "context": "No value"
-  },
-  {
     "term": "generic.not-available",
     "definition": "No disponible",
     "context": "Not available"
@@ -16008,6 +16063,11 @@
     "term": "generic.sent-at",
     "definition": "Fecha de envío",
     "context": "Sent at"
+  },
+  {
+    "term": "generic.set-as-default-value",
+    "definition": "Marcar como predeterminado",
+    "context": "Set as default"
   },
   {
     "term": "generic.share",
@@ -18098,6 +18158,11 @@
     "term": "page.petition-compose.variable-referenced-in-message",
     "definition": "Esta variable está referenciada en <b>{configurationName}</b> y no se puede eliminar.",
     "context": "This variable is referenced in <b>{configurationName}</b> and cannot be removed."
+  },
+  {
+    "term": "page.petition-compose.variable-referenced-in-petition-attachments-visibility",
+    "definition": "Esta variable está referenciada en las condiciones de visibilidad de un adjunto del documento. Para continuar, primero elimina las condiciones de referencia.",
+    "context": "This variable is referenced in the visibility conditions of a document attachment. To continue, first remove the referencing conditions."
   },
   {
     "term": "page.petition-replies.export-pdf",

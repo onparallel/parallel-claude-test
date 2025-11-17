@@ -45,6 +45,14 @@ export const PetitionStatus = enumType({
     },
   ],
 });
+export const PetitionVariableType = enumType({
+  name: "PetitionVariableType",
+  description: "The type of a petition variable.",
+  members: [
+    { name: "NUMBER", description: "The variable is a number." },
+    { name: "ENUM", description: "The variable is an enum." },
+  ],
+});
 
 export const PetitionApprovalRequestStatus = enumType({
   name: "PetitionApprovalRequestStatus",
@@ -1646,31 +1654,81 @@ export const FoldersInput = inputObjectType({
   },
 });
 
-export const PetitionVariableValueLabel = objectType({
-  name: "PetitionVariableValueLabel",
+export const PetitionVariableNumberValueLabel = objectType({
+  name: "PetitionVariableNumberValueLabel",
   definition(t) {
     t.nonNull.float("value");
     t.nonNull.string("label");
   },
 });
 
-export const PetitionVariable = objectType({
-  name: "PetitionVariable",
+export const PetitionVariableEnumLabel = objectType({
+  name: "PetitionVariableEnumLabel",
   definition(t) {
-    t.nonNull.string("name");
+    t.nonNull.string("value");
+    t.nonNull.string("label");
+  },
+});
+
+export const PetitionVariableNumber = objectType({
+  name: "PetitionVariableNumber",
+  definition(t) {
+    t.implements("PetitionVariable");
     t.nonNull.float("defaultValue", { resolve: (o) => o.default_value });
-    t.nonNull.boolean("showInReplies", { resolve: (o) => o.show_in_replies });
     t.nonNull.list.nonNull.field("valueLabels", {
-      type: "PetitionVariableValueLabel",
+      type: "PetitionVariableNumberValueLabel",
+      description: "The value labels of the variable.",
+      resolve: (o) => o.value_labels ?? [],
+    });
+  },
+  sourceType: /* ts */ `{
+    name: string;
+    type: "NUMBER";
+    default_value: number;
+    value_labels?: { value: number; label: string }[];
+  }`,
+});
+
+export const PetitionVariableEnum = objectType({
+  name: "PetitionVariableEnum",
+  definition(t) {
+    t.implements("PetitionVariable");
+    t.nonNull.string("defaultValue", { resolve: (o) => o.default_value });
+    t.nonNull.list.nonNull.field("valueLabels", {
+      type: "PetitionVariableEnumLabel",
       description: "The value labels of the variable.",
       resolve: (o) => o.value_labels,
     });
   },
   sourceType: /* ts */ `{
     name: string;
-    default_value: number;
+    type: "ENUM";
+    default_value: string;
+    value_labels: { value: string; label: string }[];
+  }`,
+});
+
+export const PetitionVariable = interfaceType({
+  name: "PetitionVariable",
+  definition(t) {
+    t.nonNull.string("name");
+    t.nonNull.field("type", { type: PetitionVariableType });
+    t.nonNull.boolean("showInReplies", { resolve: (o) => o.show_in_replies });
+  },
+  resolveType: (o) => {
+    if (o.type === "NUMBER") {
+      return "PetitionVariableNumber";
+    } else if (o.type === "ENUM") {
+      return "PetitionVariableEnum";
+    }
+    return null;
+  },
+  sourceType: /* ts */ `{
+    name: string;
+    type: "NUMBER" | "ENUM";
+    default_value: number | string;
     show_in_replies: boolean;
-    value_labels: { value: number; label: string }[];
+    value_labels?: { value: number | string; label: string }[];
   }`,
 });
 
@@ -1678,11 +1736,11 @@ export const PetitionVariableResult = objectType({
   name: "PetitionVariableResult",
   definition(t) {
     t.nonNull.string("name");
-    t.nullable.float("value", { resolve: (o) => o.value });
+    t.nullable.json("value", { resolve: (o) => o.value });
   },
   sourceType: /* ts */ `{
     name: string;
-    value: number | null;
+    value: number | string | null;
   }`,
 });
 

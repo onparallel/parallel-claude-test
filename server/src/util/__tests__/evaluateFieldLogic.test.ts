@@ -1018,7 +1018,7 @@ describe("evaluateFieldLogic", () => {
       expect(fields).toMatchObject([true, true, false].map((isVisible) => ({ isVisible })));
     });
 
-    it("show when variable equals value", () => {
+    it("show when NUMBER variable equals value", () => {
       const fields = evaluateFieldLogic({
         fields: [
           {
@@ -1059,8 +1059,8 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [
-          { name: "score", defaultValue: 0 },
-          { name: "price", defaultValue: 50 },
+          { type: "NUMBER", name: "score", defaultValue: 0 },
+          { type: "NUMBER", name: "price", defaultValue: 50 },
         ],
         customLists: [],
         automaticNumberingConfig: null,
@@ -1085,7 +1085,195 @@ describe("evaluateFieldLogic", () => {
       ]);
     });
 
-    it("hide when variable equals value and field has no replies", () => {
+    it("show when ENUM variable equals value", () => {
+      const fields = evaluateFieldLogic({
+        fields: [
+          {
+            id: 1,
+            type: "TEXT",
+            options: {},
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  variableName: "risk",
+                  operator: "EQUAL",
+                  value: "high",
+                },
+              ],
+            },
+            math: null,
+            replies: [],
+          },
+        ],
+        variables: [
+          { type: "NUMBER", name: "score", defaultValue: 0 },
+          {
+            type: "ENUM",
+            name: "risk",
+            defaultValue: "high",
+            valueLabels: [{ value: "low" }, { value: "medium" }, { value: "high" }],
+          },
+        ],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
+      });
+
+      expect(fields).toEqual([
+        {
+          isVisible: true,
+          previousVariables: { score: 0, risk: "high" },
+          currentVariables: { score: 0, risk: "high" },
+          finalVariables: { score: 0, risk: "high" },
+          headerNumber: null,
+        },
+      ]);
+    });
+
+    it("show when ENUM variable GREATER_THAN value", () => {
+      const fields = evaluateFieldLogic({
+        fields: [
+          {
+            id: 1,
+            type: "TEXT",
+            options: {},
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  variableName: "risk",
+                  operator: "GREATER_THAN",
+                  value: "medium",
+                },
+              ],
+            },
+            math: null,
+            replies: [],
+          },
+        ],
+        variables: [
+          { type: "NUMBER", name: "score", defaultValue: 0 },
+          {
+            type: "ENUM",
+            name: "risk",
+            defaultValue: "high",
+            valueLabels: [{ value: "low" }, { value: "medium" }, { value: "high" }],
+          },
+        ],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
+      });
+
+      expect(fields).toEqual([
+        {
+          isVisible: true,
+          previousVariables: { score: 0, risk: "high" },
+          currentVariables: { score: 0, risk: "high" },
+          finalVariables: { score: 0, risk: "high" },
+          headerNumber: null,
+        },
+      ]);
+    });
+
+    it("show when ENUM variable LESS_THAN_OR_EQUAL value", () => {
+      const fields = evaluateFieldLogic({
+        fields: [
+          {
+            id: 1,
+            type: "TEXT",
+            options: {},
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  variableName: "risk",
+                  operator: "LESS_THAN_OR_EQUAL",
+                  value: "low",
+                },
+              ],
+            },
+            math: null,
+            replies: [],
+          },
+        ],
+        variables: [
+          { type: "NUMBER", name: "score", defaultValue: 0 },
+          {
+            type: "ENUM",
+            name: "risk",
+            defaultValue: "medium",
+            valueLabels: [{ value: "low" }, { value: "medium" }, { value: "high" }],
+          },
+        ],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
+      });
+
+      expect(fields).toEqual([
+        {
+          isVisible: false,
+          previousVariables: { score: 0, risk: "medium" },
+          currentVariables: { score: 0, risk: "medium" },
+          finalVariables: { score: 0, risk: "medium" },
+          headerNumber: null,
+        },
+      ]);
+    });
+
+    it("hide when ENUM variable LESS_THAN value", () => {
+      const fields = evaluateFieldLogic({
+        fields: [
+          {
+            id: 1,
+            type: "TEXT",
+            options: {},
+            visibility: {
+              type: "HIDE",
+              operator: "AND",
+              conditions: [
+                {
+                  variableName: "risk",
+                  operator: "LESS_THAN",
+                  value: "medium",
+                },
+              ],
+            },
+            math: null,
+            replies: [],
+          },
+        ],
+        variables: [
+          { type: "NUMBER", name: "score", defaultValue: 0 },
+          {
+            type: "ENUM",
+            name: "risk",
+            defaultValue: "low",
+            valueLabels: [{ value: "low" }, { value: "medium" }, { value: "high" }],
+          },
+        ],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
+      });
+
+      expect(fields).toEqual([
+        {
+          isVisible: false,
+          previousVariables: { score: 0, risk: "low" },
+          currentVariables: { score: 0, risk: "low" },
+          finalVariables: { score: 0, risk: "low" },
+          headerNumber: null,
+        },
+      ]);
+    });
+
+    it("hide when NUMBER variable equals value and field has no replies", () => {
       const fields = evaluateFieldLogic({
         fields: [
           {
@@ -1121,7 +1309,7 @@ describe("evaluateFieldLogic", () => {
             replies: [],
           },
         ],
-        variables: [{ name: "score", defaultValue: 100 }],
+        variables: [{ type: "NUMBER", name: "score", defaultValue: 100 }],
         customLists: [],
         automaticNumberingConfig: null,
         standardListDefinitions: [],
@@ -1222,7 +1410,7 @@ describe("evaluateFieldLogic", () => {
             ],
           },
         ],
-        variables: [{ name: "score", defaultValue: 100 }],
+        variables: [{ type: "NUMBER", name: "score", defaultValue: 100 }],
         customLists: [],
         automaticNumberingConfig: null,
         standardListDefinitions: [],
@@ -1394,8 +1582,8 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [
-          { name: "score", defaultValue: 0 },
-          { name: "price", defaultValue: 50 },
+          { type: "NUMBER", name: "score", defaultValue: 0 },
+          { type: "NUMBER", name: "price", defaultValue: 50 },
         ],
         customLists: [],
         automaticNumberingConfig: { numberingType: "NUMBERS" },
@@ -1601,8 +1789,8 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [
-          { name: "score", defaultValue: 0 },
-          { name: "price", defaultValue: 50 },
+          { type: "NUMBER", name: "score", defaultValue: 0 },
+          { type: "NUMBER", name: "price", defaultValue: 50 },
         ],
         customLists: [],
         automaticNumberingConfig: { numberingType: "LETTERS" },
@@ -1808,8 +1996,8 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [
-          { name: "score", defaultValue: 0 },
-          { name: "price", defaultValue: 50 },
+          { type: "NUMBER", name: "score", defaultValue: 0 },
+          { type: "NUMBER", name: "price", defaultValue: 50 },
         ],
         customLists: [],
         automaticNumberingConfig: { numberingType: "ROMAN_NUMERALS" },
@@ -2054,7 +2242,7 @@ describe("evaluateFieldLogic", () => {
             replies: [],
           },
         ],
-        variables: [{ name: "total", defaultValue: 0 }],
+        variables: [{ type: "NUMBER", name: "total", defaultValue: 0 }],
         customLists: [],
         automaticNumberingConfig: null,
         standardListDefinitions: [],
@@ -2120,7 +2308,7 @@ describe("evaluateFieldLogic", () => {
             replies: [],
           },
         ],
-        variables: [{ name: "total", defaultValue: 0 }],
+        variables: [{ type: "NUMBER", name: "total", defaultValue: 0 }],
         customLists: [],
         automaticNumberingConfig: null,
         standardListDefinitions: [],
@@ -2179,8 +2367,8 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [
-          { name: "total", defaultValue: 10 },
-          { name: "score", defaultValue: 100 },
+          { type: "NUMBER", name: "total", defaultValue: 10 },
+          { type: "NUMBER", name: "score", defaultValue: 100 },
         ],
         customLists: [],
         automaticNumberingConfig: null,
@@ -2193,6 +2381,178 @@ describe("evaluateFieldLogic", () => {
           previousVariables: { total: 10, score: 100 },
           currentVariables: { total: 0.1, score: 100 },
           finalVariables: { total: 0.1, score: 100 },
+          headerNumber: null,
+        },
+      ]);
+    });
+
+    it("simple ASSIGNATION with ENUM operand", () => {
+      const fields = evaluateFieldLogic({
+        fields: [
+          {
+            id: 1,
+            type: "DATE",
+            options: {},
+            visibility: null,
+            math: [
+              {
+                operator: "AND",
+                conditions: [
+                  {
+                    modifier: "NUMBER_OF_REPLIES",
+                    fieldId: 1,
+                    operator: "EQUAL",
+                    value: 0,
+                  },
+                ],
+                operations: [
+                  {
+                    operator: "ASSIGNATION",
+                    operand: {
+                      type: "ENUM",
+                      value: "high",
+                    },
+                    variable: "risk",
+                  },
+                ],
+              },
+            ],
+            replies: [],
+          },
+        ],
+        variables: [
+          {
+            type: "ENUM",
+            name: "risk",
+            defaultValue: "low",
+            valueLabels: [{ value: "low" }, { value: "medium" }, { value: "high" }],
+          },
+        ],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
+      });
+
+      expect(fields).toEqual([
+        {
+          isVisible: true,
+          previousVariables: { risk: "low" },
+          currentVariables: { risk: "high" },
+          finalVariables: { risk: "high" },
+          headerNumber: null,
+        },
+      ]);
+    });
+
+    it("simple ASSIGNATION_IF_LOWER with ENUM operand", () => {
+      const fields = evaluateFieldLogic({
+        fields: [
+          {
+            id: 1,
+            type: "DATE",
+            options: {},
+            visibility: null,
+            math: [
+              {
+                operator: "AND",
+                conditions: [
+                  {
+                    variableName: "risk",
+                    operator: "EQUAL",
+                    value: "medium",
+                  },
+                ],
+                operations: [
+                  {
+                    operator: "ASSIGNATION_IF_LOWER",
+                    operand: {
+                      type: "ENUM",
+                      value: "low",
+                    },
+                    variable: "risk",
+                  },
+                ],
+              },
+            ],
+            replies: [],
+          },
+        ],
+        variables: [
+          {
+            type: "ENUM",
+            name: "risk",
+            defaultValue: "medium",
+            valueLabels: [{ value: "low" }, { value: "medium" }, { value: "high" }],
+          },
+        ],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
+      });
+
+      expect(fields).toEqual([
+        {
+          isVisible: true,
+          previousVariables: { risk: "medium" },
+          currentVariables: { risk: "low" },
+          finalVariables: { risk: "low" },
+          headerNumber: null,
+        },
+      ]);
+    });
+
+    it("simple ASSIGNATION_IF_GREATER with ENUM operand", () => {
+      const fields = evaluateFieldLogic({
+        fields: [
+          {
+            id: 1,
+            type: "DATE",
+            options: {},
+            visibility: null,
+            math: [
+              {
+                operator: "AND",
+                conditions: [
+                  {
+                    variableName: "risk",
+                    operator: "EQUAL",
+                    value: "medium",
+                  },
+                ],
+                operations: [
+                  {
+                    operator: "ASSIGNATION_IF_GREATER",
+                    operand: {
+                      type: "ENUM",
+                      value: "low",
+                    },
+                    variable: "risk",
+                  },
+                ],
+              },
+            ],
+            replies: [],
+          },
+        ],
+        variables: [
+          {
+            type: "ENUM",
+            name: "risk",
+            defaultValue: "medium",
+            valueLabels: [{ value: "low" }, { value: "medium" }, { value: "high" }],
+          },
+        ],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
+      });
+
+      expect(fields).toEqual([
+        {
+          isVisible: true,
+          previousVariables: { risk: "medium" },
+          currentVariables: { risk: "medium" },
+          finalVariables: { risk: "medium" },
           headerNumber: null,
         },
       ]);
@@ -2270,7 +2630,7 @@ describe("evaluateFieldLogic", () => {
             ],
           },
         ],
-        variables: [{ name: "price", defaultValue: 0 }],
+        variables: [{ type: "NUMBER", name: "price", defaultValue: 0 }],
         customLists: [],
         automaticNumberingConfig: null,
         standardListDefinitions: [],
@@ -2342,8 +2702,8 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [
-          { name: "score", defaultValue: 0 },
-          { name: "price", defaultValue: 1.5 },
+          { type: "NUMBER", name: "score", defaultValue: 0 },
+          { type: "NUMBER", name: "price", defaultValue: 1.5 },
         ],
         customLists: [],
         automaticNumberingConfig: null,
@@ -2399,7 +2759,7 @@ describe("evaluateFieldLogic", () => {
             replies: [{ content: { value: 0 }, anonymized_at: null }],
           },
         ],
-        variables: [{ name: "score", defaultValue: 0 }],
+        variables: [{ type: "NUMBER", name: "score", defaultValue: 0 }],
         customLists: [],
         automaticNumberingConfig: null,
         standardListDefinitions: [],
@@ -2464,7 +2824,7 @@ describe("evaluateFieldLogic", () => {
             replies: [],
           },
         ],
-        variables: [{ name: "score", defaultValue: 0 }],
+        variables: [{ type: "NUMBER", name: "score", defaultValue: 0 }],
         customLists: [],
         automaticNumberingConfig: null,
         standardListDefinitions: [],
@@ -2612,8 +2972,8 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [
-          { name: "total", defaultValue: 0 },
-          { name: "score", defaultValue: 1 },
+          { type: "NUMBER", name: "total", defaultValue: 0 },
+          { type: "NUMBER", name: "score", defaultValue: 1 },
         ],
         customLists: [],
         automaticNumberingConfig: null,
@@ -2881,7 +3241,7 @@ describe("evaluateFieldLogic", () => {
             ],
           },
         ],
-        variables: [{ name: "edad", defaultValue: 0 }],
+        variables: [{ type: "NUMBER", name: "edad", defaultValue: 0 }],
         customLists: [],
         automaticNumberingConfig: null,
         standardListDefinitions: [],
@@ -3090,8 +3450,8 @@ describe("evaluateFieldLogic", () => {
           },
         ],
         variables: [
-          { name: "score", defaultValue: 1 },
-          { name: "price", defaultValue: 2 },
+          { type: "NUMBER", name: "score", defaultValue: 1 },
+          { type: "NUMBER", name: "price", defaultValue: 2 },
         ],
         customLists: [],
         automaticNumberingConfig: null,
@@ -3241,7 +3601,7 @@ describe("evaluateFieldLogic", () => {
             replies: [],
           },
         ],
-        variables: [{ name: "score", defaultValue: 0 }],
+        variables: [{ type: "NUMBER", name: "score", defaultValue: 0 }],
         customLists: [],
         automaticNumberingConfig: null,
         standardListDefinitions: [],
@@ -3325,7 +3685,7 @@ describe("evaluateFieldLogic", () => {
             ],
           },
         ],
-        variables: [{ name: "risk", defaultValue: 0 }],
+        variables: [{ type: "NUMBER", name: "risk", defaultValue: 0 }],
         customLists: [],
         automaticNumberingConfig: null,
         standardListDefinitions: [

@@ -266,7 +266,7 @@ describe("GraphQL/Petition Approval Request", () => {
             values: [],
           },
         ]),
-        variables: [{ name: "price", default_value: 0 }],
+        variables: [{ type: "NUMBER", name: "price", default_value: 0 }],
       }));
 
       steps = await mocks.knex.from("petition_approval_request_step").insert(
