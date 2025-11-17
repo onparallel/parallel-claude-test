@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, MenuDivider, MenuItem, MenuList, Square } from "@chakra-ui/react";
+import { Flex, MenuDivider, MenuItem, MenuList, Square } from "@chakra-ui/react";
 import { AddIcon, CopyIcon, DeleteIcon, EditIcon, UserArrowIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { DashboardTabs_DashboardFragment } from "@parallel/graphql/__types";
@@ -12,10 +12,11 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
+import { OverflownText } from "../common/OverflownText";
 import { RadioTab, RadioTabList } from "../common/RadioTab";
 import { useAskNameDialog } from "../petition-list/AskNameDialog";
 import { useDashboardSharingDialog } from "./dialogs/DashboardSharingDialog";
-const MIN_TAB_WIDTH = 96;
+const MIN_TAB_WIDTH = 100;
 
 interface DashboardTabsProps {
   userId: string;
@@ -306,10 +307,9 @@ function DashboardTab({
         cursor="pointer"
         gap={{ base: 1, sm: 2 }}
         paddingEnd={{ base: 1, sm: 2 }}
+        justifyContent="space-between"
       >
-        <Box flex={1} isTruncated fontWeight={500}>
-          {dashboard.name}
-        </Box>
+        <OverflownText fontWeight={500}>{dashboard.name}</OverflownText>
         <Square size={6}>
           {isActive ? (
             <MoreOptionsMenuButton
