@@ -704,7 +704,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               onRefetchPetition={refetch}
               onToggleGeneralComments={handleToggleGeneralComments}
               isShowingGeneralComments={activeFieldId === GENERAL_COMMENTS_FIELD_ID}
-              isDisabled={isAnonymizedOrDeletionScheduled || myEffectivePermission === "READ"}
+              isDisabled={isAnonymizedOrDeletionScheduled}
             />
           ) : petition.isDocumentGenerationEnabled ? (
             <PetitionSignaturesCard
