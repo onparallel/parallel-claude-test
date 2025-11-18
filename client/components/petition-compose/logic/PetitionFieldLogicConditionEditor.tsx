@@ -122,13 +122,23 @@ export function PetitionFieldLogicConditionEditor({
           </>
         )
       ) : variable?.__typename === "PetitionVariableEnum" ? (
-        <PetitionFieldMathEnumSelect
-          value={condition.value as string}
-          onChange={(value) => {
-            onConditionChange({ ...condition, value });
-          }}
-          variable={variable}
-        />
+        <HStack>
+          <Text as="span">
+            <FormattedMessage
+              id="component.petition-field-logic-condition-editor.is-equal-to"
+              defaultMessage="is equal to"
+            />
+          </Text>
+          <Box flex="1">
+            <PetitionFieldMathEnumSelect
+              value={condition.value as string}
+              onChange={(value) => {
+                onConditionChange({ ...condition, value });
+              }}
+              variable={variable}
+            />
+          </Box>
+        </HStack>
       ) : (
         <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }} alignItems="start">
           {isMultipleValue ? (

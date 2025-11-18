@@ -2920,6 +2920,11 @@
     "context": "Edit {variableName}"
   },
   {
+    "term": "component.create-or-update-petition-variable-dialog.enum-variable-description-help",
+    "definition": "Sort the options from lowest to highest priority. This order will allow you to use comparison operators in calculations.",
+    "context": "Sort the options from lowest to highest priority. This order will allow you to use comparison operators in calculations."
+  },
+  {
     "term": "component.create-or-update-petition-variable-dialog.enum-variable-title",
     "definition": "Create enum variable",
     "context": "Create enum variable"
@@ -2961,8 +2966,8 @@
   },
   {
     "term": "component.create-or-update-petition-variable-dialog.options-value-label-help",
-    "definition": "This is the value stored internally.",
-    "context": "This is the value stored internally."
+    "definition": "This is the value stored internally. If you plan on integrating with the Parallel API, this is the value that you will obtain.",
+    "context": "This is the value stored internally. If you plan on integrating with the Parallel API, this is the value that you will obtain."
   },
   {
     "term": "component.create-or-update-petition-variable-dialog.select-variable-type",

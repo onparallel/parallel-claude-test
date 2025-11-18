@@ -757,28 +757,14 @@ function CreateOrUpdateEnumVariableDialog({
               />
             </Text>
           </Stack>
-
-          <FormControl as={HStack}>
-            <Stack flex={1} gap={1}>
-              <FormLabel margin={0}>
-                <FormattedMessage
-                  id="component.create-or-update-petition-variable-dialog.show-in-replies"
-                  defaultMessage="Show in the review section"
-                />
-              </FormLabel>
-              <FormHelperText margin={0}>
-                <FormattedMessage
-                  id="component.create-or-update-petition-variable-dialog.show-in-replies-description"
-                  defaultMessage="If you enable this option, the variable will appear in the review section."
-                />
-              </FormHelperText>
-            </Stack>
-            <Center>
-              <Switch {...register("showInReplies")} />
-            </Center>
-          </FormControl>
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="component.create-or-update-petition-variable-dialog.enum-variable-description-help"
+              defaultMessage="Sort the options from lowest to highest priority. This order will allow you to use comparison operators in calculations."
+            />
+          </Text>
           <FormProvider {...form}>
-            <Table variant="unstyled">
+            <Table variant="unstyled" insetInlineStart={-2.5} position="relative">
               <Thead>
                 <Tr>
                   <Th
@@ -812,7 +798,7 @@ function CreateOrUpdateEnumVariableDialog({
                       <Text>
                         <FormattedMessage
                           id="component.create-or-update-petition-variable-dialog.options-value-label-help"
-                          defaultMessage="This is the value stored internally."
+                          defaultMessage="This is the value stored internally. If you plan on integrating with the Parallel API, this is the value that you will obtain."
                         />
                       </Text>
                     </HelpPopover>
@@ -873,6 +859,25 @@ function CreateOrUpdateEnumVariableDialog({
               </Tfoot>
             </Table>
           </FormProvider>
+          <FormControl as={HStack}>
+            <Stack flex={1} gap={1}>
+              <FormLabel margin={0}>
+                <FormattedMessage
+                  id="component.create-or-update-petition-variable-dialog.show-in-replies"
+                  defaultMessage="Show in the review section"
+                />
+              </FormLabel>
+              <FormHelperText margin={0}>
+                <FormattedMessage
+                  id="component.create-or-update-petition-variable-dialog.show-in-replies-description"
+                  defaultMessage="If you enable this option, the variable will appear in the review section."
+                />
+              </FormHelperText>
+            </Stack>
+            <Center>
+              <Switch {...register("showInReplies")} />
+            </Center>
+          </FormControl>
         </Stack>
       }
       alternative={
