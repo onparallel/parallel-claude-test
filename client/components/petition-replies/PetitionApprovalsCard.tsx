@@ -1241,10 +1241,10 @@ function PetitionApprovalStepRow({
                 defaultMessage: "Send reminder",
               })}
               onClick={onSendReminder}
-              isDisabled={isDisabled}
+              isDisabled={isDisabled || step.status !== "PENDING"}
             />
             <MoreOptionsMenuButton
-              isDisabled={isDisabled}
+              isDisabled={isDisabled || step.status !== "PENDING"}
               variant="outline"
               options={
                 <MenuList minWidth="160px">
