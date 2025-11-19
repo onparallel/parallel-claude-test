@@ -6,6 +6,7 @@ import { ApiContext } from "../../context";
 import { PetitionField } from "../../db/__types";
 import { PetitionFieldOptions } from "../../services/PetitionFieldService";
 import { ValidateReplyContentError } from "../../services/PetitionValidationService";
+import { getAssertionErrorMessage, isAssertionError } from "../../util/assert";
 import { toBytes } from "../../util/fileSize";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
@@ -463,6 +464,7 @@ function validateVariableData(
     valueLabels?: { value: any; label: string }[] | null;
   },
 ) {
+  assert(type === "NUMBER" || type === "ENUM", `Invalid variable type: ${type}`);
   if (type === "NUMBER") {
     assert(typeof data.defaultValue === "number", `defaultValue must be a number`);
     for (const vl of data.valueLabels ?? []) {
@@ -489,8 +491,6 @@ function validateVariableData(
       data.valueLabels.some((vl) => vl.value === data.defaultValue),
       `defaultValue must be one of the valueLabels values`,
     );
-  } else {
-    throw new Error(`Invalid variable type: ${type}`);
   }
 }
 
@@ -504,8 +504,8 @@ export function validateCreatePetitionVariableInput<
     try {
       validateVariableData(input.type, input);
     } catch (error) {
-      if (error instanceof Error) {
-        throw new ArgValidationError(info, argName, error.message.replace("Assertion Error: ", ""));
+      if (isAssertionError(error)) {
+        throw new ArgValidationError(info, argName, getAssertionErrorMessage(error));
       }
       throw error;
     }
@@ -536,8 +536,8 @@ export function validateUpdatePetitionVariableInput<
         valueLabels: input.valueLabels ?? variable.value_labels,
       });
     } catch (error) {
-      if (error instanceof Error) {
-        throw new ArgValidationError(info, argName, error.message.replace("Assertion Error: ", ""));
+      if (isAssertionError(error)) {
+        throw new ArgValidationError(info, argName, getAssertionErrorMessage(error));
       }
       throw error;
     }

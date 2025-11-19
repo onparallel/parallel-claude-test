@@ -1,4 +1,5 @@
 import { indexBy, unique } from "remeda";
+import { getAssertionErrorMessage, isAssertionError } from "../../util/assert";
 import { isGlobalId, toGlobalId } from "../../util/globalId";
 import { validateProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
 import { NexusGenInputs } from "../__types";
@@ -57,12 +58,8 @@ export function validProfileListViewDataInput<TypeName extends string, FieldName
         const fieldsById = indexBy(fields, (f) => f.id);
         validateProfileFieldValuesFilter(input.values, fieldsById);
       } catch (e) {
-        if (e instanceof Error && e.message.startsWith("Assertion Error: ")) {
-          throw new ArgValidationError(
-            info,
-            `${argName}.values`,
-            e.message.slice("Assertion Error: ".length),
-          );
+        if (isAssertionError(e)) {
+          throw new ArgValidationError(info, `${argName}.values`, getAssertionErrorMessage(e));
         } else {
           throw e;
         }

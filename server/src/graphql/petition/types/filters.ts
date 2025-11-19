@@ -1,6 +1,7 @@
 import { enumType, inputObjectType } from "nexus";
 import { isNullish, partition, unique } from "remeda";
 import { assert } from "ts-essentials";
+import { getAssertionErrorMessage, isAssertionError } from "../../../util/assert";
 import { fromGlobalId, isGlobalId } from "../../../util/globalId";
 import { NexusGenInputs } from "../../__types";
 import { ArgWithPath, getArgWithPath } from "../../helpers/authorize";
@@ -92,8 +93,8 @@ export function validPetitionSharedWithFilter<TypeName extends string, FieldName
         "User groups must belong to the same organization",
       );
     } catch (e) {
-      if (e instanceof Error && e.message.startsWith("Assertion Error: ")) {
-        throw new ArgValidationError(info, argName, e.message.replace("Assertion Error: ", ""));
+      if (isAssertionError(e)) {
+        throw new ArgValidationError(info, argName, getAssertionErrorMessage(e));
       }
       throw new ArgValidationError(info, argName, "Invalid shared with filter");
     }
@@ -185,8 +186,8 @@ export function validPetitionTagFilter<TypeName extends string, FieldName extend
         "Tags must belong to the same organization",
       );
     } catch (e) {
-      if (e instanceof Error && e.message.startsWith("Assertion Error: ")) {
-        throw new ArgValidationError(info, argName, e.message.replace("Assertion Error: ", ""));
+      if (isAssertionError(e)) {
+        throw new ArgValidationError(info, argName, getAssertionErrorMessage(e));
       }
       throw new ArgValidationError(info, argName, "Invalid tags filter");
     }

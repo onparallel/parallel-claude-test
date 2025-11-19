@@ -12,6 +12,7 @@ import pMap from "p-map";
 import { indexBy, isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { ProfileTypeField } from "../../db/__types";
+import { getAssertionErrorMessage, isAssertionError } from "../../util/assert";
 import {
   ProfileFieldValuesFilterOperatorValues,
   validateProfileFieldValuesFilter,
@@ -161,12 +162,8 @@ export const profiles = queryField((t) => {
           validateProfileFieldValuesFilter(filter?.values, profileTypeFieldsById);
         }
       } catch (e) {
-        if (e instanceof Error && e.message.startsWith("Assertion Error: ")) {
-          throw new ArgValidationError(
-            info,
-            "filter.values",
-            e.message.slice("Assertion Error: ".length),
-          );
+        if (isAssertionError(e)) {
+          throw new ArgValidationError(info, "filter.values", getAssertionErrorMessage(e));
         } else {
           throw e;
         }

@@ -4,6 +4,7 @@ import { booleanArg, intArg, mutationField, nonNull, nullable, stringArg } from 
 import { indexBy, isNonNullish, isNullish, round, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { UserGroupPermissionName } from "../../db/__types";
+import { getAssertionErrorMessage, isAssertionError } from "../../util/assert";
 import { awsLogger } from "../../util/awsLogger";
 import { toBytes } from "../../util/fileSize";
 import { fullName } from "../../util/fullName";
@@ -1329,11 +1330,10 @@ export const associateProfilesToPetitionsExcel = mutationField(
       } catch (error) {
         return {
           result: RESULT.FAILURE,
-          message:
-            error instanceof Error
-              ? error.message.startsWith("Assertion Error:")
-                ? error.message.replace("Assertion Error: ", "")
-                : error.message
+          message: isAssertionError(error)
+            ? getAssertionErrorMessage(error)
+            : error instanceof Error
+              ? error.message
               : "Unknown error",
         };
       }
@@ -1473,11 +1473,10 @@ export const createProfileRelationshipsExcel = mutationField("createProfileRelat
     } catch (error) {
       return {
         result: RESULT.FAILURE,
-        message:
-          error instanceof Error
-            ? error.message.startsWith("Assertion Error:")
-              ? error.message.replace("Assertion Error: ", "")
-              : error.message
+        message: isAssertionError(error)
+          ? getAssertionErrorMessage(error)
+          : error instanceof Error
+            ? error.message
             : "Unknown error",
       };
     }

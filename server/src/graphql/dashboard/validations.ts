@@ -3,6 +3,7 @@ import { GraphQLResolveInfo } from "graphql";
 import { indexBy, isNonNullish, isNullish, partition } from "remeda";
 import { ApiContext } from "../../context";
 import { ProfileStatusValues } from "../../db/__types";
+import { getAssertionErrorMessage, isAssertionError } from "../../util/assert";
 import { fromGlobalId, isGlobalId } from "../../util/globalId";
 import { validateProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
 import { NexusGenInputs } from "../__types";
@@ -204,12 +205,8 @@ async function validateProfileFilter(
         indexBy(profileTypeFields, (f) => f.id),
       );
     } catch (error) {
-      if (error instanceof Error && error.message.startsWith("Assertion Error: ")) {
-        throw new ArgValidationError(
-          info,
-          `${argName}.values`,
-          error.message.slice("Assertion Error: ".length),
-        );
+      if (isAssertionError(error)) {
+        throw new ArgValidationError(info, `${argName}.values`, getAssertionErrorMessage(error));
       } else {
         throw error;
       }
