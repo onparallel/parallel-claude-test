@@ -235,6 +235,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
               },
             },
             signatureConfig: { merge: true },
+            variables: { merge: mergeArraysBy(["name"]) },
           },
         },
         PetitionBaseMini: {
