@@ -1797,7 +1797,7 @@ export class ProfileRepository extends BaseRepository {
     opts: {
       type: T;
       before: { eventId: number };
-      after: { type: ProfileEventType };
+      after: { type: ProfileEventType } | { createdAt: Date };
     },
   ): Promise<GenericProfileEvent<T>[]> {
     return await this.raw<GenericProfileEvent<T>>(
@@ -1812,14 +1812,23 @@ export class ProfileRepository extends BaseRepository {
               SELECT MAX(pe2.id)
               FROM profile_event pe2
               WHERE pe2.profile_id = ?
-                AND pe2.type = ?
+                AND ?
                 AND pe2.id < ?
             ),
             0
           )
         ORDER BY pe.created_at DESC, pe.id DESC
       `,
-      [profileId, opts.type, opts.before.eventId, profileId, opts.after.type, opts.before.eventId],
+      [
+        profileId,
+        opts.type,
+        opts.before.eventId,
+        profileId,
+        "type" in opts.after
+          ? this.knex.raw(/* sql */ `pe2.type = ?`, [opts.after.type])
+          : this.knex.raw(/* sql */ `pe2.created_at <= ?`, [opts.after.createdAt]),
+        opts.before.eventId,
+      ],
     );
   }
 

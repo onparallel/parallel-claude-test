@@ -176,17 +176,34 @@ export class ClientRiskUpdateListener
         }
       } else if (
         // a relationship between a client and a file was created or removed
-        ((event.type === "PROFILE_RELATIONSHIP_CREATED" ||
+        (event.type === "PROFILE_RELATIONSHIP_CREATED" ||
           event.type === "PROFILE_RELATIONSHIP_REMOVED") &&
-          event.data.profile_relationship_type_id === config.clientFileRelationshipTypeId &&
-          // there will be 2 events of this type, one for each side of the relationship
-          // we just need to handle one side, as handling both could result in race condition errors
-          [config.individual.profileTypeId, config.legalEntity.profileTypeId].includes(
-            profile.profile_type_id,
-          )) ||
+        event.data.profile_relationship_type_id === config.clientFileRelationshipTypeId &&
+        // there will be 2 events of this type, one for each side of the relationship
+        // we just need to handle one side, as handling both could result in race condition errors
+        // LEFT_SIDE: client (INDIVIDUAL or LEGAL_ENTITY)
+        // RIGHT_SIDE: file (FILE)
+        [config.individual.profileTypeId, config.legalEntity.profileTypeId].includes(
+          profile.profile_type_id,
+        )
+      ) {
+        // get every event of the same type before this event and created in the same timestamp
+        // this way we can only process the first event of this batch (user added or removed multiple relationships at the same time)
+        // and avoid race condition errors
+        const previousEvents = await this.profiles.getProfileEvents(event.profile_id, {
+          type: event.type,
+          before: { eventId: event.id },
+          after: { createdAt: event.created_at },
+        });
+
+        // if there are no previous events, it means this is the first event of this batch
+        if (previousEvents.length === 0) {
+          await this.updateGlobalClientRisk(profile, event.org_id, config);
+        }
+      } else if (
         // a file was closed or reopened
-        ((event.type === "PROFILE_CLOSED" || event.type === "PROFILE_REOPENED") &&
-          profile.profile_type_id === config.file.profileTypeId)
+        (event.type === "PROFILE_CLOSED" || event.type === "PROFILE_REOPENED") &&
+        profile.profile_type_id === config.file.profileTypeId
       ) {
         await this.updateGlobalClientRisk(profile, event.org_id, config);
       }
