@@ -349,9 +349,13 @@ export class Auth implements IAuth {
         if (isNullish(integration) || integration.org_id !== orgId) {
           throw new Error("Invalid user");
         }
-        // before creating a new user, check if already exists one with the same cognito_id
+        // before creating a new user, check if already exists one with the same cognito_id or external_id
         // if so, update its user_data.email
-        user = (await this.users.loadUsersByCognitoId(cognitoId)).find((u) => u.org_id === orgId);
+        user =
+          (await this.users.loadUsersByCognitoId(cognitoId)).find((u) => u.org_id === orgId) ??
+          (await this.users.loadUserByExternalId({ externalId, orgId })) ??
+          undefined;
+
         if (isNullish(user)) {
           const preferredLocale = this.asUserLocale(state.get("locale"));
           user = await this.accountSetup.createUser(
@@ -379,6 +383,7 @@ export class Auth implements IAuth {
               email,
               first_name: firstName,
               last_name: lastName,
+              cognito_id: cognitoId,
               is_sso_user: true,
             },
             `OrganizationSSO:${org.id}`,
