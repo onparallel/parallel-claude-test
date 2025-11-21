@@ -1124,8 +1124,10 @@ input EditProfileTypeProcessInput {
 The effective permission for a petition and user
 """
 type EffectivePetitionUserPermission {
+  isBypassed: Boolean!
+
   """
-  wether user is subscribed or not to emails and alerts of the petition
+  Whether user is subscribed or not to emails and alerts of the petition
   """
   isSubscribed: Boolean!
 

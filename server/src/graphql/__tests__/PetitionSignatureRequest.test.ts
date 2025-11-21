@@ -19,7 +19,6 @@ describe("GraphQL/PetitionSignatureRequest", () => {
   let readPetition: Petition;
   let user: User;
   let organization: Organization;
-  let readSignature: PetitionSignatureRequest;
 
   let orgIntegration: OrgIntegration;
 
@@ -34,7 +33,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
       organization.id,
       user.id,
       1,
-      () => ({ signature_config: { isEnabled: true } }),
+      () => ({ signature_config: JSON.stringify({ isEnabled: true }) }),
       () => ({
         type: "READ",
       }),
@@ -46,8 +45,10 @@ describe("GraphQL/PetitionSignatureRequest", () => {
       type: "SIGNATURE",
       is_enabled: true,
     });
+  });
 
-    [readSignature] = await mocks.createRandomPetitionSignatureRequest(readPetition.id);
+  afterEach(async () => {
+    await mocks.knex("petition_signature_request").delete();
   });
 
   afterAll(async () => {
@@ -364,6 +365,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
     });
 
     it("sends error when trying to cancel a signature with read access", async () => {
+      const [readSignature] = await mocks.createRandomPetitionSignatureRequest(readPetition.id);
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionSignatureRequestId: GID!) {
@@ -427,6 +429,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
     });
 
     it("sends error when trying to update a signature metadata with read access", async () => {
+      const [readSignature] = await mocks.createRandomPetitionSignatureRequest(readPetition.id);
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionSignatureRequestId: GID!, $metadata: JSONObject!) {
@@ -487,6 +490,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
     });
 
     it("sends error when trying to send a signature reminder with read access", async () => {
+      const [readSignature] = await mocks.createRandomPetitionSignatureRequest(readPetition.id);
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionSignatureRequestId: GID!) {

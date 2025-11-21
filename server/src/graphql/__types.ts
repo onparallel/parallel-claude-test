@@ -1430,7 +1430,7 @@ export interface NexusGenObjects {
   EffectivePetitionUserPermission: Pick<
     db.PetitionPermission,
     "petition_id" | "user_id" | "type" | "is_subscribed"
-  >;
+  > & { is_bypassed?: boolean };
   EventSubscriptionSignatureKey: db.EventSubscriptionSignatureKey;
   FeatureFlagNameValue: {
     // root type
@@ -2773,6 +2773,7 @@ export interface NexusGenFieldTypes {
   };
   EffectivePetitionUserPermission: {
     // field return type
+    isBypassed: boolean; // Boolean!
     isSubscribed: boolean; // Boolean!
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     user: NexusGenRootTypes["User"]; // User!
@@ -6122,6 +6123,7 @@ export interface NexusGenFieldTypeNames {
   };
   EffectivePetitionUserPermission: {
     // field return type name
+    isBypassed: "Boolean";
     isSubscribed: "Boolean";
     permissionType: "PetitionPermissionType";
     user: "User";

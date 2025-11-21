@@ -182,6 +182,18 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
                 },
               ]
             : []),
+          {
+            name: "PETITIONS:BYPASS_PERMISSIONS",
+            title: intl.formatMessage({
+              id: "page.permissions-group.petitions-bypass-permissions",
+              defaultMessage: "Bypass petition permissions",
+            }),
+            description: intl.formatMessage({
+              id: "page.permissions-group.petitions-bypass-permissions-description",
+              defaultMessage:
+                "Grants users in this team write access to every parallel and template in their organization, without explicitly sharing with them.",
+            }),
+          },
         ],
       },
       {

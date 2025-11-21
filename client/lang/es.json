@@ -17845,6 +17845,16 @@
     "context": "Team permissions"
   },
   {
+    "term": "page.permissions-group.petitions-bypass-permissions",
+    "definition": "Bypass permisos de parallels",
+    "context": "Bypass petition permissions"
+  },
+  {
+    "term": "page.permissions-group.petitions-bypass-permissions-description",
+    "definition": "Concede a los usuarios en este equipo permisos de escritura a todas los parallels y plantillas en su organización, sin compartir explícitamente con ellos.",
+    "context": "Grants users in this team write access to every parallel and template in their organization, without explicitly sharing with them."
+  },
+  {
     "term": "page.permissions-group.petitions-change-path",
     "definition": "Mover plantillas y parallels",
     "context": "Move templates and parallels"

@@ -17845,6 +17845,16 @@
     "context": "Team permissions"
   },
   {
+    "term": "page.permissions-group.petitions-bypass-permissions",
+    "definition": "Bypass petition permissions",
+    "context": "Bypass petition permissions"
+  },
+  {
+    "term": "page.permissions-group.petitions-bypass-permissions-description",
+    "definition": "Grants users in this team write access to every parallel and template in their organization, without explicitly sharing with them.",
+    "context": "Grants users in this team write access to every parallel and template in their organization, without explicitly sharing with them."
+  },
+  {
     "term": "page.permissions-group.petitions-change-path",
     "definition": "Move templates and parallels",
     "context": "Move templates and parallels"

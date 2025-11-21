@@ -104,7 +104,7 @@ export function userHasAccessToPublicPetitionLink<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
   argName: TArg,
-  permissionTypes?: PetitionPermissionType[],
+  permissionType?: PetitionPermissionType,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -116,7 +116,7 @@ export function userHasAccessToPublicPetitionLink<
       return await ctx.petitions.userHasAccessToPetitions(
         ctx.user!.id,
         publicPetitionLinks.map((ppl) => ppl.template_id),
-        permissionTypes,
+        permissionType,
       );
     } catch {}
     return false;

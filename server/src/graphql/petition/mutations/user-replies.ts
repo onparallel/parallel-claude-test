@@ -73,7 +73,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     ),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["FILE_UPLOAD"]),
@@ -138,7 +138,7 @@ export const createFileUploadReplyComplete = mutationField("createFileUploadRepl
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
@@ -169,7 +169,7 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
     ),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
@@ -229,7 +229,7 @@ export const updateFileUploadReplyComplete = mutationField("updateFileUploadRepl
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
@@ -275,7 +275,7 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
@@ -328,7 +328,7 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
     parentReplyId: globalIdArg("PetitionFieldReply"),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"]),
@@ -428,7 +428,7 @@ export const retryAsyncFieldCompletion = mutationField("retryAsyncFieldCompletio
     parentReplyId: globalIdArg("PetitionFieldReply"),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
@@ -476,7 +476,7 @@ export const bulkCreatePetitionReplies = mutationField("bulkCreatePetitionReplie
     replies: nonNull(jsonObjectArg()),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     not(petitionHasStatus("petitionId", "CLOSED")),
@@ -510,7 +510,7 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
   authorize: authenticateAnd(
     userHasEnabledIntegration("DOW_JONES_KYC"),
     userHasFeatureFlag("DOW_JONES_KYC"),
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["DOW_JONES_KYC"]),
@@ -596,7 +596,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
   description: "Creates multiple replies for a petition at once",
   type: list("PetitionFieldReply"),
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreOfTypePetition("petitionId"),
     fieldsBelongsToPetition("petitionId", (args) => args.fields.map((field) => field.id)),
@@ -726,7 +726,7 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
   description: "Updates multiple replies for a petition at once",
   type: list("PetitionFieldReply"),
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     repliesBelongsToPetition("petitionId", (args) => args.replies.map((r) => r.id)),
     replyIsForFieldOfType(

@@ -1,10 +1,11 @@
 import { inject, injectable } from "inversify";
-import { isNonNullish, isNullish } from "remeda";
+import { isNonNullish, isNullish, unique } from "remeda";
 import { PetitionEventType, PetitionEventTypeValues } from "../../../db/__types";
 
 import { PetitionEvent } from "../../../db/events/PetitionEvent";
 import { PetitionRepository } from "../../../db/repositories/PetitionRepository";
 import { SubscriptionRepository } from "../../../db/repositories/SubscriptionRepository";
+import { UserRepository } from "../../../db/repositories/UserRepository";
 import {
   EVENT_SUBSCRIPTION_SERVICE,
   IEventSubscriptionService,
@@ -21,6 +22,7 @@ export const PETITION_EVENT_SUBSCRIPTIONS_LISTENER = Symbol.for(
 export class PetitionEventSubscriptionsListener implements EventListener<PetitionEventType> {
   constructor(
     @inject(PetitionRepository) private petitions: PetitionRepository,
+    @inject(UserRepository) private users: UserRepository,
     @inject(SubscriptionRepository) private subscriptions: SubscriptionRepository,
     @inject(EVENT_SUBSCRIPTION_SERVICE)
     public readonly eventSubscription: IEventSubscriptionService,
@@ -33,9 +35,17 @@ export class PetitionEventSubscriptionsListener implements EventListener<Petitio
     if (!petition || petition.deletion_scheduled_at !== null) {
       return;
     }
-    const userIds = (await this.petitions.loadEffectivePermissions(petition.id)).map(
-      (p) => p.user_id!,
+
+    const bypassUsers = await this.users.getUsersWithPermission(
+      petition.org_id,
+      "PETITIONS:BYPASS_PERMISSIONS",
     );
+
+    const userIds = unique([
+      ...(await this.petitions.loadEffectivePermissions(petition.id)).map((p) => p.user_id!),
+      ...bypassUsers.map((u) => u.id),
+    ]);
+
     if (userIds.length === 0) {
       return;
     }

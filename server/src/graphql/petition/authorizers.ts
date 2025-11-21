@@ -69,7 +69,7 @@ export function userHasAccessToPetitions<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
   argName: TArg,
-  permissionTypes?: PetitionPermissionType[],
+  permissionType?: PetitionPermissionType,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -77,9 +77,7 @@ export function userHasAccessToPetitions<
       if (petitionIds.length === 0) {
         return true;
       }
-      if (
-        await ctx.petitions.userHasAccessToPetitions(ctx.user!.id, petitionIds, permissionTypes)
-      ) {
+      if (await ctx.petitions.userHasAccessToPetitions(ctx.user!.id, petitionIds, permissionType)) {
         return true;
       }
     } catch {}
@@ -93,7 +91,7 @@ export function userHasAccessToSignatureRequest<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
 >(
   argName: TArg,
-  permissionTypes?: PetitionPermissionType[],
+  permissionType?: PetitionPermissionType,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -109,7 +107,7 @@ export function userHasAccessToSignatureRequest<
       return await ctx.petitions.userHasAccessToPetitions(
         ctx.user!.id,
         unique(signatureRequests.map((s) => s!.petition_id)),
-        permissionTypes,
+        permissionType,
       );
     } catch {}
     return false;
@@ -782,7 +780,7 @@ export function userHasPermissionInFolders<
 >(
   folderIdsArg: TArgIds,
   typeArg: TArgType,
-  permissionTypes: PetitionPermissionType,
+  permissionType: PetitionPermissionType,
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -800,7 +798,7 @@ export function userHasPermissionInFolders<
         ctx.user!.org_id,
         getArg(args, typeArg) === "TEMPLATE",
         paths,
-        permissionTypes,
+        permissionType,
       );
     } catch {}
     return false;

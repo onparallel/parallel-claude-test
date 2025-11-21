@@ -116,6 +116,7 @@ function Petitions() {
   });
 
   const stateRef = useUpdatingRef(queryState);
+  const userHasBypassPermission = useHasPermission("PETITIONS:BYPASS_PERMISSIONS");
 
   const sort =
     queryState.sort ??
@@ -476,6 +477,7 @@ function Petitions() {
     selectedCount: selectedRows.length,
     hasSelectedFolders: selectedRows.some((c) => c.__typename === "PetitionFolder"),
     minimumPermission,
+    userHasBypassPermission,
     onRenameClick: handleRenameClick,
     onDeleteClick: () => handleDeleteClick(true),
     onCloneAsTemplateClick: handleCloneAsTemplate,
@@ -912,6 +914,7 @@ function usePetitionListActions({
   selectedCount,
   hasSelectedFolders,
   minimumPermission,
+  userHasBypassPermission,
   onRenameClick,
   onShareClick,
   onCloneClick,
@@ -930,6 +933,7 @@ function usePetitionListActions({
   selectedCount: number;
   hasSelectedFolders: boolean;
   minimumPermission: PetitionPermissionType;
+  userHasBypassPermission: boolean;
   onRenameClick: () => void;
   onShareClick: () => void;
   onCloneClick: () => void;
@@ -960,7 +964,7 @@ function usePetitionListActions({
         key: "recover",
         onClick: onRecoverClick,
         leftIcon: <ArchiveIcon />,
-        isDisabled: minimumPermission !== "OWNER",
+        isDisabled: !userHasBypassPermission && minimumPermission !== "OWNER",
         children: <FormattedMessage id="generic.recover" defaultMessage="Recover" />,
       },
       {

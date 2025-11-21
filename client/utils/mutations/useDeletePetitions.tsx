@@ -25,6 +25,7 @@ import { assert } from "ts-essentials";
 import { isApolloError } from "../apollo/isApolloError";
 import { partitionOnTypename } from "../apollo/typename";
 import { withError } from "../promises/withError";
+import { useHasPermission } from "../useHasPermission";
 
 export function useDeletePetitions({ modalProps }: { modalProps?: BaseModalProps } = {}) {
   const intl = useIntl();
@@ -237,12 +238,14 @@ function ConfirmDeletePetitionsDialog({
   type: PetitionBaseType;
 }>) {
   const intl = useIntl();
+  const userHasBypassPermission = useHasPermission("PETITIONS:BYPASS_PERMISSIONS");
   const [folders, petitions] = partitionOnTypename(petitionsOrFolders, "PetitionFolder");
 
   const folderPetitionCount = folders.reduce((acc, curr) => acc + curr.petitionCount, 0);
   const count = folderPetitionCount + petitions.length;
 
   const isOneSharedToMe =
+    !userHasBypassPermission &&
     petitions.length === 1 &&
     folderPetitionCount === 0 &&
     petitions.every((p) => p.myEffectivePermission?.permissionType !== "OWNER");

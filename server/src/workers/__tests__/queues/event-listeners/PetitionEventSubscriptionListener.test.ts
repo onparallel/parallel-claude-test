@@ -38,7 +38,12 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
     mocks = new Mocks(knex);
 
     [organization] = await mocks.createRandomOrganizations(1);
-    users = await mocks.createRandomUsers(organization.id, 6);
+    users = await mocks.createRandomUsers(organization.id, 7);
+
+    const [bypassGroup] = await mocks.createUserGroups(1, organization.id, [
+      { effect: "GRANT", name: "PETITIONS:BYPASS_PERMISSIONS" },
+    ]);
+    await mocks.insertUserGroupMembers(bypassGroup.id, [users[6].id]);
 
     queueSpy = jest.spyOn(container.get<IQueuesService>(QUEUES_SERVICE), "enqueueMessages");
   });
@@ -64,6 +69,7 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
     // users[3] -> WRITE. subscribed but not enabled
     // users[4] -> WRITE. not subscribed
     // users[5] -> subscribed to PETITION_CREATED but ignores their own events
+    // users[6] -> has bypass permission and is subscribed to all events
 
     await mocks.sharePetitions([petitionFromTemplate.id, petition.id], users[1].id, "READ");
     await mocks.sharePetitions([petitionFromTemplate.id, petition.id], users[2].id, "WRITE");
@@ -113,6 +119,14 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
         name: "users.5.webhook",
         ignore_owner_events: true,
       },
+      {
+        type: "PETITION",
+        user_id: users[6].id,
+        event_types: null,
+        endpoint: "https://users.6.com/events",
+        is_enabled: true,
+        name: "users.6.webhook",
+      },
     ]);
   });
 
@@ -148,7 +162,7 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
     expect(queueSpy).toHaveBeenCalledTimes(1);
     expect(queueSpy.mock.calls[0][0]).toEqual("webhooks-worker");
     expect(queueSpy.mock.calls[0][1]).toIncludeSameMembers(
-      [0, 1, 2, 4].map((index) => ({
+      [0, 1, 2, 4, 5].map((index) => ({
         id: `webhook-${toGlobalId("EventSubscription", subscriptions[index].id)}`,
         body: {
           subscriptionId: subscriptions[index].id,
@@ -182,11 +196,11 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
     expect(queueSpy.mock.calls[0][0]).toEqual("webhooks-worker");
-    expect(queueSpy.mock.calls[0][1]).toIncludeSameMembers([
-      {
-        id: `webhook-${toGlobalId("EventSubscription", subscriptions[0].id)}`,
+    expect(queueSpy.mock.calls[0][1]).toIncludeSameMembers(
+      [0, 5].map((index) => ({
+        id: `webhook-${toGlobalId("EventSubscription", subscriptions[index].id)}`,
         body: {
-          subscriptionId: subscriptions[0].id,
+          subscriptionId: subscriptions[index].id,
           body: {
             id: toGlobalId("PetitionEvent", event.id),
             petitionId: toGlobalId("Petition", event.petition_id),
@@ -197,8 +211,8 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
             createdAt: event.created_at,
           },
         },
-      },
-    ]);
+      })),
+    );
   });
 
   it("does not send webhook event for user who ignores their own events", async () => {
@@ -220,11 +234,11 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
 
     expect(queueSpy).toHaveBeenCalledTimes(1);
     expect(queueSpy.mock.calls[0][0]).toEqual("webhooks-worker");
-    expect(queueSpy.mock.calls[0][1]).toIncludeSameMembers([
-      {
-        id: `webhook-${toGlobalId("EventSubscription", subscriptions[0].id)}`,
+    expect(queueSpy.mock.calls[0][1]).toIncludeSameMembers(
+      [0, 1, 2, 5].map((index) => ({
+        id: `webhook-${toGlobalId("EventSubscription", subscriptions[index].id)}`,
         body: {
-          subscriptionId: subscriptions[0].id,
+          subscriptionId: subscriptions[index].id,
           body: {
             id: toGlobalId("PetitionEvent", event.id),
             petitionId: toGlobalId("Petition", event.petition_id),
@@ -235,37 +249,7 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
             createdAt: event.created_at,
           },
         },
-      },
-      {
-        id: `webhook-${toGlobalId("EventSubscription", subscriptions[1].id)}`,
-        body: {
-          subscriptionId: subscriptions[1].id,
-          body: {
-            id: toGlobalId("PetitionEvent", event.id),
-            petitionId: toGlobalId("Petition", event.petition_id),
-            type: "PETITION_CREATED",
-            data: {
-              userId: toGlobalId("User", users[5].id),
-            },
-            createdAt: event.created_at,
-          },
-        },
-      },
-      {
-        id: `webhook-${toGlobalId("EventSubscription", subscriptions[2].id)}`,
-        body: {
-          subscriptionId: subscriptions[2].id,
-          body: {
-            id: toGlobalId("PetitionEvent", event.id),
-            petitionId: toGlobalId("Petition", event.petition_id),
-            type: "PETITION_CREATED",
-            data: {
-              userId: toGlobalId("User", users[5].id),
-            },
-            createdAt: event.created_at,
-          },
-        },
-      },
-    ]);
+      })),
+    );
   });
 });

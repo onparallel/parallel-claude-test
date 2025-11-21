@@ -1047,7 +1047,8 @@ export interface EditProfileTypeProcessInput {
 /** The effective permission for a petition and user */
 export interface EffectivePetitionUserPermission {
   __typename?: "EffectivePetitionUserPermission";
-  /** wether user is subscribed or not to emails and alerts of the petition */
+  isBypassed: Scalars["Boolean"]["output"];
+  /** Whether user is subscribed or not to emails and alerts of the petition */
   isSubscribed: Scalars["Boolean"]["output"];
   /** The type of the permission. */
   permissionType: PetitionPermissionType;
@@ -15114,6 +15115,7 @@ export type PetitionHeader_PetitionFragment = {
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
+    isBypassed: boolean;
     permissionType: PetitionPermissionType;
   } | null;
 };
@@ -15152,6 +15154,7 @@ export type PetitionHeader_PetitionBase_Petition_Fragment = {
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
+    isBypassed: boolean;
     permissionType: PetitionPermissionType;
   } | null;
 };
@@ -15255,6 +15258,7 @@ export type PetitionLayout_PetitionBase_Petition_Fragment = {
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
+    isBypassed: boolean;
     permissionType: PetitionPermissionType;
   } | null;
   profiles: Array<{ __typename?: "Profile"; id: string }>;
@@ -53800,6 +53804,7 @@ export type PetitionActivity_PetitionFragment = {
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
+    isBypassed: boolean;
     permissionType: PetitionPermissionType;
   } | null;
   permissions: Array<
@@ -54167,6 +54172,7 @@ export type PetitionActivity_updatePetitionMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          isBypassed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
         permissions: Array<
@@ -55684,6 +55690,7 @@ export type PetitionActivity_petitionQuery = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          isBypassed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
         permissions: Array<
@@ -56147,6 +56154,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
+    isBypassed: boolean;
     permissionType: PetitionPermissionType;
   } | null;
   attachmentsList: {
@@ -56979,6 +56987,7 @@ export type PetitionCompose_updatePetitionMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          isBypassed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
         effectivePermissions: Array<{
@@ -57364,6 +57373,7 @@ export type PetitionCompose_updateFieldPositionsMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          isBypassed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
@@ -57494,6 +57504,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
             isSubscribed: boolean;
+            isBypassed: boolean;
             permissionType: PetitionPermissionType;
           } | null;
           profiles: Array<{ __typename?: "Profile"; id: string }>;
@@ -57799,6 +57810,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
             isSubscribed: boolean;
+            isBypassed: boolean;
             permissionType: PetitionPermissionType;
           } | null;
           profiles: Array<{ __typename?: "Profile"; id: string }>;
@@ -58045,6 +58057,7 @@ export type PetitionCompose_deletePetitionFieldMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          isBypassed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
@@ -58770,6 +58783,7 @@ export type PetitionCompose_createProfileLinkedPetitionFieldMutation = {
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
             isSubscribed: boolean;
+            isBypassed: boolean;
             permissionType: PetitionPermissionType;
           } | null;
           profiles: Array<{ __typename?: "Profile"; id: string }>;
@@ -59374,6 +59388,7 @@ export type PetitionCompose_petitionQuery = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          isBypassed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
         attachmentsList: {
@@ -59853,6 +59868,7 @@ export type PetitionMessages_PetitionBase_Petition_Fragment = {
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
+    isBypassed: boolean;
     permissionType: PetitionPermissionType;
   } | null;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
@@ -60094,6 +60110,7 @@ export type PetitionMessages_petitionQuery = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          isBypassed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
@@ -60177,6 +60194,7 @@ export type PetitionMessages_updatePetitionMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          isBypassed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
@@ -60739,6 +60757,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
+    isBypassed: boolean;
     permissionType: PetitionPermissionType;
   } | null;
   fields: Array<{
@@ -61671,6 +61690,7 @@ export type PetitionPreview_updatePetitionMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          isBypassed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
         fields: Array<{
@@ -62529,6 +62549,7 @@ export type PetitionPreview_completePetitionMutation = {
     myEffectivePermission?: {
       __typename?: "EffectivePetitionUserPermission";
       isSubscribed: boolean;
+      isBypassed: boolean;
       permissionType: PetitionPermissionType;
     } | null;
     fields: Array<{
@@ -63018,6 +63039,7 @@ export type PetitionPreview_petitionQuery = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          isBypassed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
         fields: Array<{
@@ -64319,6 +64341,7 @@ export type PetitionReplies_PetitionFragment = {
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
+    isBypassed: boolean;
     permissionType: PetitionPermissionType;
   } | null;
   profiles: Array<{
@@ -64753,6 +64776,7 @@ export type PetitionReplies_updatePetitionMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          isBypassed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
         profiles: Array<{ __typename?: "Profile"; id: string }>;
@@ -65364,6 +65388,7 @@ export type PetitionReplies_petitionQuery = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          isBypassed: boolean;
           permissionType: PetitionPermissionType;
         } | null;
         profiles: Array<{
@@ -82617,6 +82642,7 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
     }
     myEffectivePermission {
       isSubscribed
+      isBypassed
       permissionType
     }
     ...HeaderNameEditable_PetitionBase

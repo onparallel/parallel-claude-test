@@ -117,7 +117,7 @@ export const PetitionHeader = Object.assign(
     const isAnonymized = petition.__typename === "Petition" ? petition.isAnonymized : false;
     const isSubscribed =
       petition.__typename === "Petition" ? petition.myEffectivePermission!.isSubscribed : false;
-    const myEffectivePermission = petition.myEffectivePermission!.permissionType;
+    const myEffectivePermission = petition.myEffectivePermission!;
 
     const moreOptionsRef = useRef<HTMLButtonElement>(null);
 
@@ -498,7 +498,7 @@ export const PetitionHeader = Object.assign(
               render={({ children, ...props }) => (
                 <>
                   {!userCanChangePath ||
-                  myEffectivePermission === "READ" ||
+                  myEffectivePermission.permissionType === "READ" ||
                   isNonNullish(petition.permanentDeletionAt) ? (
                     <HStack minWidth={0} paddingX={1.5} color="gray.600" fontSize="sm" {...props}>
                       <FolderIcon boxSize={4} />
@@ -528,7 +528,7 @@ export const PetitionHeader = Object.assign(
             />
             {me.hasProfilesAccess &&
             petition.__typename === "Petition" &&
-            ((!petition.isAnonymized && myEffectivePermission !== "READ") ||
+            ((!petition.isAnonymized && myEffectivePermission.permissionType !== "READ") ||
               petition.profiles.length > 0) ? (
               <>
                 <Divider isVertical height={3.5} color="gray.500" />
@@ -542,7 +542,8 @@ export const PetitionHeader = Object.assign(
                   fontWeight="normal"
                   onClick={() =>
                     handleProfilesClick(
-                      petition.profiles.length === 0 && myEffectivePermission !== "READ",
+                      petition.profiles.length === 0 &&
+                        myEffectivePermission.permissionType !== "READ",
                     )
                   }
                   isDisabled={isAnonymized || isNonNullish(petition.permanentDeletionAt)}
@@ -674,7 +675,9 @@ export const PetitionHeader = Object.assign(
                         {isPetition ? (
                           <MenuItem
                             onClick={handleImportRepliesClick}
-                            isDisabled={isAnonymized || myEffectivePermission === "READ"}
+                            isDisabled={
+                              isAnonymized || myEffectivePermission.permissionType === "READ"
+                            }
                             icon={<ImportIcon display="block" boxSize={4} />}
                           >
                             <FormattedMessage
@@ -702,7 +705,7 @@ export const PetitionHeader = Object.assign(
                         {me.hasProfilesAccess &&
                         petition.__typename === "Petition" &&
                         !petition.isAnonymized &&
-                        myEffectivePermission !== "READ" ? (
+                        myEffectivePermission.permissionType !== "READ" ? (
                           <MenuItem
                             onClick={() => handleProfilesClick(true, true)}
                             isDisabled={isAnonymized}
@@ -762,7 +765,9 @@ export const PetitionHeader = Object.assign(
                           <FormattedMessage id="generic.move-to" defaultMessage="Move to..." />
                         </MenuItem>
 
-                        {isPetition && myEffectivePermission !== "READ" && status === "CLOSED" ? (
+                        {isPetition &&
+                        myEffectivePermission.permissionType !== "READ" &&
+                        status === "CLOSED" ? (
                           <MenuItem
                             onClick={handleReopenPetition}
                             isDisabled={isAnonymized}
@@ -803,7 +808,10 @@ export const PetitionHeader = Object.assign(
                             }}
                             value={isSubscribed ? "FOLLOW" : "IGNORE"}
                           >
-                            <MenuItemOption value="FOLLOW">
+                            <MenuItemOption
+                              value="FOLLOW"
+                              isDisabled={petition.myEffectivePermission?.isBypassed}
+                            >
                               <Box flex="1">
                                 <Text fontWeight="bold">
                                   <FormattedMessage
@@ -819,7 +827,10 @@ export const PetitionHeader = Object.assign(
                                 </Text>
                               </Box>
                             </MenuItemOption>
-                            <MenuItemOption value="IGNORE">
+                            <MenuItemOption
+                              value="IGNORE"
+                              isDisabled={petition.myEffectivePermission?.isBypassed}
+                            >
                               <Box flex="1">
                                 <Text fontWeight="bold">
                                   <FormattedMessage
@@ -857,7 +868,10 @@ export const PetitionHeader = Object.assign(
               <ButtonWithMoreOptions
                 leftIcon={<ArchiveIcon />}
                 flexShrink={0}
-                isDisabled={myEffectivePermission !== "OWNER"}
+                isDisabled={
+                  myEffectivePermission.permissionType !== "OWNER" &&
+                  (!isPetition || !petition.myEffectivePermission?.isBypassed)
+                }
                 onClick={handleRecoverClick}
                 data-action="recover-petition"
                 options={
@@ -900,6 +914,7 @@ export const PetitionHeader = Object.assign(
             }
             myEffectivePermission {
               isSubscribed
+              isBypassed
               permissionType
             }
 

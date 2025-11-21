@@ -342,31 +342,39 @@ export class PetitionRepository extends BaseRepository {
   async userHasAccessToPetitions(
     userId: number,
     petitionIds: MaybeArray<number>,
-    permissionTypes?: PetitionPermissionType[],
+    permissionType?: PetitionPermissionType,
   ) {
     const permissions = await this.userHasAccessToPetitionsRaw(
       userId,
       unMaybeArray(petitionIds),
-      permissionTypes,
+      permissionType,
     );
     return permissions.every((p) => p);
   }
 
-  async userHasAccessToPetitionsRaw(
+  private async userHasAccessToPetitionsRaw(
     userId: number,
     petitionIds: number[],
-    permissionTypes?: PetitionPermissionType[],
+    permissionType: PetitionPermissionType = "READ",
   ) {
+    const user = await this.loadUserBypassPetitionPermission(userId);
+    if (user) {
+      const rows = await this.from("petition")
+        .whereIn("id", petitionIds)
+        .where("org_id", user.org_id)
+        .whereNull("deleted_at")
+        .select<{ id: number }[]>(this.knex.raw(`distinct(id)`));
+
+      const ids = new Set(rows.map((r) => r.id));
+      return petitionIds.map((id) => ids.has(id) && ["READ", "WRITE"].includes(permissionType));
+    }
+
     const rows = await this.from("petition_permission")
       .where({ user_id: userId })
       .whereIn("petition_id", petitionIds)
       .whereNull("deleted_at")
       .whereNull("user_group_id")
-      .mmodify((q) => {
-        if (permissionTypes) {
-          q.whereIn("type", permissionTypes);
-        }
-      })
+      .where("type", "<=", permissionType)
       .select<{ petition_id: number }[]>(this.knex.raw(`distinct(petition_id)`));
     const ids = new Set(rows.map((r) => r.petition_id));
     return petitionIds.map((id) => ids.has(id));
@@ -517,6 +525,37 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(replyIds).size;
   }
 
+  /**
+   * Returns the user provided in key if they have the PETITIONS:BYPASS_PERMISSIONS permission.
+   */
+  readonly loadUserBypassPetitionPermission = this.buildLoader<number, User | null>(
+    async (userIds, t) => {
+      const rows = await this.raw<User>(
+        /* sql */ `
+        select u.* 
+        from "user_group" ug
+        join "user_group_permission" ugp on ugp.user_group_id = ug.id
+        join "user_group_member" ugm on ugm.user_group_id = ug.id
+        join "user" u on u.id = ugm.user_id
+        where ugp.name = 'PETITIONS:BYPASS_PERMISSIONS'
+        and ugp.deleted_at is null
+        and ug.deleted_at is null
+        and ugm.deleted_at is null
+        and u.deleted_at is null
+        and u.org_id = ug.org_id
+        and u.id in ?
+        group by u.id, ugp.name
+        having every(ugp.effect = 'GRANT')
+      `,
+        [this.sqlIn(userIds)],
+        t,
+      );
+
+      const byUserId = indexBy(rows, (r) => r.id);
+      return userIds.map((id) => byUserId[id] ?? null);
+    },
+  );
+
   getPaginatedPetitionsForUser = paginationLoader<
     | Petition
     | {
@@ -634,7 +673,7 @@ export class PetitionRepository extends BaseRepository {
     if (isNonNullish(opts.minEffectivePermission)) {
       builders.push((q) =>
         q.whereRaw(
-          "pp.effective_permission <= ?::petition_permission_type",
+          /* sql */ `coalesce(pp.effective_permission, 'WRITE'::petition_permission_type) <= ?::petition_permission_type`,
           opts.minEffectivePermission,
         ),
       );
@@ -650,6 +689,8 @@ export class PetitionRepository extends BaseRepository {
       opts.sortBy?.some((s) => s.field === "lastUsedAt") && type === "TEMPLATE";
     const needsSentAt = opts.sortBy?.some((s) => s.field === "sentAt") && type === "PETITION";
 
+    const bypassUser = await this.loadUserBypassPetitionPermission(userId);
+
     let query = this.knex
       .with(
         "_p",
@@ -657,7 +698,7 @@ export class PetitionRepository extends BaseRepository {
           .fromRaw("petition as p")
           .joinRaw(
             /* sql */ `
-            join (
+            left join (
               select pp.petition_id, min(pp.type) as effective_permission
               from petition_permission pp
                 where pp.user_id = ? 
@@ -671,6 +712,9 @@ export class PetitionRepository extends BaseRepository {
           .where("p.is_template", type === "TEMPLATE")
           .modify(function (q) {
             builders.forEach((b) => b.call(this, q));
+            if (isNullish(bypassUser)) {
+              q.whereNotNull("pp.effective_permission");
+            }
             if (needsSentAt) {
               q.joinRaw(
                 /* sql */ `left join lateral(select min(coalesce(pm.scheduled_at, pm.created_at)) as sent_at from petition_message pm where pm.petition_id = p.id) pm on true`,
@@ -685,7 +729,9 @@ export class PetitionRepository extends BaseRepository {
           })
           .select(
             "p.*",
-            "pp.effective_permission",
+            this.knex.raw(
+              /* sql */ `coalesce(pp.effective_permission, 'WRITE'::petition_permission_type) as effective_permission`,
+            ),
             needsSentAt ? "pm.sent_at" : this.knex.raw(/* sql */ `null::timestamptz as sent_at`),
             needsLastUsedAt
               ? this.knex.raw(/* sql */ `greatest(plua.last_used_at, p.created_at) as last_used_at`)
@@ -7785,14 +7831,20 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async getUserPetitionFoldersList(userId: number, orgId: number, isTemplate: boolean) {
+    const bypassUser = await this.loadUserBypassPetitionPermission(userId);
+
     const paths = await this.raw<{ path: string }>(
       /* sql */ `
-      select distinct("path") from petition p
-      join petition_permission pp on p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null
-      where p.deleted_at is null and p.is_template = ? and p.org_id = ?
-      order by "path" asc;
-    `,
-      [userId, isTemplate, orgId],
+        select distinct("path") as path
+        from "petition" p
+        left join petition_permission pp on p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null
+        where p.deleted_at is null
+        and p.org_id = ?
+        and p.is_template = ?
+        and (pp.id is not null or ?::bool)
+        order by "path" asc
+      `,
+      [userId, orgId, isTemplate, isNonNullish(bypassUser)],
     );
 
     return paths.map((p) => p.path);
@@ -7808,6 +7860,16 @@ export class PetitionRepository extends BaseRepository {
     paths: string[],
     permissionType: PetitionPermissionType,
   ) {
+    // if the user is part of a "bypass" group, they will have at least WRITE permission on every petition inside any folder
+    const bypassUser = await this.loadUserBypassPetitionPermission(userId);
+    if (
+      isNonNullish(bypassUser) &&
+      bypassUser.org_id === orgId &&
+      ["READ", "WRITE"].includes(permissionType)
+    ) {
+      return true;
+    }
+
     const hasPetitionWithLowerPermission = await this.exists(
       /* sql */ `
         select min(pp.type) from petition p
@@ -7833,16 +7895,24 @@ export class PetitionRepository extends BaseRepository {
     isTemplate: boolean,
     user: User,
   ) {
+    const bypassUser = await this.loadUserBypassPetitionPermission(user.id);
+
     await this.raw(
       /* sql */ `
         with user_petition_ids as (
-          select p.id from petition p
-            join petition_permission pp on pp.petition_id = p.id
-          where pp.user_id = ? and pp.deleted_at is null
-            and p.is_template = ? and p.deleted_at is null and p.org_id = ?
-            and (p.id in ? or exists(
-              select * from unnest(?::text[]) as t(prefix) where starts_with(p.path, prefix)
-            ))
+          select p.id 
+          from petition p
+          left join petition_permission pp on pp.petition_id = p.id and pp.user_id = ? and pp.deleted_at is null
+          where 
+            p.is_template = ? 
+            and p.org_id = ?
+            and p.deleted_at is null 
+            and (pp.id is not null or ?::bool)
+            and (
+              p.id in ? or exists(
+                select * from unnest(?::text[]) as t(prefix) where starts_with(p.path, prefix)
+              )
+            )
         )
         update petition p
         set
@@ -7856,6 +7926,7 @@ export class PetitionRepository extends BaseRepository {
         user.id,
         isTemplate,
         user.org_id,
+        isNonNullish(bypassUser),
         this.sqlIn(petitionIds.length > 0 ? petitionIds : [-1]),
         this.sqlArray(paths),
         destination,
@@ -7866,19 +7937,25 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async getUserPetitionsInsideFolders(paths: string[], isTemplate: boolean, user: User) {
+    const bypassUser = await this.loadUserBypassPetitionPermission(user.id);
+
     return await this.raw<Petition>(
       /* sql */ `
-      select p.* from petition p
-        join petition_permission pp on p.id = pp.petition_id
-      where pp.user_id = ? and pp.deleted_at is null
-        and p.is_template = ? and p.deleted_at is null and p.org_id = ?
-        and exists(
-          select * from unnest(?::text[]) as t(prefix) where starts_with(p.path, prefix)
-        )
-        group by p.id
-        order by p.path asc, p.id asc;
+      select p.* 
+      from petition p
+      left join petition_permission pp on p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null
+      where 
+        p.is_template = ? 
+        and p.deleted_at is null 
+        and p.org_id = ?
+        and (pp.id is not null or ?::bool)
+      and exists(
+        select * from unnest(?::text[]) as t(prefix) where starts_with(p.path, prefix)
+      )
+      group by p.id
+      order by p.path asc, p.id asc;
     `,
-      [user.id, isTemplate, user.org_id, this.sqlArray(paths)],
+      [user.id, isTemplate, user.org_id, isNonNullish(bypassUser), this.sqlArray(paths)],
     );
   }
 

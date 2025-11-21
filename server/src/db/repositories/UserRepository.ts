@@ -126,6 +126,7 @@ export class UserRepository extends BaseRepository {
           group by user_id
         `,
         [this.sqlIn(userIds), this.sqlIn(userIds)],
+        t,
       );
       const byUserId = indexBy(results, (r) => r.user_id);
       return userIds.map((userId) => byUserId[userId]?.permissions ?? []);

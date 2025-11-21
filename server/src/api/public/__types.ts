@@ -962,7 +962,8 @@ export type EditProfileTypeProcessInput = {
 
 /** The effective permission for a petition and user */
 export type EffectivePetitionUserPermission = {
-  /** wether user is subscribed or not to emails and alerts of the petition */
+  isBypassed: Scalars["Boolean"]["output"];
+  /** Whether user is subscribed or not to emails and alerts of the petition */
   isSubscribed: Scalars["Boolean"]["output"];
   /** The type of the permission. */
   permissionType: PetitionPermissionType;

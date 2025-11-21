@@ -32,7 +32,7 @@ export const createPetitionComment = mutationField("createPetitionComment", {
       "isInternal",
       false,
       and(
-        userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+        userHasAccessToPetitions("petitionId", "WRITE"),
         ifArgDefined(
           "petitionFieldId",
           and(
@@ -46,7 +46,7 @@ export const createPetitionComment = mutationField("createPetitionComment", {
     ifArgEquals(
       "sharePetitionPermission",
       "WRITE",
-      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      userHasAccessToPetitions("petitionId", "WRITE"),
     ),
     ifArgDefined(
       "petitionFieldId",
@@ -164,7 +164,7 @@ export const updatePetitionComment = mutationField("updatePetitionComment", {
     ifArgEquals(
       "sharePetitionPermission",
       "WRITE",
-      userHasAccessToPetitions("petitionId", ["OWNER"]),
+      userHasAccessToPetitions("petitionId", "OWNER"),
       userHasAccessToPetitions("petitionId"),
     ),
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),

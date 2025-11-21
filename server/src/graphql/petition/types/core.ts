@@ -222,8 +222,25 @@ export const PetitionBase = interfaceType({
       description:
         "The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates).",
       resolve: async (root, _, ctx) => {
-        const permissions = await ctx.petitions.loadEffectivePermissions(root.id);
-        return permissions.find((p) => p.user_id === ctx.user!.id) ?? null;
+        const myPermission =
+          (await ctx.petitions.loadEffectivePermissions(root.id)).find(
+            (p) => p.user_id === ctx.user!.id,
+          ) ?? null;
+
+        if (myPermission) {
+          return myPermission;
+        }
+
+        const bypassUser = await ctx.petitions.loadUserBypassPetitionPermission(ctx.user!.id);
+        return bypassUser && root.org_id === bypassUser.org_id
+          ? {
+              type: "WRITE",
+              user_id: ctx.user!.id,
+              petition_id: root.id,
+              is_subscribed: false,
+              is_bypassed: true,
+            }
+          : null;
       },
     });
     t.list.nonNull.field("fields", {
@@ -478,8 +495,25 @@ export const PetitionBaseMini = objectType({
       description:
         "The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates).",
       resolve: async (root, _, ctx) => {
-        const permissions = await ctx.petitions.loadEffectivePermissions(root.id);
-        return permissions.find((p) => p.user_id === ctx.user!.id) ?? null;
+        const myPermission =
+          (await ctx.petitions.loadEffectivePermissions(root.id)).find(
+            (p) => p.user_id === ctx.user!.id,
+          ) ?? null;
+
+        if (myPermission) {
+          return myPermission;
+        }
+
+        const bypassUser = await ctx.petitions.loadUserBypassPetitionPermission(ctx.user!.id);
+        return bypassUser && root.org_id === bypassUser.org_id
+          ? {
+              type: "WRITE",
+              user_id: ctx.user!.id,
+              petition_id: root.id,
+              is_subscribed: false,
+              is_bypassed: true,
+            }
+          : null;
       },
     });
     t.nullable.field("status", {

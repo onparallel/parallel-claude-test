@@ -2020,7 +2020,7 @@ export const associateProfileToPetition = mutationField("associateProfileToPetit
   type: "PetitionProfile",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     userHasAccessToProfile("profileId"),
     profileIsNotAnonymized("profileId"),

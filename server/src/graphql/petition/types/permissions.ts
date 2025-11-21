@@ -49,7 +49,7 @@ export const PetitionPermission = interfaceType({
 
 export const EffectivePetitionUserPermission = objectType({
   name: "EffectivePetitionUserPermission",
-  sourceType: `Pick<db.PetitionPermission, "petition_id" | "user_id" | "type" | "is_subscribed">`,
+  sourceType: `Pick<db.PetitionPermission, "petition_id" | "user_id" | "type" | "is_subscribed"> & { is_bypassed?: boolean }`,
   description: "The effective permission for a petition and user",
   definition(t) {
     t.field("user", {
@@ -64,8 +64,11 @@ export const EffectivePetitionUserPermission = objectType({
       resolve: (o) => o.type,
     });
     t.boolean("isSubscribed", {
-      description: "wether user is subscribed or not to emails and alerts of the petition",
+      description: "Whether user is subscribed or not to emails and alerts of the petition",
       resolve: (o) => o.is_subscribed,
+    });
+    t.boolean("isBypassed", {
+      resolve: (o) => o.is_bypassed ?? false,
     });
   },
 });

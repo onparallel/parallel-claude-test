@@ -12,7 +12,7 @@ export const transferPetitionOwnership = mutationField("transferPetitionOwnershi
     "Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions.",
   type: list(nonNull("PetitionBase")),
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionIds", ["OWNER"]),
+    userHasAccessToPetitions("petitionIds", "OWNER"),
     petitionsAreNotScheduledForDeletion("petitionIds"),
     userHasAccessToUsers("userId"),
   ),

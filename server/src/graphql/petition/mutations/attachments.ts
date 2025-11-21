@@ -31,7 +31,7 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
     description: "Generates and returns a signed url to upload a field attachment to AWS S3",
     type: "PetitionFieldAttachmentUploadData",
     authorize: authenticateAnd(
-      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      userHasAccessToPetitions("petitionId", "WRITE"),
       petitionsAreNotScheduledForDeletion("petitionId"),
       fieldsBelongsToPetition("petitionId", "fieldId"),
       petitionsAreNotPublicTemplates("petitionId"),
@@ -88,7 +88,7 @@ export const petitionFieldAttachmentUploadComplete = mutationField(
       attachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
     },
     authorize: authenticateAnd(
-      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      userHasAccessToPetitions("petitionId", "WRITE"),
       petitionsAreNotScheduledForDeletion("petitionId"),
       fieldsBelongsToPetition("petitionId", "fieldId"),
       fieldAttachmentBelongsToField("fieldId", "attachmentId"),
@@ -115,7 +115,7 @@ export const deletePetitionFieldAttachment = mutationField("deletePetitionFieldA
     attachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldAttachmentBelongsToField("fieldId", "attachmentId"),
@@ -182,7 +182,7 @@ export const createPetitionAttachmentUploadLink = mutationField(
     description: "Generates and returns a signed url to upload a petition attachment to AWS S3",
     type: list("PetitionAttachmentUploadData"),
     authorize: authenticateAnd(
-      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      userHasAccessToPetitions("petitionId", "WRITE"),
       petitionsAreNotScheduledForDeletion("petitionId"),
       petitionsAreNotPublicTemplates("petitionId"),
       petitionIsNotAnonymized("petitionId"),
@@ -260,7 +260,7 @@ export const petitionAttachmentUploadComplete = mutationField("petitionAttachmen
     attachmentId: nonNull(globalIdArg("PetitionAttachment")),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -288,7 +288,7 @@ export const deletePetitionAttachment = mutationField("deletePetitionAttachment"
     attachmentId: nonNull(globalIdArg("PetitionAttachment")),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -351,7 +351,7 @@ export const reorderPetitionAttachments = mutationField("reorderPetitionAttachme
   description: "Reorders the positions of attachments in the petition",
   type: "PetitionBase",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     petitionAttachmentBelongsToPetition("petitionId", "attachmentIds"),
     isValidPetitionAttachmentReorder("petitionId", "attachmentType", "attachmentIds"),
@@ -381,7 +381,7 @@ export const updatePetitionAttachmentType = mutationField("updatePetitionAttachm
   description: "Updates the type of a petition attachment and sets it in the final position",
   type: "PetitionAttachment",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -413,7 +413,7 @@ export const updatePetitionAttachmentVisibility = mutationField(
     description: "Updates the visibility of a petition attachment. Pass null to remove visibility.",
     type: "PetitionAttachment",
     authorize: authenticateAnd(
-      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+      userHasAccessToPetitions("petitionId", "WRITE"),
       petitionsAreNotScheduledForDeletion("petitionId"),
       petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
       petitionsAreNotPublicTemplates("petitionId"),

@@ -747,7 +747,7 @@ export const createEditPetitionPermissionMaybeTask = mutationField(
   `,
     type: "MaybeTask",
     authorize: authenticateAnd(
-      userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
+      userHasAccessToPetitions("petitionIds", "WRITE"),
       petitionsAreNotScheduledForDeletion("petitionIds"),
       userHasAccessToUsers("userIds"),
       userHasAccessToUserGroups("userGroupIds"),
@@ -829,7 +829,7 @@ export const createRemovePetitionPermissionMaybeTask = mutationField(
     `,
     type: "MaybeTask",
     authorize: authenticateAnd(
-      userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
+      userHasAccessToPetitions("petitionIds", "WRITE"),
       petitionsAreNotScheduledForDeletion("petitionIds"),
       userHasAccessToUsers("userIds"),
       userHasAccessToUserGroups("userGroupIds"),
