@@ -91,6 +91,14 @@ export interface IIntegrationsSetupService {
     createdBy: string,
     t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"ID_VERIFICATION", "BANKFLIP">>;
+  updateBankflipIdVerificationIntegration(
+    integrationId: number,
+    data: Replace<
+      Partial<OrgIntegration>,
+      { settings: IntegrationSettings<"ID_VERIFICATION", "BANKFLIP"> }
+    >,
+    t?: Knex.Transaction,
+  ): Promise<void>;
   createBankflipDocumentProcessingIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
       settings: IntegrationSettings<"DOCUMENT_PROCESSING", "BANKFLIP">;
@@ -98,6 +106,14 @@ export interface IIntegrationsSetupService {
     createdBy: string,
     t?: Knex.Transaction,
   ): Promise<EnhancedOrgIntegration<"DOCUMENT_PROCESSING", "BANKFLIP">>;
+  updateBankflipDocumentProcessingIntegration(
+    integrationId: number,
+    data: Replace<
+      Partial<OrgIntegration>,
+      { settings: IntegrationSettings<"DOCUMENT_PROCESSING", "BANKFLIP"> }
+    >,
+    t?: Knex.Transaction,
+  ): Promise<void>;
   createEInformaProfileExternalSourceIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
       settings: IntegrationSettings<"PROFILE_EXTERNAL_SOURCE", "EINFORMA">;
@@ -243,6 +259,17 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     return await this.bankflipIdVerificationIntegration.createOrgIntegration(data, createdBy, t);
   }
 
+  async updateBankflipIdVerificationIntegration(
+    integrationId: number,
+    data: Replace<
+      Partial<OrgIntegration>,
+      { settings: IntegrationSettings<"ID_VERIFICATION", "BANKFLIP"> }
+    >,
+    t?: Knex.Transaction,
+  ): Promise<void> {
+    await this.bankflipIdVerificationIntegration.updateOrgIntegration(integrationId, data, t);
+  }
+
   async createBankflipDocumentProcessingIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
       settings: IntegrationSettings<"DOCUMENT_PROCESSING", "BANKFLIP">;
@@ -255,6 +282,17 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
       createdBy,
       t,
     );
+  }
+
+  async updateBankflipDocumentProcessingIntegration(
+    integrationId: number,
+    data: Replace<
+      Partial<OrgIntegration>,
+      { settings: IntegrationSettings<"DOCUMENT_PROCESSING", "BANKFLIP"> }
+    >,
+    t?: Knex.Transaction,
+  ): Promise<void> {
+    await this.bankflipDocumentProcessingIntegration.updateOrgIntegration(integrationId, data, t);
   }
 
   async createEInformaProfileExternalSourceIntegration(

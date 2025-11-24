@@ -686,10 +686,14 @@ export const createBankflipIdVerificationIntegration = mutationField(
     },
     resolve: async (_, args, ctx) => {
       try {
-        const data = await ctx.integrationsSetup.createBankflipIdVerificationIntegration(
-          {
-            org_id: args.orgId,
-            name: "ID Verification",
+        const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
+          args.orgId,
+          "ID_VERIFICATION",
+          "BANKFLIP",
+        );
+
+        if (isNonNullish(integration)) {
+          await ctx.integrationsSetup.updateBankflipIdVerificationIntegration(integration.id, {
             settings: {
               CREDENTIALS: {
                 API_KEY: args.apiKey,
@@ -697,14 +701,33 @@ export const createBankflipIdVerificationIntegration = mutationField(
                 WEBHOOK_SECRET: args.webhookSecret,
               },
             },
-          },
-          `User:${ctx.realUser!.id}`,
-        );
+          });
 
-        return {
-          result: "SUCCESS",
-          message: `Integration:${data.id} created successfully`,
-        };
+          return {
+            result: "SUCCESS",
+            message: `Integration:${integration.id} updated successfully`,
+          };
+        } else {
+          const data = await ctx.integrationsSetup.createBankflipIdVerificationIntegration(
+            {
+              org_id: args.orgId,
+              name: "ID Verification",
+              settings: {
+                CREDENTIALS: {
+                  API_KEY: args.apiKey,
+                  HOST: args.host,
+                  WEBHOOK_SECRET: args.webhookSecret,
+                },
+              },
+            },
+            `User:${ctx.realUser!.id}`,
+          );
+
+          return {
+            result: "SUCCESS",
+            message: `Integration:${data.id} created successfully`,
+          };
+        }
       } catch (error) {
         return {
           result: RESULT.FAILURE,
@@ -732,10 +755,13 @@ export const createBankflipDocumentProcessingIntegration = mutationField(
     },
     resolve: async (_, args, ctx) => {
       try {
-        const data = await ctx.integrationsSetup.createBankflipDocumentProcessingIntegration(
-          {
-            org_id: args.orgId,
-            name: "Document Processing",
+        const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
+          args.orgId,
+          "DOCUMENT_PROCESSING",
+          "BANKFLIP",
+        );
+        if (isNonNullish(integration)) {
+          await ctx.integrationsSetup.updateBankflipDocumentProcessingIntegration(integration.id, {
             settings: {
               CREDENTIALS: {
                 API_KEY: args.apiKey,
@@ -743,14 +769,32 @@ export const createBankflipDocumentProcessingIntegration = mutationField(
                 WEBHOOK_SECRET: args.webhookSecret,
               },
             },
-          },
-          `User:${ctx.realUser!.id}`,
-        );
+          });
+          return {
+            result: "SUCCESS",
+            message: `Integration:${integration.id} updated successfully`,
+          };
+        } else {
+          const data = await ctx.integrationsSetup.createBankflipDocumentProcessingIntegration(
+            {
+              org_id: args.orgId,
+              name: "Document Processing",
+              settings: {
+                CREDENTIALS: {
+                  API_KEY: args.apiKey,
+                  HOST: args.host,
+                  WEBHOOK_SECRET: args.webhookSecret,
+                },
+              },
+            },
+            `User:${ctx.realUser!.id}`,
+          );
 
-        return {
-          result: "SUCCESS",
-          message: `Integration:${data.id} created successfully`,
-        };
+          return {
+            result: "SUCCESS",
+            message: `Integration:${data.id} created successfully`,
+          };
+        }
       } catch (error) {
         return {
           result: RESULT.FAILURE,
