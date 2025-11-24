@@ -77,7 +77,10 @@ const server = new ApolloServer({
 
 if (process.env.TS_NODE_DEV) {
   process.on("SIGTERM", async function () {
-    await server.stop();
+    try {
+      // sometimes in dev mode restarts happen before the server is started, ignore the error
+      await server.stop();
+    } catch {}
     process.exit(0);
   });
 }
