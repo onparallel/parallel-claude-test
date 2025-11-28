@@ -380,7 +380,11 @@ export class PetitionImportExportService implements IPetitionImportExportService
         if (!ptf || !ptf.alias) {
           throw new Error(`Profile type field not found or is not standard`);
         }
-        return ptf.alias;
+        const profileType = standardProfileTypes.find((pt) => pt.id === ptf.profile_type_id);
+        if (!profileType) {
+          throw new Error(`Profile type not found`);
+        }
+        return `${profileType.standard_type!}:${ptf.alias}`;
       }
 
       throw new Error(`Unknown type: ${type}`);
@@ -390,6 +394,13 @@ export class PetitionImportExportService implements IPetitionImportExportService
       options.labels = [];
       options.values = [];
     }
+
+    const profileTypeField = standardProfileTypeFields.find(
+      (ptf) => ptf.id === field.profile_type_field_id,
+    );
+    const profileType = standardProfileTypes.find(
+      (pt) => pt.id === profileTypeField?.profile_type_id,
+    );
 
     return {
       // replace the DB id with incremental integers to not expose database info.
@@ -410,9 +421,9 @@ export class PetitionImportExportService implements IPetitionImportExportService
       hasCommentsEnabled: field.has_comments_enabled,
       profileType:
         standardProfileTypes.find((pt) => pt.id === field.profile_type_id)?.standard_type ?? null,
-      profileTypeField:
-        standardProfileTypeFields.find((ptf) => ptf.id === field.profile_type_field_id)?.alias ??
-        null,
+      profileTypeField: profileTypeField
+        ? `${profileType!.standard_type!}:${profileTypeField.alias}`
+        : null,
     };
   }
 
@@ -449,8 +460,14 @@ export class PetitionImportExportService implements IPetitionImportExportService
         }
         return profileType.id;
       } else if (type === "ProfileTypeField") {
-        const alias = id as unknown as string;
-        const profileTypeField = standardProfileTypeFields.find((ptf) => ptf.alias === alias);
+        const [standardType, alias] = (id as unknown as string).split(":");
+        const profileType = standardProfileTypes.find((pt) => pt.standard_type === standardType);
+        if (!profileType) {
+          throw new Error(`Could not find ${standardType} ProfileType on user's organization`);
+        }
+        const profileTypeField = standardProfileTypeFields.find(
+          (ptf) => ptf.alias === alias && ptf.profile_type_id === profileType.id,
+        );
         if (!profileTypeField) {
           throw new Error(`Could not find ${alias} ProfileTypeField on user's organization`);
         }
@@ -545,8 +562,17 @@ export class PetitionImportExportService implements IPetitionImportExportService
           const profileType = standardProfileTypes.find(
             (pt) => pt.standard_type === jsonField.profileType,
           );
+
+          let standardType: string | undefined;
+          let alias: string | undefined;
+          if (jsonField.profileTypeField) {
+            [standardType, alias] = jsonField.profileTypeField.split(":");
+          }
           const profileTypeField = standardProfileTypeFields.find(
-            (ptf) => ptf.alias === jsonField.profileTypeField,
+            (ptf) =>
+              ptf.alias === alias &&
+              ptf.profile_type_id ===
+                standardProfileTypes.find((pt) => pt.standard_type === standardType)?.id,
           );
 
           const [field] = await this.petitions.createPetitionFieldsAtPosition(
