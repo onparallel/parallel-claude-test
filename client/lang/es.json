@@ -17846,13 +17846,13 @@
   },
   {
     "term": "page.permissions-group.petitions-bypass-permissions",
-    "definition": "Bypass permisos de parallels",
-    "context": "Bypass petition permissions"
+    "definition": "Habilitar acceso completo a parallels",
+    "context": "Enable full access to parallels"
   },
   {
     "term": "page.permissions-group.petitions-bypass-permissions-description",
-    "definition": "Concede a los usuarios en este equipo permisos de escritura a todas los parallels y plantillas en su organización, sin compartir explícitamente con ellos.",
-    "context": "Grants users in this team write access to every parallel and template in their organization, without explicitly sharing with them."
+    "definition": "Concede a los usuarios de este equipo permisos de escritura y gestión completa sobre todos los parallels y plantillas de la organización, ignorando las configuraciones de compartición individuales.",
+    "context": "Grant users in this team full write and management permissions over all parallels and templates in the organization, bypassing individual sharing configurations."
   },
   {
     "term": "page.permissions-group.petitions-change-path",

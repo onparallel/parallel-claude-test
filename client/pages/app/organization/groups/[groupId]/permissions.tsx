@@ -186,12 +186,12 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
             name: "PETITIONS:BYPASS_PERMISSIONS",
             title: intl.formatMessage({
               id: "page.permissions-group.petitions-bypass-permissions",
-              defaultMessage: "Bypass petition permissions",
+              defaultMessage: "Enable full access to parallels",
             }),
             description: intl.formatMessage({
               id: "page.permissions-group.petitions-bypass-permissions-description",
               defaultMessage:
-                "Grants users in this team write access to every parallel and template in their organization, without explicitly sharing with them.",
+                "Grant users in this team full write and management permissions over all parallels and templates in the organization, bypassing individual sharing configurations.",
             }),
           },
         ],
