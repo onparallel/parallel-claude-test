@@ -19,9 +19,9 @@ import { DelayQueuePayload } from "../queues/DelayQueue";
 import { EmailEventsWorkerPayload } from "../queues/EmailEventsQueue";
 import { EmailSenderWorkerPayload } from "../queues/EmailSenderQueue";
 import { EventProcessorPayload } from "../queues/EventProcessorQueue";
+import { SignatureWorkerPayload } from "../queues/SignatureWorkerQueue";
+import { TaskWorkerPayload } from "../queues/TaskWorkerQueue";
 import { WebhooksWorkerPayload } from "../queues/WebhooksWorkerQueue";
-import { SignatureWorkerPayload } from "../signature-worker";
-import { TaskWorkerPayload } from "../task-worker";
 
 export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
   "email-events": EmailEventsWorkerPayload;

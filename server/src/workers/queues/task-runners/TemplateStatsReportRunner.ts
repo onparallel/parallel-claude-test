@@ -1,16 +1,28 @@
+import { inject, injectable } from "inversify";
 import { chunk, difference, findLast, isNonNullish, sortBy } from "remeda";
-import { PetitionStatus } from "../../db/__types";
+import { Config, CONFIG } from "../../../config";
+import { PetitionStatus } from "../../../db/__types";
 import {
   PetitionEvent,
   ReplyCreatedEvent,
   ReplyDeletedEvent,
   ReplyUpdatedEvent,
-} from "../../db/events/PetitionEvent";
-import { PetitionTimeStatistics, TaskOutput } from "../../db/repositories/TaskRepository";
-import { average, median, quartiles } from "../../util/arrays";
-import { toGlobalId } from "../../util/globalId";
-import { Maybe } from "../../util/types";
-import { TaskRunner } from "../helpers/TaskRunner";
+} from "../../../db/events/PetitionEvent";
+import { FileRepository } from "../../../db/repositories/FileRepository";
+import { ReadOnlyPetitionRepository } from "../../../db/repositories/PetitionRepository";
+import {
+  PetitionTimeStatistics,
+  Task,
+  TaskOutput,
+  TaskRepository,
+} from "../../../db/repositories/TaskRepository";
+import { ReadOnlyUserRepository } from "../../../db/repositories/UserRepository";
+import { ILogger, LOGGER } from "../../../services/Logger";
+import { IStorageService, STORAGE_SERVICE } from "../../../services/StorageService";
+import { average, median, quartiles } from "../../../util/arrays";
+import { toGlobalId } from "../../../util/globalId";
+import { Maybe } from "../../../util/types";
+import { TaskRunner } from "../../helpers/TaskRunner";
 
 export interface TemplateStatsReportInput {
   id: number;
@@ -24,17 +36,31 @@ type TemplateStatsReportPetitionWithEvents = TemplateStatsReportInput & {
   events: PetitionEvent[];
 };
 
+@injectable()
 export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT"> {
-  async run() {
-    const { template_id: templateId, start_date: startDate, end_date: endDate } = this.task.input;
+  constructor(
+    @inject(ReadOnlyPetitionRepository) private readonlyPetitions: ReadOnlyPetitionRepository,
+    @inject(ReadOnlyUserRepository) private readonlyUsers: ReadOnlyUserRepository,
+    // ---- EXTENDS ---- //
+    @inject(LOGGER) logger: ILogger,
+    @inject(CONFIG) config: Config,
+    @inject(TaskRepository) tasks: TaskRepository,
+    @inject(FileRepository) files: FileRepository,
+    @inject(STORAGE_SERVICE) storage: IStorageService,
+  ) {
+    super(logger, config, tasks, files, storage);
+  }
+
+  async run(task: Task<"TEMPLATE_STATS_REPORT">) {
+    const { template_id: templateId, start_date: startDate, end_date: endDate } = task.input;
 
     const [user, hasAccess] = await Promise.all([
-      this.ctx.readonlyUsers.loadUser(this.task.user_id!),
-      this.ctx.readonlyPetitions.userHasAccessToPetitions(this.task.user_id!, [templateId]),
+      this.readonlyUsers.loadUser(task.user_id!),
+      this.readonlyPetitions.userHasAccessToPetitions(task.user_id!, [templateId]),
     ]);
 
     if (!hasAccess) {
-      throw new Error(`User ${this.task.user_id} has no access to template ${templateId}`);
+      throw new Error(`User ${task.user_id} has no access to template ${templateId}`);
     }
 
     return await this.generateTemplateStatsReport(templateId, user!.org_id, startDate, endDate);
@@ -47,8 +73,8 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
     endDate?: Maybe<Date> | undefined,
   ): Promise<TaskOutput<"TEMPLATE_STATS_REPORT">> {
     const [template, orgPetitions] = await Promise.all([
-      this.ctx.readonlyPetitions.loadPetition(templateId),
-      this.ctx.readonlyPetitions.getPetitionsForTemplateStatsReport(
+      this.readonlyPetitions.loadPetition(templateId),
+      this.readonlyPetitions.getPetitionsForTemplateStatsReport(
         templateId,
         orgId,
         startDate,
@@ -60,7 +86,7 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
       throw new Error(`Petition:${templateId} not found`);
     }
 
-    const petitionEvents = (await this.ctx.readonlyPetitions.getPetitionEventsByType(
+    const petitionEvents = (await this.readonlyPetitions.getPetitionEventsByType(
       orgPetitions.map((p) => p.id),
       [
         "ACCESS_ACTIVATED",

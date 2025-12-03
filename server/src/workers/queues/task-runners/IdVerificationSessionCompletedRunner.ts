@@ -1,13 +1,28 @@
+import { inject, injectable } from "inversify";
 import pMap from "p-map";
 import { isNonNullish, isNullish, pick } from "remeda";
 import { assert } from "ts-essentials";
+import { Config, CONFIG } from "../../../config";
+import { FileRepository } from "../../../db/repositories/FileRepository";
+import { PetitionRepository } from "../../../db/repositories/PetitionRepository";
+import { Task, TaskRepository } from "../../../db/repositories/TaskRepository";
 import {
   CreateIdentityVerificationSessionRequest,
   IdentityVerificationSessionResponse,
-} from "../../integrations/id-verification/IdVerificationIntegration";
-import { fromGlobalId } from "../../util/globalId";
-import { random } from "../../util/token";
-import { TaskRunner } from "../helpers/TaskRunner";
+} from "../../../integrations/id-verification/IdVerificationIntegration";
+import {
+  ID_VERIFICATION_SERVICE,
+  IIdVerificationService,
+} from "../../../services/IdVerificationService";
+import { ILogger, LOGGER } from "../../../services/Logger";
+import {
+  IOrganizationCreditsService,
+  ORGANIZATION_CREDITS_SERVICE,
+} from "../../../services/OrganizationCreditsService";
+import { IStorageService, STORAGE_SERVICE } from "../../../services/StorageService";
+import { fromGlobalId } from "../../../util/globalId";
+import { random } from "../../../util/token";
+import { TaskRunner } from "../../helpers/TaskRunner";
 
 interface IdentityVerificationDocumentReplyContent {
   file_upload_id: number | null;
@@ -24,11 +39,26 @@ interface IdentityVerificationDocumentReply {
   metadata?: any;
 }
 
+@injectable()
 export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFICATION_SESSION_COMPLETED"> {
-  async run() {
-    const { integration_id: integrationId, external_id: externalId } = this.task.input;
+  constructor(
+    @inject(PetitionRepository) private petitions: PetitionRepository,
+    @inject(ID_VERIFICATION_SERVICE) private idVerification: IIdVerificationService,
+    @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: IOrganizationCreditsService,
+    // ---- EXTENDS ---- //
+    @inject(LOGGER) logger: ILogger,
+    @inject(CONFIG) config: Config,
+    @inject(TaskRepository) tasks: TaskRepository,
+    @inject(FileRepository) files: FileRepository,
+    @inject(STORAGE_SERVICE) storage: IStorageService,
+  ) {
+    super(logger, config, tasks, files, storage);
+  }
 
-    const session = await this.ctx.idVerification.fetchSession(integrationId, externalId);
+  async run(task: Task<"ID_VERIFICATION_SESSION_COMPLETED">) {
+    const { integration_id: integrationId, external_id: externalId } = task.input;
+
+    const session = await this.idVerification.fetchSession(integrationId, externalId);
 
     const petitionId = fromGlobalId(session.metadata.petitionId, "Petition").id;
     const userId =
@@ -36,7 +66,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
 
     try {
       if (isNonNullish(userId)) {
-        await this.ctx.orgCredits.ensurePetitionHasConsumedCredit(petitionId, `User:${userId}`);
+        await this.orgCredits.ensurePetitionHasConsumedCredit(petitionId, `User:${userId}`);
       }
 
       await this.createIdVerificationReplies(session);
@@ -75,12 +105,12 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
       ? `User:${userId}`
       : `PetitionAccess:${petitionAccessId!}`;
 
-    const field = await this.ctx.petitions.loadField(fieldId);
+    const field = await this.petitions.loadField(fieldId);
     assert(isNonNullish(field), "Field not found");
 
     if (isNonNullish(session.identityVerification)) {
       const integrationId = fromGlobalId(session.metadata.integrationId, "OrgIntegration").id;
-      await this.ctx.petitions.createPetitionFieldReply(
+      await this.petitions.createPetitionFieldReply(
         petitionId,
         {
           petition_field_id: fieldId,
@@ -118,7 +148,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
       ? `User:${userId}`
       : `PetitionAccess:${petitionAccessId!}`;
 
-    const field = await this.ctx.petitions.loadField(fieldId);
+    const field = await this.petitions.loadField(fieldId);
     assert(isNonNullish(field), "Field not found");
 
     const idVerificationReplies = isNonNullish(session.identityVerification)
@@ -126,16 +156,16 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
       : [];
 
     if (idVerificationReplies.length > 0) {
-      const currentFieldReplies = await this.ctx.petitions.loadRepliesForField(fieldId);
+      const currentFieldReplies = await this.petitions.loadRepliesForField(fieldId);
       // valid new replies will replace old ones
       if (
         idVerificationReplies.every((reply) => reply.content.error === undefined) ||
         currentFieldReplies.length === 0
       ) {
         if (currentFieldReplies.length > 0) {
-          await this.ctx.petitions.deletePetitionFieldReplies([{ id: fieldId }], createdBy);
+          await this.petitions.deletePetitionFieldReplies([{ id: fieldId }], createdBy);
         }
-        await this.ctx.petitions.createPetitionFieldReply(
+        await this.petitions.createPetitionFieldReply(
           petitionId,
           idVerificationReplies.map((data) => ({
             petition_field_id: fieldId,
@@ -156,7 +186,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
     createdBy: string,
   ): Promise<IdentityVerificationDocumentReply[]> {
     const fieldId = fromGlobalId(session.metadata.fieldId, "PetitionField").id;
-    const field = await this.ctx.petitions.loadField(fieldId);
+    const field = await this.petitions.loadField(fieldId);
     if (!field) {
       return [];
     }
@@ -192,7 +222,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
       `identityVerification.id expected to be defined in session ${session.id}`,
     );
 
-    const summary = await this.ctx.idVerification.fetchSessionSummary(
+    const summary = await this.idVerification.fetchSessionSummary(
       integrationId,
       session.identityVerification.id,
     );
@@ -215,7 +245,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
           };
         }
 
-        const documentBuffer = await this.ctx.idVerification.fetchBinaryDocumentContents(
+        const documentBuffer = await this.idVerification.fetchBinaryDocumentContents(
           integrationId,
           doc.imagesDocument.id,
         );
@@ -241,7 +271,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
         ]);
 
         const path = random(16);
-        const res = await this.ctx.storage.fileUploads.uploadFile(
+        const res = await this.storage.fileUploads.uploadFile(
           path,
           doc.imagesDocument.contentType,
           documentBuffer,
@@ -259,7 +289,7 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
               .replace(/\s/g, "_")}`
           : doc.imagesDocument.name;
 
-        const [file] = await this.ctx.files.createFileUpload(
+        const [file] = await this.files.createFileUpload(
           {
             path,
             content_type: doc.imagesDocument.contentType,
@@ -310,19 +340,19 @@ export class IdVerificationSessionCompletedRunner extends TaskRunner<"ID_VERIFIC
     replies.push(...documentsData);
 
     if (isNonNullish(summary.selfie?.videoDocument)) {
-      const videoBuffer = await this.ctx.idVerification.fetchBinaryDocumentContents(
+      const videoBuffer = await this.idVerification.fetchBinaryDocumentContents(
         integrationId,
         summary.selfie.videoDocument.id,
       );
 
       const path = random(16);
-      const res = await this.ctx.storage.fileUploads.uploadFile(
+      const res = await this.storage.fileUploads.uploadFile(
         path,
         summary.selfie.videoDocument.contentType,
         videoBuffer,
       );
 
-      const [file] = await this.ctx.files.createFileUpload(
+      const [file] = await this.files.createFileUpload(
         {
           path,
           content_type: summary.selfie.videoDocument.contentType,

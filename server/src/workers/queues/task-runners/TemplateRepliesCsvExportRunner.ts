@@ -1,52 +1,75 @@
 import Excel from "exceljs";
 import { isNonNullish, partition, sortBy } from "remeda";
 import { Readable } from "stream";
-import { PetitionField, PetitionFieldReply } from "../../db/__types";
 
-import { applyFieldVisibility } from "../../util/fieldLogic";
-
-import { fieldReplyUrl } from "../../util/fieldReplyUrl";
-import { toGlobalId } from "../../util/globalId";
-import { isFileTypeField } from "../../util/isFileTypeField";
-import { pMapChunk } from "../../util/promises/pMapChunk";
-import { Maybe } from "../../util/types";
-import { TaskRunner } from "../helpers/TaskRunner";
+import { inject, injectable } from "inversify";
+import { Config, CONFIG } from "../../../config";
+import { PetitionField, PetitionFieldReply } from "../../../db/__types";
+import { ReadOnlyContactRepository } from "../../../db/repositories/ContactRepository";
+import { FileRepository } from "../../../db/repositories/FileRepository";
+import { ReadOnlyPetitionRepository } from "../../../db/repositories/PetitionRepository";
+import { Task, TaskRepository } from "../../../db/repositories/TaskRepository";
+import { ReadOnlyUserRepository } from "../../../db/repositories/UserRepository";
+import { ILogger, LOGGER } from "../../../services/Logger";
+import { IStorageService, STORAGE_SERVICE } from "../../../services/StorageService";
+import { applyFieldVisibility } from "../../../util/fieldLogic";
+import { fieldReplyUrl } from "../../../util/fieldReplyUrl";
+import { toGlobalId } from "../../../util/globalId";
+import { isFileTypeField } from "../../../util/isFileTypeField";
+import { pMapChunk } from "../../../util/promises/pMapChunk";
+import { Maybe } from "../../../util/types";
+import { TaskRunner } from "../../helpers/TaskRunner";
 
 interface AliasedPetitionField extends PetitionField {
   alias: string;
 }
+
+@injectable()
 export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES_CSV_EXPORT"> {
-  async run() {
-    const { template_id: templateId } = this.task.input;
+  constructor(
+    @inject(ReadOnlyUserRepository) private readonlyUsers: ReadOnlyUserRepository,
+    @inject(ReadOnlyPetitionRepository) private readonlyPetitions: ReadOnlyPetitionRepository,
+    @inject(ReadOnlyContactRepository) private readonlyContacts: ReadOnlyContactRepository,
+    // ---- EXTENDS ---- //
+    @inject(LOGGER) logger: ILogger,
+    @inject(CONFIG) config: Config,
+    @inject(TaskRepository) tasks: TaskRepository,
+    @inject(FileRepository) files: FileRepository,
+    @inject(STORAGE_SERVICE) storage: IStorageService,
+  ) {
+    super(logger, config, tasks, files, storage);
+  }
+  async run(task: Task<"TEMPLATE_REPLIES_CSV_EXPORT">) {
+    const { template_id: templateId } = task.input;
 
-    if (!this.task.user_id) {
-      throw new Error(`Task ${this.task.id} is missing user_id`);
+    if (!task.user_id) {
+      throw new Error(`Task ${task.id} is missing user_id`);
     }
 
-    const user = await this.ctx.readonlyUsers.loadUser(this.task.user_id);
+    const user = await this.readonlyUsers.loadUser(task.user_id);
     if (!user) {
-      throw new Error(`User ${this.task.user_id} not found`);
+      throw new Error(`User ${task.user_id} not found`);
     }
 
-    const hasAccess = await this.ctx.readonlyPetitions.userHasAccessToPetitions(this.task.user_id, [
+    const hasAccess = await this.readonlyPetitions.userHasAccessToPetitions(task.user_id, [
       templateId,
     ]);
     if (!hasAccess) {
-      throw new Error(`User ${this.task.user_id} has no access to petition ${templateId}`);
+      throw new Error(`User ${task.user_id} has no access to petition ${templateId}`);
     }
 
     const [allTemplateFields, petitions] = await Promise.all([
-      this.ctx.readonlyPetitions.loadAllFieldsByPetitionId(templateId),
-      this.ctx.readonlyPetitions.getPetitionsForTemplateRepliesReport(templateId),
+      this.readonlyPetitions.loadAllFieldsByPetitionId(templateId),
+      this.readonlyPetitions.getPetitionsForTemplateRepliesReport(templateId),
     ]);
 
-    const petitionsAccesses = await this.ctx.readonlyPetitions.loadAccessesForPetition(
+    const petitionsAccesses = await this.readonlyPetitions.loadAccessesForPetition(
       petitions.map((p) => p.id),
     );
 
     const petitionsAccessesContacts = await Promise.all(
       petitionsAccesses.map((accesses) =>
-        this.ctx.readonlyContacts.loadContactByAccessId(accesses.map((a) => a.id)),
+        this.readonlyContacts.loadContactByAccessId(accesses.map((a) => a.id)),
       ),
     );
 
@@ -58,12 +81,12 @@ export class TemplateRepliesCsvExportRunner extends TaskRunner<"TEMPLATE_REPLIES
 
     let rows: Record<string, Maybe<string | Date>>[] = [];
 
-    const parallelUrl = this.ctx.config.misc.parallelUrl;
+    const parallelUrl = this.config.misc.parallelUrl;
 
     if (petitions.length > 0) {
       const petitionsComposedFields = await pMapChunk(
         petitions.map((p) => p.id),
-        async (ids) => await this.ctx.readonlyPetitions.getComposedPetitionFieldsAndVariables(ids),
+        async (ids) => await this.readonlyPetitions.getComposedPetitionFieldsAndVariables(ids),
         { chunkSize: 50, concurrency: 1 },
       );
 

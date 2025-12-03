@@ -21,6 +21,7 @@ import { IRedis, REDIS } from "../src/services/Redis";
 import { IStorageService, STORAGE_SERVICE } from "../src/services/StorageService";
 import { BackgroundCheckProfileSearchQueue } from "../src/workers/queues/BackgroundCheckProfileSearchQueue";
 import { eventListenersModule } from "../src/workers/queues/event-listeners/module";
+import { taskRunnersModule } from "../src/workers/queues/task-runners/module";
 import { WebhooksWorker } from "../src/workers/queues/WebhooksWorkerQueue";
 import {
   MockAdverseMediaSearchService,
@@ -92,6 +93,7 @@ export async function createTestContainer() {
 
   container.bind(WebhooksWorker).toSelf();
   container.load(eventListenersModule);
+  container.load(taskRunnersModule);
 
   container.bind(BackgroundCheckProfileSearchQueue).toSelf();
   return container;

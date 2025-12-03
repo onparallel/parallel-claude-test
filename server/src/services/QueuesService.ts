@@ -11,7 +11,7 @@ import { pMapChunk } from "../util/promises/pMapChunk";
 import { waitFor } from "../util/promises/waitFor";
 import { random } from "../util/token";
 import { MaybeArray, unMaybeArray } from "../util/types";
-import { QueueWorkerPayload_OLD } from "../workers/helpers/createQueueWorker_OLD";
+import { QueueWorkerPayload } from "../workers/helpers/createQueueWorker";
 import { ILogger, LOGGER } from "./Logger";
 
 export interface IQueuesService {
@@ -21,13 +21,13 @@ export interface IQueuesService {
     messages:
       | {
           id: string;
-          body: QueueWorkerPayload_OLD<Q>;
+          body: QueueWorkerPayload<Q>;
           groupId?: string;
           deduplicationId?: string;
           delaySeconds?: number;
         }[]
       | {
-          body: QueueWorkerPayload_OLD<Q>;
+          body: QueueWorkerPayload<Q>;
           groupId?: string;
           deduplicationId?: string;
           delaySeconds?: number;
@@ -86,8 +86,8 @@ export class QueuesService implements IQueuesService {
   async enqueueMessages<Q extends keyof Config["queueWorkers"]>(
     queue: Q,
     messages:
-      | { id: string; body: QueueWorkerPayload_OLD<Q>; groupId?: string; delaySeconds?: number }[]
-      | { body: QueueWorkerPayload_OLD<Q>; groupId?: string; delaySeconds?: number },
+      | { id: string; body: QueueWorkerPayload<Q>; groupId?: string; delaySeconds?: number }[]
+      | { body: QueueWorkerPayload<Q>; groupId?: string; delaySeconds?: number },
     t?: Knex.Transaction,
   ) {
     if (Array.isArray(messages) && messages.length === 0) {
@@ -113,13 +113,13 @@ export class QueuesService implements IQueuesService {
     messages:
       | {
           id: string;
-          body: QueueWorkerPayload_OLD<Q>;
+          body: QueueWorkerPayload<Q>;
           groupId?: string;
           deduplicationId?: string;
           delaySeconds?: number;
         }[]
       | {
-          body: QueueWorkerPayload_OLD<Q>;
+          body: QueueWorkerPayload<Q>;
           groupId?: string;
           deduplicationId?: string;
           delaySeconds?: number;

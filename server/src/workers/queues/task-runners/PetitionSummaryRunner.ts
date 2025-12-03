@@ -1,3 +1,4 @@
+import { inject, injectable } from "inversify";
 import { Drop } from "liquidjs";
 import { IntlShape } from "react-intl";
 import {
@@ -11,21 +12,32 @@ import {
   unique,
   zip,
 } from "remeda";
-import { Petition, PetitionField, PetitionFieldType } from "../../db/__types";
+import { Config, CONFIG } from "../../../config";
+import { Petition, PetitionField, PetitionFieldType } from "../../../db/__types";
+import { FileRepository } from "../../../db/repositories/FileRepository";
+import { IntegrationRepository } from "../../../db/repositories/IntegrationRepository";
+import { OrganizationRepository } from "../../../db/repositories/OrganizationRepository";
+import { PetitionRepository } from "../../../db/repositories/PetitionRepository";
+import { Task, TaskRepository } from "../../../db/repositories/TaskRepository";
+import { UserRepository } from "../../../db/repositories/UserRepository";
 import {
   DateLiquidValue,
   DateTimeLiquidValue,
   WithLabelLiquidValue,
-} from "../../pdf/utils/liquid/LiquidValue";
-import { PetitionFieldOptions } from "../../services/PetitionFieldService";
-import { zipX } from "../../util/arrays";
-import { getFieldsWithIndices } from "../../util/fieldIndices";
-import { evaluateFieldLogic, FieldLogicResult } from "../../util/fieldLogic";
-import { fullName } from "../../util/fullName";
-import { isFileTypeField } from "../../util/isFileTypeField";
-import { createLiquid } from "../../util/liquid";
-import { UnwrapArray, UnwrapPromise } from "../../util/types";
-import { TaskRunner } from "../helpers/TaskRunner";
+} from "../../../pdf/utils/liquid/LiquidValue";
+import { AI_COMPLETION_SERVICE, IAiCompletionService } from "../../../services/AiCompletionService";
+import { I18N_SERVICE, II18nService } from "../../../services/I18nService";
+import { ILogger, LOGGER } from "../../../services/Logger";
+import { PetitionFieldOptions } from "../../../services/PetitionFieldService";
+import { IStorageService, STORAGE_SERVICE } from "../../../services/StorageService";
+import { zipX } from "../../../util/arrays";
+import { getFieldsWithIndices } from "../../../util/fieldIndices";
+import { evaluateFieldLogic, FieldLogicResult } from "../../../util/fieldLogic";
+import { fullName } from "../../../util/fullName";
+import { isFileTypeField } from "../../../util/isFileTypeField";
+import { createLiquid } from "../../../util/liquid";
+import { UnwrapArray, UnwrapPromise } from "../../../util/types";
+import { TaskRunner } from "../../helpers/TaskRunner";
 
 const SUMMARY_FIELD_TYPES = [
   "TEXT",
@@ -44,23 +56,39 @@ const SUMMARY_FIELD_TYPES = [
   "ID_VERIFICATION",
 ] as const;
 
+@injectable()
 export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
-  async run() {
-    const { petition_id: petitionId } = this.task.input;
+  constructor(
+    @inject(PetitionRepository) private petitions: PetitionRepository,
+    @inject(UserRepository) private users: UserRepository,
+    @inject(IntegrationRepository) private integrations: IntegrationRepository,
+    @inject(I18N_SERVICE) private i18n: II18nService,
+    @inject(AI_COMPLETION_SERVICE) private aiCompletion: IAiCompletionService,
+    @inject(OrganizationRepository) private organizations: OrganizationRepository,
+    // ---- EXTENDS ---- //
+    @inject(LOGGER) logger: ILogger,
+    @inject(CONFIG) config: Config,
+    @inject(TaskRepository) tasks: TaskRepository,
+    @inject(FileRepository) files: FileRepository,
+    @inject(STORAGE_SERVICE) storage: IStorageService,
+  ) {
+    super(logger, config, tasks, files, storage);
+  }
 
-    if (!this.task.user_id) {
-      throw new Error(`Task ${this.task.id} is missing user_id`);
+  async run(task: Task<"PETITION_SUMMARY">) {
+    const { petition_id: petitionId } = task.input;
+
+    if (!task.user_id) {
+      throw new Error(`Task ${task.id} is missing user_id`);
     }
-    const hasAccess = await this.ctx.petitions.userHasAccessToPetitions(this.task.user_id, [
-      petitionId,
-    ]);
+    const hasAccess = await this.petitions.userHasAccessToPetitions(task.user_id, [petitionId]);
     if (!hasAccess) {
-      throw new Error(`User ${this.task.user_id} has no access to petition ${petitionId}`);
+      throw new Error(`User ${task.user_id} has no access to petition ${petitionId}`);
     }
 
-    const user = (await this.ctx.users.loadUser(this.task.user_id))!;
+    const user = (await this.users.loadUser(task.user_id))!;
 
-    const petition = await this.ctx.petitions.loadPetition(petitionId);
+    const petition = await this.petitions.loadPetition(petitionId);
 
     const summaryConfig = petition?.summary_config;
 
@@ -73,7 +101,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
       throw new Error("Petition not found or summary_config is not defined");
     }
 
-    const integration = await this.ctx.integrations.loadIntegration(summaryConfig.integration_id);
+    const integration = await this.integrations.loadIntegration(summaryConfig.integration_id);
 
     if (
       isNullish(integration) ||
@@ -83,12 +111,12 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
       throw new Error("Integration not found or type is not AI_COMPLETION");
     }
 
-    const intl = await this.ctx.i18n.getIntl(petition.recipient_locale);
+    const intl = await this.i18n.getIntl(petition.recipient_locale);
 
     const scope = await this.buildPetitionSummaryLiquidScope(petition, intl);
     const liquid = createLiquid();
 
-    const summary = await this.ctx.aiCompletion.processAiCompletion(
+    const summary = await this.aiCompletion.processAiCompletion(
       {
         type: "PETITION_SUMMARY",
         integrationId: summaryConfig.integration_id,
@@ -105,7 +133,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
       `User:${user.id}`,
     );
 
-    await this.ctx.petitions.updatePetitionSummaryAiCompletionLogId(
+    await this.petitions.updatePetitionSummaryAiCompletionLogId(
       petition,
       summary.id,
       `User:${user.id}`,
@@ -118,14 +146,14 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
     petition: Pick<Petition, "id" | "org_id" | "recipient_locale">,
     intl: IntlShape,
   ) {
-    const [composedPetition] = await this.ctx.petitions.getComposedPetitionFieldsAndVariables([
+    const [composedPetition] = await this.petitions.getComposedPetitionFieldsAndVariables([
       petition.id,
     ]);
-    const events = await this.ctx.petitions.getLastPetitionReplyStatusChangeEvents([petition.id]);
+    const events = await this.petitions.getLastPetitionReplyStatusChangeEvents([petition.id]);
     const userIds = unique(events.map((e) => e.data.user_id).filter(isNonNullish));
     const userDataById = pipe(
       userIds,
-      zip(await this.ctx.users.loadUserDataByUserId(userIds)),
+      zip(await this.users.loadUserDataByUserId(userIds)),
       mapToObj(identity),
     );
     const eventsByReplyId = mapToObj(events, (e) => [e.data.petition_field_reply_id, e]);
@@ -140,7 +168,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
     });
     const reviewedAtByReplyId = mapValues(eventsByReplyId, (e) => e.created_at);
 
-    const organization = await this.ctx.organizations.loadOrg(petition.org_id);
+    const organization = await this.organizations.loadOrg(petition.org_id);
 
     const fileUploadReferences: {
       fileUploadId?: number;
@@ -301,7 +329,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
 
     // load every file upload referenced in petition and modify the object to include the file upload info inside scope
     const fileIds = fileUploadReferences.map((f) => f.fileUploadId!);
-    const fileUploads = await this.ctx.files.loadFileUpload(fileIds);
+    const fileUploads = await this.files.loadFileUpload(fileIds);
 
     for (const fileReference of fileUploadReferences) {
       const file = fileUploads.find((f) => f?.id === fileReference.fileUploadId);
@@ -359,7 +387,7 @@ export class PetitionSummaryRunner extends TaskRunner<"PETITION_SUMMARY"> {
   private buildPetitionVariablesLiquidScope(
     logic: FieldLogicResult,
     variables: UnwrapArray<
-      UnwrapPromise<ReturnType<typeof this.ctx.petitions.getComposedPetitionFieldsAndVariables>>
+      UnwrapPromise<ReturnType<typeof this.petitions.getComposedPetitionFieldsAndVariables>>
     >["variables"],
   ) {
     const valueLabels = Object.fromEntries(

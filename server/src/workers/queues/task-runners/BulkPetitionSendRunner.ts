@@ -1,28 +1,66 @@
 import { addMinutes } from "date-fns";
 import Excel from "exceljs";
 import safeStringify from "fast-safe-stringify";
+import { inject, injectable } from "inversify";
 import pMap from "p-map";
 import { chunk, isNonNullish, isNullish } from "remeda";
-import { pFlatMap } from "../../util/promises/pFlatMap";
-import { safeJsonParse } from "../../util/safeJsonParse";
+import { Config, CONFIG } from "../../../config";
+import { ContactRepository } from "../../../db/repositories/ContactRepository";
+import { FileRepository } from "../../../db/repositories/FileRepository";
+import { OrganizationRepository } from "../../../db/repositories/OrganizationRepository";
+import { PetitionRepository } from "../../../db/repositories/PetitionRepository";
+import { Task, TaskRepository } from "../../../db/repositories/TaskRepository";
+import { UserRepository } from "../../../db/repositories/UserRepository";
+import { EMAILS, IEmailsService } from "../../../services/EmailsService";
+import { ILogger, LOGGER } from "../../../services/Logger";
+import {
+  IOrganizationCreditsService,
+  ORGANIZATION_CREDITS_SERVICE,
+} from "../../../services/OrganizationCreditsService";
+import {
+  IPetitionMessageContextService,
+  PETITION_MESSAGE_CONTEXT_SERVICE,
+} from "../../../services/PetitionMessageContextService";
+import { IStorageService, STORAGE_SERVICE } from "../../../services/StorageService";
+import { pFlatMap } from "../../../util/promises/pFlatMap";
+import { safeJsonParse } from "../../../util/safeJsonParse";
 import {
   interpolatePlaceholdersInSlate,
   renderTextWithPlaceholders,
-} from "../../util/slate/placeholders";
-import { RateLimitGuard } from "../helpers/RateLimitGuard";
-import { TaskRunner } from "../helpers/TaskRunner";
+} from "../../../util/slate/placeholders";
+import { RateLimitGuard } from "../../helpers/RateLimitGuard";
+import { TaskRunner } from "../../helpers/TaskRunner";
+
+@injectable()
 export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
-  async run() {
+  constructor(
+    @inject(PetitionRepository) private petitions: PetitionRepository,
+    @inject(UserRepository) private users: UserRepository,
+    @inject(OrganizationRepository) private organizations: OrganizationRepository,
+    @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: IOrganizationCreditsService,
+    @inject(ContactRepository) private contacts: ContactRepository,
+    @inject(PETITION_MESSAGE_CONTEXT_SERVICE)
+    private petitionMessageContext: IPetitionMessageContextService,
+    @inject(EMAILS) private emails: IEmailsService,
+    // ---- EXTENDS ---- //
+    @inject(LOGGER) logger: ILogger,
+    @inject(CONFIG) config: Config,
+    @inject(TaskRepository) tasks: TaskRepository,
+    @inject(FileRepository) files: FileRepository,
+    @inject(STORAGE_SERVICE) storage: IStorageService,
+  ) {
+    super(logger, config, tasks, files, storage);
+  }
+
+  async run(task: Task<"BULK_PETITION_SEND">) {
     const rateLimit = new RateLimitGuard(100); // 100 petitions per second
 
-    const { template_id: templateId, temporary_file_id: temporaryFileId } = this.task.input;
+    const { template_id: templateId, temporary_file_id: temporaryFileId } = task.input;
 
     const skipEmailSend = process.env.ENV === "staging";
 
-    const template = await this.ctx.petitions.loadPetition(templateId);
-    const user = isNonNullish(this.task.user_id)
-      ? await this.ctx.users.loadUser(this.task.user_id)
-      : null;
+    const template = await this.petitions.loadPetition(templateId);
+    const user = isNonNullish(task.user_id) ? await this.users.loadUser(task.user_id) : null;
 
     if (!template || template.deletion_scheduled_at !== null || isNullish(user)) {
       // should not happen, just in case
@@ -34,7 +72,7 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
 
     const data = await this.parseCsvFile(temporaryFileId);
 
-    const usageLimit = await this.ctx.organizations.loadCurrentOrganizationUsageLimit(
+    const usageLimit = await this.organizations.loadCurrentOrganizationUsageLimit(
       user.org_id,
       "PETITION_SEND",
     );
@@ -61,9 +99,9 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
               await rateLimit.waitUntilAllowed();
 
               await this.validateContactData(row);
-              await this.ctx.orgCredits.consumePetitionSendCredits(template.org_id, 1);
+              await this.orgCredits.consumePetitionSendCredits(template.org_id, 1);
 
-              const [contact] = await this.ctx.contacts.createOrUpdate(
+              const [contact] = await this.contacts.createOrUpdate(
                 {
                   org_id: template.org_id,
                   email: row.email,
@@ -73,7 +111,7 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
                 `User:${user.id}`,
               );
 
-              const getValues = await this.ctx.petitionMessageContext.fetchPlaceholderValues({
+              const getValues = await this.petitionMessageContext.fetchPlaceholderValues({
                 petitionId: templateId,
                 userId: user.id,
                 contactId: contact.id,
@@ -83,7 +121,7 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
                 ? renderTextWithPlaceholders(template.email_subject, getValues).slice(0, 255)
                 : "";
 
-              const petition = await this.ctx.petitions.createPetitionFromId(
+              const petition = await this.petitions.createPetitionFromId(
                 templateId,
                 { name: emailSubject, isTemplate: false, creditsUsed: 1 },
                 user,
@@ -99,7 +137,7 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
                   (signer) => signer.email !== contact.email,
                 )
               ) {
-                await this.ctx.petitions.updatePetition(
+                await this.petitions.updatePetition(
                   petition.id,
                   {
                     signature_config: {
@@ -115,9 +153,9 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
                 );
               }
 
-              await this.ctx.petitions.prefillPetition(petition.id, row, user);
+              await this.petitions.prefillPetition(petition.id, row, user);
 
-              const accesses = await this.ctx.petitions.createAccesses(
+              const accesses = await this.petitions.createAccesses(
                 petition.id,
                 [
                   {
@@ -141,7 +179,7 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
                 : "[]";
 
               // when skipping email send, set status to PROCESSED so it's not picked up and sent by workers
-              const messages = await this.ctx.petitions.createMessages(
+              const messages = await this.petitions.createMessages(
                 petition.id,
                 skipEmailSend ? null : scheduledAt,
                 accesses.map((access) => ({
@@ -160,8 +198,8 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
               const messagesToProcess = messages.filter((m) => m.status === "PROCESSING");
 
               if (messagesToProcess.length > 0) {
-                await this.ctx.emails.sendPetitionMessageEmail(messagesToProcess.map((m) => m.id));
-                await this.ctx.petitions.createEvent(
+                await this.emails.sendPetitionMessageEmail(messagesToProcess.map((m) => m.id));
+                await this.petitions.createEvent(
                   messagesToProcess.map((message) => ({
                     type: "MESSAGE_SENT",
                     data: { petition_message_id: message.id },
@@ -183,7 +221,7 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
                   (error instanceof Error ? error.message : safeStringify(error)),
               };
             } finally {
-              await this.onProgress(100 * (++processed / data.length));
+              await this.onProgress(task, 100 * (++processed / data.length));
             }
           },
           { concurrency: 1 },
@@ -199,7 +237,7 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
       throw new Error(`Missing 'email' or 'firstName' columns`);
     }
 
-    if (!(await this.ctx.emails.validateEmail(row.email))) {
+    if (!(await this.emails.validateEmail(row.email))) {
       throw new Error(`Invalid email: ${row.email}`);
     }
   }
@@ -207,8 +245,8 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
   private async parseCsvFile(temporaryFileId: number) {
     const sendData: Record<string, any>[] = [];
 
-    const temporaryFile = (await this.ctx.files.loadTemporaryFile(temporaryFileId))!;
-    const buffer = await this.ctx.storage.temporaryFiles.downloadFile(temporaryFile.path);
+    const temporaryFile = (await this.files.loadTemporaryFile(temporaryFileId))!;
+    const buffer = await this.storage.temporaryFiles.downloadFile(temporaryFile.path);
 
     const workBook = new Excel.Workbook();
     const csvFile = await workBook.csv.read(buffer, {

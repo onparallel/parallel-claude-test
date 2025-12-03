@@ -1,20 +1,45 @@
+import { inject, injectable } from "inversify";
 import { isNonNullish } from "remeda";
-import { parseReplyToken } from "../../graphql/integrations/utils";
-import { BackgroundCheckEntitySearchType } from "../../pdf/__types";
+import { Config, CONFIG } from "../../../config";
+import { FileRepository } from "../../../db/repositories/FileRepository";
+import { PetitionRepository } from "../../../db/repositories/PetitionRepository";
+import { ProfileRepository } from "../../../db/repositories/ProfileRepository";
+import { Task, TaskRepository } from "../../../db/repositories/TaskRepository";
+import { parseReplyToken } from "../../../graphql/integrations/utils";
+import { BackgroundCheckEntitySearchType } from "../../../pdf/__types";
 import {
+  BACKGROUND_CHECK_SERVICE,
   BackgroundCheckContent,
   EntitySearchRequest,
   EntitySearchResponse,
-} from "../../services/BackgroundCheckService";
-import { TaskRunner } from "../helpers/TaskRunner";
+  IBackgroundCheckService,
+} from "../../../services/BackgroundCheckService";
+import { ILogger, LOGGER } from "../../../services/Logger";
+import { IStorageService, STORAGE_SERVICE } from "../../../services/StorageService";
+import { TaskRunner } from "../../helpers/TaskRunner";
 
+@injectable()
 export class BackgroundCheckResultsPdfRunner extends TaskRunner<"BACKGROUND_CHECK_RESULTS_PDF"> {
-  async run() {
-    if (!this.task.user_id) {
-      throw new Error(`Task ${this.task.id} is missing user_id`);
+  constructor(
+    @inject(PetitionRepository) private petitions: PetitionRepository,
+    @inject(ProfileRepository) private profiles: ProfileRepository,
+    @inject(BACKGROUND_CHECK_SERVICE) private backgroundCheck: IBackgroundCheckService,
+    // ---- EXTENDS ---- //
+    @inject(LOGGER) logger: ILogger,
+    @inject(CONFIG) config: Config,
+    @inject(TaskRepository) tasks: TaskRepository,
+    @inject(FileRepository) files: FileRepository,
+    @inject(STORAGE_SERVICE) storage: IStorageService,
+  ) {
+    super(logger, config, tasks, files, storage);
+  }
+
+  async run(task: Task<"BACKGROUND_CHECK_RESULTS_PDF">) {
+    if (!task.user_id) {
+      throw new Error(`Task ${task.id} is missing user_id`);
     }
 
-    const { token, name, date, type, country, birth_country: birthCountry } = this.task.input;
+    const { token, name, date, type, country, birth_country: birthCountry } = task.input;
     const params = parseReplyToken(token);
 
     // Prepare search query from task input
@@ -28,13 +53,10 @@ export class BackgroundCheckResultsPdfRunner extends TaskRunner<"BACKGROUND_CHEC
 
     // Try to load existing saved search results, or fetch new results from the provider
     const content = await this.loadExtendedSearchContent(query, params);
-    await this.onProgress(60); // 60% of the task is done
+    await this.onProgress(task, 60); // 60% of the task is done
 
     // Generate PDF
-    const pdfData = await this.ctx.backgroundCheck.entitySearchResultsPdf(
-      this.task.user_id,
-      content,
-    );
+    const pdfData = await this.backgroundCheck.entitySearchResultsPdf(task.user_id, content);
 
     // Upload to temporary storage
     const tmpFile = await this.uploadTemporaryFile({
@@ -56,7 +78,7 @@ export class BackgroundCheckResultsPdfRunner extends TaskRunner<"BACKGROUND_CHEC
   ): Promise<{ query: EntitySearchRequest; search: EntitySearchResponse<true> }> {
     let content: BackgroundCheckContent | null = null;
     if ("petitionId" in params) {
-      const replies = await this.ctx.petitions.loadRepliesForField(params.fieldId);
+      const replies = await this.petitions.loadRepliesForField(params.fieldId);
       content =
         replies.find(
           (r) =>
@@ -64,14 +86,14 @@ export class BackgroundCheckResultsPdfRunner extends TaskRunner<"BACKGROUND_CHEC
             r.parent_petition_field_reply_id === (params.parentReplyId ?? null),
         )?.content ?? null;
     } else if ("profileId" in params) {
-      const { value, draftValue } = await this.ctx.profiles.loadProfileFieldValueWithDraft(params);
+      const { value, draftValue } = await this.profiles.loadProfileFieldValueWithDraft(params);
       content = draftValue?.content ?? value?.content ?? null;
     }
 
     if (isNonNullish(content)) {
       return {
         query: content.query,
-        search: this.ctx.backgroundCheck.mapBackgroundCheckSearch(content),
+        search: this.backgroundCheck.mapBackgroundCheckSearch(content),
       };
     }
 
@@ -79,9 +101,9 @@ export class BackgroundCheckResultsPdfRunner extends TaskRunner<"BACKGROUND_CHEC
     const orgId = await this.getOrganizationId(params);
     return {
       query,
-      search: this.ctx.backgroundCheck.mapBackgroundCheckSearch({
+      search: this.backgroundCheck.mapBackgroundCheckSearch({
         query,
-        search: await this.ctx.backgroundCheck.entitySearch(query, orgId),
+        search: await this.backgroundCheck.entitySearch(query, orgId),
         entity: null,
         falsePositives: [],
       }),
@@ -93,7 +115,7 @@ export class BackgroundCheckResultsPdfRunner extends TaskRunner<"BACKGROUND_CHEC
    */
   private async getOrganizationId(params: ReturnType<typeof parseReplyToken>): Promise<number> {
     if ("petitionId" in params) {
-      const petition = await this.ctx.petitions.loadPetition(params.petitionId);
+      const petition = await this.petitions.loadPetition(params.petitionId);
       if (!petition) {
         throw new Error("Petition not found");
       }
@@ -101,7 +123,7 @@ export class BackgroundCheckResultsPdfRunner extends TaskRunner<"BACKGROUND_CHEC
     }
 
     if ("profileId" in params) {
-      const profile = await this.ctx.profiles.loadProfile(params.profileId);
+      const profile = await this.profiles.loadProfile(params.profileId);
       if (!profile) {
         throw new Error("Profile not found");
       }

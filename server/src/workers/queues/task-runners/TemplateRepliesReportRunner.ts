@@ -1,106 +1,95 @@
 import { formatInTimeZone } from "date-fns-tz";
 import Excel from "exceljs";
+import { inject, injectable } from "inversify";
 import { IntlShape } from "react-intl";
 import { firstBy, isNonNullish, partition, sortBy } from "remeda";
 import { Readable } from "stream";
+import { Config, CONFIG } from "../../../config";
 import {
   PetitionField,
   PetitionFieldReply,
   PetitionMessage,
   PetitionSignatureRequest,
   PetitionStatus,
-} from "../../db/__types";
-import { PetitionSignatureConfig } from "../../db/repositories/PetitionRepository";
-import { FORMATS } from "../../util/dates";
-import { applyFieldVisibility, evaluateFieldLogic } from "../../util/fieldLogic";
-import { fieldReplyUrl } from "../../util/fieldReplyUrl";
-import { fullName } from "../../util/fullName";
-import { toGlobalId } from "../../util/globalId";
-import { isFileTypeField } from "../../util/isFileTypeField";
-import { pMapChunk } from "../../util/promises/pMapChunk";
-import { titleize } from "../../util/strings";
-import { Maybe } from "../../util/types";
-import { TaskRunner } from "../helpers/TaskRunner";
+} from "../../../db/__types";
+import { ReadOnlyContactRepository } from "../../../db/repositories/ContactRepository";
+import { FeatureFlagRepository } from "../../../db/repositories/FeatureFlagRepository";
+import { FileRepository } from "../../../db/repositories/FileRepository";
+import {
+  PetitionSignatureConfig,
+  ReadOnlyPetitionRepository,
+} from "../../../db/repositories/PetitionRepository";
+import { ReadOnlyTagRepository } from "../../../db/repositories/TagRepository";
+import { Task, TaskRepository } from "../../../db/repositories/TaskRepository";
+import { ReadOnlyUserRepository } from "../../../db/repositories/UserRepository";
+import { I18N_SERVICE, II18nService } from "../../../services/I18nService";
+import { ILogger, LOGGER } from "../../../services/Logger";
+import { IStorageService, STORAGE_SERVICE } from "../../../services/StorageService";
+import { FORMATS } from "../../../util/dates";
+import { applyFieldVisibility, evaluateFieldLogic } from "../../../util/fieldLogic";
+import { fieldReplyUrl } from "../../../util/fieldReplyUrl";
+import { fullName } from "../../../util/fullName";
+import { toGlobalId } from "../../../util/globalId";
+import { isFileTypeField } from "../../../util/isFileTypeField";
+import { pMapChunk } from "../../../util/promises/pMapChunk";
+import { titleize } from "../../../util/strings";
+import { Maybe } from "../../../util/types";
+import { TaskRunner } from "../../helpers/TaskRunner";
 
-function getPetitionSignatureStatus({
-  status,
-  currentSignatureRequest,
-  signatureConfig,
-}: {
-  status: PetitionStatus;
-  currentSignatureRequest?: PetitionSignatureRequest | null;
-  signatureConfig: PetitionSignatureConfig | null;
-}) {
-  if (
-    signatureConfig?.isEnabled &&
-    ["COMPLETED", "CLOSED"].includes(status) &&
-    (!currentSignatureRequest ||
-      currentSignatureRequest.status === "COMPLETED" ||
-      currentSignatureRequest.cancel_reason === "CANCELLED_BY_USER")
-  ) {
-    // petition is completed and configured to be reviewed before starting signature
-    // and signature was never started or the last one is already completed (now we're starting a new request)
-    // this means the user has to manually trigger the start of the signature request
-    return "PENDING_START";
-  }
-
-  if (isNonNullish(currentSignatureRequest)) {
-    // signature request is already started, return the current status
-    if (["ENQUEUED", "PROCESSING", "PROCESSED"].includes(currentSignatureRequest.status)) {
-      return "PROCESSING";
-    } else {
-      return currentSignatureRequest.status as "COMPLETED" | "CANCELLED";
-    }
-  } else if (signatureConfig?.isEnabled && ["DRAFT", "PENDING"].includes(status)) {
-    // petition has signature configured but it's not yet completed
-    return "NOT_STARTED";
-  }
-
-  // petition doesn't have signature configured and never started a signature request
-  return "NO_SIGNATURE";
-}
-
+@injectable()
 export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_REPORT"> {
-  private info(message: string) {
-    this.ctx.logger.info(`[TemplateRepliesReportRunner:${this.task.input.petition_id}] ${message}`);
+  constructor(
+    @inject(ReadOnlyPetitionRepository) private readonlyPetitions: ReadOnlyPetitionRepository,
+    @inject(ReadOnlyUserRepository) private readonlyUsers: ReadOnlyUserRepository,
+    @inject(ReadOnlyTagRepository) private readonlyTags: ReadOnlyTagRepository,
+    @inject(ReadOnlyContactRepository) private readonlyContacts: ReadOnlyContactRepository,
+    @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository,
+    @inject(I18N_SERVICE) private i18n: II18nService,
+    // ---- EXTENDS ---- //
+    @inject(LOGGER) logger: ILogger,
+    @inject(CONFIG) config: Config,
+    @inject(TaskRepository) tasks: TaskRepository,
+    @inject(FileRepository) files: FileRepository,
+    @inject(STORAGE_SERVICE) storage: IStorageService,
+  ) {
+    super(logger, config, tasks, files, storage);
+  }
+  private info(templateId: number, message: string) {
+    this.logger.info(`[TemplateRepliesReportRunner:${templateId}] ${message}`);
   }
 
-  async run() {
+  async run(task: Task<"TEMPLATE_REPLIES_REPORT">) {
     const {
       petition_id: templateId,
       timezone,
       start_date: startDate,
       end_date: endDate,
-    } = this.task.input;
+    } = task.input;
 
-    if (!this.task.user_id) {
-      throw new Error(`Task ${this.task.id} is missing user_id`);
+    if (!task.user_id) {
+      throw new Error(`Task ${task.id} is missing user_id`);
     }
 
-    const user = await this.ctx.readonlyUsers.loadUser(this.task.user_id);
+    const user = await this.readonlyUsers.loadUser(task.user_id);
     if (!user) {
-      throw new Error(`User ${this.task.user_id} not found`);
+      throw new Error(`User ${task.user_id} not found`);
     }
 
-    const hasAccess = await this.ctx.readonlyPetitions.userHasAccessToPetitions(this.task.user_id, [
+    const hasAccess = await this.readonlyPetitions.userHasAccessToPetitions(task.user_id, [
       templateId,
     ]);
     if (!hasAccess) {
-      throw new Error(`User ${this.task.user_id} has no access to petition ${templateId}`);
+      throw new Error(`User ${task.user_id} has no access to petition ${templateId}`);
     }
     const [includePreviewUrl, template, templateFields, petitions] = await Promise.all([
-      this.ctx.featureFlags.orgHasFeatureFlag(user.org_id, "TEMPLATE_REPLIES_PREVIEW_URL"),
-      this.ctx.readonlyPetitions.loadPetition(templateId),
-      this.ctx.readonlyPetitions.loadAllFieldsByPetitionId(templateId),
-      this.ctx.readonlyPetitions.getPetitionsForTemplateRepliesReport(
-        templateId,
-        startDate,
-        endDate,
-      ),
+      this.featureFlags.orgHasFeatureFlag(user.org_id, "TEMPLATE_REPLIES_PREVIEW_URL"),
+      this.readonlyPetitions.loadPetition(templateId),
+      this.readonlyPetitions.loadAllFieldsByPetitionId(templateId),
+      this.readonlyPetitions.getPetitionsForTemplateRepliesReport(templateId, startDate, endDate),
     ]);
-    this.info(`Loaded ${petitions.length} petitions`);
+    this.info(templateId, `Loaded ${petitions.length} petitions`);
 
-    const intl = await this.ctx.i18n.getIntl(template!.recipient_locale);
+    const intl = await this.i18n.getIntl(template!.recipient_locale);
 
     const headers = this.buildExcelHeaders(
       includePreviewUrl,
@@ -109,78 +98,77 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     );
     let rows: Record<string, Maybe<string | Date>>[] = [];
 
-    const parallelUrl = this.ctx.config.misc.parallelUrl;
+    const parallelUrl = this.config.misc.parallelUrl;
 
     if (petitions.length > 0) {
       const ids = petitions.map((p) => p.id);
 
       const petitionsAccesses = await pMapChunk(
         ids,
-        async (ids) => await this.ctx.readonlyPetitions.loadAccessesForPetition(ids),
+        async (ids) => await this.readonlyPetitions.loadAccessesForPetition(ids),
         { chunkSize: 200, concurrency: 1 },
       );
 
-      this.info(`Loaded ${petitionsAccesses.length} accesses`);
+      this.info(templateId, `Loaded ${petitionsAccesses.length} accesses`);
 
       const petitionsMessages = await pMapChunk(
         ids,
-        async (ids) => await this.ctx.readonlyPetitions.loadMessagesByPetitionId(ids),
+        async (ids) => await this.readonlyPetitions.loadMessagesByPetitionId(ids),
         { chunkSize: 200, concurrency: 1 },
       );
 
-      this.info(`Loaded ${petitionsMessages.length} messages`);
+      this.info(templateId, `Loaded ${petitionsMessages.length} messages`);
 
       const composedPetitions = await pMapChunk(
         ids,
-        async (ids) => await this.ctx.readonlyPetitions.getComposedPetitionFieldsAndVariables(ids),
+        async (ids) => await this.readonlyPetitions.getComposedPetitionFieldsAndVariables(ids),
         { chunkSize: 200, concurrency: 1 },
       );
 
-      this.info(`Loaded ${composedPetitions.length} composed petitions`);
+      this.info(templateId, `Loaded ${composedPetitions.length} composed petitions`);
 
       const petitionsOwner = await pMapChunk(
         ids,
-        async (ids) => await this.ctx.readonlyPetitions.loadPetitionOwner(ids),
+        async (ids) => await this.readonlyPetitions.loadPetitionOwner(ids),
         { chunkSize: 200, concurrency: 1 },
       );
 
-      this.info(`Loaded ${petitionsOwner.length} petition owners`);
+      this.info(templateId, `Loaded ${petitionsOwner.length} petition owners`);
 
       const petitionsTags = await pMapChunk(
         ids,
-        async (ids) => await this.ctx.readonlyTags.loadTagsByPetitionId(ids),
+        async (ids) => await this.readonlyTags.loadTagsByPetitionId(ids),
         { chunkSize: 200, concurrency: 1 },
       );
 
-      this.info(`Loaded ${petitionsTags.length} tags`);
+      this.info(templateId, `Loaded ${petitionsTags.length} tags`);
 
       const petitionsEvents = await pMapChunk(
         ids,
-        async (ids) => await this.ctx.readonlyPetitions.loadPetitionEventsByPetitionId(ids),
+        async (ids) => await this.readonlyPetitions.loadPetitionEventsByPetitionId(ids),
         { chunkSize: 200, concurrency: 1 },
       );
 
-      this.info(`Loaded ${petitionsEvents.length} events`);
+      this.info(templateId, `Loaded ${petitionsEvents.length} events`);
 
       const latestSignatures = await pMapChunk(
         ids,
-        async (ids) =>
-          await this.ctx.readonlyPetitions.loadLatestPetitionSignatureByPetitionId(ids),
+        async (ids) => await this.readonlyPetitions.loadLatestPetitionSignatureByPetitionId(ids),
         { chunkSize: 200, concurrency: 1 },
       );
 
-      this.info(`Loaded ${latestSignatures.length} signatures`);
+      this.info(templateId, `Loaded ${latestSignatures.length} signatures`);
 
       const petitionsAccessesContacts = await Promise.all(
         petitionsAccesses.map((accesses) =>
-          this.ctx.readonlyContacts.loadContactByAccessId(accesses.map((a) => a.id)),
+          this.readonlyContacts.loadContactByAccessId(accesses.map((a) => a.id)),
         ),
       );
 
-      this.info(`Loaded ${petitionsAccessesContacts.length} contacts`);
+      this.info(templateId, `Loaded ${petitionsAccessesContacts.length} contacts`);
 
       const petitionsOwnerUserData = await Promise.all(
-        petitionsOwner.map((user) => this.ctx.users.loadUserDataByUserId(user!.id)),
+        petitionsOwner.map((user) => this.readonlyUsers.loadUserDataByUserId(user!.id)),
       );
 
       const petitionsFirstMessage = petitionsMessages.reduce(
@@ -194,15 +182,16 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
 
       const petitionsFirstMessageUserData = await Promise.all(
         petitionsFirstMessage.map((m) =>
-          m ? this.ctx.users.loadUserDataByUserId(m.sender_id) : null,
+          m ? this.readonlyUsers.loadUserDataByUserId(m.sender_id) : null,
         ),
       );
 
-      this.info(`Loaded ${petitionsFirstMessageUserData.length} user datas`);
+      this.info(templateId, `Loaded ${petitionsFirstMessageUserData.length} user datas`);
 
       rows = petitions.map((petition, petitionIndex) => {
         if (petitionIndex % 100 === 0) {
           this.info(
+            templateId,
             `about to process petition ${petition.id} (${petitionIndex + 1}/${petitions.length})...`,
           );
         }
@@ -234,7 +223,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           .filter((e) => e.type === "SIGNATURE_COMPLETED")
           .at(-1);
 
-        const latestSignatureStatus = getPetitionSignatureStatus({
+        const latestSignatureStatus = this.getPetitionSignatureStatus({
           status: petition.status!,
           currentSignatureRequest: latestSignatures[petitionIndex],
           signatureConfig: petition.signature_config,
@@ -427,10 +416,10 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       });
     }
 
-    this.info("exporting data to excel...");
+    this.info(templateId, "exporting data to excel...");
     const stream = await this.exportToExcel(headers, rows);
 
-    this.info("uploading excel file to temporary bucket...");
+    this.info(templateId, "uploading excel file to temporary bucket...");
     const tmpFile = await this.uploadTemporaryFile({
       stream,
       filename: intl.formatMessage(
@@ -633,5 +622,43 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     }
 
     return headers;
+  }
+
+  private getPetitionSignatureStatus({
+    status,
+    currentSignatureRequest,
+    signatureConfig,
+  }: {
+    status: PetitionStatus;
+    currentSignatureRequest?: PetitionSignatureRequest | null;
+    signatureConfig: PetitionSignatureConfig | null;
+  }) {
+    if (
+      signatureConfig?.isEnabled &&
+      ["COMPLETED", "CLOSED"].includes(status) &&
+      (!currentSignatureRequest ||
+        currentSignatureRequest.status === "COMPLETED" ||
+        currentSignatureRequest.cancel_reason === "CANCELLED_BY_USER")
+    ) {
+      // petition is completed and configured to be reviewed before starting signature
+      // and signature was never started or the last one is already completed (now we're starting a new request)
+      // this means the user has to manually trigger the start of the signature request
+      return "PENDING_START";
+    }
+
+    if (isNonNullish(currentSignatureRequest)) {
+      // signature request is already started, return the current status
+      if (["ENQUEUED", "PROCESSING", "PROCESSED"].includes(currentSignatureRequest.status)) {
+        return "PROCESSING";
+      } else {
+        return currentSignatureRequest.status as "COMPLETED" | "CANCELLED";
+      }
+    } else if (signatureConfig?.isEnabled && ["DRAFT", "PENDING"].includes(status)) {
+      // petition has signature configured but it's not yet completed
+      return "NOT_STARTED";
+    }
+
+    // petition doesn't have signature configured and never started a signature request
+    return "NO_SIGNATURE";
   }
 }

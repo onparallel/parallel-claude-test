@@ -1,39 +1,67 @@
 import stringify from "fast-safe-stringify";
+import { inject, injectable } from "inversify";
 import pMap from "p-map";
 import { groupBy, isDeepEqual, isNonNullish, isNullish, pick, zip } from "remeda";
 import { assert } from "ts-essentials";
-import { CreatePetitionFieldReply, PetitionFieldReply } from "../../db/__types";
+import { Config, CONFIG } from "../../../config";
+import { CreatePetitionFieldReply, PetitionFieldReply } from "../../../db/__types";
+import { FileRepository } from "../../../db/repositories/FileRepository";
+import { PetitionRepository } from "../../../db/repositories/PetitionRepository";
+import { Task, TaskRepository } from "../../../db/repositories/TaskRepository";
 import {
+  BANKFLIP_SERVICE,
+  BankflipService,
   ModelRequest,
   ModelRequestDocument,
   ModelRequestOutcome,
   SessionMetadata,
   SessionSummaryResponse,
-} from "../../services/BankflipService";
-import { fromGlobalId, toGlobalId } from "../../util/globalId";
-import { pFlatMap } from "../../util/promises/pFlatMap";
-import { random } from "../../util/token";
-import { TaskRunner } from "../helpers/TaskRunner";
+} from "../../../services/BankflipService";
+import { ILogger, LOGGER } from "../../../services/Logger";
+import {
+  IOrganizationCreditsService,
+  ORGANIZATION_CREDITS_SERVICE,
+} from "../../../services/OrganizationCreditsService";
+import { IStorageService, STORAGE_SERVICE } from "../../../services/StorageService";
+import { fromGlobalId, toGlobalId } from "../../../util/globalId";
+import { pFlatMap } from "../../../util/promises/pFlatMap";
+import { random } from "../../../util/token";
+import { TaskRunner } from "../../helpers/TaskRunner";
 
+@injectable()
 export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION_COMPLETED"> {
-  async run() {
+  constructor(
+    @inject(BANKFLIP_SERVICE) private bankflip: BankflipService,
+    @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: IOrganizationCreditsService,
+    @inject(PetitionRepository) private petitions: PetitionRepository,
+    // ---- EXTENDS ---- //
+    @inject(LOGGER) logger: ILogger,
+    @inject(CONFIG) config: Config,
+    @inject(TaskRepository) tasks: TaskRepository,
+    @inject(FileRepository) files: FileRepository,
+    @inject(STORAGE_SERVICE) storage: IStorageService,
+  ) {
+    super(logger, config, tasks, files, storage);
+  }
+
+  async run(task: Task<"BANKFLIP_SESSION_COMPLETED">) {
     const {
       bankflip_session_id: sessionId,
       org_id: orgId,
       update_errors: updateErrors,
-    } = this.task.input;
-    const metadata = await this.ctx.bankflip.fetchSessionMetadata(
+    } = task.input;
+    const metadata = await this.bankflip.fetchSessionMetadata(
       toGlobalId("Organization", orgId),
       sessionId,
     );
     const petitionId = fromGlobalId(metadata.petitionId, "Petition").id;
     const userId = "userId" in metadata ? fromGlobalId(metadata.userId, "User").id : null;
 
-    const summary = await this.ctx.bankflip.fetchSessionSummary(metadata.orgId, sessionId);
+    const summary = await this.bankflip.fetchSessionSummary(metadata.orgId, sessionId);
 
     try {
       if (isNonNullish(userId)) {
-        await this.ctx.orgCredits.ensurePetitionHasConsumedCredit(petitionId, `User:${userId}`);
+        await this.orgCredits.ensurePetitionHasConsumedCredit(petitionId, `User:${userId}`);
       }
 
       if (updateErrors) {
@@ -84,7 +112,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
 
     const errorContents: any[] = [];
     if (isNonNullish(summary.identityVerification)) {
-      const field = await this.ctx.petitions.loadField(fieldId);
+      const field = await this.petitions.loadField(fieldId);
       if (isNonNullish(field?.options.identityVerification)) {
         errorContents.push({
           file_upload_id: null,
@@ -105,7 +133,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     );
 
     if (errorContents.length > 0) {
-      await this.ctx.petitions.createPetitionFieldReply(
+      await this.petitions.createPetitionFieldReply(
         petitionId,
         errorContents.map((content) => ({
           petition_field_id: fieldId,
@@ -139,7 +167,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
 
     // fetch replies with request that have previously errored
     // and try to update their content with the new data
-    const fieldReplies = (await this.ctx.petitions.loadRepliesForField(fieldId)).filter(
+    const fieldReplies = (await this.petitions.loadRepliesForField(fieldId)).filter(
       (r) => r.parent_petition_field_reply_id === parentReplyId && r.status !== "APPROVED",
     );
 
@@ -218,7 +246,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     fillRepliesArrays(modelRequestErrorReplies, modelRequestNewDocuments);
 
     if (updateRepliesData.length > 0) {
-      await this.ctx.petitions.updatePetitionFieldRepliesContent(
+      await this.petitions.updatePetitionFieldRepliesContent(
         petitionId,
         updateRepliesData,
         isNonNullish(userId) ? "User" : "PetitionAccess",
@@ -227,7 +255,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     }
 
     if (newRepliesData.length > 0) {
-      await this.ctx.petitions.createPetitionFieldReply(
+      await this.petitions.createPetitionFieldReply(
         petitionId,
         newRepliesData.map((data) => ({
           petition_field_id: fieldId,
@@ -278,7 +306,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     const replies = [...idVerificationReplies, ...modelRequestReplies];
 
     if (replies.length > 0) {
-      await this.ctx.petitions.createPetitionFieldReply(
+      await this.petitions.createPetitionFieldReply(
         petitionId,
         replies.map((data) => ({
           petition_field_id: fieldId,
@@ -348,19 +376,15 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
 
         const pdfBuffers = await pMap(
           documents.pdf,
-          async ({ id }) => await this.ctx.bankflip.fetchBinaryDocumentContents(metadata.orgId, id),
+          async ({ id }) => await this.bankflip.fetchBinaryDocumentContents(metadata.orgId, id),
           { concurrency: 1 },
         );
 
         const results: Pick<CreatePetitionFieldReply, "content" | "metadata">[] = [];
         for (const [request, pdfBuffer] of zip(documents.pdf, pdfBuffers)) {
           const path = random(16);
-          const res = await this.ctx.storage.fileUploads.uploadFile(
-            path,
-            "application/pdf",
-            pdfBuffer,
-          );
-          const [file] = await this.ctx.files.createFileUpload(
+          const res = await this.storage.fileUploads.uploadFile(path, "application/pdf", pdfBuffer);
+          const [file] = await this.files.createFileUpload(
             {
               path,
               content_type: "application/pdf",
@@ -379,7 +403,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
             request.model.type === "CARP_CIUD_CERT_CATASTRO"
               ? null
               : documents.json.length === 1
-                ? await this.ctx.bankflip.fetchJsonDocumentContents(
+                ? await this.bankflip.fetchJsonDocumentContents(
                     metadata.orgId,
                     documents.json[0].id,
                   )
@@ -408,7 +432,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     createdBy: string,
   ): Promise<Pick<CreatePetitionFieldReply, "content" | "metadata">[]> {
     const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
-    const field = await this.ctx.petitions.loadField(fieldId);
+    const field = await this.petitions.loadField(fieldId);
     if (!field) {
       return [];
     }
@@ -429,7 +453,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
 
     assert(isNonNullish(idVerification.id), "idVerification.id expected to be non-null");
 
-    const idVerificationSummary = await this.ctx.bankflip.fetchIdVerificationSummary(
+    const idVerificationSummary = await this.bankflip.fetchIdVerificationSummary(
       metadata.orgId,
       idVerification.id,
     );
@@ -451,7 +475,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
           };
         }
 
-        const documentBuffer = await this.ctx.bankflip.fetchBinaryDocumentContents(
+        const documentBuffer = await this.bankflip.fetchBinaryDocumentContents(
           metadata.orgId,
           doc.imagesDocument.id,
         );
@@ -477,7 +501,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
         ]);
 
         const path = random(16);
-        const res = await this.ctx.storage.fileUploads.uploadFile(
+        const res = await this.storage.fileUploads.uploadFile(
           path,
           doc.imagesDocument.contentType,
           documentBuffer,
@@ -495,7 +519,7 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
               .replace(/\s/g, "_")}`
           : doc.imagesDocument.name;
 
-        const [file] = await this.ctx.files.createFileUpload(
+        const [file] = await this.files.createFileUpload(
           {
             path,
             content_type: doc.imagesDocument.contentType,
@@ -538,18 +562,18 @@ export class BankflipSessionCompletedRunner extends TaskRunner<"BANKFLIP_SESSION
     replies.push(...documentReplies);
 
     if (isNonNullish(idVerificationSummary.selfie?.videoDocument)) {
-      const videoBuffer = await this.ctx.bankflip.fetchBinaryDocumentContents(
+      const videoBuffer = await this.bankflip.fetchBinaryDocumentContents(
         metadata.orgId,
         idVerificationSummary.selfie.videoDocument.id,
       );
 
       const path = random(16);
-      const res = await this.ctx.storage.fileUploads.uploadFile(
+      const res = await this.storage.fileUploads.uploadFile(
         path,
         idVerificationSummary.selfie.videoDocument.contentType,
         videoBuffer,
       );
-      const [file] = await this.ctx.files.createFileUpload(
+      const [file] = await this.files.createFileUpload(
         {
           path,
           content_type: idVerificationSummary.selfie.videoDocument.contentType,

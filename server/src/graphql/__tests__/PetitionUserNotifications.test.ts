@@ -1,6 +1,5 @@
 import gql from "graphql-tag";
 import { Knex } from "knex";
-import { WorkerContext } from "../../context";
 import {
   Organization,
   Petition,
@@ -12,8 +11,9 @@ import {
 import { KNEX } from "../../db/knex";
 import { PetitionUserNotification } from "../../db/notifications";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
+import { Task } from "../../db/repositories/TaskRepository";
 import { toGlobalId } from "../../util/globalId";
-import { PetitionSharingRunner } from "../../workers/tasks/PetitionSharingRunner";
+import { PetitionSharingRunner } from "../../workers/queues/task-runners/PetitionSharingRunner";
 import { TestClient, initServer } from "./server";
 
 describe("GraphQL - PetitionUserNotifications", () => {
@@ -710,12 +710,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       })
       .returning("*");
 
-    const runner = new PetitionSharingRunner(
-      testClient.container.get<WorkerContext>(WorkerContext),
-      task as any,
-    );
-
-    await runner.run();
+    await testClient.container.get(PetitionSharingRunner).run(task as Task<"PETITION_SHARING">);
 
     const { data, errors } = await testClient.query({
       query: gql`
@@ -780,12 +775,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       })
       .returning("*");
 
-    const runner = new PetitionSharingRunner(
-      testClient.container.get<WorkerContext>(WorkerContext),
-      task as any,
-    );
-
-    await runner.run();
+    await testClient.container.get(PetitionSharingRunner).run(task as Task<"PETITION_SHARING">);
 
     const { data, errors } = await testClient.query({
       query: gql`
@@ -848,12 +838,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       })
       .returning("*");
 
-    const runner = new PetitionSharingRunner(
-      testClient.container.get<WorkerContext>(WorkerContext),
-      task as any,
-    );
-
-    await runner.run();
+    await testClient.container.get(PetitionSharingRunner).run(task as Task<"PETITION_SHARING">);
 
     const { data, errors } = await testClient.query({
       query: gql`
