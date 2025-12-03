@@ -5828,6 +5828,11 @@
   dependencies:
     "@opentelemetry/core" "^1.1.0"
 
+"@pinojs/redact@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@pinojs/redact/-/redact-0.4.0.tgz#c3de060dd12640dcc838516aa2a6803cc7b2e9d6"
+  integrity sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg==
+
 "@pkgjs/parseargs@^0.11.0":
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
@@ -9623,6 +9628,15 @@
   integrity sha512-dbLksz7FEwyFoANbpIlNnd3bVm0clQSUsnP8yUVQucStZPsuWjCrhL2jlAbGNrTrahX96ntUMXHb/sM68TibFg==
   dependencies:
     "@zag-js/dom-query" "0.31.1"
+
+"@zone-eu/mailsplit@5.4.7":
+  version "5.4.7"
+  resolved "https://registry.yarnpkg.com/@zone-eu/mailsplit/-/mailsplit-5.4.7.tgz#ad86fe08222883418f33cf02d57025de02d2eb38"
+  integrity sha512-jApX86aDgolMz08pP20/J2zcns02NSK3zSiYouf01QQg4250L+GUAWSWicmS7eRvs+Z7wP7QfXrnkaTBGrIpwQ==
+  dependencies:
+    libbase64 "1.3.0"
+    libmime "5.3.7"
+    libqp "2.1.1"
 
 abbrev@1:
   version "1.1.1"
@@ -14312,7 +14326,7 @@ image-size@^1.0.0:
   dependencies:
     queue "6.0.2"
 
-imapflow@*, imapflow@^1.0.199:
+imapflow@*:
   version "1.0.199"
   resolved "https://registry.yarnpkg.com/imapflow/-/imapflow-1.0.199.tgz#f12f2c7a9e4fa68c5210e44b42ca214be91f1f01"
   integrity sha512-MIRgVg+LrBmPo8I1iAmSFrrft2RjrFQvsShr9MTzcX5vU6ztHOaQbz4obm1j+Y6nwhhI1npKfVzZkZ7cGyxzxg==
@@ -14325,6 +14339,21 @@ imapflow@*, imapflow@^1.0.199:
     mailsplit "5.4.6"
     nodemailer "7.0.9"
     pino "10.0.0"
+    socks "2.8.7"
+
+imapflow@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/imapflow/-/imapflow-1.1.1.tgz#00848b95f55e04140467ba011df6e8d5f1179026"
+  integrity sha512-cgK0eGagmw8C3pY6IiVLSF52N4bwvNRJ7mog4bdZOTafG90yNgUkShQBjo4/CRqvl/isPcaV1Gc0OmFBdXF0HQ==
+  dependencies:
+    "@zone-eu/mailsplit" "5.4.7"
+    encoding-japanese "2.2.0"
+    iconv-lite "0.7.0"
+    libbase64 "1.3.0"
+    libmime "5.3.7"
+    libqp "2.1.1"
+    nodemailer "7.0.10"
+    pino "10.1.0"
     socks "2.8.7"
 
 imask@^7.6.1:
@@ -16174,21 +16203,21 @@ magic-string@^0.30.0, magic-string@^0.30.3, magic-string@^0.30.5:
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.5.0"
 
-mailparser@^3.7.5:
-  version "3.7.5"
-  resolved "https://registry.yarnpkg.com/mailparser/-/mailparser-3.7.5.tgz#f1a3f04c58be8bf2a20e26506b56fbbabf416345"
-  integrity sha512-o59RgZC+4SyCOn4xRH1mtRiZ1PbEmi6si6Ufnd3tbX/V9zmZN1qcqu8xbXY62H6CwIclOT3ppm5u/wV2nujn4g==
+mailparser@^3.9.0:
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/mailparser/-/mailparser-3.9.0.tgz#3b71732a26aa7c3390cd39540713eed7daf0aa2c"
+  integrity sha512-jpaNLhDjwy0w2f8sySOSRiWREjPqssSc0C2czV98btCXCRX3EyNloQ2IWirmMDj1Ies8Fkm0l96bZBZpDG7qkg==
   dependencies:
+    "@zone-eu/mailsplit" "5.4.7"
     encoding-japanese "2.2.0"
     he "1.2.0"
     html-to-text "9.0.5"
     iconv-lite "0.7.0"
     libmime "5.3.7"
     linkify-it "5.0.0"
-    mailsplit "5.4.6"
-    nodemailer "7.0.9"
+    nodemailer "7.0.10"
     punycode.js "2.3.1"
-    tlds "1.260.0"
+    tlds "1.261.0"
 
 mailsplit@5.4.6:
   version "5.4.6"
@@ -17099,12 +17128,7 @@ node-source-walk@^7.0.0:
   dependencies:
     "@babel/parser" "^7.24.4"
 
-nodemailer@7.0.9:
-  version "7.0.9"
-  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-7.0.9.tgz#fe5abd4173e08e01aa243c7cddd612ad8c6ccc18"
-  integrity sha512-9/Qm0qXIByEP8lEV2qOqcAW7bRpL8CR9jcTwk3NBnHJNmP9fIJ86g2fgmIXqHY+nj55ZEMwWqYAT2QTDpRUYiQ==
-
-nodemailer@^7.0.11:
+nodemailer@7.0.10, nodemailer@7.0.11, nodemailer@7.0.9, nodemailer@^7.0.11:
   version "7.0.11"
   resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-7.0.11.tgz#5f7b06afaec20073cff36bea92d1c7395cc3e512"
   integrity sha512-gnXhNRE0FNhD7wPSCGhdNh46Hs6nm+uTyg+Kq0cZukNQiYdnCsoQjodNP9BQVG9XrcK/v6/MgpAPBUFyzh9pvw==
@@ -17939,6 +17963,23 @@ pino@10.0.0:
     real-require "^0.2.0"
     safe-stable-stringify "^2.3.1"
     slow-redact "^0.3.0"
+    sonic-boom "^4.0.1"
+    thread-stream "^3.0.0"
+
+pino@10.1.0:
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/pino/-/pino-10.1.0.tgz#eb2a8a5b509fe4c75643ccec30461ea24766003a"
+  integrity sha512-0zZC2ygfdqvqK8zJIr1e+wT1T/L+LF6qvqvbzEQ6tiMAoTqEVK9a1K3YRu8HEUvGEvNqZyPJTtb2sNIoTkB83w==
+  dependencies:
+    "@pinojs/redact" "^0.4.0"
+    atomic-sleep "^1.0.0"
+    on-exit-leak-free "^2.1.0"
+    pino-abstract-transport "^2.0.0"
+    pino-std-serializers "^7.0.0"
+    process-warning "^5.0.0"
+    quick-format-unescaped "^4.0.3"
+    real-require "^0.2.0"
+    safe-stable-stringify "^2.3.1"
     sonic-boom "^4.0.1"
     thread-stream "^3.0.0"
 
@@ -20451,10 +20492,10 @@ title-case@^3.0.3:
   dependencies:
     tslib "^2.0.3"
 
-tlds@1.260.0:
-  version "1.260.0"
-  resolved "https://registry.yarnpkg.com/tlds/-/tlds-1.260.0.tgz#666c2584cf627b4296e888b799ec341be42821ac"
-  integrity sha512-78+28EWBhCEE7qlyaHA9OR3IPvbCLiDh3Ckla593TksfFc9vfTsgvH7eS+dr3o9qr31gwGbogcI16yN91PoRjQ==
+tlds@1.261.0:
+  version "1.261.0"
+  resolved "https://registry.yarnpkg.com/tlds/-/tlds-1.261.0.tgz#055e412e92f01f84a9c8ac0504d3472d68b3c4c9"
+  integrity sha512-QXqwfEl9ddlGBaRFXIvNKK6OhipSiLXuRuLJX5DErz0o0Q0rYxulWLdFryTkV5PkdZct5iMInwYEGe/eR++1AA==
 
 tmp@0.2.4, tmp@^0.0.33, tmp@^0.2.0, tmp@^0.2.5:
   version "0.2.4"
