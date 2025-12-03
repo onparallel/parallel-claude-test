@@ -2,30 +2,47 @@ import "reflect-metadata";
 // keep this space to prevent import sorting, removing init from top
 import { CronJob } from "cron";
 import { EventEmitter } from "events";
+import { ContainerModule } from "inversify";
 import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
-import { WorkerContext } from "../../context";
 import { ILogger, LOGGER } from "../../services/Logger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
 
+export abstract class CronWorker<Q extends keyof Config["cronWorkers"]> {
+  abstract handler(config: Config["cronWorkers"][Q]): Promise<void>;
+}
+
+interface CronWorkerOptions {
+  additionalModules?: ContainerModule[];
+}
+
 export async function createCronWorker<Q extends keyof Config["cronWorkers"]>(
   name: Q,
-  handler: (context: WorkerContext, config: Config["cronWorkers"][Q]) => Promise<void>,
+  workerImplementation: new (...args: any[]) => CronWorker<Q>,
+  options?: CronWorkerOptions,
 ) {
   await loadEnv(`.${name}.env`);
 
+  const { additionalModules } = {
+    additionalModules: [],
+    ...options,
+  };
+
   const container = createContainer();
   const config = container.get<Config>(CONFIG);
+  additionalModules.forEach((module) => container.load(module));
+  container.bind(workerImplementation).toSelf();
   yargs
     .command(
       "run",
       "Run once",
       () => {},
       async () => {
+        const worker = container.get<CronWorker<Q>>(workerImplementation);
         try {
-          await handler(container.get<WorkerContext>(WorkerContext), config["cronWorkers"][name]);
+          await worker.handler(config["cronWorkers"][name]);
         } catch (error: any) {
           console.log(error);
           process.exit(1);
@@ -45,11 +62,9 @@ export async function createCronWorker<Q extends keyof Config["cronWorkers"]>(
           try {
             running = true;
             logger.info(`Cron ${name}: Execution start`);
+            const worker = container.get<CronWorker<Q>>(workerImplementation);
             const duration = await stopwatch(async () => {
-              await handler(
-                container.get<WorkerContext>(WorkerContext),
-                config["cronWorkers"][name],
-              );
+              await worker.handler(config["cronWorkers"][name]);
             });
             const nextExecution = job.nextDate().toISO();
             logger.info(
